@@ -1,0 +1,38 @@
+.drop-target {
+  position: relative;
+
+  .drop-target-dropzone {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 100%;
+    width: 100%;
+    z-index: 10000;
+  }
+
+  .drop-target-selection {
+    position: relative;
+    pointer-events: none;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(255, 0, 0, 0.5);
+
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
+
+    &.left {
+      width: 50%;
+    }
+    &.right {
+      left: 50%;
+      width: 50%;
+    }
+    &.bottom {
+      top: 50%;
+      height: 50%;
+    }
+    &.top {
+      height: 50%;
+    }
+  }
+}

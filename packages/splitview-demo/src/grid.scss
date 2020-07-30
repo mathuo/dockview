@@ -1,0 +1,33 @@
+.header {
+  padding-left: 10px;
+  display: flex;
+
+  span {
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+}
+
+.my-tab {
+  &.my-active-tab {
+    .tab-list {
+      visibility: visible;
+    }
+  }
+
+  &.my-inactive-tab {
+    .tab-list {
+      visibility: hidden;
+    }
+    &:hover {
+      .tab-list {
+        visibility: visible;
+      }
+    }
+  }
+
+  a:active {
+    -webkit-mask-size: 100% 100% !important;
+    mask-size: 100% 100% !important;
+  }
+}

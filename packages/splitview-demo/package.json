@@ -1,0 +1,22 @@
+{
+  "name": "splitview-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "../../node_modules/.bin/webpack --config webpack.config.js",
+    "start": "../../node_modules/.bin/webpack-dev-server --config webpack.config.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "splitview": "^1.0.0",
+    "splitview-react": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.41",
+    "@types/react-dom": "^16.9.8"
+  }
+}

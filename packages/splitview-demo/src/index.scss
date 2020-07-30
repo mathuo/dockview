@@ -1,0 +1,20 @@
+@import "~splitview/dist/splitview/splitview.css";
+@import "~splitview/dist/splitview/paneview.css";
+@import "~splitview/dist/gridview/gridview.css";
+@import "~splitview/dist/layout/layout.css";
+@import "~splitview/dist/groupview/groupview.css";
+@import "~splitview/dist/groupview/droptarget/droptarget.css";
+
+body {
+  margin: 0;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  overflow: hidden;
+}
+
+*,
+*::after,
+*::before {
+  // -webkit-user-drag: none;
+  -webkit-app-region: no-drag;
+  -webkit-user-select: none;
+}

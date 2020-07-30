@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "baseUrl": "./packages",
+    "paths": {
+      "splitview-react": ["splitview-react/src"],
+      "splitview": ["splitview/src"],
+      "splitview-demo": ["splitview-demo/src"]
+    }
+  }
+}

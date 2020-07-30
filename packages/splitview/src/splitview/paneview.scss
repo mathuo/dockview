@@ -1,0 +1,41 @@
+.pane-container {
+  &.animated {
+    .view {
+      transition-duration: 0.15s;
+      transition-timing-function: ease-out;
+    }
+  }
+  .view {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    &:not(:first-child)::before {
+      background-color: transparent !important;
+    }
+  }
+
+  .pane {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .pane-header {
+      background-color: #383838;
+      color: white;
+
+      &:focus,
+      :focus-within {
+        outline-width: 1px;
+        outline-style: solid;
+        outline-offset: -1px;
+        opacity: 1 !important;
+        outline-color: dodgerblue;
+      }
+    }
+    .pane-body {
+      overflow: auto;
+      background-color: #252526;
+    }
+  }
+}
