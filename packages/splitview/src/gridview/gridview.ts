@@ -1,8 +1,52 @@
-import { Orientation, SplitView } from "../splitview/splitview";
-import { Emitter, Event } from "../events";
-import { IView as ISplitviewView } from "../splitview/splitview";
+import { Orientation, Sizing } from "../splitview/splitview";
 import { Target } from "../groupview/droptarget/droptarget";
 import { tail } from "../array";
+import { LeafNode } from "./leafNode";
+import { BranchNode } from "./branchNode";
+import { Node } from "./types";
+import { Emitter, Event } from "../events";
+import { IDisposable } from "../types";
+
+function flipNode<T extends Node>(
+  node: T,
+  size: number,
+  orthogonalSize: number
+): T {
+  if (node instanceof BranchNode) {
+    const result = new BranchNode(
+      orthogonal(node.orientation),
+      size,
+      orthogonalSize
+    );
+
+    let totalSize = 0;
+
+    for (let i = node.children.length - 1; i >= 0; i--) {
+      const child = node.children[i];
+      const childSize =
+        child instanceof BranchNode ? child.orthogonalSize : child.size;
+
+      let newSize =
+        node.size === 0 ? 0 : Math.round((size * childSize) / node.size);
+      totalSize += newSize;
+
+      // The last view to add should adjust to rounding errors
+      if (i === 0) {
+        newSize += size - totalSize;
+      }
+
+      result.addChild(flipNode(child, orthogonalSize, newSize), newSize, 0);
+    }
+
+    return result as T;
+  } else {
+    return new LeafNode(
+      (node as LeafNode).view,
+      orthogonal(node.orientation),
+      orthogonalSize
+    ) as T;
+  }
+}
 
 export function indexInParent(element: HTMLElement): number {
   const parentElement = element.parentElement;
@@ -89,274 +133,191 @@ export interface IGridView {
   readonly minimumHeight: number;
   readonly maximumHeight: number;
   layout(width: number, height: number, top: number, left: number): void;
+  toJSON?(): object;
+  fromJSON?(json: object): void;
 }
-
-class LeafNode implements ISplitviewView {
-  private readonly _onDidChange = new Emitter<number | undefined>();
-  readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
-  private _size: number;
-  private _orthogonalSize: number;
-
-  private get minimumWidth(): number {
-    return this.view.minimumWidth;
-  }
-
-  private get maximumWidth(): number {
-    return this.view.maximumWidth;
-  }
-
-  private get minimumHeight(): number {
-    return this.view.minimumHeight;
-  }
-
-  private get maximumHeight(): number {
-    return this.view.maximumHeight;
-  }
-
-  get minimumSize(): number {
-    return this.orientation === Orientation.HORIZONTAL
-      ? this.minimumHeight
-      : this.minimumWidth;
-  }
-
-  get maximumSize(): number {
-    return this.orientation === Orientation.HORIZONTAL
-      ? this.maximumHeight
-      : this.maximumWidth;
-  }
-
-  get minimumOrthogonalSize(): number {
-    return this.orientation === Orientation.HORIZONTAL
-      ? this.minimumWidth
-      : this.minimumHeight;
-  }
-
-  get maximumOrthogonalSize(): number {
-    return this.orientation === Orientation.HORIZONTAL
-      ? this.maximumWidth
-      : this.maximumHeight;
-  }
-
-  get orthogonalSize() {
-    return this._orthogonalSize;
-  }
-
-  get size() {
-    return this._size;
-  }
-
-  get element() {
-    return this.view.element;
-  }
-
-  constructor(
-    public readonly view: IGridView,
-    readonly orientation: Orientation,
-    orthogonalSize: number,
-    size: number = 0
-  ) {}
-
-  public layout(size: number, orthogonalSize: number) {
-    this._size = size;
-    this._orthogonalSize = orthogonalSize;
-  }
-}
-
-class BranchNode implements ISplitviewView {
-  readonly element: HTMLElement;
-  private splitview: SplitView;
-  private _orthogonalSize: number;
-  private _size: number;
-  public readonly children: Node[] = [];
-
-  private readonly _onDidChange = new Emitter<number | undefined>();
-  readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
-
-  get width(): number {
-    return this.orientation === Orientation.HORIZONTAL
-      ? this.size
-      : this.orthogonalSize;
-  }
-
-  get height(): number {
-    return this.orientation === Orientation.HORIZONTAL
-      ? this.orthogonalSize
-      : this.size;
-  }
-
-  get minimumSize(): number {
-    return this.children.length === 0
-      ? 0
-      : Math.max(...this.children.map((c) => c.minimumOrthogonalSize));
-  }
-
-  get maximumSize(): number {
-    return Math.min(...this.children.map((c) => c.maximumOrthogonalSize));
-  }
-
-  get minimumOrthogonalSize(): number {
-    return this.splitview.minimumSize;
-  }
-
-  get maximumOrthogonalSize(): number {
-    return this.splitview.maximumSize;
-  }
-
-  get orthogonalSize() {
-    return this._orthogonalSize;
-  }
-
-  get size() {
-    return this._size;
-  }
-
-  get minimumWidth(): number {
-    return this.orientation === Orientation.HORIZONTAL
-      ? this.minimumOrthogonalSize
-      : this.minimumSize;
-  }
-
-  get minimumHeight(): number {
-    return this.orientation === Orientation.HORIZONTAL
-      ? this.minimumSize
-      : this.minimumOrthogonalSize;
-  }
-
-  get maximumWidth(): number {
-    return this.orientation === Orientation.HORIZONTAL
-      ? this.maximumOrthogonalSize
-      : this.maximumSize;
-  }
-
-  get maximumHeight(): number {
-    return this.orientation === Orientation.HORIZONTAL
-      ? this.maximumSize
-      : this.maximumOrthogonalSize;
-  }
-
-  constructor(
-    readonly orientation: Orientation,
-    orthogonalSize: number,
-    size: number = 0
-  ) {
-    this._orthogonalSize = orthogonalSize;
-    this._size = size;
-    this.element = document.createElement("div");
-    this.element.className = "branch-node";
-
-    this.splitview = new SplitView(this.element, {
-      orientation: this.orientation,
-    });
-    this.splitview.layout(this.size, this.orthogonalSize);
-  }
-
-  moveChild(from: number, to: number): void {
-    if (from === to) {
-      return;
-    }
-
-    if (from < 0 || from >= this.children.length) {
-      throw new Error("Invalid from index");
-    }
-
-    // to = clamp(to, 0, this.children.length);
-
-    if (from < to) {
-      to--;
-    }
-
-    this.splitview.moveView(from, to);
-
-    const child = this._removeChild(from);
-    this._addChild(child, to);
-  }
-
-  getChildSize(index: number): number {
-    if (index < 0 || index >= this.children.length) {
-      throw new Error("Invalid index");
-    }
-
-    return this.splitview.getViewSize(index);
-  }
-
-  resizeChild(index: number, size: number): void {
-    if (index < 0 || index >= this.children.length) {
-      throw new Error("Invalid index");
-    }
-
-    this.splitview.resizeView(index, size);
-  }
-
-  public layout(size: number, orthogonalSize: number) {
-    this._size = orthogonalSize;
-    this._orthogonalSize = size;
-
-    this.splitview.layout(this.size, this.orthogonalSize);
-  }
-
-  public addChild(node: Node, size: number, index: number): void {
-    if (index < 0 || index > this.children.length) {
-      throw new Error("Invalid index");
-    }
-
-    this.splitview.addView(node, size, index);
-    this._addChild(node, index);
-  }
-
-  public removeChild(index: number) {
-    if (index < 0 || index >= this.children.length) {
-      throw new Error("Invalid index");
-    }
-
-    this.splitview.removeView(index);
-    this._removeChild(index);
-  }
-
-  private _addChild(node: Node, index: number): void {
-    this.children.splice(index, 0, node);
-  }
-
-  private _removeChild(index: number): Node {
-    const first = index === 0;
-    const last = index === this.children.length - 1;
-    const [child] = this.children.splice(index, 1);
-
-    return child;
-  }
-}
-
-type Node = BranchNode | LeafNode;
 
 const orthogonal = (orientation: Orientation) =>
   orientation === Orientation.HORIZONTAL
     ? Orientation.VERTICAL
     : Orientation.HORIZONTAL;
 
+const serializeLeafNode = (node: LeafNode) => {
+  const size =
+    node.orientation === Orientation.HORIZONTAL
+      ? node.size
+      : node.orthogonalSize;
+  return {
+    size: node.size,
+    data: node.view.toJSON ? node.view.toJSON() : {},
+    type: "leaf",
+  };
+};
+
+const serializeBranchNode = (node: BranchNode) => {
+  const size =
+    node.orientation === Orientation.HORIZONTAL
+      ? node.size
+      : node.orthogonalSize;
+
+  return {
+    orientation: node.orientation,
+    size,
+    data: node.children.map((child) => {
+      if (child instanceof LeafNode) {
+        return serializeLeafNode(child);
+      }
+      return serializeBranchNode(child as BranchNode);
+    }),
+    type: "branch",
+  };
+};
+
+export interface ISerializedLeafNode {
+  type: "leaf";
+  data: any;
+  size: number;
+  visible?: boolean;
+}
+
+export interface ISerializedBranchNode {
+  type: "branch";
+  data: ISerializedNode[];
+  size: number;
+}
+
+export type ISerializedNode = ISerializedLeafNode | ISerializedBranchNode;
+
+export interface INodeDescriptor {
+  node: Node;
+  visible?: boolean;
+}
+
+export type IViewDeserializer = {
+  fromJSON: (data: {}) => IGridView;
+};
+
 export class Gridview {
   private _root: BranchNode;
   public readonly element: HTMLElement;
+
+  private readonly _onDidChange = new Emitter<number | undefined>();
+  readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
+
+  public serialize() {
+    return {
+      root: serializeBranchNode(this.root),
+      height: this.height,
+      width: this.width,
+      orientation: this.orientation,
+    };
+  }
+
+  public dispose() {
+    this.root.dispose();
+  }
+
+  public clear() {
+    this.root.dispose();
+    this.root = new BranchNode(Orientation.HORIZONTAL, 0, 0);
+  }
+
+  public deserialize(json: any, deserializer: IViewDeserializer) {
+    const orientation = json.orientation;
+    const height = json.height;
+
+    // const result = new Gridview();
+    this.orientation = orientation;
+    this._deserialize(
+      json.root as ISerializedBranchNode,
+      orientation,
+      deserializer,
+      height
+    );
+
+    // return result;
+  }
+
+  private _deserialize(
+    root: ISerializedBranchNode,
+    orientation: Orientation,
+    deserializer: IViewDeserializer,
+    orthogonalSize: number
+  ): void {
+    this.root = this._deserializeNode(
+      root,
+      orientation,
+      deserializer,
+      orthogonalSize
+    ) as BranchNode;
+  }
+
+  private _deserializeNode(
+    node: ISerializedNode,
+    orientation: Orientation,
+    deserializer: IViewDeserializer,
+    orthogonalSize: number
+  ): Node {
+    let result: Node;
+    if (node.type === "branch") {
+      const serializedChildren = node.data as ISerializedNode[];
+      const children = serializedChildren.map((serializedChild) => {
+        return {
+          node: this._deserializeNode(
+            serializedChild,
+            orthogonal(orientation),
+            deserializer,
+            node.size
+          ),
+        } as INodeDescriptor;
+      });
+
+      result = new BranchNode(orientation, node.size, orthogonalSize, children);
+    } else {
+      result = new LeafNode(
+        deserializer.fromJSON(node.data),
+        orientation,
+        orthogonalSize,
+        node.size
+      );
+    }
+
+    return result;
+  }
 
   public get orientation() {
     return this.root.orientation;
   }
 
-  public set orienation(orientation: Orientation) {
-    // this._orienation = orientation;
+  public set orientation(orientation: Orientation) {
+    if (this._root.orientation === orientation) {
+      return;
+    }
+
+    const { size, orthogonalSize } = this._root;
+    this.root = flipNode(this._root, orthogonalSize, size);
+    this.root.layout(size, orthogonalSize);
   }
 
   private get root(): BranchNode {
     return this._root;
   }
 
+  private disposable: IDisposable;
+
   private set root(root: BranchNode) {
     const oldRoot = this._root;
 
     if (oldRoot) {
+      this.disposable?.dispose();
+      oldRoot.dispose();
       this.element.removeChild(oldRoot.element);
-      // oldRoot.dispose();
     }
 
     this._root = root;
+    this.disposable = this._root.onDidChange((e) => {
+      this._onDidChange.fire(e);
+    });
     this.element.appendChild(root.element);
   }
 
@@ -381,7 +342,7 @@ export class Gridview {
   }
 
   constructor() {
-    this.orienation = Orientation.HORIZONTAL;
+    // this.orientation = Orientation.HORIZONTAL;
     this.element = document.createElement("div");
     this.element.className = "grid-view";
     this.root = new BranchNode(Orientation.HORIZONTAL, 0, 0);
@@ -399,7 +360,7 @@ export class Gridview {
     parent.moveChild(from, to);
   }
 
-  public addView(view: IGridView, size: number, location: number[]) {
+  public addView(view: IGridView, size: number | Sizing, location: number[]) {
     const [rest, index] = tail(location);
 
     const [pathToParent, parent] = this.getNode(rest);
@@ -415,7 +376,7 @@ export class Gridview {
       const [grandParent, ..._] = [...pathToParent].reverse();
       const [parentIndex, ...__] = [...rest].reverse();
 
-      let newSiblingSize: number = 0;
+      let newSiblingSize: number | Sizing = 0;
 
       grandParent.removeChild(parentIndex);
 
@@ -433,17 +394,21 @@ export class Gridview {
       );
       newParent.addChild(newSibling, newSiblingSize, 0);
 
+      if (typeof size !== "number" && size.type === "split") {
+        size = { type: "split", index: 0 };
+      }
+
       const node = new LeafNode(view, grandParent.orientation, parent.size);
       newParent.addChild(node, size, index);
     }
   }
 
-  public remove(view: IGridView) {
+  public remove(view: IGridView, sizing?: Sizing) {
     const location = getGridLocation(view.element);
-    return this.removeView(location);
+    return this.removeView(location, sizing);
   }
 
-  removeView(location: number[]): IGridView {
+  removeView(location: number[], sizing?: Sizing): IGridView {
     const [rest, index] = tail(location);
     const [pathToParent, parent] = this.getNode(rest);
 
@@ -457,7 +422,7 @@ export class Gridview {
       throw new Error("Invalid location");
     }
 
-    parent.removeChild(index);
+    parent.removeChild(index, sizing);
 
     if (parent.children.length === 0) {
       throw new Error("Invalid grid state");
@@ -476,7 +441,7 @@ export class Gridview {
       }
 
       // we must promote sibling to be the new root
-      parent.removeChild(0);
+      parent.removeChild(0, sizing);
       this.root = sibling;
       return node.view;
     }
@@ -485,12 +450,12 @@ export class Gridview {
     const [parentIndex, ...__] = [...rest].reverse();
 
     const sibling = parent.children[0];
-    parent.removeChild(0);
+    parent.removeChild(0, sizing);
 
     const sizes = grandParent.children.map((_, i) =>
       grandParent.getChildSize(i)
     );
-    grandParent.removeChild(parentIndex);
+    grandParent.removeChild(parentIndex, sizing);
 
     if (sibling instanceof BranchNode) {
       sizes.splice(parentIndex, 1, ...sibling.children.map((c) => c.size));

@@ -2,14 +2,13 @@ import * as React from "react";
 import { LoadFromConfig } from "./loadFromConfig";
 import { FromApi } from "./fromApi";
 import { PaneDemo } from "./pane";
-
-import { Grid } from "./grid";
+import { TestGrid } from "./reactgrid";
 
 const options = [
   { id: "config", component: LoadFromConfig },
   { id: "api", component: FromApi },
   { id: "pane", component: PaneDemo },
-  { id: "grid", component: Grid },
+  { id: "grid", component: TestGrid },
 ];
 
 export const App = () => {
@@ -24,17 +23,19 @@ export const App = () => {
   );
 
   return (
-    <div style={{ height: "100vh", width: "100vh" }}>
-      <select onChange={onChange} value={value}>
-        {options.map((option, i) => (
-          <option key={i} value={option.id}>
-            {option.id}{" "}
-          </option>
-        ))}
-      </select>
+    <div style={{ height: "100vh", width: "100vw" }}>
+      <div style={{ height: "20px" }}>
+        <select onChange={onChange} value={value}>
+          {options.map((option, i) => (
+            <option key={i} value={option.id}>
+              {option.id}{" "}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {Component && (
-        <div>
+        <div style={{ width: "100%" }}>
           <Component />
         </div>
       )}

@@ -6,6 +6,10 @@ export function tail<T>(arr: T[]): [T[], T] {
   return [arr.slice(0, arr.length - 1), arr[arr.length - 1]];
 }
 
+export function last<T>(arr: T[]): T {
+  return arr.length > 0 ? arr[arr.length - 1] : undefined;
+}
+
 export function sequenceEquals<T>(arr1: T[], arr2: T[]) {
   if (arr1.length !== arr2.length) {
     return false;

@@ -2,6 +2,15 @@ export interface IDisposable {
   dispose: () => void;
 }
 
+export interface ISerializable {
+  toJSON(): object;
+  fromJSON(data: object): void;
+}
+
+export namespace Disposable {
+  export const NONE: IDisposable = { dispose: () => {} };
+}
+
 export class CompositeDisposable {
   private disposables: IDisposable[];
 

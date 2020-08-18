@@ -4,18 +4,22 @@ import { ITab, Tab } from "./tab";
 import { removeClasses, addClasses, toggleClass } from "../../dom";
 import { hasProcessed } from "../droptarget/droptarget";
 import { TabDropEvent } from "../events";
-import { IPanel } from "../group";
+
 import { IGroupview } from "../groupview";
 import { IGroupAccessor } from "../../layout";
+import { last } from "../../array";
+import { DataTransferSingleton } from "../droptarget/dataTransfer";
+import { IPanel } from "../panel/types";
 
 export interface ITabContainer extends IDisposable {
   element: HTMLElement;
+  visible: boolean;
+  height: number;
   hasActiveDragEvent: boolean;
-  addTab: (tab: ITab, index?: number) => void;
   delete: (id: string) => void;
   indexOf: (tabOrId: ITab | string) => number;
   at: (index: number) => ITab;
-  onDropped: Event<TabDropEvent>;
+  onDropEvent: Event<TabDropEvent>;
   setActive: (isGroupActive: boolean) => void;
   setActivePanel: (panel: IPanel) => void;
   isActive: (tab: ITab) => boolean;
@@ -24,14 +28,39 @@ export interface ITabContainer extends IDisposable {
 }
 
 export class TabContainer extends CompositeDisposable implements ITabContainer {
+  private tabContainer: HTMLElement;
   private _element: HTMLElement;
+  private actionContainer: HTMLElement;
 
   private tabs: ITab[] = [];
   private selectedIndex: number = -1;
   private active: boolean;
+  private activePanel: IPanel;
+
+  private _visible: boolean = true;
+  private _height: number;
 
   private readonly _onDropped = new Emitter<TabDropEvent>();
-  readonly onDropped: Event<TabDropEvent> = this._onDropped.event;
+  readonly onDropEvent: Event<TabDropEvent> = this._onDropped.event;
+
+  get visible() {
+    return this._visible;
+  }
+
+  set visible(value: boolean) {
+    this._visible = value;
+
+    toggleClass(this.element, "hidden", !this._visible);
+  }
+
+  get height() {
+    return this._height;
+  }
+
+  set height(value: number) {
+    this._height = value;
+    this._element.style.height = `${this.height}px`;
+  }
 
   public get element() {
     return this._element;
@@ -60,26 +89,52 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
     this.addDisposables(this._onDropped);
 
     this._element = document.createElement("div");
-    this._element.className = "tab-container";
+    this._element.className = "title-container";
+
+    this.height = 35;
+
+    this.actionContainer = document.createElement("div");
+    this.actionContainer.className = "action-container";
+
+    const list = document.createElement("ul");
+    list.className = "action-list";
+    // const closeAnchor = document.createElement("a");
+    // closeAnchor.className = "close-action";
+    // this.actionContainer.appendChild(list);
+    // list.appendChild(closeAnchor);
+
+    this.tabContainer = document.createElement("div");
+    this.tabContainer.className = "tab-container";
+
+    this._element.appendChild(this.tabContainer);
+    this._element.appendChild(this.actionContainer);
 
     this.addDisposables(
-      addDisposableListener(this._element, "dragenter", (event) => {
-        if (!this.tabs[this.tabs.length - 1].hasActiveDragEvent) {
-          addClasses(this._element, "drag-over-target");
-        }
-      }),
-      addDisposableListener(this._element, "dragover", (event) => {
-        event.preventDefault();
-      }),
-      addDisposableListener(this._element, "dragleave", (event) => {
-        removeClasses(this.element, "drag-over-target");
-      }),
-      addDisposableListener(this._element, "drop", (event) => {
-        if (hasProcessed(event)) {
-          console.debug("tab drop event has already been processed");
+      addDisposableListener(this.tabContainer, "dragenter", (event) => {
+        if (!DataTransferSingleton.has(this.accessor.id)) {
+          console.debug("[tabs] invalid drop event");
           return;
         }
-        removeClasses(this.element, "drag-over-target");
+        if (!last(this.tabs).hasActiveDragEvent) {
+          addClasses(this.tabContainer, "drag-over-target");
+        }
+      }),
+      addDisposableListener(this.tabContainer, "dragover", (event) => {
+        event.preventDefault();
+      }),
+      addDisposableListener(this.tabContainer, "dragleave", (event) => {
+        removeClasses(this.tabContainer, "drag-over-target");
+      }),
+      addDisposableListener(this.tabContainer, "drop", (event) => {
+        if (!DataTransferSingleton.has(this.accessor.id)) {
+          console.debug("[tabs] invalid drop event");
+          return;
+        }
+        if (hasProcessed(event)) {
+          console.debug("[tab] drop event already processed");
+          return;
+        }
+        removeClasses(this.tabContainer, "drag-over-target");
 
         const {
           groupId,
@@ -92,7 +147,7 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
           const index = this.tabs.findIndex((tab) => tab.id === itemId);
           if (index > -1) {
             if (index === this.tabs.length - 1) {
-              console.log("last");
+              console.debug("[tabs] dropped in empty space");
               return;
             }
           }
@@ -105,7 +160,8 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
         );
 
         if (ignore) {
-          console.log("drag el in path");
+          console.debug("[tabs] ignore event");
+
           return;
         }
 
@@ -125,12 +181,15 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
     toggleClass(this.element, "inactive", !isGroupActive);
   }
 
-  public addTab(tab: ITab, index: number = this.tabs.length) {
+  private addTab(tab: ITab, index: number = this.tabs.length) {
     if (index < 0 || index > this.tabs.length) {
       throw new Error("invalid location");
     }
 
-    this.element.insertBefore(tab.element, this.element.children[index]);
+    this.tabContainer.insertBefore(
+      tab.element,
+      this.tabContainer.children[index]
+    );
 
     this.tabs = [...this.tabs.slice(0, index), tab, ...this.tabs.slice(index)];
 
@@ -146,17 +205,18 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
     tab.element.remove();
   }
 
-  public setActivePanel(panel: IPanel) {
-    // panel.
-  }
+  public setActivePanel(panel: IPanel) {}
 
   public openPanel(panel: IPanel, index: number = this.tabs.length) {
-    const tab = new Tab(panel.id, this.group.id);
-    tab.setContent(panel.header);
+    if (this.tabs.find((tab) => tab.id === panel.id)) {
+      return;
+    }
+    const tab = new Tab(panel.id, this.accessor, this.group);
+    tab.setContent(panel.header.element);
 
     const disposables = CompositeDisposable.from(
       tab.onChanged((event) => {
-        this.group.openPanel(panel);
+        this.group.open(panel);
       }),
       tab.onDropped((event) => {
         const group = this.accessor.getGroup(event.groupId);
@@ -172,9 +232,12 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
     );
 
     this.addTab(tab, index);
+    this.activePanel = panel;
   }
 
-  public closePanel(panel: IPanel) {}
+  public closePanel(panel: IPanel) {
+    this.delete(panel.id);
+  }
 
   public dispose() {
     super.dispose();

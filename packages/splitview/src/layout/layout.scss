@@ -1,0 +1,21 @@
+.layout-debug-container {
+  color: white;
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  z-index: 9999;
+  font-size: 11px;
+  width: 100px;
+
+  .layout-debug-widget {
+    background-color: black;
+    margin: 1px;
+    .layout-debug-widget-row {
+      padding: 0px 5px;
+      display: flex;
+      span:first-child {
+        flex-grow: 1;
+      }
+    }
+  }
+}

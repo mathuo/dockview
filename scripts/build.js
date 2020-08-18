@@ -40,12 +40,16 @@ const build = (options) => {
   });
 
   gulp.task("sass", () => {
-    return gulp
-      .src("./src/**/*.scss")
-      .pipe(
-        concat("styles.scss").pipe(gulpSass().on("error", gulpSass.logError))
-      )
-      .pipe(gulp.dest("./dist"));
+    return (
+      gulp
+        .src("./src/**/*.scss")
+        // .pipe(
+        // concat("styles.scss")
+        .pipe(gulpSass().on("error", gulpSass.logError))
+        // )
+        .pipe(concat("styles.css"))
+        .pipe(gulp.dest("./dist"))
+    );
   });
 };
 

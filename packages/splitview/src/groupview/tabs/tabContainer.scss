@@ -1,0 +1,60 @@
+.title-container {
+  display: flex;
+  background-color: #252526;
+  overflow: overlay;
+  flex-shrink: 0;
+  //   height: 35px;
+
+  &.hidden {
+    display: none;
+  }
+
+  &::-webkit-scrollbar {
+    height: 3px;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+
+  .tab-container {
+    flex-shrink: 0;
+    flex-grow: 1;
+    display: flex;
+    font-size: 13px;
+    overflow-x: overlay;
+    overflow-y: hidden;
+
+    &.drag-over-target {
+      background-color: rgba(255, 0, 0, 0.5);
+    }
+
+    .tab {
+      max-width: 200px;
+      min-width: 75px;
+      background-color: #2d2d2d;
+      cursor: pointer;
+      position: relative;
+      box-sizing: border-box;
+      // -webkit-user-drag: element;
+
+      &:not(:first-child)::before {
+        content: " ";
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 5;
+        pointer-events: none;
+        background-color: rgb(37, 37, 38);
+        width: 1px;
+        height: 100%;
+      }
+    }
+  }
+}

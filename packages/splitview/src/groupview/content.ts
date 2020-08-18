@@ -1,12 +1,11 @@
 import { CompositeDisposable, IDisposable } from "../types";
-import { IPanel } from "./group";
 import { Emitter, Event } from "../events";
 import { trackFocus } from "../dom";
-
+ 
 export interface IContentContainer extends IDisposable {
   onDidFocus: Event<void>;
   element: HTMLElement;
-  openPanel: (panel: IPanel) => void;
+  openPanel: (panel: HTMLElement) => void;
   closePanel: () => void;
 }
 
@@ -33,12 +32,12 @@ export class ContentContainer extends CompositeDisposable
     onDidFocus(() => this._onDidFocus.fire());
   }
 
-  public openPanel(panel: IPanel) {
+  public openPanel(panel: HTMLElement) {
     if (this.content) {
       this._element.removeChild(this.content);
       this.content = undefined;
     }
-    this.content = panel.content;
+    this.content = panel;
     this._element.appendChild(this.content);
   }
 

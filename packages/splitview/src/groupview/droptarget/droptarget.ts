@@ -1,4 +1,5 @@
 import { Emitter, Event } from "../../events";
+import { DataTransferSingleton } from "./dataTransfer";
 
 export enum Target {
   Top = "Top",
@@ -45,7 +46,11 @@ export class Droptarget {
 
   constructor(
     private element: HTMLElement,
-    private options: { isDisabled: () => boolean; isDirectional: boolean }
+    private options: {
+      isDisabled: () => boolean;
+      isDirectional: boolean;
+      id: string;
+    }
   ) {
     this.element.addEventListener("dragenter", this.onDragEnter);
   }
@@ -57,13 +62,18 @@ export class Droptarget {
   }
 
   private onDragEnter = (event: DragEvent) => {
+    if (!DataTransferSingleton.has(this.options.id)) {
+      console.debug("[droptarget] invalid event");
+      return;
+    }
+
     if (this.options.isDisabled()) {
       return;
     }
 
     event.preventDefault();
     if (!this.target) {
-      console.log("create drop target");
+      console.debug("[droptarget] created");
       this.target = document.createElement("div");
       this.target.className = "drop-target-dropzone";
       this.overlay = document.createElement("div");
@@ -80,13 +90,18 @@ export class Droptarget {
   };
 
   private onDrop = (event: DragEvent) => {
-    console.log("drop");
+    if (!DataTransferSingleton.has(this.options.id)) {
+      console.debug("[dragtarget] invalid");
+      return;
+    }
+
+    console.debug("[dragtarget] drop");
     this.removeDropTarget();
 
     if (!hasProcessed(event)) {
       this._onDidChange.fire({ target: this.state, event });
     } else {
-      console.log("processed");
+      console.debug("[dragtarget] already processed");
     }
     this.state = undefined;
 
@@ -100,15 +115,12 @@ export class Droptarget {
       return;
     }
 
-    // console.log("over");
-
     const width = this.target.clientWidth;
     const height = this.target.clientHeight;
     const x = event.offsetX;
     const y = event.offsetY;
     const xp = (100 * x) / width;
     const yp = (100 * y) / height;
-    // console.log(`top ${yp} left ${xp}`);
 
     const isRight = xp > 80;
     const isLeft = xp < 20;
@@ -134,7 +146,7 @@ export class Droptarget {
   };
 
   private onDragLeave = (event: DragEvent) => {
-    console.log("leave");
+    console.debug("[droptarget] leave");
     this.removeDropTarget();
   };
 

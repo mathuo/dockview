@@ -2,7 +2,11 @@ import { addDisposableListener, Emitter, Event } from "../../events";
 import { Droptarget } from "../droptarget/droptarget";
 import { CompositeDisposable } from "../../types";
 import { TabChangedEvent, TabDropEvent, TabChangedEventType } from "../events";
-import { DRAG_TYPE } from "../groupview";
+import { IGroupview } from "../groupview";
+import { DataTransferSingleton } from "../droptarget/dataTransfer";
+import { IGroupAccessor } from "../../layout";
+
+export const DRAG_TYPE = "group_drag";
 
 export interface ITab {
   id: string;
@@ -15,7 +19,9 @@ export interface ITab {
 
 export class Tab extends CompositeDisposable implements ITab {
   private _element: HTMLElement;
-  private dragInProgresss: boolean;
+  private dragInPlayDetails: { id?: string; isDragging: boolean } = {
+    isDragging: false,
+  };
   private droptarget: Droptarget;
   private content: HTMLElement;
 
@@ -30,10 +36,14 @@ export class Tab extends CompositeDisposable implements ITab {
   }
 
   public get hasActiveDragEvent() {
-    return this.dragInProgresss;
+    return this.dragInPlayDetails?.isDragging;
   }
 
-  constructor(public id: string, private groupId: string) {
+  constructor(
+    public id: string,
+    private readonly accessor: IGroupAccessor,
+    private group: IGroupview
+  ) {
     super();
 
     this.addDisposables(this._onChanged, this._onDropped);
@@ -43,13 +53,18 @@ export class Tab extends CompositeDisposable implements ITab {
     this._element.draggable = true;
 
     this.addDisposables(
-      addDisposableListener(this._element, "click", (ev) => {
+      addDisposableListener(this._element, "mousedown", (ev) => {
+        if (ev.defaultPrevented) {
+          return;
+        }
         this._onChanged.fire({ type: TabChangedEventType.CLICK });
       }),
       addDisposableListener(this._element, "dragstart", (event) => {
-        this.dragInProgresss = true;
+        this.dragInPlayDetails = { isDragging: true, id: this.accessor.id };
+
         // set up a custom ghost image
         const dragImage = this._element.cloneNode(true) as HTMLElement;
+
         const box = this._element.getBoundingClientRect();
         dragImage.style.height = `${box.height}px`;
         dragImage.style.width = `${box.width}px`;
@@ -61,24 +76,31 @@ export class Tab extends CompositeDisposable implements ITab {
         );
         setTimeout(() => document.body.removeChild(dragImage), 0);
         // configure the data-transfer object
-        event.dataTransfer.setData(
-          "text/plain",
-          JSON.stringify({
-            type: DRAG_TYPE,
-            itemId: this.id,
-            groupId: this.groupId,
-          })
-        );
+
+        const data = JSON.stringify({
+          type: DRAG_TYPE,
+          itemId: this.id,
+          groupId: this.group.id,
+        });
+        DataTransferSingleton.setData(this.dragInPlayDetails.id, data);
+
+        event.dataTransfer.setData("text/plain", data);
         event.dataTransfer.effectAllowed = "move";
       }),
       addDisposableListener(this._element, "dragend", (ev) => {
-        this.dragInProgresss = false;
+        // drop events fire before dragend so we can remove this safely
+        DataTransferSingleton.removeData(this.dragInPlayDetails.id);
+        this.dragInPlayDetails = {
+          isDragging: false,
+          id: undefined,
+        };
       })
     );
 
     this.droptarget = new Droptarget(this._element, {
       isDirectional: false,
-      isDisabled: () => this.dragInProgresss,
+      isDisabled: () => this.dragInPlayDetails.isDragging,
+      id: this.accessor.id,
     });
 
     this.addDisposables(
