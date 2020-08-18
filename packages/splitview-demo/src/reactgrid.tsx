@@ -63,9 +63,11 @@ const components = {
     });
 
     React.useEffect(() => {
-      const listener = props.api.onDidPanelStateChange((x) => {
-        setPanelState(x);
-      });
+      const disposable = new CompositeDisposable(
+        props.api.onDidPanelStateChange((x) => {
+          setPanelState(x);
+        })
+      );
 
       props.api.setClosePanelHook(() => {
         if (confirm("close?")) {
@@ -75,7 +77,7 @@ const components = {
       });
 
       return () => {
-        listener.dispose();
+        disposable.dispose();
       };
     }, []);
 
@@ -91,7 +93,12 @@ const components = {
       []
     );
     return (
-      <div style={{ backgroundColor, height: "100%" }}>
+      <div
+        style={{
+          backgroundColor,
+          height: "100%",
+        }}
+      >
         <div>test component</div>
         <button onClick={onClick}>set state</button>
         {/* {props.api.getState()["test_key"]} */}
@@ -105,7 +112,7 @@ const components = {
 
 const nextGuid = (() => {
   let counter = 0;
-  return () => (counter++).toString();
+  return () => "panel_" + (counter++).toString();
 })();
 
 export const TestGrid = () => {

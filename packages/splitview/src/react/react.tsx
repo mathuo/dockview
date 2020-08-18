@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { IDisposable } from "../types";
+import { IDisposable } from "../lifecycle";
 import { PanelApi } from "../groupview/panel/api";
 
 export interface IPanelProps {

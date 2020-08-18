@@ -1,4 +1,4 @@
-import { CompositeDisposable } from "../../types";
+import { CompositeDisposable, MutableDisposable } from "../../lifecycle";
 import { PanelHeaderPart, PartInitParameters } from "./parts";
 import { addDisposableListener } from "../../events";
 import { toggleClass } from "../../dom";
@@ -7,6 +7,7 @@ export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
   private _element: HTMLElement;
   private _isGroupActive: boolean;
   private _isPanelVisible: boolean;
+
   //
   private _content: HTMLElement;
   private _actionContainer: HTMLElement;
@@ -14,6 +15,8 @@ export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
   private _closeAnchor: HTMLElement;
   //
   private params: PartInitParameters;
+  //
+  private isDirtyDisposable = new MutableDisposable();
 
   get element() {
     return this._element;
@@ -66,6 +69,11 @@ export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
   public init(params: PartInitParameters) {
     this.params = params;
     this._content.textContent = params.title;
+
+    this.isDirtyDisposable.value = this.params.api.onDidDirtyChange((event) => {
+      const isDirty = event;
+      toggleClass(this._closeAnchor, "dirty", isDirty);
+    });
   }
 
   public setVisible(isPanelVisible: boolean, isGroupVisible: boolean) {

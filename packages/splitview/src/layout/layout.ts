@@ -1,8 +1,4 @@
-import {
-  Gridview,
-  getRelativeLocation,
-  IViewDeserializer,
-} from "../gridview/gridview";
+import { Gridview, getRelativeLocation } from "../gridview/gridview";
 import { Target } from "../groupview/droptarget/droptarget";
 import { getGridLocation } from "../gridview/gridview";
 import { tail, sequenceEquals } from "../array";
@@ -14,14 +10,12 @@ import {
   GroupChangeEvent,
 } from "../groupview/groupview";
 import { IPanel } from "../groupview/panel/types";
-import { DefaultTab } from "../groupview/panel/tab";
 import { DefaultPanel } from "../groupview/panel/panel";
-import { CompositeDisposable, IDisposable } from "../types";
+import { CompositeDisposable, IValueDisposable } from "../lifecycle";
 import { Event, Emitter } from "../events";
 import { Watermark } from "./watermark/watermark";
 import { timeoutPromise } from "../async";
-import { IPanelDeserializer, DefaultDeserializer } from "../react/deserializer";
-import { DebugWidget } from "./debug";
+import { DebugWidget } from "./debug/debug";
 import {
   PanelContentPart,
   PanelHeaderPart,
@@ -29,14 +23,13 @@ import {
   PanelHeaderPartConstructor,
   WatermarkConstructor,
 } from "../groupview/panel/parts";
+import { debounce } from "../functions";
+import { counter } from "../math";
+import { DefaultDeserializer, IPanelDeserializer } from "./deserializer";
+import { createContentComponent, createTabComponent } from "./componentFactory";
 
-const counter = () => {
-  let value = 1;
-  return { next: () => (value++).toString() };
-};
-
-let nextGroupId = counter();
-let nextLayoutId = counter();
+const nextGroupId = counter();
+const nextLayoutId = counter();
 
 interface AddPanelOptions {
   tabComponentName?: string | PanelHeaderPartConstructor;
@@ -135,38 +128,29 @@ interface Options {
   watermarkComponent?: WatermarkConstructor;
   frameworkPanelWrapper: FrameworkPanelWrapper;
   tabHeight?: number;
+  debug?: boolean;
 }
-
-enum ChangeType {
-  ADD_GROUP,
-  REMOVE_GROUP,
-}
-
-type LayoutChangeEvent = {
-  type: ChangeType;
-};
 
 export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
+  private readonly _element: HTMLElement;
   private readonly _id = nextLayoutId.next();
-  private debugContainer: DebugWidget;
-  private readonly groups = new Map<
-    string,
-    { view: IGroupview; disposable: IDisposable }
-  >();
-  private readonly panels = new Map<
-    string,
-    { panel: IPanel; disposable?: IDisposable }
-  >();
-  private gridview: Gridview = new Gridview();
-  private _activeGroup: IGroupview;
-  private _size: number;
-  private _orthogonalSize: number;
-  private _element: HTMLElement;
-  private _deserializer: IPanelDeserializer;
-  private resizeTimer: NodeJS.Timer;
+  private readonly groups = new Map<string, IValueDisposable<IGroupview>>();
+  private readonly panels = new Map<string, IValueDisposable<IPanel>>();
+  private readonly gridview: Gridview = new Gridview();
+  private readonly dirtyPanels = new Set<IPanel>();
+  private readonly debouncedDeque = debounce(this.persist.bind(this), 5000);
+  // events
   private readonly _onDidLayoutChange = new Emitter<GroupChangeEvent>();
   readonly onDidLayoutChange: Event<GroupChangeEvent> = this._onDidLayoutChange
     .event;
+  // everything else
+  private _size: number;
+  private _orthogonalSize: number;
+  private _activeGroup: IGroupview;
+  private _deserializer: IPanelDeserializer;
+  private resizeTimer: NodeJS.Timer;
+  private debugContainer: DebugWidget;
+  private panelState = {};
 
   constructor(public readonly options: Options) {
     super();
@@ -176,6 +160,12 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
 
     if (!this.options.components) {
       this.options.components = {};
+    }
+    if (!this.options.frameworkComponents) {
+      this.options.frameworkComponents = {};
+    }
+    if (!this.options.frameworkTabComponents) {
+      this.options.frameworkTabComponents = {};
     }
     if (!this.options.tabComponents) {
       this.options.tabComponents = {};
@@ -188,7 +178,7 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
       this._onDidLayoutChange.fire({ kind: GroupChangeKind.LAYOUT });
     });
 
-    this.toggleDebugContainer();
+    this.updateContainer();
   }
   get panelCount() {
     return this.panels.size;
@@ -214,8 +204,6 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
     return this._element;
   }
 
-  private dirty = new Set<string>();
-
   public registerPanel(panel: IPanel) {
     if (this.panels.has(panel.id)) {
       throw new Error(`panel ${panel.id} already exists`);
@@ -223,14 +211,13 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
 
     const disposable = new CompositeDisposable(
       panel.onDidStateChange((e) => {
-        this.dirty.add(panel.id);
-        panel.setDirty(true);
+        this.addDirtyPanel(panel);
 
         console.log("state event ");
       })
     );
 
-    this.panels.set(panel.id, { panel, disposable });
+    this.panels.set(panel.id, { value: panel, disposable });
 
     this._onDidLayoutChange.fire({ kind: GroupChangeKind.PANEL_CREATED });
   }
@@ -239,7 +226,7 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
     if (!this.panels.has(panel.id)) {
       throw new Error(`panel ${panel.id} doesn't exist`);
     }
-    const { disposable, panel: unregisteredPanel } = this.panels.get(panel.id);
+    const { disposable, value: unregisteredPanel } = this.panels.get(panel.id);
 
     disposable.dispose();
     unregisteredPanel.dispose();
@@ -251,15 +238,27 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
 
   public toJSON() {
     const data = this.gridview.serialize();
-    this._activeGroup.id;
-    return data;
+
+    const state = { ...this.panelState };
+
+    const panels = Array.from(this.panels.values()).reduce(
+      (collection, panel) => {
+        if (!this.panelState[panel.value.id]) {
+          collection[panel.value.id] = panel.value.toJSON();
+        }
+        return collection;
+      },
+      state
+    );
+
+    return { grid: data, panels };
   }
 
-  public deserialize(data: object) {
+  public deserialize(data: any) {
     this.gridview.clear();
     this.panels.forEach((panel) => {
       panel.disposable.dispose();
-      panel.panel.dispose();
+      panel.value.dispose();
     });
     this.panels.clear();
     this.groups.clear();
@@ -268,12 +267,15 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
     this.gridview.layout(this._size, this._orthogonalSize);
   }
 
-  public fromJSON(data: object, deserializer: IPanelDeserializer) {
+  public fromJSON(data: any, deserializer: IPanelDeserializer) {
+    const { grid, panels } = data;
+
     this.gridview.deserialize(
-      data,
+      grid,
       new DefaultDeserializer(this, {
-        fromJSON: (data) => {
-          const panel = deserializer.fromJSON(data);
+        createPanel: (id) => {
+          const panelData = panels[id];
+          const panel = deserializer.fromJSON(panelData);
           this.registerPanel(panel);
           return panel;
         },
@@ -286,7 +288,7 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
     for (const entry of this.groups.entries()) {
       const [key, group] = entry;
 
-      const didCloseAll = await group.view.closeAll();
+      const didCloseAll = await group.value.closeAll();
       if (!didCloseAll) {
         return false;
       }
@@ -297,7 +299,7 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
 
   public setHeight(height: number) {
     this.groups.forEach((value) => {
-      value.view.tabHeight = height;
+      value.value.tabHeight = height;
     });
   }
 
@@ -328,8 +330,18 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
     componentName: string | PanelContentPartConstructor,
     options?: AddPanelOptions
   ): PanelReference {
-    const component = this.createContentComponent(componentName);
-    const tabComponent = this.createTabComponent(options?.tabComponentName);
+    const component = createContentComponent(
+      componentName,
+      this.options.components,
+      this.options.frameworkComponents,
+      this.options.frameworkPanelWrapper.createContentWrapper
+    );
+    const tabComponent = createTabComponent(
+      options?.tabComponentName,
+      this.options.tabComponents,
+      this.options.frameworkTabComponents,
+      this.options.frameworkPanelWrapper.createTabWrapper
+    );
 
     const panel = new DefaultPanel(id, tabComponent, component);
     panel.init({
@@ -341,7 +353,7 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
 
     if (options?.position?.referencePanel) {
       const referencePanel = this.panels.get(options.position.referencePanel)
-        .panel;
+        .value;
       const referenceGroup = this.findGroup(referencePanel);
 
       const target = toTarget(options.position.direction);
@@ -377,7 +389,7 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
     const group = this.createGroup();
 
     if (options) {
-      const referencePanel = this.panels.get(options.referencePanel).panel;
+      const referencePanel = this.panels.get(options.referencePanel).value;
       const referenceGroup = this.findGroup(referencePanel);
 
       const target = toTarget(options.direction);
@@ -395,7 +407,7 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
   }
 
   public getGroup(id: string) {
-    return this.groups.get(id)?.view;
+    return this.groups.get(id)?.value;
   }
 
   public remove(group: IGroupview) {
@@ -416,9 +428,9 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
 
     if (
       this.groups.size === 1 &&
-      Array.from(this.groups.values())[0].view.size === 0
+      Array.from(this.groups.values())[0].value.size === 0
     ) {
-      group = Array.from(this.groups.values())[0].view;
+      group = Array.from(this.groups.values())[0].value;
     } else {
       group = this.createGroup();
       this.doAddGroup(group, location);
@@ -452,7 +464,7 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
     this._onDidLayoutChange.fire({ kind: GroupChangeKind.REMOVE_GROUP });
 
     if (!options?.skipActive && this.groups.size > 0) {
-      this.doSetGroupActive(Array.from(this.groups.values())[0].view);
+      this.doSetGroupActive(Array.from(this.groups.values())[0].value);
     }
 
     return view;
@@ -473,7 +485,7 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
     target: Target,
     index?: number
   ) {
-    const sourceGroup = this.groups.get(groupId).view;
+    const sourceGroup = this.groups.get(groupId).value;
 
     switch (target) {
       case Target.Center:
@@ -554,7 +566,7 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
         group
       );
 
-      this.groups.set(group.id, { view: group, disposable });
+      this.groups.set(group.id, { value: group, disposable });
     }
 
     return group;
@@ -578,78 +590,46 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
 
   private findGroup(panel: IPanel): IGroupview | undefined {
     return Array.from(this.groups.values()).find((group) =>
-      group.view.contains(panel)
-    ).view;
+      group.value.contains(panel)
+    ).value;
   }
 
-  private createContentComponent(
-    componentName: string | PanelContentPartConstructor | any
-  ): PanelContentPart {
-    const Component =
-      typeof componentName === "string"
-        ? this.options.components[componentName]
-        : componentName;
-    const FrameworkComponent =
-      typeof componentName === "string"
-        ? this.options.frameworkComponents[componentName]
-        : componentName;
-    if (Component && FrameworkComponent) {
-      throw new Error(
-        `cannot register component ${componentName} as both a component and frameworkComponent`
-      );
-    }
-    if (FrameworkComponent) {
-      if (!this.options.frameworkPanelWrapper) {
-        throw new Error(
-          "you must register a frameworkPanelWrapper to use framework components"
-        );
-      }
-      const wrappedComponent = this.options.frameworkPanelWrapper.createContentWrapper(
-        componentName,
-        FrameworkComponent
-      );
-      return wrappedComponent;
-    }
-    return new Component() as PanelContentPart;
+  private addDirtyPanel(panel: IPanel) {
+    this.dirtyPanels.add(panel);
+    panel.setDirty(true);
+    this._onDidLayoutChange.fire({ kind: GroupChangeKind.PANEL_DIRTY });
+    this.debouncedDeque();
   }
-  private createTabComponent(
-    componentName: string | PanelHeaderPartConstructor | any
-  ): PanelHeaderPart {
-    const Component =
-      typeof componentName === "string"
-        ? this.options.tabComponents[componentName]
-        : componentName;
-    const FrameworkComponent =
-      typeof componentName === "string"
-        ? this.options.frameworkTabComponents[componentName]
-        : componentName;
-    if (Component && FrameworkComponent) {
-      throw new Error(
-        `cannot register component ${componentName} as both a component and frameworkComponent`
-      );
-    }
-    if (FrameworkComponent) {
-      if (!this.options.frameworkPanelWrapper) {
-        throw new Error(
-          "you must register a frameworkPanelWrapper to use framework components"
-        );
-      }
-      const wrappedComponent = this.options.frameworkPanelWrapper.createTabWrapper(
-        componentName,
-        FrameworkComponent
-      );
-      return wrappedComponent;
-    }
 
-    if (!Component) {
-      return new DefaultTab();
-    }
+  private persist() {
+    const dirtyPanels = Array.from(this.dirtyPanels);
+    this.dirtyPanels.clear();
 
-    return new Component() as PanelHeaderPart;
+    const partialPanelState = dirtyPanels
+      .map((p) => this.panels.get(p.id))
+      .filter((_) => !!_)
+      .reduce((collection, panel) => {
+        collection[panel.value.id] = panel.value.toJSON();
+        return collection;
+      }, {});
+
+    this.panelState = {
+      ...this.panelState,
+      ...partialPanelState,
+    };
+
+    dirtyPanels
+      .filter((p) => this.panels.has(p.id))
+      .forEach((panel) => {
+        panel.setDirty(false);
+        this._onDidLayoutChange.fire({ kind: GroupChangeKind.PANEL_CLEAN });
+      });
   }
 
   public dispose() {
     super.dispose();
+
+    this.gridview.dispose();
 
     this.debugContainer?.dispose();
 
@@ -661,12 +641,14 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
     this._onDidLayoutChange.dispose();
   }
 
-  private toggleDebugContainer() {
-    if (!this.debugContainer) {
-      this.debugContainer = new DebugWidget(this);
-    } else {
-      this.debugContainer.dispose();
-      this.debugContainer = undefined;
+  private updateContainer() {
+    if (this.options.debug) {
+      if (!this.debugContainer) {
+        this.debugContainer = new DebugWidget(this);
+      } else {
+        this.debugContainer.dispose();
+        this.debugContainer = undefined;
+      }
     }
   }
 }

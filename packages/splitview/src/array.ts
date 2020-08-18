@@ -22,3 +22,43 @@ export function sequenceEquals<T>(arr1: T[], arr2: T[]) {
   }
   return true;
 }
+
+/**
+ * Pushes an element to the start of the array, if found.
+ */
+export function pushToStart<T>(arr: T[], value: T): void {
+  const index = arr.indexOf(value);
+
+  if (index > -1) {
+    arr.splice(index, 1);
+    arr.unshift(value);
+  }
+}
+
+/**
+ * Pushes an element to the end of the array, if found.
+ */
+export function pushToEnd<T>(arr: T[], value: T): void {
+  const index = arr.indexOf(value);
+
+  if (index > -1) {
+    arr.splice(index, 1);
+    arr.push(value);
+  }
+}
+
+export const range = (from: number, to: number) => {
+  const result: number[] = [];
+
+  if (from <= to) {
+    for (let i = from; i < to; i++) {
+      result.push(i);
+    }
+  } else {
+    for (let i = from; i > to; i--) {
+      result.push(i);
+    }
+  }
+
+  return result;
+};

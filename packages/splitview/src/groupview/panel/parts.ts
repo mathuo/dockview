@@ -1,4 +1,4 @@
-import { IDisposable } from "../../types";
+import { IDisposable } from "../../lifecycle";
 import { IGroupview } from "../groupview";
 import { IGroupAccessor } from "../../layout";
 import { PanelApi } from "./api";

@@ -1,5 +1,5 @@
 import { Event, Emitter, addDisposableListener } from "./events";
-import { IDisposable, CompositeDisposable } from "./types";
+import { IDisposable, CompositeDisposable } from "./lifecycle";
 
 export function getDomNodePagePosition(domNode: HTMLElement) {
   const bb = domNode.getBoundingClientRect();

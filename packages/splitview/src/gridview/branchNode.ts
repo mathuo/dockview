@@ -2,7 +2,7 @@ import { IView, SplitView, Orientation, Sizing } from "../splitview/splitview";
 import { Emitter, Event } from "../events";
 import { INodeDescriptor } from "./gridview";
 import { Node } from "./types";
-import { CompositeDisposable, IDisposable, Disposable } from "../types";
+import { CompositeDisposable, IDisposable, Disposable } from "../lifecycle";
 
 export class BranchNode extends CompositeDisposable implements IView {
   readonly element: HTMLElement;

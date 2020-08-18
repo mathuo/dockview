@@ -1,4 +1,4 @@
-import { IDisposable, CompositeDisposable } from "../types";
+import { IDisposable, CompositeDisposable } from "../lifecycle";
 import { ITabContainer, TabContainer } from "./tabs/tabContainer";
 import { IContentContainer, ContentContainer } from "./content";
 import { IGridView } from "../gridview/gridview";
@@ -26,6 +26,8 @@ export const enum GroupChangeKind {
   //
   PANEL_CREATED = "PANEL_CREATED",
   PANEL_DESTROYED = "PANEL_DESTROYED",
+  PANEL_DIRTY = "PANEL_DIRTY",
+  PANEL_CLEAN = "PANEL_CLEAN",
 }
 
 export interface IGroupItem {
@@ -136,7 +138,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
   public toJSON(): object {
     return {
-      views: this.panels.map((panel) => panel.toJSON()),
+      views: this.panels.map((panel) => panel.id),
       activeView: this.activePanel?.id,
     };
   }
@@ -280,9 +282,13 @@ export class Groupview extends CompositeDisposable implements IGroupview {
       }
     }
 
-    // take a copy since we will be edting the array as we iterate through
-    const arrPanelCpy = [...this.panels];
-    await Promise.all(arrPanelCpy.map((p) => this.doClose(p)));
+    if (this.panels.length > 0) {
+      // take a copy since we will be edting the array as we iterate through
+      const arrPanelCpy = [...this.panels];
+      await Promise.all(arrPanelCpy.map((p) => this.doClose(p)));
+    } else {
+      this.accessor.remove(this);
+    }
 
     return true;
   }

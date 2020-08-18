@@ -1,4 +1,4 @@
-import { IDisposable, CompositeDisposable } from "../../types";
+import { IDisposable, CompositeDisposable } from "../../lifecycle";
 import { addDisposableListener, Emitter, Event } from "../../events";
 import { ITab, Tab } from "./tab";
 import { removeClasses, addClasses, toggleClass } from "../../dom";

@@ -5,7 +5,7 @@ export * from "./groupview/groupview";
 export * from "./groupview/content";
 export * from "./groupview/tabs/tab";
 export * from "./events";
-export * from "./types";
+export * from "./lifecycle";
 export * from "./groupview/panel/panel";
 export * from "./groupview/panel/api";
 export * from "./react/react";

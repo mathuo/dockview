@@ -1,10 +1,10 @@
 import * as React from "react";
-import { IDisposable } from "../types";
+import { IDisposable } from "../lifecycle";
 import { Layout, Api } from "../layout/layout";
 import { ReactPanelContentPart } from "./reactContentPart";
 import { ReactPanelHeaderPart } from "./reactHeaderPart";
 import { IPanelProps } from "./react";
-import { DefaultDeserializer, ReactPanelDeserialzier } from "./deserializer";
+import { ReactPanelDeserialzier } from "./deserializer";
 
 export type OnReadyEvent = {
   api: Api;

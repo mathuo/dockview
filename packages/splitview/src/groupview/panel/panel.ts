@@ -7,7 +7,7 @@ import {
 } from "./api";
 import { Emitter, Event } from "../../events";
 import { IGroupview, GroupChangeKind } from "../groupview";
-import { MutableDisposable, CompositeDisposable } from "../../types";
+import { MutableDisposable, CompositeDisposable } from "../../lifecycle";
 import { PanelContentPart, PanelHeaderPart, ClosePanelResult } from "./parts";
 
 export class DefaultPanel extends CompositeDisposable implements IPanel {
@@ -18,6 +18,8 @@ export class DefaultPanel extends CompositeDisposable implements IPanel {
   private readonly _onDidPanelDimensionsChange = new Emitter<
     PanelDimensionChangeEvent
   >();
+  private readonly _onDidDirtyChange = new Emitter<boolean>();
+
   private readonly api: PanelApi;
   private group: IGroupview;
   private params: PanelInitParameters;
@@ -43,6 +45,7 @@ export class DefaultPanel extends CompositeDisposable implements IPanel {
     this.api = new PanelApiImpl(
       this._onDidPanelStateChange.event,
       this._onDidPanelDimensionsChange.event,
+      this._onDidDirtyChange.event,
       this,
       this.group
     );
@@ -55,7 +58,7 @@ export class DefaultPanel extends CompositeDisposable implements IPanel {
   }
 
   public setDirty(isDirty: boolean) {
-    //
+    this._onDidDirtyChange.fire(isDirty);
   }
 
   public close(): Promise<ClosePanelResult> {
@@ -142,6 +145,7 @@ export class DefaultPanel extends CompositeDisposable implements IPanel {
     this._onDidStateChange.dispose();
     this._onDidPanelStateChange.dispose();
     this._onDidPanelDimensionsChange.dispose();
+    this._onDidDirtyChange.dispose();
     this.api.dispose();
     this.mutableDisposable.dispose();
 

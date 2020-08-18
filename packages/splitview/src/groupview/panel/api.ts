@@ -2,7 +2,7 @@ import { IGroupview } from "../groupview";
 import { Event, Emitter } from "../../events";
 import { ClosePanelResult } from "./parts";
 import { IPanel } from "./types";
-import { CompositeDisposable, IDisposable } from "../../types";
+import { CompositeDisposable, IDisposable } from "../../lifecycle";
 
 export type PanelStateChangeEvent = {
   isPanelVisible: boolean;
@@ -27,6 +27,7 @@ export interface PanelApi extends IDisposable {
   setState(state: { [index: string]: any });
   getState: () => { [index: string]: any };
   onDidStateChange: Event<any>;
+  onDidDirtyChange: Event<boolean>;
 }
 
 export class PanelApiImpl extends CompositeDisposable implements PanelApi {
@@ -45,6 +46,10 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
 
   get onDidPanelDimensionChange() {
     return this._dimensionEvent;
+  }
+
+  get onDidDirtyChange() {
+    return this._dirtyEvent;
   }
 
   get isGroupActive() {
@@ -70,6 +75,7 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
   constructor(
     private _event: Event<PanelStateChangeEvent>,
     private _dimensionEvent: Event<PanelDimensionChangeEvent>,
+    private _dirtyEvent: Event<boolean>,
     private panel: IPanel,
     group: IGroupview
   ) {

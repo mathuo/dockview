@@ -1,6 +1,6 @@
-import { CompositeDisposable } from "../types";
-import { Layout } from "./layout";
-import { GroupChangeKind } from "../groupview/groupview";
+import { CompositeDisposable } from "../../lifecycle";
+import { Layout } from "../layout";
+import { GroupChangeKind } from "../../groupview/groupview";
 
 export class DebugWidget extends CompositeDisposable {
   private _element: HTMLElement;

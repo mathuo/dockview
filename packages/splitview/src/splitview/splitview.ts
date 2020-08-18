@@ -1,7 +1,18 @@
 import { removeClasses, addClasses, firstIndex } from "../dom";
-import { clamp, clampView, range } from "../util";
+import { clamp } from "../math";
 import { Event, Emitter } from "../events";
-import { pushToStart, pushToEnd } from "../util";
+import { pushToStart, pushToEnd, range } from "../array";
+
+export const clampView = (view: IView, size: number) => {
+  const result = clamp(size, view.minimumSize, view.maximumSize);
+
+  if (typeof view.snapSize !== "number" || size >= view.minimumSize) {
+    return result;
+  }
+
+  const snapSize = Math.min(view.snapSize, view.minimumSize);
+  return size < snapSize ? 0 : view.minimumSize;
+};
 
 export enum Orientation {
   HORIZONTAL = "HORIZONTAL",

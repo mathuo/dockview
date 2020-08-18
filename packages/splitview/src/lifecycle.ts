@@ -2,6 +2,11 @@ export interface IDisposable {
   dispose: () => void;
 }
 
+export interface IValueDisposable<T> {
+  value: T;
+  disposable: IDisposable;
+}
+
 export interface ISerializable {
   toJSON(): object;
   fromJSON(data: object): void;

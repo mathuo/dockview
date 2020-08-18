@@ -7,7 +7,7 @@ import { IGroupview } from "../../groupview/groupview";
 import { ActionContainer } from "../../groupview/actions/actionsContainer";
 import { addDisposableListener } from "../../events";
 import { toggleClass } from "../../dom";
-import { CompositeDisposable } from "../../types";
+import { CompositeDisposable } from "../../lifecycle";
 
 export class Watermark extends CompositeDisposable implements WatermarkPart {
   private _element: HTMLElement;

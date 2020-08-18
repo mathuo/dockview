@@ -8,12 +8,12 @@
     outline: none;
   }
 
-  &.active {
-    .content-container {
-      outline: 1px solid red;
-      outline-offset: -2px;
-    }
-  }
+  // &.active {
+  //   .content-container {
+  //     outline: 1px solid red;
+  //     outline-offset: -2px;
+  //   }
+  // }
 
   &.empty {
     .title-container {
@@ -25,5 +25,6 @@
     flex-grow: 1;
     background-color: rgb(30, 30, 30);
     overflow: hidden;
+    outline: none;
   }
 }

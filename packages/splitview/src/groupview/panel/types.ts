@@ -1,5 +1,5 @@
 import { IGroupview } from "../groupview";
-import { IDisposable, ISerializable } from "../../types";
+import { IDisposable, ISerializable } from "../../lifecycle";
 import { Event } from "../../events";
 import {
   WatermarkPart,

@@ -1,6 +1,6 @@
 import { addDisposableListener, Emitter, Event } from "../../events";
 import { Droptarget } from "../droptarget/droptarget";
-import { CompositeDisposable } from "../../types";
+import { CompositeDisposable } from "../../lifecycle";
 import { TabChangedEvent, TabDropEvent, TabChangedEventType } from "../events";
 import { IGroupview } from "../groupview";
 import { DataTransferSingleton } from "../droptarget/dataTransfer";

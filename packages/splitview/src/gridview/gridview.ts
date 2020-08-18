@@ -5,7 +5,7 @@ import { LeafNode } from "./leafNode";
 import { BranchNode } from "./branchNode";
 import { Node } from "./types";
 import { Emitter, Event } from "../events";
-import { IDisposable } from "../types";
+import { IDisposable } from "../lifecycle";
 
 function flipNode<T extends Node>(
   node: T,
