@@ -2,18 +2,11 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: #252526;
+  background-color: var(--group-view-background-color);
 
   &:focus {
     outline: none;
   }
-
-  // &.active {
-  //   .content-container {
-  //     outline: 1px solid red;
-  //     outline-offset: -2px;
-  //   }
-  // }
 
   &.empty {
     .title-container {

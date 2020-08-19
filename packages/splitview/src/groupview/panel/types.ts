@@ -18,6 +18,7 @@ export type PanelUpdateEvent = {
 
 export type PanelInitParameters = {
   title: string;
+  suppressClosable?: boolean;
   params: { [index: string]: any };
   state?: { [index: string]: any };
 };

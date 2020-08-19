@@ -5,7 +5,8 @@
   "main": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "scripts": {
-    "build": "../../node_modules/.bin/webpack"
+    "build": "gulp run",
+    "docs": "typedoc --excludeNotExported --out typedocs/ src/"
   },
   "author": "",
   "license": "ISC",
@@ -14,5 +15,8 @@
     "@types/react-dom": "^16.9.8",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "typedoc": "^0.18.0"
   }
 }

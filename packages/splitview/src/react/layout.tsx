@@ -33,6 +33,7 @@ export interface IReactGridProps {
       props?: { [key: string]: any };
     };
   };
+  debug?: boolean;
   tabHeight?: number;
 }
 
@@ -72,6 +73,7 @@ export const ReactGrid = (props: IReactGridProps) => {
       frameworkComponents: props.components,
       frameworkTabComponents: props.tabComponents,
       tabHeight: props.tabHeight,
+      debug: props.debug,
     });
 
     layoutReference.current = layout;

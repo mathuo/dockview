@@ -1,6 +1,6 @@
 .title-container {
   display: flex;
-  background-color: #252526;
+  background-color: var(--title-bar-background-color);
   overflow: overlay;
   flex-shrink: 0;
   //   height: 35px;
@@ -20,7 +20,7 @@
 
   /* Handle */
   &::-webkit-scrollbar-thumb {
-    background: #888;
+    background: var(--title-bar-scroll-bar-color);
   }
 
   .tab-container {
@@ -32,17 +32,16 @@
     overflow-y: hidden;
 
     &.drag-over-target {
-      background-color: rgba(255, 0, 0, 0.5);
+      background-color: var(--drag-over-background-color);
     }
 
     .tab {
       max-width: 200px;
       min-width: 75px;
-      background-color: #2d2d2d;
+      background-color: var(--tab-background-color);
       cursor: pointer;
       position: relative;
       box-sizing: border-box;
-      // -webkit-user-drag: element;
 
       &:not(:first-child)::before {
         content: " ";
@@ -51,7 +50,7 @@
         left: 0;
         z-index: 5;
         pointer-events: none;
-        background-color: rgb(37, 37, 38);
+        background-color: var(--tab-divider-color);
         width: 1px;
         height: 100%;
       }

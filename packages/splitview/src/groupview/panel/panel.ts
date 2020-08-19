@@ -76,6 +76,7 @@ export class DefaultPanel extends CompositeDisposable implements IPanel {
       tab: this.headerPart.toJSON(),
       props: this.params.params,
       title: this.params.title,
+      suppressClosable: this.params.suppressClosable,
       state: this.api.getState(),
     };
   }

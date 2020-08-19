@@ -7,6 +7,7 @@ import {
   PanelStateChangeEvent,
   ClosePanelResult,
   CompositeDisposable,
+  GroupChangeKind,
 } from "splitview";
 
 const components = {
@@ -16,12 +17,20 @@ const components = {
 
     const onReady = (event: OnReadyEvent) => {
       _api.current = event.api;
-      event.api.addPanelFromComponent(nextGuid(), "test_component", {
-        title: "inner-1",
-      });
-      event.api.addPanelFromComponent(nextGuid(), "test_component", {
-        title: "inner-2",
-      });
+
+      const layout = props.api.getState()["layout"];
+      if (layout) {
+        event.api.deserialize(layout);
+      } else {
+        event.api.addPanelFromComponent("test_component", {
+          id: nextGuid(),
+          title: "inner-1",
+        });
+        event.api.addPanelFromComponent("test_component", {
+          id: nextGuid(),
+          title: "inner-2",
+        });
+      }
       setApi(event.api);
     };
 
@@ -29,6 +38,11 @@ const components = {
       const compDis = new CompositeDisposable(
         props.api.onDidPanelDimensionChange((event) => {
           _api.current?.layout(event.width, event.height);
+        }),
+        _api.current.onDidLayoutChange((event) => {
+          if (event.kind === GroupChangeKind.LAYOUT_CONFIG_UPDATED) {
+            props.api.setState("layout", _api.current.toJSON());
+          }
         })
       );
 
@@ -53,6 +67,7 @@ const components = {
         onReady={onReady}
         components={components}
         tabHeight={20}
+        debug={true}
       />
     );
   },
@@ -130,23 +145,24 @@ export const TestGrid = () => {
       return;
     }
 
-    const panelReference = api.addPanelFromComponent(
-      nextGuid(),
-      "test_component",
-      {
-        title: "Item 1",
-        params: { text: "how low?" },
-      }
-    );
-    api.addPanelFromComponent("item2", "test_component", {
+    const panelReference = api.addPanelFromComponent("test_component", {
+      id: nextGuid(),
+      title: "Item 1",
+      params: { text: "how low?" },
+    });
+    api.addPanelFromComponent("test_component", {
+      id: "item2",
       title: "Item 2",
     });
-    api.addPanelFromComponent(nextGuid(), "test_component", {
+    api.addPanelFromComponent("test_component", {
+      id: nextGuid(),
       title: "Item 3",
     });
-    api.addPanelFromComponent(nextGuid(), "inner_component", {
+    api.addPanelFromComponent("inner_component", {
+      id: nextGuid(),
       title: "Item 3",
       position: { direction: "below", referencePanel: "item2" },
+      suppressClosable: true,
     });
 
     // setInterval(() => {
@@ -156,7 +172,8 @@ export const TestGrid = () => {
   }, [api]);
 
   const onAdd = () => {
-    api.addPanelFromComponent(nextGuid(), "test_component", {
+    api.addPanelFromComponent("test_component", {
+      id: nextGuid(),
       title: "-",
     });
   };
@@ -220,6 +237,7 @@ export const TestGrid = () => {
         // autoSizeToFitContainer={true}
         onReady={onReady}
         components={components}
+        debug={true}
         // serializedLayout={data}
       />
     </div>

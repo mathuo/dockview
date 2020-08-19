@@ -74,6 +74,10 @@ export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
       const isDirty = event;
       toggleClass(this._closeAnchor, "dirty", isDirty);
     });
+
+    if (this.params.suppressClosable && this._closeAnchor.parentElement) {
+      this._closeAnchor.remove();
+    }
   }
 
   public setVisible(isPanelVisible: boolean, isGroupVisible: boolean) {
@@ -98,17 +102,19 @@ export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
   private getColor() {
     if (this._isGroupActive) {
       if (this._isPanelVisible) {
-        return "white";
+        return "var(--active-group-visible-panel-color)";
       }
-      return "#969696";
+      return "var(--active-group-hidden-panel-color)";
     }
     if (this._isPanelVisible) {
-      return "#8F8F8F";
+      return "var(--inactive-group-visible-panel-color)";
     }
-    return "#626262";
+    return "var(--inactive-group-hidden-panel-color)";
   }
 
   private getBackgroundColor() {
-    return this._isPanelVisible ? "#1E1E1E" : "#2D2D2D";
+    return this._isPanelVisible
+      ? "var(--panel-visible-color)"
+      : "var(--panel-hidden-color)";
   }
 }

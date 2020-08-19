@@ -1,0 +1,20 @@
+:root {
+  --group-view-background-color: #252526;
+  --title-bar-background-color: #252526;
+  --title-bar-scroll-bar-color: #888;
+  --tab-background-color: #2d2d2d;
+  --tab-divider-color: rgb(37, 37, 38);
+  --drag-over-background-color: rgba(255, 0, 0, 0.5);
+  //
+  --active-group-visible-panel-color: white;
+  --active-group-hidden-panel-color: #969696;
+  --inactive-group-visible-panel-color: #8f8f8f;
+  --inactive-group-hidden-panel-color: #626262;
+  --panel-visible-color: #1e1e1e;
+  --panel-hidden-color: #2d2d2d;
+  //
+  --tab-close-icon: url("https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg");
+  --tab-dirty-icon: url("https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg");
+  //
+  --splitview-divider-color: rgb(68, 68, 68);
+}

@@ -16,53 +16,15 @@ import { Event, Emitter } from "../events";
 import { Watermark } from "./watermark/watermark";
 import { timeoutPromise } from "../async";
 import { DebugWidget } from "./debug/debug";
-import {
-  PanelContentPart,
-  PanelHeaderPart,
-  PanelContentPartConstructor,
-  PanelHeaderPartConstructor,
-  WatermarkConstructor,
-} from "../groupview/panel/parts";
+import { PanelContentPartConstructor } from "../groupview/panel/parts";
 import { debounce } from "../functions";
-import { counter } from "../math";
+import { sequentialNumberGenerator } from "../math";
 import { DefaultDeserializer, IPanelDeserializer } from "./deserializer";
 import { createContentComponent, createTabComponent } from "./componentFactory";
+import { AddGroupOptions, AddPanelOptions, LayoutOptions } from "./options";
 
-const nextGroupId = counter();
-const nextLayoutId = counter();
-
-interface AddPanelOptions {
-  tabComponentName?: string | PanelHeaderPartConstructor;
-  params?: { [key: string]: any };
-  title?: string;
-  position?: {
-    direction?: "left" | "right" | "above" | "below" | "within";
-    referencePanel: string;
-  };
-}
-
-interface AddGroupOptions {
-  direction?: "left" | "right" | "above" | "below";
-  referencePanel: string;
-}
-
-const toTarget = (
-  direction: "left" | "right" | "above" | "below" | "within"
-) => {
-  switch (direction) {
-    case "left":
-      return Target.Left;
-    case "right":
-      return Target.Right;
-    case "above":
-      return Target.Top;
-    case "below":
-      return Target.Bottom;
-    case "within":
-    default:
-      return Target.Center;
-  }
-};
+const nextGroupId = sequentialNumberGenerator();
+const nextLayoutId = sequentialNumberGenerator();
 
 export type PanelReference = {
   update: (event: { params: { [key: string]: any } }) => void;
@@ -70,23 +32,26 @@ export type PanelReference = {
 };
 
 export interface Api {
+  layout(width: number, height: number): void;
+  //
   addPanelFromComponent(
-    id: string,
     componentName: string | PanelContentPartConstructor,
-    options?: AddPanelOptions
+    options: AddPanelOptions
   ): PanelReference;
   addEmptyGroup(options?: AddGroupOptions);
-  layout(width: number, height: number): void;
+  closeAll: () => Promise<boolean>;
+  //
+  setAutoResizeToFit(enabled: boolean): void;
+  resizeToFit(): void;
+  setTabHeight(height: number): void;
+  groupCount: number;
+  panelCount: number;
+  // lifecycle
   toJSON(): object;
   deserialize: (data: object) => void;
   deserializer: IPanelDeserializer;
-  setAutoResizeToFit(enabled: boolean): void;
-  resizeToFit(): void;
-  setHeight(height: number): void;
-  groupCount: number;
-  panelCount: number;
+  // events
   onDidLayoutChange: Event<GroupChangeEvent>;
-  closeAll: () => Promise<boolean>;
 }
 
 export interface IGroupAccessor {
@@ -103,35 +68,13 @@ export interface IGroupAccessor {
   remove: (group: IGroupview) => void;
   groupCount: number;
   panelCount: number;
-  options: Options;
+  options: LayoutOptions;
   onDidLayoutChange: Event<GroupChangeEvent>;
 }
 
-export type FrameworkPanelWrapper = {
-  createContentWrapper: (id: string, component: any) => PanelContentPart;
-  createTabWrapper: (id: string, component: any) => PanelHeaderPart;
-};
+export interface ILayout extends IGroupAccessor, Api {}
 
-interface Options {
-  tabComponents?: {
-    [componentName: string]: PanelHeaderPartConstructor;
-  };
-  components?: {
-    [componentName: string]: PanelContentPartConstructor;
-  };
-  frameworkTabComponents?: {
-    [componentName: string]: any;
-  };
-  frameworkComponents?: {
-    [componentName: string]: any;
-  };
-  watermarkComponent?: WatermarkConstructor;
-  frameworkPanelWrapper: FrameworkPanelWrapper;
-  tabHeight?: number;
-  debug?: boolean;
-}
-
-export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
+export class Layout extends CompositeDisposable implements ILayout {
   private readonly _element: HTMLElement;
   private readonly _id = nextLayoutId.next();
   private readonly groups = new Map<string, IValueDisposable<IGroupview>>();
@@ -152,7 +95,7 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
   private debugContainer: DebugWidget;
   private panelState = {};
 
-  constructor(public readonly options: Options) {
+  constructor(public readonly options: LayoutOptions) {
     super();
 
     this._element = document.createElement("div");
@@ -174,9 +117,11 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
       this.options.watermarkComponent = Watermark;
     }
 
-    this.gridview.onDidChange((e) => {
-      this._onDidLayoutChange.fire({ kind: GroupChangeKind.LAYOUT });
-    });
+    this.addDisposables(
+      this.gridview.onDidChange((e) => {
+        this._onDidLayoutChange.fire({ kind: GroupChangeKind.LAYOUT });
+      })
+    );
 
     this.updateContainer();
   }
@@ -210,11 +155,7 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
     }
 
     const disposable = new CompositeDisposable(
-      panel.onDidStateChange((e) => {
-        this.addDirtyPanel(panel);
-
-        console.log("state event ");
-      })
+      panel.onDidStateChange((e) => this.addDirtyPanel(panel))
     );
 
     this.panels.set(panel.id, { value: panel, disposable });
@@ -236,6 +177,11 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
     this._onDidLayoutChange.fire({ kind: GroupChangeKind.PANEL_DESTROYED });
   }
 
+  /**
+   * Serialize the current state of the layout
+   *
+   * @returns A JSON respresentation of the layout
+   */
   public toJSON() {
     const data = this.gridview.serialize();
 
@@ -297,7 +243,7 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
     return true;
   }
 
-  public setHeight(height: number) {
+  public setTabHeight(height: number) {
     this.groups.forEach((value) => {
       value.value.tabHeight = height;
     });
@@ -326,9 +272,8 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
   }
 
   public addPanelFromComponent(
-    id: string,
     componentName: string | PanelContentPartConstructor,
-    options?: AddPanelOptions
+    options: AddPanelOptions
   ): PanelReference {
     const component = createContentComponent(
       componentName,
@@ -337,26 +282,27 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
       this.options.frameworkPanelWrapper.createContentWrapper
     );
     const tabComponent = createTabComponent(
-      options?.tabComponentName,
+      options.tabComponentName,
       this.options.tabComponents,
       this.options.frameworkTabComponents,
       this.options.frameworkPanelWrapper.createTabWrapper
     );
 
-    const panel = new DefaultPanel(id, tabComponent, component);
+    const panel = new DefaultPanel(options.id, tabComponent, component);
     panel.init({
-      title: options?.title,
+      title: options.title,
+      suppressClosable: options?.suppressClosable,
       params: options?.params || {},
     });
 
     this.registerPanel(panel);
 
-    if (options?.position?.referencePanel) {
+    if (options.position?.referencePanel) {
       const referencePanel = this.panels.get(options.position.referencePanel)
         .value;
       const referenceGroup = this.findGroup(referencePanel);
 
-      const target = toTarget(options.position.direction);
+      const target = this.toTarget(options.position.direction);
       if (target === Target.Center) {
         referenceGroup.open(panel);
       } else {
@@ -392,7 +338,7 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
       const referencePanel = this.panels.get(options.referencePanel).value;
       const referenceGroup = this.findGroup(referencePanel);
 
-      const target = toTarget(options.direction);
+      const target = this.toTarget(options.direction);
 
       const location = getGridLocation(referenceGroup.element);
       const relativeLocation = getRelativeLocation(
@@ -624,6 +570,26 @@ export class Layout extends CompositeDisposable implements IGroupAccessor, Api {
         panel.setDirty(false);
         this._onDidLayoutChange.fire({ kind: GroupChangeKind.PANEL_CLEAN });
       });
+
+    this._onDidLayoutChange.fire({
+      kind: GroupChangeKind.LAYOUT_CONFIG_UPDATED,
+    });
+  }
+
+  private toTarget(direction: "left" | "right" | "above" | "below" | "within") {
+    switch (direction) {
+      case "left":
+        return Target.Left;
+      case "right":
+        return Target.Right;
+      case "above":
+        return Target.Top;
+      case "below":
+        return Target.Bottom;
+      case "within":
+      default:
+        return Target.Center;
+    }
   }
 
   public dispose() {

@@ -28,6 +28,8 @@ export const enum GroupChangeKind {
   PANEL_DESTROYED = "PANEL_DESTROYED",
   PANEL_DIRTY = "PANEL_DIRTY",
   PANEL_CLEAN = "PANEL_CLEAN",
+  //
+  LAYOUT_CONFIG_UPDATED = "LAYOUT_CONFIG_UPDATED",
 }
 
 export interface IGroupItem {

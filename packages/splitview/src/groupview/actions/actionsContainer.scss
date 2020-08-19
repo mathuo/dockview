@@ -20,10 +20,8 @@
       height: 16px;
       width: 16px;
       display: block;
-      -webkit-mask: url(https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg)
-        50% 50% / 90% 90% no-repeat;
-      mask: url(https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg)
-        50% 50% / 90% 90% no-repeat;
+      -webkit-mask: var(--tab-close-icon) 50% 50% / 90% 90% no-repeat;
+      mask: var(--tab-close-icon) 50% 50% / 90% 90% no-repeat;
       margin-right: "0.5em";
       cursor: pointer;
     }

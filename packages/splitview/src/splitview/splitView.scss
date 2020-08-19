@@ -22,9 +22,12 @@
     }
 
     & > .view-container > .view {
-      &:not(:first-child)::before {
-        height: 100%;
-        width: 1px;
+      &:not(:first-child) {
+        padding-left: 1px;
+        &::before {
+          height: 100%;
+          width: 1px;
+        }
       }
     }
   }
@@ -41,9 +44,12 @@
     & > .view-container > .view {
       width: 100%;
 
-      &:not(:first-child)::before {
-        height: 1px;
-        width: 100%;
+      &:not(:first-child) {
+        padding-top: 1px;
+        &::before {
+          height: 1px;
+          width: 100%;
+        }
       }
     }
   }
@@ -72,7 +78,7 @@
       left: 0;
       z-index: 5;
       pointer-events: none;
-      background-color: var(--splitview-divider-color, rgb(68, 68, 68));
+      background-color: var(--splitview-divider-color);
     }
 
     .view {
