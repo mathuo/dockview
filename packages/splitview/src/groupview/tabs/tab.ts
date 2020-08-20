@@ -5,6 +5,7 @@ import { TabChangedEvent, TabDropEvent, TabChangedEventType } from "../events";
 import { IGroupview } from "../groupview";
 import { DataTransferSingleton } from "../droptarget/dataTransfer";
 import { IGroupAccessor } from "../../layout";
+import { toggleClass } from "../../dom";
 
 export const DRAG_TYPE = "group_drag";
 
@@ -15,6 +16,7 @@ export interface ITab {
   setContent: (element: HTMLElement) => void;
   onChanged: Event<TabChangedEvent>;
   onDropped: Event<TabDropEvent>;
+  setActive(isActive: boolean): void;
 }
 
 export class Tab extends CompositeDisposable implements ITab {
@@ -66,8 +68,13 @@ export class Tab extends CompositeDisposable implements ITab {
         const dragImage = this._element.cloneNode(true) as HTMLElement;
 
         const box = this._element.getBoundingClientRect();
+
+        // if the style of the tab is determined by CSS by a parent element that style will lost
+        // therefore we must explicility re-add the style features that we know will be lost
         dragImage.style.height = `${box.height}px`;
         dragImage.style.width = `${box.width}px`;
+        dragImage.style.color = "var(--active-group-visible-panel-color)";
+
         document.body.appendChild(dragImage);
         event.dataTransfer.setDragImage(
           dragImage,
@@ -122,6 +129,11 @@ export class Tab extends CompositeDisposable implements ITab {
         }, 0);
       })
     );
+  }
+
+  public setActive(isActive: boolean) {
+    toggleClass(this.element, "active-tab", isActive);
+    toggleClass(this.element, "inactive-tab", !isActive);
   }
 
   public setContent(element: HTMLElement) {

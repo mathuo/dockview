@@ -3,7 +3,7 @@
   background-color: var(--title-bar-background-color);
   overflow: overlay;
   flex-shrink: 0;
-  //   height: 35px;
+  box-sizing: border-box;
 
   &.hidden {
     display: none;
@@ -38,7 +38,6 @@
     .tab {
       max-width: 200px;
       min-width: 75px;
-      background-color: var(--tab-background-color);
       cursor: pointer;
       position: relative;
       box-sizing: border-box;

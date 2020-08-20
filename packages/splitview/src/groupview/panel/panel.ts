@@ -120,21 +120,24 @@ export class DefaultPanel extends CompositeDisposable implements IPanel {
         //
         this._onDidPanelStateChange.fire({
           isGroupActive,
-          isPanelVisible: this.group.isActive(this),
+          isPanelVisible: this.group.isPanelActive(this),
         });
       }
     });
 
     this._onDidPanelStateChange.fire({
       isGroupActive,
-      isPanelVisible: this.group.isActive(this),
+      isPanelVisible: this.group.isPanelActive(this),
     });
 
     if (this.headerPart.setVisible) {
-      this.headerPart.setVisible(this.group.isActive(this), isGroupActive);
+      this.headerPart.setVisible(this.group.isPanelActive(this), isGroupActive);
     }
     if (this.contentPart.setVisible) {
-      this.contentPart.setVisible(this.group.isActive(this), isGroupActive);
+      this.contentPart.setVisible(
+        this.group.isPanelActive(this),
+        isGroupActive
+      );
     }
   }
 

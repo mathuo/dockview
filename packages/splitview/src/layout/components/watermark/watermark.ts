@@ -1,13 +1,13 @@
 import {
   WatermarkPart,
   WatermarkPartInitParameters,
-} from "../../groupview/panel/parts";
-import { IGroupAccessor } from "../layout";
-import { IGroupview } from "../../groupview/groupview";
-import { ActionContainer } from "../../groupview/actions/actionsContainer";
-import { addDisposableListener } from "../../events";
-import { toggleClass } from "../../dom";
-import { CompositeDisposable } from "../../lifecycle";
+} from "../../../groupview/panel/parts";
+import { IGroupAccessor } from "../../layout";
+import { IGroupview } from "../../../groupview/groupview";
+import { ActionContainer } from "../../../groupview/actions/actionsContainer";
+import { addDisposableListener } from "../../../events";
+import { toggleClass } from "../../../dom";
+import { CompositeDisposable } from "../../../lifecycle";
 
 export class Watermark extends CompositeDisposable implements WatermarkPart {
   private _element: HTMLElement;
@@ -44,7 +44,7 @@ export class Watermark extends CompositeDisposable implements WatermarkPart {
 
     addDisposableListener(closeAnchor, "click", (ev) => {
       ev.preventDefault(); //
-      this.accessor.remove(this._group);
+      this.accessor.removeGroup(this._group);
     });
   }
 
@@ -71,7 +71,7 @@ export class Watermark extends CompositeDisposable implements WatermarkPart {
   }
 
   private render() {
-    const isOneGroup = this.accessor.groupCount <= 1;
+    const isOneGroup = this.accessor.size <= 1;
     toggleClass(this.element, "has-actions", isOneGroup);
   }
 

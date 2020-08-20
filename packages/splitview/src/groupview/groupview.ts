@@ -55,20 +55,28 @@ export interface GroupChangeEvent {
   panel?: IPanel;
 }
 
+// export interface IGroupviewPublic {
+
+// }
+
 export interface IGroupview extends IDisposable, IGridView {
   id: string;
   size: number;
-  active: boolean;
-  onDidGroupChange: Event<{ kind: GroupChangeKind }>;
   panels: IPanel[];
   tabHeight: number;
-  open(panel: IPanel, index?: number): void;
-  close(panel: IPanel): Promise<boolean>;
-  closeAll(): Promise<boolean>;
-  contains(panel: IPanel): boolean;
-  remove: (panelOrId: IPanel | string) => IPanel;
   setActive: (isActive: boolean) => void;
-  isActive: (panel: IPanel) => boolean;
+  // state
+  isPanelActive: (panel: IPanel) => boolean;
+  isActive: boolean;
+  activePanel: IPanel;
+  // panel lifecycle
+  openPanel(panel: IPanel, index?: number): void;
+  closePanel(panel: IPanel): Promise<boolean>;
+  closeAllPanels(): Promise<boolean>;
+  containsPanel(panel: IPanel): boolean;
+  removePanel: (panelOrId: IPanel | string) => IPanel;
+  // events
+  onDidGroupChange: Event<{ kind: GroupChangeKind }>;
   onMove: Event<GroupMoveEvent>;
 }
 
@@ -78,7 +86,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
   private tabContainer: ITabContainer;
   private contentContainer: IContentContainer;
   private _active: boolean;
-  private activePanel: IPanel;
+  private _activePanel: IPanel;
   private dropTarget: Droptarget;
   private watermark: WatermarkPart;
 
@@ -94,6 +102,10 @@ export class Groupview extends CompositeDisposable implements IGroupview {
   readonly onDidGroupChange: Event<{ kind: GroupChangeKind }> = this
     ._onDidGroupChange.event;
 
+  get activePanel() {
+    return this._activePanel;
+  }
+
   get tabHeight() {
     return this.tabContainer.height;
   }
@@ -102,7 +114,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     this.tabContainer.height = height;
   }
 
-  get active() {
+  get isActive() {
     return this._active;
   }
 
@@ -141,11 +153,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
   public toJSON(): object {
     return {
       views: this.panels.map((panel) => panel.id),
-      activeView: this.activePanel?.id,
+      activeView: this._activePanel?.id,
     };
   }
 
-  public contains(panel: IPanel) {
+  public containsPanel(panel: IPanel) {
     return this.panels.includes(panel);
   }
 
@@ -212,18 +224,18 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
     if (options?.panels) {
       options.panels.forEach((panel) => {
-        this.open(panel);
+        this.openPanel(panel);
       });
     }
     if (options?.activePanel) {
-      this.open(options?.activePanel);
+      this.openPanel(options?.activePanel);
     }
 
     this.updateContainer();
   }
 
-  public open(panel: IPanel, index?: number) {
-    if (this.activePanel === panel) {
+  public openPanel(panel: IPanel, index?: number) {
+    if (this._activePanel === panel) {
       this.accessor.doSetGroupActive(this);
       return;
     }
@@ -239,7 +251,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     this.updateContainer();
   }
 
-  public remove(groupItemOrId: IPanel | string): IPanel {
+  public removePanel(groupItemOrId: IPanel | string): IPanel {
     const id =
       typeof groupItemOrId === "string" ? groupItemOrId : groupItemOrId.id;
 
@@ -249,20 +261,20 @@ export class Groupview extends CompositeDisposable implements IGroupview {
       throw new Error("invalid operation");
     }
 
-    return this.removePanel(panel);
+    return this._removePanel(panel);
   }
 
-  public async closeAll() {
-    const index = this.panels.indexOf(this.activePanel);
+  public async closeAllPanels() {
+    const index = this.panels.indexOf(this._activePanel);
 
     if (index > -1) {
-      if (this.panels.indexOf(this.activePanel) < 0) {
+      if (this.panels.indexOf(this._activePanel) < 0) {
         console.warn("active panel not tracked");
       }
 
       const canClose =
-        !this.activePanel.close ||
-        (await this.activePanel.close()) === ClosePanelResult.CLOSE;
+        !this._activePanel.close ||
+        (await this._activePanel.close()) === ClosePanelResult.CLOSE;
       if (!canClose) {
         return false;
       }
@@ -273,7 +285,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         continue;
       }
       const panel = this.panels[i];
-      this.open(panel);
+      this.openPanel(panel);
 
       if (panel.close) {
         await timeoutPromise(0);
@@ -289,13 +301,13 @@ export class Groupview extends CompositeDisposable implements IGroupview {
       const arrPanelCpy = [...this.panels];
       await Promise.all(arrPanelCpy.map((p) => this.doClose(p)));
     } else {
-      this.accessor.remove(this);
+      this.accessor.removeGroup(this);
     }
 
     return true;
   }
 
-  public close = async (panel: IPanel) => {
+  public closePanel = async (panel: IPanel) => {
     if (panel.close && (await panel.close()) === ClosePanelResult.DONT_CLOSE) {
       return false;
     }
@@ -305,19 +317,19 @@ export class Groupview extends CompositeDisposable implements IGroupview {
   };
 
   private doClose(panel: IPanel) {
-    this.remove(panel);
+    this._removePanel(panel);
 
     (this.accessor as Layout).unregisterPanel(panel);
 
     panel.dispose();
 
     if (this.panels.length === 0) {
-      this.accessor.remove(this);
+      this.accessor.removeGroup(this);
     }
   }
 
-  public isActive(panel: IPanel) {
-    return this.activePanel === panel;
+  public isPanelActive(panel: IPanel) {
+    return this._activePanel === panel;
   }
 
   public setActive(isActive: boolean) {
@@ -327,12 +339,12 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
     this._active = isActive;
 
-    toggleClass(this.element, "active", isActive);
-    toggleClass(this.element, "inactive", !isActive);
+    toggleClass(this.element, "active-group", isActive);
+    toggleClass(this.element, "inactive-group", !isActive);
 
     this.tabContainer.setActive(this._active);
 
-    if (!this.activePanel && this.panels.length > 0) {
+    if (!this._activePanel && this.panels.length > 0) {
       this.doSetActivePanel(this.panels[0]);
     }
 
@@ -351,25 +363,25 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     this._width = width;
     this._height = height;
 
-    if (this.activePanel?.layout) {
-      this.activePanel.layout(this._width, this._height);
+    if (this._activePanel?.layout) {
+      this._activePanel.layout(this._width, this._height);
     }
   }
 
-  private removePanel(panel: IPanel) {
+  private _removePanel(panel: IPanel) {
     const index = this._panels.indexOf(panel);
 
-    const isActivePanel = this.activePanel === panel;
+    const isActivePanel = this._activePanel === panel;
 
     this.doRemovePanel(panel);
 
     if (isActivePanel && this.panels.length > 0) {
       const nextPanel = this.panels[Math.max(0, index - 1)];
-      this.open(nextPanel);
+      this.openPanel(nextPanel);
     }
 
-    if (this.activePanel && this.panels.length === 0) {
-      this.activePanel = undefined;
+    if (this._activePanel && this.panels.length === 0) {
+      this._activePanel = undefined;
     }
 
     this.updateContainer();
@@ -379,7 +391,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
   private doRemovePanel(panel: IPanel) {
     const index = this.panels.indexOf(panel);
 
-    if (this.activePanel === panel) {
+    if (this._activePanel === panel) {
       this.contentContainer.closePanel();
     }
 
@@ -407,8 +419,9 @@ export class Groupview extends CompositeDisposable implements IGroupview {
   }
 
   private doSetActivePanel(panel: IPanel) {
-    this.activePanel = panel;
+    this._activePanel = panel;
     this.tabContainer.setActivePanel(panel);
+    panel.layout(this._width, this._height);
     this._onDidGroupChange.fire({ kind: GroupChangeKind.PANEL_ACTIVE });
   }
 

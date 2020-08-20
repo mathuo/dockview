@@ -23,12 +23,22 @@ const components = {
         event.api.deserialize(layout);
       } else {
         event.api.addPanelFromComponent("test_component", {
-          id: nextGuid(),
+          id: "inner-1",
           title: "inner-1",
         });
         event.api.addPanelFromComponent("test_component", {
-          id: nextGuid(),
+          id: "inner-2",
           title: "inner-2",
+        });
+        event.api.addPanelFromComponent("test_component", {
+          id: nextGuid(),
+          title: "inner-3",
+          position: { direction: "within", referencePanel: "inner-1" },
+        });
+        event.api.addPanelFromComponent("test_component", {
+          id: nextGuid(),
+          title: "inner-4",
+          position: { direction: "within", referencePanel: "inner-2" },
         });
       }
       setApi(event.api);
@@ -62,13 +72,19 @@ const components = {
     }, [api]);
 
     return (
-      <ReactGrid
-        autoSizeToFitContainer={true}
-        onReady={onReady}
-        components={components}
-        tabHeight={20}
-        debug={true}
-      />
+      <div
+        style={{
+          boxSizing: "border-box",
+          // borderTop: "1px solid var(--splitview-divider-color)",
+        }}
+      >
+        <ReactGrid
+          onReady={onReady}
+          components={components}
+          tabHeight={20}
+          debug={true}
+        />
+      </div>
     );
   },
   test_component: (props: IPanelProps & { [key: string]: any }) => {
@@ -156,7 +172,7 @@ export const TestGrid = () => {
     });
     api.addPanelFromComponent("test_component", {
       id: nextGuid(),
-      title: "Item 3",
+      title: "Item 3 with a long title",
     });
     api.addPanelFromComponent("inner_component", {
       id: nextGuid(),
@@ -209,7 +225,7 @@ export const TestGrid = () => {
   };
 
   const onLoad = async () => {
-    const didClose = await api.closeAll();
+    const didClose = await api.closeAllGroups();
     if (!didClose) {
       return;
     }
@@ -221,7 +237,7 @@ export const TestGrid = () => {
   };
 
   const onClear = () => {
-    api.closeAll();
+    api.closeAllGroups();
   };
 
   return (
@@ -238,6 +254,7 @@ export const TestGrid = () => {
         onReady={onReady}
         components={components}
         debug={true}
+
         // serializedLayout={data}
       />
     </div>

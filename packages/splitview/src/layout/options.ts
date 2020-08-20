@@ -25,6 +25,7 @@ export interface LayoutOptions {
     [componentName: string]: any;
   };
   watermarkComponent?: WatermarkConstructor;
+  watermarkFrameworkComponent?: any;
   frameworkPanelWrapper: FrameworkPanelWrapper;
   tabHeight?: number;
   debug?: boolean;

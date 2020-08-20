@@ -1,12 +1,7 @@
 import { IGroupview } from "../groupview";
 import { IDisposable, ISerializable } from "../../lifecycle";
 import { Event } from "../../events";
-import {
-  WatermarkPart,
-  PanelHeaderPart,
-  PanelContentPart,
-  ClosePanelResult,
-} from "./parts";
+import { PanelHeaderPart, PanelContentPart, ClosePanelResult } from "./parts";
 
 // objects
 

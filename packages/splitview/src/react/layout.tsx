@@ -21,6 +21,7 @@ export interface IReactGridProps {
   tabComponents?: {
     [componentName: string]: React.FunctionComponent<IPanelProps>;
   };
+  watermarkComponent?: React.FunctionComponent;
   onReady?: (event: OnReadyEvent) => void;
   autoSizeToFitContainer?: boolean;
   serializedLayout?: {};
@@ -81,11 +82,11 @@ export const ReactGrid = (props: IReactGridProps) => {
 
     layout.deserializer = new ReactPanelDeserialzier(layout);
 
+    layout.resizeToFit();
+
     if (props.serializedLayout) {
       layout.deserialize(props.serializedLayout);
     }
-
-    layout.resizeToFit();
 
     if (props.onReady) {
       props.onReady({ api: layout });

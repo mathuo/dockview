@@ -13,9 +13,9 @@ import { IPanel } from "../groupview/panel/types";
 import { DefaultPanel } from "../groupview/panel/panel";
 import { CompositeDisposable, IValueDisposable } from "../lifecycle";
 import { Event, Emitter } from "../events";
-import { Watermark } from "./watermark/watermark";
+import { Watermark } from "./components/watermark/watermark";
 import { timeoutPromise } from "../async";
-import { DebugWidget } from "./debug/debug";
+import { DebugWidget } from "./components/debug/debug";
 import { PanelContentPartConstructor } from "../groupview/panel/parts";
 import { debounce } from "../functions";
 import { sequentialNumberGenerator } from "../math";
@@ -34,19 +34,18 @@ export type PanelReference = {
 export interface Api {
   layout(width: number, height: number): void;
   //
+  setAutoResizeToFit(enabled: boolean): void;
+  resizeToFit(): void;
+  setTabHeight(height: number): void;
+  size: number;
+  totalPanels: number;
+  // lifecycle
   addPanelFromComponent(
     componentName: string | PanelContentPartConstructor,
     options: AddPanelOptions
   ): PanelReference;
   addEmptyGroup(options?: AddGroupOptions);
-  closeAll: () => Promise<boolean>;
-  //
-  setAutoResizeToFit(enabled: boolean): void;
-  resizeToFit(): void;
-  setTabHeight(height: number): void;
-  groupCount: number;
-  panelCount: number;
-  // lifecycle
+  closeAllGroups: () => Promise<boolean>;
   toJSON(): object;
   deserialize: (data: object) => void;
   deserializer: IPanelDeserializer;
@@ -65,11 +64,12 @@ export interface IGroupAccessor {
     index?: number
   ): void;
   doSetGroupActive: (group: IGroupview) => void;
-  remove: (group: IGroupview) => void;
-  groupCount: number;
-  panelCount: number;
+  removeGroup: (group: IGroupview) => void;
+  size: number;
+  totalPanels: number;
   options: LayoutOptions;
   onDidLayoutChange: Event<GroupChangeEvent>;
+  activeGroup: IGroupview;
 }
 
 export interface ILayout extends IGroupAccessor, Api {}
@@ -125,7 +125,12 @@ export class Layout extends CompositeDisposable implements ILayout {
 
     this.updateContainer();
   }
-  get panelCount() {
+
+  get activeGroup() {
+    return this._activeGroup;
+  }
+
+  get totalPanels() {
     return this.panels.size;
   }
 
@@ -141,7 +146,7 @@ export class Layout extends CompositeDisposable implements ILayout {
     return this._id;
   }
 
-  get groupCount() {
+  get size() {
     return this.groups.size;
   }
 
@@ -230,11 +235,11 @@ export class Layout extends CompositeDisposable implements ILayout {
     this._onDidLayoutChange.fire({ kind: GroupChangeKind.NEW_LAYOUT });
   }
 
-  public async closeAll() {
+  public async closeAllGroups() {
     for (const entry of this.groups.entries()) {
       const [key, group] = entry;
 
-      const didCloseAll = await group.value.closeAll();
+      const didCloseAll = await group.value.closeAllPanels();
       if (!didCloseAll) {
         return false;
       }
@@ -304,7 +309,7 @@ export class Layout extends CompositeDisposable implements ILayout {
 
       const target = this.toTarget(options.position.direction);
       if (target === Target.Center) {
-        referenceGroup.open(panel);
+        referenceGroup.openPanel(panel);
       } else {
         const location = getGridLocation(referenceGroup.element);
         const relativeLocation = getRelativeLocation(
@@ -326,7 +331,7 @@ export class Layout extends CompositeDisposable implements ILayout {
       },
       remove: () => {
         const group = this.findGroup(panel);
-        group.remove(panel);
+        group.removePanel(panel);
       },
     };
   }
@@ -356,9 +361,9 @@ export class Layout extends CompositeDisposable implements ILayout {
     return this.groups.get(id)?.value;
   }
 
-  public remove(group: IGroupview) {
+  public removeGroup(group: IGroupview) {
     if (this.groups.size === 1) {
-      group.panels.forEach((panel) => group.remove(panel));
+      group.panels.forEach((panel) => group.removePanel(panel));
       this._activeGroup = group;
       return;
     }
@@ -382,7 +387,7 @@ export class Layout extends CompositeDisposable implements ILayout {
       this.doAddGroup(group, location);
     }
 
-    group.open(panel);
+    group.openPanel(panel);
   }
 
   private doAddGroup(group: IGroupview, location: number[] = [0]) {
@@ -436,11 +441,11 @@ export class Layout extends CompositeDisposable implements ILayout {
     switch (target) {
       case Target.Center:
       case undefined:
-        const groupItem = sourceGroup.remove(itemId);
+        const groupItem = sourceGroup.removePanel(itemId);
         if (sourceGroup.size === 0) {
           this.doRemoveGroup(sourceGroup);
         }
-        referenceGroup.open(groupItem, index);
+        referenceGroup.openPanel(groupItem, index);
 
         return;
     }
@@ -482,7 +487,7 @@ export class Layout extends CompositeDisposable implements ILayout {
       );
       this.doAddGroup(targetGroup, location);
     } else {
-      const groupItem = sourceGroup.remove(itemId);
+      const groupItem = sourceGroup.removePanel(itemId);
       const dropLocation = getRelativeLocation(
         this.gridview.orientation,
         referenceLocation,
@@ -536,7 +541,7 @@ export class Layout extends CompositeDisposable implements ILayout {
 
   private findGroup(panel: IPanel): IGroupview | undefined {
     return Array.from(this.groups.values()).find((group) =>
-      group.value.contains(panel)
+      group.value.containsPanel(panel)
     ).value;
   }
 

@@ -29,7 +29,7 @@ export class ContentContainer extends CompositeDisposable
 
     const { onDidBlur, onDidFocus } = trackFocus(this._element);
 
-    onDidFocus(() => this._onDidFocus.fire());
+    this.addDisposables(onDidFocus(() => this._onDidFocus.fire()));
   }
 
   public openPanel(panel: HTMLElement) {

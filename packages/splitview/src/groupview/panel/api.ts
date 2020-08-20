@@ -104,7 +104,7 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
   }
 
   public close() {
-    return this.group.close(this.panel);
+    return this.group.closePanel(this.panel);
   }
 
   public setClosePanelHook(callback: () => Promise<ClosePanelResult>) {

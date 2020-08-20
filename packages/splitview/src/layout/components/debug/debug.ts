@@ -1,6 +1,6 @@
-import { CompositeDisposable } from "../../lifecycle";
-import { Layout } from "../layout";
-import { GroupChangeKind } from "../../groupview/groupview";
+import { CompositeDisposable } from "../../../lifecycle";
+import { Layout } from "../../layout";
+import { GroupChangeKind } from "../../../groupview/groupview";
 
 export class DebugWidget extends CompositeDisposable {
   private _element: HTMLElement;
@@ -39,8 +39,8 @@ export class DebugWidget extends CompositeDisposable {
     this.addDisposables(
       this.layout.onDidLayoutChange((event) => {
         if (events.includes(event.kind)) {
-          gc.textContent = this.layout.groupCount.toString();
-          pc.textContent = this.layout.panelCount.toString();
+          gc.textContent = this.layout.size.toString();
+          pc.textContent = this.layout.totalPanels.toString();
         }
       })
     );

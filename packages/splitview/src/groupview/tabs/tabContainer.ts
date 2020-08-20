@@ -176,9 +176,6 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
 
   public setActive(isGroupActive: boolean) {
     this.active = isGroupActive;
-
-    toggleClass(this.element, "active", isGroupActive);
-    toggleClass(this.element, "inactive", !isGroupActive);
   }
 
   private addTab(tab: ITab, index: number = this.tabs.length) {
@@ -205,7 +202,12 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
     tab.element.remove();
   }
 
-  public setActivePanel(panel: IPanel) {}
+  public setActivePanel(panel: IPanel) {
+    this.tabs.forEach((tab) => {
+      const isActivePanel = panel.id === tab.id;
+      tab.setActive(isActivePanel);
+    });
+  }
 
   public openPanel(panel: IPanel, index: number = this.tabs.length) {
     if (this.tabs.find((tab) => tab.id === panel.id)) {
@@ -216,7 +218,7 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
 
     const disposables = CompositeDisposable.from(
       tab.onChanged((event) => {
-        this.group.open(panel);
+        this.group.openPanel(panel);
       }),
       tab.onDropped((event) => {
         const group = this.accessor.getGroup(event.groupId);
@@ -245,7 +247,7 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
 
   private redraw() {
     this.group.panels.forEach((panel, i) => {
-      const isTabActive = this.group.isActive(panel);
+      const isTabActive = this.group.isPanelActive(panel);
       const isGroupActive = this.isActive;
     });
   }

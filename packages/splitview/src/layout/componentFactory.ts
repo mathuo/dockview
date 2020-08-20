@@ -4,7 +4,7 @@ import {
   PanelHeaderPart,
   PanelHeaderPartConstructor,
 } from "../groupview/panel/parts";
-import { DefaultTab } from "../groupview/panel/defaultTab";
+import { DefaultTab } from "./components/tab/defaultTab";
 
 export function createContentComponent(
   componentName: string | PanelContentPartConstructor | any,
