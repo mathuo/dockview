@@ -11,17 +11,34 @@ import {
 } from "../groupview/groupview";
 import { IPanel } from "../groupview/panel/types";
 import { DefaultPanel } from "../groupview/panel/panel";
-import { CompositeDisposable, IValueDisposable } from "../lifecycle";
-import { Event, Emitter } from "../events";
+import {
+  CompositeDisposable,
+  IDisposable,
+  IValueDisposable,
+} from "../lifecycle";
+import { Event, Emitter, addDisposableListener } from "../events";
 import { Watermark } from "./components/watermark/watermark";
 import { timeoutPromise } from "../async";
 import { DebugWidget } from "./components/debug/debug";
-import { PanelContentPartConstructor } from "../groupview/panel/parts";
+import {
+  PanelContentPartConstructor,
+  PanelHeaderPartConstructor,
+} from "../groupview/panel/parts";
 import { debounce } from "../functions";
 import { sequentialNumberGenerator } from "../math";
 import { DefaultDeserializer, IPanelDeserializer } from "./deserializer";
 import { createContentComponent, createTabComponent } from "./componentFactory";
-import { AddGroupOptions, AddPanelOptions, LayoutOptions } from "./options";
+import {
+  AddGroupOptions,
+  AddPanelOptions,
+  PanelOptions,
+  LayoutOptions,
+  MovementOptions,
+} from "./options";
+import {
+  DataTransferSingleton,
+  DragType,
+} from "../groupview/droptarget/dataTransfer";
 
 const nextGroupId = sequentialNumberGenerator();
 const nextLayoutId = sequentialNumberGenerator();
@@ -40,17 +57,24 @@ export interface Api {
   size: number;
   totalPanels: number;
   // lifecycle
-  addPanelFromComponent(
-    componentName: string | PanelContentPartConstructor,
-    options: AddPanelOptions
-  ): PanelReference;
-  addEmptyGroup(options?: AddGroupOptions);
+  addPanelFromComponent(options: AddPanelOptions): PanelReference;
+  addEmptyGroup(options?: AddGroupOptions): void;
   closeAllGroups: () => Promise<boolean>;
   toJSON(): object;
   deserialize: (data: object) => void;
   deserializer: IPanelDeserializer;
   // events
   onDidLayoutChange: Event<GroupChangeEvent>;
+  moveToNext(options?: MovementOptions): void;
+  moveToPrevious(options?: MovementOptions): void;
+  activeGroup: IGroupview;
+  createDragTarget(
+    target: {
+      element: HTMLElement;
+      content: string;
+    },
+    options: (() => PanelOptions) | PanelOptions
+  ): IDisposable;
 }
 
 export interface IGroupAccessor {
@@ -70,6 +94,11 @@ export interface IGroupAccessor {
   options: LayoutOptions;
   onDidLayoutChange: Event<GroupChangeEvent>;
   activeGroup: IGroupview;
+  //
+  addPanelFromComponent(options: AddPanelOptions): PanelReference;
+  addPanel(options: AddPanelOptions): IPanel;
+  //
+  getPanel: (id: string) => IPanel;
 }
 
 export interface ILayout extends IGroupAccessor, Api {}
@@ -152,6 +181,106 @@ export class Layout extends CompositeDisposable implements ILayout {
 
   get element() {
     return this._element;
+  }
+
+  public getPanel(id: string): IPanel {
+    return this.panels.get(id)?.value;
+  }
+
+  private drag: IDisposable;
+
+  public createDragTarget(
+    target: {
+      element: HTMLElement;
+      content: string;
+    },
+    options: (() => PanelOptions) | PanelOptions
+  ): IDisposable {
+    const disposables = new CompositeDisposable(
+      addDisposableListener(target.element, "dragstart", (event) => {
+        const panelOptions =
+          typeof options === "function" ? options() : options;
+
+        const panel = this.panels.get(panelOptions.id)?.value;
+        if (panel) {
+          this.drag = panel.group.startActiveDrag(panel);
+        }
+
+        const data = JSON.stringify({
+          type: DragType.EXTERNAL,
+          ...panelOptions,
+        });
+
+        DataTransferSingleton.setData(this.id, data);
+
+        event.dataTransfer.effectAllowed = "move";
+
+        const dragImage = document.createElement("div");
+        dragImage.textContent = target.content;
+        dragImage.classList.add("custom-dragging");
+
+        document.body.appendChild(dragImage);
+        event.dataTransfer.setDragImage(
+          dragImage,
+          event.offsetX,
+          event.offsetY
+        );
+        setTimeout(() => document.body.removeChild(dragImage), 0);
+
+        event.dataTransfer.setData("text/plain", data);
+      }),
+      addDisposableListener(this._element, "dragend", (ev) => {
+        // drop events fire before dragend so we can remove this safely
+        DataTransferSingleton.removeData(this.id);
+        this.drag?.dispose();
+        this.drag = undefined;
+      })
+    );
+
+    return disposables;
+  }
+
+  public moveToNext(options?: MovementOptions) {
+    if (!options) {
+      options = {};
+    }
+    if (!options.group) {
+      options.group = this.activeGroup;
+    }
+
+    if (options.includePanel) {
+      if (
+        options.group.activePanel !==
+        options.group.panels[options.group.panels.length - 1]
+      ) {
+        options.group.moveToNext({ suppressRoll: true });
+        return;
+      }
+    }
+
+    const location = getGridLocation(options.group.element);
+    const next = this.gridview.next(location)?.view as IGroupview;
+    this.doSetGroupActive(next);
+  }
+
+  public moveToPrevious(options?: MovementOptions) {
+    if (!options) {
+      options = {};
+    }
+    if (!options.group) {
+      options.group = this.activeGroup;
+    }
+
+    if (options.includePanel) {
+      if (options.group.activePanel !== options.group.panels[0]) {
+        options.group.moveToPrevious({ suppressRoll: true });
+        return;
+      }
+    }
+
+    const location = getGridLocation(options.group.element);
+    const next = this.gridview.preivous(location)?.view as IGroupview;
+    this.doSetGroupActive(next);
   }
 
   public registerPanel(panel: IPanel) {
@@ -276,31 +405,8 @@ export class Layout extends CompositeDisposable implements ILayout {
     this.layout(width, height);
   }
 
-  public addPanelFromComponent(
-    componentName: string | PanelContentPartConstructor,
-    options: AddPanelOptions
-  ): PanelReference {
-    const component = createContentComponent(
-      componentName,
-      this.options.components,
-      this.options.frameworkComponents,
-      this.options.frameworkPanelWrapper.createContentWrapper
-    );
-    const tabComponent = createTabComponent(
-      options.tabComponentName,
-      this.options.tabComponents,
-      this.options.frameworkTabComponents,
-      this.options.frameworkPanelWrapper.createTabWrapper
-    );
-
-    const panel = new DefaultPanel(options.id, tabComponent, component);
-    panel.init({
-      title: options.title,
-      suppressClosable: options?.suppressClosable,
-      params: options?.params || {},
-    });
-
-    this.registerPanel(panel);
+  public addPanelFromComponent(options: AddPanelOptions): PanelReference {
+    const panel = this.addPanel(options);
 
     if (options.position?.referencePanel) {
       const referencePanel = this.panels.get(options.position.referencePanel)
@@ -334,6 +440,43 @@ export class Layout extends CompositeDisposable implements ILayout {
         group.removePanel(panel);
       },
     };
+  }
+
+  public addPanel(options: AddPanelOptions): IPanel {
+    const component = this.createContentComponent(options.componentName);
+    const tabComponent = this.createTabComponent(options.tabComponentName);
+
+    const panel = new DefaultPanel(options.id, tabComponent, component);
+    panel.init({
+      title: options.title || options.id,
+      suppressClosable: options?.suppressClosable,
+      params: options?.params || {},
+    });
+
+    this.registerPanel(panel);
+    return panel;
+  }
+
+  private createContentComponent(
+    componentName: string | PanelContentPartConstructor
+  ) {
+    return createContentComponent(
+      componentName,
+      this.options.components,
+      this.options.frameworkComponents,
+      this.options.frameworkPanelWrapper.createContentWrapper
+    );
+  }
+
+  private createTabComponent(
+    componentName: string | PanelHeaderPartConstructor
+  ) {
+    return createTabComponent(
+      componentName,
+      this.options.tabComponents,
+      this.options.frameworkTabComponents,
+      this.options.frameworkPanelWrapper.createTabWrapper
+    );
   }
 
   public addEmptyGroup(options: AddGroupOptions) {
@@ -436,13 +579,14 @@ export class Layout extends CompositeDisposable implements ILayout {
     target: Target,
     index?: number
   ) {
-    const sourceGroup = this.groups.get(groupId).value;
+    const sourceGroup = groupId ? this.groups.get(groupId).value : undefined;
 
     switch (target) {
       case Target.Center:
       case undefined:
-        const groupItem = sourceGroup.removePanel(itemId);
-        if (sourceGroup.size === 0) {
+        const groupItem =
+          sourceGroup?.removePanel(itemId) || this.panels.get(itemId).value;
+        if (sourceGroup?.size === 0) {
           this.doRemoveGroup(sourceGroup);
         }
         referenceGroup.openPanel(groupItem, index);
@@ -457,7 +601,7 @@ export class Layout extends CompositeDisposable implements ILayout {
       target
     );
 
-    if (sourceGroup.size < 2) {
+    if (sourceGroup?.size < 2) {
       const [targetParentLocation, to] = tail(targetLocation);
       const sourceLocation = getGridLocation(sourceGroup.element);
       const [sourceParentLocation, from] = tail(sourceLocation);
@@ -472,7 +616,6 @@ export class Layout extends CompositeDisposable implements ILayout {
       }
 
       // source group will become empty so delete the group
-      // TODO - this doesn't work on linked groups
       const targetGroup = this.doRemoveGroup(sourceGroup, {
         skipActive: true,
         skipDispose: true,
@@ -487,7 +630,8 @@ export class Layout extends CompositeDisposable implements ILayout {
       );
       this.doAddGroup(targetGroup, location);
     } else {
-      const groupItem = sourceGroup.removePanel(itemId);
+      const groupItem =
+        sourceGroup?.removePanel(itemId) || this.panels.get(itemId).value;
       const dropLocation = getRelativeLocation(
         this.gridview.orientation,
         referenceLocation,

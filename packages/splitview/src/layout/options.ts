@@ -1,3 +1,4 @@
+import { IGroupview } from "../groupview/groupview";
 import {
   PanelContentPart,
   PanelContentPartConstructor,
@@ -29,14 +30,22 @@ export interface LayoutOptions {
   frameworkPanelWrapper: FrameworkPanelWrapper;
   tabHeight?: number;
   debug?: boolean;
+  allowAllDropEvents?: boolean;
 }
 
-export interface AddPanelOptions {
-  tabComponentName?: string | PanelHeaderPartConstructor;
+export interface PanelOptions {
+  componentName: string;
+  tabComponentName?: string;
   params?: { [key: string]: any };
   id: string;
   title?: string;
   suppressClosable?: boolean;
+}
+
+export interface AddPanelOptions
+  extends Omit<PanelOptions, "componentName" | "tabComponentName"> {
+  componentName: string | PanelContentPartConstructor;
+  tabComponentName?: string | PanelHeaderPartConstructor;
   position?: {
     direction?: "left" | "right" | "above" | "below" | "within";
     referencePanel: string;
@@ -46,4 +55,9 @@ export interface AddPanelOptions {
 export interface AddGroupOptions {
   direction?: "left" | "right" | "above" | "below";
   referencePanel: string;
+}
+
+export interface MovementOptions {
+  group?: IGroupview;
+  includePanel?: boolean;
 }

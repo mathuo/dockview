@@ -22,20 +22,24 @@ const components = {
       if (layout) {
         event.api.deserialize(layout);
       } else {
-        event.api.addPanelFromComponent("test_component", {
+        event.api.addPanelFromComponent({
+          componentName: "test_component",
           id: "inner-1",
           title: "inner-1",
         });
-        event.api.addPanelFromComponent("test_component", {
+        event.api.addPanelFromComponent({
+          componentName: "test_component",
           id: "inner-2",
           title: "inner-2",
         });
-        event.api.addPanelFromComponent("test_component", {
+        event.api.addPanelFromComponent({
+          componentName: "test_component",
           id: nextGuid(),
           title: "inner-3",
           position: { direction: "within", referencePanel: "inner-1" },
         });
-        event.api.addPanelFromComponent("test_component", {
+        event.api.addPanelFromComponent({
+          componentName: "test_component",
           id: nextGuid(),
           title: "inner-4",
           position: { direction: "within", referencePanel: "inner-2" },
@@ -161,20 +165,24 @@ export const TestGrid = () => {
       return;
     }
 
-    const panelReference = api.addPanelFromComponent("test_component", {
+    const panelReference = api.addPanelFromComponent({
+      componentName: "test_component",
       id: nextGuid(),
       title: "Item 1",
       params: { text: "how low?" },
     });
-    api.addPanelFromComponent("test_component", {
+    api.addPanelFromComponent({
+      componentName: "test_component",
       id: "item2",
       title: "Item 2",
     });
-    api.addPanelFromComponent("test_component", {
+    api.addPanelFromComponent({
+      componentName: "test_component",
       id: nextGuid(),
       title: "Item 3 with a long title",
     });
-    api.addPanelFromComponent("inner_component", {
+    api.addPanelFromComponent({
+      componentName: "test_component",
       id: nextGuid(),
       title: "Item 3",
       position: { direction: "below", referencePanel: "item2" },
@@ -188,9 +196,10 @@ export const TestGrid = () => {
   }, [api]);
 
   const onAdd = () => {
-    api.addPanelFromComponent("test_component", {
-      id: nextGuid(),
-      title: "-",
+    const id = nextGuid();
+    api.addPanelFromComponent({
+      componentName: "test_component",
+      id,
     });
   };
 
@@ -240,14 +249,62 @@ export const TestGrid = () => {
     api.closeAllGroups();
   };
 
+  const onNextGroup = () => {
+    api.moveToNext({ includePanel: true });
+  };
+
+  const onPreviousGroup = () => {
+    api.moveToPrevious({ includePanel: true });
+  };
+
+  const onNextPanel = () => {
+    api.activeGroup?.moveToNext();
+  };
+
+  const onPreviousPanel = () => {
+    api.activeGroup?.moveToPrevious();
+  };
+
+  const dragRef = React.useRef<HTMLDivElement>();
+
+  React.useEffect(() => {
+    if (!api) {
+      return;
+    }
+    console.log("create drag refs");
+    api.createDragTarget(
+      { element: dragRef.current, content: "drag me" },
+      {
+        id: "yellow",
+        componentName: "test_component",
+      }
+    );
+  }, [api]);
+
   return (
     <div style={{ width: "100%" }}>
-      <div style={{ height: "20px" }}>
+      <div style={{ height: "20px", display: "flex" }}>
         <button onClick={onAdd}>Add</button>
         <button onClick={onAddEmpty}>Add empty</button>
         <button onClick={onConfig}>Save</button>
         <button onClick={onLoad}>Load</button>
         <button onClick={onClear}>Clear</button>
+        <button onClick={onNextGroup}>Next</button>
+        <button onClick={onPreviousGroup}>Before</button>
+        <button onClick={onNextPanel}>NextPanel</button>
+        <button onClick={onPreviousPanel}>BeforePanel</button>
+        <div
+          draggable={true}
+          className="my-dragger"
+          style={{
+            backgroundColor: "dodgerblue",
+            borderRadius: "10px",
+            color: " white",
+          }}
+          ref={dragRef}
+        >
+          Drag me
+        </div>
       </div>
       <ReactGrid
         // autoSizeToFitContainer={true}

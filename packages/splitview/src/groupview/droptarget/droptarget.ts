@@ -9,7 +9,7 @@ export enum Target {
   Center = "Center",
 }
 
-type DroptargetEvent = {
+export type DroptargetEvent = {
   target: Target;
   event: DragEvent;
 };
@@ -50,6 +50,7 @@ export class Droptarget {
       isDisabled: () => boolean;
       isDirectional: boolean;
       id: string;
+      allowAnyDataTransfer?: boolean;
     }
   ) {
     this.element.addEventListener("dragenter", this.onDragEnter);
@@ -62,7 +63,10 @@ export class Droptarget {
   }
 
   private onDragEnter = (event: DragEvent) => {
-    if (!DataTransferSingleton.has(this.options.id)) {
+    if (
+      !this.options.allowAnyDataTransfer &&
+      !DataTransferSingleton.has(this.options.id)
+    ) {
       console.debug("[droptarget] invalid event");
       return;
     }
@@ -90,7 +94,10 @@ export class Droptarget {
   };
 
   private onDrop = (event: DragEvent) => {
-    if (!DataTransferSingleton.has(this.options.id)) {
+    if (
+      !this.options.allowAnyDataTransfer &&
+      !DataTransferSingleton.has(this.options.id)
+    ) {
       console.debug("[dragtarget] invalid");
       return;
     }

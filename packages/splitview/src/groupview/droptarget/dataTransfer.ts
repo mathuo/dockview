@@ -1,3 +1,49 @@
+import { PanelOptions } from "../../layout/options";
+
+export enum DragType {
+  ITEM = "group_drag",
+  EXTERNAL = "external_group_drag",
+}
+
+export type DragItem = {
+  itemId: string;
+  groupId: string;
+};
+
+export type ExternalDragItem = PanelOptions;
+
+export type DataObject = DragItem | ExternalDragItem;
+
+/**
+ * Determine whether this data belong to that of an event that was started by
+ * dragging a tab component
+ */
+export const isTabDragEvent = (data: any): data is DragItem => {
+  return data.type === DragType.ITEM;
+};
+
+/**
+ * Determine whether this data belong to that of an event that was started by
+ * a custom drag-enable component
+ */
+export const isCustomDragEvent = (data: any): data is ExternalDragItem => {
+  return data.type === DragType.EXTERNAL;
+};
+
+export const extractData = (event: DragEvent): DataObject => {
+  const data = JSON.parse(event.dataTransfer.getData("text/plain"));
+
+  if (!data) {
+    console.warn(`[dragEvent] text/plain data is missing`);
+  }
+
+  if (typeof data.type !== "string") {
+    console.warn(`[dragEvent] invalid type ${data.type}`);
+  }
+
+  return data;
+};
+
 class DataTransfer {
   private map = new Map<string, string>();
 

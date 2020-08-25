@@ -46,20 +46,27 @@
 }
 
 .tab {
+  &.dragging {
+    color: var(--active-group-visible-panel-color);
+    .tab-action {
+      background-color: var(--active-group-visible-panel-color);
+    }
+  }
+
   &.active-tab > .default-tab {
     background-color: var(--tab-background-visible);
-    .tab-list {
+    .tab-action {
       visibility: visible;
     }
   }
 
   &.inactive-tab > .default-tab {
     background-color: var(--tab-background-hidden);
-    .tab-list {
+    .tab-action:not(.dirty) {
       visibility: hidden;
     }
     &:hover {
-      .tab-list {
+      .tab-action {
         visibility: visible;
       }
     }

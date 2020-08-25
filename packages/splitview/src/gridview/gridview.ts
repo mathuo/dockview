@@ -321,6 +321,49 @@ export class Gridview {
     this.element.appendChild(root.element);
   }
 
+  public next(location: number[]) {
+    return this.progmaticSelect(location);
+  }
+
+  public preivous(location: number[]) {
+    return this.progmaticSelect(location, true);
+  }
+
+  private progmaticSelect(location: number[], reverse = false) {
+    const [rest, index] = tail(location);
+    const [path, node] = this.getNode(location);
+
+    if (!(node instanceof LeafNode)) {
+      throw new Error("invalid location");
+    }
+
+    const findLeaf = (node: Node, last: boolean) => {
+      if (node instanceof LeafNode) {
+        return node;
+      }
+      if (node instanceof BranchNode) {
+        return findLeaf(
+          node.children[last ? node.children.length - 1 : 0],
+          last
+        );
+      }
+      throw new Error("invalid node");
+    };
+
+    for (let i = path.length - 1; i > -1; i--) {
+      const n = path[i];
+      const l = location[i] || 0;
+      const canProgressInCurrentLevel = reverse
+        ? l - 1 > -1
+        : l + 1 < n.children.length;
+      if (canProgressInCurrentLevel) {
+        return findLeaf(n.children[reverse ? l - 1 : l + 1], reverse);
+      }
+    }
+
+    return findLeaf(this.root, reverse);
+  }
+
   get width(): number {
     return this.root.width;
   }

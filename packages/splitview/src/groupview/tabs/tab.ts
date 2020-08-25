@@ -1,13 +1,15 @@
 import { addDisposableListener, Emitter, Event } from "../../events";
-import { Droptarget } from "../droptarget/droptarget";
+import { Droptarget, DroptargetEvent } from "../droptarget/droptarget";
 import { CompositeDisposable } from "../../lifecycle";
 import { TabChangedEvent, TabDropEvent, TabChangedEventType } from "../events";
 import { IGroupview } from "../groupview";
-import { DataTransferSingleton } from "../droptarget/dataTransfer";
+import {
+  DataTransferSingleton,
+  DragType,
+  extractData,
+} from "../droptarget/dataTransfer";
 import { IGroupAccessor } from "../../layout";
 import { toggleClass } from "../../dom";
-
-export const DRAG_TYPE = "group_drag";
 
 export interface ITab {
   id: string;
@@ -15,8 +17,10 @@ export interface ITab {
   hasActiveDragEvent: boolean;
   setContent: (element: HTMLElement) => void;
   onChanged: Event<TabChangedEvent>;
-  onDropped: Event<TabDropEvent>;
+  onDropped: Event<DroptargetEvent>;
   setActive(isActive: boolean): void;
+  startDragEvent(): void;
+  stopDragEvent(): void;
 }
 
 export class Tab extends CompositeDisposable implements ITab {
@@ -30,8 +34,8 @@ export class Tab extends CompositeDisposable implements ITab {
   private readonly _onChanged = new Emitter<TabChangedEvent>();
   readonly onChanged: Event<TabChangedEvent> = this._onChanged.event;
 
-  private readonly _onDropped = new Emitter<TabDropEvent>();
-  readonly onDropped: Event<TabDropEvent> = this._onDropped.event;
+  private readonly _onDropped = new Emitter<DroptargetEvent>();
+  readonly onDropped: Event<DroptargetEvent> = this._onDropped.event;
 
   public get element() {
     return this._element;
@@ -39,6 +43,14 @@ export class Tab extends CompositeDisposable implements ITab {
 
   public get hasActiveDragEvent() {
     return this.dragInPlayDetails?.isDragging;
+  }
+
+  public startDragEvent() {
+    this.dragInPlayDetails = { isDragging: true, id: this.accessor.id };
+  }
+
+  public stopDragEvent() {
+    this.dragInPlayDetails = { isDragging: false, id: undefined };
   }
 
   constructor(
@@ -73,7 +85,8 @@ export class Tab extends CompositeDisposable implements ITab {
         // therefore we must explicility re-add the style features that we know will be lost
         dragImage.style.height = `${box.height}px`;
         dragImage.style.width = `${box.width}px`;
-        dragImage.style.color = "var(--active-group-visible-panel-color)";
+        dragImage.style.position = "absolute";
+        dragImage.classList.add("dragging");
 
         document.body.appendChild(dragImage);
         event.dataTransfer.setDragImage(
@@ -85,7 +98,7 @@ export class Tab extends CompositeDisposable implements ITab {
         // configure the data-transfer object
 
         const data = JSON.stringify({
-          type: DRAG_TYPE,
+          type: DragType.ITEM,
           itemId: this.id,
           groupId: this.group.id,
         });
@@ -112,21 +125,7 @@ export class Tab extends CompositeDisposable implements ITab {
 
     this.addDisposables(
       this.droptarget.onDidChange((event) => {
-        const {
-          groupId,
-          itemId,
-        }: { groupId: string; itemId: string } = JSON.parse(
-          event.event.dataTransfer.getData("text/plain")
-        );
-
-        setTimeout(() => {
-          this._onDropped.fire({
-            groupId,
-            itemId,
-            target: event.target,
-            // index: this.items.findIndex((i) => i.tab === tab),
-          });
-        }, 0);
+        this._onDropped.fire(event);
       })
     );
   }

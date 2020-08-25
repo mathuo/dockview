@@ -21,11 +21,15 @@ export class DefaultPanel extends CompositeDisposable implements IPanel {
   private readonly _onDidDirtyChange = new Emitter<boolean>();
 
   private readonly api: PanelApi;
-  private group: IGroupview;
+  private _group: IGroupview;
   private params: PanelInitParameters;
 
   private readonly _onDidStateChange = new Emitter<any>();
   readonly onDidStateChange: Event<any> = this._onDidStateChange.event;
+
+  get group() {
+    return this._group;
+  }
 
   get header() {
     return this.headerPart;
@@ -47,7 +51,7 @@ export class DefaultPanel extends CompositeDisposable implements IPanel {
       this._onDidPanelDimensionsChange.event,
       this._onDidDirtyChange.event,
       this,
-      this.group
+      this._group
     );
 
     this.addDisposables(
@@ -112,30 +116,33 @@ export class DefaultPanel extends CompositeDisposable implements IPanel {
   }
 
   public setVisible(isGroupActive: boolean, group: IGroupview) {
-    this.group = group;
+    this._group = group;
     this.api.group = group;
 
-    this.mutableDisposable.value = this.group.onDidGroupChange((ev) => {
+    this.mutableDisposable.value = this._group.onDidGroupChange((ev) => {
       if (ev.kind === GroupChangeKind.GROUP_ACTIVE) {
         //
         this._onDidPanelStateChange.fire({
           isGroupActive,
-          isPanelVisible: this.group.isPanelActive(this),
+          isPanelVisible: this._group.isPanelActive(this),
         });
       }
     });
 
     this._onDidPanelStateChange.fire({
       isGroupActive,
-      isPanelVisible: this.group.isPanelActive(this),
+      isPanelVisible: this._group.isPanelActive(this),
     });
 
     if (this.headerPart.setVisible) {
-      this.headerPart.setVisible(this.group.isPanelActive(this), isGroupActive);
+      this.headerPart.setVisible(
+        this._group.isPanelActive(this),
+        isGroupActive
+      );
     }
     if (this.contentPart.setVisible) {
       this.contentPart.setVisible(
-        this.group.isPanelActive(this),
+        this._group.isPanelActive(this),
         isGroupActive
       );
     }

@@ -98,10 +98,6 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
 
     const list = document.createElement("ul");
     list.className = "action-list";
-    // const closeAnchor = document.createElement("a");
-    // closeAnchor.className = "close-action";
-    // this.actionContainer.appendChild(list);
-    // list.appendChild(closeAnchor);
 
     this.tabContainer = document.createElement("div");
     this.tabContainer.className = "tab-container";
@@ -136,23 +132,6 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
         }
         removeClasses(this.tabContainer, "drag-over-target");
 
-        const {
-          groupId,
-          itemId,
-        }: { groupId: string; itemId: string } = JSON.parse(
-          event.dataTransfer.getData("text/plain")
-        );
-
-        if (this.group.id === groupId) {
-          const index = this.tabs.findIndex((tab) => tab.id === itemId);
-          if (index > -1) {
-            if (index === this.tabs.length - 1) {
-              console.debug("[tabs] dropped in empty space");
-              return;
-            }
-          }
-        }
-
         const activetab = this.tabs.find((tab) => tab.hasActiveDragEvent);
 
         const ignore = !!(
@@ -161,14 +140,11 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
 
         if (ignore) {
           console.debug("[tabs] ignore event");
-
           return;
         }
 
         this._onDropped.fire({
-          groupId,
-          itemId,
-          target: undefined,
+          event: { event, target: undefined },
         });
       })
     );
@@ -216,20 +192,13 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
     const tab = new Tab(panel.id, this.accessor, this.group);
     tab.setContent(panel.header.element);
 
+    // TODO - dispose of resources
     const disposables = CompositeDisposable.from(
       tab.onChanged((event) => {
         this.group.openPanel(panel);
       }),
       tab.onDropped((event) => {
-        const group = this.accessor.getGroup(event.groupId);
-
-        this.accessor.moveGroup(
-          this.group,
-          event.groupId,
-          event.itemId,
-          event.target,
-          this.indexOf(tab)
-        );
+        this._onDropped.fire({ event, index: this.indexOf(tab) });
       })
     );
 
@@ -243,12 +212,5 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
 
   public dispose() {
     super.dispose();
-  }
-
-  private redraw() {
-    this.group.panels.forEach((panel, i) => {
-      const isTabActive = this.group.isPanelActive(panel);
-      const isGroupActive = this.isActive;
-    });
   }
 }

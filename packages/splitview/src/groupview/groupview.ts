@@ -1,14 +1,20 @@
-import { IDisposable, CompositeDisposable } from "../lifecycle";
+import { IDisposable, CompositeDisposable, Disposable } from "../lifecycle";
 import { ITabContainer, TabContainer } from "./tabs/tabContainer";
 import { IContentContainer, ContentContainer } from "./content";
 import { IGridView } from "../gridview/gridview";
-import { Target, Droptarget } from "./droptarget/droptarget";
+import { Target, Droptarget, DroptargetEvent } from "./droptarget/droptarget";
 import { Event, Emitter, addDisposableListener } from "../events";
 import { IGroupAccessor, Layout } from "../layout";
 import { toggleClass } from "../dom";
 import { ClosePanelResult, WatermarkPart } from "./panel/parts";
 import { IPanel } from "./panel/types";
 import { timeoutPromise } from "../async";
+import {
+  extractData,
+  isTabDragEvent,
+  isCustomDragEvent,
+  DataObject,
+} from "./droptarget/dataTransfer";
 
 export const enum GroupChangeKind {
   GROUP_ACTIVE = "GROUP_ACTIVE",
@@ -55,10 +61,6 @@ export interface GroupChangeEvent {
   panel?: IPanel;
 }
 
-// export interface IGroupviewPublic {
-
-// }
-
 export interface IGroupview extends IDisposable, IGridView {
   id: string;
   size: number;
@@ -78,6 +80,11 @@ export interface IGroupview extends IDisposable, IGridView {
   // events
   onDidGroupChange: Event<{ kind: GroupChangeKind }>;
   onMove: Event<GroupMoveEvent>;
+  //
+  startActiveDrag(panel: IPanel): IDisposable;
+  //
+  moveToNext(options?: { panel?: IPanel; suppressRoll?: boolean }): void;
+  moveToPrevious(options?: { panel?: IPanel; suppressRoll?: boolean }): void;
 }
 
 export class Groupview extends CompositeDisposable implements IGroupview {
@@ -157,6 +164,70 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     };
   }
 
+  public startActiveDrag(panel: IPanel): IDisposable {
+    const index = this.tabContainer.indexOf(panel.id);
+    if (index > -1) {
+      const tab = this.tabContainer.at(index);
+      tab.startDragEvent();
+      return {
+        dispose: () => {
+          tab.stopDragEvent();
+        },
+      };
+    }
+    return Disposable.NONE;
+  }
+
+  public moveToNext(options?: { panel?: IPanel; suppressRoll?: boolean }) {
+    if (!options) {
+      options = {};
+    }
+    if (!options.panel) {
+      options.panel = this.activePanel;
+    }
+
+    const index = this.panels.indexOf(options.panel);
+
+    let normalizedIndex: number = undefined;
+
+    if (index < this.panels.length - 1) {
+      normalizedIndex = index + 1;
+    } else if (!options.suppressRoll) {
+      normalizedIndex = 0;
+    }
+
+    if (normalizedIndex === undefined) {
+      return;
+    }
+
+    this.openPanel(this.panels[normalizedIndex]);
+  }
+
+  public moveToPrevious(options?: { panel?: IPanel; suppressRoll?: boolean }) {
+    if (!options) {
+      options = {};
+    }
+    if (!options.panel) {
+      options.panel = this.activePanel;
+    }
+
+    const index = this.panels.indexOf(options.panel);
+
+    let normalizedIndex: number = undefined;
+
+    if (index > 0) {
+      normalizedIndex = index - 1;
+    } else if (!options.suppressRoll) {
+      normalizedIndex = this.panels.length - 1;
+    }
+
+    if (normalizedIndex === undefined) {
+      return;
+    }
+
+    this.openPanel(this.panels[normalizedIndex]);
+  }
+
   public containsPanel(panel: IPanel) {
     return this.panels.includes(panel);
   }
@@ -195,9 +266,9 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     this.addDisposables(
       this._onMove,
       this._onDidGroupChange,
-      this.tabContainer.onDropEvent((event) => {
-        this._onMove.fire(event);
-      }),
+      this.tabContainer.onDropEvent((event) =>
+        this.handleDataObject(event.event, event.index)
+      ),
       this.contentContainer.onDidFocus(() => {
         this.accessor.doSetGroupActive(this);
       }),
@@ -210,15 +281,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
           return;
         }
 
-        const {
-          groupId,
-          itemId,
-        }: { groupId: string; itemId: string } = JSON.parse(
-          event.event.dataTransfer.getData("text/plain")
-        );
-        setTimeout(() => {
-          this._onMove.fire({ groupId, itemId, target: event.target });
-        }, 0);
+        this.handleDataObject(event);
       })
     );
 
@@ -234,7 +297,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     this.updateContainer();
   }
 
-  public openPanel(panel: IPanel, index?: number) {
+  public openPanel(panel: IPanel, index: number = this.panels.length) {
     if (this._activePanel === panel) {
       this.accessor.doSetGroupActive(this);
       return;
@@ -401,19 +464,16 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     this._onDidGroupChange.fire({ kind: GroupChangeKind.REMOVE_PANEL, panel });
   }
 
-  private doAddPanel(panel: IPanel, index?: number) {
+  private doAddPanel(panel: IPanel, index: number) {
     const existingPanel = this._panels.indexOf(panel);
     const hasExistingPabel = existingPanel > -1;
 
     if (hasExistingPabel) {
+      // TODO - need to ensure ordering hasn't changed and if it has need to re-order this.panels
       return;
     }
 
-    this._panels = [
-      ...this._panels.splice(0, index),
-      panel,
-      ...this._panels.splice(index),
-    ];
+    this.panels.splice(index, 0, panel);
 
     this._onDidGroupChange.fire({ kind: GroupChangeKind.ADD_PANEL });
   }
@@ -451,6 +511,43 @@ export class Groupview extends CompositeDisposable implements IGroupview {
       this.watermark.dispose();
       this.watermark = undefined;
       this.contentContainer.closePanel();
+    }
+  }
+
+  private handleDataObject(event: DroptargetEvent, index?: number) {
+    const dataObject = extractData(event.event);
+
+    if (isTabDragEvent(dataObject)) {
+      const { groupId, itemId } = dataObject;
+      if (this.id === groupId) {
+        const index = this.tabContainer.indexOf(itemId);
+        if (index > -1 && index === this.panels.length - 1) {
+          console.debug("[tabs] dropped in empty space");
+          return;
+        }
+      }
+
+      this._onMove.fire({
+        target: event.target,
+        groupId: dataObject.groupId,
+        itemId: dataObject.itemId,
+        index,
+      });
+    }
+
+    if (isCustomDragEvent(dataObject)) {
+      let panel = this.accessor.getPanel(dataObject.id);
+
+      if (!panel) {
+        panel = this.accessor.addPanel(dataObject);
+      }
+
+      this._onMove.fire({
+        target: event.target,
+        groupId: panel.group?.id,
+        itemId: panel.id,
+        index,
+      });
     }
   }
 

@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { IDisposable } from "../lifecycle";
 import { PanelApi } from "../groupview/panel/api";
+import { sequentialNumberGenerator } from "../math";
 
 export interface IPanelProps {
   api: PanelApi;
@@ -43,7 +44,7 @@ const PanelWrapper = React.forwardRef(
   }
 );
 
-let id = 0;
+const counter = sequentialNumberGenerator();
 
 export class ReactPart implements IDisposable {
   private componentInstance: IPanelWrapperRef;
@@ -85,11 +86,7 @@ export class ReactPart implements IDisposable {
         this.componentInstance = element;
       },
     });
-    const portal = ReactDOM.createPortal(
-      wrapper,
-      this.parent,
-      (++id).toString()
-    );
+    const portal = ReactDOM.createPortal(wrapper, this.parent, counter.next());
 
     this.ref = {
       portal,

@@ -5,8 +5,8 @@ import { PanelApi } from "./api";
 import { PanelInitParameters } from "./types";
 
 export enum ClosePanelResult {
-  CLOSE,
-  DONT_CLOSE,
+  CLOSE = "CLOSE",
+  DONT_CLOSE = "DONT_CLOSE",
 }
 
 interface Methods extends IDisposable {

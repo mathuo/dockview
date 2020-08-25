@@ -30,6 +30,7 @@ export interface IPanel extends IDisposable, ISerializable {
   id: string;
   header: PanelHeaderPart;
   content: PanelContentPart;
+  group: IGroupview;
   focus(): void;
   onHide(): void;
   setVisible(isGroupActive: boolean, group: IGroupview): void;
