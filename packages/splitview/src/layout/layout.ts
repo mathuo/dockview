@@ -8,6 +8,7 @@ import {
   GroupOptions,
   GroupChangeKind,
   GroupChangeEvent,
+  GroupDropEvent,
 } from "../groupview/groupview";
 import { IPanel } from "../groupview/panel/types";
 import { DefaultPanel } from "../groupview/panel/panel";
@@ -37,6 +38,7 @@ import {
 } from "./options";
 import {
   DataTransferSingleton,
+  DATA_KEY,
   DragType,
 } from "../groupview/droptarget/dataTransfer";
 
@@ -75,6 +77,10 @@ export interface Api {
     },
     options: (() => PanelOptions) | PanelOptions
   ): IDisposable;
+  addDndHandle(
+    type: string,
+    cb: (event: LayoutDropEvent) => PanelOptions
+  ): void;
 }
 
 export interface IGroupAccessor {
@@ -103,6 +109,10 @@ export interface IGroupAccessor {
 
 export interface ILayout extends IGroupAccessor, Api {}
 
+export interface LayoutDropEvent {
+  event: GroupDropEvent;
+}
+
 export class Layout extends CompositeDisposable implements ILayout {
   private readonly _element: HTMLElement;
   private readonly _id = nextLayoutId.next();
@@ -123,6 +133,17 @@ export class Layout extends CompositeDisposable implements ILayout {
   private resizeTimer: NodeJS.Timer;
   private debugContainer: DebugWidget;
   private panelState = {};
+  private registry = new Map<
+    string,
+    (event: LayoutDropEvent) => PanelOptions
+  >();
+
+  addDndHandle(
+    type: string,
+    cb: (event: LayoutDropEvent) => PanelOptions
+  ): void {
+    this.registry.set(type, cb);
+  }
 
   constructor(public readonly options: LayoutOptions) {
     super();
@@ -227,7 +248,7 @@ export class Layout extends CompositeDisposable implements ILayout {
         );
         setTimeout(() => document.body.removeChild(dragImage), 0);
 
-        event.dataTransfer.setData("text/plain", data);
+        event.dataTransfer.setData(DATA_KEY, data);
       }),
       addDisposableListener(this._element, "dragend", (ev) => {
         // drop events fire before dragend so we can remove this safely
@@ -658,7 +679,32 @@ export class Layout extends CompositeDisposable implements ILayout {
         group.onDidGroupChange((event) => {
           this._onDidLayoutChange.fire(event);
         }),
-        group
+        group.onDrop((event) => {
+          const dragEvent = event.event;
+          const dataTransfer = dragEvent.dataTransfer;
+          if (dataTransfer.types.length === 0) {
+            return;
+          }
+          if (!this.registry.has(dataTransfer.types[0])) {
+            return;
+          }
+          const cb = this.registry.get(dataTransfer.types[0]);
+
+          const panelOptions = cb({ event });
+
+          let panel = this.getPanel(panelOptions.id);
+
+          if (!panel) {
+            panel = this.addPanel(panelOptions);
+          }
+          this.moveGroup(
+            group,
+            panel?.group.id,
+            panel.id,
+            event.target,
+            event.index
+          );
+        })
       );
 
       this.groups.set(group.id, { value: group, disposable });

@@ -193,6 +193,15 @@ export const TestGrid = () => {
     //   panelReference.update({ params: { text: `Tick ${Date.now()}` } });
     //   // panelReference.remove();
     // }, 1000);
+
+    api.addDndHandle("text/plain", (ev) => {
+      const { event } = ev;
+
+      return {
+        id: "yellow",
+        componentName: "test_component",
+      };
+    });
   }, [api]);
 
   const onAdd = () => {
@@ -274,12 +283,16 @@ export const TestGrid = () => {
     console.log("create drag refs");
     api.createDragTarget(
       { element: dragRef.current, content: "drag me" },
-      {
+      () => ({
         id: "yellow",
         componentName: "test_component",
-      }
+      })
     );
   }, [api]);
+
+  const onDragStart = (event: React.DragEvent) => {
+    event.dataTransfer.setData("text/plain", "Panel2");
+  };
 
   return (
     <div style={{ width: "100%" }}>
@@ -305,13 +318,25 @@ export const TestGrid = () => {
         >
           Drag me
         </div>
+        <div
+          onDragStart={onDragStart}
+          draggable={true}
+          className="my-dragger"
+          style={{
+            backgroundColor: "orange",
+            borderRadius: "10px",
+            color: " white",
+          }}
+        >
+          Drag me too
+        </div>
       </div>
       <ReactGrid
         // autoSizeToFitContainer={true}
         onReady={onReady}
         components={components}
         debug={true}
-
+        enableExternalDragEvents={true}
         // serializedLayout={data}
       />
     </div>

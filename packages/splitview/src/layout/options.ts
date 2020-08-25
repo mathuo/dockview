@@ -30,7 +30,7 @@ export interface LayoutOptions {
   frameworkPanelWrapper: FrameworkPanelWrapper;
   tabHeight?: number;
   debug?: boolean;
-  allowAllDropEvents?: boolean;
+  enableExternalDragEvents?: boolean;
 }
 
 export interface PanelOptions {

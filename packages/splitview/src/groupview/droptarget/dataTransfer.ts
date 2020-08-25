@@ -1,5 +1,11 @@
 import { PanelOptions } from "../../layout/options";
 
+export const DATA_KEY = "splitview/transfer";
+
+export const isPanelTransferEvent = (event: DragEvent) => {
+  return event.dataTransfer.types.includes(DATA_KEY);
+};
+
 export enum DragType {
   ITEM = "group_drag",
   EXTERNAL = "external_group_drag",
@@ -31,10 +37,10 @@ export const isCustomDragEvent = (data: any): data is ExternalDragItem => {
 };
 
 export const extractData = (event: DragEvent): DataObject => {
-  const data = JSON.parse(event.dataTransfer.getData("text/plain"));
+  const data = JSON.parse(event.dataTransfer.getData(DATA_KEY));
 
   if (!data) {
-    console.warn(`[dragEvent] text/plain data is missing`);
+    console.warn(`[dragEvent] ${DATA_KEY} data is missing`);
   }
 
   if (typeof data.type !== "string") {

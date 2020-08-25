@@ -13,7 +13,7 @@ import {
   extractData,
   isTabDragEvent,
   isCustomDragEvent,
-  DataObject,
+  isPanelTransferEvent,
 } from "./droptarget/dataTransfer";
 
 export const enum GroupChangeKind {
@@ -71,6 +71,7 @@ export interface IGroupview extends IDisposable, IGridView {
   isPanelActive: (panel: IPanel) => boolean;
   isActive: boolean;
   activePanel: IPanel;
+  indexOf(panel: IPanel): number;
   // panel lifecycle
   openPanel(panel: IPanel, index?: number): void;
   closePanel(panel: IPanel): Promise<boolean>;
@@ -86,6 +87,12 @@ export interface IGroupview extends IDisposable, IGridView {
   moveToNext(options?: { panel?: IPanel; suppressRoll?: boolean }): void;
   moveToPrevious(options?: { panel?: IPanel; suppressRoll?: boolean }): void;
 }
+
+export type GroupDropEvent = {
+  event: DragEvent;
+  target: Target;
+  index?: number;
+};
 
 export class Groupview extends CompositeDisposable implements IGroupview {
   private _element: HTMLElement;
@@ -104,6 +111,9 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
   private readonly _onMove = new Emitter<GroupMoveEvent>();
   readonly onMove: Event<GroupMoveEvent> = this._onMove.event;
+
+  private readonly _onDrop = new Emitter<GroupDropEvent>();
+  readonly onDrop: Event<GroupDropEvent> = this._onDrop.event;
 
   private readonly _onDidGroupChange = new Emitter<GroupChangeEvent>();
   readonly onDidGroupChange: Event<{ kind: GroupChangeKind }> = this
@@ -155,6 +165,10 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
   get maximumWidth() {
     return Number.MAX_SAFE_INTEGER;
+  }
+
+  public indexOf(panel: IPanel) {
+    return this.tabContainer.indexOf(panel.id);
   }
 
   public toJSON(): object {
@@ -239,7 +253,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
   ) {
     super();
 
-    this.addDisposables(this._onMove);
+    this.addDisposables(this._onMove, this._onDidGroupChange, this._onDrop);
 
     this._element = document.createElement("div");
     this._element.className = "groupview";
@@ -256,6 +270,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
           this._panels.length === 1 && this.tabContainer.hasActiveDragEvent
         );
       },
+      enableExternalDragEvents: this.accessor.options.enableExternalDragEvents,
     });
 
     this._element.append(
@@ -267,7 +282,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
       this._onMove,
       this._onDidGroupChange,
       this.tabContainer.onDropEvent((event) =>
-        this.handleDataObject(event.event, event.index)
+        this.handleDropEvent(event.event, event.index)
       ),
       this.contentContainer.onDidFocus(() => {
         this.accessor.doSetGroupActive(this);
@@ -281,7 +296,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
           return;
         }
 
-        this.handleDataObject(event);
+        this.handleDropEvent(event);
       })
     );
 
@@ -514,12 +529,28 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
   }
 
-  private handleDataObject(event: DroptargetEvent, index?: number) {
-    const dataObject = extractData(event.event);
+  private handleDropEvent(event: DroptargetEvent, index?: number) {
+    if (isPanelTransferEvent(event.event)) {
+      this.handlePanelDropEvent(event.event, event.target, index);
+      return;
+    }
+
+    this._onDrop.fire({ event: event.event, target: event.target, index });
+
+    console.debug("[customDropEvent]");
+  }
+
+  private handlePanelDropEvent(
+    event: DragEvent,
+    target: Target,
+    index?: number
+  ) {
+    const dataObject = extractData(event);
 
     if (isTabDragEvent(dataObject)) {
       const { groupId, itemId } = dataObject;
-      if (this.id === groupId) {
+      const isSameGroup = this.id === groupId;
+      if (isSameGroup) {
         const index = this.tabContainer.indexOf(itemId);
         if (index > -1 && index === this.panels.length - 1) {
           console.debug("[tabs] dropped in empty space");
@@ -528,7 +559,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
       }
 
       this._onMove.fire({
-        target: event.target,
+        target,
         groupId: dataObject.groupId,
         itemId: dataObject.itemId,
         index,
@@ -543,7 +574,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
       }
 
       this._onMove.fire({
-        target: event.target,
+        target,
         groupId: panel.group?.id,
         itemId: panel.id,
         index,

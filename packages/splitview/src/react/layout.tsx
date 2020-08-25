@@ -36,6 +36,7 @@ export interface IReactGridProps {
   };
   debug?: boolean;
   tabHeight?: number;
+  enableExternalDragEvents?: boolean;
 }
 
 export const ReactGrid = (props: IReactGridProps) => {
@@ -75,6 +76,7 @@ export const ReactGrid = (props: IReactGridProps) => {
       frameworkTabComponents: props.tabComponents,
       tabHeight: props.tabHeight,
       debug: props.debug,
+      enableExternalDragEvents: props.enableExternalDragEvents,
     });
 
     layoutReference.current = layout;

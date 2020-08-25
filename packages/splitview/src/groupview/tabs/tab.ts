@@ -5,6 +5,7 @@ import { TabChangedEvent, TabDropEvent, TabChangedEventType } from "../events";
 import { IGroupview } from "../groupview";
 import {
   DataTransferSingleton,
+  DATA_KEY,
   DragType,
   extractData,
 } from "../droptarget/dataTransfer";
@@ -104,7 +105,7 @@ export class Tab extends CompositeDisposable implements ITab {
         });
         DataTransferSingleton.setData(this.dragInPlayDetails.id, data);
 
-        event.dataTransfer.setData("text/plain", data);
+        event.dataTransfer.setData(DATA_KEY, data);
         event.dataTransfer.effectAllowed = "move";
       }),
       addDisposableListener(this._element, "dragend", (ev) => {
@@ -121,6 +122,7 @@ export class Tab extends CompositeDisposable implements ITab {
       isDirectional: false,
       isDisabled: () => this.dragInPlayDetails.isDragging,
       id: this.accessor.id,
+      enableExternalDragEvents: this.accessor.options.enableExternalDragEvents,
     });
 
     this.addDisposables(

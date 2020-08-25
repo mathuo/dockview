@@ -50,7 +50,7 @@ export class Droptarget {
       isDisabled: () => boolean;
       isDirectional: boolean;
       id: string;
-      allowAnyDataTransfer?: boolean;
+      enableExternalDragEvents?: boolean;
     }
   ) {
     this.element.addEventListener("dragenter", this.onDragEnter);
@@ -64,7 +64,7 @@ export class Droptarget {
 
   private onDragEnter = (event: DragEvent) => {
     if (
-      !this.options.allowAnyDataTransfer &&
+      !this.options.enableExternalDragEvents &&
       !DataTransferSingleton.has(this.options.id)
     ) {
       console.debug("[droptarget] invalid event");
@@ -95,7 +95,7 @@ export class Droptarget {
 
   private onDrop = (event: DragEvent) => {
     if (
-      !this.options.allowAnyDataTransfer &&
+      !this.options.enableExternalDragEvents &&
       !DataTransferSingleton.has(this.options.id)
     ) {
       console.debug("[dragtarget] invalid");
