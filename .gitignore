@@ -2,3 +2,4 @@ node_modules/
 dist/
 typedocs/
 .DS_Store
+lerna-debug.log
