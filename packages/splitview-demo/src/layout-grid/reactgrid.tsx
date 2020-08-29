@@ -9,6 +9,39 @@ import {
   CompositeDisposable,
   GroupChangeKind,
 } from "splitview";
+import { CustomTab } from "./customTab";
+import { SplitPanel } from "./splitPanel";
+
+const Editor = (props: IPanelProps & { layoutApi: Api }) => {
+  const [tabHeight, setTabHeight] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    if (props.layoutApi) {
+      setTabHeight(props.layoutApi.getTabHeight());
+    }
+  }, [props.layoutApi]);
+
+  const onTabHeightChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(event.target.value);
+    if (!Number.isNaN(value)) {
+      setTabHeight(value);
+    }
+  };
+
+  const onClick = () => {
+    props.layoutApi.setTabHeight(tabHeight);
+  };
+
+  return (
+    <div style={{ height: "100%", backgroundColor: "white", color: "black" }}>
+      <label>
+        Tab height
+        <input onChange={onTabHeightChange} value={tabHeight} type="number" />
+        <button onClick={onClick}>Apply</button>
+      </label>
+    </div>
+  );
+};
 
 const components = {
   inner_component: (props: IPanelProps) => {
@@ -122,6 +155,7 @@ const components = {
 
     const backgroundColor = React.useMemo(
       () =>
+        // "#1e1e1e",
         `rgb(${Math.floor(Math.random() * 256)},${Math.floor(
           Math.random() * 256
         )},${Math.floor(Math.random() * 256)})`,
@@ -143,6 +177,12 @@ const components = {
       </div>
     );
   },
+  editor: Editor,
+  split_panel: SplitPanel,
+};
+
+const tabComponents = {
+  default: CustomTab,
 };
 
 const nextGuid = (() => {
@@ -177,7 +217,7 @@ export const TestGrid = () => {
       title: "Item 2",
     });
     api.addPanelFromComponent({
-      componentName: "test_component",
+      componentName: "split_panel",
       id: nextGuid(),
       title: "Item 3 with a long title",
     });
@@ -199,6 +239,18 @@ export const TestGrid = () => {
 
       return {
         id: "yellow",
+        componentName: "test_component",
+      };
+    });
+
+    api.addDndHandle("Files", (ev) => {
+      const { event } = ev;
+
+      ev.event.event.preventDefault();
+
+      return {
+        id: Date.now().toString(),
+        title: event.event.dataTransfer.files[0].name,
         componentName: "test_component",
       };
     });
@@ -224,6 +276,7 @@ export const TestGrid = () => {
       _api.current?.layout(width, height);
     };
     window.addEventListener("resize", callback);
+    callback(undefined);
 
     const dis = _api.current.onDidLayoutChange((event) => {
       console.log(event.kind);
@@ -280,7 +333,6 @@ export const TestGrid = () => {
     if (!api) {
       return;
     }
-    console.log("create drag refs");
     api.createDragTarget(
       { element: dragRef.current, content: "drag me" },
       () => ({
@@ -294,10 +346,25 @@ export const TestGrid = () => {
     event.dataTransfer.setData("text/plain", "Panel2");
   };
 
+  const onAddEditor = () => {
+    api.addPanelFromComponent({
+      id: "editor",
+      componentName: "editor",
+      tabComponentName: "default",
+      params: { layoutApi: api },
+    });
+  };
+
+  const onTabContextMenu = (event: MouseEvent) => {};
+
   return (
-    <div style={{ width: "100%" }}>
+    <div
+      // className="visual-studio-theme"
+      style={{ width: "100%" }}
+    >
       <div style={{ height: "20px", display: "flex" }}>
         <button onClick={onAdd}>Add</button>
+        <button onClick={onAddEditor}>Expr</button>
         <button onClick={onAddEmpty}>Add empty</button>
         <button onClick={onConfig}>Save</button>
         <button onClick={onLoad}>Load</button>
@@ -335,9 +402,12 @@ export const TestGrid = () => {
         // autoSizeToFitContainer={true}
         onReady={onReady}
         components={components}
+        tabComponents={tabComponents}
         debug={true}
+        // tabHeight={30}
         enableExternalDragEvents={true}
         // serializedLayout={data}
+        // onTabContextMenu={onTabContextMenu}
       />
     </div>
   );

@@ -4,15 +4,15 @@ import { ClosePanelResult } from "./parts";
 import { IPanel } from "./types";
 import { CompositeDisposable, IDisposable } from "../../lifecycle";
 
-export type PanelStateChangeEvent = {
+export interface PanelStateChangeEvent {
   isPanelVisible: boolean;
   isGroupActive: boolean;
-};
+}
 
-export type PanelDimensionChangeEvent = {
+export interface PanelDimensionChangeEvent {
   width: number;
   height: number;
-};
+}
 
 export interface PanelApi extends IDisposable {
   onDidPanelStateChange: Event<PanelStateChangeEvent>;

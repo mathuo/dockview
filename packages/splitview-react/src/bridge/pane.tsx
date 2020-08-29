@@ -16,7 +16,7 @@ export interface IPaneComponentRef {
   layout: (size: number, orthogonalSize: number) => void;
 }
 
-export type PaneComponent = React.RefForwardingComponent<
+export type PaneComponent = React.ForwardRefRenderFunction<
   IPaneComponentRef,
   IPaneComponentProps
 >;
@@ -27,7 +27,7 @@ export interface IPaneHeaderComponentProps extends IViewWithReactComponent {
   userprops?: { [index: string]: any };
 }
 
-export type PaneHeaderComponent = React.RefForwardingComponent<
+export type PaneHeaderComponent = React.ForwardRefRenderFunction<
   {},
   IPaneHeaderComponentProps
 >;

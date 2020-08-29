@@ -1,8 +1,8 @@
 import { IDisposable, CompositeDisposable, Disposable } from "../lifecycle";
-import { ITabContainer, TabContainer } from "./tabs/tabContainer";
-import { IContentContainer, ContentContainer } from "./content";
+import { ITabContainer, TabContainer } from "./titlebar/tabContainer";
+import { IContentContainer, ContentContainer } from "./panel/content/content";
 import { IGridView } from "../gridview/gridview";
-import { Target, Droptarget, DroptargetEvent } from "./droptarget/droptarget";
+import { Position, Droptarget, DroptargetEvent } from "./droptarget/droptarget";
 import { Event, Emitter, addDisposableListener } from "../events";
 import { IGroupAccessor, Layout } from "../layout";
 import { toggleClass } from "../dom";
@@ -44,12 +44,12 @@ export interface IGroupItem {
   body: { element: HTMLElement };
 }
 
-type GroupMoveEvent = {
+interface GroupMoveEvent {
   groupId: string;
   itemId: string;
-  target: Target;
+  target: Position;
   index?: number;
-};
+}
 
 export interface GroupOptions {
   panels: IPanel[];
@@ -88,11 +88,11 @@ export interface IGroupview extends IDisposable, IGridView {
   moveToPrevious(options?: { panel?: IPanel; suppressRoll?: boolean }): void;
 }
 
-export type GroupDropEvent = {
+export interface GroupDropEvent {
   event: DragEvent;
-  target: Target;
+  target: Position;
   index?: number;
-};
+}
 
 export class Groupview extends CompositeDisposable implements IGroupview {
   private _element: HTMLElement;
@@ -129,6 +129,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
   set tabHeight(height: number) {
     this.tabContainer.height = height;
+    this.layout(this._width, this._height);
   }
 
   get isActive() {
@@ -290,7 +291,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
       this.dropTarget.onDidChange((event) => {
         // if we've center dropped on ourself then ignore
         if (
-          event.target === Target.Center &&
+          event.position === Position.Center &&
           this.tabContainer.hasActiveDragEvent
         ) {
           return;
@@ -531,18 +532,18 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
   private handleDropEvent(event: DroptargetEvent, index?: number) {
     if (isPanelTransferEvent(event.event)) {
-      this.handlePanelDropEvent(event.event, event.target, index);
+      this.handlePanelDropEvent(event.event, event.position, index);
       return;
     }
 
-    this._onDrop.fire({ event: event.event, target: event.target, index });
+    this._onDrop.fire({ event: event.event, target: event.position, index });
 
     console.debug("[customDropEvent]");
   }
 
   private handlePanelDropEvent(
     event: DragEvent,
-    target: Target,
+    target: Position,
     index?: number
   ) {
     const dataObject = extractData(event);
@@ -550,10 +551,10 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     if (isTabDragEvent(dataObject)) {
       const { groupId, itemId } = dataObject;
       const isSameGroup = this.id === groupId;
-      if (isSameGroup) {
-        const index = this.tabContainer.indexOf(itemId);
-        if (index > -1 && index === this.panels.length - 1) {
-          console.debug("[tabs] dropped in empty space");
+      if (isSameGroup && !target) {
+        const oldIndex = this.tabContainer.indexOf(itemId);
+        if (oldIndex === index) {
+          console.debug("[tabs] drop indicates no change in position");
           return;
         }
       }

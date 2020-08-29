@@ -5,18 +5,18 @@ import { PanelHeaderPart, PanelContentPart, ClosePanelResult } from "./parts";
 
 // objects
 
-export type PanelUpdateEvent = {
+export interface PanelUpdateEvent {
   params: { [key: string]: any };
-};
+}
 
 // init parameters
 
-export type PanelInitParameters = {
+export interface PanelInitParameters {
   title: string;
   suppressClosable?: boolean;
   params: { [index: string]: any };
   state?: { [index: string]: any };
-};
+}
 
 // constructors
 

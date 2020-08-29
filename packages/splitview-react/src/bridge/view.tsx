@@ -12,7 +12,7 @@ export interface IViewComponentRef {
   layout: (size: number, orthogonalSize: number) => void;
 }
 
-export type ViewComponent = React.RefForwardingComponent<
+export type ViewComponent = React.ForwardRefRenderFunction<
   IViewComponentRef,
   IViewComponentProps
 >;

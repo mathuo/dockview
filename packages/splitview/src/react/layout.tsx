@@ -6,9 +6,9 @@ import { ReactPanelHeaderPart } from "./reactHeaderPart";
 import { IPanelProps } from "./react";
 import { ReactPanelDeserialzier } from "./deserializer";
 
-export type OnReadyEvent = {
+export interface OnReadyEvent {
   api: Api;
-};
+}
 
 export interface ReactLayout {
   addPortal: (portal: React.ReactPortal) => IDisposable;

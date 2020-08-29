@@ -1,67 +1,17 @@
-.groupview {
-  &.active-group {
-    > .title-container > .tab-container > .tab {
-      &.active-tab {
-        .default-tab {
-          background-color: var(--tab-background-visible);
-          color: var(--active-group-visible-panel-color);
-        }
-        .tab-action {
-          background-color: var(--active-group-visible-panel-color);
-        }
-      }
-      &.inactive-tab {
-        .default-tab {
-          background-color: var(--tab-background-hidden);
-          color: var(--active-group-hidden-panel-color);
-        }
-        .tab-action {
-          background-color: var(--active-group-hidden-panel-color);
-        }
-      }
-    }
-  }
-  &.inactive-group {
-    > .title-container > .tab-container > .tab {
-      &.active-tab {
-        .default-tab {
-          background-color: var(--tab-background-visible);
-          color: var(--inactive-group-visible-panel-color);
-        }
-        .tab-action {
-          background-color: var(--inactive-group-visible-panel-color);
-        }
-      }
-      &.inactive-tab {
-        .default-tab {
-          background-color: var(--tab-background-hidden);
-          color: var(--inactive-group-hidden-panel-color);
-        }
-        .tab-action {
-          background-color: var(--inactive-group-hidden-panel-color);
-        }
-      }
-    }
-  }
-}
-
 .tab {
   &.dragging {
-    color: var(--active-group-visible-panel-color);
     .tab-action {
       background-color: var(--active-group-visible-panel-color);
     }
   }
 
   &.active-tab > .default-tab {
-    background-color: var(--tab-background-visible);
     .tab-action {
       visibility: visible;
     }
   }
 
   &.inactive-tab > .default-tab {
-    background-color: var(--tab-background-hidden);
     .tab-action:not(.dirty) {
       visibility: hidden;
     }

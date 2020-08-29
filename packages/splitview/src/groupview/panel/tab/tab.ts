@@ -1,23 +1,31 @@
-import { addDisposableListener, Emitter, Event } from "../../events";
-import { Droptarget, DroptargetEvent } from "../droptarget/droptarget";
-import { CompositeDisposable } from "../../lifecycle";
-import { TabChangedEvent, TabDropEvent, TabChangedEventType } from "../events";
-import { IGroupview } from "../groupview";
+import { addDisposableListener, Emitter, Event } from "../../../events";
+import { Droptarget, DroptargetEvent } from "../../droptarget/droptarget";
+import { CompositeDisposable } from "../../../lifecycle";
+import { IGroupview } from "../../groupview";
 import {
   DataTransferSingleton,
   DATA_KEY,
   DragType,
-  extractData,
-} from "../droptarget/dataTransfer";
-import { IGroupAccessor } from "../../layout";
-import { toggleClass } from "../../dom";
+} from "../../droptarget/dataTransfer";
+// import { IGroupAccessor } from "../../layout";
+import { toggleClass } from "../../../dom";
+import { IGroupAccessor } from "../../../layout";
+
+export enum TabInteractionKind {
+  CLICK = "CLICK",
+  CONTEXT_MENU = "CONTEXT_MEU",
+}
+
+export interface TabInteractionEvent {
+  kind: TabInteractionKind;
+}
 
 export interface ITab {
   id: string;
   element: HTMLElement;
   hasActiveDragEvent: boolean;
   setContent: (element: HTMLElement) => void;
-  onChanged: Event<TabChangedEvent>;
+  onChanged: Event<TabInteractionEvent>;
   onDropped: Event<DroptargetEvent>;
   setActive(isActive: boolean): void;
   startDragEvent(): void;
@@ -32,8 +40,8 @@ export class Tab extends CompositeDisposable implements ITab {
   private droptarget: Droptarget;
   private content: HTMLElement;
 
-  private readonly _onChanged = new Emitter<TabChangedEvent>();
-  readonly onChanged: Event<TabChangedEvent> = this._onChanged.event;
+  private readonly _onChanged = new Emitter<TabInteractionEvent>();
+  readonly onChanged: Event<TabInteractionEvent> = this._onChanged.event;
 
   private readonly _onDropped = new Emitter<DroptargetEvent>();
   readonly onDropped: Event<DroptargetEvent> = this._onDropped.event;
@@ -72,7 +80,10 @@ export class Tab extends CompositeDisposable implements ITab {
         if (ev.defaultPrevented) {
           return;
         }
-        this._onChanged.fire({ type: TabChangedEventType.CLICK });
+        this._onChanged.fire({ kind: TabInteractionKind.CLICK });
+      }),
+      addDisposableListener(this._element, "contextmenu", (ev) => {
+        this._onChanged.fire({ kind: TabInteractionKind.CONTEXT_MENU });
       }),
       addDisposableListener(this._element, "dragstart", (event) => {
         this.dragInPlayDetails = { isDragging: true, id: this.accessor.id };

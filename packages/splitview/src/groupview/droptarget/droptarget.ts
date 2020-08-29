@@ -1,7 +1,7 @@
 import { Emitter, Event } from "../../events";
 import { DataTransferSingleton } from "./dataTransfer";
 
-export enum Target {
+export enum Position {
   Top = "Top",
   Left = "Left",
   Bottom = "Bottom",
@@ -9,10 +9,10 @@ export enum Target {
   Center = "Center",
 }
 
-export type DroptargetEvent = {
-  target: Target;
+export interface DroptargetEvent {
+  position: Position;
   event: DragEvent;
-};
+}
 
 const HAS_PROCESSED_KEY = "__drop_target_processed__";
 
@@ -39,7 +39,7 @@ const toggleClassName = (
 export class Droptarget {
   private target: HTMLElement;
   private overlay: HTMLElement;
-  private state: Target;
+  private state: Position | undefined;
 
   private readonly _onDidChange = new Emitter<DroptargetEvent>();
   readonly onDidChange: Event<DroptargetEvent> = this._onDidChange.event;
@@ -106,7 +106,7 @@ export class Droptarget {
     this.removeDropTarget();
 
     if (!hasProcessed(event)) {
-      this._onDidChange.fire({ target: this.state, event });
+      this._onDidChange.fire({ position: this.state, event });
     } else {
       console.debug("[dragtarget] already processed");
     }
@@ -140,15 +140,15 @@ export class Droptarget {
     toggleClassName(this.overlay, "bottom", isBottom);
 
     if (isRight) {
-      this.state = Target.Right;
+      this.state = Position.Right;
     } else if (isLeft) {
-      this.state = Target.Left;
+      this.state = Position.Left;
     } else if (isTop) {
-      this.state = Target.Top;
+      this.state = Position.Top;
     } else if (isBottom) {
-      this.state = Target.Bottom;
+      this.state = Position.Bottom;
     } else {
-      this.state = Target.Center;
+      this.state = Position.Center;
     }
   };
 

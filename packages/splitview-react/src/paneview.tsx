@@ -24,19 +24,19 @@ export interface IPaneViewReactProps {
   initialLayout?: PaneViewSerializedConfig;
 }
 
-export type PaneViewReadyEvent = {
+export interface PaneViewReadyEvent {
   api: PaneviewApi;
-};
+}
 
-export type PaneViewSerializedConfig = {
+export interface PaneViewSerializedConfig {
   views: Array<
     Omit<IPaneWithReactComponent, "component" | "headerComponent"> & {
       size?: number;
     }
   >;
-};
+}
 
-export type PaneviewApi = {
+export interface PaneviewApi {
   add: (
     options: Omit<IPaneWithReactComponent, "component" | "headerComponent"> & {
       size?: number;
@@ -45,7 +45,7 @@ export type PaneviewApi = {
   ) => void;
   moveView: (from: number, to: number) => void;
   toJSON: () => {};
-};
+}
 
 export interface IPaneViewComponentRef {
   layout: (size: number, orthogonalSize: number) => void;

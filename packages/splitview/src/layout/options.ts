@@ -1,4 +1,5 @@
 import { IGroupview } from "../groupview/groupview";
+import { PanelApi } from "../groupview/panel/api";
 import {
   PanelContentPart,
   PanelContentPartConstructor,
@@ -6,11 +7,20 @@ import {
   PanelHeaderPartConstructor,
   WatermarkConstructor,
 } from "../groupview/panel/parts";
+import { IPanel } from "../groupview/panel/types";
+import { Api } from "./layout";
 
-export type FrameworkPanelWrapper = {
+export interface FrameworkPanelWrapper {
   createContentWrapper: (id: string, component: any) => PanelContentPart;
   createTabWrapper: (id: string, component: any) => PanelHeaderPart;
-};
+}
+
+export interface TabContextMenuEvent {
+  event: MouseEvent;
+  api: Api;
+  panelApi: PanelApi;
+  panel: IPanel;
+}
 
 export interface LayoutOptions {
   tabComponents?: {
@@ -31,6 +41,7 @@ export interface LayoutOptions {
   tabHeight?: number;
   debug?: boolean;
   enableExternalDragEvents?: boolean;
+  onTabContextMenu?: (event: TabContextMenuEvent) => void;
 }
 
 export interface PanelOptions {

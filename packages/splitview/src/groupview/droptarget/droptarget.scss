@@ -20,18 +20,18 @@
     transition-duration: 0.15s;
     transition-timing-function: ease-out;
 
-    &.left {
+    &.left,
+    &.right {
       width: 50%;
     }
     &.right {
-      left: 50%;
-      width: 50%;
+      transform: translate(100%, 0%);
     }
     &.bottom {
-      top: 50%;
-      height: 50%;
+      transform: translate(0%, 100%);
     }
-    &.top {
+    &.top,
+    &.bottom {
       height: 50%;
     }
   }

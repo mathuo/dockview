@@ -1,8 +1,8 @@
 import { IDisposable, CompositeDisposable } from "../../lifecycle";
 import { addDisposableListener, Emitter, Event } from "../../events";
-import { ITab, Tab } from "./tab";
+import { ITab, Tab, TabInteractionKind } from "../panel/tab/tab";
 import { removeClasses, addClasses, toggleClass } from "../../dom";
-import { hasProcessed } from "../droptarget/droptarget";
+import { hasProcessed, Position } from "../droptarget/droptarget";
 import { TabDropEvent } from "../events";
 
 import { IGroupview } from "../groupview";
@@ -144,7 +144,8 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
         }
 
         this._onDropped.fire({
-          event: { event, target: undefined },
+          event: { event, position: Position.Center },
+          index: this.tabs.length - 1,
         });
       })
     );
@@ -195,7 +196,13 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
     // TODO - dispose of resources
     const disposables = CompositeDisposable.from(
       tab.onChanged((event) => {
-        this.group.openPanel(panel);
+        switch (event.kind) {
+          case TabInteractionKind.CLICK:
+            this.group.openPanel(panel);
+            break;
+          case TabInteractionKind.CONTEXT_MENU:
+          // TODO finish
+        }
       }),
       tab.onDropped((event) => {
         this._onDropped.fire({ event, index: this.indexOf(tab) });

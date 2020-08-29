@@ -2,7 +2,7 @@ import * as React from "react";
 import { LoadFromConfig } from "./loadFromConfig";
 import { FromApi } from "./fromApi";
 import { PaneDemo } from "./pane";
-import { TestGrid } from "./reactgrid";
+import { TestGrid } from "./layout-grid/reactgrid";
 
 const options = [
   { id: "config", component: LoadFromConfig },

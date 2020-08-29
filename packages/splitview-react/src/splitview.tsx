@@ -9,15 +9,15 @@ export interface IViewWithReactComponent extends IBaseView {
   component: ViewComponent;
 }
 
-export type OnReadyEvent = {
+export interface OnReadyEvent {
   api: SplitviewApi;
-};
+}
 
-export type SerializedConfig = {
+export interface SerializedConfig {
   views: Array<Omit<IViewWithReactComponent, "component"> & { size?: number }>;
-};
+}
 
-export type SplitviewApi = {
+export interface SplitviewApi {
   add: (
     options: Omit<IViewWithReactComponent, "component"> & {
       size?: number;
@@ -26,7 +26,7 @@ export type SplitviewApi = {
   ) => void;
   moveView: (from: number, to: number) => void;
   toJSON: () => {};
-};
+}
 
 export interface ISplitViewReactProps {
   orientation: Orientation;

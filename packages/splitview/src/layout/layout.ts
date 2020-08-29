@@ -1,5 +1,5 @@
 import { Gridview, getRelativeLocation } from "../gridview/gridview";
-import { Target } from "../groupview/droptarget/droptarget";
+import { Position } from "../groupview/droptarget/droptarget";
 import { getGridLocation } from "../gridview/gridview";
 import { tail, sequenceEquals } from "../array";
 import {
@@ -45,10 +45,10 @@ import {
 const nextGroupId = sequentialNumberGenerator();
 const nextLayoutId = sequentialNumberGenerator();
 
-export type PanelReference = {
+export interface PanelReference {
   update: (event: { params: { [key: string]: any } }) => void;
   remove: () => void;
-};
+}
 
 export interface Api {
   layout(width: number, height: number): void;
@@ -56,6 +56,7 @@ export interface Api {
   setAutoResizeToFit(enabled: boolean): void;
   resizeToFit(): void;
   setTabHeight(height: number): void;
+  getTabHeight(): number;
   size: number;
   totalPanels: number;
   // lifecycle
@@ -90,7 +91,7 @@ export interface IGroupAccessor {
     referenceGroup: IGroupview,
     groupId: string,
     itemId: string,
-    target: Target,
+    target: Position,
     index?: number
   ): void;
   doSetGroupActive: (group: IGroupview) => void;
@@ -399,9 +400,14 @@ export class Layout extends CompositeDisposable implements ILayout {
   }
 
   public setTabHeight(height: number) {
+    this.options.tabHeight = height;
     this.groups.forEach((value) => {
       value.value.tabHeight = height;
     });
+  }
+
+  public getTabHeight() {
+    return this.options.tabHeight;
   }
 
   public setAutoResizeToFit(enabled: boolean) {
@@ -435,7 +441,7 @@ export class Layout extends CompositeDisposable implements ILayout {
       const referenceGroup = this.findGroup(referencePanel);
 
       const target = this.toTarget(options.position.direction);
-      if (target === Target.Center) {
+      if (target === Position.Center) {
         referenceGroup.openPanel(panel);
       } else {
         const location = getGridLocation(referenceGroup.element);
@@ -597,13 +603,13 @@ export class Layout extends CompositeDisposable implements ILayout {
     referenceGroup: IGroupview,
     groupId: string,
     itemId: string,
-    target: Target,
+    target: Position,
     index?: number
   ) {
     const sourceGroup = groupId ? this.groups.get(groupId).value : undefined;
 
     switch (target) {
-      case Target.Center:
+      case Position.Center:
       case undefined:
         const groupItem =
           sourceGroup?.removePanel(itemId) || this.panels.get(itemId).value;
@@ -699,7 +705,7 @@ export class Layout extends CompositeDisposable implements ILayout {
           }
           this.moveGroup(
             group,
-            panel?.group.id,
+            panel?.group?.id,
             panel.id,
             event.target,
             event.index
@@ -774,16 +780,16 @@ export class Layout extends CompositeDisposable implements ILayout {
   private toTarget(direction: "left" | "right" | "above" | "below" | "within") {
     switch (direction) {
       case "left":
-        return Target.Left;
+        return Position.Left;
       case "right":
-        return Target.Right;
+        return Position.Right;
       case "above":
-        return Target.Top;
+        return Position.Top;
       case "below":
-        return Target.Bottom;
+        return Position.Bottom;
       case "within":
       default:
-        return Target.Center;
+        return Position.Center;
     }
   }
 

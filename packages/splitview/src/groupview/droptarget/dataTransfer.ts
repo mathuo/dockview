@@ -11,12 +11,12 @@ export enum DragType {
   EXTERNAL = "external_group_drag",
 }
 
-export type DragItem = {
+export interface DragItem {
   itemId: string;
   groupId: string;
-};
+}
 
-export type ExternalDragItem = PanelOptions;
+export interface ExternalDragItem extends PanelOptions {}
 
 export type DataObject = DragItem | ExternalDragItem;
 

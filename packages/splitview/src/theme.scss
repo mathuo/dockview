@@ -4,11 +4,13 @@
   --title-bar-background-color: #252526;
   --title-bar-scroll-bar-color: #888;
   //
-  --tab-background-visible: #1e1e1e;
-  --tab-background-hidden: #2d2d2d;
+  --active-tab-background-visible: #1e1e1e;
+  --active-tab-background-hidden: #2d2d2d;
+  --inactive-tab-background-visible: #1e1e1e;
+  --inactive-tab-background-hidden: #2d2d2d;
   --tab-divider-color: #1e1e1e;
   //
-  --drag-over-background-color: rgba(255, 0, 0, 0.5);
+  --drag-over-background-color: rgba(83, 89, 93, 0.5);
   //
   --active-group-visible-panel-color: white;
   --active-group-hidden-panel-color: #969696;
@@ -19,4 +21,21 @@
   --tab-dirty-icon: url("https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg");
   //
   --splitview-divider-color: rgb(68, 68, 68);
+}
+
+.visual-studio-theme {
+  --active-tab-background-visible: dodgerblue;
+
+  .groupview {
+    &.active-group {
+      > .title-container {
+        border-bottom: 2px solid var(--active-tab-background-visible);
+      }
+    }
+    &.inactive-group {
+      > .title-container {
+        border-bottom: 2px solid var(--inactive-tab-background-visible);
+      }
+    }
+  }
 }

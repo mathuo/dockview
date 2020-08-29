@@ -6,7 +6,7 @@
   "types": "dist/esm/index.d.ts",
   "scripts": {
     "build": "gulp run",
-    "docs": "typedoc --excludeNotExported --excludePrivate true --mode file --out typedocs/ src/"
+    "docs": "typedoc"
   },
   "author": "",
   "license": "ISC",

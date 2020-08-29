@@ -1,5 +1,5 @@
 import { Orientation, Sizing } from "../splitview/splitview";
-import { Target } from "../groupview/droptarget/droptarget";
+import { Position } from "../groupview/droptarget/droptarget";
 import { tail } from "../array";
 import { LeafNode } from "./leafNode";
 import { BranchNode } from "./branchNode";
@@ -91,7 +91,7 @@ export function getGridLocation(element: HTMLElement): number[] {
 export function getRelativeLocation(
   rootOrientation: Orientation,
   location: number[],
-  direction: Target
+  direction: Position
 ): number[] {
   const orientation = getLocationOrientation(rootOrientation, location);
   const directionOrientation = getDirectionOrientation(direction);
@@ -99,20 +99,20 @@ export function getRelativeLocation(
   if (orientation === directionOrientation) {
     let [rest, index] = tail(location);
 
-    if (direction === Target.Right || direction === Target.Bottom) {
+    if (direction === Position.Right || direction === Position.Bottom) {
       index += 1;
     }
 
     return [...rest, index];
   } else {
     const index =
-      direction === Target.Right || direction === Target.Bottom ? 1 : 0;
+      direction === Position.Right || direction === Position.Bottom ? 1 : 0;
     return [...location, index];
   }
 }
 
-export function getDirectionOrientation(direction: Target): Orientation {
-  return direction === Target.Top || direction === Target.Bottom
+export function getDirectionOrientation(direction: Position): Orientation {
+  return direction === Position.Top || direction === Position.Bottom
     ? Orientation.VERTICAL
     : Orientation.HORIZONTAL;
 }
@@ -193,9 +193,9 @@ export interface INodeDescriptor {
   visible?: boolean;
 }
 
-export type IViewDeserializer = {
+export interface IViewDeserializer {
   fromJSON: (data: {}) => IGridView;
-};
+}
 
 export class Gridview {
   private _root: BranchNode;

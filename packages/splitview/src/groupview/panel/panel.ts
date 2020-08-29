@@ -149,7 +149,11 @@ export class DefaultPanel extends CompositeDisposable implements IPanel {
   }
 
   public layout(width: number, height: number) {
-    this._onDidPanelDimensionsChange.fire({ width, height });
+    // thw height of the panel excluded the height of the title/tab
+    this._onDidPanelDimensionsChange.fire({
+      width,
+      height: height - (this.group?.tabHeight || 0),
+    });
   }
 
   public dispose() {

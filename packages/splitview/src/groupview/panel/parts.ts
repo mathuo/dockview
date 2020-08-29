@@ -14,13 +14,13 @@ interface Methods extends IDisposable {
   setVisible(isPanelVisible: boolean, isGroupVisible: boolean): void;
 }
 
-export type WatermarkPartInitParameters = {
+export interface WatermarkPartInitParameters {
   accessor: IGroupAccessor;
-};
+}
 
-export type PartInitParameters = {
+export interface PartInitParameters extends PanelInitParameters {
   api: PanelApi;
-} & PanelInitParameters;
+}
 
 export interface PanelHeaderPart extends Methods {
   id: string;
