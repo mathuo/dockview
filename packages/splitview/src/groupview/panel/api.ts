@@ -1,51 +1,37 @@
 import { IGroupview } from "../groupview";
-import { Event, Emitter } from "../../events";
+import { Event } from "../../events";
 import { ClosePanelResult } from "./parts";
-import { IPanel } from "./types";
-import { CompositeDisposable, IDisposable } from "../../lifecycle";
+import { IGroupPanel } from "./types";
+import {
+  BasePanelApi,
+  IBasePanelApi,
+  PanelDimensionChangeEvent,
+} from "../../panel/api";
 
 export interface PanelStateChangeEvent {
   isPanelVisible: boolean;
   isGroupActive: boolean;
 }
 
-export interface PanelDimensionChangeEvent {
-  width: number;
-  height: number;
-}
-
-export interface PanelApi extends IDisposable {
+export interface PanelApi extends IBasePanelApi {
   onDidPanelStateChange: Event<PanelStateChangeEvent>;
-  onDidPanelDimensionChange: Event<PanelDimensionChangeEvent>;
   isPanelVisible: boolean;
   isGroupActive: boolean;
   group: IGroupview;
   close: () => Promise<boolean>;
   setClosePanelHook(callback: () => Promise<ClosePanelResult>): void;
   canClose: () => Promise<ClosePanelResult>;
-  setState(key: string, value: any);
-  setState(state: { [index: string]: any });
-  getState: () => { [index: string]: any };
-  onDidStateChange: Event<any>;
   onDidDirtyChange: Event<boolean>;
 }
 
-export class PanelApiImpl extends CompositeDisposable implements PanelApi {
+export class PanelApiImpl extends BasePanelApi implements PanelApi {
   private _isPanelVisible: boolean;
   private _isGroupActive: boolean;
   private _group: IGroupview;
   private _closePanelCallback: () => Promise<ClosePanelResult>;
-  private _state: { [index: string]: any } = {};
-
-  private readonly _onDidStateChange = new Emitter<any>();
-  readonly onDidStateChange: Event<any> = this._onDidStateChange.event;
 
   get onDidPanelStateChange() {
     return this._event;
-  }
-
-  get onDidPanelDimensionChange() {
-    return this._dimensionEvent;
   }
 
   get onDidDirtyChange() {
@@ -74,12 +60,12 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
 
   constructor(
     private _event: Event<PanelStateChangeEvent>,
-    private _dimensionEvent: Event<PanelDimensionChangeEvent>,
+    _dimensionEvent: Event<PanelDimensionChangeEvent>,
     private _dirtyEvent: Event<boolean>,
-    private panel: IPanel,
+    private panel: IGroupPanel,
     group: IGroupview
   ) {
-    super();
+    super(_dimensionEvent);
     this._group = group;
 
     this.addDisposables(
@@ -88,19 +74,6 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
         this._isPanelVisible = event.isPanelVisible;
       })
     );
-  }
-
-  public setState(key: string | { [index: string]: any }, value?: any) {
-    if (typeof key === "object") {
-      this._state = key;
-    } else {
-      this._state[key] = value;
-    }
-    this._onDidStateChange.fire(undefined);
-  }
-
-  public getState(): { [index: string]: any } {
-    return this._state;
   }
 
   public close() {
@@ -113,7 +86,5 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
 
   public dispose() {
     super.dispose();
-
-    this._onDidStateChange.dispose();
   }
 }

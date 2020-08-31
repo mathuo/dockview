@@ -5,6 +5,7 @@ const merge = require("merge2");
 const header = require("gulp-header");
 const gulpSass = require("gulp-sass");
 const concat = require("gulp-concat");
+const sourcemaps = require("gulp-sourcemaps");
 
 const headerTemplate = [
   "/**",
@@ -28,13 +29,19 @@ const build = (options) => {
 
   gulp.task("esm", () => {
     const ts = gulpTypescript.createProject(tsconfig);
-    const tsResult = gulp.src(["src/**/*.ts", "src/**/*.tsx"]).pipe(ts());
+    const tsResult = gulp
+      .src(["src/**/*.ts", "src/**/*.tsx"])
+      .pipe(sourcemaps.init())
+      .pipe(ts());
     return merge([
       tsResult.dts
         .pipe(header(dtsHeaderTemplate, { pkg: package }))
         .pipe(gulp.dest("./dist/esm")),
       tsResult.js
         .pipe(header(headerTemplate, { pkg: package }))
+        .pipe(gulp.dest("./dist/esm")),
+      tsResult
+        .pipe(sourcemaps.write(".", { includeContent: false }))
         .pipe(gulp.dest("./dist/esm")),
     ]);
   });

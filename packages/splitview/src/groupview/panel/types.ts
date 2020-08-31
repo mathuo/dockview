@@ -2,31 +2,20 @@ import { IGroupview } from "../groupview";
 import { IDisposable, ISerializable } from "../../lifecycle";
 import { Event } from "../../events";
 import { PanelHeaderPart, PanelContentPart, ClosePanelResult } from "./parts";
-
-// objects
-
-export interface PanelUpdateEvent {
-  params: { [key: string]: any };
-}
+import { InitParameters, IPanel } from "../../panel/types";
 
 // init parameters
 
-export interface PanelInitParameters {
+export interface PanelInitParameters extends InitParameters {
   title: string;
   suppressClosable?: boolean;
-  params: { [index: string]: any };
-  state?: { [index: string]: any };
 }
 
 // constructors
 
-export interface PanelConstructor {
-  new (): IPanel;
-}
-
 // panel
 
-export interface IPanel extends IDisposable, ISerializable {
+export interface IGroupPanel extends IDisposable, ISerializable, IPanel {
   id: string;
   header: PanelHeaderPart;
   content: PanelContentPart;
@@ -36,8 +25,6 @@ export interface IPanel extends IDisposable, ISerializable {
   setVisible(isGroupActive: boolean, group: IGroupview): void;
   setDirty(isDirty: boolean): void;
   close?(): Promise<ClosePanelResult>;
-  layout?(width: number, height: number): void;
   init?(params: PanelInitParameters & { [index: string]: string }): void;
-  update?(event: PanelUpdateEvent): void;
   onDidStateChange: Event<any>;
 }

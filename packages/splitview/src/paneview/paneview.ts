@@ -1,4 +1,4 @@
-import { SplitView, IView, Orientation } from "./splitview";
+import { SplitView, IView, Orientation } from "../splitview/splitview";
 import { IDisposable } from "../lifecycle";
 import { Emitter } from "../events";
 import { addClasses, removeClasses } from "../dom";

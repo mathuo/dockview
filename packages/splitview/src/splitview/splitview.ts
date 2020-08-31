@@ -68,14 +68,22 @@ export class SplitView {
   private sashContainer: HTMLElement;
   private views: IViewItem[] = [];
   private sashes: ISashItem[] = [];
-  private orientation: Orientation;
-  private size: number;
-  private orthogonalSize: number;
+  private _orientation: Orientation;
+  private _size: number;
+  private _orthogonalSize: number;
   private contentSize: number;
   private _proportions: number[];
 
   private _onDidSashEnd = new Emitter<any>();
   public onDidSashEnd = this._onDidSashEnd.event;
+
+  get size() {
+    return this._size;
+  }
+
+  get orthogonalSize() {
+    return this._orthogonalSize;
+  }
 
   public get length() {
     return this.views.length;
@@ -83,6 +91,10 @@ export class SplitView {
 
   public get proportions() {
     return [...this._proportions];
+  }
+
+  get orientation() {
+    return this._orientation;
   }
 
   get minimumSize(): number {
@@ -99,7 +111,7 @@ export class SplitView {
     private readonly container: HTMLElement,
     options: ISplitViewOptions
   ) {
-    this.orientation = options.orientation;
+    this._orientation = options.orientation;
     this.element = this.createContainer();
 
     this.viewContainer = this.createViewContainer();
@@ -112,7 +124,7 @@ export class SplitView {
 
     // We have an existing set of view, add them now
     if (options.descriptor) {
-      this.size = options.descriptor.size;
+      this._size = options.descriptor.size;
       options.descriptor.views.forEach((viewDescriptor, index) => {
         const sizing = viewDescriptor.size;
 
@@ -161,7 +173,7 @@ export class SplitView {
     size = clamp(
       size,
       item.view.minimumSize,
-      Math.min(item.view.maximumSize, this.size)
+      Math.min(item.view.maximumSize, this._size)
     );
 
     item.size = size;
@@ -189,7 +201,7 @@ export class SplitView {
 
     const contentSize = this.views.reduce((r, i) => r + i.size, 0);
 
-    this.resize(this.views.length - 1, this.size - contentSize, undefined, [
+    this.resize(this.views.length - 1, this._size - contentSize, undefined, [
       index,
     ]);
     this.distributeEmptySpace();
@@ -250,7 +262,7 @@ export class SplitView {
 
       const cb = (event: MouseEvent) => {
         let start =
-          this.orientation === Orientation.HORIZONTAL
+          this._orientation === Orientation.HORIZONTAL
             ? event.clientX
             : event.clientY;
         const sizes = this.views.map((x) => x.size);
@@ -259,7 +271,7 @@ export class SplitView {
 
         const mousemove = (event: MouseEvent) => {
           const current =
-            this.orientation === Orientation.HORIZONTAL
+            this._orientation === Orientation.HORIZONTAL
               ? event.clientX
               : event.clientY;
           const delta = current - start;
@@ -370,11 +382,11 @@ export class SplitView {
     this.addView(view, sizing, to);
   }
 
-  public setOrientation(orientation: Orientation) {
-    if (orientation === this.orientation) {
+  set orientation(orientation: Orientation) {
+    if (orientation === this._orientation) {
       return;
     }
-    this.orientation = orientation;
+    this._orientation = orientation;
 
     const classname =
       orientation === Orientation.HORIZONTAL ? "horizontal" : "vertical";
@@ -386,8 +398,8 @@ export class SplitView {
   }
 
   public layout(size: number, orthogonalSize: number) {
-    this.size = size;
-    this.orthogonalSize = orthogonalSize;
+    this._size = size;
+    this._orthogonalSize = orthogonalSize;
 
     for (let i = 0; i < this.views.length; i++) {
       const item = this.views[i];
@@ -412,7 +424,7 @@ export class SplitView {
 
     this.resize(
       this.views.length - 1,
-      this.size - contentSize,
+      this._size - contentSize,
       undefined,
       lowPriorityIndexes,
       highPriorityIndexes
@@ -423,7 +435,7 @@ export class SplitView {
 
   private distributeEmptySpace() {
     let contentSize = this.views.reduce((r, i) => r + i.size, 0);
-    let emptyDelta = this.size - contentSize;
+    let emptyDelta = this._size - contentSize;
 
     for (let i = this.views.length - 1; emptyDelta !== 0 && i >= 0; i--) {
       const item = this.views[i];
@@ -448,30 +460,30 @@ export class SplitView {
     for (let i = 0; i < this.views.length - 1; i++) {
       sum += this.views[i].size;
       x.push(sum);
-      if (this.orientation === Orientation.HORIZONTAL) {
+      if (this._orientation === Orientation.HORIZONTAL) {
         this.sashes[i].container.style.left = `${sum - 2}px`;
         this.sashes[i].container.style.top = `0px`;
       }
-      if (this.orientation === Orientation.VERTICAL) {
+      if (this._orientation === Orientation.VERTICAL) {
         this.sashes[i].container.style.left = `0px`;
         this.sashes[i].container.style.top = `${sum - 2}px`;
       }
     }
     this.views.forEach((view, i) => {
-      if (this.orientation === Orientation.HORIZONTAL) {
+      if (this._orientation === Orientation.HORIZONTAL) {
         view.container.style.width = `${view.size}px`;
         view.container.style.left = i == 0 ? "0px" : `${x[i - 1]}px`;
         view.container.style.top = "";
         view.container.style.height = "";
       }
-      if (this.orientation === Orientation.VERTICAL) {
+      if (this._orientation === Orientation.VERTICAL) {
         view.container.style.height = `${view.size}px`;
         view.container.style.top = i == 0 ? "0px" : `${x[i - 1]}px`;
         view.container.style.width = "";
         view.container.style.left = "";
       }
 
-      view.view.layout(view.size, this.orthogonalSize);
+      view.view.layout(view.size, this._orthogonalSize);
     });
   }
 
@@ -588,12 +600,13 @@ export class SplitView {
   private createContainer() {
     const element = document.createElement("div");
     const orientationClassname =
-      this.orientation === Orientation.HORIZONTAL ? "horizontal" : "vertical";
+      this._orientation === Orientation.HORIZONTAL ? "horizontal" : "vertical";
     element.className = `split-view-container ${orientationClassname}`;
     return element;
   }
 
   public dispose() {
+    this.element.remove();
     for (let i = 0; i < this.element.children.length; i++) {
       if (this.element.children.item[i] === this.element) {
         this.element.removeChild(this.element);

@@ -4,6 +4,7 @@ import {
   PanelHeaderPart,
   PanelHeaderPartConstructor,
 } from "../groupview/panel/parts";
+import { FrameworkFactory } from "../types";
 import { DefaultTab } from "./components/tab/defaultTab";
 
 export function createContentComponent(
@@ -14,7 +15,7 @@ export function createContentComponent(
   frameworkComponents: {
     [componentName: string]: any;
   },
-  createFrameworkComponent: (id: string, component: any) => PanelContentPart
+  createFrameworkComponent: FrameworkFactory<PanelContentPart>
 ): PanelContentPart {
   const Component =
     typeof componentName === "string"
@@ -35,7 +36,7 @@ export function createContentComponent(
         "you must register a frameworkPanelWrapper to use framework components"
       );
     }
-    const wrappedComponent = createFrameworkComponent(
+    const wrappedComponent = createFrameworkComponent.createComponent(
       componentName,
       FrameworkComponent
     );
@@ -52,7 +53,7 @@ export function createTabComponent(
   frameworkComponents: {
     [componentName: string]: any;
   },
-  createFrameworkComponent: (id: string, component: any) => PanelHeaderPart
+  createFrameworkComponent: FrameworkFactory<PanelHeaderPart>
 ): PanelHeaderPart {
   const Component =
     typeof componentName === "string"
@@ -73,7 +74,7 @@ export function createTabComponent(
         "you must register a frameworkPanelWrapper to use framework components"
       );
     }
-    const wrappedComponent = createFrameworkComponent(
+    const wrappedComponent = createFrameworkComponent.createComponent(
       componentName,
       FrameworkComponent
     );

@@ -3,13 +3,14 @@ import { IGroupview } from "../groupview";
 import { IGroupAccessor } from "../../layout";
 import { PanelApi } from "./api";
 import { PanelInitParameters } from "./types";
+import { Constructor } from "../../types";
 
 export enum ClosePanelResult {
   CLOSE = "CLOSE",
   DONT_CLOSE = "DONT_CLOSE",
 }
 
-interface Methods extends IDisposable {
+interface BasePart extends IDisposable {
   init?(params: PartInitParameters): void;
   setVisible(isPanelVisible: boolean, isGroupVisible: boolean): void;
 }
@@ -22,14 +23,14 @@ export interface PartInitParameters extends PanelInitParameters {
   api: PanelApi;
 }
 
-export interface PanelHeaderPart extends Methods {
+export interface PanelHeaderPart extends BasePart {
   id: string;
   element: HTMLElement;
   layout?(height: string): void;
   toJSON(): {};
 }
 
-export interface PanelContentPart extends Methods {
+export interface PanelContentPart extends BasePart {
   id: string;
   element: HTMLElement;
   layout?(width: number, height: number): void;
@@ -46,13 +47,11 @@ export interface WatermarkPart extends IDisposable {
   element: HTMLElement;
 }
 
-export interface PanelHeaderPartConstructor {
-  new (): PanelHeaderPart;
-}
-export interface PanelContentPartConstructor {
-  new (): PanelContentPart;
-}
+// constructors
 
-export interface WatermarkConstructor {
-  new (): WatermarkPart;
-}
+export interface PanelHeaderPartConstructor
+  extends Constructor<PanelHeaderPart> {}
+export interface PanelContentPartConstructor
+  extends Constructor<PanelContentPart> {}
+
+export interface WatermarkConstructor extends Constructor<WatermarkPart> {}

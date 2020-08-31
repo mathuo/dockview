@@ -1,16 +1,13 @@
-import { IPanel, PanelInitParameters, PanelUpdateEvent } from "./types";
-import {
-  PanelApiImpl,
-  PanelStateChangeEvent,
-  PanelDimensionChangeEvent,
-  PanelApi,
-} from "./api";
+import { IGroupPanel, PanelInitParameters } from "./types";
+import { PanelApiImpl, PanelStateChangeEvent, PanelApi } from "./api";
 import { Emitter, Event } from "../../events";
 import { IGroupview, GroupChangeKind } from "../groupview";
 import { MutableDisposable, CompositeDisposable } from "../../lifecycle";
 import { PanelContentPart, PanelHeaderPart, ClosePanelResult } from "./parts";
+import { PanelDimensionChangeEvent } from "../../panel/api";
+import { PanelUpdateEvent } from "../../panel/types";
 
-export class DefaultPanel extends CompositeDisposable implements IPanel {
+export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
   private readonly mutableDisposable = new MutableDisposable();
   private readonly _onDidPanelStateChange = new Emitter<PanelStateChangeEvent>({
     emitLastValue: true,

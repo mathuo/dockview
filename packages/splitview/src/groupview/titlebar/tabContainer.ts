@@ -1,4 +1,8 @@
-import { IDisposable, CompositeDisposable } from "../../lifecycle";
+import {
+  IDisposable,
+  CompositeDisposable,
+  IValueDisposable,
+} from "../../lifecycle";
 import { addDisposableListener, Emitter, Event } from "../../events";
 import { ITab, Tab, TabInteractionKind } from "../panel/tab/tab";
 import { removeClasses, addClasses, toggleClass } from "../../dom";
@@ -9,7 +13,7 @@ import { IGroupview } from "../groupview";
 import { IGroupAccessor } from "../../layout";
 import { last } from "../../array";
 import { DataTransferSingleton } from "../droptarget/dataTransfer";
-import { IPanel } from "../panel/types";
+import { IGroupPanel } from "../panel/types";
 
 export interface ITabContainer extends IDisposable {
   element: HTMLElement;
@@ -21,10 +25,10 @@ export interface ITabContainer extends IDisposable {
   at: (index: number) => ITab;
   onDropEvent: Event<TabDropEvent>;
   setActive: (isGroupActive: boolean) => void;
-  setActivePanel: (panel: IPanel) => void;
+  setActivePanel: (panel: IGroupPanel) => void;
   isActive: (tab: ITab) => boolean;
-  closePanel: (panel: IPanel) => void;
-  openPanel: (panel: IPanel, index?: number) => void;
+  closePanel: (panel: IGroupPanel) => void;
+  openPanel: (panel: IGroupPanel, index?: number) => void;
 }
 
 export class TabContainer extends CompositeDisposable implements ITabContainer {
@@ -32,10 +36,10 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
   private _element: HTMLElement;
   private actionContainer: HTMLElement;
 
-  private tabs: ITab[] = [];
+  private tabs: IValueDisposable<ITab>[] = [];
   private selectedIndex: number = -1;
   private active: boolean;
-  private activePanel: IPanel;
+  private activePanel: IGroupPanel;
 
   private _visible: boolean = true;
   private _height: number;
@@ -67,20 +71,22 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
   }
 
   public isActive(tab: ITab) {
-    return this.selectedIndex > -1 && this.tabs[this.selectedIndex] === tab;
+    return (
+      this.selectedIndex > -1 && this.tabs[this.selectedIndex].value === tab
+    );
   }
 
   public get hasActiveDragEvent() {
-    return !!this.tabs.find((tab) => tab.hasActiveDragEvent);
+    return !!this.tabs.find((tab) => tab.value.hasActiveDragEvent);
   }
 
   public at(index: number) {
-    return this.tabs[index];
+    return this.tabs[index]?.value;
   }
 
   public indexOf(tabOrId: ITab) {
     const id = typeof tabOrId === "string" ? tabOrId : tabOrId.id;
-    return this.tabs.findIndex((tab) => tab.id === id);
+    return this.tabs.findIndex((tab) => tab.value.id === id);
   }
 
   constructor(private accessor: IGroupAccessor, private group: IGroupview) {
@@ -111,7 +117,7 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
           console.debug("[tabs] invalid drop event");
           return;
         }
-        if (!last(this.tabs).hasActiveDragEvent) {
+        if (!last(this.tabs).value.hasActiveDragEvent) {
           addClasses(this.tabContainer, "drag-over-target");
         }
       }),
@@ -132,10 +138,11 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
         }
         removeClasses(this.tabContainer, "drag-over-target");
 
-        const activetab = this.tabs.find((tab) => tab.hasActiveDragEvent);
+        const activetab = this.tabs.find((tab) => tab.value.hasActiveDragEvent);
 
         const ignore = !!(
-          activetab && event.composedPath().find((x) => activetab.element === x)
+          activetab &&
+          event.composedPath().find((x) => activetab.value.element === x)
         );
 
         if (ignore) {
@@ -155,13 +162,16 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
     this.active = isGroupActive;
   }
 
-  private addTab(tab: ITab, index: number = this.tabs.length) {
+  private addTab(
+    tab: IValueDisposable<ITab>,
+    index: number = this.tabs.length
+  ) {
     if (index < 0 || index > this.tabs.length) {
       throw new Error("invalid location");
     }
 
     this.tabContainer.insertBefore(
-      tab.element,
+      tab.value.element,
       this.tabContainer.children[index]
     );
 
@@ -173,28 +183,31 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
   }
 
   public delete(id: string) {
-    const index = this.tabs.findIndex((tab) => tab.id === id);
+    const index = this.tabs.findIndex((tab) => tab.value.id === id);
 
     const tab = this.tabs.splice(index, 1)[0];
-    tab.element.remove();
+
+    const { value, disposable } = tab;
+
+    disposable.dispose();
+    value.element.remove();
   }
 
-  public setActivePanel(panel: IPanel) {
+  public setActivePanel(panel: IGroupPanel) {
     this.tabs.forEach((tab) => {
-      const isActivePanel = panel.id === tab.id;
-      tab.setActive(isActivePanel);
+      const isActivePanel = panel.id === tab.value.id;
+      tab.value.setActive(isActivePanel);
     });
   }
 
-  public openPanel(panel: IPanel, index: number = this.tabs.length) {
-    if (this.tabs.find((tab) => tab.id === panel.id)) {
+  public openPanel(panel: IGroupPanel, index: number = this.tabs.length) {
+    if (this.tabs.find((tab) => tab.value.id === panel.id)) {
       return;
     }
     const tab = new Tab(panel.id, this.accessor, this.group);
     tab.setContent(panel.header.element);
 
-    // TODO - dispose of resources
-    const disposables = CompositeDisposable.from(
+    const disposable = CompositeDisposable.from(
       tab.onChanged((event) => {
         switch (event.kind) {
           case TabInteractionKind.CLICK:
@@ -209,15 +222,22 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
       })
     );
 
-    this.addTab(tab, index);
+    const value: IValueDisposable<ITab> = { value: tab, disposable };
+
+    this.addTab(value, index);
     this.activePanel = panel;
   }
 
-  public closePanel(panel: IPanel) {
+  public closePanel(panel: IGroupPanel) {
     this.delete(panel.id);
   }
 
   public dispose() {
     super.dispose();
+
+    this.tabs.forEach((tab) => {
+      tab.disposable.dispose();
+    });
+    this.tabs = [];
   }
 }

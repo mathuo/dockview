@@ -1,25 +1,44 @@
 import * as React from "react";
-import { Orientation, SplitView } from "../splitview/splitview";
-import { ReactView } from "./reactView";
+import { IBasePanelApi } from "../panel/api";
+import { IDisposable } from "../lifecycle";
+import {
+  IComponentSplitview,
+  ComponentSplitview,
+} from "../splitview/componentSplitview";
+import { Orientation } from "../splitview/splitview";
+import { ReactComponentView } from "./reactComponentView";
 
 export interface SplitviewFacade {
-  addFromComponent(options: { id: string; component: string }): void;
+  addFromComponent(options: {
+    id: string;
+    component: string;
+    params?: { [index: string]: any };
+  }): void;
   layout(size: number, orthogonalSize: number): void;
+  onChange: (cb: (event: { proportions: number[] }) => void) => IDisposable;
+  toJSON: () => any;
+  deserialize: (data: any) => void;
 }
 
 export interface SplitviewReadyEvent {
-  api: SplitviewFacade;
+  api: IComponentSplitview;
+}
+
+export interface ISplitviewPanelProps {
+  api: IBasePanelApi;
 }
 
 export interface ISplitviewComponentProps {
   orientation: Orientation;
   onReady?: (event: SplitviewReadyEvent) => void;
-  components: { [index: string]: React.FunctionComponent<{}> };
+  components: {
+    [index: string]: React.FunctionComponent<ISplitviewPanelProps>;
+  };
 }
 
 export const SplitViewComponent = (props: ISplitviewComponentProps) => {
   const domReference = React.useRef<HTMLDivElement>();
-  const splitview = React.useRef<SplitView>();
+  const splitpanel = React.useRef<IComponentSplitview>();
   const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
 
   const addPortal = React.useCallback((p: React.ReactPortal) => {
@@ -32,52 +51,29 @@ export const SplitViewComponent = (props: ISplitviewComponentProps) => {
   }, []);
 
   React.useEffect(() => {
-    splitview.current = new SplitView(domReference.current, {
+    splitpanel.current = new ComponentSplitview(domReference.current, {
       orientation: props.orientation,
+      frameworkComponents: props.components,
+      frameworkWrapper: {
+        createComponent: (id: string, component: any) => {
+          return new ReactComponentView(id, id, component, { addPortal });
+        },
+      },
     });
-
-    const createViewWrapper = (
-      id: string,
-      component: React.FunctionComponent<{}>
-    ) => {
-      return new ReactView(id, component, { addPortal });
-    };
-
-    const facade: SplitviewFacade = {
-      addFromComponent: (options) => {
-        const component = props.components[options.component];
-        const view = createViewWrapper(options.id, component);
-
-        splitview.current.addView(view, { type: "distribute" });
-        view.init({ params: {} });
-        return {
-          dispose: () => {
-            //
-          },
-        };
-      },
-      layout: (width, height) => {
-        const [size, orthogonalSize] =
-          props.orientation === Orientation.HORIZONTAL
-            ? [width, height]
-            : [height, width];
-        splitview.current.layout(size, orthogonalSize);
-      },
-    };
 
     const { width, height } = domReference.current.getBoundingClientRect();
     const [size, orthogonalSize] =
       props.orientation === Orientation.HORIZONTAL
         ? [width, height]
         : [height, width];
-    splitview.current.layout(size, orthogonalSize);
+    splitpanel.current.layout(size, orthogonalSize);
 
     if (props.onReady) {
-      props.onReady({ api: facade });
+      props.onReady({ api: splitpanel.current });
     }
 
     return () => {
-      splitview.current.dispose();
+      splitpanel.current.dispose();
     };
   }, []);
 

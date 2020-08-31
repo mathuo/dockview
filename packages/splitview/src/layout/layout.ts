@@ -10,7 +10,7 @@ import {
   GroupChangeEvent,
   GroupDropEvent,
 } from "../groupview/groupview";
-import { IPanel } from "../groupview/panel/types";
+import { IGroupPanel } from "../groupview/panel/types";
 import { DefaultPanel } from "../groupview/panel/panel";
 import {
   CompositeDisposable,
@@ -103,9 +103,9 @@ export interface IGroupAccessor {
   activeGroup: IGroupview;
   //
   addPanelFromComponent(options: AddPanelOptions): PanelReference;
-  addPanel(options: AddPanelOptions): IPanel;
+  addPanel(options: AddPanelOptions): IGroupPanel;
   //
-  getPanel: (id: string) => IPanel;
+  getPanel: (id: string) => IGroupPanel;
 }
 
 export interface ILayout extends IGroupAccessor, Api {}
@@ -118,10 +118,10 @@ export class Layout extends CompositeDisposable implements ILayout {
   private readonly _element: HTMLElement;
   private readonly _id = nextLayoutId.next();
   private readonly groups = new Map<string, IValueDisposable<IGroupview>>();
-  private readonly panels = new Map<string, IValueDisposable<IPanel>>();
+  private readonly panels = new Map<string, IValueDisposable<IGroupPanel>>();
   private readonly gridview: Gridview = new Gridview();
-  private readonly dirtyPanels = new Set<IPanel>();
-  private readonly debouncedDeque = debounce(this.persist.bind(this), 5000);
+  private readonly dirtyPanels = new Set<IGroupPanel>();
+  private readonly debouncedDeque = debounce(this.syncConfigs.bind(this), 5000);
   // events
   private readonly _onDidLayoutChange = new Emitter<GroupChangeEvent>();
   readonly onDidLayoutChange: Event<GroupChangeEvent> = this._onDidLayoutChange
@@ -205,7 +205,7 @@ export class Layout extends CompositeDisposable implements ILayout {
     return this._element;
   }
 
-  public getPanel(id: string): IPanel {
+  public getPanel(id: string): IGroupPanel {
     return this.panels.get(id)?.value;
   }
 
@@ -305,7 +305,7 @@ export class Layout extends CompositeDisposable implements ILayout {
     this.doSetGroupActive(next);
   }
 
-  public registerPanel(panel: IPanel) {
+  public registerPanel(panel: IGroupPanel) {
     if (this.panels.has(panel.id)) {
       throw new Error(`panel ${panel.id} already exists`);
     }
@@ -319,7 +319,7 @@ export class Layout extends CompositeDisposable implements ILayout {
     this._onDidLayoutChange.fire({ kind: GroupChangeKind.PANEL_CREATED });
   }
 
-  public unregisterPanel(panel: IPanel) {
+  public unregisterPanel(panel: IGroupPanel) {
     if (!this.panels.has(panel.id)) {
       throw new Error(`panel ${panel.id} doesn't exist`);
     }
@@ -339,6 +339,8 @@ export class Layout extends CompositeDisposable implements ILayout {
    * @returns A JSON respresentation of the layout
    */
   public toJSON() {
+    this.syncConfigs();
+
     const data = this.gridview.serialize();
 
     const state = { ...this.panelState };
@@ -354,6 +356,43 @@ export class Layout extends CompositeDisposable implements ILayout {
     );
 
     return { grid: data, panels };
+  }
+
+  /**
+   * Ensure the local copy of the layout state is up-to-date
+   */
+  private syncConfigs() {
+    const dirtyPanels = Array.from(this.dirtyPanels);
+
+    if (dirtyPanels.length === 0) {
+      console.debug("[layout#syncConfigs] no dirty panels");
+    }
+
+    this.dirtyPanels.clear();
+
+    const partialPanelState = dirtyPanels
+      .map((panel) => this.panels.get(panel.id))
+      .filter((_) => !!_)
+      .reduce((collection, panel) => {
+        collection[panel.value.id] = panel.value.toJSON();
+        return collection;
+      }, {});
+
+    this.panelState = {
+      ...this.panelState,
+      ...partialPanelState,
+    };
+
+    dirtyPanels
+      .filter((p) => this.panels.has(p.id))
+      .forEach((panel) => {
+        panel.setDirty(false);
+        this._onDidLayoutChange.fire({ kind: GroupChangeKind.PANEL_CLEAN });
+      });
+
+    this._onDidLayoutChange.fire({
+      kind: GroupChangeKind.LAYOUT_CONFIG_UPDATED,
+    });
   }
 
   public deserialize(data: any) {
@@ -469,7 +508,7 @@ export class Layout extends CompositeDisposable implements ILayout {
     };
   }
 
-  public addPanel(options: AddPanelOptions): IPanel {
+  public addPanel(options: AddPanelOptions): IGroupPanel {
     const component = this.createContentComponent(options.componentName);
     const tabComponent = this.createTabComponent(options.tabComponentName);
 
@@ -491,7 +530,7 @@ export class Layout extends CompositeDisposable implements ILayout {
       componentName,
       this.options.components,
       this.options.frameworkComponents,
-      this.options.frameworkPanelWrapper.createContentWrapper
+      this.options.frameworkComponentFactory.content
     );
   }
 
@@ -502,7 +541,7 @@ export class Layout extends CompositeDisposable implements ILayout {
       componentName,
       this.options.tabComponents,
       this.options.frameworkTabComponents,
-      this.options.frameworkPanelWrapper.createTabWrapper
+      this.options.frameworkComponentFactory.tab
     );
   }
 
@@ -544,7 +583,7 @@ export class Layout extends CompositeDisposable implements ILayout {
     this.doRemoveGroup(group);
   }
 
-  private addPanelToNewGroup(panel: IPanel, location: number[] = [0]) {
+  private addPanelToNewGroup(panel: IGroupPanel, location: number[] = [0]) {
     let group: IGroupview;
 
     if (
@@ -735,46 +774,17 @@ export class Layout extends CompositeDisposable implements ILayout {
     this.gridview.layout(size, orthogonalSize);
   }
 
-  private findGroup(panel: IPanel): IGroupview | undefined {
+  private findGroup(panel: IGroupPanel): IGroupview | undefined {
     return Array.from(this.groups.values()).find((group) =>
       group.value.containsPanel(panel)
     ).value;
   }
 
-  private addDirtyPanel(panel: IPanel) {
+  private addDirtyPanel(panel: IGroupPanel) {
     this.dirtyPanels.add(panel);
     panel.setDirty(true);
     this._onDidLayoutChange.fire({ kind: GroupChangeKind.PANEL_DIRTY });
     this.debouncedDeque();
-  }
-
-  private persist() {
-    const dirtyPanels = Array.from(this.dirtyPanels);
-    this.dirtyPanels.clear();
-
-    const partialPanelState = dirtyPanels
-      .map((p) => this.panels.get(p.id))
-      .filter((_) => !!_)
-      .reduce((collection, panel) => {
-        collection[panel.value.id] = panel.value.toJSON();
-        return collection;
-      }, {});
-
-    this.panelState = {
-      ...this.panelState,
-      ...partialPanelState,
-    };
-
-    dirtyPanels
-      .filter((p) => this.panels.has(p.id))
-      .forEach((panel) => {
-        panel.setDirty(false);
-        this._onDidLayoutChange.fire({ kind: GroupChangeKind.PANEL_CLEAN });
-      });
-
-    this._onDidLayoutChange.fire({
-      kind: GroupChangeKind.LAYOUT_CONFIG_UPDATED,
-    });
   }
 
   private toTarget(direction: "left" | "right" | "above" | "below" | "within") {

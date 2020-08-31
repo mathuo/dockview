@@ -5,6 +5,7 @@ import { ReactPanelContentPart } from "./reactContentPart";
 import { ReactPanelHeaderPart } from "./reactHeaderPart";
 import { IPanelProps } from "./react";
 import { ReactPanelDeserialzier } from "./deserializer";
+import { FrameworkComponentFactory } from "../layout/options";
 
 export interface OnReadyEvent {
   api: Api;
@@ -55,23 +56,27 @@ export const ReactGrid = (props: IReactGridProps) => {
       };
     };
 
-    const frameworkPanelWrapper = {
-      createContentWrapper: (
-        id: string,
-        component: React.FunctionComponent<IPanelProps>
-      ) => {
-        return new ReactPanelContentPart(id, component, { addPortal });
+    const frameworkPanelWrapper: FrameworkComponentFactory = {
+      content: {
+        createComponent: (
+          id: string,
+          component: React.FunctionComponent<IPanelProps>
+        ) => {
+          return new ReactPanelContentPart(id, component, { addPortal });
+        },
       },
-      createTabWrapper: (
-        id: string,
-        component: React.FunctionComponent<IPanelProps>
-      ) => {
-        return new ReactPanelHeaderPart(id, component, { addPortal });
+      tab: {
+        createComponent: (
+          id: string,
+          component: React.FunctionComponent<IPanelProps>
+        ) => {
+          return new ReactPanelHeaderPart(id, component, { addPortal });
+        },
       },
     };
 
     const layout = new Layout({
-      frameworkPanelWrapper,
+      frameworkComponentFactory: frameworkPanelWrapper,
       frameworkComponents: props.components,
       frameworkTabComponents: props.tabComponents,
       tabHeight: props.tabHeight,

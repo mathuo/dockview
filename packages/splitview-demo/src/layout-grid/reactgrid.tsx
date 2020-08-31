@@ -10,38 +10,8 @@ import {
   GroupChangeKind,
 } from "splitview";
 import { CustomTab } from "./customTab";
+import { Editor } from "./editorPanel";
 import { SplitPanel } from "./splitPanel";
-
-const Editor = (props: IPanelProps & { layoutApi: Api }) => {
-  const [tabHeight, setTabHeight] = React.useState<number>(0);
-
-  React.useEffect(() => {
-    if (props.layoutApi) {
-      setTabHeight(props.layoutApi.getTabHeight());
-    }
-  }, [props.layoutApi]);
-
-  const onTabHeightChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(event.target.value);
-    if (!Number.isNaN(value)) {
-      setTabHeight(value);
-    }
-  };
-
-  const onClick = () => {
-    props.layoutApi.setTabHeight(tabHeight);
-  };
-
-  return (
-    <div style={{ height: "100%", backgroundColor: "white", color: "black" }}>
-      <label>
-        Tab height
-        <input onChange={onTabHeightChange} value={tabHeight} type="number" />
-        <button onClick={onClick}>Apply</button>
-      </label>
-    </div>
-  );
-};
 
 const components = {
   inner_component: (props: IPanelProps) => {
@@ -51,7 +21,7 @@ const components = {
     const onReady = (event: OnReadyEvent) => {
       _api.current = event.api;
 
-      const layout = props.api.getState()["layout"];
+      const layout = props.api.getStateKey<object>("layout");
       if (layout) {
         event.api.deserialize(layout);
       } else {

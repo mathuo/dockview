@@ -1,4 +1,4 @@
-import { IPanel } from "../groupview/panel/types";
+import { IGroupPanel } from "../groupview/panel/types";
 import { Layout } from "../layout/layout";
 import { DefaultPanel } from "../groupview/panel/panel";
 import { PanelContentPart, PanelHeaderPart } from "../groupview/panel/parts";
@@ -11,7 +11,7 @@ import {
 export class ReactPanelDeserialzier implements IPanelDeserializer {
   constructor(private readonly layout: Layout) {}
 
-  public fromJSON(panelData: { [index: string]: any }): IPanel {
+  public fromJSON(panelData: { [index: string]: any }): IGroupPanel {
     const panelId = panelData.id;
     const content = panelData.content;
     const tab = panelData.tab;
@@ -24,14 +24,14 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
       content.id,
       this.layout.options.components,
       this.layout.options.frameworkComponents,
-      this.layout.options.frameworkPanelWrapper.createContentWrapper
+      this.layout.options.frameworkComponentFactory.content
     ) as PanelContentPart;
 
     const headerPart = createTabComponent(
       tab.id,
       this.layout.options.tabComponents,
-      this.layout.options.frameworkPanelWrapper,
-      this.layout.options.frameworkPanelWrapper.createTabWrapper
+      this.layout.options.frameworkComponentFactory,
+      this.layout.options.frameworkComponentFactory.tab
     ) as PanelHeaderPart;
 
     const panel = new DefaultPanel(panelId, headerPart, contentPart);

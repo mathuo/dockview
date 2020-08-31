@@ -1,5 +1,5 @@
 export * from "./splitview/splitview";
-export * from "./splitview/paneview";
+export * from "./paneview/paneview";
 export * from "./gridview/gridview";
 export * from "./groupview/groupview";
 export * from "./groupview/panel/content/content";

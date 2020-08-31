@@ -7,19 +7,20 @@ import {
   PanelHeaderPartConstructor,
   WatermarkConstructor,
 } from "../groupview/panel/parts";
-import { IPanel } from "../groupview/panel/types";
+import { IGroupPanel } from "../groupview/panel/types";
+import { FrameworkFactory } from "../types";
 import { Api } from "./layout";
 
-export interface FrameworkPanelWrapper {
-  createContentWrapper: (id: string, component: any) => PanelContentPart;
-  createTabWrapper: (id: string, component: any) => PanelHeaderPart;
+export interface FrameworkComponentFactory {
+  content: FrameworkFactory<PanelContentPart>;
+  tab: FrameworkFactory<PanelHeaderPart>;
 }
 
 export interface TabContextMenuEvent {
   event: MouseEvent;
   api: Api;
   panelApi: PanelApi;
-  panel: IPanel;
+  panel: IGroupPanel;
 }
 
 export interface LayoutOptions {
@@ -37,7 +38,7 @@ export interface LayoutOptions {
   };
   watermarkComponent?: WatermarkConstructor;
   watermarkFrameworkComponent?: any;
-  frameworkPanelWrapper: FrameworkPanelWrapper;
+  frameworkComponentFactory: FrameworkComponentFactory;
   tabHeight?: number;
   debug?: boolean;
   enableExternalDragEvents?: boolean;
