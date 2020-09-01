@@ -1,28 +1,19 @@
 import { IGroupPanel, PanelInitParameters } from "./types";
-import { PanelApiImpl, PanelStateChangeEvent, PanelApi } from "./api";
+import { PanelApiImpl, PanelStateChangeEvent, IPanelApi } from "./api";
 import { Emitter, Event } from "../../events";
 import { IGroupview, GroupChangeKind } from "../groupview";
 import { MutableDisposable, CompositeDisposable } from "../../lifecycle";
 import { PanelContentPart, PanelHeaderPart, ClosePanelResult } from "./parts";
-import { PanelDimensionChangeEvent } from "../../panel/api";
 import { PanelUpdateEvent } from "../../panel/types";
 
 export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
   private readonly mutableDisposable = new MutableDisposable();
-  private readonly _onDidPanelStateChange = new Emitter<PanelStateChangeEvent>({
-    emitLastValue: true,
-  });
-  private readonly _onDidPanelDimensionsChange = new Emitter<
-    PanelDimensionChangeEvent
-  >();
-  private readonly _onDidDirtyChange = new Emitter<boolean>();
 
-  private readonly api: PanelApi;
+  private readonly api: PanelApiImpl;
   private _group: IGroupview;
   private params: PanelInitParameters;
 
-  private readonly _onDidStateChange = new Emitter<any>();
-  readonly onDidStateChange: Event<any> = this._onDidStateChange.event;
+  readonly onDidStateChange: Event<any>;
 
   get group() {
     return this._group;
@@ -43,23 +34,12 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
   ) {
     super();
 
-    this.api = new PanelApiImpl(
-      this._onDidPanelStateChange.event,
-      this._onDidPanelDimensionsChange.event,
-      this._onDidDirtyChange.event,
-      this,
-      this._group
-    );
-
-    this.addDisposables(
-      this.api.onDidStateChange((e) => {
-        this._onDidStateChange.fire(undefined);
-      })
-    );
+    this.api = new PanelApiImpl(this, this._group);
+    this.onDidStateChange = this.api.onDidStateChange;
   }
 
   public setDirty(isDirty: boolean) {
-    this._onDidDirtyChange.fire(isDirty);
+    this.api._onDidDirtyChange.fire(isDirty);
   }
 
   public close(): Promise<ClosePanelResult> {
@@ -90,7 +70,7 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
     this.params.params = { ...this.params.params, ...params };
 
     this.contentPart.update(params.params);
-    this._onDidStateChange.fire(undefined);
+    this.api._onDidStateChange.fire();
   }
 
   public init(params: PanelInitParameters): void {
@@ -119,14 +99,14 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
     this.mutableDisposable.value = this._group.onDidGroupChange((ev) => {
       if (ev.kind === GroupChangeKind.GROUP_ACTIVE) {
         //
-        this._onDidPanelStateChange.fire({
+        this.api._onDidPanelStateChange.fire({
           isGroupActive,
           isPanelVisible: this._group.isPanelActive(this),
         });
       }
     });
 
-    this._onDidPanelStateChange.fire({
+    this.api._onDidPanelStateChange.fire({
       isGroupActive,
       isPanelVisible: this._group.isPanelActive(this),
     });
@@ -147,17 +127,13 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
 
   public layout(width: number, height: number) {
     // thw height of the panel excluded the height of the title/tab
-    this._onDidPanelDimensionsChange.fire({
+    this.api._onDidPanelDimensionChange.fire({
       width,
       height: height - (this.group?.tabHeight || 0),
     });
   }
 
   public dispose() {
-    this._onDidStateChange.dispose();
-    this._onDidPanelStateChange.dispose();
-    this._onDidPanelDimensionsChange.dispose();
-    this._onDidDirtyChange.dispose();
     this.api.dispose();
     this.mutableDisposable.dispose();
 

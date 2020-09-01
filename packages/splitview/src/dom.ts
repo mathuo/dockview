@@ -158,6 +158,9 @@ export function trackFocus(element: HTMLElement | Window): IFocusTracker {
   return new FocusTracker(element);
 }
 
+/**
+ * Track focus on an element. If element is HTMLElement ensure a valid tabIndex is set
+ */
 class FocusTracker extends CompositeDisposable implements IFocusTracker {
   private readonly _onDidFocus = new Emitter<void>();
   public readonly onDidFocus: Event<void> = this._onDidFocus.event;
@@ -169,6 +172,7 @@ class FocusTracker extends CompositeDisposable implements IFocusTracker {
 
   constructor(element: HTMLElement | Window) {
     super();
+
     let hasFocus = isAncestor(document.activeElement, <HTMLElement>element);
     let loosingFocus = false;
 

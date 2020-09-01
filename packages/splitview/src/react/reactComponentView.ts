@@ -20,7 +20,7 @@ export class ReactComponentView
   private api: BasePanelApi;
   private readonly _onDidPanelDimensionsChange = new Emitter<
     PanelDimensionChangeEvent
-  >();
+  >({ emitLastValue: true });
 
   private _onDidChange: Emitter<number | undefined> = new Emitter<
     number | undefined
@@ -49,14 +49,16 @@ export class ReactComponentView
     private readonly parent: ReactLayout
   ) {
     super();
-    this.api = new BasePanelApi(this._onDidPanelDimensionsChange.event);
+    this.api = new BasePanelApi();
     if (!this.component) {
       throw new Error("React.FunctionalComponent cannot be undefined");
     }
 
     this._element = document.createElement("div");
+    this._element.tabIndex = -1;
+    this._element.style.outline = "none";
 
-    const { onDidFocus } = trackFocus(this.element);
+    const { onDidFocus } = trackFocus(this._element);
 
     this.addDisposables(
       this._onDidPanelDimensionsChange,

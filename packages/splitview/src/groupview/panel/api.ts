@@ -1,5 +1,5 @@
 import { IGroupview } from "../groupview";
-import { Event } from "../../events";
+import { Emitter, Event } from "../../events";
 import { ClosePanelResult } from "./parts";
 import { IGroupPanel } from "./types";
 import {
@@ -13,7 +13,7 @@ export interface PanelStateChangeEvent {
   isGroupActive: boolean;
 }
 
-export interface PanelApi extends IBasePanelApi {
+export interface IPanelApi extends IBasePanelApi {
   onDidPanelStateChange: Event<PanelStateChangeEvent>;
   isPanelVisible: boolean;
   isGroupActive: boolean;
@@ -24,19 +24,19 @@ export interface PanelApi extends IBasePanelApi {
   onDidDirtyChange: Event<boolean>;
 }
 
-export class PanelApiImpl extends BasePanelApi implements PanelApi {
+export class PanelApiImpl extends BasePanelApi implements IPanelApi {
   private _isPanelVisible: boolean;
   private _isGroupActive: boolean;
   private _group: IGroupview;
   private _closePanelCallback: () => Promise<ClosePanelResult>;
 
-  get onDidPanelStateChange() {
-    return this._event;
-  }
+  readonly _onDidPanelStateChange = new Emitter<PanelStateChangeEvent>({
+    emitLastValue: true,
+  });
+  readonly onDidPanelStateChange = this._onDidPanelStateChange.event;
 
-  get onDidDirtyChange() {
-    return this._dirtyEvent;
-  }
+  readonly _onDidDirtyChange = new Emitter<boolean>();
+  readonly onDidDirtyChange = this._onDidDirtyChange.event;
 
   get isGroupActive() {
     return this._isGroupActive;
@@ -58,18 +58,12 @@ export class PanelApiImpl extends BasePanelApi implements PanelApi {
     return this._group;
   }
 
-  constructor(
-    private _event: Event<PanelStateChangeEvent>,
-    _dimensionEvent: Event<PanelDimensionChangeEvent>,
-    private _dirtyEvent: Event<boolean>,
-    private panel: IGroupPanel,
-    group: IGroupview
-  ) {
-    super(_dimensionEvent);
+  constructor(private panel: IGroupPanel, group: IGroupview) {
+    super();
     this._group = group;
 
     this.addDisposables(
-      this._event((event) => {
+      this.onDidPanelStateChange((event) => {
         this._isGroupActive = event.isGroupActive;
         this._isPanelVisible = event.isPanelVisible;
       })

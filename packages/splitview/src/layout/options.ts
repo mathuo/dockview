@@ -1,5 +1,5 @@
 import { IGroupview } from "../groupview/groupview";
-import { PanelApi } from "../groupview/panel/api";
+import { IPanelApi } from "../groupview/panel/api";
 import {
   PanelContentPart,
   PanelContentPartConstructor,
@@ -11,7 +11,7 @@ import { IGroupPanel } from "../groupview/panel/types";
 import { FrameworkFactory } from "../types";
 import { Api } from "./layout";
 
-export interface FrameworkComponentFactory {
+export interface GroupPanelFrameworkComponentFactory {
   content: FrameworkFactory<PanelContentPart>;
   tab: FrameworkFactory<PanelHeaderPart>;
 }
@@ -19,7 +19,7 @@ export interface FrameworkComponentFactory {
 export interface TabContextMenuEvent {
   event: MouseEvent;
   api: Api;
-  panelApi: PanelApi;
+  panelApi: IPanelApi;
   panel: IGroupPanel;
 }
 
@@ -38,7 +38,7 @@ export interface LayoutOptions {
   };
   watermarkComponent?: WatermarkConstructor;
   watermarkFrameworkComponent?: any;
-  frameworkComponentFactory: FrameworkComponentFactory;
+  frameworkComponentFactory: GroupPanelFrameworkComponentFactory;
   tabHeight?: number;
   debug?: boolean;
   enableExternalDragEvents?: boolean;

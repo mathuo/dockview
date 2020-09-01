@@ -5,7 +5,7 @@ import { ReactPanelContentPart } from "./reactContentPart";
 import { ReactPanelHeaderPart } from "./reactHeaderPart";
 import { IPanelProps } from "./react";
 import { ReactPanelDeserialzier } from "./deserializer";
-import { FrameworkComponentFactory } from "../layout/options";
+import { GroupPanelFrameworkComponentFactory } from "../layout/options";
 
 export interface OnReadyEvent {
   api: Api;
@@ -56,7 +56,7 @@ export const ReactGrid = (props: IReactGridProps) => {
       };
     };
 
-    const frameworkPanelWrapper: FrameworkComponentFactory = {
+    const factory: GroupPanelFrameworkComponentFactory = {
       content: {
         createComponent: (
           id: string,
@@ -76,7 +76,7 @@ export const ReactGrid = (props: IReactGridProps) => {
     };
 
     const layout = new Layout({
-      frameworkComponentFactory: frameworkPanelWrapper,
+      frameworkComponentFactory: factory,
       frameworkComponents: props.components,
       frameworkTabComponents: props.tabComponents,
       tabHeight: props.tabHeight,

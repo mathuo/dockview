@@ -1,12 +1,12 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { IDisposable } from "../lifecycle";
-import { PanelApi } from "../groupview/panel/api";
+import { IPanelApi } from "../groupview/panel/api";
 import { sequentialNumberGenerator } from "../math";
 import { IBasePanelApi } from "../panel/api";
 
 export interface IPanelProps {
-  api: PanelApi;
+  api: IPanelApi;
 }
 
 interface IPanelWrapperProps {

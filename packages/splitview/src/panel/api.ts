@@ -27,19 +27,28 @@ export interface IBasePanelApi extends IDisposable {
   getState: () => { [key: string]: StateObject };
   getStateKey: <T extends StateObject>(key: string) => T;
   onDidStateChange: Event<void>;
+  //
+  // onFocus(): Event<void>;
+  // onBlur(): Event<void>;
 }
 export class BasePanelApi extends CompositeDisposable implements IBasePanelApi {
   private _state: { [key: string]: StateObject } = {};
 
-  private readonly _onDidStateChange = new Emitter<void>();
+  readonly _onDidStateChange = new Emitter<void>();
   readonly onDidStateChange: Event<void> = this._onDidStateChange.event;
+  //
+  readonly _onDidPanelDimensionChange = new Emitter<PanelDimensionChangeEvent>({
+    emitLastValue: true,
+  });
+  readonly onDidPanelDimensionChange = this._onDidPanelDimensionChange.event;
 
-  get onDidPanelDimensionChange() {
-    return this._dimensionEvent;
-  }
-
-  constructor(private _dimensionEvent: Event<PanelDimensionChangeEvent>) {
+  constructor() {
     super();
+
+    this.addDisposables(
+      this._onDidStateChange,
+      this._onDidPanelDimensionChange
+    );
   }
 
   public setState(
@@ -65,7 +74,5 @@ export class BasePanelApi extends CompositeDisposable implements IBasePanelApi {
 
   public dispose() {
     super.dispose();
-
-    this._onDidStateChange.dispose();
   }
 }

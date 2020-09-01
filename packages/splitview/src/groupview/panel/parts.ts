@@ -1,7 +1,7 @@
 import { IDisposable } from "../../lifecycle";
 import { IGroupview } from "../groupview";
 import { IGroupAccessor } from "../../layout";
-import { PanelApi } from "./api";
+import { IPanelApi } from "./api";
 import { PanelInitParameters } from "./types";
 import { Constructor } from "../../types";
 
@@ -20,7 +20,7 @@ export interface WatermarkPartInitParameters {
 }
 
 export interface PartInitParameters extends PanelInitParameters {
-  api: PanelApi;
+  api: IPanelApi;
 }
 
 export interface PanelHeaderPart extends BasePart {
