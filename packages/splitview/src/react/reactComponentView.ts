@@ -1,6 +1,7 @@
 import { trackFocus } from "../dom";
 import { Emitter } from "../events";
-import { BasePanelApi, PanelDimensionChangeEvent } from "../panel/api";
+import { PanelApi } from "../panel/api";
+import { PanelDimensionChangeEvent } from "../panel/types";
 import { CompositeDisposable } from "../lifecycle";
 import { IView } from "../splitview/splitview";
 import { ReactLayout } from "./layout";
@@ -17,7 +18,7 @@ export class ReactComponentView
   private _element: HTMLElement;
   private part: ReactPart;
   private params: { params: any };
-  private api: BasePanelApi;
+  private api: PanelApi;
   private readonly _onDidPanelDimensionsChange = new Emitter<
     PanelDimensionChangeEvent
   >({ emitLastValue: true });
@@ -49,7 +50,7 @@ export class ReactComponentView
     private readonly parent: ReactLayout
   ) {
     super();
-    this.api = new BasePanelApi();
+    this.api = new PanelApi();
     if (!this.component) {
       throw new Error("React.FunctionalComponent cannot be undefined");
     }
@@ -58,12 +59,15 @@ export class ReactComponentView
     this._element.tabIndex = -1;
     this._element.style.outline = "none";
 
-    const { onDidFocus } = trackFocus(this._element);
+    const { onDidFocus, onDidBlur } = trackFocus(this._element);
 
     this.addDisposables(
       this._onDidPanelDimensionsChange,
       onDidFocus(() => {
-        //
+        this.api._onDidChangeFocus.fire({ isFocused: true });
+      }),
+      onDidBlur(() => {
+        this.api._onDidChangeFocus.fire({ isFocused: false });
       })
     );
   }
@@ -98,7 +102,7 @@ export class ReactComponentView
   }
 
   dispose() {
-    this._onDidPanelDimensionsChange.dispose();
+    super.dispose();
     this.api.dispose();
   }
 }

@@ -7,7 +7,6 @@ import {
   DATA_KEY,
   DragType,
 } from "../../droptarget/dataTransfer";
-// import { IGroupAccessor } from "../../layout";
 import { toggleClass } from "../../../dom";
 import { IGroupAccessor } from "../../../layout";
 

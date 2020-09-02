@@ -1,13 +1,9 @@
+import { PanelDimensionChangeEvent } from "./types";
 import { Emitter, Event } from "../events";
 import { CompositeDisposable, IDisposable } from "../lifecycle";
 
-export interface PanelDimensionChangeEvent {
-  width: number;
-  height: number;
-}
-
-// try and do a bit better than the 'any' type.
-// anything that is serializable JSON should be valid
+// we've tried to do a bit better than the 'any' type.
+// anything that is serializable JSON should be valid here
 type StateObject =
   | number
   | string
@@ -18,21 +14,34 @@ type StateObject =
   | StateObject[]
   | { [key: string]: StateObject };
 
-export interface IBasePanelApi extends IDisposable {
+interface State {
+  [key: string]: StateObject;
+}
+
+type ChangeFocusEvent = {
+  isFocused: boolean;
+};
+
+export interface IPanelApi extends IDisposable {
   // events
-  onDidPanelDimensionChange: Event<PanelDimensionChangeEvent>;
+  onDidDimensionsChange: Event<PanelDimensionChangeEvent>;
+  onDidStateChange: Event<void>;
+  onDidFocusChange: Event<ChangeFocusEvent>;
   // state
   setState(key: string, value: StateObject): void;
-  setState(state: { [key: string]: StateObject }): void;
-  getState: () => { [key: string]: StateObject };
+  setState(state: State): void;
+  getState: () => State;
   getStateKey: <T extends StateObject>(key: string) => T;
-  onDidStateChange: Event<void>;
   //
-  // onFocus(): Event<void>;
-  // onBlur(): Event<void>;
+  readonly isFocused: boolean;
 }
-export class BasePanelApi extends CompositeDisposable implements IBasePanelApi {
-  private _state: { [key: string]: StateObject } = {};
+
+/**
+ * A core api implementation that should be used across all panel-like objects
+ */
+export class PanelApi extends CompositeDisposable implements IPanelApi {
+  private _state: State = {};
+  private _isFocused: boolean;
 
   readonly _onDidStateChange = new Emitter<void>();
   readonly onDidStateChange: Event<void> = this._onDidStateChange.event;
@@ -40,14 +49,28 @@ export class BasePanelApi extends CompositeDisposable implements IBasePanelApi {
   readonly _onDidPanelDimensionChange = new Emitter<PanelDimensionChangeEvent>({
     emitLastValue: true,
   });
-  readonly onDidPanelDimensionChange = this._onDidPanelDimensionChange.event;
+  readonly onDidDimensionsChange = this._onDidPanelDimensionChange.event;
+  //
+  readonly _onDidChangeFocus = new Emitter<ChangeFocusEvent>({
+    emitLastValue: true,
+  });
+  readonly onDidFocusChange: Event<ChangeFocusEvent> = this._onDidChangeFocus
+    .event;
+
+  get isFocused() {
+    return this._isFocused;
+  }
 
   constructor() {
     super();
 
     this.addDisposables(
       this._onDidStateChange,
-      this._onDidPanelDimensionChange
+      this._onDidChangeFocus,
+      this._onDidPanelDimensionChange,
+      this.onDidFocusChange((event) => {
+        this._isFocused = event.isFocused;
+      })
     );
   }
 
@@ -63,13 +86,12 @@ export class BasePanelApi extends CompositeDisposable implements IBasePanelApi {
     this._onDidStateChange.fire(undefined);
   }
 
-  public getState(): { [key: string]: StateObject } {
+  public getState(): State {
     return this._state;
   }
 
-  public getStateKey(key: string) {
-    // TODO - find an alternative to 'as any'
-    return this._state[key] as any;
+  public getStateKey<T extends StateObject>(key: string): T {
+    return this._state[key] as T;
   }
 
   public dispose() {

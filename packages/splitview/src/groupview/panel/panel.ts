@@ -1,6 +1,6 @@
 import { IGroupPanel, PanelInitParameters } from "./types";
-import { PanelApiImpl, PanelStateChangeEvent, IPanelApi } from "./api";
-import { Emitter, Event } from "../../events";
+import { GroupPanelApi } from "./api";
+import { Event } from "../../events";
 import { IGroupview, GroupChangeKind } from "../groupview";
 import { MutableDisposable, CompositeDisposable } from "../../lifecycle";
 import { PanelContentPart, PanelHeaderPart, ClosePanelResult } from "./parts";
@@ -9,7 +9,7 @@ import { PanelUpdateEvent } from "../../panel/types";
 export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
   private readonly mutableDisposable = new MutableDisposable();
 
-  private readonly api: PanelApiImpl;
+  private readonly api: GroupPanelApi;
   private _group: IGroupview;
   private params: PanelInitParameters;
 
@@ -34,7 +34,7 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
   ) {
     super();
 
-    this.api = new PanelApiImpl(this, this._group);
+    this.api = new GroupPanelApi(this, this._group);
     this.onDidStateChange = this.api.onDidStateChange;
   }
 
@@ -63,7 +63,7 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
   }
 
   public fromJSON(data: object) {
-    // this.
+    //
   }
 
   public update(params: PanelUpdateEvent): void {
@@ -98,17 +98,15 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
 
     this.mutableDisposable.value = this._group.onDidGroupChange((ev) => {
       if (ev.kind === GroupChangeKind.GROUP_ACTIVE) {
-        //
-        this.api._onDidPanelStateChange.fire({
-          isGroupActive,
-          isPanelVisible: this._group.isPanelActive(this),
+        this.api._onDidChangeVisibility.fire({
+          isVisible: this._group.isPanelActive(this),
         });
       }
     });
 
-    this.api._onDidPanelStateChange.fire({
-      isGroupActive,
-      isPanelVisible: this._group.isPanelActive(this),
+    this.api._onDidChangeFocus.fire({ isFocused: isGroupActive });
+    this.api._onDidChangeVisibility.fire({
+      isVisible: this._group.isPanelActive(this),
     });
 
     if (this.headerPart.setVisible) {

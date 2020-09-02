@@ -128,8 +128,6 @@ export class BranchNode extends CompositeDisposable implements IView {
       throw new Error("Invalid from index");
     }
 
-    // to = clamp(to, 0, this.children.length);
-
     if (from < to) {
       to--;
     }

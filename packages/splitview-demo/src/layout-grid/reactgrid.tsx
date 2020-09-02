@@ -4,7 +4,6 @@ import {
   OnReadyEvent,
   Api,
   IPanelProps,
-  PanelStateChangeEvent,
   ClosePanelResult,
   CompositeDisposable,
   GroupChangeKind,
@@ -53,7 +52,7 @@ const components = {
 
     React.useEffect(() => {
       const compDis = new CompositeDisposable(
-        props.api.onDidPanelDimensionChange((event) => {
+        props.api.onDidDimensionsChange((event) => {
           _api.current?.layout(event.width, event.height);
         }),
         _api.current.onDidLayoutChange((event) => {
@@ -95,15 +94,21 @@ const components = {
     );
   },
   test_component: (props: IPanelProps & { [key: string]: any }) => {
-    const [panelState, setPanelState] = React.useState<PanelStateChangeEvent>({
+    const [panelState, setPanelState] = React.useState<{
+      isGroupActive: boolean;
+      isPanelVisible: boolean;
+    }>({
       isGroupActive: false,
       isPanelVisible: false,
     });
 
     React.useEffect(() => {
       const disposable = new CompositeDisposable(
-        props.api.onDidPanelStateChange((x) => {
-          setPanelState(x);
+        props.api.onDidFocusChange((event) => {
+          setPanelState((_) => ({ ..._, isGroupActive: event.isFocused }));
+        }),
+        props.api.onDidChangeVisibility((x) => {
+          setPanelState((_) => ({ ..._, isPanelVisible: x.isVisible }));
         })
       );
 

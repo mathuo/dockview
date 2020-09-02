@@ -226,7 +226,6 @@ export class Gridview {
     const orientation = json.orientation;
     const height = json.height;
 
-    // const result = new Gridview();
     this.orientation = orientation;
     this._deserialize(
       json.root as ISerializedBranchNode,
@@ -234,8 +233,6 @@ export class Gridview {
       deserializer,
       height
     );
-
-    // return result;
   }
 
   private _deserialize(
@@ -385,7 +382,6 @@ export class Gridview {
   }
 
   constructor() {
-    // this.orientation = Orientation.HORIZONTAL;
     this.element = document.createElement("div");
     this.element.className = "grid-view";
     this.root = new BranchNode(Orientation.HORIZONTAL, 0, 0);

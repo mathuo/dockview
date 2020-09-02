@@ -1,5 +1,5 @@
 import * as React from "react";
-import { IBasePanelApi } from "../panel/api";
+import { IPanelApi } from "../panel/api";
 import { IDisposable } from "../lifecycle";
 import {
   IComponentSplitview,
@@ -25,7 +25,7 @@ export interface SplitviewReadyEvent {
 }
 
 export interface ISplitviewPanelProps {
-  api: IBasePanelApi;
+  api: IPanelApi;
 }
 
 export interface ISplitviewComponentProps {

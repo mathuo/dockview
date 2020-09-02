@@ -11,11 +11,15 @@ import { SplitViewComponent } from "splitview";
 
 const components = {
   default1: (props: ISplitviewPanelProps) => {
+    const [focused, setFocused] = React.useState<boolean>(false);
     React.useEffect(() => {
       const disposable = new CompositeDisposable();
       disposable.addDisposables(
-        props.api.onDidPanelDimensionChange((event) => {
+        props.api.onDidDimensionsChange((event) => {
           //
+        }),
+        props.api.onDidFocusChange((event) => {
+          setFocused(event.isFocused);
         })
       );
 
@@ -24,7 +28,11 @@ const components = {
       };
     }, []);
 
-    return <div style={{ height: "100%", width: "100%" }}>hiya</div>;
+    return (
+      <div
+        style={{ height: "100%", width: "100%" }}
+      >{`component [isFocused: ${focused}]`}</div>
+    );
   },
 };
 
@@ -32,13 +40,18 @@ export const SplitPanel = (props: IPanelProps) => {
   const api = React.useRef<SplitviewFacade>();
 
   React.useEffect(() => {
-    props.api.onDidPanelDimensionChange((event) => {
-      api.current?.layout(event.width, event.height - 20);
-    });
+    const disposable = new CompositeDisposable(
+      props.api.onDidDimensionsChange((event) => {
+        api.current?.layout(event.width, event.height - 20);
+      }),
+      api.current.onChange((event) => {
+        props.api.setState("sview_layout", api.current.toJSON());
+      })
+    );
 
-    api.current.onChange((event) => {
-      props.api.setState("sview_layout", api.current.toJSON());
-    });
+    return () => {
+      disposable.dispose();
+    };
   }, []);
 
   const onReady = (event: SplitviewReadyEvent) => {

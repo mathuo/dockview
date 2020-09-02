@@ -159,7 +159,7 @@ export function trackFocus(element: HTMLElement | Window): IFocusTracker {
 }
 
 /**
- * Track focus on an element. If element is HTMLElement ensure a valid tabIndex is set
+ * Track focus on an element. Ensure tabIndex is set when an HTMLElement is not focusable by default
  */
 class FocusTracker extends CompositeDisposable implements IFocusTracker {
   private readonly _onDidFocus = new Emitter<void>();
