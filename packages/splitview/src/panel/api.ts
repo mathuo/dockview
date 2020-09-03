@@ -18,9 +18,9 @@ interface State {
   [key: string]: StateObject;
 }
 
-type ChangeFocusEvent = {
+interface ChangeFocusEvent {
   isFocused: boolean;
-};
+}
 
 export interface IPanelApi extends IDisposable {
   // events

@@ -19,9 +19,6 @@ export class ReactComponentView
   private part: ReactPart;
   private params: { params: any };
   private api: PanelApi;
-  private readonly _onDidPanelDimensionsChange = new Emitter<
-    PanelDimensionChangeEvent
-  >({ emitLastValue: true });
 
   private _onDidChange: Emitter<number | undefined> = new Emitter<
     number | undefined
@@ -62,7 +59,6 @@ export class ReactComponentView
     const { onDidFocus, onDidBlur } = trackFocus(this._element);
 
     this.addDisposables(
-      this._onDidPanelDimensionsChange,
       onDidFocus(() => {
         this.api._onDidChangeFocus.fire({ isFocused: true });
       }),
@@ -73,7 +69,7 @@ export class ReactComponentView
   }
 
   layout(width: number, height: number) {
-    this._onDidPanelDimensionsChange.fire({ width, height });
+    this.api._onDidPanelDimensionChange.fire({ width, height });
   }
 
   init(parameters: InitParameters): void {

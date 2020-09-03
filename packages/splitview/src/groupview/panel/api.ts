@@ -4,9 +4,9 @@ import { ClosePanelResult } from "./parts";
 import { IGroupPanel } from "./types";
 import { PanelApi, IPanelApi } from "../../panel/api";
 
-type ChangeVisibilityEvent = {
+interface ChangeVisibilityEvent {
   isVisible: boolean;
-};
+}
 
 export interface IGroupPanelApi extends IPanelApi {
   // events
