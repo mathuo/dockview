@@ -1,5 +1,5 @@
 import { IDisposable } from "../lifecycle";
-import { Orientation, SplitView } from "./splitview";
+import { LayoutPriority, Orientation, SplitView } from "./splitview";
 import {
   createComponent,
   ISerializableView,
@@ -13,11 +13,13 @@ export interface IComponentSplitview extends IDisposable {
     params?: {
       [index: string]: any;
     };
+    priority?: LayoutPriority;
   }): IDisposable;
   layout(width: number, height: number): void;
   onChange(cb: (event: { proportions: number[] }) => void): IDisposable;
   toJSON(): object;
   deserialize(data: any): void;
+  minimumSize: number;
 }
 
 /**
@@ -40,12 +42,17 @@ export class ComponentSplitview implements IComponentSplitview {
     this.splitview = new SplitView(this.element, options);
   }
 
+  get minimumSize() {
+    return this.splitview.minimumSize;
+  }
+
   addFromComponent(options: {
     id: string;
     component: string;
     params?: {
       [index: string]: any;
     };
+    priority?: LayoutPriority;
   }): IDisposable {
     const view = createComponent(
       options.component,
@@ -58,6 +65,8 @@ export class ComponentSplitview implements IComponentSplitview {
 
     this.splitview.addView(view, { type: "distribute" });
     view.init({ params: options.params });
+    view.priority = options.priority;
+
     return {
       dispose: () => {
         //
@@ -85,7 +94,13 @@ export class ComponentSplitview implements IComponentSplitview {
   toJSON(): object {
     const views = this.splitview.getViews().map((v: ISerializableView, i) => {
       const size = this.splitview.getViewSize(i);
-      return { size, data: v.toJSON ? v.toJSON() : {} };
+      return {
+        size,
+        data: v.toJSON ? v.toJSON() : {},
+        minimumSize: v.minimumSize,
+        maximumSize: v.maximumSize,
+        snapSize: v.snapSize,
+      };
     });
 
     return {
@@ -100,6 +115,7 @@ export class ComponentSplitview implements IComponentSplitview {
     this.splitview.dispose();
     this.splitview = new SplitView(this.element, {
       orientation,
+      proportionalLayout: false,
       descriptor: {
         size,
         views: views.map((v) => {
@@ -112,7 +128,19 @@ export class ComponentSplitview implements IComponentSplitview {
             this.options.frameworkWrapper.createComponent
           );
 
+          if (typeof v.minimumSize === "number") {
+            view.minimumSize = v.minimumSize;
+          }
+          if (typeof v.maximumSize === "number") {
+            view.maximumSize = v.maximumSize;
+          }
+          if (typeof v.snapSize === "number") {
+            view.snapSize = v.snapSize;
+          }
+
           view.init({ params: v.props });
+
+          view.priority = v.priority;
 
           return { size: v.size, view };
         }),

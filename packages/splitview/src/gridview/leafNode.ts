@@ -1,4 +1,4 @@
-import { IView, Orientation } from "../splitview/splitview";
+import { IView, LayoutPriority, Orientation } from "../splitview/splitview";
 import { Emitter, Event } from "../events";
 import { IGridView } from "./gridview";
 
@@ -24,6 +24,10 @@ export class LeafNode implements IView {
 
   private get maximumHeight(): number {
     return this.view.maximumHeight;
+  }
+
+  get priority(): LayoutPriority | undefined {
+    return this.view.priority;
   }
 
   get minimumSize(): number {

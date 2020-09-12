@@ -19,16 +19,16 @@ export interface SplitPanelOptions extends ISplitViewOptions {
 export interface ISerializableViewConstructor
   extends Constructor<ISerializableView> {}
 
-export function createComponent(
-  componentName: string | ISerializableViewConstructor | any,
+export function createComponent<T>(
+  componentName: string | Constructor<T> | any,
   components: {
-    [componentName: string]: ISerializableView;
+    [componentName: string]: T;
   },
   frameworkComponents: {
     [componentName: string]: any;
   },
-  createFrameworkComponent: (id: string, component: any) => ISerializableView
-): ISerializableView {
+  createFrameworkComponent: (id: string, component: any) => T
+): T {
   const Component =
     typeof componentName === "string"
       ? components[componentName]
@@ -54,5 +54,5 @@ export function createComponent(
     );
     return wrappedComponent;
   }
-  return new Component() as ISerializableView;
+  return new Component() as T;
 }

@@ -13,11 +13,7 @@ const components = {
   default1: (props: ISplitviewPanelProps) => {
     const [focused, setFocused] = React.useState<boolean>(false);
     React.useEffect(() => {
-      const disposable = new CompositeDisposable();
-      disposable.addDisposables(
-        props.api.onDidDimensionsChange((event) => {
-          //
-        }),
+      const disposable = new CompositeDisposable(
         props.api.onDidFocusChange((event) => {
           setFocused(event.isFocused);
         })

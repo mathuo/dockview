@@ -1,4 +1,4 @@
-import { Orientation, Sizing } from "../splitview/splitview";
+import { LayoutPriority, Orientation, Sizing } from "../splitview/splitview";
 import { Position } from "../groupview/droptarget/droptarget";
 import { tail } from "../array";
 import { LeafNode } from "./leafNode";
@@ -15,6 +15,7 @@ function flipNode<T extends Node>(
   if (node instanceof BranchNode) {
     const result = new BranchNode(
       orthogonal(node.orientation),
+      node.proportionalLayout,
       size,
       orthogonalSize
     );
@@ -132,6 +133,7 @@ export interface IGridView {
   readonly maximumWidth: number;
   readonly minimumHeight: number;
   readonly maximumHeight: number;
+  readonly priority?: LayoutPriority;
   layout(width: number, height: number, top: number, left: number): void;
   toJSON?(): object;
   fromJSON?(json: object): void;
@@ -219,7 +221,12 @@ export class Gridview {
 
   public clear() {
     this.root.dispose();
-    this.root = new BranchNode(Orientation.HORIZONTAL, 0, 0);
+    this.root = new BranchNode(
+      Orientation.HORIZONTAL,
+      this.proportionalLayout,
+      0,
+      0
+    );
   }
 
   public deserialize(json: any, deserializer: IViewDeserializer) {
@@ -269,7 +276,13 @@ export class Gridview {
         } as INodeDescriptor;
       });
 
-      result = new BranchNode(orientation, node.size, orthogonalSize, children);
+      result = new BranchNode(
+        orientation,
+        this.proportionalLayout,
+        node.size,
+        orthogonalSize,
+        children
+      );
     } else {
       result = new LeafNode(
         deserializer.fromJSON(node.data),
@@ -334,7 +347,7 @@ export class Gridview {
       throw new Error("invalid location");
     }
 
-    const findLeaf = (node: Node, last: boolean) => {
+    const findLeaf = (node: Node, last: boolean): LeafNode => {
       if (node instanceof LeafNode) {
         return node;
       }
@@ -381,10 +394,15 @@ export class Gridview {
     return this.root.maximumHeight;
   }
 
-  constructor() {
+  constructor(readonly proportionalLayout: boolean) {
     this.element = document.createElement("div");
     this.element.className = "grid-view";
-    this.root = new BranchNode(Orientation.HORIZONTAL, 0, 0);
+    this.root = new BranchNode(
+      Orientation.HORIZONTAL,
+      proportionalLayout,
+      0,
+      0
+    );
 
     this.element.appendChild(this.root.element);
   }
@@ -421,6 +439,7 @@ export class Gridview {
 
       const newParent = new BranchNode(
         parent.orientation,
+        this.proportionalLayout,
         parent.size,
         parent.orthogonalSize
       );

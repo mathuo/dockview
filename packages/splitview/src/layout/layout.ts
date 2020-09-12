@@ -51,6 +51,10 @@ export interface PanelReference {
 }
 
 export interface Api {
+  readonly minimumHeight: number;
+  readonly maximumHeight: number;
+  readonly minimumWidth: number;
+  readonly maximumWidth: number;
   layout(width: number, height: number): void;
   //
   setAutoResizeToFit(enabled: boolean): void;
@@ -119,7 +123,7 @@ export class Layout extends CompositeDisposable implements ILayout {
   private readonly _id = nextLayoutId.next();
   private readonly groups = new Map<string, IValueDisposable<IGroupview>>();
   private readonly panels = new Map<string, IValueDisposable<IGroupPanel>>();
-  private readonly gridview: Gridview = new Gridview();
+  private readonly gridview: Gridview = new Gridview(true);
   private readonly dirtyPanels = new Set<IGroupPanel>();
   private readonly debouncedDeque = debounce(this.syncConfigs.bind(this), 5000);
   // events
@@ -175,6 +179,19 @@ export class Layout extends CompositeDisposable implements ILayout {
     );
 
     this.updateContainer();
+  }
+
+  get minimumHeight() {
+    return this.gridview.minimumHeight;
+  }
+  get maximumHeight() {
+    return this.gridview.maximumHeight;
+  }
+  get minimumWidth() {
+    return this.gridview.maximumWidth;
+  }
+  get maximumWidth() {
+    return this.gridview.maximumWidth;
   }
 
   get activeGroup() {

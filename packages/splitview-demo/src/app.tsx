@@ -3,12 +3,13 @@ import { LoadFromConfig } from "./loadFromConfig";
 import { FromApi } from "./fromApi";
 import { PaneDemo } from "./pane";
 import { TestGrid } from "./layout-grid/reactgrid";
+import { Application } from "./layout-grid/application";
 
 const options = [
   { id: "config", component: LoadFromConfig },
   { id: "api", component: FromApi },
   { id: "pane", component: PaneDemo },
-  { id: "grid", component: TestGrid },
+  { id: "grid", component: Application },
 ];
 
 export const App = () => {
@@ -23,8 +24,15 @@ export const App = () => {
   );
 
   return (
-    <div style={{ height: "100vh", width: "100vw" }}>
-      <div style={{ height: "20px" }}>
+    <div
+      style={{
+        height: "100vh",
+        width: "100vw",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <div style={{ height: "20px", flexShrink: 0 }}>
         <select onChange={onChange} value={value}>
           {options.map((option, i) => (
             <option key={i} value={option.id}>
@@ -35,7 +43,7 @@ export const App = () => {
       </div>
 
       {Component && (
-        <div style={{ width: "100%" }}>
+        <div style={{ width: "100%", flexGrow: 1 }}>
           <Component />
         </div>
       )}

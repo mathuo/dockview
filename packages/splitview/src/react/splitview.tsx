@@ -18,6 +18,7 @@ export interface SplitviewFacade {
   onChange: (cb: (event: { proportions: number[] }) => void) => IDisposable;
   toJSON: () => any;
   deserialize: (data: any) => void;
+  minimumSize: number;
 }
 
 export interface SplitviewReadyEvent {
@@ -59,6 +60,7 @@ export const SplitViewComponent = (props: ISplitviewComponentProps) => {
           return new ReactComponentView(id, id, component, { addPortal });
         },
       },
+      proportionalLayout: false,
     });
 
     const { width, height } = domReference.current.getBoundingClientRect();

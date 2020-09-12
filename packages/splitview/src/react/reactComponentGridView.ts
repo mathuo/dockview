@@ -1,20 +1,16 @@
 import { trackFocus } from "../dom";
 import { Emitter } from "../events";
 import { PanelApi } from "../panel/api";
-import { PanelDimensionChangeEvent } from "../panel/types";
 import { CompositeDisposable } from "../lifecycle";
-import { IView } from "../splitview/splitview";
 import { ReactLayout } from "./layout";
 import { ReactPart } from "./react";
 import { ISplitviewPanelProps } from "./splitview";
 import { PanelUpdateEvent, InitParameters, IPanel } from "../panel/types";
+import { IComponentGridview } from "../layout/componentGridview";
 
-/**
- * A no-thrills implementation of IView that renders a React component
- */
-export class ReactComponentView
+export class ReactComponentGridView
   extends CompositeDisposable
-  implements IView, IPanel {
+  implements IComponentGridview, IPanel {
   private _element: HTMLElement;
   private part: ReactPart;
   private params: { params: any };
@@ -29,29 +25,22 @@ export class ReactComponentView
     return this._element;
   }
 
-  private _minimumSize: number = 200;
-  private _maximumSize: number = Number.MAX_SAFE_INTEGER;
-  private _snapSize: number;
+  private _minimumWidth: number = 200;
+  private _minimumHeight: number = 200;
+  private _maximumWidth: number = Number.MAX_SAFE_INTEGER;
+  private _maximumHeight: number = Number.MAX_SAFE_INTEGER;
 
-  get minimumSize() {
-    return this._minimumSize;
+  get minimumWidth() {
+    return this._minimumWidth;
   }
-  set minimumSize(value: number) {
-    this._minimumSize = value;
+  get minimumHeight() {
+    return this._minimumHeight;
   }
-
-  get snapSize() {
-    return this._snapSize;
+  get maximumHeight() {
+    return this._maximumHeight;
   }
-  set snapSize(value: number) {
-    this._snapSize = value;
-  }
-
-  get maximumSize() {
-    return this._maximumSize;
-  }
-  set maximumSize(value: number) {
-    this._maximumSize = value;
+  get maximumWidth() {
+    return this._maximumHeight;
   }
 
   constructor(
@@ -78,11 +67,6 @@ export class ReactComponentView
       }),
       onDidBlur(() => {
         this.api._onDidChangeFocus.fire({ isFocused: false });
-      }),
-      this.api.onDidConstraintsChange((event) => {
-        if (typeof event.minimumSize === "number") {
-          this.minimumSize = event.minimumSize;
-        }
       })
     );
   }

@@ -34,6 +34,7 @@ export interface IPanelApi extends IDisposable {
   getStateKey: <T extends StateObject>(key: string) => T;
   //
   readonly isFocused: boolean;
+  setMinimumSize(value: number): void;
 }
 
 /**
@@ -56,6 +57,13 @@ export class PanelApi extends CompositeDisposable implements IPanelApi {
   });
   readonly onDidFocusChange: Event<ChangeFocusEvent> = this._onDidChangeFocus
     .event;
+  //
+  //
+  readonly _onDidConstraintsChange = new Emitter<{ minimumSize?: number }>({
+    emitLastValue: true,
+  });
+  readonly onDidConstraintsChange: Event<{ minimumSize?: number }> = this
+    ._onDidConstraintsChange.event;
 
   get isFocused() {
     return this._isFocused;
@@ -72,6 +80,10 @@ export class PanelApi extends CompositeDisposable implements IPanelApi {
         this._isFocused = event.isFocused;
       })
     );
+  }
+
+  public setMinimumSize(value: number) {
+    this._onDidConstraintsChange.fire({ minimumSize: value });
   }
 
   public setState(

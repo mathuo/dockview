@@ -7,6 +7,7 @@ import {
   ClosePanelResult,
   CompositeDisposable,
   GroupChangeKind,
+  ISplitviewPanelProps,
 } from "splitview";
 import { CustomTab } from "./customTab";
 import { Editor } from "./editorPanel";
@@ -165,7 +166,7 @@ const nextGuid = (() => {
   return () => "panel_" + (counter++).toString();
 })();
 
-export const TestGrid = () => {
+export const TestGrid = (props: ISplitviewPanelProps) => {
   const _api = React.useRef<Api>();
   const [api, setApi] = React.useState<Api>();
 
@@ -175,7 +176,6 @@ export const TestGrid = () => {
   };
 
   React.useEffect(() => {
-    // return;
     if (!api) {
       return;
     }
@@ -244,22 +244,28 @@ export const TestGrid = () => {
   };
 
   React.useEffect(() => {
-    const callback = (ev: UIEvent) => {
-      const height = window.innerHeight - 40;
-      const width = window.innerWidth;
+    // const callback = (ev: UIEvent) => {
+    //   const height = window.innerHeight - 40;
+    //   const width = window.innerWidth;
 
-      _api.current?.layout(width, height);
-    };
-    window.addEventListener("resize", callback);
-    callback(undefined);
+    //   _api.current?.layout(width, height);
+    // };
+    // window.addEventListener("resize", callback);
+    // callback(undefined);
 
-    const dis = _api.current.onDidLayoutChange((event) => {
-      console.log(event.kind);
-    });
+    const disposable = new CompositeDisposable(
+      _api.current.onDidLayoutChange((event) => {
+        console.log(event.kind);
+      }),
+      props.api.onDidDimensionsChange((event) => {
+        const { width, height } = event;
+        _api.current.layout(width, height);
+      })
+    );
 
     return () => {
-      dis.dispose();
-      window.removeEventListener("resize", callback);
+      disposable.dispose();
+      // window.removeEventListener("resize", callback);
     };
   }, []);
 
@@ -335,9 +341,16 @@ export const TestGrid = () => {
   return (
     <div
       // className="visual-studio-theme"
-      style={{ width: "100%" }}
+      style={{ width: "100%", overflow: "hidden" }}
     >
-      <div style={{ height: "20px", display: "flex" }}>
+      <div
+        style={{
+          height: "20px",
+          display: "flex",
+          maxHeight: "20px",
+          minHeight: "20px",
+        }}
+      >
         <button onClick={onAdd}>Add</button>
         <button onClick={onAddEditor}>Expr</button>
         <button onClick={onAddEmpty}>Add empty</button>

@@ -47,8 +47,13 @@ export function pushToEnd<T>(arr: T[], value: T): void {
   }
 }
 
-export const range = (from: number, to: number) => {
+export const range = (from: number, to: number = undefined) => {
   const result: number[] = [];
+
+  if (to === undefined) {
+    to = from;
+    from = 0;
+  }
 
   if (from <= to) {
     for (let i = from; i < to; i++) {

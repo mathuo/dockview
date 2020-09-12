@@ -1,4 +1,10 @@
-import { IView, SplitView, Orientation, Sizing } from "../splitview/splitview";
+import {
+  IView,
+  SplitView,
+  Orientation,
+  Sizing,
+  LayoutPriority,
+} from "../splitview/splitview";
 import { Emitter, Event } from "../events";
 import { INodeDescriptor } from "./gridview";
 import { Node } from "./types";
@@ -76,8 +82,27 @@ export class BranchNode extends CompositeDisposable implements IView {
       : this.maximumOrthogonalSize;
   }
 
+  get priority(): LayoutPriority {
+    if (this.children.length === 0) {
+      return LayoutPriority.Normal;
+    }
+
+    const priorities = this.children.map((c) =>
+      typeof c.priority === "undefined" ? LayoutPriority.Normal : c.priority
+    );
+
+    if (priorities.some((p) => p === LayoutPriority.High)) {
+      return LayoutPriority.High;
+    } else if (priorities.some((p) => p === LayoutPriority.Low)) {
+      return LayoutPriority.Low;
+    }
+
+    return LayoutPriority.Normal;
+  }
+
   constructor(
     readonly orientation: Orientation,
+    readonly proportionalLayout: boolean,
     size: number = 0,
     orthogonalSize: number,
 
@@ -92,6 +117,7 @@ export class BranchNode extends CompositeDisposable implements IView {
     if (!childDescriptors) {
       this.splitview = new SplitView(this.element, {
         orientation: this.orientation,
+        proportionalLayout,
       });
       this.splitview.layout(this.size, this.orthogonalSize);
     } else {

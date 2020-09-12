@@ -1,4 +1,4 @@
-import { removeClasses, addClasses, firstIndex } from "../dom";
+import { removeClasses, addClasses, firstIndex, toggleClass } from "../dom";
 import { clamp } from "../math";
 import { Event, Emitter } from "../events";
 import { pushToStart, pushToEnd, range } from "../array";
@@ -19,15 +19,29 @@ export enum Orientation {
   VERTICAL = "VERTICAL",
 }
 
+export enum SashState {
+  MAXIMUM,
+  MINIMUM,
+  DISABLED,
+  ENABLED,
+}
+
 export interface ISplitViewOptions {
   orientation: Orientation;
   readonly descriptor?: ISplitViewDescriptor;
+  proportionalLayout?: boolean;
+}
+export enum LayoutPriority {
+  Low = "low",
+  High = "high",
+  Normal = "normal",
 }
 
 export interface IBaseView {
-  readonly minimumSize: number;
-  readonly maximumSize: number;
-  readonly snapSize?: number;
+  minimumSize: number;
+  maximumSize: number;
+  snapSize?: number;
+  priority?: LayoutPriority;
 }
 
 export interface IView extends IBaseView {
@@ -73,6 +87,7 @@ export class SplitView {
   private _orthogonalSize: number;
   private contentSize: number;
   private _proportions: number[];
+  private proportionalLayout: boolean;
 
   private _onDidSashEnd = new Emitter<any>();
   public onDidSashEnd = this._onDidSashEnd.event;
@@ -90,7 +105,7 @@ export class SplitView {
   }
 
   public get proportions() {
-    return [...this._proportions];
+    return this._proportions ? [...this._proportions] : undefined;
   }
 
   get orientation() {
@@ -113,6 +128,11 @@ export class SplitView {
   ) {
     this._orientation = options.orientation;
     this.element = this.createContainer();
+
+    this.proportionalLayout =
+      options.proportionalLayout === undefined
+        ? true
+        : !!options.proportionalLayout;
 
     this.viewContainer = this.createViewContainer();
     this.sashContainer = this.createSashContainer();
@@ -398,18 +418,35 @@ export class SplitView {
   }
 
   public layout(size: number, orthogonalSize: number) {
+    const previousSize = Math.max(this.size, this.contentSize);
     this._size = size;
     this._orthogonalSize = orthogonalSize;
 
-    for (let i = 0; i < this.views.length; i++) {
-      const item = this.views[i];
+    if (!this.proportions) {
+      const indexes = range(this.views.length);
+      const lowPriorityIndexes = indexes.filter(
+        (i) => this.views[i].view.priority === LayoutPriority.Low
+      );
+      const highPriorityIndexes = indexes.filter(
+        (i) => this.views[i].view.priority === LayoutPriority.High
+      );
 
-      // const x =
-      //   this.proportions.length > 0
-      //     ? this.proportions[i]
-      //     : 1 / this.views.length;
+      this.resize(
+        this.views.length - 1,
+        size - previousSize,
+        undefined,
+        lowPriorityIndexes,
+        highPriorityIndexes
+      );
+    } else {
+      for (let i = 0; i < this.views.length; i++) {
+        const item = this.views[i];
 
-      item.size = clampView(item.view, Math.round(this._proportions[i] * size));
+        item.size = clampView(
+          item.view,
+          Math.round(this._proportions[i] * size)
+        );
+      }
     }
 
     this.distributeEmptySpace();
@@ -448,7 +485,7 @@ export class SplitView {
   }
 
   private saveProportions(): void {
-    if (this.contentSize > 0) {
+    if (this.proportionalLayout && this.contentSize > 0) {
       this._proportions = this.views.map((i) => i.size / this.contentSize);
     }
   }
@@ -457,16 +494,22 @@ export class SplitView {
     this.contentSize = this.views.reduce((r, i) => r + i.size, 0);
     let sum = 0;
     let x: number[] = [];
+
+    this.updateSashEnablement();
+
     for (let i = 0; i < this.views.length - 1; i++) {
       sum += this.views[i].size;
       x.push(sum);
+
+      const offset = Math.min(Math.max(0, sum - 2), this.size - 4);
+
       if (this._orientation === Orientation.HORIZONTAL) {
-        this.sashes[i].container.style.left = `${sum - 2}px`;
+        this.sashes[i].container.style.left = `${offset}px`;
         this.sashes[i].container.style.top = `0px`;
       }
       if (this._orientation === Orientation.VERTICAL) {
         this.sashes[i].container.style.left = `0px`;
-        this.sashes[i].container.style.top = `${sum - 2}px`;
+        this.sashes[i].container.style.top = `${offset}px`;
       }
     }
     this.views.forEach((view, i) => {
@@ -485,6 +528,110 @@ export class SplitView {
 
       view.view.layout(view.size, this._orthogonalSize);
     });
+  }
+
+  private findFirstSnapIndex(indexes: number[]): number | undefined {
+    // visible views first
+    for (const index of indexes) {
+      const viewItem = this.views[index];
+
+      // if (!viewItem.visible) {
+      // 	continue;
+      // }
+
+      if (viewItem.view.snapSize) {
+        return index;
+      }
+    }
+
+    return undefined;
+  }
+
+  private updateSashEnablement(): void {
+    let previous = false;
+    const collapsesDown = this.views.map(
+      (i) => (previous = i.size - i.view.minimumSize > 0 || previous)
+    );
+
+    previous = false;
+    const expandsDown = this.views.map(
+      (i) => (previous = i.view.maximumSize - i.size > 0 || previous)
+    );
+
+    const reverseViews = [...this.views].reverse();
+    previous = false;
+    const collapsesUp = reverseViews
+      .map((i) => (previous = i.size - i.view.minimumSize > 0 || previous))
+      .reverse();
+
+    previous = false;
+    const expandsUp = reverseViews
+      .map((i) => (previous = i.view.maximumSize - i.size > 0 || previous))
+      .reverse();
+
+    let position = 0;
+    for (let index = 0; index < this.sashes.length; index++) {
+      const sash = this.sashes[index];
+      const viewItem = this.views[index];
+      position += viewItem.size;
+
+      const min = !(collapsesDown[index] && expandsUp[index + 1]);
+      const max = !(expandsDown[index] && collapsesUp[index + 1]);
+
+      if (min && max) {
+        const upIndexes = range(index, -1);
+        const downIndexes = range(index + 1, this.views.length);
+        const snapBeforeIndex = this.findFirstSnapIndex(upIndexes);
+        const snapAfterIndex = this.findFirstSnapIndex(downIndexes);
+
+        const snappedBefore = false;
+        // typeof snapBeforeIndex === "number" &&
+        // !this.views[snapBeforeIndex].visible;
+        const snappedAfter = false;
+        // typeof snapAfterIndex === "number" &&
+        // !this.views[snapAfterIndex].visible;
+
+        if (
+          snappedBefore &&
+          collapsesUp[index] &&
+          // (
+          position > 0
+          //  || this.startSnappingEnabled)
+        ) {
+          this.updateSash(sash, SashState.MINIMUM);
+          // sash.state = SashState.Minimum;
+        } else if (
+          snappedAfter &&
+          collapsesDown[index] &&
+          // (
+          position < this.contentSize
+          // || this.endSnappingEnabled)
+        ) {
+          // sash.state = SashState.Maximum;
+          this.updateSash(sash, SashState.MAXIMUM);
+        } else {
+          // sash.state = SashState.Disabled;
+          this.updateSash(sash, SashState.DISABLED);
+        }
+      } else if (min && !max) {
+        // sash.state = SashState.Minimum;
+        this.updateSash(sash, SashState.MINIMUM);
+      } else if (!min && max) {
+        // sash.state = SashState.Maximum;
+
+        this.updateSash(sash, SashState.MAXIMUM);
+      } else {
+        // sash.state = SashState.Enabled;
+        this.updateSash(sash, SashState.ENABLED);
+      }
+    }
+  }
+
+  private updateSash(sash: ISashItem, state: SashState) {
+    toggleClass(sash.container, "disabled", state === SashState.DISABLED);
+    toggleClass(sash.container, "enabled", state === SashState.ENABLED);
+    toggleClass(sash.container, "maximum", state === SashState.MAXIMUM);
+    toggleClass(sash.container, "minimum", state === SashState.MINIMUM);
   }
 
   private resize = (

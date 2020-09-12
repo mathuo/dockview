@@ -13,7 +13,9 @@ export * from "./groupview/panel/types";
 export * from "./groupview/panel/parts";
 export * from "./react/layout";
 export * from "./react/splitview";
+export * from "./react/gridview";
 export * from "./react/reactContentPart";
 export * from "./react/reactHeaderPart";
+export * from "./react/reactComponentGridView";
 
 export * from "./layout";
