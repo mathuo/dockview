@@ -137,6 +137,7 @@ export interface IGridView {
   layout(width: number, height: number, top: number, left: number): void;
   toJSON?(): object;
   fromJSON?(json: object): void;
+  snap?: boolean;
 }
 
 const orthogonal = (orientation: Orientation) =>

@@ -30,6 +30,10 @@ export class LeafNode implements IView {
     return this.view.priority;
   }
 
+  get snapSize() {
+    return this.view.snap ? this.minimumSize / 2 : undefined;
+  }
+
   get minimumSize(): number {
     return this.orientation === Orientation.HORIZONTAL
       ? this.minimumHeight

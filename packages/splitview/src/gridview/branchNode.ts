@@ -64,6 +64,10 @@ export class BranchNode extends CompositeDisposable implements IView {
       : this.minimumSize;
   }
 
+  get snapSize() {
+    return undefined;
+  }
+
   get minimumHeight(): number {
     return this.orientation === Orientation.HORIZONTAL
       ? this.minimumSize

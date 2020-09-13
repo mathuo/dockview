@@ -37,6 +37,7 @@ export interface AddComponentOptions {
 
   size?: number;
   priority?: LayoutPriority;
+  snap?: boolean;
 }
 
 export interface GridComponentOptions {
@@ -252,6 +253,7 @@ export class ComponentGridview
     );
     view.init({ params: {} });
     view.priority = options.priority;
+    view.snap = options.snap;
 
     this.groups.set(options.id, { value: view, disposable: Disposable.NONE });
 

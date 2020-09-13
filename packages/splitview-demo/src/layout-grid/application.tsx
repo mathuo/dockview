@@ -130,10 +130,12 @@ export const Application = () => {
     event.api.addComponent({
       id: "1",
       component: "sidebar",
+      snap: true,
     });
     event.api.addComponent({
       id: "2",
       component: "editor",
+      snap: true,
       position: { reference: "1", direction: "right" },
       priority: LayoutPriority.High,
     });
@@ -157,6 +159,7 @@ export const Application = () => {
       component: "panel",
       position: { reference: "2", direction: "below" },
       size: 200,
+      snap: true,
     });
 
     return () => {
