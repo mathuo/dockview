@@ -1,19 +1,19 @@
 import * as React from "react";
-import { LoadFromConfig } from "./loadFromConfig";
-import { FromApi } from "./fromApi";
-import { PaneDemo } from "./pane";
+// import { LoadFromConfig } from "./loadFromConfig";
+// import { FromApi } from "./fromApi";
+// import { PaneDemo } from "./pane";
 import { TestGrid } from "./layout-grid/reactgrid";
 import { Application } from "./layout-grid/application";
 
 const options = [
-  { id: "config", component: LoadFromConfig },
-  { id: "api", component: FromApi },
-  { id: "pane", component: PaneDemo },
+  // { id: "config", component: LoadFromConfig },
+  // { id: "api", component: FromApi },
+  // { id: "pane", component: PaneDemo },
   { id: "grid", component: Application },
 ];
 
 export const App = () => {
-  const [value, setValue] = React.useState<string>(options[3].id);
+  const [value, setValue] = React.useState<string>(options[0].id);
 
   const onChange = (event: React.ChangeEvent<HTMLSelectElement>) =>
     setValue(event.target.value);
