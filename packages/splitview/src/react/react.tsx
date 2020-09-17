@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom";
 import { IDisposable } from "../lifecycle";
 import { IGroupPanelApi } from "../groupview/panel/api";
 import { sequentialNumberGenerator } from "../math";
-import { IPanelApi } from "../panel/api";
+import { IBaseViewApi } from "../panel/api";
 
 export interface IPanelProps {
   api: IGroupPanelApi;
@@ -54,7 +54,7 @@ export class ReactPart implements IDisposable {
 
   constructor(
     private readonly parent: HTMLElement,
-    private readonly api: IPanelApi,
+    private readonly api: IBaseViewApi,
     private readonly addPortal: (portal: React.ReactPortal) => IDisposable,
     private readonly component: React.FunctionComponent<{}>,
     private readonly parameters: { [key: string]: any }

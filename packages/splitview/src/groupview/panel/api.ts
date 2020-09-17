@@ -2,13 +2,13 @@ import { IGroupview } from "../groupview";
 import { Emitter, Event } from "../../events";
 import { ClosePanelResult } from "./parts";
 import { IGroupPanel } from "./types";
-import { PanelApi, IPanelApi } from "../../panel/api";
+import { IBaseViewApi, BaseViewApi } from "../../panel/api";
 
 interface ChangeVisibilityEvent {
   isVisible: boolean;
 }
 
-export interface IGroupPanelApi extends IPanelApi {
+export interface IGroupPanelApi extends IBaseViewApi {
   // events
   onDidDirtyChange: Event<boolean>;
   onDidChangeVisibility: Event<ChangeVisibilityEvent>;
@@ -20,7 +20,7 @@ export interface IGroupPanelApi extends IPanelApi {
   setClosePanelHook(callback: () => Promise<ClosePanelResult>): void;
 }
 
-export class GroupPanelApi extends PanelApi implements IGroupPanelApi {
+export class GroupPanelApi extends BaseViewApi implements IGroupPanelApi {
   private _isVisible: boolean;
   private _group: IGroupview;
   private _closePanelCallback: () => Promise<ClosePanelResult>;

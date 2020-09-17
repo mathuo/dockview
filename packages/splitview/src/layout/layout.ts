@@ -188,7 +188,7 @@ export class Layout extends CompositeDisposable implements ILayout {
     return this.gridview.maximumHeight;
   }
   get minimumWidth() {
-    return this.gridview.maximumWidth;
+    return this.gridview.minimumWidth;
   }
   get maximumWidth() {
     return this.gridview.maximumWidth;

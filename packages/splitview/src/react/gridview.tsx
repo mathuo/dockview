@@ -1,22 +1,25 @@
 import * as React from "react";
-import { Gridview, IGridView } from "../gridview/gridview";
 import {
   ComponentGridview,
   IComponentGridviewLayout,
 } from "../layout/componentGridview";
+import { IGridApi } from "../panel/api";
 import { Orientation } from "../splitview/splitview";
 import { ReactComponentGridView } from "./reactComponentGridView";
-import { ReactComponentView } from "./reactComponentView";
 
 export interface GridviewReadyEvent {
   api: IComponentGridviewLayout;
+}
+
+export interface IGridviewPanelProps {
+  api: IGridApi;
 }
 
 export interface IGridviewComponentProps {
   orientation: Orientation;
   onReady?: (event: GridviewReadyEvent) => void;
   components: {
-    [index: string]: React.FunctionComponent<{}>;
+    [index: string]: React.FunctionComponent<IGridviewPanelProps>;
   };
 }
 

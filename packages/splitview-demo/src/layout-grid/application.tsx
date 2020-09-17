@@ -1,125 +1,24 @@
 import * as React from "react";
 import {
   Orientation,
-  SplitViewComponent,
-  SplitviewReadyEvent,
-  SplitviewFacade,
-  ISplitviewPanelProps,
-  CompositeDisposable,
   GridviewComponent,
   LayoutPriority,
   GridviewReadyEvent,
-  IComponentGridviewLayout,
   ComponentGridview,
+  IGridviewPanelProps,
 } from "splitview";
 import { TestGrid } from "./reactgrid";
 
-const components = {
-  editor: TestGrid,
-  panel: () => {
-    return <div>panel</div>;
-  },
-};
-
-const layout = {
-  views: [
-    {
-      size: 6,
-      data: {
-        id: "editor",
-        component: "editor",
-        state: {},
-      },
-    },
-    {
-      size: 1,
-      data: {
-        id: "panel",
-        component: "panel",
-        state: {},
-      },
-      priority: "low",
-      snapSize: 100,
-      minimumSize: 100,
-    },
-  ],
-  size: 0,
-  orientation: "VERTICAL",
-};
-
-const PrimaryContent = (props: ISplitviewPanelProps) => {
-  const api = React.useRef<SplitviewFacade>();
-
-  const onReady = (event: SplitviewReadyEvent) => {
-    event.api.deserialize(layout);
-    // event.api.addFromComponent({ id: "1", component: "editor" });
-    // event.api.addFromComponent({
-    //   id: "2",
-    //   component: "panel",
-    //   priority: LayoutPriority.Low,
-    // });
-
-    api.current = event.api;
-  };
-
-  React.useEffect(() => {
-    const disposable = new CompositeDisposable(
-      props.api.onDidDimensionsChange((event) => {
-        api.current.layout(event.width, event.height);
-      })
-    );
-
-    props.api.setMinimumSize(api.current.minimumSize);
-
-    return () => {
-      disposable.dispose();
-    };
-  });
-
-  return (
-    <SplitViewComponent
-      components={components}
-      onReady={onReady}
-      orientation={Orientation.VERTICAL}
-    />
-  );
-};
-
-const rootcomponents = {
-  sidebar: (props: ISplitviewPanelProps) => {
+const rootcomponents: {
+  [index: string]: React.FunctionComponent<IGridviewPanelProps>;
+} = {
+  sidebar: (props: IGridviewPanelProps) => {
     return <div>sidebar</div>;
   },
   editor: TestGrid,
   panel: () => {
     return <div>panel</div>;
   },
-  main: PrimaryContent,
-};
-
-const rootLayout = {
-  views: [
-    {
-      size: 1,
-      data: {
-        id: "sidebar",
-        component: "sidebar",
-        state: {},
-      },
-      snapSize: 100,
-      minimumSize: 100,
-      priority: "low",
-    },
-    {
-      size: 6,
-      data: {
-        id: "main",
-        component: "main",
-        state: {},
-      },
-    },
-  ],
-  size: 0,
-  orientation: "HORIZONTAL",
 };
 
 export const Application = () => {
@@ -140,7 +39,6 @@ export const Application = () => {
       priority: LayoutPriority.High,
     });
 
-    // event.api.addComponent({ id: "2", component: "main" });
     api.current = event.api as ComponentGridview;
   };
 
@@ -169,17 +67,9 @@ export const Application = () => {
 
   return (
     <GridviewComponent
-      components={rootcomponents as any}
+      components={rootcomponents}
       onReady={onReady}
       orientation={Orientation.HORIZONTAL}
     />
   );
-
-  // return (
-  //   <SplitViewComponent
-  //     components={rootcomponents}
-  //     onReady={onReady}
-  //     orientation={Orientation.HORIZONTAL}
-  //   />
-  // );
 };

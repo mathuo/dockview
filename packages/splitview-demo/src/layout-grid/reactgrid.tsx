@@ -7,7 +7,7 @@ import {
   ClosePanelResult,
   CompositeDisposable,
   GroupChangeKind,
-  ISplitviewPanelProps,
+  IGridviewPanelProps,
 } from "splitview";
 import { CustomTab } from "./customTab";
 import { Editor } from "./editorPanel";
@@ -166,7 +166,7 @@ const nextGuid = (() => {
   return () => "panel_" + (counter++).toString();
 })();
 
-export const TestGrid = (props: ISplitviewPanelProps) => {
+export const TestGrid = (props: IGridviewPanelProps) => {
   const _api = React.useRef<Api>();
   const [api, setApi] = React.useState<Api>();
 
@@ -253,13 +253,18 @@ export const TestGrid = (props: ISplitviewPanelProps) => {
     // window.addEventListener("resize", callback);
     // callback(undefined);
 
+    props.api.setConstraints({
+      minimumWidth: () => _api.current.minimumWidth,
+      minimumHeight: () => _api.current.minimumHeight,
+    });
+
     const disposable = new CompositeDisposable(
       _api.current.onDidLayoutChange((event) => {
         console.log(event.kind);
       }),
       props.api.onDidDimensionsChange((event) => {
         const { width, height } = event;
-        _api.current.layout(width, height);
+        _api.current.layout(width, height - 20);
       })
     );
 

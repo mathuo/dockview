@@ -78,11 +78,6 @@ export class ReactComponentView
       }),
       onDidBlur(() => {
         this.api._onDidChangeFocus.fire({ isFocused: false });
-      }),
-      this.api.onDidConstraintsChange((event) => {
-        if (typeof event.minimumSize === "number") {
-          this.minimumSize = event.minimumSize;
-        }
       })
     );
   }
