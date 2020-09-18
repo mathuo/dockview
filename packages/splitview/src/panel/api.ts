@@ -1,6 +1,7 @@
 import { PanelDimensionChangeEvent } from "./types";
 import { Emitter, Event } from "../events";
 import { CompositeDisposable, IDisposable } from "../lifecycle";
+import { FunctionOrValue } from "../types";
 
 // we've tried to do a bit better than the 'any' type.
 // anything that is serializable JSON should be valid here
@@ -106,8 +107,8 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
 }
 
 interface PanelConstraintChangeEvent {
-  minimumSize?: number | (() => number);
-  maximumSize?: number | (() => number);
+  minimumSize?: FunctionOrValue<number>;
+  maximumSize?: FunctionOrValue<number>;
 }
 
 export interface IPanelApi extends IBaseViewApi {
@@ -132,10 +133,10 @@ export class PanelApi extends BaseViewApi implements IBaseViewApi {
 }
 
 interface GridConstraintChangeEvent {
-  minimumWidth?: number | (() => number);
-  minimumHeight?: number | (() => number);
-  maximumWidth?: number | (() => number);
-  maximumHeight?: number | (() => number);
+  minimumWidth?: FunctionOrValue<number>;
+  minimumHeight?: FunctionOrValue<number>;
+  maximumWidth?: FunctionOrValue<number>;
+  maximumHeight?: FunctionOrValue<number>;
 }
 
 export interface IGridApi extends IBaseViewApi {

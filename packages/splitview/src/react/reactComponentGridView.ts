@@ -1,12 +1,13 @@
 import { trackFocus } from "../dom";
 import { Emitter } from "../events";
-import { GridApi, IGridApi, PanelApi } from "../panel/api";
+import { GridApi } from "../panel/api";
 import { CompositeDisposable } from "../lifecycle";
 import { ReactLayout } from "./layout";
 import { ReactPart } from "./react";
 import { ISplitviewPanelProps } from "./splitview";
 import { PanelUpdateEvent, InitParameters, IPanel } from "../panel/types";
 import { IComponentGridview } from "../layout/componentGridview";
+import { FunctionOrValue } from "../types";
 
 export class ReactComponentGridView
   extends CompositeDisposable
@@ -25,10 +26,10 @@ export class ReactComponentGridView
     return this._element;
   }
 
-  private _minimumWidth: number | (() => number) = 200;
-  private _minimumHeight: number | (() => number) = 200;
-  private _maximumWidth: number | (() => number) = Number.MAX_SAFE_INTEGER;
-  private _maximumHeight: number | (() => number) = Number.MAX_SAFE_INTEGER;
+  private _minimumWidth: FunctionOrValue<number> = 200;
+  private _minimumHeight: FunctionOrValue<number> = 200;
+  private _maximumWidth: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
+  private _maximumHeight: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
 
   get minimumWidth() {
     return typeof this._minimumWidth === "function"
