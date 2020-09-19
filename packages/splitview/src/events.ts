@@ -47,7 +47,7 @@ export class Emitter<T> implements IDisposable {
         return {
           dispose: () => {
             const index = this._listeners.indexOf(listener);
-            if (index > 1) {
+            if (index > -1) {
               this._listeners.splice(index, 1);
             }
           },

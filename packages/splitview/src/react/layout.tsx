@@ -5,7 +5,7 @@ import { ReactPanelContentPart } from "./reactContentPart";
 import { ReactPanelHeaderPart } from "./reactHeaderPart";
 import { IPanelProps } from "./react";
 import { ReactPanelDeserialzier } from "./deserializer";
-import { GroupPanelFrameworkComponentFactory } from "../layout/options";
+import { GroupPanelFrameworkComponentFactory, TabContextMenuEvent } from "../layout/options";
 
 export interface OnReadyEvent {
   api: Api;
@@ -38,6 +38,7 @@ export interface IReactGridProps {
   debug?: boolean;
   tabHeight?: number;
   enableExternalDragEvents?: boolean;
+  onTabContextMenu?: (event: TabContextMenuEvent) => void;
 }
 
 export const ReactGrid = (props: IReactGridProps) => {
@@ -89,6 +90,7 @@ export const ReactGrid = (props: IReactGridProps) => {
 
     layout.deserializer = new ReactPanelDeserialzier(layout);
 
+
     layout.resizeToFit();
 
     if (props.serializedLayout) {
@@ -103,6 +105,16 @@ export const ReactGrid = (props: IReactGridProps) => {
       layout.dispose();
     };
   }, []);
+
+  React.useEffect(() => {
+    const disposable = layoutReference.current.onTabContextMenu((event) => {
+      props.onTabContextMenu(event);
+    });
+
+    return () => {
+      disposable.dispose()
+    }
+  }, [props.onTabContextMenu])
 
   React.useEffect(() => {
     layoutReference.current.setAutoResizeToFit(props.autoSizeToFitContainer);

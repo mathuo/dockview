@@ -13,11 +13,11 @@ const rootcomponents: {
   [index: string]: React.FunctionComponent<IGridviewPanelProps>;
 } = {
   sidebar: (props: IGridviewPanelProps) => {
-    return <div>sidebar</div>;
+    return <div style={{backgroundColor: "rgb(37,37,38)", height:"100%"}}>sidebar</div>;
   },
   editor: TestGrid,
   panel: () => {
-    return <div>panel</div>;
+    return <div style={{backgroundColor: "rgb(30,30,30)", height: "100%"}}>panel</div>;
   },
 };
 

@@ -1,5 +1,4 @@
 import { IGroupview } from "../groupview/groupview";
-import { IGroupPanelApi } from "../groupview/panel/api";
 import {
   PanelContentPart,
   PanelContentPartConstructor,
@@ -19,7 +18,6 @@ export interface GroupPanelFrameworkComponentFactory {
 export interface TabContextMenuEvent {
   event: MouseEvent;
   api: Api;
-  panelApi: IGroupPanelApi;
   panel: IGroupPanel;
 }
 
@@ -42,7 +40,6 @@ export interface LayoutOptions {
   tabHeight?: number;
   debug?: boolean;
   enableExternalDragEvents?: boolean;
-  onTabContextMenu?: (event: TabContextMenuEvent) => void;
 }
 
 export interface PanelOptions {

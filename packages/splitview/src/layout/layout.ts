@@ -34,13 +34,14 @@ import {
   AddPanelOptions,
   PanelOptions,
   LayoutOptions,
-  MovementOptions,
+  MovementOptions, TabContextMenuEvent
 } from "./options";
 import {
   DataTransferSingleton,
   DATA_KEY,
   DragType,
 } from "../groupview/droptarget/dataTransfer";
+import { LayoutMouseEvent, MouseEventKind } from "../groupview/events";
 
 const nextGroupId = sequentialNumberGenerator();
 const nextLayoutId = sequentialNumberGenerator();
@@ -72,6 +73,8 @@ export interface Api {
   deserializer: IPanelDeserializer;
   // events
   onDidLayoutChange: Event<GroupChangeEvent>;
+  onTabInteractionEvent: Event<LayoutMouseEvent>;
+  onTabContextMenu: Event<TabContextMenuEvent>;
   moveToNext(options?: MovementOptions): void;
   moveToPrevious(options?: MovementOptions): void;
   activeGroup: IGroupview;
@@ -110,6 +113,7 @@ export interface IGroupAccessor {
   addPanel(options: AddPanelOptions): IGroupPanel;
   //
   getPanel: (id: string) => IGroupPanel;
+  fireMouseEvent(event: LayoutMouseEvent): void;
 }
 
 export interface ILayout extends IGroupAccessor, Api {}
@@ -128,8 +132,11 @@ export class Layout extends CompositeDisposable implements ILayout {
   private readonly debouncedDeque = debounce(this.syncConfigs.bind(this), 5000);
   // events
   private readonly _onDidLayoutChange = new Emitter<GroupChangeEvent>();
-  readonly onDidLayoutChange: Event<GroupChangeEvent> = this._onDidLayoutChange
-    .event;
+  readonly onDidLayoutChange: Event<GroupChangeEvent> = this._onDidLayoutChange.event;
+  private readonly _onTabInteractionEvent = new Emitter<LayoutMouseEvent>();
+  readonly onTabInteractionEvent: Event<LayoutMouseEvent> = this._onTabInteractionEvent.event;
+  private readonly _onTabContextMenu = new Emitter<TabContextMenuEvent>();
+  readonly onTabContextMenu: Event<TabContextMenuEvent> = this._onTabContextMenu.event;
   // everything else
   private _size: number;
   private _orthogonalSize: number;
@@ -486,6 +493,20 @@ export class Layout extends CompositeDisposable implements ILayout {
       height,
     } = this.element.parentElement.getBoundingClientRect();
     this.layout(width, height);
+  }
+
+  fireMouseEvent(event: LayoutMouseEvent) {
+    switch(event.kind) {
+      case MouseEventKind.CONTEXT_MENU:
+        if(event.tab) {
+          this._onTabContextMenu.fire({
+            event: event.event,
+            api: this,
+            panel: event.panel
+          })
+        }
+        break;
+    }
   }
 
   public addPanelFromComponent(options: AddPanelOptions): PanelReference {

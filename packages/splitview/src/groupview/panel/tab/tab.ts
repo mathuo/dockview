@@ -9,22 +9,15 @@ import {
 } from "../../droptarget/dataTransfer";
 import { toggleClass } from "../../../dom";
 import { IGroupAccessor } from "../../../layout";
+import {LayoutMouseEvent, MouseEventKind} from "../../events"
 
-export enum TabInteractionKind {
-  CLICK = "CLICK",
-  CONTEXT_MENU = "CONTEXT_MEU",
-}
-
-export interface TabInteractionEvent {
-  kind: TabInteractionKind;
-}
 
 export interface ITab {
   id: string;
   element: HTMLElement;
   hasActiveDragEvent: boolean;
   setContent: (element: HTMLElement) => void;
-  onChanged: Event<TabInteractionEvent>;
+  onChanged: Event<LayoutMouseEvent>;
   onDropped: Event<DroptargetEvent>;
   setActive(isActive: boolean): void;
   startDragEvent(): void;
@@ -39,8 +32,8 @@ export class Tab extends CompositeDisposable implements ITab {
   private droptarget: Droptarget;
   private content: HTMLElement;
 
-  private readonly _onChanged = new Emitter<TabInteractionEvent>();
-  readonly onChanged: Event<TabInteractionEvent> = this._onChanged.event;
+  private readonly _onChanged = new Emitter<LayoutMouseEvent>();
+  readonly onChanged: Event<LayoutMouseEvent> = this._onChanged.event;
 
   private readonly _onDropped = new Emitter<DroptargetEvent>();
   readonly onDropped: Event<DroptargetEvent> = this._onDropped.event;
@@ -75,14 +68,14 @@ export class Tab extends CompositeDisposable implements ITab {
     this._element.draggable = true;
 
     this.addDisposables(
-      addDisposableListener(this._element, "mousedown", (ev) => {
-        if (ev.defaultPrevented) {
+      addDisposableListener(this._element, "mousedown", (event) => {
+        if (event.defaultPrevented) {
           return;
         }
-        this._onChanged.fire({ kind: TabInteractionKind.CLICK });
+        this._onChanged.fire({ kind: MouseEventKind.CLICK,event });
       }),
-      addDisposableListener(this._element, "contextmenu", (ev) => {
-        this._onChanged.fire({ kind: TabInteractionKind.CONTEXT_MENU });
+      addDisposableListener(this._element, "contextmenu", (event) => {
+        this._onChanged.fire({ kind: MouseEventKind.CONTEXT_MENU, event });
       }),
       addDisposableListener(this._element, "dragstart", (event) => {
         this.dragInPlayDetails = { isDragging: true, id: this.accessor.id };

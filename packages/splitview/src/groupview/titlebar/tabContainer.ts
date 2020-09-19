@@ -4,7 +4,7 @@ import {
   IValueDisposable,
 } from "../../lifecycle";
 import { addDisposableListener, Emitter, Event } from "../../events";
-import { ITab, Tab, TabInteractionKind } from "../panel/tab/tab";
+import { ITab, Tab } from "../panel/tab/tab";
 import { removeClasses, addClasses, toggleClass } from "../../dom";
 import { hasProcessed, Position } from "../droptarget/droptarget";
 import { TabDropEvent } from "../events";
@@ -14,6 +14,7 @@ import { IGroupAccessor } from "../../layout";
 import { last } from "../../array";
 import { DataTransferSingleton } from "../droptarget/dataTransfer";
 import { IGroupPanel } from "../panel/types";
+import {MouseEventKind} from "../events"
 
 export interface ITabContainer extends IDisposable {
   element: HTMLElement;
@@ -210,12 +211,11 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
     const disposable = CompositeDisposable.from(
       tab.onChanged((event) => {
         switch (event.kind) {
-          case TabInteractionKind.CLICK:
+          case MouseEventKind.CLICK:
             this.group.openPanel(panel);
             break;
-          case TabInteractionKind.CONTEXT_MENU:
-          // TODO finish
         }
+        this.accessor.fireMouseEvent({...event, panel, tab:true});
       }),
       tab.onDropped((event) => {
         this._onDropped.fire({ event, index: this.indexOf(tab) });

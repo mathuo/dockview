@@ -8,6 +8,7 @@ import {
   CompositeDisposable,
   GroupChangeKind,
   IGridviewPanelProps,
+  TabContextMenuEvent
 } from "splitview";
 import { CustomTab } from "./customTab";
 import { Editor } from "./editorPanel";
@@ -341,7 +342,9 @@ export const TestGrid = (props: IGridviewPanelProps) => {
     });
   };
 
-  const onTabContextMenu = (event: MouseEvent) => {};
+  const onTabContextMenu = React.useMemo(() => (event: TabContextMenuEvent) => {
+    console.log(event);
+  },[])
 
   return (
     <div
@@ -400,7 +403,7 @@ export const TestGrid = (props: IGridviewPanelProps) => {
         // tabHeight={30}
         enableExternalDragEvents={true}
         // serializedLayout={data}
-        // onTabContextMenu={onTabContextMenu}
+        onTabContextMenu={onTabContextMenu}
       />
     </div>
   );
