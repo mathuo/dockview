@@ -1,69 +1,69 @@
 export function tail<T>(arr: T[]): [T[], T] {
-  if (arr.length === 0) {
-    throw new Error("Invalid tail call");
-  }
+    if (arr.length === 0) {
+        throw new Error('Invalid tail call')
+    }
 
-  return [arr.slice(0, arr.length - 1), arr[arr.length - 1]];
+    return [arr.slice(0, arr.length - 1), arr[arr.length - 1]]
 }
 
 export function last<T>(arr: T[]): T {
-  return arr.length > 0 ? arr[arr.length - 1] : undefined;
+    return arr.length > 0 ? arr[arr.length - 1] : undefined
 }
 
 export function sequenceEquals<T>(arr1: T[], arr2: T[]) {
-  if (arr1.length !== arr2.length) {
-    return false;
-  }
-
-  for (let i = 0; i < arr1.length; i++) {
-    if (arr1[i] !== arr2[i]) {
-      return false;
+    if (arr1.length !== arr2.length) {
+        return false
     }
-  }
-  return true;
+
+    for (let i = 0; i < arr1.length; i++) {
+        if (arr1[i] !== arr2[i]) {
+            return false
+        }
+    }
+    return true
 }
 
 /**
  * Pushes an element to the start of the array, if found.
  */
 export function pushToStart<T>(arr: T[], value: T): void {
-  const index = arr.indexOf(value);
+    const index = arr.indexOf(value)
 
-  if (index > -1) {
-    arr.splice(index, 1);
-    arr.unshift(value);
-  }
+    if (index > -1) {
+        arr.splice(index, 1)
+        arr.unshift(value)
+    }
 }
 
 /**
  * Pushes an element to the end of the array, if found.
  */
 export function pushToEnd<T>(arr: T[], value: T): void {
-  const index = arr.indexOf(value);
+    const index = arr.indexOf(value)
 
-  if (index > -1) {
-    arr.splice(index, 1);
-    arr.push(value);
-  }
+    if (index > -1) {
+        arr.splice(index, 1)
+        arr.push(value)
+    }
 }
 
 export const range = (from: number, to: number = undefined) => {
-  const result: number[] = [];
+    const result: number[] = []
 
-  if (to === undefined) {
-    to = from;
-    from = 0;
-  }
-
-  if (from <= to) {
-    for (let i = from; i < to; i++) {
-      result.push(i);
+    if (to === undefined) {
+        to = from
+        from = 0
     }
-  } else {
-    for (let i = from; i > to; i--) {
-      result.push(i);
-    }
-  }
 
-  return result;
-};
+    if (from <= to) {
+        for (let i = from; i < to; i++) {
+            result.push(i)
+        }
+    } else {
+        for (let i = from; i > to; i--) {
+            result.push(i)
+        }
+    }
+
+    return result
+}

@@ -1,44 +1,44 @@
 {
-  "name": "splitview-root",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mathuo/splitview.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/mathuo/splitview/issues"
-  },
-  "homepage": "https://github.com/mathuo/splitview#readme",
-  "devDependencies": {
-    "@testing-library/jest-dom": "^5.10.1",
-    "@types/jest": "^26.0.3",
-    "css-loader": "^3.6.0",
-    "gulp": "^4.0.2",
-    "gulp-clean": "^0.4.0",
-    "gulp-concat": "^2.6.1",
-    "gulp-header": "^2.0.9",
-    "gulp-sass": "^4.1.0",
-    "gulp-sourcemaps": "^2.6.5",
-    "gulp-typescript": "^6.0.0-alpha.1",
-    "jest": "^26.1.0",
-    "jsdom": "^16.2.2",
-    "lerna": "^3.22.1",
-    "merge2": "^1.4.1",
-    "node-sass": "^4.14.1",
-    "sass-loader": "^8.0.2",
-    "style-loader": "^1.2.1",
-    "ts-jest": "^26.1.1",
-    "ts-loader": "^7.0.5",
-    "typescript": "^3.9.5",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.0"
-  }
+    "name": "splitview-root",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mathuo/splitview.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/mathuo/splitview/issues"
+    },
+    "homepage": "https://github.com/mathuo/splitview#readme",
+    "devDependencies": {
+        "@testing-library/jest-dom": "^5.10.1",
+        "@types/jest": "^26.0.3",
+        "css-loader": "^3.6.0",
+        "gulp": "^4.0.2",
+        "gulp-clean": "^0.4.0",
+        "gulp-concat": "^2.6.1",
+        "gulp-header": "^2.0.9",
+        "gulp-sass": "^4.1.0",
+        "gulp-sourcemaps": "^2.6.5",
+        "gulp-typescript": "^6.0.0-alpha.1",
+        "jest": "^26.1.0",
+        "jsdom": "^16.2.2",
+        "lerna": "^3.22.1",
+        "merge2": "^1.4.1",
+        "node-sass": "^4.14.1",
+        "sass-loader": "^8.0.2",
+        "style-loader": "^1.2.1",
+        "ts-jest": "^26.1.1",
+        "ts-loader": "^7.0.5",
+        "typescript": "^3.9.5",
+        "webpack": "^4.43.0",
+        "webpack-cli": "^3.3.12",
+        "webpack-dev-server": "^3.11.0"
+    }
 }

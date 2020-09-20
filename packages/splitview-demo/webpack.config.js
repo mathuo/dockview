@@ -1,53 +1,53 @@
-var path = require("path");
+var path = require('path')
 
 module.exports = {
-  entry: path.resolve(__dirname, "src/index.tsx"),
-  devtool: "source-map",
-  output: {
-    filename: "bundle.js",
-    path: path.resolve(__dirname, "dist"),
-  },
-  mode: "development",
-  resolve: {
-    extensions: [".ts", ".js", ".tsx", "jsx"],
-    alias: {
-      react: path.resolve(__dirname, "node_modules/react"),
-      "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
+    entry: path.resolve(__dirname, 'src/index.tsx'),
+    devtool: 'source-map',
+    output: {
+        filename: 'bundle.js',
+        path: path.resolve(__dirname, 'dist'),
     },
-  },
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        loader: "ts-loader",
-        options: { configFile: "tsconfig.build.json" },
-      },
-      {
-        test: /\.s[ac]ss$/i,
-        use: [
-          // Creates `style` nodes from JS strings
-          "style-loader",
-          // Translates CSS into CommonJS
-          "css-loader",
-          // Compiles Sass to CSS
-          "sass-loader",
+    mode: 'development',
+    resolve: {
+        extensions: ['.ts', '.js', '.tsx', 'jsx'],
+        alias: {
+            react: path.resolve(__dirname, 'node_modules/react'),
+            'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+        },
+    },
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                loader: 'ts-loader',
+                options: { configFile: 'tsconfig.build.json' },
+            },
+            {
+                test: /\.s[ac]ss$/i,
+                use: [
+                    // Creates `style` nodes from JS strings
+                    'style-loader',
+                    // Translates CSS into CommonJS
+                    'css-loader',
+                    // Compiles Sass to CSS
+                    'sass-loader',
+                ],
+            },
+            {
+                test: /\.css$/i,
+                use: [
+                    // Creates `style` nodes from JS strings
+                    'style-loader',
+                    // Translates CSS into CommonJS
+                    'css-loader',
+                ],
+            },
         ],
-      },
-      {
-        test: /\.css$/i,
-        use: [
-          // Creates `style` nodes from JS strings
-          "style-loader",
-          // Translates CSS into CommonJS
-          "css-loader",
-        ],
-      },
-    ],
-  },
-  devServer: {
-    port: 9000,
-    compress: true,
-    contentBase: path.resolve(__dirname, "public"),
-    publicPath: "/dist",
-  },
-};
+    },
+    devServer: {
+        port: 9000,
+        compress: true,
+        contentBase: path.resolve(__dirname, 'public'),
+        publicPath: '/dist',
+    },
+}
