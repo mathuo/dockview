@@ -1,9 +1,9 @@
-import { IGridView, IViewDeserializer } from '../gridview/gridview'
-import { IGroupPanel } from '../groupview/panel/types'
-import { Layout } from './layout'
+import { IGridView, IViewDeserializer } from '../gridview/gridview';
+import { IGroupPanel } from '../groupview/panel/types';
+import { Layout } from './layout';
 
 export interface IPanelDeserializer {
-    fromJSON(panelData: { [index: string]: any }): IGroupPanel
+    fromJSON(panelData: { [index: string]: any }): IGroupPanel;
 }
 
 export class DefaultDeserializer implements IViewDeserializer {
@@ -13,22 +13,22 @@ export class DefaultDeserializer implements IViewDeserializer {
     ) {}
 
     public fromJSON(data: { [key: string]: any }): IGridView {
-        const children = data.views
-        const active = data.activeView
+        const children = data.views;
+        const active = data.activeView;
 
-        const panels: IGroupPanel[] = []
+        const panels: IGroupPanel[] = [];
 
         for (const child of children) {
-            const panel = this.panelDeserializer.createPanel(child)
+            const panel = this.panelDeserializer.createPanel(child);
 
-            panels.push(panel)
+            panels.push(panel);
         }
 
         const group = this.layout.createGroup({
             panels,
             activePanel: panels.find((p) => p.id === active),
-        })
+        });
 
-        return group
+        return group;
     }
 }

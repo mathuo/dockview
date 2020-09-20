@@ -1,4 +1,4 @@
-import { BranchNode } from './branchNode'
-import { LeafNode } from './leafNode'
+import { BranchNode } from './branchNode';
+import { LeafNode } from './leafNode';
 
-export type Node = BranchNode | LeafNode
+export type Node = BranchNode | LeafNode;

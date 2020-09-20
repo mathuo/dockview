@@ -1,9 +1,9 @@
-import { DroptargetEvent } from './droptarget/droptarget'
-import { IGroupPanel } from './panel/types'
+import { DroptargetEvent } from './droptarget/droptarget';
+import { IGroupPanel } from './panel/types';
 
 export interface TabDropEvent {
-    event: DroptargetEvent
-    index?: number
+    event: DroptargetEvent;
+    index?: number;
 }
 
 export enum MouseEventKind {
@@ -12,8 +12,8 @@ export enum MouseEventKind {
 }
 
 export interface LayoutMouseEvent {
-    kind: MouseEventKind
-    event: MouseEvent
-    panel?: IGroupPanel
-    tab?: boolean
+    kind: MouseEventKind;
+    event: MouseEvent;
+    panel?: IGroupPanel;
+    tab?: boolean;
 }

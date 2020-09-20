@@ -1,27 +1,27 @@
-import * as React from 'react'
+import * as React from 'react';
 // import { LoadFromConfig } from "./loadFromConfig";
 // import { FromApi } from "./fromApi";
 // import { PaneDemo } from "./pane";
-import { TestGrid } from './layout-grid/reactgrid'
-import { Application } from './layout-grid/application'
+import { TestGrid } from './layout-grid/reactgrid';
+import { Application } from './layout-grid/application';
 
 const options = [
     // { id: "config", component: LoadFromConfig },
     // { id: "api", component: FromApi },
     // { id: "pane", component: PaneDemo },
     { id: 'grid', component: Application },
-]
+];
 
 export const App = () => {
-    const [value, setValue] = React.useState<string>(options[0].id)
+    const [value, setValue] = React.useState<string>(options[0].id);
 
     const onChange = (event: React.ChangeEvent<HTMLSelectElement>) =>
-        setValue(event.target.value)
+        setValue(event.target.value);
 
     const Component = React.useMemo(
         () => options.find((o) => o.id === value)?.component,
         [value]
-    )
+    );
 
     return (
         <div
@@ -48,5 +48,5 @@ export const App = () => {
                 </div>
             )}
         </div>
-    )
-}
+    );
+};

@@ -1,39 +1,39 @@
-import * as React from 'react'
-import { Orientation, IBaseView, PaneView } from 'splitview'
+import * as React from 'react';
+import { Orientation, IBaseView, PaneView } from 'splitview';
 
-import { PaneReact } from './panel/pane'
-import { PaneComponent, PaneHeaderComponent } from './bridge/pane'
+import { PaneReact } from './panel/pane';
+import { PaneComponent, PaneHeaderComponent } from './bridge/pane';
 
 export interface IPaneWithReactComponent extends IBaseView {
-    id: string
-    headerId: string
-    component: PaneComponent
-    headerComponent: PaneHeaderComponent
-    isExpanded: boolean
-    componentProps: {}
-    headerProps: {}
+    id: string;
+    headerId: string;
+    component: PaneComponent;
+    headerComponent: PaneHeaderComponent;
+    isExpanded: boolean;
+    componentProps: {};
+    headerProps: {};
 }
 
 export interface IPaneViewReactProps {
-    orientation: Orientation
-    onReady?: (event: PaneViewReadyEvent) => void
-    components?: { [index: string]: PaneComponent }
-    headerComponents?: { [index: string]: PaneHeaderComponent }
-    size: number
-    orthogonalSize: number
-    initialLayout?: PaneViewSerializedConfig
+    orientation: Orientation;
+    onReady?: (event: PaneViewReadyEvent) => void;
+    components?: { [index: string]: PaneComponent };
+    headerComponents?: { [index: string]: PaneHeaderComponent };
+    size: number;
+    orthogonalSize: number;
+    initialLayout?: PaneViewSerializedConfig;
 }
 
 export interface PaneViewReadyEvent {
-    api: PaneviewApi
+    api: PaneviewApi;
 }
 
 export interface PaneViewSerializedConfig {
     views: Array<
         Omit<IPaneWithReactComponent, 'component' | 'headerComponent'> & {
-            size?: number
+            size?: number;
         }
-    >
+    >;
 }
 
 export interface PaneviewApi {
@@ -42,27 +42,27 @@ export interface PaneviewApi {
             IPaneWithReactComponent,
             'component' | 'headerComponent'
         > & {
-            size?: number
-            index?: number
+            size?: number;
+            index?: number;
         }
-    ) => void
-    moveView: (from: number, to: number) => void
-    toJSON: () => {}
+    ) => void;
+    moveView: (from: number, to: number) => void;
+    toJSON: () => {};
 }
 
 export interface IPaneViewComponentRef {
-    layout: (size: number, orthogonalSize: number) => void
+    layout: (size: number, orthogonalSize: number) => void;
 }
 
 export const PaneViewComponent = React.forwardRef(
     (props: IPaneViewReactProps, _ref: React.Ref<IPaneViewComponentRef>) => {
-        const ref = React.useRef<HTMLDivElement>()
+        const ref = React.useRef<HTMLDivElement>();
         const dimension = React.useRef<{
-            size: number
-            orthogonalSize: number
-        }>()
-        const paneview = React.useRef<PaneView>()
-        const [portals, setPortals] = React.useState<React.ReactPortal[]>([])
+            size: number;
+            orthogonalSize: number;
+        }>();
+        const paneview = React.useRef<PaneView>();
+        const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
 
         const createView = React.useCallback(
             (_view: IPaneWithReactComponent) => {
@@ -70,47 +70,47 @@ export const PaneViewComponent = React.forwardRef(
                     headerName: 'header',
                     headerComponent: _view.headerComponent,
                     addPortal: (portal) => {
-                        setPortals((portals) => [...portals, portal])
+                        setPortals((portals) => [...portals, portal]);
                         return {
                             dispose: () => {
                                 setPortals((portals) =>
                                     portals.filter((_) => _ !== portal)
-                                )
+                                );
                             },
-                        }
+                        };
                     },
-                })
+                });
             },
             []
-        )
+        );
 
         const hydrate = React.useCallback(() => {
             if (!props.initialLayout || !paneview.current) {
-                return
+                return;
             }
 
-            const serializedConfig = props.initialLayout
+            const serializedConfig = props.initialLayout;
 
             serializedConfig.views.forEach((view) => {
-                const component = props.components[view.id]
-                const headerComponent = props.headerComponents[view.headerId]
+                const component = props.components[view.id];
+                const headerComponent = props.headerComponents[view.headerId];
                 paneview.current.addPane(
                     createView({ ...view, component, headerComponent }),
                     view.size
-                )
-            })
-            paneview.current.layout(props.size, props.orthogonalSize)
-        }, [props.initialLayout])
+                );
+            });
+            paneview.current.layout(props.size, props.orthogonalSize);
+        }, [props.initialLayout]);
 
         React.useEffect(() => {
             if (paneview.current && dimension?.current) {
                 paneview.current?.layout(
                     dimension.current.size,
                     dimension.current.orthogonalSize
-                )
-                dimension.current = undefined
+                );
+                dimension.current = undefined;
             }
-        }, [paneview.current])
+        }, [paneview.current]);
 
         // if you put this in a hook it's laggy
         // paneview.current?.layout(props.size, props.orthogonalSize);
@@ -122,20 +122,20 @@ export const PaneViewComponent = React.forwardRef(
                     if (!paneview.current) {
                         // handle the case when layout is called and paneview doesn't exist yet
                         // we cache the values and use them at the first opportunity
-                        dimension.current = { size, orthogonalSize }
+                        dimension.current = { size, orthogonalSize };
                     }
-                    paneview.current?.layout(size, orthogonalSize)
+                    paneview.current?.layout(size, orthogonalSize);
                 },
             }),
             [paneview]
-        )
+        );
 
         React.useEffect(() => {
             paneview.current = new PaneView(ref.current, {
                 orientation: props.orientation,
-            })
+            });
 
-            hydrate()
+            hydrate();
 
             if (props.onReady) {
                 props.onReady({
@@ -145,14 +145,14 @@ export const PaneViewComponent = React.forwardRef(
                                 IPaneWithReactComponent,
                                 'component' | 'headerComponent'
                             > & {
-                                props?: {}
-                                size?: number
-                                index?: number
+                                props?: {};
+                                size?: number;
+                                index?: number;
                             }
                         ) => {
-                            const component = props.components[options.id]
+                            const component = props.components[options.id];
                             const headerComponent =
-                                props.headerComponents[options.headerId]
+                                props.headerComponents[options.headerId];
                             paneview.current.addPane(
                                 createView({
                                     ...options,
@@ -161,14 +161,14 @@ export const PaneViewComponent = React.forwardRef(
                                 }),
                                 options.size,
                                 options.index
-                            )
+                            );
                             paneview.current.layout(
                                 props.size,
                                 props.orthogonalSize
-                            )
+                            );
                         },
                         moveView: (from: number, to: number) => {
-                            paneview.current.moveView(from, to)
+                            paneview.current.moveView(from, to);
                         },
                         toJSON: () => {
                             return {
@@ -188,28 +188,28 @@ export const PaneViewComponent = React.forwardRef(
                                 //     {}
                                 //   )
                                 // ),
-                            }
+                            };
                         },
                     },
-                })
+                });
             }
 
-            paneview.current.layout(props.size, props.orthogonalSize)
+            paneview.current.layout(props.size, props.orthogonalSize);
 
             return () => {
-                paneview.current?.dispose()
-                paneview.current = undefined
-            }
-        }, [])
+                paneview.current?.dispose();
+                paneview.current = undefined;
+            };
+        }, []);
 
         React.useEffect(() => {
-            paneview.current?.setOrientation(props.orientation)
-        }, [props.orientation])
+            paneview.current?.setOrientation(props.orientation);
+        }, [props.orientation]);
 
         return (
             <div ref={ref} className="split-view-react-wrapper">
                 {portals}
             </div>
-        )
+        );
     }
-)
+);

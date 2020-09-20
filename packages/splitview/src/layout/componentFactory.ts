@@ -3,87 +3,87 @@ import {
     PanelContentPartConstructor,
     PanelHeaderPart,
     PanelHeaderPartConstructor,
-} from '../groupview/panel/parts'
-import { FrameworkFactory } from '../types'
-import { DefaultTab } from './components/tab/defaultTab'
+} from '../groupview/panel/parts';
+import { FrameworkFactory } from '../types';
+import { DefaultTab } from './components/tab/defaultTab';
 
 export function createContentComponent(
     componentName: string | PanelContentPartConstructor | any,
     components: {
-        [componentName: string]: PanelContentPartConstructor
+        [componentName: string]: PanelContentPartConstructor;
     },
     frameworkComponents: {
-        [componentName: string]: any
+        [componentName: string]: any;
     },
     createFrameworkComponent: FrameworkFactory<PanelContentPart>
 ): PanelContentPart {
     const Component =
         typeof componentName === 'string'
             ? components[componentName]
-            : componentName
+            : componentName;
     const FrameworkComponent =
         typeof componentName === 'string'
             ? frameworkComponents[componentName]
-            : componentName
+            : componentName;
     if (Component && FrameworkComponent) {
         throw new Error(
             `cannot register component ${componentName} as both a component and frameworkComponent`
-        )
+        );
     }
     if (FrameworkComponent) {
         if (!createFrameworkComponent) {
             throw new Error(
                 'you must register a frameworkPanelWrapper to use framework components'
-            )
+            );
         }
         const wrappedComponent = createFrameworkComponent.createComponent(
             componentName,
             FrameworkComponent
-        )
-        return wrappedComponent
+        );
+        return wrappedComponent;
     }
-    return new Component() as PanelContentPart
+    return new Component() as PanelContentPart;
 }
 
 export function createTabComponent(
     componentName: string | PanelHeaderPartConstructor | any,
     components: {
-        [componentName: string]: PanelHeaderPartConstructor
+        [componentName: string]: PanelHeaderPartConstructor;
     },
     frameworkComponents: {
-        [componentName: string]: any
+        [componentName: string]: any;
     },
     createFrameworkComponent: FrameworkFactory<PanelHeaderPart>
 ): PanelHeaderPart {
     const Component =
         typeof componentName === 'string'
             ? components[componentName]
-            : componentName
+            : componentName;
     const FrameworkComponent =
         typeof componentName === 'string'
             ? frameworkComponents[componentName]
-            : componentName
+            : componentName;
     if (Component && FrameworkComponent) {
         throw new Error(
             `cannot register component ${componentName} as both a component and frameworkComponent`
-        )
+        );
     }
     if (FrameworkComponent) {
         if (!createFrameworkComponent) {
             throw new Error(
                 'you must register a frameworkPanelWrapper to use framework components'
-            )
+            );
         }
         const wrappedComponent = createFrameworkComponent.createComponent(
             componentName,
             FrameworkComponent
-        )
-        return wrappedComponent
+        );
+        return wrappedComponent;
     }
 
     if (!Component) {
-        return new DefaultTab()
+        return new DefaultTab();
     }
 
-    return new Component() as PanelHeaderPart
+    return new Component() as PanelHeaderPart;
 }

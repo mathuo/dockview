@@ -1,11 +1,11 @@
-const gulp = require('gulp')
-const gulpClean = require('gulp-clean')
-const gulpTypescript = require('gulp-typescript')
-const merge = require('merge2')
-const header = require('gulp-header')
-const gulpSass = require('gulp-sass')
-const concat = require('gulp-concat')
-const sourcemaps = require('gulp-sourcemaps')
+const gulp = require('gulp');
+const gulpClean = require('gulp-clean');
+const gulpTypescript = require('gulp-typescript');
+const merge = require('merge2');
+const header = require('gulp-header');
+const gulpSass = require('gulp-sass');
+const concat = require('gulp-concat');
+const sourcemaps = require('gulp-sourcemaps');
 
 const headerTemplate = [
     '/**',
@@ -14,25 +14,25 @@ const headerTemplate = [
     ' * @link <%= pkg.homepage %>',
     ' * @licence <%= pkg.licence %>',
     ' */\n',
-].join('\n')
+].join('\n');
 
 const dtsHeaderTemplate = [
     '// Type definitions for <%= pkg.name %> v <%= pkg.version %>',
     '// Project <%= pkg.homepage %>\n',
-].join('\n')
+].join('\n');
 
 const build = (options) => {
-    const { tsconfig, package } = options
+    const { tsconfig, package } = options;
     gulp.task('clean', () =>
         gulp.src('dist', { read: false, allowEmpty: true }).pipe(gulpClean())
-    )
+    );
 
     gulp.task('esm', () => {
-        const ts = gulpTypescript.createProject(tsconfig)
+        const ts = gulpTypescript.createProject(tsconfig);
         const tsResult = gulp
             .src(['src/**/*.ts', 'src/**/*.tsx'])
             .pipe(sourcemaps.init())
-            .pipe(ts())
+            .pipe(ts());
         return merge([
             tsResult.dts
                 .pipe(header(dtsHeaderTemplate, { pkg: package }))
@@ -43,8 +43,8 @@ const build = (options) => {
             tsResult
                 .pipe(sourcemaps.write('.', { includeContent: false }))
                 .pipe(gulp.dest('./dist/esm')),
-        ])
-    })
+        ]);
+    });
 
     gulp.task('sass', () => {
         return (
@@ -56,8 +56,8 @@ const build = (options) => {
                 // )
                 .pipe(concat('styles.css'))
                 .pipe(gulp.dest('./dist'))
-        )
-    })
-}
+        );
+    });
+};
 
-module.exports = { build }
+module.exports = { build };

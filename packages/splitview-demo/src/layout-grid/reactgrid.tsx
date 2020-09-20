@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from 'react';
 import {
     ReactGrid,
     OnReadyEvent,
@@ -9,33 +9,33 @@ import {
     GroupChangeKind,
     IGridviewPanelProps,
     TabContextMenuEvent,
-} from 'splitview'
-import { CustomTab } from './customTab'
-import { Editor } from './editorPanel'
-import { SplitPanel } from './splitPanel'
+} from 'splitview';
+import { CustomTab } from './customTab';
+import { Editor } from './editorPanel';
+import { SplitPanel } from './splitPanel';
 
 const components = {
     inner_component: (props: IPanelProps) => {
-        const _api = React.useRef<Api>()
-        const [api, setApi] = React.useState<Api>()
+        const _api = React.useRef<Api>();
+        const [api, setApi] = React.useState<Api>();
 
         const onReady = (event: OnReadyEvent) => {
-            _api.current = event.api
+            _api.current = event.api;
 
-            const layout = props.api.getStateKey<object>('layout')
+            const layout = props.api.getStateKey<object>('layout');
             if (layout) {
-                event.api.deserialize(layout)
+                event.api.deserialize(layout);
             } else {
                 event.api.addPanelFromComponent({
                     componentName: 'test_component',
                     id: 'inner-1',
                     title: 'inner-1',
-                })
+                });
                 event.api.addPanelFromComponent({
                     componentName: 'test_component',
                     id: 'inner-2',
                     title: 'inner-2',
-                })
+                });
                 event.api.addPanelFromComponent({
                     componentName: 'test_component',
                     id: nextGuid(),
@@ -44,7 +44,7 @@ const components = {
                         direction: 'within',
                         referencePanel: 'inner-1',
                     },
-                })
+                });
                 event.api.addPanelFromComponent({
                     componentName: 'test_component',
                     id: nextGuid(),
@@ -53,37 +53,37 @@ const components = {
                         direction: 'within',
                         referencePanel: 'inner-2',
                     },
-                })
+                });
             }
-            setApi(event.api)
-        }
+            setApi(event.api);
+        };
 
         React.useEffect(() => {
             const compDis = new CompositeDisposable(
                 props.api.onDidDimensionsChange((event) => {
-                    _api.current?.layout(event.width, event.height)
+                    _api.current?.layout(event.width, event.height);
                 }),
                 _api.current.onDidLayoutChange((event) => {
                     if (event.kind === GroupChangeKind.LAYOUT_CONFIG_UPDATED) {
-                        props.api.setState('layout', _api.current.toJSON())
+                        props.api.setState('layout', _api.current.toJSON());
                     }
                 })
-            )
+            );
 
             return () => {
-                compDis.dispose()
-            }
-        }, [])
+                compDis.dispose();
+            };
+        }, []);
 
         React.useEffect(() => {
             if (!api) {
-                return
+                return;
             }
 
             api.onDidLayoutChange((event) => {
                 // on inner grid changes
-            })
-        }, [api])
+            });
+        }, [api]);
 
         return (
             <div
@@ -99,16 +99,16 @@ const components = {
                     debug={true}
                 />
             </div>
-        )
+        );
     },
     test_component: (props: IPanelProps & { [key: string]: any }) => {
         const [panelState, setPanelState] = React.useState<{
-            isGroupActive: boolean
-            isPanelVisible: boolean
+            isGroupActive: boolean;
+            isPanelVisible: boolean;
         }>({
             isGroupActive: false,
             isPanelVisible: false,
-        })
+        });
 
         React.useEffect(() => {
             const disposable = new CompositeDisposable(
@@ -116,31 +116,31 @@ const components = {
                     setPanelState((_) => ({
                         ..._,
                         isGroupActive: event.isFocused,
-                    }))
+                    }));
                 }),
                 props.api.onDidChangeVisibility((x) => {
                     setPanelState((_) => ({
                         ..._,
                         isPanelVisible: x.isVisible,
-                    }))
+                    }));
                 })
-            )
+            );
 
             props.api.setClosePanelHook(() => {
                 if (confirm('close?')) {
-                    return Promise.resolve(ClosePanelResult.CLOSE)
+                    return Promise.resolve(ClosePanelResult.CLOSE);
                 }
-                return Promise.resolve(ClosePanelResult.DONT_CLOSE)
-            })
+                return Promise.resolve(ClosePanelResult.DONT_CLOSE);
+            });
 
             return () => {
-                disposable.dispose()
-            }
-        }, [])
+                disposable.dispose();
+            };
+        }, []);
 
         const onClick = () => {
-            props.api.setState('test_key', 'hello')
-        }
+            props.api.setState('test_key', 'hello');
+        };
 
         const backgroundColor = React.useMemo(
             () =>
@@ -149,7 +149,7 @@ const components = {
                     Math.random() * 256
                 )},${Math.floor(Math.random() * 256)})`,
             []
-        )
+        );
         return (
             <div
                 style={{
@@ -164,33 +164,33 @@ const components = {
                 <div>{`G:${panelState.isGroupActive} P:${panelState.isPanelVisible}`}</div>
                 <div>{props.text || '-'}</div>
             </div>
-        )
+        );
     },
     editor: Editor,
     split_panel: SplitPanel,
-}
+};
 
 const tabComponents = {
     default: CustomTab,
-}
+};
 
 const nextGuid = (() => {
-    let counter = 0
-    return () => 'panel_' + (counter++).toString()
-})()
+    let counter = 0;
+    return () => 'panel_' + (counter++).toString();
+})();
 
 export const TestGrid = (props: IGridviewPanelProps) => {
-    const _api = React.useRef<Api>()
-    const [api, setApi] = React.useState<Api>()
+    const _api = React.useRef<Api>();
+    const [api, setApi] = React.useState<Api>();
 
     const onReady = (event: OnReadyEvent) => {
-        _api.current = event.api
-        setApi(event.api)
-    }
+        _api.current = event.api;
+        setApi(event.api);
+    };
 
     React.useEffect(() => {
         if (!api) {
-            return
+            return;
         }
 
         const panelReference = api.addPanelFromComponent({
@@ -198,24 +198,24 @@ export const TestGrid = (props: IGridviewPanelProps) => {
             id: nextGuid(),
             title: 'Item 1',
             params: { text: 'how low?' },
-        })
+        });
         api.addPanelFromComponent({
             componentName: 'test_component',
             id: 'item2',
             title: 'Item 2',
-        })
+        });
         api.addPanelFromComponent({
             componentName: 'split_panel',
             id: nextGuid(),
             title: 'Item 3 with a long title',
-        })
+        });
         api.addPanelFromComponent({
             componentName: 'test_component',
             id: nextGuid(),
             title: 'Item 3',
             position: { direction: 'below', referencePanel: 'item2' },
             suppressClosable: true,
-        })
+        });
 
         // setInterval(() => {
         //   panelReference.update({ params: { text: `Tick ${Date.now()}` } });
@@ -223,38 +223,38 @@ export const TestGrid = (props: IGridviewPanelProps) => {
         // }, 1000);
 
         api.addDndHandle('text/plain', (ev) => {
-            const { event } = ev
+            const { event } = ev;
 
             return {
                 id: 'yellow',
                 componentName: 'test_component',
-            }
-        })
+            };
+        });
 
         api.addDndHandle('Files', (ev) => {
-            const { event } = ev
+            const { event } = ev;
 
-            ev.event.event.preventDefault()
+            ev.event.event.preventDefault();
 
             return {
                 id: Date.now().toString(),
                 title: event.event.dataTransfer.files[0].name,
                 componentName: 'test_component',
-            }
-        })
-    }, [api])
+            };
+        });
+    }, [api]);
 
     const onAdd = () => {
-        const id = nextGuid()
+        const id = nextGuid();
         api.addPanelFromComponent({
             componentName: 'test_component',
             id,
-        })
-    }
+        });
+    };
 
     const onAddEmpty = () => {
-        api.addEmptyGroup()
-    }
+        api.addEmptyGroup();
+    };
 
     React.useEffect(() => {
         // const callback = (ev: UIEvent) => {
@@ -269,68 +269,68 @@ export const TestGrid = (props: IGridviewPanelProps) => {
         props.api.setConstraints({
             minimumWidth: () => _api.current.minimumWidth,
             minimumHeight: () => _api.current.minimumHeight,
-        })
+        });
 
         const disposable = new CompositeDisposable(
             _api.current.onDidLayoutChange((event) => {
-                console.log(event.kind)
+                console.log(event.kind);
             }),
             props.api.onDidDimensionsChange((event) => {
-                const { width, height } = event
-                _api.current.layout(width, height - 20)
+                const { width, height } = event;
+                _api.current.layout(width, height - 20);
             })
-        )
+        );
 
         return () => {
-            disposable.dispose()
+            disposable.dispose();
             // window.removeEventListener("resize", callback);
-        }
-    }, [])
+        };
+    }, []);
 
     const onConfig = () => {
-        const data = api.toJSON()
-        const stringData = JSON.stringify(data, null, 4)
-        console.log(stringData)
-        localStorage.setItem('layout', stringData)
-    }
+        const data = api.toJSON();
+        const stringData = JSON.stringify(data, null, 4);
+        console.log(stringData);
+        localStorage.setItem('layout', stringData);
+    };
 
     const onLoad = async () => {
-        const didClose = await api.closeAllGroups()
+        const didClose = await api.closeAllGroups();
         if (!didClose) {
-            return
+            return;
         }
-        const data = localStorage.getItem('layout')
+        const data = localStorage.getItem('layout');
         if (data) {
-            const jsonData = JSON.parse(data)
-            api.deserialize(jsonData)
+            const jsonData = JSON.parse(data);
+            api.deserialize(jsonData);
         }
-    }
+    };
 
     const onClear = () => {
-        api.closeAllGroups()
-    }
+        api.closeAllGroups();
+    };
 
     const onNextGroup = () => {
-        api.moveToNext({ includePanel: true })
-    }
+        api.moveToNext({ includePanel: true });
+    };
 
     const onPreviousGroup = () => {
-        api.moveToPrevious({ includePanel: true })
-    }
+        api.moveToPrevious({ includePanel: true });
+    };
 
     const onNextPanel = () => {
-        api.activeGroup?.moveToNext()
-    }
+        api.activeGroup?.moveToNext();
+    };
 
     const onPreviousPanel = () => {
-        api.activeGroup?.moveToPrevious()
-    }
+        api.activeGroup?.moveToPrevious();
+    };
 
-    const dragRef = React.useRef<HTMLDivElement>()
+    const dragRef = React.useRef<HTMLDivElement>();
 
     React.useEffect(() => {
         if (!api) {
-            return
+            return;
         }
         api.createDragTarget(
             { element: dragRef.current, content: 'drag me' },
@@ -338,12 +338,12 @@ export const TestGrid = (props: IGridviewPanelProps) => {
                 id: 'yellow',
                 componentName: 'test_component',
             })
-        )
-    }, [api])
+        );
+    }, [api]);
 
     const onDragStart = (event: React.DragEvent) => {
-        event.dataTransfer.setData('text/plain', 'Panel2')
-    }
+        event.dataTransfer.setData('text/plain', 'Panel2');
+    };
 
     const onAddEditor = () => {
         api.addPanelFromComponent({
@@ -351,15 +351,15 @@ export const TestGrid = (props: IGridviewPanelProps) => {
             componentName: 'editor',
             tabComponentName: 'default',
             params: { layoutApi: api },
-        })
-    }
+        });
+    };
 
     const onTabContextMenu = React.useMemo(
         () => (event: TabContextMenuEvent) => {
-            console.log(event)
+            console.log(event);
         },
         []
-    )
+    );
 
     return (
         <div
@@ -421,5 +421,5 @@ export const TestGrid = (props: IGridviewPanelProps) => {
                 onTabContextMenu={onTabContextMenu}
             />
         </div>
-    )
-}
+    );
+};

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from 'react';
 import {
     CompositeDisposable,
     IPanelProps,
@@ -6,65 +6,65 @@ import {
     Orientation,
     SplitviewFacade,
     SplitviewReadyEvent,
-} from 'splitview'
-import { SplitViewComponent } from 'splitview'
+} from 'splitview';
+import { SplitViewComponent } from 'splitview';
 
 const components = {
     default1: (props: ISplitviewPanelProps) => {
-        const [focused, setFocused] = React.useState<boolean>(false)
+        const [focused, setFocused] = React.useState<boolean>(false);
         React.useEffect(() => {
             const disposable = new CompositeDisposable(
                 props.api.onDidFocusChange((event) => {
-                    setFocused(event.isFocused)
+                    setFocused(event.isFocused);
                 })
-            )
+            );
 
             return () => {
-                disposable.dispose()
-            }
-        }, [])
+                disposable.dispose();
+            };
+        }, []);
 
         return (
             <div
                 style={{ height: '100%', width: '100%' }}
             >{`component [isFocused: ${focused}]`}</div>
-        )
+        );
     },
-}
+};
 
 export const SplitPanel = (props: IPanelProps) => {
-    const api = React.useRef<SplitviewFacade>()
+    const api = React.useRef<SplitviewFacade>();
 
     React.useEffect(() => {
         const disposable = new CompositeDisposable(
             props.api.onDidDimensionsChange((event) => {
-                api.current?.layout(event.width, event.height - 20)
+                api.current?.layout(event.width, event.height - 20);
             }),
             api.current.onChange((event) => {
-                props.api.setState('sview_layout', api.current.toJSON())
+                props.api.setState('sview_layout', api.current.toJSON());
             })
-        )
+        );
 
         return () => {
-            disposable.dispose()
-        }
-    }, [])
+            disposable.dispose();
+        };
+    }, []);
 
     const onReady = (event: SplitviewReadyEvent) => {
-        const existingLayout = props.api.getStateKey('sview_layout')
+        const existingLayout = props.api.getStateKey('sview_layout');
 
         if (existingLayout) {
-            event.api.deserialize(existingLayout)
+            event.api.deserialize(existingLayout);
         } else {
-            event.api.addFromComponent({ id: '1', component: 'default1' })
-            event.api.addFromComponent({ id: '2', component: 'default1' })
+            event.api.addFromComponent({ id: '1', component: 'default1' });
+            event.api.addFromComponent({ id: '2', component: 'default1' });
         }
-        api.current = event.api
-    }
+        api.current = event.api;
+    };
 
     const onSave = () => {
-        props.api.setState('sview_layout', api.current.toJSON())
-    }
+        props.api.setState('sview_layout', api.current.toJSON());
+    };
 
     return (
         <div
@@ -84,5 +84,5 @@ export const SplitPanel = (props: IPanelProps) => {
                 orientation={Orientation.VERTICAL}
             />
         </div>
-    )
-}
+    );
+};

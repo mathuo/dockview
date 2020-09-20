@@ -1,14 +1,14 @@
-import * as React from 'react'
-import { PanelHeaderPart, PartInitParameters } from '../groupview/panel/parts'
-import { ReactPart, IPanelProps } from './react'
-import { ReactLayout } from './layout'
+import * as React from 'react';
+import { PanelHeaderPart, PartInitParameters } from '../groupview/panel/parts';
+import { ReactPart, IPanelProps } from './react';
+import { ReactLayout } from './layout';
 
 export class ReactPanelHeaderPart implements PanelHeaderPart {
-    private _element: HTMLElement
-    private part: ReactPart
+    private _element: HTMLElement;
+    private part: ReactPart;
 
     get element() {
-        return this._element
+        return this._element;
     }
 
     constructor(
@@ -16,7 +16,7 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
         private readonly component: React.FunctionComponent<IPanelProps>,
         private readonly parent: ReactLayout
     ) {
-        this._element = document.createElement('div')
+        this._element = document.createElement('div');
     }
 
     public init(parameters: PartInitParameters): void {
@@ -26,13 +26,13 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
             this.parent.addPortal,
             this.component,
             parameters.params
-        )
+        );
     }
 
     public toJSON() {
         return {
             id: this.id,
-        }
+        };
     }
 
     public layout(height: string) {
@@ -44,6 +44,6 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
     }
 
     public dispose() {
-        this.part?.dispose()
+        this.part?.dispose();
     }
 }
