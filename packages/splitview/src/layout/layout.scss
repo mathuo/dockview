@@ -1,63 +1,63 @@
 .custom-dragging {
-  height: 24px;
-  line-height: 24px;
-  font-size: 11px;
-  width: 100px;
-  background-color: dodgerblue;
-  color: ghostwhite;
-  border-radius: 11px;
-  position: absolute;
-  padding-left: 10px;
+    height: 24px;
+    line-height: 24px;
+    font-size: 11px;
+    width: 100px;
+    background-color: dodgerblue;
+    color: ghostwhite;
+    border-radius: 11px;
+    position: absolute;
+    padding-left: 10px;
 }
 
 .groupview {
-  &.active-group {
-    > .title-container > .tab-container > .tab {
-      &.active-tab {
-        background-color: var(--active-tab-background-visible);
-        color: var(--active-group-visible-panel-color);
+    &.active-group {
+        > .title-container > .tab-container > .tab {
+            &.active-tab {
+                background-color: var(--active-tab-background-visible);
+                color: var(--active-group-visible-panel-color);
 
-        .tab-action {
-          background-color: var(--active-group-visible-panel-color);
-        }
-      }
-      &.inactive-tab {
-        background-color: var(--active-tab-background-hidden);
-        color: var(--active-group-hidden-panel-color);
+                .tab-action {
+                    background-color: var(--active-group-visible-panel-color);
+                }
+            }
+            &.inactive-tab {
+                background-color: var(--active-tab-background-hidden);
+                color: var(--active-group-hidden-panel-color);
 
-        .tab-action {
-          background-color: var(--active-group-hidden-panel-color);
+                .tab-action {
+                    background-color: var(--active-group-hidden-panel-color);
+                }
+            }
         }
-      }
     }
-  }
-  &.inactive-group {
-    > .title-container > .tab-container > .tab {
-      &.active-tab {
-        background-color: var(--inactive-tab-background-visible);
-        color: var(--inactive-group-visible-panel-color);
+    &.inactive-group {
+        > .title-container > .tab-container > .tab {
+            &.active-tab {
+                background-color: var(--inactive-tab-background-visible);
+                color: var(--inactive-group-visible-panel-color);
 
-        .tab-action {
-          background-color: var(--inactive-group-visible-panel-color);
-        }
-      }
-      &.inactive-tab {
-        background-color: var(--inactive-tab-background-hidden);
-        color: var(--inactive-group-hidden-panel-color);
+                .tab-action {
+                    background-color: var(--inactive-group-visible-panel-color);
+                }
+            }
+            &.inactive-tab {
+                background-color: var(--inactive-tab-background-hidden);
+                color: var(--inactive-group-hidden-panel-color);
 
-        .tab-action {
-          background-color: var(--inactive-group-hidden-panel-color);
+                .tab-action {
+                    background-color: var(--inactive-group-hidden-panel-color);
+                }
+            }
         }
-      }
     }
-  }
 }
 
 // when a tab is dragged we loss the above stylings because they are conditional on parent elements
 // there we also set some stylings for the dragging event
 .tab {
-  &.dragging {
-    background-color: var(--active-tab-background-visible);
-    color: var(--active-group-visible-panel-color);
-  }
+    &.dragging {
+        background-color: var(--active-tab-background-visible);
+        color: var(--active-group-visible-panel-color);
+    }
 }

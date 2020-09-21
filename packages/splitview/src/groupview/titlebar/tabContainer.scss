@@ -1,57 +1,57 @@
 .title-container {
-  display: flex;
-  background-color: var(--title-bar-background-color);
-  overflow: overlay;
-  flex-shrink: 0;
-  box-sizing: border-box;
-
-  &.hidden {
-    display: none;
-  }
-
-  &::-webkit-scrollbar {
-    height: 3px;
-  }
-
-  /* Track */
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  /* Handle */
-  &::-webkit-scrollbar-thumb {
-    background: var(--title-bar-scroll-bar-color);
-  }
-
-  .tab-container {
-    flex-shrink: 0;
-    flex-grow: 1;
     display: flex;
-    font-size: 13px;
-    overflow-x: overlay;
-    overflow-y: hidden;
+    background-color: var(--title-bar-background-color);
+    overflow: overlay;
+    flex-shrink: 0;
+    box-sizing: border-box;
 
-    &.drag-over-target {
-      background-color: var(--drag-over-background-color);
+    &.hidden {
+        display: none;
     }
 
-    .tab {
-      min-width: 75px;
-      cursor: pointer;
-      position: relative;
-      box-sizing: border-box;
-
-      &:not(:first-child)::before {
-        content: " ";
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 5;
-        pointer-events: none;
-        background-color: var(--tab-divider-color);
-        width: 1px;
-        height: 100%;
-      }
+    &::-webkit-scrollbar {
+        height: 3px;
     }
-  }
+
+    /* Track */
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+        background: var(--title-bar-scroll-bar-color);
+    }
+
+    .tab-container {
+        flex-shrink: 0;
+        flex-grow: 1;
+        display: flex;
+        font-size: 13px;
+        overflow-x: overlay;
+        overflow-y: hidden;
+
+        &.drag-over-target {
+            background-color: var(--drag-over-background-color);
+        }
+
+        .tab {
+            min-width: 75px;
+            cursor: pointer;
+            position: relative;
+            box-sizing: border-box;
+
+            &:not(:first-child)::before {
+                content: ' ';
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 5;
+                pointer-events: none;
+                background-color: var(--tab-divider-color);
+                width: 1px;
+                height: 100%;
+            }
+        }
+    }
 }

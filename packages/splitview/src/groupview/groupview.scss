@@ -1,22 +1,22 @@
 .groupview {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background-color: var(--group-view-background-color);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--group-view-background-color);
 
-  &:focus {
-    outline: none;
-  }
-
-  &.empty {
-    .title-container {
-      display: none;
+    &:focus {
+        outline: none;
     }
-  }
 
-  .content-container {
-    flex-grow: 1;
-    overflow: hidden;
-    outline: none;
-  }
+    &.empty {
+        .title-container {
+            display: none;
+        }
+    }
+
+    .content-container {
+        flex-grow: 1;
+        overflow: hidden;
+        outline: none;
+    }
 }

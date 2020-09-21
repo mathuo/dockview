@@ -1,15 +1,15 @@
-@import "~splitview/dist/styles.css";
+@import '~splitview/dist/styles.css';
 
 body {
-  margin: 0;
-  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-  overflow: hidden;
+    margin: 0;
+    font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+    overflow: hidden;
 }
 
 *,
 *::after,
 *::before {
-  // -webkit-user-drag: none;
-  -webkit-app-region: no-drag;
-  -webkit-user-select: none;
+    // -webkit-user-drag: none;
+    -webkit-app-region: no-drag;
+    -webkit-user-select: none;
 }

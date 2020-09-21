@@ -1,23 +1,23 @@
 {
-  "name": "splitview",
-  "version": "1.0.0",
-  "description": "",
-  "main": "dist/esm/index.js",
-  "types": "dist/esm/index.d.ts",
-  "module": "dist/esm/index.js",
-  "scripts": {
-    "build": "gulp run",
-    "docs": "typedoc"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@types/react": "^16.9.43",
-    "@types/react-dom": "^16.9.8",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1"
-  },
-  "devDependencies": {
-    "typedoc": "^0.18.0"
-  }
+    "name": "splitview",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/esm/index.js",
+    "types": "dist/esm/index.d.ts",
+    "module": "dist/esm/index.js",
+    "scripts": {
+        "build": "gulp run",
+        "docs": "typedoc"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@types/react": "^16.9.43",
+        "@types/react-dom": "^16.9.8",
+        "react": "^16.13.1",
+        "react-dom": "^16.13.1"
+    },
+    "devDependencies": {
+        "typedoc": "^0.18.0"
+    }
 }

@@ -1,130 +1,130 @@
 .split-view-container {
-  position: relative;
-  overflow: hidden;
-  height: 100%;
-  width: 100%;
-
-  &.animation {
-    .view,
-    .sash {
-      transition-duration: 0.15s;
-      transition-timing-function: ease-out;
-    }
-  }
-
-  // debug
-  // .sash {
-  //   &.enabled {
-  //     background-color: black;
-  //   }
-  //   &.disabled {
-  //     background-color: orange;
-  //   }
-  //   &.maximum {
-  //     background-color: green;
-  //   }
-  //   &.minimum {
-  //     background-color: red;
-  //   }
-  // }
-
-  &.horizontal {
-    height: 100%;
-
-    & > .sash-container > .sash {
-      height: 100%;
-      width: 4px;
-      &.enabled {
-        cursor: ew-resize;
-      }
-      &.disabled {
-        cursor: none;
-      }
-      &.maximum {
-        cursor: w-resize;
-      }
-      &.minimum {
-        cursor: e-resize;
-      }
-    }
-
-    & > .view-container > .view {
-      &:not(:first-child) {
-        padding-left: 1px;
-        &::before {
-          height: 100%;
-          width: 1px;
-        }
-      }
-    }
-  }
-
-  &.vertical {
-    width: 100%;
-
-    & > .sash-container > .sash {
-      width: 100%;
-      height: 4px;
-
-      &.enabled {
-        cursor: ns-resize;
-      }
-      &.disabled {
-        cursor: none;
-      }
-      &.maximum {
-        cursor: n-resize;
-      }
-      &.minimum {
-        cursor: s-resize;
-      }
-    }
-
-    & > .view-container > .view {
-      width: 100%;
-
-      &:not(:first-child) {
-        padding-top: 1px;
-        &::before {
-          height: 1px;
-          width: 100%;
-        }
-      }
-    }
-  }
-
-  .sash-container {
-    height: 100%;
-    width: 100%;
-    position: absolute;
-
-    .sash {
-      position: absolute;
-      z-index: 99;
-      outline: none;
-    }
-  }
-
-  .view-container {
     position: relative;
+    overflow: hidden;
     height: 100%;
     width: 100%;
 
-    .view:not(:first-child)::before {
-      content: " ";
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 5;
-      pointer-events: none;
-      background-color: var(--splitview-divider-color);
+    &.animation {
+        .view,
+        .sash {
+            transition-duration: 0.15s;
+            transition-timing-function: ease-out;
+        }
     }
 
-    .view {
-      height: 100%;
-      box-sizing: border-box;
-      overflow: auto;
-      position: absolute;
+    // debug
+    // .sash {
+    //   &.enabled {
+    //     background-color: black;
+    //   }
+    //   &.disabled {
+    //     background-color: orange;
+    //   }
+    //   &.maximum {
+    //     background-color: green;
+    //   }
+    //   &.minimum {
+    //     background-color: red;
+    //   }
+    // }
+
+    &.horizontal {
+        height: 100%;
+
+        & > .sash-container > .sash {
+            height: 100%;
+            width: 4px;
+            &.enabled {
+                cursor: ew-resize;
+            }
+            &.disabled {
+                cursor: none;
+            }
+            &.maximum {
+                cursor: w-resize;
+            }
+            &.minimum {
+                cursor: e-resize;
+            }
+        }
+
+        & > .view-container > .view {
+            &:not(:first-child) {
+                padding-left: 1px;
+                &::before {
+                    height: 100%;
+                    width: 1px;
+                }
+            }
+        }
     }
-  }
+
+    &.vertical {
+        width: 100%;
+
+        & > .sash-container > .sash {
+            width: 100%;
+            height: 4px;
+
+            &.enabled {
+                cursor: ns-resize;
+            }
+            &.disabled {
+                cursor: none;
+            }
+            &.maximum {
+                cursor: n-resize;
+            }
+            &.minimum {
+                cursor: s-resize;
+            }
+        }
+
+        & > .view-container > .view {
+            width: 100%;
+
+            &:not(:first-child) {
+                padding-top: 1px;
+                &::before {
+                    height: 1px;
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+    .sash-container {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+
+        .sash {
+            position: absolute;
+            z-index: 99;
+            outline: none;
+        }
+    }
+
+    .view-container {
+        position: relative;
+        height: 100%;
+        width: 100%;
+
+        .view:not(:first-child)::before {
+            content: ' ';
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 5;
+            pointer-events: none;
+            background-color: var(--splitview-divider-color);
+        }
+
+        .view {
+            height: 100%;
+            box-sizing: border-box;
+            overflow: auto;
+            position: absolute;
+        }
+    }
 }

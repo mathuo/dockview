@@ -1,134 +1,146 @@
-import * as React from "react";
-import { IDisposable } from "../lifecycle";
-import { Layout, Api } from "../layout/layout";
-import { ReactPanelContentPart } from "./reactContentPart";
-import { ReactPanelHeaderPart } from "./reactHeaderPart";
-import { IPanelProps } from "./react";
-import { ReactPanelDeserialzier } from "./deserializer";
-import { GroupPanelFrameworkComponentFactory, TabContextMenuEvent } from "../layout/options";
+import * as React from 'react';
+import { IDisposable } from '../lifecycle';
+import { Layout, Api } from '../layout/layout';
+import { ReactPanelContentPart } from './reactContentPart';
+import { ReactPanelHeaderPart } from './reactHeaderPart';
+import { IPanelProps } from './react';
+import { ReactPanelDeserialzier } from './deserializer';
+import {
+    GroupPanelFrameworkComponentFactory,
+    TabContextMenuEvent,
+} from '../layout/options';
 
 export interface OnReadyEvent {
-  api: Api;
+    api: Api;
 }
 
 export interface ReactLayout {
-  addPortal: (portal: React.ReactPortal) => IDisposable;
+    addPortal: (portal: React.ReactPortal) => IDisposable;
 }
 
 export interface IReactGridProps {
-  components?: {
-    [componentName: string]: React.FunctionComponent<IPanelProps>;
-  };
-  tabComponents?: {
-    [componentName: string]: React.FunctionComponent<IPanelProps>;
-  };
-  watermarkComponent?: React.FunctionComponent;
-  onReady?: (event: OnReadyEvent) => void;
-  autoSizeToFitContainer?: boolean;
-  serializedLayout?: {};
-  deserializer?: {
-    fromJSON: (
-      data: any
-    ) => {
-      component: React.FunctionComponent<IPanelProps>;
-      tabComponent?: React.FunctionComponent<IPanelProps>;
-      props?: { [key: string]: any };
+    components?: {
+        [componentName: string]: React.FunctionComponent<IPanelProps>;
     };
-  };
-  debug?: boolean;
-  tabHeight?: number;
-  enableExternalDragEvents?: boolean;
-  onTabContextMenu?: (event: TabContextMenuEvent) => void;
+    tabComponents?: {
+        [componentName: string]: React.FunctionComponent<IPanelProps>;
+    };
+    watermarkComponent?: React.FunctionComponent;
+    onReady?: (event: OnReadyEvent) => void;
+    autoSizeToFitContainer?: boolean;
+    serializedLayout?: {};
+    deserializer?: {
+        fromJSON: (
+            data: any
+        ) => {
+            component: React.FunctionComponent<IPanelProps>;
+            tabComponent?: React.FunctionComponent<IPanelProps>;
+            props?: { [key: string]: any };
+        };
+    };
+    debug?: boolean;
+    tabHeight?: number;
+    enableExternalDragEvents?: boolean;
+    onTabContextMenu?: (event: TabContextMenuEvent) => void;
 }
 
 export const ReactGrid = (props: IReactGridProps) => {
-  const domReference = React.useRef<HTMLDivElement>();
-  const layoutReference = React.useRef<Layout>();
+    const domReference = React.useRef<HTMLDivElement>();
+    const layoutReference = React.useRef<Layout>();
 
-  const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
+    const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
 
-  React.useEffect(() => {
-    const addPortal = (p: React.ReactPortal) => {
-      setPortals((portals) => [...portals, p]);
-      return {
-        dispose: () => {
-          setPortals((portals) => portals.filter((portal) => portal !== p));
-        },
-      };
-    };
+    React.useEffect(() => {
+        const addPortal = (p: React.ReactPortal) => {
+            setPortals((portals) => [...portals, p]);
+            return {
+                dispose: () => {
+                    setPortals((portals) =>
+                        portals.filter((portal) => portal !== p)
+                    );
+                },
+            };
+        };
 
-    const factory: GroupPanelFrameworkComponentFactory = {
-      content: {
-        createComponent: (
-          id: string,
-          component: React.FunctionComponent<IPanelProps>
-        ) => {
-          return new ReactPanelContentPart(id, component, { addPortal });
-        },
-      },
-      tab: {
-        createComponent: (
-          id: string,
-          component: React.FunctionComponent<IPanelProps>
-        ) => {
-          return new ReactPanelHeaderPart(id, component, { addPortal });
-        },
-      },
-    };
+        const factory: GroupPanelFrameworkComponentFactory = {
+            content: {
+                createComponent: (
+                    id: string,
+                    component: React.FunctionComponent<IPanelProps>
+                ) => {
+                    return new ReactPanelContentPart(id, component, {
+                        addPortal,
+                    });
+                },
+            },
+            tab: {
+                createComponent: (
+                    id: string,
+                    component: React.FunctionComponent<IPanelProps>
+                ) => {
+                    return new ReactPanelHeaderPart(id, component, {
+                        addPortal,
+                    });
+                },
+            },
+        };
 
-    const layout = new Layout({
-      frameworkComponentFactory: factory,
-      frameworkComponents: props.components,
-      frameworkTabComponents: props.tabComponents,
-      tabHeight: props.tabHeight,
-      debug: props.debug,
-      enableExternalDragEvents: props.enableExternalDragEvents,
-    });
+        const element = document.createElement('div');
 
-    layoutReference.current = layout;
-    domReference.current.appendChild(layoutReference.current.element);
+        const layout = new Layout(element, {
+            frameworkComponentFactory: factory,
+            frameworkComponents: props.components,
+            frameworkTabComponents: props.tabComponents,
+            tabHeight: props.tabHeight,
+            debug: props.debug,
+            enableExternalDragEvents: props.enableExternalDragEvents,
+        });
 
-    layout.deserializer = new ReactPanelDeserialzier(layout);
+        layoutReference.current = layout;
+        domReference.current.appendChild(layoutReference.current.element);
 
+        layout.deserializer = new ReactPanelDeserialzier(layout);
 
-    layout.resizeToFit();
+        layout.resizeToFit();
 
-    if (props.serializedLayout) {
-      layout.deserialize(props.serializedLayout);
-    }
+        if (props.serializedLayout) {
+            layout.deserialize(props.serializedLayout);
+        }
 
-    if (props.onReady) {
-      props.onReady({ api: layout });
-    }
+        if (props.onReady) {
+            props.onReady({ api: layout });
+        }
 
-    return () => {
-      layout.dispose();
-    };
-  }, []);
+        return () => {
+            layout.dispose();
+        };
+    }, []);
 
-  React.useEffect(() => {
-    const disposable = layoutReference.current.onTabContextMenu((event) => {
-      props.onTabContextMenu(event);
-    });
+    React.useEffect(() => {
+        const disposable = layoutReference.current.onTabContextMenu((event) => {
+            props.onTabContextMenu(event);
+        });
 
-    return () => {
-      disposable.dispose()
-    }
-  }, [props.onTabContextMenu])
+        return () => {
+            disposable.dispose();
+        };
+    }, [props.onTabContextMenu]);
 
-  React.useEffect(() => {
-    layoutReference.current.setAutoResizeToFit(props.autoSizeToFitContainer);
-  }, [props.autoSizeToFitContainer]);
+    React.useEffect(() => {
+        layoutReference.current.setAutoResizeToFit(
+            props.autoSizeToFitContainer
+        );
+    }, [props.autoSizeToFitContainer]);
 
-  return (
-    <div
-      style={{
-        // height: "100%",
-        width: "100%",
-      }}
-      ref={domReference}
-    >
-      {portals}
-    </div>
-  );
+    return (
+        <div
+            style={{
+                // height: "100%",
+                width: '100%',
+            }}
+            ref={domReference}
+        >
+            {portals}
+        </div>
+    );
 };

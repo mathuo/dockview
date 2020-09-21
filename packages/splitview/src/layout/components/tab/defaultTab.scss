@@ -1,77 +1,79 @@
 .tab {
-  &.dragging {
-    .tab-action {
-      background-color: var(--active-group-visible-panel-color);
-    }
-  }
-
-  &.active-tab > .default-tab {
-    .tab-action {
-      visibility: visible;
-    }
-  }
-
-  &.inactive-tab > .default-tab {
-    .tab-action:not(.dirty) {
-      visibility: hidden;
-    }
-    &:hover {
-      .tab-action {
-        visibility: visible;
-      }
-    }
-  }
-
-  .default-tab {
-    position: relative;
-    height: 100%;
-    display: flex;
-    min-width: 80px;
-    align-items: center;
-    padding-left: 10px;
-    white-space: nowrap;
-    text-overflow: elipsis;
-    font-size: 13px;
-
-    .tab-content {
-      flex-grow: 1;
-    }
-
-    .action-container {
-      text-align: right;
-      width: 28px;
-      display: flex;
-
-      .tab-list {
-        display: flex;
-        padding: 0px;
-        margin: 0px;
-        justify-content: flex-end;
-
-        a:active:hover {
-          -webkit-mask-size: 100% 100% !important;
-          mask-size: 100% 100% !important;
-        }
-
+    &.dragging {
         .tab-action {
-          height: 16px;
-          width: 16px;
-          display: block;
-          -webkit-mask: var(--tab-close-icon) 50% 50% / 90% 90% no-repeat;
-          mask: var(--tab-close-icon) 50% 50% / 90% 90% no-repeat;
-          margin-right: "0.5em";
-
-          &.disable-close {
-            display: none;
-          }
-
-          &.dirty:not(:hover) {
-            display: block;
-            -webkit-mask: var(--tab-dirty-icon) 50% 50% / 60% 60% no-repeat;
-            mask: var(--tab-dirty-icon) 50% 50% / 60% 60% no-repeat;
-          }
+            background-color: var(--active-group-visible-panel-color);
         }
-      }
     }
-  }
+
+    &.active-tab > .default-tab {
+        .tab-action {
+            visibility: visible;
+        }
+    }
+
+    &.inactive-tab > .default-tab {
+        .tab-action:not(.dirty) {
+            visibility: hidden;
+        }
+        &:hover {
+            .tab-action {
+                visibility: visible;
+            }
+        }
+    }
+
+    .default-tab {
+        position: relative;
+        height: 100%;
+        display: flex;
+        min-width: 80px;
+        align-items: center;
+        padding-left: 10px;
+        white-space: nowrap;
+        text-overflow: elipsis;
+        font-size: 13px;
+
+        .tab-content {
+            flex-grow: 1;
+        }
+
+        .action-container {
+            text-align: right;
+            width: 28px;
+            display: flex;
+
+            .tab-list {
+                display: flex;
+                padding: 0px;
+                margin: 0px;
+                justify-content: flex-end;
+
+                a:active:hover {
+                    -webkit-mask-size: 100% 100% !important;
+                    mask-size: 100% 100% !important;
+                }
+
+                .tab-action {
+                    height: 16px;
+                    width: 16px;
+                    display: block;
+                    -webkit-mask: var(--tab-close-icon) 50% 50% / 90% 90%
+                        no-repeat;
+                    mask: var(--tab-close-icon) 50% 50% / 90% 90% no-repeat;
+                    margin-right: '0.5em';
+
+                    &.disable-close {
+                        display: none;
+                    }
+
+                    &.dirty:not(:hover) {
+                        display: block;
+                        -webkit-mask: var(--tab-dirty-icon) 50% 50% / 60% 60%
+                            no-repeat;
+                        mask: var(--tab-dirty-icon) 50% 50% / 60% 60% no-repeat;
+                    }
+                }
+            }
+        }
+    }
 }
