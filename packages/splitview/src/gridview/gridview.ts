@@ -141,7 +141,7 @@ export interface IGridView {
     readonly maximumWidth: number;
     readonly minimumHeight: number;
     readonly maximumHeight: number;
-    readonly priority?: LayoutPriority;
+    priority?: LayoutPriority;
     layout(width: number, height: number, top: number, left: number): void;
     toJSON?(): object;
     fromJSON?(json: object): void;

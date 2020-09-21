@@ -58,8 +58,8 @@ export const SplitViewComponent = (props: ISplitviewComponentProps) => {
             orientation: props.orientation,
             frameworkComponents: props.components,
             frameworkWrapper: {
-                createComponent: (id: string, component: any) => {
-                    return new ReactComponentView(id, id, component, {
+                createComponent: (id: string, componentId, component: any) => {
+                    return new ReactComponentView(id, componentId, component, {
                         addPortal,
                     });
                 },

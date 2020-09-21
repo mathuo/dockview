@@ -66,9 +66,10 @@ export const ReactGrid = (props: IReactGridProps) => {
             content: {
                 createComponent: (
                     id: string,
+                    componentId: string,
                     component: React.FunctionComponent<IPanelProps>
                 ) => {
-                    return new ReactPanelContentPart(id, component, {
+                    return new ReactPanelContentPart(componentId, component, {
                         addPortal,
                     });
                 },
@@ -76,9 +77,10 @@ export const ReactGrid = (props: IReactGridProps) => {
             tab: {
                 createComponent: (
                     id: string,
+                    componentId:string,
                     component: React.FunctionComponent<IPanelProps>
                 ) => {
-                    return new ReactPanelHeaderPart(id, component, {
+                    return new ReactPanelHeaderPart(componentId, component, {
                         addPortal,
                     });
                 },

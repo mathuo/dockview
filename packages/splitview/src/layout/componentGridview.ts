@@ -4,16 +4,12 @@ import { getGridLocation } from '../gridview/gridview';
 import { tail, sequenceEquals } from '../array';
 import { GroupChangeKind } from '../groupview/groupview';
 import { Disposable } from '../lifecycle';
-
 import { DebugWidget } from './components/debug/debug';
-
 import { IPanelDeserializer } from './deserializer';
-
 import { createComponent } from '../splitview/options';
 import { LayoutPriority } from '../splitview/splitview';
-
 import { GridComponentOptions } from '.';
-import { BaseGrid, IBaseGrid, IBaseGridView } from './baseGrid';
+import { BaseGrid, IBaseGrid, IBaseGridView, toTarget } from './baseGrid';
 
 export interface AddComponentOptions {
     component: string;
@@ -30,7 +26,6 @@ export interface AddComponentOptions {
 
 export interface IComponentGridview extends IBaseGridView {
     init?: (params: { params: any }) => void;
-    priority?: LayoutPriority;
 }
 
 export interface IComponentGridviewLayout
@@ -41,9 +36,6 @@ export interface IComponentGridviewLayout
 export class ComponentGridview
     extends BaseGrid<IComponentGridview>
     implements IComponentGridviewLayout {
-    // events
-    // everything else
-
     private _deserializer: IPanelDeserializer;
     private debugContainer: DebugWidget;
 
@@ -112,7 +104,7 @@ export class ComponentGridview
             const referenceGroup = this.groups.get(options.position.reference)
                 .value;
 
-            const target = this.toTarget(options.position.direction);
+            const target = toTarget(options.position.direction);
             if (target === Position.Center) {
                 throw new Error(`${target} not supported as an option`);
             } else {
@@ -126,6 +118,7 @@ export class ComponentGridview
         }
 
         const view = createComponent(
+            options.id,
             options.component,
             this.options.components,
             this.options.frameworkComponents,
@@ -188,24 +181,6 @@ export class ComponentGridview
             target
         );
         this.doAddGroup(targetGroup, location);
-    }
-
-    private toTarget(
-        direction: 'left' | 'right' | 'above' | 'below' | 'within'
-    ) {
-        switch (direction) {
-            case 'left':
-                return Position.Left;
-            case 'right':
-                return Position.Right;
-            case 'above':
-                return Position.Top;
-            case 'below':
-                return Position.Bottom;
-            case 'within':
-            default:
-                return Position.Center;
-        }
     }
 
     public dispose() {

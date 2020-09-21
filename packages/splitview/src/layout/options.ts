@@ -32,7 +32,7 @@ export interface GridComponentOptions {
     frameworkComponents?: {
         [componentName: string]: any;
     };
-    frameworkComponentFactory: any;
+    frameworkComponentFactory: FrameworkFactory<IComponentGridview>;
     tabHeight?: number;
 }
 

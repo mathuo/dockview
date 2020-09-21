@@ -1,11 +1,30 @@
 import { MovementOptions2 } from '.';
 import { Emitter, Event } from '../events';
 import { getGridLocation, Gridview, IGridView } from '../gridview/gridview';
+import { Position } from '../groupview/droptarget/droptarget';
 import { GroupChangeEvent, GroupChangeKind } from '../groupview/groupview';
 import { CompositeDisposable, IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
 
 const nextLayoutId = sequentialNumberGenerator();
+
+export function toTarget(
+    direction: 'left' | 'right' | 'above' | 'below' | 'within'
+) {
+    switch (direction) {
+        case 'left':
+            return Position.Left;
+        case 'right':
+            return Position.Right;
+        case 'above':
+            return Position.Top;
+        case 'below':
+            return Position.Bottom;
+        case 'within':
+        default:
+            return Position.Center;
+    }
+}
 
 export interface BaseGridOptions {
     readonly proportionalLayout?: boolean;
@@ -14,6 +33,7 @@ export interface BaseGridOptions {
 export interface IBaseGridView extends IGridView {
     id: string;
     setActive(isActive: boolean): void;
+    isActive: boolean;
 }
 
 export interface IBaseGrid<T extends IBaseGridView> {

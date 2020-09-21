@@ -20,6 +20,7 @@ export interface ISerializableViewConstructor
     extends Constructor<ISerializableView> {}
 
 export function createComponent<T>(
+    id: string,
     componentName: string | Constructor<T> | any,
     components: {
         [componentName: string]: T;
@@ -27,7 +28,11 @@ export function createComponent<T>(
     frameworkComponents: {
         [componentName: string]: any;
     },
-    createFrameworkComponent: (id: string, component: any) => T
+    createFrameworkComponent: (
+        id: string,
+        componentId: string,
+        component: any
+    ) => T
 ): T {
     const Component =
         typeof componentName === 'string'
@@ -49,6 +54,7 @@ export function createComponent<T>(
             );
         }
         const wrappedComponent = createFrameworkComponent(
+            id,
             componentName,
             FrameworkComponent
         );

@@ -22,12 +22,14 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
 
         const contentPart = createContentComponent(
             content.id,
+            content.id,
             this.layout.options.components,
             this.layout.options.frameworkComponents,
             this.layout.options.frameworkComponentFactory.content
         ) as PanelContentPart;
 
         const headerPart = createTabComponent(
+            tab.id,
             tab.id,
             this.layout.options.tabComponents,
             this.layout.options.frameworkComponentFactory,

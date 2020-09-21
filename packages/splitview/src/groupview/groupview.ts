@@ -67,7 +67,6 @@ export interface IGroupview extends IDisposable, IBaseGridView {
     tabHeight: number;
     // state
     isPanelActive: (panel: IGroupPanel) => boolean;
-    isActive: boolean;
     activePanel: IGroupPanel;
     indexOf(panel: IGroupPanel): number;
     // panel lifecycle

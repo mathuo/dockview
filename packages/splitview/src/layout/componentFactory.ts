@@ -8,6 +8,7 @@ import { FrameworkFactory } from '../types';
 import { DefaultTab } from './components/tab/defaultTab';
 
 export function createContentComponent(
+    id: string,
     componentName: string | PanelContentPartConstructor | any,
     components: {
         [componentName: string]: PanelContentPartConstructor;
@@ -37,6 +38,7 @@ export function createContentComponent(
             );
         }
         const wrappedComponent = createFrameworkComponent.createComponent(
+            id,
             componentName,
             FrameworkComponent
         );
@@ -46,6 +48,7 @@ export function createContentComponent(
 }
 
 export function createTabComponent(
+    id: string,
     componentName: string | PanelHeaderPartConstructor | any,
     components: {
         [componentName: string]: PanelHeaderPartConstructor;
@@ -75,6 +78,7 @@ export function createTabComponent(
             );
         }
         const wrappedComponent = createFrameworkComponent.createComponent(
+            id,
             componentName,
             FrameworkComponent
         );

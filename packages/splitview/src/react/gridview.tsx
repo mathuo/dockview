@@ -44,8 +44,8 @@ export const GridviewComponent = (props: IGridviewComponentProps) => {
             orientation: props.orientation,
             frameworkComponents: props.components,
             frameworkComponentFactory: {
-                createComponent: (id: string, component: any) => {
-                    return new ReactComponentGridView(id, id, component, {
+                createComponent: (id: string, componentId, component) => {
+                    return new ReactComponentGridView(id, componentId, component, {
                         addPortal,
                     });
                 },

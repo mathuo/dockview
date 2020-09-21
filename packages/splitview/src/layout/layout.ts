@@ -43,7 +43,7 @@ import {
     DragType,
 } from '../groupview/droptarget/dataTransfer';
 import { LayoutMouseEvent, MouseEventKind } from '../groupview/events';
-import { BaseGrid, IBaseGrid } from './baseGrid';
+import { BaseGrid, IBaseGrid, toTarget } from './baseGrid';
 
 const nextGroupId = sequentialNumberGenerator();
 
@@ -456,7 +456,7 @@ export class Layout extends BaseGrid<IGroupview> implements ILayout {
             ).value;
             const referenceGroup = this.findGroup(referencePanel);
 
-            const target = this.toTarget(options.position.direction);
+            const target = toTarget(options.position.direction);
             if (target === Position.Center) {
                 referenceGroup.openPanel(panel);
             } else {
@@ -486,8 +486,14 @@ export class Layout extends BaseGrid<IGroupview> implements ILayout {
     }
 
     public addPanel(options: AddPanelOptions): IGroupPanel {
-        const component = this.createContentComponent(options.componentName);
-        const tabComponent = this.createTabComponent(options.tabComponentName);
+        const component = this.createContentComponent(
+            options.id,
+            options.componentName
+        );
+        const tabComponent = this.createTabComponent(
+            options.id,
+            options.tabComponentName
+        );
 
         const panel = new DefaultPanel(options.id, tabComponent, component);
         panel.init({
@@ -501,9 +507,11 @@ export class Layout extends BaseGrid<IGroupview> implements ILayout {
     }
 
     private createContentComponent(
+        id: string,
         componentName: string | PanelContentPartConstructor
     ) {
         return createContentComponent(
+            id,
             componentName,
             this.options.components,
             this.options.frameworkComponents,
@@ -512,9 +520,11 @@ export class Layout extends BaseGrid<IGroupview> implements ILayout {
     }
 
     private createTabComponent(
+        id: string,
         componentName: string | PanelHeaderPartConstructor
     ) {
         return createTabComponent(
+            id,
             componentName,
             this.options.tabComponents,
             this.options.frameworkTabComponents,
@@ -530,7 +540,7 @@ export class Layout extends BaseGrid<IGroupview> implements ILayout {
                 .value;
             const referenceGroup = this.findGroup(referencePanel);
 
-            const target = this.toTarget(options.direction);
+            const target = toTarget(options.direction);
 
             const location = getGridLocation(referenceGroup.element);
             const relativeLocation = getRelativeLocation(
@@ -713,24 +723,6 @@ export class Layout extends BaseGrid<IGroupview> implements ILayout {
         panel.setDirty(true);
         this._onDidLayoutChange.fire({ kind: GroupChangeKind.PANEL_DIRTY });
         this.debouncedDeque();
-    }
-
-    private toTarget(
-        direction: 'left' | 'right' | 'above' | 'below' | 'within'
-    ) {
-        switch (direction) {
-            case 'left':
-                return Position.Left;
-            case 'right':
-                return Position.Right;
-            case 'above':
-                return Position.Top;
-            case 'below':
-                return Position.Bottom;
-            case 'within':
-            default:
-                return Position.Center;
-        }
     }
 
     public dispose() {

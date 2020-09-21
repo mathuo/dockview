@@ -183,6 +183,7 @@ export const TestGrid = (props: IGridviewPanelProps) => {
     const _api = React.useRef<Api>();
     const [api, setApi] = React.useState<Api>();
 
+
     const onReady = (event: OnReadyEvent) => {
         _api.current = event.api;
         setApi(event.api);
@@ -265,6 +266,7 @@ export const TestGrid = (props: IGridviewPanelProps) => {
         // };
         // window.addEventListener("resize", callback);
         // callback(undefined);
+
 
         props.api.setConstraints({
             minimumWidth: () => _api.current.minimumWidth,

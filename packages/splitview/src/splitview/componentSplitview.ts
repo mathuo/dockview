@@ -55,6 +55,7 @@ export class ComponentSplitview implements IComponentSplitview {
         priority?: LayoutPriority;
     }): IDisposable {
         const view = createComponent(
+            options.id,
             options.component,
             this.options.components,
             this.options.frameworkComponents,
@@ -124,6 +125,7 @@ export class ComponentSplitview implements IComponentSplitview {
                     const data = v.data;
 
                     const view = createComponent(
+                        data.id,
                         data.component,
                         this.options.components,
                         this.options.frameworkComponents,

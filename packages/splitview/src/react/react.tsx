@@ -85,6 +85,13 @@ export class ReactPart implements IDisposable {
             ...this.parameters,
         } as any;
 
+
+        if(typeof this.component !== 'function') {
+            // if we throw an error before entering the React world it will provide us with
+            // a more sensible stack trace to debug
+            throw new Error("invalid operation")
+        }
+
         const wrapper = React.createElement(PanelWrapper, {
             component: this.component,
             componentProps: props,
