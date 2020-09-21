@@ -9,8 +9,7 @@ import {
 } from "../../droptarget/dataTransfer";
 import { toggleClass } from "../../../dom";
 import { IGroupAccessor } from "../../../layout";
-import {LayoutMouseEvent, MouseEventKind} from "../../events"
-
+import { LayoutMouseEvent, MouseEventKind } from "../../events";
 
 export interface ITab {
   id: string;
@@ -72,7 +71,7 @@ export class Tab extends CompositeDisposable implements ITab {
         if (event.defaultPrevented) {
           return;
         }
-        this._onChanged.fire({ kind: MouseEventKind.CLICK,event });
+        this._onChanged.fire({ kind: MouseEventKind.CLICK, event });
       }),
       addDisposableListener(this._element, "contextmenu", (event) => {
         this._onChanged.fire({ kind: MouseEventKind.CONTEXT_MENU, event });
