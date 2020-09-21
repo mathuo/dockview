@@ -1,9 +1,9 @@
-import { getRelativeLocation, IGridView } from '../gridview/gridview';
+import { getRelativeLocation } from '../gridview/gridview';
 import { Position } from '../groupview/droptarget/droptarget';
 import { getGridLocation } from '../gridview/gridview';
 import { tail, sequenceEquals } from '../array';
 import { GroupChangeKind, GroupChangeEvent } from '../groupview/groupview';
-import { Disposable, IValueDisposable } from '../lifecycle';
+import { Disposable } from '../lifecycle';
 import { Event, Emitter } from '../events';
 
 import { DebugWidget } from './components/debug/debug';
@@ -12,12 +12,10 @@ import { sequentialNumberGenerator } from '../math';
 import { IPanelDeserializer } from './deserializer';
 
 import { createComponent } from '../splitview/options';
-import { LayoutPriority, Orientation } from '../splitview/splitview';
-import { MovementOptions2 } from './options';
+import { LayoutPriority } from '../splitview/splitview';
+
 import { GridComponentOptions } from '.';
 import { BaseGrid, IBaseGrid, IBaseGridView } from './baseGrid';
-
-const nextLayoutId = sequentialNumberGenerator();
 
 export interface AddComponentOptions {
     component: string;
@@ -46,9 +44,6 @@ export class ComponentGridview
     extends BaseGrid<IComponentGridview>
     implements IComponentGridviewLayout {
     // events
-    private readonly _onDidLayoutChange = new Emitter<GroupChangeEvent>();
-    readonly onDidLayoutChange: Event<GroupChangeEvent> = this
-        ._onDidLayoutChange.event;
     // everything else
 
     private _deserializer: IPanelDeserializer;

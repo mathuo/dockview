@@ -1,5 +1,7 @@
 import { MovementOptions2 } from '.';
+import { Emitter, Event } from '../events';
 import { getGridLocation, Gridview, IGridView } from '../gridview/gridview';
+import { GroupChangeEvent } from '../groupview/groupview';
 import { CompositeDisposable, IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
 
@@ -24,6 +26,7 @@ export interface IBaseGrid<T extends IBaseGridView> {
     readonly activeGroup: T;
     readonly size: number;
     getGroup(id: string): T | undefined;
+    readonly onDidLayoutChange: Event<GroupChangeEvent>;
 }
 
 export class BaseGrid<T extends IBaseGridView>
@@ -38,6 +41,10 @@ export class BaseGrid<T extends IBaseGridView>
     //
     protected _size: number;
     protected _orthogonalSize: number;
+    //
+    protected readonly _onDidLayoutChange = new Emitter<GroupChangeEvent>();
+    readonly onDidLayoutChange: Event<GroupChangeEvent> = this
+        ._onDidLayoutChange.event;
 
     get id() {
         return this._id;

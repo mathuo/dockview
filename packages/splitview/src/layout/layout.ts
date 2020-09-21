@@ -73,7 +73,7 @@ export interface Api {
     deserialize: (data: object) => void;
     deserializer: IPanelDeserializer;
     // events
-    onDidLayoutChange: Event<GroupChangeEvent>;
+    readonly onDidLayoutChange: Event<GroupChangeEvent>;
     onTabInteractionEvent: Event<LayoutMouseEvent>;
     onTabContextMenu: Event<TabContextMenuEvent>;
     moveToNext(options?: MovementOptions): void;
@@ -107,7 +107,7 @@ export interface IGroupAccessor {
     readonly size: number;
     totalPanels: number;
     options: LayoutOptions;
-    onDidLayoutChange: Event<GroupChangeEvent>;
+    readonly onDidLayoutChange: Event<GroupChangeEvent>;
     //
     addPanelFromComponent(options: AddPanelOptions): PanelReference;
     addPanel(options: AddPanelOptions): IGroupPanel;
@@ -130,9 +130,6 @@ export class Layout extends BaseGrid<IGroupview> implements ILayout {
         5000
     );
     // events
-    private readonly _onDidLayoutChange = new Emitter<GroupChangeEvent>();
-    readonly onDidLayoutChange: Event<GroupChangeEvent> = this
-        ._onDidLayoutChange.event;
     private readonly _onTabInteractionEvent = new Emitter<LayoutMouseEvent>();
     readonly onTabInteractionEvent: Event<LayoutMouseEvent> = this
         ._onTabInteractionEvent.event;
