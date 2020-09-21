@@ -172,12 +172,6 @@ export class Layout extends BaseGrid<IGroupview> implements ILayout {
             this.options.watermarkComponent = Watermark;
         }
 
-        this.addDisposables(
-            this.gridview.onDidChange((e) => {
-                this._onDidLayoutChange.fire({ kind: GroupChangeKind.LAYOUT });
-            })
-        );
-
         this.updateContainer();
     }
 
@@ -557,10 +551,7 @@ export class Layout extends BaseGrid<IGroupview> implements ILayout {
             return;
         }
 
-        if (group === this._activeGroup) {
-            this._activeGroup = undefined;
-        }
-        this.doRemoveGroup(group);
+        super.removeGroup(group);
     }
 
     private addPanelToNewGroup(panel: IGroupPanel, location: number[] = [0]) {
@@ -577,37 +568,6 @@ export class Layout extends BaseGrid<IGroupview> implements ILayout {
         }
 
         group.openPanel(panel);
-    }
-
-    private doAddGroup(group: IGroupview, location: number[] = [0]) {
-        this.gridview.addView(group, { type: 'distribute' }, location);
-        this._onDidLayoutChange.fire({ kind: GroupChangeKind.ADD_GROUP });
-        this.doSetGroupActive(group);
-    }
-
-    private doRemoveGroup(
-        group: IGroupview,
-        options?: { skipActive?: boolean; skipDispose?: boolean }
-    ) {
-        if (!this.groups.has(group.id)) {
-            throw new Error('invalid operation');
-        }
-
-        const { disposable } = this.groups.get(group.id);
-
-        if (!options?.skipDispose) {
-            disposable.dispose();
-            this.groups.delete(group.id);
-        }
-
-        const view = this.gridview.remove(group, { type: 'distribute' });
-        this._onDidLayoutChange.fire({ kind: GroupChangeKind.REMOVE_GROUP });
-
-        if (!options?.skipActive && this.groups.size > 0) {
-            this.doSetGroupActive(Array.from(this.groups.values())[0].value);
-        }
-
-        return view;
     }
 
     public moveGroupOrPanel(

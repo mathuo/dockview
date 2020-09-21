@@ -2,13 +2,11 @@ import { getRelativeLocation } from '../gridview/gridview';
 import { Position } from '../groupview/droptarget/droptarget';
 import { getGridLocation } from '../gridview/gridview';
 import { tail, sequenceEquals } from '../array';
-import { GroupChangeKind, GroupChangeEvent } from '../groupview/groupview';
+import { GroupChangeKind } from '../groupview/groupview';
 import { Disposable } from '../lifecycle';
-import { Event, Emitter } from '../events';
 
 import { DebugWidget } from './components/debug/debug';
 
-import { sequentialNumberGenerator } from '../math';
 import { IPanelDeserializer } from './deserializer';
 
 import { createComponent } from '../splitview/options';
@@ -61,12 +59,6 @@ export class ComponentGridview
         if (!this.options.frameworkComponents) {
             this.options.frameworkComponents = {};
         }
-
-        this.addDisposables(
-            this.gridview.onDidChange((e) => {
-                this._onDidLayoutChange.fire({ kind: GroupChangeKind.LAYOUT });
-            })
-        );
     }
 
     get deserializer() {
@@ -149,49 +141,6 @@ export class ComponentGridview
         });
 
         this.doAddGroup(view, relativeLocation, options.size);
-    }
-
-    public removeGroup(group: IComponentGridview) {
-        if (group === this._activeGroup) {
-            this._activeGroup = undefined;
-        }
-        this.doRemoveGroup(group);
-    }
-
-    private doAddGroup(
-        group: IComponentGridview,
-        location: number[],
-        size?: number
-    ) {
-        this.gridview.addView(group, size ?? { type: 'distribute' }, location);
-
-        this._onDidLayoutChange.fire({ kind: GroupChangeKind.ADD_GROUP });
-        this.doSetGroupActive(group);
-    }
-
-    private doRemoveGroup(
-        group: IComponentGridview,
-        options?: { skipActive?: boolean; skipDispose?: boolean }
-    ) {
-        if (!this.groups.has(group.id)) {
-            throw new Error('invalid operation');
-        }
-
-        const { disposable } = this.groups.get(group.id);
-
-        if (!options?.skipDispose) {
-            disposable.dispose();
-            this.groups.delete(group.id);
-        }
-
-        const view = this.gridview.remove(group, { type: 'distribute' });
-        this._onDidLayoutChange.fire({ kind: GroupChangeKind.REMOVE_GROUP });
-
-        if (!options?.skipActive && this.groups.size > 0) {
-            this.doSetGroupActive(Array.from(this.groups.values())[0].value);
-        }
-
-        return view;
     }
 
     public moveGroup(
