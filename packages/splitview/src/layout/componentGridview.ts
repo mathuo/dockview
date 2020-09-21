@@ -58,7 +58,7 @@ export class ComponentGridview
         element: HTMLElement,
         public readonly options: GridComponentOptions
     ) {
-        super(element, { proportionalLayout: true });
+        super(element, { proportionalLayout: false });
 
         if (!this.options.components) {
             this.options.components = {};
