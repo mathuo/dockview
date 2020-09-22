@@ -1,5 +1,6 @@
-import { IDisposable } from 'splitview/dist/esm';
-import { createContentComponent } from '../layout/componentFactory';
+import { IDisposable } from '../lifecycle';
+import { PaneReact } from '../react/reactPane';
+import { createComponent } from '../splitview/options';
 import { Orientation } from '../splitview/splitview';
 import { PaneviewComponentOptions } from './options';
 import { PaneView } from './paneview';
@@ -30,22 +31,23 @@ export class ComponentPaneView implements IComponentPaneView {
 
     addFromComponent(options: {
         id: string;
-        component: string;
-        params?: {
-            [index: string]: any;
+        componentName: string;
+        tabComponentName: string;
+        params: {
+            [key: string]: any;
         };
     }): IDisposable {
-        const view = createContentComponent(
+        const view = (createComponent(
             options.id,
-            options.component,
+            options.componentName,
             this.options.components,
             this.options.frameworkComponents,
             this.options.frameworkWrapper.createComponent
-        );
+        ) as unknown) as PaneReact;
 
-        this.registerView(view);
+        // this.registerView(view);
 
-        this.paneview.addPane(view, { type: 'distribute' });
+        this.paneview.addPane(view);
         view.init({ params: options.params });
 
         return {

@@ -8,17 +8,12 @@ import {
     IGridviewPanelProps,
 } from 'splitview';
 import { TestGrid } from './reactgrid';
+import { Sidebar } from './sidebar';
 
 const rootcomponents: {
     [index: string]: React.FunctionComponent<IGridviewPanelProps>;
 } = {
-    sidebar: (props: IGridviewPanelProps) => {
-        return (
-            <div style={{ backgroundColor: 'rgb(37,37,38)', height: '100%' }}>
-                sidebar
-            </div>
-        );
-    },
+    sidebar: Sidebar,
     editor: TestGrid,
     panel: () => {
         return (

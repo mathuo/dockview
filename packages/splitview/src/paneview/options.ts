@@ -1,12 +1,12 @@
-import { ISerializableView } from '../splitview/options';
 import { FrameworkFactory } from '../types';
+import { Pane } from './paneview';
 
 export interface PaneviewComponentOptions {
     components?: {
-        [componentName: string]: ISerializableView;
+        [componentName: string]: Pane;
     };
     frameworkComponents?: {
         [componentName: string]: any;
     };
-    frameworkWrapper?: FrameworkFactory<ISerializableView>;
+    frameworkWrapper?: FrameworkFactory<Pane>;
 }

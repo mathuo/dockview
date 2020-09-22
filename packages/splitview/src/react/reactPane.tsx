@@ -1,19 +1,29 @@
 import * as React from 'react';
-import { Pane, IDisposable } from 'splitview';
+import { BaseViewApi, IBaseViewApi } from '../panel/api';
+import { Pane } from '../paneview/paneview';
+import { ReactLayout } from './layout';
+import { ReactPart } from './react';
 
 export class PaneReact extends Pane {
     private params: {};
+    private api: IBaseViewApi;
+
+    private contentPart: ReactPart;
+    private headerPart: ReactPart;
 
     constructor(
         private readonly bodyComponent: React.FunctionComponent<{}>,
+        private readonly parent: ReactLayout,
         private readonly options: {
             isExpanded: boolean;
             headerName: string;
-            addPortal: (portal: React.ReactPortal) => IDisposable;
-            headerComponent?: React.FunctionComponent<{}>;
+            headerComponent: React.FunctionComponent<{}>;
         }
     ) {
         super({ isExpanded: options.isExpanded });
+
+        this.api = new BaseViewApi();
+
         this.layout = this.layout.bind(this);
         this.onDidChange = this.onDidChange.bind(this);
 
@@ -22,6 +32,20 @@ export class PaneReact extends Pane {
 
     init(parameters: {}): void {
         this.params = parameters;
+        this.contentPart = new ReactPart(
+            this.body,
+            this.api,
+            this.parent.addPortal,
+            this.bodyComponent,
+            this.params
+        );
+        this.headerPart = new ReactPart(
+            this.header,
+            this.api,
+            this.parent.addPortal,
+            this.bodyComponent,
+            this.params
+        );
     }
 
     public renderBody(element: HTMLElement) {
@@ -37,6 +61,8 @@ export class PaneReact extends Pane {
     }
 
     public dispose() {
-        //
+        this.headerPart.dispose();
+        this.contentPart.dispose();
+        this.api.dispose();
     }
 }

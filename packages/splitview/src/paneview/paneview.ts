@@ -12,8 +12,8 @@ export interface IPaneOptions {
 
 export abstract class Pane implements IView {
     public element: HTMLElement;
-    private header: HTMLElement;
-    private body: HTMLElement;
+    protected header: HTMLElement;
+    protected body: HTMLElement;
 
     private _onDidChangeExpansionState: Emitter<boolean> = new Emitter<
         boolean
@@ -134,45 +134,25 @@ export abstract class Pane implements IView {
 
     public render() {
         this.header = document.createElement('div');
+        this.header.tabIndex = -1;
+        this.header.style.outline = 'none';
+
         this.header.className = 'pane-header';
         this.header.style.height = `${this.headerSize}px`;
         this.header.style.lineHeight = `${this.headerSize}px`;
+
         this.element.appendChild(this.header);
         this.renderHeader(this.header);
 
-        // this.updateHeader();
-
         this.body = document.createElement('div');
+        this.body.tabIndex = -1;
+        this.body.style.outline = 'none';
+
         this.body.className = 'pane-body';
+
         this.element.appendChild(this.body);
         this.renderBody(this.body);
-
-        // if (!this.isExpanded()) {
-        //   this.body.remove();
-        // }
     }
-
-    // protected updateHeader(): void {
-    //   const expanded = this.isExpanded();
-
-    //   this.header.style.height = `${this.headerSize}px`;
-    //   this.header.style.lineHeight = `${this.headerSize}px`;
-    //   toggleClass(this.header, "hidden", !this.headerVisible);
-    //   toggleClass(this.header, "expanded", expanded);
-    //   this.header.setAttribute("aria-expanded", String(expanded));
-
-    //   this.header.style.color = this.styles.headerForeground
-    //     ? this.styles.headerForeground.toString()
-    //     : "";
-    //   this.header.style.backgroundColor = this.styles.headerBackground
-    //     ? this.styles.headerBackground.toString()
-    //     : "";
-    //   this.header.style.borderTop =
-    //     this.styles.headerBorder && this.orientation === Orientation.VERTICAL
-    //       ? `1px solid ${this.styles.headerBorder}`
-    //       : "";
-    //   this._dropBackground = this.styles.dropBackground;
-    // }
 
     protected abstract renderHeader(container: HTMLElement): void;
     protected abstract renderBody(container: HTMLElement): void;
