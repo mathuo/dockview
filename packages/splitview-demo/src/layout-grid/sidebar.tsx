@@ -33,6 +33,18 @@ export const Sidebar = (props: IGridviewPanelProps) => {
             params: {},
             tabComponentName: 'default1',
         });
+        event.api.addFromComponent({
+            id: '3',
+            componentName: 'default',
+            params: {},
+            tabComponentName: 'default1',
+        });
+        event.api.addFromComponent({
+            id: '4',
+            componentName: 'default',
+            params: {},
+            tabComponentName: 'default1',
+        });
 
         api.current = event.api;
     };
@@ -47,5 +59,9 @@ export const Sidebar = (props: IGridviewPanelProps) => {
         };
     });
 
-    return <PaneViewComponent components={components} onReady={onReady} />;
+    return (
+        <div style={{ height: '100%', backgroundColor: 'rgb(37,37,38)' }}>
+            <PaneViewComponent components={components} onReady={onReady} />
+        </div>
+    );
 };

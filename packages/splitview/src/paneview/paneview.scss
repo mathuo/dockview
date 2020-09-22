@@ -9,10 +9,15 @@
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        padding: 0px !important;
 
         &:not(:first-child)::before {
             background-color: transparent !important;
         }
+    }
+
+    &:first-of-type > .pane > .pane-header {
+        border-top: none !important;
     }
 
     .pane {
@@ -22,6 +27,7 @@
         height: 100%;
 
         .pane-header {
+            border-top: 1px solid gray;
             background-color: #383838;
             color: white;
 

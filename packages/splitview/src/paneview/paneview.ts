@@ -135,7 +135,6 @@ export abstract class Pane implements IView {
     public render() {
         this.header = document.createElement('div');
         this.header.tabIndex = -1;
-        this.header.style.outline = 'none';
 
         this.header.className = 'pane-header';
         this.header.style.height = `${this.headerSize}px`;
@@ -152,7 +151,6 @@ export abstract class Pane implements IView {
 
         this.body = document.createElement('div');
         this.body.tabIndex = -1;
-        this.body.style.outline = 'none';
 
         this.body.className = 'pane-body';
 
