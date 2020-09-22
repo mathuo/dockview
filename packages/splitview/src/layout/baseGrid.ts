@@ -5,6 +5,7 @@ import { Position } from '../groupview/droptarget/droptarget';
 import { GroupChangeEvent, GroupChangeKind } from '../groupview/groupview';
 import { CompositeDisposable, IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
+import { Orientation } from '../splitview/splitview';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -28,6 +29,7 @@ export function toTarget(
 
 export interface BaseGridOptions {
     readonly proportionalLayout?: boolean;
+    readonly orientation?: Orientation;
 }
 
 export interface IBaseGridView extends IGridView {
@@ -101,7 +103,10 @@ export class BaseGrid<T extends IBaseGridView>
     ) {
         super();
 
-        this.gridview = new Gridview(!!options.proportionalLayout);
+        this.gridview = new Gridview(
+            !!options.proportionalLayout,
+            options.orientation
+        );
         this.element.appendChild(this.gridview.element);
 
         this.addDisposables(

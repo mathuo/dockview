@@ -55,6 +55,7 @@ export interface LayoutOptions {
     tabHeight?: number;
     debug?: boolean;
     enableExternalDragEvents?: boolean;
+    orientation?: Orientation;
 }
 
 export interface PanelOptions {

@@ -38,7 +38,7 @@
                 cursor: ew-resize;
             }
             &.disabled {
-                cursor: none;
+                cursor: default;
             }
             &.maximum {
                 cursor: w-resize;
@@ -70,7 +70,7 @@
                 cursor: ns-resize;
             }
             &.disabled {
-                cursor: none;
+                cursor: default;
             }
             &.maximum {
                 cursor: n-resize;

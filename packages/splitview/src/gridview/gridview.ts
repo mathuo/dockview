@@ -403,15 +403,13 @@ export class Gridview {
         return this.root.maximumHeight;
     }
 
-    constructor(readonly proportionalLayout: boolean) {
+    constructor(
+        readonly proportionalLayout: boolean,
+        orientation: Orientation = Orientation.HORIZONTAL
+    ) {
         this.element = document.createElement('div');
         this.element.className = 'grid-view';
-        this.root = new BranchNode(
-            Orientation.HORIZONTAL,
-            proportionalLayout,
-            0,
-            0
-        );
+        this.root = new BranchNode(orientation, proportionalLayout, 0, 0);
 
         this.element.appendChild(this.root.element);
     }

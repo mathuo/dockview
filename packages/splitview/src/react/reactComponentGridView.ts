@@ -1,9 +1,16 @@
 import { ReactLayout } from './layout';
 import { ISplitviewPanelProps } from './splitview';
-import { IPanel } from '../panel/types';
+import { InitParameters, IPanel } from '../panel/types';
 import { IComponentGridview } from '../layout/componentGridview';
 import { FunctionOrValue } from '../types';
 import { BaseReactComponentGridView } from './baseReactComponentView';
+
+export interface GridviewInitParameters extends InitParameters {
+    minimumWidth?: number;
+    maximumWidth?: number;
+    minimumHeight?: number;
+    maximumHeight?: number;
+}
 
 export class ReactComponentGridView
     extends BaseReactComponentGridView
@@ -70,6 +77,23 @@ export class ReactComponentGridView
                 }
             })
         );
+    }
+
+    init(parameters: GridviewInitParameters): void {
+        if (parameters.maximumHeight) {
+            this._maximumHeight = parameters.maximumHeight;
+        }
+        if (parameters.minimumHeight) {
+            this._minimumHeight = parameters.minimumHeight;
+        }
+        if (parameters.maximumWidth) {
+            this._maximumWidth = parameters.maximumWidth;
+        }
+        if (parameters.minimumWidth) {
+            this._minimumWidth = parameters.minimumWidth;
+        }
+
+        super.init(parameters);
     }
 
     setActive(isActive: boolean) {

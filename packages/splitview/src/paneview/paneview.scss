@@ -27,9 +27,8 @@
         height: 100%;
 
         .pane-header {
-            border-top: 1px solid gray;
-            background-color: #383838;
-            color: white;
+            border-top: 1px solid rgba(204, 204, 204, 0.2);
+            box-sizing: border-box;
 
             &:focus,
             :focus-within {
@@ -42,8 +41,16 @@
         }
         .pane-body {
             overflow: auto;
-            background-color: #252526;
             flex-grow: 1;
+
+            &:focus,
+            :focus-within {
+                outline-width: 1px;
+                outline-style: solid;
+                outline-offset: -1px;
+                opacity: 1 !important;
+                outline-color: dodgerblue;
+            }
         }
     }
 }

@@ -154,7 +154,10 @@ export class Layout extends BaseGrid<IGroupview> implements ILayout {
     }
 
     constructor(element: HTMLElement, public readonly options: LayoutOptions) {
-        super(element, { proportionalLayout: true });
+        super(element, {
+            proportionalLayout: true,
+            orientation: options.orientation,
+        });
 
         if (!this.options.components) {
             this.options.components = {};

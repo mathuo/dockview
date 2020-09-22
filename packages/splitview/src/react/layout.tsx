@@ -77,7 +77,7 @@ export const ReactGrid = (props: IReactGridProps) => {
             tab: {
                 createComponent: (
                     id: string,
-                    componentId:string,
+                    componentId: string,
                     component: React.FunctionComponent<IPanelProps>
                 ) => {
                     return new ReactPanelHeaderPart(componentId, component, {
@@ -96,6 +96,7 @@ export const ReactGrid = (props: IReactGridProps) => {
             tabHeight: props.tabHeight,
             debug: props.debug,
             enableExternalDragEvents: props.enableExternalDragEvents,
+            // orientation: props.orientation,
         });
 
         layoutReference.current = layout;

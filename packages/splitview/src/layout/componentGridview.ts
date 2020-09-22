@@ -10,6 +10,7 @@ import { createComponent } from '../splitview/options';
 import { LayoutPriority } from '../splitview/splitview';
 import { GridComponentOptions } from '.';
 import { BaseGrid, IBaseGrid, IBaseGridView, toTarget } from './baseGrid';
+import { GridviewInitParameters } from '../react/reactComponentGridView';
 
 export interface AddComponentOptions {
     component: string;
@@ -22,10 +23,15 @@ export interface AddComponentOptions {
     size?: number;
     priority?: LayoutPriority;
     snap?: boolean;
+    minimumWidth?: number;
+    maximumWidth?: number;
+    minimumHeight?: number;
+    maximumHeight?: number;
+    location?: number[];
 }
 
 export interface IComponentGridview extends IBaseGridView {
-    init?: (params: { params: any }) => void;
+    init?: (params: GridviewInitParameters) => void;
 }
 
 export interface IComponentGridviewLayout
@@ -43,7 +49,10 @@ export class ComponentGridview
         element: HTMLElement,
         public readonly options: GridComponentOptions
     ) {
-        super(element, { proportionalLayout: false });
+        super(element, {
+            proportionalLayout: false,
+            orientation: options.orientation,
+        });
 
         if (!this.options.components) {
             this.options.components = {};
@@ -98,7 +107,7 @@ export class ComponentGridview
     }
 
     public addComponent(options: AddComponentOptions) {
-        let relativeLocation: number[] = [0];
+        let relativeLocation: number[] = options.location || [0];
 
         if (options.position?.reference) {
             const referenceGroup = this.groups.get(options.position.reference)
@@ -124,7 +133,13 @@ export class ComponentGridview
             this.options.frameworkComponents,
             this.options.frameworkComponentFactory.createComponent
         );
-        view.init({ params: {} });
+        view.init({
+            params: {},
+            minimumWidth: options.minimumWidth,
+            maximumWidth: options.maximumWidth,
+            minimumHeight: options.minimumHeight,
+            maximumHeight: options.maximumHeight,
+        });
         view.priority = options.priority;
         view.snap = options.snap;
 

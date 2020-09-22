@@ -9,11 +9,7 @@ import {
 
 const components = {
     default: (props: IPaneviewPanelProps) => {
-        return (
-            <div style={{ height: '100%', backgroundColor: 'lightgreen' }}>
-                This is an example panel
-            </div>
-        );
+        return <div style={{ height: '100%' }}>This is an example panel</div>;
     },
 };
 
