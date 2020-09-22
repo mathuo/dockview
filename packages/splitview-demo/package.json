@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "build": "bash ../../node_modules/.bin/webpack --config webpack.config.js",
-        "start": "../../node_modules/.bin/webpack-dev-server --config webpack.config.js"
+        "start": "bash ../../node_modules/.bin/webpack-dev-server --config webpack.config.js"
     },
     "author": "",
     "license": "ISC",

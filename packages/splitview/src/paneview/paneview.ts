@@ -192,6 +192,18 @@ export class PaneView implements IDisposable {
     private orthogonalSize: number;
     private size: number;
 
+    get minimumSize() {
+        return this.splitview.minimumSize;
+    }
+
+    get maximumSize() {
+        return this.splitview.maximumSize;
+    }
+
+    get orientation() {
+        return this.splitview.orientation;
+    }
+
     constructor(container: HTMLElement, options: { orientation: Orientation }) {
         this._orientation = options.orientation ?? Orientation.VERTICAL;
 
@@ -203,6 +215,7 @@ export class PaneView implements IDisposable {
         container.appendChild(this.element);
         this.splitview = new SplitView(this.element, {
             orientation: this._orientation,
+            proportionalLayout: false,
         });
     }
 

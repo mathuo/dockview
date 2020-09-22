@@ -46,6 +46,10 @@ export class ComponentSplitview implements IComponentSplitview {
         return this.splitview.minimumSize;
     }
 
+    get maximumSize() {
+        return this.splitview.maximumSize;
+    }
+
     addFromComponent(options: {
         id: string;
         component: string;
@@ -92,6 +96,7 @@ export class ComponentSplitview implements IComponentSplitview {
             cb({ proportions: this.splitview.proportions });
         });
     }
+
     toJSON(): object {
         const views = this.splitview
             .getViews()
