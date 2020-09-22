@@ -140,6 +140,12 @@ export abstract class Pane implements IView {
         this.header.className = 'pane-header';
         this.header.style.height = `${this.headerSize}px`;
         this.header.style.lineHeight = `${this.headerSize}px`;
+        this.header.style.minHeight = `${this.headerSize}px`;
+        this.header.style.maxHeight = `${this.headerSize}px`;
+
+        this.header.addEventListener('click', () => [
+            this.setExpanded(!this.isExpanded()),
+        ]);
 
         this.element.appendChild(this.header);
         this.renderHeader(this.header);

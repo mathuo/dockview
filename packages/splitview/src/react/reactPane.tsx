@@ -12,15 +12,20 @@ export class PaneReact extends Pane {
     private headerPart: ReactPart;
 
     constructor(
+        private id: string,
+        private componentId: string,
         private readonly bodyComponent: React.FunctionComponent<{}>,
         private readonly parent: ReactLayout,
         private readonly options: {
-            isExpanded: boolean;
-            headerName: string;
-            headerComponent: React.FunctionComponent<{}>;
+            isExpanded?: boolean;
+            headerName?: string;
+            headerComponent?: React.FunctionComponent<{}>;
         }
     ) {
-        super({ isExpanded: options.isExpanded });
+        super({
+            isExpanded: true,
+            // options.isExpanded
+        });
 
         this.api = new BaseViewApi();
 
@@ -39,13 +44,13 @@ export class PaneReact extends Pane {
             this.bodyComponent,
             this.params
         );
-        this.headerPart = new ReactPart(
-            this.header,
-            this.api,
-            this.parent.addPortal,
-            this.bodyComponent,
-            this.params
-        );
+        // this.headerPart = new ReactPart(
+        //     this.header,
+        //     this.api,
+        //     this.parent.addPortal,
+        //     this.bodyComponent,
+        //     this.params
+        // );
     }
 
     public renderBody(element: HTMLElement) {

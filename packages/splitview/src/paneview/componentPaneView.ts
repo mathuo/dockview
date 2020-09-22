@@ -7,6 +7,14 @@ import { PaneView } from './paneview';
 
 export interface IComponentPaneView extends IDisposable {
     layout(size: number, orthogonalSize: number): void;
+    addFromComponent(options: {
+        id: string;
+        componentName: string;
+        tabComponentName: string;
+        params: {
+            [key: string]: any;
+        };
+    }): IDisposable;
 }
 
 export class ComponentPaneView implements IComponentPaneView {

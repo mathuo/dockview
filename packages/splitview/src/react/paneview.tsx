@@ -1,7 +1,10 @@
 import * as React from 'react';
 import { IPanelApi } from '../panel/api';
-import { Orientation } from '../splitview/splitview';
-import { ComponentPaneView, IComponentPaneView } from '../paneview/componentPaneView';
+import {
+    ComponentPaneView,
+    IComponentPaneView,
+} from '../paneview/componentPaneView';
+import { PaneReact } from './reactPane';
 
 export interface PaneviewReadyEvent {
     api: IComponentPaneView;
@@ -12,14 +15,13 @@ export interface IPaneviewPanelProps {
 }
 
 export interface IPaneviewComponentProps {
-    orientation: Orientation;
     onReady?: (event: PaneviewReadyEvent) => void;
     components: {
         [index: string]: React.FunctionComponent<IPaneviewPanelProps>;
     };
 }
 
-export const SplitViewComponent = (props: IPaneviewComponentProps) => {
+export const PaneViewComponent = (props: IPaneviewComponentProps) => {
     const domReference = React.useRef<HTMLDivElement>();
     const splitpanel = React.useRef<IComponentPaneView>();
     const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
@@ -37,14 +39,23 @@ export const SplitViewComponent = (props: IPaneviewComponentProps) => {
 
     React.useEffect(() => {
         splitpanel.current = new ComponentPaneView(domReference.current, {
-            // 
+            frameworkComponents: props.components,
+            components: {},
+            frameworkWrapper: {
+                createComponent: (id: string, componentId, component: any) => {
+                    return new PaneReact(
+                        id,
+                        componentId,
+                        component,
+                        { addPortal },
+                        {}
+                    );
+                },
+            },
         });
 
         const { width, height } = domReference.current.getBoundingClientRect();
-        const [size, orthogonalSize] =
-            props.orientation === Orientation.HORIZONTAL
-                ? [width, height]
-                : [height, width];
+        const [size, orthogonalSize] = [height, width];
         splitpanel.current.layout(size, orthogonalSize);
 
         if (props.onReady) {

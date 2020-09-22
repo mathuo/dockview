@@ -234,7 +234,7 @@ export class SplitView {
 
     public addView(
         view: IView,
-        size: number | Sizing = undefined,
+        size: number | Sizing = { type: 'distribute' },
         index: number = this.views.length,
         skipLayout?: boolean
     ) {

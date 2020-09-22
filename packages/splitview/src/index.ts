@@ -1,5 +1,6 @@
 export * from './splitview/splitview';
 export * from './paneview/paneview';
+export * from './paneview/componentPaneView';
 export * from './gridview/gridview';
 export * from './groupview/groupview';
 export * from './groupview/panel/content/content';
@@ -17,5 +18,6 @@ export * from './react/gridview';
 export * from './react/reactContentPart';
 export * from './react/reactHeaderPart';
 export * from './react/reactComponentGridView';
+export * from './react/paneview';
 
 export * from './layout';
