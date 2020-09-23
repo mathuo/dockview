@@ -10,7 +10,7 @@ import {
 import { IGroupPanel } from '../groupview/panel/types';
 import { Orientation } from '../splitview/splitview';
 import { FrameworkFactory } from '../types';
-import { IGridPanelComponentView } from './componentGridview';
+import { IGridPanelComponentView } from '../gridview/componentGridview';
 import { Api } from './componentDockview';
 
 export interface GroupPanelFrameworkComponentFactory {

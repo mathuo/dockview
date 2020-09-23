@@ -2,9 +2,9 @@ import * as React from 'react';
 import {
     ComponentGridview,
     IComponentGridview,
-} from '../dockview/componentGridview';
-import { IGridPanelApi } from '../panel/api';
-import { Orientation } from '../splitview/splitview';
+} from '../../gridview/componentGridview';
+import { IGridPanelApi } from '../../panel/api';
+import { Orientation } from '../../splitview/splitview';
 import { ReactComponentGridView } from './reactComponentGridView';
 
 export interface GridviewReadyEvent {

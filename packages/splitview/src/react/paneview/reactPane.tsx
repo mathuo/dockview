@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { BaseViewApi, IBaseViewApi } from '../panel/api';
-import { Pane } from '../paneview/paneview';
-import { ReactLayout } from './dockview';
-import { ReactPart } from './react';
+import { BaseViewApi, IBaseViewApi } from '../../panel/api';
+import { Pane } from '../../paneview/paneview';
+import { ReactLayout } from '../dockview/dockview';
+import { ReactPart } from '../react';
 
 export class PaneReact extends Pane {
     private params: {};

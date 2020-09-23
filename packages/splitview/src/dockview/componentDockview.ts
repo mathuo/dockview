@@ -43,7 +43,11 @@ import {
     DragType,
 } from '../groupview/droptarget/dataTransfer';
 import { LayoutMouseEvent, MouseEventKind } from '../groupview/events';
-import { BaseGrid, IBaseGrid, toTarget } from './baseGrid';
+import {
+    BaseGrid,
+    IBaseGrid,
+    toTarget,
+} from '../gridview/baseComponentGridview';
 
 const nextGroupId = sequentialNumberGenerator();
 

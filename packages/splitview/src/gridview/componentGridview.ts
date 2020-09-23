@@ -1,16 +1,21 @@
-import { getRelativeLocation } from '../gridview/gridview';
+import { getRelativeLocation } from './gridview';
 import { Position } from '../groupview/droptarget/droptarget';
-import { getGridLocation } from '../gridview/gridview';
+import { getGridLocation } from './gridview';
 import { tail, sequenceEquals } from '../array';
 import { GroupChangeKind } from '../groupview/groupview';
 import { Disposable } from '../lifecycle';
-import { DebugWidget } from './components/debug/debug';
-import { IPanelDeserializer } from './deserializer';
+import { DebugWidget } from '../dockview/components/debug/debug';
+import { IPanelDeserializer } from '../dockview/deserializer';
 import { createComponent } from '../splitview/options';
 import { LayoutPriority } from '../splitview/splitview';
-import { GridComponentOptions } from '.';
-import { BaseGrid, IBaseGrid, IGridPanelView, toTarget } from './baseGrid';
-import { GridviewInitParameters } from '../react/reactComponentGridView';
+import { GridComponentOptions } from '../dockview';
+import {
+    BaseGrid,
+    IBaseGrid,
+    IGridPanelView,
+    toTarget,
+} from './baseComponentGridview';
+import { GridviewInitParameters } from '../react/gridview/reactComponentGridView';
 
 export interface AddComponentOptions {
     component: string;

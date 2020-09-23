@@ -1,3 +1,3 @@
 export * from './componentDockview';
-export * from './componentGridview';
+export * from '../gridview/componentGridview';
 export * from './options';

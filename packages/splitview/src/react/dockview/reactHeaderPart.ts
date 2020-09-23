@@ -1,13 +1,12 @@
 import * as React from 'react';
 import {
-    PanelContentPart,
+    PanelHeaderPart,
     PartInitParameters,
-    ClosePanelResult,
-} from '../groupview/panel/parts';
-import { ReactPart, IPanelProps } from './react';
+} from '../../groupview/panel/parts';
+import { ReactPart, IPanelProps } from '../react';
 import { ReactLayout } from './dockview';
 
-export class ReactPanelContentPart implements PanelContentPart {
+export class ReactPanelHeaderPart implements PanelHeaderPart {
     private _element: HTMLElement;
     private part: ReactPart;
 
@@ -39,22 +38,13 @@ export class ReactPanelContentPart implements PanelContentPart {
         };
     }
 
-    public update(params: {}) {
-        this.part.update(params);
+    public layout(height: string) {
+        // noop - retrieval from api
     }
 
     public setVisible(isPanelVisible: boolean, isGroupVisible: boolean): void {
         // noop - retrieval from api
     }
-
-    public layout(width: number, height: number): void {}
-
-    public close(): Promise<ClosePanelResult> {
-        return Promise.resolve(ClosePanelResult.CLOSE);
-    }
-
-    public focus(): void {}
-    public onHide(): void {}
 
     public dispose() {
         this.part?.dispose();

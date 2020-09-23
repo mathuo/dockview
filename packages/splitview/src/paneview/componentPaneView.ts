@@ -1,5 +1,5 @@
 import { IDisposable } from '../lifecycle';
-import { PaneReact } from '../react/reactPane';
+import { PaneReact } from '../react/paneview/reactPane';
 import { createComponent } from '../splitview/options';
 import { Orientation } from '../splitview/splitview';
 import { PaneviewComponentOptions } from './options';

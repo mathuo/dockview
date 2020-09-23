@@ -1,8 +1,8 @@
-import { IView } from '../splitview/splitview';
-import { ReactLayout } from './dockview';
+import { IView } from '../../splitview/splitview';
+import { ReactLayout } from '../dockview/dockview';
 import { ISplitviewPanelProps } from './splitview';
-import { IPanel } from '../panel/types';
-import { BaseReactComponentGridView } from './baseReactComponentView';
+import { IPanel } from '../../panel/types';
+import { BaseReactComponentGridView } from '../baseReactComponentView';
 
 /**
  * A no-thrills implementation of IView that renders a React component

@@ -1,9 +1,9 @@
-import { ReactLayout } from './dockview';
-import { ISplitviewPanelProps } from './splitview';
-import { InitParameters, IPanel } from '../panel/types';
-import { IGridPanelComponentView } from '../dockview/componentGridview';
-import { FunctionOrValue } from '../types';
-import { BaseReactComponentGridView } from './baseReactComponentView';
+import { ReactLayout } from '../dockview/dockview';
+import { ISplitviewPanelProps } from '../splitview/splitview';
+import { InitParameters, IPanel } from '../../panel/types';
+import { IGridPanelComponentView } from '../../gridview/componentGridview';
+import { FunctionOrValue } from '../../types';
+import { BaseReactComponentGridView } from '../baseReactComponentView';
 
 export interface GridviewInitParameters extends InitParameters {
     minimumWidth?: number;

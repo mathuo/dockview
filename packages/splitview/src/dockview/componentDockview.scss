@@ -53,8 +53,10 @@
     }
 }
 
-// when a tab is dragged we loss the above stylings because they are conditional on parent elements
-// there we also set some stylings for the dragging event
+/**
+ * when a tab is dragged we lose the above stylings because they are conditional on parent elements
+ * therefore we also set some stylings for the dragging event
+ **/
 .tab {
     &.dragging {
         background-color: var(--active-tab-background-visible);

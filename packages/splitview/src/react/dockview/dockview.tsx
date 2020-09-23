@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { IDisposable } from '../lifecycle';
-import { ComponentDockview, Api } from '../dockview/componentDockview';
+import { IDisposable } from '../../lifecycle';
+import { ComponentDockview, Api } from '../../dockview/componentDockview';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
-import { IPanelProps } from './react';
-import { ReactPanelDeserialzier } from './deserializer';
+import { IPanelProps } from '../react';
+import { ReactPanelDeserialzier } from '../deserializer';
 import {
     GroupPanelFrameworkComponentFactory,
     TabContextMenuEvent,
-} from '../dockview/options';
+} from '../../dockview/options';
 
 export interface DockviewReadyEvent {
     api: Api;

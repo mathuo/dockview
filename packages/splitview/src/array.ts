@@ -10,7 +10,7 @@ export function last<T>(arr: T[]): T {
     return arr.length > 0 ? arr[arr.length - 1] : undefined;
 }
 
-export function sequenceEquals<T>(arr1: T[], arr2: T[]) {
+export function sequenceEquals<T>(arr1: T[], arr2: T[]): boolean {
     if (arr1.length !== arr2.length) {
         return false;
     }
@@ -47,7 +47,7 @@ export function pushToEnd<T>(arr: T[], value: T): void {
     }
 }
 
-export const range = (from: number, to: number = undefined) => {
+export const range = (from: number, to: number = undefined): number[] => {
     const result: number[] = [];
 
     if (to === undefined) {

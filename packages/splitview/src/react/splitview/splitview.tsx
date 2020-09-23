@@ -1,31 +1,33 @@
 import * as React from 'react';
-import { IPanelApi } from '../panel/api';
+import { IPanelApi } from '../../panel/api';
 import {
-    ComponentPaneView,
-    IComponentPaneView,
-} from '../paneview/componentPaneView';
-import { PaneReact } from './reactPane';
+    IComponentSplitview,
+    ComponentSplitview,
+} from '../../splitview/componentSplitview';
+import { Orientation } from '../../splitview/splitview';
+import { ReactComponentView } from './reactComponentView';
 
-export interface PaneviewReadyEvent {
-    api: IComponentPaneView;
+export interface SplitviewReadyEvent {
+    api: IComponentSplitview;
 }
 
-export interface IPaneviewPanelProps {
+export interface ISplitviewPanelProps {
     api: IPanelApi;
 }
 
-export interface IPaneviewComponentProps {
-    onReady?: (event: PaneviewReadyEvent) => void;
+export interface ISplitviewComponentProps {
+    orientation: Orientation;
+    onReady?: (event: SplitviewReadyEvent) => void;
     components: {
-        [index: string]: React.FunctionComponent<IPaneviewPanelProps>;
+        [index: string]: React.FunctionComponent<ISplitviewPanelProps>;
     };
 }
 
-export const PaneViewComponent: React.FunctionComponent<IPaneviewComponentProps> = (
-    props: IPaneviewComponentProps
+export const SplitviewComponent: React.FunctionComponent<ISplitviewComponentProps> = (
+    props: ISplitviewComponentProps
 ) => {
     const domReference = React.useRef<HTMLDivElement>();
-    const splitpanel = React.useRef<IComponentPaneView>();
+    const splitpanel = React.useRef<IComponentSplitview>();
     const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
 
     const addPortal = React.useCallback((p: React.ReactPortal) => {
@@ -40,24 +42,24 @@ export const PaneViewComponent: React.FunctionComponent<IPaneviewComponentProps>
     }, []);
 
     React.useEffect(() => {
-        splitpanel.current = new ComponentPaneView(domReference.current, {
+        splitpanel.current = new ComponentSplitview(domReference.current, {
+            orientation: props.orientation,
             frameworkComponents: props.components,
-            components: {},
             frameworkWrapper: {
                 createComponent: (id: string, componentId, component: any) => {
-                    return new PaneReact(
-                        id,
-                        componentId,
-                        component,
-                        { addPortal },
-                        {}
-                    );
+                    return new ReactComponentView(id, componentId, component, {
+                        addPortal,
+                    });
                 },
             },
+            proportionalLayout: false,
         });
 
         const { width, height } = domReference.current.getBoundingClientRect();
-        const [size, orthogonalSize] = [height, width];
+        const [size, orthogonalSize] =
+            props.orientation === Orientation.HORIZONTAL
+                ? [width, height]
+                : [height, width];
         splitpanel.current.layout(size, orthogonalSize);
 
         if (props.onReady) {
@@ -81,4 +83,4 @@ export const PaneViewComponent: React.FunctionComponent<IPaneviewComponentProps>
         </div>
     );
 };
-PaneViewComponent.displayName = 'PaneviewComponent';
+SplitviewComponent.displayName = 'SplitviewComponent';

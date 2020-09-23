@@ -1,6 +1,6 @@
-import { MovementOptions2 } from '.';
+import { MovementOptions2 } from '../dockview';
 import { Emitter, Event } from '../events';
-import { getGridLocation, Gridview, IGridView } from '../gridview/gridview';
+import { getGridLocation, Gridview, IGridView } from './gridview';
 import { Position } from '../groupview/droptarget/droptarget';
 import { GroupChangeEvent, GroupChangeKind } from '../groupview/groupview';
 import { CompositeDisposable, IValueDisposable } from '../lifecycle';

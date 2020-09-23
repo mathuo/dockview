@@ -18,7 +18,7 @@ import {
     isCustomDragEvent,
     isPanelTransferEvent,
 } from './droptarget/dataTransfer';
-import { IGridPanelView } from '../dockview/baseGrid';
+import { IGridPanelView } from '../gridview/baseComponentGridview';
 
 export const enum GroupChangeKind {
     GROUP_ACTIVE = 'GROUP_ACTIVE',
