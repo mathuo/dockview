@@ -1,4 +1,4 @@
-import { PanelOptions } from '../../layout/options';
+import { PanelOptions } from '../../dockview/options';
 
 export const DATA_KEY = 'splitview/transfer';
 

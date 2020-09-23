@@ -32,13 +32,13 @@ export interface BaseGridOptions {
     readonly orientation?: Orientation;
 }
 
-export interface IBaseGridView extends IGridView {
+export interface IGridPanelView extends IGridView {
     id: string;
     setActive(isActive: boolean): void;
     isActive: boolean;
 }
 
-export interface IBaseGrid<T extends IBaseGridView> {
+export interface IBaseGrid<T extends IGridPanelView> {
     readonly element: HTMLElement;
     readonly id: string;
     readonly minimumHeight: number;
@@ -51,7 +51,7 @@ export interface IBaseGrid<T extends IBaseGridView> {
     readonly onDidLayoutChange: Event<GroupChangeEvent>;
 }
 
-export class BaseGrid<T extends IBaseGridView>
+export class BaseGrid<T extends IGridPanelView>
     extends CompositeDisposable
     implements IBaseGrid<T> {
     private readonly _id = nextLayoutId.next();

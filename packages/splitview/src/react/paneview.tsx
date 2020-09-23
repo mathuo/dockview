@@ -21,7 +21,9 @@ export interface IPaneviewComponentProps {
     };
 }
 
-export const PaneViewComponent = (props: IPaneviewComponentProps) => {
+export const PaneViewComponent: React.FunctionComponent<IPaneviewComponentProps> = (
+    props: IPaneviewComponentProps
+) => {
     const domReference = React.useRef<HTMLDivElement>();
     const splitpanel = React.useRef<IComponentPaneView>();
     const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
@@ -79,3 +81,4 @@ export const PaneViewComponent = (props: IPaneviewComponentProps) => {
         </div>
     );
 };
+PaneViewComponent.displayName = 'PaneviewComponent';

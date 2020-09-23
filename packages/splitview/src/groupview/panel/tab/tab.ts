@@ -8,7 +8,7 @@ import {
     DragType,
 } from '../../droptarget/dataTransfer';
 import { toggleClass } from '../../../dom';
-import { IGroupAccessor } from '../../../layout';
+import { IGroupAccessor } from '../../../dockview';
 import { LayoutMouseEvent, MouseEventKind } from '../../events';
 
 export interface ITab {

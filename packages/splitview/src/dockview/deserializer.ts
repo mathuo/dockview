@@ -1,6 +1,6 @@
 import { IGridView, IViewDeserializer } from '../gridview/gridview';
 import { IGroupPanel } from '../groupview/panel/types';
-import { Layout } from './layout';
+import { ComponentDockview } from './componentDockview';
 
 export interface IPanelDeserializer {
     fromJSON(panelData: { [index: string]: any }): IGroupPanel;
@@ -8,7 +8,7 @@ export interface IPanelDeserializer {
 
 export class DefaultDeserializer implements IViewDeserializer {
     constructor(
-        private readonly layout: Layout,
+        private readonly layout: ComponentDockview,
         private panelDeserializer: { createPanel: (id: string) => IGroupPanel }
     ) {}
 

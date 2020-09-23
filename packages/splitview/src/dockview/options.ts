@@ -10,8 +10,8 @@ import {
 import { IGroupPanel } from '../groupview/panel/types';
 import { Orientation } from '../splitview/splitview';
 import { FrameworkFactory } from '../types';
-import { IComponentGridview } from './componentGridview';
-import { Api } from './layout';
+import { IGridPanelComponentView } from './componentGridview';
+import { Api } from './componentDockview';
 
 export interface GroupPanelFrameworkComponentFactory {
     content: FrameworkFactory<PanelContentPart>;
@@ -27,12 +27,12 @@ export interface TabContextMenuEvent {
 export interface GridComponentOptions {
     orientation: Orientation;
     components?: {
-        [componentName: string]: IComponentGridview;
+        [componentName: string]: IGridPanelComponentView;
     };
     frameworkComponents?: {
         [componentName: string]: any;
     };
-    frameworkComponentFactory: FrameworkFactory<IComponentGridview>;
+    frameworkComponentFactory: FrameworkFactory<IGridPanelComponentView>;
     tabHeight?: number;
 }
 

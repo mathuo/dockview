@@ -4,10 +4,10 @@ import {
     IPanelProps,
     ISplitviewPanelProps,
     Orientation,
-    SplitviewFacade,
     SplitviewReadyEvent,
+    SplitviewComponent,
+    IComponentSplitview,
 } from 'splitview';
-import { SplitViewComponent } from 'splitview';
 
 const components = {
     default1: (props: ISplitviewPanelProps) => {
@@ -33,7 +33,7 @@ const components = {
 };
 
 export const SplitPanel = (props: IPanelProps) => {
-    const api = React.useRef<SplitviewFacade>();
+    const api = React.useRef<IComponentSplitview>();
 
     React.useEffect(() => {
         const disposable = new CompositeDisposable(
@@ -78,7 +78,7 @@ export const SplitPanel = (props: IPanelProps) => {
             <div style={{ height: '20px', flexShrink: 0 }}>
                 <button onClick={onSave}>save</button>
             </div>
-            <SplitViewComponent
+            <SplitviewComponent
                 components={components}
                 onReady={onReady}
                 orientation={Orientation.VERTICAL}

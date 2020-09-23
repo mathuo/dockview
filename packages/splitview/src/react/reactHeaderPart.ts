@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { PanelHeaderPart, PartInitParameters } from '../groupview/panel/parts';
 import { ReactPart, IPanelProps } from './react';
-import { ReactLayout } from './layout';
+import { ReactLayout } from './dockview';
 
 export class ReactPanelHeaderPart implements PanelHeaderPart {
     private _element: HTMLElement;

@@ -1,18 +1,18 @@
 import * as React from 'react';
 import {
     ComponentGridview,
-    IComponentGridviewLayout,
-} from '../layout/componentGridview';
-import { IGridApi } from '../panel/api';
+    IComponentGridview,
+} from '../dockview/componentGridview';
+import { IGridPanelApi } from '../panel/api';
 import { Orientation } from '../splitview/splitview';
 import { ReactComponentGridView } from './reactComponentGridView';
 
 export interface GridviewReadyEvent {
-    api: IComponentGridviewLayout;
+    api: IComponentGridview;
 }
 
 export interface IGridviewPanelProps {
-    api: IGridApi;
+    api: IGridPanelApi;
 }
 
 export interface IGridviewComponentProps {
@@ -23,9 +23,11 @@ export interface IGridviewComponentProps {
     };
 }
 
-export const GridviewComponent = (props: IGridviewComponentProps) => {
+export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps> = (
+    props: IGridviewComponentProps
+) => {
     const domReference = React.useRef<HTMLDivElement>();
-    const gridview = React.useRef<IComponentGridviewLayout>();
+    const gridview = React.useRef<IComponentGridview>();
     const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
 
     const addPortal = React.useCallback((p: React.ReactPortal) => {
@@ -45,9 +47,14 @@ export const GridviewComponent = (props: IGridviewComponentProps) => {
             frameworkComponents: props.components,
             frameworkComponentFactory: {
                 createComponent: (id: string, componentId, component) => {
-                    return new ReactComponentGridView(id, componentId, component, {
-                        addPortal,
-                    });
+                    return new ReactComponentGridView(
+                        id,
+                        componentId,
+                        component,
+                        {
+                            addPortal,
+                        }
+                    );
                 },
             },
         });
@@ -69,3 +76,4 @@ export const GridviewComponent = (props: IGridviewComponentProps) => {
         </div>
     );
 };
+GridviewComponent.displayName = 'GridviewComponent';

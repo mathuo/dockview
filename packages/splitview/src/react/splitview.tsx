@@ -1,25 +1,11 @@
 import * as React from 'react';
 import { IPanelApi } from '../panel/api';
-import { IDisposable } from '../lifecycle';
 import {
     IComponentSplitview,
     ComponentSplitview,
 } from '../splitview/componentSplitview';
 import { Orientation } from '../splitview/splitview';
 import { ReactComponentView } from './reactComponentView';
-
-export interface SplitviewFacade {
-    addFromComponent(options: {
-        id: string;
-        component: string;
-        params?: { [index: string]: any };
-    }): void;
-    layout(size: number, orthogonalSize: number): void;
-    onChange: (cb: (event: { proportions: number[] }) => void) => IDisposable;
-    toJSON: () => any;
-    deserialize: (data: any) => void;
-    minimumSize: number;
-}
 
 export interface SplitviewReadyEvent {
     api: IComponentSplitview;
@@ -37,7 +23,9 @@ export interface ISplitviewComponentProps {
     };
 }
 
-export const SplitViewComponent = (props: ISplitviewComponentProps) => {
+export const SplitviewComponent: React.FunctionComponent<ISplitviewComponentProps> = (
+    props: ISplitviewComponentProps
+) => {
     const domReference = React.useRef<HTMLDivElement>();
     const splitpanel = React.useRef<IComponentSplitview>();
     const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
@@ -95,3 +83,4 @@ export const SplitViewComponent = (props: ISplitviewComponentProps) => {
         </div>
     );
 };
+SplitviewComponent.displayName = 'SplitviewComponent';

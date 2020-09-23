@@ -1,4 +1,5 @@
 export * from './splitview/splitview';
+export * from './splitview/componentSplitview';
 export * from './paneview/paneview';
 export * from './paneview/componentPaneView';
 export * from './gridview/gridview';
@@ -12,7 +13,7 @@ export * from './groupview/panel/api';
 export * from './react/react';
 export * from './groupview/panel/types';
 export * from './groupview/panel/parts';
-export * from './react/layout';
+export * from './react/dockview';
 export * from './react/splitview';
 export * from './react/gridview';
 export * from './react/reactContentPart';
@@ -20,4 +21,4 @@ export * from './react/reactHeaderPart';
 export * from './react/reactComponentGridView';
 export * from './react/paneview';
 
-export * from './layout';
+export * from './dockview';

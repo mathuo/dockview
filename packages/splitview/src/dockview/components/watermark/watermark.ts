@@ -2,7 +2,7 @@ import {
     WatermarkPart,
     WatermarkPartInitParameters,
 } from '../../../groupview/panel/parts';
-import { IGroupAccessor } from '../../layout';
+import { IGroupAccessor } from '../../componentDockview';
 import { IGroupview } from '../../../groupview/groupview';
 import { ActionContainer } from '../../../groupview/actions/actionsContainer';
 import { addDisposableListener } from '../../../events';

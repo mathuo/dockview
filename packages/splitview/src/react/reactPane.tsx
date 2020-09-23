@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { BaseViewApi, IBaseViewApi } from '../panel/api';
 import { Pane } from '../paneview/paneview';
-import { ReactLayout } from './layout';
+import { ReactLayout } from './dockview';
 import { ReactPart } from './react';
 
 export class PaneReact extends Pane {
@@ -28,10 +28,6 @@ export class PaneReact extends Pane {
         });
 
         this.api = new BaseViewApi();
-
-        this.layout = this.layout.bind(this);
-        this.onDidChange = this.onDidChange.bind(this);
-
         this.render();
     }
 

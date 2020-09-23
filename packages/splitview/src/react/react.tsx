@@ -49,8 +49,14 @@ const PanelWrapper = React.forwardRef(
         );
     }
 );
+PanelWrapper.displayName = 'PanelWrapper';
 
-const counter = sequentialNumberGenerator();
+/**
+ * Since we are storing the React.Portal references in a rendered array they
+ * require a key property like any other React elements rendered in an array
+ * to prevent excess re-rendering
+ */
+const uniquePortalKeyGenerator = sequentialNumberGenerator();
 
 export class ReactPart implements IDisposable {
     private componentInstance: IPanelWrapperRef;
@@ -85,11 +91,14 @@ export class ReactPart implements IDisposable {
             ...this.parameters,
         } as any;
 
-
-        if(typeof this.component !== 'function') {
-            // if we throw an error before entering the React world it will provide us with
-            // a more sensible stack trace to debug
-            throw new Error("invalid operation")
+        // TODO use a better check for isReactFunctionalComponent
+        if (typeof this.component !== 'function') {
+            /**
+             * we know this isn't a React.FunctionComponent so throw an error here.
+             * if we do not intercept this the React library will throw a very obsure error
+             * for the same reason.
+             */
+            throw new Error('invalid operation');
         }
 
         const wrapper = React.createElement(PanelWrapper, {
@@ -102,7 +111,7 @@ export class ReactPart implements IDisposable {
         const portal = ReactDOM.createPortal(
             wrapper,
             this.parent,
-            counter.next()
+            uniquePortalKeyGenerator.next()
         );
 
         this.ref = {

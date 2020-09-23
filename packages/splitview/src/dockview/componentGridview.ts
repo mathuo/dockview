@@ -9,7 +9,7 @@ import { IPanelDeserializer } from './deserializer';
 import { createComponent } from '../splitview/options';
 import { LayoutPriority } from '../splitview/splitview';
 import { GridComponentOptions } from '.';
-import { BaseGrid, IBaseGrid, IBaseGridView, toTarget } from './baseGrid';
+import { BaseGrid, IBaseGrid, IGridPanelView, toTarget } from './baseGrid';
 import { GridviewInitParameters } from '../react/reactComponentGridView';
 
 export interface AddComponentOptions {
@@ -30,18 +30,17 @@ export interface AddComponentOptions {
     location?: number[];
 }
 
-export interface IComponentGridview extends IBaseGridView {
+export interface IGridPanelComponentView extends IGridPanelView {
     init?: (params: GridviewInitParameters) => void;
 }
 
-export interface IComponentGridviewLayout
-    extends IBaseGrid<IComponentGridview> {
+export interface IComponentGridview extends IBaseGrid<IGridPanelComponentView> {
     addComponent(options: AddComponentOptions): void;
 }
 
 export class ComponentGridview
-    extends BaseGrid<IComponentGridview>
-    implements IComponentGridviewLayout {
+    extends BaseGrid<IGridPanelComponentView>
+    implements IComponentGridview {
     private _deserializer: IPanelDeserializer;
     private debugContainer: DebugWidget;
 
@@ -152,7 +151,7 @@ export class ComponentGridview
     }
 
     public moveGroup(
-        referenceGroup: IComponentGridview,
+        referenceGroup: IGridPanelComponentView,
         groupId: string,
         target: Position
     ) {
@@ -184,7 +183,7 @@ export class ComponentGridview
         const targetGroup = this.doRemoveGroup(sourceGroup, {
             skipActive: true,
             skipDispose: true,
-        }) as IComponentGridview;
+        }) as IGridPanelComponentView;
 
         // after deleting the group we need to re-evaulate the ref location
         const updatedReferenceLocation = getGridLocation(

@@ -10,7 +10,7 @@ import { hasProcessed, Position } from '../droptarget/droptarget';
 import { TabDropEvent } from '../events';
 
 import { IGroupview } from '../groupview';
-import { IGroupAccessor } from '../../layout';
+import { IGroupAccessor } from '../../dockview';
 import { last } from '../../array';
 import { DataTransferSingleton } from '../droptarget/dataTransfer';
 import { IGroupPanel } from '../panel/types';

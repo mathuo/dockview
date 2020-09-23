@@ -1,18 +1,17 @@
 import { trackFocus } from '../dom';
 import { Emitter } from '../events';
-import { GridApi } from '../panel/api';
+import { GridPanelApi } from '../panel/api';
 import { CompositeDisposable } from '../lifecycle';
-import { ReactLayout } from './layout';
+import { ReactLayout } from './dockview';
 import { ReactPart } from './react';
 import { ISplitviewPanelProps } from './splitview';
 import { PanelUpdateEvent, InitParameters } from '../panel/types';
 
-export class BaseReactComponentGridView
-    extends CompositeDisposable {
+export class BaseReactComponentGridView extends CompositeDisposable {
     private _element: HTMLElement;
     private part: ReactPart;
     private params: { params: any };
-    protected api: GridApi;
+    protected api: GridPanelApi;
 
     private _onDidChange: Emitter<number | undefined> = new Emitter<
         number | undefined
@@ -32,7 +31,7 @@ export class BaseReactComponentGridView
         private readonly parent: ReactLayout
     ) {
         super();
-        this.api = new GridApi();
+        this.api = new GridPanelApi();
         if (!this.component) {
             throw new Error('React.FunctionalComponent cannot be undefined');
         }
@@ -44,7 +43,6 @@ export class BaseReactComponentGridView
         const { onDidFocus, onDidBlur } = trackFocus(this._element);
 
         this.addDisposables(
-           
             onDidFocus(() => {
                 this.api._onDidChangeFocus.fire({ isFocused: true });
             }),
@@ -54,7 +52,6 @@ export class BaseReactComponentGridView
         );
     }
 
-   
     layout(width: number, height: number) {
         this.api._onDidPanelDimensionChange.fire({ width, height });
     }

@@ -11,23 +11,9 @@ export interface IPaneOptions {
 }
 
 export abstract class Pane implements IView {
-    public element: HTMLElement;
-    protected header: HTMLElement;
-    protected body: HTMLElement;
-
-    private _onDidChangeExpansionState: Emitter<boolean> = new Emitter<
-        boolean
-    >();
-    public onDidChangeExpansionState = this._onDidChangeExpansionState.event;
-
-    private _onDidChange: Emitter<number | undefined> = new Emitter<
-        number | undefined
-    >();
-    public onDidChange = this._onDidChange.event;
-
+    private _element: HTMLElement;
     private _minimumBodySize: number;
     private _maximumBodySize: number;
-
     private _minimumSize: number;
     private _maximumSize: number;
     private _isExpanded: boolean;
@@ -36,10 +22,81 @@ export abstract class Pane implements IView {
     private animationTimer: NodeJS.Timeout;
     private expandedSize: number;
     private headerSize = 22;
+    private _onDidChangeExpansionState: Emitter<boolean> = new Emitter<
+        boolean
+    >();
+    private _onDidChange: Emitter<number | undefined> = new Emitter<
+        number | undefined
+    >();
+    //
+    protected header: HTMLElement;
+    protected body: HTMLElement;
+
+    get onDidChange() {
+        return this._onDidChange.event;
+    }
+
+    get onDidChangeExpansionState() {
+        return this._onDidChangeExpansionState.event;
+    }
+
+    get element() {
+        return this._element;
+    }
+
+    get minimumSize(): number {
+        const headerSize = this.headerSize;
+        const expanded = this.isExpanded();
+        const minimumBodySize = expanded
+            ? this._minimumBodySize
+            : this._orientation === Orientation.HORIZONTAL
+            ? 50
+            : 0;
+
+        return headerSize + minimumBodySize;
+    }
+
+    get maximumSize(): number {
+        const headerSize = this.headerSize;
+        const expanded = this.isExpanded();
+        const maximumBodySize = expanded
+            ? this._maximumBodySize
+            : this._orientation === Orientation.HORIZONTAL
+            ? 50
+            : 0;
+
+        return headerSize + maximumBodySize;
+    }
+
+    get orientation() {
+        return this._orientation;
+    }
+
+    get orthogonalSize() {
+        return this._orthogonalSize;
+    }
+
+    set minimumSize(size: number) {
+        this._minimumSize = size;
+        this._onDidChange.fire(undefined);
+    }
+
+    set maximumSize(size: number) {
+        this._maximumSize = size;
+        this._onDidChange.fire(undefined);
+    }
+
+    set orientation(orientation: Orientation) {
+        this._orientation = orientation;
+    }
+
+    set orthogonalSize(size: number) {
+        this._orthogonalSize = size;
+    }
 
     constructor(options: IPaneOptions) {
-        this.element = document.createElement('div');
-        this.element.className = 'pane';
+        this._element = document.createElement('div');
+        this._element.className = 'pane';
 
         this._minimumBodySize =
             typeof options.minimumBodySize === 'number'
@@ -54,50 +111,8 @@ export abstract class Pane implements IView {
         this.orientation = options.orientation;
     }
 
-    public get minimumSize(): number {
-        const headerSize = this.headerSize;
-        const expanded = this.isExpanded();
-        const minimumBodySize = expanded
-            ? this._minimumBodySize
-            : this._orientation === Orientation.HORIZONTAL
-            ? 50
-            : 0;
-
-        return headerSize + minimumBodySize;
-    }
-
-    public get maximumSize(): number {
-        const headerSize = this.headerSize;
-        const expanded = this.isExpanded();
-        const maximumBodySize = expanded
-            ? this._maximumBodySize
-            : this._orientation === Orientation.HORIZONTAL
-            ? 50
-            : 0;
-
-        return headerSize + maximumBodySize;
-    }
-
     public isExpanded() {
         return this._isExpanded;
-    }
-
-    public get orientation() {
-        return this._orientation;
-    }
-
-    public get orthogonalSize() {
-        return this._orthogonalSize;
-    }
-
-    public set minimumSize(size: number) {
-        this._minimumSize = size;
-        this._onDidChange.fire(undefined);
-    }
-
-    public set maximumSize(size: number) {
-        this._maximumSize = size;
-        this._onDidChange.fire(undefined);
     }
 
     public setExpanded(expanded: boolean) {
@@ -116,14 +131,6 @@ export abstract class Pane implements IView {
 
         this._onDidChangeExpansionState.fire(expanded);
         this._onDidChange.fire(expanded ? this.expandedSize : undefined);
-    }
-
-    public set orientation(orientation: Orientation) {
-        this._orientation = orientation;
-    }
-
-    public set orthogonalSize(size: number) {
-        this._orthogonalSize = size;
     }
 
     public layout(size: number, orthogonalSize: number) {

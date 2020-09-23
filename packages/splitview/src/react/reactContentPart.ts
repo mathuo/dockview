@@ -5,7 +5,7 @@ import {
     ClosePanelResult,
 } from '../groupview/panel/parts';
 import { ReactPart, IPanelProps } from './react';
-import { ReactLayout } from './layout';
+import { ReactLayout } from './dockview';
 
 export class ReactPanelContentPart implements PanelContentPart {
     private _element: HTMLElement;

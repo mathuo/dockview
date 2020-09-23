@@ -116,13 +116,18 @@ export interface IGroupAccessor {
     fireMouseEvent(event: LayoutMouseEvent): void;
 }
 
-export interface ILayout extends IGroupAccessor, Api, IBaseGrid<IGroupview> {}
+export interface IComponentDockview
+    extends IGroupAccessor,
+        Api,
+        IBaseGrid<IGroupview> {}
 
 export interface LayoutDropEvent {
     event: GroupDropEvent;
 }
 
-export class Layout extends BaseGrid<IGroupview> implements ILayout {
+export class ComponentDockview
+    extends BaseGrid<IGroupview>
+    implements IComponentDockview {
     private readonly panels = new Map<string, IValueDisposable<IGroupPanel>>();
     private readonly dirtyPanels = new Set<IGroupPanel>();
     private readonly debouncedDeque = debounce(

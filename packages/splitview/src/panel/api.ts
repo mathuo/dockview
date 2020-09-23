@@ -118,7 +118,7 @@ export interface IPanelApi extends IBaseViewApi {
     setConstraints(value: PanelConstraintChangeEvent): void;
 }
 
-export class PanelApi extends BaseViewApi implements IBaseViewApi {
+export class PanelApi extends BaseViewApi implements IPanelApi {
     readonly _onDidConstraintsChange = new Emitter<PanelConstraintChangeEvent>({
         emitLastValue: true,
     });
@@ -141,12 +141,12 @@ interface GridConstraintChangeEvent {
     maximumHeight?: FunctionOrValue<number>;
 }
 
-export interface IGridApi extends IBaseViewApi {
+export interface IGridPanelApi extends IBaseViewApi {
     onDidConstraintsChange: Event<GridConstraintChangeEvent>;
     setConstraints(value: GridConstraintChangeEvent): void;
 }
 
-export class GridApi extends BaseViewApi implements IBaseViewApi {
+export class GridPanelApi extends BaseViewApi implements IGridPanelApi {
     readonly _onDidConstraintsChange = new Emitter<GridConstraintChangeEvent>({
         emitLastValue: true,
     });

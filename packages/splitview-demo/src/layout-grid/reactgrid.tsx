@@ -1,7 +1,5 @@
 import * as React from 'react';
 import {
-    ReactGrid,
-    OnReadyEvent,
     Api,
     IPanelProps,
     ClosePanelResult,
@@ -9,6 +7,8 @@ import {
     GroupChangeKind,
     IGridviewPanelProps,
     TabContextMenuEvent,
+    DockviewReadyEvent,
+    DockviewComponent,
 } from 'splitview';
 import { CustomTab } from './customTab';
 import { Editor } from './editorPanel';
@@ -19,7 +19,7 @@ const components = {
         const _api = React.useRef<Api>();
         const [api, setApi] = React.useState<Api>();
 
-        const onReady = (event: OnReadyEvent) => {
+        const onReady = (event: DockviewReadyEvent) => {
             _api.current = event.api;
 
             const layout = props.api.getStateKey<object>('layout');
@@ -92,7 +92,7 @@ const components = {
                     // borderTop: "1px solid var(--splitview-divider-color)",
                 }}
             >
-                <ReactGrid
+                <DockviewComponent
                     onReady={onReady}
                     components={components}
                     tabHeight={20}
@@ -183,8 +183,7 @@ export const TestGrid = (props: IGridviewPanelProps) => {
     const _api = React.useRef<Api>();
     const [api, setApi] = React.useState<Api>();
 
-
-    const onReady = (event: OnReadyEvent) => {
+    const onReady = (event: DockviewReadyEvent) => {
         _api.current = event.api;
         setApi(event.api);
     };
@@ -266,7 +265,6 @@ export const TestGrid = (props: IGridviewPanelProps) => {
         // };
         // window.addEventListener("resize", callback);
         // callback(undefined);
-
 
         props.api.setConstraints({
             minimumWidth: () => _api.current.minimumWidth,
@@ -411,7 +409,7 @@ export const TestGrid = (props: IGridviewPanelProps) => {
                     Drag me too
                 </div>
             </div>
-            <ReactGrid
+            <DockviewComponent
                 // autoSizeToFitContainer={true}
                 onReady={onReady}
                 components={components}

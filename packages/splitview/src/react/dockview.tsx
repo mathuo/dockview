@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IDisposable } from '../lifecycle';
-import { Layout, Api } from '../layout/layout';
+import { ComponentDockview, Api } from '../dockview/componentDockview';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
 import { IPanelProps } from './react';
@@ -8,9 +8,9 @@ import { ReactPanelDeserialzier } from './deserializer';
 import {
     GroupPanelFrameworkComponentFactory,
     TabContextMenuEvent,
-} from '../layout/options';
+} from '../dockview/options';
 
-export interface OnReadyEvent {
+export interface DockviewReadyEvent {
     api: Api;
 }
 
@@ -18,7 +18,7 @@ export interface ReactLayout {
     addPortal: (portal: React.ReactPortal) => IDisposable;
 }
 
-export interface IReactGridProps {
+export interface IDockviewComponentProps {
     components?: {
         [componentName: string]: React.FunctionComponent<IPanelProps>;
     };
@@ -26,7 +26,7 @@ export interface IReactGridProps {
         [componentName: string]: React.FunctionComponent<IPanelProps>;
     };
     watermarkComponent?: React.FunctionComponent;
-    onReady?: (event: OnReadyEvent) => void;
+    onReady?: (event: DockviewReadyEvent) => void;
     autoSizeToFitContainer?: boolean;
     serializedLayout?: {};
     deserializer?: {
@@ -44,9 +44,11 @@ export interface IReactGridProps {
     onTabContextMenu?: (event: TabContextMenuEvent) => void;
 }
 
-export const ReactGrid = (props: IReactGridProps) => {
+export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps> = (
+    props: IDockviewComponentProps
+) => {
     const domReference = React.useRef<HTMLDivElement>();
-    const layoutReference = React.useRef<Layout>();
+    const layoutReference = React.useRef<ComponentDockview>();
 
     const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
 
@@ -89,7 +91,7 @@ export const ReactGrid = (props: IReactGridProps) => {
 
         const element = document.createElement('div');
 
-        const layout = new Layout(element, {
+        const layout = new ComponentDockview(element, {
             frameworkComponentFactory: factory,
             frameworkComponents: props.components,
             frameworkTabComponents: props.tabComponents,
@@ -138,7 +140,7 @@ export const ReactGrid = (props: IReactGridProps) => {
     return (
         <div
             style={{
-                // height: "100%",
+                // height: '100%',
                 width: '100%',
             }}
             ref={domReference}
@@ -147,3 +149,4 @@ export const ReactGrid = (props: IReactGridProps) => {
         </div>
     );
 };
+DockviewComponent.displayName = 'DockviewComponent';

@@ -3,7 +3,11 @@ import { ITabContainer, TabContainer } from './titlebar/tabContainer';
 import { IContentContainer, ContentContainer } from './panel/content/content';
 import { Position, Droptarget, DroptargetEvent } from './droptarget/droptarget';
 import { Event, Emitter, addDisposableListener } from '../events';
-import { IComponentGridview, IGroupAccessor, Layout } from '../layout';
+import {
+    IGridPanelComponentView,
+    IGroupAccessor,
+    ComponentDockview,
+} from '../dockview';
 import { toggleClass } from '../dom';
 import { ClosePanelResult, WatermarkPart } from './panel/parts';
 import { IGroupPanel } from './panel/types';
@@ -14,7 +18,7 @@ import {
     isCustomDragEvent,
     isPanelTransferEvent,
 } from './droptarget/dataTransfer';
-import { IBaseGridView } from '../layout/baseGrid';
+import { IGridPanelView } from '../dockview/baseGrid';
 
 export const enum GroupChangeKind {
     GROUP_ACTIVE = 'GROUP_ACTIVE',
@@ -61,7 +65,7 @@ export interface GroupChangeEvent {
     panel?: IGroupPanel;
 }
 
-export interface IGroupview extends IDisposable, IBaseGridView {
+export interface IGroupview extends IDisposable, IGridPanelView {
     size: number;
     panels: IGroupPanel[];
     tabHeight: number;
@@ -411,7 +415,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
     private doClose(panel: IGroupPanel) {
         this._removePanel(panel);
-        (this.accessor as Layout).unregisterPanel(panel);
+        (this.accessor as ComponentDockview).unregisterPanel(panel);
 
         panel.dispose();
 
