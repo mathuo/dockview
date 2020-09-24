@@ -2,11 +2,11 @@ import * as React from 'react';
 import {
     PanelContentPart,
     ClosePanelResult,
-    PartInitParameters,
+    GroupPanelPartInitParameters,
 } from '../../groupview/panel/parts';
 import { ReactPart } from '../react';
 import { IGroupPanelProps, ReactLayout } from '../dockview/dockview';
-import { IGroupPanelApi } from '../../api/groupPanelApi';
+import { PanelUpdateEvent } from '../../panel/types';
 
 export class ReactPanelContentPart implements PanelContentPart {
     private _element: HTMLElement;
@@ -24,7 +24,7 @@ export class ReactPanelContentPart implements PanelContentPart {
         this._element = document.createElement('div');
     }
 
-    public init(parameters: PartInitParameters): void {
+    public init(parameters: GroupPanelPartInitParameters): void {
         this.part = new ReactPart(
             this.element,
             parameters.api,
@@ -40,8 +40,8 @@ export class ReactPanelContentPart implements PanelContentPart {
         };
     }
 
-    public update(params: {}) {
-        this.part.update(params);
+    public update(params: PanelUpdateEvent) {
+        this.part.update(params.params);
     }
 
     public setVisible(isPanelVisible: boolean, isGroupVisible: boolean): void {

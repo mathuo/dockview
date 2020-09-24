@@ -1,4 +1,4 @@
-import { IGroupPanel } from './types';
+import { IGroupPanel } from './parts';
 import { GroupPanelApi } from '../../api/groupPanelApi';
 import { Event } from '../../events';
 import { IGroupview, GroupChangeKind } from '../groupview';
@@ -66,14 +66,10 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
         };
     }
 
-    public fromJSON(data: object) {
-        //
-    }
-
     public update(params: PanelUpdateEvent): void {
         this.params.params = { ...this.params.params, ...params };
 
-        this.contentPart.update(params.params);
+        this.contentPart.update(params);
         this.api._onDidStateChange.fire();
     }
 

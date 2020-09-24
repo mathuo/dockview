@@ -1,5 +1,5 @@
 import { DroptargetEvent } from './droptarget/droptarget';
-import { IGroupPanel } from './panel/types';
+import { IGroupPanel } from './panel/parts';
 
 export interface TabDropEvent {
     event: DroptargetEvent;

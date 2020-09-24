@@ -3,55 +3,67 @@ import { IGroupview } from '../groupview';
 import { IGroupAccessor } from '../../dockview';
 import { IGroupPanelApi } from '../../api/groupPanelApi';
 import { Constructor } from '../../types';
-import { InitParameters, IPanel } from '../../panel/types';
+import { PanelInitParameters, IPanel } from '../../panel/types';
+import { Event } from '../../events';
 
 export enum ClosePanelResult {
     CLOSE = 'CLOSE',
     DONT_CLOSE = 'DONT_CLOSE',
 }
 
-export interface WatermarkPartInitParameters {
-    accessor: IGroupAccessor;
-}
+// group panel parts
 
-export interface HeaderInitParameters {
+export interface HeaderPartInitParameters {
     title: string;
     suppressClosable?: boolean;
 }
 
-export interface IGroupPanelInitParameters
-    extends InitParameters,
-        HeaderInitParameters {
-    headerPart: PanelHeaderPart;
-    contentPart: PanelContentPart;
-    // api: IGroupPanelApi;
-}
-
-export interface PartInitParameters
-    extends InitParameters,
-        HeaderInitParameters {
+export interface GroupPanelPartInitParameters
+    extends PanelInitParameters,
+        HeaderPartInitParameters {
     api: IGroupPanelApi;
 }
 
-export interface PanelHeaderPart extends IPanel, IDisposable {
+export interface PanelHeaderPart extends IPanel {
     id: string;
     element: HTMLElement;
-    init?(parameters: PartInitParameters);
-    toJSON(): {};
+    init?(parameters: GroupPanelPartInitParameters);
     setVisible(isPanelVisible: boolean, isGroupVisible: boolean): void;
 }
 
-export interface PanelContentPart extends IPanel, IDisposable {
+export interface PanelContentPart extends IPanel {
     id: string;
     element: HTMLElement;
-    init?(parameters: PartInitParameters);
-    layout?(width: number, height: number): void;
-    close?(): Promise<ClosePanelResult>;
-    focus(): void;
-    onHide(): void;
-    update(params: {}): void;
-    toJSON(): {};
     setVisible(isPanelVisible: boolean, isGroupVisible: boolean): void;
+    init?(parameters: GroupPanelPartInitParameters);
+    close?(): Promise<ClosePanelResult>;
+}
+
+// group panel
+
+export interface IGroupPanelInitParameters
+    extends PanelInitParameters,
+        HeaderPartInitParameters {
+    headerPart: PanelHeaderPart;
+    contentPart: PanelContentPart;
+}
+
+export interface IGroupPanel extends IDisposable, IPanel {
+    id: string;
+    header: PanelHeaderPart;
+    content: PanelContentPart;
+    group: IGroupview;
+    setVisible(isGroupActive: boolean, group: IGroupview): void;
+    setDirty(isDirty: boolean): void;
+    close?(): Promise<ClosePanelResult>;
+    init?(params: IGroupPanelInitParameters): void;
+    onDidStateChange: Event<any>;
+}
+
+// watermark component
+
+export interface WatermarkPartInitParameters {
+    accessor: IGroupAccessor;
 }
 
 export interface WatermarkPart extends IDisposable {

@@ -1,15 +1,14 @@
 import { trackFocus } from '../dom';
 import { Emitter } from '../events';
-import { GridPanelApi } from '../api/gridPanelApi';
 import { CompositeDisposable } from '../lifecycle';
 import { ReactLayout } from './dockview/dockview';
 import { ReactPart } from './react';
-import { PanelUpdateEvent, InitParameters } from '../panel/types';
-import { BaseViewApi, IBaseViewApi } from '../api/api';
+import { PanelUpdateEvent, PanelInitParameters, IPanel } from '../panel/types';
+import { BaseViewApi } from '../api/api';
 
-export class BaseReactComponentGridView<
-    T extends BaseViewApi
-> extends CompositeDisposable {
+export class BaseReactComponentGridView<T extends BaseViewApi>
+    extends CompositeDisposable
+    implements IPanel {
     private _element: HTMLElement;
     private part: ReactPart;
     private params: { params: any };
@@ -55,7 +54,7 @@ export class BaseReactComponentGridView<
         this.api._onDidPanelDimensionChange.fire({ width, height });
     }
 
-    init(parameters: InitParameters): void {
+    init(parameters: PanelInitParameters): void {
         this.params = parameters;
         this.part = new ReactPart(
             this.element,

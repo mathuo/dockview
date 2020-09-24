@@ -10,7 +10,6 @@ import {
     GroupChangeEvent,
     GroupDropEvent,
 } from '../groupview/groupview';
-import { IGroupPanel } from '../groupview/panel/types';
 import { DefaultPanel } from '../groupview/panel/panel';
 import {
     CompositeDisposable,
@@ -24,6 +23,7 @@ import { DebugWidget } from './components/debug/debug';
 import {
     PanelContentPartConstructor,
     PanelHeaderPartConstructor,
+    IGroupPanel,
 } from '../groupview/panel/parts';
 import { debounce } from '../functions';
 import { sequentialNumberGenerator } from '../math';

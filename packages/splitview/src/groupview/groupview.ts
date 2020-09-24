@@ -3,14 +3,9 @@ import { ITabContainer, TabContainer } from './titlebar/tabContainer';
 import { IContentContainer, ContentContainer } from './panel/content/content';
 import { Position, Droptarget, DroptargetEvent } from './droptarget/droptarget';
 import { Event, Emitter, addDisposableListener } from '../events';
-import {
-    IGridPanelComponentView,
-    IGroupAccessor,
-    ComponentDockview,
-} from '../dockview';
+import { IGroupAccessor, ComponentDockview } from '../dockview';
 import { toggleClass } from '../dom';
-import { ClosePanelResult, WatermarkPart } from './panel/parts';
-import { IGroupPanel } from './panel/types';
+import { ClosePanelResult, WatermarkPart, IGroupPanel } from './panel/parts';
 import { timeoutPromise } from '../async';
 import {
     extractData,

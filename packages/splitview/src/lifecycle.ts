@@ -7,11 +7,6 @@ export interface IValueDisposable<T> {
     disposable: IDisposable;
 }
 
-export interface ISerializable {
-    toJSON(): object;
-    fromJSON(data: object): void;
-}
-
 export namespace Disposable {
     export const NONE: IDisposable = { dispose: () => {} };
 }

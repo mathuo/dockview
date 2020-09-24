@@ -11,7 +11,6 @@ export * from './lifecycle';
 export * from './groupview/panel/panel';
 export * from './api/groupPanelApi';
 export * from './react/react';
-export * from './groupview/panel/types';
 export * from './groupview/panel/parts';
 export * from './react';
 export * from './dockview';

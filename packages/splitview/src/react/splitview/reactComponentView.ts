@@ -7,7 +7,7 @@ import { PanelApi } from '../../api/panelApi';
 
 export class ReactComponentView
     extends BaseReactComponentGridView<PanelApi>
-    implements IView, IPanel {
+    implements IView {
     private _minimumSize: number = 200;
     private _maximumSize: number = Number.MAX_SAFE_INTEGER;
     private _snapSize: number;

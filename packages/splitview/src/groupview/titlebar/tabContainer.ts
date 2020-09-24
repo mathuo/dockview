@@ -13,7 +13,7 @@ import { IGroupview } from '../groupview';
 import { IGroupAccessor } from '../../dockview';
 import { last } from '../../array';
 import { DataTransferSingleton } from '../droptarget/dataTransfer';
-import { IGroupPanel } from '../panel/types';
+import { IGroupPanel } from '../panel/parts';
 import { MouseEventKind } from '../events';
 
 export interface ITabContainer extends IDisposable {

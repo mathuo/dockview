@@ -1,12 +1,12 @@
 import { ReactLayout } from '../dockview/dockview';
-import { InitParameters, IPanel } from '../../panel/types';
+import { PanelInitParameters, IPanel } from '../../panel/types';
 import { IGridPanelComponentView } from '../../gridview/componentGridview';
 import { FunctionOrValue } from '../../types';
 import { BaseReactComponentGridView } from '../baseReactComponentView';
 import { IGridviewComponentProps } from './gridview';
 import { GridPanelApi } from '../../api/gridPanelApi';
 
-export interface GridviewInitParameters extends InitParameters {
+export interface GridviewInitParameters extends PanelInitParameters {
     minimumWidth?: number;
     maximumWidth?: number;
     minimumHeight?: number;
@@ -15,7 +15,7 @@ export interface GridviewInitParameters extends InitParameters {
 
 export class ReactComponentGridView
     extends BaseReactComponentGridView<GridPanelApi>
-    implements IGridPanelComponentView, IPanel {
+    implements IGridPanelComponentView {
     private _minimumWidth: FunctionOrValue<number> = 200;
     private _minimumHeight: FunctionOrValue<number> = 200;
     private _maximumWidth: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;

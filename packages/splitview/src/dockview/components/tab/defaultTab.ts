@@ -1,7 +1,7 @@
 import { CompositeDisposable, MutableDisposable } from '../../../lifecycle';
 import {
     PanelHeaderPart,
-    PartInitParameters,
+    GroupPanelPartInitParameters,
 } from '../../../groupview/panel/parts';
 import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
@@ -17,7 +17,7 @@ export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
     private _list: HTMLElement;
     private action: HTMLElement;
     //
-    private params: PartInitParameters;
+    private params: GroupPanelPartInitParameters;
     //
     private isDirtyDisposable = new MutableDisposable();
 
@@ -65,7 +65,7 @@ export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
         return { id: this.id };
     }
 
-    public init(params: PartInitParameters) {
+    public init(params: GroupPanelPartInitParameters) {
         this.params = params;
         this._content.textContent = params.title;
 

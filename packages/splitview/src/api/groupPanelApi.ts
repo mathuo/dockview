@@ -1,7 +1,6 @@
 import { IGroupview } from '../groupview/groupview';
 import { Emitter, Event } from '../events';
-import { ClosePanelResult } from '../groupview/panel/parts';
-import { IGroupPanel } from '../groupview/panel/types';
+import { ClosePanelResult, IGroupPanel } from '../groupview/panel/parts';
 import { GridPanelApi, IGridPanelApi } from './gridPanelApi';
 
 interface ChangeVisibilityEvent {

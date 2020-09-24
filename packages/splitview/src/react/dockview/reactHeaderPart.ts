@@ -2,7 +2,7 @@ import * as React from 'react';
 import { IGroupPanelApi } from '../../api/groupPanelApi';
 import {
     PanelHeaderPart,
-    PartInitParameters,
+    GroupPanelPartInitParameters,
 } from '../../groupview/panel/parts';
 import { ReactPart } from '../react';
 import { IGroupPanelProps, ReactLayout } from './dockview';
@@ -23,7 +23,7 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
         this._element = document.createElement('div');
     }
 
-    public init(parameters: PartInitParameters): void {
+    public init(parameters: GroupPanelPartInitParameters): void {
         this.part = new ReactPart(
             this.element,
             parameters.api,

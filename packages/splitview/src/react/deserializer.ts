@@ -1,7 +1,10 @@
-import { IGroupPanel } from '../groupview/panel/types';
 import { ComponentDockview } from '../dockview/componentDockview';
 import { DefaultPanel } from '../groupview/panel/panel';
-import { PanelContentPart, PanelHeaderPart } from '../groupview/panel/parts';
+import {
+    PanelContentPart,
+    PanelHeaderPart,
+    IGroupPanel,
+} from '../groupview/panel/parts';
 import { IPanelDeserializer } from '../dockview/deserializer';
 import {
     createContentComponent,
