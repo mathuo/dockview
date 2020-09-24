@@ -2,22 +2,25 @@ import { SplitView, IView, Orientation } from '../splitview/splitview';
 import { IDisposable } from '../lifecycle';
 import { Emitter } from '../events';
 import { addClasses, removeClasses } from '../dom';
+import { Event } from 'splitview/dist/esm';
 
 export interface IPaneOptions {
     minimumBodySize?: number;
     maximumBodySize?: number;
-    orientation?: Orientation;
     isExpanded?: boolean;
 }
 
-export abstract class Pane implements IView {
+export interface IPaneview extends IView {
+    onDidChangeExpansionState: Event<boolean>;
+}
+
+export abstract class Pane implements IPaneview {
     private _element: HTMLElement;
     private _minimumBodySize: number;
     private _maximumBodySize: number;
     private _minimumSize: number;
     private _maximumSize: number;
     private _isExpanded: boolean;
-    private _orientation: Orientation;
     private _orthogonalSize: number;
     private animationTimer: NodeJS.Timeout;
     private expandedSize: number;
@@ -47,11 +50,7 @@ export abstract class Pane implements IView {
     get minimumSize(): number {
         const headerSize = this.headerSize;
         const expanded = this.isExpanded();
-        const minimumBodySize = expanded
-            ? this._minimumBodySize
-            : this._orientation === Orientation.HORIZONTAL
-            ? 50
-            : 0;
+        const minimumBodySize = expanded ? this._minimumBodySize : 0;
 
         return headerSize + minimumBodySize;
     }
@@ -59,17 +58,9 @@ export abstract class Pane implements IView {
     get maximumSize(): number {
         const headerSize = this.headerSize;
         const expanded = this.isExpanded();
-        const maximumBodySize = expanded
-            ? this._maximumBodySize
-            : this._orientation === Orientation.HORIZONTAL
-            ? 50
-            : 0;
+        const maximumBodySize = expanded ? this._maximumBodySize : 0;
 
         return headerSize + maximumBodySize;
-    }
-
-    get orientation() {
-        return this._orientation;
     }
 
     get orthogonalSize() {
@@ -84,10 +75,6 @@ export abstract class Pane implements IView {
     set maximumSize(size: number) {
         this._maximumSize = size;
         this._onDidChange.fire(undefined);
-    }
-
-    set orientation(orientation: Orientation) {
-        this._orientation = orientation;
     }
 
     set orthogonalSize(size: number) {
@@ -108,7 +95,6 @@ export abstract class Pane implements IView {
                 : Number.POSITIVE_INFINITY;
 
         this._isExpanded = options.isExpanded;
-        this.orientation = options.orientation;
     }
 
     public isExpanded() {
@@ -227,7 +213,6 @@ export class PaneView implements IDisposable {
         };
 
         this.paneItems.splice(index, 0, paneItem);
-        pane.orientation = this._orientation;
         pane.orthogonalSize = this.orthogonalSize;
         this.splitview.addView(pane, size, index);
     }

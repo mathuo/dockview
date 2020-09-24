@@ -3,7 +3,6 @@ import { Emitter, Event } from '../events';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { FunctionOrValue } from '../types';
 
-// we've tried to do a bit better than the 'any' type.
 // anything that is serializable JSON should be valid here
 type StateObject =
     | number

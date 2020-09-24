@@ -6,6 +6,8 @@ import { PaneviewComponentOptions } from './options';
 import { PaneView } from './paneview';
 
 export interface IComponentPaneView extends IDisposable {
+    readonly minimumSize: number;
+    readonly maximumSize: number;
     layout(size: number, orthogonalSize: number): void;
     addFromComponent(options: {
         id: string;
@@ -25,6 +27,7 @@ export class ComponentPaneView implements IComponentPaneView {
         private readonly options: PaneviewComponentOptions
     ) {
         this.paneview = new PaneView(this.element, {
+            // only allow paneview in the vertical orientation for now
             orientation: Orientation.VERTICAL,
         });
     }
