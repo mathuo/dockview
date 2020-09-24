@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { IGroupPanelApi } from '../../api/groupPanelApi';
 import {
     PanelHeaderPart,
     PartInitParameters,
@@ -38,7 +39,7 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
         };
     }
 
-    public layout(height: string) {
+    public layout(width: number, height: number) {
         // noop - retrieval from api
     }
 

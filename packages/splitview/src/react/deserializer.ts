@@ -36,9 +36,11 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
             this.layout.options.frameworkComponentFactory.tab
         ) as PanelHeaderPart;
 
-        const panel = new DefaultPanel(panelId, headerPart, contentPart);
+        const panel = new DefaultPanel(panelId);
 
         panel.init({
+            headerPart,
+            contentPart,
             title,
             suppressClosable,
             params: props || {},

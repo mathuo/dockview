@@ -1,9 +1,14 @@
-import { IGroupPanel, PanelInitParameters } from './types';
+import { IGroupPanel } from './types';
 import { GroupPanelApi } from '../../api/groupPanelApi';
 import { Event } from '../../events';
 import { IGroupview, GroupChangeKind } from '../groupview';
 import { MutableDisposable, CompositeDisposable } from '../../lifecycle';
-import { PanelContentPart, PanelHeaderPart, ClosePanelResult } from './parts';
+import {
+    PanelContentPart,
+    PanelHeaderPart,
+    ClosePanelResult,
+    IGroupPanelInitParameters,
+} from './parts';
 import { PanelUpdateEvent } from '../../panel/types';
 
 export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
@@ -11,9 +16,12 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
 
     private readonly api: GroupPanelApi;
     private _group: IGroupview;
-    private params: PanelInitParameters;
+    private params: IGroupPanelInitParameters;
 
     readonly onDidStateChange: Event<any>;
+
+    private headerPart: PanelHeaderPart;
+    private contentPart: PanelContentPart;
 
     get group() {
         return this._group;
@@ -27,11 +35,7 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
         return this.contentPart;
     }
 
-    constructor(
-        public readonly id: string,
-        private readonly headerPart: PanelHeaderPart,
-        private readonly contentPart: PanelContentPart
-    ) {
+    constructor(public readonly id: string) {
         super();
 
         this.api = new GroupPanelApi(this, this._group);
@@ -73,8 +77,11 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
         this.api._onDidStateChange.fire();
     }
 
-    public init(params: PanelInitParameters): void {
+    public init(params: IGroupPanelInitParameters): void {
         this.params = params;
+        this.contentPart = params.contentPart;
+        this.headerPart = params.headerPart;
+
         this.api.setState(this.params.state);
         if (this.content.init) {
             this.content.init({ ...params, api: this.api });

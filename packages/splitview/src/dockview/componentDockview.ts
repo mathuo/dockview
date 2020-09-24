@@ -498,17 +498,19 @@ export class ComponentDockview
     }
 
     public addPanel(options: AddPanelOptions): IGroupPanel {
-        const component = this.createContentComponent(
+        const contentPart = this.createContentComponent(
             options.id,
             options.componentName
         );
-        const tabComponent = this.createTabComponent(
+        const headerPart = this.createTabComponent(
             options.id,
             options.tabComponentName
         );
 
-        const panel = new DefaultPanel(options.id, tabComponent, component);
+        const panel = new DefaultPanel(options.id);
         panel.init({
+            headerPart,
+            contentPart,
             title: options.title || options.id,
             suppressClosable: options?.suppressClosable,
             params: options?.params || {},

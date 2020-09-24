@@ -1,11 +1,12 @@
 import * as React from 'react';
 import {
     PanelContentPart,
-    PartInitParameters,
     ClosePanelResult,
+    PartInitParameters,
 } from '../../groupview/panel/parts';
 import { ReactPart } from '../react';
 import { IGroupPanelProps, ReactLayout } from '../dockview/dockview';
+import { IGroupPanelApi } from '../../api/groupPanelApi';
 
 export class ReactPanelContentPart implements PanelContentPart {
     private _element: HTMLElement;
