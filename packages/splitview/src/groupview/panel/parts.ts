@@ -25,14 +25,12 @@ export interface GroupPanelPartInitParameters
 }
 
 export interface PanelHeaderPart extends IPanel {
-    id: string;
     element: HTMLElement;
     init?(parameters: GroupPanelPartInitParameters);
     setVisible(isPanelVisible: boolean, isGroupVisible: boolean): void;
 }
 
 export interface PanelContentPart extends IPanel {
-    id: string;
     element: HTMLElement;
     setVisible(isPanelVisible: boolean, isGroupVisible: boolean): void;
     init?(parameters: GroupPanelPartInitParameters);
@@ -49,7 +47,6 @@ export interface IGroupPanelInitParameters
 }
 
 export interface IGroupPanel extends IDisposable, IPanel {
-    id: string;
     header: PanelHeaderPart;
     content: PanelContentPart;
     group: IGroupview;

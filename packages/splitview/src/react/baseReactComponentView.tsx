@@ -11,7 +11,7 @@ export class BaseReactComponentGridView<T extends BaseViewApi>
     implements IPanel {
     private _element: HTMLElement;
     private part: ReactPart;
-    private params: { params: any };
+    private params: PanelInitParameters;
 
     private _onDidChange: Emitter<number | undefined> = new Emitter<
         number | undefined
@@ -66,7 +66,7 @@ export class BaseReactComponentGridView<T extends BaseViewApi>
     }
 
     update(params: PanelUpdateEvent) {
-        this.params = { ...this.params.params, ...params };
+        this.params = { ...this.params, params: params.params };
         this.part.update(params);
     }
 

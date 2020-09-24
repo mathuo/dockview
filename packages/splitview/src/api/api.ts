@@ -1,18 +1,22 @@
 import { Emitter, Event } from '../events';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 
-// anything that is serializable JSON should be valid here
-type StateObject =
+/**
+ * A valid JSON type
+ */
+export type StateObject =
     | number
     | string
     | boolean
-    | undefined
     | null
     | object
     | StateObject[]
     | { [key: string]: StateObject };
 
-interface State {
+/**
+ * A JSON-serializable object
+ */
+export interface State {
     [key: string]: StateObject;
 }
 

@@ -1,5 +1,5 @@
 import { ReactLayout } from '../dockview/dockview';
-import { PanelInitParameters, IPanel } from '../../panel/types';
+import { PanelInitParameters } from '../../panel/types';
 import { IGridPanelComponentView } from '../../gridview/componentGridview';
 import { FunctionOrValue } from '../../types';
 import { BaseReactComponentGridView } from '../baseReactComponentView';
