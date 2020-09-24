@@ -4,8 +4,8 @@ import {
     PartInitParameters,
     ClosePanelResult,
 } from '../../groupview/panel/parts';
-import { ReactPart, IPanelProps } from '../react';
-import { ReactLayout } from '../dockview/dockview';
+import { ReactPart } from '../react';
+import { IGroupPanelProps, ReactLayout } from '../dockview/dockview';
 
 export class ReactPanelContentPart implements PanelContentPart {
     private _element: HTMLElement;
@@ -17,7 +17,7 @@ export class ReactPanelContentPart implements PanelContentPart {
 
     constructor(
         public readonly id: string,
-        private readonly component: React.FunctionComponent<IPanelProps>,
+        private readonly component: React.FunctionComponent<IGroupPanelProps>,
         private readonly parent: ReactLayout
     ) {
         this._element = document.createElement('div');

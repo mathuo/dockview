@@ -4,14 +4,15 @@ import { GridPanelApi } from '../api/gridPanelApi';
 import { CompositeDisposable } from '../lifecycle';
 import { ReactLayout } from './dockview/dockview';
 import { ReactPart } from './react';
-import { ISplitviewPanelProps } from './splitview/splitview';
 import { PanelUpdateEvent, InitParameters } from '../panel/types';
+import { BaseViewApi, IBaseViewApi } from '../api/api';
 
-export class BaseReactComponentGridView extends CompositeDisposable {
+export class BaseReactComponentGridView<
+    T extends BaseViewApi
+> extends CompositeDisposable {
     private _element: HTMLElement;
     private part: ReactPart;
     private params: { params: any };
-    protected api: GridPanelApi;
 
     private _onDidChange: Emitter<number | undefined> = new Emitter<
         number | undefined
@@ -25,13 +26,11 @@ export class BaseReactComponentGridView extends CompositeDisposable {
     constructor(
         public readonly id: string,
         private readonly componentName: string,
-        private readonly component: React.FunctionComponent<
-            ISplitviewPanelProps
-        >,
-        private readonly parent: ReactLayout
+        private readonly component: React.FunctionComponent<{}>,
+        private readonly parent: ReactLayout,
+        protected readonly api: T
     ) {
         super();
-        this.api = new GridPanelApi();
         if (!this.component) {
             throw new Error('React.FunctionalComponent cannot be undefined');
         }

@@ -1,7 +1,7 @@
 import { IDisposable } from '../../lifecycle';
 import { IGroupview } from '../groupview';
 import { IGroupAccessor } from '../../dockview';
-import { IGroupPanelApi } from './api';
+import { IGroupPanelApi } from '../../api/groupPanelApi';
 import { PanelInitParameters } from './types';
 import { Constructor } from '../../types';
 

@@ -9,7 +9,7 @@ export * from './groupview/panel/tab/tab';
 export * from './events';
 export * from './lifecycle';
 export * from './groupview/panel/panel';
-export * from './groupview/panel/api';
+export * from './api/groupPanelApi';
 export * from './react/react';
 export * from './groupview/panel/types';
 export * from './groupview/panel/parts';

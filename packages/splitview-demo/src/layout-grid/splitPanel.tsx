@@ -1,12 +1,12 @@
 import * as React from 'react';
 import {
     CompositeDisposable,
-    IPanelProps,
     ISplitviewPanelProps,
     Orientation,
     SplitviewReadyEvent,
     SplitviewComponent,
     IComponentSplitview,
+    IGroupPanelProps,
 } from 'splitview';
 
 const components = {
@@ -32,7 +32,7 @@ const components = {
     },
 };
 
-export const SplitPanel = (props: IPanelProps) => {
+export const SplitPanel = (props: IGroupPanelProps) => {
     const api = React.useRef<IComponentSplitview>();
 
     React.useEffect(() => {

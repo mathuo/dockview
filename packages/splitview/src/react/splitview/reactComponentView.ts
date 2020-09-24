@@ -3,12 +3,10 @@ import { ReactLayout } from '../dockview/dockview';
 import { ISplitviewPanelProps } from './splitview';
 import { IPanel } from '../../panel/types';
 import { BaseReactComponentGridView } from '../baseReactComponentView';
+import { PanelApi } from '../../api/panelApi';
 
-/**
- * A no-thrills implementation of IView that renders a React component
- */
 export class ReactComponentView
-    extends BaseReactComponentGridView
+    extends BaseReactComponentGridView<PanelApi>
     implements IView, IPanel {
     private _minimumSize: number = 200;
     private _maximumSize: number = Number.MAX_SAFE_INTEGER;
@@ -41,7 +39,7 @@ export class ReactComponentView
         component: React.FunctionComponent<ISplitviewPanelProps>,
         parent: ReactLayout
     ) {
-        super(id, componentName, component, parent);
+        super(id, componentName, component, parent, new PanelApi());
     }
 
     dispose() {

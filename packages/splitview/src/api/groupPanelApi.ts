@@ -1,14 +1,14 @@
-import { IGroupview } from '../groupview';
-import { Emitter, Event } from '../../events';
-import { ClosePanelResult } from './parts';
-import { IGroupPanel } from './types';
-import { IBaseViewApi, BaseViewApi } from '../../api/api';
+import { IGroupview } from '../groupview/groupview';
+import { Emitter, Event } from '../events';
+import { ClosePanelResult } from '../groupview/panel/parts';
+import { IGroupPanel } from '../groupview/panel/types';
+import { GridPanelApi, IGridPanelApi } from './gridPanelApi';
 
 interface ChangeVisibilityEvent {
     isVisible: boolean;
 }
 
-export interface IGroupPanelApi extends IBaseViewApi {
+export interface IGroupPanelApi extends IGridPanelApi {
     // events
     onDidDirtyChange: Event<boolean>;
     onDidChangeVisibility: Event<ChangeVisibilityEvent>;
@@ -20,7 +20,7 @@ export interface IGroupPanelApi extends IBaseViewApi {
     setClosePanelHook(callback: () => Promise<ClosePanelResult>): void;
 }
 
-export class GroupPanelApi extends BaseViewApi implements IGroupPanelApi {
+export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
     private _isVisible: boolean;
     private _group: IGroupview;
     private _closePanelCallback: () => Promise<ClosePanelResult>;

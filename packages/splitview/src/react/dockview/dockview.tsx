@@ -3,12 +3,16 @@ import { IDisposable } from '../../lifecycle';
 import { ComponentDockview, Api } from '../../dockview/componentDockview';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
-import { IPanelProps } from '../react';
 import { ReactPanelDeserialzier } from '../deserializer';
 import {
     GroupPanelFrameworkComponentFactory,
     TabContextMenuEvent,
 } from '../../dockview/options';
+import { IGroupPanelApi } from '../../api/groupPanelApi';
+
+export interface IGroupPanelProps {
+    api: IGroupPanelApi;
+}
 
 export interface DockviewReadyEvent {
     api: Api;
@@ -20,10 +24,10 @@ export interface ReactLayout {
 
 export interface IDockviewComponentProps {
     components?: {
-        [componentName: string]: React.FunctionComponent<IPanelProps>;
+        [componentName: string]: React.FunctionComponent<IGroupPanelProps>;
     };
     tabComponents?: {
-        [componentName: string]: React.FunctionComponent<IPanelProps>;
+        [componentName: string]: React.FunctionComponent<IGroupPanelProps>;
     };
     watermarkComponent?: React.FunctionComponent;
     onReady?: (event: DockviewReadyEvent) => void;
@@ -33,8 +37,8 @@ export interface IDockviewComponentProps {
         fromJSON: (
             data: any
         ) => {
-            component: React.FunctionComponent<IPanelProps>;
-            tabComponent?: React.FunctionComponent<IPanelProps>;
+            component: React.FunctionComponent<IGroupPanelProps>;
+            tabComponent?: React.FunctionComponent<IGroupPanelProps>;
             props?: { [key: string]: any };
         };
     };
@@ -69,7 +73,7 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
                 createComponent: (
                     id: string,
                     componentId: string,
-                    component: React.FunctionComponent<IPanelProps>
+                    component: React.FunctionComponent<IGroupPanelProps>
                 ) => {
                     return new ReactPanelContentPart(componentId, component, {
                         addPortal,
@@ -80,7 +84,7 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
                 createComponent: (
                     id: string,
                     componentId: string,
-                    component: React.FunctionComponent<IPanelProps>
+                    component: React.FunctionComponent<IGroupPanelProps>
                 ) => {
                     return new ReactPanelHeaderPart(componentId, component, {
                         addPortal,

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
     Api,
-    IPanelProps,
+    IGroupPanelProps,
     ClosePanelResult,
     CompositeDisposable,
     GroupChangeKind,
@@ -15,7 +15,7 @@ import { Editor } from './editorPanel';
 import { SplitPanel } from './splitPanel';
 
 const components = {
-    inner_component: (props: IPanelProps) => {
+    inner_component: (props: IGroupPanelProps) => {
         const _api = React.useRef<Api>();
         const [api, setApi] = React.useState<Api>();
 
@@ -101,7 +101,7 @@ const components = {
             </div>
         );
     },
-    test_component: (props: IPanelProps & { [key: string]: any }) => {
+    test_component: (props: IGroupPanelProps & { [key: string]: any }) => {
         const [panelState, setPanelState] = React.useState<{
             isGroupActive: boolean;
             isPanelVisible: boolean;

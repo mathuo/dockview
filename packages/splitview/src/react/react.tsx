@@ -1,17 +1,12 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { IDisposable } from '../lifecycle';
-import { IGroupPanelApi } from '../groupview/panel/api';
 import { sequentialNumberGenerator } from '../math';
 import { IBaseViewApi } from '../api/api';
 
-export interface IPanelProps {
-    api: IGroupPanelApi;
-}
-
 interface IPanelWrapperProps {
-    component: React.FunctionComponent<IPanelProps>;
-    componentProps: any;
+    component: React.FunctionComponent<{}>;
+    componentProps: { [key: string]: any };
 }
 
 interface IPanelWrapperRef {
@@ -43,10 +38,7 @@ const PanelWrapper = React.forwardRef(
             };
         }, []);
 
-        return React.createElement(
-            props.component,
-            _props.current as IPanelProps
-        );
+        return React.createElement(props.component, _props.current);
     }
 );
 PanelWrapper.displayName = 'PanelWrapper';

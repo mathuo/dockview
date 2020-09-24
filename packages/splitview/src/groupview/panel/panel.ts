@@ -1,5 +1,5 @@
 import { IGroupPanel, PanelInitParameters } from './types';
-import { GroupPanelApi } from './api';
+import { GroupPanelApi } from '../../api/groupPanelApi';
 import { Event } from '../../events';
 import { IGroupview, GroupChangeKind } from '../groupview';
 import { MutableDisposable, CompositeDisposable } from '../../lifecycle';

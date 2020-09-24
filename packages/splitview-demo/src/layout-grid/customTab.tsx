@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { IPanelProps } from 'splitview';
+import { IGroupPanelProps } from 'splitview';
 
-export const CustomTab = (props: IPanelProps) => {
+export const CustomTab = (props: IGroupPanelProps) => {
     return <div>hello</div>;
 };

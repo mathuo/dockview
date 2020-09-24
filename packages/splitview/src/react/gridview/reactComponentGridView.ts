@@ -1,9 +1,10 @@
 import { ReactLayout } from '../dockview/dockview';
-import { ISplitviewPanelProps } from '../splitview/splitview';
 import { InitParameters, IPanel } from '../../panel/types';
 import { IGridPanelComponentView } from '../../gridview/componentGridview';
 import { FunctionOrValue } from '../../types';
 import { BaseReactComponentGridView } from '../baseReactComponentView';
+import { IGridviewComponentProps } from './gridview';
+import { GridPanelApi } from '../../api/gridPanelApi';
 
 export interface GridviewInitParameters extends InitParameters {
     minimumWidth?: number;
@@ -13,7 +14,7 @@ export interface GridviewInitParameters extends InitParameters {
 }
 
 export class ReactComponentGridView
-    extends BaseReactComponentGridView
+    extends BaseReactComponentGridView<GridPanelApi>
     implements IGridPanelComponentView, IPanel {
     private _minimumWidth: FunctionOrValue<number> = 200;
     private _minimumHeight: FunctionOrValue<number> = 200;
@@ -44,10 +45,10 @@ export class ReactComponentGridView
     constructor(
         id: string,
         componentName: string,
-        component: React.FunctionComponent<ISplitviewPanelProps>,
+        component: React.FunctionComponent<IGridviewComponentProps>,
         parent: ReactLayout
     ) {
-        super(id, componentName, component, parent);
+        super(id, componentName, component, parent, new GridPanelApi());
 
         this.addDisposables(
             this.api.onDidConstraintsChange((event) => {
