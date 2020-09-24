@@ -1,7 +1,6 @@
 import { PanelDimensionChangeEvent } from './types';
 import { Emitter, Event } from '../events';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
-import { FunctionOrValue } from '../types';
 
 // anything that is serializable JSON should be valid here
 type StateObject =
@@ -20,11 +19,6 @@ interface State {
 
 interface ChangeFocusEvent {
     isFocused: boolean;
-}
-
-interface PanelConstraintChangeEvent {
-    minimumSize?: number | (() => number);
-    maximumSize?: number | (() => number);
 }
 
 export interface IBaseViewApi extends IDisposable {
@@ -104,59 +98,5 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
 
     public dispose() {
         super.dispose();
-    }
-}
-
-interface PanelConstraintChangeEvent {
-    minimumSize?: FunctionOrValue<number>;
-    maximumSize?: FunctionOrValue<number>;
-}
-
-export interface IPanelApi extends IBaseViewApi {
-    onDidConstraintsChange: Event<PanelConstraintChangeEvent>;
-    setConstraints(value: PanelConstraintChangeEvent): void;
-}
-
-export class PanelApi extends BaseViewApi implements IPanelApi {
-    readonly _onDidConstraintsChange = new Emitter<PanelConstraintChangeEvent>({
-        emitLastValue: true,
-    });
-    readonly onDidConstraintsChange: Event<PanelConstraintChangeEvent> = this
-        ._onDidConstraintsChange.event;
-
-    constructor() {
-        super();
-    }
-
-    public setConstraints(value: PanelConstraintChangeEvent) {
-        this._onDidConstraintsChange.fire(value);
-    }
-}
-
-interface GridConstraintChangeEvent {
-    minimumWidth?: FunctionOrValue<number>;
-    minimumHeight?: FunctionOrValue<number>;
-    maximumWidth?: FunctionOrValue<number>;
-    maximumHeight?: FunctionOrValue<number>;
-}
-
-export interface IGridPanelApi extends IBaseViewApi {
-    onDidConstraintsChange: Event<GridConstraintChangeEvent>;
-    setConstraints(value: GridConstraintChangeEvent): void;
-}
-
-export class GridPanelApi extends BaseViewApi implements IGridPanelApi {
-    readonly _onDidConstraintsChange = new Emitter<GridConstraintChangeEvent>({
-        emitLastValue: true,
-    });
-    readonly onDidConstraintsChange: Event<GridConstraintChangeEvent> = this
-        ._onDidConstraintsChange.event;
-
-    constructor() {
-        super();
-    }
-
-    public setConstraints(value: GridConstraintChangeEvent) {
-        this._onDidConstraintsChange.fire(value);
     }
 }

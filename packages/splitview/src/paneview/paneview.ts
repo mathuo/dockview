@@ -1,8 +1,7 @@
 import { SplitView, IView, Orientation } from '../splitview/splitview';
 import { IDisposable } from '../lifecycle';
-import { Emitter } from '../events';
+import { Emitter, Event } from '../events';
 import { addClasses, removeClasses } from '../dom';
-import { Event } from 'splitview/dist/esm';
 
 export interface IPaneOptions {
     minimumBodySize?: number;

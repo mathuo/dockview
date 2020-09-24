@@ -2,7 +2,7 @@ import { IGroupview } from '../groupview';
 import { IDisposable, ISerializable } from '../../lifecycle';
 import { Event } from '../../events';
 import { PanelHeaderPart, PanelContentPart, ClosePanelResult } from './parts';
-import { InitParameters, IPanel } from '../../panel/types';
+import { InitParameters, IPanel } from '../../api/types';
 
 // init parameters
 

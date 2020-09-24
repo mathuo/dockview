@@ -17,7 +17,7 @@ export namespace Disposable {
 }
 
 export class CompositeDisposable {
-    private disposables: IDisposable[];
+    private readonly disposables: IDisposable[];
 
     public static from(...args: IDisposable[]) {
         return new CompositeDisposable(...args);

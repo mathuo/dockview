@@ -1,11 +1,11 @@
 import { trackFocus } from '../dom';
 import { Emitter } from '../events';
-import { GridPanelApi } from '../panel/api';
+import { GridPanelApi } from '../api/gridPanelApi';
 import { CompositeDisposable } from '../lifecycle';
 import { ReactLayout } from './dockview/dockview';
 import { ReactPart } from './react';
 import { ISplitviewPanelProps } from './splitview/splitview';
-import { PanelUpdateEvent, InitParameters } from '../panel/types';
+import { PanelUpdateEvent, InitParameters } from '../api/types';
 
 export class BaseReactComponentGridView extends CompositeDisposable {
     private _element: HTMLElement;

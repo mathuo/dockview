@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BaseViewApi, IBaseViewApi } from '../../panel/api';
+import { BaseViewApi, IBaseViewApi } from '../../api/api';
 import { Pane } from '../../paneview/paneview';
 import { ReactLayout } from '../dockview/dockview';
 import { ReactPart } from '../react';

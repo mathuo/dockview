@@ -1,6 +1,6 @@
 import { ReactLayout } from '../dockview/dockview';
 import { ISplitviewPanelProps } from '../splitview/splitview';
-import { InitParameters, IPanel } from '../../panel/types';
+import { InitParameters, IPanel } from '../../api/types';
 import { IGridPanelComponentView } from '../../gridview/componentGridview';
 import { FunctionOrValue } from '../../types';
 import { BaseReactComponentGridView } from '../baseReactComponentView';

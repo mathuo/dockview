@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { IDisposable } from '../lifecycle';
 import { IGroupPanelApi } from '../groupview/panel/api';
 import { sequentialNumberGenerator } from '../math';
-import { IBaseViewApi } from '../panel/api';
+import { IBaseViewApi } from '../api/api';
 
 export interface IPanelProps {
     api: IGroupPanelApi;

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IPanelApi } from '../../panel/api';
+import { IPanelApi } from '../../api/panelApi';
 import {
     ComponentPaneView,
     IComponentPaneView,

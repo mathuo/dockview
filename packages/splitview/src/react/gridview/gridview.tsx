@@ -3,7 +3,7 @@ import {
     ComponentGridview,
     IComponentGridview,
 } from '../../gridview/componentGridview';
-import { IGridPanelApi } from '../../panel/api';
+import { IGridPanelApi } from '../../api/gridPanelApi';
 import { Orientation } from '../../splitview/splitview';
 import { ReactComponentGridView } from './reactComponentGridView';
 

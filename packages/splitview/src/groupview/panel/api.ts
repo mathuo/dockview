@@ -2,7 +2,7 @@ import { IGroupview } from '../groupview';
 import { Emitter, Event } from '../../events';
 import { ClosePanelResult } from './parts';
 import { IGroupPanel } from './types';
-import { IBaseViewApi, BaseViewApi } from '../../panel/api';
+import { IBaseViewApi, BaseViewApi } from '../../api/api';
 
 interface ChangeVisibilityEvent {
     isVisible: boolean;
