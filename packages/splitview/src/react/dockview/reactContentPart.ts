@@ -54,9 +54,6 @@ export class ReactPanelContentPart implements PanelContentPart {
         return Promise.resolve(ClosePanelResult.CLOSE);
     }
 
-    public focus(): void {}
-    public onHide(): void {}
-
     public dispose() {
         this.part?.dispose();
     }

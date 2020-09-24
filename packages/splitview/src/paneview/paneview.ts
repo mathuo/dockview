@@ -1,5 +1,5 @@
 import { SplitView, IView, Orientation } from '../splitview/splitview';
-import { IDisposable } from '../lifecycle';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { Emitter, Event } from '../events';
 import { addClasses, removeClasses } from '../dom';
 
@@ -13,7 +13,7 @@ export interface IPaneview extends IView {
     onDidChangeExpansionState: Event<boolean>;
 }
 
-export abstract class Pane implements IPaneview {
+export abstract class Pane extends CompositeDisposable implements IPaneview {
     private _element: HTMLElement;
     private _minimumBodySize: number;
     private _maximumBodySize: number;
@@ -81,6 +81,10 @@ export abstract class Pane implements IPaneview {
     }
 
     constructor(options: IPaneOptions) {
+        super();
+
+        this.addDisposables(this._onDidChange, this._onDidChangeExpansionState);
+
         this._element = document.createElement('div');
         this._element.className = 'pane';
 

@@ -76,6 +76,17 @@ export class ComponentPaneView implements IComponentPaneView {
         this.paneview.layout(size, orthogonalSize);
     }
 
+    /**
+     * Resize the layout to fit the parent container
+     */
+    public resizeToFit(): void {
+        const {
+            width,
+            height,
+        } = this.element.parentElement.getBoundingClientRect();
+        this.layout(width, height);
+    }
+
     public dispose() {
         this.paneview.dispose();
     }

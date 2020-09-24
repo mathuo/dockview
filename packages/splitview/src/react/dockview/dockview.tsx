@@ -9,6 +9,7 @@ import {
     TabContextMenuEvent,
 } from '../../dockview/options';
 import { IGroupPanelApi } from '../../api/groupPanelApi';
+import { usePortalsLifecycle } from '../react';
 
 export interface IGroupPanelProps {
     api: IGroupPanelApi;
@@ -51,23 +52,12 @@ export interface IDockviewComponentProps {
 export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps> = (
     props: IDockviewComponentProps
 ) => {
-    const domReference = React.useRef<HTMLDivElement>();
-    const layoutReference = React.useRef<ComponentDockview>();
+    const domRef = React.useRef<HTMLDivElement>();
+    const dockviewRef = React.useRef<ComponentDockview>();
 
-    const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
+    const [portals, addPortal] = usePortalsLifecycle();
 
     React.useEffect(() => {
-        const addPortal = (p: React.ReactPortal) => {
-            setPortals((portals) => [...portals, p]);
-            return {
-                dispose: () => {
-                    setPortals((portals) =>
-                        portals.filter((portal) => portal !== p)
-                    );
-                },
-            };
-        };
-
         const factory: GroupPanelFrameworkComponentFactory = {
             content: {
                 createComponent: (
@@ -95,7 +85,7 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
 
         const element = document.createElement('div');
 
-        const layout = new ComponentDockview(element, {
+        const dockview = new ComponentDockview(element, {
             frameworkComponentFactory: factory,
             frameworkComponents: props.components,
             frameworkTabComponents: props.tabComponents,
@@ -105,28 +95,28 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
             // orientation: props.orientation,
         });
 
-        layoutReference.current = layout;
-        domReference.current.appendChild(layoutReference.current.element);
-
-        layout.deserializer = new ReactPanelDeserialzier(layout);
-
-        layout.resizeToFit();
+        domRef.current.appendChild(dockview.element);
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
 
         if (props.serializedLayout) {
-            layout.deserialize(props.serializedLayout);
+            dockview.deserialize(props.serializedLayout);
         }
+
+        dockview.resizeToFit();
 
         if (props.onReady) {
-            props.onReady({ api: layout });
+            props.onReady({ api: dockview });
         }
 
+        dockviewRef.current = dockview;
+
         return () => {
-            layout.dispose();
+            dockview.dispose();
         };
     }, []);
 
     React.useEffect(() => {
-        const disposable = layoutReference.current.onTabContextMenu((event) => {
+        const disposable = dockviewRef.current.onTabContextMenu((event) => {
             props.onTabContextMenu(event);
         });
 
@@ -136,9 +126,7 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
     }, [props.onTabContextMenu]);
 
     React.useEffect(() => {
-        layoutReference.current.setAutoResizeToFit(
-            props.autoSizeToFitContainer
-        );
+        dockviewRef.current.setAutoResizeToFit(props.autoSizeToFitContainer);
     }, [props.autoSizeToFitContainer]);
 
     return (
@@ -147,7 +135,7 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
                 // height: '100%',
                 width: '100%',
             }}
-            ref={domReference}
+            ref={domRef}
         >
             {portals}
         </div>

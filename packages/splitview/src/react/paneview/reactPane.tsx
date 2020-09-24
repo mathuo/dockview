@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { BaseViewApi, IBaseViewApi } from '../../api/api';
+import { IPanePanelApi, PanePanelApi } from '../../api/panePanelApi';
 import { Pane } from '../../paneview/paneview';
 import { ReactLayout } from '../dockview/dockview';
 import { ReactPart } from '../react';
 
 export class PaneReact extends Pane {
     private params: {};
-    private api: IBaseViewApi;
+    private api: PanePanelApi;
 
     private contentPart: ReactPart;
     private headerPart: ReactPart;
@@ -27,7 +27,14 @@ export class PaneReact extends Pane {
             // options.isExpanded
         });
 
-        this.api = new BaseViewApi();
+        this.api = new PanePanelApi();
+
+        this.addDisposables(
+            this.onDidChangeExpansionState((isExpanded) => {
+                this.api._onDidExpansionChange.fire({ isExpanded });
+            })
+        );
+
         this.render();
     }
 
@@ -62,6 +69,7 @@ export class PaneReact extends Pane {
     }
 
     public dispose() {
+        super.dispose();
         this.headerPart.dispose();
         this.contentPart.dispose();
         this.api.dispose();

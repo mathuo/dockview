@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { IGroupPanelApi } from '../../api/groupPanelApi';
 import {
     PanelHeaderPart,
     GroupPanelPartInitParameters,

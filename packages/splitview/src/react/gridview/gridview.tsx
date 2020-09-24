@@ -6,6 +6,7 @@ import {
 import { IGridPanelApi } from '../../api/gridPanelApi';
 import { Orientation } from '../../splitview/splitview';
 import { ReactComponentGridView } from './reactComponentGridView';
+import { usePortalsLifecycle } from '../react';
 
 export interface GridviewReadyEvent {
     api: IComponentGridview;
@@ -26,23 +27,12 @@ export interface IGridviewComponentProps {
 export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps> = (
     props: IGridviewComponentProps
 ) => {
-    const domReference = React.useRef<HTMLDivElement>();
-    const gridview = React.useRef<IComponentGridview>();
-    const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
-
-    const addPortal = React.useCallback((p: React.ReactPortal) => {
-        setPortals((portals) => [...portals, p]);
-        return {
-            dispose: () => {
-                setPortals((portals) =>
-                    portals.filter((portal) => portal !== p)
-                );
-            },
-        };
-    }, []);
+    const domRef = React.useRef<HTMLDivElement>();
+    const gridviewRef = React.useRef<IComponentGridview>();
+    const [portals, addPortal] = usePortalsLifecycle();
 
     React.useEffect(() => {
-        gridview.current = new ComponentGridview(domReference.current, {
+        const gridview = new ComponentGridview(domRef.current, {
             orientation: props.orientation,
             frameworkComponents: props.components,
             frameworkComponentFactory: {
@@ -59,9 +49,17 @@ export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps>
             },
         });
 
+        // gridview.resizeToFit();
+
         if (props.onReady) {
-            props.onReady({ api: gridview.current });
+            props.onReady({ api: gridview });
         }
+
+        gridviewRef.current = gridview;
+
+        return () => {
+            gridview.dispose();
+        };
     }, []);
 
     return (
@@ -70,7 +68,7 @@ export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps>
                 height: '100%',
                 width: '100%',
             }}
-            ref={domReference}
+            ref={domRef}
         >
             {portals}
         </div>

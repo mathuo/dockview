@@ -1,17 +1,18 @@
 import * as React from 'react';
-import { IPanelApi } from '../../api/panelApi';
+import { IPanePanelApi } from '../../api/panePanelApi';
 import {
     ComponentPaneView,
     IComponentPaneView,
 } from '../../paneview/componentPaneView';
 import { PaneReact } from './reactPane';
+import { usePortalsLifecycle } from '../react';
 
 export interface PaneviewReadyEvent {
     api: IComponentPaneView;
 }
 
 export interface IPaneviewPanelProps {
-    api: IPanelApi;
+    api: IPanePanelApi;
 }
 
 export interface IPaneviewComponentProps {
@@ -24,23 +25,12 @@ export interface IPaneviewComponentProps {
 export const PaneViewComponent: React.FunctionComponent<IPaneviewComponentProps> = (
     props: IPaneviewComponentProps
 ) => {
-    const domReference = React.useRef<HTMLDivElement>();
-    const splitpanel = React.useRef<IComponentPaneView>();
-    const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
-
-    const addPortal = React.useCallback((p: React.ReactPortal) => {
-        setPortals((portals) => [...portals, p]);
-        return {
-            dispose: () => {
-                setPortals((portals) =>
-                    portals.filter((portal) => portal !== p)
-                );
-            },
-        };
-    }, []);
+    const domRef = React.useRef<HTMLDivElement>();
+    const paneviewRef = React.useRef<IComponentPaneView>();
+    const [portals, addPortal] = usePortalsLifecycle();
 
     React.useEffect(() => {
-        splitpanel.current = new ComponentPaneView(domReference.current, {
+        const paneview = new ComponentPaneView(domRef.current, {
             frameworkComponents: props.components,
             components: {},
             frameworkWrapper: {
@@ -56,16 +46,20 @@ export const PaneViewComponent: React.FunctionComponent<IPaneviewComponentProps>
             },
         });
 
-        const { width, height } = domReference.current.getBoundingClientRect();
+        const { width, height } = domRef.current.getBoundingClientRect();
         const [size, orthogonalSize] = [height, width];
-        splitpanel.current.layout(size, orthogonalSize);
+        paneview.layout(size, orthogonalSize);
 
         if (props.onReady) {
-            props.onReady({ api: splitpanel.current });
+            props.onReady({ api: paneview });
         }
 
+        paneview.resizeToFit();
+
+        paneviewRef.current = paneview;
+
         return () => {
-            splitpanel.current.dispose();
+            paneview.dispose();
         };
     }, []);
 
@@ -75,7 +69,7 @@ export const PaneViewComponent: React.FunctionComponent<IPaneviewComponentProps>
                 height: '100%',
                 width: '100%',
             }}
-            ref={domReference}
+            ref={domRef}
         >
             {portals}
         </div>

@@ -5,6 +5,7 @@ import {
     ComponentSplitview,
 } from '../../splitview/componentSplitview';
 import { Orientation } from '../../splitview/splitview';
+import { usePortalsLifecycle } from '../react';
 import { ReactComponentView } from './reactComponentView';
 
 export interface SplitviewReadyEvent {
@@ -26,23 +27,12 @@ export interface ISplitviewComponentProps {
 export const SplitviewComponent: React.FunctionComponent<ISplitviewComponentProps> = (
     props: ISplitviewComponentProps
 ) => {
-    const domReference = React.useRef<HTMLDivElement>();
-    const splitpanel = React.useRef<IComponentSplitview>();
-    const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
-
-    const addPortal = React.useCallback((p: React.ReactPortal) => {
-        setPortals((portals) => [...portals, p]);
-        return {
-            dispose: () => {
-                setPortals((portals) =>
-                    portals.filter((portal) => portal !== p)
-                );
-            },
-        };
-    }, []);
+    const domRef = React.useRef<HTMLDivElement>();
+    const splitviewRef = React.useRef<IComponentSplitview>();
+    const [portals, addPortal] = usePortalsLifecycle();
 
     React.useEffect(() => {
-        splitpanel.current = new ComponentSplitview(domReference.current, {
+        const splitview = new ComponentSplitview(domRef.current, {
             orientation: props.orientation,
             frameworkComponents: props.components,
             frameworkWrapper: {
@@ -55,19 +45,16 @@ export const SplitviewComponent: React.FunctionComponent<ISplitviewComponentProp
             proportionalLayout: false,
         });
 
-        const { width, height } = domReference.current.getBoundingClientRect();
-        const [size, orthogonalSize] =
-            props.orientation === Orientation.HORIZONTAL
-                ? [width, height]
-                : [height, width];
-        splitpanel.current.layout(size, orthogonalSize);
+        splitview.resizeToFit();
 
         if (props.onReady) {
-            props.onReady({ api: splitpanel.current });
+            props.onReady({ api: splitview });
         }
 
+        splitviewRef.current = splitview;
+
         return () => {
-            splitpanel.current.dispose();
+            splitview.dispose();
         };
     }, []);
 
@@ -77,7 +64,7 @@ export const SplitviewComponent: React.FunctionComponent<ISplitviewComponentProp
                 height: '100%',
                 width: '100%',
             }}
-            ref={domReference}
+            ref={domRef}
         >
             {portals}
         </div>

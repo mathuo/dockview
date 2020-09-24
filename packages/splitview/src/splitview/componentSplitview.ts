@@ -79,6 +79,17 @@ export class ComponentSplitview implements IComponentSplitview {
         };
     }
 
+    /**
+     * Resize the layout to fit the parent container
+     */
+    public resizeToFit(): void {
+        const {
+            width,
+            height,
+        } = this.element.parentElement.getBoundingClientRect();
+        this.layout(width, height);
+    }
+
     private registerView(view: ISerializableView) {
         //
     }

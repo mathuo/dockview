@@ -118,3 +118,28 @@ export class ReactPart implements IDisposable {
         this.disposed = true;
     }
 }
+
+/**
+ * A React Hook that returns an array of portals to be rendered by the user of this hook
+ * and a disposable function to add a portal. Calling dispose remove this portal from the
+ * portal array
+ */
+export const usePortalsLifecycle = () => {
+    const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
+
+    const addPortal = React.useCallback((p: React.ReactPortal) => {
+        setPortals((portals) => [...portals, p]);
+        return {
+            dispose: () => {
+                setPortals((portals) =>
+                    portals.filter((portal) => portal !== p)
+                );
+            },
+        };
+    }, []);
+
+    return [portals, addPortal] as [
+        React.ReactPortal[],
+        (portal: React.ReactPortal) => IDisposable
+    ];
+};
