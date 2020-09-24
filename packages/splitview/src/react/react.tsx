@@ -127,6 +127,8 @@ export class ReactPart implements IDisposable {
 export const usePortalsLifecycle = () => {
     const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
 
+    React.useDebugValue(`Portal count: ${portals.length}`);
+
     const addPortal = React.useCallback((p: React.ReactPortal) => {
         setPortals((portals) => [...portals, p]);
         return {
