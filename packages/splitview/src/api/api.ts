@@ -1,4 +1,3 @@
-import { PanelDimensionChangeEvent } from './types';
 import { Emitter, Event } from '../events';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 
@@ -19,6 +18,10 @@ interface State {
 
 interface ChangeFocusEvent {
     isFocused: boolean;
+}
+interface PanelDimensionChangeEvent {
+    width: number;
+    height: number;
 }
 
 export interface IBaseViewApi extends IDisposable {

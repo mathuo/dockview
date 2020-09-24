@@ -1,7 +1,7 @@
 import { IView } from '../../splitview/splitview';
 import { ReactLayout } from '../dockview/dockview';
 import { ISplitviewPanelProps } from './splitview';
-import { IPanel } from '../../api/types';
+import { IPanel } from '../../panel/types';
 import { BaseReactComponentGridView } from '../baseReactComponentView';
 
 /**

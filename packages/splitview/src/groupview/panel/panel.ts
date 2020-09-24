@@ -4,7 +4,7 @@ import { Event } from '../../events';
 import { IGroupview, GroupChangeKind } from '../groupview';
 import { MutableDisposable, CompositeDisposable } from '../../lifecycle';
 import { PanelContentPart, PanelHeaderPart, ClosePanelResult } from './parts';
-import { PanelUpdateEvent } from '../../api/types';
+import { PanelUpdateEvent } from '../../panel/types';
 
 export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
     private readonly mutableDisposable = new MutableDisposable();

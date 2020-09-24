@@ -12,8 +12,3 @@ export interface IPanel {
     layout?(width: number, height: number): void;
     update?(event: PanelUpdateEvent): void;
 }
-
-export interface PanelDimensionChangeEvent {
-    width: number;
-    height: number;
-}

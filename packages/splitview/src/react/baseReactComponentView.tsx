@@ -5,7 +5,7 @@ import { CompositeDisposable } from '../lifecycle';
 import { ReactLayout } from './dockview/dockview';
 import { ReactPart } from './react';
 import { ISplitviewPanelProps } from './splitview/splitview';
-import { PanelUpdateEvent, InitParameters } from '../api/types';
+import { PanelUpdateEvent, InitParameters } from '../panel/types';
 
 export class BaseReactComponentGridView extends CompositeDisposable {
     private _element: HTMLElement;
