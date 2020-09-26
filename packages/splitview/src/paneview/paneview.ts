@@ -13,6 +13,8 @@ export interface IPaneview extends IView {
     onDidChangeExpansionState: Event<boolean>;
 }
 
+const MINIMUM_BODY_SIZE = 120;
+
 export abstract class Pane extends CompositeDisposable implements IPaneview {
     private _element: HTMLElement;
     private _minimumBodySize: number;
@@ -91,7 +93,7 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
         this._minimumBodySize =
             typeof options.minimumBodySize === 'number'
                 ? options.minimumBodySize
-                : 120;
+                : MINIMUM_BODY_SIZE;
         this._maximumBodySize =
             typeof options.maximumBodySize === 'number'
                 ? options.maximumBodySize

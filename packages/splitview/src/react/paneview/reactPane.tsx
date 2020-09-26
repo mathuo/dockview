@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IPanePanelApi, PanePanelApi } from '../../api/panePanelApi';
+import { PanePanelApi } from '../../api/panePanelApi';
 import { Pane } from '../../paneview/paneview';
 import { ReactLayout } from '../dockview/dockview';
 import { ReactPart } from '../react';
@@ -20,14 +20,13 @@ export class PaneReact extends Pane {
             isExpanded?: boolean;
             headerName?: string;
             headerComponent?: React.FunctionComponent<{}>;
+            minimumBodySize?: number;
+            maximumBodySize;
         }
     ) {
-        super({
-            isExpanded: true,
-            // options.isExpanded
-        });
+        super(options);
 
-        this.api = new PanePanelApi();
+        this.api = new PanePanelApi(this);
 
         this.addDisposables(
             this.onDidChangeExpansionState((isExpanded) => {
