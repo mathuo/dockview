@@ -138,7 +138,7 @@ export class ComponentGridview
             this.options.frameworkComponentFactory.createComponent
         );
         view.init({
-            params: {},
+            params: options.params,
             minimumWidth: options.minimumWidth,
             maximumWidth: options.maximumWidth,
             minimumHeight: options.minimumHeight,

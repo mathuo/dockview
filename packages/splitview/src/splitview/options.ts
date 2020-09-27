@@ -1,9 +1,14 @@
 import { IView, ISplitViewOptions } from '../splitview/splitview';
-import { Constructor, FrameworkFactory } from '../types';
+import { Constructor, FrameworkFactory, ICommonView } from '../types';
 
-export interface ISerializableView extends IView {
+export interface ISerializableView extends IView, ICommonView {
     toJSON: () => object;
-    init: (params: { params: any }) => void;
+    init: (params: {
+        params: any;
+        minimumSize?: number;
+        maximumSize?: number;
+        snapSize?: number;
+    }) => void;
 }
 
 export interface SplitPanelOptions extends ISplitViewOptions {

@@ -33,6 +33,8 @@ const components = {
     },
 };
 
+const SPLIT_PANEL_STATE_KEY = 'splitview_panel_state';
+
 export const SplitPanel = (props: IGroupPanelProps) => {
     const api = React.useRef<IComponentSplitview>();
 
@@ -42,7 +44,7 @@ export const SplitPanel = (props: IGroupPanelProps) => {
                 api.current?.layout(event.width, event.height - 20);
             }),
             api.current.onChange((event) => {
-                props.api.setState('sview_layout', api.current.toJSON());
+                props.api.setState(SPLIT_PANEL_STATE_KEY, api.current.toJSON());
             })
         );
 
@@ -52,10 +54,10 @@ export const SplitPanel = (props: IGroupPanelProps) => {
     }, []);
 
     const onReady = (event: SplitviewReadyEvent) => {
-        const existingLayout = props.api.getStateKey('sview_layout');
+        const existingLayout = props.api.getStateKey(SPLIT_PANEL_STATE_KEY);
 
         if (existingLayout) {
-            event.api.deserialize(existingLayout);
+            event.api.fromJSON(existingLayout);
         } else {
             event.api.addFromComponent({ id: '1', component: 'default1' });
             event.api.addFromComponent({ id: '2', component: 'default1' });
@@ -64,7 +66,7 @@ export const SplitPanel = (props: IGroupPanelProps) => {
     };
 
     const onSave = () => {
-        props.api.setState('sview_layout', api.current.toJSON());
+        props.api.setState(SPLIT_PANEL_STATE_KEY, api.current.toJSON());
     };
 
     return (
