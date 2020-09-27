@@ -5,20 +5,23 @@ import { Orientation } from '../splitview/splitview';
 import { PaneviewComponentOptions } from './options';
 import { PaneView } from './paneview';
 
-export interface AddPanviewCompponentOptions {
+export interface AddPaneviewCompponentOptions {
     id: string;
     component: string;
     tabComponentName: string;
     params: {
         [key: string]: any;
     };
+    minimumBodySize?: number;
+    maximumBodySize?: number;
+    isExpanded?: boolean;
 }
 
 export interface IComponentPaneView extends IDisposable {
     readonly minimumSize: number;
     readonly maximumSize: number;
     layout(size: number, orthogonalSize: number): void;
-    addFromComponent(options: AddPanviewCompponentOptions): IDisposable;
+    addFromComponent(options: AddPaneviewCompponentOptions): IDisposable;
     resizeToFit(): void;
 }
 
@@ -43,7 +46,7 @@ export class ComponentPaneView implements IComponentPaneView {
         return this.paneview.maximumSize;
     }
 
-    addFromComponent(options: AddPanviewCompponentOptions): IDisposable {
+    addFromComponent(options: AddPaneviewCompponentOptions): IDisposable {
         const view = (createComponent(
             options.id,
             options.component,
@@ -52,10 +55,13 @@ export class ComponentPaneView implements IComponentPaneView {
             this.options.frameworkWrapper.createComponent
         ) as unknown) as PaneReact;
 
-        // this.registerView(view);
-
         this.paneview.addPane(view);
-        view.init({ params: options.params });
+        view.init({
+            params: options.params,
+            minimumBodySize: options.minimumBodySize,
+            maximumBodySize: options.maximumBodySize,
+            isExpanded: options.isExpanded,
+        });
 
         return {
             dispose: () => {

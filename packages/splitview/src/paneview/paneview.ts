@@ -71,6 +71,16 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
         this._orthogonalSize = size;
     }
 
+    set minimumBodySize(value: number) {
+        this._minimumBodySize =
+            typeof value === 'number' ? value : MINIMUM_BODY_SIZE;
+    }
+
+    set maximumBodySize(value: number) {
+        this._maximumBodySize =
+            typeof value === 'number' ? value : Number.POSITIVE_INFINITY;
+    }
+
     constructor(options: IPaneOptions) {
         super();
 
@@ -79,15 +89,8 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
         this._element = document.createElement('div');
         this._element.className = 'pane';
 
-        this._minimumBodySize =
-            typeof options.minimumBodySize === 'number'
-                ? options.minimumBodySize
-                : MINIMUM_BODY_SIZE;
-        this._maximumBodySize =
-            typeof options.maximumBodySize === 'number'
-                ? options.maximumBodySize
-                : Number.POSITIVE_INFINITY;
-
+        this.minimumBodySize = options.minimumBodySize;
+        this.maximumBodySize = options.maximumBodySize;
         this._isExpanded = options.isExpanded;
     }
 

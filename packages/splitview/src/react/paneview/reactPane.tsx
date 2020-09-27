@@ -1,11 +1,18 @@
 import * as React from 'react';
+import { PanelInitParameters } from '../../panel/types';
 import { PanePanelApi } from '../../api/panePanelApi';
 import { Pane } from '../../paneview/paneview';
 import { ReactLayout } from '../dockview/dockview';
 import { ReactPart } from '../react';
 
+export interface PanePanelInitParameter extends PanelInitParameters {
+    minimumBodySize?: number;
+    maximumBodySize?: number;
+    isExpanded?: boolean;
+}
+
 export class PaneReact extends Pane {
-    private params: {};
+    private params: PanelInitParameters;
     private api: PanePanelApi;
 
     private contentPart: ReactPart;
@@ -37,7 +44,17 @@ export class PaneReact extends Pane {
         this.render();
     }
 
-    init(parameters: {}): void {
+    init(parameters: PanePanelInitParameter): void {
+        if (typeof parameters.minimumBodySize === 'number') {
+            this.minimumBodySize = parameters.minimumBodySize;
+        }
+        if (typeof parameters.maximumBodySize === 'number') {
+            this.maximumBodySize = parameters.maximumBodySize;
+        }
+        if (typeof parameters.isExpanded === 'boolean') {
+            this.setExpanded(parameters.isExpanded);
+        }
+
         this.params = parameters;
         this.contentPart = new ReactPart(
             this.body,
