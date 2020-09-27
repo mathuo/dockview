@@ -93,6 +93,10 @@ export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
         this.render();
     }
 
+    public layout(width: number, height: number) {
+        // noop
+    }
+
     private render() {
         //
     }

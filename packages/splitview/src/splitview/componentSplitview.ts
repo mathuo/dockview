@@ -5,13 +5,12 @@ import {
     ISerializableView,
     SplitPanelOptions,
 } from './options';
+import { Parameters } from '../panel/types';
 
 export interface AddSplitviewComponentOptions {
     id: string;
     component: string;
-    params?: {
-        [index: string]: any;
-    };
+    params?: Parameters;
     priority?: LayoutPriority;
     minimumSize?: number;
     maximumSize?: number;
@@ -75,8 +74,8 @@ export class ComponentSplitview implements IComponentSplitview {
             minimumSize: options.minimumSize,
             maximumSize: options.maximumSize,
             snapSize: options.snapSize,
+            priority: options.priority,
         });
-        view.priority = options.priority;
 
         return {
             dispose: () => {
@@ -154,24 +153,13 @@ export class ComponentSplitview implements IComponentSplitview {
                         this.options.frameworkWrapper.createComponent
                     );
 
-                    if (typeof v.minimumSize === 'number') {
-                        view.minimumSize = v.minimumSize;
-                    }
-                    if (typeof v.maximumSize === 'number') {
-                        view.maximumSize = v.maximumSize;
-                    }
-                    if (typeof v.snapSize === 'number') {
-                        view.snapSize = v.snapSize;
-                    }
-
                     view.init({
                         params: v.props,
                         minimumSize: v.minimumSize,
                         maximumSize: v.maximumSize,
                         snapSize: v.snapSize,
+                        priority: v.priority,
                     });
-
-                    view.priority = v.priority;
 
                     return { size: v.size, view };
                 }),

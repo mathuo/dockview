@@ -1,14 +1,20 @@
-import { IView, ISplitViewOptions } from '../splitview/splitview';
-import { Constructor, FrameworkFactory, ICommonView } from '../types';
+import { IPanel, PanelInitParameters } from '../panel/types';
+import {
+    IView,
+    ISplitViewOptions,
+    LayoutPriority,
+} from '../splitview/splitview';
+import { Constructor, FrameworkFactory } from '../types';
 
-export interface ISerializableView extends IView, ICommonView {
-    toJSON: () => object;
-    init: (params: {
-        params: any;
-        minimumSize?: number;
-        maximumSize?: number;
-        snapSize?: number;
-    }) => void;
+export interface PanelViewInitParameters extends PanelInitParameters {
+    minimumSize?: number;
+    maximumSize?: number;
+    snapSize?: number;
+    priority?: LayoutPriority;
+}
+
+export interface ISerializableView extends IView, IPanel {
+    init: (params: PanelViewInitParameters) => void;
 }
 
 export interface SplitPanelOptions extends ISplitViewOptions {

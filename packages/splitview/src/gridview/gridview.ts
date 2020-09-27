@@ -142,7 +142,11 @@ export interface IGridView {
     readonly minimumHeight: number;
     readonly maximumHeight: number;
     priority?: LayoutPriority;
-    layout(width: number, height: number, top: number, left: number): void;
+    layout(
+        width: number,
+        height: number
+        // top: number, left: number
+    ): void;
     toJSON?(): object;
     fromJSON?(json: object): void;
     snap?: boolean;

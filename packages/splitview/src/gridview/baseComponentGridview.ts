@@ -6,7 +6,7 @@ import { GroupChangeEvent, GroupChangeKind } from '../groupview/groupview';
 import { CompositeDisposable, IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
 import { Orientation } from '../splitview/splitview';
-import { ICommonView } from '../types';
+import { IPanel } from '../panel/types';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -33,7 +33,7 @@ export interface BaseGridOptions {
     readonly orientation?: Orientation;
 }
 
-export interface IGridPanelView extends IGridView, ICommonView {
+export interface IGridPanelView extends IGridView, IPanel {
     setActive(isActive: boolean): void;
     isActive: boolean;
 }

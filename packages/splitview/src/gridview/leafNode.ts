@@ -89,6 +89,6 @@ export class LeafNode implements IView {
                 ? [orthogonalSize, size]
                 : [size, orthogonalSize];
 
-        this.view.layout(width, height, 0, 0);
+        this.view.layout(width, height);
     }
 }

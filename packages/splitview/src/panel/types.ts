@@ -20,7 +20,7 @@ export interface PanelUpdateEvent {
 export interface IPanel extends IDisposable {
     readonly id: string;
     init?(params: PanelInitParameters): void;
-    layout?(width: number, height: number): void;
+    layout(width: number, height: number): void;
     update?(event: PanelUpdateEvent): void;
     toJSON?(): object;
 }

@@ -46,7 +46,7 @@ PanelWrapper.displayName = 'PanelWrapper';
 /**
  * Since we are storing the React.Portal references in a rendered array they
  * require a key property like any other React elements rendered in an array
- * to prevent excess re-rendering
+ * to prevent excessive re-rendering
  */
 const uniquePortalKeyGenerator = sequentialNumberGenerator();
 
@@ -119,29 +119,34 @@ export class ReactPart implements IDisposable {
     }
 }
 
+type PortalLifecycleHook = () => [
+    React.ReactPortal[],
+    (portal: React.ReactPortal) => IDisposable
+];
+
 /**
  * A React Hook that returns an array of portals to be rendered by the user of this hook
- * and a disposable function to add a portal. Calling dispose remove this portal from the
+ * and a disposable function to add a portal. Calling dispose removes this portal from the
  * portal array
  */
-export const usePortalsLifecycle = () => {
+export const usePortalsLifecycle: PortalLifecycleHook = () => {
     const [portals, setPortals] = React.useState<React.ReactPortal[]>([]);
 
     React.useDebugValue(`Portal count: ${portals.length}`);
 
-    const addPortal = React.useCallback((p: React.ReactPortal) => {
-        setPortals((portals) => [...portals, p]);
+    const addPortal = React.useCallback((portal: React.ReactPortal) => {
+        setPortals((portals) => [...portals, portal]);
+        let disposed = false;
         return {
             dispose: () => {
-                setPortals((portals) =>
-                    portals.filter((portal) => portal !== p)
-                );
+                if (disposed) {
+                    throw new Error('invalid operation');
+                }
+                disposed = true;
+                setPortals((portals) => portals.filter((p) => p !== portal));
             },
         };
     }, []);
 
-    return [portals, addPortal] as [
-        React.ReactPortal[],
-        (portal: React.ReactPortal) => IDisposable
-    ];
+    return [portals, addPortal];
 };

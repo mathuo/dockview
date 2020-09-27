@@ -1,9 +1,12 @@
-import { ISerializableView } from '../../splitview/options';
+import {
+    ISerializableView,
+    PanelViewInitParameters,
+} from '../../splitview/options';
 import { ReactLayout } from '../dockview/dockview';
 import { ISplitviewPanelProps } from './splitview';
 import { BaseReactComponentGridView } from '../baseReactComponentView';
 import { PanelApi } from '../../api/panelApi';
-import { PanelInitParameters } from '../../panel/types';
+import { LayoutPriority } from '../../splitview/splitview';
 
 export class ReactComponentView
     extends BaseReactComponentGridView<PanelApi>
@@ -11,6 +14,11 @@ export class ReactComponentView
     private _minimumSize: number = 200;
     private _maximumSize: number = Number.MAX_SAFE_INTEGER;
     private _snapSize: number;
+    private _priority: LayoutPriority;
+
+    get priority() {
+        return this._priority;
+    }
 
     get minimumSize() {
         return this._minimumSize;
@@ -42,14 +50,10 @@ export class ReactComponentView
         super(id, componentName, component, parent, new PanelApi());
     }
 
-    init(
-        parameters: PanelInitParameters & {
-            minimumSize?: number;
-            maximumSize?: number;
-            snapSize?: number;
-        }
-    ): void {
+    init(parameters: PanelViewInitParameters): void {
         super.init(parameters);
+
+        this._priority = parameters.priority;
 
         if (parameters.minimumSize) {
             this.minimumSize = parameters.minimumSize;

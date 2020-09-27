@@ -7,7 +7,3 @@ export interface FrameworkFactory<T> {
 }
 
 export type FunctionOrValue<T> = (() => T) | T;
-
-export interface ICommonView {
-    id: string;
-}
