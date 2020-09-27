@@ -47,11 +47,13 @@ export interface IBaseGrid<T extends IGridPanelView> {
     readonly maximumWidth: number;
     readonly activeGroup: T;
     readonly size: number;
-    getGroup(id: string): T | undefined;
     readonly onDidLayoutChange: Event<GroupChangeEvent>;
+    getGroup(id: string): T | undefined;
+    toJSON(): object;
+    fromJSON(data: any): void;
 }
 
-export class BaseGrid<T extends IGridPanelView>
+export abstract class BaseGrid<T extends IGridPanelView>
     extends CompositeDisposable
     implements IBaseGrid<T> {
     private readonly _id = nextLayoutId.next();
@@ -115,6 +117,9 @@ export class BaseGrid<T extends IGridPanelView>
             })
         );
     }
+
+    public abstract toJSON(): object;
+    public abstract fromJSON(data: any): void;
 
     protected doAddGroup(group: T, location: number[] = [0], size?: number) {
         this.gridview.addView(group, size ?? { type: 'distribute' }, location);

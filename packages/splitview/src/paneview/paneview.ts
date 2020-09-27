@@ -19,8 +19,7 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
     private _element: HTMLElement;
     private _minimumBodySize: number;
     private _maximumBodySize: number;
-    private _minimumSize: number;
-    private _maximumSize: number;
+
     private _isExpanded: boolean;
     private _orthogonalSize: number;
     private animationTimer: NodeJS.Timeout;
@@ -66,16 +65,6 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
 
     get orthogonalSize() {
         return this._orthogonalSize;
-    }
-
-    set minimumSize(size: number) {
-        this._minimumSize = size;
-        this._onDidChange.fire(undefined);
-    }
-
-    set maximumSize(size: number) {
-        this._maximumSize = size;
-        this._onDidChange.fire(undefined);
     }
 
     set orthogonalSize(size: number) {

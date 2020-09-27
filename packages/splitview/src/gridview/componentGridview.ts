@@ -89,11 +89,11 @@ export class ComponentGridview
         this.gridview.clear();
         this.groups.clear();
 
-        this.fromJSON(data, this.deserializer);
+        this.fromJSON(data);
         this.gridview.layout(this._size, this._orthogonalSize);
     }
 
-    public fromJSON(data: any, deserializer: IPanelDeserializer) {
+    public fromJSON(data: any) {
         const { grid, panels } = data;
 
         // this.gridview.deserialize(

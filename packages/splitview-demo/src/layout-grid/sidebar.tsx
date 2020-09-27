@@ -19,25 +19,25 @@ export const Sidebar = (props: IGridviewPanelProps) => {
     const onReady = (event: PaneviewReadyEvent) => {
         event.api.addFromComponent({
             id: '1',
-            componentName: 'default',
+            component: 'default',
             params: {},
             tabComponentName: 'default1',
         });
         event.api.addFromComponent({
             id: '2',
-            componentName: 'default',
+            component: 'default',
             params: {},
             tabComponentName: 'default1',
         });
         event.api.addFromComponent({
             id: '3',
-            componentName: 'default',
+            component: 'default',
             params: {},
             tabComponentName: 'default1',
         });
         event.api.addFromComponent({
             id: '4',
-            componentName: 'default',
+            component: 'default',
             params: {},
             tabComponentName: 'default1',
         });

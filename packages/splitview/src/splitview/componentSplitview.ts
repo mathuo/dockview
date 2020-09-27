@@ -6,20 +6,24 @@ import {
     SplitPanelOptions,
 } from './options';
 
+export interface AddSplitviewComponentOptions {
+    id: string;
+    component: string;
+    params?: {
+        [index: string]: any;
+    };
+    priority?: LayoutPriority;
+}
+
 export interface IComponentSplitview extends IDisposable {
-    addFromComponent(options: {
-        id: string;
-        component: string;
-        params?: {
-            [index: string]: any;
-        };
-        priority?: LayoutPriority;
-    }): IDisposable;
+    readonly minimumSize: number;
+    readonly maximumSize: number;
+    addFromComponent(options: AddSplitviewComponentOptions): IDisposable;
     layout(width: number, height: number): void;
     onChange(cb: (event: { proportions: number[] }) => void): IDisposable;
     toJSON(): object;
     deserialize(data: any): void;
-    minimumSize: number;
+    resizeToFit(): void;
 }
 
 /**
@@ -50,14 +54,7 @@ export class ComponentSplitview implements IComponentSplitview {
         return this.splitview.maximumSize;
     }
 
-    addFromComponent(options: {
-        id: string;
-        component: string;
-        params?: {
-            [index: string]: any;
-        };
-        priority?: LayoutPriority;
-    }): IDisposable {
+    addFromComponent(options: AddSplitviewComponentOptions): IDisposable {
         const view = createComponent(
             options.id,
             options.component,

@@ -20,7 +20,7 @@ export interface State {
     [key: string]: StateObject;
 }
 
-interface ChangeFocusEvent {
+interface FocusEvent {
     isFocused: boolean;
 }
 interface PanelDimensionChangeEvent {
@@ -32,7 +32,7 @@ export interface IBaseViewApi extends IDisposable {
     // events
     onDidDimensionsChange: Event<PanelDimensionChangeEvent>;
     onDidStateChange: Event<void>;
-    onDidFocusChange: Event<ChangeFocusEvent>;
+    onDidFocusChange: Event<FocusEvent>;
     // state
     setState(key: string, value: StateObject): void;
     setState(state: State): void;
@@ -59,11 +59,10 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
     });
     readonly onDidDimensionsChange = this._onDidPanelDimensionChange.event;
     //
-    readonly _onDidChangeFocus = new Emitter<ChangeFocusEvent>({
+    readonly _onDidChangeFocus = new Emitter<FocusEvent>({
         emitLastValue: true,
     });
-    readonly onDidFocusChange: Event<ChangeFocusEvent> = this._onDidChangeFocus
-        .event;
+    readonly onDidFocusChange: Event<FocusEvent> = this._onDidChangeFocus.event;
     //
 
     get isFocused() {

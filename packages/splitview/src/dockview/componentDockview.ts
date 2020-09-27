@@ -332,7 +332,7 @@ export class ComponentDockview
      *
      * @returns A JSON respresentation of the layout
      */
-    public toJSON() {
+    public toJSON(): object {
         this.syncConfigs();
 
         const data = this.gridview.serialize();
@@ -400,11 +400,14 @@ export class ComponentDockview
         this.panels.clear();
         this.groups.clear();
 
-        this.fromJSON(data, this.deserializer);
+        this.fromJSON(data);
         this.gridview.layout(this._size, this._orthogonalSize);
     }
 
-    public fromJSON(data: any, deserializer: IPanelDeserializer) {
+    public fromJSON(data: any) {
+        if (!this.deserializer) {
+            throw new Error('invalid deserializer');
+        }
         const { grid, panels } = data;
 
         this.gridview.deserialize(
@@ -412,7 +415,7 @@ export class ComponentDockview
             new DefaultDeserializer(this, {
                 createPanel: (id) => {
                     const panelData = panels[id];
-                    const panel = deserializer.fromJSON(panelData);
+                    const panel = this.deserializer.fromJSON(panelData);
                     this.registerPanel(panel);
                     return panel;
                 },

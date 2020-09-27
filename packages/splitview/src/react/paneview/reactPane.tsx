@@ -21,7 +21,7 @@ export class PaneReact extends Pane {
             headerName?: string;
             headerComponent?: React.FunctionComponent<{}>;
             minimumBodySize?: number;
-            maximumBodySize;
+            maximumBodySize?: number;
         }
     ) {
         super(options);
