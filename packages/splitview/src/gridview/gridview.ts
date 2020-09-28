@@ -1,4 +1,8 @@
-import { LayoutPriority, Orientation, Sizing } from '../splitview/splitview';
+import {
+    LayoutPriority,
+    Orientation,
+    Sizing,
+} from '../splitview/core/splitview';
 import { Position } from '../groupview/droptarget/droptarget';
 import { tail } from '../array';
 import { LeafNode } from './leafNode';

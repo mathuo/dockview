@@ -6,16 +6,16 @@ import { GroupChangeKind } from '../groupview/groupview';
 import { Disposable } from '../lifecycle';
 import { DebugWidget } from '../dockview/components/debug/debug';
 import { IPanelDeserializer } from '../dockview/deserializer';
-import { createComponent } from '../splitview/options';
-import { LayoutPriority } from '../splitview/splitview';
-import { GridComponentOptions } from '../dockview';
+import { createComponent } from '../splitview/core/options';
+import { LayoutPriority } from '../splitview/core/splitview';
+import { GridComponentOptions } from './options';
 import {
     BaseGrid,
     IBaseGrid,
     IGridPanelView,
     toTarget,
 } from './baseComponentGridview';
-import { GridviewInitParameters } from '../react/gridview/reactComponentGridView';
+import { GridviewInitParameters } from './gridPanelView';
 
 export interface AddComponentOptions {
     component: string;
@@ -143,9 +143,9 @@ export class ComponentGridview
             maximumWidth: options.maximumWidth,
             minimumHeight: options.minimumHeight,
             maximumHeight: options.maximumHeight,
+            priority: options.priority,
+            snap: options.snap,
         });
-        view.priority = options.priority;
-        view.snap = options.snap;
 
         this.groups.set(options.id, {
             value: view,

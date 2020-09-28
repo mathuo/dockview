@@ -1,4 +1,8 @@
-import { IView, LayoutPriority, Orientation } from '../splitview/splitview';
+import {
+    IView,
+    LayoutPriority,
+    Orientation,
+} from '../splitview/core/splitview';
 import { Emitter, Event } from '../events';
 import { IGridView } from './gridview';
 

@@ -4,8 +4,8 @@ import {
     IComponentGridview,
 } from '../../gridview/componentGridview';
 import { IGridPanelApi } from '../../api/gridPanelApi';
-import { Orientation } from '../../splitview/splitview';
-import { ReactComponentGridView } from './reactComponentGridView';
+import { Orientation } from '../../splitview/core/splitview';
+import { ReactGridPanelView } from './view';
 import { usePortalsLifecycle } from '../react';
 
 export interface GridviewReadyEvent {
@@ -37,14 +37,9 @@ export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps>
             frameworkComponents: props.components,
             frameworkComponentFactory: {
                 createComponent: (id: string, componentId, component) => {
-                    return new ReactComponentGridView(
-                        id,
-                        componentId,
-                        component,
-                        {
-                            addPortal,
-                        }
-                    );
+                    return new ReactGridPanelView(id, componentId, component, {
+                        addPortal,
+                    });
                 },
             },
         });

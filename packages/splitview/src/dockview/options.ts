@@ -8,9 +8,8 @@ import {
     WatermarkConstructor,
     IGroupPanel,
 } from '../groupview/panel/parts';
-import { Orientation } from '../splitview/splitview';
+import { Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
-import { IGridPanelComponentView } from '../gridview/componentGridview';
 import { Api } from './componentDockview';
 
 export interface GroupPanelFrameworkComponentFactory {
@@ -24,19 +23,7 @@ export interface TabContextMenuEvent {
     panel: IGroupPanel;
 }
 
-export interface GridComponentOptions {
-    orientation: Orientation;
-    components?: {
-        [componentName: string]: IGridPanelComponentView;
-    };
-    frameworkComponents?: {
-        [componentName: string]: any;
-    };
-    frameworkComponentFactory: FrameworkFactory<IGridPanelComponentView>;
-    tabHeight?: number;
-}
-
-export interface LayoutOptions {
+export interface DockviewOptions {
     tabComponents?: {
         [componentName: string]: PanelHeaderPartConstructor;
     };

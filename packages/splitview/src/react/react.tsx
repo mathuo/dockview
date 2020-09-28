@@ -50,7 +50,11 @@ PanelWrapper.displayName = 'PanelWrapper';
  */
 const uniquePortalKeyGenerator = sequentialNumberGenerator();
 
-export class ReactPart implements IDisposable {
+export interface IFrameworkPart extends IDisposable {
+    update(params: {}): void;
+}
+
+export class ReactPart implements IFrameworkPart {
     private componentInstance: IPanelWrapperRef;
     private ref: { portal: React.ReactPortal; disposable: IDisposable };
     private disposed: boolean;

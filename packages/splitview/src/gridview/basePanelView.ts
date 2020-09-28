@@ -1,17 +1,16 @@
 import { trackFocus } from '../dom';
 import { Emitter } from '../events';
 import { CompositeDisposable } from '../lifecycle';
-import { ReactLayout } from './dockview/dockview';
-import { ReactPart } from './react';
+import { IFrameworkPart } from '../react/react';
 import { PanelUpdateEvent, PanelInitParameters, IPanel } from '../panel/types';
 import { BaseViewApi } from '../api/api';
 
-export class BaseReactComponentGridView<T extends BaseViewApi>
+export abstract class BasePanelView<T extends BaseViewApi>
     extends CompositeDisposable
     implements IPanel {
     private _element: HTMLElement;
-    private part: ReactPart;
-    private params: PanelInitParameters;
+    private part: IFrameworkPart;
+    protected params: PanelInitParameters;
 
     private _onDidChange: Emitter<number | undefined> = new Emitter<
         number | undefined
@@ -24,15 +23,10 @@ export class BaseReactComponentGridView<T extends BaseViewApi>
 
     constructor(
         public readonly id: string,
-        private readonly componentName: string,
-        private readonly component: React.FunctionComponent<{}>,
-        private readonly parent: ReactLayout,
-        protected readonly api: T
+        private readonly component: string,
+        public readonly api: T
     ) {
         super();
-        if (!this.component) {
-            throw new Error('React.FunctionalComponent cannot be undefined');
-        }
 
         this._element = document.createElement('div');
         this._element.tabIndex = -1;
@@ -56,13 +50,7 @@ export class BaseReactComponentGridView<T extends BaseViewApi>
 
     init(parameters: PanelInitParameters): void {
         this.params = parameters;
-        this.part = new ReactPart(
-            this.element,
-            this.api,
-            this.parent.addPortal,
-            this.component,
-            parameters.params
-        );
+        this.part = this.getComponent();
     }
 
     update(params: PanelUpdateEvent) {
@@ -73,7 +61,7 @@ export class BaseReactComponentGridView<T extends BaseViewApi>
     toJSON(): object {
         return {
             id: this.id,
-            component: this.componentName,
+            component: this.component,
             props: this.params.params,
             state: this.api.getState(),
         };
@@ -83,4 +71,6 @@ export class BaseReactComponentGridView<T extends BaseViewApi>
         super.dispose();
         this.api.dispose();
     }
+
+    protected abstract getComponent();
 }

@@ -33,7 +33,7 @@ import {
     AddGroupOptions,
     AddPanelOptions,
     PanelOptions,
-    LayoutOptions,
+    DockviewOptions,
     MovementOptions,
     TabContextMenuEvent,
 } from './options';
@@ -110,7 +110,7 @@ export interface IGroupAccessor {
     removeGroup: (group: IGroupview) => void;
     readonly size: number;
     totalPanels: number;
-    options: LayoutOptions;
+    options: DockviewOptions;
     readonly onDidLayoutChange: Event<GroupChangeEvent>;
     //
     addPanelFromComponent(options: AddPanelOptions): PanelReference;
@@ -162,7 +162,10 @@ export class ComponentDockview
         this.registry.set(type, cb);
     }
 
-    constructor(element: HTMLElement, public readonly options: LayoutOptions) {
+    constructor(
+        element: HTMLElement,
+        public readonly options: DockviewOptions
+    ) {
         super(element, {
             proportionalLayout: true,
             orientation: options.orientation,

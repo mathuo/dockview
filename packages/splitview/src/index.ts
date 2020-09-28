@@ -1,4 +1,4 @@
-export * from './splitview/splitview';
+export * from './splitview/core/splitview';
 export * from './splitview/componentSplitview';
 export * from './paneview/paneview';
 export * from './paneview/componentPaneView';

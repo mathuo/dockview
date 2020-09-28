@@ -4,9 +4,9 @@ import {
     IComponentSplitview,
     ComponentSplitview,
 } from '../../splitview/componentSplitview';
-import { Orientation } from '../../splitview/splitview';
+import { Orientation } from '../../splitview/core/splitview';
 import { usePortalsLifecycle } from '../react';
-import { ReactComponentView } from './reactComponentView';
+import { ReactPanelView } from './view';
 
 export interface SplitviewReadyEvent {
     api: IComponentSplitview;
@@ -37,7 +37,7 @@ export const SplitviewComponent: React.FunctionComponent<ISplitviewComponentProp
             frameworkComponents: props.components,
             frameworkWrapper: {
                 createComponent: (id: string, componentId, component: any) => {
-                    return new ReactComponentView(id, componentId, component, {
+                    return new ReactPanelView(id, componentId, component, {
                         addPortal,
                     });
                 },

@@ -1,11 +1,12 @@
 import { IDisposable } from '../lifecycle';
-import { LayoutPriority, Orientation, SplitView } from './splitview';
+import { LayoutPriority, Orientation, SplitView } from './core/splitview';
 import {
     createComponent,
     ISerializableView,
     SplitPanelOptions,
-} from './options';
+} from './core/options';
 import { Parameters } from '../panel/types';
+import { PanelView } from './panelView';
 
 export interface AddSplitviewComponentOptions {
     id: string;
@@ -95,8 +96,8 @@ export class ComponentSplitview implements IComponentSplitview {
         this.layout(width, height);
     }
 
-    private registerView(view: ISerializableView) {
-        //
+    private registerView(view: PanelView) {
+        // view.api.onDidFocusChange(())
     }
 
     layout(width: number, height: number): void {

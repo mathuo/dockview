@@ -1,15 +1,10 @@
-import {
-    ISerializableView,
-    PanelViewInitParameters,
-} from '../../splitview/options';
-import { ReactLayout } from '../dockview/dockview';
-import { ISplitviewPanelProps } from './splitview';
-import { BaseReactComponentGridView } from '../baseReactComponentView';
-import { PanelApi } from '../../api/panelApi';
-import { LayoutPriority } from '../../splitview/splitview';
+import { ISerializableView, PanelViewInitParameters } from './core/options';
+import { BasePanelView } from '../gridview/basePanelView';
+import { PanelApi } from '../api/panelApi';
+import { LayoutPriority } from './core/splitview';
 
-export class ReactComponentView
-    extends BaseReactComponentGridView<PanelApi>
+export abstract class PanelView
+    extends BasePanelView<PanelApi>
     implements ISerializableView {
     private _minimumSize: number = 200;
     private _maximumSize: number = Number.MAX_SAFE_INTEGER;
@@ -41,13 +36,8 @@ export class ReactComponentView
         this._maximumSize = value;
     }
 
-    constructor(
-        id: string,
-        componentName: string,
-        component: React.FunctionComponent<ISplitviewPanelProps>,
-        parent: ReactLayout
-    ) {
-        super(id, componentName, component, parent, new PanelApi());
+    constructor(id: string, componentName: string) {
+        super(id, componentName, new PanelApi());
     }
 
     init(parameters: PanelViewInitParameters): void {

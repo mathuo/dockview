@@ -5,7 +5,7 @@ import { Position } from '../groupview/droptarget/droptarget';
 import { GroupChangeEvent, GroupChangeKind } from '../groupview/groupview';
 import { CompositeDisposable, IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
-import { Orientation } from '../splitview/splitview';
+import { Orientation } from '../splitview/core/splitview';
 import { IPanel } from '../panel/types';
 
 const nextLayoutId = sequentialNumberGenerator();

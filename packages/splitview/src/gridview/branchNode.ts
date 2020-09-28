@@ -4,7 +4,7 @@ import {
     Orientation,
     Sizing,
     LayoutPriority,
-} from '../splitview/splitview';
+} from '../splitview/core/splitview';
 import { Emitter, Event } from '../events';
 import { INodeDescriptor } from './gridview';
 import { Node } from './types';

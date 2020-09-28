@@ -1,25 +1,36 @@
-import { ReactLayout } from '../dockview/dockview';
-import { PanelInitParameters } from '../../panel/types';
-import { IGridPanelComponentView } from '../../gridview/componentGridview';
-import { FunctionOrValue } from '../../types';
-import { BaseReactComponentGridView } from '../baseReactComponentView';
-import { IGridviewComponentProps } from './gridview';
-import { GridPanelApi } from '../../api/gridPanelApi';
+import { PanelInitParameters } from '../panel/types';
+import { IGridPanelComponentView } from './componentGridview';
+import { FunctionOrValue } from '../types';
+import { BasePanelView } from './basePanelView';
+import { GridPanelApi } from '../api/gridPanelApi';
+import { LayoutPriority } from '../splitview/core/splitview';
 
 export interface GridviewInitParameters extends PanelInitParameters {
     minimumWidth?: number;
     maximumWidth?: number;
     minimumHeight?: number;
     maximumHeight?: number;
+    priority?: LayoutPriority;
+    snap?: boolean;
 }
 
-export class ReactComponentGridView
-    extends BaseReactComponentGridView<GridPanelApi>
+export abstract class GridPanelView
+    extends BasePanelView<GridPanelApi>
     implements IGridPanelComponentView {
     private _minimumWidth: FunctionOrValue<number> = 200;
     private _minimumHeight: FunctionOrValue<number> = 200;
     private _maximumWidth: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
     private _maximumHeight: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
+    private _priority: LayoutPriority;
+    private _snap: boolean;
+
+    get priority() {
+        return this._priority;
+    }
+
+    get snap() {
+        return this._snap;
+    }
 
     get minimumWidth() {
         return typeof this._minimumWidth === 'function'
@@ -42,13 +53,8 @@ export class ReactComponentGridView
             : this._maximumWidth;
     }
 
-    constructor(
-        id: string,
-        componentName: string,
-        component: React.FunctionComponent<IGridviewComponentProps>,
-        parent: ReactLayout
-    ) {
-        super(id, componentName, component, parent, new GridPanelApi());
+    constructor(id: string, component: string) {
+        super(id, component, new GridPanelApi());
 
         this.addDisposables(
             this.api.onDidConstraintsChange((event) => {
@@ -93,6 +99,9 @@ export class ReactComponentGridView
         if (parameters.minimumWidth) {
             this._minimumWidth = parameters.minimumWidth;
         }
+
+        this._priority = parameters.priority;
+        this._snap = parameters.snap;
 
         super.init(parameters);
     }

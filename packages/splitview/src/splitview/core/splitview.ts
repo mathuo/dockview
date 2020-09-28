@@ -1,7 +1,7 @@
-import { removeClasses, addClasses, firstIndex, toggleClass } from '../dom';
-import { clamp } from '../math';
-import { Event, Emitter } from '../events';
-import { pushToStart, pushToEnd, range } from '../array';
+import { removeClasses, addClasses, firstIndex, toggleClass } from '../../dom';
+import { clamp } from '../../math';
+import { Event, Emitter } from '../../events';
+import { pushToStart, pushToEnd, range } from '../../array';
 
 export const clampView = (view: IView, size: number) => {
     const result = clamp(size, view.minimumSize, view.maximumSize);
