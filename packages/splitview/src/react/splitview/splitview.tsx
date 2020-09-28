@@ -22,6 +22,7 @@ export interface ISplitviewComponentProps {
     components: {
         [index: string]: React.FunctionComponent<ISplitviewPanelProps>;
     };
+    proportionalLayout?: boolean;
 }
 
 export const SplitviewComponent: React.FunctionComponent<ISplitviewComponentProps> = (
@@ -42,7 +43,7 @@ export const SplitviewComponent: React.FunctionComponent<ISplitviewComponentProp
                     });
                 },
             },
-            proportionalLayout: false,
+            proportionalLayout: props.proportionalLayout,
         });
 
         splitview.resizeToFit();

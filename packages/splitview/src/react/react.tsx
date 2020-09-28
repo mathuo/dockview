@@ -54,7 +54,7 @@ export interface IFrameworkPart extends IDisposable {
     update(params: {}): void;
 }
 
-export class ReactPart implements IFrameworkPart {
+export class ReactPart<P> implements IFrameworkPart {
     private componentInstance: IPanelWrapperRef;
     private ref: { portal: React.ReactPortal; disposable: IDisposable };
     private disposed: boolean;
@@ -63,7 +63,7 @@ export class ReactPart implements IFrameworkPart {
         private readonly parent: HTMLElement,
         private readonly api: IBaseViewApi,
         private readonly addPortal: (portal: React.ReactPortal) => IDisposable,
-        private readonly component: React.FunctionComponent<{}>,
+        private readonly component: React.FunctionComponent<P>,
         private readonly parameters: { [key: string]: any }
     ) {
         this.createPortal();

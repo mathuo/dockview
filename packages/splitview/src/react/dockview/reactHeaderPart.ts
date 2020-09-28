@@ -4,11 +4,11 @@ import {
     GroupPanelPartInitParameters,
 } from '../../groupview/panel/parts';
 import { ReactPart } from '../react';
-import { IGroupPanelProps, ReactLayout } from './dockview';
+import { IGroupPanelProps, ReactPortalStore } from './dockview';
 
 export class ReactPanelHeaderPart implements PanelHeaderPart {
     private _element: HTMLElement;
-    private part: ReactPart;
+    private part: ReactPart<IGroupPanelProps>;
 
     get element() {
         return this._element;
@@ -17,7 +17,7 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
     constructor(
         public readonly id: string,
         private readonly component: React.FunctionComponent<IGroupPanelProps>,
-        private readonly parent: ReactLayout
+        private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');
     }
@@ -26,7 +26,7 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
         this.part = new ReactPart(
             this.element,
             parameters.api,
-            this.parent.addPortal,
+            this.reactPortalStore.addPortal,
             this.component,
             parameters.params
         );

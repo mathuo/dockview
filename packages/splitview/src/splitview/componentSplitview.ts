@@ -1,21 +1,29 @@
 import { IDisposable } from '../lifecycle';
-import { LayoutPriority, Orientation, SplitView } from './core/splitview';
+import {
+    LayoutPriority,
+    Orientation,
+    Sizing,
+    SplitView,
+} from './core/splitview';
 import {
     createComponent,
     ISerializableView,
     SplitPanelOptions,
 } from './core/options';
 import { Parameters } from '../panel/types';
-import { PanelView } from './panelView';
 
 export interface AddSplitviewComponentOptions {
     id: string;
     component: string;
     params?: Parameters;
-    priority?: LayoutPriority;
+    //
+    size?: number;
+    index?: number;
     minimumSize?: number;
     maximumSize?: number;
     snapSize?: number;
+    //
+    priority?: LayoutPriority;
 }
 
 export interface IComponentSplitview extends IDisposable {
@@ -35,6 +43,14 @@ export interface IComponentSplitview extends IDisposable {
 export class ComponentSplitview implements IComponentSplitview {
     private splitview: SplitView;
 
+    get minimumSize() {
+        return this.splitview.minimumSize;
+    }
+
+    get maximumSize() {
+        return this.splitview.maximumSize;
+    }
+
     constructor(
         private readonly element: HTMLElement,
         private readonly options: SplitPanelOptions
@@ -49,14 +65,6 @@ export class ComponentSplitview implements IComponentSplitview {
         this.splitview = new SplitView(this.element, options);
     }
 
-    get minimumSize() {
-        return this.splitview.minimumSize;
-    }
-
-    get maximumSize() {
-        return this.splitview.maximumSize;
-    }
-
     addFromComponent(options: AddSplitviewComponentOptions): IDisposable {
         const view = createComponent(
             options.id,
@@ -66,9 +74,12 @@ export class ComponentSplitview implements IComponentSplitview {
             this.options.frameworkWrapper.createComponent
         );
 
-        this.registerView(view);
-
-        this.splitview.addView(view, { type: 'distribute' });
+        const size: Sizing | number =
+            typeof options.size === 'number'
+                ? options.size
+                : { type: 'distribute' };
+        const index =
+            typeof options.index === 'number' ? options.index : undefined;
 
         view.init({
             params: options.params,
@@ -77,6 +88,8 @@ export class ComponentSplitview implements IComponentSplitview {
             snapSize: options.snapSize,
             priority: options.priority,
         });
+
+        this.splitview.addView(view, size, index);
 
         return {
             dispose: () => {
@@ -88,16 +101,12 @@ export class ComponentSplitview implements IComponentSplitview {
     /**
      * Resize the layout to fit the parent container
      */
-    public resizeToFit(): void {
+    resizeToFit(): void {
         const {
             width,
             height,
         } = this.element.parentElement.getBoundingClientRect();
         this.layout(width, height);
-    }
-
-    private registerView(view: PanelView) {
-        // view.api.onDidFocusChange(())
     }
 
     layout(width: number, height: number): void {
@@ -134,6 +143,7 @@ export class ComponentSplitview implements IComponentSplitview {
             orientation: this.splitview.orientation,
         };
     }
+
     fromJSON(data: any): void {
         const { views, orientation, size } = data;
 
@@ -170,7 +180,7 @@ export class ComponentSplitview implements IComponentSplitview {
         this.splitview.orientation = orientation;
     }
 
-    public dispose() {
+    dispose() {
         this.splitview.dispose();
     }
 }

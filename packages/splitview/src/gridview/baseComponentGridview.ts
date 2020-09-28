@@ -10,9 +10,9 @@ import { IPanel } from '../panel/types';
 
 const nextLayoutId = sequentialNumberGenerator();
 
-export function toTarget(
-    direction: 'left' | 'right' | 'above' | 'below' | 'within'
-) {
+export type Direction = 'left' | 'right' | 'above' | 'below' | 'within';
+
+export function toTarget(direction: Direction) {
     switch (direction) {
         case 'left':
             return Position.Left;
@@ -250,6 +250,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
             this.resizeTimer = undefined;
         }
 
+        this._onDidLayoutChange.dispose();
         this.gridview.dispose();
     }
 }

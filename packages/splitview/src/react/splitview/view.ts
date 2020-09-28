@@ -1,5 +1,5 @@
 import { PanelView } from '../../splitview/panelView';
-import { ReactLayout } from '../dockview/dockview';
+import { ReactPortalStore } from '../dockview/dockview';
 import { ReactPart } from '../react';
 import { ISplitviewPanelProps } from './splitview';
 
@@ -10,7 +10,7 @@ export class ReactPanelView extends PanelView {
         private readonly reactComponent: React.FunctionComponent<
             ISplitviewPanelProps
         >,
-        private readonly parent: ReactLayout
+        private readonly reactPortalStore: ReactPortalStore
     ) {
         super(id, component);
     }
@@ -19,7 +19,7 @@ export class ReactPanelView extends PanelView {
         return new ReactPart(
             this.element,
             this.api,
-            this.parent.addPortal,
+            this.reactPortalStore.addPortal,
             this.reactComponent,
             this.params.params
         );

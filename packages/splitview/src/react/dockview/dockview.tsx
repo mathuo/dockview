@@ -19,7 +19,7 @@ export interface DockviewReadyEvent {
     api: Api;
 }
 
-export interface ReactLayout {
+export interface ReactPortalStore {
     addPortal: (portal: React.ReactPortal) => IDisposable;
 }
 

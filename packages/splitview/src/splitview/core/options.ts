@@ -1,5 +1,5 @@
 import { IPanel, PanelInitParameters } from '../../panel/types';
-import { IView, ISplitViewOptions, LayoutPriority } from './splitview';
+import { IView, SplitViewOptions, LayoutPriority } from './splitview';
 import { Constructor, FrameworkFactory } from '../../types';
 import { PanelView } from '../panelView';
 
@@ -14,7 +14,7 @@ export interface ISerializableView extends IView, IPanel {
     init: (params: PanelViewInitParameters) => void;
 }
 
-export interface SplitPanelOptions extends ISplitViewOptions {
+export interface SplitPanelOptions extends SplitViewOptions {
     components?: {
         [componentName: string]: PanelView;
     };

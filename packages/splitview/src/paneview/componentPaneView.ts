@@ -1,5 +1,5 @@
 import { IDisposable } from '../lifecycle';
-import { PaneReact } from '../react/paneview/reactPane';
+import { PaneReact } from '../react/paneview/view';
 import { createComponent } from '../splitview/core/options';
 import { Orientation } from '../splitview/core/splitview';
 import { PaneviewComponentOptions } from './options';
@@ -47,13 +47,13 @@ export class ComponentPaneView implements IComponentPaneView {
     }
 
     addFromComponent(options: AddPaneviewCompponentOptions): IDisposable {
-        const view = (createComponent(
+        const view = createComponent(
             options.id,
             options.component,
             this.options.components,
             this.options.frameworkComponents,
             this.options.frameworkWrapper.createComponent
-        ) as unknown) as PaneReact;
+        );
 
         this.paneview.addPane(view);
         view.init({

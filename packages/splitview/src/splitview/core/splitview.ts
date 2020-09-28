@@ -26,10 +26,10 @@ export enum SashState {
     ENABLED,
 }
 
-export interface ISplitViewOptions {
-    orientation: Orientation;
+export interface SplitViewOptions {
+    readonly orientation: Orientation;
     readonly descriptor?: ISplitViewDescriptor;
-    proportionalLayout?: boolean;
+    readonly proportionalLayout?: boolean;
 }
 export enum LayoutPriority {
     Low = 'low',
@@ -124,7 +124,7 @@ export class SplitView {
 
     constructor(
         private readonly container: HTMLElement,
-        options: ISplitViewOptions
+        options: SplitViewOptions
     ) {
         this._orientation = options.orientation;
         this.element = this.createContainer();

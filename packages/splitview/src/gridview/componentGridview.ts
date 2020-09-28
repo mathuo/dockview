@@ -11,28 +11,32 @@ import { LayoutPriority } from '../splitview/core/splitview';
 import { GridComponentOptions } from './options';
 import {
     BaseGrid,
+    Direction,
     IBaseGrid,
     IGridPanelView,
     toTarget,
 } from './baseComponentGridview';
 import { GridviewInitParameters } from './gridPanelView';
+import { Parameters } from '../panel/types';
 
 export interface AddComponentOptions {
-    component: string;
-    params?: { [key: string]: any };
     id: string;
-    position?: {
-        direction?: 'left' | 'right' | 'above' | 'below' | 'within';
-        reference: string;
-    };
+    component: string;
+    params?: Parameters;
+    //
     size?: number;
-    priority?: LayoutPriority;
-    snap?: boolean;
     minimumWidth?: number;
     maximumWidth?: number;
     minimumHeight?: number;
     maximumHeight?: number;
+    //
+    position?: {
+        direction?: Direction;
+        reference: string;
+    };
     location?: number[];
+    priority?: LayoutPriority;
+    snap?: boolean;
 }
 
 export interface IGridPanelComponentView extends IGridPanelView {
@@ -47,11 +51,10 @@ export class ComponentGridview
     extends BaseGrid<IGridPanelComponentView>
     implements IComponentGridview {
     private _deserializer: IPanelDeserializer;
-    private debugContainer: DebugWidget;
 
     constructor(
         element: HTMLElement,
-        public readonly options: GridComponentOptions
+        private readonly options: GridComponentOptions
     ) {
         super(element, {
             proportionalLayout: false,
@@ -137,6 +140,7 @@ export class ComponentGridview
             this.options.frameworkComponents,
             this.options.frameworkComponentFactory.createComponent
         );
+
         view.init({
             params: options.params,
             minimumWidth: options.minimumWidth,
@@ -145,10 +149,6 @@ export class ComponentGridview
             maximumHeight: options.maximumHeight,
             priority: options.priority,
             snap: options.snap,
-        });
-
-        view.api.onDidSizeChange((event) => {
-            //
         });
 
         this.groups.set(options.id, {
@@ -208,9 +208,5 @@ export class ComponentGridview
 
     public dispose() {
         super.dispose();
-
-        this.debugContainer?.dispose();
-
-        this._onDidLayoutChange.dispose();
     }
 }

@@ -2,8 +2,11 @@ import { SplitView, IView, Orientation } from '../splitview/core/splitview';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { Emitter, Event } from '../events';
 import { addClasses, removeClasses } from '../dom';
+import { IFrameworkPart } from '../react/react';
+import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
+import { PanePanelApi } from '../api/panePanelApi';
 
-export interface IPaneOptions {
+export interface PanePanelInitParameter extends PanelInitParameters {
     minimumBodySize?: number;
     maximumBodySize?: number;
     isExpanded?: boolean;
@@ -17,8 +20,10 @@ const MINIMUM_BODY_SIZE = 120;
 
 export abstract class Pane extends CompositeDisposable implements IPaneview {
     private _element: HTMLElement;
-    private _minimumBodySize: number;
-    private _maximumBodySize: number;
+    private _minimumBodySize: number = MINIMUM_BODY_SIZE;
+    private _maximumBodySize: number = Number.POSITIVE_INFINITY;
+
+    protected api: PanePanelApi;
 
     private _isExpanded: boolean;
     private _orthogonalSize: number;
@@ -32,8 +37,12 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
         number | undefined
     >();
     //
+    protected params: PanePanelInitParameter;
     protected header: HTMLElement;
     protected body: HTMLElement;
+
+    private part: IFrameworkPart;
+    private headerPart: IFrameworkPart;
 
     get onDidChange() {
         return this._onDidChange.event;
@@ -81,17 +90,59 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
             typeof value === 'number' ? value : Number.POSITIVE_INFINITY;
     }
 
-    constructor(options: IPaneOptions) {
+    constructor(
+        public readonly id: string,
+        private readonly component: string
+    ) {
         super();
 
-        this.addDisposables(this._onDidChange, this._onDidChangeExpansionState);
+        this.api = new PanePanelApi(this);
+
+        this.addDisposables(
+            this.api,
+            this._onDidChange,
+            this._onDidChangeExpansionState,
+            this.onDidChangeExpansionState((isExpanded) => {
+                this.api._onDidExpansionChange.fire({ isExpanded });
+            })
+        );
 
         this._element = document.createElement('div');
         this._element.className = 'pane';
 
-        this.minimumBodySize = options.minimumBodySize;
-        this.maximumBodySize = options.maximumBodySize;
-        this._isExpanded = options.isExpanded;
+        this.render();
+    }
+
+    init(parameters: PanePanelInitParameter): void {
+        this.params = parameters;
+
+        if (typeof parameters.minimumBodySize === 'number') {
+            this.minimumBodySize = parameters.minimumBodySize;
+        }
+        if (typeof parameters.maximumBodySize === 'number') {
+            this.maximumBodySize = parameters.maximumBodySize;
+        }
+        if (typeof parameters.isExpanded === 'boolean') {
+            this.setExpanded(parameters.isExpanded);
+        }
+
+        this.part = this.getComponent();
+        this.headerPart = this.getHeaderComponent();
+    }
+
+    update(params: PanelUpdateEvent) {
+        this.params = { ...this.params, params: params.params };
+        this.part.update(params);
+        this.headerPart.update(params);
+    }
+
+    toJSON(): object {
+        return {
+            id: this.id,
+            component: this.component,
+            props: this.params.params,
+            state: this.api.getState(),
+        };
     }
 
     public isExpanded() {
@@ -122,7 +173,7 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
         }
     }
 
-    public render() {
+    private render() {
         this.header = document.createElement('div');
         this.header.tabIndex = -1;
 
@@ -132,12 +183,7 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
         this.header.style.minHeight = `${this.headerSize}px`;
         this.header.style.maxHeight = `${this.headerSize}px`;
 
-        this.header.addEventListener('click', () => [
-            this.setExpanded(!this.isExpanded()),
-        ]);
-
         this.element.appendChild(this.header);
-        this.renderHeader(this.header);
 
         this.body = document.createElement('div');
         this.body.tabIndex = -1;
@@ -145,11 +191,17 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
         this.body.className = 'pane-body';
 
         this.element.appendChild(this.body);
-        this.renderBody(this.body);
     }
 
-    protected abstract renderHeader(container: HTMLElement): void;
-    protected abstract renderBody(container: HTMLElement): void;
+    dispose() {
+        super.dispose();
+
+        this.part?.dispose();
+        this.headerPart?.dispose();
+    }
+
+    protected abstract getComponent(): IFrameworkPart;
+    protected abstract getHeaderComponent(): IFrameworkPart;
 }
 
 interface PaneItem {

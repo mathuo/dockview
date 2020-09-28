@@ -4,7 +4,7 @@ import {
     ComponentPaneView,
     IComponentPaneView,
 } from '../../paneview/componentPaneView';
-import { PaneReact } from './reactPane';
+import { PaneReact } from './view';
 import { usePortalsLifecycle } from '../react';
 
 export interface PaneviewReadyEvent {
@@ -35,13 +35,9 @@ export const PaneViewComponent: React.FunctionComponent<IPaneviewComponentProps>
             components: {},
             frameworkWrapper: {
                 createComponent: (id: string, componentId, component: any) => {
-                    return new PaneReact(
-                        id,
-                        componentId,
-                        component,
-                        { addPortal },
-                        {}
-                    );
+                    return new PaneReact(id, componentId, component, {
+                        addPortal,
+                    });
                 },
             },
         });

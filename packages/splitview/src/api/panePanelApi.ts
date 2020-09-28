@@ -13,8 +13,6 @@ export interface IPanePanelApi extends IPanelApi {
 }
 
 export class PanePanelApi extends PanelApi implements IPanePanelApi {
-    private _isExpanded: boolean;
-
     readonly _onDidExpansionChange = new Emitter<ExpansionEvent>({
         emitLastValue: true,
     });
@@ -23,12 +21,6 @@ export class PanePanelApi extends PanelApi implements IPanePanelApi {
 
     constructor(private pane: Pane) {
         super();
-
-        this.addDisposables(
-            this.onDidExpansionChange((event) => {
-                this._isExpanded = event.isExpanded;
-            })
-        );
     }
 
     setExpanded(isExpanded: boolean): void {
@@ -36,6 +28,6 @@ export class PanePanelApi extends PanelApi implements IPanePanelApi {
     }
 
     get isExpanded() {
-        return this._isExpanded;
+        return this.pane.isExpanded();
     }
 }
