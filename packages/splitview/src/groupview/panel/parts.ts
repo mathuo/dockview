@@ -64,11 +64,11 @@ export interface WatermarkPartInitParameters {
     accessor: IGroupAccessor;
 }
 
-// export interface WatermarkPart extends IDisposable {
-//     init?: (params: WatermarkPartInitParameters) => void;
-//     setVisible?(visible: boolean, group: IGroupview): void;
-//     element: HTMLElement;
-// }
+export interface WatermarkPart extends IDisposable {
+    init?: (params: WatermarkPartInitParameters) => void;
+    setVisible?(visible: boolean, group: IGroupview): void;
+    element: HTMLElement;
+}
 
 // constructors
 
@@ -79,4 +79,4 @@ export interface PanelContentPartConstructor {
     new (): PanelContentPart;
 }
 
-export interface WatermarkConstructor extends Constructor<PanelContentPart> {}
+export interface WatermarkConstructor extends Constructor<WatermarkPart> {}

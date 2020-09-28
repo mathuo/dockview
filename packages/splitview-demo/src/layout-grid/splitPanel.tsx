@@ -13,6 +13,10 @@ const components = {
     default1: (props: ISplitviewPanelProps) => {
         const [focused, setFocused] = React.useState<boolean>(false);
 
+        const onClick = () => {
+            props.api.setSize({ size: 300 });
+        };
+
         React.useEffect(() => {
             const disposable = new CompositeDisposable(
                 props.api.onDidFocusChange((event) => {
@@ -26,9 +30,10 @@ const components = {
         }, []);
 
         return (
-            <div
-                style={{ height: '100%', width: '100%' }}
-            >{`component [isFocused: ${focused}]`}</div>
+            <div style={{ height: '100%', width: '100%' }}>
+                {`component [isFocused: ${focused}]`}
+                <button onClick={onClick}>resize</button>
+            </div>
         );
     },
 };

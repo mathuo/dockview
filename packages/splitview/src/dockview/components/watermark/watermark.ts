@@ -1,4 +1,7 @@
-import { PanelContentPart } from '../../../groupview/panel/parts';
+import {
+    PanelContentPart,
+    WatermarkPart,
+} from '../../../groupview/panel/parts';
 import { IGroupAccessor } from '../../componentDockview';
 import { IGroupview } from '../../../groupview/groupview';
 import { ActionContainer } from '../../../groupview/actions/actionsContainer';
@@ -6,9 +9,10 @@ import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
 import { CompositeDisposable } from '../../../lifecycle';
 
-export class Watermark extends CompositeDisposable implements PanelContentPart {
+export class Watermark extends CompositeDisposable implements WatermarkPart {
     private _element: HTMLElement;
     private accessor: IGroupAccessor;
+    private group: IGroupview;
 
     get id() {
         return 'watermark';
@@ -42,7 +46,7 @@ export class Watermark extends CompositeDisposable implements PanelContentPart {
 
         addDisposableListener(closeAnchor, 'click', (ev) => {
             ev.preventDefault();
-            // this.accessor.removeGroup(this._group);
+            this.accessor.removeGroup(this.group);
         });
     }
 
@@ -62,7 +66,8 @@ export class Watermark extends CompositeDisposable implements PanelContentPart {
         this.render();
     }
 
-    public setVisible(visible: boolean, isGroupVisible: boolean): void {
+    public setVisible(visible: boolean, group: IGroupview): void {
+        this.group = group;
         this.render();
     }
 

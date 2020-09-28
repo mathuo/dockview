@@ -5,7 +5,12 @@ import { Position, Droptarget, DroptargetEvent } from './droptarget/droptarget';
 import { Event, Emitter, addDisposableListener } from '../events';
 import { IGroupAccessor, ComponentDockview } from '../dockview';
 import { toggleClass } from '../dom';
-import { ClosePanelResult, IGroupPanel, PanelContentPart } from './panel/parts';
+import {
+    ClosePanelResult,
+    IGroupPanel,
+    PanelContentPart,
+    WatermarkPart,
+} from './panel/parts';
 import { timeoutPromise } from '../async';
 import {
     extractData,
@@ -102,7 +107,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     private _active: boolean;
     private _activePanel: IGroupPanel;
     private dropTarget: Droptarget;
-    private watermark: PanelContentPart;
+    private watermark: WatermarkPart;
 
     private readonly _onDidChange = new Emitter<IViewSize | undefined>();
     readonly onDidChange: Event<IViewSize | undefined> = this._onDidChange
@@ -447,7 +452,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.panels.forEach((panel) => panel.setVisible(this._active, this));
 
         if (this.watermark?.setVisible) {
-            this.watermark.setVisible(this._active, true);
+            this.watermark.setVisible(this._active, this);
         }
 
         if (isActive) {
@@ -529,9 +534,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             this.watermark = new WatermarkComponent();
             this.watermark.init({
                 accessor: this.accessor,
-                api: null,
-                params: {},
-                title: null,
             });
         }
 
@@ -546,7 +548,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
             this.contentContainer.openPanel(this.watermark);
 
-            this.watermark.setVisible(true, true);
+            this.watermark.setVisible(true, this);
         }
         if (!this.isEmpty && this.watermark.element.parentNode) {
             this.watermark.dispose();

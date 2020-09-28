@@ -53,6 +53,9 @@ export abstract class PanelView
                 ) {
                     this._maximumSize = event.maximumSize;
                 }
+            }),
+            this.api.onDidSizeChange((event) => {
+                this._onDidChange.fire(event.size);
             })
         );
     }

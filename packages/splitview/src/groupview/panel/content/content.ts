@@ -6,7 +6,7 @@ import { PanelContentPart } from '../parts';
 export interface IContentContainer extends IDisposable {
     onDidFocus: Event<void>;
     element: HTMLElement;
-    openPanel: (panel: PanelContentPart) => void;
+    openPanel: (panel: { element: HTMLElement }) => void;
     closePanel: () => void;
 }
 
@@ -14,7 +14,7 @@ export class ContentContainer
     extends CompositeDisposable
     implements IContentContainer {
     private _element: HTMLElement;
-    private content: PanelContentPart;
+    private content: { element: HTMLElement };
 
     private readonly _onDidFocus = new Emitter<void>();
     readonly onDidFocus: Event<void> = this._onDidFocus.event;
