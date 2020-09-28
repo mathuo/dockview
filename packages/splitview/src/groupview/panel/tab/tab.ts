@@ -10,12 +10,13 @@ import {
 import { toggleClass } from '../../../dom';
 import { IGroupAccessor } from '../../../dockview';
 import { LayoutMouseEvent, MouseEventKind } from '../../events';
+import { PanelHeaderPart } from '../parts';
 
 export interface ITab {
     id: string;
     element: HTMLElement;
     hasActiveDragEvent: boolean;
-    setContent: (element: HTMLElement) => void;
+    setContent: (element: PanelHeaderPart) => void;
     onChanged: Event<LayoutMouseEvent>;
     onDropped: Event<DroptargetEvent>;
     setActive(isActive: boolean): void;
@@ -29,7 +30,7 @@ export class Tab extends CompositeDisposable implements ITab {
         isDragging: false,
     };
     private droptarget: Droptarget;
-    private content: HTMLElement;
+    private content: PanelHeaderPart;
 
     private readonly _onChanged = new Emitter<LayoutMouseEvent>();
     readonly onChanged: Event<LayoutMouseEvent> = this._onChanged.event;
@@ -146,12 +147,12 @@ export class Tab extends CompositeDisposable implements ITab {
         toggleClass(this.element, 'inactive-tab', !isActive);
     }
 
-    public setContent(element: HTMLElement) {
+    public setContent(part: PanelHeaderPart) {
         if (this.content) {
-            this._element.removeChild(this.content);
+            this._element.removeChild(this.content.element);
         }
-        this.content = element;
-        this._element.appendChild(this.content);
+        this.content = part;
+        this._element.appendChild(this.content.element);
     }
 
     public dispose() {

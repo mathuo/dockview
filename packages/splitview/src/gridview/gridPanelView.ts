@@ -4,6 +4,8 @@ import { FunctionOrValue } from '../types';
 import { BasePanelView } from './basePanelView';
 import { GridPanelApi } from '../api/gridPanelApi';
 import { LayoutPriority } from '../splitview/core/splitview';
+import { Emitter, Event } from '../events';
+import { IViewSize } from './gridview';
 
 export interface GridviewInitParameters extends PanelInitParameters {
     minimumWidth?: number;
@@ -23,6 +25,10 @@ export abstract class GridPanelView
     private _maximumHeight: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
     private _priority: LayoutPriority;
     private _snap: boolean;
+
+    private readonly _onDidChange = new Emitter<IViewSize | undefined>();
+    readonly onDidChange: Event<IViewSize | undefined> = this._onDidChange
+        .event;
 
     get priority() {
         return this._priority;
@@ -82,6 +88,12 @@ export abstract class GridPanelView
                 ) {
                     this._maximumHeight = event.maximumHeight;
                 }
+            }),
+            this.api.onDidSizeChange((event) => {
+                this._onDidChange.fire({
+                    height: event.height,
+                    width: event.width,
+                });
             })
         );
     }

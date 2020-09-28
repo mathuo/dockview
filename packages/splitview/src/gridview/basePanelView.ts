@@ -12,10 +12,10 @@ export abstract class BasePanelView<T extends BaseViewApi>
     private part: IFrameworkPart;
     protected params: PanelInitParameters;
 
-    private _onDidChange: Emitter<number | undefined> = new Emitter<
-        number | undefined
-    >();
-    public onDidChange = this._onDidChange.event;
+    /**
+     * Provide an IFrameworkPart that will determine the rendered UI of this view piece.
+     */
+    protected abstract getComponent(): IFrameworkPart;
 
     get element() {
         return this._element;
@@ -71,6 +71,4 @@ export abstract class BasePanelView<T extends BaseViewApi>
         super.dispose();
         this.api.dispose();
     }
-
-    protected abstract getComponent();
 }

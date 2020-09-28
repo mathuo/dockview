@@ -215,7 +215,7 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
             return;
         }
         const tab = new Tab(panel.id, this.accessor, this.group);
-        tab.setContent(panel.header.element);
+        tab.setContent(panel.header);
 
         const disposable = CompositeDisposable.from(
             tab.onChanged((event) => {

@@ -9,9 +9,15 @@ interface GridConstraintChangeEvent {
     maximumHeight?: FunctionOrValue<number>;
 }
 
+interface SizeEvent {
+    width?: number;
+    height?: number;
+}
+
 export interface IGridPanelApi extends IBaseViewApi {
     onDidConstraintsChange: Event<GridConstraintChangeEvent>;
     setConstraints(value: GridConstraintChangeEvent): void;
+    setSize(event: SizeEvent): void;
 }
 
 export class GridPanelApi extends BaseViewApi implements IGridPanelApi {
@@ -20,6 +26,11 @@ export class GridPanelApi extends BaseViewApi implements IGridPanelApi {
     });
     readonly onDidConstraintsChange: Event<GridConstraintChangeEvent> = this
         ._onDidConstraintsChange.event;
+    //
+
+    readonly _onDidSizeChange = new Emitter<SizeEvent>();
+    readonly onDidSizeChange: Event<SizeEvent> = this._onDidSizeChange.event;
+    //
 
     constructor() {
         super();
@@ -27,5 +38,9 @@ export class GridPanelApi extends BaseViewApi implements IGridPanelApi {
 
     public setConstraints(value: GridConstraintChangeEvent) {
         this._onDidConstraintsChange.fire(value);
+    }
+
+    public setSize(event: SizeEvent) {
+        this._onDidSizeChange.fire(event);
     }
 }

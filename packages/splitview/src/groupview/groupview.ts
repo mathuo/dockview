@@ -5,7 +5,7 @@ import { Position, Droptarget, DroptargetEvent } from './droptarget/droptarget';
 import { Event, Emitter, addDisposableListener } from '../events';
 import { IGroupAccessor, ComponentDockview } from '../dockview';
 import { toggleClass } from '../dom';
-import { ClosePanelResult, WatermarkPart, IGroupPanel } from './panel/parts';
+import { ClosePanelResult, IGroupPanel, PanelContentPart } from './panel/parts';
 import { timeoutPromise } from '../async';
 import {
     extractData,
@@ -14,6 +14,7 @@ import {
     isPanelTransferEvent,
 } from './droptarget/dataTransfer';
 import { IGridPanelView } from '../gridview/baseComponentGridview';
+import { IViewSize } from '../gridview/gridview';
 
 export const enum GroupChangeKind {
     GROUP_ACTIVE = 'GROUP_ACTIVE',
@@ -101,7 +102,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     private _active: boolean;
     private _activePanel: IGroupPanel;
     private dropTarget: Droptarget;
-    private watermark: WatermarkPart;
+    private watermark: PanelContentPart;
+
+    private readonly _onDidChange = new Emitter<IViewSize | undefined>();
+    readonly onDidChange: Event<IViewSize | undefined> = this._onDidChange
+        .event;
 
     private _width: number;
     private _height: number;
@@ -329,7 +334,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.doAddPanel(panel, index);
 
         this.tabContainer.openPanel(panel, index);
-        this.contentContainer.openPanel(panel.content.element);
+        this.contentContainer.openPanel(panel.content);
 
         this.doSetActivePanel(panel);
         this.accessor.doSetGroupActive(this);
@@ -442,7 +447,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.panels.forEach((panel) => panel.setVisible(this._active, this));
 
         if (this.watermark?.setVisible) {
-            this.watermark.setVisible(this._active, this);
+            this.watermark.setVisible(this._active, true);
         }
 
         if (isActive) {
@@ -522,7 +527,12 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         if (this.accessor.options.watermarkComponent && !this.watermark) {
             const WatermarkComponent = this.accessor.options.watermarkComponent;
             this.watermark = new WatermarkComponent();
-            this.watermark.init({ accessor: this.accessor });
+            this.watermark.init({
+                accessor: this.accessor,
+                api: null,
+                params: {},
+                title: null,
+            });
         }
 
         this.panels.forEach((panel) => panel.setVisible(this._active, this));
@@ -534,9 +544,9 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 }
             });
 
-            this.contentContainer.openPanel(this.watermark.element);
+            this.contentContainer.openPanel(this.watermark);
 
-            this.watermark.setVisible(true, this);
+            this.watermark.setVisible(true, true);
         }
         if (!this.isEmpty && this.watermark.element.parentNode) {
             this.watermark.dispose();

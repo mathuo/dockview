@@ -9,6 +9,7 @@ import {
 } from 'splitview';
 import { Activitybar } from './activitybar';
 import { Footer } from './footer';
+import { Panel } from './panel';
 import { TestGrid } from './reactgrid';
 import { Sidebar } from './sidebar';
 
@@ -19,13 +20,7 @@ const rootcomponents: {
     activitybar: Activitybar,
     editor: TestGrid,
     footer: Footer,
-    panel: () => {
-        return (
-            <div style={{ backgroundColor: 'rgb(30,30,30)', height: '100%' }}>
-                panel
-            </div>
-        );
-    },
+    panel: Panel,
 };
 
 export const Application = () => {

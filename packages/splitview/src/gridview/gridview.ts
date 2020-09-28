@@ -139,7 +139,13 @@ export function getLocationOrientation(
         : rootOrientation;
 }
 
+export interface IViewSize {
+    width: number;
+    height: number;
+}
+
 export interface IGridView {
+    readonly onDidChange: Event<IViewSize | undefined>;
     readonly element: HTMLElement;
     readonly minimumWidth: number;
     readonly maximumWidth: number;

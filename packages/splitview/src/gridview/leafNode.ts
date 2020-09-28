@@ -5,14 +5,14 @@ import {
 } from '../splitview/core/splitview';
 import { Emitter, Event } from '../events';
 import { IGridView } from './gridview';
+import { IDisposable } from '../lifecycle';
 
 export class LeafNode implements IView {
     private readonly _onDidChange = new Emitter<number | undefined>();
     readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
     private _size: number;
     private _orthogonalSize: number;
-
-    public dispose() {}
+    private _disposable: IDisposable;
 
     private get minimumWidth(): number {
         return this.view.minimumWidth;
@@ -82,6 +82,16 @@ export class LeafNode implements IView {
     ) {
         this._orthogonalSize = orthogonalSize;
         this._size = size;
+
+        this._disposable = this.view.onDidChange((event) =>
+            this._onDidChange.fire(
+                event
+                    ? this.orientation === Orientation.VERTICAL
+                        ? event.width
+                        : event.height
+                    : undefined
+            )
+        );
     }
 
     public layout(size: number, orthogonalSize: number) {
@@ -94,5 +104,9 @@ export class LeafNode implements IView {
                 : [size, orthogonalSize];
 
         this.view.layout(width, height);
+    }
+
+    public dispose() {
+        this._disposable.dispose();
     }
 }

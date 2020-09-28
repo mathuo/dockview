@@ -7,9 +7,14 @@ interface PanelConstraintChangeEvent {
     maximumSize?: FunctionOrValue<number>;
 }
 
+interface SizeEvent {
+    size: number;
+}
+
 export interface IPanelApi extends IBaseViewApi {
     onDidConstraintsChange: Event<PanelConstraintChangeEvent>;
     setConstraints(value: PanelConstraintChangeEvent): void;
+    setSize(event: SizeEvent): void;
 }
 
 export class PanelApi extends BaseViewApi implements IPanelApi {
@@ -18,6 +23,11 @@ export class PanelApi extends BaseViewApi implements IPanelApi {
     });
     readonly onDidConstraintsChange: Event<PanelConstraintChangeEvent> = this
         ._onDidConstraintsChange.event;
+    //
+
+    readonly _onDidSizeChange = new Emitter<SizeEvent>();
+    readonly onDidSizeChange: Event<SizeEvent> = this._onDidSizeChange.event;
+    //
 
     constructor() {
         super();
@@ -25,5 +35,9 @@ export class PanelApi extends BaseViewApi implements IPanelApi {
 
     public setConstraints(value: PanelConstraintChangeEvent) {
         this._onDidConstraintsChange.fire(value);
+    }
+
+    public setSize(event: SizeEvent) {
+        this._onDidSizeChange.fire(event);
     }
 }

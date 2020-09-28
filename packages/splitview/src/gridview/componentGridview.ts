@@ -147,6 +147,10 @@ export class ComponentGridview
             snap: options.snap,
         });
 
+        view.api.onDidSizeChange((event) => {
+            //
+        });
+
         this.groups.set(options.id, {
             value: view,
             disposable: Disposable.NONE,

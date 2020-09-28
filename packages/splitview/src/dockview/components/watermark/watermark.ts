@@ -1,7 +1,4 @@
-import {
-    WatermarkPart,
-    WatermarkPartInitParameters,
-} from '../../../groupview/panel/parts';
+import { PanelContentPart } from '../../../groupview/panel/parts';
 import { IGroupAccessor } from '../../componentDockview';
 import { IGroupview } from '../../../groupview/groupview';
 import { ActionContainer } from '../../../groupview/actions/actionsContainer';
@@ -9,12 +6,13 @@ import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
 import { CompositeDisposable } from '../../../lifecycle';
 
-export class Watermark extends CompositeDisposable implements WatermarkPart {
+export class Watermark extends CompositeDisposable implements PanelContentPart {
     private _element: HTMLElement;
     private accessor: IGroupAccessor;
 
-    private _visible: boolean;
-    private _group: IGroupview;
+    get id() {
+        return 'watermark';
+    }
 
     constructor() {
         super();
@@ -43,12 +41,16 @@ export class Watermark extends CompositeDisposable implements WatermarkPart {
         actions.add(closeAnchor);
 
         addDisposableListener(closeAnchor, 'click', (ev) => {
-            ev.preventDefault(); //
-            this.accessor.removeGroup(this._group);
+            ev.preventDefault();
+            // this.accessor.removeGroup(this._group);
         });
     }
 
-    public init(params: WatermarkPartInitParameters) {
+    layout(width: number, height: number) {
+        // noop
+    }
+
+    public init(params) {
         this.accessor = params.accessor;
 
         this.addDisposables(
@@ -60,9 +62,7 @@ export class Watermark extends CompositeDisposable implements WatermarkPart {
         this.render();
     }
 
-    public setVisible(visible: boolean, group: IGroupview): void {
-        this._visible = visible;
-        this._group = group;
+    public setVisible(visible: boolean, isGroupVisible: boolean): void {
         this.render();
     }
 

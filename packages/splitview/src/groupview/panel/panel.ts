@@ -80,10 +80,10 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
 
         this.api.setState(this.params.state);
         if (this.content.init) {
-            this.content.init({ ...params, api: this.api });
+            this.content.init({ ...params, api: this.api, accessor: null });
         }
         if (this.header.init) {
-            this.header.init({ ...params, api: this.api });
+            this.header.init({ ...params, api: this.api, accessor: null });
         }
     }
 
