@@ -151,6 +151,11 @@ const components = {
                 )},${Math.floor(Math.random() * 256)})`,
             []
         );
+
+        const onRename = () => {
+            props.api.setTitle('Did it change?');
+        };
+
         return (
             <div
                 style={{
@@ -160,6 +165,7 @@ const components = {
             >
                 <div>test component</div>
                 <button onClick={onClick}>set state</button>
+                <button onClick={onRename}>rename</button>
                 {/* {props.api.getState()["test_key"]} */}
 
                 <div>{`G:${panelState.isGroupActive} P:${panelState.isPanelVisible}`}</div>

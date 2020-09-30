@@ -5,6 +5,7 @@ import {
 } from '../../../groupview/panel/parts';
 import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
+import { PanelUpdateEvent } from '../../../panel/types';
 
 export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
     private _element: HTMLElement;
@@ -17,7 +18,7 @@ export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
     private _list: HTMLElement;
     private action: HTMLElement;
     //
-    private params: GroupPanelPartInitParameters;
+    private params: GroupPanelPartInitParameters = {} as any;
     //
     private isDirtyDisposable = new MutableDisposable();
 
@@ -61,6 +62,11 @@ export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
         this.render();
     }
 
+    public update(event: PanelUpdateEvent) {
+        this.params = { ...this.params, ...event.params };
+        this.render();
+    }
+
     public toJSON() {
         return { id: this.id };
     }
@@ -98,6 +104,6 @@ export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
     }
 
     private render() {
-        //
+        this._content.textContent = this.params.title;
     }
 }

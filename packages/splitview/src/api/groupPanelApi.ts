@@ -7,6 +7,10 @@ interface VisibilityEvent {
     isVisible: boolean;
 }
 
+interface TitleEvent {
+    title: string;
+}
+
 export interface IGroupPanelApi extends IGridPanelApi {
     // events
     onDidDirtyChange: Event<boolean>;
@@ -17,6 +21,7 @@ export interface IGroupPanelApi extends IGridPanelApi {
     close: () => Promise<boolean>;
     canClose: () => Promise<ClosePanelResult>;
     setClosePanelHook(callback: () => Promise<ClosePanelResult>): void;
+    setTitle(title: string): void;
 }
 
 export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
@@ -31,6 +36,8 @@ export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
     });
     readonly onDidChangeVisibility: Event<VisibilityEvent> = this
         ._onDidChangeVisibility.event;
+    readonly _onDidTitleChange = new Emitter<TitleEvent>();
+    readonly onDidTitleChange = this._onDidTitleChange.event;
 
     get isVisible() {
         return this._isVisible;
@@ -59,6 +66,10 @@ export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
                 this._isVisible = event.isVisible;
             })
         );
+    }
+
+    public setTitle(title: string) {
+        this._onDidTitleChange.fire({ title });
     }
 
     public close() {

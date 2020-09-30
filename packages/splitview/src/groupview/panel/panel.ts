@@ -40,6 +40,13 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
 
         this.api = new GroupPanelApi(this, this._group);
         this.onDidStateChange = this.api.onDidStateChange;
+
+        this.addDisposables(
+            this.api.onDidTitleChange((event) => {
+                const title = event.title;
+                this.update({ params: { title } });
+            })
+        );
     }
 
     public setDirty(isDirty: boolean) {
@@ -70,7 +77,7 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
         this.params.params = { ...this.params.params, ...params };
 
         this.contentPart.update(params);
-        this.api._onDidStateChange.fire();
+        this.headerPart.update(params);
     }
 
     public init(params: IGroupPanelInitParameters): void {

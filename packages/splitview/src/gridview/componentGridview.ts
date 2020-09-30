@@ -4,7 +4,6 @@ import { getGridLocation } from './gridview';
 import { tail, sequenceEquals } from '../array';
 import { GroupChangeKind } from '../groupview/groupview';
 import { Disposable } from '../lifecycle';
-import { DebugWidget } from '../dockview/components/debug/debug';
 import { IPanelDeserializer } from '../dockview/deserializer';
 import { createComponent } from '../splitview/core/options';
 import { LayoutPriority } from '../splitview/core/splitview';
@@ -18,6 +17,11 @@ import {
 } from './baseComponentGridview';
 import { GridviewInitParameters } from './gridPanelView';
 import { Parameters } from '../panel/types';
+import { GridPanelApi } from '../api/gridPanelApi';
+
+interface PanelReference {
+    api: GridPanelApi;
+}
 
 export interface AddComponentOptions {
     id: string;
@@ -113,7 +117,7 @@ export class ComponentGridview
         this._onDidLayoutChange.fire({ kind: GroupChangeKind.NEW_LAYOUT });
     }
 
-    public addComponent(options: AddComponentOptions) {
+    public addComponent(options: AddComponentOptions): PanelReference {
         let relativeLocation: number[] = options.location || [0];
 
         if (options.position?.reference) {
@@ -157,6 +161,8 @@ export class ComponentGridview
         });
 
         this.doAddGroup(view, relativeLocation, options.size);
+
+        return { api: view.api };
     }
 
     public moveGroup(
