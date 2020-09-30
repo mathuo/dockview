@@ -19,7 +19,7 @@ export class ReactPanelView extends PanelView {
         return new ReactPart(
             this.element,
             this.api,
-            this.reactPortalStore.addPortal,
+            this.reactPortalStore,
             this.reactComponent,
             this.params.params
         );

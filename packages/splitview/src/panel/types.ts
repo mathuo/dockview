@@ -24,3 +24,7 @@ export interface IPanel extends IDisposable {
     update?(event: PanelUpdateEvent): void;
     toJSON?(): object;
 }
+
+export interface IFrameworkPart extends IDisposable {
+    update(params: { [index: string]: any }): void;
+}

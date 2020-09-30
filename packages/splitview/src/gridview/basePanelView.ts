@@ -1,8 +1,11 @@
 import { trackFocus } from '../dom';
-import { Emitter } from '../events';
 import { CompositeDisposable } from '../lifecycle';
-import { IFrameworkPart } from '../react/react';
-import { PanelUpdateEvent, PanelInitParameters, IPanel } from '../panel/types';
+import {
+    IFrameworkPart,
+    PanelUpdateEvent,
+    PanelInitParameters,
+    IPanel,
+} from '../panel/types';
 import { BaseViewApi } from '../api/api';
 
 export abstract class BasePanelView<T extends BaseViewApi>

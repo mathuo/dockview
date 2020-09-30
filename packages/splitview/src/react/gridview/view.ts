@@ -19,7 +19,7 @@ export class ReactGridPanelView extends GridPanelView {
         return new ReactPart(
             this.element,
             this.api,
-            this.reactPortalStore.addPortal,
+            this.reactPortalStore,
             this.reactComponent,
             this.params.params
         );

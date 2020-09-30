@@ -28,7 +28,7 @@ export class ReactPanelContentPart implements PanelContentPart {
         this.part = new ReactPart(
             this.element,
             parameters.api,
-            this.reactPortalStore.addPortal,
+            this.reactPortalStore,
             this.component,
             parameters.params
         );

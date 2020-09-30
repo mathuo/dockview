@@ -26,7 +26,7 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
         this.part = new ReactPart(
             this.element,
             parameters.api,
-            this.reactPortalStore.addPortal,
+            this.reactPortalStore,
             this.component,
             parameters.params
         );

@@ -31,7 +31,7 @@
             box-sizing: border-box;
 
             &:focus,
-            :focus-within {
+            &:focus-within {
                 outline-width: 1px;
                 outline-style: solid;
                 outline-offset: -1px;
@@ -44,7 +44,7 @@
             flex-grow: 1;
 
             &:focus,
-            :focus-within {
+            &:focus-within {
                 outline-width: 1px;
                 outline-style: solid;
                 outline-offset: -1px;

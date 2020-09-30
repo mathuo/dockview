@@ -72,7 +72,7 @@ export const Application = () => {
 
     React.useEffect(() => {
         const callback = (ev: UIEvent) => {
-            const height = window.innerHeight - 20;
+            const height = window.innerHeight;
             const width = window.innerWidth;
 
             api.current?.layout(width, height);

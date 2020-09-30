@@ -12,6 +12,7 @@ import {
 } from 'splitview';
 import { CustomTab } from './customTab';
 import { Editor } from './editorPanel';
+import { useLayoutRegistry } from './registry';
 import { SplitPanel } from './splitPanel';
 
 const components = {
@@ -174,7 +175,7 @@ const tabComponents = {
     default: CustomTab,
 };
 
-const nextGuid = (() => {
+export const nextGuid = (() => {
     let counter = 0;
     return () => 'panel_' + (counter++).toString();
 })();
@@ -182,10 +183,12 @@ const nextGuid = (() => {
 export const TestGrid = (props: IGridviewPanelProps) => {
     const _api = React.useRef<Api>();
     const [api, setApi] = React.useState<Api>();
+    const registry = useLayoutRegistry();
 
     const onReady = (event: DockviewReadyEvent) => {
         _api.current = event.api;
         setApi(event.api);
+        registry.register('dockview', event.api);
     };
 
     React.useEffect(() => {
@@ -244,18 +247,6 @@ export const TestGrid = (props: IGridviewPanelProps) => {
         });
     }, [api]);
 
-    const onAdd = () => {
-        const id = nextGuid();
-        api.addPanelFromComponent({
-            componentName: 'test_component',
-            id,
-        });
-    };
-
-    const onAddEmpty = () => {
-        api.addEmptyGroup();
-    };
-
     React.useEffect(() => {
         // const callback = (ev: UIEvent) => {
         //   const height = window.innerHeight - 40;
@@ -277,7 +268,7 @@ export const TestGrid = (props: IGridviewPanelProps) => {
             }),
             props.api.onDidDimensionsChange((event) => {
                 const { width, height } = event;
-                _api.current.layout(width, height - 20);
+                _api.current.layout(width, height);
             })
         );
 
@@ -286,73 +277,6 @@ export const TestGrid = (props: IGridviewPanelProps) => {
             // window.removeEventListener("resize", callback);
         };
     }, []);
-
-    const onConfig = () => {
-        const data = api.toJSON();
-        const stringData = JSON.stringify(data, null, 4);
-        console.log(stringData);
-        localStorage.setItem('layout', stringData);
-    };
-
-    const onLoad = async () => {
-        const didClose = await api.closeAllGroups();
-        if (!didClose) {
-            return;
-        }
-        const data = localStorage.getItem('layout');
-        if (data) {
-            const jsonData = JSON.parse(data);
-            api.deserialize(jsonData);
-        }
-    };
-
-    const onClear = () => {
-        api.closeAllGroups();
-    };
-
-    const onNextGroup = () => {
-        api.moveToNext({ includePanel: true });
-    };
-
-    const onPreviousGroup = () => {
-        api.moveToPrevious({ includePanel: true });
-    };
-
-    const onNextPanel = () => {
-        api.activeGroup?.moveToNext();
-    };
-
-    const onPreviousPanel = () => {
-        api.activeGroup?.moveToPrevious();
-    };
-
-    const dragRef = React.useRef<HTMLDivElement>();
-
-    React.useEffect(() => {
-        if (!api) {
-            return;
-        }
-        api.createDragTarget(
-            { element: dragRef.current, content: 'drag me' },
-            () => ({
-                id: 'yellow',
-                componentName: 'test_component',
-            })
-        );
-    }, [api]);
-
-    const onDragStart = (event: React.DragEvent) => {
-        event.dataTransfer.setData('text/plain', 'Panel2');
-    };
-
-    const onAddEditor = () => {
-        api.addPanelFromComponent({
-            id: 'editor',
-            componentName: 'editor',
-            tabComponentName: 'default',
-            params: { layoutApi: api },
-        });
-    };
 
     const onTabContextMenu = React.useMemo(
         () => (event: TabContextMenuEvent) => {
@@ -366,55 +290,12 @@ export const TestGrid = (props: IGridviewPanelProps) => {
             // className="visual-studio-theme"
             style={{ width: '100%', overflow: 'hidden' }}
         >
-            <div
-                style={{
-                    height: '20px',
-                    display: 'flex',
-                    maxHeight: '20px',
-                    minHeight: '20px',
-                }}
-            >
-                <button onClick={onAdd}>Add</button>
-                <button onClick={onAddEditor}>Expr</button>
-                <button onClick={onAddEmpty}>Add empty</button>
-                <button onClick={onConfig}>Save</button>
-                <button onClick={onLoad}>Load</button>
-                <button onClick={onClear}>Clear</button>
-                <button onClick={onNextGroup}>Next</button>
-                <button onClick={onPreviousGroup}>Before</button>
-                <button onClick={onNextPanel}>NextPanel</button>
-                <button onClick={onPreviousPanel}>BeforePanel</button>
-                <div
-                    draggable={true}
-                    className="my-dragger"
-                    style={{
-                        backgroundColor: 'dodgerblue',
-                        borderRadius: '10px',
-                        color: ' white',
-                    }}
-                    ref={dragRef}
-                >
-                    Drag me
-                </div>
-                <div
-                    onDragStart={onDragStart}
-                    draggable={true}
-                    className="my-dragger"
-                    style={{
-                        backgroundColor: 'orange',
-                        borderRadius: '10px',
-                        color: ' white',
-                    }}
-                >
-                    Drag me too
-                </div>
-            </div>
             <DockviewComponent
                 // autoSizeToFitContainer={true}
                 onReady={onReady}
                 components={components}
                 tabComponents={tabComponents}
-                debug={true}
+                debug={false}
                 // tabHeight={30}
                 enableExternalDragEvents={true}
                 // serializedLayout={data}

@@ -2,8 +2,11 @@ import { SplitView, IView, Orientation } from '../splitview/core/splitview';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { Emitter, Event } from '../events';
 import { addClasses, removeClasses } from '../dom';
-import { IFrameworkPart } from '../react/react';
-import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
+import {
+    IFrameworkPart,
+    PanelInitParameters,
+    PanelUpdateEvent,
+} from '../panel/types';
 import { PanePanelApi } from '../api/panePanelApi';
 
 export interface PanePanelInitParameter extends PanelInitParameters {
@@ -236,21 +239,18 @@ export class PaneView implements IDisposable {
         this.element = document.createElement('div');
         this.element.className = 'pane-container';
 
-        this.setupAnimation = this.setupAnimation.bind(this);
-
         container.appendChild(this.element);
+
         this.splitview = new SplitView(this.element, {
             orientation: this._orientation,
             proportionalLayout: false,
         });
     }
 
-    public setOrientation(orientation: Orientation) {
-        this._orientation = orientation;
-    }
-
     public addPane(pane: Pane, size?: number, index = this.splitview.length) {
-        const disposable = pane.onDidChangeExpansionState(this.setupAnimation);
+        const disposable = pane.onDidChangeExpansionState(() => {
+            this.setupAnimation();
+        });
 
         const paneItem: PaneItem = {
             pane,
@@ -296,6 +296,7 @@ export class PaneView implements IDisposable {
     private setupAnimation() {
         if (this.animationTimer) {
             clearTimeout(this.animationTimer);
+            this.animationTimer = undefined;
         }
 
         addClasses(this.element, 'animated');
@@ -307,6 +308,11 @@ export class PaneView implements IDisposable {
     }
 
     public dispose() {
+        if (this.animationTimer) {
+            clearTimeout(this.animationTimer);
+            this.animationTimer = undefined;
+        }
+
         this.paneItems.forEach((paneItem) => {
             paneItem.disposable.dispose();
         });

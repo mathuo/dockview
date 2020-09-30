@@ -26,7 +26,7 @@ export class PaneReact extends Pane {
         return new ReactPart(
             this.body,
             this.api,
-            this.reactPortalStore.addPortal,
+            this.reactPortalStore,
             this.reactComponent,
             this.params
         );
@@ -36,7 +36,7 @@ export class PaneReact extends Pane {
         return new ReactPart(
             this.header,
             this.api,
-            this.reactPortalStore.addPortal,
+            this.reactPortalStore,
             (props: IPaneviewPanelProps) => {
                 const onClick = () => {
                     props.api.setExpanded(!props.api.isExpanded);

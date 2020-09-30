@@ -5,12 +5,15 @@ import {
     PaneviewReadyEvent,
     IPaneviewPanelProps,
     IComponentPaneView,
+    Api,
 } from 'splitview';
+import { ControlCenter } from './controlCenter';
 
 const components = {
     default: (props: IPaneviewPanelProps) => {
         return <div style={{ height: '100%' }}>This is an example panel</div>;
     },
+    controlCenter: ControlCenter,
 };
 
 export const Sidebar = (props: IGridviewPanelProps) => {
@@ -19,7 +22,7 @@ export const Sidebar = (props: IGridviewPanelProps) => {
     const onReady = (event: PaneviewReadyEvent) => {
         event.api.addFromComponent({
             id: '1',
-            component: 'default',
+            component: 'controlCenter',
             params: {},
             tabComponentName: 'default1',
         });

@@ -3,9 +3,11 @@ import * as ReactDOM from 'react-dom';
 import { IDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
 import { IBaseViewApi } from '../api/api';
+import { ReactPortalStore } from './dockview/dockview';
+import { IFrameworkPart } from '../panel/types';
 
 interface IPanelWrapperProps {
-    component: React.FunctionComponent<{}>;
+    component: React.FunctionComponent<{ [key: string]: any }>;
     componentProps: { [key: string]: any };
 }
 
@@ -13,7 +15,15 @@ interface IPanelWrapperRef {
     update: (props: { [key: string]: any }) => void;
 }
 
-const PanelWrapper = React.forwardRef(
+/**
+ * This component is intended to interface between vanilla-JS and React hence we had to be
+ * creative in how we update props.
+ * A ref of the component is exposed with an update method; which when called stores the props
+ * as a ref within this component and forcefully triggers a re-render of the component using
+ * the ref of props we just set on the renderered component as the props passed to the inner
+ * component
+ */
+const ReactComponentBridge = React.forwardRef(
     (props: IPanelWrapperProps, ref: React.RefObject<IPanelWrapperRef>) => {
         const [_, triggerRender] = React.useState<number>();
         const _props = React.useRef<{ [key: string]: any }>(
@@ -25,6 +35,10 @@ const PanelWrapper = React.forwardRef(
             () => ({
                 update: (props: { [key: string]: any }) => {
                     _props.current = { ..._props.current, ...props };
+                    /**
+                     * setting a arbitrary piece of state within this component will
+                     * trigger a re-render
+                     */
                     triggerRender(Date.now());
                 },
             }),
@@ -41,7 +55,7 @@ const PanelWrapper = React.forwardRef(
         return React.createElement(props.component, _props.current);
     }
 );
-PanelWrapper.displayName = 'PanelWrapper';
+ReactComponentBridge.displayName = 'PanelWrapper';
 
 /**
  * Since we are storing the React.Portal references in a rendered array they
@@ -49,10 +63,6 @@ PanelWrapper.displayName = 'PanelWrapper';
  * to prevent excessive re-rendering
  */
 const uniquePortalKeyGenerator = sequentialNumberGenerator();
-
-export interface IFrameworkPart extends IDisposable {
-    update(params: {}): void;
-}
 
 export class ReactPart<P> implements IFrameworkPart {
     private componentInstance: IPanelWrapperRef;
@@ -62,14 +72,14 @@ export class ReactPart<P> implements IFrameworkPart {
     constructor(
         private readonly parent: HTMLElement,
         private readonly api: IBaseViewApi,
-        private readonly addPortal: (portal: React.ReactPortal) => IDisposable,
+        private readonly portalStore: ReactPortalStore,
         private readonly component: React.FunctionComponent<P>,
         private readonly parameters: { [key: string]: any }
     ) {
         this.createPortal();
     }
 
-    public update(props: {}) {
+    public update(props: { [index: string]: any }) {
         if (this.disposed) {
             throw new Error('invalid operation');
         }
@@ -82,37 +92,37 @@ export class ReactPart<P> implements IFrameworkPart {
             throw new Error('invalid operation');
         }
 
-        let props = {
+        const props = {
             api: this.api,
             ...this.parameters,
-        } as any;
+        } as { [index: string]: any } & { api: IBaseViewApi };
 
         // TODO use a better check for isReactFunctionalComponent
         if (typeof this.component !== 'function') {
             /**
              * we know this isn't a React.FunctionComponent so throw an error here.
              * if we do not intercept this the React library will throw a very obsure error
-             * for the same reason.
+             * for the same reason, at least at this point we will emit a sensible stacktrace.
              */
             throw new Error('invalid operation');
         }
 
-        const wrapper = React.createElement(PanelWrapper, {
+        const bridgeComponent = React.createElement(ReactComponentBridge, {
             component: this.component,
             componentProps: props,
-            ref: (element: any) => {
+            ref: (element) => {
                 this.componentInstance = element;
             },
         });
         const portal = ReactDOM.createPortal(
-            wrapper,
+            bridgeComponent,
             this.parent,
             uniquePortalKeyGenerator.next()
         );
 
         this.ref = {
             portal,
-            disposable: this.addPortal(portal),
+            disposable: this.portalStore.addPortal(portal),
         };
     }
 

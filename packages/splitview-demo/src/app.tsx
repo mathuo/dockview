@@ -32,7 +32,7 @@ export const App = () => {
                 flexDirection: 'column',
             }}
         >
-            <div style={{ height: '20px', flexShrink: 0 }}>
+            {/* <div style={{ height: '20px', flexShrink: 0 }}>
                 <select onChange={onChange} value={value}>
                     {options.map((option, i) => (
                         <option key={i} value={option.id}>
@@ -40,13 +40,14 @@ export const App = () => {
                         </option>
                     ))}
                 </select>
-            </div>
+            </div> */}
 
-            {Component && (
-                <div style={{ width: '100%', flexGrow: 1 }}>
-                    <Component />
-                </div>
-            )}
+            {/* {Component && ( */}
+            <div style={{ width: '100%', flexGrow: 1 }}>
+                {/* <Component /> */}
+                <Application />
+            </div>
+            {/* )} */}
         </div>
     );
 };
