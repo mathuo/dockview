@@ -32,6 +32,10 @@ interface VisibilityEvent {
     isVisible: boolean;
 }
 
+interface ActiveEvent {
+    isActive: boolean;
+}
+
 export interface IBaseViewApi extends IDisposable {
     // events
     onDidDimensionsChange: Event<PanelDimensionChangeEvent>;
@@ -78,6 +82,12 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
     });
     readonly onDidVisibilityChange: Event<VisibilityEvent> = this
         ._onDidVisibilityChange.event;
+    //
+    readonly _onDidActiveChange = new Emitter<ActiveEvent>({
+        emitLastValue: true,
+    });
+    readonly onDidActiveChange: Event<ActiveEvent> = this._onDidActiveChange
+        .event;
     //
 
     get isFocused() {

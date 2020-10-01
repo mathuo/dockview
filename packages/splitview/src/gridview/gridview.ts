@@ -174,7 +174,7 @@ const serializeLeafNode = (node: LeafNode) => {
             ? node.size
             : node.orthogonalSize;
     return {
-        size: node.size,
+        size: node,
         data: node.view.toJSON ? node.view.toJSON() : {},
         type: 'leaf',
     };
@@ -297,6 +297,7 @@ export class Gridview {
                         deserializer,
                         node.size
                     ),
+                    visible: (serializedChild as { visible: boolean }).visible,
                 } as INodeDescriptor;
             });
 
@@ -479,6 +480,13 @@ export class Gridview {
 
             let newSiblingSize: number | Sizing = 0;
 
+            const newSiblingCachedVisibleSize = grandParent.getChildCachedVisibleSize(
+                parentIndex
+            );
+            if (typeof newSiblingCachedVisibleSize === 'number') {
+                newSiblingSize = Sizing.Invisible(newSiblingCachedVisibleSize);
+            }
+
             grandParent.removeChild(parentIndex);
 
             const newParent = new BranchNode(
@@ -556,6 +564,7 @@ export class Gridview {
         const [parentIndex, ...__] = [...rest].reverse();
 
         const sibling = parent.children[0];
+        const isSiblingVisible = parent.isChildVisible(0);
         parent.removeChild(0, sizing);
 
         const sizes = grandParent.children.map((_, i) =>
@@ -580,11 +589,10 @@ export class Gridview {
                 orthogonal(sibling.orientation),
                 sibling.size
             );
-            grandParent.addChild(
-                newSibling,
-                sibling.orthogonalSize,
-                parentIndex
-            );
+            const sizing = isSiblingVisible
+                ? sibling.orthogonalSize
+                : Sizing.Invisible(sibling.orthogonalSize);
+            grandParent.addChild(newSibling, sizing, parentIndex);
         }
 
         for (let i = 0; i < sizes.length; i++) {

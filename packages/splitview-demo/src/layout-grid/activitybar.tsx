@@ -13,6 +13,10 @@ export const Activitybar = (props: IGridviewPanelProps) => {
         api.toggleVisibility(sidebarPanel);
     };
 
+    React.useEffect(() => {
+        // props.api.onDidActiveChange((event) => {});
+    }, []);
+
     return (
         <div
             onClick={onOpenSidebar}

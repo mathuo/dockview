@@ -14,6 +14,7 @@ export abstract class BasePanelView<T extends BaseViewApi>
     private _height: number;
     private _width: number;
     private _element: HTMLElement;
+    private _isVisible: boolean;
     private part: IFrameworkPart;
     protected params: PanelInitParameters;
 
@@ -68,17 +69,23 @@ export abstract class BasePanelView<T extends BaseViewApi>
         this.part = this.getComponent();
     }
 
+    setVisible(isVisible: boolean) {
+        this._isVisible = isVisible;
+    }
+
     update(params: PanelUpdateEvent) {
         this.params = { ...this.params, params: params.params };
         this.part.update(params);
     }
 
     toJSON(): object {
+        const state = this.api.getState();
         return {
             id: this.id,
             component: this.component,
             props: this.params.params,
-            state: this.api.getState(),
+            state: Object.keys(state).length === 0 ? undefined : state,
+            visible: this._isVisible,
         };
     }
 

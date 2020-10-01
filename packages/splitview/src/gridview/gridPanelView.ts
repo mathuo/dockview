@@ -119,6 +119,7 @@ export abstract class GridPanelView
     }
 
     setVisible(isVisible: boolean) {
+        super.setVisible(isVisible);
         this.api._onDidVisibilityChange.fire({ isVisible });
     }
 

@@ -119,6 +119,10 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
             isVisible: this._group.isPanelActive(this),
         });
 
+        this.api._onDidChangeVisibility.fire({
+            isVisible: this._group.isPanelActive(this),
+        });
+
         if (this.headerPart.setVisible) {
             this.headerPart.setVisible(
                 this._group.isPanelActive(this),

@@ -70,9 +70,22 @@ interface ISashDragSnapState {
     readonly size: number;
 }
 
+type ViewItemSize = number | { cachedVisibleSize: number };
+
 export type DistributeSizing = { type: 'distribute' };
 export type SplitSizing = { type: 'split'; index: number };
-export type Sizing = DistributeSizing | SplitSizing;
+export type InvisibleSizing = { type: 'invisible'; cachedVisibleSize: number };
+export type Sizing = DistributeSizing | SplitSizing | InvisibleSizing;
+
+export namespace Sizing {
+    export const Distribute: DistributeSizing = { type: 'distribute' };
+    export function Split(index: number): SplitSizing {
+        return { type: 'split', index };
+    }
+    export function Invisible(cachedVisibleSize: number): InvisibleSizing {
+        return { type: 'invisible', cachedVisibleSize };
+    }
+}
 
 export interface ISplitViewDescriptor {
     size: number;
@@ -153,7 +166,14 @@ export class SplitView {
         if (options.descriptor) {
             this._size = options.descriptor.size;
             options.descriptor.views.forEach((viewDescriptor, index) => {
-                const sizing = viewDescriptor.size;
+                const sizing =
+                    viewDescriptor.visible === undefined ||
+                    viewDescriptor.visible
+                        ? viewDescriptor.size
+                        : ({
+                              type: 'invisible',
+                              cachedVisibleSize: viewDescriptor.size,
+                          } as InvisibleSizing);
 
                 const view = viewDescriptor.view;
                 this.addView(
@@ -272,12 +292,14 @@ export class SplitView {
 
         container.appendChild(view.element);
 
-        let viewSize: number;
+        let viewSize: ViewItemSize;
 
         if (typeof size === 'number') {
             viewSize = size;
         } else if (size.type === 'split') {
             viewSize = this.getViewSize(size.index) / 2;
+        } else if (size.type === 'invisible') {
+            viewSize = { cachedVisibleSize: size.cachedVisibleSize };
         } else {
             viewSize = view.minimumSize;
         }
@@ -420,7 +442,7 @@ export class SplitView {
 
                 const end = () => {
                     for (const item of this.views) {
-                        item.enabled = false;
+                        item.enabled = true;
                     }
 
                     this.saveProportions();
@@ -516,8 +538,21 @@ export class SplitView {
         return viewItem.view;
     }
 
+    getViewCachedVisibleSize(index: number): number | undefined {
+        if (index < 0 || index >= this.views.length) {
+            throw new Error('Index out of bounds');
+        }
+
+        const viewItem = this.views[index];
+        return viewItem.cachedVisibleSize;
+    }
+
     public moveView(from: number, to: number) {
-        const sizing = this.getViewSize(from);
+        const cachedVisibleSize = this.getViewCachedVisibleSize(from);
+        const sizing =
+            typeof cachedVisibleSize === 'undefined'
+                ? this.getViewSize(from)
+                : Sizing.Invisible(cachedVisibleSize);
         const view = this.removeView(from);
         this.addView(view, sizing, to);
     }

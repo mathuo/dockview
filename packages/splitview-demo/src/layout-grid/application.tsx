@@ -38,6 +38,8 @@ export const Application = () => {
             );
         layout();
 
+        event.api.fromJSON(require('./application.layout.json'));
+
         registry.register('gridview', event.api);
 
         event.api.addComponent({
@@ -82,6 +84,10 @@ export const Application = () => {
         });
 
         api.current = event.api as ComponentGridview;
+
+        setTimeout(() => {
+            console.log(JSON.stringify(api.current.toJSON(), null, 4));
+        }, 10000);
     };
 
     React.useEffect(() => {

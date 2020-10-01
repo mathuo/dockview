@@ -61,6 +61,7 @@ export abstract class PanelView
     }
 
     setVisible(isVisible: boolean) {
+        super.setVisible(isVisible);
         this.api._onDidVisibilityChange.fire({ isVisible });
     }
 
