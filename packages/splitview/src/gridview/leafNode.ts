@@ -94,6 +94,12 @@ export class LeafNode implements IView {
         );
     }
 
+    public setVisible(visible: boolean) {
+        if (this.view.setVisible) {
+            this.view.setVisible(visible);
+        }
+    }
+
     public layout(size: number, orthogonalSize: number) {
         this._size = size;
         this._orthogonalSize = orthogonalSize;

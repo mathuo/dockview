@@ -38,6 +38,16 @@ export interface IGridPanelView extends IGridView, IPanel {
     isActive: boolean;
 }
 
+export interface IBaseGridPublicApi<T extends IGridPanelView>
+    extends Pick<
+        IBaseGrid<T>,
+        | 'id'
+        | 'minimumHeight'
+        | 'maximumHeight'
+        | 'minimumWidth'
+        | 'maximumWidth'
+    > {}
+
 export interface IBaseGrid<T extends IGridPanelView> {
     readonly element: HTMLElement;
     readonly id: string;
@@ -150,7 +160,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
             this.doSetGroupActive(Array.from(this.groups.values())[0].value);
         }
 
-        return view;
+        return view as T;
     }
 
     public getGroup(id: string): T | undefined {

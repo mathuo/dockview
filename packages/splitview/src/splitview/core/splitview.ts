@@ -2,6 +2,7 @@ import { removeClasses, addClasses, firstIndex, toggleClass } from '../../dom';
 import { clamp } from '../../math';
 import { Event, Emitter } from '../../events';
 import { pushToStart, pushToEnd, range } from '../../array';
+import { ViewItem } from './viewItem';
 
 export const clampView = (view: IView, size: number) => {
     const result = clamp(size, view.minimumSize, view.maximumSize);
@@ -51,12 +52,12 @@ export interface IView extends IBaseView {
     setVisible?(visible: boolean): void;
 }
 
-export interface IViewItem {
-    view: IView;
-    size: number;
-    container: HTMLElement;
-    dispose: () => void;
-}
+// export interface IViewItem {
+//     view: IView;
+//     size: number;
+//     container: HTMLElement;
+//     dispose: () => void;
+// }
 
 interface ISashItem {
     container: HTMLElement;
@@ -80,7 +81,7 @@ export class SplitView {
     private element: HTMLElement;
     private viewContainer: HTMLElement;
     private sashContainer: HTMLElement;
-    private views: IViewItem[] = [];
+    private views: ViewItem[] = [];
     private sashes: ISashItem[] = [];
     private _orientation: Orientation;
     private _size: number;
@@ -113,13 +114,13 @@ export class SplitView {
     }
 
     get minimumSize(): number {
-        return this.views.reduce((r, item) => r + item.view.minimumSize, 0);
+        return this.views.reduce((r, item) => r + item.minimumSize, 0);
     }
 
     get maximumSize(): number {
         return this.length === 0
             ? Number.POSITIVE_INFINITY
-            : this.views.reduce((r, item) => r + item.view.maximumSize, 0);
+            : this.views.reduce((r, item) => r + item.maximumSize, 0);
     }
 
     constructor(
@@ -164,6 +165,28 @@ export class SplitView {
         }
     }
 
+    isViewVisible(index: number): boolean {
+        if (index < 0 || index >= this.views.length) {
+            throw new Error('Index out of bounds');
+        }
+
+        const viewItem = this.views[index];
+        return viewItem.visible;
+    }
+
+    setViewVisible(index: number, visible: boolean): void {
+        if (index < 0 || index >= this.views.length) {
+            throw new Error('Index out of bounds');
+        }
+
+        const viewItem = this.views[index];
+        viewItem.setVisible(visible, viewItem.size);
+
+        this.distributeEmptySpace(index);
+        this.layoutViews();
+        this.saveProportions();
+    }
+
     getViewSize(index: number): number {
         if (index < 0 || index >= this.views.length) {
             return -1;
@@ -192,8 +215,8 @@ export class SplitView {
         size = Math.round(size);
         size = clamp(
             size,
-            item.view.minimumSize,
-            Math.min(item.view.maximumSize, this._size)
+            item.minimumSize,
+            Math.min(item.maximumSize, this._size)
         );
 
         item.size = size;
@@ -207,7 +230,7 @@ export class SplitView {
         return this.views.map((x) => x.view);
     }
 
-    private onDidChange(item: IViewItem, size: number | undefined): void {
+    private onDidChange(item: ViewItem, size: number | undefined): void {
         const index = this.views.indexOf(item);
 
         if (index < 0 || index >= this.views.length) {
@@ -215,7 +238,7 @@ export class SplitView {
         }
 
         size = typeof size === 'number' ? size : item.size;
-        size = clamp(size, item.view.minimumSize, item.view.maximumSize);
+        size = clamp(size, item.minimumSize, item.maximumSize);
 
         item.size = size;
 
@@ -243,10 +266,6 @@ export class SplitView {
 
         container.appendChild(view.element);
 
-        const disposable = view.onDidChange((size) =>
-            this.onDidChange(viewItem, size)
-        );
-
         let viewSize: number;
 
         if (typeof size === 'number') {
@@ -257,15 +276,24 @@ export class SplitView {
             viewSize = view.minimumSize;
         }
 
-        const viewItem: IViewItem = {
-            view,
-            size: viewSize,
-            container,
-            dispose: () => {
-                disposable?.dispose();
-                this.viewContainer.removeChild(container);
-            },
+        // TODO hard to read b/c of hoisted code
+        const disposable = view.onDidChange((size) =>
+            this.onDidChange(viewItem, size)
+        );
+
+        const dispose = () => {
+            disposable?.dispose();
+            this.viewContainer.removeChild(container);
         };
+
+        const viewItem = new ViewItem(container, view, viewSize, { dispose });
+
+        // const viewItem: IViewItem = {
+        //     view,
+        //     size: viewSize,
+        //     container,
+        //     dispose,
+        // };
 
         if (index === this.views.length) {
             this.viewContainer.appendChild(container);
@@ -354,11 +382,11 @@ export class SplitView {
     }
 
     distributeViewSizes(): void {
-        const flexibleViewItems: IViewItem[] = [];
+        const flexibleViewItems: ViewItem[] = [];
         let flexibleSize = 0;
 
         for (const item of this.views) {
-            if (item.view.maximumSize - item.view.minimumSize > 0) {
+            if (item.maximumSize - item.minimumSize > 0) {
                 flexibleViewItems.push(item);
                 flexibleSize += item.size;
             }
@@ -367,11 +395,7 @@ export class SplitView {
         const size = Math.floor(flexibleSize / flexibleViewItems.length);
 
         for (const item of flexibleViewItems) {
-            item.size = clamp(
-                size,
-                item.view.minimumSize,
-                item.view.maximumSize
-            );
+            item.size = clamp(size, item.minimumSize, item.maximumSize);
         }
 
         // const indexes = range(this.viewItems.length);
@@ -439,10 +463,10 @@ export class SplitView {
         if (!this.proportions) {
             const indexes = range(this.views.length);
             const lowPriorityIndexes = indexes.filter(
-                (i) => this.views[i].view.priority === LayoutPriority.Low
+                (i) => this.views[i].priority === LayoutPriority.Low
             );
             const highPriorityIndexes = indexes.filter(
-                (i) => this.views[i].view.priority === LayoutPriority.High
+                (i) => this.views[i].priority === LayoutPriority.High
             );
 
             this.resize(
@@ -484,13 +508,37 @@ export class SplitView {
         this.saveProportions();
     }
 
-    private distributeEmptySpace() {
+    private distributeEmptySpace(lowPriorityIndex?: number) {
         let contentSize = this.views.reduce((r, i) => r + i.size, 0);
         let emptyDelta = this._size - contentSize;
 
-        for (let i = this.views.length - 1; emptyDelta !== 0 && i >= 0; i--) {
-            const item = this.views[i];
-            const size = clampView(item.view, item.size + emptyDelta);
+        const indexes = range(this.views.length - 1, -1);
+        const lowPriorityIndexes = indexes.filter(
+            (i) => this.views[i].priority === LayoutPriority.Low
+        );
+        const highPriorityIndexes = indexes.filter(
+            (i) => this.views[i].priority === LayoutPriority.High
+        );
+
+        for (const index of highPriorityIndexes) {
+            pushToStart(indexes, index);
+        }
+
+        for (const index of lowPriorityIndexes) {
+            pushToEnd(indexes, index);
+        }
+
+        if (typeof lowPriorityIndex === 'number') {
+            pushToEnd(indexes, lowPriorityIndex);
+        }
+
+        for (let i = 0; emptyDelta !== 0 && i < indexes.length; i++) {
+            const item = this.views[indexes[i]];
+            const size = clamp(
+                item.size + emptyDelta,
+                item.minimumSize,
+                item.maximumSize
+            );
             const viewDelta = size - item.size;
 
             emptyDelta -= viewDelta;
@@ -566,27 +614,23 @@ export class SplitView {
     private updateSashEnablement(): void {
         let previous = false;
         const collapsesDown = this.views.map(
-            (i) => (previous = i.size - i.view.minimumSize > 0 || previous)
+            (i) => (previous = i.size - i.minimumSize > 0 || previous)
         );
 
         previous = false;
         const expandsDown = this.views.map(
-            (i) => (previous = i.view.maximumSize - i.size > 0 || previous)
+            (i) => (previous = i.maximumSize - i.size > 0 || previous)
         );
 
         const reverseViews = [...this.views].reverse();
         previous = false;
         const collapsesUp = reverseViews
-            .map(
-                (i) => (previous = i.size - i.view.minimumSize > 0 || previous)
-            )
+            .map((i) => (previous = i.size - i.minimumSize > 0 || previous))
             .reverse();
 
         previous = false;
         const expandsUp = reverseViews
-            .map(
-                (i) => (previous = i.view.maximumSize - i.size > 0 || previous)
-            )
+            .map((i) => (previous = i.maximumSize - i.size > 0 || previous))
             .reverse();
 
         let position = 0;
@@ -693,12 +737,12 @@ export class SplitView {
                 _ +
                 (typeof this.views[i].view.snapSize === 'number'
                     ? 0
-                    : this.views[i].view.minimumSize) -
+                    : this.views[i].minimumSize) -
                 sizes[i],
             0
         );
         const maxDeltaUp = upIndexes.reduce(
-            (_, i) => _ + this.views[i].view.maximumSize - sizes[i],
+            (_, i) => _ + this.views[i].maximumSize - sizes[i],
             0
         );
         //
@@ -711,14 +755,14 @@ export class SplitView {
                           sizes[i] -
                           (typeof this.views[i].view.snapSize === 'number'
                               ? 0
-                              : this.views[i].view.minimumSize),
+                              : this.views[i].minimumSize),
                       0
                   );
         const minDeltaDown =
             downIndexes.length === 0
                 ? Number.NEGATIVE_INFINITY
                 : downIndexes.reduce(
-                      (_, i) => _ + sizes[i] - this.views[i].view.maximumSize,
+                      (_, i) => _ + sizes[i] - this.views[i].maximumSize,
                       0
                   );
         //

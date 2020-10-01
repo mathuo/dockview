@@ -1,0 +1,11 @@
+.activity-bar-item {
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(90, 90, 90, 0.5);
+    }
+}

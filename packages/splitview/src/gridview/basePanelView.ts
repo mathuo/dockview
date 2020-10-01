@@ -11,6 +11,8 @@ import { BaseViewApi } from '../api/api';
 export abstract class BasePanelView<T extends BaseViewApi>
     extends CompositeDisposable
     implements IPanel {
+    private _height: number;
+    private _width: number;
     private _element: HTMLElement;
     private part: IFrameworkPart;
     protected params: PanelInitParameters;
@@ -22,6 +24,14 @@ export abstract class BasePanelView<T extends BaseViewApi>
 
     get element() {
         return this._element;
+    }
+
+    get width() {
+        return this._width;
+    }
+
+    get height() {
+        return this._height;
     }
 
     constructor(
@@ -47,7 +57,13 @@ export abstract class BasePanelView<T extends BaseViewApi>
         );
     }
 
+    setVisible(visible: boolean) {
+        //
+    }
+
     layout(width: number, height: number) {
+        this._width = width;
+        this._height = height;
         this.api._onDidPanelDimensionChange.fire({ width, height });
     }
 

@@ -160,6 +160,7 @@ export interface IGridView {
     toJSON?(): object;
     fromJSON?(json: object): void;
     snap?: boolean;
+    setVisible?(visible: boolean): void;
 }
 
 const orthogonal = (orientation: Orientation) =>
@@ -426,6 +427,28 @@ export class Gridview {
         this.root = new BranchNode(orientation, proportionalLayout, 0, 0);
 
         this.element.appendChild(this.root.element);
+    }
+
+    isViewVisible(location: number[]): boolean {
+        const [rest, index] = tail(location);
+        const [, parent] = this.getNode(rest);
+
+        if (!(parent instanceof BranchNode)) {
+            throw new Error('Invalid from location');
+        }
+
+        return parent.isChildVisible(index);
+    }
+
+    setViewVisible(location: number[], visible: boolean): void {
+        const [rest, index] = tail(location);
+        const [, parent] = this.getNode(rest);
+
+        if (!(parent instanceof BranchNode)) {
+            throw new Error('Invalid from location');
+        }
+
+        parent.setChildVisible(index, visible);
     }
 
     public moveView(parentLocation: number[], from: number, to: number): void {

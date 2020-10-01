@@ -7,10 +7,12 @@ import {
     ComponentGridview,
     IGridviewPanelProps,
 } from 'splitview';
+import { ComponentDockview } from 'splitview/dist/esm';
 import { Activitybar } from './activitybar';
 import { Footer } from './footer';
 import { Panel } from './panel';
 import { TestGrid } from './reactgrid';
+import { useLayoutRegistry } from './registry';
 import { Sidebar } from './sidebar';
 
 const rootcomponents: {
@@ -25,9 +27,19 @@ const rootcomponents: {
 
 export const Application = () => {
     const api = React.useRef<ComponentGridview>();
+    const registry = useLayoutRegistry();
 
     const onReady = (event: GridviewReadyEvent) => {
-        // event.api.deserialize(rootLayout);
+        const layout = () =>
+            (event.api as ComponentGridview).layout(
+                window.innerWidth,
+                window.innerHeight,
+                true
+            );
+        layout();
+
+        registry.register('gridview', event.api);
+
         event.api.addComponent({
             id: '0',
             component: 'activitybar',
@@ -45,20 +57,22 @@ export const Application = () => {
         });
 
         event.api.addComponent({
-            id: '1',
-            component: 'sidebar',
-            // position: { reference: '4', direction: 'above' },
-            snap: true,
-            location: [0, 1],
-            minimumWidth: 170,
-        });
-        event.api.addComponent({
             id: '2',
             component: 'editor',
             snap: true,
-            position: { reference: '1', direction: 'right' },
+            location: [0, 1],
             priority: LayoutPriority.High,
         });
+
+        event.api.addComponent({
+            id: 'sidebar',
+            component: 'sidebar',
+            snap: true,
+            position: { reference: '2', direction: 'left' },
+            minimumWidth: 170,
+            size: 171,
+        });
+
         event.api.addComponent({
             id: '3',
             component: 'panel',

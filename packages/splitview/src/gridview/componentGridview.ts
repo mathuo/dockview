@@ -12,10 +12,11 @@ import {
     BaseGrid,
     Direction,
     IBaseGrid,
+    IBaseGridPublicApi,
     IGridPanelView,
     toTarget,
 } from './baseComponentGridview';
-import { GridviewInitParameters } from './gridPanelView';
+import { GridPanelView, GridviewInitParameters } from './gridPanelView';
 import { Parameters } from '../panel/types';
 import { GridPanelApi } from '../api/gridPanelApi';
 
@@ -47,12 +48,23 @@ export interface IGridPanelComponentView extends IGridPanelView {
     init?: (params: GridviewInitParameters) => void;
 }
 
-export interface IComponentGridview extends IBaseGrid<IGridPanelComponentView> {
+export interface IComponentGridview extends IBaseGrid<GridPanelView> {
     addComponent(options: AddComponentOptions): void;
+    getPanel(id: string): GridPanelView;
+    setVisible(panel: GridPanelView, visible: boolean): void;
+    isVisible(panel: GridPanelView): boolean;
+    toggleVisibility(panel: GridPanelView): void;
 }
 
+export interface GridviewApi
+    extends IBaseGridPublicApi<GridPanelView>,
+        Pick<
+            IComponentGridview,
+            'addComponent' | 'setVisible' | 'isVisible' | 'toggleVisibility'
+        > {}
+
 export class ComponentGridview
-    extends BaseGrid<IGridPanelComponentView>
+    extends BaseGrid<GridPanelView>
     implements IComponentGridview {
     private _deserializer: IPanelDeserializer;
 
@@ -98,6 +110,18 @@ export class ComponentGridview
 
         this.fromJSON(data);
         this.gridview.layout(this._size, this._orthogonalSize);
+    }
+
+    public setVisible(panel: GridPanelView, visible: boolean) {
+        this.gridview.setViewVisible(getGridLocation(panel.element), visible);
+    }
+
+    public isVisible(panel: GridPanelView) {
+        return this.gridview.isViewVisible(getGridLocation(panel.element));
+    }
+
+    public toggleVisibility(panel: GridPanelView) {
+        this.setVisible(panel, !this.isVisible(panel));
     }
 
     public fromJSON(data: any) {
@@ -165,6 +189,10 @@ export class ComponentGridview
         return { api: view.api };
     }
 
+    public getPanel(id: string): GridPanelView {
+        return this.getGroup(id) as GridPanelView;
+    }
+
     public moveGroup(
         referenceGroup: IGridPanelComponentView,
         groupId: string,
@@ -198,7 +226,7 @@ export class ComponentGridview
         const targetGroup = this.doRemoveGroup(sourceGroup, {
             skipActive: true,
             skipDispose: true,
-        }) as IGridPanelComponentView;
+        });
 
         // after deleting the group we need to re-evaulate the ref location
         const updatedReferenceLocation = getGridLocation(
