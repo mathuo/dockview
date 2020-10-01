@@ -28,11 +28,16 @@ interface PanelDimensionChangeEvent {
     height: number;
 }
 
+interface VisibilityEvent {
+    isVisible: boolean;
+}
+
 export interface IBaseViewApi extends IDisposable {
     // events
     onDidDimensionsChange: Event<PanelDimensionChangeEvent>;
     onDidStateChange: Event<void>;
     onDidFocusChange: Event<FocusEvent>;
+    onDidVisibilityChange: Event<VisibilityEvent>;
     // state
     setState(key: string, value: StateObject): void;
     setState(state: State): void;
@@ -67,6 +72,12 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
         emitLastValue: true,
     });
     readonly onDidFocusChange: Event<FocusEvent> = this._onDidChangeFocus.event;
+    //
+    readonly _onDidVisibilityChange = new Emitter<VisibilityEvent>({
+        emitLastValue: true,
+    });
+    readonly onDidVisibilityChange: Event<VisibilityEvent> = this
+        ._onDidVisibilityChange.event;
     //
 
     get isFocused() {

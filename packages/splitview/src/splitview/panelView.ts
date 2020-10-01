@@ -60,6 +60,10 @@ export abstract class PanelView
         );
     }
 
+    setVisible(isVisible: boolean) {
+        this.api._onDidVisibilityChange.fire({ isVisible });
+    }
+
     init(parameters: PanelViewInitParameters): void {
         super.init(parameters);
 

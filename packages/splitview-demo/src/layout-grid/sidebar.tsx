@@ -6,6 +6,7 @@ import {
     IPaneviewPanelProps,
     IComponentPaneView,
     Api,
+    CompositeDisposable,
 } from 'splitview';
 import { ControlCenter } from './controlCenter';
 
@@ -49,9 +50,14 @@ export const Sidebar = (props: IGridviewPanelProps) => {
     };
 
     React.useEffect(() => {
-        const disposable = props.api.onDidDimensionsChange((ev) => {
-            api.current.layout(ev.width, ev.height);
-        });
+        const disposable = new CompositeDisposable(
+            props.api.onDidDimensionsChange((ev) => {
+                api.current.layout(ev.width, ev.height);
+            }),
+            props.api.onDidVisibilityChange((event) => {
+                console.log(event);
+            })
+        );
 
         return () => {
             disposable.dispose();
