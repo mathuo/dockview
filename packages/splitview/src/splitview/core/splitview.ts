@@ -64,6 +64,12 @@ interface ISashItem {
     disposable: () => void;
 }
 
+interface ISashDragSnapState {
+    readonly index: number;
+    readonly limitDelta: number;
+    readonly size: number;
+}
+
 export type DistributeSizing = { type: 'distribute' };
 export type SplitSizing = { type: 'split'; index: number };
 export type Sizing = DistributeSizing | SplitSizing;
@@ -311,17 +317,84 @@ export class SplitView {
             const sash = document.createElement('div');
             sash.className = 'sash';
 
-            const cb = (event: MouseEvent) => {
+            const onStart = (event: MouseEvent) => {
+                for (const item of this.views) {
+                    item.enabled = false;
+                }
+
                 let start =
                     this._orientation === Orientation.HORIZONTAL
                         ? event.clientX
                         : event.clientY;
-                const sizes = this.views.map((x) => x.size);
 
                 const index = firstIndex(
                     this.sashes,
                     (s) => s.container === sash
                 );
+
+                //
+                const sizes = this.views.map((x) => x.size);
+
+                //
+                let snapBefore: ISashDragSnapState | undefined;
+                let snapAfter: ISashDragSnapState | undefined;
+                const upIndexes = range(index, -1);
+                const downIndexes = range(index + 1, this.views.length);
+                const minDeltaUp = upIndexes.reduce(
+                    (r, i) => r + (this.views[i].minimumSize - sizes[i]),
+                    0
+                );
+                const maxDeltaUp = upIndexes.reduce(
+                    (r, i) => r + (this.views[i].viewMaximumSize - sizes[i]),
+                    0
+                );
+                const maxDeltaDown =
+                    downIndexes.length === 0
+                        ? Number.POSITIVE_INFINITY
+                        : downIndexes.reduce(
+                              (r, i) =>
+                                  r + (sizes[i] - this.views[i].minimumSize),
+                              0
+                          );
+                const minDeltaDown =
+                    downIndexes.length === 0
+                        ? Number.NEGATIVE_INFINITY
+                        : downIndexes.reduce(
+                              (r, i) =>
+                                  r +
+                                  (sizes[i] - this.views[i].viewMaximumSize),
+                              0
+                          );
+                const minDelta = Math.max(minDeltaUp, minDeltaDown);
+                const maxDelta = Math.min(maxDeltaDown, maxDeltaUp);
+                const snapBeforeIndex = this.findFirstSnapIndex(upIndexes);
+                const snapAfterIndex = this.findFirstSnapIndex(downIndexes);
+                if (typeof snapBeforeIndex === 'number') {
+                    const viewItem = this.views[snapBeforeIndex];
+                    const halfSize = Math.floor(viewItem.viewMinimumSize / 2);
+
+                    snapBefore = {
+                        index: snapBeforeIndex,
+                        limitDelta: viewItem.visible
+                            ? minDelta - halfSize
+                            : minDelta + halfSize,
+                        size: viewItem.size,
+                    };
+                }
+
+                if (typeof snapAfterIndex === 'number') {
+                    const viewItem = this.views[snapAfterIndex];
+                    const halfSize = Math.floor(viewItem.viewMinimumSize / 2);
+
+                    snapAfter = {
+                        index: snapAfterIndex,
+                        limitDelta: viewItem.visible
+                            ? maxDelta + halfSize
+                            : maxDelta - halfSize,
+                        size: viewItem.size,
+                    };
+                }
+                //
 
                 const mousemove = (event: MouseEvent) => {
                     const current =
@@ -333,14 +406,23 @@ export class SplitView {
                     this.resize(
                         index,
                         delta,
-                        sizes
-                        // sizes
+                        sizes,
+                        undefined,
+                        undefined,
+                        minDelta,
+                        maxDelta,
+                        snapBefore,
+                        snapAfter
                     );
                     this.distributeEmptySpace();
                     this.layoutViews();
                 };
 
                 const end = () => {
+                    for (const item of this.views) {
+                        item.enabled = false;
+                    }
+
                     this.saveProportions();
 
                     document.removeEventListener('mousemove', mousemove);
@@ -355,10 +437,10 @@ export class SplitView {
                 document.addEventListener('mouseend', end);
             };
 
-            sash.addEventListener('mousedown', cb);
+            sash.addEventListener('mousedown', onStart);
 
             const disposable = () => {
-                sash.removeEventListener('mousedown', cb);
+                sash.removeEventListener('mousedown', onStart);
                 this.sashContainer.removeChild(sash);
             };
 
@@ -599,11 +681,30 @@ export class SplitView {
         for (const index of indexes) {
             const viewItem = this.views[index];
 
-            // if (!viewItem.visible) {
-            // 	continue;
-            // }
+            if (!viewItem.visible) {
+                continue;
+            }
 
-            if (viewItem.view.snapSize) {
+            if (typeof viewItem.view.snapSize === 'number') {
+                return index;
+            }
+        }
+
+        // then, hidden views
+        for (const index of indexes) {
+            const viewItem = this.views[index];
+
+            if (
+                viewItem.visible &&
+                viewItem.maximumSize - viewItem.minimumSize > 0
+            ) {
+                return undefined;
+            }
+
+            if (
+                !viewItem.visible &&
+                typeof viewItem.view.snapSize === 'number'
+            ) {
                 return index;
             }
         }
@@ -648,12 +749,12 @@ export class SplitView {
                 const snapBeforeIndex = this.findFirstSnapIndex(upIndexes);
                 const snapAfterIndex = this.findFirstSnapIndex(downIndexes);
 
-                const snappedBefore = false;
-                // typeof snapBeforeIndex === "number" &&
-                // !this.views[snapBeforeIndex].visible;
-                const snappedAfter = false;
-                // typeof snapAfterIndex === "number" &&
-                // !this.views[snapAfterIndex].visible;
+                const snappedBefore =
+                    typeof snapBeforeIndex === 'number' &&
+                    !this.views[snapBeforeIndex].visible;
+                const snappedAfter =
+                    typeof snapAfterIndex === 'number' &&
+                    !this.views[snapAfterIndex].visible;
 
                 if (
                     snappedBefore &&
@@ -703,10 +804,14 @@ export class SplitView {
         delta: number,
         sizes: number[] = this.views.map((x) => x.size),
         lowPriorityIndexes?: number[],
-        highPriorityIndexes?: number[]
+        highPriorityIndexes?: number[],
+        overloadMinDelta: number = Number.NEGATIVE_INFINITY,
+        overloadMaxDelta: number = Number.POSITIVE_INFINITY,
+        snapBefore?: ISashDragSnapState,
+        snapAfter?: ISashDragSnapState
     ) => {
         if (index < 0 || index > this.views.length) {
-            return;
+            return 0;
         }
 
         const upIndexes = range(index, -1);
@@ -769,6 +874,33 @@ export class SplitView {
         const minDelta = Math.max(minDeltaUp, minDeltaDown);
         const maxDelta = Math.min(maxDeltaDown, maxDeltaUp);
         //
+        let snapped = false;
+        if (snapBefore) {
+            const snapView = this.views[snapBefore.index];
+            const visible = delta >= snapBefore.limitDelta;
+            snapped = visible !== snapView.visible;
+            snapView.setVisible(visible, snapBefore.size);
+        }
+
+        if (!snapped && snapAfter) {
+            const snapView = this.views[snapAfter.index];
+            const visible = delta < snapAfter.limitDelta;
+            snapped = visible !== snapView.visible;
+            snapView.setVisible(visible, snapAfter.size);
+        }
+
+        if (snapped) {
+            return this.resize(
+                index,
+                delta,
+                sizes,
+                lowPriorityIndexes,
+                highPriorityIndexes,
+                overloadMinDelta,
+                overloadMaxDelta
+            );
+        }
+        //
         const tentativeDelta = clamp(delta, minDelta, maxDelta);
         let actualDelta = 0;
         //
@@ -794,6 +926,7 @@ export class SplitView {
             item.size = size;
         }
         //
+        return delta;
     };
 
     private createViewContainer() {
