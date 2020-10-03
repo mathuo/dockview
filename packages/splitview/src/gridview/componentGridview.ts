@@ -127,17 +127,54 @@ export class ComponentGridview
     public fromJSON(data: any) {
         const { grid, panels } = data;
 
-        // this.gridview.deserialize(
-        //   grid,
-        //   new DefaultDeserializer(this, {
-        //     createPanel: (id) => {
-        //       const panelData = panels[id];
-        //       const panel = deserializer.fromJSON(panelData);
-        //       this.registerPanel(panel);
-        //       return panel;
-        //     },
-        //   })
-        // );
+        this.gridview.clear();
+        this.groups.clear();
+
+        this.gridview.deserialize(grid, {
+            fromJSON: (data: any) => {
+                const view = createComponent(
+                    data.id,
+                    data.component,
+                    this.options.components,
+                    this.options.frameworkComponents,
+                    this.options.frameworkComponentFactory.createComponent
+                );
+
+                let priority: LayoutPriority;
+
+                switch (data.priority) {
+                    case LayoutPriority.High:
+                        priority = LayoutPriority.High;
+                        break;
+                    case LayoutPriority.Low:
+                        priority = LayoutPriority.Low;
+                        break;
+                    case LayoutPriority.Normal:
+                        priority = LayoutPriority.Normal;
+                        break;
+                }
+
+                view.init({
+                    params: data.params,
+                    minimumWidth: data.minimumWidth,
+                    maximumWidth: data.maximumWidth,
+                    minimumHeight: data.minimumHeight,
+                    maximumHeight: data.maximumHeight,
+                    priority,
+                    snap: data.snap,
+                });
+
+                this.groups.set(data.id, {
+                    value: view,
+                    disposable: Disposable.NONE,
+                });
+
+                return view;
+            },
+        });
+
+        this.gridview.layout(this._size, this._orthogonalSize);
+
         this._onDidLayoutChange.fire({ kind: GroupChangeKind.NEW_LAYOUT });
     }
 

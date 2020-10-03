@@ -39,8 +39,11 @@ export const Application = () => {
         layout();
 
         event.api.fromJSON(require('./application.layout.json'));
+        // layout();
+        api.current = event.api as ComponentGridview;
 
         registry.register('gridview', event.api);
+        return;
 
         event.api.addComponent({
             id: '0',
@@ -82,8 +85,6 @@ export const Application = () => {
             size: 200,
             snap: true,
         });
-
-        api.current = event.api as ComponentGridview;
 
         setTimeout(() => {
             console.log(JSON.stringify(api.current.toJSON(), null, 4));

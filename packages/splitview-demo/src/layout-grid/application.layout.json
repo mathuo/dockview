@@ -1,66 +1,78 @@
 {
     "grid": {
         "root": {
-            "orientation": "VERTICAL",
-            "size": 1385,
+            "type": "branch",
             "data": [
                 {
-                    "orientation": "HORIZONTAL",
-                    "size": 1385,
+                    "type": "branch",
                     "data": [
                         {
-                            "size": 48,
+                            "type": "leaf",
                             "data": {
                                 "id": "0",
-                                "component": "activitybar"
+                                "component": "activitybar",
+                                "minimumHeight": 200,
+                                "minimumWidth": 48,
+                                "maximumWidth": 48
                             },
-                            "type": "leaf"
+                            "size": 1013
                         },
                         {
-                            "size": 0,
+                            "type": "leaf",
                             "data": {
                                 "id": "sidebar",
                                 "component": "sidebar",
-                                "visible": false
+                                "minimumHeight": 200,
+                                "minimumWidth": 170,
+                                "snap": true
                             },
-                            "type": "leaf"
+                            "size": 1013
                         },
                         {
-                            "orientation": "VERTICAL",
-                            "size": 1337,
+                            "type": "branch",
                             "data": [
                                 {
-                                    "size": 813,
+                                    "type": "leaf",
                                     "data": {
                                         "id": "2",
-                                        "component": "editor"
+                                        "component": "editor",
+                                        "minimumHeight": 200,
+                                        "minimumWidth": 300,
+                                        "snap": true,
+                                        "priority": "high"
                                     },
-                                    "type": "leaf"
+                                    "size": 1166
                                 },
                                 {
-                                    "size": 200,
+                                    "type": "leaf",
                                     "data": {
                                         "id": "3",
-                                        "component": "panel"
+                                        "component": "panel",
+                                        "minimumHeight": 200,
+                                        "minimumWidth": 200,
+                                        "snap": true
                                     },
-                                    "type": "leaf"
+                                    "size": 230
                                 }
                             ],
-                            "type": "branch"
+                            "size": 1166
                         }
                     ],
-                    "type": "branch"
+                    "size": 1013
                 },
                 {
-                    "size": 22,
+                    "type": "leaf",
                     "data": {
                         "id": "4",
-                        "component": "footer"
+                        "component": "footer",
+                        "minimumHeight": 22,
+                        "maximumHeight": 22,
+                        "minimumWidth": 200
                     },
-                    "type": "leaf"
+                    "size": 1385
                 }
             ],
-            "type": "branch"
+            "size": 1385
         },
         "height": 1035,
         "width": 1385,

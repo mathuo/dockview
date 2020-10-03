@@ -7,6 +7,7 @@ import {
 } from '../splitview/core/splitview';
 import { Emitter, Event } from '../events';
 import { INodeDescriptor } from './gridview';
+import { LeafNode } from './leafNode';
 import { Node } from './types';
 import { CompositeDisposable, IDisposable, Disposable } from '../lifecycle';
 
@@ -132,6 +133,11 @@ export class BranchNode extends CompositeDisposable implements IView {
                     return {
                         view: childDescriptor.node,
                         size: childDescriptor.node.size,
+                        visible:
+                            childDescriptor.node instanceof LeafNode &&
+                            childDescriptor.visible !== undefined
+                                ? childDescriptor.visible
+                                : true,
                     };
                 }),
                 size: this.orthogonalSize,
@@ -141,6 +147,7 @@ export class BranchNode extends CompositeDisposable implements IView {
             this.splitview = new SplitView(this.element, {
                 orientation: this.orientation,
                 descriptor,
+                proportionalLayout,
             });
         }
 

@@ -174,28 +174,77 @@ const serializeLeafNode = (node: LeafNode) => {
             ? node.size
             : node.orthogonalSize;
     return {
-        size: node,
+        size,
         data: node.view.toJSON ? node.view.toJSON() : {},
         type: 'leaf',
+        visible: node.size !== 0,
     };
 };
 
-const serializeBranchNode = (node: BranchNode) => {
+// const serializeBranchNode = (node: BranchNode) => {
+//     const size =
+//         node.orientation === Orientation.HORIZONTAL
+//             ? node.size
+//             : node.orthogonalSize;
+
+//     return {
+//         orientation: node.orientation,
+//         size,
+//         data: node.children.map((child) => {
+//             if (child instanceof LeafNode) {
+//                 return serializeLeafNode(child);
+//             }
+//             return serializeBranchNode(child as BranchNode);
+//         }),
+//         type: 'branch',
+//     };
+// };
+
+export interface GridLeafNode<T extends IGridView> {
+    readonly view: T;
+    readonly cachedVisibleSize: number | undefined;
+    readonly box: { width: number; height: number };
+}
+
+export interface GridBranchNode<T extends IGridView> {
+    readonly children: GridNode<T>[];
+    readonly box: { width: number; height: number };
+}
+
+export type GridNode<T extends IGridView> = GridLeafNode<T> | GridBranchNode<T>;
+
+export function isGridBranchNode<T extends IGridView>(
+    node: GridNode<T>
+): node is GridBranchNode<T> {
+    return !!(node as any).children;
+}
+
+const serializeBranchNode = <T extends IGridView>(
+    node: GridNode<T>,
+    orientation: Orientation
+) => {
     const size =
-        node.orientation === Orientation.HORIZONTAL
-            ? node.size
-            : node.orthogonalSize;
+        orientation === Orientation.VERTICAL ? node.box.width : node.box.height;
+
+    if (!isGridBranchNode(node)) {
+        if (typeof node.cachedVisibleSize === 'number') {
+            return {
+                type: 'leaf',
+                data: node.view.toJSON(),
+                size: node.cachedVisibleSize,
+                visible: false,
+            };
+        }
+
+        return { type: 'leaf', data: node.view.toJSON(), size };
+    }
 
     return {
-        orientation: node.orientation,
-        size,
-        data: node.children.map((child) => {
-            if (child instanceof LeafNode) {
-                return serializeLeafNode(child);
-            }
-            return serializeBranchNode(child as BranchNode);
-        }),
         type: 'branch',
+        data: node.children.map((c) =>
+            serializeBranchNode(c, orthogonal(orientation))
+        ),
+        size,
     };
 };
 
@@ -232,7 +281,7 @@ export class Gridview {
 
     public serialize() {
         return {
-            root: serializeBranchNode(this.root),
+            root: serializeBranchNode(this.getView(), this.orientation),
             height: this.height,
             width: this.width,
             orientation: this.orientation,
@@ -244,13 +293,8 @@ export class Gridview {
     }
 
     public clear() {
-        this.root.dispose();
-        this.root = new BranchNode(
-            Orientation.HORIZONTAL,
-            this.proportionalLayout,
-            0,
-            0
-        );
+        const orientation = this.root.orientation;
+        this.root = new BranchNode(orientation, this.proportionalLayout, 0, 0);
     }
 
     public deserialize(json: any, deserializer: IViewDeserializer) {
@@ -364,6 +408,45 @@ export class Gridview {
         return this.progmaticSelect(location, true);
     }
 
+    getView(): GridBranchNode<IGridView>;
+    getView(location?: number[]): GridNode<IGridView>;
+    getView(location?: number[]): GridNode<IGridView> {
+        const node = location ? this.getNode(location)[1] : this._root;
+        return this._getViews(node, this.orientation);
+    }
+
+    private _getViews(
+        node: Node,
+        orientation: Orientation,
+        cachedVisibleSize?: number
+    ): GridNode<IGridView> {
+        const box =
+            orientation === Orientation.VERTICAL
+                ? { height: node.size, width: node.orthogonalSize }
+                : { height: node.orthogonalSize, width: node.size };
+
+        if (node instanceof LeafNode) {
+            return { box, view: node.view, cachedVisibleSize };
+        }
+
+        const children: GridNode<IGridView>[] = [];
+
+        for (let i = 0; i < node.children.length; i++) {
+            const child = node.children[i];
+            const cachedVisibleSize = node.getChildCachedVisibleSize(i);
+
+            children.push(
+                this._getViews(
+                    child,
+                    orthogonal(orientation),
+                    cachedVisibleSize
+                )
+            );
+        }
+
+        return { box, children };
+    }
+
     private progmaticSelect(location: number[], reverse = false) {
         const [rest, index] = tail(location);
         const [path, node] = this.getNode(location);
@@ -426,8 +509,6 @@ export class Gridview {
         this.element = document.createElement('div');
         this.element.className = 'grid-view';
         this.root = new BranchNode(orientation, proportionalLayout, 0, 0);
-
-        this.element.appendChild(this.root.element);
     }
 
     isViewVisible(location: number[]): boolean {

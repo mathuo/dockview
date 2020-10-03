@@ -50,7 +50,7 @@
 
         & > .view-container > .view {
             &:not(:first-child) {
-                padding-left: 1px;
+                // padding-left: 1px;
                 &::before {
                     height: 100%;
                     width: 1px;
@@ -84,7 +84,7 @@
             width: 100%;
 
             &:not(:first-child) {
-                padding-top: 1px;
+                // padding-top: 1px;
                 &::before {
                     height: 1px;
                     width: 100%;

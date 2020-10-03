@@ -131,6 +131,23 @@ export abstract class GridPanelView
         return false;
     }
 
+    toJSON(): object {
+        const state = super.toJSON();
+        const maximum = (value: number) =>
+            value === Number.MAX_SAFE_INTEGER ? undefined : value;
+        const minimum = (value: number) => (value <= 0 ? undefined : value);
+
+        return {
+            ...state,
+            minimumHeight: minimum(this.minimumHeight),
+            maximumHeight: maximum(this.maximumHeight),
+            minimumWidth: minimum(this.minimumWidth),
+            maximumWidth: maximum(this.maximumWidth),
+            snap: this.snap,
+            priority: this.priority,
+        };
+    }
+
     dispose() {
         super.dispose();
     }
