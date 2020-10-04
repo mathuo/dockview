@@ -64,7 +64,11 @@ export const SplitPanel = (props: IGroupPanelProps) => {
         if (existingLayout) {
             event.api.fromJSON(existingLayout);
         } else {
-            event.api.addFromComponent({ id: '1', component: 'default1' });
+            event.api.addFromComponent({
+                id: '1',
+                component: 'default1',
+                snap: true,
+            });
             event.api.addFromComponent({ id: '2', component: 'default1' });
         }
         api.current = event.api;
@@ -83,9 +87,6 @@ export const SplitPanel = (props: IGroupPanelProps) => {
                 color: 'white',
             }}
         >
-            <div style={{ height: '20px', flexShrink: 0 }}>
-                <button onClick={onSave}>save</button>
-            </div>
             <SplitviewComponent
                 components={components}
                 onReady={onReady}

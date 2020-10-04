@@ -703,7 +703,7 @@ export class SplitView {
                 continue;
             }
 
-            if (typeof viewItem.view.snap) {
+            if (viewItem.snap) {
                 return index;
             }
         }
@@ -719,7 +719,7 @@ export class SplitView {
                 return undefined;
             }
 
-            if (!viewItem.visible && typeof viewItem.view.snap) {
+            if (!viewItem.visible && viewItem.snap) {
                 return index;
             }
         }

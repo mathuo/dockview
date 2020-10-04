@@ -63,9 +63,9 @@ export class ViewItem {
     get priority(): LayoutPriority | undefined {
         return this.view.priority;
     }
-    // get snap(): boolean {
-    //     return !!this.view.snap;
-    // }
+    get snap(): boolean {
+        return !!this.view.snap;
+    }
 
     set enabled(enabled: boolean) {
         this.container.style.pointerEvents = enabled ? '' : 'none';
