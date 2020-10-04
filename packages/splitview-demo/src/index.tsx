@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { App } from './app';
 import './index.scss';
+import { Application } from './layout-grid/application';
 
-ReactDOM.render(<App />, document.getElementById('app'));
+ReactDOM.render(<Application />, document.getElementById('app'));

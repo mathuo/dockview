@@ -29,6 +29,7 @@
         .pane-header {
             border-top: 1px solid rgba(204, 204, 204, 0.2);
             box-sizing: border-box;
+            user-select: none;
 
             &:focus,
             &:focus-within {
