@@ -71,6 +71,11 @@ export abstract class BasePanelView<T extends BaseViewApi>
 
     setVisible(isVisible: boolean) {
         this._isVisible = isVisible;
+        this.api._onDidVisibilityChange.fire({ isVisible });
+    }
+
+    setActive(isActive: boolean) {
+        this.api._onDidActiveChange.fire({ isActive });
     }
 
     update(params: PanelUpdateEvent) {

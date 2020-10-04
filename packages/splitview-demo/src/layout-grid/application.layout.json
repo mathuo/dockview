@@ -15,7 +15,8 @@
                                 "minimumWidth": 48,
                                 "maximumWidth": 48
                             },
-                            "size": 1013
+                            "size": 48
+           
                         },
                         {
                             "type": "leaf",
@@ -26,7 +27,8 @@
                                 "minimumWidth": 170,
                                 "snap": true
                             },
-                            "size": 1013
+                            "size": 400,
+                            "visible": true
                         },
                         {
                             "type": "branch",

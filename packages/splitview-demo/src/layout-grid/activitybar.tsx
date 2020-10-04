@@ -1,10 +1,15 @@
 import * as React from 'react';
-import { ComponentGridview, IGridviewPanelProps } from 'splitview';
+import {
+    ComponentGridview,
+    CompositeDisposable,
+    IGridviewPanelProps,
+} from 'splitview';
 import './activitybar.scss';
 import { useLayoutRegistry } from './registry';
 
 export const Activitybar = (props: IGridviewPanelProps) => {
     const registry = useLayoutRegistry();
+    const [isActive, setActive] = React.useState<boolean>(false);
 
     const onOpenSidebar = () => {
         const api = registry.get<ComponentGridview>('gridview');
@@ -14,7 +19,12 @@ export const Activitybar = (props: IGridviewPanelProps) => {
     };
 
     React.useEffect(() => {
-        // props.api.onDidActiveChange((event) => {});
+        const disposable = new CompositeDisposable(
+            props.api.onDidActiveChange((event) => {
+                setActive(event.isActive);
+                console.log(event);
+            })
+        );
     }, []);
 
     return (

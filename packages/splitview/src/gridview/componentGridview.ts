@@ -3,7 +3,7 @@ import { Position } from '../groupview/droptarget/droptarget';
 import { getGridLocation } from './gridview';
 import { tail, sequenceEquals } from '../array';
 import { GroupChangeKind } from '../groupview/groupview';
-import { Disposable } from '../lifecycle';
+import { CompositeDisposable, Disposable } from '../lifecycle';
 import { IPanelDeserializer } from '../dockview/deserializer';
 import { createComponent } from '../splitview/core/options';
 import { LayoutPriority } from '../splitview/core/splitview';
@@ -140,34 +140,17 @@ export class ComponentGridview
                     this.options.frameworkComponentFactory.createComponent
                 );
 
-                let priority: LayoutPriority;
-
-                switch (data.priority) {
-                    case LayoutPriority.High:
-                        priority = LayoutPriority.High;
-                        break;
-                    case LayoutPriority.Low:
-                        priority = LayoutPriority.Low;
-                        break;
-                    case LayoutPriority.Normal:
-                        priority = LayoutPriority.Normal;
-                        break;
-                }
-
                 view.init({
                     params: data.params,
                     minimumWidth: data.minimumWidth,
                     maximumWidth: data.maximumWidth,
                     minimumHeight: data.minimumHeight,
                     maximumHeight: data.maximumHeight,
-                    priority,
+                    priority: data.priority,
                     snap: data.snap,
                 });
 
-                this.groups.set(data.id, {
-                    value: view,
-                    disposable: Disposable.NONE,
-                });
+                this.registerPanel(view);
 
                 return view;
             },
@@ -216,14 +199,34 @@ export class ComponentGridview
             snap: options.snap,
         });
 
-        this.groups.set(options.id, {
-            value: view,
-            disposable: Disposable.NONE,
-        });
+        this.registerPanel(view);
 
         this.doAddGroup(view, relativeLocation, options.size);
 
         return { api: view.api };
+    }
+
+    private registerPanel(panel: GridPanelView) {
+        const disposable = new CompositeDisposable(
+            panel.api.onDidFocusChange((event) => {
+                if (!event.isFocused) {
+                    return;
+                }
+                this.groups.forEach((groupItem) => {
+                    const group = groupItem.value;
+                    if (group !== panel) {
+                        group.setActive(false);
+                    } else {
+                        group.setActive(true);
+                    }
+                });
+            })
+        );
+
+        this.groups.set(panel.id, {
+            value: panel,
+            disposable,
+        });
     }
 
     public getPanel(id: string): GridPanelView {
@@ -275,6 +278,17 @@ export class ComponentGridview
             target
         );
         this.doAddGroup(targetGroup, location);
+    }
+
+    public removeGroup(group: GridPanelView) {
+        super.removeGroup(group);
+
+        const panel = this.groups.get(group.id);
+
+        if (panel) {
+            panel.disposable.dispose();
+            this.groups.delete(group.id);
+        }
     }
 
     public dispose() {

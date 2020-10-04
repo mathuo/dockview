@@ -42,6 +42,7 @@ export interface IBaseViewApi extends IDisposable {
     onDidStateChange: Event<void>;
     onDidFocusChange: Event<FocusEvent>;
     onDidVisibilityChange: Event<VisibilityEvent>;
+    onDidActiveChange: Event<ActiveEvent>;
     // state
     setState(key: string, value: StateObject): void;
     setState(state: State): void;
