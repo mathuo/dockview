@@ -4,17 +4,6 @@ import { Event, Emitter } from '../../events';
 import { pushToStart, pushToEnd, range } from '../../array';
 import { ViewItem } from './viewItem';
 
-export const clampView = (view: IView, size: number) => {
-    const result = clamp(size, view.minimumSize, view.maximumSize);
-
-    if (typeof view.snapSize !== 'number' || size >= view.minimumSize) {
-        return result;
-    }
-
-    const snapSize = Math.min(view.snapSize, view.minimumSize);
-    return size < snapSize ? 0 : view.minimumSize;
-};
-
 export enum Orientation {
     HORIZONTAL = 'HORIZONTAL',
     VERTICAL = 'VERTICAL',
@@ -41,7 +30,7 @@ export enum LayoutPriority {
 export interface IBaseView {
     minimumSize: number;
     maximumSize: number;
-    snapSize?: number;
+    snap?: boolean;
     priority?: LayoutPriority;
 }
 
@@ -49,7 +38,7 @@ export interface IView extends IBaseView {
     readonly element: HTMLElement | DocumentFragment;
     readonly onDidChange: Event<number | undefined>;
     layout(size: number, orthogonalSize: number): void;
-    setVisible?(visible: boolean): void;
+    setVisible(visible: boolean): void;
 }
 
 // export interface IViewItem {
@@ -102,7 +91,7 @@ export class SplitView {
     private sashContainer: HTMLElement;
     private views: ViewItem[] = [];
     private sashes: ISashItem[] = [];
-    private _orientation: Orientation;
+    private readonly _orientation: Orientation;
     private _size: number;
     private _orthogonalSize: number;
     private contentSize: number;
@@ -315,13 +304,6 @@ export class SplitView {
         };
 
         const viewItem = new ViewItem(container, view, viewSize, { dispose });
-
-        // const viewItem: IViewItem = {
-        //     view,
-        //     size: viewSize,
-        //     container,
-        //     dispose,
-        // };
 
         if (index === this.views.length) {
             this.viewContainer.appendChild(container);
@@ -557,20 +539,20 @@ export class SplitView {
         this.addView(view, sizing, to);
     }
 
-    set orientation(orientation: Orientation) {
-        if (orientation === this._orientation) {
-            return;
-        }
-        this._orientation = orientation;
+    // set orientation(orientation: Orientation) {
+    //     if (orientation === this._orientation) {
+    //         return;
+    //     }
+    //     this._orientation = orientation;
 
-        const classname =
-            orientation === Orientation.HORIZONTAL ? 'horizontal' : 'vertical';
+    //     const classname =
+    //         orientation === Orientation.HORIZONTAL ? 'horizontal' : 'vertical';
 
-        removeClasses(this.viewContainer, 'vertical', 'horizontal');
-        removeClasses(this.sashContainer, 'vertical', 'horizontal');
-        addClasses(this.viewContainer, classname);
-        addClasses(this.sashContainer, classname);
-    }
+    //     removeClasses(this.viewContainer, 'vertical', 'horizontal');
+    //     removeClasses(this.sashContainer, 'vertical', 'horizontal');
+    //     addClasses(this.viewContainer, classname);
+    //     addClasses(this.sashContainer, classname);
+    // }
 
     public layout(size: number, orthogonalSize: number) {
         const previousSize = Math.max(this.size, this.contentSize);
@@ -597,9 +579,10 @@ export class SplitView {
             for (let i = 0; i < this.views.length; i++) {
                 const item = this.views[i];
 
-                item.size = clampView(
-                    item.view,
-                    Math.round(this._proportions[i] * size)
+                item.size = clamp(
+                    Math.round(this._proportions[i] * size),
+                    item.minimumSize,
+                    item.maximumSize
                 );
             }
         }
@@ -720,7 +703,7 @@ export class SplitView {
                 continue;
             }
 
-            if (typeof viewItem.view.snapSize === 'number') {
+            if (typeof viewItem.view.snap) {
                 return index;
             }
         }
@@ -736,10 +719,7 @@ export class SplitView {
                 return undefined;
             }
 
-            if (
-                !viewItem.visible &&
-                typeof viewItem.view.snapSize === 'number'
-            ) {
+            if (!viewItem.visible && typeof viewItem.view.snap) {
                 return index;
             }
         }
@@ -873,12 +853,7 @@ export class SplitView {
         const downSizes = downIndexes.map((i) => sizes[i]);
         //
         const minDeltaUp = upIndexes.reduce(
-            (_, i) =>
-                _ +
-                (typeof this.views[i].view.snapSize === 'number'
-                    ? 0
-                    : this.views[i].minimumSize) -
-                sizes[i],
+            (_, i) => _ + this.views[i].minimumSize - sizes[i],
             0
         );
         const maxDeltaUp = upIndexes.reduce(
@@ -890,12 +865,8 @@ export class SplitView {
             downIndexes.length === 0
                 ? Number.POSITIVE_INFINITY
                 : downIndexes.reduce(
-                      (_, i) =>
-                          _ +
-                          sizes[i] -
-                          (typeof this.views[i].view.snapSize === 'number'
-                              ? 0
-                              : this.views[i].minimumSize),
+                      (_, i) => _ + sizes[i] - this.views[i].minimumSize,
+
                       0
                   );
         const minDeltaDown =
@@ -943,7 +914,11 @@ export class SplitView {
 
         for (let i = 0; i < upItems.length; i++) {
             const item = upItems[i];
-            const size = clampView(item.view, upSizes[i] + deltaUp);
+            const size = clamp(
+                upSizes[i] + deltaUp,
+                item.minimumSize,
+                item.maximumSize
+            );
             const viewDelta = size - upSizes[i];
 
             actualDelta += viewDelta;
@@ -954,7 +929,11 @@ export class SplitView {
         let deltaDown = actualDelta;
         for (let i = 0; i < downItems.length; i++) {
             const item = downItems[i];
-            const size = clampView(item.view, downSizes[i] - deltaDown);
+            const size = clamp(
+                downSizes[i] - deltaDown,
+                item.minimumSize,
+                item.maximumSize
+            );
             const viewDelta = size - downSizes[i];
 
             deltaDown += viewDelta;

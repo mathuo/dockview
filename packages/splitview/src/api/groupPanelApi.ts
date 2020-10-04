@@ -1,6 +1,6 @@
 import { IGroupview } from '../groupview/groupview';
 import { Emitter, Event } from '../events';
-import { ClosePanelResult, IGroupPanel } from '../groupview/panel/parts';
+import { IGroupPanel } from '../groupview/panel/parts';
 import { GridPanelApi, IGridPanelApi } from './gridPanelApi';
 
 interface VisibilityEvent {
@@ -14,37 +14,37 @@ interface TitleEvent {
 export interface IGroupPanelApi extends IGridPanelApi {
     // events
     onDidDirtyChange: Event<boolean>;
-    onDidChangeVisibility: Event<VisibilityEvent>;
+    onDidGroupPanelVisibleChange: Event<VisibilityEvent>;
     // misc
-    readonly isVisible: boolean;
+    readonly isGroupVisible: boolean;
     readonly group: IGroupview;
     close: () => Promise<boolean>;
-    canClose: () => Promise<ClosePanelResult>;
-    setClosePanelHook(callback: () => Promise<ClosePanelResult>): void;
+    tryClose: () => Promise<boolean>;
+    interceptOnCloseAction(interceptor: () => Promise<boolean>): void;
     setTitle(title: string): void;
 }
 
 export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
-    private _isVisible: boolean;
+    private _isGroupVisible: boolean;
     private _group: IGroupview;
-    private _closePanelCallback: () => Promise<ClosePanelResult>;
+    private _interceptor: () => Promise<boolean>;
 
     readonly _onDidDirtyChange = new Emitter<boolean>();
     readonly onDidDirtyChange = this._onDidDirtyChange.event;
-    readonly _onDidChangeVisibility = new Emitter<VisibilityEvent>({
+    readonly _onDidGroupPanelVisibleChange = new Emitter<VisibilityEvent>({
         emitLastValue: true,
     });
-    readonly onDidChangeVisibility: Event<VisibilityEvent> = this
-        ._onDidChangeVisibility.event;
+    readonly onDidGroupPanelVisibleChange: Event<VisibilityEvent> = this
+        ._onDidGroupPanelVisibleChange.event;
     readonly _onDidTitleChange = new Emitter<TitleEvent>();
     readonly onDidTitleChange = this._onDidTitleChange.event;
 
-    get isVisible() {
-        return this._isVisible;
+    get isGroupVisible() {
+        return this._isGroupVisible;
     }
 
-    get canClose() {
-        return this._closePanelCallback;
+    get tryClose() {
+        return this._interceptor;
     }
 
     set group(value: IGroupview) {
@@ -60,10 +60,10 @@ export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
         this._group = group;
 
         this.addDisposables(
-            this._onDidChangeVisibility,
+            this._onDidGroupPanelVisibleChange,
             this._onDidDirtyChange,
-            this.onDidChangeVisibility((event) => {
-                this._isVisible = event.isVisible;
+            this.onDidGroupPanelVisibleChange((event) => {
+                this._isGroupVisible = event.isVisible;
             })
         );
     }
@@ -76,8 +76,8 @@ export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
         return this.group.closePanel(this.panel);
     }
 
-    public setClosePanelHook(callback: () => Promise<ClosePanelResult>) {
-        this._closePanelCallback = callback;
+    public interceptOnCloseAction(interceptor: () => Promise<boolean>) {
+        this._interceptor = interceptor;
     }
 
     public dispose() {

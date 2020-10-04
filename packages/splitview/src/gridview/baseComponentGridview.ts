@@ -7,6 +7,7 @@ import { CompositeDisposable, IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
 import { Orientation } from '../splitview/core/splitview';
 import { IPanel } from '../panel/types';
+import { Sizing } from '../splitview/core/splitview';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -132,7 +133,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
     public abstract fromJSON(data: any): void;
 
     protected doAddGroup(group: T, location: number[] = [0], size?: number) {
-        this.gridview.addView(group, size ?? { type: 'distribute' }, location);
+        this.gridview.addView(group, size ?? Sizing.Distribute, location);
 
         this._onDidLayoutChange.fire({ kind: GroupChangeKind.ADD_GROUP });
         this.doSetGroupActive(group);
@@ -153,7 +154,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
             this.groups.delete(group.id);
         }
 
-        const view = this.gridview.remove(group, { type: 'distribute' });
+        const view = this.gridview.remove(group, Sizing.Distribute);
         this._onDidLayoutChange.fire({ kind: GroupChangeKind.REMOVE_GROUP });
 
         if (!options?.skipActive && this.groups.size > 0) {

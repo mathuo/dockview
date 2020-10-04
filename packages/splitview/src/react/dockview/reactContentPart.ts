@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {
     PanelContentPart,
-    ClosePanelResult,
     GroupPanelPartInitParameters,
 } from '../../groupview/panel/parts';
 import { ReactPart } from '../react';
@@ -50,8 +49,8 @@ export class ReactPanelContentPart implements PanelContentPart {
 
     public layout(width: number, height: number): void {}
 
-    public close(): Promise<ClosePanelResult> {
-        return Promise.resolve(ClosePanelResult.CLOSE);
+    public close(): Promise<boolean> {
+        return Promise.resolve(true);
     }
 
     public dispose() {

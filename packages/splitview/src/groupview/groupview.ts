@@ -5,12 +5,7 @@ import { Position, Droptarget, DroptargetEvent } from './droptarget/droptarget';
 import { Event, Emitter, addDisposableListener } from '../events';
 import { IGroupAccessor, ComponentDockview } from '../dockview';
 import { toggleClass } from '../dom';
-import {
-    ClosePanelResult,
-    IGroupPanel,
-    PanelContentPart,
-    WatermarkPart,
-} from './panel/parts';
+import { IGroupPanel, WatermarkPart } from './panel/parts';
 import { timeoutPromise } from '../async';
 import {
     extractData,
@@ -371,8 +366,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             }
 
             const canClose =
-                !this._activePanel.close ||
-                (await this._activePanel.close()) === ClosePanelResult.CLOSE;
+                !this._activePanel.close || (await this._activePanel.close());
             if (!canClose) {
                 return false;
             }
@@ -387,8 +381,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
             if (panel.close) {
                 await timeoutPromise(0);
-                const canClose =
-                    (await panel.close()) === ClosePanelResult.CLOSE;
+                const canClose = await panel.close();
                 if (!canClose) {
                     return false;
                 }
@@ -407,10 +400,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
 
     public closePanel = async (panel: IGroupPanel) => {
-        if (
-            panel.close &&
-            (await panel.close()) === ClosePanelResult.DONT_CLOSE
-        ) {
+        if (panel.close && !(await panel.close())) {
             return false;
         }
 

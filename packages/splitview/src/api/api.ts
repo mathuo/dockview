@@ -50,6 +50,8 @@ export interface IBaseViewApi extends IDisposable {
     getStateKey: <T extends StateObject>(key: string) => T;
     //
     readonly isFocused: boolean;
+    readonly isActive: boolean;
+    readonly isVisible: boolean;
     readonly width: number;
     readonly height: number;
 }
@@ -60,6 +62,8 @@ export interface IBaseViewApi extends IDisposable {
 export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
     private _state: State = {};
     private _isFocused: boolean;
+    private _isActive: boolean;
+    private _isVisible: boolean;
     private _width = 0;
     private _height = 0;
 
@@ -95,6 +99,13 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
         return this._isFocused;
     }
 
+    get isActive() {
+        return this._isActive;
+    }
+    get isVisible() {
+        return this._isVisible;
+    }
+
     get width() {
         return this._width;
     }
@@ -108,10 +119,18 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
 
         this.addDisposables(
             this._onDidStateChange,
-            this._onDidChangeFocus,
             this._onDidPanelDimensionChange,
+            this._onDidChangeFocus,
+            this._onDidVisibilityChange,
+            this._onDidActiveChange,
             this.onDidFocusChange((event) => {
                 this._isFocused = event.isFocused;
+            }),
+            this.onDidActiveChange((event) => {
+                this._isActive = event.isActive;
+            }),
+            this.onDidVisibilityChange((event) => {
+                this._isVisible = event.isVisible;
             }),
             this.onDidDimensionsChange((event) => {
                 this._width = event.width;

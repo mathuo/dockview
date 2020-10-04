@@ -6,7 +6,6 @@ import { MutableDisposable, CompositeDisposable } from '../../lifecycle';
 import {
     PanelContentPart,
     PanelHeaderPart,
-    ClosePanelResult,
     IGroupPanelInitParameters,
 } from './parts';
 import { PanelUpdateEvent } from '../../panel/types';
@@ -53,12 +52,12 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
         this.api._onDidDirtyChange.fire(isDirty);
     }
 
-    public close(): Promise<ClosePanelResult> {
-        if (this.api.canClose) {
-            return this.api.canClose();
+    public close(): Promise<boolean> {
+        if (this.api.tryClose) {
+            return this.api.tryClose();
         }
 
-        return Promise.resolve(ClosePanelResult.CLOSE);
+        return Promise.resolve(true);
     }
 
     public toJSON(): object {
@@ -94,32 +93,24 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
         }
     }
 
-    public onHide() {
-        //
-    }
-
-    public focus() {
-        //
-    }
-
     public setVisible(isGroupActive: boolean, group: IGroupview) {
         this._group = group;
         this.api.group = group;
 
         this.mutableDisposable.value = this._group.onDidGroupChange((ev) => {
             if (ev.kind === GroupChangeKind.GROUP_ACTIVE) {
-                this.api._onDidChangeVisibility.fire({
+                this.api._onDidGroupPanelVisibleChange.fire({
                     isVisible: this._group.isPanelActive(this),
                 });
             }
         });
 
         this.api._onDidChangeFocus.fire({ isFocused: isGroupActive });
-        this.api._onDidChangeVisibility.fire({
+        this.api._onDidGroupPanelVisibleChange.fire({
             isVisible: this._group.isPanelActive(this),
         });
 
-        this.api._onDidChangeVisibility.fire({
+        this.api._onDidGroupPanelVisibleChange.fire({
             isVisible: this._group.isPanelActive(this),
         });
 
@@ -138,7 +129,7 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
     }
 
     public layout(width: number, height: number) {
-        // thw height of the panel excluded the height of the title/tab
+        // the obtain the correct dimensions of the content panel we must deduct the tab height
         this.api._onDidPanelDimensionChange.fire({
             width,
             height: height - (this.group?.tabHeight || 0),

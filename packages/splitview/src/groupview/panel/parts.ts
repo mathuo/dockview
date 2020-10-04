@@ -6,11 +6,6 @@ import { Constructor } from '../../types';
 import { PanelInitParameters, IPanel } from '../../panel/types';
 import { Event } from '../../events';
 
-export enum ClosePanelResult {
-    CLOSE = 'CLOSE',
-    DONT_CLOSE = 'DONT_CLOSE',
-}
-
 // group panel parts
 
 export interface HeaderPartInitParameters {
@@ -35,7 +30,7 @@ export interface PanelContentPart extends IPanel {
     element: HTMLElement;
     setVisible(isPanelVisible: boolean, isGroupVisible: boolean): void;
     init?(parameters: GroupPanelPartInitParameters);
-    close?(): Promise<ClosePanelResult>;
+    close?(): Promise<boolean>;
 }
 
 // group panel
@@ -53,7 +48,7 @@ export interface IGroupPanel extends IDisposable, IPanel {
     group: IGroupview;
     setVisible(isGroupActive: boolean, group: IGroupview): void;
     setDirty(isDirty: boolean): void;
-    close?(): Promise<ClosePanelResult>;
+    close?(): Promise<boolean>;
     init?(params: IGroupPanelInitParameters): void;
     onDidStateChange: Event<any>;
 }

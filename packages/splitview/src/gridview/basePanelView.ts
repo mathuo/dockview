@@ -49,6 +49,7 @@ export abstract class BasePanelView<T extends BaseViewApi>
         const { onDidFocus, onDidBlur } = trackFocus(this._element);
 
         this.addDisposables(
+            this.api,
             onDidFocus(() => {
                 this.api._onDidChangeFocus.fire({ isFocused: true });
             }),
@@ -90,7 +91,6 @@ export abstract class BasePanelView<T extends BaseViewApi>
             component: this.component,
             props: this.params.params,
             state: Object.keys(state).length === 0 ? undefined : state,
-            // visible: this._isVisible,
         };
     }
 

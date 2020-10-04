@@ -6,7 +6,7 @@ import { PanelView } from '../panelView';
 export interface PanelViewInitParameters extends PanelInitParameters {
     minimumSize?: number;
     maximumSize?: number;
-    snapSize?: number;
+    snap?: boolean;
     priority?: LayoutPriority;
 }
 

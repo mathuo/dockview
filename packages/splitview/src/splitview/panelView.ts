@@ -10,8 +10,8 @@ export abstract class PanelView
     implements ISerializableView {
     private _minimumSize: FunctionOrValue<number> = 200;
     private _maximumSize: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
-    private _snapSize: number;
     private _priority: LayoutPriority;
+    private _snap: boolean;
 
     private readonly _onDidChange = new Emitter<number | undefined>();
     readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
@@ -26,14 +26,14 @@ export abstract class PanelView
             : this._minimumSize;
     }
 
-    get snapSize() {
-        return this._snapSize;
-    }
-
     get maximumSize() {
         return typeof this._maximumSize === 'function'
             ? this._maximumSize()
             : this._maximumSize;
+    }
+
+    get snap() {
+        return this._snap;
     }
 
     constructor(id: string, componentName: string) {
@@ -60,6 +60,10 @@ export abstract class PanelView
         );
     }
 
+    layout(size: number, orthogonalSize: number) {
+        super.layout(size, orthogonalSize);
+    }
+
     setVisible(isVisible: boolean) {
         super.setVisible(isVisible);
         this.api._onDidVisibilityChange.fire({ isVisible });
@@ -76,8 +80,8 @@ export abstract class PanelView
         if (parameters.maximumSize) {
             this._maximumSize = parameters.maximumSize;
         }
-        if (parameters.snapSize) {
-            this._snapSize = parameters.snapSize;
+        if (parameters.snap) {
+            this._snap = parameters.snap;
         }
     }
 

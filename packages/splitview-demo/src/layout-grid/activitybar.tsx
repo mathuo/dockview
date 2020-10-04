@@ -22,9 +22,12 @@ export const Activitybar = (props: IGridviewPanelProps) => {
         const disposable = new CompositeDisposable(
             props.api.onDidActiveChange((event) => {
                 setActive(event.isActive);
-                console.log(event);
             })
         );
+
+        return () => {
+            disposable.dispose();
+        };
     }, []);
 
     return (

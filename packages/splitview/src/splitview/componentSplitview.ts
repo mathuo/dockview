@@ -21,7 +21,7 @@ export interface AddSplitviewComponentOptions {
     index?: number;
     minimumSize?: number;
     maximumSize?: number;
-    snapSize?: number;
+    snap?: boolean;
     //
     priority?: LayoutPriority;
 }
@@ -75,9 +75,7 @@ export class ComponentSplitview implements IComponentSplitview {
         );
 
         const size: Sizing | number =
-            typeof options.size === 'number'
-                ? options.size
-                : { type: 'distribute' };
+            typeof options.size === 'number' ? options.size : Sizing.Distribute;
         const index =
             typeof options.index === 'number' ? options.index : undefined;
 
@@ -85,7 +83,7 @@ export class ComponentSplitview implements IComponentSplitview {
             params: options.params,
             minimumSize: options.minimumSize,
             maximumSize: options.maximumSize,
-            snapSize: options.snapSize,
+            snap: options.snap,
             priority: options.priority,
         });
 
@@ -133,7 +131,7 @@ export class ComponentSplitview implements IComponentSplitview {
                     data: view.toJSON ? view.toJSON() : {},
                     minimumSize: view.minimumSize,
                     maximumSize: view.maximumSize,
-                    snapSize: view.snapSize,
+                    snap: view.snap,
                 };
             });
 
@@ -168,7 +166,7 @@ export class ComponentSplitview implements IComponentSplitview {
                         params: v.props,
                         minimumSize: v.minimumSize,
                         maximumSize: v.maximumSize,
-                        snapSize: v.snapSize,
+                        snap: v.snap,
                         priority: v.priority,
                     });
 
@@ -176,8 +174,6 @@ export class ComponentSplitview implements IComponentSplitview {
                 }),
             },
         });
-
-        this.splitview.orientation = orientation;
     }
 
     dispose() {

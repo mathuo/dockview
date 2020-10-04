@@ -2,7 +2,6 @@ import * as React from 'react';
 import {
     Api,
     IGroupPanelProps,
-    ClosePanelResult,
     CompositeDisposable,
     GroupChangeKind,
     IGridviewPanelProps,
@@ -119,7 +118,7 @@ const components = {
                         isGroupActive: event.isFocused,
                     }));
                 }),
-                props.api.onDidChangeVisibility((x) => {
+                props.api.onDidGroupPanelVisibleChange((x) => {
                     setPanelState((_) => ({
                         ..._,
                         isPanelVisible: x.isVisible,
@@ -127,11 +126,11 @@ const components = {
                 })
             );
 
-            props.api.setClosePanelHook(() => {
+            props.api.interceptOnCloseAction(() => {
                 if (confirm('close?')) {
-                    return Promise.resolve(ClosePanelResult.CLOSE);
+                    return Promise.resolve(true);
                 }
-                return Promise.resolve(ClosePanelResult.DONT_CLOSE);
+                return Promise.resolve(false);
             });
 
             return () => {

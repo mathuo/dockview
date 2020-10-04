@@ -93,6 +93,10 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
             typeof value === 'number' ? value : Number.POSITIVE_INFINITY;
     }
 
+    setVisible(isVisible: boolean) {
+        this.api._onDidVisibilityChange.fire({ isVisible });
+    }
+
     constructor(
         public readonly id: string,
         private readonly component: string

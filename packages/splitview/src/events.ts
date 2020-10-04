@@ -1,5 +1,21 @@
 import { IDisposable } from './lifecycle';
 
+export class DefaultEvent {
+    private _defaultPrevented: boolean;
+
+    constructor() {
+        this._defaultPrevented = false;
+    }
+
+    get defaultPrevented() {
+        return this._defaultPrevented;
+    }
+
+    preventDefault() {
+        this._defaultPrevented = true;
+    }
+}
+
 export interface Event<T> {
     (listener: (e: T) => any): IDisposable;
 }

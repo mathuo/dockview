@@ -34,8 +34,8 @@ export class LeafNode implements IView {
         return this.view.priority;
     }
 
-    get snapSize() {
-        return this.view.snap ? this.minimumSize / 2 : undefined;
+    get snap() {
+        return this.view.snap;
     }
 
     get minimumSize(): number {
