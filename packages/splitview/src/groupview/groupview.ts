@@ -16,6 +16,7 @@ import {
 import { IGridPanelView } from '../gridview/baseComponentGridview';
 import { IViewSize } from '../gridview/gridview';
 import { createComponent } from '../splitview/core/options';
+import { DockviewApi } from '../api/component.api';
 
 export const enum GroupChangeKind {
     GROUP_ACTIVE = 'GROUP_ACTIVE',

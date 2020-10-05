@@ -162,6 +162,7 @@ export class ComponentDockview
         string,
         (event: LayoutDropEvent) => PanelOptions
     >();
+    private _api: DockviewApi;
 
     addDndHandle(
         type: string,
@@ -197,6 +198,8 @@ export class ComponentDockview
         ) {
             this.options.watermarkComponent = Watermark;
         }
+
+        this._api = new DockviewApi(this);
 
         this.updateContainer();
     }

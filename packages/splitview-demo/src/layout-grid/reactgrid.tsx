@@ -294,9 +294,5 @@ export const TestGrid = (props: IGridviewPanelProps) => {
 };
 
 const Watermark = (props) => {
-    return (
-        <div>
-            <div>custom watermark</div>
-        </div>
-    );
+    return <div>custom watermark</div>;
 };
