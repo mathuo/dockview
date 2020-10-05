@@ -36,13 +36,13 @@ const build = (options) => {
         return merge([
             tsResult.dts
                 .pipe(header(dtsHeaderTemplate, { pkg: package }))
-                .pipe(gulp.dest('./dist/esm')),
+                .pipe(gulp.dest('./dist/cjs')),
             tsResult.js
                 .pipe(header(headerTemplate, { pkg: package }))
-                .pipe(gulp.dest('./dist/esm')),
+                .pipe(gulp.dest('./dist/cjs')),
             tsResult
                 .pipe(sourcemaps.write('.', { includeContent: false }))
-                .pipe(gulp.dest('./dist/esm')),
+                .pipe(gulp.dest('./dist/cjs')),
         ]);
     });
 

@@ -4,4 +4,4 @@ dist/
 typedocs/
 .DS_Store
 *-debug.log
-test-publish/
+.build

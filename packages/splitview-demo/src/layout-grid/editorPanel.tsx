@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { Api, IGroupPanelProps } from 'splitview';
+import { Api, DockviewApi, IGroupPanelProps } from 'splitview';
 
-export const Editor = (props: IGroupPanelProps & { layoutApi: Api }) => {
+export const Editor = (
+    props: IGroupPanelProps & { layoutApi: DockviewApi }
+) => {
     const [tabHeight, setTabHeight] = React.useState<number>(0);
 
     React.useEffect(() => {

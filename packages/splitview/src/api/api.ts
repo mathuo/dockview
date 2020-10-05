@@ -36,7 +36,7 @@ interface ActiveEvent {
     isActive: boolean;
 }
 
-export interface IBaseViewApi extends IDisposable {
+export interface IBaseViewApi {
     // events
     onDidDimensionsChange: Event<PanelDimensionChangeEvent>;
     onDidStateChange: Event<void>;

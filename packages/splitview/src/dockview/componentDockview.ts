@@ -48,6 +48,7 @@ import {
     IBaseGrid,
     toTarget,
 } from '../gridview/baseComponentGridview';
+import { DockviewApi } from '../api/component.api';
 
 const nextGroupId = sequentialNumberGenerator();
 
@@ -61,7 +62,7 @@ export interface Api {
     readonly maximumHeight: number;
     readonly minimumWidth: number;
     readonly maximumWidth: number;
-    layout(width: number, height: number): void;
+    // layout(width: number, height: number): void;
     //
     setAutoResizeToFit(enabled: boolean): void;
     resizeToFit(): void;
@@ -457,7 +458,7 @@ export class ComponentDockview
                 if (event.tab) {
                     this._onTabContextMenu.fire({
                         event: event.event,
-                        api: this,
+                        api: new DockviewApi(this),
                         panel: event.panel,
                     });
                 }

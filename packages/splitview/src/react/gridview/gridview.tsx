@@ -7,9 +7,10 @@ import { IGridPanelApi } from '../../api/gridPanelApi';
 import { Orientation } from '../../splitview/core/splitview';
 import { ReactGridPanelView } from './view';
 import { usePortalsLifecycle } from '../react';
+import { GridviewApi } from '../../api/component.api';
 
 export interface GridviewReadyEvent {
-    api: IComponentGridview;
+    api: GridviewApi;
 }
 
 export interface IGridviewPanelProps {
@@ -44,10 +45,8 @@ export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps>
             },
         });
 
-        // gridview.resizeToFit();
-
         if (props.onReady) {
-            props.onReady({ api: gridview });
+            props.onReady({ api: new GridviewApi(gridview) });
         }
 
         gridviewRef.current = gridview;

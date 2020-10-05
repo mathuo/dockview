@@ -1,4 +1,5 @@
-import { IDisposable } from '../lifecycle';
+import { Emitter, Event } from '../events';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { PaneReact } from '../react/paneview/view';
 import { createComponent } from '../splitview/core/options';
 import { Orientation } from '../splitview/core/splitview';
@@ -20,23 +21,21 @@ export interface AddPaneviewCompponentOptions {
 export interface IComponentPaneView extends IDisposable {
     readonly minimumSize: number;
     readonly maximumSize: number;
-    layout(size: number, orthogonalSize: number): void;
     addFromComponent(options: AddPaneviewCompponentOptions): IDisposable;
+    layout(width: number, height: number): void;
+    onDidLayoutChange: Event<void>;
+    toJSON(): object;
+    fromJSON(data: any): void;
     resizeToFit(): void;
 }
 
-export class ComponentPaneView implements IComponentPaneView {
+export class ComponentPaneView
+    extends CompositeDisposable
+    implements IComponentPaneView {
     private paneview: PaneView;
 
-    constructor(
-        private element: HTMLElement,
-        private readonly options: PaneviewComponentOptions
-    ) {
-        this.paneview = new PaneView(this.element, {
-            // only allow paneview in the vertical orientation for now
-            orientation: Orientation.VERTICAL,
-        });
-    }
+    private readonly _onDidLayoutChange = new Emitter<void>();
+    readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
 
     get minimumSize() {
         return this.paneview.minimumSize;
@@ -44,6 +43,25 @@ export class ComponentPaneView implements IComponentPaneView {
 
     get maximumSize() {
         return this.paneview.maximumSize;
+    }
+
+    constructor(
+        private element: HTMLElement,
+        private readonly options: PaneviewComponentOptions
+    ) {
+        super();
+
+        this.paneview = new PaneView(this.element, {
+            // only allow paneview in the vertical orientation for now
+            orientation: Orientation.VERTICAL,
+        });
+
+        this.addDisposables(
+            this.paneview.onDidChange(() => {
+                this._onDidLayoutChange.fire(undefined);
+            }),
+            this.paneview
+        );
     }
 
     addFromComponent(options: AddPaneviewCompponentOptions): IDisposable {
@@ -70,7 +88,7 @@ export class ComponentPaneView implements IComponentPaneView {
         };
     }
 
-    public layout(width: number, height: number): void {
+    layout(width: number, height: number): void {
         const [size, orthogonalSize] =
             this.paneview.orientation === Orientation.HORIZONTAL
                 ? [width, height]
@@ -81,7 +99,7 @@ export class ComponentPaneView implements IComponentPaneView {
     /**
      * Resize the layout to fit the parent container
      */
-    public resizeToFit(): void {
+    resizeToFit(): void {
         const {
             width,
             height,
@@ -89,7 +107,12 @@ export class ComponentPaneView implements IComponentPaneView {
         this.layout(width, height);
     }
 
-    public dispose() {
-        this.paneview.dispose();
+    toJSON(): object {
+        // TODO paneview#toJSON
+        return {};
+    }
+
+    fromJSON(data: any): void {
+        // TODO paneview#fromJSON
     }
 }

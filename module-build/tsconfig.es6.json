@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "es6",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": false,
+        "declaration": true,
+        "target": "es5",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "downlevelIteration": true,
+        "incremental": true
+        
+    }
+}

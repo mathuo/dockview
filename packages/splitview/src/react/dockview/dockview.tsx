@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IDisposable } from '../../lifecycle';
-import { ComponentDockview, Api } from '../../dockview/componentDockview';
+import { ComponentDockview } from '../../dockview/componentDockview';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
 import { ReactPanelDeserialzier } from '../deserializer';
@@ -10,13 +10,14 @@ import {
 } from '../../dockview/options';
 import { IGroupPanelApi } from '../../api/groupPanelApi';
 import { usePortalsLifecycle } from '../react';
+import { DockviewApi } from '../../api/component.api';
 
 export interface IGroupPanelProps {
     api: IGroupPanelApi;
 }
 
 export interface DockviewReadyEvent {
-    api: Api;
+    api: DockviewApi;
 }
 
 export interface ReactPortalStore {
@@ -105,7 +106,7 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
         dockview.resizeToFit();
 
         if (props.onReady) {
-            props.onReady({ api: dockview });
+            props.onReady({ api: new DockviewApi(dockview) });
         }
 
         dockviewRef.current = dockview;

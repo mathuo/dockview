@@ -216,7 +216,7 @@ interface PaneItem {
     disposable: IDisposable;
 }
 
-export class PaneView implements IDisposable {
+export class PaneView extends CompositeDisposable implements IDisposable {
     private element: HTMLElement;
     private splitview: SplitView;
     private paneItems: PaneItem[] = [];
@@ -224,6 +224,9 @@ export class PaneView implements IDisposable {
     private animationTimer: NodeJS.Timeout;
     private orthogonalSize: number;
     private size: number;
+
+    private readonly _onDidChange = new Emitter<void>();
+    readonly onDidChange: Event<void> = this._onDidChange.event;
 
     get minimumSize() {
         return this.splitview.minimumSize;
@@ -238,6 +241,8 @@ export class PaneView implements IDisposable {
     }
 
     constructor(container: HTMLElement, options: { orientation: Orientation }) {
+        super();
+
         this._orientation = options.orientation ?? Orientation.VERTICAL;
 
         this.element = document.createElement('div');
@@ -249,6 +254,12 @@ export class PaneView implements IDisposable {
             orientation: this._orientation,
             proportionalLayout: false,
         });
+
+        this.addDisposables(
+            this.splitview.onDidSashEnd(() => {
+                this._onDidChange.fire(undefined);
+            })
+        );
     }
 
     public addPane(pane: Pane, size?: number, index = this.splitview.length) {
@@ -312,6 +323,8 @@ export class PaneView implements IDisposable {
     }
 
     public dispose() {
+        super.dispose();
+
         if (this.animationTimer) {
             clearTimeout(this.animationTimer);
             this.animationTimer = undefined;

@@ -1,4 +1,4 @@
-import { IDisposable } from '../lifecycle';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
 import {
     LayoutPriority,
     Orientation,
@@ -10,20 +10,14 @@ import {
     ISerializableView,
     SplitPanelOptions,
 } from './core/options';
-import { Parameters } from '../panel/types';
+import { BaseComponentOptions } from '../panel/types';
+import { Emitter, Event } from '../events';
 
-export interface AddSplitviewComponentOptions {
-    id: string;
-    component: string;
-    params?: Parameters;
-    //
+export interface AddSplitviewComponentOptions extends BaseComponentOptions {
     size?: number;
     index?: number;
     minimumSize?: number;
     maximumSize?: number;
-    snap?: boolean;
-    //
-    priority?: LayoutPriority;
 }
 
 export interface IComponentSplitview extends IDisposable {
@@ -31,7 +25,7 @@ export interface IComponentSplitview extends IDisposable {
     readonly maximumSize: number;
     addFromComponent(options: AddSplitviewComponentOptions): IDisposable;
     layout(width: number, height: number): void;
-    onChange(cb: (event: { proportions: number[] }) => void): IDisposable;
+    onDidLayoutChange: Event<void>;
     toJSON(): object;
     fromJSON(data: any): void;
     resizeToFit(): void;
@@ -40,8 +34,13 @@ export interface IComponentSplitview extends IDisposable {
 /**
  * A high-level implementation of splitview that works using 'panels'
  */
-export class ComponentSplitview implements IComponentSplitview {
+export class ComponentSplitview
+    extends CompositeDisposable
+    implements IComponentSplitview {
     private splitview: SplitView;
+
+    private readonly _onDidLayoutChange = new Emitter<void>();
+    readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
 
     get minimumSize() {
         return this.splitview.minimumSize;
@@ -55,6 +54,8 @@ export class ComponentSplitview implements IComponentSplitview {
         private readonly element: HTMLElement,
         private readonly options: SplitPanelOptions
     ) {
+        super();
+
         if (!options.components) {
             options.components = {};
         }
@@ -63,6 +64,13 @@ export class ComponentSplitview implements IComponentSplitview {
         }
 
         this.splitview = new SplitView(this.element, options);
+
+        this.addDisposables(
+            this.splitview.onDidSashEnd(() => {
+                this._onDidLayoutChange.fire(undefined);
+            }),
+            this.splitview
+        );
     }
 
     addFromComponent(options: AddSplitviewComponentOptions): IDisposable {
@@ -115,12 +123,6 @@ export class ComponentSplitview implements IComponentSplitview {
         this.splitview.layout(size, orthogonalSize);
     }
 
-    onChange(cb: (event: { proportions: number[] }) => void): IDisposable {
-        return this.splitview.onDidSashEnd(() => {
-            cb({ proportions: this.splitview.proportions });
-        });
-    }
-
     toJSON(): object {
         const views = this.splitview
             .getViews()
@@ -148,13 +150,13 @@ export class ComponentSplitview implements IComponentSplitview {
         this.splitview.dispose();
         this.splitview = new SplitView(this.element, {
             orientation,
-            proportionalLayout: false,
+            proportionalLayout: this.options.proportionalLayout,
             descriptor: {
                 size,
-                views: views.map((v) => {
-                    const data = v.data;
+                views: views.map((view) => {
+                    const data = view.data;
 
-                    const view = createComponent(
+                    const panel = createComponent(
                         data.id,
                         data.component,
                         this.options.components,
@@ -162,21 +164,17 @@ export class ComponentSplitview implements IComponentSplitview {
                         this.options.frameworkWrapper.createComponent
                     );
 
-                    view.init({
-                        params: v.props,
-                        minimumSize: v.minimumSize,
-                        maximumSize: v.maximumSize,
-                        snap: v.snap,
-                        priority: v.priority,
+                    panel.init({
+                        params: view.props,
+                        minimumSize: view.minimumSize,
+                        maximumSize: view.maximumSize,
+                        snap: view.snap,
+                        priority: view.priority,
                     });
 
-                    return { size: v.size, view };
+                    return { size: view.size, view: panel };
                 }),
             },
         });
-    }
-
-    dispose() {
-        this.splitview.dispose();
     }
 }

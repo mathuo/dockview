@@ -6,8 +6,8 @@ import {
     GridviewReadyEvent,
     ComponentGridview,
     IGridviewPanelProps,
+    GridviewApi,
 } from 'splitview';
-import { ComponentDockview } from 'splitview/dist/esm';
 import { Activitybar } from './activitybar';
 import { Footer } from './footer';
 import { Panel } from './panel';
@@ -26,21 +26,12 @@ const rootcomponents: {
 };
 
 export const Application = () => {
-    const api = React.useRef<ComponentGridview>();
+    const api = React.useRef<GridviewApi>();
     const registry = useLayoutRegistry();
 
     const onReady = (event: GridviewReadyEvent) => {
-        const layout = () =>
-            (event.api as ComponentGridview).layout(
-                window.innerWidth,
-                window.innerHeight,
-                true
-            );
-        layout();
-
         event.api.fromJSON(require('./application.layout.json'));
-        // layout();
-        api.current = event.api as ComponentGridview;
+        api.current = event.api;
 
         registry.register('gridview', event.api);
         return;
@@ -85,24 +76,19 @@ export const Application = () => {
             size: 200,
             snap: true,
         });
-
-        setTimeout(() => {
-            console.log(JSON.stringify(api.current.toJSON(), null, 4));
-        }, 10000);
     };
 
     React.useEffect(() => {
-        const callback = (ev: UIEvent) => {
-            const height = window.innerHeight;
-            const width = window.innerWidth;
-
-            api.current?.layout(width, height);
+        const onresize = (ev: UIEvent) => {
+            const { innerWidth: width, innerHeight: height } = window;
+            api.current?.layout(width, height); // // fill the entire screen
         };
-        window.addEventListener('resize', callback);
-        callback(undefined);
+        window.addEventListener('resize', onresize);
+
+        onresize(undefined); // initial render
 
         return () => {
-            window.removeEventListener('resize', callback);
+            window.removeEventListener('resize', onresize);
         };
     }, []);
 

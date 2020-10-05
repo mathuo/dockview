@@ -6,9 +6,10 @@ import {
 } from '../../paneview/componentPaneView';
 import { PaneReact } from './view';
 import { usePortalsLifecycle } from '../react';
+import { PaneviewApi } from '../../api/component.api';
 
 export interface PaneviewReadyEvent {
-    api: IComponentPaneView;
+    api: PaneviewApi;
 }
 
 export interface IPaneviewPanelProps {
@@ -47,7 +48,7 @@ export const PaneViewComponent: React.FunctionComponent<IPaneviewComponentProps>
         paneview.layout(size, orthogonalSize);
 
         if (props.onReady) {
-            props.onReady({ api: paneview });
+            props.onReady({ api: new PaneviewApi(paneview) });
         }
 
         paneview.resizeToFit();

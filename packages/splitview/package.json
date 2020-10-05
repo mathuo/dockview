@@ -2,12 +2,14 @@
     "name": "splitview",
     "version": "1.0.0",
     "description": "",
-    "main": "dist/esm/index.js",
-    "types": "dist/esm/index.d.ts",
-    "module": "dist/esm/index.js",
+    "main": "dist/cjs/index.js",
+    "types": "dist/cjs/index.d.ts",
+    "module": "dist/es6/index.js",
     "scripts": {
         "build": "gulp run",
-        "docs": "typedoc"
+        "docs": "typedoc",
+        "build-es6": "bash ../../node_modules/.bin/tsc --project tsconfig.es6.json",
+        "build-es5": "bash ../../node_modules/.bin/tsc --project tsconfig.json"
     },
     "author": "",
     "license": "ISC",

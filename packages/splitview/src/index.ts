@@ -10,6 +10,7 @@ export * from './events';
 export * from './lifecycle';
 export * from './groupview/panel/panel';
 export * from './api/groupPanelApi';
+export * from './api/component.api';
 export * from './react/react';
 export * from './groupview/panel/parts';
 export * from './react';

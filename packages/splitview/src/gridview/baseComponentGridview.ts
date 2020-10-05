@@ -39,16 +39,6 @@ export interface IGridPanelView extends IGridView, IPanel {
     isActive: boolean;
 }
 
-export interface IBaseGridPublicApi<T extends IGridPanelView>
-    extends Pick<
-        IBaseGrid<T>,
-        | 'id'
-        | 'minimumHeight'
-        | 'maximumHeight'
-        | 'minimumWidth'
-        | 'maximumWidth'
-    > {}
-
 export interface IBaseGrid<T extends IGridPanelView> {
     readonly element: HTMLElement;
     readonly id: string;
@@ -62,6 +52,8 @@ export interface IBaseGrid<T extends IGridPanelView> {
     getGroup(id: string): T | undefined;
     toJSON(): object;
     fromJSON(data: any): void;
+    layout(width: number, height: number, force?: boolean): void;
+    resizeToFit(): void;
 }
 
 export abstract class BaseGrid<T extends IGridPanelView>
@@ -120,7 +112,11 @@ export abstract class BaseGrid<T extends IGridPanelView>
             !!options.proportionalLayout,
             options.orientation
         );
+
         this.element.appendChild(this.gridview.element);
+
+        // TODO for some reason this is required before anything will layout correctly
+        this.layout(0, 0, true);
 
         this.addDisposables(
             this.gridview.onDidChange((event) => {

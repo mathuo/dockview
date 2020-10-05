@@ -5,8 +5,8 @@ import {
     Orientation,
     SplitviewReadyEvent,
     SplitviewComponent,
-    IComponentSplitview,
     IGroupPanelProps,
+    SplitviewApi,
 } from 'splitview';
 
 const components = {
@@ -41,14 +41,14 @@ const components = {
 const SPLIT_PANEL_STATE_KEY = 'splitview_panel_state';
 
 export const SplitPanel = (props: IGroupPanelProps) => {
-    const api = React.useRef<IComponentSplitview>();
+    const api = React.useRef<SplitviewApi>();
 
     React.useEffect(() => {
         const disposable = new CompositeDisposable(
             props.api.onDidDimensionsChange((event) => {
-                api.current?.layout(event.width, event.height - 20);
+                api.current?.layout(event.width, event.height);
             }),
-            api.current.onChange((event) => {
+            api.current.onDidLayoutChange(() => {
                 props.api.setState(SPLIT_PANEL_STATE_KEY, api.current.toJSON());
             })
         );

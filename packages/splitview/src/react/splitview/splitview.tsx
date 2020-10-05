@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { SplitviewApi } from '../../api/component.api';
 import { IPanelApi } from '../../api/panelApi';
 import {
     IComponentSplitview,
@@ -9,7 +10,7 @@ import { usePortalsLifecycle } from '../react';
 import { ReactPanelView } from './view';
 
 export interface SplitviewReadyEvent {
-    api: IComponentSplitview;
+    api: SplitviewApi;
 }
 
 export interface ISplitviewPanelProps {
@@ -49,7 +50,7 @@ export const SplitviewComponent: React.FunctionComponent<ISplitviewComponentProp
         splitview.resizeToFit();
 
         if (props.onReady) {
-            props.onReady({ api: splitview });
+            props.onReady({ api: new SplitviewApi(splitview) });
         }
 
         splitviewRef.current = splitview;

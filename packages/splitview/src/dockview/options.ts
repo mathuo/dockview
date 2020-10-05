@@ -1,3 +1,4 @@
+import { DockviewApi } from '../api/component.api';
 import { IGridView } from '../gridview/gridview';
 import { IGroupview } from '../groupview/groupview';
 import {
@@ -10,7 +11,6 @@ import {
 } from '../groupview/panel/parts';
 import { Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
-import { Api } from './componentDockview';
 
 export interface GroupPanelFrameworkComponentFactory {
     content: FrameworkFactory<PanelContentPart>;
@@ -19,7 +19,7 @@ export interface GroupPanelFrameworkComponentFactory {
 
 export interface TabContextMenuEvent {
     event: MouseEvent;
-    api: Api;
+    api: DockviewApi;
     panel: IGroupPanel;
 }
 

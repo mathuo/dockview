@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Api } from 'splitview';
+import { DockviewApi, GridviewApi } from 'splitview';
 import { useLayoutRegistry } from './registry';
 import './controlCenter.scss';
 
@@ -14,7 +14,7 @@ export const ControlCenter = () => {
     const dragRef = React.useRef<HTMLDivElement>();
 
     React.useEffect(() => {
-        const api = registry.get<Api>('dockview');
+        const api = registry.get<DockviewApi>('dockview');
         const target = api.createDragTarget(
             { element: dragRef.current, content: 'drag me' },
             () => ({
@@ -33,7 +33,7 @@ export const ControlCenter = () => {
     };
 
     const onAdd = () => {
-        const api = registry.get<Api>('dockview');
+        const api = registry.get<DockviewApi>('dockview');
         const id = nextGuid();
         api.addPanelFromComponent({
             componentName: 'test_component',
@@ -43,29 +43,29 @@ export const ControlCenter = () => {
     };
 
     const onAddEmpty = () => {
-        const api = registry.get<Api>('dockview');
+        const api = registry.get<DockviewApi>('dockview');
         api.addEmptyGroup();
     };
 
     const nextPanel = () => {
-        const api = registry.get<Api>('dockview');
+        const api = registry.get<DockviewApi>('dockview');
         api.moveToNext({ includePanel: true });
     };
     const nextGroup = () => {
-        const api = registry.get<Api>('dockview');
+        const api = registry.get<DockviewApi>('dockview');
         api.moveToNext();
     };
     const previousPanel = () => {
-        const api = registry.get<Api>('dockview');
+        const api = registry.get<DockviewApi>('dockview');
         api.moveToPrevious({ includePanel: true });
     };
     const previousGroup = () => {
-        const api = registry.get<Api>('dockview');
+        const api = registry.get<DockviewApi>('dockview');
         api.moveToNext();
     };
 
     const onConfig = () => {
-        const api = registry.get<Api>('dockview');
+        const api = registry.get<DockviewApi>('dockview');
         const data = api.toJSON();
         const stringData = JSON.stringify(data, null, 4);
         console.log(stringData);
@@ -73,7 +73,7 @@ export const ControlCenter = () => {
     };
 
     const onLoad = async () => {
-        const api = registry.get<Api>('dockview');
+        const api = registry.get<DockviewApi>('dockview');
         const didClose = await api.closeAllGroups();
         if (!didClose) {
             return;
@@ -86,8 +86,13 @@ export const ControlCenter = () => {
     };
 
     const onClear = () => {
-        const api = registry.get<Api>('dockview');
+        const api = registry.get<DockviewApi>('dockview');
         api.closeAllGroups();
+    };
+
+    const saveApplicationLayout = () => {
+        const api = registry.get<GridviewApi>('gridview');
+        console.log(JSON.stringify(api.toJSON(), null, 4));
     };
 
     return (
@@ -118,6 +123,11 @@ export const ControlCenter = () => {
             </div>
             <div className="control-center-row">
                 <button onClick={onClear}>Clear</button>
+            </div>
+            <div className="control-center-row">
+                <button onClick={saveApplicationLayout}>
+                    Save application layout
+                </button>
             </div>
             <div
                 draggable={true}

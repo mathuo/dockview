@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
-    ComponentGridview,
     CompositeDisposable,
+    GridviewApi,
     IGridviewPanelProps,
 } from 'splitview';
 import './activitybar.scss';
@@ -12,7 +12,7 @@ export const Activitybar = (props: IGridviewPanelProps) => {
     const [isActive, setActive] = React.useState<boolean>(false);
 
     const onOpenSidebar = () => {
-        const api = registry.get<ComponentGridview>('gridview');
+        const api = registry.get<GridviewApi>('gridview');
 
         const sidebarPanel = api.getGroup('sidebar');
         api.toggleVisibility(sidebarPanel);

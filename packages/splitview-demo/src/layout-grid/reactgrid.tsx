@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {
-    Api,
     IGroupPanelProps,
     CompositeDisposable,
     GroupChangeKind,
@@ -8,6 +7,7 @@ import {
     TabContextMenuEvent,
     DockviewReadyEvent,
     DockviewComponent,
+    DockviewApi,
 } from 'splitview';
 import { CustomTab } from './customTab';
 import { Editor } from './editorPanel';
@@ -16,8 +16,7 @@ import { SplitPanel } from './splitPanel';
 
 const components = {
     inner_component: (props: IGroupPanelProps) => {
-        const _api = React.useRef<Api>();
-        const [api, setApi] = React.useState<Api>();
+        const _api = React.useRef<DockviewApi>();
 
         const onReady = (event: DockviewReadyEvent) => {
             _api.current = event.api;
@@ -55,7 +54,6 @@ const components = {
                     },
                 });
             }
-            setApi(event.api);
         };
 
         React.useEffect(() => {
@@ -74,16 +72,6 @@ const components = {
                 compDis.dispose();
             };
         }, []);
-
-        React.useEffect(() => {
-            if (!api) {
-                return;
-            }
-
-            api.onDidLayoutChange((event) => {
-                // on inner grid changes
-            });
-        }, [api]);
 
         return (
             <div
@@ -186,20 +174,14 @@ export const nextGuid = (() => {
 })();
 
 export const TestGrid = (props: IGridviewPanelProps) => {
-    const _api = React.useRef<Api>();
-    const [api, setApi] = React.useState<Api>();
+    const _api = React.useRef<DockviewApi>();
     const registry = useLayoutRegistry();
 
     const onReady = (event: DockviewReadyEvent) => {
+        const api = event.api;
         _api.current = event.api;
-        setApi(event.api);
-        registry.register('dockview', event.api);
-    };
-
-    React.useEffect(() => {
-        if (!api) {
-            return;
-        }
+        // setApi(event.api);
+        registry.register('dockview', api);
 
         const panelReference = api.addPanelFromComponent({
             componentName: 'test_component',
@@ -250,7 +232,7 @@ export const TestGrid = (props: IGridviewPanelProps) => {
                 componentName: 'test_component',
             };
         });
-    }, [api]);
+    };
 
     React.useEffect(() => {
         // const callback = (ev: UIEvent) => {

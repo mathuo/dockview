@@ -3,8 +3,9 @@
     "compilerOptions": {
         "composite": true,
         "declaration": true,
-        "outDir": "./dist",
-        "rootDir": "./src"
+        "outDir": "dist/cjs",
+        "rootDir": "src",
+        "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.build"
     },
     "include": ["src/**/*"]
 }

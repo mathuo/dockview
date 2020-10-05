@@ -4,9 +4,8 @@ import {
     PaneViewComponent,
     PaneviewReadyEvent,
     IPaneviewPanelProps,
-    IComponentPaneView,
-    Api,
     CompositeDisposable,
+    PaneviewApi,
 } from 'splitview';
 import { ControlCenter } from './controlCenter';
 
@@ -18,7 +17,7 @@ const components = {
 };
 
 export const Sidebar = (props: IGridviewPanelProps) => {
-    const api = React.useRef<IComponentPaneView>();
+    const api = React.useRef<PaneviewApi>();
 
     const onReady = (event: PaneviewReadyEvent) => {
         event.api.addFromComponent({

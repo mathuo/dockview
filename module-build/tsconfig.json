@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": false,
+        "declaration": true,
+        "target": "es5",
+        "esModuleInterop": true,
+        "downlevelIteration": true,
+        "incremental": true
+        
+    }
+}

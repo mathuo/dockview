@@ -3,45 +3,36 @@ import { Position } from '../groupview/droptarget/droptarget';
 import { getGridLocation } from './gridview';
 import { tail, sequenceEquals } from '../array';
 import { GroupChangeKind } from '../groupview/groupview';
-import { CompositeDisposable, Disposable } from '../lifecycle';
+import { CompositeDisposable } from '../lifecycle';
 import { IPanelDeserializer } from '../dockview/deserializer';
 import { createComponent } from '../splitview/core/options';
-import { LayoutPriority } from '../splitview/core/splitview';
 import { GridComponentOptions } from './options';
 import {
     BaseGrid,
     Direction,
     IBaseGrid,
-    IBaseGridPublicApi,
     IGridPanelView,
     toTarget,
 } from './baseComponentGridview';
 import { GridPanelView, GridviewInitParameters } from './gridPanelView';
-import { Parameters } from '../panel/types';
+import { BaseComponentOptions, Parameters } from '../panel/types';
 import { GridPanelApi } from '../api/gridPanelApi';
 
 interface PanelReference {
     api: GridPanelApi;
 }
 
-export interface AddComponentOptions {
-    id: string;
-    component: string;
-    params?: Parameters;
-    //
+export interface AddComponentOptions extends BaseComponentOptions {
     size?: number;
     minimumWidth?: number;
     maximumWidth?: number;
     minimumHeight?: number;
     maximumHeight?: number;
-    //
     position?: {
         direction?: Direction;
         reference: string;
     };
     location?: number[];
-    priority?: LayoutPriority;
-    snap?: boolean;
 }
 
 export interface IGridPanelComponentView extends IGridPanelView {
@@ -55,13 +46,6 @@ export interface IComponentGridview extends IBaseGrid<GridPanelView> {
     isVisible(panel: GridPanelView): boolean;
     toggleVisibility(panel: GridPanelView): void;
 }
-
-export interface GridviewApi
-    extends IBaseGridPublicApi<GridPanelView>,
-        Pick<
-            IComponentGridview,
-            'addComponent' | 'setVisible' | 'isVisible' | 'toggleVisibility'
-        > {}
 
 export class ComponentGridview
     extends BaseGrid<GridPanelView>
