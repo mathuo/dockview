@@ -278,12 +278,11 @@ export const TestGrid = (props: IGridviewPanelProps) => {
             style={{ width: '100%', overflow: 'hidden' }}
         >
             <DockviewComponent
-                // autoSizeToFitContainer={true}
                 onReady={onReady}
                 components={components}
                 tabComponents={tabComponents}
                 debug={false}
-                // tabHeight={30}
+                // tabHeight={}
                 enableExternalDragEvents={true}
                 // serializedLayout={data}
                 onTabContextMenu={onTabContextMenu}

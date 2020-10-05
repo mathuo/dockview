@@ -7,6 +7,21 @@ body {
     color: white;
 }
 
+::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--title-bar-scroll-bar-color);
+}
+
 *,
 *::after,
 *::before {

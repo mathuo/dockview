@@ -56,16 +56,6 @@ export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps>
         };
     }, []);
 
-    return (
-        <div
-            style={{
-                height: '100%',
-                width: '100%',
-            }}
-            ref={domRef}
-        >
-            {portals}
-        </div>
-    );
+    return <div ref={domRef}>{portals}</div>;
 };
 GridviewComponent.displayName = 'GridviewComponent';

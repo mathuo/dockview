@@ -34,7 +34,6 @@ export interface IDockviewComponentProps {
     };
     watermarkComponent?: React.FunctionComponent;
     onReady?: (event: DockviewReadyEvent) => void;
-    autoSizeToFitContainer?: boolean;
     serializedLayout?: {};
     deserializer?: {
         fromJSON: (
@@ -139,20 +138,6 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
         };
     }, [props.onTabContextMenu]);
 
-    React.useEffect(() => {
-        dockviewRef.current.setAutoResizeToFit(props.autoSizeToFitContainer);
-    }, [props.autoSizeToFitContainer]);
-
-    return (
-        <div
-            style={{
-                // height: '100%',
-                width: '100%',
-            }}
-            ref={domRef}
-        >
-            {portals}
-        </div>
-    );
+    return <div ref={domRef}>{portals}</div>;
 };
 DockviewComponent.displayName = 'DockviewComponent';

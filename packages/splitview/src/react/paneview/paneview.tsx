@@ -61,16 +61,6 @@ export const PaneViewComponent: React.FunctionComponent<IPaneviewComponentProps>
         };
     }, []);
 
-    return (
-        <div
-            style={{
-                height: '100%',
-                width: '100%',
-            }}
-            ref={domRef}
-        >
-            {portals}
-        </div>
-    );
+    return <div ref={domRef}>{portals}</div>;
 };
 PaneViewComponent.displayName = 'PaneviewComponent';
