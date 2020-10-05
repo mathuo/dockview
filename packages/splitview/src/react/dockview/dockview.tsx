@@ -11,6 +11,7 @@ import {
 import { IGroupPanelApi } from '../../api/groupPanelApi';
 import { usePortalsLifecycle } from '../react';
 import { DockviewApi } from '../../api/component.api';
+import { ReactWatermarkPart } from './reactWatermarkPart';
 
 export interface IGroupPanelProps {
     api: IGroupPanelApi;
@@ -82,6 +83,17 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
                     });
                 },
             },
+            watermark: {
+                createComponent: (
+                    id: string,
+                    componentId: string,
+                    component: React.FunctionComponent<{}>
+                ) => {
+                    return new ReactWatermarkPart(componentId, component, {
+                        addPortal,
+                    });
+                },
+            },
         };
 
         const element = document.createElement('div');
@@ -93,6 +105,7 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
             tabHeight: props.tabHeight,
             debug: props.debug,
             enableExternalDragEvents: props.enableExternalDragEvents,
+            watermarkFrameworkComponent: props.watermarkComponent,
             // orientation: props.orientation,
         });
 

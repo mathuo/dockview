@@ -44,10 +44,12 @@ export class Watermark extends CompositeDisposable implements WatermarkPart {
 
         actions.add(closeAnchor);
 
-        addDisposableListener(closeAnchor, 'click', (ev) => {
-            ev.preventDefault();
-            this.accessor.removeGroup(this.group);
-        });
+        this.addDisposables(
+            addDisposableListener(closeAnchor, 'click', (ev) => {
+                ev.preventDefault();
+                this.accessor.removeGroup(this.group);
+            })
+        );
     }
 
     layout(width: number, height: number) {

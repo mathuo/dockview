@@ -8,6 +8,7 @@ import {
     PanelHeaderPartConstructor,
     WatermarkConstructor,
     IGroupPanel,
+    WatermarkPart,
 } from '../groupview/panel/parts';
 import { Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
@@ -15,6 +16,7 @@ import { FrameworkFactory } from '../types';
 export interface GroupPanelFrameworkComponentFactory {
     content: FrameworkFactory<PanelContentPart>;
     tab: FrameworkFactory<PanelHeaderPart>;
+    watermark: FrameworkFactory<WatermarkPart>;
 }
 
 export interface TabContextMenuEvent {

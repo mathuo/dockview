@@ -3,9 +3,38 @@ import {
     PanelContentPartConstructor,
     PanelHeaderPart,
     PanelHeaderPartConstructor,
+    WatermarkConstructor,
+    WatermarkPart,
 } from '../groupview/panel/parts';
 import { FrameworkFactory } from '../types';
 import { DefaultTab } from './components/tab/defaultTab';
+
+export function createWatermarkComponent(
+    component: WatermarkConstructor,
+    frameworkComponent: any,
+    createFrameworkComponent: FrameworkFactory<WatermarkPart>
+) {
+    if (component && frameworkComponent) {
+        throw new Error(
+            `cannot register watermark as both a component and frameworkComponent`
+        );
+    }
+
+    if (frameworkComponent) {
+        if (!createFrameworkComponent) {
+            throw new Error(
+                'you must register a frameworkPanelWrapper to use framework components'
+            );
+        }
+        const wrappedComponent = createFrameworkComponent.createComponent(
+            'watermark-id',
+            'watermark-name',
+            frameworkComponent
+        );
+        return wrappedComponent;
+    }
+    return new component() as WatermarkPart;
+}
 
 export function createContentComponent(
     id: string,

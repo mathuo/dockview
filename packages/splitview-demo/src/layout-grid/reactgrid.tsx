@@ -287,7 +287,16 @@ export const TestGrid = (props: IGridviewPanelProps) => {
                 enableExternalDragEvents={true}
                 // serializedLayout={data}
                 onTabContextMenu={onTabContextMenu}
+                watermarkComponent={Watermark}
             />
+        </div>
+    );
+};
+
+const Watermark = (props) => {
+    return (
+        <div>
+            <div>custom watermark</div>
         </div>
     );
 };

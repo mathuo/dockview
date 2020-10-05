@@ -24,11 +24,16 @@ import {
     PanelContentPartConstructor,
     PanelHeaderPartConstructor,
     IGroupPanel,
+    WatermarkPart,
 } from '../groupview/panel/parts';
 import { debounce } from '../functions';
 import { sequentialNumberGenerator } from '../math';
 import { DefaultDeserializer, IPanelDeserializer } from './deserializer';
-import { createContentComponent, createTabComponent } from './componentFactory';
+import {
+    createContentComponent,
+    createTabComponent,
+    createWatermarkComponent,
+} from './componentFactory';
 import {
     AddGroupOptions,
     AddPanelOptions,
@@ -49,6 +54,7 @@ import {
     toTarget,
 } from '../gridview/baseComponentGridview';
 import { DockviewApi } from '../api/component.api';
+import { IFrameworkPart } from '../panel/types';
 
 const nextGroupId = sequentialNumberGenerator();
 
@@ -119,6 +125,7 @@ export interface IGroupAccessor {
     //
     getPanel: (id: string) => IGroupPanel;
     fireMouseEvent(event: LayoutMouseEvent): void;
+    createWatermarkComponent(): WatermarkPart;
 }
 
 export interface IComponentDockview
@@ -184,7 +191,10 @@ export class ComponentDockview
         if (!this.options.tabComponents) {
             this.options.tabComponents = {};
         }
-        if (!this.options.watermarkComponent) {
+        if (
+            !this.options.watermarkComponent &&
+            !this.options.watermarkFrameworkComponent
+        ) {
             this.options.watermarkComponent = Watermark;
         }
 
@@ -525,6 +535,14 @@ export class ComponentDockview
 
         this.registerPanel(panel);
         return panel;
+    }
+
+    createWatermarkComponent() {
+        return createWatermarkComponent(
+            this.options.watermarkComponent,
+            this.options.watermarkFrameworkComponent,
+            this.options.frameworkComponentFactory.watermark
+        );
     }
 
     private createContentComponent(

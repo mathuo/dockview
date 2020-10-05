@@ -15,6 +15,7 @@ import {
 } from './droptarget/dataTransfer';
 import { IGridPanelView } from '../gridview/baseComponentGridview';
 import { IViewSize } from '../gridview/gridview';
+import { createComponent } from '../splitview/core/options';
 
 export const enum GroupChangeKind {
     GROUP_ACTIVE = 'GROUP_ACTIVE',
@@ -519,9 +520,8 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     private updateContainer() {
         toggleClass(this.element, 'empty', this.isEmpty);
 
-        if (this.accessor.options.watermarkComponent && !this.watermark) {
-            const WatermarkComponent = this.accessor.options.watermarkComponent;
-            this.watermark = new WatermarkComponent();
+        if (!this.watermark) {
+            this.watermark = this.accessor.createWatermarkComponent();
             this.watermark.init({
                 accessor: this.accessor,
             });
