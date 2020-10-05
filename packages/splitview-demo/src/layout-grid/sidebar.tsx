@@ -25,24 +25,28 @@ export const Sidebar = (props: IGridviewPanelProps) => {
             component: 'controlCenter',
             params: {},
             tabComponentName: 'default1',
+            title: 'Control Center',
         });
         event.api.addFromComponent({
             id: '2',
             component: 'default',
             params: {},
             tabComponentName: 'default1',
+            title: 'Panel 1',
         });
         event.api.addFromComponent({
             id: '3',
             component: 'default',
             params: {},
             tabComponentName: 'default1',
+            title: 'Panel 2',
         });
         event.api.addFromComponent({
             id: '4',
             component: 'default',
             params: {},
             tabComponentName: 'default1',
+            title: 'Panel 3',
         });
 
         api.current = event.api;
@@ -64,7 +68,11 @@ export const Sidebar = (props: IGridviewPanelProps) => {
     });
 
     return (
-        <div style={{ height: '100%', backgroundColor: 'rgb(37,37,38)' }}>
+        <div
+            style={{
+                backgroundColor: 'rgb(37,37,38)',
+            }}
+        >
             <PaneViewComponent components={components} onReady={onReady} />
         </div>
     );

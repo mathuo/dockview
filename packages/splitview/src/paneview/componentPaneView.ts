@@ -16,6 +16,7 @@ export interface AddPaneviewCompponentOptions {
     minimumBodySize?: number;
     maximumBodySize?: number;
     isExpanded?: boolean;
+    title: string;
 }
 
 export interface IComponentPaneView extends IDisposable {
@@ -79,6 +80,7 @@ export class ComponentPaneView
             minimumBodySize: options.minimumBodySize,
             maximumBodySize: options.maximumBodySize,
             isExpanded: options.isExpanded,
+            title: options.title,
         });
 
         return {

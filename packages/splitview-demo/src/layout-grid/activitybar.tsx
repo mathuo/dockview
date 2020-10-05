@@ -39,7 +39,17 @@ export const Activitybar = (props: IGridviewPanelProps) => {
                 backgroundColor: 'rgb(51,51,51)',
             }}
         >
-            <div className="activity-bar-item">T</div>
+            <div className="activity-bar-item">
+                <a
+                    style={{
+                        WebkitMask: `url(https://fonts.gstatic.com/s/i/materialicons/search/v7/24px.svg) 50% 50% / 65% 65% no-repeat`,
+                        height: '100%',
+                        width: '100%',
+                        display: 'block',
+                        backgroundColor: 'gray',
+                    }}
+                />
+            </div>
         </div>
     );
 };

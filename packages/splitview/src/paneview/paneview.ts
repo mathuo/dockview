@@ -13,6 +13,7 @@ export interface PanePanelInitParameter extends PanelInitParameters {
     minimumBodySize?: number;
     maximumBodySize?: number;
     isExpanded?: boolean;
+    title: string;
 }
 
 export interface IPaneview extends IView {
