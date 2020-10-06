@@ -8,6 +8,7 @@ import {
     MovementOptions,
     PanelOptions,
 } from '../dockview';
+import { IGroupview } from '../groupview/groupview';
 import {
     AddPaneviewCompponentOptions,
     IComponentPaneView,
@@ -217,6 +218,10 @@ export class DockviewApi {
 
     closeAllGroups() {
         return this.component.closeAllGroups();
+    }
+
+    removeGroup(group: IGroupview) {
+        return this.component.removeGroup(group);
     }
 
     resizeToFit() {

@@ -28,6 +28,7 @@ export interface ReactPortalStore {
 
 export interface IWatermarkPanelProps {
     containerApi: DockviewApi;
+    close(): void;
 }
 
 export interface IDockviewComponentProps {

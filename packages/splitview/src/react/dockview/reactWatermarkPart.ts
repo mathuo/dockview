@@ -10,6 +10,7 @@ import { IGroupPanelProps, ReactPortalStore } from './dockview';
 export class ReactWatermarkPart implements WatermarkPart {
     private _element: HTMLElement;
     private part: ReactPart<IGroupPanelProps>;
+    private _groupRef: { value: IGroupview } = { value: null };
 
     get element() {
         return this._element;
@@ -17,7 +18,7 @@ export class ReactWatermarkPart implements WatermarkPart {
 
     constructor(
         public readonly id: string,
-        private readonly component: React.FunctionComponent<{}>,
+        private readonly component: React.FunctionComponent<IGroupPanelProps>,
         private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');
@@ -33,6 +34,8 @@ export class ReactWatermarkPart implements WatermarkPart {
                 ...parameters.params,
                 api: parameters.api,
                 containerApi: parameters.containerApi,
+                close: () =>
+                    parameters.containerApi.removeGroup(this._groupRef.value),
             }
         );
     }
@@ -49,6 +52,7 @@ export class ReactWatermarkPart implements WatermarkPart {
 
     public setVisible(isPanelVisible: boolean, group: IGroupview): void {
         // noop - retrieval from api
+        this._groupRef.value = group;
     }
 
     public dispose() {

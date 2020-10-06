@@ -292,6 +292,10 @@ const Watermark = (props: IWatermarkPanelProps) => {
         };
     }, []);
 
+    const onClick = () => {
+        props.close();
+    };
+
     return (
         <div
             style={{
@@ -312,6 +316,7 @@ const Watermark = (props: IWatermarkPanelProps) => {
                 <span style={{ flexGrow: 1 }} />
                 {groups > 1 && (
                     <span
+                        onClick={onClick}
                         style={{
                             display: 'flex',
                             justifyContent: 'center',
