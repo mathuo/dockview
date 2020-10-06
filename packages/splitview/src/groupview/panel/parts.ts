@@ -5,6 +5,7 @@ import { IGroupPanelApi } from '../../api/groupPanelApi';
 import { Constructor } from '../../types';
 import { PanelInitParameters, IPanel } from '../../panel/types';
 import { Event } from '../../events';
+import { DockviewApi } from '../../api/component.api';
 
 // group panel parts
 
@@ -17,7 +18,7 @@ export interface GroupPanelPartInitParameters
     extends PanelInitParameters,
         HeaderPartInitParameters {
     api: IGroupPanelApi;
-    accessor: IGroupAccessor;
+    containerApi: DockviewApi;
 }
 
 export interface PanelHeaderPart extends IPanel {
@@ -40,6 +41,7 @@ export interface IGroupPanelInitParameters
         HeaderPartInitParameters {
     headerPart: PanelHeaderPart;
     contentPart: PanelContentPart;
+    containerApi: DockviewApi;
 }
 
 export interface IGroupPanel extends IDisposable, IPanel {
@@ -60,7 +62,7 @@ export interface WatermarkPartInitParameters {
 }
 
 export interface WatermarkPart extends IDisposable {
-    init?: (params: WatermarkPartInitParameters) => void;
+    init?: (params: GroupPanelPartInitParameters) => void;
     setVisible?(visible: boolean, group: IGroupview): void;
     element: HTMLElement;
 }

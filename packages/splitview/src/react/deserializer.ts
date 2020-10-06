@@ -41,6 +41,7 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
 
         const panel = new DefaultPanel(panelId);
 
+        // TODO container api
         panel.init({
             headerPart,
             contentPart,
@@ -48,6 +49,7 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
             suppressClosable,
             params: props || {},
             state: state || {},
+            containerApi: null,
         });
 
         return panel;

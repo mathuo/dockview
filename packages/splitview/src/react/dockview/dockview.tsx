@@ -15,6 +15,7 @@ import { ReactWatermarkPart } from './reactWatermarkPart';
 
 export interface IGroupPanelProps {
     api: IGroupPanelApi;
+    containerApi: DockviewApi;
 }
 
 export interface DockviewReadyEvent {
@@ -25,6 +26,10 @@ export interface ReactPortalStore {
     addPortal: (portal: React.ReactPortal) => IDisposable;
 }
 
+export interface IWatermarkPanelProps {
+    containerApi: DockviewApi;
+}
+
 export interface IDockviewComponentProps {
     components?: {
         [componentName: string]: React.FunctionComponent<IGroupPanelProps>;
@@ -32,7 +37,7 @@ export interface IDockviewComponentProps {
     tabComponents?: {
         [componentName: string]: React.FunctionComponent<IGroupPanelProps>;
     };
-    watermarkComponent?: React.FunctionComponent;
+    watermarkComponent?: React.FunctionComponent<IWatermarkPanelProps>;
     onReady?: (event: DockviewReadyEvent) => void;
     serializedLayout?: {};
     deserializer?: {

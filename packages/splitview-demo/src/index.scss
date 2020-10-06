@@ -29,3 +29,19 @@ body {
     // -webkit-app-region: no-drag;
     // -webkit-user-select: none;
 }
+
+.close-action {
+    &:active {
+        -webkit-mask-size: 100% 100% !important;
+        mask-size: 100% 100% !important;
+    }
+
+    background-color: white;
+    height: 16px;
+    width: 16px;
+    display: block;
+    -webkit-mask: var(--tab-close-icon) 50% 50% / 90% 90% no-repeat;
+    mask: var(--tab-close-icon) 50% 50% / 90% 90% no-repeat;
+    margin-right: '0.5em';
+    cursor: pointer;
+}

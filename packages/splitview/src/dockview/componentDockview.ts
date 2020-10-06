@@ -54,7 +54,6 @@ import {
     toTarget,
 } from '../gridview/baseComponentGridview';
 import { DockviewApi } from '../api/component.api';
-import { IFrameworkPart } from '../panel/types';
 
 const nextGroupId = sequentialNumberGenerator();
 
@@ -534,6 +533,7 @@ export class ComponentDockview
             title: options.title || options.id,
             suppressClosable: options?.suppressClosable,
             params: options?.params || {},
+            containerApi: new DockviewApi(this),
         });
 
         this.registerPanel(panel);

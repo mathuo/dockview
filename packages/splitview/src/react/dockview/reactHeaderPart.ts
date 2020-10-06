@@ -28,7 +28,11 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
             parameters.api,
             this.reactPortalStore,
             this.component,
-            parameters.params
+            {
+                ...parameters.params,
+                api: parameters.api,
+                containerApi: parameters.containerApi,
+            }
         );
     }
 

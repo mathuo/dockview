@@ -8,6 +8,7 @@ import {
     DockviewReadyEvent,
     DockviewComponent,
     DockviewApi,
+    IWatermarkPanelProps,
 } from 'splitview';
 import { CustomTab } from './customTab';
 import { Editor } from './editorPanel';
@@ -274,6 +275,54 @@ export const TestGrid = (props: IGridviewPanelProps) => {
     );
 };
 
-const Watermark = (props) => {
-    return <div>custom watermark</div>;
+const Watermark = (props: IWatermarkPanelProps) => {
+    const [groups, setGroups] = React.useState<number>(props.containerApi.size);
+    React.useEffect(() => {
+        console.log('mount');
+        const disposable = new CompositeDisposable(
+            props.containerApi.onDidLayoutChange(() => {
+                console.log(`groups2 ${props.containerApi.size}`);
+                setGroups(props.containerApi.size);
+            })
+        );
+
+        return () => {
+            console.log('unmount');
+            disposable.dispose();
+        };
+    }, []);
+
+    return (
+        <div
+            style={{
+                display: 'flex',
+                width: '100%',
+                flexGrow: 1,
+                height: '100%',
+                flexDirection: 'column',
+            }}
+        >
+            <div
+                style={{
+                    height: '35px',
+                    display: 'flex',
+                    width: '100%',
+                }}
+            >
+                <span style={{ flexGrow: 1 }} />
+                {groups > 1 && (
+                    <span
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <a className="close-action"></a>
+                    </span>
+                )}
+            </div>
+            <div style={{ flexGrow: 1 }}></div>
+        </div>
+    );
 };

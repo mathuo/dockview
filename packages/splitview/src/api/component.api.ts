@@ -167,6 +167,14 @@ export class DockviewApi {
         return this.component.maximumWidth;
     }
 
+    get size() {
+        return this.component.size;
+    }
+
+    get totalPanels() {
+        return this.component.totalPanels;
+    }
+
     get onDidLayoutChange() {
         return this.component.onDidLayoutChange;
     }

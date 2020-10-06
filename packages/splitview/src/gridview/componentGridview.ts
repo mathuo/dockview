@@ -17,6 +17,7 @@ import {
 import { GridPanelView, GridviewInitParameters } from './gridPanelView';
 import { BaseComponentOptions, Parameters } from '../panel/types';
 import { GridPanelApi } from '../api/gridPanelApi';
+import { DockviewApi } from '../api/component.api';
 
 interface PanelReference {
     api: GridPanelApi;
