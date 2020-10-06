@@ -499,9 +499,9 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
     private doAddPanel(panel: IGroupPanel, index: number) {
         const existingPanel = this._panels.indexOf(panel);
-        const hasExistingPabel = existingPanel > -1;
+        const hasExistingPanel = existingPanel > -1;
 
-        if (hasExistingPabel) {
+        if (hasExistingPanel) {
             // TODO - need to ensure ordering hasn't changed and if it has need to re-order this.panels
             return;
         }

@@ -60,6 +60,10 @@ export const SplitviewComponent: React.FunctionComponent<ISplitviewComponentProp
         };
     }, []);
 
-    return <div ref={domRef}>{portals}</div>;
+    return (
+        <div style={{ height: '100%', width: '100%' }} ref={domRef}>
+            {portals}
+        </div>
+    );
 };
 SplitviewComponent.displayName = 'SplitviewComponent';

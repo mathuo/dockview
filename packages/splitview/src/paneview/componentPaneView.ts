@@ -1,15 +1,73 @@
-import { Emitter, Event } from '../events';
+import { PanePanelApi } from '../api/panePanelApi';
+import { addDisposableListener, Emitter, Event } from '../events';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
-import { PaneReact } from '../react/paneview/view';
+import { PanelUpdateEvent } from '../panel/types';
 import { createComponent } from '../splitview/core/options';
 import { Orientation } from '../splitview/core/splitview';
 import { PaneviewComponentOptions } from './options';
-import { PaneView } from './paneview';
+import {
+    IPaneBodyPart,
+    IPaneHeaderPart,
+    Pane,
+    PanePanelInitParameter,
+    PaneView,
+} from './paneview';
+
+class DefaultHeader extends CompositeDisposable implements IPaneHeaderPart {
+    private _element: HTMLElement;
+    private apiRef: { api: PanePanelApi } = { api: null };
+
+    get element() {
+        return this._element;
+    }
+
+    constructor() {
+        super();
+        this._element = document.createElement('div');
+
+        this.addDisposables(
+            addDisposableListener(this.element, 'click', () => {
+                this.apiRef.api?.setExpanded(!this.apiRef.api.isExpanded);
+            })
+        );
+    }
+
+    init(params: PanePanelInitParameter & { api: PanePanelApi }) {
+        this.apiRef.api = params.api;
+        this._element.textContent = params.title;
+    }
+
+    update(params: PanelUpdateEvent) {
+        //
+    }
+}
+
+export class PaneFramework extends Pane {
+    constructor(
+        private readonly options: {
+            id: string;
+            component: string;
+            headerComponent: string;
+            body: IPaneBodyPart;
+            header: IPaneHeaderPart;
+        }
+    ) {
+        super(options.id, options.component, options.headerComponent);
+    }
+
+    getComponent() {
+        return this.options.body;
+    }
+
+    getHeaderComponent() {
+        return this.options.header;
+    }
+}
 
 export interface AddPaneviewCompponentOptions {
     id: string;
     component: string;
-    tabComponentName: string;
+    headerComponent?: string;
     params: {
         [key: string]: any;
     };
@@ -66,13 +124,35 @@ export class ComponentPaneView
     }
 
     addFromComponent(options: AddPaneviewCompponentOptions): IDisposable {
-        const view = createComponent(
+        const body = createComponent(
             options.id,
             options.component,
             this.options.components,
             this.options.frameworkComponents,
-            this.options.frameworkWrapper.createComponent
+            this.options.frameworkWrapper.body.createComponent
         );
+
+        let header: IPaneHeaderPart;
+
+        if (options.headerComponent) {
+            header = createComponent(
+                options.id,
+                options.headerComponent,
+                this.options.headerComponents,
+                this.options.headerframeworkComponents,
+                this.options.frameworkWrapper.header.createComponent
+            );
+        } else {
+            header = new DefaultHeader();
+        }
+
+        const view = new PaneFramework({
+            id: options.id,
+            component: options.component,
+            headerComponent: options.headerComponent,
+            header,
+            body,
+        });
 
         this.paneview.addPane(view);
         view.init({
@@ -110,11 +190,76 @@ export class ComponentPaneView
     }
 
     toJSON(): object {
-        // TODO paneview#toJSON
-        return {};
+        const views = this.paneview.getPanes().map((view: Pane, i) => {
+            const size = this.paneview.getViewSize(i);
+            return {
+                size,
+                data: view.toJSON ? view.toJSON() : {},
+                minimumSize: view.minimumBodySize,
+                maximumSize: view.maximumBodySize,
+                expanded: view.isExpanded(),
+            };
+        });
+
+        return {
+            views,
+            size: this.paneview.size,
+            orientation: this.paneview.orientation,
+        };
     }
 
     fromJSON(data: any): void {
-        // TODO paneview#fromJSON
+        const { views, orientation, size } = data;
+
+        this.paneview.dispose();
+        this.paneview = new PaneView(this.element, {
+            orientation,
+            descriptor: {
+                size,
+                views: views.map((view) => {
+                    const data = view.data;
+
+                    const body = createComponent(
+                        data.id,
+                        data.component,
+                        this.options.components,
+                        this.options.frameworkComponents,
+                        this.options.frameworkWrapper.body.createComponent
+                    );
+
+                    let header: IPaneHeaderPart;
+
+                    if (data.headerComponent) {
+                        header = createComponent(
+                            data.id,
+                            data.headerComponent,
+                            this.options.headerComponents,
+                            this.options.headerframeworkComponents,
+                            this.options.frameworkWrapper.header.createComponent
+                        );
+                    } else {
+                        header = new DefaultHeader();
+                    }
+
+                    const panel = new PaneFramework({
+                        id: data.id,
+                        component: data.component,
+                        headerComponent: data.tabComponentName,
+                        header,
+                        body,
+                    });
+
+                    panel.init({
+                        params: data.props,
+                        minimumBodySize: view.minimumSize,
+                        maximumBodySize: view.maximumSize,
+                        title: data.title,
+                        isExpanded: !!view.expanded,
+                    });
+
+                    return { size: view.size, view: panel };
+                }),
+            },
+        });
     }
 }

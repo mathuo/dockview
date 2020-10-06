@@ -33,6 +33,7 @@ const components = {
             <div style={{ height: '100%', width: '100%' }}>
                 {`component [isFocused: ${focused}]`}
                 <button onClick={onClick}>resize</button>
+                <span>{(props as any).text}</span>
             </div>
         );
     },
@@ -59,23 +60,26 @@ export const SplitPanel = (props: IGroupPanelProps) => {
     }, []);
 
     const onReady = (event: SplitviewReadyEvent) => {
+        api.current = event.api;
+
         const existingLayout = props.api.getStateKey(SPLIT_PANEL_STATE_KEY);
 
-        if (existingLayout) {
-            event.api.fromJSON(existingLayout);
-        } else {
-            event.api.addFromComponent({
-                id: '1',
-                component: 'default1',
-                snap: true,
-            });
-            event.api.addFromComponent({ id: '2', component: 'default1' });
-        }
-        api.current = event.api;
+        event.api.fromJSON(require('./splitpanel.layout.json'));
+        return;
+        event.api.addFromComponent({
+            id: '1',
+            component: 'default1',
+            snap: true,
+            params: {
+                text: 'hiya',
+            },
+        });
+        event.api.addFromComponent({ id: '2', component: 'default1' });
     };
 
     const onSave = () => {
         props.api.setState(SPLIT_PANEL_STATE_KEY, api.current.toJSON());
+        console.log(JSON.stringify(api.current.toJSON(), null, 4));
     };
 
     return (

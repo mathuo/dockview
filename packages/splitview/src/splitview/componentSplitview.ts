@@ -165,7 +165,7 @@ export class ComponentSplitview
                     );
 
                     panel.init({
-                        params: view.props,
+                        params: data.props,
                         minimumSize: view.minimumSize,
                         maximumSize: view.maximumSize,
                         snap: view.snap,

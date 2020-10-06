@@ -180,7 +180,6 @@ export const TestGrid = (props: IGridviewPanelProps) => {
     const onReady = (event: DockviewReadyEvent) => {
         const api = event.api;
         _api.current = event.api;
-        // setApi(event.api);
         registry.register('dockview', api);
 
         const panelReference = api.addPanelFromComponent({
@@ -207,11 +206,6 @@ export const TestGrid = (props: IGridviewPanelProps) => {
             suppressClosable: true,
         });
 
-        // setInterval(() => {
-        //   panelReference.update({ params: { text: `Tick ${Date.now()}` } });
-        //   // panelReference.remove();
-        // }, 1000);
-
         api.addDndHandle('text/plain', (ev) => {
             const { event } = ev;
 
@@ -235,15 +229,6 @@ export const TestGrid = (props: IGridviewPanelProps) => {
     };
 
     React.useEffect(() => {
-        // const callback = (ev: UIEvent) => {
-        //   const height = window.innerHeight - 40;
-        //   const width = window.innerWidth;
-
-        //   _api.current?.layout(width, height);
-        // };
-        // window.addEventListener("resize", callback);
-        // callback(undefined);
-
         props.api.setConstraints({
             minimumWidth: () => _api.current.minimumWidth,
             minimumHeight: () => _api.current.minimumHeight,
@@ -261,7 +246,6 @@ export const TestGrid = (props: IGridviewPanelProps) => {
 
         return () => {
             disposable.dispose();
-            // window.removeEventListener("resize", callback);
         };
     }, []);
 

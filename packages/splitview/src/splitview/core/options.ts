@@ -68,5 +68,6 @@ export function createComponent<T>(
         );
         return wrappedComponent;
     }
+
     return new Component() as T;
 }

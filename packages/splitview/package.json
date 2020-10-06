@@ -11,15 +11,27 @@
         "build-es6": "bash ../../node_modules/.bin/tsc --project tsconfig.es6.json",
         "build-es5": "bash ../../node_modules/.bin/tsc --project tsconfig.json"
     },
+    "keywords": [
+        "splitview",
+        "split-view",
+        "gridview",
+        "grid-view",
+        "layout",
+        "react",
+        "react-component",
+        "grid"
+      ],
     "author": "",
     "license": "ISC",
-    "dependencies": {
-        "@types/react": "^16.9.43",
+    "devDependencies": {
+        "@types/react": "^16.9.51",
         "@types/react-dom": "^16.9.8",
         "react": "^16.13.1",
-        "react-dom": "^16.13.1"
-    },
-    "devDependencies": {
+        "react-dom": "^16.13.1",
         "typedoc": "^0.18.0"
+    },
+    "peerDependencies": {
+        "react": "^16.8.0",
+        "react-dom": "^16.8.0"
     }
 }

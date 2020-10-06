@@ -1,0 +1,112 @@
+{
+    "grid": {
+        "root": {
+            "type": "branch",
+            "data": [
+                {
+                    "type": "leaf",
+                    "data": {
+                        "views": [
+                            "panel_1"
+                        ],
+                        "activeView": "panel_1"
+                    },
+                    "size": 666
+                },
+                {
+                    "type": "branch",
+                    "data": [
+                        {
+                            "type": "leaf",
+                            "data": {
+                                "views": [
+                                    "item2"
+                                ],
+                                "activeView": "item2"
+                            },
+                            "size": 371
+                        },
+                        {
+                            "type": "leaf",
+                            "data": {
+                                "views": [
+                                    "panel_2"
+                                ],
+                                "activeView": "panel_2"
+                            },
+                            "size": 371
+                        }
+                    ],
+                    "size": 371
+                },
+                {
+                    "type": "leaf",
+                    "data": {
+                        "views": [
+                            "panel_0"
+                        ],
+                        "activeView": "panel_0"
+                    },
+                    "size": 666
+                }
+            ],
+            "size": 666
+        },
+        "height": 666,
+        "width": 1114,
+        "orientation": "HORIZONTAL"
+    },
+    "panels": {
+        "panel_0": {
+            "id": "panel_0",
+            "content": {
+                "id": "test_component"
+            },
+            "tab": {
+                "id": "__DEFAULT_TAB__"
+            },
+            "props": {
+                "text": "how low?"
+            },
+            "title": "Item 1",
+            "state": {}
+        },
+        "item2": {
+            "id": "item2",
+            "content": {
+                "id": "test_component"
+            },
+            "tab": {
+                "id": "__DEFAULT_TAB__"
+            },
+            "props": {},
+            "title": "Item 2",
+            "state": {}
+        },
+        "panel_1": {
+            "id": "panel_1",
+            "content": {
+                "id": "split_panel"
+            },
+            "tab": {
+                "id": "__DEFAULT_TAB__"
+            },
+            "props": {},
+            "title": "Item 3 with a long title",
+            "state": {}
+        },
+        "panel_2": {
+            "id": "panel_2",
+            "content": {
+                "id": "test_component"
+            },
+            "tab": {
+                "id": "__DEFAULT_TAB__"
+            },
+            "props": {},
+            "title": "Item 3",
+            "suppressClosable": true,
+            "state": {}
+        }
+    }
+}

@@ -91,7 +91,7 @@ export const ControlCenter = () => {
     };
 
     const saveApplicationLayout = () => {
-        const api = registry.get<GridviewApi>('gridview');
+        const api = registry.get<GridviewApi>('dockview');
         console.log(JSON.stringify(api.toJSON(), null, 4));
     };
 

@@ -1,96 +1,93 @@
 import * as React from 'react';
-import { CompositeDisposable } from '../../lifecycle';
-import { Pane } from '../../paneview/paneview';
+import { PanelApi } from '../../api/panelApi';
+import { PanelUpdateEvent } from '../../panel/types';
+import { IPaneBodyPart, PanePanelInitParameter } from '../../paneview/paneview';
 import { ReactPortalStore } from '../dockview/dockview';
 import { ReactPart } from '../react';
 import { IPaneviewPanelProps } from './paneview';
 
-const DefaultHeader = (props: IPaneviewPanelProps) => {
-    const [url, setUrl] = React.useState<string>(
-        props.api.isExpanded
-            ? 'https://fonts.gstatic.com/s/i/materialicons/expand_more/v6/24px.svg'
-            : 'https://fonts.gstatic.com/s/i/materialicons/chevron_right/v7/24px.svg'
-    );
-    const onClick = () => {
-        props.api.setExpanded(!props.api.isExpanded);
-    };
+export class PanelBody implements IPaneBodyPart {
+    private _element: HTMLElement;
+    private part: ReactPart<IPaneviewPanelProps>;
 
-    React.useEffect(() => {
-        const disposable = new CompositeDisposable(
-            props.api.onDidExpansionChange((event) => {
-                setUrl(
-                    event.isExpanded
-                        ? 'https://fonts.gstatic.com/s/i/materialicons/expand_more/v6/24px.svg'
-                        : 'https://fonts.gstatic.com/s/i/materialicons/chevron_right/v7/24px.svg'
-                );
-            })
-        );
+    get element() {
+        return this._element;
+    }
 
-        return () => {
-            disposable.dispose();
-        };
-    });
-
-    return (
-        <div
-            style={{
-                display: 'flex',
-                fontSize: '11px',
-                textTransform: 'uppercase',
-                cursor: 'pointer',
-            }}
-            onClick={onClick}
-        >
-            <div style={{ width: '20px' }}>
-                <a
-                    style={{
-                        WebkitMask: `url(${url}) 50% 50% / 100% 100% no-repeat`,
-                        height: '100%',
-                        display: 'block',
-                        backgroundColor: 'lightgray',
-                    }}
-                />
-            </div>
-            <span>{props.title}</span>
-        </div>
-    );
-};
-
-export class PaneReact extends Pane {
     constructor(
-        id: string,
-        component: string,
-        private readonly reactComponent: React.FunctionComponent<
+        public readonly id: string,
+        private readonly component: React.FunctionComponent<
             IPaneviewPanelProps
         >,
         private readonly reactPortalStore: ReactPortalStore
     ) {
-        super(id, component);
+        this._element = document.createElement('div');
+    }
 
-        this.addDisposables(
-            this.onDidChangeExpansionState((isExpanded) => {
-                this.api._onDidExpansionChange.fire({ isExpanded });
-            })
+    public init(parameters: PanePanelInitParameter & { api: PanelApi }): void {
+        this.part = new ReactPart(
+            this.element,
+            parameters.api,
+            this.reactPortalStore,
+            this.component,
+            { ...parameters.params, title: parameters.title }
         );
     }
 
-    getComponent() {
-        return new ReactPart(
-            this.body,
-            this.api,
+    public toJSON() {
+        return {
+            id: this.id,
+        };
+    }
+
+    public update(params: PanelUpdateEvent) {
+        this.part.update(params.params);
+    }
+
+    public dispose() {
+        this.part?.dispose();
+    }
+}
+
+export class PanelHeader implements IPaneBodyPart {
+    private _element: HTMLElement;
+    private part: ReactPart<IPaneviewPanelProps>;
+
+    get element() {
+        return this._element;
+    }
+
+    constructor(
+        public readonly id: string,
+        private readonly component: React.FunctionComponent<
+            IPaneviewPanelProps
+        >,
+        private readonly reactPortalStore: ReactPortalStore
+    ) {
+        this._element = document.createElement('div');
+    }
+
+    public init(parameters: PanePanelInitParameter & { api: PanelApi }): void {
+        this.part = new ReactPart(
+            this.element,
+            parameters.api,
             this.reactPortalStore,
-            this.reactComponent,
-            { ...this.params.params, title: this.params.title }
+            this.component,
+            { ...parameters.params, title: parameters.title }
         );
     }
 
-    getHeaderComponent() {
-        return new ReactPart(
-            this.header,
-            this.api,
-            this.reactPortalStore,
-            DefaultHeader,
-            { ...this.params.params, title: this.params.title }
-        );
+    public toJSON() {
+        return {
+            id: this.id,
+        };
+    }
+
+    public update(params: PanelUpdateEvent) {
+        this.part.update(params.params);
+    }
+
+    public dispose() {
+        this.part?.dispose();
     }
 }

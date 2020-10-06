@@ -16,10 +16,15 @@ export enum SashState {
     ENABLED,
 }
 
+export interface ISplitviewStyles {
+    separatorBorder: 'transparent';
+}
+
 export interface SplitViewOptions {
     readonly orientation: Orientation;
     readonly descriptor?: ISplitViewDescriptor;
     readonly proportionalLayout?: boolean;
+    readonly styles?: ISplitviewStyles;
 }
 export enum LayoutPriority {
     Low = 'low',
@@ -40,13 +45,6 @@ export interface IView extends IBaseView {
     layout(size: number, orthogonalSize: number): void;
     setVisible(visible: boolean): void;
 }
-
-// export interface IViewItem {
-//     view: IView;
-//     size: number;
-//     container: HTMLElement;
-//     dispose: () => void;
-// }
 
 interface ISashItem {
     container: HTMLElement;
@@ -293,7 +291,6 @@ export class SplitView {
             viewSize = view.minimumSize;
         }
 
-        // TODO hard to read b/c of hoisted code
         const disposable = view.onDidChange((size) =>
             this.onDidChange(viewItem, size)
         );

@@ -11,7 +11,7 @@ import {
 import { Activitybar } from './activitybar';
 import { Footer } from './footer';
 import { Panel } from './panel';
-import { TestGrid } from './reactgrid';
+import { TestGrid } from './layoutGrid';
 import { useLayoutRegistry } from './registry';
 import { Sidebar } from './sidebar';
 

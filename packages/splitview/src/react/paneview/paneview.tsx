@@ -4,9 +4,9 @@ import {
     ComponentPaneView,
     IComponentPaneView,
 } from '../../paneview/componentPaneView';
-import { PaneReact } from './view';
 import { usePortalsLifecycle } from '../react';
 import { PaneviewApi } from '../../api/component.api';
+import { PanelBody, PanelHeader } from './view';
 
 export interface PaneviewReadyEvent {
     api: PaneviewApi;
@@ -22,6 +22,9 @@ export interface IPaneviewComponentProps {
     components: {
         [index: string]: React.FunctionComponent<IPaneviewPanelProps>;
     };
+    headerComponents: {
+        [index: string]: React.FunctionComponent<IPaneviewPanelProps>;
+    };
 }
 
 export const PaneViewComponent: React.FunctionComponent<IPaneviewComponentProps> = (
@@ -35,11 +38,26 @@ export const PaneViewComponent: React.FunctionComponent<IPaneviewComponentProps>
         const paneview = new ComponentPaneView(domRef.current, {
             frameworkComponents: props.components,
             components: {},
+            headerComponents: {},
+            headerframeworkComponents: props.headerComponents,
             frameworkWrapper: {
-                createComponent: (id: string, componentId, component: any) => {
-                    return new PaneReact(id, componentId, component, {
-                        addPortal,
-                    });
+                header: {
+                    createComponent: (
+                        id: string,
+                        componentId,
+                        component: any
+                    ) => {
+                        return new PanelHeader(id, component, { addPortal });
+                    },
+                },
+                body: {
+                    createComponent: (
+                        id: string,
+                        componentId,
+                        component: any
+                    ) => {
+                        return new PanelBody(id, component, { addPortal });
+                    },
                 },
             },
         });

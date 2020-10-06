@@ -1,13 +1,26 @@
-import { SplitView, IView, Orientation } from '../splitview/core/splitview';
+import {
+    SplitView,
+    IView,
+    Orientation,
+    ISplitViewDescriptor,
+} from '../splitview/core/splitview';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { Emitter, Event } from '../events';
 import { addClasses, removeClasses } from '../dom';
-import {
-    IFrameworkPart,
-    PanelInitParameters,
-    PanelUpdateEvent,
-} from '../panel/types';
+import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
 import { PanePanelApi } from '../api/panePanelApi';
+
+export interface IPaneBodyPart extends IDisposable {
+    readonly element: HTMLElement;
+    update(params: PanelUpdateEvent);
+    init(parameters: PanePanelInitParameter & { api: PanePanelApi }): void;
+}
+
+export interface IPaneHeaderPart extends IDisposable {
+    readonly element: HTMLElement;
+    update(params: PanelUpdateEvent);
+    init(parameters: PanePanelInitParameter & { api: PanePanelApi }): void;
+}
 
 export interface PanePanelInitParameter extends PanelInitParameters {
     minimumBodySize?: number;
@@ -20,11 +33,9 @@ export interface IPaneview extends IView {
     onDidChangeExpansionState: Event<boolean>;
 }
 
-const MINIMUM_BODY_SIZE = 120;
-
 export abstract class Pane extends CompositeDisposable implements IPaneview {
     private _element: HTMLElement;
-    private _minimumBodySize: number = MINIMUM_BODY_SIZE;
+    private _minimumBodySize: number = 0;
     private _maximumBodySize: number = Number.POSITIVE_INFINITY;
 
     protected api: PanePanelApi;
@@ -45,8 +56,8 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
     protected header: HTMLElement;
     protected body: HTMLElement;
 
-    private part: IFrameworkPart;
-    private headerPart: IFrameworkPart;
+    private part: IPaneHeaderPart;
+    private headerPart: IPaneBodyPart;
 
     get onDidChange() {
         return this._onDidChange.event;
@@ -85,8 +96,7 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
     }
 
     set minimumBodySize(value: number) {
-        this._minimumBodySize =
-            typeof value === 'number' ? value : MINIMUM_BODY_SIZE;
+        this._minimumBodySize = typeof value === 'number' ? value : 0;
     }
 
     set maximumBodySize(value: number) {
@@ -100,7 +110,8 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
 
     constructor(
         public readonly id: string,
-        private readonly component: string
+        private readonly component: string,
+        private readonly headerComponent: string
     ) {
         super();
 
@@ -136,6 +147,12 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
 
         this.part = this.getComponent();
         this.headerPart = this.getHeaderComponent();
+
+        this.part.init({ ...parameters, api: this.api });
+        this.headerPart.init({ ...parameters, api: this.api });
+
+        this.body.append(this.part.element);
+        this.header.append(this.headerPart.element);
     }
 
     update(params: PanelUpdateEvent) {
@@ -148,7 +165,9 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
         return {
             id: this.id,
             component: this.component,
+            headerComponent: this.headerComponent,
             props: this.params.params,
+            title: this.params.title,
             state: this.api.getState(),
         };
     }
@@ -208,8 +227,8 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
         this.headerPart?.dispose();
     }
 
-    protected abstract getComponent(): IFrameworkPart;
-    protected abstract getHeaderComponent(): IFrameworkPart;
+    protected abstract getComponent(): IPaneBodyPart;
+    protected abstract getHeaderComponent(): IPaneHeaderPart;
 }
 
 interface PaneItem {
@@ -223,8 +242,6 @@ export class PaneView extends CompositeDisposable implements IDisposable {
     private paneItems: PaneItem[] = [];
     private _orientation: Orientation;
     private animationTimer: NodeJS.Timeout;
-    private orthogonalSize: number;
-    private size: number;
 
     private readonly _onDidChange = new Emitter<void>();
     readonly onDidChange: Event<void> = this._onDidChange.event;
@@ -241,7 +258,18 @@ export class PaneView extends CompositeDisposable implements IDisposable {
         return this.splitview.orientation;
     }
 
-    constructor(container: HTMLElement, options: { orientation: Orientation }) {
+    get size() {
+        return this.splitview.size;
+    }
+
+    get orthogonalSize() {
+        return this.splitview.orthogonalSize;
+    }
+
+    constructor(
+        container: HTMLElement,
+        options: { orientation: Orientation; descriptor?: ISplitViewDescriptor }
+    ) {
         super();
 
         this._orientation = options.orientation ?? Orientation.VERTICAL;
@@ -254,6 +282,27 @@ export class PaneView extends CompositeDisposable implements IDisposable {
         this.splitview = new SplitView(this.element, {
             orientation: this._orientation,
             proportionalLayout: false,
+            descriptor: options.descriptor,
+        });
+
+        // if we've added views from the descriptor we need to
+        // add the panes to our Pane array and setup animation
+        this.getPanes().forEach((pane, index) => {
+            const disposable = pane.onDidChangeExpansionState(() => {
+                this.setupAnimation();
+            });
+
+            const paneItem: PaneItem = {
+                pane,
+                disposable: {
+                    dispose: () => {
+                        disposable.dispose();
+                    },
+                },
+            };
+
+            this.paneItems.splice(index, 0, paneItem);
+            pane.orthogonalSize = this.splitview.orthogonalSize;
         });
 
         this.addDisposables(
@@ -263,7 +312,12 @@ export class PaneView extends CompositeDisposable implements IDisposable {
         );
     }
 
-    public addPane(pane: Pane, size?: number, index = this.splitview.length) {
+    public addPane(
+        pane: Pane,
+        size?: number,
+        index = this.splitview.length,
+        skipLayout = false
+    ) {
         const disposable = pane.onDidChangeExpansionState(() => {
             this.setupAnimation();
         });
@@ -278,8 +332,12 @@ export class PaneView extends CompositeDisposable implements IDisposable {
         };
 
         this.paneItems.splice(index, 0, paneItem);
-        pane.orthogonalSize = this.orthogonalSize;
-        this.splitview.addView(pane, size, index);
+        pane.orthogonalSize = this.splitview.orthogonalSize;
+        this.splitview.addView(pane, size, index, skipLayout);
+    }
+
+    getViewSize(index: number) {
+        return this.splitview.getViewSize(index);
     }
 
     public getPanes() {
@@ -299,14 +357,11 @@ export class PaneView extends CompositeDisposable implements IDisposable {
     }
 
     public layout(size: number, orthogonalSize: number): void {
-        this.orthogonalSize = orthogonalSize;
-        this.size = size;
-
         for (const paneItem of this.paneItems) {
-            paneItem.pane.orthogonalSize = this.orthogonalSize;
+            paneItem.pane.orthogonalSize = orthogonalSize;
         }
 
-        this.splitview.layout(this.size, this.orthogonalSize);
+        this.splitview.layout(size, orthogonalSize);
     }
 
     private setupAnimation() {
@@ -326,6 +381,8 @@ export class PaneView extends CompositeDisposable implements IDisposable {
     public dispose() {
         super.dispose();
 
+        this.splitview.dispose();
+
         if (this.animationTimer) {
             clearTimeout(this.animationTimer);
             this.animationTimer = undefined;
@@ -334,5 +391,6 @@ export class PaneView extends CompositeDisposable implements IDisposable {
         this.paneItems.forEach((paneItem) => {
             paneItem.disposable.dispose();
         });
+        this.paneItems = [];
     }
 }
