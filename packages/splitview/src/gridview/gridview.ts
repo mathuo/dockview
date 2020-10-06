@@ -421,7 +421,7 @@ export class Gridview {
         cachedVisibleSize?: number
     ): GridNode<IGridView> {
         const box =
-            orientation === Orientation.VERTICAL
+            orientation === Orientation.HORIZONTAL
                 ? { height: node.size, width: node.orthogonalSize }
                 : { height: node.orthogonalSize, width: node.size };
 

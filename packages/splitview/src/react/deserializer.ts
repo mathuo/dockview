@@ -16,24 +16,24 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
 
     public fromJSON(panelData: { [index: string]: any }): IGroupPanel {
         const panelId = panelData.id;
-        const content = panelData.content;
-        const tab = panelData.tab;
+        const contentId = panelData.contentId;
+        const tabId = panelData.tabId;
         const props = panelData.props;
         const title = panelData.title;
         const state = panelData.state;
         const suppressClosable = panelData.suppressClosable;
 
         const contentPart = createContentComponent(
-            content.id,
-            content.id,
+            contentId,
+            contentId,
             this.layout.options.components,
             this.layout.options.frameworkComponents,
             this.layout.options.frameworkComponentFactory.content
         ) as PanelContentPart;
 
         const headerPart = createTabComponent(
-            tab.id,
-            tab.id,
+            tabId,
+            tabId,
             this.layout.options.tabComponents,
             this.layout.options.frameworkComponentFactory,
             this.layout.options.frameworkComponentFactory.tab

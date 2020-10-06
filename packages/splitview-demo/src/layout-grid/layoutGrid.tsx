@@ -182,6 +182,9 @@ export const TestGrid = (props: IGridviewPanelProps) => {
         _api.current = event.api;
         registry.register('dockview', api);
 
+        event.api.deserialize(require('./layoutGrid.layout.json'));
+        return;
+
         const panelReference = api.addPanelFromComponent({
             componentName: 'test_component',
             id: nextGuid(),
@@ -257,22 +260,17 @@ export const TestGrid = (props: IGridviewPanelProps) => {
     );
 
     return (
-        <div
-            // className="visual-studio-theme"
-            style={{ width: '100%', overflow: 'hidden' }}
-        >
-            <DockviewComponent
-                onReady={onReady}
-                components={components}
-                tabComponents={tabComponents}
-                debug={false}
-                // tabHeight={}
-                enableExternalDragEvents={true}
-                // serializedLayout={data}
-                onTabContextMenu={onTabContextMenu}
-                watermarkComponent={Watermark}
-            />
-        </div>
+        <DockviewComponent
+            onReady={onReady}
+            components={components}
+            tabComponents={tabComponents}
+            debug={false}
+            // tabHeight={}
+            enableExternalDragEvents={true}
+            // serializedLayout={data}
+            onTabContextMenu={onTabContextMenu}
+            watermarkComponent={Watermark}
+        />
     );
 };
 

@@ -216,10 +216,10 @@ export class BranchNode extends CompositeDisposable implements IView {
     }
 
     public layout(size: number, orthogonalSize: number) {
-        this._size = orthogonalSize;
-        this._orthogonalSize = size;
+        this._size = size;
+        this._orthogonalSize = orthogonalSize;
 
-        this.splitview.layout(this.size, this.orthogonalSize);
+        this.splitview.layout(this.orthogonalSize, this.size);
     }
 
     public addChild(

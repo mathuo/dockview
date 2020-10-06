@@ -63,8 +63,8 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
     public toJSON(): object {
         return {
             id: this.id,
-            content: this.contentPart.toJSON(),
-            tab: this.headerPart.toJSON(),
+            contentId: this.contentPart.id,
+            tabId: this.headerPart.id,
             props: this.params.params,
             title: this.params.title,
             suppressClosable: this.params.suppressClosable,
