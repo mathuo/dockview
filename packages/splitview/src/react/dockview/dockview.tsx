@@ -114,7 +114,7 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
             // orientation: props.orientation,
         });
 
-        domRef.current.appendChild(dockview.element);
+        domRef.current?.appendChild(dockview.element);
         dockview.deserializer = new ReactPanelDeserialzier(dockview);
 
         if (props.serializedLayout) {
@@ -135,6 +135,12 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
     }, []);
 
     React.useEffect(() => {
+        if (!props.onTabContextMenu) {
+            return () => {
+                //noop
+            };
+        }
+
         const disposable = dockviewRef.current.onTabContextMenu((event) => {
             props.onTabContextMenu(event);
         });

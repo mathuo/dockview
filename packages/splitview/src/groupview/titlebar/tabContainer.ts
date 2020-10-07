@@ -39,8 +39,8 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
 
     private tabs: IValueDisposable<ITab>[] = [];
     private selectedIndex: number = -1;
-    private active: boolean;
-    private activePanel: IGroupPanel;
+    private active = false;
+    private activePanel: IGroupPanel | undefined;
 
     private _visible: boolean = true;
     private _height: number;
@@ -86,7 +86,7 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
         return this.tabs[index]?.value;
     }
 
-    public indexOf(tabOrId: ITab) {
+    public indexOf(tabOrId: ITab | string): number {
         const id = typeof tabOrId === 'string' ? tabOrId : tabOrId.id;
         return this.tabs.findIndex((tab) => tab.value.id === id);
     }

@@ -1,14 +1,17 @@
-import { GridPanelView } from '../../gridview/gridPanelView';
+import {
+    GridPanelView,
+    GridviewInitParameters,
+} from '../../gridview/gridPanelView';
 import { ReactPortalStore } from '../dockview/dockview';
 import { ReactPart } from '../react';
-import { IGridviewComponentProps } from './gridview';
+import { IGridviewPanelProps } from './gridview';
 
 export class ReactGridPanelView extends GridPanelView {
     constructor(
         id: string,
         component: string,
         private readonly reactComponent: React.FunctionComponent<
-            IGridviewComponentProps
+            IGridviewPanelProps
         >,
         private readonly reactPortalStore: ReactPortalStore
     ) {
@@ -18,10 +21,14 @@ export class ReactGridPanelView extends GridPanelView {
     getComponent() {
         return new ReactPart(
             this.element,
-            this.api,
             this.reactPortalStore,
             this.reactComponent,
-            this.params.params
+            {
+                ...this.params.params,
+                api: this.api,
+                containerApi: (this.params as GridviewInitParameters)
+                    .containerApi,
+            }
         );
     }
 }

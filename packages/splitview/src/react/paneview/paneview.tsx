@@ -14,6 +14,7 @@ export interface PaneviewReadyEvent {
 
 export interface IPaneviewPanelProps {
     api: IPanePanelApi;
+    containerApi: PaneviewApi;
     title: string;
 }
 

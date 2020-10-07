@@ -1,3 +1,4 @@
+import { PanelViewInitParameters } from '../../splitview/core/options';
 import { PanelView } from '../../splitview/panelView';
 import { ReactPortalStore } from '../dockview/dockview';
 import { ReactPart } from '../react';
@@ -18,10 +19,14 @@ export class ReactPanelView extends PanelView {
     getComponent() {
         return new ReactPart(
             this.element,
-            this.api,
             this.reactPortalStore,
             this.reactComponent,
-            this.params.params
+            {
+                ...this.params.params,
+                api: this.api,
+                containerApi: (this.params as PanelViewInitParameters)
+                    .containerApi,
+            }
         );
     }
 }

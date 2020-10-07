@@ -1,4 +1,5 @@
 import {
+    GroupPanelPartInitParameters,
     PanelContentPart,
     WatermarkPart,
 } from '../../../groupview/panel/parts';
@@ -56,8 +57,8 @@ export class Watermark extends CompositeDisposable implements WatermarkPart {
         // noop
     }
 
-    public init(params) {
-        this.accessor = params.accessor;
+    public init(params: GroupPanelPartInitParameters) {
+        // this.accessor = params.accessor;
 
         this.addDisposables(
             this.accessor.onDidLayoutChange((event) => {

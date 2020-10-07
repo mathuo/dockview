@@ -61,9 +61,9 @@ export interface IBaseViewApi {
  */
 export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
     private _state: State = {};
-    private _isFocused: boolean;
-    private _isActive: boolean;
-    private _isVisible: boolean;
+    private _isFocused = false;
+    private _isActive = false;
+    private _isVisible = false;
     private _width = 0;
     private _height = 0;
 

@@ -17,7 +17,7 @@ import {
 import { GridPanelView, GridviewInitParameters } from './gridPanelView';
 import { BaseComponentOptions, Parameters } from '../panel/types';
 import { GridPanelApi } from '../api/gridPanelApi';
-import { DockviewApi } from '../api/component.api';
+import { DockviewApi, GridviewApi } from '../api/component.api';
 
 interface PanelReference {
     api: GridPanelApi;
@@ -133,6 +133,7 @@ export class ComponentGridview
                     maximumHeight: data.maximumHeight,
                     priority: data.priority,
                     snap: data.snap,
+                    containerApi: new GridviewApi(this),
                 });
 
                 this.registerPanel(view);
@@ -182,6 +183,7 @@ export class ComponentGridview
             maximumHeight: options.maximumHeight,
             priority: options.priority,
             snap: options.snap,
+            containerApi: new GridviewApi(this),
         });
 
         this.registerPanel(view);
@@ -223,9 +225,11 @@ export class ComponentGridview
         groupId: string,
         target: Position
     ) {
-        const sourceGroup = groupId
-            ? this.groups.get(groupId).value
-            : undefined;
+        const sourceGroup = this.getGroup(groupId);
+
+        if (!sourceGroup) {
+            throw new Error('invalid operation');
+        }
 
         const referenceLocation = getGridLocation(referenceGroup.element);
         const targetLocation = getRelativeLocation(

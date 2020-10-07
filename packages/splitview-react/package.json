@@ -10,7 +10,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "splitview": "*"
+        "splitview": "0.0.0-beta.0"
     },
     "devDependencies": {
         "@testing-library/react": "^10.4.2",

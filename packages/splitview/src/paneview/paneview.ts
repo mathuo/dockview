@@ -9,17 +9,18 @@ import { Emitter, Event } from '../events';
 import { addClasses, removeClasses } from '../dom';
 import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
 import { PanePanelApi } from '../api/panePanelApi';
+import { PaneviewApi } from '../api/component.api';
 
 export interface IPaneBodyPart extends IDisposable {
     readonly element: HTMLElement;
-    update(params: PanelUpdateEvent);
-    init(parameters: PanePanelInitParameter & { api: PanePanelApi }): void;
+    update(params: PanelUpdateEvent): void;
+    init(parameters: PanePanelComponentInitParameter): void;
 }
 
 export interface IPaneHeaderPart extends IDisposable {
     readonly element: HTMLElement;
-    update(params: PanelUpdateEvent);
-    init(parameters: PanePanelInitParameter & { api: PanePanelApi }): void;
+    update(params: PanelUpdateEvent): void;
+    init(parameters: PanePanelComponentInitParameter): void;
 }
 
 export interface PanePanelInitParameter extends PanelInitParameters {
@@ -27,6 +28,12 @@ export interface PanePanelInitParameter extends PanelInitParameters {
     maximumBodySize?: number;
     isExpanded?: boolean;
     title: string;
+    containerApi: PaneviewApi;
+}
+
+export interface PanePanelComponentInitParameter
+    extends PanePanelInitParameter {
+    api: PanePanelApi;
 }
 
 export interface IPaneview extends IView {
@@ -40,9 +47,9 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
 
     protected api: PanePanelApi;
 
-    private _isExpanded: boolean;
-    private _orthogonalSize: number;
-    private animationTimer: NodeJS.Timeout;
+    private _isExpanded = false;
+    private _orthogonalSize = 0;
+    private animationTimer: NodeJS.Timeout | undefined;
     private expandedSize: number;
     private headerSize = 22;
     private _onDidChangeExpansionState: Emitter<boolean> = new Emitter<
@@ -56,8 +63,8 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
     protected header: HTMLElement;
     protected body: HTMLElement;
 
-    private part: IPaneHeaderPart;
-    private headerPart: IPaneBodyPart;
+    private part?: IPaneHeaderPart;
+    private headerPart?: IPaneBodyPart;
 
     get onDidChange() {
         return this._onDidChange.event;
@@ -157,8 +164,8 @@ export abstract class Pane extends CompositeDisposable implements IPaneview {
 
     update(params: PanelUpdateEvent) {
         this.params = { ...this.params, params: params.params };
-        this.part.update(params);
-        this.headerPart.update(params);
+        this.part?.update(params);
+        this.headerPart?.update(params);
     }
 
     toJSON(): object {
@@ -241,7 +248,7 @@ export class PaneView extends CompositeDisposable implements IDisposable {
     private splitview: SplitView;
     private paneItems: PaneItem[] = [];
     private _orientation: Orientation;
-    private animationTimer: NodeJS.Timeout;
+    private animationTimer: NodeJS.Timeout | undefined;
 
     private readonly _onDidChange = new Emitter<void>();
     readonly onDidChange: Event<void> = this._onDidChange.event;

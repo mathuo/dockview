@@ -1,14 +1,16 @@
 import * as React from 'react';
-import { PanelApi } from '../../api/panelApi';
 import { PanelUpdateEvent } from '../../panel/types';
-import { IPaneBodyPart, PanePanelInitParameter } from '../../paneview/paneview';
+import {
+    IPaneBodyPart,
+    PanePanelComponentInitParameter,
+} from '../../paneview/paneview';
 import { ReactPortalStore } from '../dockview/dockview';
 import { ReactPart } from '../react';
 import { IPaneviewPanelProps } from './paneview';
 
 export class PanelBody implements IPaneBodyPart {
     private _element: HTMLElement;
-    private part: ReactPart<IPaneviewPanelProps>;
+    private part?: ReactPart<IPaneviewPanelProps>;
 
     get element() {
         return this._element;
@@ -24,13 +26,17 @@ export class PanelBody implements IPaneBodyPart {
         this._element = document.createElement('div');
     }
 
-    public init(parameters: PanePanelInitParameter & { api: PanelApi }): void {
+    public init(parameters: PanePanelComponentInitParameter): void {
         this.part = new ReactPart(
             this.element,
-            parameters.api,
             this.reactPortalStore,
             this.component,
-            { ...parameters.params, title: parameters.title }
+            {
+                ...parameters.params,
+                api: parameters.api,
+                title: parameters.title,
+                containerApi: parameters.containerApi,
+            }
         );
     }
 
@@ -41,7 +47,7 @@ export class PanelBody implements IPaneBodyPart {
     }
 
     public update(params: PanelUpdateEvent) {
-        this.part.update(params.params);
+        this.part?.update(params.params);
     }
 
     public dispose() {
@@ -51,7 +57,7 @@ export class PanelBody implements IPaneBodyPart {
 
 export class PanelHeader implements IPaneBodyPart {
     private _element: HTMLElement;
-    private part: ReactPart<IPaneviewPanelProps>;
+    private part?: ReactPart<IPaneviewPanelProps>;
 
     get element() {
         return this._element;
@@ -67,13 +73,17 @@ export class PanelHeader implements IPaneBodyPart {
         this._element = document.createElement('div');
     }
 
-    public init(parameters: PanePanelInitParameter & { api: PanelApi }): void {
+    public init(parameters: PanePanelComponentInitParameter): void {
         this.part = new ReactPart(
             this.element,
-            parameters.api,
             this.reactPortalStore,
             this.component,
-            { ...parameters.params, title: parameters.title }
+            {
+                ...parameters.params,
+                api: parameters.api,
+                title: parameters.title,
+                containerApi: parameters.containerApi,
+            }
         );
     }
 
@@ -84,7 +94,7 @@ export class PanelHeader implements IPaneBodyPart {
     }
 
     public update(params: PanelUpdateEvent) {
-        this.part.update(params.params);
+        this.part?.update(params.params);
     }
 
     public dispose() {

@@ -4,7 +4,12 @@
         "target": "es2019",
         "sourceMap": true,
         "declaration": true,
-        "jsx": "react"
+        "jsx": "react",
+        "noImplicitReturns": true,
+        "noImplicitAny": true,
+        "allowUnreachableCode": false,
+        // "strict": true,
+        "forceConsistentCasingInFileNames": true
     },
     "exclude": ["node_modules", "dist"]
 }

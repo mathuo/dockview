@@ -2,21 +2,25 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { IDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
-import { IBaseViewApi } from '../api/api';
 import { ReactPortalStore } from './dockview/dockview';
 import { IFrameworkPart } from '../panel/types';
 
+/** React 'props-like' object */
+interface Props {
+    [key: string]: any;
+}
+
 interface IPanelWrapperProps {
-    component: React.FunctionComponent<{ [key: string]: any }>;
-    componentProps: { [key: string]: any };
+    component: React.FunctionComponent<Props>;
+    componentProps: Props;
 }
 
 interface IPanelWrapperRef {
-    update: (props: { [key: string]: any }) => void;
+    update: (props: Props) => void;
 }
 
 /**
- * This component is intended to interface between vanilla-JS and React hence we had to be
+ * This component is intended to interface between vanilla-js and React hence we need to be
  * creative in how we update props.
  * A ref of the component is exposed with an update method; which when called stores the props
  * as a ref within this component and forcefully triggers a re-render of the component using
@@ -26,18 +30,18 @@ interface IPanelWrapperRef {
 const ReactComponentBridge = React.forwardRef(
     (props: IPanelWrapperProps, ref: React.RefObject<IPanelWrapperRef>) => {
         const [_, triggerRender] = React.useState<number>();
-        const _props = React.useRef<{ [key: string]: any }>(
-            props.componentProps
-        );
+        const _props = React.useRef<Props>(props.componentProps);
 
         React.useImperativeHandle(
             ref,
             () => ({
-                update: (props: { [key: string]: any }) => {
+                update: (props: Props) => {
                     _props.current = { ..._props.current, ...props };
                     /**
                      * setting a arbitrary piece of state within this component will
-                     * trigger a re-render
+                     * trigger a re-render.
+                     * we use this rather than updating through a prop since we can
+                     * pass a ref into the vanilla-js world.
                      */
                     triggerRender(Date.now());
                 },
@@ -59,22 +63,21 @@ ReactComponentBridge.displayName = 'PanelWrapper';
 
 /**
  * Since we are storing the React.Portal references in a rendered array they
- * require a key property like any other React elements rendered in an array
+ * require a key property like any other React element rendered in an array
  * to prevent excessive re-rendering
  */
 const uniquePortalKeyGenerator = sequentialNumberGenerator();
 
 export class ReactPart<P> implements IFrameworkPart {
     private componentInstance: IPanelWrapperRef;
-    private ref: { portal: React.ReactPortal; disposable: IDisposable };
+    private ref?: { portal: React.ReactPortal; disposable: IDisposable };
     private disposed: boolean;
 
     constructor(
         private readonly parent: HTMLElement,
-        private readonly api: IBaseViewApi,
         private readonly portalStore: ReactPortalStore,
         private readonly component: React.FunctionComponent<P>,
-        private readonly parameters: { [key: string]: any }
+        private readonly parameters: Partial<P>
     ) {
         this.createPortal();
     }
@@ -92,11 +95,6 @@ export class ReactPart<P> implements IFrameworkPart {
             throw new Error('invalid operation');
         }
 
-        const props = {
-            api: this.api,
-            ...this.parameters,
-        } as { [index: string]: any } & { api: IBaseViewApi };
-
         // TODO use a better check for isReactFunctionalComponent
         if (typeof this.component !== 'function') {
             /**
@@ -109,7 +107,7 @@ export class ReactPart<P> implements IFrameworkPart {
 
         const bridgeComponent = React.createElement(ReactComponentBridge, {
             component: this.component,
-            componentProps: props,
+            componentProps: this.parameters,
             ref: (element) => {
                 this.componentInstance = element;
             },
@@ -127,8 +125,7 @@ export class ReactPart<P> implements IFrameworkPart {
     }
 
     public dispose() {
-        this.ref?.disposable?.dispose();
-        this.ref = undefined;
+        this.ref?.disposable.dispose();
         this.disposed = true;
     }
 }

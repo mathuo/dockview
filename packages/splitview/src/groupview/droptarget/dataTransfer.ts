@@ -1,8 +1,13 @@
 import { PanelOptions } from '../../dockview/options';
+import { tryParseJSON } from '../../json';
 
 export const DATA_KEY = 'splitview/transfer';
 
 export const isPanelTransferEvent = (event: DragEvent) => {
+    if (!event.dataTransfer) {
+        return false;
+    }
+
     return event.dataTransfer.types.includes(DATA_KEY);
 };
 
@@ -37,7 +42,7 @@ export const isCustomDragEvent = (data: any): data is ExternalDragItem => {
 };
 
 export const extractData = (event: DragEvent): DataObject => {
-    const data = JSON.parse(event.dataTransfer.getData(DATA_KEY));
+    const data = tryParseJSON(event.dataTransfer?.getData(DATA_KEY));
 
     if (!data) {
         console.warn(`[dragEvent] ${DATA_KEY} data is missing`);

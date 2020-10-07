@@ -140,8 +140,8 @@ export function getLocationOrientation(
 }
 
 export interface IViewSize {
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
 }
 
 export interface IGridView {
@@ -219,10 +219,17 @@ export function isGridBranchNode<T extends IGridView>(
     return !!(node as any).children;
 }
 
+type SerializedGridObject = {
+    type: 'leaf' | 'branch';
+    data: object;
+    size: number;
+    visible?: boolean;
+};
+
 const serializeBranchNode = <T extends IGridView>(
     node: GridNode<T>,
     orientation: Orientation
-) => {
+): SerializedGridObject => {
     const size =
         orientation === Orientation.VERTICAL ? node.box.width : node.box.height;
 

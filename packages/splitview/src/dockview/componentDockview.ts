@@ -15,6 +15,7 @@ import {
     CompositeDisposable,
     IDisposable,
     IValueDisposable,
+    MutableDisposable,
 } from '../lifecycle';
 import { Event, Emitter, addDisposableListener } from '../events';
 import { Watermark } from './components/watermark/watermark';
@@ -54,6 +55,7 @@ import {
     toTarget,
 } from '../gridview/baseComponentGridview';
 import { DockviewApi } from '../api/component.api';
+import { State } from '../api/api';
 
 const nextGroupId = sequentialNumberGenerator();
 
@@ -104,7 +106,7 @@ export interface Api {
 
 export interface IGroupAccessor {
     readonly id: string;
-    getGroup: (id: string) => IGroupview;
+    getGroup: (id: string) => IGroupview | undefined;
     moveGroupOrPanel(
         referenceGroup: IGroupview,
         groupId: string,
@@ -153,10 +155,10 @@ export class ComponentDockview
     readonly onTabContextMenu: Event<TabContextMenuEvent> = this
         ._onTabContextMenu.event;
     // everything else
-    private drag: IDisposable;
+    private drag = new MutableDisposable();
     private _deserializer: IPanelDeserializer;
-    private debugContainer: DebugWidget;
-    private panelState = {};
+    private debugContainer: DebugWidget | undefined;
+    private panelState: State = {};
     private registry = new Map<
         string,
         (event: LayoutDropEvent) => PanelOptions
@@ -215,7 +217,7 @@ export class ComponentDockview
         this._deserializer = value;
     }
 
-    public getPanel(id: string): IGroupPanel {
+    public getPanel(id: string): IGroupPanel | undefined {
         return this.panels.get(id)?.value;
     }
 
@@ -228,12 +230,16 @@ export class ComponentDockview
     ): IDisposable {
         const disposables = new CompositeDisposable(
             addDisposableListener(target.element, 'dragstart', (event) => {
+                if (!event.dataTransfer) {
+                    throw new Error('unsupported');
+                }
+
                 const panelOptions =
                     typeof options === 'function' ? options() : options;
 
                 const panel = this.panels.get(panelOptions.id)?.value;
                 if (panel) {
-                    this.drag = panel.group.startActiveDrag(panel);
+                    this.drag.value = panel.group.startActiveDrag(panel);
                 }
 
                 const data = JSON.stringify({
@@ -262,23 +268,22 @@ export class ComponentDockview
             addDisposableListener(this.element, 'dragend', (ev) => {
                 // drop events fire before dragend so we can remove this safely
                 DataTransferSingleton.removeData(this.id);
-                this.drag?.dispose();
-                this.drag = undefined;
+                this.drag.dispose();
             })
         );
 
         return disposables;
     }
 
-    public moveToNext(options?: MovementOptions) {
-        if (!options) {
-            options = {};
-        }
+    public moveToNext(options: MovementOptions = {}) {
         if (!options.group) {
+            if (!this.activeGroup) {
+                return;
+            }
             options.group = this.activeGroup;
         }
 
-        if (options.includePanel) {
+        if (options.includePanel && options.group) {
             if (
                 options.group.activePanel !==
                 options.group.panels[options.group.panels.length - 1]
@@ -293,15 +298,15 @@ export class ComponentDockview
         this.doSetGroupActive(next);
     }
 
-    public moveToPrevious(options?: MovementOptions) {
-        if (!options) {
-            options = {};
-        }
+    public moveToPrevious(options: MovementOptions = {}) {
         if (!options.group) {
+            if (!this.activeGroup) {
+                return;
+            }
             options.group = this.activeGroup;
         }
 
-        if (options.includePanel) {
+        if (options.includePanel && options.group) {
             if (options.group.activePanel !== options.group.panels[0]) {
                 options.group.moveToPrevious({ suppressRoll: true });
                 return;
@@ -386,7 +391,7 @@ export class ComponentDockview
             .reduce((collection, panel) => {
                 collection[panel.value.id] = panel.value.toJSON();
                 return collection;
-            }, {});
+            }, {} as State);
 
         this.panelState = {
             ...this.panelState,
@@ -482,9 +487,10 @@ export class ComponentDockview
         const panel = this.addPanel(options);
 
         if (options.position?.referencePanel) {
-            const referencePanel = this.panels.get(
+            const referencePanel = this.getPanel(
                 options.position.referencePanel
-            ).value;
+            );
+
             const referenceGroup = this.findGroup(referencePanel);
 
             const target = toTarget(options.position.direction);
@@ -726,10 +732,11 @@ export class ComponentDockview
                     if (dataTransfer.types.length === 0) {
                         return;
                     }
-                    if (!this.registry.has(dataTransfer.types[0])) {
+                    const cb = this.registry.get(dataTransfer.types[0]);
+
+                    if (!cb) {
                         return;
                     }
-                    const cb = this.registry.get(dataTransfer.types[0]);
 
                     const panelOptions = cb({ event });
 

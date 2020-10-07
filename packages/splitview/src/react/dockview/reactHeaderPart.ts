@@ -8,7 +8,7 @@ import { IGroupPanelProps, ReactPortalStore } from './dockview';
 
 export class ReactPanelHeaderPart implements PanelHeaderPart {
     private _element: HTMLElement;
-    private part: ReactPart<IGroupPanelProps>;
+    private part?: ReactPart<IGroupPanelProps>;
 
     get element() {
         return this._element;
@@ -25,7 +25,6 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
     public init(parameters: GroupPanelPartInitParameters): void {
         this.part = new ReactPart(
             this.element,
-            parameters.api,
             this.reactPortalStore,
             this.component,
             {

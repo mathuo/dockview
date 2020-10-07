@@ -327,7 +327,38 @@ const Watermark = (props: IWatermarkPanelProps) => {
                     </span>
                 )}
             </div>
-            <div style={{ flexGrow: 1 }}></div>
+            <div
+                style={{
+                    flexGrow: 1,
+                    display: 'flex',
+                    justifyContent: 'center',
+                }}
+            >
+                {/* <svg
+                    width="300"
+                    height="300"
+                    viewBox="0 0 300 300"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <rect
+                        x="12.5"
+                        y="12.5"
+                        width="175"
+                        height="275"
+                        stroke="black"
+                        stroke-width="25"
+                    />
+                    <rect
+                        x="112.5"
+                        y="62.5"
+                        width="175"
+                        height="175"
+                        stroke="black"
+                        stroke-width="25"
+                    />
+                </svg> */}
+            </div>
         </div>
     );
 };

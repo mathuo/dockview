@@ -10,8 +10,8 @@ export abstract class PanelView
     implements ISerializableView {
     private _minimumSize: FunctionOrValue<number> = 200;
     private _maximumSize: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
-    private _priority: LayoutPriority;
-    private _snap: boolean;
+    private _priority?: LayoutPriority;
+    private _snap = false;
 
     private readonly _onDidChange = new Emitter<number | undefined>();
     readonly onDidChange: Event<number | undefined> = this._onDidChange.event;

@@ -46,7 +46,7 @@ export interface IBaseGrid<T extends IGridPanelView> {
     readonly maximumHeight: number;
     readonly minimumWidth: number;
     readonly maximumWidth: number;
-    readonly activeGroup: T;
+    readonly activeGroup: T | undefined;
     readonly size: number;
     readonly onDidLayoutChange: Event<GroupChangeEvent>;
     getGroup(id: string): T | undefined;
@@ -63,11 +63,11 @@ export abstract class BaseGrid<T extends IGridPanelView>
     protected readonly groups = new Map<string, IValueDisposable<T>>();
     protected readonly gridview: Gridview;
     //
-    private resizeTimer: NodeJS.Timer;
-    protected _activeGroup: T;
+    private resizeTimer?: NodeJS.Timer;
+    protected _activeGroup: T | undefined;
     //
-    protected _size: number;
-    protected _orthogonalSize: number;
+    protected _size = 0;
+    protected _orthogonalSize = 0;
     //
     protected readonly _onDidLayoutChange = new Emitter<GroupChangeEvent>();
     readonly onDidLayoutChange: Event<GroupChangeEvent> = this
@@ -184,6 +184,9 @@ export abstract class BaseGrid<T extends IGridPanelView>
             options = {};
         }
         if (!options.group) {
+            if (!this.activeGroup) {
+                return;
+            }
             options.group = this.activeGroup;
         }
 
@@ -197,6 +200,9 @@ export abstract class BaseGrid<T extends IGridPanelView>
             options = {};
         }
         if (!options.group) {
+            if (!this.activeGroup) {
+                return;
+            }
             options.group = this.activeGroup;
         }
 
@@ -242,6 +248,9 @@ export abstract class BaseGrid<T extends IGridPanelView>
      * Resize the layout to fit the parent container
      */
     public resizeToFit(): void {
+        if (!this.element.parentElement) {
+            return;
+        }
         const {
             width,
             height,

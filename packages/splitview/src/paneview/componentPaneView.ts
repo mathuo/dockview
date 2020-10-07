@@ -1,9 +1,10 @@
+import { PaneviewApi } from '../api/component.api';
 import { PanePanelApi } from '../api/panePanelApi';
 import { addDisposableListener, Emitter, Event } from '../events';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { PanelUpdateEvent } from '../panel/types';
 import { createComponent } from '../splitview/core/options';
-import { Orientation } from '../splitview/core/splitview';
+import { LayoutPriority, Orientation } from '../splitview/core/splitview';
 import { PaneviewComponentOptions } from './options';
 import {
     IPaneBodyPart,
@@ -155,12 +156,14 @@ export class ComponentPaneView
         });
 
         this.paneview.addPane(view);
+
         view.init({
             params: options.params,
             minimumBodySize: options.minimumBodySize,
             maximumBodySize: options.maximumBodySize,
             isExpanded: options.isExpanded,
             title: options.title,
+            containerApi: new PaneviewApi(this),
         });
 
         return {
@@ -182,6 +185,9 @@ export class ComponentPaneView
      * Resize the layout to fit the parent container
      */
     resizeToFit(): void {
+        if (!this.element.parentElement) {
+            return;
+        }
         const {
             width,
             height,
@@ -209,7 +215,26 @@ export class ComponentPaneView
     }
 
     fromJSON(data: any): void {
-        const { views, orientation, size } = data;
+        const { views, orientation, size } = data as {
+            orientation: Orientation;
+            size: number;
+            expanded?: boolean;
+            views: Array<{
+                snap?: boolean;
+                priority?: LayoutPriority;
+                minimumSize?: number;
+                maximumSize?: number;
+                data: {
+                    id: string;
+                    component: string;
+                    title: string;
+                    headerComponent?: string;
+                    props: { [index: string]: any };
+                };
+                size: number;
+                expanded?: boolean;
+            }>;
+        };
 
         this.paneview.dispose();
         this.paneview = new PaneView(this.element, {
@@ -224,7 +249,7 @@ export class ComponentPaneView
                         data.component,
                         this.options.components,
                         this.options.frameworkComponents,
-                        this.options.frameworkWrapper.body.createComponent
+                        this.options.frameworkWrapper?.body.createComponent
                     );
 
                     let header: IPaneHeaderPart;
@@ -235,7 +260,8 @@ export class ComponentPaneView
                             data.headerComponent,
                             this.options.headerComponents,
                             this.options.headerframeworkComponents,
-                            this.options.frameworkWrapper.header.createComponent
+                            this.options.frameworkWrapper?.header
+                                .createComponent
                         );
                     } else {
                         header = new DefaultHeader();
@@ -244,7 +270,7 @@ export class ComponentPaneView
                     const panel = new PaneFramework({
                         id: data.id,
                         component: data.component,
-                        headerComponent: data.tabComponentName,
+                        headerComponent: data.headerComponent,
                         header,
                         body,
                     });
@@ -255,6 +281,7 @@ export class ComponentPaneView
                         maximumBodySize: view.maximumSize,
                         title: data.title,
                         isExpanded: !!view.expanded,
+                        containerApi: new PaneviewApi(this),
                     });
 
                     return { size: view.size, view: panel };

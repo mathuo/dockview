@@ -10,6 +10,7 @@ import {
     createContentComponent,
     createTabComponent,
 } from '../dockview/componentFactory';
+import { DockviewApi } from '../api/component.api';
 
 export class ReactPanelDeserialzier implements IPanelDeserializer {
     constructor(private readonly layout: ComponentDockview) {}
@@ -49,7 +50,7 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
             suppressClosable,
             params: props || {},
             state: state || {},
-            containerApi: null,
+            containerApi: new DockviewApi(this.layout),
         });
 
         return panel;

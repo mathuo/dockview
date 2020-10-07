@@ -25,7 +25,7 @@ export interface IGroupPanelApi extends IGridPanelApi {
 }
 
 export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
-    private _isGroupVisible: boolean;
+    private _isGroupVisible = false;
     private _group: IGroupview;
     private _interceptor: () => Promise<boolean>;
 

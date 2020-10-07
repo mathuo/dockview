@@ -77,7 +77,7 @@ export function isHTMLElement(o: any): o is HTMLElement {
 }
 
 export const isInTree = (element: HTMLElement, className: string) => {
-    let _element = element;
+    let _element: HTMLElement | undefined = element;
 
     while (_element) {
         if (_element.classList.contains(className)) {

@@ -9,7 +9,7 @@ import { PanelUpdateEvent } from '../../panel/types';
 
 export class ReactPanelContentPart implements PanelContentPart {
     private _element: HTMLElement;
-    private part: ReactPart<IGroupPanelProps>;
+    private part?: ReactPart<IGroupPanelProps>;
 
     get element() {
         return this._element;
@@ -26,7 +26,6 @@ export class ReactPanelContentPart implements PanelContentPart {
     public init(parameters: GroupPanelPartInitParameters): void {
         this.part = new ReactPart(
             this.element,
-            parameters.api,
             this.reactPortalStore,
             this.component,
             {
@@ -44,7 +43,7 @@ export class ReactPanelContentPart implements PanelContentPart {
     }
 
     public update(params: PanelUpdateEvent) {
-        this.part.update(params.params);
+        this.part?.update(params.params);
     }
 
     public setVisible(isPanelVisible: boolean, isGroupVisible: boolean): void {

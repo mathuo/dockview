@@ -6,6 +6,7 @@ import { GridPanelApi } from '../api/gridPanelApi';
 import { LayoutPriority } from '../splitview/core/splitview';
 import { Emitter, Event } from '../events';
 import { IViewSize } from './gridview';
+import { GridviewApi } from '../api/component.api';
 
 export interface GridviewInitParameters extends PanelInitParameters {
     minimumWidth?: number;
@@ -14,6 +15,7 @@ export interface GridviewInitParameters extends PanelInitParameters {
     maximumHeight?: number;
     priority?: LayoutPriority;
     snap?: boolean;
+    containerApi: GridviewApi;
 }
 
 export abstract class GridPanelView
@@ -23,8 +25,8 @@ export abstract class GridPanelView
     private _minimumHeight: FunctionOrValue<number> = 200;
     private _maximumWidth: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
     private _maximumHeight: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
-    private _priority: LayoutPriority;
-    private _snap: boolean;
+    private _priority?: LayoutPriority;
+    private _snap = false;
 
     private readonly _onDidChange = new Emitter<IViewSize | undefined>();
     readonly onDidChange: Event<IViewSize | undefined> = this._onDidChange
@@ -113,7 +115,7 @@ export abstract class GridPanelView
         }
 
         this._priority = parameters.priority;
-        this._snap = parameters.snap;
+        this._snap = !!parameters.snap;
 
         super.init(parameters);
     }

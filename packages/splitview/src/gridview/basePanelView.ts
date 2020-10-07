@@ -11,12 +11,12 @@ import { BaseViewApi } from '../api/api';
 export abstract class BasePanelView<T extends BaseViewApi>
     extends CompositeDisposable
     implements IPanel {
-    private _height: number;
-    private _width: number;
+    private _height = 0;
+    private _width = 0;
     private _element: HTMLElement;
-    private _isVisible: boolean;
-    private part: IFrameworkPart;
-    protected params: PanelInitParameters;
+    private _isVisible = false;
+    private part?: IFrameworkPart;
+    protected params?: PanelInitParameters;
 
     /**
      * Provide an IFrameworkPart that will determine the rendered UI of this view piece.
@@ -81,7 +81,7 @@ export abstract class BasePanelView<T extends BaseViewApi>
 
     update(params: PanelUpdateEvent) {
         this.params = { ...this.params, params: params.params };
-        this.part.update(params);
+        this.part?.update(params);
     }
 
     toJSON(): object {

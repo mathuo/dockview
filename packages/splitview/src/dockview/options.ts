@@ -1,4 +1,5 @@
 import { DockviewApi } from '../api/component.api';
+import { Direction } from '../gridview/baseComponentGridview';
 import { IGridView } from '../gridview/gridview';
 import { IGroupview } from '../groupview/groupview';
 import {
@@ -61,7 +62,7 @@ export interface AddPanelOptions
     componentName: string | PanelContentPartConstructor;
     tabComponentName?: string | PanelHeaderPartConstructor;
     position?: {
-        direction?: 'left' | 'right' | 'above' | 'below' | 'within';
+        direction?: Direction;
         referencePanel: string;
     };
 }

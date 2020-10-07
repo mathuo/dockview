@@ -1,6 +1,6 @@
 {
     "name": "splitview",
-    "version": "1.0.0",
+    "version": "0.0.0-beta.0",
     "description": "",
     "main": "dist/cjs/index.js",
     "types": "dist/cjs/index.d.ts",
@@ -9,8 +9,10 @@
         "build": "gulp run",
         "docs": "typedoc",
         "build-es6": "bash ../../node_modules/.bin/tsc --project tsconfig.es6.json",
-        "build-es5": "bash ../../node_modules/.bin/tsc --project tsconfig.json"
+        "build-es5": "bash ../../node_modules/.bin/tsc --project tsconfig.json",
+        "build-both": "npm run build-es5 && npm run build-es6"
     },
+    "files": ["dist"],
     "keywords": [
         "splitview",
         "split-view",

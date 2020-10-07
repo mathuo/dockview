@@ -4,7 +4,8 @@
         "outDir": "dist/es6",
         "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.es6",
         "jsx": "react",
-        "baseUrl": "."
+        // "baseUrl": "."
+        "rootDir": "src"
     },
     "include": ["src"],
     "exclude": ["**/node_modules", "src/__tests__"]

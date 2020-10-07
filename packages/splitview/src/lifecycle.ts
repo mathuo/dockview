@@ -32,7 +32,7 @@ export class CompositeDisposable {
 }
 
 export class MutableDisposable implements IDisposable {
-    private _disposable: IDisposable;
+    private _disposable = Disposable.NONE;
 
     constructor() {}
 

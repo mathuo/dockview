@@ -21,7 +21,7 @@ export const hasProcessed = (event: DragEvent) =>
 
 // tagging events as processed is better than calling .stopPropagation() which is the root of all evil
 const setEventAsProcessed = (event: DragEvent) => {
-    event[HAS_PROCESSED_KEY] = true;
+    (event as any)[HAS_PROCESSED_KEY] = true;
 };
 
 const toggleClassName = (
@@ -37,8 +37,8 @@ const toggleClassName = (
 };
 
 export class Droptarget {
-    private target: HTMLElement;
-    private overlay: HTMLElement;
+    private target: HTMLElement | undefined;
+    private overlay: HTMLElement | undefined;
     private state: Position | undefined;
 
     private readonly _onDidChange = new Emitter<DroptargetEvent>();
@@ -122,8 +122,8 @@ export class Droptarget {
             return;
         }
 
-        const width = this.target.clientWidth;
-        const height = this.target.clientHeight;
+        const width = this.target?.clientWidth;
+        const height = this.target?.clientHeight;
         const x = event.offsetX;
         const y = event.offsetY;
         const xp = (100 * x) / width;

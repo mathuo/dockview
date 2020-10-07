@@ -1,5 +1,9 @@
 ## Splitview
 
+```jsx
+import {SplitviewComponent} from "splitview"
+```
+
 ## Paneview
 
 ## Dockview

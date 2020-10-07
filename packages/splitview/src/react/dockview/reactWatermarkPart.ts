@@ -7,10 +7,14 @@ import {
 import { ReactPart } from '../react';
 import { IGroupPanelProps, ReactPortalStore } from './dockview';
 
+interface IWatermarkPanelProps extends IGroupPanelProps {
+    close: () => void;
+}
+
 export class ReactWatermarkPart implements WatermarkPart {
     private _element: HTMLElement;
-    private part: ReactPart<IGroupPanelProps>;
-    private _groupRef: { value: IGroupview } = { value: null };
+    private part?: ReactPart<IWatermarkPanelProps>;
+    private _groupRef: { value: IGroupview | undefined } = { value: undefined };
 
     get element() {
         return this._element;
@@ -18,7 +22,9 @@ export class ReactWatermarkPart implements WatermarkPart {
 
     constructor(
         public readonly id: string,
-        private readonly component: React.FunctionComponent<IGroupPanelProps>,
+        private readonly component: React.FunctionComponent<
+            IWatermarkPanelProps
+        >,
         private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');
@@ -27,7 +33,6 @@ export class ReactWatermarkPart implements WatermarkPart {
     public init(parameters: GroupPanelPartInitParameters): void {
         this.part = new ReactPart(
             this.element,
-            parameters.api,
             this.reactPortalStore,
             this.component,
             {

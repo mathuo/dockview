@@ -15,6 +15,7 @@ export interface GridviewReadyEvent {
 
 export interface IGridviewPanelProps {
     api: IGridPanelApi;
+    containerApi: GridviewApi;
 }
 
 export interface IGridviewComponentProps {

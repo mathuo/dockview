@@ -9,10 +9,9 @@ import { PanelUpdateEvent } from '../../../panel/types';
 
 export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
     private _element: HTMLElement;
-    private _isGroupActive: boolean;
-    private _isPanelVisible: boolean;
 
-    //
+    private _isPanelVisible = false;
+    private _isGroupActive = false;
     private _content: HTMLElement;
     private _actionContainer: HTMLElement;
     private _list: HTMLElement;

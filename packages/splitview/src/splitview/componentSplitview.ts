@@ -12,6 +12,7 @@ import {
 } from './core/options';
 import { BaseComponentOptions } from '../panel/types';
 import { Emitter, Event } from '../events';
+import { SplitviewApi } from '../api/component.api';
 
 export interface AddSplitviewComponentOptions extends BaseComponentOptions {
     size?: number;
@@ -79,7 +80,7 @@ export class ComponentSplitview
             options.component,
             this.options.components,
             this.options.frameworkComponents,
-            this.options.frameworkWrapper.createComponent
+            this.options.frameworkWrapper?.createComponent
         );
 
         const size: Sizing | number =
@@ -93,6 +94,7 @@ export class ComponentSplitview
             maximumSize: options.maximumSize,
             snap: options.snap,
             priority: options.priority,
+            containerApi: new SplitviewApi(this),
         });
 
         this.splitview.addView(view, size, index);
@@ -108,10 +110,13 @@ export class ComponentSplitview
      * Resize the layout to fit the parent container
      */
     resizeToFit(): void {
+        if (!this.element.parentElement) {
+            return;
+        }
         const {
             width,
             height,
-        } = this.element.parentElement.getBoundingClientRect();
+        } = this.element.parentElement?.getBoundingClientRect();
         this.layout(width, height);
     }
 
@@ -133,7 +138,7 @@ export class ComponentSplitview
                     data: view.toJSON ? view.toJSON() : {},
                     minimumSize: view.minimumSize,
                     maximumSize: view.maximumSize,
-                    snap: view.snap,
+                    snap: !!view.snap,
                 };
             });
 
@@ -145,7 +150,22 @@ export class ComponentSplitview
     }
 
     fromJSON(data: any): void {
-        const { views, orientation, size } = data;
+        const { views, orientation, size } = data as {
+            orientation: Orientation;
+            size: number;
+            views: Array<{
+                snap?: boolean;
+                priority?: LayoutPriority;
+                minimumSize?: number;
+                maximumSize?: number;
+                data: {
+                    id: string;
+                    component: string;
+                    props: { [index: string]: any };
+                };
+                size: number;
+            }>;
+        };
 
         this.splitview.dispose();
         this.splitview = new SplitView(this.element, {
@@ -161,7 +181,7 @@ export class ComponentSplitview
                         data.component,
                         this.options.components,
                         this.options.frameworkComponents,
-                        this.options.frameworkWrapper.createComponent
+                        this.options.frameworkWrapper?.createComponent
                     );
 
                     panel.init({
@@ -170,6 +190,7 @@ export class ComponentSplitview
                         maximumSize: view.maximumSize,
                         snap: view.snap,
                         priority: view.priority,
+                        containerApi: new SplitviewApi(this),
                     });
 
                     return { size: view.size, view: panel };

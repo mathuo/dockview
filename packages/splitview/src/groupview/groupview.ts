@@ -101,17 +101,17 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
     private tabContainer: ITabContainer;
     private contentContainer: IContentContainer;
-    private _active: boolean;
-    private _activePanel: IGroupPanel;
+    private _active = false;
+    private _activePanel: IGroupPanel | undefined;
     private dropTarget: Droptarget;
-    private watermark: WatermarkPart;
+    private watermark: WatermarkPart | undefined;
 
     private readonly _onDidChange = new Emitter<IViewSize | undefined>();
     readonly onDidChange: Event<IViewSize | undefined> = this._onDidChange
         .event;
 
-    private _width: number;
-    private _height: number;
+    private _width = 0;
+    private _height = 0;
 
     private _panels: IGroupPanel[] = [];
 
@@ -212,15 +212,13 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         const index = this.panels.indexOf(options.panel);
 
-        let normalizedIndex: number = undefined;
+        let normalizedIndex: number;
 
         if (index < this.panels.length - 1) {
             normalizedIndex = index + 1;
         } else if (!options.suppressRoll) {
             normalizedIndex = 0;
-        }
-
-        if (normalizedIndex === undefined) {
+        } else {
             return;
         }
 
@@ -240,15 +238,13 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         const index = this.panels.indexOf(options.panel);
 
-        let normalizedIndex: number = undefined;
+        let normalizedIndex: number;
 
         if (index > 0) {
             normalizedIndex = index - 1;
         } else if (!options.suppressRoll) {
             normalizedIndex = this.panels.length - 1;
-        }
-
-        if (normalizedIndex === undefined) {
+        } else {
             return;
         }
 
@@ -360,7 +356,10 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
 
     public async closeAllPanels() {
-        const index = this.panels.indexOf(this._activePanel);
+        const index =
+            typeof this._activePanel === 'number'
+                ? this.panels.indexOf(this._activePanel)
+                : -1;
 
         if (index > -1) {
             if (this.panels.indexOf(this._activePanel) < 0) {
@@ -368,7 +367,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             }
 
             const canClose =
-                !this._activePanel.close || (await this._activePanel.close());
+                !this._activePanel?.close || (await this._activePanel.close());
             if (!canClose) {
                 return false;
             }
@@ -522,13 +521,14 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         toggleClass(this.element, 'empty', this.isEmpty);
 
         if (!this.watermark) {
-            this.watermark = this.accessor.createWatermarkComponent();
-            this.watermark.init({
+            const watermark = this.accessor.createWatermarkComponent();
+            watermark.init({
                 containerApi: new DockviewApi(this.accessor as any),
                 params: {},
                 title: '',
                 api: null,
             });
+            this.watermark = watermark;
         }
 
         this.panels.forEach((panel) => panel.setVisible(this._active, this));
@@ -541,7 +541,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             });
 
             this.contentContainer.openPanel(this.watermark);
-
             this.watermark.setVisible(true, this);
         }
         if (!this.isEmpty && this.watermark.element.parentNode) {

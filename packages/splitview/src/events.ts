@@ -1,14 +1,18 @@
 import { IDisposable } from './lifecycle';
 
-export class DefaultEvent {
+/**
+ * Mimic the basic functionality of a UI-event to provide familar paradigms
+ * such as preventDefault()
+ */
+export class UIEvent {
     private _defaultPrevented: boolean;
-
-    constructor() {
-        this._defaultPrevented = false;
-    }
 
     get defaultPrevented() {
         return this._defaultPrevented;
+    }
+
+    constructor() {
+        this._defaultPrevented = false;
     }
 
     preventDefault() {
@@ -43,9 +47,9 @@ export namespace Event {
 // dumb event emitter with better typings than nodes event emitter
 // https://github.com/microsoft/vscode/blob/master/src/vs/base/common/event.ts
 export class Emitter<T> implements IDisposable {
-    private _event: Event<T>;
+    private _event?: Event<T>;
 
-    private _last: T;
+    private _last?: T;
     private _listeners: Array<(e: T) => any> = [];
     private _disposed: boolean = false;
 

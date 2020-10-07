@@ -90,10 +90,10 @@ export class SplitView {
     private views: ViewItem[] = [];
     private sashes: ISashItem[] = [];
     private readonly _orientation: Orientation;
-    private _size: number;
-    private _orthogonalSize: number;
-    private contentSize: number;
-    private _proportions: number[];
+    private _size = 0;
+    private _orthogonalSize = 0;
+    private contentSize = 0;
+    private _proportions: number[] | undefined = undefined;
     private proportionalLayout: boolean;
 
     private _onDidSashEnd = new Emitter<any>();
@@ -821,7 +821,7 @@ export class SplitView {
         overloadMaxDelta: number = Number.POSITIVE_INFINITY,
         snapBefore?: ISashDragSnapState,
         snapAfter?: ISashDragSnapState
-    ) => {
+    ): number => {
         if (index < 0 || index > this.views.length) {
             return 0;
         }
@@ -965,7 +965,7 @@ export class SplitView {
     public dispose() {
         this.element.remove();
         for (let i = 0; i < this.element.children.length; i++) {
-            if (this.element.children.item[i] === this.element) {
+            if (this.element.children.item(i) === this.element) {
                 this.element.removeChild(this.element);
                 break;
             }

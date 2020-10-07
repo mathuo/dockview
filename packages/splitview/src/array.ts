@@ -6,7 +6,7 @@ export function tail<T>(arr: T[]): [T[], T] {
     return [arr.slice(0, arr.length - 1), arr[arr.length - 1]];
 }
 
-export function last<T>(arr: T[]): T {
+export function last<T>(arr: T[]): T | undefined {
     return arr.length > 0 ? arr[arr.length - 1] : undefined;
 }
 
@@ -47,10 +47,10 @@ export function pushToEnd<T>(arr: T[], value: T): void {
     }
 }
 
-export const range = (from: number, to: number = undefined): number[] => {
+export const range = (from: number, to?: number): number[] => {
     const result: number[] = [];
 
-    if (to === undefined) {
+    if (typeof to !== 'number') {
         to = from;
         from = 0;
     }

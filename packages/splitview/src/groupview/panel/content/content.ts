@@ -1,7 +1,6 @@
 import { CompositeDisposable, IDisposable } from '../../../lifecycle';
 import { Emitter, Event } from '../../../events';
 import { trackFocus } from '../../../dom';
-import { PanelContentPart } from '../parts';
 
 export interface IContentContainer extends IDisposable {
     onDidFocus: Event<void>;
@@ -14,7 +13,7 @@ export class ContentContainer
     extends CompositeDisposable
     implements IContentContainer {
     private _element: HTMLElement;
-    private content: { element: HTMLElement };
+    private content: { element: HTMLElement } | undefined;
 
     private readonly _onDidFocus = new Emitter<void>();
     readonly onDidFocus: Event<void> = this._onDidFocus.event;
@@ -34,7 +33,7 @@ export class ContentContainer
         this.addDisposables(onDidFocus(() => this._onDidFocus.fire()));
     }
 
-    public openPanel(panel: PanelContentPart) {
+    public openPanel(panel: { element: HTMLElement }) {
         if (this.content) {
             this._element.removeChild(this.content.element);
             this.content = undefined;
