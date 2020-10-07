@@ -41,7 +41,8 @@
             }
         }
         .pane-body {
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
             flex-grow: 1;
 
             &:focus,
