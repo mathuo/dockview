@@ -129,9 +129,8 @@ export class ComponentSplitview
     }
 
     toJSON(): object {
-        const views = this.splitview
-            .getViews()
-            .map((view: ISerializableView, i) => {
+        const views = (this.splitview.getViews() as ISerializableView[]).map(
+            (view, i) => {
                 const size = this.splitview.getViewSize(i);
                 return {
                     size,
@@ -140,7 +139,8 @@ export class ComponentSplitview
                     maximumSize: view.maximumSize,
                     snap: !!view.snap,
                 };
-            });
+            }
+        );
 
         return {
             views,

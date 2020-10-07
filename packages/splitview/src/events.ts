@@ -90,14 +90,12 @@ export class Emitter<T> implements IDisposable {
     }
 }
 
-export type EventHandler = HTMLElement | HTMLDocument | Window;
-
-export const addDisposableListener = <K extends keyof HTMLElementEventMap>(
-    element: EventHandler,
+export function addDisposableWindowListener<K extends keyof WindowEventMap>(
+    element: Window,
     type: K,
-    listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+    listener: (this: Window, ev: WindowEventMap[K]) => any,
     options?: boolean | AddEventListenerOptions
-): IDisposable => {
+): IDisposable {
     element.addEventListener(type, listener, options);
 
     return {
@@ -105,4 +103,21 @@ export const addDisposableListener = <K extends keyof HTMLElementEventMap>(
             element.removeEventListener(type, listener);
         },
     };
-};
+}
+
+export function addDisposableListener<K extends keyof HTMLElementEventMap>(
+    element: HTMLElement,
+    type: K,
+    listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+    options?: boolean | AddEventListenerOptions
+): IDisposable {
+    element.addEventListener(type, listener, options);
+
+    return {
+        dispose: () => {
+            element.removeEventListener(type, listener);
+        },
+    };
+}
+
+window.addEventListener;

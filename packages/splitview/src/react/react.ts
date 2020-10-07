@@ -5,18 +5,13 @@ import { sequentialNumberGenerator } from '../math';
 import { ReactPortalStore } from './dockview/dockview';
 import { IFrameworkPart } from '../panel/types';
 
-/** React 'props-like' object */
-interface Props {
-    [key: string]: any;
-}
-
 interface IPanelWrapperProps {
-    component: React.FunctionComponent<Props>;
-    componentProps: Props;
+    component: React.FunctionComponent<{ [key: string]: any }>;
+    componentProps: { [key: string]: any };
 }
 
 interface IPanelWrapperRef {
-    update: (props: Props) => void;
+    update: (props: { [key: string]: any }) => void;
 }
 
 /**
@@ -27,38 +22,39 @@ interface IPanelWrapperRef {
  * the ref of props we just set on the renderered component as the props passed to the inner
  * component
  */
-const ReactComponentBridge = React.forwardRef(
-    (props: IPanelWrapperProps, ref: React.RefObject<IPanelWrapperRef>) => {
-        const [_, triggerRender] = React.useState<number>();
-        const _props = React.useRef<Props>(props.componentProps);
+const ReactComponentBridge: React.ForwardRefRenderFunction<
+    IPanelWrapperRef,
+    IPanelWrapperProps
+> = (props, ref) => {
+    const [_, triggerRender] = React.useState<number>();
+    const _props = React.useRef<object>(props.componentProps);
 
-        React.useImperativeHandle(
-            ref,
-            () => ({
-                update: (props: Props) => {
-                    _props.current = { ..._props.current, ...props };
-                    /**
-                     * setting a arbitrary piece of state within this component will
-                     * trigger a re-render.
-                     * we use this rather than updating through a prop since we can
-                     * pass a ref into the vanilla-js world.
-                     */
-                    triggerRender(Date.now());
-                },
-            }),
-            []
-        );
+    React.useImperativeHandle(
+        ref,
+        () => ({
+            update: (props: object) => {
+                _props.current = { ..._props.current, ...props };
+                /**
+                 * setting a arbitrary piece of state within this component will
+                 * trigger a re-render.
+                 * we use this rather than updating through a prop since we can
+                 * pass a ref into the vanilla-js world.
+                 */
+                triggerRender(Date.now());
+            },
+        }),
+        []
+    );
 
-        React.useEffect(() => {
-            console.debug('[reactwrapper] component mounted ');
-            return () => {
-                console.debug('[reactwrapper] component unmounted ');
-            };
-        }, []);
+    React.useEffect(() => {
+        console.debug('[reactwrapper] component mounted ');
+        return () => {
+            console.debug('[reactwrapper] component unmounted ');
+        };
+    }, []);
 
-        return React.createElement(props.component, _props.current);
-    }
-);
+    return React.createElement(props.component, _props.current);
+};
 ReactComponentBridge.displayName = 'PanelWrapper';
 
 /**
@@ -68,7 +64,7 @@ ReactComponentBridge.displayName = 'PanelWrapper';
  */
 const uniquePortalKeyGenerator = sequentialNumberGenerator();
 
-export class ReactPart<P> implements IFrameworkPart {
+export class ReactPart<P extends object> implements IFrameworkPart {
     private componentInstance: IPanelWrapperRef;
     private ref?: { portal: React.ReactPortal; disposable: IDisposable };
     private disposed: boolean;
@@ -77,7 +73,7 @@ export class ReactPart<P> implements IFrameworkPart {
         private readonly parent: HTMLElement,
         private readonly portalStore: ReactPortalStore,
         private readonly component: React.FunctionComponent<P>,
-        private readonly parameters: Partial<P>
+        private readonly parameters: P
     ) {
         this.createPortal();
     }
@@ -105,13 +101,17 @@ export class ReactPart<P> implements IFrameworkPart {
             throw new Error('invalid operation');
         }
 
-        const bridgeComponent = React.createElement(ReactComponentBridge, {
-            component: this.component,
-            componentProps: this.parameters,
-            ref: (element) => {
-                this.componentInstance = element;
-            },
-        });
+        const bridgeComponent = React.createElement(
+            React.forwardRef(ReactComponentBridge),
+            {
+                component: (this
+                    .component as unknown) as React.FunctionComponent<{}>,
+                componentProps: (this.parameters as unknown) as {},
+                ref: (element) => {
+                    this.componentInstance = element;
+                },
+            }
+        );
         const portal = ReactDOM.createPortal(
             bridgeComponent,
             this.parent,

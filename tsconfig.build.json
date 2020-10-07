@@ -8,8 +8,14 @@
         "noImplicitReturns": true,
         "noImplicitAny": true,
         "allowUnreachableCode": false,
+        "forceConsistentCasingInFileNames": true,
         // "strict": true,
-        "forceConsistentCasingInFileNames": true
+        "strictBindCallApply": true, // pass
+        "alwaysStrict": true, // pass
+        "noImplicitThis": true, // pass
+        "strictFunctionTypes": true, // pass
+        "strictNullChecks": false,
+        "strictPropertyInitialization": false,
     },
     "exclude": ["node_modules", "dist"]
 }

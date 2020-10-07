@@ -1,4 +1,9 @@
-import { Event, Emitter, addDisposableListener } from './events';
+import {
+    Event,
+    Emitter,
+    addDisposableListener,
+    addDisposableWindowListener,
+} from './events';
 import { IDisposable, CompositeDisposable } from './lifecycle';
 
 export function getDomNodePagePosition(domNode: HTMLElement) {
@@ -211,12 +216,21 @@ class FocusTracker extends CompositeDisposable implements IFocusTracker {
             }
         };
 
-        this.addDisposables(
-            addDisposableListener(element, 'focus', onFocus, true)
-        );
-        this.addDisposables(
-            addDisposableListener(element, 'blur', onBlur, true)
-        );
+        if (element instanceof HTMLElement) {
+            this.addDisposables(
+                addDisposableListener(element, 'focus', onFocus, true)
+            );
+            this.addDisposables(
+                addDisposableListener(element, 'blur', onBlur, true)
+            );
+        } else {
+            this.addDisposables(
+                addDisposableWindowListener(element, 'focus', onFocus, true)
+            );
+            this.addDisposables(
+                addDisposableWindowListener(element, 'blur', onBlur, true)
+            );
+        }
     }
 
     refreshState() {
