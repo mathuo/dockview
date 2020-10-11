@@ -70,6 +70,10 @@ export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
         return { id: this.id };
     }
 
+    focus() {
+        //noop
+    }
+
     public init(params: GroupPanelPartInitParameters) {
         this.params = params;
         this._content.textContent = params.title;

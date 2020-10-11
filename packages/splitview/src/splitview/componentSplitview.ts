@@ -13,6 +13,8 @@ import {
 import { BaseComponentOptions } from '../panel/types';
 import { Emitter, Event } from '../events';
 import { SplitviewApi } from '../api/component.api';
+import { PaneView } from '../paneview/paneview';
+import { PanelView } from './panelView';
 
 export interface AddSplitviewComponentOptions extends BaseComponentOptions {
     size?: number;
@@ -30,6 +32,7 @@ export interface IComponentSplitview extends IDisposable {
     toJSON(): object;
     fromJSON(data: any): void;
     resizeToFit(): void;
+    focus(): void;
 }
 
 /**
@@ -74,6 +77,29 @@ export class ComponentSplitview
         );
     }
 
+    focus() {
+        //
+    }
+
+    private _activePanel: PanelView;
+
+    setActive(view: PanelView) {
+        this._activePanel = view;
+
+        this.getViews()
+            .filter((v) => v !== view)
+            .forEach((v) => v.setActive(false));
+        view.setActive(true);
+    }
+
+    getViews(): PanelView[] {
+        return this.splitview.getViews() as PanelView[];
+    }
+
+    removeView(id: string) {
+        this.splitview.view;
+    }
+
     addFromComponent(options: AddSplitviewComponentOptions): IDisposable {
         const view = createComponent(
             options.id,
@@ -87,6 +113,13 @@ export class ComponentSplitview
             typeof options.size === 'number' ? options.size : Sizing.Distribute;
         const index =
             typeof options.index === 'number' ? options.index : undefined;
+
+        const disposable = view.api.onDidFocusChange((event) => {
+            if (!event.isFocused) {
+                return; // only care if focused
+            }
+            this.setActive(view);
+        });
 
         view.init({
             params: options.params,

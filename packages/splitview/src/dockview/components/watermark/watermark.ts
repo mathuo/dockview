@@ -1,9 +1,8 @@
 import {
     GroupPanelPartInitParameters,
-    PanelContentPart,
     WatermarkPart,
 } from '../../../groupview/panel/parts';
-import { IGroupAccessor } from '../../componentDockview';
+import { IComponentDockview } from '../../componentDockview';
 import { IGroupview } from '../../../groupview/groupview';
 import { ActionContainer } from '../../../groupview/actions/actionsContainer';
 import { addDisposableListener } from '../../../events';
@@ -12,7 +11,7 @@ import { CompositeDisposable } from '../../../lifecycle';
 
 export class Watermark extends CompositeDisposable implements WatermarkPart {
     private _element: HTMLElement;
-    private accessor: IGroupAccessor;
+    private accessor: IComponentDockview;
     private group: IGroupview;
 
     get id() {

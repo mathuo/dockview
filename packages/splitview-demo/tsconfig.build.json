@@ -1,11 +1,25 @@
 {
-    "extends": "../../tsconfig.build.json",
-
     "compilerOptions": {
         "composite": true,
         "declaration": true,
         "outDir": "./dist",
-        "rootDir": "./src"
+        "rootDir": "./src",
+        "module": "commonjs",
+        "target": "es2019",
+        "sourceMap": true,
+        "jsx": "react",
+        "noImplicitReturns": true,
+        "noImplicitAny": true,
+        // "allowUnreachableCode": false,
+        "forceConsistentCasingInFileNames": true,
+        // "strict": true,
+        // "strictBindCallApply": true, // pass
+        // "alwaysStrict": true, // pass
+        // "noImplicitThis": true, // pass
+        // "strictFunctionTypes": true, // pass
+        // "strictNullChecks": false,
+        // "strictPropertyInitialization": false,
     },
-    "include": ["src/**/*"]
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "dist"]
 }

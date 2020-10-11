@@ -10,7 +10,7 @@ import { hasProcessed, Position } from '../droptarget/droptarget';
 import { TabDropEvent } from '../events';
 
 import { IGroupview } from '../groupview';
-import { IGroupAccessor } from '../../dockview';
+import { IComponentDockview } from '../../dockview';
 import { last } from '../../array';
 import { DataTransferSingleton } from '../droptarget/dataTransfer';
 import { IGroupPanel } from '../panel/parts';
@@ -91,7 +91,11 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
         return this.tabs.findIndex((tab) => tab.value.id === id);
     }
 
-    constructor(private accessor: IGroupAccessor, private group: IGroupview) {
+    constructor(
+        private accessor: IComponentDockview,
+        private group: IGroupview,
+        options: { tabHeight: number }
+    ) {
         super();
 
         this.addDisposables(this._onDropped);
@@ -99,7 +103,7 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
         this._element = document.createElement('div');
         this._element.className = 'title-container';
 
-        this.height = 35;
+        this.height = options.tabHeight;
 
         this.actionContainer = document.createElement('div');
         this.actionContainer.className = 'action-container';
@@ -221,6 +225,7 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
             tab.onChanged((event) => {
                 switch (event.kind) {
                     case MouseEventKind.CLICK:
+                        event.event.preventDefault(); // prevent the click focusing anything, because we need to programatically focus the next panel
                         this.group.openPanel(panel);
                         break;
                 }

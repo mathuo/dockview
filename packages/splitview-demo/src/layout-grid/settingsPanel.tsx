@@ -1,16 +1,10 @@
 import * as React from 'react';
-import { Api, DockviewApi, IGroupPanelProps } from 'splitview';
+import { IGroupPanelProps } from 'splitview';
 
-export const Editor = (
-    props: IGroupPanelProps & { layoutApi: DockviewApi }
-) => {
-    const [tabHeight, setTabHeight] = React.useState<number>(0);
-
-    React.useEffect(() => {
-        if (props.layoutApi) {
-            setTabHeight(props.layoutApi.getTabHeight());
-        }
-    }, [props.layoutApi]);
+export const Settings = (props: IGroupPanelProps) => {
+    const [tabHeight, setTabHeight] = React.useState<number>(
+        props.containerApi.getTabHeight()
+    );
 
     const onTabHeightChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value);
@@ -20,13 +14,11 @@ export const Editor = (
     };
 
     const onClick = () => {
-        props.layoutApi.setTabHeight(tabHeight);
+        props.containerApi.setTabHeight(tabHeight);
     };
 
     return (
-        <div
-            style={{ height: '100%', backgroundColor: 'white', color: 'black' }}
-        >
+        <div style={{ height: '100%', color: 'white' }}>
             <label>
                 Tab height
                 <input

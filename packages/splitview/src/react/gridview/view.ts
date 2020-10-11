@@ -2,8 +2,7 @@ import {
     GridPanelView,
     GridviewInitParameters,
 } from '../../gridview/gridPanelView';
-import { ReactPortalStore } from '../dockview/dockview';
-import { ReactPart } from '../react';
+import { ReactPart, ReactPortalStore } from '../react';
 import { IGridviewPanelProps } from './gridview';
 
 export class ReactGridPanelView extends GridPanelView {

@@ -4,8 +4,7 @@ import {
     IPaneBodyPart,
     PanePanelComponentInitParameter,
 } from '../../paneview/paneview';
-import { ReactPortalStore } from '../dockview/dockview';
-import { ReactPart } from '../react';
+import { ReactPart, ReactPortalStore } from '../react';
 import { IPaneviewPanelProps } from './paneview';
 
 export class PanelBody implements IPaneBodyPart {

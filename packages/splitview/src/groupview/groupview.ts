@@ -3,7 +3,7 @@ import { ITabContainer, TabContainer } from './titlebar/tabContainer';
 import { IContentContainer, ContentContainer } from './panel/content/content';
 import { Position, Droptarget, DroptargetEvent } from './droptarget/droptarget';
 import { Event, Emitter, addDisposableListener } from '../events';
-import { IGroupAccessor, ComponentDockview } from '../dockview';
+import { IComponentDockview, ComponentDockview } from '../dockview';
 import { toggleClass } from '../dom';
 import { IGroupPanel, WatermarkPart } from './panel/parts';
 import { timeoutPromise } from '../async';
@@ -15,8 +15,8 @@ import {
 } from './droptarget/dataTransfer';
 import { IGridPanelView } from '../gridview/baseComponentGridview';
 import { IViewSize } from '../gridview/gridview';
-import { createComponent } from '../splitview/core/options';
 import { DockviewApi } from '../api/component.api';
+import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
 
 export const enum GroupChangeKind {
     GROUP_ACTIVE = 'GROUP_ACTIVE',
@@ -54,8 +54,9 @@ interface GroupMoveEvent {
 }
 
 export interface GroupOptions {
-    panels: IGroupPanel[];
+    panels?: IGroupPanel[];
     activePanel?: IGroupPanel;
+    tabHeight?: number;
 }
 
 export interface GroupChangeEvent {
@@ -256,9 +257,9 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
 
     constructor(
-        private accessor: IGroupAccessor,
+        private accessor: IComponentDockview,
         public id: string,
-        private options?: GroupOptions
+        private options: GroupOptions
     ) {
         super();
 
@@ -266,9 +267,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         this._element = document.createElement('div');
         this._element.className = 'groupview';
-        this._element.tabIndex = -1;
+        // this._element.tabIndex = -1;
 
-        this.tabContainer = new TabContainer(this.accessor, this);
+        this.tabContainer = new TabContainer(this.accessor, this, {
+            tabHeight: options.tabHeight,
+        });
         this.contentContainer = new ContentContainer();
         this.dropTarget = new Droptarget(this.contentContainer.element, {
             isDirectional: true,
@@ -296,7 +299,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 this.handleDropEvent(event.event, event.index)
             ),
             this.contentContainer.onDidFocus(() => {
-                this.accessor.doSetGroupActive(this);
+                this.accessor.doSetGroupActive(this, true);
             }),
             this.dropTarget.onDidChange((event) => {
                 // if we've center dropped on ourself then ignore
@@ -321,6 +324,18 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
 
         this.updateContainer();
+    }
+
+    init(params: PanelInitParameters) {
+        //noop
+    }
+
+    update(params: PanelUpdateEvent) {
+        //noop
+    }
+
+    focus() {
+        this._activePanel?.focus();
     }
 
     public openPanel(panel: IGroupPanel, index: number = this.panels.length) {
@@ -413,8 +428,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this._removePanel(panel);
         (this.accessor as ComponentDockview).unregisterPanel(panel);
 
-        panel.dispose();
-
         if (this.panels.length === 0) {
             this.accessor.removeGroup(this);
         }
@@ -424,8 +437,14 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         return this._activePanel === panel;
     }
 
-    public setActive(isActive: boolean) {
+    public setActive(isActive: boolean, skipFocus = false) {
         if (this._active === isActive) {
+            if (!skipFocus) {
+                setTimeout(() => {
+                    // ensures the focus takes effect
+                    this._activePanel?.focus();
+                }, 0);
+            }
             return;
         }
 
@@ -447,6 +466,12 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
 
         if (isActive) {
+            if (!skipFocus) {
+                setTimeout(() => {
+                    // ensures the focus takes effect
+                    this._activePanel?.focus();
+                }, 0);
+            }
             this._onDidGroupChange.fire({ kind: GroupChangeKind.GROUP_ACTIVE });
         }
     }
@@ -514,6 +539,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this._activePanel = panel;
         this.tabContainer.setActivePanel(panel);
         panel.layout(this._width, this._height);
+
         this._onDidGroupChange.fire({ kind: GroupChangeKind.PANEL_ACTIVE });
     }
 

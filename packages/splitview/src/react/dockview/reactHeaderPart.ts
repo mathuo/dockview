@@ -3,8 +3,9 @@ import {
     PanelHeaderPart,
     GroupPanelPartInitParameters,
 } from '../../groupview/panel/parts';
-import { ReactPart } from '../react';
-import { IGroupPanelProps, ReactPortalStore } from './dockview';
+import { PanelUpdateEvent } from '../../panel/types';
+import { ReactPart, ReactPortalStore } from '../react';
+import { IGroupPanelProps } from './dockview';
 
 export class ReactPanelHeaderPart implements PanelHeaderPart {
     private _element: HTMLElement;
@@ -22,6 +23,10 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
         this._element = document.createElement('div');
     }
 
+    focus() {
+        //noop
+    }
+
     public init(parameters: GroupPanelPartInitParameters): void {
         this.part = new ReactPart(
             this.element,
@@ -33,6 +38,10 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
                 containerApi: parameters.containerApi,
             }
         );
+    }
+
+    public update(event: PanelUpdateEvent) {
+        //noop
     }
 
     public toJSON() {

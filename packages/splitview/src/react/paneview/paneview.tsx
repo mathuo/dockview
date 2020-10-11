@@ -28,7 +28,7 @@ export interface IPaneviewComponentProps {
     };
 }
 
-export const PaneViewComponent: React.FunctionComponent<IPaneviewComponentProps> = (
+export const PaneviewComponent: React.FunctionComponent<IPaneviewComponentProps> = (
     props: IPaneviewComponentProps
 ) => {
     const domRef = React.useRef<HTMLDivElement>();
@@ -82,4 +82,4 @@ export const PaneViewComponent: React.FunctionComponent<IPaneviewComponentProps>
 
     return <div ref={domRef}>{portals}</div>;
 };
-PaneViewComponent.displayName = 'PaneviewComponent';
+PaneviewComponent.displayName = 'PaneviewComponent';

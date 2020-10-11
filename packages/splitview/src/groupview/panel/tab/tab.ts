@@ -8,7 +8,7 @@ import {
     DragType,
 } from '../../droptarget/dataTransfer';
 import { toggleClass } from '../../../dom';
-import { IGroupAccessor } from '../../../dockview';
+import { IComponentDockview } from '../../../dockview';
 import { LayoutMouseEvent, MouseEventKind } from '../../events';
 import { PanelHeaderPart } from '../parts';
 
@@ -56,7 +56,7 @@ export class Tab extends CompositeDisposable implements ITab {
 
     constructor(
         public id: string,
-        private readonly accessor: IGroupAccessor,
+        private readonly accessor: IComponentDockview,
         private group: IGroupview
     ) {
         super();

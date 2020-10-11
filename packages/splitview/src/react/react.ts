@@ -2,8 +2,11 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { IDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
-import { ReactPortalStore } from './dockview/dockview';
 import { IFrameworkPart } from '../panel/types';
+
+export interface ReactPortalStore {
+    addPortal: (portal: React.ReactPortal) => IDisposable;
+}
 
 interface IPanelWrapperProps {
     component: React.FunctionComponent<{ [key: string]: any }>;

@@ -1,14 +1,19 @@
 ## Splitview
 
-```jsx
+```javascript
 import {SplitviewComponent} from "splitview"
 ```
 
-## Paneview
+## Gridview
+
+```javascript
+import {GridviewComponent} from "splitview"
+```
 
 ## Dockview
 
-## Groupview
+```javascript
+import {DockviewComponent} from "splitview"
+```
 
-## Gridview
 

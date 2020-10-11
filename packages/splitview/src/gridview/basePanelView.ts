@@ -59,6 +59,10 @@ export abstract class BasePanelView<T extends BaseViewApi>
         );
     }
 
+    focus() {
+        this.api._onFocusEvent.fire();
+    }
+
     layout(width: number, height: number) {
         this._width = width;
         this._height = height;

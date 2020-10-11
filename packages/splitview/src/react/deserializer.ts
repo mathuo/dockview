@@ -40,7 +40,7 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
             this.layout.options.frameworkComponentFactory.tab
         ) as PanelHeaderPart;
 
-        const panel = new DefaultPanel(panelId);
+        const panel = new DefaultPanel(panelId, new DockviewApi(this.layout));
 
         // TODO container api
         panel.init({
@@ -50,7 +50,6 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
             suppressClosable,
             params: props || {},
             state: state || {},
-            containerApi: new DockviewApi(this.layout),
         });
 
         return panel;

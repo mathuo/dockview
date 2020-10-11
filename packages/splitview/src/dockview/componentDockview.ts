@@ -58,34 +58,40 @@ import { DockviewApi } from '../api/component.api';
 import { State } from '../api/api';
 
 const nextGroupId = sequentialNumberGenerator();
+const DEFAULT_TAB_HEIGHT = 35;
 
 export interface PanelReference {
     update: (event: { params: { [key: string]: any } }) => void;
     remove: () => void;
 }
 
-export interface Api {
-    readonly minimumHeight: number;
-    readonly maximumHeight: number;
-    readonly minimumWidth: number;
-    readonly maximumWidth: number;
-    // layout(width: number, height: number): void;
-    //
+export interface IComponentDockview extends IBaseGrid<IGroupview> {
+    readonly activeGroup: IGroupview;
+    moveGroupOrPanel(
+        referenceGroup: IGroupview,
+        groupId: string,
+        itemId: string,
+        target: Position,
+        index?: number
+    ): void;
+    doSetGroupActive: (group: IGroupview, skipFocus?: boolean) => void;
+    removeGroup: (group: IGroupview) => void;
+    options: DockviewOptions;
+    addPanel(options: AddPanelOptions): IGroupPanel;
+    getPanel: (id: string) => IGroupPanel;
+    fireMouseEvent(event: LayoutMouseEvent): void;
+    createWatermarkComponent(): WatermarkPart;
     setAutoResizeToFit(enabled: boolean): void;
-    resizeToFit(): void;
     setTabHeight(height: number): void;
     getTabHeight(): number;
-    readonly size: number;
     totalPanels: number;
     // lifecycle
     addPanelFromComponent(options: AddPanelOptions): PanelReference;
     addEmptyGroup(options?: AddGroupOptions): void;
     closeAllGroups: () => Promise<boolean>;
-    toJSON(): object;
     deserialize: (data: object) => void;
     deserializer: IPanelDeserializer;
     // events
-    readonly onDidLayoutChange: Event<GroupChangeEvent>;
     onTabInteractionEvent: Event<LayoutMouseEvent>;
     onTabContextMenu: Event<TabContextMenuEvent>;
     moveToNext(options?: MovementOptions): void;
@@ -101,38 +107,9 @@ export interface Api {
         type: string,
         cb: (event: LayoutDropEvent) => PanelOptions
     ): void;
-    readonly activeGroup: IGroupview;
+    setActivePanel(panel: IGroupPanel): void;
+    focus(): void;
 }
-
-export interface IGroupAccessor {
-    readonly id: string;
-    getGroup: (id: string) => IGroupview | undefined;
-    moveGroupOrPanel(
-        referenceGroup: IGroupview,
-        groupId: string,
-        itemId: string,
-        target: Position,
-        index?: number
-    ): void;
-    doSetGroupActive: (group: IGroupview) => void;
-    removeGroup: (group: IGroupview) => void;
-    readonly size: number;
-    totalPanels: number;
-    options: DockviewOptions;
-    readonly onDidLayoutChange: Event<GroupChangeEvent>;
-    //
-    addPanelFromComponent(options: AddPanelOptions): PanelReference;
-    addPanel(options: AddPanelOptions): IGroupPanel;
-    //
-    getPanel: (id: string) => IGroupPanel;
-    fireMouseEvent(event: LayoutMouseEvent): void;
-    createWatermarkComponent(): WatermarkPart;
-}
-
-export interface IComponentDockview
-    extends IGroupAccessor,
-        Api,
-        IBaseGrid<IGroupview> {}
 
 export interface LayoutDropEvent {
     event: GroupDropEvent;
@@ -184,6 +161,9 @@ export class ComponentDockview
         if (!this.options.components) {
             this.options.components = {};
         }
+        if (typeof this.options.tabHeight !== 'number') {
+            this.options.tabHeight = DEFAULT_TAB_HEIGHT;
+        }
         if (!this.options.frameworkComponents) {
             this.options.frameworkComponents = {};
         }
@@ -215,6 +195,10 @@ export class ComponentDockview
 
     set deserializer(value: IPanelDeserializer) {
         this._deserializer = value;
+    }
+
+    focus() {
+        this.activeGroup?.focus();
     }
 
     public getPanel(id: string): IGroupPanel | undefined {
@@ -273,6 +257,11 @@ export class ComponentDockview
         );
 
         return disposables;
+    }
+
+    setActivePanel(panel: IGroupPanel) {
+        this.doSetGroupActive(panel.group);
+        panel.group.openPanel(panel);
     }
 
     public moveToNext(options: MovementOptions = {}) {
@@ -370,7 +359,11 @@ export class ComponentDockview
             state
         );
 
-        return { grid: data, panels };
+        return {
+            grid: data,
+            panels,
+            options: { tabHeight: this.getTabHeight() },
+        };
     }
 
     /**
@@ -429,7 +422,11 @@ export class ComponentDockview
         if (!this.deserializer) {
             throw new Error('invalid deserializer');
         }
-        const { grid, panels } = data;
+        const { grid, panels, options } = data;
+
+        if (typeof options.tabHeight === 'number') {
+            this.setTabHeight(options.tabHeight);
+        }
 
         this.gridview.deserialize(
             grid,
@@ -475,7 +472,7 @@ export class ComponentDockview
                 if (event.tab) {
                     this._onTabContextMenu.fire({
                         event: event.event,
-                        api: new DockviewApi(this),
+                        api: this._api,
                         panel: event.panel,
                     });
                 }
@@ -532,14 +529,13 @@ export class ComponentDockview
             options.tabComponentName
         );
 
-        const panel = new DefaultPanel(options.id);
+        const panel = new DefaultPanel(options.id, this._api);
         panel.init({
             headerPart,
             contentPart,
             title: options.title || options.id,
             suppressClosable: options?.suppressClosable,
             params: options?.params || {},
-            containerApi: new DockviewApi(this),
         });
 
         this.registerPanel(panel);
@@ -705,6 +701,13 @@ export class ComponentDockview
     }
 
     createGroup(options?: GroupOptions) {
+        if (!options) {
+            options = {};
+        }
+        if (typeof options.tabHeight !== 'number') {
+            options.tabHeight = this.getTabHeight();
+        }
+
         const group = new Groupview(this, nextGroupId.next(), options);
 
         if (typeof this.options.tabHeight === 'number') {

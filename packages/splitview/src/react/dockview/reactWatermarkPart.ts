@@ -4,8 +4,8 @@ import {
     GroupPanelPartInitParameters,
     WatermarkPart,
 } from '../../groupview/panel/parts';
-import { ReactPart } from '../react';
-import { IGroupPanelProps, ReactPortalStore } from './dockview';
+import { ReactPart, ReactPortalStore } from '../react';
+import { IGroupPanelProps } from './dockview';
 
 interface IWatermarkPanelProps extends IGroupPanelProps {
     close: () => void;

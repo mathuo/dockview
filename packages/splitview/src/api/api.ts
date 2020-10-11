@@ -43,6 +43,7 @@ export interface IBaseViewApi {
     onDidFocusChange: Event<FocusEvent>;
     onDidVisibilityChange: Event<VisibilityEvent>;
     onDidActiveChange: Event<ActiveEvent>;
+    onFocusEvent: Event<void>;
     // state
     setState(key: string, value: StateObject): void;
     setState(state: State): void;
@@ -81,6 +82,9 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
         emitLastValue: true,
     });
     readonly onDidFocusChange: Event<FocusEvent> = this._onDidChangeFocus.event;
+    //
+    readonly _onFocusEvent = new Emitter<void>();
+    readonly onFocusEvent: Event<void> = this._onFocusEvent.event;
     //
     readonly _onDidVisibilityChange = new Emitter<VisibilityEvent>({
         emitLastValue: true,
@@ -123,6 +127,7 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
             this._onDidChangeFocus,
             this._onDidVisibilityChange,
             this._onDidActiveChange,
+            this._onFocusEvent,
             this.onDidFocusChange((event) => {
                 this._isFocused = event.isFocused;
             }),

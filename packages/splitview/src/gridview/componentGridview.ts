@@ -17,7 +17,7 @@ import {
 import { GridPanelView, GridviewInitParameters } from './gridPanelView';
 import { BaseComponentOptions, Parameters } from '../panel/types';
 import { GridPanelApi } from '../api/gridPanelApi';
-import { DockviewApi, GridviewApi } from '../api/component.api';
+import { GridviewApi } from '../api/component.api';
 
 interface PanelReference {
     api: GridPanelApi;
@@ -37,7 +37,7 @@ export interface AddComponentOptions extends BaseComponentOptions {
 }
 
 export interface IGridPanelComponentView extends IGridPanelView {
-    init?: (params: GridviewInitParameters) => void;
+    init: (params: GridviewInitParameters) => void;
 }
 
 export interface IComponentGridview extends IBaseGrid<GridPanelView> {
@@ -46,6 +46,7 @@ export interface IComponentGridview extends IBaseGrid<GridPanelView> {
     setVisible(panel: GridPanelView, visible: boolean): void;
     isVisible(panel: GridPanelView): boolean;
     toggleVisibility(panel: GridPanelView): void;
+    focus(): void;
 }
 
 export class ComponentGridview
@@ -107,6 +108,10 @@ export class ComponentGridview
 
     public toggleVisibility(panel: GridPanelView) {
         this.setVisible(panel, !this.isVisible(panel));
+    }
+
+    focus() {
+        this.activeGroup?.focus();
     }
 
     public fromJSON(data: any) {

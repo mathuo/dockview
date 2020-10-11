@@ -92,5 +92,8 @@
             "suppressClosable": true,
             "state": {}
         }
+    },
+    "options":{
+        "tabHeight": 35
     }
 }

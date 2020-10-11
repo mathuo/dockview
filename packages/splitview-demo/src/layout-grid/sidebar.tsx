@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
     IGridviewPanelProps,
-    PaneViewComponent,
+    PaneviewComponent,
     PaneviewReadyEvent,
     IPaneviewPanelProps,
     CompositeDisposable,
@@ -122,6 +122,9 @@ export const Sidebar = (props: IGridviewPanelProps) => {
             }),
             props.api.onDidVisibilityChange((event) => {
                 console.log(event);
+            }),
+            props.api.onFocusEvent(() => {
+                api.current.focus();
             })
         );
 
@@ -136,7 +139,7 @@ export const Sidebar = (props: IGridviewPanelProps) => {
                 backgroundColor: 'rgb(37,37,38)',
             }}
         >
-            <PaneViewComponent
+            <PaneviewComponent
                 headerComponents={headerComponents}
                 components={components}
                 onReady={onReady}

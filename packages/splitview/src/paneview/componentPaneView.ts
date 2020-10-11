@@ -87,6 +87,7 @@ export interface IComponentPaneView extends IDisposable {
     toJSON(): object;
     fromJSON(data: any): void;
     resizeToFit(): void;
+    focus(): void;
 }
 
 export class ComponentPaneView
@@ -122,6 +123,10 @@ export class ComponentPaneView
             }),
             this.paneview
         );
+    }
+
+    focus() {
+        //
     }
 
     addFromComponent(options: AddPaneviewCompponentOptions): IDisposable {

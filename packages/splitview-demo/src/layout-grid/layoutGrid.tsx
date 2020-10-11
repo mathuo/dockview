@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import {
     IGroupPanelProps,
     CompositeDisposable,
@@ -9,11 +10,13 @@ import {
     DockviewComponent,
     DockviewApi,
     IWatermarkPanelProps,
+    IGroupPanel,
 } from 'splitview';
 import { CustomTab } from './customTab';
-import { Editor } from './editorPanel';
+import { Settings } from './settingsPanel';
 import { useLayoutRegistry } from './registry';
 import { SplitPanel } from './splitPanel';
+import './layoutGrid.scss';
 
 const components = {
     inner_component: (props: IGroupPanelProps) => {
@@ -99,6 +102,8 @@ const components = {
             isPanelVisible: false,
         });
 
+        const input = React.useRef<HTMLInputElement>();
+
         React.useEffect(() => {
             const disposable = new CompositeDisposable(
                 props.api.onDidFocusChange((event) => {
@@ -112,6 +117,9 @@ const components = {
                         ..._,
                         isPanelVisible: x.isVisible,
                     }));
+                }),
+                props.api.onFocusEvent(() => {
+                    input.current.focus();
                 })
             );
 
@@ -154,6 +162,7 @@ const components = {
                 <div>test component</div>
                 <button onClick={onClick}>set state</button>
                 <button onClick={onRename}>rename</button>
+                <input ref={input} placeholder="focus test" />
                 {/* {props.api.getState()["test_key"]} */}
 
                 <div>{`G:${panelState.isGroupActive} P:${panelState.isPanelVisible}`}</div>
@@ -161,7 +170,7 @@ const components = {
             </div>
         );
     },
-    editor: Editor,
+    settings: Settings,
     split_panel: SplitPanel,
 };
 
@@ -182,6 +191,27 @@ export const TestGrid = (props: IGridviewPanelProps) => {
         const api = event.api;
         _api.current = event.api;
         registry.register('dockview', api);
+
+        api.addDndHandle('text/plain', (ev) => {
+            const { event } = ev;
+
+            return {
+                id: 'yellow',
+                componentName: 'test_component',
+            };
+        });
+
+        api.addDndHandle('Files', (ev) => {
+            const { event } = ev;
+
+            ev.event.event.preventDefault();
+
+            return {
+                id: Date.now().toString(),
+                title: event.event.dataTransfer.files[0].name,
+                componentName: 'test_component',
+            };
+        });
 
         event.api.deserialize(require('./layoutGrid.layout.json'));
         return;
@@ -209,27 +239,6 @@ export const TestGrid = (props: IGridviewPanelProps) => {
             position: { direction: 'below', referencePanel: 'item2' },
             suppressClosable: true,
         });
-
-        api.addDndHandle('text/plain', (ev) => {
-            const { event } = ev;
-
-            return {
-                id: 'yellow',
-                componentName: 'test_component',
-            };
-        });
-
-        api.addDndHandle('Files', (ev) => {
-            const { event } = ev;
-
-            ev.event.event.preventDefault();
-
-            return {
-                id: Date.now().toString(),
-                title: event.event.dataTransfer.files[0].name,
-                componentName: 'test_component',
-            };
-        });
     };
 
     React.useEffect(() => {
@@ -253,25 +262,79 @@ export const TestGrid = (props: IGridviewPanelProps) => {
         };
     }, []);
 
+    const [coord, setCoord] = React.useState<{
+        x: number;
+        y: number;
+        panel: IGroupPanel;
+    }>(undefined);
+
     const onTabContextMenu = React.useMemo(
         () => (event: TabContextMenuEvent) => {
-            console.log(event);
+            event.event.preventDefault();
+            console.log(event.panel);
+            const cb = (event: MouseEvent) => {
+                let element: HTMLElement = event.target as HTMLElement;
+
+                while (element) {
+                    if (element.classList.contains('context-menu')) {
+                        return;
+                    }
+                    element = element.parentElement;
+                }
+
+                window.removeEventListener('mousedown', cb);
+                setCoord(undefined);
+            };
+            window.addEventListener('mousedown', cb);
+            setCoord({
+                x: event.event.clientX,
+                y: event.event.clientY,
+                panel: event.panel,
+            });
         },
         []
     );
 
+    const onClose = () => {
+        setCoord(undefined);
+        coord.panel.api.close();
+    };
+
+    const onChangeName = () => {
+        setCoord(undefined);
+        coord.panel.api.setTitle('This looks new?');
+    };
+
     return (
-        <DockviewComponent
-            onReady={onReady}
-            components={components}
-            tabComponents={tabComponents}
-            debug={false}
-            // tabHeight={}
-            enableExternalDragEvents={true}
-            // serializedLayout={data}
-            onTabContextMenu={onTabContextMenu}
-            watermarkComponent={Watermark}
-        />
+        <>
+            {coord &&
+                ReactDOM.createPortal(
+                    <div
+                        className="context-menu"
+                        style={{
+                            left: `${coord.x}px`,
+                            top: `${coord.y}px`,
+                        }}
+                    >
+                        <div className="context-action" onClick={onClose}>
+                            Close
+                        </div>
+                        <div className="context-action" onClick={onChangeName}>
+                            Rename
+                        </div>
+                    </div>,
+                    document.getElementById('anchor')
+                )}
+            <DockviewComponent
+                onReady={onReady}
+                components={components}
+                tabComponents={tabComponents}
+                debug={false}
+                enableExternalDragEvents={true}
+                onTabContextMenu={onTabContextMenu}
+                watermarkComponent={Watermark}
+            />
+        </>
     );
 };
 

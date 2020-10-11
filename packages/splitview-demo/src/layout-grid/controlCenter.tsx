@@ -95,10 +95,29 @@ export const ControlCenter = () => {
         console.log(JSON.stringify(api.toJSON(), null, 4));
     };
 
+    const onAddSettings = () => {
+        const api = registry.get<DockviewApi>('dockview');
+
+        const settingsPanel = api.getPanel('settings');
+        if (settingsPanel) {
+            api.setActive(settingsPanel);
+            return;
+        }
+
+        api.addPanelFromComponent({
+            id: 'settings',
+            componentName: 'settings',
+            title: 'Settings',
+        });
+    };
+
     return (
         <div className="control-center">
             <div className="control-center-row">
                 <button onClick={onAdd}>Add</button>
+            </div>
+            <div className="control-center-row">
+                <button onClick={onAddSettings}>Settings</button>
             </div>
             <div className="control-center-row">
                 <button onClick={onAddEmpty}>Add empty</button>

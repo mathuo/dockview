@@ -22,10 +22,6 @@ export interface DockviewReadyEvent {
     api: DockviewApi;
 }
 
-export interface ReactPortalStore {
-    addPortal: (portal: React.ReactPortal) => IDisposable;
-}
-
 export interface IWatermarkPanelProps {
     containerApi: DockviewApi;
     close(): void;
@@ -40,16 +36,6 @@ export interface IDockviewComponentProps {
     };
     watermarkComponent?: React.FunctionComponent<IWatermarkPanelProps>;
     onReady?: (event: DockviewReadyEvent) => void;
-    serializedLayout?: {};
-    deserializer?: {
-        fromJSON: (
-            data: any
-        ) => {
-            component: React.FunctionComponent<IGroupPanelProps>;
-            tabComponent?: React.FunctionComponent<IGroupPanelProps>;
-            props?: { [key: string]: any };
-        };
-    };
     debug?: boolean;
     tabHeight?: number;
     enableExternalDragEvents?: boolean;
@@ -111,15 +97,10 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
             debug: props.debug,
             enableExternalDragEvents: props.enableExternalDragEvents,
             watermarkFrameworkComponent: props.watermarkComponent,
-            // orientation: props.orientation,
         });
 
         domRef.current?.appendChild(dockview.element);
         dockview.deserializer = new ReactPanelDeserialzier(dockview);
-
-        if (props.serializedLayout) {
-            dockview.deserialize(props.serializedLayout);
-        }
 
         dockview.resizeToFit();
 

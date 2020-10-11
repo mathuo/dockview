@@ -1,7 +1,6 @@
 import { PanelViewInitParameters } from '../../splitview/core/options';
 import { PanelView } from '../../splitview/panelView';
-import { ReactPortalStore } from '../dockview/dockview';
-import { ReactPart } from '../react';
+import { ReactPart, ReactPortalStore } from '../react';
 import { ISplitviewPanelProps } from './splitview';
 
 export class ReactPanelView extends PanelView {

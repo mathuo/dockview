@@ -9,11 +9,12 @@ import {
     IGroupPanelInitParameters,
 } from './parts';
 import { PanelUpdateEvent } from '../../panel/types';
+import { DockviewApi } from '../../api/component.api';
 
 export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
     private readonly mutableDisposable = new MutableDisposable();
 
-    private readonly api: GroupPanelApi;
+    readonly api: GroupPanelApi;
     private _group: IGroupview;
     private params?: IGroupPanelInitParameters;
 
@@ -34,7 +35,10 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
         return this.contentPart;
     }
 
-    constructor(public readonly id: string) {
+    constructor(
+        public readonly id: string,
+        private readonly containerApi: DockviewApi
+    ) {
         super();
 
         this.api = new GroupPanelApi(this, this._group);
@@ -46,6 +50,10 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
                 this.update({ params: { title } });
             })
         );
+    }
+
+    focus() {
+        this.api._onFocusEvent.fire();
     }
 
     public setDirty(isDirty: boolean) {
@@ -89,12 +97,12 @@ export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
         this.content?.init({
             ...params,
             api: this.api,
-            containerApi: params.containerApi,
+            containerApi: this.containerApi,
         });
         this.header?.init({
             ...params,
             api: this.api,
-            containerApi: params.containerApi,
+            containerApi: this.containerApi,
         });
     }
 

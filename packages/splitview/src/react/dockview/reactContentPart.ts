@@ -3,8 +3,8 @@ import {
     PanelContentPart,
     GroupPanelPartInitParameters,
 } from '../../groupview/panel/parts';
-import { ReactPart } from '../react';
-import { IGroupPanelProps, ReactPortalStore } from '../dockview/dockview';
+import { ReactPart, ReactPortalStore } from '../react';
+import { IGroupPanelProps } from '../dockview/dockview';
 import { PanelUpdateEvent } from '../../panel/types';
 
 export class ReactPanelContentPart implements PanelContentPart {
@@ -21,6 +21,10 @@ export class ReactPanelContentPart implements PanelContentPart {
         private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');
+    }
+
+    focus() {
+        //noop
     }
 
     public init(parameters: GroupPanelPartInitParameters): void {

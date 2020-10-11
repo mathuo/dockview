@@ -1,5 +1,4 @@
 import { State } from '../api/api';
-import { Event } from '../events';
 import { IDisposable } from '../lifecycle';
 import { LayoutPriority } from '../splitview/core/splitview';
 
@@ -21,14 +20,15 @@ export interface PanelUpdateEvent {
 
 export interface IPanel extends IDisposable {
     readonly id: string;
-    init?(params: PanelInitParameters): void;
+    init(params: PanelInitParameters): void;
     layout(width: number, height: number): void;
-    update?(event: PanelUpdateEvent): void;
-    toJSON?(): object;
+    update(event: PanelUpdateEvent): void;
+    toJSON(): object;
+    focus(): void;
 }
 
 export interface IFrameworkPart extends IDisposable {
-    update(params: { [index: string]: any }): void;
+    update(params: Parameters): void;
 }
 
 export interface BaseComponentOptions {

@@ -157,7 +157,7 @@ export interface IGridView {
         height: number
         // top: number, left: number
     ): void;
-    toJSON?(): object;
+    toJSON(): object;
     fromJSON?(json: object): void;
     snap?: boolean;
     setVisible?(visible: boolean): void;
@@ -167,38 +167,6 @@ const orthogonal = (orientation: Orientation) =>
     orientation === Orientation.HORIZONTAL
         ? Orientation.VERTICAL
         : Orientation.HORIZONTAL;
-
-const serializeLeafNode = (node: LeafNode) => {
-    const size =
-        node.orientation === Orientation.HORIZONTAL
-            ? node.size
-            : node.orthogonalSize;
-    return {
-        size,
-        data: node.view.toJSON ? node.view.toJSON() : {},
-        type: 'leaf',
-        visible: node.size !== 0,
-    };
-};
-
-// const serializeBranchNode = (node: BranchNode) => {
-//     const size =
-//         node.orientation === Orientation.HORIZONTAL
-//             ? node.size
-//             : node.orthogonalSize;
-
-//     return {
-//         orientation: node.orientation,
-//         size,
-//         data: node.children.map((child) => {
-//             if (child instanceof LeafNode) {
-//                 return serializeLeafNode(child);
-//             }
-//             return serializeBranchNode(child as BranchNode);
-//         }),
-//         type: 'branch',
-//     };
-// };
 
 export interface GridLeafNode<T extends IGridView> {
     readonly view: T;

@@ -11,11 +11,17 @@ export const Activitybar = (props: IGridviewPanelProps) => {
     const registry = useLayoutRegistry();
     const [isActive, setActive] = React.useState<boolean>(false);
 
-    const onOpenSidebar = () => {
+    const onOpenSidebar = (event: React.MouseEvent<HTMLDivElement>) => {
         const api = registry.get<GridviewApi>('gridview');
 
         const sidebarPanel = api.getGroup('sidebar');
-        api.toggleVisibility(sidebarPanel);
+        if (api.isVisible(sidebarPanel)) {
+            api.setVisible(sidebarPanel, false);
+        } else {
+            event.preventDefault(); // prevent focus
+            api.setVisible(sidebarPanel, true);
+            sidebarPanel.focus();
+        }
     };
 
     React.useEffect(() => {

@@ -60,15 +60,6 @@ export abstract class PanelView
         );
     }
 
-    layout(size: number, orthogonalSize: number) {
-        super.layout(size, orthogonalSize);
-    }
-
-    setVisible(isVisible: boolean) {
-        super.setVisible(isVisible);
-        this.api._onDidVisibilityChange.fire({ isVisible });
-    }
-
     init(parameters: PanelViewInitParameters): void {
         super.init(parameters);
 

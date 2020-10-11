@@ -119,5 +119,3 @@ export function addDisposableListener<K extends keyof HTMLElementEventMap>(
         },
     };
 }
-
-window.addEventListener;

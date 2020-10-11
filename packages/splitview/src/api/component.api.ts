@@ -9,6 +9,7 @@ import {
     PanelOptions,
 } from '../dockview';
 import { IGroupview } from '../groupview/groupview';
+import { IGroupPanel } from '../groupview/panel/parts';
 import {
     AddPaneviewCompponentOptions,
     IComponentPaneView,
@@ -33,6 +34,10 @@ export class SplitviewApi {
     }
 
     constructor(private readonly component: IComponentSplitview) {}
+
+    focus() {
+        return this.component.focus();
+    }
 
     layout(width: number, height: number) {
         return this.component.layout(width, height);
@@ -69,6 +74,10 @@ export class PaneviewApi {
     }
 
     constructor(private readonly component: IComponentPaneView) {}
+
+    focus() {
+        return this.component.focus();
+    }
 
     layout(width: number, height: number) {
         return this.component.layout(width, height);
@@ -113,6 +122,10 @@ export class GridviewApi {
     }
 
     constructor(private readonly component: IComponentGridview) {}
+
+    focus() {
+        return this.component.focus();
+    }
 
     layout(width: number, height: number, force = false) {
         return this.component.layout(width, height, force);
@@ -181,6 +194,18 @@ export class DockviewApi {
     }
 
     constructor(private readonly component: IComponentDockview) {}
+
+    focus() {
+        return this.component.focus();
+    }
+
+    getPanel(id: string): IGroupPanel | undefined {
+        return this.component.getPanel(id);
+    }
+
+    setActive(panel: IGroupPanel) {
+        return this.component.setActivePanel(panel);
+    }
 
     layout(width: number, height: number, force = false) {
         return this.component.layout(width, height, force);

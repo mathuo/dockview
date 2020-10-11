@@ -1,6 +1,6 @@
 import { IDisposable } from '../../lifecycle';
 import { IGroupview } from '../groupview';
-import { IGroupAccessor } from '../../dockview';
+import { IComponentDockview } from '../../dockview';
 import { IGroupPanelApi } from '../../api/groupPanelApi';
 import { Constructor } from '../../types';
 import { PanelInitParameters, IPanel } from '../../panel/types';
@@ -41,29 +41,29 @@ export interface IGroupPanelInitParameters
         HeaderPartInitParameters {
     headerPart: PanelHeaderPart;
     contentPart: PanelContentPart;
-    containerApi: DockviewApi;
 }
 
 export interface IGroupPanel extends IDisposable, IPanel {
-    header?: PanelHeaderPart;
-    content?: PanelContentPart;
-    group: IGroupview;
+    readonly header?: PanelHeaderPart;
+    readonly content?: PanelContentPart;
+    readonly group: IGroupview;
+    readonly api: IGroupPanelApi;
     setVisible(isGroupActive: boolean, group: IGroupview): void;
     setDirty(isDirty: boolean): void;
     close?(): Promise<boolean>;
-    init?(params: IGroupPanelInitParameters): void;
+    init(params: IGroupPanelInitParameters): void;
     onDidStateChange: Event<any>;
 }
 
 // watermark component
 
 export interface WatermarkPartInitParameters {
-    accessor: IGroupAccessor;
+    accessor: IComponentDockview;
 }
 
 export interface WatermarkPart extends IDisposable {
-    init?: (params: GroupPanelPartInitParameters) => void;
-    setVisible?(visible: boolean, group: IGroupview): void;
+    init: (params: GroupPanelPartInitParameters) => void;
+    setVisible(visible: boolean, group: IGroupview): void;
     element: HTMLElement;
 }
 

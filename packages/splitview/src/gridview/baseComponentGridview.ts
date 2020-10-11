@@ -35,7 +35,7 @@ export interface BaseGridOptions {
 }
 
 export interface IGridPanelView extends IGridView, IPanel {
-    setActive(isActive: boolean): void;
+    setActive(isActive: boolean, skipFocus?: boolean): void;
     isActive: boolean;
 }
 
@@ -164,11 +164,11 @@ export abstract class BaseGrid<T extends IGridPanelView>
         return this.groups.get(id)?.value;
     }
 
-    public doSetGroupActive(group: T) {
+    public doSetGroupActive(group: T, skipFocus?: boolean) {
         if (this._activeGroup && this._activeGroup !== group) {
-            this._activeGroup.setActive(false);
+            this._activeGroup.setActive(false, skipFocus);
         }
-        group.setActive(true);
+        group.setActive(true, skipFocus);
         this._activeGroup = group;
     }
 
