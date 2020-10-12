@@ -5,7 +5,13 @@ import {
 } from '../../lifecycle';
 import { addDisposableListener, Emitter, Event } from '../../events';
 import { ITab, Tab } from '../panel/tab/tab';
-import { removeClasses, addClasses, toggleClass } from '../../dom';
+import {
+    removeClasses,
+    addClasses,
+    toggleClass,
+    isInTree,
+    isAncestor,
+} from '../../dom';
 import { hasProcessed, Position } from '../droptarget/droptarget';
 import { TabDropEvent } from '../events';
 
@@ -15,6 +21,7 @@ import { last } from '../../array';
 import { DataTransferSingleton } from '../droptarget/dataTransfer';
 import { IGroupPanel } from '../panel/parts';
 import { MouseEventKind } from '../events';
+import { focusedElement } from '../../focusedElement';
 
 export interface ITabContainer extends IDisposable {
     element: HTMLElement;
@@ -223,10 +230,12 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
 
         const disposable = CompositeDisposable.from(
             tab.onChanged((event) => {
+                const alreadyFocused =
+                    panel.id === this.group.activePanel?.id &&
+                    this.group.isAncestor(focusedElement.element);
                 switch (event.kind) {
                     case MouseEventKind.CLICK:
-                        event.event.preventDefault(); // prevent the click focusing anything, because we need to programatically focus the next panel
-                        this.group.openPanel(panel);
+                        this.group.setPanel(panel, alreadyFocused);
                         break;
                 }
                 this.accessor.fireMouseEvent({ ...event, panel, tab: true });

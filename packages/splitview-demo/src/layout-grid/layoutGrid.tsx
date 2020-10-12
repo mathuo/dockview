@@ -167,6 +167,7 @@ const components = {
 
                 <div>{`G:${panelState.isGroupActive} P:${panelState.isPanelVisible}`}</div>
                 <div>{props.text || '-'}</div>
+                <input placeholder="another focus test" />
             </div>
         );
     },

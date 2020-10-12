@@ -47,19 +47,23 @@ export const ControlCenter = () => {
         api.addEmptyGroup();
     };
 
-    const nextPanel = () => {
+    const nextPanel = (ev: React.MouseEvent<HTMLButtonElement>) => {
+        ev.preventDefault();
         const api = registry.get<DockviewApi>('dockview');
         api.moveToNext({ includePanel: true });
     };
-    const nextGroup = () => {
+    const nextGroup = (ev: React.MouseEvent<HTMLButtonElement>) => {
+        ev.preventDefault();
         const api = registry.get<DockviewApi>('dockview');
         api.moveToNext();
     };
-    const previousPanel = () => {
+    const previousPanel = (ev: React.MouseEvent<HTMLButtonElement>) => {
+        ev.preventDefault();
         const api = registry.get<DockviewApi>('dockview');
         api.moveToPrevious({ includePanel: true });
     };
-    const previousGroup = () => {
+    const previousGroup = (ev: React.MouseEvent<HTMLButtonElement>) => {
+        ev.preventDefault();
         const api = registry.get<DockviewApi>('dockview');
         api.moveToNext();
     };
@@ -128,31 +132,33 @@ export const ControlCenter = () => {
     return (
         <div className="control-center">
             <div className="control-center-row">
-                <button onClick={onFocusSplitview}>Split view focus</button>
+                <button onMouseDown={onFocusSplitview}>Split view focus</button>
             </div>
             <div className="control-center-row">
-                <button onClick={onFocusPanel}>Split view panel focus</button>
+                <button onMouseDown={onFocusPanel}>
+                    Split view panel focus
+                </button>
             </div>
             <div className="control-center-row">
-                <button onClick={onAdd}>Add</button>
+                <button onMouseDown={onAdd}>Add</button>
             </div>
             <div className="control-center-row">
-                <button onClick={onAddSettings}>Settings</button>
+                <button onMouseDown={onAddSettings}>Settings</button>
             </div>
             <div className="control-center-row">
-                <button onClick={onAddEmpty}>Add empty</button>
+                <button onMouseDown={onAddEmpty}>Add empty</button>
             </div>
             <div className="control-center-row">
-                <button onClick={nextPanel}>Next panel</button>
+                <button onMouseDown={nextPanel}>Next panel</button>
             </div>
             <div className="control-center-row">
-                <button onClick={nextGroup}>Next Group</button>
+                <button onMouseDown={nextGroup}>Next Group</button>
             </div>
             <div className="control-center-row">
-                <button onClick={previousPanel}>Previous Panel</button>
+                <button onMouseDown={previousPanel}>Previous Panel</button>
             </div>
             <div className="control-center-row">
-                <button onClick={previousGroup}>Previous Group</button>
+                <button onMouseDown={previousGroup}>Previous Group</button>
             </div>
             <div className="control-center-row">
                 <button onClick={onConfig}>Save</button>

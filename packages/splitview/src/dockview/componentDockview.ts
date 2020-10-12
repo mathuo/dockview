@@ -349,6 +349,8 @@ export class ComponentDockview
 
         const state = { ...this.panelState };
 
+        // this.activeGroup.id
+
         const panels = Array.from(this.panels.values()).reduce(
             (collection, panel) => {
                 if (!this.panelState[panel.value.id]) {
@@ -362,6 +364,7 @@ export class ComponentDockview
         return {
             grid: data,
             panels,
+            activeGroup: this.activeGroup?.id,
             options: { tabHeight: this.getTabHeight() },
         };
     }
@@ -422,7 +425,7 @@ export class ComponentDockview
         if (!this.deserializer) {
             throw new Error('invalid deserializer');
         }
-        const { grid, panels, options } = data;
+        const { grid, panels, options, activeGroup } = data;
 
         if (typeof options.tabHeight === 'number') {
             this.setTabHeight(options.tabHeight);
@@ -439,6 +442,11 @@ export class ComponentDockview
                 },
             })
         );
+
+        if (typeof activeGroup === 'string') {
+            this.doSetGroupActive(this.getGroup(activeGroup));
+        }
+
         this._onDidLayoutChange.fire({ kind: GroupChangeKind.NEW_LAYOUT });
     }
 
@@ -708,7 +716,15 @@ export class ComponentDockview
             options.tabHeight = this.getTabHeight();
         }
 
-        const group = new Groupview(this, nextGroupId.next(), options);
+        if (options?.id && this.groups.has(options.id)) {
+            throw new Error(`duplicate group ${options.id}`);
+        }
+
+        const group = new Groupview(
+            this,
+            options?.id || nextGroupId.next(),
+            options
+        );
 
         if (typeof this.options.tabHeight === 'number') {
             group.tabHeight = this.options.tabHeight;

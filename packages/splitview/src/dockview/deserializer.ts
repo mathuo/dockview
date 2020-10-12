@@ -27,6 +27,7 @@ export class DefaultDeserializer implements IViewDeserializer {
         const group = this.layout.createGroup({
             panels,
             activePanel: panels.find((p) => p.id === active),
+            id: data.id,
         });
 
         return group;

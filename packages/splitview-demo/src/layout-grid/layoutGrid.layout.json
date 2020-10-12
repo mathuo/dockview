@@ -6,6 +6,7 @@
                 {
                     "type": "leaf",
                     "data": {
+                        "id": "group_1",
                         "views": [
                             "split_panel"
                         ],
@@ -19,6 +20,7 @@
                         {
                             "type": "leaf",
                             "data": {
+                                "id": "group_2",
                                 "views": [
                                     "item2"
                                 ],
@@ -29,6 +31,7 @@
                         {
                             "type": "leaf",
                             "data": {
+                                "id": "group_3",
                                 "views": [
                                     "panel_2"
                                 ],
@@ -42,6 +45,7 @@
                 {
                     "type": "leaf",
                     "data": {
+                        "id": "group_4",
                         "views": [
                             "panel_0"
                         ],
@@ -95,5 +99,6 @@
     },
     "options":{
         "tabHeight": 35
-    }
+    },
+    "activeGroup": "group_2"
 }

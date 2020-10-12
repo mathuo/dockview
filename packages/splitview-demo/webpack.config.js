@@ -49,5 +49,6 @@ module.exports = {
         compress: true,
         contentBase: path.resolve(__dirname, 'public'),
         publicPath: '/dist',
+        writeToDisk:true
     },
 };

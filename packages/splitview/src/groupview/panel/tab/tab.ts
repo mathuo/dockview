@@ -7,10 +7,11 @@ import {
     DATA_KEY,
     DragType,
 } from '../../droptarget/dataTransfer';
-import { toggleClass } from '../../../dom';
+import { toggleClass, trackFocus } from '../../../dom';
 import { IComponentDockview } from '../../../dockview';
 import { LayoutMouseEvent, MouseEventKind } from '../../events';
 import { PanelHeaderPart } from '../parts';
+import { focusedElement } from '../../../focusedElement';
 
 export interface ITab {
     id: string;
@@ -65,21 +66,10 @@ export class Tab extends CompositeDisposable implements ITab {
 
         this._element = document.createElement('div');
         this._element.className = 'tab';
+        this._element.tabIndex = 0;
         this._element.draggable = true;
 
         this.addDisposables(
-            addDisposableListener(this._element, 'mousedown', (event) => {
-                if (event.defaultPrevented) {
-                    return;
-                }
-                this._onChanged.fire({ kind: MouseEventKind.CLICK, event });
-            }),
-            addDisposableListener(this._element, 'contextmenu', (event) => {
-                this._onChanged.fire({
-                    kind: MouseEventKind.CONTEXT_MENU,
-                    event,
-                });
-            }),
             addDisposableListener(this._element, 'dragstart', (event) => {
                 this.dragInPlayDetails = {
                     isDragging: true,
@@ -124,6 +114,40 @@ export class Tab extends CompositeDisposable implements ITab {
                     isDragging: false,
                     id: undefined,
                 };
+            }),
+            addDisposableListener(this._element, 'mousedown', (event) => {
+                if (event.defaultPrevented) {
+                    return;
+                }
+
+                /**
+                 * //TODO mousedown focusing with draggable element (is there a better approach?)
+                 *
+                 * this mousedown event wants to focus the tab itself but if we call preventDefault()
+                 * this would also prevent the dragStart event from firing. To get around this we propagate
+                 * the onChanged event during the next tick of the event-loop, allowing the tab element to become
+                 * focused on this tick and ensuring the dragstart event is not interrupted
+                 */
+
+                const oldFocus = focusedElement.element as any;
+                setTimeout(() => {
+                    oldFocus.focus();
+                    this._onChanged.fire({ kind: MouseEventKind.CLICK, event });
+                }, 0);
+            }),
+            addDisposableListener(this._element, 'focusin', (event) => {
+                const oldFocus = focusedElement.element as any;
+                if (oldFocus.focus) {
+                    // setTimeout(() => {
+                    // oldFocus.focus();
+                    // }, 0);
+                }
+            }),
+            addDisposableListener(this._element, 'contextmenu', (event) => {
+                this._onChanged.fire({
+                    kind: MouseEventKind.CONTEXT_MENU,
+                    event,
+                });
             })
         );
 

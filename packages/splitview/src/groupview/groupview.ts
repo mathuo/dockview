@@ -4,7 +4,7 @@ import { IContentContainer, ContentContainer } from './panel/content/content';
 import { Position, Droptarget, DroptargetEvent } from './droptarget/droptarget';
 import { Event, Emitter, addDisposableListener } from '../events';
 import { IComponentDockview, ComponentDockview } from '../dockview';
-import { toggleClass } from '../dom';
+import { isAncestor, toggleClass } from '../dom';
 import { IGroupPanel, WatermarkPart } from './panel/parts';
 import { timeoutPromise } from '../async';
 import {
@@ -56,6 +56,7 @@ interface GroupMoveEvent {
 export interface GroupOptions {
     panels?: IGroupPanel[];
     activePanel?: IGroupPanel;
+    id?: string;
     tabHeight?: number;
 }
 
@@ -89,6 +90,8 @@ export interface IGroupview extends IDisposable, IGridPanelView {
         panel?: IGroupPanel;
         suppressRoll?: boolean;
     }): void;
+    setPanel(panel: IGroupPanel, skipFocus?: boolean): void;
+    isAncestor(element: Element): boolean;
 }
 
 export interface GroupDropEvent {
@@ -175,6 +178,13 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         return Number.MAX_SAFE_INTEGER;
     }
 
+    isAncestor(element: Element): boolean {
+        return (
+            element === this.contentContainer.element ||
+            isAncestor(element, this.contentContainer.element)
+        );
+    }
+
     public indexOf(panel: IGroupPanel) {
         return this.tabContainer.indexOf(panel.id);
     }
@@ -183,6 +193,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         return {
             views: this.panels.map((panel) => panel.id),
             activeView: this._activePanel?.id,
+            id: this.id,
         };
     }
 
@@ -319,9 +330,12 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 this.doAddPanel(panel);
             });
         }
+
         if (options?.activePanel) {
             this.doSetActivePanel(options.activePanel);
         }
+
+        this.setActive(this._active, true, true);
 
         this.updateContainer();
     }
@@ -348,6 +362,21 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         this.doSetActivePanel(panel);
         this.accessor.doSetGroupActive(this);
+
+        this.updateContainer();
+    }
+
+    public setPanel(panel: IGroupPanel, skipFocus?: boolean) {
+        if (this._activePanel === panel) {
+            this.accessor.doSetGroupActive(this, skipFocus);
+            return;
+        }
+
+        this.tabContainer.openPanel(panel, this.panels.indexOf(panel));
+        this.contentContainer.openPanel(panel.content);
+
+        this.doSetActivePanel(panel);
+        this.accessor.doSetGroupActive(this, skipFocus);
 
         this.updateContainer();
     }
@@ -434,13 +463,10 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         return this._activePanel === panel;
     }
 
-    public setActive(isActive: boolean, skipFocus = false) {
-        if (this._active === isActive) {
+    public setActive(isActive: boolean, skipFocus = false, force = false) {
+        if (!force && this._active === isActive) {
             if (!skipFocus) {
-                setTimeout(() => {
-                    // ensures the focus takes effect
-                    this._activePanel?.focus();
-                }, 0);
+                this._activePanel?.focus();
             }
             return;
         }
@@ -464,10 +490,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         if (isActive) {
             if (!skipFocus) {
-                setTimeout(() => {
-                    // ensures the focus takes effect
-                    this._activePanel?.focus();
-                }, 0);
+                this._activePanel?.focus();
             }
             this._onDidGroupChange.fire({ kind: GroupChangeKind.GROUP_ACTIVE });
         }
@@ -522,13 +545,13 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         const existingPanel = this._panels.indexOf(panel);
         const hasExistingPanel = existingPanel > -1;
 
+        this.tabContainer.openPanel(panel, index);
+        this.contentContainer.openPanel(panel.content);
+
         if (hasExistingPanel) {
             // TODO - need to ensure ordering hasn't changed and if it has need to re-order this.panels
             return;
         }
-
-        this.tabContainer.openPanel(panel, index);
-        this.contentContainer.openPanel(panel.content);
 
         this.panels.splice(index, 0, panel);
 
