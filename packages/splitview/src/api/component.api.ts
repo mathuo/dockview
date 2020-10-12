@@ -14,11 +14,13 @@ import {
     AddPaneviewCompponentOptions,
     IComponentPaneView,
 } from '../paneview/componentPaneView';
+import { PaneView } from '../paneview/paneview';
 import { GridPanelView } from '../react';
 import {
     AddSplitviewComponentOptions,
     IComponentSplitview,
 } from '../splitview/componentSplitview';
+import { PanelView } from '../splitview/panelView';
 
 export class SplitviewApi {
     get minimumSize() {
@@ -37,6 +39,14 @@ export class SplitviewApi {
 
     focus() {
         return this.component.focus();
+    }
+
+    getPanel(id: string) {
+        return this.component.getPanel(id);
+    }
+
+    setActive(panel: PanelView) {
+        return this.component.setActive(panel);
     }
 
     layout(width: number, height: number) {
@@ -203,7 +213,7 @@ export class DockviewApi {
         return this.component.getPanel(id);
     }
 
-    setActive(panel: IGroupPanel) {
+    setActivePanel(panel: IGroupPanel) {
         return this.component.setActivePanel(panel);
     }
 

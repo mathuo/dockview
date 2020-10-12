@@ -115,7 +115,7 @@ export class ComponentGridview
     }
 
     public fromJSON(data: any) {
-        const { grid, panels } = data;
+        const { grid, panels, activePanel } = data;
 
         this.gridview.clear();
         this.groups.clear();
@@ -146,6 +146,13 @@ export class ComponentGridview
                 return view;
             },
         });
+
+        if (typeof activePanel === 'string') {
+            const panel = this.getPanel(activePanel);
+            if (panel) {
+                this.doSetGroupActive(panel);
+            }
+        }
 
         this.gridview.layout(this._size, this._orthogonalSize);
 

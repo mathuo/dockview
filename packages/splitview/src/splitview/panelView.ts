@@ -60,6 +60,13 @@ export abstract class PanelView
         );
     }
 
+    setActive(isActive: boolean, skipFocus?: boolean) {
+        super.setActive(isActive);
+        if (!skipFocus) {
+            this.focus();
+        }
+    }
+
     init(parameters: PanelViewInitParameters): void {
         super.init(parameters);
 

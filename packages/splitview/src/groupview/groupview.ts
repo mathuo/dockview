@@ -316,11 +316,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         if (options?.panels) {
             options.panels.forEach((panel) => {
-                this.openPanel(panel);
+                this.doAddPanel(panel);
             });
         }
         if (options?.activePanel) {
-            this.openPanel(options?.activePanel);
+            this.doSetActivePanel(options.activePanel);
         }
 
         this.updateContainer();
@@ -345,9 +345,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
 
         this.doAddPanel(panel, index);
-
-        this.tabContainer.openPanel(panel, index);
-        this.contentContainer.openPanel(panel.content);
 
         this.doSetActivePanel(panel);
         this.accessor.doSetGroupActive(this);
@@ -521,7 +518,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         });
     }
 
-    private doAddPanel(panel: IGroupPanel, index: number) {
+    private doAddPanel(panel: IGroupPanel, index: number = this.panels.length) {
         const existingPanel = this._panels.indexOf(panel);
         const hasExistingPanel = existingPanel > -1;
 
@@ -529,6 +526,9 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             // TODO - need to ensure ordering hasn't changed and if it has need to re-order this.panels
             return;
         }
+
+        this.tabContainer.openPanel(panel, index);
+        this.contentContainer.openPanel(panel.content);
 
         this.panels.splice(index, 0, panel);
 
@@ -538,6 +538,9 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     private doSetActivePanel(panel: IGroupPanel) {
         this._activePanel = panel;
         this.tabContainer.setActivePanel(panel);
+
+        // this.contentContainer.openPanel(panel.content);
+
         panel.layout(this._width, this._height);
 
         this._onDidGroupChange.fire({ kind: GroupChangeKind.PANEL_ACTIVE });

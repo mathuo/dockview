@@ -7,9 +7,9 @@
                     "type": "leaf",
                     "data": {
                         "views": [
-                            "panel_1"
+                            "split_panel"
                         ],
-                        "activeView": "panel_1"
+                        "activeView": "split_panel"
                     },
                     "size": 371
                 },
@@ -75,8 +75,8 @@
             "title": "Item 2",
             "state": {}
         },
-        "panel_1": {
-            "id": "panel_1",
+        "split_panel": {
+            "id": "split_panel",
             "contentId": "split_panel",
             "tabId": "__DEFAULT_TAB__",
             "props": {},

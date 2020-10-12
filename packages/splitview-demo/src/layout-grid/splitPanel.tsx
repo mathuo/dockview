@@ -8,12 +8,16 @@ import {
     IGroupPanelProps,
     SplitviewApi,
 } from 'splitview';
+import { useLayoutRegistry } from './registry';
+import './splitPanel.scss';
 
 const components = {
     default1: (props: ISplitviewPanelProps) => {
+        const ref = React.useRef<HTMLInputElement>();
         const [focused, setFocused] = React.useState<boolean>(false);
+        const [active, setActive] = React.useState<boolean>(false);
 
-        const onClick = () => {
+        const onClick = (ev: React.MouseEvent<HTMLButtonElement>) => {
             props.api.setSize({ size: 300 });
         };
 
@@ -21,6 +25,12 @@ const components = {
             const disposable = new CompositeDisposable(
                 props.api.onDidFocusChange((event) => {
                     setFocused(event.isFocused);
+                }),
+                props.api.onDidActiveChange((event) => {
+                    setActive(event.isActive);
+                }),
+                props.api.onFocusEvent(() => {
+                    ref.current.focus();
                 })
             );
 
@@ -31,8 +41,9 @@ const components = {
 
         return (
             <div style={{ height: '100%', width: '100%' }}>
-                {`component [isFocused: ${focused}]`}
+                {`[isFocused: ${focused} isActive: ${active}]`}
                 <button onClick={onClick}>resize</button>
+                <input ref={ref} type="text" placeholder="focus test" />
                 <span>{(props as any).text}</span>
             </div>
         );
@@ -43,6 +54,7 @@ const SPLIT_PANEL_STATE_KEY = 'splitview_panel_state';
 
 export const SplitPanel = (props: IGroupPanelProps) => {
     const api = React.useRef<SplitviewApi>();
+    const registry = useLayoutRegistry();
 
     React.useEffect(() => {
         const disposable = new CompositeDisposable(
@@ -51,6 +63,9 @@ export const SplitPanel = (props: IGroupPanelProps) => {
             }),
             api.current.onDidLayoutChange(() => {
                 props.api.setState(SPLIT_PANEL_STATE_KEY, api.current.toJSON());
+            }),
+            props.api.onFocusEvent(() => {
+                api.current.focus();
             })
         );
 
@@ -61,6 +76,8 @@ export const SplitPanel = (props: IGroupPanelProps) => {
 
     const onReady = (event: SplitviewReadyEvent) => {
         api.current = event.api;
+
+        registry.register('splitview', event.api);
 
         const existingLayout = props.api.getStateKey(SPLIT_PANEL_STATE_KEY);
 

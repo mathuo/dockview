@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DockviewApi, GridviewApi } from 'splitview';
+import { DockviewApi, GridviewApi, SplitviewApi } from 'splitview';
 import { useLayoutRegistry } from './registry';
 import './controlCenter.scss';
 
@@ -100,7 +100,7 @@ export const ControlCenter = () => {
 
         const settingsPanel = api.getPanel('settings');
         if (settingsPanel) {
-            api.setActive(settingsPanel);
+            api.setActivePanel(settingsPanel);
             return;
         }
 
@@ -111,8 +111,28 @@ export const ControlCenter = () => {
         });
     };
 
+    const onFocusSplitview = () => {
+        const api = registry.get<SplitviewApi>('splitview');
+
+        const panel = api.getPanel('1');
+
+        api.setActive(panel);
+    };
+
+    const onFocusPanel = () => {
+        const api = registry.get<DockviewApi>('dockview');
+        const panel = api.getPanel('split_panel');
+        api.setActivePanel(panel);
+    };
+
     return (
         <div className="control-center">
+            <div className="control-center-row">
+                <button onClick={onFocusSplitview}>Split view focus</button>
+            </div>
+            <div className="control-center-row">
+                <button onClick={onFocusPanel}>Split view panel focus</button>
+            </div>
             <div className="control-center-row">
                 <button onClick={onAdd}>Add</button>
             </div>

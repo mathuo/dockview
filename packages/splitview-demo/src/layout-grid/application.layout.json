@@ -79,5 +79,6 @@
         "height": 1035,
         "width": 1385,
         "orientation": "VERTICAL"
-    }
+    },
+    "activePanel": "3"
 }
