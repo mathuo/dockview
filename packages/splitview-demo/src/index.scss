@@ -5,6 +5,7 @@ body {
     font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
     overflow: hidden;
     color: white;
+    font-size: 13px;
 }
 
 ::-webkit-scrollbar {
@@ -44,4 +45,23 @@ body {
     mask: var(--tab-close-icon) 50% 50% / 90% 90% no-repeat;
     margin-right: '0.5em';
     cursor: pointer;
+}
+
+button {
+    max-width: 125px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    border: none;
+    background-color: rgb(14, 99, 156);
+    color: white;
+    font-family: inherit;
+    outline: none;
+    padding: 2px 14px;
+    margin: 2px 0px;
+
+    &:hover {
+        background-color: rgb(17, 119, 187);
+        cursor: pointer;
+    }
 }

@@ -155,19 +155,36 @@ const components = {
         return (
             <div
                 style={{
-                    backgroundColor,
+                    // backgroundColor,
                     height: '100%',
                 }}
             >
-                <div>test component</div>
-                <button onClick={onClick}>set state</button>
-                <button onClick={onRename}>rename</button>
-                <input ref={input} placeholder="focus test" />
-                {/* {props.api.getState()["test_key"]} */}
+                <div
+                    style={{
+                        padding: '5px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                    }}
+                >
+                    <div>This is a dockable panel</div>
+                    <div>{`isPanelVisible:${panelState.isPanelVisible}`}</div>
+                    <div>{`isPanelVisible:${panelState.isPanelVisible}`}</div>
+                    <button onClick={onClick}>set state</button>
+                    <button onClick={onRename}>rename</button>
 
-                <div>{`G:${panelState.isGroupActive} P:${panelState.isPanelVisible}`}</div>
-                <div>{props.text || '-'}</div>
-                <input placeholder="another focus test" />
+                    {/* {props.api.getState()["test_key"]} */}
+
+                    {/* <div>{props.text || '-'}</div> */}
+                    <input
+                        style={{ width: '175px' }}
+                        ref={input}
+                        placeholder="This is focused by the panel"
+                    />
+                    <input
+                        style={{ width: '175px' }}
+                        placeholder="This is also focusable"
+                    />
+                </div>
             </div>
         );
     },

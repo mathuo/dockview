@@ -40,11 +40,17 @@ const components = {
         }, []);
 
         return (
-            <div style={{ height: '100%', width: '100%' }}>
-                {`[isFocused: ${focused} isActive: ${active}]`}
-                <button onClick={onClick}>resize</button>
-                <input ref={ref} type="text" placeholder="focus test" />
-                <span>{(props as any).text}</span>
+            <div style={{ height: '100%' }}>
+                <div style={{ display: 'flex', padding: '5px' }}>
+                    <div>This is a splitview panel inside a dockable panel</div>
+                    <span style={{ flexGrow: 1 }} />
+                    <button onClick={onClick}>resize</button>
+                </div>
+                <div style={{ padding: '0px 5px' }}>
+                    <div>{`isPanelActive: ${active} isPanelFocused: ${focused}`}</div>
+                    <input ref={ref} type="text" placeholder="focus test" />
+                    {/* <span>{(props as any).text}</span> */}
+                </div>
             </div>
         );
     },

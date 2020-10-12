@@ -25,10 +25,20 @@ export const Panel = (props: IGridviewPanelProps) => {
     };
 
     return (
-        <div style={{ backgroundColor: 'rgb(30,30,30)', height: '100%' }}>
-            <button onClick={onClick}>Resize</button>
-            Panel
-            <div>{`active: ${active} focused ${focused}`}</div>
+        <div
+            style={{
+                backgroundColor: 'rgb(30,30,30)',
+                height: '100%',
+            }}
+        >
+            <div style={{ display: 'flex', padding: '5px' }}>
+                <span>This panel is outside of the dockable layer</span>
+                <span style={{ flexGrow: 1 }} />
+                <button onClick={onClick}>Resize</button>
+            </div>
+            <div style={{ padding: '0px 5px' }}>
+                <div>{`isPanelActive: ${active} isPanelFocused: ${focused}`}</div>
+            </div>
         </div>
     );
 };
