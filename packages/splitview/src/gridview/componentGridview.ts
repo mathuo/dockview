@@ -14,7 +14,7 @@ import {
     IGridPanelView,
     toTarget,
 } from './baseComponentGridview';
-import { GridPanelView, GridviewInitParameters } from './gridPanelView';
+import { GridviewPanel, GridviewInitParameters } from './gridviewPanel';
 import { BaseComponentOptions, Parameters } from '../panel/types';
 import { GridPanelApi } from '../api/gridPanelApi';
 import { GridviewApi } from '../api/component.api';
@@ -40,17 +40,17 @@ export interface IGridPanelComponentView extends IGridPanelView {
     init: (params: GridviewInitParameters) => void;
 }
 
-export interface IComponentGridview extends IBaseGrid<GridPanelView> {
+export interface IComponentGridview extends IBaseGrid<GridviewPanel> {
     addComponent(options: AddComponentOptions): void;
-    getPanel(id: string): GridPanelView;
-    setVisible(panel: GridPanelView, visible: boolean): void;
-    isVisible(panel: GridPanelView): boolean;
-    toggleVisibility(panel: GridPanelView): void;
+    getPanel(id: string): GridviewPanel;
+    setVisible(panel: GridviewPanel, visible: boolean): void;
+    isVisible(panel: GridviewPanel): boolean;
+    toggleVisibility(panel: GridviewPanel): void;
     focus(): void;
 }
 
 export class ComponentGridview
-    extends BaseGrid<GridPanelView>
+    extends BaseGrid<GridviewPanel>
     implements IComponentGridview {
     private _deserializer: IPanelDeserializer;
 
@@ -98,15 +98,15 @@ export class ComponentGridview
         this.gridview.layout(this._size, this._orthogonalSize);
     }
 
-    public setVisible(panel: GridPanelView, visible: boolean) {
+    public setVisible(panel: GridviewPanel, visible: boolean) {
         this.gridview.setViewVisible(getGridLocation(panel.element), visible);
     }
 
-    public isVisible(panel: GridPanelView) {
+    public isVisible(panel: GridviewPanel) {
         return this.gridview.isViewVisible(getGridLocation(panel.element));
     }
 
-    public toggleVisibility(panel: GridPanelView) {
+    public toggleVisibility(panel: GridviewPanel) {
         this.setVisible(panel, !this.isVisible(panel));
     }
 
@@ -205,7 +205,7 @@ export class ComponentGridview
         return { api: view.api };
     }
 
-    private registerPanel(panel: GridPanelView) {
+    private registerPanel(panel: GridviewPanel) {
         const disposable = new CompositeDisposable(
             panel.api.onDidFocusChange((event) => {
                 if (!event.isFocused) {
@@ -228,8 +228,8 @@ export class ComponentGridview
         });
     }
 
-    public getPanel(id: string): GridPanelView {
-        return this.getGroup(id) as GridPanelView;
+    public getPanel(id: string): GridviewPanel {
+        return this.getGroup(id) as GridviewPanel;
     }
 
     public moveGroup(
@@ -281,7 +281,7 @@ export class ComponentGridview
         this.doAddGroup(targetGroup, location);
     }
 
-    public removeGroup(group: GridPanelView) {
+    public removeGroup(group: GridviewPanel) {
         super.removeGroup(group);
 
         const panel = this.groups.get(group.id);

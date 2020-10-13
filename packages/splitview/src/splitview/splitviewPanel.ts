@@ -5,7 +5,7 @@ import { LayoutPriority } from './core/splitview';
 import { FunctionOrValue } from '../types';
 import { Emitter, Event } from '../events';
 
-export abstract class PanelView
+export abstract class SplitviewPanel
     extends BasePanelView<PanelApi>
     implements ISerializableView {
     private _minimumSize: FunctionOrValue<number> = 200;

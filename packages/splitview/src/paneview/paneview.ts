@@ -1,245 +1,15 @@
 import {
     SplitView,
-    IView,
     Orientation,
     ISplitViewDescriptor,
 } from '../splitview/core/splitview';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { Emitter, Event } from '../events';
 import { addClasses, removeClasses } from '../dom';
-import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
-import { PanePanelApi } from '../api/panePanelApi';
-import { PaneviewApi } from '../api/component.api';
-
-export interface IPaneBodyPart extends IDisposable {
-    readonly element: HTMLElement;
-    update(params: PanelUpdateEvent): void;
-    init(parameters: PanePanelComponentInitParameter): void;
-}
-
-export interface IPaneHeaderPart extends IDisposable {
-    readonly element: HTMLElement;
-    update(params: PanelUpdateEvent): void;
-    init(parameters: PanePanelComponentInitParameter): void;
-}
-
-export interface PanePanelInitParameter extends PanelInitParameters {
-    minimumBodySize?: number;
-    maximumBodySize?: number;
-    isExpanded?: boolean;
-    title: string;
-    containerApi: PaneviewApi;
-}
-
-export interface PanePanelComponentInitParameter
-    extends PanePanelInitParameter {
-    api: PanePanelApi;
-}
-
-export interface IPaneview extends IView {
-    onDidChangeExpansionState: Event<boolean>;
-}
-
-export abstract class Pane extends CompositeDisposable implements IPaneview {
-    private _element: HTMLElement;
-    private _minimumBodySize: number = 0;
-    private _maximumBodySize: number = Number.POSITIVE_INFINITY;
-
-    protected api: PanePanelApi;
-
-    private _isExpanded = false;
-    private _orthogonalSize = 0;
-    private animationTimer: NodeJS.Timeout | undefined;
-    private expandedSize: number;
-    private headerSize = 22;
-    private _onDidChangeExpansionState: Emitter<boolean> = new Emitter<
-        boolean
-    >();
-    private _onDidChange: Emitter<number | undefined> = new Emitter<
-        number | undefined
-    >();
-    //
-    protected params: PanePanelInitParameter;
-    protected header: HTMLElement;
-    protected body: HTMLElement;
-
-    private part?: IPaneHeaderPart;
-    private headerPart?: IPaneBodyPart;
-
-    get onDidChange() {
-        return this._onDidChange.event;
-    }
-
-    get onDidChangeExpansionState() {
-        return this._onDidChangeExpansionState.event;
-    }
-
-    get element() {
-        return this._element;
-    }
-
-    get minimumSize(): number {
-        const headerSize = this.headerSize;
-        const expanded = this.isExpanded();
-        const minimumBodySize = expanded ? this._minimumBodySize : 0;
-
-        return headerSize + minimumBodySize;
-    }
-
-    get maximumSize(): number {
-        const headerSize = this.headerSize;
-        const expanded = this.isExpanded();
-        const maximumBodySize = expanded ? this._maximumBodySize : 0;
-
-        return headerSize + maximumBodySize;
-    }
-
-    get orthogonalSize() {
-        return this._orthogonalSize;
-    }
-
-    set orthogonalSize(size: number) {
-        this._orthogonalSize = size;
-    }
-
-    set minimumBodySize(value: number) {
-        this._minimumBodySize = typeof value === 'number' ? value : 0;
-    }
-
-    set maximumBodySize(value: number) {
-        this._maximumBodySize =
-            typeof value === 'number' ? value : Number.POSITIVE_INFINITY;
-    }
-
-    setVisible(isVisible: boolean) {
-        this.api._onDidVisibilityChange.fire({ isVisible });
-    }
-
-    constructor(
-        public readonly id: string,
-        private readonly component: string,
-        private readonly headerComponent: string
-    ) {
-        super();
-
-        this.api = new PanePanelApi(this);
-
-        this.addDisposables(
-            this.api,
-            this._onDidChange,
-            this._onDidChangeExpansionState,
-            this.onDidChangeExpansionState((isExpanded) => {
-                this.api._onDidExpansionChange.fire({ isExpanded });
-            })
-        );
-
-        this._element = document.createElement('div');
-        this._element.className = 'pane';
-
-        this.render();
-    }
-
-    init(parameters: PanePanelInitParameter): void {
-        this.params = parameters;
-
-        if (typeof parameters.minimumBodySize === 'number') {
-            this.minimumBodySize = parameters.minimumBodySize;
-        }
-        if (typeof parameters.maximumBodySize === 'number') {
-            this.maximumBodySize = parameters.maximumBodySize;
-        }
-        if (typeof parameters.isExpanded === 'boolean') {
-            this.setExpanded(parameters.isExpanded);
-        }
-
-        this.part = this.getComponent();
-        this.headerPart = this.getHeaderComponent();
-
-        this.part.init({ ...parameters, api: this.api });
-        this.headerPart.init({ ...parameters, api: this.api });
-
-        this.body.append(this.part.element);
-        this.header.append(this.headerPart.element);
-    }
-
-    update(params: PanelUpdateEvent) {
-        this.params = { ...this.params, params: params.params };
-        this.part?.update(params);
-        this.headerPart?.update(params);
-    }
-
-    toJSON(): object {
-        return {
-            id: this.id,
-            component: this.component,
-            headerComponent: this.headerComponent,
-            props: this.params.params,
-            title: this.params.title,
-            state: this.api.getState(),
-        };
-    }
-
-    public isExpanded() {
-        return this._isExpanded;
-    }
-
-    public setExpanded(expanded: boolean) {
-        this._isExpanded = expanded;
-
-        if (expanded) {
-            if (this.animationTimer) {
-                clearTimeout(this.animationTimer);
-            }
-            this.element.appendChild(this.body);
-        } else {
-            this.animationTimer = setTimeout(() => {
-                this.body.remove();
-            }, 200);
-        }
-
-        this._onDidChangeExpansionState.fire(expanded);
-        this._onDidChange.fire(expanded ? this.expandedSize : undefined);
-    }
-
-    public layout(size: number, orthogonalSize: number) {
-        if (this.isExpanded()) {
-            this.expandedSize = size;
-        }
-    }
-
-    private render() {
-        this.header = document.createElement('div');
-        this.header.tabIndex = -1;
-
-        this.header.className = 'pane-header';
-        this.header.style.height = `${this.headerSize}px`;
-        this.header.style.lineHeight = `${this.headerSize}px`;
-        this.header.style.minHeight = `${this.headerSize}px`;
-        this.header.style.maxHeight = `${this.headerSize}px`;
-
-        this.element.appendChild(this.header);
-
-        this.body = document.createElement('div');
-        this.body.tabIndex = -1;
-
-        this.body.className = 'pane-body';
-
-        this.element.appendChild(this.body);
-    }
-
-    dispose() {
-        super.dispose();
-
-        this.part?.dispose();
-        this.headerPart?.dispose();
-    }
-
-    protected abstract getComponent(): IPaneBodyPart;
-    protected abstract getHeaderComponent(): IPaneHeaderPart;
-}
+import { PaneviewPanel } from './paneviewPanel';
 
 interface PaneItem {
-    pane: Pane;
+    pane: PaneviewPanel;
     disposable: IDisposable;
 }
 
@@ -320,7 +90,7 @@ export class PaneView extends CompositeDisposable implements IDisposable {
     }
 
     public addPane(
-        pane: Pane,
+        pane: PaneviewPanel,
         size?: number,
         index = this.splitview.length,
         skipLayout = false
@@ -348,7 +118,7 @@ export class PaneView extends CompositeDisposable implements IDisposable {
     }
 
     public getPanes() {
-        return this.splitview.getViews() as Pane[];
+        return this.splitview.getViews() as PaneviewPanel[];
     }
 
     public removePane(index: number) {

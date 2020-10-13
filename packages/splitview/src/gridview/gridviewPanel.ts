@@ -18,7 +18,7 @@ export interface GridviewInitParameters extends PanelInitParameters {
     containerApi: GridviewApi;
 }
 
-export abstract class GridPanelView
+export abstract class GridviewPanel
     extends BasePanelView<GridPanelApi>
     implements IGridPanelComponentView {
     private _minimumWidth: FunctionOrValue<number> = 200;

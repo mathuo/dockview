@@ -15,12 +15,12 @@ import {
     IComponentPaneView,
 } from '../paneview/componentPaneView';
 import { PaneView } from '../paneview/paneview';
-import { GridPanelView } from '../react';
+import { GridviewPanel } from '../react';
 import {
     AddSplitviewComponentOptions,
     IComponentSplitview,
 } from '../splitview/componentSplitview';
-import { PanelView } from '../splitview/panelView';
+import { SplitviewPanel } from '../splitview/splitviewPanel';
 
 export class SplitviewApi {
     get minimumSize() {
@@ -45,7 +45,7 @@ export class SplitviewApi {
         return this.component.getPanel(id);
     }
 
-    setActive(panel: PanelView) {
+    setActive(panel: SplitviewPanel) {
         return this.component.setActive(panel);
     }
 
@@ -153,15 +153,15 @@ export class GridviewApi {
         return this.component.getGroup(id);
     }
 
-    toggleVisibility(panel: GridPanelView) {
+    toggleVisibility(panel: GridviewPanel) {
         return this.component.toggleVisibility(panel);
     }
 
-    isVisible(panel: GridPanelView) {
+    isVisible(panel: GridviewPanel) {
         return this.component.isVisible(panel);
     }
 
-    setVisible(panel: GridPanelView, visible: boolean) {
+    setVisible(panel: GridviewPanel, visible: boolean) {
         return this.component.setVisible(panel, visible);
     }
 

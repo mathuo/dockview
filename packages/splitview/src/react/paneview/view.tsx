@@ -3,7 +3,7 @@ import { PanelUpdateEvent } from '../../panel/types';
 import {
     IPaneBodyPart,
     PanePanelComponentInitParameter,
-} from '../../paneview/paneview';
+} from '../../paneview/paneviewPanel';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IPaneviewPanelProps } from './paneview';
 

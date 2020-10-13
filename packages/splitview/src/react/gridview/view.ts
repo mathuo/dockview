@@ -1,11 +1,11 @@
 import {
-    GridPanelView,
+    GridviewPanel,
     GridviewInitParameters,
-} from '../../gridview/gridPanelView';
+} from '../../gridview/gridviewPanel';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IGridviewPanelProps } from './gridview';
 
-export class ReactGridPanelView extends GridPanelView {
+export class ReactGridPanelView extends GridviewPanel {
     constructor(
         id: string,
         component: string,

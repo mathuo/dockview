@@ -6,13 +6,13 @@ import { PanelUpdateEvent } from '../panel/types';
 import { createComponent } from '../splitview/core/options';
 import { LayoutPriority, Orientation } from '../splitview/core/splitview';
 import { PaneviewComponentOptions } from './options';
+import { PaneView } from './paneview';
 import {
     IPaneBodyPart,
     IPaneHeaderPart,
-    Pane,
+    PaneviewPanel,
     PanePanelInitParameter,
-    PaneView,
-} from './paneview';
+} from './paneviewPanel';
 
 class DefaultHeader extends CompositeDisposable implements IPaneHeaderPart {
     private _element: HTMLElement;
@@ -43,7 +43,7 @@ class DefaultHeader extends CompositeDisposable implements IPaneHeaderPart {
     }
 }
 
-export class PaneFramework extends Pane {
+export class PaneFramework extends PaneviewPanel {
     constructor(
         private readonly options: {
             id: string;
@@ -56,7 +56,7 @@ export class PaneFramework extends Pane {
         super(options.id, options.component, options.headerComponent);
     }
 
-    getComponent() {
+    getBodyComponent() {
         return this.options.body;
     }
 
@@ -201,7 +201,7 @@ export class ComponentPaneView
     }
 
     toJSON(): object {
-        const views = this.paneview.getPanes().map((view: Pane, i) => {
+        const views = this.paneview.getPanes().map((view: PaneviewPanel, i) => {
             const size = this.paneview.getViewSize(i);
             return {
                 size,

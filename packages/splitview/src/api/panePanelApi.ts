@@ -1,5 +1,5 @@
 import { Emitter, Event } from '../events';
-import { Pane } from '../paneview/paneview';
+import { PaneviewPanel } from '../paneview/paneviewPanel';
 import { IPanelApi, PanelApi } from './panelApi';
 
 interface ExpansionEvent {
@@ -19,7 +19,7 @@ export class PanePanelApi extends PanelApi implements IPanePanelApi {
     readonly onDidExpansionChange: Event<ExpansionEvent> = this
         ._onDidExpansionChange.event;
 
-    constructor(private pane: Pane) {
+    constructor(public pane: PaneviewPanel) {
         super();
     }
 

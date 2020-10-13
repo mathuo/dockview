@@ -9,7 +9,7 @@ import { useLayoutRegistry } from './registry';
 
 export const Activitybar = (props: IGridviewPanelProps) => {
     const registry = useLayoutRegistry();
-    const [isActive, setActive] = React.useState<boolean>(false);
+    const [isActive, setActive] = React.useState<boolean>();
 
     const onOpenSidebar = (event: React.MouseEvent<HTMLDivElement>) => {
         const api = registry.get<GridviewApi>('gridview');

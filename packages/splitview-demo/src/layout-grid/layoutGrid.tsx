@@ -167,8 +167,30 @@ const components = {
                     }}
                 >
                     <div>This is a dockable panel</div>
-                    <div>{`isPanelVisible:${panelState.isPanelVisible}`}</div>
-                    <div>{`isPanelVisible:${panelState.isPanelVisible}`}</div>
+                    <div>
+                        <span>{'isGroupActive: '}</span>
+                        <span
+                            style={{
+                                color: panelState.isGroupActive
+                                    ? '#23d16f'
+                                    : '#cd312b',
+                            }}
+                        >
+                            {`${panelState.isGroupActive}`}
+                        </span>
+                    </div>
+                    <div>
+                        <span>{'isPanelVisible: '}</span>
+                        <span
+                            style={{
+                                color: panelState.isPanelVisible
+                                    ? '#23d16f'
+                                    : '#cd312b',
+                            }}
+                        >
+                            {`${panelState.isPanelVisible}`}
+                        </span>
+                    </div>
                     <button onClick={onClick}>set state</button>
                     <button onClick={onRename}>rename</button>
 

@@ -49,7 +49,7 @@ const components = {
                 <div style={{ padding: '0px 5px' }}>
                     <div>{`isPanelActive: ${active} isPanelFocused: ${focused}`}</div>
                     <input ref={ref} type="text" placeholder="focus test" />
-                    {/* <span>{(props as any).text}</span> */}
+                    <span>{(props as any).text}</span>
                 </div>
             </div>
         );
@@ -65,7 +65,7 @@ export const SplitPanel = (props: IGroupPanelProps) => {
     React.useEffect(() => {
         const disposable = new CompositeDisposable(
             props.api.onDidDimensionsChange((event) => {
-                api.current?.layout(event.width, event.height);
+                api.current?.layout(event.width, event.height - 25);
             }),
             api.current.onDidLayoutChange(() => {
                 props.api.setState(SPLIT_PANEL_STATE_KEY, api.current.toJSON());
@@ -105,6 +105,11 @@ export const SplitPanel = (props: IGroupPanelProps) => {
         console.log(JSON.stringify(api.current.toJSON(), null, 4));
     };
 
+    const onUpdateProps = () => {
+        const panel = api.current.getPanel('1');
+        panel.update({ params: { text: Date.now().toString() } });
+    };
+
     return (
         <div
             style={{
@@ -114,6 +119,9 @@ export const SplitPanel = (props: IGroupPanelProps) => {
                 color: 'white',
             }}
         >
+            <div style={{ height: '25px' }}>
+                <button onClick={onUpdateProps}>Update props</button>
+            </div>
             <SplitviewComponent
                 components={components}
                 onReady={onReady}

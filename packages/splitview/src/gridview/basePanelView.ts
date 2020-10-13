@@ -37,7 +37,7 @@ export abstract class BasePanelView<T extends BaseViewApi>
 
     constructor(
         public readonly id: string,
-        private readonly component: string,
+        protected readonly component: string,
         public readonly api: T
     ) {
         super();
@@ -85,7 +85,7 @@ export abstract class BasePanelView<T extends BaseViewApi>
 
     update(params: PanelUpdateEvent) {
         this.params = { ...this.params, params: params.params };
-        this.part?.update(params);
+        this.part?.update(this.params.params);
     }
 
     toJSON(): object {

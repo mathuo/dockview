@@ -1,5 +1,5 @@
 import { FrameworkFactory } from '../types';
-import { IPaneBodyPart, IPaneHeaderPart } from './paneview';
+import { IPaneBodyPart, IPaneHeaderPart } from './paneviewPanel';
 
 export interface PaneviewComponentOptions {
     components?: {
