@@ -12,8 +12,8 @@ import { IGroupview } from '../groupview/groupview';
 import { IGroupPanel } from '../groupview/panel/parts';
 import {
     AddPaneviewCompponentOptions,
-    IComponentPaneView,
-} from '../paneview/componentPaneView';
+    IComponentPaneview,
+} from '../paneview/componentPaneview';
 import { PaneView } from '../paneview/paneview';
 import { GridviewPanel } from '../react';
 import {
@@ -83,7 +83,7 @@ export class PaneviewApi {
         return this.component.onDidLayoutChange;
     }
 
-    constructor(private readonly component: IComponentPaneView) {}
+    constructor(private readonly component: IComponentPaneview) {}
 
     focus() {
         return this.component.focus();

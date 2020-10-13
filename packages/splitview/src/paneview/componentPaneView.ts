@@ -78,7 +78,7 @@ export interface AddPaneviewCompponentOptions {
     title: string;
 }
 
-export interface IComponentPaneView extends IDisposable {
+export interface IComponentPaneview extends IDisposable {
     readonly minimumSize: number;
     readonly maximumSize: number;
     addFromComponent(options: AddPaneviewCompponentOptions): IDisposable;
@@ -90,9 +90,9 @@ export interface IComponentPaneView extends IDisposable {
     focus(): void;
 }
 
-export class ComponentPaneView
+export class ComponentPaneview
     extends CompositeDisposable
-    implements IComponentPaneView {
+    implements IComponentPaneview {
     private paneview: PaneView;
 
     private readonly _onDidLayoutChange = new Emitter<void>();

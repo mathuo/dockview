@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { IPanePanelApi } from '../../api/panePanelApi';
 import {
-    ComponentPaneView,
-    IComponentPaneView,
-} from '../../paneview/componentPaneView';
+    ComponentPaneview,
+    IComponentPaneview,
+} from '../../paneview/componentPaneview';
 import { usePortalsLifecycle } from '../react';
 import { PaneviewApi } from '../../api/component.api';
 import { PanelBody, PanelHeader } from './view';
@@ -32,11 +32,11 @@ export const PaneviewComponent: React.FunctionComponent<IPaneviewComponentProps>
     props: IPaneviewComponentProps
 ) => {
     const domRef = React.useRef<HTMLDivElement>();
-    const paneviewRef = React.useRef<IComponentPaneView>();
+    const paneviewRef = React.useRef<IComponentPaneview>();
     const [portals, addPortal] = usePortalsLifecycle();
 
     React.useEffect(() => {
-        const paneview = new ComponentPaneView(domRef.current, {
+        const paneview = new ComponentPaneview(domRef.current, {
             frameworkComponents: props.components,
             components: {},
             headerComponents: {},
