@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Orientation, IBaseView, PaneView } from 'splitview';
+import { Orientation, IBaseView, PaneView } from 'dockview';
 
 import { PaneReact } from './panel/pane';
 import { PaneComponent, PaneHeaderComponent } from './bridge/pane';

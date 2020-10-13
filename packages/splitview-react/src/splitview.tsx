@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { SplitView, Orientation, IBaseView } from 'splitview';
+import { SplitView, Orientation, IBaseView } from 'dockview';
 import { ReactRenderView } from './panel/view';
 import { ViewComponent } from './bridge/view';
 

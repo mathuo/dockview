@@ -4,12 +4,11 @@
     "description": "",
     "main": "dist/cjs/index.js",
     "types": "dist/cjs/index.d.ts",
-    "module": "dist/es6/index.js",
     "scripts": {
         "build": "gulp run",
         "docs": "typedoc",
-        "build-es6": "bash ../../node_modules/.bin/tsc --project tsconfig.es6.json",
-        "build-es5": "bash ../../node_modules/.bin/tsc --project tsconfig.json",
+        "build-es6": "bash ../../node_modules/.bin/tsc --project tsconfig.es6.json --extendedDiagnostics",
+        "build-es5": "bash ../../node_modules/.bin/tsc --project tsconfig.json --extendedDiagnostics",
         "build-both": "npm run build-es5 && npm run build-es6"
     },
     "files": ["dist"],

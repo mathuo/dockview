@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Pane, IDisposable } from 'splitview';
+import { Pane, IDisposable } from 'dockview';
 
 import {
     PaneComponent,

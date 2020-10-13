@@ -3,7 +3,7 @@ import {
     CompositeDisposable,
     GridviewApi,
     IGridviewPanelProps,
-} from 'splitview';
+} from 'dockview';
 import './activitybar.scss';
 import { useLayoutRegistry } from './registry';
 

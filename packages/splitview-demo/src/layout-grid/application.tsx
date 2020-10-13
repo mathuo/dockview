@@ -7,7 +7,7 @@ import {
     ComponentGridview,
     IGridviewPanelProps,
     GridviewApi,
-} from 'splitview';
+} from 'dockview';
 import { Activitybar } from './activitybar';
 import { Footer } from './footer';
 import { Panel } from './panel';

@@ -12,7 +12,7 @@
     "dependencies": {
         "react": "^16.13.1",
         "react-dom": "^16.13.1",
-        "splitview": "0.0.0-beta.0"
+        "dockview": "0.0.0-beta.0"
     },
     "devDependencies": {
         "@types/react": "^16.9.41",

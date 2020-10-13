@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DockviewApi, GridviewApi, SplitviewApi } from 'splitview';
+import { DockviewApi, GridviewApi, SplitviewApi } from 'dockview';
 import { useLayoutRegistry } from './registry';
 import './controlCenter.scss';
 

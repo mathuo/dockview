@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Orientation } from 'splitview';
+import { Orientation } from 'dockview';
 import { IViewWithReactComponent } from '../splitview';
 
 // component view

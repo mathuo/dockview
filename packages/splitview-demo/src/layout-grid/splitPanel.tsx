@@ -7,7 +7,7 @@ import {
     SplitviewComponent,
     IGroupPanelProps,
     SplitviewApi,
-} from 'splitview';
+} from 'dockview';
 import { useLayoutRegistry } from './registry';
 import './splitPanel.scss';
 

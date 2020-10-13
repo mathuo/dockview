@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CompositeDisposable, IGridviewPanelProps } from 'splitview';
+import { CompositeDisposable, IGridviewPanelProps } from 'dockview';
 
 export const Panel = (props: IGridviewPanelProps) => {
     const [active, setActive] = React.useState<boolean>();

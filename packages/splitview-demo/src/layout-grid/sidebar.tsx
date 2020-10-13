@@ -6,7 +6,7 @@ import {
     IPaneviewPanelProps,
     CompositeDisposable,
     PaneviewApi,
-} from 'splitview';
+} from 'dockview';
 import { ControlCenter } from './controlCenter';
 
 const DefaultHeader = (props: IPaneviewPanelProps) => {

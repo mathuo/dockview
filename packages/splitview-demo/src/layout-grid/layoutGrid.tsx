@@ -11,7 +11,7 @@ import {
     DockviewApi,
     IWatermarkPanelProps,
     IGroupPanel,
-} from 'splitview';
+} from 'dockview';
 import { CustomTab } from './customTab';
 import { Settings } from './settingsPanel';
 import { useLayoutRegistry } from './registry';

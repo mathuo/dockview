@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { IView, Emitter } from 'splitview';
+import { IView, Emitter } from 'dockview';
 import { IViewRootRef, ViewComponent, ViewRoot } from '../bridge/view';
 
 import { IViewWithReactComponent } from '../splitview';
