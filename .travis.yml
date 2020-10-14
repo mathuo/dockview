@@ -1,8 +1,8 @@
 env:
-    - CODECOV_TOKEN=4a7e16d6-2ee4-4dbe-83bb-3d2587a73c52
+    - CODECOV_TOKEN=deb138e8-93c4-441d-a6c7-e341ac9f2838
 language: node_js
 node_js:
-    - 'iojs'
+    - 14
 before_script:
     - npm install codecov -g
     - npm intstall lerna -g
