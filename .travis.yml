@@ -5,7 +5,7 @@ node_js:
     - 14
 before_script:
     - npm install codecov -g
-    - npm intstall lerna -g
+    - npm install lerna -g
     - lerna bootstrap
 script:
     - cd packages/splitview
