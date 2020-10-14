@@ -1,4 +1,7 @@
 .pane-container {
+    height: 100%;
+    width: 100%;
+
     &.animated {
         .view {
             transition-duration: 0.15s;

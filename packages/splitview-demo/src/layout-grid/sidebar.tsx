@@ -83,30 +83,30 @@ export const Sidebar = (props: IGridviewPanelProps) => {
 
         event.api.addFromComponent({
             id: '1',
-            component: 'controlCenter',
+            component: 'default',
             params: {},
-            headerComponent: 'default1',
+            headerComponent: 'default',
             title: 'Control Center',
         });
         event.api.addFromComponent({
             id: '2',
             component: 'default',
             params: {},
-            headerComponent: 'default1',
+            headerComponent: 'default',
             title: 'Panel 1',
         });
         event.api.addFromComponent({
             id: '3',
             component: 'default',
             params: {},
-            headerComponent: 'default1',
+            headerComponent: 'default',
             title: 'Panel 2',
         });
         event.api.addFromComponent({
             id: '4',
             component: 'default',
             params: {},
-            headerComponent: 'default1',
+            headerComponent: 'default',
             title: 'Panel 3',
         });
 
@@ -131,12 +131,13 @@ export const Sidebar = (props: IGridviewPanelProps) => {
         return () => {
             disposable.dispose();
         };
-    });
+    }, []);
 
     return (
         <div
             style={{
                 backgroundColor: 'rgb(37,37,38)',
+                height: '100%',
             }}
         >
             <PaneviewComponent

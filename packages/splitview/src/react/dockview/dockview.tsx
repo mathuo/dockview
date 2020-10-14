@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { IDisposable } from '../../lifecycle';
 import { ComponentDockview } from '../../dockview/componentDockview';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
@@ -131,6 +130,10 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
         };
     }, [props.onTabContextMenu]);
 
-    return <div ref={domRef}>{portals}</div>;
+    return (
+        <div style={{ height: '100%', width: '100%' }} ref={domRef}>
+            {portals}
+        </div>
+    );
 };
 DockviewComponent.displayName = 'DockviewComponent';

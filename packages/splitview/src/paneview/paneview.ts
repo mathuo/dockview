@@ -169,5 +169,7 @@ export class PaneView extends CompositeDisposable implements IDisposable {
             paneItem.disposable.dispose();
         });
         this.paneItems = [];
+
+        this.element.remove();
     }
 }

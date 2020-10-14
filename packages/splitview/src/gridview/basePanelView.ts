@@ -45,6 +45,8 @@ export abstract class BasePanelView<T extends BaseViewApi>
         this._element = document.createElement('div');
         this._element.tabIndex = -1;
         this._element.style.outline = 'none';
+        this._element.style.height = '100%';
+        this._element.style.width = '100%';
 
         const { onDidFocus, onDidBlur } = trackFocus(this._element);
 
