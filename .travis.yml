@@ -1,14 +1,14 @@
 env:
     - CODECOV_TOKEN=4a7e16d6-2ee4-4dbe-83bb-3d2587a73c52
-  language: node_js
-  node_js:
-    - "iojs"
-  before_script:
+language: node_js
+node_js:
+    - 'iojs'
+before_script:
     - npm install codecov -g
     - npm intstall lerna -g
     - lerna bootstrap
-  script:
+script:
     - cd packages/splitview
     - npm run build
-  after_success:
+after_success:
     - codecov
