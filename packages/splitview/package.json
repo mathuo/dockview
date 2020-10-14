@@ -9,8 +9,8 @@
         "build-gulp": "gulp run",
         "docs": "typedoc",
         "build-css": "gulp sass",
-        "build-es6": "bash ../../node_modules/.bin/tsc --project tsconfig.es6.json --extendedDiagnostics",
-        "build-cjs": "bash ../../node_modules/.bin/tsc --project tsconfig.json --extendedDiagnostics",
+        "build-es6": "cross-env ../../node_modules/.bin/tsc --project tsconfig.es6.json --extendedDiagnostics",
+        "build-cjs": "cross-env ../../node_modules/.bin/tsc --project tsconfig.json --extendedDiagnostics",
         "build": "npm run build-cjs && npm run build-es6 && npm run build-css",
         "clean": "rimraf dist/ .build/"
     },
@@ -32,6 +32,7 @@
     "devDependencies": {
         "@types/react": "^16.9.51",
         "@types/react-dom": "^16.9.8",
+        "cross-env": "^7.0.2",
         "node-sass": "^4.14.1",
         "react": "^16.13.1",
         "react-dom": "^16.13.1",
