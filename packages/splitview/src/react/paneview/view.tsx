@@ -23,6 +23,8 @@ export class PanelBody implements IPaneBodyPart {
         private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');
+        this._element.style.height = '100%';
+        this._element.style.width = '100%';
     }
 
     public init(parameters: PanePanelComponentInitParameter): void {
@@ -70,6 +72,8 @@ export class PanelHeader implements IPaneBodyPart {
         private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');
+        this._element.style.height = '100%';
+        this._element.style.width = '100%';
     }
 
     public init(parameters: PanePanelComponentInitParameter): void {

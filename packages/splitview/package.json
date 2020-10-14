@@ -4,14 +4,19 @@
     "description": "",
     "main": "dist/cjs/index.js",
     "types": "dist/cjs/index.d.ts",
+    "module": "dist/es6/index.js",
     "scripts": {
-        "build": "gulp run",
+        "build-gulp": "gulp run",
         "docs": "typedoc",
+        "build-css": "gulp sass",
         "build-es6": "bash ../../node_modules/.bin/tsc --project tsconfig.es6.json --extendedDiagnostics",
-        "build-es5": "bash ../../node_modules/.bin/tsc --project tsconfig.json --extendedDiagnostics",
-        "build-both": "npm run build-es5 && npm run build-es6"
+        "build-cjs": "bash ../../node_modules/.bin/tsc --project tsconfig.json --extendedDiagnostics",
+        "build": "npm run build-cjs && npm run build-es6 && npm run build-css",
+        "clean": "rimraf dist/ .build/"
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "keywords": [
         "splitview",
         "split-view",
@@ -21,12 +26,13 @@
         "react",
         "react-component",
         "grid"
-      ],
+    ],
     "author": "",
     "license": "ISC",
     "devDependencies": {
         "@types/react": "^16.9.51",
         "@types/react-dom": "^16.9.8",
+        "node-sass": "^4.14.1",
         "react": "^16.13.1",
         "react-dom": "^16.13.1",
         "typedoc": "^0.18.0"
@@ -34,5 +40,6 @@
     "peerDependencies": {
         "react": "^16.8.0",
         "react-dom": "^16.8.0"
-    }
+    },
+    "dependencies": {}
 }
