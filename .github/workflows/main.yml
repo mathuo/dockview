@@ -22,4 +22,4 @@ jobs:
     - run: codecov
       env:
         CI: true
-        CODECOV_TOKEN: deb138e8-93c4-441d-a6c7-e341ac9f2838
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
