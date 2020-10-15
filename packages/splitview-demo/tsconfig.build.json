@@ -5,7 +5,7 @@
         "outDir": "./dist",
         "rootDir": "./src",
         "module": "commonjs",
-        "target": "es2019",
+        "target": "es5",
         "sourceMap": true,
         "jsx": "react",
         "noImplicitReturns": true,

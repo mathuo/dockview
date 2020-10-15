@@ -4,7 +4,8 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-
+        "test": "jest",
+        "test-cov": "jest --coverage"
     },
     "repository": {
         "type": "git",
@@ -19,6 +20,7 @@
     "devDependencies": {
         "@testing-library/jest-dom": "^5.10.1",
         "@types/jest": "^26.0.3",
+        "cross-env": "^7.0.2",
         "css-loader": "^3.6.0",
         "gulp": "^4.0.2",
         "gulp-clean": "^0.4.0",
@@ -32,6 +34,7 @@
         "lerna": "^3.22.1",
         "merge2": "^1.4.1",
         "node-sass": "^4.14.1",
+        "rimraf": "^3.0.2",
         "sass-loader": "^8.0.2",
         "style-loader": "^1.2.1",
         "ts-jest": "^26.1.1",

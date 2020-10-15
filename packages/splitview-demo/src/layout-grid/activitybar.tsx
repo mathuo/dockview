@@ -7,6 +7,16 @@ import {
 import './activitybar.scss';
 import { useLayoutRegistry } from './registry';
 
+const ActivitybarImage = (props: { url: string }) => (
+    <a
+        style={{
+            WebkitMaskImage: `url(${props.url})`,
+            maskImage: `url(${props.url})`,
+        }}
+        className="activity-bar-item-image"
+    />
+);
+
 export const Activitybar = (props: IGridviewPanelProps) => {
     const registry = useLayoutRegistry();
     const [isActive, setActive] = React.useState<boolean>();
@@ -37,23 +47,12 @@ export const Activitybar = (props: IGridviewPanelProps) => {
     }, []);
 
     return (
-        <div
-            onClick={onOpenSidebar}
-            style={{
-                height: '100%',
-                width: '48px',
-                backgroundColor: 'rgb(51,51,51)',
-            }}
-        >
+        <div className="activity-bar" onClick={onOpenSidebar}>
             <div className="activity-bar-item">
-                <a
-                    style={{
-                        WebkitMask: `url(https://fonts.gstatic.com/s/i/materialicons/search/v7/24px.svg) 50% 50% / 65% 65% no-repeat`,
-                        height: '100%',
-                        width: '100%',
-                        display: 'block',
-                        backgroundColor: 'gray',
-                    }}
+                <ActivitybarImage
+                    url={
+                        'https://fonts.gstatic.com/s/i/materialicons/search/v7/24px.svg'
+                    }
                 />
             </div>
         </div>

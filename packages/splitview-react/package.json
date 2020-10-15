@@ -1,11 +1,21 @@
 {
-    "name": "splitview-react",
+    "name": "dockview-react",
     "version": "1.0.0",
     "description": "",
-    "main": "dist/esm/index.js",
-    "types": "dist/esm/index.d.ts",
+    "main": "dist/cjs/index.js",
+    "types": "dist/cjs/index.d.ts",
+    "module": "dist/es6/index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "build-gulp": "gulp run",
+        "docs": "typedoc",
+        "build-css": "gulp sass",
+        "build-es6": "cross-env ../../node_modules/.bin/tsc --project tsconfig.es6.json --extendedDiagnostics",
+        "build-cjs": "cross-env ../../node_modules/.bin/tsc --project tsconfig.json --extendedDiagnostics",
+        "build": "npm run build-cjs && npm run build-es6 && npm run build-css",
+        "clean": "rimraf dist/ .build/",
+        "rebuild": "npm run clean && npm run build",
+        "test": "bash ../../node_modules/.bin/jest --selectProjects dockview-react",
+        "test-cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-react --coverage"
     },
     "author": "",
     "license": "ISC",

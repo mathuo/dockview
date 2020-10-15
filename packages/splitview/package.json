@@ -1,6 +1,6 @@
 {
     "name": "dockview",
-    "version": "0.0.0-beta.0",
+    "version": "0.0.0-beta.1",
     "description": "",
     "main": "dist/cjs/index.js",
     "types": "dist/cjs/index.d.ts",
@@ -12,7 +12,11 @@
         "build-es6": "cross-env ../../node_modules/.bin/tsc --project tsconfig.es6.json --extendedDiagnostics",
         "build-cjs": "cross-env ../../node_modules/.bin/tsc --project tsconfig.json --extendedDiagnostics",
         "build": "npm run build-cjs && npm run build-es6 && npm run build-css",
-        "clean": "rimraf dist/ .build/"
+        "clean": "rimraf dist/ .build/",
+        "rebuild": "npm run clean && npm run build",
+        "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
+        "test-cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage"
+
     },
     "files": [
         "dist"

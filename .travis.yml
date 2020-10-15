@@ -11,5 +11,7 @@ before_script:
 script:
     - cd packages/splitview
     - npm run build
+    - cd ../../
+    - npm run test
 after_success:
     - codecov

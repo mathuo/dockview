@@ -1,14 +1,23 @@
 {
     "compilerOptions": {
         "module": "es6",
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": false,
         "declaration": true,
         "target": "es5",
         "moduleResolution": "node",
         "esModuleInterop": true,
         "downlevelIteration": true,
-        "incremental": true
+        "incremental": true,
+        "noImplicitReturns": true,
+        "noImplicitAny": true,
+        "allowUnreachableCode": false,
+        "forceConsistentCasingInFileNames": true,
+        // "strict": true,
+        "strictBindCallApply": true, // pass
+        "alwaysStrict": true, // pass
+        "noImplicitThis": true, // pass
+        "strictFunctionTypes": true, // pass
+        "strictNullChecks": false,
+        "strictPropertyInitialization": false,
         
     }
 }

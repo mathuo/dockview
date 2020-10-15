@@ -1,3 +1,11 @@
 {
-    "extends": "../../tsconfig.json"
+    "extends": "../../module-build/tsconfig.json",
+    "compilerOptions": {
+        "outDir": "dist/cjs",
+        "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.cjs",
+        "jsx": "react",
+        "rootDir": "src"
+    },
+    "include": ["src"],
+    "exclude": ["**/node_modules", "src/__tests__"]
 }

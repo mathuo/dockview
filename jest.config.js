@@ -1,16 +1,16 @@
+const baseConfig = require("./jest.config.base");
+
 module.exports = {
-    transform: {
-        '^.+\\.tsx?$': 'ts-jest',
-    },
-    testEnvironment: 'jsdom',
-    collectCoverageFrom: ['**/*.{ts,tsx}', '!**/node_modules/**'],
-    moduleNameMapper: {
-        '\\.(css|less|sass|scss)$':
-            '<rootDir>/src/__tests__/__mocks__/styleMock.js',
-    },
-    testMatch: [
-        '<rootDir>/src/__tests__/**/*.spec.ts',
-        '<rootDir>/src/__tests__/**/*.spec.tsx',
+    ...baseConfig,
+    displayName: { name: "root", color: "blue" },
+    projects: ["<rootDir>/packages/*/jest.config.js"],
+    collectCoverage: true,
+    collectCoverageFrom:[
+        "<rootDir>/packages/*/src/**/*.{js,jsx,ts,tsx}",
     ],
-    setupFilesAfterEnv: ['<rootDir>/src/__tests__/setupTests.ts'],
+    coveragePathIgnorePatterns: [
+        "/node_modules/",
+        "<rootDir>packages/*/src/__tests__/",
+    ],
+    coverageDirectory: "coverage"
 };
