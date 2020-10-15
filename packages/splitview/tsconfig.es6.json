@@ -1,0 +1,12 @@
+{
+    "extends": "../../module-build/tsconfig.es6.json",
+    "compilerOptions": {
+        "outDir": "dist/es6",
+        "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.es6",
+        "jsx": "react",
+        // "baseUrl": "."
+        "rootDir": "src"
+    },
+    "include": ["src"],
+    "exclude": ["**/node_modules", "src/__tests__"]
+}
