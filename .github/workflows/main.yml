@@ -15,6 +15,7 @@ jobs:
         node-version: '14.x'
     - run: npm install -g gulp
     - run: npm install -g lerna
+    - run: lerna bootstrap
     - run: npm run build
       working-directory: ./packages/splitview
     - run: npm test
