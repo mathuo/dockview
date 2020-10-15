@@ -1,0 +1,25 @@
+name: Node.js CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    - run: npm install -g gulp
+    - run: npm install -g lerna
+    - run: lerna bootstrap
+    - run: npm run build
+      working-directory: ./packages/splitview
+    - run: npm test
+    - run: codecov
+      env:
+        CI: true
+        CODECOV_TOKEN: deb138e8-93c4-441d-a6c7-e341ac9f2838
