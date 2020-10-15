@@ -3,23 +3,21 @@ name: Node.js CI
 on: [push]
 
 jobs:
-  build:
+    build:
+        runs-on: ubuntu-latest
 
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: '12.x'
-    - run: npm install -g gulp
-    - run: npm install -g lerna
-    - run: lerna bootstrap
-    - run: npm run build
-      working-directory: ./packages/splitview
-    - run: npm test
-    - run: codecov
-      env:
-        CI: true
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        steps:
+            - uses: actions/checkout@v2
+            - name: Use Node.js
+              uses: actions/setup-node@v1
+              with:
+                  node-version: '12.x'
+            - run: npm install -g gulp
+            - run: npm install -g lerna
+            - run: lerna bootstrap
+            - run: npm run build
+            - run: npm test
+            - run: codecov
+              env:
+                  CI: true
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
