@@ -9,8 +9,8 @@
         "build-gulp": "gulp run",
         "docs": "typedoc",
         "build-css": "gulp sass",
-        "build-es6": "cross-env ../../node_modules/.bin/tsc --project tsconfig.es6.json --extendedDiagnostics",
-        "build-cjs": "cross-env ../../node_modules/.bin/tsc --project tsconfig.json --extendedDiagnostics",
+        "build-es6": "tsc --project tsconfig.es6.json --extendedDiagnostics",
+        "build-cjs": "tsc --project tsconfig.json --extendedDiagnostics",
         "build": "npm run build-cjs && npm run build-es6 && npm run build-css",
         "clean": "rimraf dist/ .build/",
         "rebuild": "npm run clean && npm run build",
@@ -29,7 +29,8 @@
         "cross-env": "^7.0.2",
         "react": "^16.14.0",
         "react-dom": "^16.14.0",
-        "rimraf": "^3.0.2"
+        "rimraf": "^3.0.2",
+        "typescript": "^4.0.3"
     },
     "peerDependencies": {
         "react": "^16.8.0",
