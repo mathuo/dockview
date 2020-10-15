@@ -15,9 +15,9 @@ jobs:
         node-version: '14.x'
     - run: npm install -g gulp
     - run: npm install -g lerna
-    - run: cd packages/splitview
+      working-directory: ./packages/splitview
     - run: npm run build
-    - run: cd ../../
+      working-directory: ./
     - run: npm test
       env:
         CI: true
