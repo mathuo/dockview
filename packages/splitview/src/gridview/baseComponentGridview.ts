@@ -63,7 +63,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
     protected readonly groups = new Map<string, IValueDisposable<T>>();
     protected readonly gridview: Gridview;
     //
-    private resizeTimer?: NodeJS.Timer;
+    private resizeTimer?: any;
     protected _activeGroup: T | undefined;
     //
     protected _size = 0;

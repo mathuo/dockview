@@ -60,7 +60,7 @@ export abstract class PaneviewPanel
     private bodyPart?: IPaneHeaderPart;
     private headerPart?: IPaneBodyPart;
     private expandedSize: number;
-    private animationTimer: NodeJS.Timeout | undefined;
+    private animationTimer: any | undefined;
 
     get minimumSize(): number {
         const headerSize = this.headerSize;

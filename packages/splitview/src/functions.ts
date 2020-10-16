@@ -1,5 +1,5 @@
 export function debounce<T extends Function>(cb: T, wait: number) {
-    let timeout: NodeJS.Timeout;
+    let timeout: any;
 
     const callable = (...args: any) => {
         clearTimeout(timeout);

@@ -18,7 +18,7 @@ export class PaneView extends CompositeDisposable implements IDisposable {
     private splitview: SplitView;
     private paneItems: PaneItem[] = [];
     private _orientation: Orientation;
-    private animationTimer: NodeJS.Timeout | undefined;
+    private animationTimer: any | undefined;
 
     private readonly _onDidChange = new Emitter<void>();
     readonly onDidChange: Event<void> = this._onDidChange.event;
