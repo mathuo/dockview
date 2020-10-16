@@ -12,7 +12,7 @@ jobs:
               uses: actions/setup-node@v1
               with:
                   node-version: '12.x'
-            - run: npm install -g gulp
+            - run: npm install -g gulp-cli
             - run: npm install -g lerna
             - run: lerna bootstrap
             - run: npm run build
