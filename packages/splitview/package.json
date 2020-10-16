@@ -6,9 +6,9 @@
     "types": "dist/cjs/index.d.ts",
     "module": "dist/es6/index.js",
     "scripts": {
-        "build-gulp": "gulp run",
+        "build-gulp": "cross-env ../../node_modules/.bin/gulp run",
         "docs": "typedoc",
-        "build-css": "gulp sass",
+        "build-css": "cross-env ../../node_modules/.bin/gulp  sass",
         "build-es6": "tsc --project tsconfig.es6.json --extendedDiagnostics",
         "build-cjs": "tsc --project tsconfig.json --extendedDiagnostics",
         "build": "npm run build-cjs && npm run build-es6 && npm run build-css",
