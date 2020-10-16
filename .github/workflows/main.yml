@@ -14,6 +14,7 @@ jobs:
                   node-version: '12.x'
             - run: npm install -g gulp-cli
             - run: npm install -g lerna
+            - run: npm install -g codecov
             - run: lerna bootstrap --hoist
             - run: npm run build
             - run: npm test
