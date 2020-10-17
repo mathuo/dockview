@@ -15,6 +15,7 @@ jobs:
             - run: npm install -g gulp-cli
             - run: npm install -g lerna
             - run: npm install -g codecov
+            - run: npm ci
             - run: lerna bootstrap --hoist
             - run: npm run build
             - run: npm test
