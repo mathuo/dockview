@@ -1,1 +1,1 @@
-![CI build](https://github.com/mathuo/splitview/workflows/CI/badge.svg)
+![![CI build](https://github.com/mathuo/splitview/actions?query=workflow%3ACI)](https://github.com/mathuo/splitview/workflows/CI/badge.svg)
