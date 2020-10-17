@@ -15,10 +15,10 @@ jobs:
                   node-version: '12.x'
 
             - uses: actions/cache@v2
-            with:
-            path: '**/node_modules'
-            key: ${{ runner.os }}-modules-${{ hashFiles('**/package.lock') }}
-          
+              with:
+                path: '**/node_modules'
+                key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
 
             - run: npm install -g gulp-cli
             - run: npm install -g lerna
