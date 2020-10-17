@@ -4,8 +4,8 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "build": "bash ../../node_modules/.bin/webpack --config webpack.config.js",
-        "start": "bash ../../node_modules/.bin/webpack-dev-server --config webpack.config.js"
+        "build": "cross-env ../../node_modules/.bin/webpack --config webpack.config.js",
+        "start": "cross-env ../../node_modules/.bin/webpack serve --config webpack.config.js"
     },
     "author": "",
     "license": "ISC",
@@ -16,6 +16,8 @@
     },
     "devDependencies": {
         "@types/react": "^16.9.53",
-        "@types/react-dom": "^16.9.8"
+        "@types/react-dom": "^16.9.8",
+        "cross-env": "^7.0.2",
+        "rimraf": "^3.0.2"
     }
 }
