@@ -21,14 +21,11 @@ jobs:
                 restore-keys: |
                     ${{ runner.os }}-node-
                     
-            # - run: npm install -g gulp-cli
-            # - run: npm install -g lerna
-            - run: npm install -g codecov
             - run: npm ci
             - run: npm run bootstrap
             - run: npm run build
             - run: npm test
-            - run: codecov
+            - run: npm run codecov-publish
               env:
                   CI: true
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
