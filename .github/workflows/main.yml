@@ -14,12 +14,13 @@ jobs:
               with:
                   node-version: '12.x'
 
-            - uses: actions/cache@v2
-            with:
+            - name: Use Node.js
+              uses: actions/cache@v2
+              with:
               path: ~/.npm
               key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-              restore-keys: |
-                ${{ runner.os }}-node-
+                restore-keys: |
+                  ${{ runner.os }}-node-
 
             - run: npm install -g gulp-cli
             - run: npm install -g lerna
