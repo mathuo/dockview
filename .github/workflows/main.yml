@@ -1,22 +1,25 @@
 name: CI
-'on':
-    - push
+
+on: [push]
+
 jobs:
     build:
         runs-on: ubuntu-latest
+
         steps:
             - uses: actions/checkout@v2
+
             - name: Use Node.js
               uses: actions/setup-node@v1
               with:
-                  node-version: 12.x
-            - name: Cache
-              uses: actions/cache@v2
-              with: null
-              path: ~/.npm
-              key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
-              restore-keys: |
-                  ${{ runner.os }}-node-
+                  node-version: '12.x'
+
+            - uses: actions/cache@v2
+            with:
+            path: '**/node_modules'
+            key: ${{ runner.os }}-modules-${{ hashFiles('**/package.lock') }}
+          
+
             - run: npm install -g gulp-cli
             - run: npm install -g lerna
             - run: npm install -g codecov
@@ -27,4 +30,4 @@ jobs:
             - run: codecov
               env:
                   CI: true
-                  CODECOV_TOKEN: '${{ secrets.CODECOV_TOKEN }}'
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
