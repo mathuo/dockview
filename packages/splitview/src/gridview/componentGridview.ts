@@ -18,6 +18,7 @@ import { GridviewPanel, GridviewInitParameters } from './gridviewPanel';
 import { BaseComponentOptions, Parameters } from '../panel/types';
 import { GridPanelApi } from '../api/gridPanelApi';
 import { GridviewApi } from '../api/component.api';
+import { Sizing } from '../splitview/core/splitview';
 
 interface PanelReference {
     api: GridPanelApi;
@@ -43,6 +44,7 @@ export interface IGridPanelComponentView extends IGridPanelView {
 export interface IComponentGridview extends IBaseGrid<GridviewPanel> {
     addComponent(options: AddComponentOptions): void;
     getPanel(id: string): GridviewPanel;
+    removePanel(panel: GridviewPanel, sizing?: Sizing): void;
     setVisible(panel: GridviewPanel, visible: boolean): void;
     isVisible(panel: GridviewPanel): boolean;
     toggleVisibility(panel: GridviewPanel): void;
@@ -77,6 +79,10 @@ export class ComponentGridview
 
     set deserializer(value: IPanelDeserializer) {
         this._deserializer = value;
+    }
+
+    removePanel(panel: GridviewPanel, sizing?: Sizing) {
+        this.gridview.remove(panel, sizing);
     }
 
     /**

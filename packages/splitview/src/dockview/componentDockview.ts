@@ -1,4 +1,4 @@
-import { getRelativeLocation } from '../gridview/gridview';
+import { getRelativeLocation, IGridView } from '../gridview/gridview';
 import { Position } from '../groupview/droptarget/droptarget';
 import { getGridLocation } from '../gridview/gridview';
 import { tail, sequenceEquals } from '../array';
