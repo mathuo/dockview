@@ -88,6 +88,9 @@ export interface IComponentPaneview extends IDisposable {
     fromJSON(data: any): void;
     resizeToFit(): void;
     focus(): void;
+    getPanels(): PaneviewPanel[];
+    removePanel(panel: PaneviewPanel): void;
+    getPanel(id: string): PaneviewPanel | undefined;
 }
 
 export class ComponentPaneview
@@ -176,6 +179,20 @@ export class ComponentPaneview
                 //
             },
         };
+    }
+
+    getPanels(): PaneviewPanel[] {
+        return this.paneview.getPanes() as PaneviewPanel[];
+    }
+
+    removePanel(panel: PaneviewPanel) {
+        const views = this.getPanels();
+        const index = views.findIndex((_) => _ === panel);
+        this.paneview.removePane(index);
+    }
+
+    getPanel(id: string): PaneviewPanel | undefined {
+        return this.getPanels().find((view) => view.id === id);
     }
 
     layout(width: number, height: number): void {

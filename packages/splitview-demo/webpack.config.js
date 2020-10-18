@@ -1,4 +1,4 @@
-var path = require('path');
+const path = require('path');
 
 module.exports = {
     entry: path.resolve(__dirname, 'src/index.tsx'),
@@ -19,8 +19,7 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx?$/,
-                loader: 'ts-loader',
-                options: { configFile: 'tsconfig.build.json' },
+                loader: 'ts-loader'
             },
             {
                 test: /\.s[ac]ss$/i,
@@ -49,6 +48,6 @@ module.exports = {
         compress: true,
         contentBase: path.resolve(__dirname, 'public'),
         publicPath: '/dist',
-        writeToDisk:true
+        writeToDisk:false
     },
 };

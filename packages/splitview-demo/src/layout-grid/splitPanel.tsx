@@ -110,6 +110,25 @@ export const SplitPanel = (props: IGroupPanelProps) => {
         panel.update({ params: { text: Date.now().toString() } });
     };
 
+    const onAdd = () => {
+        api.current.addFromComponent({
+            id: `${Date.now()}`,
+            component: 'default1',
+            snap: true,
+            params: {
+                text: 'hiya',
+            },
+        });
+    };
+
+    const onRemove = () => {
+        const panels = api.current.getPanels();
+        if (panels.length === 0) {
+            return;
+        }
+        api.current.removePanel(panels[panels.length - 1]);
+    };
+
     return (
         <div
             style={{
@@ -121,6 +140,8 @@ export const SplitPanel = (props: IGroupPanelProps) => {
         >
             <div style={{ height: '25px' }}>
                 <button onClick={onUpdateProps}>Update props</button>
+                <button onClick={onAdd}>Add</button>
+                <button onClick={onRemove}>Remove</button>
             </div>
             <SplitviewComponent
                 components={components}

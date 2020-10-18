@@ -35,6 +35,8 @@ export interface IComponentSplitview extends IDisposable {
     focus(): void;
     getPanel(id: string): SplitviewPanel | undefined;
     setActive(view: SplitviewPanel, skipFocus?: boolean): void;
+    removePanel(panel: SplitviewPanel, sizing?: Sizing): void;
+    getPanels(): SplitviewPanel[];
 }
 
 /**
@@ -87,22 +89,24 @@ export class ComponentSplitview
     setActive(view: SplitviewPanel, skipFocus?: boolean) {
         this._activePanel = view;
 
-        this.getViews()
+        this.getPanels()
             .filter((v) => v !== view)
             .forEach((v) => v.setActive(false, skipFocus));
         view.setActive(true, skipFocus);
     }
 
-    getViews(): SplitviewPanel[] {
+    getPanels(): SplitviewPanel[] {
         return this.splitview.getViews() as SplitviewPanel[];
     }
 
-    removeView(id: string) {
-        // this.splitview.view;
+    removePanel(panel: SplitviewPanel, sizing?: Sizing) {
+        const views = this.getPanels();
+        const index = views.findIndex((_) => _ === panel);
+        this.splitview.removeView(index, sizing);
     }
 
     getPanel(id: string): SplitviewPanel | undefined {
-        return this.getViews().find((view) => view.id === id);
+        return this.getPanels().find((view) => view.id === id);
     }
 
     addFromComponent(options: AddSplitviewComponentOptions): void {

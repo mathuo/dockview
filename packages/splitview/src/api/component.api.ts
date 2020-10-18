@@ -13,10 +13,12 @@ import { IGroupview } from '../groupview/groupview';
 import { IGroupPanel } from '../groupview/panel/parts';
 import { AddPaneviewCompponentOptions } from '../paneview/componentPaneview';
 import { IComponentPaneview } from '../paneview/componentPaneview';
+import { PaneviewPanel } from '../paneview/paneviewPanel';
 import {
     AddSplitviewComponentOptions,
     IComponentSplitview,
 } from '../splitview/componentSplitview';
+import { Sizing } from '../splitview/core/splitview';
 import { SplitviewPanel } from '../splitview/splitviewPanel';
 
 export class SplitviewApi {
@@ -33,6 +35,14 @@ export class SplitviewApi {
     }
 
     constructor(private readonly component: IComponentSplitview) {}
+
+    removePanel(panel: SplitviewPanel, sizing?: Sizing) {
+        this.component.removePanel(panel, sizing);
+    }
+
+    getPanels(): SplitviewPanel[] {
+        return this.component.getPanels();
+    }
 
     focus() {
         return this.component.focus();
@@ -81,6 +91,18 @@ export class PaneviewApi {
     }
 
     constructor(private readonly component: IComponentPaneview) {}
+
+    getPanels(): PaneviewPanel[] {
+        return this.component.getPanels();
+    }
+
+    removePanel(panel: PaneviewPanel): void {
+        this.component.removePanel(panel);
+    }
+
+    getPanel(id: string): PaneviewPanel | undefined {
+        return this.component.getPanel(id);
+    }
 
     focus() {
         return this.component.focus();
@@ -140,6 +162,10 @@ export class GridviewApi {
 
     addComponent(options: AddComponentOptions) {
         return this.component.addComponent(options);
+    }
+
+    removePanel(panel: GridviewPanel, sizing?: Sizing): void {
+        this.component.removePanel(panel, sizing);
     }
 
     resizeToFit() {
