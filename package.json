@@ -11,7 +11,7 @@
         "bootstrap": "lerna bootstrap --hoist",
         "test-cov": "jest --coverage",
         "codecov-publish": "codecov",
-        "publish-version":"lerna publish --canary --preid beta"
+        "publish-canary-build":"lerna publish --canary --preid beta"
     },
     "repository": {
         "type": "git",
