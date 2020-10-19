@@ -5,7 +5,9 @@
         "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.cjs",
         "jsx": "react",
         "rootDir": "src",
-        "allowUnreachableCode": true
+        "allowUnreachableCode": true,
+        "noImplicitAny": false,
+        "sourceMap": true
     },
     "include": ["src"],
     "exclude": ["**/node_modules", "src/__tests__"]

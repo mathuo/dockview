@@ -6,6 +6,7 @@
     "scripts": {
         "test": "jest",
         "build": "lerna run build --ignore splitview-demo",
+        "clean": "lerna run clean",
         "bootstrap": "lerna bootstrap --hoist",
         "test-cov": "jest --coverage",
         "codecov-publish": "codecov"
@@ -21,7 +22,7 @@
     },
     "homepage": "https://github.com/mathuo/splitview#readme",
     "devDependencies": {
-        "@testing-library/jest-dom": "^5.11.4",
+        "@testing-library/dom": "^7.26.0",
         "@types/jest": "^26.0.14",
         "codecov": "^3.8.0",
         "cross-env": "^7.0.2",

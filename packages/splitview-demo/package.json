@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "build": "cross-env ../../node_modules/.bin/webpack --config webpack.config.js",
-        "start": "cross-env ../../node_modules/.bin/webpack serve --config webpack.config.js"
+        "start": "cross-env ../../node_modules/.bin/webpack serve --config webpack.config.js",
+        "clean": "rimraf dist/ .build/"
     },
     "author": "",
     "license": "ISC",
