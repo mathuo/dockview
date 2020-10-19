@@ -60,13 +60,44 @@ describe('splitview', () => {
             orientation: Orientation.HORIZONTAL,
         });
 
-        splitview.addView(new Testview(50, 100));
-        splitview.addView(new Testview(50, 100));
-        splitview.addView(new Testview(50, 100));
+        splitview.addView(new Testview(50, 50));
+        splitview.addView(new Testview(50, 50));
+        splitview.addView(new Testview(50, 50));
 
-        const viewQuery = container.querySelectorAll(
+        let viewQuery = container.querySelectorAll(
             '.split-view-container > .view-container > .view'
         );
         expect(viewQuery.length).toBe(3);
+
+        let sashQuery = container.querySelectorAll(
+            '.split-view-container > .sash-container > .sash'
+        );
+        expect(sashQuery.length).toBe(2);
+
+        splitview.removeView(2);
+
+        viewQuery = container.querySelectorAll(
+            '.split-view-container > .view-container > .view'
+        );
+        expect(viewQuery.length).toBe(2);
+
+        sashQuery = container.querySelectorAll(
+            '.split-view-container > .sash-container > .sash'
+        );
+        expect(sashQuery.length).toBe(1);
+
+        splitview.removeView(0);
+
+        viewQuery = container.querySelectorAll(
+            '.split-view-container > .view-container > .view'
+        );
+        expect(viewQuery.length).toBe(1);
+
+        sashQuery = container.querySelectorAll(
+            '.split-view-container > .sash-container > .sash'
+        );
+        expect(sashQuery.length).toBe(0);
+
+        splitview.removeView(0);
     });
 });
