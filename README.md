@@ -32,3 +32,5 @@ dockview/dist/styles.css
 ```
 
 ## React
+
+## Run the demo locally

@@ -30,11 +30,11 @@ export const Application = () => {
     const registry = useLayoutRegistry();
 
     const onReady = (event: GridviewReadyEvent) => {
-        event.api.fromJSON(require('./application.layout.json'));
+        // event.api.fromJSON(require('./application.layout.json'));
         api.current = event.api;
 
         registry.register('gridview', event.api);
-        return;
+        // return;
 
         event.api.addComponent({
             id: '0',
@@ -66,7 +66,7 @@ export const Application = () => {
             snap: true,
             position: { reference: '2', direction: 'left' },
             minimumWidth: 170,
-            size: 171,
+            size: 100,
         });
 
         event.api.addComponent({
@@ -86,6 +86,7 @@ export const Application = () => {
         window.addEventListener('resize', onresize);
 
         onresize(undefined); // initial render
+        api.current.getGroup('sidebar').api.setSize({ width: 300 });
 
         return () => {
             window.removeEventListener('resize', onresize);
