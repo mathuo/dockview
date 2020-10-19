@@ -1,7 +1,6 @@
 {
     "name": "splitview-root",
     "private": true,
-    "version": "0.0.0-beta.2",
     "description": "",
     "main": "index.js",
     "scripts": {
