@@ -10,7 +10,8 @@
         "clean": "lerna run clean",
         "bootstrap": "lerna bootstrap --hoist",
         "test-cov": "jest --coverage",
-        "codecov-publish": "codecov"
+        "codecov-publish": "codecov",
+        "publish-version":"lerna publish --canary --preid beta"
     },
     "repository": {
         "type": "git",
