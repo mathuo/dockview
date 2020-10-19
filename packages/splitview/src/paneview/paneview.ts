@@ -1,5 +1,5 @@
 import {
-    SplitView,
+    Splitview,
     Orientation,
     ISplitViewDescriptor,
 } from '../splitview/core/splitview';
@@ -13,9 +13,9 @@ interface PaneItem {
     disposable: IDisposable;
 }
 
-export class PaneView extends CompositeDisposable implements IDisposable {
+export class Paneview extends CompositeDisposable implements IDisposable {
     private element: HTMLElement;
-    private splitview: SplitView;
+    private splitview: Splitview;
     private paneItems: PaneItem[] = [];
     private _orientation: Orientation;
     private animationTimer: any | undefined;
@@ -56,7 +56,7 @@ export class PaneView extends CompositeDisposable implements IDisposable {
 
         container.appendChild(this.element);
 
-        this.splitview = new SplitView(this.element, {
+        this.splitview = new Splitview(this.element, {
             orientation: this._orientation,
             proportionalLayout: false,
             descriptor: options.descriptor,

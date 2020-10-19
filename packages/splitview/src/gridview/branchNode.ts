@@ -1,6 +1,6 @@
 import {
     IView,
-    SplitView,
+    Splitview,
     Orientation,
     Sizing,
     LayoutPriority,
@@ -13,7 +13,7 @@ import { CompositeDisposable, IDisposable, Disposable } from '../lifecycle';
 
 export class BranchNode extends CompositeDisposable implements IView {
     readonly element: HTMLElement;
-    private splitview: SplitView;
+    private splitview: Splitview;
     private _orthogonalSize: number;
     private _size: number;
     public readonly children: Node[] = [];
@@ -118,7 +118,7 @@ export class BranchNode extends CompositeDisposable implements IView {
         this.element.className = 'branch-node';
 
         if (!childDescriptors) {
-            this.splitview = new SplitView(this.element, {
+            this.splitview = new Splitview(this.element, {
                 orientation: this.orientation,
                 proportionalLayout,
             });
@@ -140,7 +140,7 @@ export class BranchNode extends CompositeDisposable implements IView {
             };
 
             this.children = childDescriptors.map((c) => c.node);
-            this.splitview = new SplitView(this.element, {
+            this.splitview = new Splitview(this.element, {
                 orientation: this.orientation,
                 descriptor,
                 proportionalLayout,

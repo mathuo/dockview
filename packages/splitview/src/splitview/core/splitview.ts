@@ -83,7 +83,7 @@ export interface ISplitViewDescriptor {
     }[];
 }
 
-export class SplitView {
+export class Splitview {
     private element: HTMLElement;
     private viewContainer: HTMLElement;
     private sashContainer: HTMLElement;
@@ -255,17 +255,19 @@ export class SplitView {
 
         item.size = size;
 
-        const contentSize = this.views.reduce((r, i) => r + i.size, 0);
+        this.relayout([index], undefined);
 
-        this.resize(
-            this.views.length - 1,
-            this._size - contentSize,
-            undefined,
-            [index]
-        );
-        this.distributeEmptySpace();
-        this.layoutViews();
-        this.saveProportions();
+        // const contentSize = this.views.reduce((r, i) => r + i.size, 0);
+
+        // this.resize(
+        //     index -1,
+        //     this._size - contentSize,
+        //     undefined,
+        //     [index]
+        // );
+        // this.distributeEmptySpace();
+        // this.layoutViews();
+        // this.saveProportions();
     }
 
     public addView(
@@ -508,7 +510,6 @@ export class SplitView {
         }
 
         this.relayout();
-        this.distributeEmptySpace();
 
         if (sizing && sizing.type === 'distribute') {
             this.distributeViewSizes();
@@ -601,6 +602,7 @@ export class SplitView {
             lowPriorityIndexes,
             highPriorityIndexes
         );
+        this.distributeEmptySpace();
         this.layoutViews();
         this.saveProportions();
     }

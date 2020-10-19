@@ -3,7 +3,7 @@ import {
     LayoutPriority,
     Orientation,
     Sizing,
-    SplitView,
+    Splitview,
 } from './core/splitview';
 import {
     createComponent,
@@ -13,7 +13,7 @@ import {
 import { BaseComponentOptions } from '../panel/types';
 import { Emitter, Event } from '../events';
 import { SplitviewApi } from '../api/component.api';
-import { PaneView } from '../paneview/paneview';
+import { Paneview } from '../paneview/paneview';
 import { SplitviewPanel } from './splitviewPanel';
 
 export interface AddSplitviewComponentOptions extends BaseComponentOptions {
@@ -45,7 +45,7 @@ export interface IComponentSplitview extends IDisposable {
 export class ComponentSplitview
     extends CompositeDisposable
     implements IComponentSplitview {
-    private splitview: SplitView;
+    private splitview: Splitview;
     private _activePanel: SplitviewPanel;
 
     private readonly _onDidLayoutChange = new Emitter<void>();
@@ -72,7 +72,7 @@ export class ComponentSplitview
             options.frameworkComponents = {};
         }
 
-        this.splitview = new SplitView(this.element, options);
+        this.splitview = new Splitview(this.element, options);
 
         this.addDisposables(
             this.splitview.onDidSashEnd(() => {
@@ -211,7 +211,7 @@ export class ComponentSplitview
         };
 
         this.splitview.dispose();
-        this.splitview = new SplitView(this.element, {
+        this.splitview = new Splitview(this.element, {
             orientation,
             proportionalLayout: this.options.proportionalLayout,
             descriptor: {

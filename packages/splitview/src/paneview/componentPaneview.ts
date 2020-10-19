@@ -6,7 +6,7 @@ import { PanelUpdateEvent } from '../panel/types';
 import { createComponent } from '../splitview/core/options';
 import { LayoutPriority, Orientation } from '../splitview/core/splitview';
 import { PaneviewComponentOptions } from './options';
-import { PaneView } from './paneview';
+import { Paneview } from './paneview';
 import {
     IPaneBodyPart,
     IPaneHeaderPart,
@@ -96,7 +96,7 @@ export interface IComponentPaneview extends IDisposable {
 export class ComponentPaneview
     extends CompositeDisposable
     implements IComponentPaneview {
-    private paneview: PaneView;
+    private paneview: Paneview;
 
     private readonly _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
@@ -115,7 +115,7 @@ export class ComponentPaneview
     ) {
         super();
 
-        this.paneview = new PaneView(this.element, {
+        this.paneview = new Paneview(this.element, {
             // only allow paneview in the vertical orientation for now
             orientation: Orientation.VERTICAL,
         });
@@ -259,7 +259,7 @@ export class ComponentPaneview
         };
 
         this.paneview.dispose();
-        this.paneview = new PaneView(this.element, {
+        this.paneview = new Paneview(this.element, {
             orientation,
             descriptor: {
                 size,
