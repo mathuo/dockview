@@ -1,4 +1,4 @@
-export function timeoutPromise(timeout: number): Promise<void> {
+export function timeoutAsPromise(timeout: number): Promise<void> {
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve();

@@ -19,7 +19,7 @@ import {
 } from '../lifecycle';
 import { Event, Emitter, addDisposableListener } from '../events';
 import { Watermark } from './components/watermark/watermark';
-import { timeoutPromise } from '../async';
+import { timeoutAsPromise } from '../async';
 import { DebugWidget } from './components/debug/debug';
 import {
     PanelContentPartConstructor,
@@ -459,7 +459,7 @@ export class ComponentDockview
             if (!didCloseAll) {
                 return false;
             }
-            await timeoutPromise(0);
+            await timeoutAsPromise(0);
         }
         return true;
     }

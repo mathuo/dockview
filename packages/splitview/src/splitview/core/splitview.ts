@@ -1,7 +1,7 @@
-import { removeClasses, addClasses, firstIndex, toggleClass } from '../../dom';
+import { removeClasses, addClasses, toggleClass } from '../../dom';
 import { clamp } from '../../math';
 import { Event, Emitter } from '../../events';
-import { pushToStart, pushToEnd, range } from '../../array';
+import { pushToStart, pushToEnd, range, firstIndex } from '../../array';
 import { ViewItem } from './viewItem';
 
 export enum Orientation {

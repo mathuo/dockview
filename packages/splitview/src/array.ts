@@ -67,3 +67,18 @@ export const range = (from: number, to?: number): number[] => {
 
     return result;
 };
+
+export function firstIndex<T>(
+    array: T[] | ReadonlyArray<T>,
+    fn: (item: T) => boolean
+): number {
+    for (let i = 0; i < array.length; i++) {
+        const element = array[i];
+
+        if (fn(element)) {
+            return i;
+        }
+    }
+
+    return -1;
+}

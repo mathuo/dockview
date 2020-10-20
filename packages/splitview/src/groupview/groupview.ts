@@ -6,7 +6,7 @@ import { Event, Emitter, addDisposableListener } from '../events';
 import { IComponentDockview, ComponentDockview } from '../dockview';
 import { isAncestor, toggleClass } from '../dom';
 import { IGroupPanel, WatermarkPart } from './panel/parts';
-import { timeoutPromise } from '../async';
+import { timeoutAsPromise } from '../async';
 import {
     extractData,
     isTabDragEvent,
@@ -422,7 +422,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             this.openPanel(panel);
 
             if (panel.close) {
-                await timeoutPromise(0);
+                await timeoutAsPromise(0);
                 const canClose = await panel.close();
                 if (!canClose) {
                     return false;

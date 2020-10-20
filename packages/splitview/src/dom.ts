@@ -124,21 +124,6 @@ export const toggleClass = (
     }
 };
 
-export function firstIndex<T>(
-    array: T[] | ReadonlyArray<T>,
-    fn: (item: T) => boolean
-): number {
-    for (let i = 0; i < array.length; i++) {
-        const element = array[i];
-
-        if (fn(element)) {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
 export function isAncestor(
     testChild: Node | null,
     testAncestor: Node | null

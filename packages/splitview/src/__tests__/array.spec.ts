@@ -1,4 +1,11 @@
-import { last, pushToEnd, pushToStart, range, tail } from '../array';
+import {
+    firstIndex,
+    last,
+    pushToEnd,
+    pushToStart,
+    range,
+    tail,
+} from '../array';
 
 describe('array', () => {
     it('tail', () => {
@@ -32,5 +39,10 @@ describe('array', () => {
         expect(range(0, 5)).toEqual([0, 1, 2, 3, 4]);
         expect(range(5, 0)).toEqual([5, 4, 3, 2, 1]);
         expect(range(5)).toEqual([0, 1, 2, 3, 4]);
+    });
+
+    it('firstIndex', () => {
+        expect(firstIndex([1, 2, 3, 4, 3], (item) => item === 3)).toBe(2);
+        expect(firstIndex([1, 2, 3, 4, 3], (item) => item === 5)).toBe(-1);
     });
 });
