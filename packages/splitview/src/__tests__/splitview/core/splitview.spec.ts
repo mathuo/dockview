@@ -110,4 +110,29 @@ describe('splitview', () => {
         );
         expect(sashQuery.length).toBe(0);
     });
+
+    it('streches to viewport', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        splitview.layout(200, 500);
+
+        const view = new Testview(50, Number.POSITIVE_INFINITY);
+
+        splitview.addView(view);
+        expect(view.size).toBe(200);
+
+        splitview.layout(100, 500);
+        expect(view.size).toBe(100);
+
+        splitview.layout(50, 500);
+        expect(view.size).toBe(50);
+
+        splitview.layout(30, 500);
+        expect(view.size).toBe(50);
+
+        splitview.layout(100, 500);
+        expect(view.size).toBe(100);
+    });
 });
