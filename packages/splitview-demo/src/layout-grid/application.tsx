@@ -86,7 +86,7 @@ export const Application = () => {
         window.addEventListener('resize', onresize);
 
         onresize(undefined); // initial render
-        api.current.getGroup('sidebar').api.setSize({ width: 300 });
+        api.current.getPanel('sidebar').api.setSize({ width: 300 });
 
         return () => {
             window.removeEventListener('resize', onresize);

@@ -102,7 +102,7 @@ export const ControlCenter = () => {
     const onAddSettings = () => {
         const api = registry.get<DockviewApi>('dockview');
 
-        const settingsPanel = api.getPanel('settings');
+        const settingsPanel = api.getGroupPanel('settings');
         if (settingsPanel) {
             api.setActivePanel(settingsPanel);
             return;
@@ -125,7 +125,7 @@ export const ControlCenter = () => {
 
     const onFocusPanel = () => {
         const api = registry.get<DockviewApi>('dockview');
-        const panel = api.getPanel('split_panel');
+        const panel = api.getGroupPanel('split_panel');
         api.setActivePanel(panel);
     };
 

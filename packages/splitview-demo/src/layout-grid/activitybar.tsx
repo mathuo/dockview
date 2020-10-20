@@ -24,7 +24,7 @@ export const Activitybar = (props: IGridviewPanelProps) => {
     const onOpenSidebar = (event: React.MouseEvent<HTMLDivElement>) => {
         const api = registry.get<GridviewApi>('gridview');
 
-        const sidebarPanel = api.getGroup('sidebar');
+        const sidebarPanel = api.getPanel('sidebar');
         if (api.isVisible(sidebarPanel)) {
             api.setVisible(sidebarPanel, false);
         } else {
