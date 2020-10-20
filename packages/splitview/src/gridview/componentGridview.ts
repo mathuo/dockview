@@ -62,6 +62,7 @@ export class ComponentGridview
         super(element, {
             proportionalLayout: false,
             orientation: options.orientation,
+            styles: options.styles,
         });
 
         if (!this.options.components) {

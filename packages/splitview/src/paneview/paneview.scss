@@ -17,6 +17,12 @@
         &:not(:first-child)::before {
             background-color: transparent !important;
         }
+
+        &:not(:first-child) {
+            .pane > .pane-header {
+                border-top: 1px solid rgba(204, 204, 204, 0.2);
+            }
+        }
     }
 
     &:first-of-type > .pane > .pane-header {
@@ -30,7 +36,6 @@
         height: 100%;
 
         .pane-header {
-            border-top: 1px solid rgba(204, 204, 204, 0.2);
             box-sizing: border-box;
             user-select: none;
 

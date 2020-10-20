@@ -23,6 +23,7 @@ export interface IGridviewComponentProps {
     orientation: Orientation;
     onReady?: (event: GridviewReadyEvent) => void;
     components?: PanelCollection<IGridviewPanelProps>;
+    hideBorders?: boolean;
 }
 
 export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps> = (
@@ -43,6 +44,9 @@ export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps>
                     });
                 },
             },
+            styles: props.hideBorders
+                ? { separatorBorder: 'transparent' }
+                : undefined,
         });
 
         if (props.onReady) {

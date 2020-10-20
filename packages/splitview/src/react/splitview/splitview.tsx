@@ -24,6 +24,7 @@ export interface ISplitviewComponentProps {
     onReady?: (event: SplitviewReadyEvent) => void;
     components: PanelCollection<ISplitviewPanelProps>;
     proportionalLayout?: boolean;
+    hideBorders?: boolean;
 }
 
 export const SplitviewComponent: React.FunctionComponent<ISplitviewComponentProps> = (
@@ -45,6 +46,9 @@ export const SplitviewComponent: React.FunctionComponent<ISplitviewComponentProp
                 },
             },
             proportionalLayout: props.proportionalLayout,
+            styles: props.hideBorders
+                ? { separatorBorder: 'transparent' }
+                : undefined,
         });
 
         splitview.resizeToFit();

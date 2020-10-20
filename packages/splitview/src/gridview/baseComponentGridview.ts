@@ -5,7 +5,7 @@ import { Position } from '../groupview/droptarget/droptarget';
 import { GroupChangeEvent, GroupChangeKind } from '../groupview/groupview';
 import { CompositeDisposable, IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
-import { Orientation } from '../splitview/core/splitview';
+import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { IPanel } from '../panel/types';
 import { Sizing } from '../splitview/core/splitview';
 
@@ -32,6 +32,7 @@ export function toTarget(direction: Direction) {
 export interface BaseGridOptions {
     readonly proportionalLayout?: boolean;
     readonly orientation?: Orientation;
+    readonly styles?: ISplitviewStyles;
 }
 
 export interface IGridPanelView extends IGridView, IPanel {
@@ -110,6 +111,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
         this.gridview = new Gridview(
             !!options.proportionalLayout,
+            options.styles,
             options.orientation
         );
 

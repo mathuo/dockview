@@ -17,7 +17,7 @@ export enum SashState {
 }
 
 export interface ISplitviewStyles {
-    separatorBorder: 'transparent';
+    separatorBorder: string;
 }
 
 export interface SplitViewOptions {
@@ -149,6 +149,8 @@ export class Splitview {
 
         this.container.appendChild(this.element);
 
+        this.style(options.styles);
+
         // We have an existing set of view, add them now
         if (options.descriptor) {
             this._size = options.descriptor.size;
@@ -175,6 +177,22 @@ export class Splitview {
             // Initialize content size and proportions for first layout
             this.contentSize = this.views.reduce((r, i) => r + i.size, 0);
             this.saveProportions();
+        }
+    }
+
+    style(styles: ISplitviewStyles): void {
+        console.log('styles', styles);
+        if (styles?.separatorBorder === 'transparent') {
+            removeClasses(this.element, 'separator-border');
+            this.element.style.removeProperty('--separator-border');
+        } else {
+            addClasses(this.element, 'separator-border');
+            if (styles?.separatorBorder) {
+                this.element.style.setProperty(
+                    '--separator-border',
+                    styles.separatorBorder
+                );
+            }
         }
     }
 

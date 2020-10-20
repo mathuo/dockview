@@ -110,6 +110,15 @@
         height: 100%;
         width: 100%;
 
+        .view {
+            height: 100%;
+            box-sizing: border-box;
+            overflow: auto;
+            position: absolute;
+        }
+    }
+
+    &.separator-border {
         .view:not(:first-child)::before {
             content: ' ';
             position: absolute;
@@ -117,14 +126,7 @@
             left: 0;
             z-index: 5;
             pointer-events: none;
-            background-color: var(--splitview-divider-color);
-        }
-
-        .view {
-            height: 100%;
-            box-sizing: border-box;
-            overflow: auto;
-            position: absolute;
+            background-color: var(--separator-border);
         }
     }
 }
