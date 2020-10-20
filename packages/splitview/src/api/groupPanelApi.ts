@@ -32,7 +32,7 @@ export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
     readonly _onDidDirtyChange = new Emitter<boolean>();
     readonly onDidDirtyChange = this._onDidDirtyChange.event;
     readonly _onDidGroupPanelVisibleChange = new Emitter<VisibilityEvent>({
-        emitLastValue: true,
+        replay: true,
     });
     readonly onDidGroupPanelVisibleChange: Event<VisibilityEvent> = this
         ._onDidGroupPanelVisibleChange.event;

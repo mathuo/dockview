@@ -232,7 +232,7 @@ export class DockviewApi {
         return this.component.focus();
     }
 
-    getGroupPanel(id: string): IGroupPanel | undefined {
+    getPanel(id: string): IGroupPanel | undefined {
         return this.component.getGroupPanel(id);
     }
 
@@ -294,7 +294,7 @@ export class DockviewApi {
         this.component.setTabHeight(height);
     }
 
-    getPanel(id: string) {
+    getGroup(id: string) {
         return this.component.getPanel(id);
     }
 

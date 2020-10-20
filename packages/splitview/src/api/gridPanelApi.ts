@@ -22,7 +22,7 @@ export interface IGridPanelApi extends IBaseViewApi {
 
 export class GridPanelApi extends BaseViewApi implements IGridPanelApi {
     readonly _onDidConstraintsChange = new Emitter<GridConstraintChangeEvent>({
-        emitLastValue: true,
+        replay: true,
     });
     readonly onDidConstraintsChange: Event<GridConstraintChangeEvent> = this
         ._onDidConstraintsChange.event;

@@ -14,7 +14,7 @@ export interface IPanePanelApi extends IPanelApi {
 
 export class PanePanelApi extends PanelApi implements IPanePanelApi {
     readonly _onDidExpansionChange = new Emitter<ExpansionEvent>({
-        emitLastValue: true,
+        replay: true,
     });
     readonly onDidExpansionChange: Event<ExpansionEvent> = this
         ._onDidExpansionChange.event;

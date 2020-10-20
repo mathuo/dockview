@@ -25,7 +25,7 @@ export interface Event<T> {
 }
 
 export interface EmitterOptions {
-    emitLastValue?: boolean;
+    replay?: boolean;
 }
 
 export namespace Event {
@@ -58,7 +58,7 @@ export class Emitter<T> implements IDisposable {
     get event() {
         if (!this._event) {
             this._event = (listener: (e: T) => void): IDisposable => {
-                if (this.options?.emitLastValue && this._last !== undefined) {
+                if (this.options?.replay && this._last !== undefined) {
                     listener(this._last);
                 }
 

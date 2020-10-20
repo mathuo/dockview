@@ -1,4 +1,5 @@
 import { Emitter, Event } from '../events';
+import { IDisposable } from '../lifecycle';
 import { FunctionOrValue } from '../types';
 import { BaseViewApi, IBaseViewApi } from './api';
 
@@ -17,9 +18,9 @@ export interface IPanelApi extends IBaseViewApi {
     setSize(event: SizeEvent): void;
 }
 
-export class PanelApi extends BaseViewApi implements IPanelApi {
+export class PanelApi extends BaseViewApi implements IPanelApi, IDisposable {
     readonly _onDidConstraintsChange = new Emitter<PanelConstraintChangeEvent>({
-        emitLastValue: true,
+        replay: true,
     });
     readonly onDidConstraintsChange: Event<PanelConstraintChangeEvent> = this
         ._onDidConstraintsChange.event;
@@ -33,11 +34,17 @@ export class PanelApi extends BaseViewApi implements IPanelApi {
         super();
     }
 
-    public setConstraints(value: PanelConstraintChangeEvent) {
+    setConstraints(value: PanelConstraintChangeEvent) {
         this._onDidConstraintsChange.fire(value);
     }
 
-    public setSize(event: SizeEvent) {
+    setSize(event: SizeEvent) {
         this._onDidSizeChange.fire(event);
+    }
+
+    dispose() {
+        super.dispose();
+        this._onDidConstraintsChange.dispose();
+        this._onDidSizeChange.dispose();
     }
 }

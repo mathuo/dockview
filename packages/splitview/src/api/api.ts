@@ -74,12 +74,12 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
     readonly _onDidPanelDimensionChange = new Emitter<
         PanelDimensionChangeEvent
     >({
-        emitLastValue: true,
+        replay: true,
     });
     readonly onDidDimensionsChange = this._onDidPanelDimensionChange.event;
     //
     readonly _onDidChangeFocus = new Emitter<FocusEvent>({
-        emitLastValue: true,
+        replay: true,
     });
     readonly onDidFocusChange: Event<FocusEvent> = this._onDidChangeFocus.event;
     //
@@ -87,13 +87,13 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
     readonly onFocusEvent: Event<void> = this._onFocusEvent.event;
     //
     readonly _onDidVisibilityChange = new Emitter<VisibilityEvent>({
-        emitLastValue: true,
+        replay: true,
     });
     readonly onDidVisibilityChange: Event<VisibilityEvent> = this
         ._onDidVisibilityChange.event;
     //
     readonly _onDidActiveChange = new Emitter<ActiveEvent>({
-        emitLastValue: true,
+        replay: true,
     });
     readonly onDidActiveChange: Event<ActiveEvent> = this._onDidActiveChange
         .event;
@@ -144,7 +144,7 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
         );
     }
 
-    public setState(
+    setState(
         key: string | { [key: string]: StateObject },
         value?: StateObject
     ) {
@@ -156,15 +156,15 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
         this._onDidStateChange.fire(undefined);
     }
 
-    public getState(): State {
+    getState(): State {
         return this._state;
     }
 
-    public getStateKey<T extends StateObject>(key: string): T {
+    getStateKey<T extends StateObject>(key: string): T {
         return this._state[key] as T;
     }
 
-    public dispose() {
+    dispose() {
         super.dispose();
     }
 }

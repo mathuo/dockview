@@ -14,7 +14,6 @@ export abstract class BasePanelView<T extends BaseViewApi>
     private _height = 0;
     private _width = 0;
     private _element: HTMLElement;
-    private _isVisible = false;
     private part?: IFrameworkPart;
     protected params?: PanelInitParameters;
 
@@ -77,7 +76,6 @@ export abstract class BasePanelView<T extends BaseViewApi>
     }
 
     setVisible(isVisible: boolean) {
-        this._isVisible = isVisible;
         this.api._onDidVisibilityChange.fire({ isVisible });
     }
 
