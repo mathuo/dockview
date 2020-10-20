@@ -7,6 +7,7 @@ import {
 } from '../../splitview/componentSplitview';
 import { Orientation } from '../../splitview/core/splitview';
 import { usePortalsLifecycle } from '../react';
+import { PanelCollection } from '../types';
 import { ReactPanelView } from './view';
 
 export interface SplitviewReadyEvent {
@@ -21,9 +22,7 @@ export interface ISplitviewPanelProps {
 export interface ISplitviewComponentProps {
     orientation: Orientation;
     onReady?: (event: SplitviewReadyEvent) => void;
-    components: {
-        [index: string]: React.FunctionComponent<ISplitviewPanelProps>;
-    };
+    components: PanelCollection<ISplitviewPanelProps>;
     proportionalLayout?: boolean;
 }
 

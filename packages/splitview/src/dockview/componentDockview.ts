@@ -78,7 +78,7 @@ export interface IComponentDockview extends IBaseGrid<IGroupview> {
     removeGroup: (group: IGroupview) => void;
     options: DockviewOptions;
     addPanel(options: AddPanelOptions): IGroupPanel;
-    getPanel: (id: string) => IGroupPanel;
+    getGroupPanel: (id: string) => IGroupPanel;
     fireMouseEvent(event: LayoutMouseEvent): void;
     createWatermarkComponent(): WatermarkPart;
     setAutoResizeToFit(enabled: boolean): void;
@@ -201,7 +201,7 @@ export class ComponentDockview
         this.activeGroup?.focus();
     }
 
-    public getPanel(id: string): IGroupPanel | undefined {
+    public getGroupPanel(id: string): IGroupPanel | undefined {
         return this.panels.get(id)?.value;
     }
 
@@ -444,7 +444,7 @@ export class ComponentDockview
         );
 
         if (typeof activeGroup === 'string') {
-            this.doSetGroupActive(this.getGroup(activeGroup));
+            this.doSetGroupActive(this.getPanel(activeGroup));
         }
 
         this._onDidLayoutChange.fire({ kind: GroupChangeKind.NEW_LAYOUT });
@@ -492,7 +492,7 @@ export class ComponentDockview
         const panel = this.addPanel(options);
 
         if (options.position?.referencePanel) {
-            const referencePanel = this.getPanel(
+            const referencePanel = this.getGroupPanel(
                 options.position.referencePanel
             );
 
@@ -759,7 +759,7 @@ export class ComponentDockview
 
                     const panelOptions = cb({ event });
 
-                    let panel = this.getPanel(panelOptions.id);
+                    let panel = this.getGroupPanel(panelOptions.id);
 
                     if (!panel) {
                         panel = this.addPanel(panelOptions);

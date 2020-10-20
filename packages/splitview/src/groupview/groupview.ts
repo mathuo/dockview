@@ -646,7 +646,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
 
         if (isCustomDragEvent(dataObject)) {
-            let panel = this.accessor.getPanel(dataObject.id);
+            let panel = this.accessor.getGroupPanel(dataObject.id);
 
             if (!panel) {
                 panel = this.accessor.addPanel(dataObject);

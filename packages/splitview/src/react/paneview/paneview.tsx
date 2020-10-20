@@ -7,6 +7,7 @@ import {
 import { usePortalsLifecycle } from '../react';
 import { PaneviewApi } from '../../api/component.api';
 import { PanelBody, PanelHeader } from './view';
+import { PanelCollection } from '../types';
 
 export interface PaneviewReadyEvent {
     api: PaneviewApi;
@@ -20,12 +21,8 @@ export interface IPaneviewPanelProps {
 
 export interface IPaneviewComponentProps {
     onReady?: (event: PaneviewReadyEvent) => void;
-    components: {
-        [index: string]: React.FunctionComponent<IPaneviewPanelProps>;
-    };
-    headerComponents: {
-        [index: string]: React.FunctionComponent<IPaneviewPanelProps>;
-    };
+    components?: PanelCollection<IPaneviewPanelProps>;
+    headerComponents?: PanelCollection<IPaneviewPanelProps>;
 }
 
 export const PaneviewComponent: React.FunctionComponent<IPaneviewComponentProps> = (

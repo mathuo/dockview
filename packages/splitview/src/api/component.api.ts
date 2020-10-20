@@ -172,8 +172,8 @@ export class GridviewApi {
         return this.component.resizeToFit();
     }
 
-    getGroup(id: string) {
-        return this.component.getGroup(id);
+    getPanel(id: string) {
+        return this.component.getPanel(id);
     }
 
     toggleVisibility(panel: GridviewPanel) {
@@ -232,8 +232,8 @@ export class DockviewApi {
         return this.component.focus();
     }
 
-    getPanel(id: string): IGroupPanel | undefined {
-        return this.component.getPanel(id);
+    getGroupPanel(id: string): IGroupPanel | undefined {
+        return this.component.getGroupPanel(id);
     }
 
     setActivePanel(panel: IGroupPanel) {
@@ -294,8 +294,8 @@ export class DockviewApi {
         this.component.setTabHeight(height);
     }
 
-    getGroup(id: string) {
-        return this.component.getGroup(id);
+    getPanel(id: string) {
+        return this.component.getPanel(id);
     }
 
     deserialize(data: object) {

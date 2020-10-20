@@ -8,6 +8,7 @@ import { Orientation } from '../../splitview/core/splitview';
 import { ReactGridPanelView } from './view';
 import { usePortalsLifecycle } from '../react';
 import { GridviewApi } from '../../api/component.api';
+import { PanelCollection } from '../types';
 
 export interface GridviewReadyEvent {
     api: GridviewApi;
@@ -21,9 +22,7 @@ export interface IGridviewPanelProps {
 export interface IGridviewComponentProps {
     orientation: Orientation;
     onReady?: (event: GridviewReadyEvent) => void;
-    components: {
-        [index: string]: React.FunctionComponent<IGridviewPanelProps>;
-    };
+    components?: PanelCollection<IGridviewPanelProps>;
 }
 
 export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps> = (

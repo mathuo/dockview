@@ -43,7 +43,6 @@ export interface IGridPanelComponentView extends IGridPanelView {
 
 export interface IComponentGridview extends IBaseGrid<GridviewPanel> {
     addComponent(options: AddComponentOptions): void;
-    getPanel(id: string): GridviewPanel;
     removePanel(panel: GridviewPanel, sizing?: Sizing): void;
     setVisible(panel: GridviewPanel, visible: boolean): void;
     isVisible(panel: GridviewPanel): boolean;
@@ -234,16 +233,12 @@ export class ComponentGridview
         });
     }
 
-    public getPanel(id: string): GridviewPanel {
-        return this.getGroup(id) as GridviewPanel;
-    }
-
     public moveGroup(
         referenceGroup: IGridPanelComponentView,
         groupId: string,
         target: Position
     ) {
-        const sourceGroup = this.getGroup(groupId);
+        const sourceGroup = this.getPanel(groupId);
 
         if (!sourceGroup) {
             throw new Error('invalid operation');

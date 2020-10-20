@@ -11,6 +11,7 @@ import { IGroupPanelApi } from '../../api/groupPanelApi';
 import { usePortalsLifecycle } from '../react';
 import { DockviewApi } from '../../api/component.api';
 import { ReactWatermarkPart } from './reactWatermarkPart';
+import { PanelCollection } from '../types';
 
 export interface IGroupPanelProps {
     api: IGroupPanelApi;
@@ -27,12 +28,8 @@ export interface IWatermarkPanelProps {
 }
 
 export interface IDockviewComponentProps {
-    components?: {
-        [componentName: string]: React.FunctionComponent<IGroupPanelProps>;
-    };
-    tabComponents?: {
-        [componentName: string]: React.FunctionComponent<IGroupPanelProps>;
-    };
+    components?: PanelCollection<IGroupPanelProps>;
+    tabComponents?: PanelCollection<IGroupPanelProps>;
     watermarkComponent?: React.FunctionComponent<IWatermarkPanelProps>;
     onReady?: (event: DockviewReadyEvent) => void;
     debug?: boolean;

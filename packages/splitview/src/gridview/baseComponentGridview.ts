@@ -49,7 +49,7 @@ export interface IBaseGrid<T extends IGridPanelView> {
     readonly activeGroup: T | undefined;
     readonly size: number;
     readonly onDidLayoutChange: Event<GroupChangeEvent>;
-    getGroup(id: string): T | undefined;
+    getPanel(id: string): T | undefined;
     toJSON(): object;
     fromJSON(data: any): void;
     layout(width: number, height: number, force?: boolean): void;
@@ -160,7 +160,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         return view as T;
     }
 
-    public getGroup(id: string): T | undefined {
+    public getPanel(id: string): T | undefined {
         return this.groups.get(id)?.value;
     }
 
