@@ -39,6 +39,7 @@ export interface IDockviewComponentProps {
     tabHeight?: number;
     enableExternalDragEvents?: boolean;
     onTabContextMenu?: (event: TabContextMenuEvent) => void;
+    hideBorders?: boolean;
 }
 
 export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps> = (
@@ -96,6 +97,9 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
             debug: props.debug,
             enableExternalDragEvents: props.enableExternalDragEvents,
             watermarkFrameworkComponent: props.watermarkComponent,
+            styles: props.hideBorders
+                ? { separatorBorder: 'transparent' }
+                : undefined,
         });
 
         domRef.current?.appendChild(dockview.element);

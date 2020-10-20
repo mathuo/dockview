@@ -4,6 +4,7 @@ import {
     Orientation,
     Sizing,
     LayoutPriority,
+    ISplitviewStyles,
 } from '../splitview/core/splitview';
 import { Emitter, Event } from '../events';
 import { INodeDescriptor } from './gridview';
@@ -106,9 +107,9 @@ export class BranchNode extends CompositeDisposable implements IView {
     constructor(
         readonly orientation: Orientation,
         readonly proportionalLayout: boolean,
+        readonly styles: ISplitviewStyles,
         size: number = 0,
         orthogonalSize: number,
-
         childDescriptors?: INodeDescriptor[]
     ) {
         super();
@@ -121,6 +122,7 @@ export class BranchNode extends CompositeDisposable implements IView {
             this.splitview = new Splitview(this.element, {
                 orientation: this.orientation,
                 proportionalLayout,
+                styles,
             });
             this.splitview.layout(this.size, this.orthogonalSize);
         } else {

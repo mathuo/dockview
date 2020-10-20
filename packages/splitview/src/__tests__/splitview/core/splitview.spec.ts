@@ -99,5 +99,15 @@ describe('splitview', () => {
         expect(sashQuery.length).toBe(0);
 
         splitview.removeView(0);
+
+        viewQuery = container.querySelectorAll(
+            '.split-view-container > .view-container > .view'
+        );
+        expect(viewQuery.length).toBe(0);
+
+        sashQuery = container.querySelectorAll(
+            '.split-view-container > .sash-container > .sash'
+        );
+        expect(sashQuery.length).toBe(0);
     });
 });

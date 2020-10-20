@@ -11,7 +11,7 @@ import {
     IGroupPanel,
     WatermarkPart,
 } from '../groupview/panel/parts';
-import { Orientation } from '../splitview/core/splitview';
+import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
 
 export interface GroupPanelFrameworkComponentFactory {
@@ -46,6 +46,7 @@ export interface DockviewOptions {
     debug?: boolean;
     enableExternalDragEvents?: boolean;
     orientation?: Orientation;
+    styles?: ISplitviewStyles;
 }
 
 export interface PanelOptions {

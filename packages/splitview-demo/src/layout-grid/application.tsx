@@ -98,6 +98,7 @@ export const Application = () => {
             components={rootcomponents}
             onReady={onReady}
             orientation={Orientation.VERTICAL}
+            hideBorders={true}
         />
     );
 };

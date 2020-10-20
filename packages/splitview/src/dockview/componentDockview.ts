@@ -156,6 +156,7 @@ export class ComponentDockview
         super(element, {
             proportionalLayout: true,
             orientation: options.orientation,
+            styles: options.styles,
         });
 
         if (!this.options.components) {

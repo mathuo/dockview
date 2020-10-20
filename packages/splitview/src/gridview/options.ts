@@ -1,5 +1,5 @@
 import { GridviewPanel } from './gridviewPanel';
-import { Orientation } from '../splitview/core/splitview';
+import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
 
 export interface GridComponentOptions {
@@ -12,4 +12,5 @@ export interface GridComponentOptions {
     };
     frameworkComponentFactory: FrameworkFactory<GridviewPanel>;
     tabHeight?: number;
+    styles?: ISplitviewStyles;
 }

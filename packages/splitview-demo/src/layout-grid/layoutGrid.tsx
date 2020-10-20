@@ -81,7 +81,7 @@ const components = {
             <div
                 style={{
                     boxSizing: 'border-box',
-                    // borderTop: "1px solid var(--splitview-divider-color)",
+                    // borderTop: "1px solid var(--separator-border)",
                 }}
             >
                 <DockviewComponent

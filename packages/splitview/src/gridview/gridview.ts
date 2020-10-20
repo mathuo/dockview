@@ -1,4 +1,5 @@
 import {
+    ISplitviewStyles,
     LayoutPriority,
     Orientation,
     Sizing,
@@ -20,6 +21,7 @@ function flipNode<T extends Node>(
         const result = new BranchNode(
             orthogonal(node.orientation),
             node.proportionalLayout,
+            node.styles,
             size,
             orthogonalSize
         );
@@ -269,7 +271,13 @@ export class Gridview {
 
     public clear() {
         const orientation = this.root.orientation;
-        this.root = new BranchNode(orientation, this.proportionalLayout, 0, 0);
+        this.root = new BranchNode(
+            orientation,
+            this.proportionalLayout,
+            this.styles,
+            0,
+            0
+        );
     }
 
     public deserialize(json: any, deserializer: IViewDeserializer) {
@@ -323,6 +331,7 @@ export class Gridview {
             result = new BranchNode(
                 orientation,
                 this.proportionalLayout,
+                this.styles,
                 node.size,
                 orthogonalSize,
                 children
@@ -479,11 +488,18 @@ export class Gridview {
 
     constructor(
         readonly proportionalLayout: boolean,
+        readonly styles: ISplitviewStyles,
         orientation: Orientation = Orientation.HORIZONTAL
     ) {
         this.element = document.createElement('div');
         this.element.className = 'grid-view';
-        this.root = new BranchNode(orientation, proportionalLayout, 0, 0);
+        this.root = new BranchNode(
+            orientation,
+            proportionalLayout,
+            styles,
+            0,
+            0
+        );
     }
 
     isViewVisible(location: number[]): boolean {
@@ -548,6 +564,7 @@ export class Gridview {
             const newParent = new BranchNode(
                 parent.orientation,
                 this.proportionalLayout,
+                this.styles,
                 parent.size,
                 parent.orthogonalSize
             );
