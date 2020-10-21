@@ -82,7 +82,7 @@ export interface IComponentDockview extends IBaseGrid<IGroupview> {
     fireMouseEvent(event: LayoutMouseEvent): void;
     createWatermarkComponent(): WatermarkPart;
     setAutoResizeToFit(enabled: boolean): void;
-    setTabHeight(height: number): void;
+    setTabHeight(height: number | undefined): void;
     getTabHeight(): number;
     totalPanels: number;
     // lifecycle
@@ -161,9 +161,6 @@ export class ComponentDockview
 
         if (!this.options.components) {
             this.options.components = {};
-        }
-        if (typeof this.options.tabHeight !== 'number') {
-            this.options.tabHeight = DEFAULT_TAB_HEIGHT;
         }
         if (!this.options.frameworkComponents) {
             this.options.frameworkComponents = {};
@@ -428,7 +425,7 @@ export class ComponentDockview
         }
         const { grid, panels, options, activeGroup } = data;
 
-        if (typeof options.tabHeight === 'number') {
+        if (typeof options?.tabHeight === 'number') {
             this.setTabHeight(options.tabHeight);
         }
 
@@ -464,7 +461,7 @@ export class ComponentDockview
         return true;
     }
 
-    public setTabHeight(height: number) {
+    public setTabHeight(height: number | undefined) {
         this.options.tabHeight = height;
         this.groups.forEach((value) => {
             value.value.tabHeight = height;

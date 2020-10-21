@@ -4,6 +4,8 @@
     overflow: overlay;
     flex-shrink: 0;
     box-sizing: border-box;
+    height: var(--title-height);
+    font-size: var(--title-font-size);
 
     &.hidden {
         display: none;
@@ -27,7 +29,6 @@
         flex-shrink: 0;
         flex-grow: 1;
         display: flex;
-        font-size: 13px;
         overflow-x: overlay;
         overflow-y: hidden;
 

@@ -17,6 +17,10 @@ export const Settings = (props: IGroupPanelProps) => {
         props.containerApi.setTabHeight(tabHeight);
     };
 
+    const onRemove = () => {
+        props.containerApi.setTabHeight(undefined);
+    };
+
     return (
         <div style={{ height: '100%', color: 'white' }}>
             <label>
@@ -27,6 +31,7 @@ export const Settings = (props: IGroupPanelProps) => {
                     type="number"
                 />
                 <button onClick={onClick}>Apply</button>
+                <button onClick={onRemove}>Remove</button>
             </label>
         </div>
     );

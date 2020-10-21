@@ -37,6 +37,7 @@ export interface IDockviewComponentProps {
     enableExternalDragEvents?: boolean;
     onTabContextMenu?: (event: TabContextMenuEvent) => void;
     hideBorders?: boolean;
+    className?: string;
 }
 
 export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps> = (
@@ -132,7 +133,11 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
     }, [props.onTabContextMenu]);
 
     return (
-        <div style={{ height: '100%', width: '100%' }} ref={domRef}>
+        <div
+            className={props.className}
+            style={{ height: '100%', width: '100%' }}
+            ref={domRef}
+        >
             {portals}
         </div>
     );

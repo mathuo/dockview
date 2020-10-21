@@ -23,6 +23,7 @@ export interface IPaneviewComponentProps {
     onReady?: (event: PaneviewReadyEvent) => void;
     components?: PanelCollection<IPaneviewPanelProps>;
     headerComponents?: PanelCollection<IPaneviewPanelProps>;
+    className?: string;
 }
 
 export const PaneviewComponent: React.FunctionComponent<IPaneviewComponentProps> = (
@@ -78,7 +79,11 @@ export const PaneviewComponent: React.FunctionComponent<IPaneviewComponentProps>
     }, []);
 
     return (
-        <div style={{ height: '100%', width: '100%' }} ref={domRef}>
+        <div
+            className={props.className}
+            style={{ height: '100%', width: '100%' }}
+            ref={domRef}
+        >
             {portals}
         </div>
     );

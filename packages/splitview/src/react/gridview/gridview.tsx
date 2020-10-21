@@ -24,6 +24,7 @@ export interface IGridviewComponentProps {
     onReady?: (event: GridviewReadyEvent) => void;
     components?: PanelCollection<IGridviewPanelProps>;
     hideBorders?: boolean;
+    className?: string;
 }
 
 export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps> = (
@@ -61,7 +62,11 @@ export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps>
     }, []);
 
     return (
-        <div style={{ height: '100%', width: '100%' }} ref={domRef}>
+        <div
+            className={props.className}
+            style={{ height: '100%', width: '100%' }}
+            ref={domRef}
+        >
             {portals}
         </div>
     );

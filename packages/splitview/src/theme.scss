@@ -21,10 +21,15 @@
     --tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');
     //
     --separator-border: rgb(68, 68, 68);
+
+    --title-font-size: 13px;
+    --title-height: 35px;
 }
 
 .visual-studio-theme {
     --active-tab-background-visible: dodgerblue;
+    --title-height: 18px;
+    --title-font-size: 11px;
 
     .groupview {
         &.active-group {

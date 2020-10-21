@@ -95,6 +95,7 @@ export const Application = () => {
 
     return (
         <GridviewComponent
+            // className={'visual-studio-theme'}
             components={rootcomponents}
             onReady={onReady}
             orientation={Orientation.VERTICAL}

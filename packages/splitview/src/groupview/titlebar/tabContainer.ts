@@ -5,13 +5,7 @@ import {
 } from '../../lifecycle';
 import { addDisposableListener, Emitter, Event } from '../../events';
 import { ITab, Tab } from '../panel/tab/tab';
-import {
-    removeClasses,
-    addClasses,
-    toggleClass,
-    isInTree,
-    isAncestor,
-} from '../../dom';
+import { removeClasses, addClasses, toggleClass } from '../../dom';
 import { hasProcessed, Position } from '../droptarget/droptarget';
 import { TabDropEvent } from '../events';
 
@@ -71,7 +65,16 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
 
     set height(value: number) {
         this._height = value;
-        this._element.style.height = `${this.height}px`;
+        if (typeof value !== 'number') {
+            // removeClasses(this.element, 'separator-border');
+            this.element.style.removeProperty('--title-height');
+        } else {
+            // addClasses(this.element, 'separator-border');
+            // if (styles?.separatorBorder) {
+            this.element.style.setProperty('--title-height', `${value}px`);
+            // }
+        }
+        // this._element.style.height = `${this.height}px`;
     }
 
     public get element() {

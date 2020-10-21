@@ -290,7 +290,7 @@ export class DockviewApi {
         return this.component.getTabHeight();
     }
 
-    setTabHeight(height: number) {
+    setTabHeight(height: number | undefined) {
         this.component.setTabHeight(height);
     }
 
