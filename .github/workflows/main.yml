@@ -24,7 +24,7 @@ jobs:
             - run: npm ci
             - run: npm run bootstrap
             - run: npm run build
-            - run: npm test-cov
+            - run: npm run test-cov
             - run: npm run codecov-publish
               env:
                   CI: true
