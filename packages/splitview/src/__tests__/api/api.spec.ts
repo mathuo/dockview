@@ -57,13 +57,13 @@ describe('api', () => {
     });
 
     it('should update isActive getter', () => {
-        expect(api.isVisible).toBeFalsy();
-
-        api._onDidVisibilityChange.fire({ isVisible: true });
         expect(api.isVisible).toBeTruthy();
 
         api._onDidVisibilityChange.fire({ isVisible: false });
         expect(api.isVisible).toBeFalsy();
+
+        api._onDidVisibilityChange.fire({ isVisible: true });
+        expect(api.isVisible).toBeTruthy();
     });
 
     it('should update width and height getter', () => {

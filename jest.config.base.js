@@ -1,6 +1,6 @@
 const {join, normalize} = require("path");
 
-const tsConfig = normalize(join(__dirname, "tsconfig.build.json"))
+const tsConfig = normalize(join(__dirname, "tsconfig.test.json"))
 
 module.exports = {
     displayName: { name: "root" },
