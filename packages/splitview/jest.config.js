@@ -10,7 +10,6 @@ module.exports = {
     modulePaths: ["<rootDir>/packages/splitview/src"],
     displayName: {name: package.name, color: "blue"},
     rootDir: "../../",
-    collectCoverage: true,
     collectCoverageFrom:[
         "<rootDir>/packages/splitview/src/**/*.{js,jsx,ts,tsx}",
     ],
