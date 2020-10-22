@@ -1,17 +1,17 @@
-import { IGroupPanel } from './parts';
-import { GroupPanelApi } from '../../api/groupPanelApi';
-import { Event } from '../../events';
-import { IGroupview, GroupChangeKind } from '../groupview';
-import { MutableDisposable, CompositeDisposable } from '../../lifecycle';
+import { IGroupPanel } from './panel/parts';
+import { GroupPanelApi } from '../api/groupPanelApi';
+import { Event } from '../events';
+import { IGroupview, GroupChangeKind } from './groupview';
+import { MutableDisposable, CompositeDisposable } from '../lifecycle';
 import {
     PanelContentPart,
     PanelHeaderPart,
     IGroupPanelInitParameters,
-} from './parts';
-import { PanelUpdateEvent } from '../../panel/types';
-import { DockviewApi } from '../../api/component.api';
+} from './panel/parts';
+import { PanelUpdateEvent } from '../panel/types';
+import { DockviewApi } from '../api/component.api';
 
-export class DefaultPanel extends CompositeDisposable implements IGroupPanel {
+export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
     private readonly mutableDisposable = new MutableDisposable();
 
     readonly api: GroupPanelApi;

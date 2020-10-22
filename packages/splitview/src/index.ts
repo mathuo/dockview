@@ -8,7 +8,7 @@ export * from './groupview/panel/content/content';
 export * from './groupview/panel/tab/tab';
 export * from './events';
 export * from './lifecycle';
-export * from './groupview/panel/panel';
+export * from './groupview/groupviewPanel';
 export * from './api/groupPanelApi';
 export * from './api/component.api';
 export * from './react/react';

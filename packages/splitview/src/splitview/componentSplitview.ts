@@ -13,7 +13,6 @@ import {
 import { BaseComponentOptions } from '../panel/types';
 import { Emitter, Event } from '../events';
 import { SplitviewApi } from '../api/component.api';
-import { Paneview } from '../paneview/paneview';
 import { SplitviewPanel } from './splitviewPanel';
 
 export interface AddSplitviewComponentOptions extends BaseComponentOptions {
@@ -37,6 +36,7 @@ export interface IComponentSplitview extends IDisposable {
     setActive(view: SplitviewPanel, skipFocus?: boolean): void;
     removePanel(panel: SplitviewPanel, sizing?: Sizing): void;
     getPanels(): SplitviewPanel[];
+    setVisible(panel: SplitviewPanel, visible: boolean): void;
 }
 
 /**
@@ -84,6 +84,16 @@ export class ComponentSplitview
 
     focus() {
         this._activePanel?.focus();
+    }
+
+    setVisible(panel: SplitviewPanel, visible: boolean) {
+        const index = this.getPanels().indexOf(panel);
+
+        if (index < 0) {
+            throw new Error('invalid operation');
+        }
+
+        this.splitview.setViewVisible(index, visible);
     }
 
     setActive(view: SplitviewPanel, skipFocus?: boolean) {

@@ -20,8 +20,16 @@ export const Panel = (props: IGridviewPanelProps) => {
         };
     }, []);
 
-    const onClick = () => {
-        props.api.setSize({ height: 500 });
+    const onToggle = () => {
+        const editorPanel = props.containerApi.getPanel('editor');
+        editorPanel.api.setVisible(!editorPanel.api.isVisible);
+    };
+
+    const onClose = () => {
+        const editorPanel = props.containerApi.getPanel('editor');
+
+        editorPanel.api.setVisible(true);
+        props.api.setVisible(false);
     };
 
     return (
@@ -36,7 +44,8 @@ export const Panel = (props: IGridviewPanelProps) => {
             <div style={{ display: 'flex', padding: '5px' }}>
                 <span>This panel is outside of the dockable layer</span>
                 <span style={{ flexGrow: 1 }} />
-                <button onClick={onClick}>Resize</button>
+                <button onClick={onToggle}>Resize</button>
+                <button onClick={onClose}>Close</button>
             </div>
             <div style={{ padding: '0px 5px' }}>
                 <div>{`isPanelActive: ${active} isPanelFocused: ${focused}`}</div>

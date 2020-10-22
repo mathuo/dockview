@@ -1,5 +1,5 @@
 import { ComponentDockview } from '../dockview/componentDockview';
-import { DefaultPanel } from '../groupview/panel/panel';
+import { GroupviewPanel } from '../groupview/groupviewPanel';
 import {
     PanelContentPart,
     PanelHeaderPart,
@@ -40,7 +40,7 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
             this.layout.options.frameworkComponentFactory.tab
         ) as PanelHeaderPart;
 
-        const panel = new DefaultPanel(panelId, new DockviewApi(this.layout));
+        const panel = new GroupviewPanel(panelId, new DockviewApi(this.layout));
 
         // TODO container api
         panel.init({

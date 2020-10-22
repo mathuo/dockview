@@ -10,7 +10,7 @@ import {
     GroupChangeEvent,
     GroupDropEvent,
 } from '../groupview/groupview';
-import { DefaultPanel } from '../groupview/panel/panel';
+import { GroupviewPanel } from '../groupview/groupviewPanel';
 import {
     CompositeDisposable,
     IDisposable,
@@ -535,7 +535,7 @@ export class ComponentDockview
             options.tabComponentName
         );
 
-        const panel = new DefaultPanel(options.id, this._api);
+        const panel = new GroupviewPanel(options.id, this._api);
         panel.init({
             headerPart,
             contentPart,

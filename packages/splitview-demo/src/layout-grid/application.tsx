@@ -37,7 +37,7 @@ export const Application = () => {
         // return;
 
         event.api.addComponent({
-            id: '0',
+            id: 'i',
             component: 'activitybar',
             minimumWidth: 48,
             maximumWidth: 48,
@@ -45,7 +45,7 @@ export const Application = () => {
         });
 
         event.api.addComponent({
-            id: '4',
+            id: 'footer',
             component: 'footer',
             location: [1],
             maximumHeight: 22,
@@ -53,7 +53,7 @@ export const Application = () => {
         });
 
         event.api.addComponent({
-            id: '2',
+            id: 'editor',
             component: 'editor',
             snap: true,
             location: [0, 1],
@@ -64,15 +64,15 @@ export const Application = () => {
             id: 'sidebar',
             component: 'sidebar',
             snap: true,
-            position: { reference: '2', direction: 'left' },
+            position: { reference: 'editor', direction: 'left' },
             minimumWidth: 170,
             size: 100,
         });
 
         event.api.addComponent({
-            id: '3',
+            id: 'panel',
             component: 'panel',
-            position: { reference: '2', direction: 'below' },
+            position: { reference: 'editor', direction: 'below' },
             size: 200,
             snap: true,
         });

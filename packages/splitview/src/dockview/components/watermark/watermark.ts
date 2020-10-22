@@ -11,8 +11,8 @@ import { CompositeDisposable } from '../../../lifecycle';
 
 export class Watermark extends CompositeDisposable implements WatermarkPart {
     private _element: HTMLElement;
-    private accessor: IComponentDockview;
     private group: IGroupview;
+    private params: GroupPanelPartInitParameters;
 
     get id() {
         return 'watermark';
@@ -47,7 +47,7 @@ export class Watermark extends CompositeDisposable implements WatermarkPart {
         this.addDisposables(
             addDisposableListener(closeAnchor, 'click', (ev) => {
                 ev.preventDefault();
-                this.accessor.removeGroup(this.group);
+                this.params.containerApi.removeGroup(this.group);
             })
         );
     }
@@ -57,10 +57,10 @@ export class Watermark extends CompositeDisposable implements WatermarkPart {
     }
 
     public init(params: GroupPanelPartInitParameters) {
-        // this.accessor = params.accessor;
+        this.params = params;
 
         this.addDisposables(
-            this.accessor.onDidLayoutChange((event) => {
+            this.params.containerApi.onDidLayoutChange((event) => {
                 this.render();
             })
         );
@@ -78,7 +78,7 @@ export class Watermark extends CompositeDisposable implements WatermarkPart {
     }
 
     private render() {
-        const isOneGroup = this.accessor.size <= 1;
+        const isOneGroup = this.params.containerApi.size <= 1;
         toggleClass(this.element, 'has-actions', isOneGroup);
     }
 

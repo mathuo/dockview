@@ -40,6 +40,11 @@ export abstract class SplitviewPanel
         super(id, componentName, new PanelApi());
 
         this.addDisposables(
+            this.api.onVisibilityChange((event) => {
+                const { isVisible } = event;
+                const { containerApi } = this.params as PanelViewInitParameters;
+                containerApi.setVisible(this, isVisible);
+            }),
             this.api.onDidConstraintsChange((event) => {
                 if (
                     typeof event.minimumSize === 'number' ||

@@ -44,6 +44,8 @@ export interface IBaseViewApi {
     onDidVisibilityChange: Event<VisibilityEvent>;
     onDidActiveChange: Event<ActiveEvent>;
     onFocusEvent: Event<void>;
+    //
+    setVisible(isVisible: boolean): void;
     // state
     setState(key: string, value: StateObject): void;
     setState(state: State): void;
@@ -64,7 +66,7 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
     private _state: State = {};
     private _isFocused = false;
     private _isActive = false;
-    private _isVisible = false;
+    private _isVisible = true;
     private _width = 0;
     private _height = 0;
 
@@ -91,6 +93,11 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
     });
     readonly onDidVisibilityChange: Event<VisibilityEvent> = this
         ._onDidVisibilityChange.event;
+    //
+
+    readonly _onVisibilityChange = new Emitter<VisibilityEvent>();
+    readonly onVisibilityChange: Event<VisibilityEvent> = this
+        ._onVisibilityChange.event;
     //
     readonly _onDidActiveChange = new Emitter<ActiveEvent>({
         replay: true,
@@ -142,6 +149,10 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
                 this._height = event.height;
             })
         );
+    }
+
+    setVisible(isVisible: boolean) {
+        this._onVisibilityChange.fire({ isVisible });
     }
 
     setState(

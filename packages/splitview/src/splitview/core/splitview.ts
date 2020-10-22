@@ -181,7 +181,6 @@ export class Splitview {
     }
 
     style(styles: ISplitviewStyles): void {
-        console.log('styles', styles);
         if (styles?.separatorBorder === 'transparent') {
             removeClasses(this.element, 'separator-border');
             this.element.style.removeProperty('--separator-border');
@@ -744,6 +743,32 @@ export class Splitview {
         return undefined;
     }
 
+    private _startSnappingEnabled = true;
+    get startSnappingEnabled(): boolean {
+        return this._startSnappingEnabled;
+    }
+    set startSnappingEnabled(startSnappingEnabled: boolean) {
+        if (this._startSnappingEnabled === startSnappingEnabled) {
+            return;
+        }
+
+        this._startSnappingEnabled = startSnappingEnabled;
+        this.updateSashEnablement();
+    }
+
+    private _endSnappingEnabled = true;
+    get endSnappingEnabled(): boolean {
+        return this._endSnappingEnabled;
+    }
+    set endSnappingEnabled(endSnappingEnabled: boolean) {
+        if (this._endSnappingEnabled === endSnappingEnabled) {
+            return;
+        }
+
+        this._endSnappingEnabled = endSnappingEnabled;
+        this.updateSashEnablement();
+    }
+
     private updateSashEnablement(): void {
         let previous = false;
         const collapsesDown = this.views.map(
@@ -791,18 +816,14 @@ export class Splitview {
                 if (
                     snappedBefore &&
                     collapsesUp[index] &&
-                    // (
-                    position > 0
-                    //  || this.startSnappingEnabled)
+                    (position > 0 || this.startSnappingEnabled)
                 ) {
                     this.updateSash(sash, SashState.MINIMUM);
                     // sash.state = SashState.Minimum;
                 } else if (
                     snappedAfter &&
                     collapsesDown[index] &&
-                    // (
-                    position < this.contentSize
-                    // || this.endSnappingEnabled)
+                    (position < this.contentSize || this.endSnappingEnabled)
                 ) {
                     // sash.state = SashState.Maximum;
                     this.updateSash(sash, SashState.MAXIMUM);

@@ -40,6 +40,10 @@ export class SplitviewApi {
         this.component.removePanel(panel, sizing);
     }
 
+    setVisible(panel: SplitviewPanel, isVisible: boolean) {
+        return this.component.setVisible(panel, isVisible);
+    }
+
     getPanels(): SplitviewPanel[] {
         return this.component.getPanels();
     }

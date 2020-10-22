@@ -65,6 +65,11 @@ export abstract class GridviewPanel
         super(id, component, new GridPanelApi());
 
         this.addDisposables(
+            this.api.onVisibilityChange((event) => {
+                const { isVisible } = event;
+                const { containerApi } = this.params as GridviewInitParameters;
+                containerApi.setVisible(this, isVisible);
+            }),
             this.api.onDidConstraintsChange((event) => {
                 if (
                     typeof event.minimumWidth === 'number' ||
