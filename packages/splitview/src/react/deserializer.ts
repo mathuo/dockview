@@ -42,7 +42,6 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
 
         const panel = new GroupviewPanel(panelId, new DockviewApi(this.layout));
 
-        // TODO container api
         panel.init({
             headerPart,
             contentPart,

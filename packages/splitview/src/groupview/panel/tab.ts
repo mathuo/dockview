@@ -146,14 +146,6 @@ export class Tab extends CompositeDisposable implements ITab {
                     this._onChanged.fire({ kind: MouseEventKind.CLICK, event });
                 }, 0);
             }),
-            addDisposableListener(this._element, 'focusin', (event) => {
-                const oldFocus = focusedElement.element as any;
-                if (oldFocus.focus) {
-                    // setTimeout(() => {
-                    // oldFocus.focus();
-                    // }, 0);
-                }
-            }),
             addDisposableListener(this._element, 'contextmenu', (event) => {
                 this._onChanged.fire({
                     kind: MouseEventKind.CONTEXT_MENU,
