@@ -4,18 +4,21 @@ import {
     IValueDisposable,
 } from '../../lifecycle';
 import { addDisposableListener, Emitter, Event } from '../../events';
-import { ITab, Tab } from '../panel/tab/tab';
+import { ITab, MouseEventKind, Tab } from '../panel/tab';
 import { removeClasses, addClasses, toggleClass } from '../../dom';
-import { hasProcessed, Position } from '../droptarget/droptarget';
-import { TabDropEvent } from '../events';
+import { DroptargetEvent, hasProcessed, Position } from '../../dnd/droptarget';
 
 import { IGroupview } from '../groupview';
 import { IComponentDockview } from '../../dockview';
 import { last } from '../../array';
-import { DataTransferSingleton } from '../droptarget/dataTransfer';
+import { DataTransferSingleton } from '../../dnd/dataTransfer';
 import { IGroupPanel } from '../panel/parts';
-import { MouseEventKind } from '../events';
 import { focusedElement } from '../../focusedElement';
+
+export interface TabDropEvent {
+    event: DroptargetEvent;
+    index?: number;
+}
 
 export interface ITabContainer extends IDisposable {
     element: HTMLElement;

@@ -1,4 +1,4 @@
-import { Emitter, Event } from '../../events';
+import { Emitter, Event } from '../events';
 import { DataTransferSingleton } from './dataTransfer';
 
 export enum Position {

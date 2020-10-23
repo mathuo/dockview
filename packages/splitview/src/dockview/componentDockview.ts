@@ -1,5 +1,5 @@
 import { getRelativeLocation, IGridView } from '../gridview/gridview';
-import { Position } from '../groupview/droptarget/droptarget';
+import { Position } from '../dnd/droptarget';
 import { getGridLocation } from '../gridview/gridview';
 import { tail, sequenceEquals } from '../array';
 import {
@@ -43,12 +43,7 @@ import {
     MovementOptions,
     TabContextMenuEvent,
 } from './options';
-import {
-    DataTransferSingleton,
-    DATA_KEY,
-    DragType,
-} from '../groupview/droptarget/dataTransfer';
-import { LayoutMouseEvent, MouseEventKind } from '../groupview/events';
+import { DataTransferSingleton, DATA_KEY, DragType } from '../dnd/dataTransfer';
 import {
     BaseGrid,
     IBaseGrid,
@@ -56,6 +51,7 @@ import {
 } from '../gridview/baseComponentGridview';
 import { DockviewApi } from '../api/component.api';
 import { State } from '../api/api';
+import { LayoutMouseEvent, MouseEventKind } from '../groupview/panel/tab';
 
 const nextGroupId = sequentialNumberGenerator();
 const DEFAULT_TAB_HEIGHT = 35;

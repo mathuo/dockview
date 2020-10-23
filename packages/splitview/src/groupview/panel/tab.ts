@@ -1,17 +1,28 @@
-import { addDisposableListener, Emitter, Event } from '../../../events';
-import { Droptarget, DroptargetEvent } from '../../droptarget/droptarget';
-import { CompositeDisposable } from '../../../lifecycle';
-import { IGroupview } from '../../groupview';
+import { addDisposableListener, Emitter, Event } from '../../events';
+import { Droptarget, DroptargetEvent } from '../../dnd/droptarget';
+import { CompositeDisposable } from '../../lifecycle';
+import { IGroupview } from '../groupview';
 import {
     DataTransferSingleton,
     DATA_KEY,
     DragType,
-} from '../../droptarget/dataTransfer';
-import { toggleClass, trackFocus } from '../../../dom';
-import { IComponentDockview } from '../../../dockview';
-import { LayoutMouseEvent, MouseEventKind } from '../../events';
-import { PanelHeaderPart } from '../parts';
-import { focusedElement } from '../../../focusedElement';
+} from '../../dnd/dataTransfer';
+import { toggleClass } from '../../dom';
+import { IComponentDockview } from '../../dockview';
+import { IGroupPanel, PanelHeaderPart } from './parts';
+import { focusedElement } from '../../focusedElement';
+
+export enum MouseEventKind {
+    CLICK = 'CLICK',
+    CONTEXT_MENU = 'CONTEXT_MENU',
+}
+
+export interface LayoutMouseEvent {
+    kind: MouseEventKind;
+    event: MouseEvent;
+    panel?: IGroupPanel;
+    tab?: boolean;
+}
 
 export interface ITab {
     id: string;

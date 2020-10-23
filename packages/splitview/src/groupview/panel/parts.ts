@@ -7,8 +7,6 @@ import { PanelInitParameters, IPanel } from '../../panel/types';
 import { Event } from '../../events';
 import { DockviewApi } from '../../api/component.api';
 
-// group panel parts
-
 export interface HeaderPartInitParameters {
     title: string;
     suppressClosable?: boolean;

@@ -1,5 +1,5 @@
 import { getRelativeLocation } from './gridview';
-import { Position } from '../groupview/droptarget/droptarget';
+import { Position } from '../dnd/droptarget';
 import { getGridLocation } from './gridview';
 import { tail, sequenceEquals } from '../array';
 import { GroupChangeKind } from '../groupview/groupview';

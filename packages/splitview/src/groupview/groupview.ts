@@ -1,7 +1,7 @@
 import { IDisposable, CompositeDisposable, Disposable } from '../lifecycle';
 import { ITabContainer, TabContainer } from './titlebar/tabContainer';
-import { IContentContainer, ContentContainer } from './panel/content/content';
-import { Position, Droptarget, DroptargetEvent } from './droptarget/droptarget';
+import { IContentContainer, ContentContainer } from './panel/content';
+import { Position, Droptarget, DroptargetEvent } from '../dnd/droptarget';
 import { Event, Emitter, addDisposableListener } from '../events';
 import { IComponentDockview, ComponentDockview } from '../dockview';
 import { isAncestor, toggleClass } from '../dom';
@@ -12,7 +12,7 @@ import {
     isTabDragEvent,
     isCustomDragEvent,
     isPanelTransferEvent,
-} from './droptarget/dataTransfer';
+} from '../dnd/dataTransfer';
 import { IGridPanelView } from '../gridview/baseComponentGridview';
 import { IViewSize } from '../gridview/gridview';
 import { DockviewApi } from '../api/component.api';

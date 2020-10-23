@@ -4,7 +4,7 @@ import {
     Orientation,
     Sizing,
 } from '../splitview/core/splitview';
-import { Position } from '../groupview/droptarget/droptarget';
+import { Position } from '../dnd/droptarget';
 import { tail } from '../array';
 import { LeafNode } from './leafNode';
 import { BranchNode } from './branchNode';

@@ -1,6 +1,6 @@
-import { CompositeDisposable, IDisposable } from '../../../lifecycle';
-import { Emitter, Event } from '../../../events';
-import { trackFocus } from '../../../dom';
+import { CompositeDisposable, IDisposable } from '../../lifecycle';
+import { Emitter, Event } from '../../events';
+import { trackFocus } from '../../dom';
 
 export interface IContentContainer extends IDisposable {
     onDidFocus: Event<void>;

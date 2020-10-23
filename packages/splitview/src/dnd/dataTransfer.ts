@@ -1,5 +1,5 @@
-import { PanelOptions } from '../../dockview/options';
-import { tryParseJSON } from '../../json';
+import { PanelOptions } from '../dockview/options';
+import { tryParseJSON } from '../json';
 
 export const DATA_KEY = 'splitview/transfer';
 
