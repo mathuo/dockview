@@ -129,11 +129,11 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
 
         this.headerPart?.setVisible(
             this._group.isPanelActive(this),
-            isGroupActive
+            this._group
         );
         this.contentPart?.setVisible(
             this._group.isPanelActive(this),
-            isGroupActive
+            this._group
         );
     }
 

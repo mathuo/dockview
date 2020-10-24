@@ -3,6 +3,7 @@
     width: 28px;
     display: flex;
     align-items: center;
+    flex-shrink: 0;
 
     .actions-container {
         display: flex;

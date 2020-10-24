@@ -92,6 +92,7 @@ export interface IGroupview extends IDisposable, IGridPanelView {
     }): void;
     setPanel(panel: IGroupPanel, skipFocus?: boolean): void;
     isAncestor(element: Element): boolean;
+    updateActions(): void;
 }
 
 export interface GroupDropEvent {
@@ -463,6 +464,16 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         return this._activePanel === panel;
     }
 
+    updateActions() {
+        if (this._active) {
+            const headerTitle = this._activePanel.content?.actions;
+            this.tabContainer.setActionElement(headerTitle);
+            (this.activePanel.content as any).updateActions();
+        } else {
+            this.tabContainer.setActionElement(undefined);
+        }
+    }
+
     public setActive(isActive: boolean, skipFocus = false, force = false) {
         if (!force && this._active === isActive) {
             if (!skipFocus) {
@@ -477,6 +488,8 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         toggleClass(this.element, 'inactive-group', !isActive);
 
         this.tabContainer.setActive(this._active);
+
+        this.updateActions();
 
         if (!this._activePanel && this.panels.length > 0) {
             this.doSetActivePanel(this.panels[0]);

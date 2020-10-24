@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { IGroupview } from '../../groupview/groupview';
 import {
     PanelHeaderPart,
     GroupPanelPartInitParameters,
@@ -54,7 +55,7 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
         // noop - retrieval from api
     }
 
-    public setVisible(isPanelVisible: boolean, isGroupVisible: boolean): void {
+    public setVisible(isPanelVisible: boolean, group: IGroupview): void {
         // noop - retrieval from api
     }
 

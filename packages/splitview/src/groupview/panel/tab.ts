@@ -131,6 +131,8 @@ export class Tab extends CompositeDisposable implements ITab {
                     return;
                 }
 
+                event.preventDefault();
+
                 /**
                  * //TODO mousedown focusing with draggable element (is there a better approach?)
                  *

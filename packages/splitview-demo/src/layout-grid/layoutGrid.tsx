@@ -11,6 +11,7 @@ import {
     DockviewApi,
     IWatermarkPanelProps,
     IGroupPanel,
+    PanelCollection,
 } from 'dockview';
 import { CustomTab } from './customTab';
 import { Settings } from './settingsPanel';
@@ -18,7 +19,7 @@ import { useLayoutRegistry } from './registry';
 import { SplitPanel } from './splitPanel';
 import './layoutGrid.scss';
 
-const components = {
+const components: PanelCollection<IGroupPanelProps> = {
     inner_component: (props: IGroupPanelProps) => {
         const _api = React.useRef<DockviewApi>();
 
@@ -103,6 +104,31 @@ const components = {
         });
 
         const input = React.useRef<HTMLInputElement>();
+
+        React.useEffect(() => {
+            props.registerActions(
+                (_props) => {
+                    return (
+                        <div
+                            style={{
+                                height: '100%',
+                                display: 'flex',
+                                backgroundColor: 'rgba(255,255,255,0.1)',
+                            }}
+                        >
+                            <span
+                                style={{
+                                    height: '100%',
+                                    width: '25px',
+                                    backgroundColor: 'red',
+                                }}
+                            ></span>
+                        </div>
+                    );
+                },
+                { qwerty: 'qwerty' }
+            );
+        }, []);
 
         React.useEffect(() => {
             const disposable = new CompositeDisposable(

@@ -22,12 +22,13 @@ export interface GroupPanelPartInitParameters
 export interface PanelHeaderPart extends IPanel {
     element: HTMLElement;
     init(parameters: GroupPanelPartInitParameters): void;
-    setVisible(isPanelVisible: boolean, isGroupVisible: boolean): void;
+    setVisible(isPanelVisible: boolean, group: IGroupview): void;
 }
 
 export interface PanelContentPart extends IPanel {
     element: HTMLElement;
-    setVisible(isPanelVisible: boolean, isGroupVisible: boolean): void;
+    actions?: HTMLElement;
+    setVisible(isPanelVisible: boolean, group: IGroupview): void;
     init(parameters: GroupPanelPartInitParameters): void;
     close?(): Promise<boolean>;
 }

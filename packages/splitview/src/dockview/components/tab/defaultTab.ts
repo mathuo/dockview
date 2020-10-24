@@ -6,6 +6,7 @@ import {
 import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
 import { PanelUpdateEvent } from '../../../panel/types';
+import { IGroupview } from '../../../groupview/groupview';
 
 export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
     private _element: HTMLElement;
@@ -95,9 +96,9 @@ export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
         }
     }
 
-    public setVisible(isPanelVisible: boolean, isGroupVisible: boolean) {
+    public setVisible(isPanelVisible: boolean, group: IGroupview) {
         this._isPanelVisible = isPanelVisible;
-        this._isGroupActive = isGroupVisible;
+        this._isGroupActive = group.isActive;
 
         this.render();
     }

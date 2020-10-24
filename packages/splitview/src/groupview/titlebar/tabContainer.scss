@@ -1,7 +1,6 @@
 .title-container {
     display: flex;
     background-color: var(--title-bar-background-color);
-    overflow: overlay;
     flex-shrink: 0;
     box-sizing: border-box;
     height: var(--title-height);
@@ -11,26 +10,25 @@
         display: none;
     }
 
-    &::-webkit-scrollbar {
-        height: 3px;
-    }
-
-    /* Track */
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    /* Handle */
-    &::-webkit-scrollbar-thumb {
-        background: var(--title-bar-scroll-bar-color);
-    }
-
     .tab-container {
-        flex-shrink: 0;
         flex-grow: 1;
         display: flex;
         overflow-x: overlay;
         overflow-y: hidden;
+
+        &::-webkit-scrollbar {
+            height: 3px;
+        }
+
+        /* Track */
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* Handle */
+        &::-webkit-scrollbar-thumb {
+            background: var(--title-bar-scroll-bar-color);
+        }
 
         &.drag-over-target {
             background-color: var(--drag-over-background-color);

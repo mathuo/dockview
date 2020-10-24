@@ -34,6 +34,7 @@ export interface ITabContainer extends IDisposable {
     isActive: (tab: ITab) => boolean;
     closePanel: (panel: IGroupPanel) => void;
     openPanel: (panel: IGroupPanel, index?: number) => void;
+    setActionElement(element: HTMLElement): void;
 }
 
 export class TabContainer extends CompositeDisposable implements ITabContainer {
@@ -78,6 +79,19 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
             // }
         }
         // this._element.style.height = `${this.height}px`;
+    }
+
+    private actions: HTMLElement;
+
+    setActionElement(element: HTMLElement): void {
+        if (this.actions) {
+            this.actions.remove();
+            this.actions = undefined;
+        }
+        if (element) {
+            this.actionContainer.appendChild(element);
+            this.actions = element;
+        }
     }
 
     public get element() {
@@ -128,6 +142,13 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
         this._element.appendChild(this.actionContainer);
 
         this.addDisposables(
+            addDisposableListener(this.tabContainer, 'mousedown', (event) => {
+                if (event.defaultPrevented) {
+                    return;
+                }
+                event.preventDefault();
+                this.accessor.doSetGroupActive(this.group);
+            }),
             addDisposableListener(this.tabContainer, 'dragenter', (event) => {
                 if (!DataTransferSingleton.has(this.accessor.id)) {
                     console.debug('[tabs] invalid drop event');

@@ -76,8 +76,12 @@ export class ReactPart<P extends object> implements IFrameworkPart {
         private readonly parent: HTMLElement,
         private readonly portalStore: ReactPortalStore,
         private readonly component: React.FunctionComponent<P>,
-        private readonly parameters: P
+        private readonly parameters: P,
+        delayRendering = false
     ) {
+        if (delayRendering) {
+            return;
+        }
         this.createPortal();
     }
 
@@ -89,7 +93,7 @@ export class ReactPart<P extends object> implements IFrameworkPart {
         this.componentInstance?.update(props);
     }
 
-    private createPortal() {
+    createPortal() {
         if (this.disposed) {
             throw new Error('invalid operation');
         }

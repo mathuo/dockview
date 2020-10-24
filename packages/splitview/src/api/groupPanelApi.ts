@@ -2,6 +2,7 @@ import { IGroupview } from '../groupview/groupview';
 import { Emitter, Event } from '../events';
 import { IGroupPanel } from '../groupview/panel/parts';
 import { GridPanelApi, IGridPanelApi } from './gridPanelApi';
+import { IDisposable } from '../lifecycle';
 
 interface VisibilityEvent {
     isVisible: boolean;
@@ -66,6 +67,11 @@ export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
                 this._isGroupVisible = event.isVisible;
             })
         );
+    }
+
+    updateTitleHeader() {
+        if (this.isGroupVisible) {
+        }
     }
 
     public setTitle(title: string) {
