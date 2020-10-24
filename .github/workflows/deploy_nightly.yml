@@ -1,7 +1,11 @@
-name: Build and Deploy
-on: [push]
+name: Deploy Nightly Demo App
+
+on:
+  schedule:
+    - cron:  '0 3 * * *' # every day at 3 am UTC
+
 jobs:
-  build-and-deploy:
+  deploy-nightly-demo-app:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
