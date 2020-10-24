@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { IGridviewPanelProps } from 'dockview';
 import './layoutGrid.scss';
 export declare const nextGuid: () => string;
