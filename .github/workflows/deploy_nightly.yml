@@ -25,6 +25,8 @@ jobs:
       - run: npm run bootstrap
       - run: npm run build
       - run: npm run test
+      - run: npm run install
+        working-directory: packages/splitview-demo
       - run: npm run build-demo
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1
