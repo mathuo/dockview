@@ -22,11 +22,9 @@ jobs:
               ${{ runner.os }}-node-
               
       - run: npm ci
-      - run: npm run bootstrap
+      - run: npm run bootstrap-no-hoist
       - run: npm run build
       - run: npm run test
-      - run: npm install
-        working-directory: packages/splitview-demo
       - run: npm run build-demo
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1
