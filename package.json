@@ -6,6 +6,7 @@
     "scripts": {
         "test": "jest",
         "build": "lerna run build --ignore splitview-demo",
+        "build-demo": "lerna run build --scope splitview-demo",
         "clean": "lerna run clean",
         "bootstrap": "lerna bootstrap --hoist",
         "test-cov": "jest --coverage",

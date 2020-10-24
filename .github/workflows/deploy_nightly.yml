@@ -25,15 +25,12 @@ jobs:
       - run: npm run bootstrap
       - run: npm run build
       - run: npm run test
-      - run: cd packages/splitview-demo
-      - run: npm run build
-
-
+      - run: npm run build-demo
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: build # The folder the action should deploy.
+          FOLDER: packages/splitview-demo/dist # The folder the action should deploy.
           TARGET_FOLDER: build
           CLEAN: true # Automatically remove deleted files from the deploy branch
