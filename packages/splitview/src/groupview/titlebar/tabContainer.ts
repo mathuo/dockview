@@ -121,9 +121,6 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
         this.actionContainer = document.createElement('div');
         this.actionContainer.className = 'action-container';
 
-        const list = document.createElement('ul');
-        list.className = 'action-list';
-
         this.tabContainer = document.createElement('div');
         this.tabContainer.className = 'tab-container';
 

@@ -17,6 +17,8 @@ export class ActionContainer {
     }
 
     public add(element: HTMLElement) {
+        const listItem = document.createElement('li');
+        listItem.className = 'action-item';
         this._list.appendChild(element);
     }
 }

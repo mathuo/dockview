@@ -58,6 +58,15 @@ export interface PanelOptions {
     suppressClosable?: boolean;
 }
 
+export interface PanelActionContext {
+    panel: IGroupPanel;
+}
+
+export interface PanelAction {
+    id: string;
+    execute: (context: PanelActionContext) => void;
+}
+
 export interface AddPanelOptions
     extends Omit<PanelOptions, 'componentName' | 'tabComponentName'> {
     componentName: string | PanelContentPartConstructor;
@@ -66,6 +75,7 @@ export interface AddPanelOptions
         direction?: Direction;
         referencePanel: string;
     };
+    actions?: PanelAction[];
 }
 
 export interface AddGroupOptions {

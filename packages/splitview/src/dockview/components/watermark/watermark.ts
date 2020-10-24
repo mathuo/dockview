@@ -2,9 +2,8 @@ import {
     GroupPanelPartInitParameters,
     WatermarkPart,
 } from '../../../groupview/panel/parts';
-import { IComponentDockview } from '../../componentDockview';
 import { IGroupview } from '../../../groupview/groupview';
-import { ActionContainer } from '../../../groupview/actions/actionsContainer';
+import { ActionContainer } from '../../../actionbar/actionsContainer';
 import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
 import { CompositeDisposable } from '../../../lifecycle';
