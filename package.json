@@ -17,14 +17,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/mathuo/splitview.git"
+        "url": "git+https://github.com/mathuo/dockview.git"
     },
     "author": "",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/mathuo/splitview/issues"
+        "url": "https://github.com/mathuo/dockview/issues"
     },
-    "homepage": "https://github.com/mathuo/splitview#readme",
+    "homepage": "https://github.com/mathuo/dockview#readme",
     "devDependencies": {
         "@testing-library/dom": "^7.26.0",
         "@types/jest": "^26.0.14",

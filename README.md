@@ -9,12 +9,12 @@
 
 ![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg)
 [![npm version](https://badge.fury.io/js/dockview.svg)](https://www.npmjs.com/package/dockview)
-[![CI Build](https://github.com/mathuo/splitview/workflows/CI/badge.svg)](https://github.com/mathuo/splitview/actions?query=workflow%3ACI)
-[![codecov](https://codecov.io/gh/mathuo/splitview/branch/master/graph/badge.svg?token=BF083TK64H)](https://codecov.io/gh/mathuo/splitview/branch/master)
+[![CI Build](https://github.com/mathuo/dockview/workflows/CI/badge.svg)](https://github.com/mathuo/dockview/actions?query=workflow%3ACI)
+[![codecov](https://codecov.io/gh/mathuo/dockview/branch/master/graph/badge.svg?token=BF083TK64H)](https://codecov.io/gh/mathuo/dockview/branch/master)
 
 ##
 
-A zero dependency layout manager based on the layering of split-view components with ReactJS support. View the live demo [here](https://mathuo.github.io/splitview/).
+A zero dependency layout manager based on the layering of split-view components with ReactJS support. View the live demo [here](https://mathuo.github.io/dockview/).
 
 ## Installation
 You can install the project from [npm](https://www.npmjs.com/package/dockview). The project comes with TypeScript typings.
