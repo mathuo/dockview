@@ -14,7 +14,7 @@
 
 ##
 
-A zero dependency layout manager based on the layering of split-view components with ReactJS support
+A zero dependency layout manager based on the layering of split-view components with ReactJS support. View the live demo [here](https://mathuo.github.io/splitview/).
 
 ## Installation
 You can install the project from [npm](https://www.npmjs.com/package/dockview). The project comes with TypeScript typings.
