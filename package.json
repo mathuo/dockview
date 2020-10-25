@@ -13,7 +13,7 @@
         "test-cov": "jest --coverage",
         "codecov-publish": "codecov",
         "version-beta-build": "lerna version prerelease --preid beta",
-        "publish-app":"lerna publish"
+        "publish-app": "lerna publish"
     },
     "repository": {
         "type": "git",
@@ -31,13 +31,8 @@
         "codecov": "^3.8.0",
         "cross-env": "^7.0.2",
         "css-loader": "^3.6.0",
-        "gulp": "^4.0.2",
-        "gulp-clean": "^0.4.0",
         "gulp-concat": "^2.6.1",
-        "gulp-header": "^2.0.9",
         "gulp-sass": "^4.1.0",
-        "gulp-sourcemaps": "^2.6.5",
-        "gulp-typescript": "^6.0.0-alpha.1",
         "jest": "^26.5.3",
         "jsdom": "^16.4.0",
         "lerna": "^3.22.1",

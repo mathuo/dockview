@@ -3,6 +3,7 @@ import { Emitter } from '../../../events';
 import {
     IView,
     Orientation,
+    Sizing,
     Splitview,
 } from '../../../splitview/core/splitview';
 
@@ -184,6 +185,24 @@ describe('splitview', () => {
         layoutDisposable.dispose();
         renderDisposable.dispose();
         splitview.dispose();
+    });
+
+    test('add view at specified index', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        splitview.layout(200, 500);
+
+        const view1 = new Testview(50, 200);
+        const view2 = new Testview(50, 200);
+        const view3 = new Testview(50, 200);
+
+        splitview.addView(view1);
+        splitview.addView(view2, Sizing.Distribute, 0);
+        splitview.addView(view3, Sizing.Distribute, 1);
+
+        expect(splitview.getViews()).toEqual([view2, view3, view1]);
     });
 
     test('streches to viewport', () => {
