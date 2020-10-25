@@ -3,7 +3,10 @@ import { ITitleContainer, TitleContainer } from './titlebar/titleContainer';
 import { IContentContainer, ContentContainer } from './panel/content';
 import { Position, Droptarget, DroptargetEvent } from '../dnd/droptarget';
 import { Event, Emitter, addDisposableListener } from '../events';
-import { IComponentDockview, ComponentDockview } from '../dockview';
+import {
+    IComponentDockview,
+    ComponentDockview,
+} from '../dockview/componentDockview';
 import { isAncestor, toggleClass } from '../dom';
 import { WatermarkPart } from './types';
 import { timeoutAsPromise } from '../async';
@@ -466,7 +469,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
 
     updateActions() {
-        if (this._active) {
+        if (this._active && this._activePanel) {
             const headerTitle = this._activePanel.content?.actions;
             this.tabContainer.setActionElement(headerTitle);
         } else {

@@ -1,5 +1,5 @@
 import { Emitter, Event } from '../events';
-import { CompositeDisposable, IDisposable } from '../lifecycle';
+import { CompositeDisposable } from '../lifecycle';
 
 /**
  * A valid JSON type

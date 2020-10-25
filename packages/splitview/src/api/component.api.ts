@@ -1,13 +1,17 @@
 import {
-    AddComponentOptions,
+    IComponentDockview,
+    LayoutDropEvent,
+} from '../dockview/componentDockview';
+import {
     AddGroupOptions,
     AddPanelOptions,
-    IComponentDockview,
-    IComponentGridview,
-    LayoutDropEvent,
     MovementOptions,
     PanelOptions,
-} from '../dockview';
+} from '../dockview/options';
+import {
+    AddComponentOptions,
+    IComponentGridview,
+} from '../gridview/componentGridview';
 import { GridviewPanel } from '../gridview/gridviewPanel';
 import { IGroupview } from '../groupview/groupview';
 import { IGroupPanel } from '../groupview/groupviewPanel';

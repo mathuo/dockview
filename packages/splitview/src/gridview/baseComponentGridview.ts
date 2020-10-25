@@ -1,4 +1,3 @@
-import { MovementOptions2 } from '../dockview';
 import { Emitter, Event } from '../events';
 import { getGridLocation, Gridview, IGridView } from './gridview';
 import { Position } from '../dnd/droptarget';
@@ -8,6 +7,7 @@ import { sequentialNumberGenerator } from '../math';
 import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { IPanel } from '../panel/types';
 import { Sizing } from '../splitview/core/splitview';
+import { MovementOptions2 } from '../dockview/options';
 
 const nextLayoutId = sequentialNumberGenerator();
 

@@ -1,3 +1,4 @@
+import { toggleClass } from '../dom';
 import { Emitter, Event } from '../events';
 import { DataTransferSingleton } from './dataTransfer';
 
@@ -24,25 +25,17 @@ const setEventAsProcessed = (event: DragEvent) => {
     (event as any)[HAS_PROCESSED_KEY] = true;
 };
 
-const toggleClassName = (
-    element: HTMLElement,
-    className: string,
-    addOrRemove: boolean
-) => {
-    if (addOrRemove && !element.classList.contains(className)) {
-        element.classList.add(className);
-    } else if (!addOrRemove && element.classList.contains(className)) {
-        element.classList.remove(className);
-    }
-};
-
 export class Droptarget {
     private target: HTMLElement | undefined;
     private overlay: HTMLElement | undefined;
-    private state: Position | undefined;
+    private _state: Position | undefined;
 
     private readonly _onDidChange = new Emitter<DroptargetEvent>();
     readonly onDidChange: Event<DroptargetEvent> = this._onDidChange.event;
+
+    get state() {
+        return this._state;
+    }
 
     constructor(
         private element: HTMLElement,
@@ -106,11 +99,13 @@ export class Droptarget {
         this.removeDropTarget();
 
         if (!hasProcessed(event)) {
-            this._onDidChange.fire({ position: this.state, event });
+            this._onDidChange.fire({ position: this._state, event });
         } else {
             console.debug('[dragtarget] already processed');
         }
-        this.state = undefined;
+        this._state = undefined;
+
+        // event.preventDefault();
 
         setEventAsProcessed(event);
     };
@@ -134,21 +129,21 @@ export class Droptarget {
         const isTop = !isRight && !isLeft && yp < 20;
         const isBottom = !isRight && !isLeft && yp > 80;
 
-        toggleClassName(this.overlay, 'right', isRight);
-        toggleClassName(this.overlay, 'left', isLeft);
-        toggleClassName(this.overlay, 'top', isTop);
-        toggleClassName(this.overlay, 'bottom', isBottom);
+        toggleClass(this.overlay, 'right', isRight);
+        toggleClass(this.overlay, 'left', isLeft);
+        toggleClass(this.overlay, 'top', isTop);
+        toggleClass(this.overlay, 'bottom', isBottom);
 
         if (isRight) {
-            this.state = Position.Right;
+            this._state = Position.Right;
         } else if (isLeft) {
-            this.state = Position.Left;
+            this._state = Position.Left;
         } else if (isTop) {
-            this.state = Position.Top;
+            this._state = Position.Top;
         } else if (isBottom) {
-            this.state = Position.Bottom;
+            this._state = Position.Bottom;
         } else {
-            this.state = Position.Center;
+            this._state = Position.Center;
         }
     };
 

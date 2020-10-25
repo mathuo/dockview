@@ -14,4 +14,6 @@ export * from './api/component.api';
 export * from './react/react';
 export * from './groupview/types';
 export * from './react';
-export * from './dockview';
+export * from './dockview/componentDockview';
+export * from './dockview/options';
+export * from './gridview/componentGridview';

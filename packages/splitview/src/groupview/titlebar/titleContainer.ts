@@ -9,11 +9,11 @@ import { removeClasses, addClasses, toggleClass } from '../../dom';
 import { DroptargetEvent, hasProcessed, Position } from '../../dnd/droptarget';
 
 import { IGroupview } from '../groupview';
-import { IComponentDockview } from '../../dockview';
 import { last } from '../../array';
 import { DataTransferSingleton } from '../../dnd/dataTransfer';
 import { focusedElement } from '../../focusedElement';
 import { IGroupPanel } from '../groupviewPanel';
+import { IComponentDockview } from '../../dockview/componentDockview';
 
 export interface TabDropEvent {
     event: DroptargetEvent;
@@ -147,7 +147,6 @@ export class TitleContainer
                 if (event.defaultPrevented) {
                     return;
                 }
-                event.preventDefault();
                 this.accessor.doSetGroupActive(this.group);
             }),
             addDisposableListener(this.tabContainer, 'dragenter', (event) => {

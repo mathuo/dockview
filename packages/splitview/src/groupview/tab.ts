@@ -4,7 +4,7 @@ import { CompositeDisposable } from '../lifecycle';
 import { IGroupview } from './groupview';
 import { DataTransferSingleton, DATA_KEY, DragType } from '../dnd/dataTransfer';
 import { toggleClass } from '../dom';
-import { IComponentDockview } from '../dockview';
+import { IComponentDockview } from '../dockview/componentDockview';
 import { PanelHeaderPart } from './types';
 import { focusedElement } from '../focusedElement';
 import { IGroupPanel } from './groupviewPanel';
@@ -127,8 +127,13 @@ export class Tab extends CompositeDisposable implements ITab {
                 if (event.defaultPrevented) {
                     return;
                 }
-
-                event.preventDefault();
+                /**
+                 * TODO: alternative to stopPropagation
+                 *
+                 * I need to stop the event propagation here since otherwise it'll be intercepted by event handlers
+                 * on the tab-container. I cannot use event.preventDefault() since I need the on DragStart event to occur
+                 */
+                event.stopPropagation();
 
                 /**
                  * //TODO mousedown focusing with draggable element (is there a better approach?)
