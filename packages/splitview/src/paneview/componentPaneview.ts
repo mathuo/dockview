@@ -14,6 +14,27 @@ import {
     PanePanelInitParameter,
 } from './paneviewPanel';
 
+interface SerializedPaneview {
+    orientation: Orientation;
+    size: number;
+    expanded?: boolean;
+    views: Array<{
+        snap?: boolean;
+        priority?: LayoutPriority;
+        minimumSize?: number;
+        maximumSize?: number;
+        data: {
+            id: string;
+            component: string;
+            title: string;
+            headerComponent?: string;
+            props: { [index: string]: any };
+        };
+        size: number;
+        expanded?: boolean;
+    }>;
+}
+
 class DefaultHeader extends CompositeDisposable implements IPaneHeaderPart {
     private _element: HTMLElement;
     private apiRef: { api: PanePanelApi } = { api: null };
@@ -237,26 +258,7 @@ export class ComponentPaneview
     }
 
     fromJSON(data: any): void {
-        const { views, orientation, size } = data as {
-            orientation: Orientation;
-            size: number;
-            expanded?: boolean;
-            views: Array<{
-                snap?: boolean;
-                priority?: LayoutPriority;
-                minimumSize?: number;
-                maximumSize?: number;
-                data: {
-                    id: string;
-                    component: string;
-                    title: string;
-                    headerComponent?: string;
-                    props: { [index: string]: any };
-                };
-                size: number;
-                expanded?: boolean;
-            }>;
-        };
+        const { views, orientation, size } = data as SerializedPaneview;
 
         this.paneview.dispose();
         this.paneview = new Paneview(this.element, {

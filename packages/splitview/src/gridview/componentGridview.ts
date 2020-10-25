@@ -24,6 +24,12 @@ interface PanelReference {
     api: GridPanelApi;
 }
 
+interface SerializedGridview {
+    grid: any;
+    panels: any;
+    activePanel: string;
+}
+
 export interface AddComponentOptions extends BaseComponentOptions {
     size?: number;
     minimumWidth?: number;
@@ -121,7 +127,7 @@ export class ComponentGridview
     }
 
     public fromJSON(data: any) {
-        const { grid, panels, activePanel } = data;
+        const { grid, panels, activePanel } = data as SerializedGridview;
 
         this.gridview.clear();
         this.groups.clear();

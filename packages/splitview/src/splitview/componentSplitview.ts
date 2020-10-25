@@ -15,6 +15,24 @@ import { Emitter, Event } from '../events';
 import { SplitviewApi } from '../api/component.api';
 import { SplitviewPanel } from './splitviewPanel';
 
+interface SerializedSplitview {
+    orientation: Orientation;
+    size: number;
+    activeView: string;
+    views: Array<{
+        snap?: boolean;
+        priority?: LayoutPriority;
+        minimumSize?: number;
+        maximumSize?: number;
+        data: {
+            id: string;
+            component: string;
+            props: { [index: string]: any };
+        };
+        size: number;
+    }>;
+}
+
 export interface AddSplitviewComponentOptions extends BaseComponentOptions {
     size?: number;
     index?: number;
@@ -88,11 +106,6 @@ export class ComponentSplitview
 
     setVisible(panel: SplitviewPanel, visible: boolean) {
         const index = this.getPanels().indexOf(panel);
-
-        if (index < 0) {
-            throw new Error('invalid operation');
-        }
-
         this.splitview.setViewVisible(index, visible);
     }
 
@@ -110,8 +123,7 @@ export class ComponentSplitview
     }
 
     removePanel(panel: SplitviewPanel, sizing?: Sizing) {
-        const views = this.getPanels();
-        const index = views.findIndex((_) => _ === panel);
+        const index = this.getPanels().findIndex((_) => _ === panel);
         this.splitview.removeView(index, sizing);
     }
 
@@ -171,9 +183,10 @@ export class ComponentSplitview
     }
 
     doAddView(view: SplitviewPanel) {
+        // TODO: manage disposable
         const disposable = view.api.onDidFocusChange((event) => {
             if (!event.isFocused) {
-                return; // only care if focused
+                return;
             }
             this.setActive(view, true);
         });
@@ -202,23 +215,12 @@ export class ComponentSplitview
     }
 
     fromJSON(data: any): void {
-        const { views, orientation, size, activeView } = data as {
-            orientation: Orientation;
-            size: number;
-            activeView: string;
-            views: Array<{
-                snap?: boolean;
-                priority?: LayoutPriority;
-                minimumSize?: number;
-                maximumSize?: number;
-                data: {
-                    id: string;
-                    component: string;
-                    props: { [index: string]: any };
-                };
-                size: number;
-            }>;
-        };
+        const {
+            views,
+            orientation,
+            size,
+            activeView,
+        } = data as SerializedSplitview;
 
         this.splitview.dispose();
         this.splitview = new Splitview(this.element, {
