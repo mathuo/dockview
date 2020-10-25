@@ -209,7 +209,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         }
 
         const location = getGridLocation(options.group.element);
-        const next = this.gridview.preivous(location)?.view;
+        const next = this.gridview.previous(location)?.view;
         this.doSetGroupActive(next as T);
     }
 

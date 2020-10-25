@@ -296,7 +296,7 @@ export class ComponentDockview
         }
 
         const location = getGridLocation(options.group.element);
-        const next = this.gridview.preivous(location)?.view as IGroupview;
+        const next = this.gridview.previous(location)?.view as IGroupview;
         this.doSetGroupActive(next);
     }
 

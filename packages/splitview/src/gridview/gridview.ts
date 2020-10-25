@@ -388,7 +388,7 @@ export class Gridview {
         return this.progmaticSelect(location);
     }
 
-    public preivous(location: number[]) {
+    public previous(location: number[]) {
         return this.progmaticSelect(location, true);
     }
 

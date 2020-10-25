@@ -103,8 +103,16 @@ export class Splitview {
         return this._size;
     }
 
+    set size(value: number) {
+        this._size = value;
+    }
+
     get orthogonalSize() {
         return this._orthogonalSize;
+    }
+
+    set orthogonalSize(value: number) {
+        this._orthogonalSize = value;
     }
 
     public get length() {
@@ -127,6 +135,32 @@ export class Splitview {
         return this.length === 0
             ? Number.POSITIVE_INFINITY
             : this.views.reduce((r, item) => r + item.maximumSize, 0);
+    }
+
+    private _startSnappingEnabled = true;
+    get startSnappingEnabled(): boolean {
+        return this._startSnappingEnabled;
+    }
+    set startSnappingEnabled(startSnappingEnabled: boolean) {
+        if (this._startSnappingEnabled === startSnappingEnabled) {
+            return;
+        }
+
+        this._startSnappingEnabled = startSnappingEnabled;
+        this.updateSashEnablement();
+    }
+
+    private _endSnappingEnabled = true;
+    get endSnappingEnabled(): boolean {
+        return this._endSnappingEnabled;
+    }
+    set endSnappingEnabled(endSnappingEnabled: boolean) {
+        if (this._endSnappingEnabled === endSnappingEnabled) {
+            return;
+        }
+
+        this._endSnappingEnabled = endSnappingEnabled;
+        this.updateSashEnablement();
     }
 
     constructor(
@@ -230,16 +264,16 @@ export class Splitview {
             return;
         }
 
-        const indexes =
-            // range(this.views.length)
-            this.views.map((_, i) => i).filter((i) => i !== index);
-        // const lowPriorityIndexes = [
-        //   ...indexes.filter((i) => this.views[i].priority === LayoutPriority.Low),
-        //   index,
-        // ];
-        // const highPriorityIndexes = indexes.filter(
-        //   (i) => this.views[i].priority === LayoutPriority.High
-        // );
+        const indexes = range(this.views.length).filter((i) => i !== index);
+        const lowPriorityIndexes = [
+            ...indexes.filter(
+                (i) => this.views[i].priority === LayoutPriority.Low
+            ),
+            index,
+        ];
+        const highPriorityIndexes = indexes.filter(
+            (i) => this.views[i].priority === LayoutPriority.High
+        );
 
         const item = this.views[index];
         size = Math.round(size);
@@ -250,10 +284,7 @@ export class Splitview {
         );
 
         item.size = size;
-        this
-            .relayout
-            // lowPriorityIndexes, highPriorityIndexes
-            ();
+        this.relayout(lowPriorityIndexes, highPriorityIndexes);
     }
 
     public getViews() {
@@ -273,18 +304,6 @@ export class Splitview {
         item.size = size;
 
         this.relayout([index], undefined);
-
-        // const contentSize = this.views.reduce((r, i) => r + i.size, 0);
-
-        // this.resize(
-        //     index -1,
-        //     this._size - contentSize,
-        //     undefined,
-        //     [index]
-        // );
-        // this.distributeEmptySpace();
-        // this.layoutViews();
-        // this.saveProportions();
     }
 
     public addView(
@@ -500,18 +519,15 @@ export class Splitview {
             item.size = clamp(size, item.minimumSize, item.maximumSize);
         }
 
-        // const indexes = range(this.viewItems.length);
-        // const lowPriorityIndexes = indexes.filter(
-        //   (i) => this.views[i].priority === LayoutPriority.Low
-        // );
-        // const highPriorityIndexes = indexes.filter(
-        //   (i) => this.viewItems[i].priority === LayoutPriority.High
-        // );
+        const indexes = range(this.views.length);
+        const lowPriorityIndexes = indexes.filter(
+            (i) => this.views[i].priority === LayoutPriority.Low
+        );
+        const highPriorityIndexes = indexes.filter(
+            (i) => this.views[i].priority === LayoutPriority.High
+        );
 
-        this
-            .relayout
-            // lowPriorityIndexes, highPriorityIndexes
-            ();
+        this.relayout(lowPriorityIndexes, highPriorityIndexes);
     }
 
     public removeView(index: number, sizing?: Sizing): IView {
@@ -554,25 +570,10 @@ export class Splitview {
         this.addView(view, sizing, to);
     }
 
-    // set orientation(orientation: Orientation) {
-    //     if (orientation === this._orientation) {
-    //         return;
-    //     }
-    //     this._orientation = orientation;
-
-    //     const classname =
-    //         orientation === Orientation.HORIZONTAL ? 'horizontal' : 'vertical';
-
-    //     removeClasses(this.viewContainer, 'vertical', 'horizontal');
-    //     removeClasses(this.sashContainer, 'vertical', 'horizontal');
-    //     addClasses(this.viewContainer, classname);
-    //     addClasses(this.sashContainer, classname);
-    // }
-
     public layout(size: number, orthogonalSize: number) {
         const previousSize = Math.max(this.size, this.contentSize);
-        this._size = size;
-        this._orthogonalSize = orthogonalSize;
+        this.size = size;
+        this.orthogonalSize = orthogonalSize;
 
         if (!this.proportions) {
             const indexes = range(this.views.length);
@@ -626,7 +627,7 @@ export class Splitview {
 
     private distributeEmptySpace(lowPriorityIndex?: number) {
         let contentSize = this.views.reduce((r, i) => r + i.size, 0);
-        let emptyDelta = this._size - contentSize;
+        let emptyDelta = this.size - contentSize;
 
         const indexes = range(this.views.length - 1, -1);
         const lowPriorityIndexes = indexes.filter(
@@ -741,32 +742,6 @@ export class Splitview {
         }
 
         return undefined;
-    }
-
-    private _startSnappingEnabled = true;
-    get startSnappingEnabled(): boolean {
-        return this._startSnappingEnabled;
-    }
-    set startSnappingEnabled(startSnappingEnabled: boolean) {
-        if (this._startSnappingEnabled === startSnappingEnabled) {
-            return;
-        }
-
-        this._startSnappingEnabled = startSnappingEnabled;
-        this.updateSashEnablement();
-    }
-
-    private _endSnappingEnabled = true;
-    get endSnappingEnabled(): boolean {
-        return this._endSnappingEnabled;
-    }
-    set endSnappingEnabled(endSnappingEnabled: boolean) {
-        if (this._endSnappingEnabled === endSnappingEnabled) {
-            return;
-        }
-
-        this._endSnappingEnabled = endSnappingEnabled;
-        this.updateSashEnablement();
     }
 
     private updateSashEnablement(): void {
