@@ -1,16 +1,13 @@
-import { addDisposableListener, Emitter, Event } from '../../events';
-import { Droptarget, DroptargetEvent } from '../../dnd/droptarget';
-import { CompositeDisposable } from '../../lifecycle';
-import { IGroupview } from '../groupview';
-import {
-    DataTransferSingleton,
-    DATA_KEY,
-    DragType,
-} from '../../dnd/dataTransfer';
-import { toggleClass } from '../../dom';
-import { IComponentDockview } from '../../dockview';
-import { IGroupPanel, PanelHeaderPart } from './parts';
-import { focusedElement } from '../../focusedElement';
+import { addDisposableListener, Emitter, Event } from '../events';
+import { Droptarget, DroptargetEvent } from '../dnd/droptarget';
+import { CompositeDisposable } from '../lifecycle';
+import { IGroupview } from './groupview';
+import { DataTransferSingleton, DATA_KEY, DragType } from '../dnd/dataTransfer';
+import { toggleClass } from '../dom';
+import { IComponentDockview } from '../dockview';
+import { PanelHeaderPart } from './types';
+import { focusedElement } from '../focusedElement';
+import { IGroupPanel } from './groupviewPanel';
 
 export enum MouseEventKind {
     CLICK = 'CLICK',

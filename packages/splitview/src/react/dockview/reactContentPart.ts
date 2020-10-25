@@ -2,49 +2,40 @@ import * as React from 'react';
 import {
     PanelContentPart,
     GroupPanelPartInitParameters,
-} from '../../groupview/panel/parts';
+} from '../../groupview/types';
 import { ReactPart, ReactPortalStore } from '../react';
-import { IGroupPanelProps } from '../dockview/dockview';
+import { ActionsbarReference, IGroupPanelProps } from '../dockview/dockview';
 import { PanelUpdateEvent } from '../../panel/types';
 import { IGroupview } from '../../groupview/groupview';
+import { IGroupPanelApi } from '../../api/groupPanelApi';
+import { DockviewApi } from '../../api/component.api';
 
-interface IExtendedGroupPanelProps extends IGroupPanelProps {
-    registerActions?<T>(c: React.FunctionComponent<T>, props: T): void;
+export interface IGroupPanelActionbarProps {
+    api: IGroupPanelApi;
+    containerApi: DockviewApi;
 }
 
 export class ReactPanelContentPart implements PanelContentPart {
     private _element: HTMLElement;
-    private part?: ReactPart<IExtendedGroupPanelProps>;
+    private part?: ReactPart<IGroupPanelProps>;
     private _group: IGroupview;
+    //
+    private _actionsElement: HTMLElement;
+    private actionsPart?: ReactPart<any>;
+
+    private parameters: GroupPanelPartInitParameters;
 
     get element() {
         return this._element;
     }
 
-    private _actionsElement: HTMLElement;
-    private actionsPart?: ReactPart<any>;
-    private _init = false;
-
     get actions() {
         return this._actionsElement;
     }
 
-    updateActions() {
-        if (!this.actionsPart) {
-            return;
-        }
-        if (this._init) {
-            return;
-        }
-        this._init = true;
-        this.actionsPart.createPortal();
-    }
-
     constructor(
         public readonly id: string,
-        private readonly component: React.FunctionComponent<
-            IExtendedGroupPanelProps
-        >,
+        private readonly component: React.FunctionComponent<IGroupPanelProps>,
         private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');
@@ -60,8 +51,6 @@ export class ReactPanelContentPart implements PanelContentPart {
         //noop
     }
 
-    private parameters: GroupPanelPartInitParameters;
-
     public init(parameters: GroupPanelPartInitParameters): void {
         this.parameters = parameters;
         this.part = new ReactPart(
@@ -72,21 +61,30 @@ export class ReactPanelContentPart implements PanelContentPart {
                 ...parameters.params,
                 api: parameters.api,
                 containerApi: parameters.containerApi,
-                registerActions: this.registerActions.bind(this),
+                setActionsbar: this.setActionsbar.bind(this),
             }
         );
     }
 
-    private registerActions<P>(
-        component: React.FunctionComponent<P>,
+    private setActionsbar<P>(
+        component: React.FunctionComponent<IGroupPanelActionbarProps & P>,
         props: P
-    ) {
-        this.actionsPart = new ReactPart<any>(
+    ): ActionsbarReference<IGroupPanelActionbarProps & P> {
+        if (this.actionsPart) {
+            console.debug('removed existing panel-actions portal');
+            this.actionsPart.dispose();
+            this.actionsPart = undefined;
+        }
+
+        this.actionsPart = new ReactPart<IGroupPanelActionbarProps & P>(
             this._actionsElement,
             this.reactPortalStore,
             component,
-            props,
-            true
+            {
+                ...props,
+                api: this.parameters.api,
+                containerApi: this.parameters.containerApi,
+            }
         );
 
         this._group?.updateActions();
@@ -94,6 +92,10 @@ export class ReactPanelContentPart implements PanelContentPart {
         return {
             update: (props: Partial<P>) => {
                 this.actionsPart.update(props);
+            },
+            dispose: () => {
+                this.actionsPart.dispose();
+                this.actionsPart = undefined;
             },
         };
     }
@@ -105,6 +107,7 @@ export class ReactPanelContentPart implements PanelContentPart {
     }
 
     public update(params: PanelUpdateEvent) {
+        this.parameters.params = params.params;
         this.part?.update(params.params);
     }
 

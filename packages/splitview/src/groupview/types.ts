@@ -1,11 +1,9 @@
-import { IDisposable } from '../../lifecycle';
-import { IGroupview } from '../groupview';
-import { IComponentDockview } from '../../dockview';
-import { IGroupPanelApi } from '../../api/groupPanelApi';
-import { Constructor } from '../../types';
-import { PanelInitParameters, IPanel } from '../../panel/types';
-import { Event } from '../../events';
-import { DockviewApi } from '../../api/component.api';
+import { IDisposable } from '../lifecycle';
+import { IGroupview } from './groupview';
+import { IComponentDockview } from '../dockview';
+import { IGroupPanelApi } from '../api/groupPanelApi';
+import { PanelInitParameters, IPanel } from '../panel/types';
+import { DockviewApi } from '../api/component.api';
 
 export interface HeaderPartInitParameters {
     title: string;
@@ -33,27 +31,6 @@ export interface PanelContentPart extends IPanel {
     close?(): Promise<boolean>;
 }
 
-// group panel
-
-export interface IGroupPanelInitParameters
-    extends PanelInitParameters,
-        HeaderPartInitParameters {
-    headerPart: PanelHeaderPart;
-    contentPart: PanelContentPart;
-}
-
-export interface IGroupPanel extends IDisposable, IPanel {
-    readonly header?: PanelHeaderPart;
-    readonly content?: PanelContentPart;
-    readonly group: IGroupview;
-    readonly api: IGroupPanelApi;
-    setVisible(isGroupActive: boolean, group: IGroupview): void;
-    setDirty(isDirty: boolean): void;
-    close?(): Promise<boolean>;
-    init(params: IGroupPanelInitParameters): void;
-    onDidStateChange: Event<any>;
-}
-
 // watermark component
 
 export interface WatermarkPartInitParameters {
@@ -75,4 +52,6 @@ export interface PanelContentPartConstructor {
     new (): PanelContentPart;
 }
 
-export interface WatermarkConstructor extends Constructor<WatermarkPart> {}
+export interface WatermarkConstructor {
+    new (): WatermarkPart;
+}

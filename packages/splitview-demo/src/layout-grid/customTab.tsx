@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { IGroupPanelProps } from 'dockview';
+import { IGroupPanelBaseProps } from 'dockview';
 
-export const CustomTab = (props: IGroupPanelProps) => {
+export const CustomTab = (props: IGroupPanelBaseProps) => {
     return <div>hello</div>;
 };

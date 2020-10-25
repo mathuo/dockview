@@ -10,7 +10,7 @@ import {
 } from '../dockview';
 import { GridviewPanel } from '../gridview/gridviewPanel';
 import { IGroupview } from '../groupview/groupview';
-import { IGroupPanel } from '../groupview/panel/parts';
+import { IGroupPanel } from '../groupview/groupviewPanel';
 import { AddPaneviewCompponentOptions } from '../paneview/componentPaneview';
 import { IComponentPaneview } from '../paneview/componentPaneview';
 import { PaneviewPanel } from '../paneview/paneviewPanel';

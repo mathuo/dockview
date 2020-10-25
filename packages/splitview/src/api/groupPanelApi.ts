@@ -1,8 +1,7 @@
 import { IGroupview } from '../groupview/groupview';
 import { Emitter, Event } from '../events';
-import { IGroupPanel } from '../groupview/panel/parts';
 import { GridPanelApi, IGridPanelApi } from './gridPanelApi';
-import { IDisposable } from '../lifecycle';
+import { IGroupPanel } from '../groupview/groupviewPanel';
 
 interface VisibilityEvent {
     isVisible: boolean;

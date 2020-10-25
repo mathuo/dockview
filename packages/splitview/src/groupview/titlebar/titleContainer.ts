@@ -4,7 +4,7 @@ import {
     IValueDisposable,
 } from '../../lifecycle';
 import { addDisposableListener, Emitter, Event } from '../../events';
-import { ITab, MouseEventKind, Tab } from '../panel/tab';
+import { ITab, MouseEventKind, Tab } from '../tab';
 import { removeClasses, addClasses, toggleClass } from '../../dom';
 import { DroptargetEvent, hasProcessed, Position } from '../../dnd/droptarget';
 
@@ -12,15 +12,15 @@ import { IGroupview } from '../groupview';
 import { IComponentDockview } from '../../dockview';
 import { last } from '../../array';
 import { DataTransferSingleton } from '../../dnd/dataTransfer';
-import { IGroupPanel } from '../panel/parts';
 import { focusedElement } from '../../focusedElement';
+import { IGroupPanel } from '../groupviewPanel';
 
 export interface TabDropEvent {
     event: DroptargetEvent;
     index?: number;
 }
 
-export interface ITabContainer extends IDisposable {
+export interface ITitleContainer extends IDisposable {
     element: HTMLElement;
     visible: boolean;
     height: number;
@@ -37,7 +37,9 @@ export interface ITabContainer extends IDisposable {
     setActionElement(element: HTMLElement): void;
 }
 
-export class TabContainer extends CompositeDisposable implements ITabContainer {
+export class TitleContainer
+    extends CompositeDisposable
+    implements ITitleContainer {
     private tabContainer: HTMLElement;
     private _element: HTMLElement;
     private actionContainer: HTMLElement;
@@ -46,6 +48,7 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
     private selectedIndex: number = -1;
     private active = false;
     private activePanel: IGroupPanel | undefined;
+    private actions: HTMLElement;
 
     private _visible: boolean = true;
     private _height: number;
@@ -80,8 +83,6 @@ export class TabContainer extends CompositeDisposable implements ITabContainer {
         }
         // this._element.style.height = `${this.height}px`;
     }
-
-    private actions: HTMLElement;
 
     setActionElement(element: HTMLElement): void {
         if (this.actions) {

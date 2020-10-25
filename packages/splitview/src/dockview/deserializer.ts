@@ -1,5 +1,5 @@
 import { IGridView, IViewDeserializer } from '../gridview/gridview';
-import { IGroupPanel } from '../groupview/panel/parts';
+import { IGroupPanel } from '../groupview/groupviewPanel';
 import { ComponentDockview } from './componentDockview';
 
 export interface IPanelDeserializer {

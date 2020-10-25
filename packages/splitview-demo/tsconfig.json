@@ -7,7 +7,8 @@
         "rootDir": "src",
         "allowUnreachableCode": true,
         "noImplicitAny": false,
-        "sourceMap": true
+        "sourceMap": true,
+        "declaration": false
     },
     "include": ["src"],
     "exclude": ["**/node_modules", "src/__tests__"]

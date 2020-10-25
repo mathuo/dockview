@@ -10,7 +10,7 @@ import {
     GroupChangeEvent,
     GroupDropEvent,
 } from '../groupview/groupview';
-import { GroupviewPanel } from '../groupview/groupviewPanel';
+import { GroupviewPanel, IGroupPanel } from '../groupview/groupviewPanel';
 import {
     CompositeDisposable,
     IDisposable,
@@ -24,9 +24,8 @@ import { DebugWidget } from './components/debug/debug';
 import {
     PanelContentPartConstructor,
     PanelHeaderPartConstructor,
-    IGroupPanel,
     WatermarkPart,
-} from '../groupview/panel/parts';
+} from '../groupview/types';
 import { debounce } from '../functions';
 import { sequentialNumberGenerator } from '../math';
 import { DefaultDeserializer, IPanelDeserializer } from './deserializer';
@@ -51,7 +50,7 @@ import {
 } from '../gridview/baseComponentGridview';
 import { DockviewApi } from '../api/component.api';
 import { State } from '../api/api';
-import { LayoutMouseEvent, MouseEventKind } from '../groupview/panel/tab';
+import { LayoutMouseEvent, MouseEventKind } from '../groupview/tab';
 
 const nextGroupId = sequentialNumberGenerator();
 const DEFAULT_TAB_HEIGHT = 35;

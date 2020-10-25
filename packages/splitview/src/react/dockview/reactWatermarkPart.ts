@@ -3,11 +3,11 @@ import { IGroupview } from '../../groupview/groupview';
 import {
     GroupPanelPartInitParameters,
     WatermarkPart,
-} from '../../groupview/panel/parts';
+} from '../../groupview/types';
 import { ReactPart, ReactPortalStore } from '../react';
-import { IGroupPanelProps } from './dockview';
+import { IGroupPanelBaseProps } from './dockview';
 
-interface IWatermarkPanelProps extends IGroupPanelProps {
+interface IWatermarkPanelProps extends IGroupPanelBaseProps {
     close: () => void;
 }
 

@@ -2,16 +2,15 @@ import { DockviewApi } from '../api/component.api';
 import { Direction } from '../gridview/baseComponentGridview';
 import { IGridView } from '../gridview/gridview';
 import { IGroupview } from '../groupview/groupview';
+import { IGroupPanel } from '../groupview/groupviewPanel';
 import {
     PanelContentPart,
     PanelContentPartConstructor,
     PanelHeaderPart,
     PanelHeaderPartConstructor,
     WatermarkConstructor,
-    IGroupPanel,
     WatermarkPart,
-} from '../groupview/panel/parts';
-import { IGroupPanelProps } from '../react';
+} from '../groupview/types';
 import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
 

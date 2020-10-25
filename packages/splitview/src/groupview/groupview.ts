@@ -1,11 +1,11 @@
 import { IDisposable, CompositeDisposable, Disposable } from '../lifecycle';
-import { ITabContainer, TabContainer } from './titlebar/tabContainer';
+import { ITitleContainer, TitleContainer } from './titlebar/titleContainer';
 import { IContentContainer, ContentContainer } from './panel/content';
 import { Position, Droptarget, DroptargetEvent } from '../dnd/droptarget';
 import { Event, Emitter, addDisposableListener } from '../events';
 import { IComponentDockview, ComponentDockview } from '../dockview';
 import { isAncestor, toggleClass } from '../dom';
-import { IGroupPanel, WatermarkPart } from './panel/parts';
+import { WatermarkPart } from './types';
 import { timeoutAsPromise } from '../async';
 import {
     extractData,
@@ -17,6 +17,7 @@ import { IGridPanelView } from '../gridview/baseComponentGridview';
 import { IViewSize } from '../gridview/gridview';
 import { DockviewApi } from '../api/component.api';
 import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
+import { IGroupPanel } from './groupviewPanel';
 
 export const enum GroupChangeKind {
     GROUP_ACTIVE = 'GROUP_ACTIVE',
@@ -104,7 +105,7 @@ export interface GroupDropEvent {
 export class Groupview extends CompositeDisposable implements IGroupview {
     private _element: HTMLElement;
 
-    private tabContainer: ITabContainer;
+    private tabContainer: ITitleContainer;
     private contentContainer: IContentContainer;
     private _active = false;
     private _activePanel: IGroupPanel | undefined;
@@ -281,7 +282,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this._element.className = 'groupview';
         // this._element.tabIndex = -1;
 
-        this.tabContainer = new TabContainer(this.accessor, this, {
+        this.tabContainer = new TitleContainer(this.accessor, this, {
             tabHeight: options.tabHeight,
         });
         this.contentContainer = new ContentContainer();
@@ -468,7 +469,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         if (this._active) {
             const headerTitle = this._activePanel.content?.actions;
             this.tabContainer.setActionElement(headerTitle);
-            (this.activePanel.content as any).updateActions();
         } else {
             this.tabContainer.setActionElement(undefined);
         }

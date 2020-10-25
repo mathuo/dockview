@@ -5,7 +5,7 @@ import {
     PanelHeaderPartConstructor,
     WatermarkConstructor,
     WatermarkPart,
-} from '../groupview/panel/parts';
+} from '../groupview/types';
 import { FrameworkFactory } from '../types';
 import { DefaultTab } from './components/tab/defaultTab';
 

@@ -2,7 +2,7 @@ import { CompositeDisposable, MutableDisposable } from '../../../lifecycle';
 import {
     PanelHeaderPart,
     GroupPanelPartInitParameters,
-} from '../../../groupview/panel/parts';
+} from '../../../groupview/types';
 import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
 import { PanelUpdateEvent } from '../../../panel/types';

@@ -1,7 +1,7 @@
 import {
     GroupPanelPartInitParameters,
     WatermarkPart,
-} from '../../../groupview/panel/parts';
+} from '../../../groupview/types';
 import { IGroupview } from '../../../groupview/groupview';
 import { ActionContainer } from '../../../actionbar/actionsContainer';
 import { addDisposableListener } from '../../../events';

@@ -1,15 +1,37 @@
-import { IGroupPanel } from './panel/parts';
-import { GroupPanelApi } from '../api/groupPanelApi';
+import { GroupPanelApi, IGroupPanelApi } from '../api/groupPanelApi';
 import { Event } from '../events';
 import { IGroupview, GroupChangeKind } from './groupview';
-import { MutableDisposable, CompositeDisposable } from '../lifecycle';
 import {
+    MutableDisposable,
+    CompositeDisposable,
+    IDisposable,
+} from '../lifecycle';
+import {
+    HeaderPartInitParameters,
     PanelContentPart,
     PanelHeaderPart,
-    IGroupPanelInitParameters,
-} from './panel/parts';
-import { PanelUpdateEvent } from '../panel/types';
+} from './types';
+import { IPanel, PanelInitParameters, PanelUpdateEvent } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
+
+export interface IGroupPanelInitParameters
+    extends PanelInitParameters,
+        HeaderPartInitParameters {
+    headerPart: PanelHeaderPart;
+    contentPart: PanelContentPart;
+}
+
+export interface IGroupPanel extends IDisposable, IPanel {
+    readonly header?: PanelHeaderPart;
+    readonly content?: PanelContentPart;
+    readonly group: IGroupview;
+    readonly api: IGroupPanelApi;
+    setVisible(isGroupActive: boolean, group: IGroupview): void;
+    setDirty(isDirty: boolean): void;
+    close?(): Promise<boolean>;
+    init(params: IGroupPanelInitParameters): void;
+    onDidStateChange: Event<any>;
+}
 
 export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
     private readonly mutableDisposable = new MutableDisposable();

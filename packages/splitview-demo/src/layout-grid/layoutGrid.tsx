@@ -106,8 +106,12 @@ const components: PanelCollection<IGroupPanelProps> = {
         const input = React.useRef<HTMLInputElement>();
 
         React.useEffect(() => {
-            props.registerActions(
+            props.setActionsbar(
                 (_props) => {
+                    const onClick = () => {
+                        _props.api.close();
+                    };
+
                     return (
                         <div
                             style={{
@@ -117,6 +121,7 @@ const components: PanelCollection<IGroupPanelProps> = {
                             }}
                         >
                             <span
+                                onClick={onClick}
                                 style={{
                                     height: '100%',
                                     width: '25px',
