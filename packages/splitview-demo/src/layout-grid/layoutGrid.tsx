@@ -30,17 +30,17 @@ const components: PanelCollection<IGroupPanelProps> = {
             if (layout) {
                 event.api.deserialize(layout);
             } else {
-                event.api.addPanelFromComponent({
+                event.api.addPanel({
                     componentName: 'test_component',
                     id: 'inner-1',
                     title: 'inner-1',
                 });
-                event.api.addPanelFromComponent({
+                event.api.addPanel({
                     componentName: 'test_component',
                     id: 'inner-2',
                     title: 'inner-2',
                 });
-                event.api.addPanelFromComponent({
+                event.api.addPanel({
                     componentName: 'test_component',
                     id: nextGuid(),
                     title: 'inner-3',
@@ -49,7 +49,7 @@ const components: PanelCollection<IGroupPanelProps> = {
                         referencePanel: 'inner-1',
                     },
                 });
-                event.api.addPanelFromComponent({
+                event.api.addPanel({
                     componentName: 'test_component',
                     id: nextGuid(),
                     title: 'inner-4',
@@ -287,23 +287,23 @@ export const TestGrid = (props: IGridviewPanelProps) => {
         event.api.deserialize(require('./layoutGrid.layout.json'));
         return;
 
-        const panelReference = api.addPanelFromComponent({
+        api.addPanel({
             componentName: 'test_component',
             id: nextGuid(),
             title: 'Item 1',
             params: { text: 'how low?' },
         });
-        api.addPanelFromComponent({
+        api.addPanel({
             componentName: 'test_component',
             id: 'item2',
             title: 'Item 2',
         });
-        api.addPanelFromComponent({
+        api.addPanel({
             componentName: 'split_panel',
             id: nextGuid(),
             title: 'Item 3 with a long title',
         });
-        api.addPanelFromComponent({
+        api.addPanel({
             componentName: 'test_component',
             id: nextGuid(),
             title: 'Item 3',

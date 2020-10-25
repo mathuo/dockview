@@ -43,7 +43,7 @@ export interface AddSplitviewComponentOptions extends BaseComponentOptions {
 export interface IComponentSplitview extends IDisposable {
     readonly minimumSize: number;
     readonly maximumSize: number;
-    addFromComponent(options: AddSplitviewComponentOptions): void;
+    addPanel(options: AddSplitviewComponentOptions): void;
     layout(width: number, height: number): void;
     onDidLayoutChange: Event<void>;
     toJSON(): object;
@@ -131,7 +131,7 @@ export class ComponentSplitview
         return this.getPanels().find((view) => view.id === id);
     }
 
-    addFromComponent(options: AddSplitviewComponentOptions): void {
+    addPanel(options: AddSplitviewComponentOptions): void {
         const view = createComponent(
             options.id,
             options.component,

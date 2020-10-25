@@ -48,7 +48,7 @@ export interface IGridPanelComponentView extends IGridPanelView {
 }
 
 export interface IComponentGridview extends IBaseGrid<GridviewPanel> {
-    addComponent(options: AddComponentOptions): void;
+    addPanel(options: AddComponentOptions): void;
     removePanel(panel: GridviewPanel, sizing?: Sizing): void;
     setVisible(panel: GridviewPanel, visible: boolean): void;
     isVisible(panel: GridviewPanel): boolean;
@@ -171,7 +171,7 @@ export class ComponentGridview
         this._onDidLayoutChange.fire({ kind: GroupChangeKind.NEW_LAYOUT });
     }
 
-    public addComponent(options: AddComponentOptions): PanelReference {
+    public addPanel(options: AddComponentOptions): PanelReference {
         let relativeLocation: number[] = options.location || [0];
 
         if (options.position?.reference) {

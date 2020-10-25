@@ -89,7 +89,7 @@ export const SplitPanel = (props: IGroupPanelProps) => {
 
         event.api.fromJSON(require('./splitpanel.layout.json'));
         return;
-        event.api.addFromComponent({
+        event.api.addPanel({
             id: '1',
             component: 'default1',
             snap: true,
@@ -97,7 +97,7 @@ export const SplitPanel = (props: IGroupPanelProps) => {
                 text: 'hiya',
             },
         });
-        event.api.addFromComponent({ id: '2', component: 'default1' });
+        event.api.addPanel({ id: '2', component: 'default1' });
     };
 
     const onSave = () => {
@@ -111,7 +111,7 @@ export const SplitPanel = (props: IGroupPanelProps) => {
     };
 
     const onAdd = () => {
-        api.current.addFromComponent({
+        api.current.addPanel({
             id: `${Date.now()}`,
             component: 'default1',
             snap: true,

@@ -35,7 +35,7 @@ export const ControlCenter = () => {
     const onAdd = () => {
         const api = registry.get<DockviewApi>('dockview');
         const id = nextGuid();
-        api.addPanelFromComponent({
+        api.addPanel({
             componentName: 'test_component',
             id: `control_center_panel_${id}`,
             title: `Item ${id}`,
@@ -108,7 +108,7 @@ export const ControlCenter = () => {
             return;
         }
 
-        api.addPanelFromComponent({
+        api.addPanel({
             id: 'settings',
             componentName: 'settings',
             title: 'Settings',

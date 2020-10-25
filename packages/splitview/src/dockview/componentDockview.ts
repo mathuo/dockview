@@ -81,7 +81,6 @@ export interface IComponentDockview extends IBaseGrid<IGroupview> {
     getTabHeight(): number;
     totalPanels: number;
     // lifecycle
-    addPanelFromComponent(options: AddPanelOptions): PanelReference;
     addEmptyGroup(options?: AddGroupOptions): void;
     closeAllGroups: () => Promise<boolean>;
     deserialize: (data: object) => void;
@@ -481,8 +480,8 @@ export class ComponentDockview
         }
     }
 
-    public addPanelFromComponent(options: AddPanelOptions): PanelReference {
-        const panel = this.addPanel(options);
+    public addPanel(options: AddPanelOptions): IGroupPanel {
+        const panel = this._addPanel(options);
 
         if (options.position?.referencePanel) {
             const referencePanel = this.getGroupPanel(
@@ -507,20 +506,10 @@ export class ComponentDockview
             this.addPanelToNewGroup(panel);
         }
 
-        return {
-            update: (event: { params: { [key: string]: any } }) => {
-                if (panel.update) {
-                    panel.update({ params: event.params });
-                }
-            },
-            remove: () => {
-                const group = this.findGroup(panel);
-                group.removePanel(panel);
-            },
-        };
+        return panel;
     }
 
-    public addPanel(options: AddPanelOptions): IGroupPanel {
+    public _addPanel(options: AddPanelOptions): IGroupPanel {
         const contentPart = this.createContentComponent(
             options.id,
             options.componentName
@@ -755,7 +744,7 @@ export class ComponentDockview
                     let panel = this.getGroupPanel(panelOptions.id);
 
                     if (!panel) {
-                        panel = this.addPanel(panelOptions);
+                        panel = this._addPanel(panelOptions);
                     }
                     this.moveGroupOrPanel(
                         group,

@@ -68,8 +68,8 @@ export class SplitviewApi {
         return this.component.layout(width, height);
     }
 
-    addFromComponent(options: AddSplitviewComponentOptions) {
-        return this.component.addFromComponent(options);
+    addPanel(options: AddSplitviewComponentOptions) {
+        return this.component.addPanel(options);
     }
 
     resizeToFit() {
@@ -168,8 +168,8 @@ export class GridviewApi {
         return this.component.layout(width, height, force);
     }
 
-    addComponent(options: AddComponentOptions) {
-        return this.component.addComponent(options);
+    addPanel(options: AddComponentOptions) {
+        return this.component.addPanel(options);
     }
 
     removePanel(panel: GridviewPanel, sizing?: Sizing): void {
@@ -252,8 +252,8 @@ export class DockviewApi {
         return this.component.layout(width, height, force);
     }
 
-    addPanelFromComponent(options: AddPanelOptions) {
-        return this.component.addPanelFromComponent(options);
+    addPanel(options: AddPanelOptions) {
+        return this.component.addPanel(options);
     }
 
     addDndHandle(type: string, cb: (event: LayoutDropEvent) => PanelOptions) {

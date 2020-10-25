@@ -36,7 +36,7 @@ export const Application = () => {
         registry.register('gridview', event.api);
         // return;
 
-        event.api.addComponent({
+        event.api.addPanel({
             id: 'i',
             component: 'activitybar',
             minimumWidth: 48,
@@ -44,7 +44,7 @@ export const Application = () => {
             location: [0],
         });
 
-        event.api.addComponent({
+        event.api.addPanel({
             id: 'footer',
             component: 'footer',
             location: [1],
@@ -52,7 +52,7 @@ export const Application = () => {
             minimumHeight: 22,
         });
 
-        event.api.addComponent({
+        event.api.addPanel({
             id: 'editor',
             component: 'editor',
             snap: true,
@@ -60,7 +60,7 @@ export const Application = () => {
             priority: LayoutPriority.High,
         });
 
-        event.api.addComponent({
+        event.api.addPanel({
             id: 'sidebar',
             component: 'sidebar',
             snap: true,
@@ -69,7 +69,7 @@ export const Application = () => {
             size: 100,
         });
 
-        event.api.addComponent({
+        event.api.addPanel({
             id: 'panel',
             component: 'panel',
             position: { reference: 'editor', direction: 'below' },
