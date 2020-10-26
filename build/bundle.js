@@ -875,28 +875,28 @@ exports.Application = function () {
         api.current = event.api;
         registry.register('gridview', event.api);
         // return;
-        event.api.addComponent({
+        event.api.addPanel({
             id: 'i',
             component: 'activitybar',
             minimumWidth: 48,
             maximumWidth: 48,
             location: [0],
         });
-        event.api.addComponent({
+        event.api.addPanel({
             id: 'footer',
             component: 'footer',
             location: [1],
             maximumHeight: 22,
             minimumHeight: 22,
         });
-        event.api.addComponent({
+        event.api.addPanel({
             id: 'editor',
             component: 'editor',
             snap: true,
             location: [0, 1],
             priority: dockview_1.LayoutPriority.High,
         });
-        event.api.addComponent({
+        event.api.addPanel({
             id: 'sidebar',
             component: 'sidebar',
             snap: true,
@@ -904,7 +904,7 @@ exports.Application = function () {
             minimumWidth: 170,
             size: 100,
         });
-        event.api.addComponent({
+        event.api.addPanel({
             id: 'panel',
             component: 'panel',
             position: { reference: 'editor', direction: 'below' },
@@ -1033,7 +1033,7 @@ exports.ControlCenter = function () {
     var onAdd = function () {
         var api = registry.get('dockview');
         var id = nextGuid();
-        api.addPanelFromComponent({
+        api.addPanel({
             componentName: 'test_component',
             id: "control_center_panel_" + id,
             title: "Item " + id,
@@ -1106,7 +1106,7 @@ exports.ControlCenter = function () {
             api.setActivePanel(settingsPanel);
             return;
         }
-        api.addPanelFromComponent({
+        api.addPanel({
             id: 'settings',
             componentName: 'settings',
             title: 'Settings',
@@ -1266,9 +1266,9 @@ exports.Footer = function (props) {
 /*! CommonJS bailout: this is used directly at 32:14-18 */
 /*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 80:24-40 */
 /*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 89:24-40 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 230:16-32 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 241:16-32 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 246:16-32 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 233:16-32 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 244:16-32 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 249:16-32 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -1339,17 +1339,17 @@ var components = {
                 event.api.deserialize(layout);
             }
             else {
-                event.api.addPanelFromComponent({
+                event.api.addPanel({
                     componentName: 'test_component',
                     id: 'inner-1',
                     title: 'inner-1',
                 });
-                event.api.addPanelFromComponent({
+                event.api.addPanel({
                     componentName: 'test_component',
                     id: 'inner-2',
                     title: 'inner-2',
                 });
-                event.api.addPanelFromComponent({
+                event.api.addPanel({
                     componentName: 'test_component',
                     id: exports.nextGuid(),
                     title: 'inner-3',
@@ -1358,7 +1358,7 @@ var components = {
                         referencePanel: 'inner-1',
                     },
                 });
-                event.api.addPanelFromComponent({
+                event.api.addPanel({
                     componentName: 'test_component',
                     id: exports.nextGuid(),
                     title: 'inner-4',
@@ -1394,13 +1394,16 @@ var components = {
         }), 2), panelState = _a[0], setPanelState = _a[1];
         var input = React.useRef();
         React.useEffect(function () {
-            props.registerActions(function (_props) {
+            props.setActionsbar(function (_props) {
+                var onClick = function () {
+                    _props.api.close();
+                };
                 return (React.createElement("div", { style: {
                         height: '100%',
                         display: 'flex',
                         backgroundColor: 'rgba(255,255,255,0.1)',
                     } },
-                    React.createElement("span", { style: {
+                    React.createElement("span", { onClick: onClick, style: {
                             height: '100%',
                             width: '25px',
                             backgroundColor: 'red',
@@ -1499,23 +1502,23 @@ exports.TestGrid = function (props) {
         });
         event.api.deserialize(__webpack_require__(/*! ./layoutGrid.layout.json */ "./src/layout-grid/layoutGrid.layout.json"));
         return;
-        var panelReference = api.addPanelFromComponent({
+        api.addPanel({
             componentName: 'test_component',
             id: exports.nextGuid(),
             title: 'Item 1',
             params: { text: 'how low?' },
         });
-        api.addPanelFromComponent({
+        api.addPanel({
             componentName: 'test_component',
             id: 'item2',
             title: 'Item 2',
         });
-        api.addPanelFromComponent({
+        api.addPanel({
             componentName: 'split_panel',
             id: exports.nextGuid(),
             title: 'Item 3 with a long title',
         });
-        api.addPanelFromComponent({
+        api.addPanel({
             componentName: 'test_component',
             id: exports.nextGuid(),
             title: 'Item 3',
@@ -2113,7 +2116,7 @@ exports.SplitPanel = function (props) {
         var existingLayout = props.api.getStateKey(SPLIT_PANEL_STATE_KEY);
         event.api.fromJSON(__webpack_require__(/*! ./splitpanel.layout.json */ "./src/layout-grid/splitpanel.layout.json"));
         return;
-        event.api.addFromComponent({
+        event.api.addPanel({
             id: '1',
             component: 'default1',
             snap: true,
@@ -2121,7 +2124,7 @@ exports.SplitPanel = function (props) {
                 text: 'hiya',
             },
         });
-        event.api.addFromComponent({ id: '2', component: 'default1' });
+        event.api.addPanel({ id: '2', component: 'default1' });
     };
     var onSave = function () {
         props.api.setState(SPLIT_PANEL_STATE_KEY, api.current.toJSON());
@@ -2132,7 +2135,7 @@ exports.SplitPanel = function (props) {
         panel.update({ params: { text: Date.now().toString() } });
     };
     var onAdd = function () {
-        api.current.addFromComponent({
+        api.current.addPanel({
             id: "" + Date.now(),
             component: 'default1',
             snap: true,
@@ -31346,8 +31349,8 @@ var SplitviewApi = /** @class */ (function () {
     SplitviewApi.prototype.layout = function (width, height) {
         return this.component.layout(width, height);
     };
-    SplitviewApi.prototype.addFromComponent = function (options) {
-        return this.component.addFromComponent(options);
+    SplitviewApi.prototype.addPanel = function (options) {
+        return this.component.addPanel(options);
     };
     SplitviewApi.prototype.resizeToFit = function () {
         return this.component.resizeToFit();
@@ -31462,8 +31465,8 @@ var GridviewApi = /** @class */ (function () {
         if (force === void 0) { force = false; }
         return this.component.layout(width, height, force);
     };
-    GridviewApi.prototype.addComponent = function (options) {
-        return this.component.addComponent(options);
+    GridviewApi.prototype.addPanel = function (options) {
+        return this.component.addPanel(options);
     };
     GridviewApi.prototype.removePanel = function (panel, sizing) {
         this.component.removePanel(panel, sizing);
@@ -31558,8 +31561,8 @@ var DockviewApi = /** @class */ (function () {
         if (force === void 0) { force = false; }
         return this.component.layout(width, height, force);
     };
-    DockviewApi.prototype.addPanelFromComponent = function (options) {
-        return this.component.addPanelFromComponent(options);
+    DockviewApi.prototype.addPanel = function (options) {
+        return this.component.addPanel(options);
     };
     DockviewApi.prototype.addDndHandle = function (type, cb) {
         return this.component.addDndHandle(type, cb);
@@ -32172,8 +32175,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "hasProcessed": () => /* binding */ hasProcessed,
 /* harmony export */   "Droptarget": () => /* binding */ Droptarget
 /* harmony export */ });
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
-/* harmony import */ var _dataTransfer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./dataTransfer */ "../splitview/dist/es6/dnd/dataTransfer.js");
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dom */ "../splitview/dist/es6/dom.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _dataTransfer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./dataTransfer */ "../splitview/dist/es6/dnd/dataTransfer.js");
+
 
 
 var Position;
@@ -32192,24 +32197,16 @@ var hasProcessed = function (event) {
 var setEventAsProcessed = function (event) {
     event[HAS_PROCESSED_KEY] = true;
 };
-var toggleClassName = function (element, className, addOrRemove) {
-    if (addOrRemove && !element.classList.contains(className)) {
-        element.classList.add(className);
-    }
-    else if (!addOrRemove && element.classList.contains(className)) {
-        element.classList.remove(className);
-    }
-};
 var Droptarget = /** @class */ (function () {
     function Droptarget(element, options) {
         var _this = this;
         this.element = element;
         this.options = options;
-        this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
         this.onDidChange = this._onDidChange.event;
         this.onDragEnter = function (event) {
             if (!_this.options.enableExternalDragEvents &&
-                !_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.DataTransferSingleton.has(_this.options.id)) {
+                !_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.DataTransferSingleton.has(_this.options.id)) {
                 console.debug('[droptarget] invalid event');
                 return;
             }
@@ -32234,19 +32231,20 @@ var Droptarget = /** @class */ (function () {
         };
         this.onDrop = function (event) {
             if (!_this.options.enableExternalDragEvents &&
-                !_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.DataTransferSingleton.has(_this.options.id)) {
+                !_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.DataTransferSingleton.has(_this.options.id)) {
                 console.debug('[dragtarget] invalid');
                 return;
             }
             console.debug('[dragtarget] drop');
             _this.removeDropTarget();
             if (!hasProcessed(event)) {
-                _this._onDidChange.fire({ position: _this.state, event: event });
+                _this._onDidChange.fire({ position: _this._state, event: event });
             }
             else {
                 console.debug('[dragtarget] already processed');
             }
-            _this.state = undefined;
+            _this._state = undefined;
+            // event.preventDefault();
             setEventAsProcessed(event);
         };
         this.onDragOver = function (event) {
@@ -32265,24 +32263,24 @@ var Droptarget = /** @class */ (function () {
             var isLeft = xp < 20;
             var isTop = !isRight && !isLeft && yp < 20;
             var isBottom = !isRight && !isLeft && yp > 80;
-            toggleClassName(_this.overlay, 'right', isRight);
-            toggleClassName(_this.overlay, 'left', isLeft);
-            toggleClassName(_this.overlay, 'top', isTop);
-            toggleClassName(_this.overlay, 'bottom', isBottom);
+            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(_this.overlay, 'right', isRight);
+            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(_this.overlay, 'left', isLeft);
+            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(_this.overlay, 'top', isTop);
+            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(_this.overlay, 'bottom', isBottom);
             if (isRight) {
-                _this.state = Position.Right;
+                _this._state = Position.Right;
             }
             else if (isLeft) {
-                _this.state = Position.Left;
+                _this._state = Position.Left;
             }
             else if (isTop) {
-                _this.state = Position.Top;
+                _this._state = Position.Top;
             }
             else if (isBottom) {
-                _this.state = Position.Bottom;
+                _this._state = Position.Bottom;
             }
             else {
-                _this.state = Position.Center;
+                _this._state = Position.Center;
             }
         };
         this.onDragLeave = function (event) {
@@ -32291,6 +32289,13 @@ var Droptarget = /** @class */ (function () {
         };
         this.element.addEventListener('dragenter', this.onDragEnter);
     }
+    Object.defineProperty(Droptarget.prototype, "state", {
+        get: function () {
+            return this._state;
+        },
+        enumerable: false,
+        configurable: true
+    });
     Droptarget.prototype.dispose = function () {
         this._onDidChange.dispose();
         this.removeDropTarget();
@@ -32345,7 +32350,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../dnd/dataTransfer */ "../splitview/dist/es6/dnd/dataTransfer.js");
 /* harmony import */ var _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../gridview/baseComponentGridview */ "../splitview/dist/es6/gridview/baseComponentGridview.js");
 /* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
-/* harmony import */ var _groupview_panel_tab__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../groupview/panel/tab */ "../splitview/dist/es6/groupview/panel/tab.js");
+/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../groupview/tab */ "../splitview/dist/es6/groupview/tab.js");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -32594,7 +32599,7 @@ var ComponentDockview = /** @class */ (function (_super) {
             }
         }
         var location = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(options.group.element);
-        var next = (_a = this.gridview.preivous(location)) === null || _a === void 0 ? void 0 : _a.view;
+        var next = (_a = this.gridview.previous(location)) === null || _a === void 0 ? void 0 : _a.view;
         this.doSetGroupActive(next);
     };
     ComponentDockview.prototype.registerPanel = function (panel) {
@@ -32758,7 +32763,7 @@ var ComponentDockview = /** @class */ (function (_super) {
     };
     ComponentDockview.prototype.fireMouseEvent = function (event) {
         switch (event.kind) {
-            case _groupview_panel_tab__WEBPACK_IMPORTED_MODULE_14__.MouseEventKind.CONTEXT_MENU:
+            case _groupview_tab__WEBPACK_IMPORTED_MODULE_14__.MouseEventKind.CONTEXT_MENU:
                 if (event.tab) {
                     this._onTabContextMenu.fire({
                         event: event.event,
@@ -32769,10 +32774,9 @@ var ComponentDockview = /** @class */ (function (_super) {
                 break;
         }
     };
-    ComponentDockview.prototype.addPanelFromComponent = function (options) {
-        var _this = this;
+    ComponentDockview.prototype.addPanel = function (options) {
         var _a;
-        var panel = this.addPanel(options);
+        var panel = this._addPanel(options);
         if ((_a = options.position) === null || _a === void 0 ? void 0 : _a.referencePanel) {
             var referencePanel = this.getGroupPanel(options.position.referencePanel);
             var referenceGroup = this.findGroup(referencePanel);
@@ -32789,19 +32793,9 @@ var ComponentDockview = /** @class */ (function (_super) {
         else {
             this.addPanelToNewGroup(panel);
         }
-        return {
-            update: function (event) {
-                if (panel.update) {
-                    panel.update({ params: event.params });
-                }
-            },
-            remove: function () {
-                var group = _this.findGroup(panel);
-                group.removePanel(panel);
-            },
-        };
+        return panel;
     };
-    ComponentDockview.prototype.addPanel = function (options) {
+    ComponentDockview.prototype._addPanel = function (options) {
         var contentPart = this.createContentComponent(options.id, options.componentName);
         var headerPart = this.createTabComponent(options.id, options.tabComponentName);
         var panel = new _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_3__.GroupviewPanel(options.id, this._api);
@@ -32940,7 +32934,7 @@ var ComponentDockview = /** @class */ (function (_super) {
                 var panelOptions = cb({ event: event });
                 var panel = _this.getGroupPanel(panelOptions.id);
                 if (!panel) {
-                    panel = _this.addPanel(panelOptions);
+                    panel = _this._addPanel(panelOptions);
                 }
                 _this.moveGroupOrPanel(group, (_a = panel === null || panel === void 0 ? void 0 : panel.group) === null || _a === void 0 ? void 0 : _a.id, panel.id, event.target, event.index);
             }));
@@ -33451,32 +33445,6 @@ var DefaultDeserializer = /** @class */ (function () {
     };
     return DefaultDeserializer;
 }());
-
-
-
-/***/ }),
-
-/***/ "../splitview/dist/es6/dockview/index.js":
-/*!***********************************************!*\
-  !*** ../splitview/dist/es6/dockview/index.js ***!
-  \***********************************************/
-/*! namespace exports */
-/*! export ComponentDockview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/dockview/componentDockview.js .ComponentDockview */
-/*! export ComponentGridview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/componentGridview.js .ComponentGridview */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_exports__, __webpack_require__.d, __webpack_require__.r, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ComponentDockview": () => /* reexport safe */ _componentDockview__WEBPACK_IMPORTED_MODULE_0__.ComponentDockview,
-/* harmony export */   "ComponentGridview": () => /* reexport safe */ _gridview_componentGridview__WEBPACK_IMPORTED_MODULE_1__.ComponentGridview
-/* harmony export */ });
-/* harmony import */ var _componentDockview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./componentDockview */ "../splitview/dist/es6/dockview/componentDockview.js");
-/* harmony import */ var _gridview_componentGridview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../gridview/componentGridview */ "../splitview/dist/es6/gridview/componentGridview.js");
-
-
 
 
 
@@ -34150,7 +34118,7 @@ var BaseGrid = /** @class */ (function (_super) {
             options.group = this.activeGroup;
         }
         var location = (0,_gridview__WEBPACK_IMPORTED_MODULE_1__.getGridLocation)(options.group.element);
-        var next = (_a = this.gridview.preivous(location)) === null || _a === void 0 ? void 0 : _a.view;
+        var next = (_a = this.gridview.previous(location)) === null || _a === void 0 ? void 0 : _a.view;
         this.doSetGroupActive(next);
     };
     BaseGrid.prototype.layout = function (size, orthogonalSize, forceResize) {
@@ -34804,7 +34772,7 @@ var ComponentGridview = /** @class */ (function (_super) {
     };
     ComponentGridview.prototype.fromJSON = function (data) {
         var _this = this;
-        var grid = data.grid, panels = data.panels, activePanel = data.activePanel;
+        var _a = data, grid = _a.grid, panels = _a.panels, activePanel = _a.activePanel;
         this.gridview.clear();
         this.groups.clear();
         this.gridview.deserialize(grid, {
@@ -34833,7 +34801,7 @@ var ComponentGridview = /** @class */ (function (_super) {
         this.gridview.layout(this._size, this._orthogonalSize);
         this._onDidLayoutChange.fire({ kind: "NEW_LAYOUT" /* NEW_LAYOUT */ });
     };
-    ComponentGridview.prototype.addComponent = function (options) {
+    ComponentGridview.prototype.addPanel = function (options) {
         var _a;
         var relativeLocation = options.location || [0];
         if ((_a = options.position) === null || _a === void 0 ? void 0 : _a.reference) {
@@ -35191,7 +35159,7 @@ var Gridview = /** @class */ (function () {
     Gridview.prototype.next = function (location) {
         return this.progmaticSelect(location);
     };
-    Gridview.prototype.preivous = function (location) {
+    Gridview.prototype.previous = function (location) {
         return this.progmaticSelect(location, true);
     };
     Gridview.prototype.getView = function (location) {
@@ -35793,7 +35761,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "Groupview": () => /* binding */ Groupview
 /* harmony export */ });
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
-/* harmony import */ var _titlebar_tabContainer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./titlebar/tabContainer */ "../splitview/dist/es6/groupview/titlebar/tabContainer.js");
+/* harmony import */ var _titlebar_titleContainer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./titlebar/titleContainer */ "../splitview/dist/es6/groupview/titlebar/titleContainer.js");
 /* harmony import */ var _panel_content__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./panel/content */ "../splitview/dist/es6/groupview/panel/content.js");
 /* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
@@ -35935,7 +35903,7 @@ var Groupview = /** @class */ (function (_super) {
         _this._element = document.createElement('div');
         _this._element.className = 'groupview';
         // this._element.tabIndex = -1;
-        _this.tabContainer = new _titlebar_tabContainer__WEBPACK_IMPORTED_MODULE_1__.TabContainer(_this.accessor, _this, {
+        _this.tabContainer = new _titlebar_titleContainer__WEBPACK_IMPORTED_MODULE_1__.TitleContainer(_this.accessor, _this, {
             tabHeight: options.tabHeight,
         });
         _this.contentContainer = new _panel_content__WEBPACK_IMPORTED_MODULE_2__.ContentContainer();
@@ -36247,10 +36215,9 @@ var Groupview = /** @class */ (function (_super) {
     };
     Groupview.prototype.updateActions = function () {
         var _a;
-        if (this._active) {
+        if (this._active && this._activePanel) {
             var headerTitle = (_a = this._activePanel.content) === null || _a === void 0 ? void 0 : _a.actions;
             this.tabContainer.setActionElement(headerTitle);
-            this.activePanel.content.updateActions();
         }
         else {
             this.tabContainer.setActionElement(undefined);
@@ -36682,10 +36649,10 @@ var ContentContainer = /** @class */ (function (_super) {
 
 /***/ }),
 
-/***/ "../splitview/dist/es6/groupview/panel/tab.js":
-/*!****************************************************!*\
-  !*** ../splitview/dist/es6/groupview/panel/tab.js ***!
-  \****************************************************/
+/***/ "../splitview/dist/es6/groupview/tab.js":
+/*!**********************************************!*\
+  !*** ../splitview/dist/es6/groupview/tab.js ***!
+  \**********************************************/
 /*! namespace exports */
 /*! export MouseEventKind [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Tab [provided] [no usage info] [missing usage info prevents renaming] */
@@ -36699,12 +36666,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "MouseEventKind": () => /* binding */ MouseEventKind,
 /* harmony export */   "Tab": () => /* binding */ Tab
 /* harmony export */ });
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../events */ "../splitview/dist/es6/events.js");
-/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../lifecycle */ "../splitview/dist/es6/lifecycle.js");
-/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../dnd/dataTransfer */ "../splitview/dist/es6/dnd/dataTransfer.js");
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../dom */ "../splitview/dist/es6/dom.js");
-/* harmony import */ var _focusedElement__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../focusedElement */ "../splitview/dist/es6/focusedElement.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dnd/dataTransfer */ "../splitview/dist/es6/dnd/dataTransfer.js");
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../dom */ "../splitview/dist/es6/dom.js");
+/* harmony import */ var _focusedElement__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../focusedElement */ "../splitview/dist/es6/focusedElement.js");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -36785,7 +36752,13 @@ var Tab = /** @class */ (function (_super) {
             if (event.defaultPrevented) {
                 return;
             }
-            event.preventDefault();
+            /**
+             * TODO: alternative to stopPropagation
+             *
+             * I need to stop the event propagation here since otherwise it'll be intercepted by event handlers
+             * on the tab-container. I cannot use event.preventDefault() since I need the on DragStart event to occur
+             */
+            event.stopPropagation();
             /**
              * //TODO mousedown focusing with draggable element (is there a better approach?)
              *
@@ -36860,12 +36833,12 @@ var Tab = /** @class */ (function (_super) {
 
 /***/ }),
 
-/***/ "../splitview/dist/es6/groupview/titlebar/tabContainer.js":
-/*!****************************************************************!*\
-  !*** ../splitview/dist/es6/groupview/titlebar/tabContainer.js ***!
-  \****************************************************************/
+/***/ "../splitview/dist/es6/groupview/titlebar/titleContainer.js":
+/*!******************************************************************!*\
+  !*** ../splitview/dist/es6/groupview/titlebar/titleContainer.js ***!
+  \******************************************************************/
 /*! namespace exports */
-/*! export TabContainer [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export TitleContainer [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
 /*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
@@ -36873,11 +36846,11 @@ var Tab = /** @class */ (function (_super) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "TabContainer": () => /* binding */ TabContainer
+/* harmony export */   "TitleContainer": () => /* binding */ TitleContainer
 /* harmony export */ });
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lifecycle */ "../splitview/dist/es6/lifecycle.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../events */ "../splitview/dist/es6/events.js");
-/* harmony import */ var _panel_tab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../panel/tab */ "../splitview/dist/es6/groupview/panel/tab.js");
+/* harmony import */ var _tab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../tab */ "../splitview/dist/es6/groupview/tab.js");
 /* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../dom */ "../splitview/dist/es6/dom.js");
 /* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
 /* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../array */ "../splitview/dist/es6/array.js");
@@ -36935,9 +36908,9 @@ var __spread = (undefined && undefined.__spread) || function () {
 
 
 
-var TabContainer = /** @class */ (function (_super) {
-    __extends(TabContainer, _super);
-    function TabContainer(accessor, group, options) {
+var TitleContainer = /** @class */ (function (_super) {
+    __extends(TitleContainer, _super);
+    function TitleContainer(accessor, group, options) {
         var _this = _super.call(this) || this;
         _this.accessor = accessor;
         _this.group = group;
@@ -36961,7 +36934,6 @@ var TabContainer = /** @class */ (function (_super) {
             if (event.defaultPrevented) {
                 return;
             }
-            event.preventDefault();
             _this.accessor.doSetGroupActive(_this.group);
         }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.tabContainer, 'dragenter', function (event) {
             if (!_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_5__.DataTransferSingleton.has(_this.accessor.id)) {
@@ -37001,7 +36973,7 @@ var TabContainer = /** @class */ (function (_super) {
         }));
         return _this;
     }
-    Object.defineProperty(TabContainer.prototype, "visible", {
+    Object.defineProperty(TitleContainer.prototype, "visible", {
         get: function () {
             return this._visible;
         },
@@ -37012,7 +36984,7 @@ var TabContainer = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(TabContainer.prototype, "height", {
+    Object.defineProperty(TitleContainer.prototype, "height", {
         get: function () {
             return this._height;
         },
@@ -37033,7 +37005,7 @@ var TabContainer = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    TabContainer.prototype.setActionElement = function (element) {
+    TitleContainer.prototype.setActionElement = function (element) {
         if (this.actions) {
             this.actions.remove();
             this.actions = undefined;
@@ -37043,36 +37015,36 @@ var TabContainer = /** @class */ (function (_super) {
             this.actions = element;
         }
     };
-    Object.defineProperty(TabContainer.prototype, "element", {
+    Object.defineProperty(TitleContainer.prototype, "element", {
         get: function () {
             return this._element;
         },
         enumerable: false,
         configurable: true
     });
-    TabContainer.prototype.isActive = function (tab) {
+    TitleContainer.prototype.isActive = function (tab) {
         return (this.selectedIndex > -1 &&
             this.tabs[this.selectedIndex].value === tab);
     };
-    Object.defineProperty(TabContainer.prototype, "hasActiveDragEvent", {
+    Object.defineProperty(TitleContainer.prototype, "hasActiveDragEvent", {
         get: function () {
             return !!this.tabs.find(function (tab) { return tab.value.hasActiveDragEvent; });
         },
         enumerable: false,
         configurable: true
     });
-    TabContainer.prototype.at = function (index) {
+    TitleContainer.prototype.at = function (index) {
         var _a;
         return (_a = this.tabs[index]) === null || _a === void 0 ? void 0 : _a.value;
     };
-    TabContainer.prototype.indexOf = function (tabOrId) {
+    TitleContainer.prototype.indexOf = function (tabOrId) {
         var id = typeof tabOrId === 'string' ? tabOrId : tabOrId.id;
         return this.tabs.findIndex(function (tab) { return tab.value.id === id; });
     };
-    TabContainer.prototype.setActive = function (isGroupActive) {
+    TitleContainer.prototype.setActive = function (isGroupActive) {
         this.active = isGroupActive;
     };
-    TabContainer.prototype.addTab = function (tab, index) {
+    TitleContainer.prototype.addTab = function (tab, index) {
         if (index === void 0) { index = this.tabs.length; }
         if (index < 0 || index > this.tabs.length) {
             throw new Error('invalid location');
@@ -37085,33 +37057,33 @@ var TabContainer = /** @class */ (function (_super) {
             this.selectedIndex = index;
         }
     };
-    TabContainer.prototype.delete = function (id) {
+    TitleContainer.prototype.delete = function (id) {
         var index = this.tabs.findIndex(function (tab) { return tab.value.id === id; });
         var tab = this.tabs.splice(index, 1)[0];
         var value = tab.value, disposable = tab.disposable;
         disposable.dispose();
         value.element.remove();
     };
-    TabContainer.prototype.setActivePanel = function (panel) {
+    TitleContainer.prototype.setActivePanel = function (panel) {
         this.tabs.forEach(function (tab) {
             var isActivePanel = panel.id === tab.value.id;
             tab.value.setActive(isActivePanel);
         });
     };
-    TabContainer.prototype.openPanel = function (panel, index) {
+    TitleContainer.prototype.openPanel = function (panel, index) {
         var _this = this;
         if (index === void 0) { index = this.tabs.length; }
         if (this.tabs.find(function (tab) { return tab.value.id === panel.id; })) {
             return;
         }
-        var tab = new _panel_tab__WEBPACK_IMPORTED_MODULE_2__.Tab(panel.id, this.accessor, this.group);
+        var tab = new _tab__WEBPACK_IMPORTED_MODULE_2__.Tab(panel.id, this.accessor, this.group);
         tab.setContent(panel.header);
         var disposable = _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable.from(tab.onChanged(function (event) {
             var _a;
             var alreadyFocused = panel.id === ((_a = _this.group.activePanel) === null || _a === void 0 ? void 0 : _a.id) &&
                 _this.group.isAncestor(_focusedElement__WEBPACK_IMPORTED_MODULE_6__.focusedElement.element);
             switch (event.kind) {
-                case _panel_tab__WEBPACK_IMPORTED_MODULE_2__.MouseEventKind.CLICK:
+                case _tab__WEBPACK_IMPORTED_MODULE_2__.MouseEventKind.CLICK:
                     _this.group.setPanel(panel, alreadyFocused);
                     break;
             }
@@ -37123,17 +37095,17 @@ var TabContainer = /** @class */ (function (_super) {
         this.addTab(value, index);
         this.activePanel = panel;
     };
-    TabContainer.prototype.closePanel = function (panel) {
+    TitleContainer.prototype.closePanel = function (panel) {
         this.delete(panel.id);
     };
-    TabContainer.prototype.dispose = function () {
+    TitleContainer.prototype.dispose = function () {
         _super.prototype.dispose.call(this);
         this.tabs.forEach(function (tab) {
             tab.disposable.dispose();
         });
         this.tabs = [];
     };
-    return TabContainer;
+    return TitleContainer;
 }(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
 
 
@@ -37164,7 +37136,7 @@ var TabContainer = /** @class */ (function (_super) {
 /*! export Groupview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/groupview.js .Groupview */
 /*! export GroupviewPanel [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/groupviewPanel.js .GroupviewPanel */
 /*! export LayoutPriority [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .LayoutPriority */
-/*! export MouseEventKind [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/panel/tab.js .MouseEventKind */
+/*! export MouseEventKind [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/tab.js .MouseEventKind */
 /*! export MutableDisposable [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/lifecycle.js .MutableDisposable */
 /*! export Orientation [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .Orientation */
 /*! export PaneFramework [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/paneview/componentPaneview.js .PaneFramework */
@@ -37179,7 +37151,7 @@ var TabContainer = /** @class */ (function (_super) {
 /*! export Splitview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .Splitview */
 /*! export SplitviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/component.api.js .SplitviewApi */
 /*! export SplitviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/splitview/splitview.js .SplitviewComponent */
-/*! export Tab [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/panel/tab.js .Tab */
+/*! export Tab [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/tab.js .Tab */
 /*! export UIEvent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .UIEvent */
 /*! export addDisposableListener [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .addDisposableListener */
 /*! export addDisposableWindowListener [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .addDisposableWindowListener */
@@ -37215,8 +37187,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "isGridBranchNode": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.isGridBranchNode,
 /* harmony export */   "Groupview": () => /* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_5__.Groupview,
 /* harmony export */   "ContentContainer": () => /* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_6__.ContentContainer,
-/* harmony export */   "MouseEventKind": () => /* reexport safe */ _groupview_panel_tab__WEBPACK_IMPORTED_MODULE_7__.MouseEventKind,
-/* harmony export */   "Tab": () => /* reexport safe */ _groupview_panel_tab__WEBPACK_IMPORTED_MODULE_7__.Tab,
+/* harmony export */   "MouseEventKind": () => /* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_7__.MouseEventKind,
+/* harmony export */   "Tab": () => /* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_7__.Tab,
 /* harmony export */   "Emitter": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.Emitter,
 /* harmony export */   "Event": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.Event,
 /* harmony export */   "UIEvent": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.UIEvent,
@@ -37240,8 +37212,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "ReactPanelContentPart": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_14__.ReactPanelContentPart,
 /* harmony export */   "ReactPanelHeaderPart": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_14__.ReactPanelHeaderPart,
 /* harmony export */   "SplitviewComponent": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_14__.SplitviewComponent,
-/* harmony export */   "ComponentDockview": () => /* reexport safe */ _dockview__WEBPACK_IMPORTED_MODULE_15__.ComponentDockview,
-/* harmony export */   "ComponentGridview": () => /* reexport safe */ _dockview__WEBPACK_IMPORTED_MODULE_15__.ComponentGridview
+/* harmony export */   "ComponentDockview": () => /* reexport safe */ _dockview_componentDockview__WEBPACK_IMPORTED_MODULE_15__.ComponentDockview,
+/* harmony export */   "ComponentGridview": () => /* reexport safe */ _gridview_componentGridview__WEBPACK_IMPORTED_MODULE_16__.ComponentGridview
 /* harmony export */ });
 /* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
 /* harmony import */ var _splitview_componentSplitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitview/componentSplitview */ "../splitview/dist/es6/splitview/componentSplitview.js");
@@ -37250,7 +37222,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./gridview/gridview */ "../splitview/dist/es6/gridview/gridview.js");
 /* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./groupview/groupview */ "../splitview/dist/es6/groupview/groupview.js");
 /* harmony import */ var _groupview_panel_content__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./groupview/panel/content */ "../splitview/dist/es6/groupview/panel/content.js");
-/* harmony import */ var _groupview_panel_tab__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./groupview/panel/tab */ "../splitview/dist/es6/groupview/panel/tab.js");
+/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./groupview/tab */ "../splitview/dist/es6/groupview/tab.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./events */ "../splitview/dist/es6/events.js");
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./lifecycle */ "../splitview/dist/es6/lifecycle.js");
 /* harmony import */ var _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./groupview/groupviewPanel */ "../splitview/dist/es6/groupview/groupviewPanel.js");
@@ -37258,7 +37230,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./api/component.api */ "../splitview/dist/es6/api/component.api.js");
 /* harmony import */ var _react_react__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./react/react */ "../splitview/dist/es6/react/react.js");
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./react */ "../splitview/dist/es6/react/index.js");
-/* harmony import */ var _dockview__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./dockview */ "../splitview/dist/es6/dockview/index.js");
+/* harmony import */ var _dockview_componentDockview__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./dockview/componentDockview */ "../splitview/dist/es6/dockview/componentDockview.js");
+/* harmony import */ var _gridview_componentGridview__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./gridview/componentGridview */ "../splitview/dist/es6/gridview/componentGridview.js");
+
+
 
 
 
@@ -38305,7 +38280,6 @@ var ReactPanelContentPart = /** @class */ (function () {
         this.id = id;
         this.component = component;
         this.reactPortalStore = reactPortalStore;
-        this._init = false;
         this._element = document.createElement('div');
         this._element.style.height = '100%';
         this._element.style.width = '100%';
@@ -38327,31 +38301,30 @@ var ReactPanelContentPart = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    ReactPanelContentPart.prototype.updateActions = function () {
-        if (!this.actionsPart) {
-            return;
-        }
-        if (this._init) {
-            return;
-        }
-        this._init = true;
-        this.actionsPart.createPortal();
-    };
     ReactPanelContentPart.prototype.focus = function () {
         //noop
     };
     ReactPanelContentPart.prototype.init = function (parameters) {
         this.parameters = parameters;
-        this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, __assign(__assign({}, parameters.params), { api: parameters.api, containerApi: parameters.containerApi, registerActions: this.registerActions.bind(this) }));
+        this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, __assign(__assign({}, parameters.params), { api: parameters.api, containerApi: parameters.containerApi, setActionsbar: this.setActionsbar.bind(this) }));
     };
-    ReactPanelContentPart.prototype.registerActions = function (component, props) {
+    ReactPanelContentPart.prototype.setActionsbar = function (component, props) {
         var _this = this;
         var _a;
-        this.actionsPart = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this._actionsElement, this.reactPortalStore, component, props, true);
+        if (this.actionsPart) {
+            console.debug('removed existing panel-actions portal');
+            this.actionsPart.dispose();
+            this.actionsPart = undefined;
+        }
+        this.actionsPart = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this._actionsElement, this.reactPortalStore, component, __assign(__assign({}, props), { api: this.parameters.api, containerApi: this.parameters.containerApi }));
         (_a = this._group) === null || _a === void 0 ? void 0 : _a.updateActions();
         return {
             update: function (props) {
                 _this.actionsPart.update(props);
+            },
+            dispose: function () {
+                _this.actionsPart.dispose();
+                _this.actionsPart = undefined;
             },
         };
     };
@@ -38362,6 +38335,7 @@ var ReactPanelContentPart = /** @class */ (function () {
     };
     ReactPanelContentPart.prototype.update = function (params) {
         var _a;
+        this.parameters.params = params.params;
         (_a = this.part) === null || _a === void 0 ? void 0 : _a.update(params.params);
     };
     ReactPanelContentPart.prototype.setVisible = function (isPanelVisible, group) {
@@ -38991,15 +38965,11 @@ ReactComponentBridge.displayName = 'PanelWrapper';
  */
 var uniquePortalKeyGenerator = (0,_math__WEBPACK_IMPORTED_MODULE_2__.sequentialNumberGenerator)();
 var ReactPart = /** @class */ (function () {
-    function ReactPart(parent, portalStore, component, parameters, delayRendering) {
-        if (delayRendering === void 0) { delayRendering = false; }
+    function ReactPart(parent, portalStore, component, parameters) {
         this.parent = parent;
         this.portalStore = portalStore;
         this.component = component;
         this.parameters = parameters;
-        if (delayRendering) {
-            return;
-        }
         this.createPortal();
     }
     ReactPart.prototype.update = function (props) {
@@ -39308,9 +39278,6 @@ var ComponentSplitview = /** @class */ (function (_super) {
     };
     ComponentSplitview.prototype.setVisible = function (panel, visible) {
         var index = this.getPanels().indexOf(panel);
-        if (index < 0) {
-            throw new Error('invalid operation');
-        }
         this.splitview.setViewVisible(index, visible);
     };
     ComponentSplitview.prototype.setActive = function (view, skipFocus) {
@@ -39324,14 +39291,13 @@ var ComponentSplitview = /** @class */ (function (_super) {
         return this.splitview.getViews();
     };
     ComponentSplitview.prototype.removePanel = function (panel, sizing) {
-        var views = this.getPanels();
-        var index = views.findIndex(function (_) { return _ === panel; });
+        var index = this.getPanels().findIndex(function (_) { return _ === panel; });
         this.splitview.removeView(index, sizing);
     };
     ComponentSplitview.prototype.getPanel = function (id) {
         return this.getPanels().find(function (view) { return view.id === id; });
     };
-    ComponentSplitview.prototype.addFromComponent = function (options) {
+    ComponentSplitview.prototype.addPanel = function (options) {
         var _a;
         var view = (0,_core_options__WEBPACK_IMPORTED_MODULE_4__.createComponent)(options.id, options.component, this.options.components, this.options.frameworkComponents, (_a = this.options.frameworkWrapper) === null || _a === void 0 ? void 0 : _a.createComponent);
         var size = typeof options.size === 'number' ? options.size : _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Sizing.Distribute;
@@ -39367,9 +39333,10 @@ var ComponentSplitview = /** @class */ (function (_super) {
     };
     ComponentSplitview.prototype.doAddView = function (view) {
         var _this = this;
+        // TODO: manage disposable
         var disposable = view.api.onDidFocusChange(function (event) {
             if (!event.isFocused) {
-                return; // only care if focused
+                return;
             }
             _this.setActive(view, true);
         });
@@ -39719,12 +39686,18 @@ var Splitview = /** @class */ (function () {
         get: function () {
             return this._size;
         },
+        set: function (value) {
+            this._size = value;
+        },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(Splitview.prototype, "orthogonalSize", {
         get: function () {
             return this._orthogonalSize;
+        },
+        set: function (value) {
+            this._orthogonalSize = value;
         },
         enumerable: false,
         configurable: true
@@ -39766,6 +39739,34 @@ var Splitview = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(Splitview.prototype, "startSnappingEnabled", {
+        get: function () {
+            return this._startSnappingEnabled;
+        },
+        set: function (startSnappingEnabled) {
+            if (this._startSnappingEnabled === startSnappingEnabled) {
+                return;
+            }
+            this._startSnappingEnabled = startSnappingEnabled;
+            this.updateSashEnablement();
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Splitview.prototype, "endSnappingEnabled", {
+        get: function () {
+            return this._endSnappingEnabled;
+        },
+        set: function (endSnappingEnabled) {
+            if (this._endSnappingEnabled === endSnappingEnabled) {
+                return;
+            }
+            this._endSnappingEnabled = endSnappingEnabled;
+            this.updateSashEnablement();
+        },
+        enumerable: false,
+        configurable: true
+    });
     Splitview.prototype.style = function (styles) {
         if ((styles === null || styles === void 0 ? void 0 : styles.separatorBorder) === 'transparent') {
             (0,_dom__WEBPACK_IMPORTED_MODULE_0__.removeClasses)(this.element, 'separator-border');
@@ -39802,25 +39803,20 @@ var Splitview = /** @class */ (function () {
         return this.views[index].size;
     };
     Splitview.prototype.resizeView = function (index, size) {
+        var _this = this;
         if (index < 0 || index >= this.views.length) {
             return;
         }
-        var indexes = 
-        // range(this.views.length)
-        this.views.map(function (_, i) { return i; }).filter(function (i) { return i !== index; });
-        // const lowPriorityIndexes = [
-        //   ...indexes.filter((i) => this.views[i].priority === LayoutPriority.Low),
-        //   index,
-        // ];
-        // const highPriorityIndexes = indexes.filter(
-        //   (i) => this.views[i].priority === LayoutPriority.High
-        // );
+        var indexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(this.views.length).filter(function (i) { return i !== index; });
+        var lowPriorityIndexes = __spread(indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.Low; }), [
+            index,
+        ]);
+        var highPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.High; });
         var item = this.views[index];
         size = Math.round(size);
         size = (0,_math__WEBPACK_IMPORTED_MODULE_4__.clamp)(size, item.minimumSize, Math.min(item.maximumSize, this._size));
         item.size = size;
-        this
-            .relayout();
+        this.relayout(lowPriorityIndexes, highPriorityIndexes);
     };
     Splitview.prototype.getViews = function () {
         return this.views.map(function (x) { return x.view; });
@@ -39834,16 +39830,6 @@ var Splitview = /** @class */ (function () {
         size = (0,_math__WEBPACK_IMPORTED_MODULE_4__.clamp)(size, item.minimumSize, item.maximumSize);
         item.size = size;
         this.relayout([index], undefined);
-        // const contentSize = this.views.reduce((r, i) => r + i.size, 0);
-        // this.resize(
-        //     index -1,
-        //     this._size - contentSize,
-        //     undefined,
-        //     [index]
-        // );
-        // this.distributeEmptySpace();
-        // this.layoutViews();
-        // this.saveProportions();
     };
     Splitview.prototype.addView = function (view, size, index, skipLayout) {
         var _this = this;
@@ -40004,6 +39990,7 @@ var Splitview = /** @class */ (function () {
     };
     Splitview.prototype.distributeViewSizes = function () {
         var e_5, _a, e_6, _b;
+        var _this = this;
         var flexibleViewItems = [];
         var flexibleSize = 0;
         try {
@@ -40036,15 +40023,10 @@ var Splitview = /** @class */ (function () {
             }
             finally { if (e_6) throw e_6.error; }
         }
-        // const indexes = range(this.viewItems.length);
-        // const lowPriorityIndexes = indexes.filter(
-        //   (i) => this.views[i].priority === LayoutPriority.Low
-        // );
-        // const highPriorityIndexes = indexes.filter(
-        //   (i) => this.viewItems[i].priority === LayoutPriority.High
-        // );
-        this
-            .relayout();
+        var indexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(this.views.length);
+        var lowPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.Low; });
+        var highPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.High; });
+        this.relayout(lowPriorityIndexes, highPriorityIndexes);
     };
     Splitview.prototype.removeView = function (index, sizing) {
         // Remove view
@@ -40077,23 +40059,11 @@ var Splitview = /** @class */ (function () {
         var view = this.removeView(from);
         this.addView(view, sizing, to);
     };
-    // set orientation(orientation: Orientation) {
-    //     if (orientation === this._orientation) {
-    //         return;
-    //     }
-    //     this._orientation = orientation;
-    //     const classname =
-    //         orientation === Orientation.HORIZONTAL ? 'horizontal' : 'vertical';
-    //     removeClasses(this.viewContainer, 'vertical', 'horizontal');
-    //     removeClasses(this.sashContainer, 'vertical', 'horizontal');
-    //     addClasses(this.viewContainer, classname);
-    //     addClasses(this.sashContainer, classname);
-    // }
     Splitview.prototype.layout = function (size, orthogonalSize) {
         var _this = this;
         var previousSize = Math.max(this.size, this.contentSize);
-        this._size = size;
-        this._orthogonalSize = orthogonalSize;
+        this.size = size;
+        this.orthogonalSize = orthogonalSize;
         if (!this.proportions) {
             var indexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(this.views.length);
             var lowPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.Low; });
@@ -40120,7 +40090,7 @@ var Splitview = /** @class */ (function () {
         var e_7, _a, e_8, _b;
         var _this = this;
         var contentSize = this.views.reduce(function (r, i) { return r + i.size; }, 0);
-        var emptyDelta = this._size - contentSize;
+        var emptyDelta = this.size - contentSize;
         var indexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(this.views.length - 1, -1);
         var lowPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.Low; });
         var highPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.High; });
@@ -40247,34 +40217,6 @@ var Splitview = /** @class */ (function () {
         }
         return undefined;
     };
-    Object.defineProperty(Splitview.prototype, "startSnappingEnabled", {
-        get: function () {
-            return this._startSnappingEnabled;
-        },
-        set: function (startSnappingEnabled) {
-            if (this._startSnappingEnabled === startSnappingEnabled) {
-                return;
-            }
-            this._startSnappingEnabled = startSnappingEnabled;
-            this.updateSashEnablement();
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Splitview.prototype, "endSnappingEnabled", {
-        get: function () {
-            return this._endSnappingEnabled;
-        },
-        set: function (endSnappingEnabled) {
-            if (this._endSnappingEnabled === endSnappingEnabled) {
-                return;
-            }
-            this._endSnappingEnabled = endSnappingEnabled;
-            this.updateSashEnablement();
-        },
-        enumerable: false,
-        configurable: true
-    });
     Splitview.prototype.updateSashEnablement = function () {
         var previous = false;
         var collapsesDown = this.views.map(function (i) { return (previous = i.size - i.minimumSize > 0 || previous); });
