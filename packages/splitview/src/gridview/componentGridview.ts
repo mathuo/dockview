@@ -19,7 +19,7 @@ import {
     GridviewInitParameters,
     GridPanelViewState,
 } from './gridviewPanel';
-import { BaseComponentOptions, Parameters } from '../panel/types';
+import { BaseComponentOptions } from '../panel/types';
 import { GridPanelApi } from '../api/gridPanelApi';
 import { GridviewApi } from '../api/component.api';
 import { Orientation, Sizing } from '../splitview/core/splitview';
@@ -28,9 +28,13 @@ interface PanelReference {
     api: GridPanelApi;
 }
 
-interface SerializedGridview {
-    grid: any;
-    panels: any;
+export interface SerializedGridview {
+    grid: {
+        height: number;
+        width: number;
+        orientation: Orientation;
+        root: SerializedGridObject<GridPanelViewState>;
+    };
     activePanel: string;
 }
 
@@ -58,6 +62,8 @@ export interface IComponentGridview extends IBaseGrid<GridviewPanel> {
     isVisible(panel: GridviewPanel): boolean;
     toggleVisibility(panel: GridviewPanel): void;
     focus(): void;
+    fromJSON(data: SerializedGridview): void;
+    toJSON(): SerializedGridview;
 }
 
 export class ComponentGridview
@@ -108,22 +114,14 @@ export class ComponentGridview
             root: SerializedGridObject<GridPanelViewState>;
         };
 
-        const serializedData = {
+        const serializedData: SerializedGridview = {
             grid: data,
             activePanel: this.activeGroup?.id,
-        } as {
-            grid: {
-                height: number;
-                width: number;
-                orientation: Orientation;
-                root: SerializedGridObject<GridPanelViewState>;
-            };
-            activePanel: string;
         };
         return serializedData;
     }
 
-    public deserialize(data: any) {
+    public deserialize(data: SerializedGridview) {
         this.gridview.clear();
         this.groups.clear();
 
@@ -147,8 +145,8 @@ export class ComponentGridview
         this.activeGroup?.focus();
     }
 
-    public fromJSON(data: any) {
-        const { grid, panels, activePanel } = data as SerializedGridview;
+    public fromJSON(data: SerializedGridview) {
+        const { grid, activePanel } = data as SerializedGridview;
 
         this.gridview.clear();
         this.groups.clear();

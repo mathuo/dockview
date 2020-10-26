@@ -1,4 +1,8 @@
-import { getRelativeLocation, IGridView } from '../gridview/gridview';
+import {
+    getRelativeLocation,
+    IGridView,
+    SerializedGridObject,
+} from '../gridview/gridview';
 import { Position } from '../dnd/droptarget';
 import { getGridLocation } from '../gridview/gridview';
 import { tail, sequenceEquals } from '../array';
@@ -51,13 +55,25 @@ import {
 import { DockviewApi } from '../api/component.api';
 import { State } from '../api/api';
 import { LayoutMouseEvent, MouseEventKind } from '../groupview/tab';
+import { Orientation } from '../splitview/core/splitview';
 
 const nextGroupId = sequentialNumberGenerator();
-const DEFAULT_TAB_HEIGHT = 35;
 
 export interface PanelReference {
     update: (event: { params: { [key: string]: any } }) => void;
     remove: () => void;
+}
+
+export interface SerializedDockview {
+    grid: {
+        root: SerializedGridObject<any>;
+        height: number;
+        width: number;
+        orientation: Orientation;
+    };
+    panels: { [key: string]: any };
+    activeGroup: string;
+    options: { tabHeight: number };
 }
 
 export interface IComponentDockview extends IBaseGrid<IGroupview> {
@@ -83,7 +99,6 @@ export interface IComponentDockview extends IBaseGrid<IGroupview> {
     // lifecycle
     addEmptyGroup(options?: AddGroupOptions): void;
     closeAllGroups: () => Promise<boolean>;
-    deserialize: (data: object) => void;
     deserializer: IPanelDeserializer;
     // events
     onTabInteractionEvent: Event<LayoutMouseEvent>;
@@ -103,6 +118,9 @@ export interface IComponentDockview extends IBaseGrid<IGroupview> {
     ): void;
     setActivePanel(panel: IGroupPanel): void;
     focus(): void;
+    toJSON(): SerializedDockview;
+    fromJSON(data: SerializedDockview): void;
+    deserialize: (data: SerializedDockview) => void;
 }
 
 export interface LayoutDropEvent {
@@ -334,7 +352,7 @@ export class ComponentDockview
      *
      * @returns A JSON respresentation of the layout
      */
-    public toJSON(): object {
+    public toJSON(): SerializedDockview {
         this.syncConfigs();
 
         const data = this.gridview.serialize();
@@ -400,7 +418,7 @@ export class ComponentDockview
         });
     }
 
-    public deserialize(data: any) {
+    public deserialize(data: SerializedDockview) {
         this.gridview.clear();
         this.panels.forEach((panel) => {
             panel.disposable.dispose();
@@ -413,7 +431,7 @@ export class ComponentDockview
         this.gridview.layout(this._size, this._orthogonalSize);
     }
 
-    public fromJSON(data: any) {
+    public fromJSON(data: SerializedDockview) {
         if (!this.deserializer) {
             throw new Error('invalid deserializer');
         }

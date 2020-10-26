@@ -68,6 +68,7 @@ export class ComponentSplitview
     implements IComponentSplitview {
     private splitview: Splitview;
     private _activePanel: SplitviewPanel;
+    private panels = new Map<string, IDisposable>();
 
     private readonly _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
@@ -126,6 +127,10 @@ export class ComponentSplitview
     }
 
     removePanel(panel: SplitviewPanel, sizing?: Sizing) {
+        const disposable = this.panels.get(panel.id);
+        disposable?.dispose();
+        this.panels.delete(panel.id);
+
         const index = this.getPanels().findIndex((_) => _ === panel);
         this.splitview.removeView(index, sizing);
     }
@@ -143,11 +148,6 @@ export class ComponentSplitview
             this.options.frameworkWrapper?.createComponent
         );
 
-        const size: Sizing | number =
-            typeof options.size === 'number' ? options.size : Sizing.Distribute;
-        const index =
-            typeof options.index === 'number' ? options.index : undefined;
-
         view.init({
             params: options.params,
             minimumSize: options.minimumSize,
@@ -156,6 +156,11 @@ export class ComponentSplitview
             priority: options.priority,
             containerApi: new SplitviewApi(this),
         });
+
+        const size: Sizing | number =
+            typeof options.size === 'number' ? options.size : Sizing.Distribute;
+        const index =
+            typeof options.index === 'number' ? options.index : undefined;
 
         this.splitview.addView(view, size, index);
 
@@ -185,14 +190,15 @@ export class ComponentSplitview
         this.splitview.layout(size, orthogonalSize);
     }
 
-    doAddView(view: SplitviewPanel) {
-        // TODO: manage disposable
+    private doAddView(view: SplitviewPanel) {
         const disposable = view.api.onDidFocusChange((event) => {
             if (!event.isFocused) {
                 return;
             }
             this.setActive(view, true);
         });
+
+        this.panels.set(view.id, disposable);
     }
 
     toJSON(): SerializedSplitview {
@@ -257,5 +263,14 @@ export class ComponentSplitview
         if (typeof activeView === 'string') {
             this.getPanel(activeView)?.setActive(true);
         }
+    }
+
+    dispose() {
+        Array.from(this.panels.values()).forEach((value) => {
+            value.dispose();
+        });
+        this.panels.clear();
+
+        super.dispose();
     }
 }

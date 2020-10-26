@@ -1,6 +1,7 @@
 import {
     IComponentDockview,
     LayoutDropEvent,
+    SerializedDockview,
 } from '../dockview/componentDockview';
 import {
     AddGroupOptions,
@@ -11,16 +12,21 @@ import {
 import {
     AddComponentOptions,
     IComponentGridview,
+    SerializedGridview,
 } from '../gridview/componentGridview';
 import { GridviewPanel } from '../gridview/gridviewPanel';
 import { IGroupview } from '../groupview/groupview';
 import { IGroupPanel } from '../groupview/groupviewPanel';
-import { AddPaneviewCompponentOptions } from '../paneview/componentPaneview';
+import {
+    AddPaneviewCompponentOptions,
+    SerializedPaneview,
+} from '../paneview/componentPaneview';
 import { IComponentPaneview } from '../paneview/componentPaneview';
 import { PaneviewPanel } from '../paneview/paneviewPanel';
 import {
     AddSplitviewComponentOptions,
     IComponentSplitview,
+    SerializedSplitview,
 } from '../splitview/componentSplitview';
 import { Sizing } from '../splitview/core/splitview';
 import { SplitviewPanel } from '../splitview/splitviewPanel';
@@ -76,7 +82,7 @@ export class SplitviewApi {
         return this.component.resizeToFit();
     }
 
-    fromJSON(data: any) {
+    fromJSON(data: SerializedSplitview) {
         return this.component.fromJSON(data);
     }
 
@@ -128,7 +134,7 @@ export class PaneviewApi {
         return this.component.resizeToFit();
     }
 
-    fromJSON(data: any) {
+    fromJSON(data: SerializedPaneview) {
         return this.component.fromJSON(data);
     }
 
@@ -196,7 +202,7 @@ export class GridviewApi {
         return this.component.setVisible(panel, visible);
     }
 
-    fromJSON(data: any) {
+    fromJSON(data: SerializedGridview) {
         return this.component.fromJSON(data);
     }
 
@@ -306,7 +312,7 @@ export class DockviewApi {
         return this.component.getPanel(id);
     }
 
-    deserialize(data: object) {
+    deserialize(data: SerializedDockview) {
         return this.component.deserialize(data);
     }
 
