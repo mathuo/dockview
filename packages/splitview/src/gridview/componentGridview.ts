@@ -1,4 +1,4 @@
-import { getRelativeLocation } from './gridview';
+import { getRelativeLocation, SerializedGridObject } from './gridview';
 import { Position } from '../dnd/droptarget';
 import { getGridLocation } from './gridview';
 import { tail, sequenceEquals } from '../array';
@@ -14,11 +14,15 @@ import {
     IGridPanelView,
     toTarget,
 } from './baseComponentGridview';
-import { GridviewPanel, GridviewInitParameters } from './gridviewPanel';
+import {
+    GridviewPanel,
+    GridviewInitParameters,
+    GridPanelViewState,
+} from './gridviewPanel';
 import { BaseComponentOptions, Parameters } from '../panel/types';
 import { GridPanelApi } from '../api/gridPanelApi';
 import { GridviewApi } from '../api/component.api';
-import { Sizing } from '../splitview/core/splitview';
+import { Orientation, Sizing } from '../splitview/core/splitview';
 
 interface PanelReference {
     api: GridPanelApi;
@@ -97,9 +101,26 @@ export class ComponentGridview
      * @returns A JSON respresentation of the layout
      */
     public toJSON() {
-        const data = this.gridview.serialize();
+        const data = this.gridview.serialize() as {
+            height: number;
+            width: number;
+            orientation: Orientation;
+            root: SerializedGridObject<GridPanelViewState>;
+        };
 
-        return { grid: data };
+        const serializedData = {
+            grid: data,
+            activePanel: this.activeGroup?.id,
+        } as {
+            grid: {
+                height: number;
+                width: number;
+                orientation: Orientation;
+                root: SerializedGridObject<GridPanelViewState>;
+            };
+            activePanel: string;
+        };
+        return serializedData;
     }
 
     public deserialize(data: any) {

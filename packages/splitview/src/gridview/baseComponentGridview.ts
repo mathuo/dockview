@@ -167,7 +167,10 @@ export abstract class BaseGrid<T extends IGridPanelView>
     }
 
     public doSetGroupActive(group: T, skipFocus?: boolean) {
-        if (this._activeGroup && this._activeGroup !== group) {
+        if (this._activeGroup === group) {
+            return;
+        }
+        if (this._activeGroup) {
             this._activeGroup.setActive(false, skipFocus);
         }
         group.setActive(true, skipFocus);

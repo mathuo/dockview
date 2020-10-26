@@ -287,8 +287,8 @@ export class Splitview {
         this.relayout(lowPriorityIndexes, highPriorityIndexes);
     }
 
-    public getViews() {
-        return this.views.map((x) => x.view);
+    public getViews<T extends IView>() {
+        return this.views.map((x) => x.view as T);
     }
 
     private onDidChange(item: ViewItem, size: number | undefined): void {

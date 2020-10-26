@@ -483,14 +483,20 @@ export class ComponentDockview
     public addPanel(options: AddPanelOptions): IGroupPanel {
         const panel = this._addPanel(options);
 
+        let referenceGroup: IGroupview;
+
         if (options.position?.referencePanel) {
             const referencePanel = this.getGroupPanel(
                 options.position.referencePanel
             );
 
-            const referenceGroup = this.findGroup(referencePanel);
+            referenceGroup = this.findGroup(referencePanel);
+        } else {
+            referenceGroup = this.activeGroup;
+        }
 
-            const target = toTarget(options.position.direction);
+        if (referenceGroup) {
+            const target = toTarget(options.position?.direction || 'within');
             if (target === Position.Center) {
                 referenceGroup.openPanel(panel);
             } else {

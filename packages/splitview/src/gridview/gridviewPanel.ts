@@ -1,7 +1,7 @@
 import { PanelInitParameters } from '../panel/types';
 import { IGridPanelComponentView } from './componentGridview';
 import { FunctionOrValue } from '../types';
-import { BasePanelView } from './basePanelView';
+import { BasePanelView, BasePanelViewState } from './basePanelView';
 import { GridPanelApi } from '../api/gridPanelApi';
 import { LayoutPriority } from '../splitview/core/splitview';
 import { Emitter, Event } from '../events';
@@ -129,7 +129,7 @@ export abstract class GridviewPanel
         return false;
     }
 
-    toJSON(): object {
+    toJSON(): GridPanelViewState {
         const state = super.toJSON();
         const maximum = (value: number) =>
             value === Number.MAX_SAFE_INTEGER ? undefined : value;
@@ -149,4 +149,13 @@ export abstract class GridviewPanel
     dispose() {
         super.dispose();
     }
+}
+
+export interface GridPanelViewState extends BasePanelViewState {
+    minimumHeight: number;
+    maximumHeight: number;
+    minimumWidth: number;
+    maximumWidth: number;
+    snap: boolean;
+    priority: LayoutPriority;
 }

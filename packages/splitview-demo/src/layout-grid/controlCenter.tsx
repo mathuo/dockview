@@ -34,10 +34,28 @@ export const ControlCenter = () => {
 
     const onAdd = () => {
         const api = registry.get<DockviewApi>('dockview');
-        const id = nextGuid();
+        const _id = nextGuid();
+        const id = `control_center_panel_${_id}`;
+
         api.addPanel({
             componentName: 'test_component',
-            id: `control_center_panel_${id}`,
+            id,
+            title: `Item ${id}`,
+        });
+    };
+
+    const onAddTheSamePanel = () => {
+        const api = registry.get<DockviewApi>('dockview');
+        const id = `duplicate_panel`;
+
+        const panel = api.getPanel(id);
+        if (panel) {
+            api.setActivePanel(panel);
+            return;
+        }
+        api.addPanel({
+            componentName: 'test_component',
+            id,
             title: `Item ${id}`,
         });
     };
@@ -140,7 +158,10 @@ export const ControlCenter = () => {
                 </button>
             </div>
             <div className="control-center-row">
-                <button onMouseDown={onAdd}>Add</button>
+                <button onMouseDown={onAdd}>Add new</button>
+            </div>
+            <div className="control-center-row">
+                <button onMouseDown={onAdd}>Add identical</button>
             </div>
             <div className="control-center-row">
                 <button onMouseDown={onAddSettings}>Settings</button>

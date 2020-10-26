@@ -17,6 +17,7 @@ export interface SplitviewReadyEvent {
 export interface ISplitviewPanelProps {
     api: IPanelApi;
     containerApi: SplitviewApi;
+    [key: string]: any;
 }
 
 export interface ISplitviewComponentProps {

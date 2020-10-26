@@ -189,17 +189,17 @@ export function isGridBranchNode<T extends IGridView>(
     return !!(node as any).children;
 }
 
-type SerializedGridObject = {
+export interface SerializedGridObject<T> {
     type: 'leaf' | 'branch';
-    data: object;
+    data: T | SerializedGridObject<T>[];
     size: number;
     visible?: boolean;
-};
+}
 
 const serializeBranchNode = <T extends IGridView>(
     node: GridNode<T>,
     orientation: Orientation
-): SerializedGridObject => {
+): SerializedGridObject<any> => {
     const size =
         orientation === Orientation.VERTICAL ? node.box.width : node.box.height;
 

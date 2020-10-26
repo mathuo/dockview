@@ -15,22 +15,25 @@ import { Emitter, Event } from '../events';
 import { SplitviewApi } from '../api/component.api';
 import { SplitviewPanel } from './splitviewPanel';
 
-interface SerializedSplitview {
+export interface SerializedSplitviewPanel {
+    snap?: boolean;
+    priority?: LayoutPriority;
+    minimumSize?: number;
+    maximumSize?: number;
+    data: {
+        id: string;
+        component: string;
+        props?: { [index: string]: any };
+        state?: { [index: string]: any };
+    };
+    size: number;
+}
+
+export interface SerializedSplitview {
     orientation: Orientation;
     size: number;
     activeView: string;
-    views: Array<{
-        snap?: boolean;
-        priority?: LayoutPriority;
-        minimumSize?: number;
-        maximumSize?: number;
-        data: {
-            id: string;
-            component: string;
-            props: { [index: string]: any };
-        };
-        size: number;
-    }>;
+    views: SerializedSplitviewPanel[];
 }
 
 export interface AddSplitviewComponentOptions extends BaseComponentOptions {
@@ -46,8 +49,8 @@ export interface IComponentSplitview extends IDisposable {
     addPanel(options: AddSplitviewComponentOptions): void;
     layout(width: number, height: number): void;
     onDidLayoutChange: Event<void>;
-    toJSON(): object;
-    fromJSON(data: any): void;
+    toJSON(): SerializedSplitview;
+    fromJSON(data: SerializedSplitview): void;
     resizeToFit(): void;
     focus(): void;
     getPanel(id: string): SplitviewPanel | undefined;
@@ -192,19 +195,20 @@ export class ComponentSplitview
         });
     }
 
-    toJSON(): object {
-        const views = (this.splitview.getViews() as ISerializableView[]).map(
-            (view, i) => {
+    toJSON(): SerializedSplitview {
+        const views: SerializedSplitviewPanel[] = this.splitview
+            .getViews<SplitviewPanel>()
+            .map((view, i) => {
                 const size = this.splitview.getViewSize(i);
                 return {
                     size,
-                    data: view.toJSON ? view.toJSON() : {},
+                    data: view.toJSON(),
                     minimumSize: view.minimumSize,
                     maximumSize: view.maximumSize,
                     snap: !!view.snap,
+                    priority: view.priority,
                 };
-            }
-        );
+            });
 
         return {
             views,
@@ -214,13 +218,8 @@ export class ComponentSplitview
         };
     }
 
-    fromJSON(data: any): void {
-        const {
-            views,
-            orientation,
-            size,
-            activeView,
-        } = data as SerializedSplitview;
+    fromJSON(data: SerializedSplitview): void {
+        const { views, orientation, size, activeView } = data;
 
         this.splitview.dispose();
         this.splitview = new Splitview(this.element, {

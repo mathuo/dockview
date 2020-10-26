@@ -193,7 +193,7 @@ export class TitleContainer
 
                 this._onDropped.fire({
                     event: { event, position: Position.Center },
-                    index: this.tabs.length - 1,
+                    index: this.tabs.length - (activetab ? 1 : 0),
                 });
             })
         );

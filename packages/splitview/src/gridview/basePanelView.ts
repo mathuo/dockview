@@ -8,6 +8,13 @@ import {
 } from '../panel/types';
 import { BaseViewApi } from '../api/api';
 
+export interface BasePanelViewState {
+    id: string;
+    component: string;
+    props?: { [key: string]: any };
+    state?: { [key: string]: any };
+}
+
 export abstract class BasePanelView<T extends BaseViewApi>
     extends CompositeDisposable
     implements IPanel {
@@ -88,7 +95,7 @@ export abstract class BasePanelView<T extends BaseViewApi>
         this.part?.update(this.params.params);
     }
 
-    toJSON(): object {
+    toJSON(): BasePanelViewState {
         const state = this.api.getState();
         return {
             id: this.id,

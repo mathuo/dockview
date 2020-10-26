@@ -1,7 +1,7 @@
 import { PaneviewApi } from '../api/component.api';
 import { PanePanelApi } from '../api/panePanelApi';
 import { Emitter, Event } from '../events';
-import { BasePanelView } from '../gridview/basePanelView';
+import { BasePanelView, BasePanelViewState } from '../gridview/basePanelView';
 import { IDisposable } from '../lifecycle';
 import {
     IFrameworkPart,
@@ -10,6 +10,11 @@ import {
     Parameters,
 } from '../panel/types';
 import { IView } from '../splitview/core/splitview';
+
+export interface PanePanelViewState extends BasePanelViewState {
+    headerComponent?: string;
+    title: string;
+}
 
 export interface PanePanelInitParameter extends PanelInitParameters {
     minimumBodySize?: number;
@@ -167,7 +172,7 @@ export abstract class PaneviewPanel
         this.header.append(this.headerPart.element);
     }
 
-    toJSON(): object {
+    toJSON(): PanePanelViewState {
         const params = this.params as PanePanelInitParameter;
         return {
             ...super.toJSON(),

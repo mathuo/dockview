@@ -24,6 +24,7 @@ export interface ActionsbarReference<P> extends IDisposable {
 export interface IGroupPanelBaseProps {
     api: IGroupPanelApi;
     containerApi: DockviewApi;
+    [key: string]: any;
 }
 
 export interface IGroupPanelProps extends IGroupPanelBaseProps {
@@ -40,6 +41,7 @@ export interface DockviewReadyEvent {
 export interface IWatermarkPanelProps {
     containerApi: DockviewApi;
     close(): void;
+    [key: string]: any;
 }
 
 export interface IDockviewComponentProps {

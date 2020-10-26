@@ -14,25 +14,28 @@ import {
     PanePanelInitParameter,
 } from './paneviewPanel';
 
-interface SerializedPaneview {
+export interface SerializedPaneviewPanel {
+    snap?: boolean;
+    priority?: LayoutPriority;
+    minimumSize?: number;
+    maximumSize?: number;
+    data: {
+        id: string;
+        component: string;
+        title: string;
+        headerComponent?: string;
+        props?: { [index: string]: any };
+        state?: { [index: string]: any };
+    };
+    size: number;
+    expanded?: boolean;
+}
+
+export interface SerializedPaneview {
     orientation: Orientation;
     size: number;
     expanded?: boolean;
-    views: Array<{
-        snap?: boolean;
-        priority?: LayoutPriority;
-        minimumSize?: number;
-        maximumSize?: number;
-        data: {
-            id: string;
-            component: string;
-            title: string;
-            headerComponent?: string;
-            props: { [index: string]: any };
-        };
-        size: number;
-        expanded?: boolean;
-    }>;
+    views: SerializedPaneviewPanel[];
 }
 
 class DefaultHeader extends CompositeDisposable implements IPaneHeaderPart {
@@ -105,8 +108,8 @@ export interface IComponentPaneview extends IDisposable {
     addFromComponent(options: AddPaneviewCompponentOptions): IDisposable;
     layout(width: number, height: number): void;
     onDidLayoutChange: Event<void>;
-    toJSON(): object;
-    fromJSON(data: any): void;
+    toJSON(): SerializedPaneview;
+    fromJSON(data: SerializedPaneview): void;
     resizeToFit(): void;
     focus(): void;
     getPanels(): PaneviewPanel[];
@@ -238,17 +241,19 @@ export class ComponentPaneview
         this.layout(width, height);
     }
 
-    toJSON(): object {
-        const views = this.paneview.getPanes().map((view: PaneviewPanel, i) => {
-            const size = this.paneview.getViewSize(i);
-            return {
-                size,
-                data: view.toJSON ? view.toJSON() : {},
-                minimumSize: view.minimumBodySize,
-                maximumSize: view.maximumBodySize,
-                expanded: view.isExpanded(),
-            };
-        });
+    toJSON(): SerializedPaneview {
+        const views: SerializedPaneviewPanel[] = this.paneview
+            .getPanes()
+            .map((view, i) => {
+                const size = this.paneview.getViewSize(i);
+                return {
+                    size,
+                    data: view.toJSON(),
+                    minimumSize: view.minimumBodySize,
+                    maximumSize: view.maximumBodySize,
+                    expanded: view.isExpanded(),
+                };
+            });
 
         return {
             views,
@@ -257,8 +262,8 @@ export class ComponentPaneview
         };
     }
 
-    fromJSON(data: any): void {
-        const { views, orientation, size } = data as SerializedPaneview;
+    fromJSON(data: SerializedPaneview): void {
+        const { views, orientation, size } = data;
 
         this.paneview.dispose();
         this.paneview = new Paneview(this.element, {
