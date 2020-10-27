@@ -4,6 +4,7 @@ import {
     pushToEnd,
     pushToStart,
     range,
+    sequenceEquals,
     tail,
 } from '../array';
 
@@ -44,5 +45,12 @@ describe('array', () => {
     it('firstIndex', () => {
         expect(firstIndex([1, 2, 3, 4, 3], (item) => item === 3)).toBe(2);
         expect(firstIndex([1, 2, 3, 4, 3], (item) => item === 5)).toBe(-1);
+    });
+
+    it('firstIndex', () => {
+        expect(sequenceEquals([1, 2, 3, 4], [1, 2, 3, 4])).toBeTruthy();
+        expect(sequenceEquals([1, 2, 3, 4], [4, 3, 2, 1])).toBeFalsy();
+        expect(sequenceEquals([1, 2, 3, 4], [1, 2, 3])).toBeFalsy();
+        expect(sequenceEquals([1, 2, 3, 4], [1, 2, 3, 4, 5])).toBeFalsy();
     });
 });
