@@ -26,7 +26,7 @@ const components: PanelCollection<IGroupPanelProps> = {
         const onReady = (event: DockviewReadyEvent) => {
             _api.current = event.api;
 
-            const layout = props.api.getStateKey<object>('layout');
+            const layout = props.api.getStateKey<any>('layout');
             if (layout) {
                 event.api.deserialize(layout);
             } else {
