@@ -3,57 +3,56 @@ import { IDisposable } from '../lifecycle';
 import { FunctionOrValue } from '../types';
 import { BaseViewApi, IBaseViewApi } from './api';
 
-interface PanelConstraintChangeEvent {
+interface PanelConstraintChangeEvent2 {
     minimumSize?: FunctionOrValue<number>;
     maximumSize?: FunctionOrValue<number>;
 }
 
-interface PanelConstraintChangeEvent2 {
+export interface PanelConstraintChangeEvent {
     minimumSize?: number;
     maximumSize?: number;
 }
 
-interface SizeEvent {
+export interface PanelSizeEvent {
     size: number;
 }
 
 export interface IPanelApi extends IBaseViewApi {
-    onDidConstraintsChange: Event<PanelConstraintChangeEvent2>;
-    setConstraints(value: PanelConstraintChangeEvent): void;
-    setSize(event: SizeEvent): void;
+    onDidConstraintsChange: Event<PanelConstraintChangeEvent>;
+    setConstraints(value: PanelConstraintChangeEvent2): void;
+    setSize(event: PanelSizeEvent): void;
 }
 
 export class PanelApi extends BaseViewApi implements IPanelApi, IDisposable {
     readonly _onDidConstraintsChangeInternal = new Emitter<
-        PanelConstraintChangeEvent
+        PanelConstraintChangeEvent2
     >();
     readonly onDidConstraintsChangeInternal: Event<
-        PanelConstraintChangeEvent
+        PanelConstraintChangeEvent2
     > = this._onDidConstraintsChangeInternal.event;
     //
 
-    readonly _onDidConstraintsChange = new Emitter<PanelConstraintChangeEvent2>(
-        {
-            replay: true,
-        }
-    );
-    readonly onDidConstraintsChange: Event<PanelConstraintChangeEvent2> = this
+    readonly _onDidConstraintsChange = new Emitter<PanelConstraintChangeEvent>({
+        replay: true,
+    });
+    readonly onDidConstraintsChange: Event<PanelConstraintChangeEvent> = this
         ._onDidConstraintsChange.event;
     //
 
-    readonly _onDidSizeChange = new Emitter<SizeEvent>();
-    readonly onDidSizeChange: Event<SizeEvent> = this._onDidSizeChange.event;
+    readonly _onDidSizeChange = new Emitter<PanelSizeEvent>();
+    readonly onDidSizeChange: Event<PanelSizeEvent> = this._onDidSizeChange
+        .event;
     //
 
     constructor() {
         super();
     }
 
-    setConstraints(value: PanelConstraintChangeEvent) {
+    setConstraints(value: PanelConstraintChangeEvent2) {
         this._onDidConstraintsChangeInternal.fire(value);
     }
 
-    setSize(event: SizeEvent) {
+    setSize(event: PanelSizeEvent) {
         this._onDidSizeChange.fire(event);
     }
 

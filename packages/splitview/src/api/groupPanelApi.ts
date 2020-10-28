@@ -2,12 +2,9 @@ import { IGroupview } from '../groupview/groupview';
 import { Emitter, Event } from '../events';
 import { GridPanelApi, IGridPanelApi } from './gridPanelApi';
 import { IGroupPanel } from '../groupview/groupviewPanel';
+import { VisibilityEvent } from './api';
 
-interface VisibilityEvent {
-    isVisible: boolean;
-}
-
-interface TitleEvent {
+export interface TitleEvent {
     title: string;
 }
 

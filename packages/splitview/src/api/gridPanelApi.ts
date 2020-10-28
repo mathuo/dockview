@@ -9,7 +9,7 @@ interface GridConstraintChangeEvent {
     maximumHeight?: FunctionOrValue<number>;
 }
 
-interface SizeEvent {
+export interface SizeEvent {
     width?: number;
     height?: number;
 }

@@ -20,19 +20,19 @@ export interface State {
     [key: string]: StateObject;
 }
 
-interface FocusEvent {
+export interface FocusEvent {
     isFocused: boolean;
 }
-interface PanelDimensionChangeEvent {
+export interface PanelDimensionChangeEvent {
     width: number;
     height: number;
 }
 
-interface VisibilityEvent {
+export interface VisibilityEvent {
     isVisible: boolean;
 }
 
-interface ActiveEvent {
+export interface ActiveEvent {
     isActive: boolean;
 }
 

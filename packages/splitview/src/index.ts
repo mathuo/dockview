@@ -17,3 +17,20 @@ export * from './react';
 export * from './dockview/componentDockview';
 export * from './dockview/options';
 export * from './gridview/componentGridview';
+
+export {
+    StateObject,
+    State,
+    FocusEvent,
+    PanelDimensionChangeEvent,
+    VisibilityEvent,
+    ActiveEvent,
+} from './api/api';
+export { SizeEvent, IGridPanelApi } from './api/gridPanelApi';
+export { TitleEvent, IGroupPanelApi } from './api/groupPanelApi';
+export {
+    PanelSizeEvent,
+    PanelConstraintChangeEvent,
+    IPanelApi,
+} from './api/panelApi';
+export { ExpansionEvent, IPanePanelApi } from './api/panePanelApi';

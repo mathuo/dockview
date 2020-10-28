@@ -6,6 +6,11 @@ import {
     SplitviewApi,
     SplitviewComponent,
     SplitviewReadyEvent,
+    PanelDimensionChangeEvent,
+    ActiveEvent,
+    FocusEvent,
+    VisibilityEvent,
+    PanelConstraintChangeEvent,
 } from 'dockview';
 import * as React from 'react';
 import './splitview.scss';
@@ -26,19 +31,23 @@ const components = {
 
         React.useEffect(() => {
             const disposable = new CompositeDisposable(
-                props.api.onDidActiveChange((event) => {
+                props.api.onDidActiveChange((event: ActiveEvent) => {
                     setActive(event.isActive);
                 }),
-                props.api.onDidConstraintsChange((event) => {
-                    setConstraints(event);
-                }),
-                props.api.onDidDimensionsChange((event) => {
-                    setDimension(event);
-                }),
-                props.api.onDidFocusChange((event) => {
+                props.api.onDidConstraintsChange(
+                    (event: PanelConstraintChangeEvent) => {
+                        setConstraints(event);
+                    }
+                ),
+                props.api.onDidDimensionsChange(
+                    (event: PanelDimensionChangeEvent) => {
+                        setDimension(event);
+                    }
+                ),
+                props.api.onDidFocusChange((event: FocusEvent) => {
                     setFocused(event.isFocused);
                 }),
-                props.api.onDidVisibilityChange((event) => {
+                props.api.onDidVisibilityChange((event: VisibilityEvent) => {
                     setVisible(event.isVisible);
                 })
             );
@@ -97,23 +106,25 @@ export const SplitviewPanel = (props: IGroupPanelProps) => {
 
     React.useEffect(() => {
         const disposable = new CompositeDisposable(
-            props.api.onDidDimensionsChange((event) => {
-                api.current.layout(event.width - 80, 100);
+            props.api.onDidDimensionsChange(
+                (event: PanelDimensionChangeEvent) => {
+                    api.current.layout(event.width - 80, 100);
 
-                const height = api.current.height;
-                const width = api.current.width;
-                const maximumSize = api.current.maximumSize;
-                const minimumSize = api.current.minimumSize;
-                setDimensions({
-                    height,
-                    width,
-                    maximumSize,
-                    minimumSize,
-                    visibility: api.current
-                        .getPanels()
-                        .map((_) => _.api.isVisible),
-                });
-            }),
+                    const height = api.current.height;
+                    const width = api.current.width;
+                    const maximumSize = api.current.maximumSize;
+                    const minimumSize = api.current.minimumSize;
+                    setDimensions({
+                        height,
+                        width,
+                        maximumSize,
+                        minimumSize,
+                        visibility: api.current
+                            .getPanels()
+                            .map((_) => _.api.isVisible),
+                    });
+                }
+            ),
             api.current.onDidLayoutChange(() => {
                 //
             })

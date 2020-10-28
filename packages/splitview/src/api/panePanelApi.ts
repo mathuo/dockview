@@ -2,7 +2,7 @@ import { Emitter, Event } from '../events';
 import { PaneviewPanel } from '../paneview/paneviewPanel';
 import { IPanelApi, PanelApi } from './panelApi';
 
-interface ExpansionEvent {
+export interface ExpansionEvent {
     isExpanded: boolean;
 }
 
