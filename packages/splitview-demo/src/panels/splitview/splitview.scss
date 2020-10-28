@@ -1,0 +1,35 @@
+.splitview-demo {
+    height: 100%;
+    width: 100%;
+
+    .api-parameter {
+        display: grid;
+        grid-template-columns: 70px 50px;
+
+        span {
+            &:nth-child(2n) {
+                text-align: right;
+            }
+        }
+
+        .visibility-toggle {
+            outline: 1px solid dodgerblue;
+            outline-offset: -1px;
+            padding: 0px 4px;
+            display: flex;
+            cursor: pointer;
+
+            &:not(:first-child) {
+                margin-left: 4px;
+            }
+        }
+    }
+
+    .splitview-demo-panel {
+        background-color: #2d2d2d;
+        height: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+}

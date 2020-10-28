@@ -18,8 +18,12 @@ import { Settings } from './settingsPanel';
 import { useLayoutRegistry } from './registry';
 import { SplitPanel } from './splitPanel';
 import './layoutGrid.scss';
+import { WelcomePanel } from '../panels/welcome/welcome';
+import { SplitviewPanel } from '../panels/splitview/splitview';
 
 const components: PanelCollection<IGroupPanelProps> = {
+    welcome: WelcomePanel,
+    splitview: SplitviewPanel,
     inner_component: (props: IGroupPanelProps) => {
         const _api = React.useRef<DockviewApi>();
 
@@ -284,7 +288,13 @@ export const TestGrid = (props: IGridviewPanelProps) => {
             };
         });
 
-        event.api.deserialize(require('./layoutGrid.layout.json'));
+        api.addPanel({
+            componentName: 'welcome',
+            id: 'welcome',
+            title: 'Welcome',
+        });
+
+        // event.api.deserialize(require('./layoutGrid.layout.json'));
         return;
 
         api.addPanel({
