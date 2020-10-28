@@ -1032,10 +1032,25 @@ exports.ControlCenter = function () {
     };
     var onAdd = function () {
         var api = registry.get('dockview');
-        var id = nextGuid();
+        var _id = nextGuid();
+        var id = "control_center_panel_" + _id;
         api.addPanel({
             componentName: 'test_component',
-            id: "control_center_panel_" + id,
+            id: id,
+            title: "Item " + id,
+        });
+    };
+    var onAddTheSamePanel = function () {
+        var api = registry.get('dockview');
+        var id = "duplicate_panel";
+        var panel = api.getPanel(id);
+        if (panel) {
+            api.setActivePanel(panel);
+            return;
+        }
+        api.addPanel({
+            componentName: 'test_component',
+            id: id,
             title: "Item " + id,
         });
     };
@@ -1128,7 +1143,9 @@ exports.ControlCenter = function () {
         React.createElement("div", { className: "control-center-row" },
             React.createElement("button", { onMouseDown: onFocusPanel }, "Split view panel focus")),
         React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onMouseDown: onAdd }, "Add")),
+            React.createElement("button", { onMouseDown: onAdd }, "Add new")),
+        React.createElement("div", { className: "control-center-row" },
+            React.createElement("button", { onMouseDown: onAdd }, "Add identical")),
         React.createElement("div", { className: "control-center-row" },
             React.createElement("button", { onMouseDown: onAddSettings }, "Settings")),
         React.createElement("div", { className: "control-center-row" },
@@ -32458,7 +32475,6 @@ var __read = (undefined && undefined.__read) || function (o, n) {
 
 
 var nextGroupId = (0,_math__WEBPACK_IMPORTED_MODULE_15__.sequentialNumberGenerator)();
-var DEFAULT_TAB_HEIGHT = 35;
 var ComponentDockview = /** @class */ (function (_super) {
     __extends(ComponentDockview, _super);
     function ComponentDockview(element, options) {
@@ -32775,12 +32791,18 @@ var ComponentDockview = /** @class */ (function (_super) {
         }
     };
     ComponentDockview.prototype.addPanel = function (options) {
-        var _a;
+        var _a, _b;
         var panel = this._addPanel(options);
+        var referenceGroup;
         if ((_a = options.position) === null || _a === void 0 ? void 0 : _a.referencePanel) {
             var referencePanel = this.getGroupPanel(options.position.referencePanel);
-            var referenceGroup = this.findGroup(referencePanel);
-            var target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_12__.toTarget)(options.position.direction);
+            referenceGroup = this.findGroup(referencePanel);
+        }
+        else {
+            referenceGroup = this.activeGroup;
+        }
+        if (referenceGroup) {
+            var target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_12__.toTarget)(((_b = options.position) === null || _b === void 0 ? void 0 : _b.direction) || 'within');
             if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
                 referenceGroup.openPanel(panel);
             }
@@ -34079,7 +34101,10 @@ var BaseGrid = /** @class */ (function (_super) {
         return (_a = this.groups.get(id)) === null || _a === void 0 ? void 0 : _a.value;
     };
     BaseGrid.prototype.doSetGroupActive = function (group, skipFocus) {
-        if (this._activeGroup && this._activeGroup !== group) {
+        if (this._activeGroup === group) {
+            return;
+        }
+        if (this._activeGroup) {
             this._activeGroup.setActive(false, skipFocus);
         }
         group.setActive(true, skipFocus);
@@ -34748,8 +34773,13 @@ var ComponentGridview = /** @class */ (function (_super) {
      * @returns A JSON respresentation of the layout
      */
     ComponentGridview.prototype.toJSON = function () {
+        var _a;
         var data = this.gridview.serialize();
-        return { grid: data };
+        var serializedData = {
+            grid: data,
+            activePanel: (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.id,
+        };
+        return serializedData;
     };
     ComponentGridview.prototype.deserialize = function (data) {
         this.gridview.clear();
@@ -34772,7 +34802,7 @@ var ComponentGridview = /** @class */ (function (_super) {
     };
     ComponentGridview.prototype.fromJSON = function (data) {
         var _this = this;
-        var _a = data, grid = _a.grid, panels = _a.panels, activePanel = _a.activePanel;
+        var _a = data, grid = _a.grid, activePanel = _a.activePanel;
         this.gridview.clear();
         this.groups.clear();
         this.gridview.deserialize(grid, {
@@ -36968,7 +36998,7 @@ var TitleContainer = /** @class */ (function (_super) {
             }
             _this._onDropped.fire({
                 event: { event: event, position: _dnd_droptarget__WEBPACK_IMPORTED_MODULE_4__.Position.Center },
-                index: _this.tabs.length - 1,
+                index: _this.tabs.length - (activetab ? 1 : 0),
             });
         }));
         return _this;
@@ -37610,11 +37640,13 @@ var ComponentPaneview = /** @class */ (function (_super) {
     };
     ComponentPaneview.prototype.toJSON = function () {
         var _this = this;
-        var views = this.paneview.getPanes().map(function (view, i) {
+        var views = this.paneview
+            .getPanes()
+            .map(function (view, i) {
             var size = _this.paneview.getViewSize(i);
             return {
                 size: size,
-                data: view.toJSON ? view.toJSON() : {},
+                data: view.toJSON(),
                 minimumSize: view.minimumBodySize,
                 maximumSize: view.maximumBodySize,
                 expanded: view.isExpanded(),
@@ -37628,7 +37660,7 @@ var ComponentPaneview = /** @class */ (function (_super) {
     };
     ComponentPaneview.prototype.fromJSON = function (data) {
         var _this = this;
-        var _a = data, views = _a.views, orientation = _a.orientation, size = _a.size;
+        var views = data.views, orientation = data.orientation, size = data.size;
         this.paneview.dispose();
         this.paneview = new _paneview__WEBPACK_IMPORTED_MODULE_4__.Paneview(this.element, {
             orientation: orientation,
@@ -39244,6 +39276,7 @@ var ComponentSplitview = /** @class */ (function (_super) {
         var _this = _super.call(this) || this;
         _this.element = element;
         _this.options = options;
+        _this.panels = new Map();
         _this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
         _this.onDidLayoutChange = _this._onDidLayoutChange.event;
         if (!options.components) {
@@ -39291,6 +39324,9 @@ var ComponentSplitview = /** @class */ (function (_super) {
         return this.splitview.getViews();
     };
     ComponentSplitview.prototype.removePanel = function (panel, sizing) {
+        var disposable = this.panels.get(panel.id);
+        disposable === null || disposable === void 0 ? void 0 : disposable.dispose();
+        this.panels.delete(panel.id);
         var index = this.getPanels().findIndex(function (_) { return _ === panel; });
         this.splitview.removeView(index, sizing);
     };
@@ -39300,8 +39336,6 @@ var ComponentSplitview = /** @class */ (function (_super) {
     ComponentSplitview.prototype.addPanel = function (options) {
         var _a;
         var view = (0,_core_options__WEBPACK_IMPORTED_MODULE_4__.createComponent)(options.id, options.component, this.options.components, this.options.frameworkComponents, (_a = this.options.frameworkWrapper) === null || _a === void 0 ? void 0 : _a.createComponent);
-        var size = typeof options.size === 'number' ? options.size : _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Sizing.Distribute;
-        var index = typeof options.index === 'number' ? options.index : undefined;
         view.init({
             params: options.params,
             minimumSize: options.minimumSize,
@@ -39310,6 +39344,8 @@ var ComponentSplitview = /** @class */ (function (_super) {
             priority: options.priority,
             containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.SplitviewApi(this),
         });
+        var size = typeof options.size === 'number' ? options.size : _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Sizing.Distribute;
+        var index = typeof options.index === 'number' ? options.index : undefined;
         this.splitview.addView(view, size, index);
         this.doAddView(view);
         this.setActive(view);
@@ -39333,25 +39369,28 @@ var ComponentSplitview = /** @class */ (function (_super) {
     };
     ComponentSplitview.prototype.doAddView = function (view) {
         var _this = this;
-        // TODO: manage disposable
         var disposable = view.api.onDidFocusChange(function (event) {
             if (!event.isFocused) {
                 return;
             }
             _this.setActive(view, true);
         });
+        this.panels.set(view.id, disposable);
     };
     ComponentSplitview.prototype.toJSON = function () {
         var _this = this;
         var _a;
-        var views = this.splitview.getViews().map(function (view, i) {
+        var views = this.splitview
+            .getViews()
+            .map(function (view, i) {
             var size = _this.splitview.getViewSize(i);
             return {
                 size: size,
-                data: view.toJSON ? view.toJSON() : {},
+                data: view.toJSON(),
                 minimumSize: view.minimumSize,
                 maximumSize: view.maximumSize,
                 snap: !!view.snap,
+                priority: view.priority,
             };
         });
         return {
@@ -39364,7 +39403,7 @@ var ComponentSplitview = /** @class */ (function (_super) {
     ComponentSplitview.prototype.fromJSON = function (data) {
         var _this = this;
         var _a;
-        var _b = data, views = _b.views, orientation = _b.orientation, size = _b.size, activeView = _b.activeView;
+        var views = data.views, orientation = data.orientation, size = data.size, activeView = data.activeView;
         this.splitview.dispose();
         this.splitview = new _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Splitview(this.element, {
             orientation: orientation,
@@ -39391,6 +39430,13 @@ var ComponentSplitview = /** @class */ (function (_super) {
         if (typeof activeView === 'string') {
             (_a = this.getPanel(activeView)) === null || _a === void 0 ? void 0 : _a.setActive(true);
         }
+    };
+    ComponentSplitview.prototype.dispose = function () {
+        Array.from(this.panels.values()).forEach(function (value) {
+            value.dispose();
+        });
+        this.panels.clear();
+        _super.prototype.dispose.call(this);
     };
     return ComponentSplitview;
 }(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
