@@ -40,6 +40,18 @@ export class SplitviewApi {
         return this.component.maximumSize;
     }
 
+    get height() {
+        return this.component.height;
+    }
+
+    get width() {
+        return this.component.width;
+    }
+
+    get length() {
+        return this.component.length;
+    }
+
     get onDidLayoutChange() {
         return this.component.onDidLayoutChange;
     }
@@ -80,6 +92,10 @@ export class SplitviewApi {
 
     resizeToFit() {
         return this.component.resizeToFit();
+    }
+
+    movePanel(from: number, to: number) {
+        this.component.movePanel(from, to);
     }
 
     fromJSON(data: SerializedSplitview) {

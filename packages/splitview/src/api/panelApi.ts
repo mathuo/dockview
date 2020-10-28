@@ -8,21 +8,36 @@ interface PanelConstraintChangeEvent {
     maximumSize?: FunctionOrValue<number>;
 }
 
+interface PanelConstraintChangeEvent2 {
+    minimumSize?: number;
+    maximumSize?: number;
+}
+
 interface SizeEvent {
     size: number;
 }
 
 export interface IPanelApi extends IBaseViewApi {
-    onDidConstraintsChange: Event<PanelConstraintChangeEvent>;
+    onDidConstraintsChange: Event<PanelConstraintChangeEvent2>;
     setConstraints(value: PanelConstraintChangeEvent): void;
     setSize(event: SizeEvent): void;
 }
 
 export class PanelApi extends BaseViewApi implements IPanelApi, IDisposable {
-    readonly _onDidConstraintsChange = new Emitter<PanelConstraintChangeEvent>({
-        replay: true,
-    });
-    readonly onDidConstraintsChange: Event<PanelConstraintChangeEvent> = this
+    readonly _onDidConstraintsChangeInternal = new Emitter<
+        PanelConstraintChangeEvent
+    >();
+    readonly onDidConstraintsChangeInternal: Event<
+        PanelConstraintChangeEvent
+    > = this._onDidConstraintsChangeInternal.event;
+    //
+
+    readonly _onDidConstraintsChange = new Emitter<PanelConstraintChangeEvent2>(
+        {
+            replay: true,
+        }
+    );
+    readonly onDidConstraintsChange: Event<PanelConstraintChangeEvent2> = this
         ._onDidConstraintsChange.event;
     //
 
@@ -35,7 +50,7 @@ export class PanelApi extends BaseViewApi implements IPanelApi, IDisposable {
     }
 
     setConstraints(value: PanelConstraintChangeEvent) {
-        this._onDidConstraintsChange.fire(value);
+        this._onDidConstraintsChangeInternal.fire(value);
     }
 
     setSize(event: SizeEvent) {

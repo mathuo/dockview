@@ -330,9 +330,11 @@ describe('splitview', () => {
 
         splitview.moveView(2, 0);
         expect(splitview.getViews()).toEqual([view3, view1, view2]);
+        expect([view1.size, view2.size, view3.size]).toEqual([66, 66, 68]);
 
         splitview.moveView(0, 2);
         expect(splitview.getViews()).toEqual([view1, view2, view3]);
+        expect([view1.size, view2.size, view3.size]).toEqual([66, 66, 68]);
 
         splitview.dispose();
     });

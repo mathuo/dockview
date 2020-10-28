@@ -530,7 +530,11 @@ export class Splitview {
         this.relayout(lowPriorityIndexes, highPriorityIndexes);
     }
 
-    public removeView(index: number, sizing?: Sizing): IView {
+    public removeView(
+        index: number,
+        sizing?: Sizing,
+        skipLayout = false
+    ): IView {
         // Remove view
         const viewItem = this.views.splice(index, 1)[0];
         viewItem.dispose();
@@ -542,7 +546,9 @@ export class Splitview {
             sashItem.disposable();
         }
 
-        this.relayout();
+        if (!skipLayout) {
+            this.relayout();
+        }
 
         if (sizing && sizing.type === 'distribute') {
             this.distributeViewSizes();
@@ -566,7 +572,7 @@ export class Splitview {
             typeof cachedVisibleSize === 'undefined'
                 ? this.getViewSize(from)
                 : Sizing.Invisible(cachedVisibleSize);
-        const view = this.removeView(from);
+        const view = this.removeView(from, undefined, true);
         this.addView(view, sizing, to);
     }
 

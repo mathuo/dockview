@@ -53,6 +53,7 @@ export abstract class BasePanelView<T extends BaseViewApi>
         this._element.style.outline = 'none';
         this._element.style.height = '100%';
         this._element.style.width = '100%';
+        this._element.style.overflow = 'hidden';
 
         const { onDidFocus, onDidBlur } = trackFocus(this._element);
 

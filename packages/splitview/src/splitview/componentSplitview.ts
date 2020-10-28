@@ -46,6 +46,9 @@ export interface AddSplitviewComponentOptions extends BaseComponentOptions {
 export interface IComponentSplitview extends IDisposable {
     readonly minimumSize: number;
     readonly maximumSize: number;
+    readonly height: number;
+    readonly width: number;
+    readonly length: number;
     addPanel(options: AddSplitviewComponentOptions): void;
     layout(width: number, height: number): void;
     onDidLayoutChange: Event<void>;
@@ -58,6 +61,7 @@ export interface IComponentSplitview extends IDisposable {
     removePanel(panel: SplitviewPanel, sizing?: Sizing): void;
     getPanels(): SplitviewPanel[];
     setVisible(panel: SplitviewPanel, visible: boolean): void;
+    movePanel(from: number, to: number): void;
 }
 
 /**
@@ -79,6 +83,22 @@ export class ComponentSplitview
 
     get maximumSize() {
         return this.splitview.maximumSize;
+    }
+
+    get height() {
+        return this.splitview.orientation === Orientation.HORIZONTAL
+            ? this.splitview.orthogonalSize
+            : this.splitview.size;
+    }
+
+    get width() {
+        return this.splitview.orientation === Orientation.HORIZONTAL
+            ? this.splitview.size
+            : this.splitview.orthogonalSize;
+    }
+
+    get length() {
+        return this.panels.size;
     }
 
     constructor(
@@ -106,6 +126,10 @@ export class ComponentSplitview
 
     focus() {
         this._activePanel?.focus();
+    }
+
+    movePanel(from: number, to: number) {
+        this.splitview.moveView(from, to);
     }
 
     setVisible(panel: SplitviewPanel, visible: boolean) {

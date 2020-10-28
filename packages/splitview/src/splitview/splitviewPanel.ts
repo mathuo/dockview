@@ -8,8 +8,11 @@ import { Emitter, Event } from '../events';
 export abstract class SplitviewPanel
     extends BasePanelView<PanelApi>
     implements ISerializableView {
-    private _minimumSize: FunctionOrValue<number> = 200;
-    private _maximumSize: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
+    private _evaluatedMinimumSize: number;
+    private _evaluatedMaximumSize: number;
+
+    private _minimumSize: FunctionOrValue<number> = 0;
+    private _maximumSize: FunctionOrValue<number> = Number.POSITIVE_INFINITY;
     private _priority?: LayoutPriority;
     private _snap = false;
 
@@ -21,15 +24,31 @@ export abstract class SplitviewPanel
     }
 
     get minimumSize() {
-        return typeof this._minimumSize === 'function'
-            ? this._minimumSize()
-            : this._minimumSize;
+        const size =
+            typeof this._minimumSize === 'function'
+                ? this._minimumSize()
+                : this._minimumSize;
+
+        if (size !== this._evaluatedMinimumSize) {
+            this._evaluatedMinimumSize = size;
+            this.updateConstraints();
+        }
+
+        return size;
     }
 
     get maximumSize() {
-        return typeof this._maximumSize === 'function'
-            ? this._maximumSize()
-            : this._maximumSize;
+        const size =
+            typeof this._maximumSize === 'function'
+                ? this._maximumSize()
+                : this._maximumSize;
+
+        if (size !== this._evaluatedMaximumSize) {
+            this._evaluatedMaximumSize = size;
+            this.updateConstraints();
+        }
+
+        return size;
     }
 
     get snap() {
@@ -45,7 +64,7 @@ export abstract class SplitviewPanel
                 const { containerApi } = this.params as PanelViewInitParameters;
                 containerApi.setVisible(this, isVisible);
             }),
-            this.api.onDidConstraintsChange((event) => {
+            this.api.onDidConstraintsChangeInternal((event) => {
                 if (
                     typeof event.minimumSize === 'number' ||
                     typeof event.minimumSize === 'function'
@@ -58,11 +77,19 @@ export abstract class SplitviewPanel
                 ) {
                     this._maximumSize = event.maximumSize;
                 }
+                this.updateConstraints();
             }),
             this.api.onDidSizeChange((event) => {
                 this._onDidChange.fire(event.size);
             })
         );
+    }
+
+    private updateConstraints() {
+        this.api._onDidConstraintsChange.fire({
+            maximumSize: this._evaluatedMaximumSize,
+            minimumSize: this._evaluatedMinimumSize,
+        });
     }
 
     setActive(isActive: boolean, skipFocus?: boolean) {
