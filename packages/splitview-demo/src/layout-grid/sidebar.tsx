@@ -8,8 +8,13 @@ import {
     PaneviewApi,
 } from 'dockview';
 import { ControlCenter } from './controlCenter';
+import { toggleClass } from '../dom';
+import './sidebar.scss';
 
 const DefaultHeader = (props: IPaneviewPanelProps) => {
+    const ref = React.useRef<HTMLDivElement>();
+    const mouseover = React.useRef<boolean>();
+
     const [url, setUrl] = React.useState<string>(
         props.api.isExpanded
             ? 'https://fonts.gstatic.com/s/i/materialicons/expand_more/v6/24px.svg'
@@ -27,6 +32,19 @@ const DefaultHeader = (props: IPaneviewPanelProps) => {
                         ? 'https://fonts.gstatic.com/s/i/materialicons/expand_more/v6/24px.svg'
                         : 'https://fonts.gstatic.com/s/i/materialicons/chevron_right/v7/24px.svg'
                 );
+                if (!event.isExpanded) {
+                    toggleClass(ref.current, 'within', false);
+                } else {
+                    toggleClass(ref.current, 'within', mouseover.current);
+                }
+            }),
+            props.api.onMouseEnter((ev) => {
+                mouseover.current = true;
+                toggleClass(ref.current, 'within', props.api.isExpanded);
+            }),
+            props.api.onMouseLeave((ev) => {
+                mouseover.current = false;
+                toggleClass(ref.current, 'within', false);
             })
         );
 
@@ -37,6 +55,8 @@ const DefaultHeader = (props: IPaneviewPanelProps) => {
 
     return (
         <div
+            className="my-header"
+            ref={ref}
             style={{
                 display: 'flex',
                 fontSize: '11px',
@@ -56,6 +76,16 @@ const DefaultHeader = (props: IPaneviewPanelProps) => {
                 />
             </div>
             <span>{props.title}</span>
+            <span style={{ flexGrow: 1 }} />
+            <div className="actions">
+                <div
+                    style={{
+                        height: '100%',
+                        width: '30px',
+                        backgroundColor: 'red',
+                    }}
+                ></div>
+            </div>
         </div>
     );
 };
