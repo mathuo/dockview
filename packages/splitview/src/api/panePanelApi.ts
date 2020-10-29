@@ -8,6 +8,8 @@ export interface ExpansionEvent {
 
 export interface IPanePanelApi extends IPanelApi {
     onDidExpansionChange: Event<ExpansionEvent>;
+    readonly onMouseEnter: Event<MouseEvent>;
+    readonly onMouseLeave: Event<MouseEvent>;
     setExpanded(isExpanded: boolean): void;
     readonly isExpanded: boolean;
 }
@@ -18,6 +20,11 @@ export class PanePanelApi extends PanelApi implements IPanePanelApi {
     });
     readonly onDidExpansionChange: Event<ExpansionEvent> = this
         ._onDidExpansionChange.event;
+
+    readonly _onMouseEnter = new Emitter<MouseEvent>({});
+    readonly onMouseEnter: Event<MouseEvent> = this._onMouseEnter.event;
+    readonly _onMouseLeave = new Emitter<MouseEvent>({});
+    readonly onMouseLeave: Event<MouseEvent> = this._onMouseLeave.event;
 
     constructor(public pane: PaneviewPanel) {
         super();

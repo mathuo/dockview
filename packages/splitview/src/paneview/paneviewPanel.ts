@@ -1,6 +1,6 @@
 import { PaneviewApi } from '../api/component.api';
 import { PanePanelApi } from '../api/panePanelApi';
-import { Emitter, Event } from '../events';
+import { addDisposableListener, Emitter, Event } from '../events';
 import { BasePanelView, BasePanelViewState } from '../gridview/basePanelView';
 import { IDisposable } from '../lifecycle';
 import {
@@ -109,6 +109,23 @@ export abstract class PaneviewPanel
         this.api.pane = this; // TODO cannot use 'this' before 'super'
 
         this.element.classList.add('pane');
+
+        this.addDisposables(
+            addDisposableListener(
+                this.element,
+                'mouseenter',
+                (ev: MouseEvent) => {
+                    this.api._onMouseEnter.fire(ev);
+                }
+            ),
+            addDisposableListener(
+                this.element,
+                'mouseleave',
+                (ev: MouseEvent) => {
+                    this.api._onMouseLeave.fire(ev);
+                }
+            )
+        );
 
         this.addDisposables(
             this._onDidChangeExpansionState,
