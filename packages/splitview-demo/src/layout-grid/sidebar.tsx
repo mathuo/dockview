@@ -20,8 +20,13 @@ const DefaultHeader = (props: IPaneviewPanelProps) => {
             ? 'https://fonts.gstatic.com/s/i/materialicons/expand_more/v6/24px.svg'
             : 'https://fonts.gstatic.com/s/i/materialicons/chevron_right/v7/24px.svg'
     );
-    const onClick = () => {
-        props.api.setExpanded(!props.api.isExpanded);
+
+    const toggle = () => {
+        toggleClass(
+            ref.current,
+            'within',
+            props.api.isExpanded && mouseover.current
+        );
     };
 
     React.useEffect(() => {
@@ -32,19 +37,15 @@ const DefaultHeader = (props: IPaneviewPanelProps) => {
                         ? 'https://fonts.gstatic.com/s/i/materialicons/expand_more/v6/24px.svg'
                         : 'https://fonts.gstatic.com/s/i/materialicons/chevron_right/v7/24px.svg'
                 );
-                if (!event.isExpanded) {
-                    toggleClass(ref.current, 'within', false);
-                } else {
-                    toggleClass(ref.current, 'within', mouseover.current);
-                }
+                toggle();
             }),
             props.api.onMouseEnter((ev) => {
                 mouseover.current = true;
-                toggleClass(ref.current, 'within', props.api.isExpanded);
+                toggle();
             }),
             props.api.onMouseLeave((ev) => {
                 mouseover.current = false;
-                toggleClass(ref.current, 'within', false);
+                toggle();
             })
         );
 
@@ -52,6 +53,17 @@ const DefaultHeader = (props: IPaneviewPanelProps) => {
             disposable.dispose();
         };
     });
+
+    const onClick = (event: React.MouseEvent) => {
+        if (event.defaultPrevented) {
+            return;
+        }
+        props.api.setExpanded(!props.api.isExpanded);
+    };
+
+    const onClickAction = (event: React.MouseEvent) => {
+        event.preventDefault();
+    };
 
     return (
         <div
@@ -79,12 +91,22 @@ const DefaultHeader = (props: IPaneviewPanelProps) => {
             <span style={{ flexGrow: 1 }} />
             <div className="actions">
                 <div
+                    onClick={onClickAction}
                     style={{
                         height: '100%',
-                        width: '30px',
-                        backgroundColor: 'red',
+                        width: '20px',
                     }}
-                ></div>
+                >
+                    <a
+                        title="Example action"
+                        style={{
+                            WebkitMask: `url(https://fonts.gstatic.com/s/i/materialicons/help_outline/v6/24px.svg) 50% 50% / 80% 80% no-repeat`,
+                            height: '100%',
+                            display: 'block',
+                            backgroundColor: 'lightgray',
+                        }}
+                    />
+                </div>
             </div>
         </div>
     );
