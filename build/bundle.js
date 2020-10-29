@@ -119,6 +119,52 @@ module.exports = exports;
 
 /***/ }),
 
+/***/ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/splitview/splitview.scss":
+/*!**********************************************************************************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/splitview/splitview.scss ***!
+  \**********************************************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: __webpack_exports__, module, __webpack_require__, module.id */
+/*! CommonJS bailout: exports is used directly at 3:0-7 */
+/*! CommonJS bailout: exports.push(...) prevents optimization as exports is passed as call context at 5:0-12 */
+/*! CommonJS bailout: exports is used directly at 7:17-24 */
+/*! CommonJS bailout: module.exports is used directly at 7:0-14 */
+/***/ ((module, exports, __webpack_require__) => {
+
+// Imports
+var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../../../node_modules/css-loader/dist/runtime/api.js */ "../../node_modules/css-loader/dist/runtime/api.js");
+exports = ___CSS_LOADER_API_IMPORT___(false);
+// Module
+exports.push([module.id, ".splitview-demo {\n  height: 100%;\n  width: 100%; }\n  .splitview-demo .api-parameter {\n    display: grid;\n    grid-template-columns: 70px 50px; }\n    .splitview-demo .api-parameter span:nth-child(2n) {\n      text-align: right; }\n    .splitview-demo .api-parameter .visibility-toggle {\n      outline: 1px solid dodgerblue;\n      outline-offset: -1px;\n      padding: 0px 4px;\n      display: flex;\n      cursor: pointer; }\n      .splitview-demo .api-parameter .visibility-toggle:not(:first-child) {\n        margin-left: 4px; }\n  .splitview-demo .splitview-demo-panel {\n    background-color: #2d2d2d;\n    height: 100%;\n    padding: 10px;\n    box-sizing: border-box;\n    overflow: hidden; }\n", ""]);
+// Exports
+module.exports = exports;
+
+
+/***/ }),
+
+/***/ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/welcome/welcome.scss":
+/*!******************************************************************************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/welcome/welcome.scss ***!
+  \******************************************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: __webpack_exports__, module, __webpack_require__, module.id */
+/*! CommonJS bailout: exports is used directly at 3:0-7 */
+/*! CommonJS bailout: exports.push(...) prevents optimization as exports is passed as call context at 5:0-12 */
+/*! CommonJS bailout: exports is used directly at 7:17-24 */
+/*! CommonJS bailout: module.exports is used directly at 7:0-14 */
+/***/ ((module, exports, __webpack_require__) => {
+
+// Imports
+var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../../../node_modules/css-loader/dist/runtime/api.js */ "../../node_modules/css-loader/dist/runtime/api.js");
+exports = ___CSS_LOADER_API_IMPORT___(false);
+// Module
+exports.push([module.id, ".welcome-panel {\n  color: #cccccc;\n  margin: 40px; }\n  .welcome-panel .welcome-header {\n    margin-bottom: 40px; }\n    .welcome-panel .welcome-header h1 {\n      font-size: 30px; }\n    .welcome-panel .welcome-header h2 {\n      font-size: 20px; }\n  .welcome-panel .directory .directory-title {\n    font-size: 16px;\n    height: 25px;\n    line-height: 25px; }\n  .welcome-panel .directory .directory-item {\n    font-size: 13px;\n    height: 20px;\n    line-height: 20px;\n    color: dodgerblue;\n    cursor: pointer; }\n    .welcome-panel .directory .directory-item:hover {\n      text-decoration: underline; }\n", ""]);
+// Exports
+module.exports = exports;
+
+
+/***/ }),
+
 /***/ "../../node_modules/css-loader/dist/cjs.js!../splitview/dist/styles.css":
 /*!******************************************************************************!*\
   !*** ../../node_modules/css-loader/dist/cjs.js!../splitview/dist/styles.css ***!
@@ -384,6 +430,68 @@ module.exports = content.locals || {};
 
 var api = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
             var content = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./splitPanel.scss */ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/splitPanel.scss");
+
+            content = content.__esModule ? content.default : content;
+
+            if (typeof content === 'string') {
+              content = [[module.id, content, '']];
+            }
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = api(content, options);
+
+
+
+module.exports = content.locals || {};
+
+/***/ }),
+
+/***/ "./src/panels/splitview/splitview.scss":
+/*!*********************************************!*\
+  !*** ./src/panels/splitview/splitview.scss ***!
+  \*********************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__, module.id */
+/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var api = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+            var content = __webpack_require__(/*! !!../../../../../node_modules/css-loader/dist/cjs.js!../../../../../node_modules/sass-loader/dist/cjs.js!./splitview.scss */ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/splitview/splitview.scss");
+
+            content = content.__esModule ? content.default : content;
+
+            if (typeof content === 'string') {
+              content = [[module.id, content, '']];
+            }
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = api(content, options);
+
+
+
+module.exports = content.locals || {};
+
+/***/ }),
+
+/***/ "./src/panels/welcome/welcome.scss":
+/*!*****************************************!*\
+  !*** ./src/panels/welcome/welcome.scss ***!
+  \*****************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__, module.id */
+/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var api = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+            var content = __webpack_require__(/*! !!../../../../../node_modules/css-loader/dist/cjs.js!../../../../../node_modules/sass-loader/dist/cjs.js!./welcome.scss */ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/welcome/welcome.scss");
 
             content = content.__esModule ? content.default : content;
 
@@ -1281,11 +1389,11 @@ exports.Footer = function (props) {
 /*! CommonJS bailout: this is used directly at 20:26-30 */
 /*! CommonJS bailout: this is used directly at 25:20-24 */
 /*! CommonJS bailout: this is used directly at 32:14-18 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 80:24-40 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 89:24-40 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 233:16-32 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 244:16-32 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 249:16-32 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 84:24-40 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 93:24-40 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 242:16-32 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 253:16-32 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 258:16-32 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -1346,7 +1454,11 @@ var settingsPanel_1 = __webpack_require__(/*! ./settingsPanel */ "./src/layout-g
 var registry_1 = __webpack_require__(/*! ./registry */ "./src/layout-grid/registry.ts");
 var splitPanel_1 = __webpack_require__(/*! ./splitPanel */ "./src/layout-grid/splitPanel.tsx");
 __webpack_require__(/*! ./layoutGrid.scss */ "./src/layout-grid/layoutGrid.scss");
+var welcome_1 = __webpack_require__(/*! ../panels/welcome/welcome */ "./src/panels/welcome/welcome.tsx");
+var splitview_1 = __webpack_require__(/*! ../panels/splitview/splitview */ "./src/panels/splitview/splitview.tsx");
 var components = {
+    welcome: welcome_1.WelcomePanel,
+    splitview: splitview_1.SplitviewPanel,
     inner_component: function (props) {
         var _api = React.useRef();
         var onReady = function (event) {
@@ -1517,7 +1629,12 @@ exports.TestGrid = function (props) {
                 componentName: 'test_component',
             };
         });
-        event.api.deserialize(__webpack_require__(/*! ./layoutGrid.layout.json */ "./src/layout-grid/layoutGrid.layout.json"));
+        api.addPanel({
+            componentName: 'welcome',
+            id: 'welcome',
+            title: 'Welcome',
+        });
+        // event.api.deserialize(require('./layoutGrid.layout.json'));
         return;
         api.addPanel({
             componentName: 'test_component',
@@ -2179,6 +2296,275 @@ exports.SplitPanel = function (props) {
             React.createElement("button", { onClick: onAdd }, "Add"),
             React.createElement("button", { onClick: onRemove }, "Remove")),
         React.createElement(dockview_1.SplitviewComponent, { components: components, onReady: onReady, orientation: dockview_1.Orientation.VERTICAL })));
+};
+
+
+/***/ }),
+
+/***/ "./src/panels/splitview/splitview.tsx":
+/*!********************************************!*\
+  !*** ./src/panels/splitview/splitview.tsx ***!
+  \********************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
+/*! CommonJS bailout: this is used directly at 2:16-20 */
+/*! CommonJS bailout: this is used directly at 13:23-27 */
+/*! CommonJS bailout: this is used directly at 20:26-30 */
+/*! CommonJS bailout: this is used directly at 25:20-24 */
+/*! CommonJS bailout: this is used directly at 32:14-18 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SplitviewPanel = void 0;
+var dockview_1 = __webpack_require__(/*! dockview */ "../splitview/dist/es6/index.js");
+var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+__webpack_require__(/*! ./splitview.scss */ "./src/panels/splitview/splitview.scss");
+var components = {
+    default: function (props) {
+        var _a = __read(React.useState(false), 2), active = _a[0], setActive = _a[1];
+        var _b = __read(React.useState(false), 2), visible = _b[0], setVisible = _b[1];
+        var _c = __read(React.useState(false), 2), focused = _c[0], setFocused = _c[1];
+        var _d = __read(React.useState({ width: 0, height: 0 }), 2), dimension = _d[0], setDimension = _d[1];
+        var _e = __read(React.useState({ maximumSize: undefined, minimumSize: undefined }), 2), constraints = _e[0], setConstraints = _e[1];
+        React.useEffect(function () {
+            var disposable = new dockview_1.CompositeDisposable(props.api.onDidActiveChange(function (event) {
+                setActive(event.isActive);
+            }), props.api.onDidConstraintsChange(function (event) {
+                setConstraints(event);
+            }), props.api.onDidDimensionsChange(function (event) {
+                setDimension(event);
+            }), props.api.onDidFocusChange(function (event) {
+                setFocused(event.isFocused);
+            }), props.api.onDidVisibilityChange(function (event) {
+                setVisible(event.isVisible);
+            }));
+            return function () {
+                disposable.dispose();
+            };
+        }, []);
+        var color = React.useMemo(function () {
+            return "rgb(" + Math.floor(256 * Math.random()) + "," + Math.floor(256 * Math.random()) + "," + Math.floor(256 * Math.random()) + ")";
+        }, []);
+        return (React.createElement("div", { style: {
+                backgroundColor: color,
+            }, className: "splitview-demo-panel" },
+            React.createElement("div", { className: "api-parameter" },
+                React.createElement("span", null, "Width"),
+                React.createElement("span", null, dimension.width),
+                React.createElement("span", null, "Height"),
+                React.createElement("span", null, dimension.height),
+                React.createElement("span", null, "Min. size"),
+                React.createElement("span", null, constraints.minimumSize),
+                React.createElement("span", null, "Max. size"),
+                React.createElement("span", null, constraints.maximumSize),
+                React.createElement("span", null, "Active"),
+                React.createElement("span", null, active.toString()),
+                React.createElement("span", null, "Visible"),
+                React.createElement("span", null, visible.toString()),
+                React.createElement("span", null, "Focused"),
+                React.createElement("span", null, focused.toString()))));
+    },
+};
+exports.SplitviewPanel = function (props) {
+    var api = React.useRef();
+    var _a = __read(React.useState({ height: 0, width: 0, maximumSize: 0, minimumSize: 0, visibility: [] }), 2), dimensions = _a[0], setDimensions = _a[1];
+    React.useEffect(function () {
+        var disposable = new dockview_1.CompositeDisposable(props.api.onDidDimensionsChange(function (event) {
+            api.current.layout(event.width - 80, 100);
+            var height = api.current.height;
+            var width = api.current.width;
+            var maximumSize = api.current.maximumSize;
+            var minimumSize = api.current.minimumSize;
+            setDimensions({
+                height: height,
+                width: width,
+                maximumSize: maximumSize,
+                minimumSize: minimumSize,
+                visibility: api.current
+                    .getPanels()
+                    .map(function (_) { return _.api.isVisible; }),
+            });
+        }), api.current.onDidLayoutChange(function () {
+            //
+        }));
+        return function () {
+            disposable.dispose();
+        };
+    }, []);
+    var onReady = function (event) {
+        api.current = event.api;
+        event.api.fromJSON({
+            views: [
+                {
+                    data: {
+                        id: 'one',
+                        component: 'default',
+                    },
+                    size: 1,
+                    minimumSize: 10,
+                },
+                {
+                    data: {
+                        id: 'two',
+                        component: 'default',
+                    },
+                    size: 2,
+                    minimumSize: 10,
+                    maximumSize: 200,
+                },
+                {
+                    data: {
+                        id: 'three',
+                        component: 'default',
+                    },
+                    size: 3,
+                    minimumSize: 10,
+                },
+            ],
+            size: 6,
+            activeView: 'one',
+            orientation: dockview_1.Orientation.HORIZONTAL,
+        });
+    };
+    var toggleVisibility = function (i) { return function () {
+        var panel = api.current.getPanels()[i];
+        api.current.setVisible(panel, !panel.api.isVisible);
+        setDimensions(function (dimensions) { return (__assign(__assign({}, dimensions), { visibility: api.current.getPanels().map(function (_) { return _.api.isVisible; }) })); });
+    }; };
+    var move = function () {
+        api.current.movePanel(api.current.getPanels().length - 1, 0);
+        setDimensions(function (dimensions) { return (__assign(__assign({}, dimensions), { visibility: api.current.getPanels().map(function (_) { return _.api.isVisible; }) })); });
+    };
+    return (React.createElement("div", { className: "splitview-demo" },
+        React.createElement("div", { style: { height: '150px', padding: '40px' } },
+            React.createElement(dockview_1.SplitviewComponent, { orientation: dockview_1.Orientation.HORIZONTAL, onReady: onReady, components: components }),
+            React.createElement("div", { style: { marginTop: '10px' }, className: "api-parameter" },
+                React.createElement("span", null, "Height"),
+                React.createElement("span", null, dimensions.height),
+                React.createElement("span", null, "Width"),
+                React.createElement("span", null, dimensions.width),
+                React.createElement("span", null, "Min. size"),
+                React.createElement("span", null, dimensions.minimumSize),
+                React.createElement("span", null, "Max. size"),
+                React.createElement("span", null, dimensions.maximumSize),
+                React.createElement("span", null, "Visible"),
+                React.createElement("span", { style: { display: 'flex' } }, dimensions.visibility.map(function (_, i) {
+                    return (React.createElement("div", { className: "visibility-toggle", onClick: toggleVisibility(i), key: i }, _ ? 'Yes' : 'No'));
+                })),
+                React.createElement("span", null, "Move view"),
+                React.createElement("span", { className: "visibility-toggle", onClick: move }, "Go")))));
+};
+
+
+/***/ }),
+
+/***/ "./src/panels/welcome/welcome.tsx":
+/*!****************************************!*\
+  !*** ./src/panels/welcome/welcome.tsx ***!
+  \****************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
+/*! CommonJS bailout: this is used directly at 2:23-27 */
+/*! CommonJS bailout: this is used directly at 9:26-30 */
+/*! CommonJS bailout: this is used directly at 14:20-24 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.WelcomePanel = void 0;
+var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+__webpack_require__(/*! ./welcome.scss */ "./src/panels/welcome/welcome.scss");
+exports.WelcomePanel = function (props) {
+    var onAddSplitview = function (event) {
+        var splitviewPanel = props.containerApi.getPanel('splitview');
+        if (splitviewPanel) {
+            props.containerApi.setActivePanel(splitviewPanel);
+            return;
+        }
+        props.containerApi.addPanel({
+            id: 'splitview',
+            componentName: 'splitview',
+            title: 'Splitview Docs',
+        });
+    };
+    return (React.createElement("div", { className: "welcome-panel" },
+        React.createElement("div", { className: "welcome-header" },
+            React.createElement("h1", null, "Dockview"),
+            React.createElement("h2", null, "Zero dependency layout manager")),
+        React.createElement("div", { className: "directory" },
+            React.createElement("div", { className: "directory-title" }, "Components"),
+            React.createElement("div", { className: "directory-item" }, "Dockview"),
+            React.createElement("div", { onClick: onAddSplitview, className: "directory-item" }, "Splitview"),
+            React.createElement("div", { className: "directory-item" }, "Gridview"),
+            React.createElement("div", { className: "directory-item" }, "Paneview"))));
 };
 
 
@@ -30867,126 +31253,6 @@ if (false) {} else {
 
 /***/ }),
 
-/***/ "./src/layout-grid/layoutGrid.layout.json":
-/*!************************************************!*\
-  !*** ./src/layout-grid/layoutGrid.layout.json ***!
-  \************************************************/
-/*! default exports */
-/*! export activeGroup [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export grid [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export height [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export orientation [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export root [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export data [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export 0 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         export data [provided] [no usage info] [missing usage info prevents renaming] */
-/*!           export activeView [provided] [no usage info] [missing usage info prevents renaming] */
-/*!           export id [provided] [no usage info] [missing usage info prevents renaming] */
-/*!           export views [provided] [no usage info] [missing usage info prevents renaming] */
-/*!             export 0 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!             other exports [not provided] [no usage info] */
-/*!           other exports [not provided] [no usage info] */
-/*!         export size [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         export type [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         other exports [not provided] [no usage info] */
-/*!       export 1 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         export data [provided] [no usage info] [missing usage info prevents renaming] */
-/*!           export 0 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!             export data [provided] [no usage info] [missing usage info prevents renaming] */
-/*!               export activeView [provided] [no usage info] [missing usage info prevents renaming] */
-/*!               export id [provided] [no usage info] [missing usage info prevents renaming] */
-/*!               export views [provided] [no usage info] [missing usage info prevents renaming] */
-/*!                 export 0 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!                 other exports [not provided] [no usage info] */
-/*!               other exports [not provided] [no usage info] */
-/*!             export size [provided] [no usage info] [missing usage info prevents renaming] */
-/*!             export type [provided] [no usage info] [missing usage info prevents renaming] */
-/*!             other exports [not provided] [no usage info] */
-/*!           export 1 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!             export data [provided] [no usage info] [missing usage info prevents renaming] */
-/*!               export activeView [provided] [no usage info] [missing usage info prevents renaming] */
-/*!               export id [provided] [no usage info] [missing usage info prevents renaming] */
-/*!               export views [provided] [no usage info] [missing usage info prevents renaming] */
-/*!                 export 0 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!                 other exports [not provided] [no usage info] */
-/*!               other exports [not provided] [no usage info] */
-/*!             export size [provided] [no usage info] [missing usage info prevents renaming] */
-/*!             export type [provided] [no usage info] [missing usage info prevents renaming] */
-/*!             other exports [not provided] [no usage info] */
-/*!           other exports [not provided] [no usage info] */
-/*!         export size [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         export type [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         other exports [not provided] [no usage info] */
-/*!       export 2 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         export data [provided] [no usage info] [missing usage info prevents renaming] */
-/*!           export activeView [provided] [no usage info] [missing usage info prevents renaming] */
-/*!           export id [provided] [no usage info] [missing usage info prevents renaming] */
-/*!           export views [provided] [no usage info] [missing usage info prevents renaming] */
-/*!             export 0 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!             other exports [not provided] [no usage info] */
-/*!           other exports [not provided] [no usage info] */
-/*!         export size [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         export type [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         other exports [not provided] [no usage info] */
-/*!       other exports [not provided] [no usage info] */
-/*!     export size [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export type [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     other exports [not provided] [no usage info] */
-/*!   export width [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export panels [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export item2 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export contentId [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export id [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export props [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       exports [not provided] [no usage info] */
-/*!     export state [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       exports [not provided] [no usage info] */
-/*!     export tabId [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export title [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     other exports [not provided] [no usage info] */
-/*!   export panel_0 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export contentId [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export id [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export props [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export text [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       other exports [not provided] [no usage info] */
-/*!     export state [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       exports [not provided] [no usage info] */
-/*!     export tabId [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export title [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     other exports [not provided] [no usage info] */
-/*!   export panel_2 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export contentId [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export id [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export props [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       exports [not provided] [no usage info] */
-/*!     export state [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       exports [not provided] [no usage info] */
-/*!     export suppressClosable [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export tabId [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export title [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     other exports [not provided] [no usage info] */
-/*!   export split_panel [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export contentId [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export id [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export props [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       exports [not provided] [no usage info] */
-/*!     export state [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       exports [not provided] [no usage info] */
-/*!     export tabId [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export title [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     other exports [not provided] [no usage info] */
-/*!   other exports [not provided] [no usage info] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = JSON.parse("{\"grid\":{\"root\":{\"type\":\"branch\",\"data\":[{\"type\":\"leaf\",\"data\":{\"id\":\"group_1\",\"views\":[\"split_panel\"],\"activeView\":\"split_panel\"},\"size\":371},{\"type\":\"branch\",\"data\":[{\"type\":\"leaf\",\"data\":{\"id\":\"group_2\",\"views\":[\"item2\"],\"activeView\":\"item2\"},\"size\":792},{\"type\":\"leaf\",\"data\":{\"id\":\"group_3\",\"views\":[\"panel_2\"],\"activeView\":\"panel_2\"},\"size\":792}],\"size\":371},{\"type\":\"leaf\",\"data\":{\"id\":\"group_4\",\"views\":[\"panel_0\"],\"activeView\":\"panel_0\"},\"size\":372}],\"size\":1584},\"height\":1114,\"width\":1584,\"orientation\":\"HORIZONTAL\"},\"panels\":{\"panel_0\":{\"id\":\"panel_0\",\"contentId\":\"test_component\",\"tabId\":\"__DEFAULT_TAB__\",\"props\":{\"text\":\"how low?\"},\"title\":\"Item 1\",\"state\":{}},\"item2\":{\"id\":\"item2\",\"contentId\":\"test_component\",\"tabId\":\"__DEFAULT_TAB__\",\"props\":{},\"title\":\"Item 2\",\"state\":{}},\"split_panel\":{\"id\":\"split_panel\",\"contentId\":\"split_panel\",\"tabId\":\"__DEFAULT_TAB__\",\"props\":{},\"title\":\"Item 3 with a long title\",\"state\":{}},\"panel_2\":{\"id\":\"panel_2\",\"contentId\":\"test_component\",\"tabId\":\"__DEFAULT_TAB__\",\"props\":{},\"title\":\"Item 3\",\"suppressClosable\":true,\"state\":{}}},\"activeGroup\":\"group_2\"}");
-
-/***/ }),
-
 /***/ "./src/layout-grid/sidebar.layout.json":
 /*!*********************************************!*\
   !*** ./src/layout-grid/sidebar.layout.json ***!
@@ -31338,6 +31604,27 @@ var SplitviewApi = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(SplitviewApi.prototype, "height", {
+        get: function () {
+            return this.component.height;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewApi.prototype, "width", {
+        get: function () {
+            return this.component.width;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewApi.prototype, "length", {
+        get: function () {
+            return this.component.length;
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(SplitviewApi.prototype, "onDidLayoutChange", {
         get: function () {
             return this.component.onDidLayoutChange;
@@ -31371,6 +31658,9 @@ var SplitviewApi = /** @class */ (function () {
     };
     SplitviewApi.prototype.resizeToFit = function () {
         return this.component.resizeToFit();
+    };
+    SplitviewApi.prototype.movePanel = function (from, to) {
+        this.component.movePanel(from, to);
     };
     SplitviewApi.prototype.fromJSON = function (data) {
         return this.component.fromJSON(data);
@@ -31885,6 +32175,9 @@ var PanelApi = /** @class */ (function (_super) {
     //
     function PanelApi() {
         var _this = _super.call(this) || this;
+        _this._onDidConstraintsChangeInternal = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onDidConstraintsChangeInternal = _this._onDidConstraintsChangeInternal.event;
+        //
         _this._onDidConstraintsChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
             replay: true,
         });
@@ -31892,11 +32185,12 @@ var PanelApi = /** @class */ (function (_super) {
             ._onDidConstraintsChange.event;
         //
         _this._onDidSizeChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onDidSizeChange = _this._onDidSizeChange.event;
+        _this.onDidSizeChange = _this._onDidSizeChange
+            .event;
         return _this;
     }
     PanelApi.prototype.setConstraints = function (value) {
-        this._onDidConstraintsChange.fire(value);
+        this._onDidConstraintsChangeInternal.fire(value);
     };
     PanelApi.prototype.setSize = function (event) {
         this._onDidSizeChange.fire(event);
@@ -34253,6 +34547,7 @@ var BasePanelView = /** @class */ (function (_super) {
         _this._element.style.outline = 'none';
         _this._element.style.height = '100%';
         _this._element.style.width = '100%';
+        _this._element.style.overflow = 'hidden';
         var _a = (0,_dom__WEBPACK_IMPORTED_MODULE_0__.trackFocus)(_this._element), onDidFocus = _a.onDidFocus, onDidBlur = _a.onDidBlur;
         _this.addDisposables(_this.api, onDidFocus(function () {
             _this.api._onDidChangeFocus.fire({ isFocused: true });
@@ -39305,9 +39600,37 @@ var ComponentSplitview = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(ComponentSplitview.prototype, "height", {
+        get: function () {
+            return this.splitview.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation.HORIZONTAL
+                ? this.splitview.orthogonalSize
+                : this.splitview.size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ComponentSplitview.prototype, "width", {
+        get: function () {
+            return this.splitview.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation.HORIZONTAL
+                ? this.splitview.size
+                : this.splitview.orthogonalSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ComponentSplitview.prototype, "length", {
+        get: function () {
+            return this.panels.size;
+        },
+        enumerable: false,
+        configurable: true
+    });
     ComponentSplitview.prototype.focus = function () {
         var _a;
         (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.focus();
+    };
+    ComponentSplitview.prototype.movePanel = function (from, to) {
+        this.splitview.moveView(from, to);
     };
     ComponentSplitview.prototype.setVisible = function (panel, visible) {
         var index = this.getPanels().indexOf(panel);
@@ -40074,7 +40397,8 @@ var Splitview = /** @class */ (function () {
         var highPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.High; });
         this.relayout(lowPriorityIndexes, highPriorityIndexes);
     };
-    Splitview.prototype.removeView = function (index, sizing) {
+    Splitview.prototype.removeView = function (index, sizing, skipLayout) {
+        if (skipLayout === void 0) { skipLayout = false; }
         // Remove view
         var viewItem = this.views.splice(index, 1)[0];
         viewItem.dispose();
@@ -40084,7 +40408,9 @@ var Splitview = /** @class */ (function () {
             var sashItem = this.sashes.splice(sashIndex, 1)[0];
             sashItem.disposable();
         }
-        this.relayout();
+        if (!skipLayout) {
+            this.relayout();
+        }
         if (sizing && sizing.type === 'distribute') {
             this.distributeViewSizes();
         }
@@ -40102,7 +40428,7 @@ var Splitview = /** @class */ (function () {
         var sizing = typeof cachedVisibleSize === 'undefined'
             ? this.getViewSize(from)
             : Sizing.Invisible(cachedVisibleSize);
-        var view = this.removeView(from);
+        var view = this.removeView(from, undefined, true);
         this.addView(view, sizing, to);
     };
     Splitview.prototype.layout = function (size, orthogonalSize) {
@@ -40542,8 +40868,8 @@ var SplitviewPanel = /** @class */ (function (_super) {
     __extends(SplitviewPanel, _super);
     function SplitviewPanel(id, componentName) {
         var _this = _super.call(this, id, componentName, new _api_panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApi()) || this;
-        _this._minimumSize = 200;
-        _this._maximumSize = Number.MAX_SAFE_INTEGER;
+        _this._minimumSize = 0;
+        _this._maximumSize = Number.POSITIVE_INFINITY;
         _this._snap = false;
         _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
         _this.onDidChange = _this._onDidChange.event;
@@ -40551,7 +40877,7 @@ var SplitviewPanel = /** @class */ (function (_super) {
             var isVisible = event.isVisible;
             var containerApi = _this.params.containerApi;
             containerApi.setVisible(_this, isVisible);
-        }), _this.api.onDidConstraintsChange(function (event) {
+        }), _this.api.onDidConstraintsChangeInternal(function (event) {
             if (typeof event.minimumSize === 'number' ||
                 typeof event.minimumSize === 'function') {
                 _this._minimumSize = event.minimumSize;
@@ -40560,6 +40886,7 @@ var SplitviewPanel = /** @class */ (function (_super) {
                 typeof event.maximumSize === 'function') {
                 _this._maximumSize = event.maximumSize;
             }
+            _this.updateConstraints();
         }), _this.api.onDidSizeChange(function (event) {
             _this._onDidChange.fire(event.size);
         }));
@@ -40574,18 +40901,28 @@ var SplitviewPanel = /** @class */ (function (_super) {
     });
     Object.defineProperty(SplitviewPanel.prototype, "minimumSize", {
         get: function () {
-            return typeof this._minimumSize === 'function'
+            var size = typeof this._minimumSize === 'function'
                 ? this._minimumSize()
                 : this._minimumSize;
+            if (size !== this._evaluatedMinimumSize) {
+                this._evaluatedMinimumSize = size;
+                this.updateConstraints();
+            }
+            return size;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(SplitviewPanel.prototype, "maximumSize", {
         get: function () {
-            return typeof this._maximumSize === 'function'
+            var size = typeof this._maximumSize === 'function'
                 ? this._maximumSize()
                 : this._maximumSize;
+            if (size !== this._evaluatedMaximumSize) {
+                this._evaluatedMaximumSize = size;
+                this.updateConstraints();
+            }
+            return size;
         },
         enumerable: false,
         configurable: true
@@ -40597,6 +40934,12 @@ var SplitviewPanel = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    SplitviewPanel.prototype.updateConstraints = function () {
+        this.api._onDidConstraintsChange.fire({
+            maximumSize: this._evaluatedMaximumSize,
+            minimumSize: this._evaluatedMinimumSize,
+        });
+    };
     SplitviewPanel.prototype.setActive = function (isActive, skipFocus) {
         _super.prototype.setActive.call(this, isActive);
         if (!skipFocus) {
