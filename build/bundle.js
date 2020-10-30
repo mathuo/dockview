@@ -96,6 +96,29 @@ module.exports = exports;
 
 /***/ }),
 
+/***/ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/sidebar.scss":
+/*!***************************************************************************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/sidebar.scss ***!
+  \***************************************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: __webpack_exports__, module, __webpack_require__, module.id */
+/*! CommonJS bailout: exports is used directly at 3:0-7 */
+/*! CommonJS bailout: exports.push(...) prevents optimization as exports is passed as call context at 5:0-12 */
+/*! CommonJS bailout: exports is used directly at 7:17-24 */
+/*! CommonJS bailout: module.exports is used directly at 7:0-14 */
+/***/ ((module, exports, __webpack_require__) => {
+
+// Imports
+var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "../../node_modules/css-loader/dist/runtime/api.js");
+exports = ___CSS_LOADER_API_IMPORT___(false);
+// Module
+exports.push([module.id, ".pane-header .my-header .actions {\n  display: none; }\n\n.pane-header .my-header.within .actions {\n  display: flex; }\n\n.pane-header:focus .actions {\n  display: flex; }\n", ""]);
+// Exports
+module.exports = exports;
+
+
+/***/ }),
+
 /***/ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/splitPanel.scss":
 /*!******************************************************************************************************************************!*\
   !*** ../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/splitPanel.scss ***!
@@ -399,6 +422,37 @@ module.exports = content.locals || {};
 
 var api = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
             var content = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./layoutGrid.scss */ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/layoutGrid.scss");
+
+            content = content.__esModule ? content.default : content;
+
+            if (typeof content === 'string') {
+              content = [[module.id, content, '']];
+            }
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = api(content, options);
+
+
+
+module.exports = content.locals || {};
+
+/***/ }),
+
+/***/ "./src/layout-grid/sidebar.scss":
+/*!**************************************!*\
+  !*** ./src/layout-grid/sidebar.scss ***!
+  \**************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__, module.id */
+/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var api = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+            var content = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./sidebar.scss */ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/sidebar.scss");
 
             content = content.__esModule ? content.default : content;
 
@@ -791,6 +845,34 @@ module.exports = function (list, options) {
     lastIdentifiers = newLastIdentifiers;
   };
 };
+
+/***/ }),
+
+/***/ "./src/dom.ts":
+/*!********************!*\
+  !*** ./src/dom.ts ***!
+  \********************/
+/*! flagged exports */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export toggleClass [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.toggleClass = void 0;
+exports.toggleClass = function (element, className, isToggled) {
+    var hasClass = element.classList.contains(className);
+    if (isToggled && !hasClass) {
+        element.classList.add(className);
+    }
+    if (!isToggled && hasClass) {
+        element.classList.remove(className);
+    }
+};
+
 
 /***/ }),
 
@@ -2040,24 +2122,44 @@ exports.Sidebar = void 0;
 var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 var dockview_1 = __webpack_require__(/*! dockview */ "../splitview/dist/es6/index.js");
 var controlCenter_1 = __webpack_require__(/*! ./controlCenter */ "./src/layout-grid/controlCenter.tsx");
+var dom_1 = __webpack_require__(/*! ../dom */ "./src/dom.ts");
+__webpack_require__(/*! ./sidebar.scss */ "./src/layout-grid/sidebar.scss");
 var DefaultHeader = function (props) {
+    var ref = React.useRef();
+    var mouseover = React.useRef();
     var _a = __read(React.useState(props.api.isExpanded
         ? 'https://fonts.gstatic.com/s/i/materialicons/expand_more/v6/24px.svg'
         : 'https://fonts.gstatic.com/s/i/materialicons/chevron_right/v7/24px.svg'), 2), url = _a[0], setUrl = _a[1];
-    var onClick = function () {
-        props.api.setExpanded(!props.api.isExpanded);
+    var toggle = function () {
+        dom_1.toggleClass(ref.current, 'within', props.api.isExpanded && mouseover.current);
     };
     React.useEffect(function () {
         var disposable = new dockview_1.CompositeDisposable(props.api.onDidExpansionChange(function (event) {
             setUrl(event.isExpanded
                 ? 'https://fonts.gstatic.com/s/i/materialicons/expand_more/v6/24px.svg'
                 : 'https://fonts.gstatic.com/s/i/materialicons/chevron_right/v7/24px.svg');
+            toggle();
+        }), props.api.onMouseEnter(function (ev) {
+            mouseover.current = true;
+            toggle();
+        }), props.api.onMouseLeave(function (ev) {
+            mouseover.current = false;
+            toggle();
         }));
         return function () {
             disposable.dispose();
         };
     });
-    return (React.createElement("div", { style: {
+    var onClick = function (event) {
+        if (event.defaultPrevented) {
+            return;
+        }
+        props.api.setExpanded(!props.api.isExpanded);
+    };
+    var onClickAction = function (event) {
+        event.preventDefault();
+    };
+    return (React.createElement("div", { className: "my-header", ref: ref, style: {
             display: 'flex',
             fontSize: '11px',
             textTransform: 'uppercase',
@@ -2070,7 +2172,19 @@ var DefaultHeader = function (props) {
                     display: 'block',
                     backgroundColor: 'lightgray',
                 } })),
-        React.createElement("span", null, props.title)));
+        React.createElement("span", null, props.title),
+        React.createElement("span", { style: { flexGrow: 1 } }),
+        React.createElement("div", { className: "actions" },
+            React.createElement("div", { onClick: onClickAction, style: {
+                    height: '100%',
+                    width: '20px',
+                } },
+                React.createElement("a", { title: "Example action", style: {
+                        WebkitMask: "url(https://fonts.gstatic.com/s/i/materialicons/help_outline/v6/24px.svg) 50% 50% / 80% 80% no-repeat",
+                        height: '100%',
+                        display: 'block',
+                        backgroundColor: 'lightgray',
+                    } })))));
 };
 var components = {
     default: function (props) {
@@ -32119,6 +32233,10 @@ var PanePanelApi = /** @class */ (function (_super) {
         });
         _this.onDidExpansionChange = _this
             ._onDidExpansionChange.event;
+        _this._onMouseEnter = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({});
+        _this.onMouseEnter = _this._onMouseEnter.event;
+        _this._onMouseLeave = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({});
+        _this.onMouseLeave = _this._onMouseLeave.event;
         return _this;
     }
     PanePanelApi.prototype.setExpanded = function (isExpanded) {
@@ -38265,6 +38383,11 @@ var PaneviewPanel = /** @class */ (function (_super) {
         _this._isExpanded = false;
         _this.api.pane = _this; // TODO cannot use 'this' before 'super'
         _this.element.classList.add('pane');
+        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.element, 'mouseenter', function (ev) {
+            _this.api._onMouseEnter.fire(ev);
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.element, 'mouseleave', function (ev) {
+            _this.api._onMouseLeave.fire(ev);
+        }));
         _this.addDisposables(_this._onDidChangeExpansionState, _this.onDidChangeExpansionState(function (isExpanded) {
             _this.api._onDidExpansionChange.fire({ isExpanded: isExpanded });
         }));
