@@ -23,7 +23,7 @@ export interface IGridviewPanelProps {
 export interface IGridviewComponentProps {
     orientation: Orientation;
     onReady?: (event: GridviewReadyEvent) => void;
-    components?: PanelCollection<IGridviewPanelProps>;
+    components: PanelCollection<IGridviewPanelProps>;
     hideBorders?: boolean;
     className?: string;
 }
