@@ -12,6 +12,7 @@ import {
     IWatermarkPanelProps,
     IGroupPanel,
     PanelCollection,
+    GridviewPanel,
 } from 'dockview';
 import { CustomTab } from './customTab';
 import { Settings } from './settingsPanel';
@@ -20,10 +21,12 @@ import { SplitPanel } from './splitPanel';
 import './layoutGrid.scss';
 import { WelcomePanel } from '../panels/welcome/welcome';
 import { SplitviewPanel } from '../panels/splitview/splitview';
+import { GridviewDemoPanel } from '../panels/gridview/gridview';
 
 const components: PanelCollection<IGroupPanelProps> = {
     welcome: WelcomePanel,
     splitview: SplitviewPanel,
+    gridview: GridviewDemoPanel,
     inner_component: (props: IGroupPanelProps) => {
         const _api = React.useRef<DockviewApi>();
 

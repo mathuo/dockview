@@ -17,6 +17,20 @@ export const WelcomePanel = (props: IGroupPanelProps) => {
         });
     };
 
+    const onAddGridview = (event: React.MouseEvent<HTMLDivElement>) => {
+        const splitviewPanel = props.containerApi.getPanel('gridview');
+        if (splitviewPanel) {
+            props.containerApi.setActivePanel(splitviewPanel);
+            return;
+        }
+
+        props.containerApi.addPanel({
+            id: 'gridview',
+            componentName: 'gridview',
+            title: 'Gridview Docs',
+        });
+    };
+
     return (
         <div className="welcome-panel">
             <div className="welcome-header">
@@ -29,7 +43,9 @@ export const WelcomePanel = (props: IGroupPanelProps) => {
                 <div onClick={onAddSplitview} className="directory-item">
                     Splitview
                 </div>
-                <div className="directory-item">Gridview</div>
+                <div onClick={onAddGridview} className="directory-item">
+                    Gridview
+                </div>
                 <div className="directory-item">Paneview</div>
             </div>
         </div>
