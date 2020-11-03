@@ -5,11 +5,7 @@ import {
     Sizing,
     Splitview,
 } from './core/splitview';
-import {
-    createComponent,
-    ISerializableView,
-    SplitPanelOptions,
-} from './core/options';
+import { createComponent, SplitPanelOptions } from './core/options';
 import { BaseComponentOptions } from '../panel/types';
 import { Emitter, Event } from '../events';
 import { SplitviewApi } from '../api/component.api';

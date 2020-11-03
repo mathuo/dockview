@@ -26,7 +26,11 @@ export {
     VisibilityEvent,
     ActiveEvent,
 } from './api/api';
-export { SizeEvent, IGridPanelApi } from './api/gridPanelApi';
+export {
+    SizeEvent,
+    IGridPanelApi,
+    GridConstraintChangeEvent,
+} from './api/gridPanelApi';
 export { TitleEvent, IGroupPanelApi } from './api/groupPanelApi';
 export {
     PanelSizeEvent,

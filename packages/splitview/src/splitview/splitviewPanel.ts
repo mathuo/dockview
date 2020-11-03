@@ -5,9 +5,24 @@ import { LayoutPriority } from './core/splitview';
 import { FunctionOrValue } from '../types';
 import { Emitter, Event } from '../events';
 
+export interface ISplitviewPanel
+    extends Readonly<
+        Pick<
+            ISerializableView,
+            | 'maximumSize'
+            | 'minimumSize'
+            | 'snap'
+            | 'priority'
+            | 'id'
+            | 'toJSON'
+            | 'update'
+            | 'onDidChange'
+        >
+    > {}
+
 export abstract class SplitviewPanel
     extends BasePanelView<PanelApi>
-    implements ISerializableView {
+    implements ISerializableView, ISplitviewPanel {
     private _evaluatedMinimumSize: number;
     private _evaluatedMaximumSize: number;
 
