@@ -169,6 +169,32 @@ describe('splitview', () => {
         splitview.dispose();
     });
 
+    test('visiblity classnames', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        const view1 = new Testview(50, 50);
+        const view2 = new Testview(50, 50);
+
+        splitview.addView(view1);
+        splitview.addView(view2);
+
+        let viewQuery = container.querySelectorAll(
+            '.split-view-container > .view-container > .view.visible'
+        );
+        expect(viewQuery.length).toBe(2);
+
+        splitview.setViewVisible(1, false);
+
+        viewQuery = container.querySelectorAll(
+            '.split-view-container > .view-container > .view.visible'
+        );
+        expect(viewQuery.length).toBe(1);
+
+        splitview.dispose();
+    });
+
     test('calls lifecycle methods on view', () => {
         const splitview = new Splitview(container, {
             orientation: Orientation.HORIZONTAL,

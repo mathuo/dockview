@@ -243,6 +243,8 @@ export class Splitview {
             throw new Error('Index out of bounds');
         }
 
+        toggleClass(this.container, 'visible', visible);
+
         const viewItem = this.views[index];
         viewItem.setVisible(visible, viewItem.size);
 
