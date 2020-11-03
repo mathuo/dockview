@@ -21,8 +21,13 @@ export interface GridviewInitParameters extends PanelInitParameters {
 export abstract class GridviewPanel
     extends BasePanelView<GridPanelApi>
     implements IGridPanelComponentView {
-    private _minimumWidth: FunctionOrValue<number> = 200;
-    private _minimumHeight: FunctionOrValue<number> = 200;
+    private _evaluatedMinimumWidth: number;
+    private _evaluatedMaximumWidth: number;
+    private _evaluatedMinimumHeight: number;
+    private _evaluatedMaximumHeight: number;
+
+    private _minimumWidth: FunctionOrValue<number> = 0;
+    private _minimumHeight: FunctionOrValue<number> = 0;
     private _maximumWidth: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
     private _maximumHeight: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
     private _priority?: LayoutPriority;
@@ -41,24 +46,60 @@ export abstract class GridviewPanel
     }
 
     get minimumWidth() {
-        return typeof this._minimumWidth === 'function'
-            ? this._minimumWidth()
-            : this._minimumWidth;
+        const width =
+            typeof this._minimumWidth === 'function'
+                ? this._minimumWidth()
+                : this._minimumWidth;
+
+        if (width !== this._evaluatedMinimumWidth) {
+            this._evaluatedMinimumWidth = width;
+            this.updateConstraints();
+        }
+
+        return width;
     }
     get minimumHeight() {
-        return typeof this._minimumHeight === 'function'
-            ? this._minimumHeight()
-            : this._minimumHeight;
+        const height =
+            typeof this._minimumHeight === 'function'
+                ? this._minimumHeight()
+                : this._minimumHeight;
+
+        if (height !== this._evaluatedMinimumHeight) {
+            this._evaluatedMinimumHeight = height;
+            this.updateConstraints();
+        }
+
+        return height;
     }
     get maximumHeight() {
-        return typeof this._maximumHeight === 'function'
-            ? this._maximumHeight()
-            : this._maximumHeight;
+        const height =
+            typeof this._maximumHeight === 'function'
+                ? this._maximumHeight()
+                : this._maximumHeight;
+
+        if (height !== this._evaluatedMaximumHeight) {
+            this._evaluatedMaximumHeight = height;
+            this.updateConstraints();
+        }
+
+        return height;
     }
     get maximumWidth() {
-        return typeof this._maximumWidth === 'function'
-            ? this._maximumWidth()
-            : this._maximumWidth;
+        const width =
+            typeof this._maximumWidth === 'function'
+                ? this._maximumWidth()
+                : this._maximumWidth;
+
+        if (width !== this._evaluatedMaximumWidth) {
+            this._evaluatedMaximumWidth = width;
+            this.updateConstraints();
+        }
+
+        return width;
+    }
+
+    get isActive() {
+        return false;
     }
 
     constructor(id: string, component: string) {
@@ -70,7 +111,7 @@ export abstract class GridviewPanel
                 const { containerApi } = this.params as GridviewInitParameters;
                 containerApi.setVisible(this, isVisible);
             }),
-            this.api.onDidConstraintsChange((event) => {
+            this.api.onDidConstraintsChangeInternal((event) => {
                 if (
                     typeof event.minimumWidth === 'number' ||
                     typeof event.minimumWidth === 'function'
@@ -125,8 +166,13 @@ export abstract class GridviewPanel
         super.init(parameters);
     }
 
-    get isActive() {
-        return false;
+    private updateConstraints() {
+        this.api._onDidConstraintsChange.fire({
+            minimumWidth: this._evaluatedMinimumWidth,
+            maximumWidth: this._evaluatedMaximumWidth,
+            minimumHeight: this._evaluatedMinimumHeight,
+            maximumHeight: this._evaluatedMaximumHeight,
+        });
     }
 
     toJSON(): GridPanelViewState {

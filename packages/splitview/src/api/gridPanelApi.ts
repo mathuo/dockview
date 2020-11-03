@@ -2,7 +2,14 @@ import { Emitter, Event } from '../events';
 import { FunctionOrValue } from '../types';
 import { BaseViewApi, IBaseViewApi } from './api';
 
-interface GridConstraintChangeEvent {
+export interface GridConstraintChangeEvent {
+    minimumWidth?: number;
+    minimumHeight?: number;
+    maximumWidth?: number;
+    maximumHeight?: number;
+}
+
+interface GridConstraintChangeEvent2 {
     minimumWidth?: FunctionOrValue<number>;
     minimumHeight?: FunctionOrValue<number>;
     maximumWidth?: FunctionOrValue<number>;
@@ -16,11 +23,19 @@ export interface SizeEvent {
 
 export interface IGridPanelApi extends IBaseViewApi {
     onDidConstraintsChange: Event<GridConstraintChangeEvent>;
-    setConstraints(value: GridConstraintChangeEvent): void;
+    setConstraints(value: GridConstraintChangeEvent2): void;
     setSize(event: SizeEvent): void;
 }
 
 export class GridPanelApi extends BaseViewApi implements IGridPanelApi {
+    readonly _onDidConstraintsChangeInternal = new Emitter<
+        GridConstraintChangeEvent2
+    >();
+    readonly onDidConstraintsChangeInternal: Event<
+        GridConstraintChangeEvent2
+    > = this._onDidConstraintsChangeInternal.event;
+    //
+
     readonly _onDidConstraintsChange = new Emitter<GridConstraintChangeEvent>({
         replay: true,
     });
@@ -37,7 +52,7 @@ export class GridPanelApi extends BaseViewApi implements IGridPanelApi {
     }
 
     public setConstraints(value: GridConstraintChangeEvent) {
-        this._onDidConstraintsChange.fire(value);
+        this._onDidConstraintsChangeInternal.fire(value);
     }
 
     public setSize(event: SizeEvent) {
