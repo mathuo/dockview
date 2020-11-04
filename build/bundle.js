@@ -158,7 +158,7 @@ module.exports = exports;
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../../../node_modules/css-loader/dist/runtime/api.js */ "../../node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ".splitview-demo {\n  height: 100%;\n  width: 100%; }\n  .splitview-demo .api-parameter {\n    display: grid;\n    grid-template-columns: 70px 50px; }\n    .splitview-demo .api-parameter span:nth-child(2n) {\n      text-align: right; }\n    .splitview-demo .api-parameter .visibility-toggle {\n      outline: 1px solid dodgerblue;\n      outline-offset: -1px;\n      padding: 0px 4px;\n      display: flex;\n      cursor: pointer; }\n      .splitview-demo .api-parameter .visibility-toggle:not(:first-child) {\n        margin-left: 4px; }\n  .splitview-demo .splitview-demo-panel {\n    background-color: #2d2d2d;\n    height: 100%;\n    padding: 10px;\n    box-sizing: border-box;\n    overflow: hidden; }\n", ""]);
+exports.push([module.id, ".splitview-demo {\n  height: 100%;\n  width: 100%; }\n\n.api-parameter {\n  display: grid;\n  grid-template-columns: 70px 50px; }\n  .api-parameter span:nth-child(2n) {\n    text-align: right; }\n  .api-parameter .visibility-toggle {\n    outline: 1px solid dodgerblue;\n    outline-offset: -1px;\n    padding: 0px 4px;\n    display: flex;\n    cursor: pointer; }\n    .api-parameter .visibility-toggle:not(:first-child) {\n      margin-left: 4px; }\n\n.splitview-demo-panel {\n  background-color: #2d2d2d;\n  height: 100%;\n  padding: 10px;\n  box-sizing: border-box;\n  overflow: hidden; }\n", ""]);
 // Exports
 module.exports = exports;
 
@@ -1471,11 +1471,11 @@ exports.Footer = function (props) {
 /*! CommonJS bailout: this is used directly at 20:26-30 */
 /*! CommonJS bailout: this is used directly at 25:20-24 */
 /*! CommonJS bailout: this is used directly at 32:14-18 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 84:24-40 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 93:24-40 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 242:16-32 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 253:16-32 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 258:16-32 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 86:24-40 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 95:24-40 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 244:16-32 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 255:16-32 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 260:16-32 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -1538,9 +1538,11 @@ var splitPanel_1 = __webpack_require__(/*! ./splitPanel */ "./src/layout-grid/sp
 __webpack_require__(/*! ./layoutGrid.scss */ "./src/layout-grid/layoutGrid.scss");
 var welcome_1 = __webpack_require__(/*! ../panels/welcome/welcome */ "./src/panels/welcome/welcome.tsx");
 var splitview_1 = __webpack_require__(/*! ../panels/splitview/splitview */ "./src/panels/splitview/splitview.tsx");
+var gridview_1 = __webpack_require__(/*! ../panels/gridview/gridview */ "./src/panels/gridview/gridview.tsx");
 var components = {
     welcome: welcome_1.WelcomePanel,
     splitview: splitview_1.SplitviewPanel,
+    gridview: gridview_1.GridviewDemoPanel,
     inner_component: function (props) {
         var _api = React.useRef();
         var onReady = function (event) {
@@ -2415,6 +2417,216 @@ exports.SplitPanel = function (props) {
 
 /***/ }),
 
+/***/ "./src/panels/gridview/gridview.tsx":
+/*!******************************************!*\
+  !*** ./src/panels/gridview/gridview.tsx ***!
+  \******************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
+/*! CommonJS bailout: this is used directly at 2:23-27 */
+/*! CommonJS bailout: this is used directly at 9:26-30 */
+/*! CommonJS bailout: this is used directly at 14:20-24 */
+/*! CommonJS bailout: this is used directly at 21:14-18 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GridviewDemoPanel = void 0;
+var dockview_1 = __webpack_require__(/*! dockview */ "../splitview/dist/es6/index.js");
+var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+var components = {
+    default: function (props) {
+        var _a = __read(React.useState(false), 2), active = _a[0], setActive = _a[1];
+        var _b = __read(React.useState(false), 2), visible = _b[0], setVisible = _b[1];
+        var _c = __read(React.useState(false), 2), focused = _c[0], setFocused = _c[1];
+        var _d = __read(React.useState({ width: 0, height: 0 }), 2), dimension = _d[0], setDimension = _d[1];
+        var _e = __read(React.useState({
+            minimumHeight: undefined,
+            maximumHeight: undefined,
+            minimumWidth: undefined,
+            maximumWidth: undefined,
+        }), 2), constraints = _e[0], setConstraints = _e[1];
+        React.useEffect(function () {
+            var disposable = new dockview_1.CompositeDisposable(props.api.onDidActiveChange(function (event) {
+                setActive(event.isActive);
+            }), props.api.onDidConstraintsChange(function (event) {
+                setConstraints(event);
+            }), props.api.onDidDimensionsChange(function (event) {
+                setDimension(event);
+            }), props.api.onDidFocusChange(function (event) {
+                setFocused(event.isFocused);
+            }), props.api.onDidVisibilityChange(function (event) {
+                setVisible(event.isVisible);
+            }));
+            return function () {
+                disposable.dispose();
+            };
+        }, []);
+        var color = React.useMemo(function () {
+            return "rgb(" + Math.floor(256 * Math.random()) + "," + Math.floor(256 * Math.random()) + "," + Math.floor(256 * Math.random()) + ")";
+        }, []);
+        return (React.createElement("div", { style: {
+                backgroundColor: color,
+            }, className: "splitview-demo-panel" },
+            React.createElement("div", { className: "api-parameter" },
+                React.createElement("span", null, "Width"),
+                React.createElement("span", null, dimension.width),
+                React.createElement("span", null, "Height"),
+                React.createElement("span", null, dimension.height),
+                React.createElement("span", null, "Min. height"),
+                React.createElement("span", null, constraints.minimumHeight),
+                React.createElement("span", null, "Max. height"),
+                React.createElement("span", null, constraints.maximumHeight),
+                React.createElement("span", null, "Min. width"),
+                React.createElement("span", null, constraints.minimumWidth),
+                React.createElement("span", null, "Max. width"),
+                React.createElement("span", null, constraints.maximumWidth),
+                React.createElement("span", null, "Active"),
+                React.createElement("span", null, active.toString()),
+                React.createElement("span", null, "Visible"),
+                React.createElement("span", null, visible.toString()),
+                React.createElement("span", null, "Focused"),
+                React.createElement("span", null, focused.toString()))));
+    },
+};
+exports.GridviewDemoPanel = function (props) {
+    var api = React.useRef();
+    var onReady = function (event) {
+        api.current = event.api;
+        event.api.fromJSON({
+            activePanel: '1',
+            grid: {
+                height: 10,
+                width: 10,
+                orientation: dockview_1.Orientation.VERTICAL,
+                root: {
+                    type: 'branch',
+                    size: 10,
+                    data: [
+                        {
+                            type: 'leaf',
+                            size: 2,
+                            data: {
+                                id: '1',
+                                component: 'default',
+                                minimumHeight: 50,
+                                maximumHeight: Number.POSITIVE_INFINITY,
+                                minimumWidth: 50,
+                                maximumWidth: Number.POSITIVE_INFINITY,
+                                snap: false,
+                                priority: dockview_1.LayoutPriority.Normal,
+                            },
+                        },
+                        {
+                            type: 'leaf',
+                            size: 3,
+                            data: {
+                                id: '2',
+                                component: 'default',
+                                minimumHeight: 50,
+                                maximumHeight: Number.POSITIVE_INFINITY,
+                                minimumWidth: 50,
+                                maximumWidth: Number.POSITIVE_INFINITY,
+                                snap: false,
+                                priority: dockview_1.LayoutPriority.Normal,
+                            },
+                        },
+                        {
+                            type: 'branch',
+                            size: 5,
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    size: 2,
+                                    data: {
+                                        id: '3',
+                                        component: 'default',
+                                        minimumHeight: 50,
+                                        maximumHeight: Number.POSITIVE_INFINITY,
+                                        minimumWidth: 50,
+                                        maximumWidth: Number.POSITIVE_INFINITY,
+                                        snap: false,
+                                        priority: dockview_1.LayoutPriority.Normal,
+                                    },
+                                },
+                                {
+                                    type: 'leaf',
+                                    size: 2,
+                                    data: {
+                                        id: '4',
+                                        component: 'default',
+                                        minimumHeight: 50,
+                                        maximumHeight: Number.POSITIVE_INFINITY,
+                                        minimumWidth: 50,
+                                        maximumWidth: Number.POSITIVE_INFINITY,
+                                        snap: false,
+                                        priority: dockview_1.LayoutPriority.Normal,
+                                    },
+                                },
+                            ],
+                        },
+                    ],
+                },
+            },
+        });
+    };
+    React.useEffect(function () {
+        var disposable = new dockview_1.CompositeDisposable(props.api.onDidDimensionsChange(function (event) {
+            var _a;
+            (_a = api.current) === null || _a === void 0 ? void 0 : _a.layout(event.width - 80, 400);
+        }));
+        return function () {
+            disposable.dispose();
+        };
+    }, []);
+    return (React.createElement("div", { style: { height: '100%', width: '100%' } },
+        React.createElement("div", { style: {
+                height: '400px',
+                margin: '40px',
+                backgroundColor: 'grey',
+            } },
+            React.createElement(dockview_1.GridviewComponent, { components: components, orientation: dockview_1.Orientation.VERTICAL, onReady: onReady }))));
+};
+
+
+/***/ }),
+
 /***/ "./src/panels/splitview/splitview.tsx":
 /*!********************************************!*\
   !*** ./src/panels/splitview/splitview.tsx ***!
@@ -2580,7 +2792,8 @@ exports.SplitviewPanel = function (props) {
                         component: 'default',
                     },
                     size: 3,
-                    minimumSize: 10,
+                    minimumSize: 50,
+                    snap: true,
                 },
             ],
             size: 6,
@@ -2669,6 +2882,18 @@ exports.WelcomePanel = function (props) {
             title: 'Splitview Docs',
         });
     };
+    var onAddGridview = function (event) {
+        var splitviewPanel = props.containerApi.getPanel('gridview');
+        if (splitviewPanel) {
+            props.containerApi.setActivePanel(splitviewPanel);
+            return;
+        }
+        props.containerApi.addPanel({
+            id: 'gridview',
+            componentName: 'gridview',
+            title: 'Gridview Docs',
+        });
+    };
     return (React.createElement("div", { className: "welcome-panel" },
         React.createElement("div", { className: "welcome-header" },
             React.createElement("h1", null, "Dockview"),
@@ -2677,7 +2902,7 @@ exports.WelcomePanel = function (props) {
             React.createElement("div", { className: "directory-title" }, "Components"),
             React.createElement("div", { className: "directory-item" }, "Dockview"),
             React.createElement("div", { onClick: onAddSplitview, className: "directory-item" }, "Splitview"),
-            React.createElement("div", { className: "directory-item" }, "Gridview"),
+            React.createElement("div", { onClick: onAddGridview, className: "directory-item" }, "Gridview"),
             React.createElement("div", { className: "directory-item" }, "Paneview"))));
 };
 
@@ -32068,6 +32293,9 @@ var GridPanelApi = /** @class */ (function (_super) {
     //
     function GridPanelApi() {
         var _this = _super.call(this) || this;
+        _this._onDidConstraintsChangeInternal = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onDidConstraintsChangeInternal = _this._onDidConstraintsChangeInternal.event;
+        //
         _this._onDidConstraintsChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
             replay: true,
         });
@@ -32079,7 +32307,7 @@ var GridPanelApi = /** @class */ (function (_super) {
         return _this;
     }
     GridPanelApi.prototype.setConstraints = function (value) {
-        this._onDidConstraintsChange.fire(value);
+        this._onDidConstraintsChangeInternal.fire(value);
     };
     GridPanelApi.prototype.setSize = function (event) {
         this._onDidSizeChange.fire(event);
@@ -35884,8 +36112,8 @@ var GridviewPanel = /** @class */ (function (_super) {
     __extends(GridviewPanel, _super);
     function GridviewPanel(id, component) {
         var _this = _super.call(this, id, component, new _api_gridPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridPanelApi()) || this;
-        _this._minimumWidth = 200;
-        _this._minimumHeight = 200;
+        _this._minimumWidth = 0;
+        _this._minimumHeight = 0;
         _this._maximumWidth = Number.MAX_SAFE_INTEGER;
         _this._maximumHeight = Number.MAX_SAFE_INTEGER;
         _this._snap = false;
@@ -35896,7 +36124,7 @@ var GridviewPanel = /** @class */ (function (_super) {
             var isVisible = event.isVisible;
             var containerApi = _this.params.containerApi;
             containerApi.setVisible(_this, isVisible);
-        }), _this.api.onDidConstraintsChange(function (event) {
+        }), _this.api.onDidConstraintsChangeInternal(function (event) {
             if (typeof event.minimumWidth === 'number' ||
                 typeof event.minimumWidth === 'function') {
                 _this._minimumWidth = event.minimumWidth;
@@ -35937,36 +36165,63 @@ var GridviewPanel = /** @class */ (function (_super) {
     });
     Object.defineProperty(GridviewPanel.prototype, "minimumWidth", {
         get: function () {
-            return typeof this._minimumWidth === 'function'
+            var width = typeof this._minimumWidth === 'function'
                 ? this._minimumWidth()
                 : this._minimumWidth;
+            if (width !== this._evaluatedMinimumWidth) {
+                this._evaluatedMinimumWidth = width;
+                this.updateConstraints();
+            }
+            return width;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(GridviewPanel.prototype, "minimumHeight", {
         get: function () {
-            return typeof this._minimumHeight === 'function'
+            var height = typeof this._minimumHeight === 'function'
                 ? this._minimumHeight()
                 : this._minimumHeight;
+            if (height !== this._evaluatedMinimumHeight) {
+                this._evaluatedMinimumHeight = height;
+                this.updateConstraints();
+            }
+            return height;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(GridviewPanel.prototype, "maximumHeight", {
         get: function () {
-            return typeof this._maximumHeight === 'function'
+            var height = typeof this._maximumHeight === 'function'
                 ? this._maximumHeight()
                 : this._maximumHeight;
+            if (height !== this._evaluatedMaximumHeight) {
+                this._evaluatedMaximumHeight = height;
+                this.updateConstraints();
+            }
+            return height;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(GridviewPanel.prototype, "maximumWidth", {
         get: function () {
-            return typeof this._maximumWidth === 'function'
+            var width = typeof this._maximumWidth === 'function'
                 ? this._maximumWidth()
                 : this._maximumWidth;
+            if (width !== this._evaluatedMaximumWidth) {
+                this._evaluatedMaximumWidth = width;
+                this.updateConstraints();
+            }
+            return width;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GridviewPanel.prototype, "isActive", {
+        get: function () {
+            return false;
         },
         enumerable: false,
         configurable: true
@@ -35988,13 +36243,14 @@ var GridviewPanel = /** @class */ (function (_super) {
         this._snap = !!parameters.snap;
         _super.prototype.init.call(this, parameters);
     };
-    Object.defineProperty(GridviewPanel.prototype, "isActive", {
-        get: function () {
-            return false;
-        },
-        enumerable: false,
-        configurable: true
-    });
+    GridviewPanel.prototype.updateConstraints = function () {
+        this.api._onDidConstraintsChange.fire({
+            minimumWidth: this._evaluatedMinimumWidth,
+            maximumWidth: this._evaluatedMaximumWidth,
+            minimumHeight: this._evaluatedMinimumHeight,
+            maximumHeight: this._evaluatedMaximumHeight,
+        });
+    };
     GridviewPanel.prototype.toJSON = function () {
         var state = _super.prototype.toJSON.call(this);
         var maximum = function (value) {
@@ -40282,6 +40538,7 @@ var Splitview = /** @class */ (function () {
         if (index < 0 || index >= this.views.length) {
             throw new Error('Index out of bounds');
         }
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.container, 'visible', visible);
         var viewItem = this.views[index];
         viewItem.setVisible(visible, viewItem.size);
         this.distributeEmptySpace(index);
