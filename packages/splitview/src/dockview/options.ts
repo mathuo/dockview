@@ -64,8 +64,8 @@ export interface PanelOptions {
 
 export interface AddPanelOptions
     extends Omit<PanelOptions, 'componentName' | 'tabComponentName'> {
-    componentName: string | PanelContentPartConstructor;
-    tabComponentName?: string | PanelHeaderPartConstructor;
+    componentName: string;
+    tabComponentName?: string;
     position?: {
         direction?: Direction;
         referencePanel: string;

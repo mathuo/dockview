@@ -565,10 +565,7 @@ export class ComponentDockview
         );
     }
 
-    private createContentComponent(
-        id: string,
-        componentName: string | PanelContentPartConstructor
-    ) {
+    private createContentComponent(id: string, componentName: string) {
         return createComponent(
             id,
             componentName,
@@ -578,10 +575,7 @@ export class ComponentDockview
         );
     }
 
-    private createTabComponent(
-        id: string,
-        componentName: string | PanelHeaderPartConstructor
-    ) {
+    private createTabComponent(id: string, componentName: string) {
         return createComponent(
             id,
             componentName,

@@ -2,7 +2,7 @@ import { FrameworkFactory } from '../types';
 
 export function createComponent<T>(
     id: string,
-    componentName: string | { new (id: string, component: string): T } | any,
+    componentName: string,
     components: {
         [componentName: string]: { new (id: string, component: string): T };
     },
@@ -16,6 +16,7 @@ export function createComponent<T>(
         typeof componentName === 'string'
             ? components[componentName]
             : componentName;
+
     const FrameworkComponent =
         typeof componentName === 'string'
             ? frameworkComponents[componentName]
