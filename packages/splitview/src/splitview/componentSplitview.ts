@@ -168,6 +168,8 @@ export class ComponentSplitview
             this.options.frameworkWrapper?.createComponent
         );
 
+        view.orientation = this.splitview.orientation;
+
         view.init({
             params: options.params,
             minimumSize: options.minimumSize,
@@ -272,6 +274,8 @@ export class ComponentSplitview
                         priority: view.priority,
                         containerApi: new SplitviewApi(this),
                     });
+
+                    panel.orientation = orientation;
 
                     this.doAddView(panel);
 

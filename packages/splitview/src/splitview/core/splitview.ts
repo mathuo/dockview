@@ -246,6 +246,9 @@ export class Splitview {
         toggleClass(this.container, 'visible', visible);
 
         const viewItem = this.views[index];
+
+        toggleClass(this.container, 'visible', visible);
+
         viewItem.setVisible(visible, viewItem.size);
 
         this.distributeEmptySpace(index);

@@ -198,6 +198,8 @@ export class ComponentPaneview
             containerApi: new PaneviewApi(this),
         });
 
+        view.orientation = this.paneview.orientation;
+
         return {
             dispose: () => {
                 //
@@ -312,6 +314,8 @@ export class ComponentPaneview
                         isExpanded: !!view.expanded,
                         containerApi: new PaneviewApi(this),
                     });
+
+                    panel.orientation = orientation;
 
                     return { size: view.size, view: panel };
                 }),

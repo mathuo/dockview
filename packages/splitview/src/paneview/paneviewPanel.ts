@@ -9,7 +9,7 @@ import {
     PanelUpdateEvent,
     Parameters,
 } from '../panel/types';
-import { IView } from '../splitview/core/splitview';
+import { IView, Orientation } from '../splitview/core/splitview';
 
 export interface PanePanelViewState extends BasePanelViewState {
     headerComponent?: string;
@@ -66,6 +66,16 @@ export abstract class PaneviewPanel
     private headerPart?: IPaneBodyPart;
     private expandedSize: number;
     private animationTimer: any | undefined;
+
+    private _orientation: Orientation;
+
+    set orientation(value: Orientation) {
+        this._orientation = value;
+    }
+
+    get orientation() {
+        return this._orientation;
+    }
 
     get minimumSize(): number {
         const headerSize = this.headerSize;
@@ -160,10 +170,14 @@ export abstract class PaneviewPanel
     }
 
     layout(size: number, orthogonalSize: number) {
+        const [width, height] =
+            this.orientation === Orientation.HORIZONTAL
+                ? [size, orthogonalSize]
+                : [orthogonalSize, size];
         if (this.isExpanded()) {
-            this.expandedSize = size;
+            this.expandedSize = width;
         }
-        super.layout(size, orthogonalSize);
+        super.layout(width, height);
     }
 
     init(parameters: PanePanelInitParameter): void {

@@ -1,7 +1,7 @@
 import { ISerializableView, PanelViewInitParameters } from './core/options';
 import { BasePanelView } from '../gridview/basePanelView';
 import { PanelApi } from '../api/panelApi';
-import { LayoutPriority } from './core/splitview';
+import { LayoutPriority, Orientation } from './core/splitview';
 import { FunctionOrValue } from '../types';
 import { Emitter, Event } from '../events';
 
@@ -31,11 +31,21 @@ export abstract class SplitviewPanel
     private _priority?: LayoutPriority;
     private _snap = false;
 
+    private _orientation: Orientation;
+
     private readonly _onDidChange = new Emitter<number | undefined>();
     readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
 
     get priority() {
         return this._priority;
+    }
+
+    set orientation(value: Orientation) {
+        this._orientation = value;
+    }
+
+    get orientation() {
+        return this._orientation;
     }
 
     get minimumSize() {
@@ -98,6 +108,14 @@ export abstract class SplitviewPanel
                 this._onDidChange.fire(event.size);
             })
         );
+    }
+
+    layout(size: number, orthogonalSize: number) {
+        const [width, height] =
+            this.orientation === Orientation.HORIZONTAL
+                ? [size, orthogonalSize]
+                : [orthogonalSize, size];
+        super.layout(width, height);
     }
 
     private updateConstraints() {

@@ -134,9 +134,9 @@ export class Paneview extends CompositeDisposable implements IDisposable {
     }
 
     public layout(size: number, orthogonalSize: number): void {
-        for (const paneItem of this.paneItems) {
-            paneItem.pane.orthogonalSize = orthogonalSize;
-        }
+        // for (const paneItem of this.paneItems) {
+        //     paneItem.pane.orthogonalSize = orthogonalSize;
+        // }
 
         this.splitview.layout(size, orthogonalSize);
     }
