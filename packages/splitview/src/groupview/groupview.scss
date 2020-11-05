@@ -9,12 +9,12 @@
     }
 
     &.empty {
-        .title-container {
+        > .title-container {
             display: none;
         }
     }
 
-    .content-container {
+    > .content-container {
         flex-grow: 1;
         overflow: hidden;
         outline: none;

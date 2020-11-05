@@ -6,7 +6,7 @@ import {
 import { addDisposableListener, Emitter, Event } from '../../events';
 import { ITab, MouseEventKind, Tab } from '../tab';
 import { removeClasses, addClasses, toggleClass } from '../../dom';
-import { DroptargetEvent, hasProcessed, Position } from '../../dnd/droptarget';
+import { DroptargetEvent, Position } from '../../dnd/droptarget';
 
 import { IGroupview } from '../groupview';
 import { last } from '../../array';
@@ -169,10 +169,11 @@ export class TitleContainer
                     console.debug('[tabs] invalid drop event');
                     return;
                 }
-                if (hasProcessed(event)) {
-                    console.debug('[tab] drop event already processed');
+                if (event.defaultPrevented) {
+                    console.debug('[tab] drop event defaultprevented');
                     return;
                 }
+
                 removeClasses(this.tabContainer, 'drag-over-target');
 
                 const activetab = this.tabs.find(

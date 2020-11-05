@@ -2,11 +2,9 @@ import { ComponentDockview } from '../dockview/componentDockview';
 import { GroupviewPanel, IGroupPanel } from '../groupview/groupviewPanel';
 import { PanelContentPart, PanelHeaderPart } from '../groupview/types';
 import { IPanelDeserializer } from '../dockview/deserializer';
-import {
-    createContentComponent,
-    createTabComponent,
-} from '../dockview/componentFactory';
+import { createComponent } from '../panel/componentFactory';
 import { DockviewApi } from '../api/component.api';
+import { DefaultTab } from '../dockview/components/tab/defaultTab';
 
 export class ReactPanelDeserialzier implements IPanelDeserializer {
     constructor(private readonly layout: ComponentDockview) {}
@@ -20,7 +18,7 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
         const state = panelData.state;
         const suppressClosable = panelData.suppressClosable;
 
-        const contentPart = createContentComponent(
+        const contentPart = createComponent(
             contentId,
             contentId,
             this.layout.options.components,
@@ -28,12 +26,13 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
             this.layout.options.frameworkComponentFactory.content
         ) as PanelContentPart;
 
-        const headerPart = createTabComponent(
+        const headerPart = createComponent(
             tabId,
             tabId,
             this.layout.options.tabComponents,
             this.layout.options.frameworkComponentFactory,
-            this.layout.options.frameworkComponentFactory.tab
+            this.layout.options.frameworkComponentFactory.tab,
+            () => new DefaultTab()
         ) as PanelHeaderPart;
 
         const panel = new GroupviewPanel(panelId, new DockviewApi(this.layout));

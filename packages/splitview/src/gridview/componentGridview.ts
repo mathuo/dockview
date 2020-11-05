@@ -5,7 +5,6 @@ import { tail, sequenceEquals } from '../array';
 import { GroupChangeKind } from '../groupview/groupview';
 import { CompositeDisposable } from '../lifecycle';
 import { IPanelDeserializer } from '../dockview/deserializer';
-import { createComponent } from '../splitview/core/options';
 import { GridComponentOptions } from './options';
 import {
     BaseGrid,
@@ -23,6 +22,7 @@ import { BaseComponentOptions } from '../panel/types';
 import { GridPanelApi } from '../api/gridPanelApi';
 import { GridviewApi } from '../api/component.api';
 import { Orientation, Sizing } from '../splitview/core/splitview';
+import { createComponent } from '../panel/componentFactory';
 
 interface PanelReference {
     api: GridPanelApi;
@@ -158,7 +158,10 @@ export class ComponentGridview
                     data.component,
                     this.options.components,
                     this.options.frameworkComponents,
-                    this.options.frameworkComponentFactory.createComponent
+                    {
+                        createComponent: this.options.frameworkComponentFactory
+                            .createComponent,
+                    }
                 );
 
                 view.init({
@@ -215,7 +218,10 @@ export class ComponentGridview
             options.component,
             this.options.components,
             this.options.frameworkComponents,
-            this.options.frameworkComponentFactory.createComponent
+            {
+                createComponent: this.options.frameworkComponentFactory
+                    .createComponent,
+            }
         );
 
         view.init({

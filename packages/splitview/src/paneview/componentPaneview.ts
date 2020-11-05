@@ -1,9 +1,9 @@
 import { PaneviewApi } from '../api/component.api';
 import { PanePanelApi } from '../api/panePanelApi';
+import { createComponent } from '../panel/componentFactory';
 import { addDisposableListener, Emitter, Event } from '../events';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { PanelUpdateEvent } from '../panel/types';
-import { createComponent } from '../splitview/core/options';
 import { LayoutPriority, Orientation } from '../splitview/core/splitview';
 import { PaneviewComponentOptions } from './options';
 import { Paneview } from './paneview';
@@ -169,7 +169,10 @@ export class ComponentPaneview
             options.component,
             this.options.components,
             this.options.frameworkComponents,
-            this.options.frameworkWrapper?.body.createComponent
+            {
+                createComponent: this.options.frameworkWrapper?.body
+                    .createComponent,
+            }
         );
 
         let header: IPaneHeaderPart;
@@ -180,7 +183,10 @@ export class ComponentPaneview
                 options.headerComponent,
                 this.options.headerComponents,
                 this.options.headerframeworkComponents,
-                this.options.frameworkWrapper?.header.createComponent
+                {
+                    createComponent: this.options.frameworkWrapper?.header
+                        .createComponent,
+                }
             );
         } else {
             header = new DefaultHeader();
@@ -287,7 +293,10 @@ export class ComponentPaneview
                         data.component,
                         this.options.components,
                         this.options.frameworkComponents,
-                        this.options.frameworkWrapper?.body.createComponent
+                        {
+                            createComponent: this.options.frameworkWrapper?.body
+                                .createComponent,
+                        }
                     );
 
                     let header: IPaneHeaderPart;
@@ -298,8 +307,10 @@ export class ComponentPaneview
                             data.headerComponent,
                             this.options.headerComponents,
                             this.options.headerframeworkComponents,
-                            this.options.frameworkWrapper?.header
-                                .createComponent
+                            {
+                                createComponent: this.options.frameworkWrapper
+                                    ?.header.createComponent,
+                            }
                         );
                     } else {
                         header = new DefaultHeader();

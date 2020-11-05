@@ -35,7 +35,7 @@ export const ControlCenter = () => {
     const onAdd = () => {
         const api = registry.get<DockviewApi>('dockview');
         const _id = nextGuid();
-        const id = `control_center_panel_${_id}`;
+        const id = `${_id}`;
 
         api.addPanel({
             componentName: 'test_component',
@@ -161,7 +161,7 @@ export const ControlCenter = () => {
                 <button onMouseDown={onAdd}>Add new</button>
             </div>
             <div className="control-center-row">
-                <button onMouseDown={onAdd}>Add identical</button>
+                <button onMouseDown={onAddTheSamePanel}>Add identical</button>
             </div>
             <div className="control-center-row">
                 <button onMouseDown={onAddSettings}>Settings</button>

@@ -15,16 +15,6 @@ export interface DroptargetEvent {
     event: DragEvent;
 }
 
-const HAS_PROCESSED_KEY = '__drop_target_processed__';
-
-export const hasProcessed = (event: DragEvent) =>
-    !!(event as any)[HAS_PROCESSED_KEY];
-
-// tagging events as processed is better than calling .stopPropagation() which is the root of all evil
-const setEventAsProcessed = (event: DragEvent) => {
-    (event as any)[HAS_PROCESSED_KEY] = true;
-};
-
 export class Droptarget {
     private target: HTMLElement | undefined;
     private overlay: HTMLElement | undefined;
@@ -98,16 +88,13 @@ export class Droptarget {
         console.debug('[dragtarget] drop');
         this.removeDropTarget();
 
-        if (!hasProcessed(event)) {
-            this._onDidChange.fire({ position: this._state, event });
+        if (event.defaultPrevented) {
+            console.debug('[dragtarget] defaultPrevented');
         } else {
-            console.debug('[dragtarget] already processed');
+            this._onDidChange.fire({ position: this._state, event });
         }
+
         this._state = undefined;
-
-        // event.preventDefault();
-
-        setEventAsProcessed(event);
     };
 
     private onDragOver = (event: DragEvent) => {

@@ -1,38 +1,38 @@
 .drop-target {
     position: relative;
 
-    .drop-target-dropzone {
+    > .drop-target-dropzone {
         position: absolute;
         left: 0px;
         top: 0px;
         height: 100%;
         width: 100%;
         z-index: 10000;
-    }
 
-    .drop-target-selection {
-        position: relative;
-        pointer-events: none;
-        height: 100%;
-        width: 100%;
-        background-color: var(--drag-over-background-color);
+        > .drop-target-selection {
+            position: relative;
+            pointer-events: none;
+            height: 100%;
+            width: 100%;
+            background-color: var(--drag-over-background-color);
 
-        transition-duration: 0.15s;
-        transition-timing-function: ease-out;
+            transition-duration: 0.15s;
+            transition-timing-function: ease-out;
 
-        &.left,
-        &.right {
-            width: 50%;
-        }
-        &.right {
-            transform: translate(100%, 0%);
-        }
-        &.bottom {
-            transform: translate(0%, 100%);
-        }
-        &.top,
-        &.bottom {
-            height: 50%;
+            &.left,
+            &.right {
+                width: 50%;
+            }
+            &.right {
+                transform: translate(100%, 0%);
+            }
+            &.bottom {
+                transform: translate(0%, 100%);
+            }
+            &.top,
+            &.bottom {
+                height: 50%;
+            }
         }
     }
 }

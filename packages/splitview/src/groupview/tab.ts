@@ -168,6 +168,7 @@ export class Tab extends CompositeDisposable implements ITab {
 
         this.addDisposables(
             this.droptarget.onDidChange((event) => {
+                event.event.preventDefault();
                 this._onDropped.fire(event);
             })
         );

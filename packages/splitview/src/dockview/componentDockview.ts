@@ -1,6 +1,5 @@
 import {
     getRelativeLocation,
-    IGridView,
     SerializedGridObject,
 } from '../gridview/gridview';
 import { Position } from '../dnd/droptarget';
@@ -11,7 +10,6 @@ import {
     Groupview,
     GroupOptions,
     GroupChangeKind,
-    GroupChangeEvent,
     GroupDropEvent,
 } from '../groupview/groupview';
 import { GroupviewPanel, IGroupPanel } from '../groupview/groupviewPanel';
@@ -33,11 +31,7 @@ import {
 import { debounce } from '../functions';
 import { sequentialNumberGenerator } from '../math';
 import { DefaultDeserializer, IPanelDeserializer } from './deserializer';
-import {
-    createContentComponent,
-    createTabComponent,
-    createWatermarkComponent,
-} from './componentFactory';
+import { createComponent } from '../panel/componentFactory';
 import {
     AddGroupOptions,
     AddPanelOptions,
@@ -56,6 +50,7 @@ import { DockviewApi } from '../api/component.api';
 import { State } from '../api/api';
 import { LayoutMouseEvent, MouseEventKind } from '../groupview/tab';
 import { Orientation } from '../splitview/core/splitview';
+import { DefaultTab } from './components/tab/defaultTab';
 
 const nextGroupId = sequentialNumberGenerator();
 
@@ -557,9 +552,15 @@ export class ComponentDockview
     }
 
     createWatermarkComponent() {
-        return createWatermarkComponent(
-            this.options.watermarkComponent,
-            this.options.watermarkFrameworkComponent,
+        return createComponent(
+            'watermark-id',
+            'watermark-name',
+            this.options.watermarkComponent
+                ? { 'watermark-name': this.options.watermarkComponent }
+                : {},
+            this.options.watermarkFrameworkComponent
+                ? { 'watermark-name': this.options.watermarkFrameworkComponent }
+                : {},
             this.options.frameworkComponentFactory.watermark
         );
     }
@@ -568,7 +569,7 @@ export class ComponentDockview
         id: string,
         componentName: string | PanelContentPartConstructor
     ) {
-        return createContentComponent(
+        return createComponent(
             id,
             componentName,
             this.options.components,
@@ -581,12 +582,13 @@ export class ComponentDockview
         id: string,
         componentName: string | PanelHeaderPartConstructor
     ) {
-        return createTabComponent(
+        return createComponent(
             id,
             componentName,
             this.options.tabComponents,
             this.options.frameworkTabComponents,
-            this.options.frameworkComponentFactory.tab
+            this.options.frameworkComponentFactory.tab,
+            () => new DefaultTab()
         );
     }
 

@@ -5,11 +5,12 @@ import {
     Sizing,
     Splitview,
 } from './core/splitview';
-import { createComponent, SplitPanelOptions } from './core/options';
+import { SplitPanelOptions } from './core/options';
 import { BaseComponentOptions } from '../panel/types';
 import { Emitter, Event } from '../events';
 import { SplitviewApi } from '../api/component.api';
 import { SplitviewPanel } from './splitviewPanel';
+import { createComponent } from '../panel/componentFactory';
 
 export interface SerializedSplitviewPanel {
     snap?: boolean;
@@ -165,7 +166,7 @@ export class ComponentSplitview
             options.component,
             this.options.components,
             this.options.frameworkComponents,
-            this.options.frameworkWrapper?.createComponent
+            { createComponent: this.options.frameworkWrapper?.createComponent }
         );
 
         view.orientation = this.splitview.orientation;
@@ -263,7 +264,10 @@ export class ComponentSplitview
                         data.component,
                         this.options.components,
                         this.options.frameworkComponents,
-                        this.options.frameworkWrapper?.createComponent
+                        {
+                            createComponent: this.options.frameworkWrapper
+                                ?.createComponent,
+                        }
                     );
 
                     panel.init({

@@ -28,10 +28,14 @@ export interface TabContextMenuEvent {
 
 export interface DockviewOptions {
     tabComponents?: {
-        [componentName: string]: PanelHeaderPartConstructor;
+        [componentName: string]: {
+            new (id: string, component: string): PanelHeaderPart;
+        };
     };
     components?: {
-        [componentName: string]: PanelContentPartConstructor;
+        [componentName: string]: {
+            new (id: string, component: string): PanelContentPart;
+        };
     };
     frameworkTabComponents?: {
         [componentName: string]: any;
