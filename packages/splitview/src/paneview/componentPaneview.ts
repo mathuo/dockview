@@ -93,7 +93,7 @@ export interface AddPaneviewCompponentOptions {
     id: string;
     component: string;
     headerComponent?: string;
-    params: {
+    params?: {
         [key: string]: any;
     };
     minimumBodySize?: number;
@@ -105,7 +105,7 @@ export interface AddPaneviewCompponentOptions {
 export interface IComponentPaneview extends IDisposable {
     readonly minimumSize: number;
     readonly maximumSize: number;
-    addFromComponent(options: AddPaneviewCompponentOptions): IDisposable;
+    addPanel(options: AddPaneviewCompponentOptions): IDisposable;
     layout(width: number, height: number): void;
     onDidLayoutChange: Event<void>;
     toJSON(): SerializedPaneview;
@@ -139,6 +139,13 @@ export class ComponentPaneview
     ) {
         super();
 
+        if (!options.components) {
+            options.components = {};
+        }
+        if (!options.frameworkComponents) {
+            options.frameworkComponents = {};
+        }
+
         this.paneview = new Paneview(this.element, {
             // only allow paneview in the vertical orientation for now
             orientation: Orientation.VERTICAL,
@@ -156,13 +163,13 @@ export class ComponentPaneview
         //
     }
 
-    addFromComponent(options: AddPaneviewCompponentOptions): IDisposable {
+    addPanel(options: AddPaneviewCompponentOptions): IDisposable {
         const body = createComponent(
             options.id,
             options.component,
             this.options.components,
             this.options.frameworkComponents,
-            this.options.frameworkWrapper.body.createComponent
+            this.options.frameworkWrapper?.body.createComponent
         );
 
         let header: IPaneHeaderPart;
@@ -173,7 +180,7 @@ export class ComponentPaneview
                 options.headerComponent,
                 this.options.headerComponents,
                 this.options.headerframeworkComponents,
-                this.options.frameworkWrapper.header.createComponent
+                this.options.frameworkWrapper?.header.createComponent
             );
         } else {
             header = new DefaultHeader();

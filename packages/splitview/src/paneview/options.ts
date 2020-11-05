@@ -1,15 +1,19 @@
 import { FrameworkFactory } from '../types';
-import { IPaneBodyPart, IPaneHeaderPart } from './paneviewPanel';
+import { IPaneBodyPart, IPaneHeaderPart, PaneviewPanel } from './paneviewPanel';
 
 export interface PaneviewComponentOptions {
     components?: {
-        [componentName: string]: IPaneBodyPart;
+        [componentName: string]: {
+            new (id: string, componentName: string): PaneviewPanel;
+        };
     };
     frameworkComponents?: {
         [componentName: string]: any;
     };
     headerComponents?: {
-        [componentName: string]: IPaneHeaderPart;
+        [componentName: string]: {
+            new (id: string, componentName: string): PaneviewPanel;
+        };
     };
     headerframeworkComponents?: {
         [componentName: string]: any;

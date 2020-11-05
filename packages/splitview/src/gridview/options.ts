@@ -5,7 +5,9 @@ import { FrameworkFactory } from '../types';
 export interface GridComponentOptions {
     orientation: Orientation;
     components?: {
-        [componentName: string]: GridviewPanel;
+        [componentName: string]: {
+            new (id: string, componentName: string): GridviewPanel;
+        };
     };
     frameworkComponents?: {
         [componentName: string]: any;

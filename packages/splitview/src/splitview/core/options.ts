@@ -18,7 +18,9 @@ export interface ISerializableView extends IView, IPanel {
 
 export interface SplitPanelOptions extends SplitViewOptions {
     components?: {
-        [componentName: string]: SplitviewPanel;
+        [componentName: string]: {
+            new (id: string, componentName: string): SplitviewPanel;
+        };
     };
     frameworkComponents?: {
         [componentName: string]: any;
@@ -33,7 +35,7 @@ export function createComponent<T>(
     id: string,
     componentName: string | Constructor<T> | any,
     components: {
-        [componentName: string]: T;
+        [componentName: string]: { new (id: string, componentName: string): T };
     },
     frameworkComponents: {
         [componentName: string]: any;
@@ -71,5 +73,5 @@ export function createComponent<T>(
         return wrappedComponent;
     }
 
-    return new Component() as T;
+    return new Component(id, componentName) as T;
 }

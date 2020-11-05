@@ -142,8 +142,8 @@ export class PaneviewApi {
         return this.component.layout(width, height);
     }
 
-    addFromComponent(options: AddPaneviewCompponentOptions) {
-        return this.component.addFromComponent(options);
+    addPanel(options: AddPaneviewCompponentOptions) {
+        return this.component.addPanel(options);
     }
 
     resizeToFit() {

@@ -78,7 +78,7 @@ describe('splitview', () => {
 
     beforeEach(() => {
         container = document.createElement('div');
-        container.className = 'ab';
+        container.className = 'container';
     });
 
     test('vertical splitview', () => {

@@ -133,31 +133,27 @@ export const Sidebar = (props: IGridviewPanelProps) => {
 
         return;
 
-        event.api.addFromComponent({
+        event.api.addPanel({
             id: '1',
             component: 'default',
-            params: {},
             headerComponent: 'default',
             title: 'Control Center',
         });
-        event.api.addFromComponent({
+        event.api.addPanel({
             id: '2',
             component: 'default',
-            params: {},
             headerComponent: 'default',
             title: 'Panel 1',
         });
-        event.api.addFromComponent({
+        event.api.addPanel({
             id: '3',
             component: 'default',
-            params: {},
             headerComponent: 'default',
             title: 'Panel 2',
         });
-        event.api.addFromComponent({
+        event.api.addPanel({
             id: '4',
             component: 'default',
-            params: {},
             headerComponent: 'default',
             title: 'Panel 3',
         });
