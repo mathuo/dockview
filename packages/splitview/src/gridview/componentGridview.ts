@@ -171,7 +171,7 @@ export class ComponentGridview
                     minimumHeight: data.minimumHeight,
                     maximumHeight: data.maximumHeight,
                     priority: data.priority,
-                    snap: data.snap,
+                    snap: !!data.snap,
                     containerApi: new GridviewApi(this),
                 });
 
@@ -231,7 +231,7 @@ export class ComponentGridview
             minimumHeight: options.minimumHeight,
             maximumHeight: options.maximumHeight,
             priority: options.priority,
-            snap: options.snap,
+            snap: !!options.snap,
             containerApi: new GridviewApi(this),
         });
 

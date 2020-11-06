@@ -5,9 +5,7 @@ import { IGroupview } from '../groupview/groupview';
 import { IGroupPanel } from '../groupview/groupviewPanel';
 import {
     PanelContentPart,
-    PanelContentPartConstructor,
     PanelHeaderPart,
-    PanelHeaderPartConstructor,
     WatermarkConstructor,
     WatermarkPart,
 } from '../groupview/types';

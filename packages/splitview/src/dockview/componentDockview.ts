@@ -23,11 +23,7 @@ import { Event, Emitter, addDisposableListener } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import { timeoutAsPromise } from '../async';
 import { DebugWidget } from './components/debug/debug';
-import {
-    PanelContentPartConstructor,
-    PanelHeaderPartConstructor,
-    WatermarkPart,
-} from '../groupview/types';
+import { WatermarkPart } from '../groupview/types';
 import { debounce } from '../functions';
 import { sequentialNumberGenerator } from '../math';
 import { DefaultDeserializer, IPanelDeserializer } from './deserializer';

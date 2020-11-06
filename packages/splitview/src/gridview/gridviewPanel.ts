@@ -198,10 +198,10 @@ export abstract class GridviewPanel
 }
 
 export interface GridPanelViewState extends BasePanelViewState {
-    minimumHeight: number;
-    maximumHeight: number;
-    minimumWidth: number;
-    maximumWidth: number;
-    snap: boolean;
-    priority: LayoutPriority;
+    minimumHeight?: number;
+    maximumHeight?: number;
+    minimumWidth?: number;
+    maximumWidth?: number;
+    snap?: boolean;
+    priority?: LayoutPriority;
 }

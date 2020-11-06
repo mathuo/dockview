@@ -32,6 +32,7 @@ export interface IGroupPanelProps extends IGroupPanelBaseProps {
         component: React.FunctionComponent<IGroupPanelActionbarProps & P>,
         props: P
     ): ActionsbarReference<IGroupPanelActionbarProps & P>;
+    [key: string]: any;
 }
 
 export interface DockviewReadyEvent {

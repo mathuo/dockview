@@ -192,7 +192,7 @@ export function isGridBranchNode<T extends IGridView>(
 export interface SerializedGridObject<T> {
     type: 'leaf' | 'branch';
     data: T | SerializedGridObject<T>[];
-    size: number;
+    size?: number;
     visible?: boolean;
 }
 
