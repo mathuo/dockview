@@ -35370,7 +35370,7 @@ var ComponentGridview = /** @class */ (function (_super) {
                     minimumHeight: data.minimumHeight,
                     maximumHeight: data.maximumHeight,
                     priority: data.priority,
-                    snap: data.snap,
+                    snap: !!data.snap,
                     containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_4__.GridviewApi(_this),
                 });
                 _this.registerPanel(view);
@@ -35412,7 +35412,7 @@ var ComponentGridview = /** @class */ (function (_super) {
             minimumHeight: options.minimumHeight,
             maximumHeight: options.maximumHeight,
             priority: options.priority,
-            snap: options.snap,
+            snap: !!options.snap,
             containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_4__.GridviewApi(this),
         });
         this.registerPanel(view);
