@@ -28,7 +28,7 @@ import {
     IComponentSplitview,
     SerializedSplitview,
 } from '../splitview/componentSplitview';
-import { Sizing } from '../splitview/core/splitview';
+import { Orientation, Sizing } from '../splitview/core/splitview';
 import { SplitviewPanel } from '../splitview/splitviewPanel';
 
 export class SplitviewApi {
@@ -181,6 +181,14 @@ export class GridviewApi {
     }
 
     constructor(private readonly component: IComponentGridview) {}
+
+    get orientation() {
+        return this.component.orientation;
+    }
+
+    set orientation(value: Orientation) {
+        this.component.orientation = value;
+    }
 
     focus() {
         return this.component.focus();

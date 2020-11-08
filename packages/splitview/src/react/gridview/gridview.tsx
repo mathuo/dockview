@@ -26,6 +26,7 @@ export interface IGridviewComponentProps {
     components: PanelCollection<IGridviewPanelProps>;
     hideBorders?: boolean;
     className?: string;
+    proportionalLayout?: boolean;
 }
 
 export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps> = (
@@ -37,6 +38,7 @@ export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps>
 
     React.useEffect(() => {
         const gridview = new ComponentGridview(domRef.current, {
+            proportionalLayout: !!props.proportionalLayout,
             orientation: props.orientation,
             frameworkComponents: props.components,
             frameworkComponentFactory: {

@@ -288,7 +288,7 @@ export class BranchNode extends CompositeDisposable implements IView {
     public dispose() {
         super.dispose();
         this._childrenDisposable.dispose();
-        this.splitview.dispose();
         this.children.forEach((child) => child.dispose());
+        this.splitview.dispose();
     }
 }

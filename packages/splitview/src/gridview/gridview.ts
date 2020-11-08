@@ -47,7 +47,8 @@ function flipNode<T extends Node>(
             result.addChild(
                 flipNode(child, orthogonalSize, newSize),
                 newSize,
-                0
+                0,
+                true
             );
         }
 
@@ -165,7 +166,7 @@ export interface IGridView {
     setVisible?(visible: boolean): void;
 }
 
-const orthogonal = (orientation: Orientation) =>
+export const orthogonal = (orientation: Orientation) =>
     orientation === Orientation.HORIZONTAL
         ? Orientation.VERTICAL
         : Orientation.HORIZONTAL;
@@ -275,8 +276,8 @@ export class Gridview {
             orientation,
             this.proportionalLayout,
             this.styles,
-            0,
-            0
+            this.root.size,
+            this.root.orthogonalSize
         );
     }
 

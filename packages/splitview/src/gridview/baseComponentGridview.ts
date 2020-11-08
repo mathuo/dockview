@@ -67,9 +67,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
     private resizeTimer?: any;
     protected _activeGroup: T | undefined;
     //
-    protected _size = 0;
-    protected _orthogonalSize = 0;
-    //
     protected readonly _onDidLayoutChange = new Emitter<GroupChangeEvent>();
     readonly onDidLayoutChange: Event<GroupChangeEvent> = this
         ._onDidLayoutChange.event;
@@ -84,6 +81,14 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     get size() {
         return this.groups.size;
+    }
+
+    get width() {
+        return this.gridview.width;
+    }
+
+    get height() {
+        return this.gridview.height;
     }
 
     get minimumHeight() {
@@ -216,26 +221,18 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.doSetGroupActive(next as T);
     }
 
-    public layout(
-        size: number,
-        orthogonalSize: number,
-        forceResize?: boolean
-    ): void {
+    public layout(width: number, height: number, forceResize?: boolean): void {
         const different =
-            forceResize ||
-            size !== this._size ||
-            orthogonalSize !== this._orthogonalSize;
+            forceResize || width !== this.width || height !== this.height;
 
         if (!different) {
             return;
         }
 
-        this.element.style.height = `${orthogonalSize}px`;
-        this.element.style.width = `${size}px`;
+        this.element.style.height = `${height}px`;
+        this.element.style.width = `${width}px`;
 
-        this._size = size;
-        this._orthogonalSize = orthogonalSize;
-        this.gridview.layout(size, orthogonalSize);
+        this.gridview.layout(width, height);
     }
 
     public setAutoResizeToFit(enabled: boolean): void {

@@ -419,7 +419,7 @@ export class ComponentDockview
         this.groups.clear();
 
         this.fromJSON(data);
-        this.gridview.layout(this._size, this._orthogonalSize);
+        this.gridview.layout(this.width, this.height);
     }
 
     public fromJSON(data: SerializedDockview) {

@@ -3,6 +3,7 @@ import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
 
 export interface GridComponentOptions {
+    proportionalLayout: boolean;
     orientation: Orientation;
     components?: {
         [componentName: string]: {

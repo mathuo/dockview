@@ -1,6 +1,6 @@
 import { getRelativeLocation, SerializedGridObject } from './gridview';
 import { Position } from '../dnd/droptarget';
-import { getGridLocation } from './gridview';
+import { getGridLocation, orthogonal } from './gridview';
 import { tail, sequenceEquals } from '../array';
 import { GroupChangeKind } from '../groupview/groupview';
 import { CompositeDisposable } from '../lifecycle';
@@ -56,6 +56,7 @@ export interface IGridPanelComponentView extends IGridPanelView {
 }
 
 export interface IComponentGridview extends IBaseGrid<GridviewPanel> {
+    orientation: Orientation;
     addPanel(options: AddComponentOptions): void;
     removePanel(panel: GridviewPanel, sizing?: Sizing): void;
     setVisible(panel: GridviewPanel, visible: boolean): void;
@@ -76,7 +77,7 @@ export class ComponentGridview
         private readonly options: GridComponentOptions
     ) {
         super(element, {
-            proportionalLayout: false,
+            proportionalLayout: options.proportionalLayout,
             orientation: options.orientation,
             styles: options.styles,
         });
@@ -87,6 +88,15 @@ export class ComponentGridview
         if (!this.options.frameworkComponents) {
             this.options.frameworkComponents = {};
         }
+    }
+
+    get orientation() {
+        return this.gridview.orientation;
+    }
+
+    set orientation(value: Orientation) {
+        this.gridview.orientation = value;
+        this.layout(this.gridview.width, this.gridview.height, true);
     }
 
     get deserializer() {
@@ -126,7 +136,6 @@ export class ComponentGridview
         this.groups.clear();
 
         this.fromJSON(data);
-        this.gridview.layout(this._size, this._orthogonalSize);
     }
 
     public setVisible(panel: GridviewPanel, visible: boolean) {
@@ -150,6 +159,57 @@ export class ComponentGridview
 
         this.gridview.clear();
         this.groups.clear();
+
+        const width = this.width;
+        const height = this.height;
+
+        this.layout(width, height, true);
+
+        // const yTransform = height / grid.height;
+        // const xTransform = width / grid.width;
+
+        // grid.height = yTransform * grid.height;
+        // grid.width = xTransform * grid.width;
+
+        // const sizeTransform =
+        //     grid.orientation === Orientation.VERTICAL ? yTransform : xTransform;
+        // const orthogonalSizeTransform =
+        //     grid.orientation === Orientation.HORIZONTAL
+        //         ? yTransform
+        //         : xTransform;
+
+        // const transform = (
+        //     item: SerializedGridObject<GridPanelViewState>,
+        //     o: Orientation
+        // ) => {
+        //     switch (item.type) {
+        //         case 'branch':
+        //             if (grid.orientation === o) {
+        //                 item.size = sizeTransform * item.size;
+        //             } else {
+        //                 item.size = orthogonalSizeTransform * item.size;
+        //             }
+
+        //             if (Array.isArray(item.data)) {
+        //                 item.data.forEach((x) => transform(x, orthogonal(o)));
+        //             }
+        //             break;
+        //         case 'leaf':
+        //             if (grid.orientation === o) {
+        //                 item.size = sizeTransform * item.size;
+        //             } else {
+        //                 item.size = orthogonalSizeTransform * item.size;
+        //             }
+
+        //             break;
+        //     }
+        // };
+
+        // grid.root.size = grid.root.size * sizeTransform;
+
+        // if (Array.isArray(grid.root.data)) {
+        //     grid.root.data.forEach((d) => transform(d, grid.orientation));
+        // }
 
         this.gridview.deserialize(grid, {
             fromJSON: (data: any) => {
@@ -188,7 +248,7 @@ export class ComponentGridview
             }
         }
 
-        this.gridview.layout(this._size, this._orthogonalSize);
+        // this.layout(width, height, true);
 
         this._onDidLayoutChange.fire({ kind: GroupChangeKind.NEW_LAYOUT });
     }
