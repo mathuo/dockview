@@ -10,6 +10,7 @@ import {
     IGroupPanelProps,
     LayoutPriority,
     Orientation,
+    orthogonal,
     PanelCollection,
     PanelConstraintChangeEvent,
     PanelDimensionChangeEvent,
@@ -104,40 +105,139 @@ const components: PanelCollection<IGridviewPanelProps> = {
 };
 
 export const GridviewDemoPanel = (props: IGroupPanelProps) => {
+    return (
+        <div
+            style={{
+                overflow: 'auto',
+                height: '100%',
+                padding: '10px 0px',
+                boxSizing: 'border-box',
+            }}
+        >
+            <div style={{ padding: '0px 20px' }}>
+                <h1>Gridview</h1>
+            </div>
+            <ul style={{ padding: '0px 20px 0px 40px' }}>
+                <li>
+                    The gridview is a collection of nested splitviews which
+                    forms a grid-based layout
+                </li>
+            </ul>
+            <GridviewDemo {...props} />
+        </div>
+    );
+};
+
+export const GridviewDemo = (props: IGroupPanelProps) => {
     const api = React.useRef<GridviewApi>();
 
-    const onReady = (event: GridviewReadyEvent) => {
-        api.current = event.api;
+    const [orientation, setOrientation] = React.useState<Orientation>(
+        Orientation.VERTICAL
+    );
 
-        event.api.fromJSON({
+    const onClick = () => {
+        api.current.orientation = orthogonal(api.current.orientation);
+        // load();
+    };
+
+    const load = () => {
+        api.current.fromJSON({
             activePanel: '1',
             grid: {
-                height: 10,
-                width: 10,
-                orientation: Orientation.VERTICAL,
+                height: 3,
+                width: 2,
+                orientation: orientation,
                 root: {
                     type: 'branch',
-                    size: 10,
+                    size: 3,
                     data: [
                         {
-                            type: 'leaf',
-                            size: 2,
-                            data: {
-                                id: '1',
-                                component: 'default',
-                                minimumHeight: 50,
-                                maximumHeight: Number.POSITIVE_INFINITY,
-                                minimumWidth: 50,
-                                maximumWidth: Number.POSITIVE_INFINITY,
-                                snap: false,
-                                priority: LayoutPriority.Normal,
-                            },
+                            type: 'branch',
+                            size: 1,
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    size: 1,
+                                    data: {
+                                        id: '1',
+                                        component: 'default',
+                                        minimumHeight: 50,
+                                        maximumHeight: Number.POSITIVE_INFINITY,
+                                        minimumWidth: 50,
+                                        maximumWidth: Number.POSITIVE_INFINITY,
+                                        snap: false,
+                                        priority: LayoutPriority.Normal,
+                                    },
+                                },
+                                {
+                                    type: 'branch',
+                                    size: 1,
+                                    data: [
+                                        {
+                                            type: 'leaf',
+                                            size: 0.5,
+                                            data: {
+                                                id: '2',
+                                                component: 'default',
+                                                minimumHeight: 50,
+                                                maximumHeight:
+                                                    Number.POSITIVE_INFINITY,
+                                                minimumWidth: 50,
+                                                maximumWidth:
+                                                    Number.POSITIVE_INFINITY,
+                                                snap: false,
+                                                priority: LayoutPriority.Normal,
+                                            },
+                                        },
+                                        {
+                                            type: 'branch',
+                                            size: 0.5,
+                                            data: [
+                                                {
+                                                    type: 'leaf',
+                                                    size: 0.5,
+                                                    data: {
+                                                        id: '2',
+                                                        component: 'default',
+                                                        minimumHeight: 50,
+                                                        maximumHeight:
+                                                            Number.POSITIVE_INFINITY,
+                                                        minimumWidth: 50,
+                                                        maximumWidth:
+                                                            Number.POSITIVE_INFINITY,
+                                                        snap: false,
+                                                        priority:
+                                                            LayoutPriority.Normal,
+                                                    },
+                                                },
+                                                {
+                                                    type: 'leaf',
+                                                    size: 0.5,
+                                                    data: {
+                                                        id: '3',
+                                                        component: 'default',
+                                                        minimumHeight: 50,
+                                                        maximumHeight:
+                                                            Number.POSITIVE_INFINITY,
+                                                        minimumWidth: 50,
+                                                        maximumWidth:
+                                                            Number.POSITIVE_INFINITY,
+                                                        snap: false,
+                                                        priority:
+                                                            LayoutPriority.Normal,
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                            ],
                         },
                         {
                             type: 'leaf',
-                            size: 3,
+                            size: 1,
                             data: {
-                                id: '2',
+                                id: '4',
                                 component: 'default',
                                 minimumHeight: 50,
                                 maximumHeight: Number.POSITIVE_INFINITY,
@@ -149,11 +249,11 @@ export const GridviewDemoPanel = (props: IGroupPanelProps) => {
                         },
                         {
                             type: 'branch',
-                            size: 5,
+                            size: 1,
                             data: [
                                 {
                                     type: 'leaf',
-                                    size: 2,
+                                    size: 1,
                                     data: {
                                         id: '3',
                                         component: 'default',
@@ -167,7 +267,7 @@ export const GridviewDemoPanel = (props: IGroupPanelProps) => {
                                 },
                                 {
                                     type: 'leaf',
-                                    size: 2,
+                                    size: 1,
                                     data: {
                                         id: '4',
                                         component: 'default',
@@ -187,10 +287,17 @@ export const GridviewDemoPanel = (props: IGroupPanelProps) => {
         });
     };
 
+    const onReady = (event: GridviewReadyEvent) => {
+        api.current = event.api;
+        api.current?.layout(props.api.width - 80, 600);
+
+        load();
+    };
+
     React.useEffect(() => {
         const disposable = new CompositeDisposable(
             props.api.onDidDimensionsChange((event) => {
-                api.current?.layout(event.width - 80, 400);
+                api.current?.layout(event.width - 80, 600);
             })
         );
 
@@ -201,6 +308,7 @@ export const GridviewDemoPanel = (props: IGroupPanelProps) => {
 
     return (
         <div style={{ height: '100%', width: '100%' }}>
+            <button onClick={onClick}>Flip</button>
             <div
                 style={{
                     height: '400px',
@@ -209,6 +317,7 @@ export const GridviewDemoPanel = (props: IGroupPanelProps) => {
                 }}
             >
                 <GridviewComponent
+                    proportionalLayout={true}
                     components={components}
                     orientation={Orientation.VERTICAL}
                     onReady={onReady}

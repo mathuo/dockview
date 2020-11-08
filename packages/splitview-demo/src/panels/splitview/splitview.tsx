@@ -11,6 +11,7 @@ import {
     FocusEvent,
     VisibilityEvent,
     PanelConstraintChangeEvent,
+    IGroupPanel,
 } from 'dockview';
 import * as React from 'react';
 import './splitview.scss';
@@ -58,10 +59,10 @@ const components = {
         }, []);
 
         const color = React.useMemo(
-            () =>
-                `rgb(${Math.floor(256 * Math.random())},${Math.floor(
-                    256 * Math.random()
-                )},${Math.floor(256 * Math.random())})`,
+            () => 'rgba(14, 99, 156,0.4)',
+            // `rgb(${Math.floor(256 * Math.random())},${Math.floor(
+            //     256 * Math.random()
+            // )},${Math.floor(256 * Math.random())})`,
             []
         );
 
@@ -69,6 +70,7 @@ const components = {
             <div
                 style={{
                     backgroundColor: color,
+                    color: '#cccccc',
                 }}
                 className="splitview-demo-panel"
             >
@@ -94,6 +96,38 @@ const components = {
 };
 
 export const SplitviewPanel = (props: IGroupPanelProps) => {
+    return (
+        <div
+            style={{
+                overflow: 'auto',
+                height: '100%',
+                padding: '10px 0px',
+                boxSizing: 'border-box',
+            }}
+        >
+            <div style={{ padding: '0px 20px' }}>
+                <h1>Splitview</h1>
+            </div>
+            <ul style={{ padding: '0px 20px 0px 40px' }}>
+                <li>
+                    The splitview component exposes an API object, a selection
+                    of avaliable values are shown in the summary sections below
+                </li>
+                <li>
+                    Each panel exposes it's own API, and has access to the
+                    common API. A selector of panel API values are shown in each
+                    panel of the splitview.
+                </li>
+            </ul>
+            <Common {...props} orientation={Orientation.HORIZONTAL} />
+            <Common {...props} orientation={Orientation.VERTICAL} />
+        </div>
+    );
+};
+
+export const Common = (
+    props: IGroupPanelProps & { orientation: Orientation }
+) => {
     const api = React.useRef<SplitviewApi>();
 
     const [dimensions, setDimensions] = React.useState<{
@@ -102,23 +136,41 @@ export const SplitviewPanel = (props: IGroupPanelProps) => {
         maximumSize: number;
         minimumSize: number;
         visibility: boolean[];
-    }>({ height: 0, width: 0, maximumSize: 0, minimumSize: 0, visibility: [] });
+        length: number;
+    }>({
+        height: undefined,
+        width: undefined,
+        maximumSize: undefined,
+        minimumSize: undefined,
+        visibility: [],
+        length: undefined,
+    });
 
     React.useEffect(() => {
         const disposable = new CompositeDisposable(
             props.api.onDidDimensionsChange(
                 (event: PanelDimensionChangeEvent) => {
-                    api.current.layout(event.width - 80, 100);
+                    switch (props.orientation) {
+                        case Orientation.HORIZONTAL:
+                            api.current.layout(500, 100);
+                            break;
+                        case Orientation.VERTICAL:
+                            api.current.layout(100, 500);
+                            break;
+                    }
 
                     const height = api.current.height;
                     const width = api.current.width;
                     const maximumSize = api.current.maximumSize;
                     const minimumSize = api.current.minimumSize;
+                    const length = api.current.length;
+
                     setDimensions({
                         height,
                         width,
                         maximumSize,
                         minimumSize,
+                        length,
                         visibility: api.current
                             .getPanels()
                             .map((_) => _.api.isVisible),
@@ -168,7 +220,7 @@ export const SplitviewPanel = (props: IGroupPanelProps) => {
             ],
             size: 6,
             activeView: 'one',
-            orientation: Orientation.HORIZONTAL,
+            orientation: props.orientation,
         });
     };
 
@@ -189,19 +241,35 @@ export const SplitviewPanel = (props: IGroupPanelProps) => {
         }));
     };
 
+    const text = React.useMemo(() => {
+        switch (props.orientation) {
+            case Orientation.VERTICAL:
+                return 'Vertical Splitview';
+            case Orientation.HORIZONTAL:
+                return 'Horizontal Splitview';
+        }
+    }, [props.orientation]);
+
     return (
-        <div className="splitview-demo">
-            <div style={{ height: '150px', padding: '40px' }}>
-                <SplitviewComponent
-                    orientation={Orientation.HORIZONTAL}
-                    onReady={onReady}
-                    components={components}
-                />
-                <div style={{ marginTop: '10px' }} className="api-parameter">
+        <div
+            className={`splitview-demo-container ${props.orientation.toLowerCase()}`}
+        >
+            <h2>{text}</h2>
+            <div className="splitview-demo-content">
+                <div className="splitview-demo-view">
+                    <SplitviewComponent
+                        orientation={props.orientation}
+                        onReady={onReady}
+                        components={components}
+                    />
+                </div>
+                <div className="api-parameter">
                     <span>Height</span>
                     <span>{dimensions.height}</span>
                     <span>Width</span>
                     <span>{dimensions.width}</span>
+                    <span>Lenght</span>
+                    <span>{dimensions.length}</span>
                     <span>Min. size</span>
                     <span>{dimensions.minimumSize}</span>
                     <span>Max. size</span>
