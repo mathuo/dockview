@@ -36,6 +36,8 @@ jobs:
       - run: npm run test
       - run: npm run docs
       - run: npm run build-demo
+      - name: mkdir
+        run: mkdir output/build && mkdir output/docs
       - name: Copy demo
         run: cp -r packages/splitview-demo/dist output/build
       - name: Copy docs
@@ -45,6 +47,5 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: outputt # The folder the action should deploy.
-          TARGET_FOLDER: .
+          FOLDER: output # The folder the action should deploy.
           CLEAN: true # Automatically remove deleted files from the deploy branch
