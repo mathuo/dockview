@@ -37,9 +37,9 @@ jobs:
       - run: npm run docs
       - run: npm run build-demo
       - name: Copy demo
-        run: cp packages/splitview-demo/dist output/build
+        run: cp -r packages/splitview-demo/dist output/build
       - name: Copy docs
-        run: cp packages/splitview/typedocs output/docs
+        run: cp -r packages/splitview/typedocs output/docs
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
