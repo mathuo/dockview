@@ -674,7 +674,7 @@ export class Splitview {
         }
     }
 
-    saveProportions(): void {
+    private saveProportions(): void {
         if (this.proportionalLayout && this.contentSize > 0) {
             this._proportions = this.views.map(
                 (i) => i.size / this.contentSize

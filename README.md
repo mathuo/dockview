@@ -33,4 +33,53 @@ dockview/dist/styles.css
 
 ## React
 
+### Splitview
+
+```javascript
+import { 
+    ISplitviewPanelProps, 
+    Orientation, 
+    SplitviewComponent,
+    SplitviewReadyEvent
+} from "dockview";
+
+const components = {
+    "my-component": (props: ISplitviewPanelProps) => {
+        return (
+            <div>
+                <span>This is a panel</span>
+                <span>{props.arbitraryProp}</span>
+            </div>
+        )
+    }
+}
+
+const Example = () => {
+    const onReady = (event: SplitviewReadyEvent) => {
+        event.addPanel({
+            id: "panel-1",
+            component: "my-component",
+            params: {
+                arbitraryProp: "Hello World"
+            }
+        });
+        event.addPanel({
+            id: "panel-2",
+            component: "my-component",
+            params: {
+                arbitraryProp: "World Hello"
+            }
+        });
+    }
+
+    return (
+        <SplitviewComponent
+            components={components}
+            onReady={onReady}
+            orientation={Orientation.VERTICAL}
+        />
+    )
+}
+```
+
 ## Run the demo locally
