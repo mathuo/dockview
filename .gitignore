@@ -1,6 +1,7 @@
 node_modules/
 coverage/
 dist/
+output/
 .idea/
 typedocs/
 .DS_Store

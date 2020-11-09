@@ -34,14 +34,7 @@ jobs:
       - run: npm run bootstrap-no-hoist
       - run: npm run build
       - run: npm run test
-      - run: npm run docs
-      - run: npm run build-demo
-      - name: mkdir
-        run: mkdir output/build && mkdir output/docs
-      - name: Copy demo
-        run: cp -r packages/splitview-demo/dist output/build
-      - name: Copy docs
-        run: cp -r packages/splitview/typedocs output/docs
+      - run: npm run package-all
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
