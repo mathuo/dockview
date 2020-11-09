@@ -1,11 +1,6 @@
 name: Deploy Nightly Demo App
 
 on:
-  push:
-    branches: [master]
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [master]
   schedule:
     - cron:  '0 3 * * *' # every day at 3 am UTC
 
@@ -41,4 +36,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to.
           FOLDER: output # The folder the action should deploy.
+          TARGET: output
           CLEAN: true # Automatically remove deleted files from the deploy branch
