@@ -1,6 +1,11 @@
 name: Deploy Nightly Demo App
 
 on:
+  push:
+    branches: [master]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [master]
   schedule:
     - cron:  '0 3 * * *' # every day at 3 am UTC
 
@@ -29,12 +34,17 @@ jobs:
       - run: npm run bootstrap-no-hoist
       - run: npm run build
       - run: npm run test
+      - run: npm run docs
       - run: npm run build-demo
+      - name: Copy demo
+        run: cp packages/splitview-demo/dist output/build
+      - name: Copy docs
+        run: cp packages/splitview/typedocs output/docs
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: packages/splitview-demo/dist # The folder the action should deploy.
-          TARGET_FOLDER: build
+          FOLDER: outputt # The folder the action should deploy.
+          TARGET_FOLDER: .
           CLEAN: true # Automatically remove deleted files from the deploy branch
