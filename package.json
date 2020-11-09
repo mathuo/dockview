@@ -7,7 +7,7 @@
         "test": "jest",
         "build": "lerna run build --ignore splitview-demo",
         "build-demo": "lerna run build --scope splitview-demo",
-        "docs": "lerna run docs --scope splitview",
+        "docs": "lerna run docs --scope dockview",
         "clean": "lerna run clean",
         "bootstrap": "lerna bootstrap --hoist",
         "bootstrap-no-hoist": "lerna bootstrap",
