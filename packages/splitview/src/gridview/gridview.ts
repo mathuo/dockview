@@ -10,7 +10,7 @@ import { LeafNode } from './leafNode';
 import { BranchNode } from './branchNode';
 import { Node } from './types';
 import { Emitter, Event } from '../events';
-import { IDisposable } from '../lifecycle';
+import { IDisposable, MutableDisposable } from '../lifecycle';
 
 function flipNode<T extends Node>(
     node: T,
@@ -250,9 +250,10 @@ export interface IViewDeserializer {
     fromJSON: (data: {}) => IGridView;
 }
 
-export class Gridview {
+export class Gridview implements IDisposable {
     private _root: BranchNode;
     public readonly element: HTMLElement;
+    private disposable: MutableDisposable = new MutableDisposable();
 
     private readonly _onDidChange = new Emitter<number | undefined>();
     readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
@@ -267,6 +268,7 @@ export class Gridview {
     }
 
     public dispose() {
+        this._onDidChange.dispose();
         this.root.dispose();
     }
 
@@ -367,22 +369,19 @@ export class Gridview {
         return this._root;
     }
 
-    private disposable: IDisposable;
-
     private set root(root: BranchNode) {
         const oldRoot = this._root;
 
         if (oldRoot) {
-            this.disposable?.dispose();
             oldRoot.dispose();
             this.element.removeChild(oldRoot.element);
         }
 
         this._root = root;
-        this.disposable = this._root.onDidChange((e) => {
+        this.element.appendChild(this._root.element);
+        this.disposable.value = this._root.onDidChange((e) => {
             this._onDidChange.fire(e);
         });
-        this.element.appendChild(root.element);
     }
 
     public next(location: number[]) {
