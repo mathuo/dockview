@@ -9,7 +9,7 @@
                         {
                             "type": "leaf",
                             "data": {
-                                "id": "0",
+                                "id": "activitybar",
                                 "component": "activitybar",
                                 "minimumHeight": 200,
                                 "minimumWidth": 48,
@@ -36,7 +36,7 @@
                                 {
                                     "type": "leaf",
                                     "data": {
-                                        "id": "2",
+                                        "id": "editor",
                                         "component": "editor",
                                         "minimumHeight": 200,
                                         "minimumWidth": 300,
@@ -48,7 +48,7 @@
                                 {
                                     "type": "leaf",
                                     "data": {
-                                        "id": "3",
+                                        "id": "panel",
                                         "component": "panel",
                                         "minimumHeight": 200,
                                         "minimumWidth": 200,
@@ -65,7 +65,7 @@
                 {
                     "type": "leaf",
                     "data": {
-                        "id": "4",
+                        "id": "footer",
                         "component": "footer",
                         "minimumHeight": 22,
                         "maximumHeight": 22,

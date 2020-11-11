@@ -103,7 +103,7 @@ export abstract class GridviewPanel
     }
 
     constructor(id: string, component: string) {
-        super(id, component, new GridPanelApi());
+        super(id, component, new GridPanelApi(id));
 
         this.addDisposables(
             this.api.onVisibilityChange((event) => {

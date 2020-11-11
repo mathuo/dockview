@@ -59,12 +59,14 @@ export interface IComponentGridview extends IBaseGrid<GridviewPanel> {
     orientation: Orientation;
     addPanel(options: AddComponentOptions): void;
     removePanel(panel: GridviewPanel, sizing?: Sizing): void;
-    setVisible(panel: GridviewPanel, visible: boolean): void;
-    isVisible(panel: GridviewPanel): boolean;
     toggleVisibility(panel: GridviewPanel): void;
     focus(): void;
     fromJSON(data: SerializedGridview): void;
     toJSON(): SerializedGridview;
+    movePanel(
+        panel: GridviewPanel,
+        options: { direction: Direction; reference: string; size?: number }
+    ): void;
 }
 
 export class ComponentGridview
@@ -138,13 +140,13 @@ export class ComponentGridview
         this.fromJSON(data);
     }
 
-    public setVisible(panel: GridviewPanel, visible: boolean) {
-        this.gridview.setViewVisible(getGridLocation(panel.element), visible);
-    }
+    // public setVisible(panel: GridviewPanel, visible: boolean) {
+    //     this.gridview.setViewVisible(getGridLocation(panel.element), visible);
+    // }
 
-    public isVisible(panel: GridviewPanel) {
-        return this.gridview.isViewVisible(getGridLocation(panel.element));
-    }
+    // public isVisible(panel: GridviewPanel) {
+    //     return this.gridview.isViewVisible(getGridLocation(panel.element));
+    // }
 
     public toggleVisibility(panel: GridviewPanel) {
         this.setVisible(panel, !this.isVisible(panel));
@@ -163,7 +165,7 @@ export class ComponentGridview
         const width = this.width;
         const height = this.height;
 
-        this.layout(width, height, true);
+        // this.layout(width, height, true);
 
         // const yTransform = height / grid.height;
         // const xTransform = width / grid.width;
@@ -251,6 +253,31 @@ export class ComponentGridview
         // this.layout(width, height, true);
 
         this._onDidLayoutChange.fire({ kind: GroupChangeKind.NEW_LAYOUT });
+    }
+
+    movePanel(
+        panel: GridviewPanel,
+        options: { direction: Direction; reference: string; size?: number }
+    ): void {
+        let relativeLocation: number[];
+
+        const removedPanel = this.gridview.remove(panel) as GridviewPanel;
+
+        const referenceGroup = this.groups.get(options.reference).value;
+
+        const target = toTarget(options.direction);
+        if (target === Position.Center) {
+            throw new Error(`${target} not supported as an option`);
+        } else {
+            const location = getGridLocation(referenceGroup.element);
+            relativeLocation = getRelativeLocation(
+                this.gridview.orientation,
+                location,
+                target
+            );
+        }
+
+        this.doAddGroup(removedPanel, relativeLocation, options.size);
     }
 
     public addPanel(options: AddComponentOptions): PanelReference {

@@ -147,14 +147,16 @@ export class BranchNode extends CompositeDisposable implements IView {
                 descriptor,
                 proportionalLayout,
             });
-            this.setupChildrenEvents();
         }
 
         this.addDisposables(
             this.splitview.onDidSashEnd(() => {
+                console.log('sash end');
                 this._onDidChange.fire(undefined);
             })
         );
+
+        this.setupChildrenEvents();
     }
 
     setVisible(visible: boolean) {

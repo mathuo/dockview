@@ -115,7 +115,7 @@ export abstract class PaneviewPanel
         component: string,
         private readonly headerComponent: string
     ) {
-        super(id, component, new PanePanelApi(null));
+        super(id, component, new PanePanelApi(id));
         this.api.pane = this; // TODO cannot use 'this' before 'super'
 
         this.element.classList.add('pane');

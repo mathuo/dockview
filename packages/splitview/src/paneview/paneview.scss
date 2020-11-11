@@ -39,6 +39,7 @@
             box-sizing: border-box;
             user-select: none;
             position: relative;
+            outline: none;
 
             &:focus,
             &:focus-within {
@@ -55,7 +56,7 @@
                     outline-width: -1px;
                     outline-style: solid;
                     outline-offset: -1px;
-                    outline-color: dodgerblue;
+                    outline-color: var(--dockview-accent-color);
                 }
                 // outline-width: 1px;
                 // outline-style: solid;
@@ -69,6 +70,7 @@
             overflow-x: hidden;
             flex-grow: 1;
             position: relative;
+            outline: none;
 
             &:focus,
             &:focus-within {
@@ -85,7 +87,7 @@
                     outline-width: -1px;
                     outline-style: solid;
                     outline-offset: -1px;
-                    outline-color: dodgerblue;
+                    outline-color: var(--dockview-accent-color);
                 }
                 // outline-width: 1px;
                 // outline-style: solid;

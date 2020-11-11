@@ -44,8 +44,8 @@ export class PanelApi extends BaseViewApi implements IPanelApi, IDisposable {
         .event;
     //
 
-    constructor() {
-        super();
+    constructor(id: string) {
+        super(id);
     }
 
     setConstraints(value: PanelConstraintChangeEvent2) {

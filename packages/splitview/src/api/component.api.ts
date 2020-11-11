@@ -9,6 +9,7 @@ import {
     MovementOptions,
     PanelOptions,
 } from '../dockview/options';
+import { Direction } from '../gridview/baseComponentGridview';
 import {
     AddComponentOptions,
     IComponentGridview,
@@ -204,6 +205,13 @@ export class GridviewApi {
 
     removePanel(panel: GridviewPanel, sizing?: Sizing): void {
         this.component.removePanel(panel, sizing);
+    }
+
+    movePanel(
+        panel: GridviewPanel,
+        options: { direction: Direction; reference: string; size?: number }
+    ) {
+        this.component.movePanel(panel, options);
     }
 
     resizeToFit() {

@@ -81,7 +81,7 @@ export abstract class SplitviewPanel
     }
 
     constructor(id: string, componentName: string) {
-        super(id, componentName, new PanelApi());
+        super(id, componentName, new PanelApi(id));
 
         this.addDisposables(
             this.api.onVisibilityChange((event) => {

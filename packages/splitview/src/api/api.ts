@@ -52,6 +52,7 @@ export interface IBaseViewApi {
     getState: () => State;
     getStateKey: <T extends StateObject>(key: string) => T;
     //
+    readonly id: string;
     readonly isFocused: boolean;
     readonly isActive: boolean;
     readonly isVisible: boolean;
@@ -125,7 +126,7 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
         return this._height;
     }
 
-    constructor() {
+    constructor(readonly id: string) {
         super();
 
         this.addDisposables(

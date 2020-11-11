@@ -53,7 +53,7 @@ export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
     }
 
     constructor(private panel: IGroupPanel, group: IGroupview) {
-        super();
+        super(panel.id);
         this._group = group;
 
         this.addDisposables(

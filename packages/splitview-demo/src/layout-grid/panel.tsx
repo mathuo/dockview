@@ -32,6 +32,16 @@ export const Panel = (props: IGridviewPanelProps) => {
         props.api.setVisible(false);
     };
 
+    const onMove = () => {
+        const thisPanel = props.containerApi.getPanel('panel');
+        const editor = props.containerApi.getPanel('editor');
+
+        props.containerApi.movePanel(thisPanel, {
+            direction: 'left',
+            reference: editor.id,
+        });
+    };
+
     return (
         <div
             style={{
@@ -44,6 +54,7 @@ export const Panel = (props: IGridviewPanelProps) => {
             <div style={{ display: 'flex', padding: '5px' }}>
                 <span>This panel is outside of the dockable layer</span>
                 <span style={{ flexGrow: 1 }} />
+                {/* <button onClick={onMove}>Move</button> */}
                 <button onClick={onToggle}>Resize</button>
                 <button onClick={onClose}>Close</button>
             </div>

@@ -47,8 +47,8 @@ export class GridPanelApi extends BaseViewApi implements IGridPanelApi {
     readonly onDidSizeChange: Event<SizeEvent> = this._onDidSizeChange.event;
     //
 
-    constructor() {
-        super();
+    constructor(id: string) {
+        super(id);
     }
 
     public setConstraints(value: GridConstraintChangeEvent) {

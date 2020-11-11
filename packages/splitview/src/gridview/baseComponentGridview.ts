@@ -55,6 +55,8 @@ export interface IBaseGrid<T extends IGridPanelView> {
     fromJSON(data: any): void;
     layout(width: number, height: number, force?: boolean): void;
     resizeToFit(): void;
+    setVisible(panel: T, visible: boolean): void;
+    isVisible(panel: T): boolean;
 }
 
 export abstract class BaseGrid<T extends IGridPanelView>
@@ -134,6 +136,15 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     public abstract toJSON(): object;
     public abstract fromJSON(data: any): void;
+
+    public setVisible(panel: T, visible: boolean) {
+        this.gridview.setViewVisible(getGridLocation(panel.element), visible);
+        this._onDidLayoutChange.fire({ kind: GroupChangeKind.LAYOUT });
+    }
+
+    public isVisible(panel: T) {
+        return this.gridview.isViewVisible(getGridLocation(panel.element));
+    }
 
     protected doAddGroup(group: T, location: number[] = [0], size?: number) {
         this.gridview.addView(group, size ?? Sizing.Distribute, location);
