@@ -4,7 +4,7 @@ describe('api', () => {
     let api: BaseViewApi;
 
     beforeEach(() => {
-        api = new BaseViewApi();
+        api = new BaseViewApi('dummy_id');
     });
 
     it('sets api state', () => {
