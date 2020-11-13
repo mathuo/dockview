@@ -204,7 +204,7 @@ module.exports = exports;
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "../../node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ":root {\n  --group-view-background-color: #1e1e1e;\n  --title-bar-background-color: #252526;\n  --title-bar-scroll-bar-color: #888;\n  --active-tab-background-visible: #1e1e1e;\n  --active-tab-background-hidden: #2d2d2d;\n  --inactive-tab-background-visible: #1e1e1e;\n  --inactive-tab-background-hidden: #2d2d2d;\n  --tab-divider-color: #1e1e1e;\n  --drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --active-group-visible-panel-color: white;\n  --active-group-hidden-panel-color: #969696;\n  --inactive-group-visible-panel-color: #8f8f8f;\n  --inactive-group-hidden-panel-color: #626262;\n  --tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');\n  --tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');\n  --separator-border: rgb(68, 68, 68);\n  --title-font-size: 13px;\n  --title-height: 35px; }\n\n.visual-studio-theme {\n  --active-tab-background-visible: dodgerblue;\n  --title-height: 18px;\n  --title-font-size: 11px; }\n  .visual-studio-theme .groupview.active-group > .title-container {\n    border-bottom: 2px solid var(--active-tab-background-visible); }\n  .visual-studio-theme .groupview.inactive-group > .title-container {\n    border-bottom: 2px solid var(--inactive-tab-background-visible); }\n\n.actions-bar {\n  text-align: right;\n  width: 28px;\n  display: flex;\n  align-items: center;\n  flex-shrink: 0; }\n  .actions-bar .actions-container {\n    display: flex;\n    padding: 0px;\n    margin: 0px;\n    justify-content: flex-end; }\n    .actions-bar .actions-container a:active {\n      -webkit-mask-size: 100% 100% !important;\n      mask-size: 100% 100% !important; }\n    .actions-bar .actions-container .close-action {\n      background-color: white;\n      height: 16px;\n      width: 16px;\n      display: block;\n      -webkit-mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n      mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n      margin-right: '0.5em';\n      cursor: pointer; }\n\n.drop-target {\n  position: relative; }\n  .drop-target > .drop-target-dropzone {\n    position: absolute;\n    left: 0px;\n    top: 0px;\n    height: 100%;\n    width: 100%;\n    z-index: 10000; }\n    .drop-target > .drop-target-dropzone > .drop-target-selection {\n      position: relative;\n      pointer-events: none;\n      height: 100%;\n      width: 100%;\n      background-color: var(--drag-over-background-color);\n      transition-duration: 0.15s;\n      transition-timing-function: ease-out; }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.left, .drop-target > .drop-target-dropzone > .drop-target-selection.right {\n        width: 50%; }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.right {\n        transform: translate(100%, 0%); }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n        transform: translate(0%, 100%); }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.top, .drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n        height: 50%; }\n\n.custom-dragging {\n  height: 24px;\n  line-height: 24px;\n  font-size: 11px;\n  width: 100px;\n  background-color: dodgerblue;\n  color: ghostwhite;\n  border-radius: 11px;\n  position: absolute;\n  padding-left: 10px; }\n\n.groupview.active-group > .title-container > .tab-container > .tab.active-tab {\n  background-color: var(--active-tab-background-visible);\n  color: var(--active-group-visible-panel-color); }\n  .groupview.active-group > .title-container > .tab-container > .tab.active-tab .tab-action {\n    background-color: var(--active-group-visible-panel-color); }\n\n.groupview.active-group > .title-container > .tab-container > .tab.inactive-tab {\n  background-color: var(--active-tab-background-hidden);\n  color: var(--active-group-hidden-panel-color); }\n  .groupview.active-group > .title-container > .tab-container > .tab.inactive-tab .tab-action {\n    background-color: var(--active-group-hidden-panel-color); }\n\n.groupview.inactive-group > .title-container > .tab-container > .tab.active-tab {\n  background-color: var(--inactive-tab-background-visible);\n  color: var(--inactive-group-visible-panel-color); }\n  .groupview.inactive-group > .title-container > .tab-container > .tab.active-tab .tab-action {\n    background-color: var(--inactive-group-visible-panel-color); }\n\n.groupview.inactive-group > .title-container > .tab-container > .tab.inactive-tab {\n  background-color: var(--inactive-tab-background-hidden);\n  color: var(--inactive-group-hidden-panel-color); }\n  .groupview.inactive-group > .title-container > .tab-container > .tab.inactive-tab .tab-action {\n    background-color: var(--inactive-group-hidden-panel-color); }\n\n/**\n * when a tab is dragged we lose the above stylings because they are conditional on parent elements\n * therefore we also set some stylings for the dragging event\n **/\n.tab.dragging {\n  background-color: var(--active-tab-background-visible);\n  color: var(--active-group-visible-panel-color); }\n\n.grid-view,\n.branch-node {\n  height: 100%;\n  width: 100%; }\n\n.groupview {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  background-color: var(--group-view-background-color); }\n  .groupview:focus {\n    outline: none; }\n  .groupview.empty > .title-container {\n    display: none; }\n  .groupview > .content-container {\n    flex-grow: 1;\n    overflow: hidden;\n    outline: none; }\n\n.pane-container {\n  height: 100%;\n  width: 100%; }\n  .pane-container.animated .view {\n    transition-duration: 0.15s;\n    transition-timing-function: ease-out; }\n  .pane-container .view {\n    overflow: hidden;\n    display: flex;\n    flex-direction: column;\n    padding: 0px !important; }\n    .pane-container .view:not(:first-child)::before {\n      background-color: transparent !important; }\n    .pane-container .view:not(:first-child) .pane > .pane-header {\n      border-top: 1px solid rgba(204, 204, 204, 0.2); }\n  .pane-container:first-of-type > .pane > .pane-header {\n    border-top: none !important; }\n  .pane-container .pane {\n    display: flex;\n    flex-direction: column;\n    overflow: hidden;\n    height: 100%; }\n    .pane-container .pane .pane-header {\n      box-sizing: border-box;\n      user-select: none;\n      position: relative; }\n      .pane-container .pane .pane-header:focus:before, .pane-container .pane .pane-header:focus-within:before {\n        position: absolute;\n        top: 0;\n        left: 0;\n        width: 100%;\n        height: 100%;\n        z-index: 5;\n        content: '';\n        pointer-events: none;\n        outline: 1px solid;\n        outline-width: -1px;\n        outline-style: solid;\n        outline-offset: -1px;\n        outline-color: dodgerblue; }\n    .pane-container .pane .pane-body {\n      overflow-y: auto;\n      overflow-x: hidden;\n      flex-grow: 1;\n      position: relative; }\n      .pane-container .pane .pane-body:focus:before, .pane-container .pane .pane-body:focus-within:before {\n        position: absolute;\n        top: 0;\n        left: 0;\n        width: 100%;\n        height: 100%;\n        z-index: 5;\n        content: '';\n        pointer-events: none;\n        outline: 1px solid;\n        outline-width: -1px;\n        outline-style: solid;\n        outline-offset: -1px;\n        outline-color: dodgerblue; }\n\n.title-container {\n  display: flex;\n  background-color: var(--title-bar-background-color);\n  flex-shrink: 0;\n  box-sizing: border-box;\n  height: var(--title-height);\n  font-size: var(--title-font-size); }\n  .title-container.hidden {\n    display: none; }\n  .title-container .tab-container {\n    flex-grow: 1;\n    display: flex;\n    overflow-x: overlay;\n    overflow-y: hidden;\n    /* Track */\n    /* Handle */ }\n    .title-container .tab-container::-webkit-scrollbar {\n      height: 3px; }\n    .title-container .tab-container::-webkit-scrollbar-track {\n      background: transparent; }\n    .title-container .tab-container::-webkit-scrollbar-thumb {\n      background: var(--title-bar-scroll-bar-color); }\n    .title-container .tab-container.drag-over-target {\n      background-color: var(--drag-over-background-color); }\n    .title-container .tab-container .tab {\n      -webkit-user-drag: element;\n      outline: none;\n      min-width: 75px;\n      cursor: pointer;\n      position: relative;\n      box-sizing: border-box; }\n      .title-container .tab-container .tab:not(:first-child)::before {\n        content: ' ';\n        position: absolute;\n        top: 0;\n        left: 0;\n        z-index: 5;\n        pointer-events: none;\n        background-color: var(--tab-divider-color);\n        width: 1px;\n        height: 100%; }\n\n.split-view-container {\n  position: relative;\n  overflow: hidden;\n  height: 100%;\n  width: 100%; }\n  .split-view-container.animation .view,\n  .split-view-container.animation .sash {\n    transition-duration: 0.15s;\n    transition-timing-function: ease-out; }\n  .split-view-container.horizontal {\n    height: 100%; }\n    .split-view-container.horizontal > .sash-container > .sash {\n      height: 100%;\n      width: 4px; }\n      .split-view-container.horizontal > .sash-container > .sash.enabled {\n        cursor: ew-resize; }\n      .split-view-container.horizontal > .sash-container > .sash.disabled {\n        cursor: default; }\n      .split-view-container.horizontal > .sash-container > .sash.maximum {\n        cursor: w-resize; }\n      .split-view-container.horizontal > .sash-container > .sash.minimum {\n        cursor: e-resize; }\n    .split-view-container.horizontal > .view-container > .view:not(:first-child)::before {\n      height: 100%;\n      width: 1px; }\n  .split-view-container.vertical {\n    width: 100%; }\n    .split-view-container.vertical > .sash-container > .sash {\n      width: 100%;\n      height: 4px; }\n      .split-view-container.vertical > .sash-container > .sash.enabled {\n        cursor: ns-resize; }\n      .split-view-container.vertical > .sash-container > .sash.disabled {\n        cursor: default; }\n      .split-view-container.vertical > .sash-container > .sash.maximum {\n        cursor: n-resize; }\n      .split-view-container.vertical > .sash-container > .sash.minimum {\n        cursor: s-resize; }\n    .split-view-container.vertical > .view-container > .view {\n      width: 100%; }\n      .split-view-container.vertical > .view-container > .view:not(:first-child)::before {\n        height: 1px;\n        width: 100%; }\n  .split-view-container .sash-container {\n    height: 100%;\n    width: 100%;\n    position: absolute; }\n    .split-view-container .sash-container .sash {\n      position: absolute;\n      z-index: 99;\n      outline: none; }\n  .split-view-container .view-container {\n    position: relative;\n    height: 100%;\n    width: 100%; }\n    .split-view-container .view-container .view {\n      height: 100%;\n      box-sizing: border-box;\n      overflow: auto;\n      position: absolute; }\n  .split-view-container.separator-border .view:not(:first-child)::before {\n    content: ' ';\n    position: absolute;\n    top: 0;\n    left: 0;\n    z-index: 5;\n    pointer-events: none;\n    background-color: var(--separator-border); }\n\n.layout-debug-container {\n  color: white;\n  position: fixed;\n  top: 0px;\n  right: 0px;\n  z-index: 9999;\n  font-size: 11px;\n  width: 100px; }\n  .layout-debug-container .layout-debug-widget {\n    background-color: black;\n    margin: 1px; }\n    .layout-debug-container .layout-debug-widget .layout-debug-widget-row {\n      padding: 0px 5px;\n      display: flex; }\n      .layout-debug-container .layout-debug-widget .layout-debug-widget-row span:first-child {\n        flex-grow: 1; }\n\n.tab.dragging .tab-action {\n  background-color: var(--active-group-visible-panel-color); }\n\n.tab.active-tab > .default-tab .tab-action {\n  visibility: visible; }\n\n.tab.inactive-tab > .default-tab .tab-action:not(.dirty) {\n  visibility: hidden; }\n\n.tab.inactive-tab > .default-tab:hover .tab-action {\n  visibility: visible; }\n\n.tab .default-tab {\n  position: relative;\n  height: 100%;\n  display: flex;\n  min-width: 80px;\n  align-items: center;\n  padding-left: 10px;\n  white-space: nowrap;\n  text-overflow: elipsis; }\n  .tab .default-tab .tab-content {\n    flex-grow: 1; }\n  .tab .default-tab .action-container {\n    text-align: right;\n    width: 28px;\n    display: flex; }\n    .tab .default-tab .action-container .tab-list {\n      display: flex;\n      padding: 0px;\n      margin: 0px;\n      justify-content: flex-end; }\n      .tab .default-tab .action-container .tab-list a:active:hover {\n        -webkit-mask-size: 100% 100% !important;\n        mask-size: 100% 100% !important; }\n      .tab .default-tab .action-container .tab-list .tab-action {\n        height: 16px;\n        width: 16px;\n        display: block;\n        -webkit-mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n        mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n        margin-right: '0.5em'; }\n        .tab .default-tab .action-container .tab-list .tab-action.disable-close {\n          display: none; }\n        .tab .default-tab .action-container .tab-list .tab-action.dirty:not(:hover) {\n          display: block;\n          -webkit-mask: var(--tab-dirty-icon) 50% 50%/60% 60% no-repeat;\n          mask: var(--tab-dirty-icon) 50% 50%/60% 60% no-repeat; }\n\n.watermark {\n  display: flex;\n  width: 100%; }\n  .watermark.has-actions .watermark-title .actions-bar {\n    display: none; }\n  .watermark .watermark-title {\n    height: 35px;\n    width: 100%;\n    display: flex; }\n  .watermark .watermark-content {\n    flex-grow: 1; }\n", ""]);
+exports.push([module.id, ":root {\n  --dockview-accent-color: dodgerblue;\n  --group-view-background-color: #1e1e1e;\n  --title-bar-background-color: #252526;\n  --title-bar-scroll-bar-color: #888;\n  --active-tab-background-visible: #1e1e1e;\n  --active-tab-background-hidden: #2d2d2d;\n  --inactive-tab-background-visible: #1e1e1e;\n  --inactive-tab-background-hidden: #2d2d2d;\n  --tab-divider-color: #1e1e1e;\n  --drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --active-group-visible-panel-color: white;\n  --active-group-hidden-panel-color: #969696;\n  --inactive-group-visible-panel-color: #8f8f8f;\n  --inactive-group-hidden-panel-color: #626262;\n  --tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');\n  --tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');\n  --separator-border: rgb(68, 68, 68);\n  --title-font-size: 13px;\n  --title-height: 35px; }\n\n.visual-studio-theme {\n  --active-tab-background-visible: dodgerblue;\n  --title-height: 18px;\n  --title-font-size: 11px; }\n  .visual-studio-theme .groupview.active-group > .title-container {\n    border-bottom: 2px solid var(--active-tab-background-visible); }\n  .visual-studio-theme .groupview.inactive-group > .title-container {\n    border-bottom: 2px solid var(--inactive-tab-background-visible); }\n\n.actions-bar {\n  text-align: right;\n  width: 28px;\n  display: flex;\n  align-items: center;\n  flex-shrink: 0; }\n  .actions-bar .actions-container {\n    display: flex;\n    padding: 0px;\n    margin: 0px;\n    justify-content: flex-end; }\n    .actions-bar .actions-container a:active {\n      -webkit-mask-size: 100% 100% !important;\n      mask-size: 100% 100% !important; }\n    .actions-bar .actions-container .close-action {\n      background-color: white;\n      height: 16px;\n      width: 16px;\n      display: block;\n      -webkit-mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n      mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n      margin-right: '0.5em';\n      cursor: pointer; }\n\n.drop-target {\n  position: relative; }\n  .drop-target > .drop-target-dropzone {\n    position: absolute;\n    left: 0px;\n    top: 0px;\n    height: 100%;\n    width: 100%;\n    z-index: 10000; }\n    .drop-target > .drop-target-dropzone > .drop-target-selection {\n      position: relative;\n      pointer-events: none;\n      height: 100%;\n      width: 100%;\n      background-color: var(--drag-over-background-color);\n      transition-duration: 0.15s;\n      transition-timing-function: ease-out; }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.left, .drop-target > .drop-target-dropzone > .drop-target-selection.right {\n        width: 50%; }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.right {\n        transform: translate(100%, 0%); }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n        transform: translate(0%, 100%); }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.top, .drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n        height: 50%; }\n\n.custom-dragging {\n  height: 24px;\n  line-height: 24px;\n  font-size: 11px;\n  width: 100px;\n  background-color: dodgerblue;\n  color: ghostwhite;\n  border-radius: 11px;\n  position: absolute;\n  padding-left: 10px; }\n\n.groupview.active-group > .title-container > .tab-container > .tab.active-tab {\n  background-color: var(--active-tab-background-visible);\n  color: var(--active-group-visible-panel-color); }\n  .groupview.active-group > .title-container > .tab-container > .tab.active-tab .tab-action {\n    background-color: var(--active-group-visible-panel-color); }\n\n.groupview.active-group > .title-container > .tab-container > .tab.inactive-tab {\n  background-color: var(--active-tab-background-hidden);\n  color: var(--active-group-hidden-panel-color); }\n  .groupview.active-group > .title-container > .tab-container > .tab.inactive-tab .tab-action {\n    background-color: var(--active-group-hidden-panel-color); }\n\n.groupview.inactive-group > .title-container > .tab-container > .tab.active-tab {\n  background-color: var(--inactive-tab-background-visible);\n  color: var(--inactive-group-visible-panel-color); }\n  .groupview.inactive-group > .title-container > .tab-container > .tab.active-tab .tab-action {\n    background-color: var(--inactive-group-visible-panel-color); }\n\n.groupview.inactive-group > .title-container > .tab-container > .tab.inactive-tab {\n  background-color: var(--inactive-tab-background-hidden);\n  color: var(--inactive-group-hidden-panel-color); }\n  .groupview.inactive-group > .title-container > .tab-container > .tab.inactive-tab .tab-action {\n    background-color: var(--inactive-group-hidden-panel-color); }\n\n/**\n * when a tab is dragged we lose the above stylings because they are conditional on parent elements\n * therefore we also set some stylings for the dragging event\n **/\n.tab.dragging {\n  background-color: var(--active-tab-background-visible);\n  color: var(--active-group-visible-panel-color); }\n\n.grid-view,\n.branch-node {\n  height: 100%;\n  width: 100%; }\n\n.groupview {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  background-color: var(--group-view-background-color); }\n  .groupview:focus {\n    outline: none; }\n  .groupview.empty > .title-container {\n    display: none; }\n  .groupview > .content-container {\n    flex-grow: 1;\n    overflow: hidden;\n    outline: none; }\n\n.pane-container {\n  height: 100%;\n  width: 100%; }\n  .pane-container.animated .view {\n    transition-duration: 0.15s;\n    transition-timing-function: ease-out; }\n  .pane-container .view {\n    overflow: hidden;\n    display: flex;\n    flex-direction: column;\n    padding: 0px !important; }\n    .pane-container .view:not(:first-child)::before {\n      background-color: transparent !important; }\n    .pane-container .view:not(:first-child) .pane > .pane-header {\n      border-top: 1px solid rgba(204, 204, 204, 0.2); }\n  .pane-container:first-of-type > .pane > .pane-header {\n    border-top: none !important; }\n  .pane-container .pane {\n    display: flex;\n    flex-direction: column;\n    overflow: hidden;\n    height: 100%; }\n    .pane-container .pane .pane-header {\n      box-sizing: border-box;\n      user-select: none;\n      position: relative;\n      outline: none; }\n      .pane-container .pane .pane-header:focus:before, .pane-container .pane .pane-header:focus-within:before {\n        position: absolute;\n        top: 0;\n        left: 0;\n        width: 100%;\n        height: 100%;\n        z-index: 5;\n        content: '';\n        pointer-events: none;\n        outline: 1px solid;\n        outline-width: -1px;\n        outline-style: solid;\n        outline-offset: -1px;\n        outline-color: var(--dockview-accent-color); }\n    .pane-container .pane .pane-body {\n      overflow-y: auto;\n      overflow-x: hidden;\n      flex-grow: 1;\n      position: relative;\n      outline: none; }\n      .pane-container .pane .pane-body:focus:before, .pane-container .pane .pane-body:focus-within:before {\n        position: absolute;\n        top: 0;\n        left: 0;\n        width: 100%;\n        height: 100%;\n        z-index: 5;\n        content: '';\n        pointer-events: none;\n        outline: 1px solid;\n        outline-width: -1px;\n        outline-style: solid;\n        outline-offset: -1px;\n        outline-color: var(--dockview-accent-color); }\n\n.title-container {\n  display: flex;\n  background-color: var(--title-bar-background-color);\n  flex-shrink: 0;\n  box-sizing: border-box;\n  height: var(--title-height);\n  font-size: var(--title-font-size); }\n  .title-container.hidden {\n    display: none; }\n  .title-container .tab-container {\n    flex-grow: 1;\n    display: flex;\n    overflow-x: overlay;\n    overflow-y: hidden;\n    /* Track */\n    /* Handle */ }\n    .title-container .tab-container::-webkit-scrollbar {\n      height: 3px; }\n    .title-container .tab-container::-webkit-scrollbar-track {\n      background: transparent; }\n    .title-container .tab-container::-webkit-scrollbar-thumb {\n      background: var(--title-bar-scroll-bar-color); }\n    .title-container .tab-container.drag-over-target {\n      background-color: var(--drag-over-background-color); }\n    .title-container .tab-container .tab {\n      -webkit-user-drag: element;\n      outline: none;\n      min-width: 75px;\n      cursor: pointer;\n      position: relative;\n      box-sizing: border-box; }\n      .title-container .tab-container .tab:not(:first-child)::before {\n        content: ' ';\n        position: absolute;\n        top: 0;\n        left: 0;\n        z-index: 5;\n        pointer-events: none;\n        background-color: var(--tab-divider-color);\n        width: 1px;\n        height: 100%; }\n\n.split-view-container {\n  position: relative;\n  overflow: hidden;\n  height: 100%;\n  width: 100%; }\n  .split-view-container.animation .view,\n  .split-view-container.animation .sash {\n    transition-duration: 0.15s;\n    transition-timing-function: ease-out; }\n  .split-view-container.horizontal {\n    height: 100%; }\n    .split-view-container.horizontal > .sash-container > .sash {\n      height: 100%;\n      width: 4px; }\n      .split-view-container.horizontal > .sash-container > .sash.enabled {\n        cursor: ew-resize; }\n      .split-view-container.horizontal > .sash-container > .sash.disabled {\n        cursor: default; }\n      .split-view-container.horizontal > .sash-container > .sash.maximum {\n        cursor: w-resize; }\n      .split-view-container.horizontal > .sash-container > .sash.minimum {\n        cursor: e-resize; }\n    .split-view-container.horizontal > .view-container > .view:not(:first-child)::before {\n      height: 100%;\n      width: 1px; }\n  .split-view-container.vertical {\n    width: 100%; }\n    .split-view-container.vertical > .sash-container > .sash {\n      width: 100%;\n      height: 4px; }\n      .split-view-container.vertical > .sash-container > .sash.enabled {\n        cursor: ns-resize; }\n      .split-view-container.vertical > .sash-container > .sash.disabled {\n        cursor: default; }\n      .split-view-container.vertical > .sash-container > .sash.maximum {\n        cursor: n-resize; }\n      .split-view-container.vertical > .sash-container > .sash.minimum {\n        cursor: s-resize; }\n    .split-view-container.vertical > .view-container > .view {\n      width: 100%; }\n      .split-view-container.vertical > .view-container > .view:not(:first-child)::before {\n        height: 1px;\n        width: 100%; }\n  .split-view-container .sash-container {\n    height: 100%;\n    width: 100%;\n    position: absolute; }\n    .split-view-container .sash-container .sash {\n      position: absolute;\n      z-index: 99;\n      outline: none; }\n  .split-view-container .view-container {\n    position: relative;\n    height: 100%;\n    width: 100%; }\n    .split-view-container .view-container .view {\n      height: 100%;\n      box-sizing: border-box;\n      overflow: auto;\n      position: absolute; }\n  .split-view-container.separator-border .view:not(:first-child)::before {\n    content: ' ';\n    position: absolute;\n    top: 0;\n    left: 0;\n    z-index: 5;\n    pointer-events: none;\n    background-color: var(--separator-border); }\n\n.layout-debug-container {\n  color: white;\n  position: fixed;\n  top: 0px;\n  right: 0px;\n  z-index: 9999;\n  font-size: 11px;\n  width: 100px; }\n  .layout-debug-container .layout-debug-widget {\n    background-color: black;\n    margin: 1px; }\n    .layout-debug-container .layout-debug-widget .layout-debug-widget-row {\n      padding: 0px 5px;\n      display: flex; }\n      .layout-debug-container .layout-debug-widget .layout-debug-widget-row span:first-child {\n        flex-grow: 1; }\n\n.tab.dragging .tab-action {\n  background-color: var(--active-group-visible-panel-color); }\n\n.tab.active-tab > .default-tab .tab-action {\n  visibility: visible; }\n\n.tab.inactive-tab > .default-tab .tab-action:not(.dirty) {\n  visibility: hidden; }\n\n.tab.inactive-tab > .default-tab:hover .tab-action {\n  visibility: visible; }\n\n.tab .default-tab {\n  position: relative;\n  height: 100%;\n  display: flex;\n  min-width: 80px;\n  align-items: center;\n  padding-left: 10px;\n  white-space: nowrap;\n  text-overflow: elipsis; }\n  .tab .default-tab .tab-content {\n    flex-grow: 1; }\n  .tab .default-tab .action-container {\n    text-align: right;\n    width: 28px;\n    display: flex; }\n    .tab .default-tab .action-container .tab-list {\n      display: flex;\n      padding: 0px;\n      margin: 0px;\n      justify-content: flex-end; }\n      .tab .default-tab .action-container .tab-list a:active:hover {\n        -webkit-mask-size: 100% 100% !important;\n        mask-size: 100% 100% !important; }\n      .tab .default-tab .action-container .tab-list .tab-action {\n        height: 16px;\n        width: 16px;\n        display: block;\n        -webkit-mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n        mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n        margin-right: '0.5em'; }\n        .tab .default-tab .action-container .tab-list .tab-action.disable-close {\n          display: none; }\n        .tab .default-tab .action-container .tab-list .tab-action.dirty:not(:hover) {\n          display: block;\n          -webkit-mask: var(--tab-dirty-icon) 50% 50%/60% 60% no-repeat;\n          mask: var(--tab-dirty-icon) 50% 50%/60% 60% no-repeat; }\n\n.watermark {\n  display: flex;\n  width: 100%; }\n  .watermark.has-actions .watermark-title .actions-bar {\n    display: none; }\n  .watermark .watermark-title {\n    height: 35px;\n    width: 100%;\n    display: flex; }\n  .watermark .watermark-content {\n    flex-grow: 1; }\n", ""]);
 // Exports
 module.exports = exports;
 
@@ -1061,45 +1061,56 @@ exports.Application = function () {
     var api = React.useRef();
     var registry = registry_1.useLayoutRegistry();
     var onReady = function (event) {
-        // event.api.fromJSON(require('./application.layout.json'));
         api.current = event.api;
         registry.register('gridview', event.api);
-        // return;
-        event.api.addPanel({
-            id: 'i',
-            component: 'activitybar',
-            minimumWidth: 48,
-            maximumWidth: 48,
-            location: [0],
-        });
-        event.api.addPanel({
-            id: 'footer',
-            component: 'footer',
-            location: [1],
-            maximumHeight: 22,
-            minimumHeight: 22,
-        });
-        event.api.addPanel({
-            id: 'editor',
-            component: 'editor',
-            snap: true,
-            location: [0, 1],
-            priority: dockview_1.LayoutPriority.High,
-        });
-        event.api.addPanel({
-            id: 'sidebar',
-            component: 'sidebar',
-            snap: true,
-            position: { reference: 'editor', direction: 'left' },
-            minimumWidth: 170,
-            size: 100,
-        });
-        event.api.addPanel({
-            id: 'panel',
-            component: 'panel',
-            position: { reference: 'editor', direction: 'below' },
-            size: 200,
-            snap: true,
+        // event.api.fromJSON(require('./application.layout.json'));
+        var state = localStorage.getItem('dockview-layout');
+        if (state) {
+            console.log('loading from save');
+            var jsonstate = JSON.parse(state);
+            event.api.fromJSON(jsonstate);
+        }
+        else {
+            event.api.addPanel({
+                id: 'i',
+                component: 'activitybar',
+                minimumWidth: 48,
+                maximumWidth: 48,
+                location: [0],
+            });
+            event.api.addPanel({
+                id: 'footer',
+                component: 'footer',
+                location: [1],
+                maximumHeight: 22,
+                minimumHeight: 22,
+            });
+            event.api.addPanel({
+                id: 'editor',
+                component: 'editor',
+                snap: true,
+                location: [0, 1],
+                priority: dockview_1.LayoutPriority.High,
+            });
+            event.api.addPanel({
+                id: 'sidebar',
+                component: 'sidebar',
+                snap: true,
+                position: { reference: 'editor', direction: 'left' },
+                minimumWidth: 170,
+                size: 100,
+            });
+            event.api.addPanel({
+                id: 'panel',
+                component: 'panel',
+                position: { reference: 'editor', direction: 'below' },
+                size: 200,
+                snap: true,
+            });
+        }
+        event.api.onDidLayoutChange(function () {
+            localStorage.setItem('dockview-layout', JSON.stringify(event.api.toJSON()));
+            console.log('SAVED', event.api.toJSON());
         });
     };
     React.useEffect(function () {
@@ -1110,7 +1121,7 @@ exports.Application = function () {
         };
         window.addEventListener('resize', onresize);
         onresize(undefined); // initial render
-        api.current.getPanel('sidebar').api.setSize({ width: 300 });
+        // api.current.getPanel('sidebar').api.setSize({ width: 300 });
         return function () {
             window.removeEventListener('resize', onresize);
         };
@@ -1918,6 +1929,14 @@ exports.Panel = function (props) {
         var editorPanel = props.containerApi.getPanel('editor');
         editorPanel.api.setVisible(true);
         props.api.setVisible(false);
+    };
+    var onMove = function () {
+        var thisPanel = props.containerApi.getPanel('panel');
+        var editor = props.containerApi.getPanel('editor');
+        props.containerApi.movePanel(thisPanel, {
+            direction: 'left',
+            reference: editor.id,
+        });
     };
     return (React.createElement("div", { style: {
             borderTop: "1px solid var(--separator-border)",
@@ -31927,8 +31946,9 @@ var __extends = (undefined && undefined.__extends) || (function () {
  */
 var BaseViewApi = /** @class */ (function (_super) {
     __extends(BaseViewApi, _super);
-    function BaseViewApi() {
+    function BaseViewApi(id) {
         var _this = _super.call(this) || this;
+        _this.id = id;
         _this._state = {};
         _this._isFocused = false;
         _this._isActive = false;
@@ -32265,6 +32285,9 @@ var GridviewApi = /** @class */ (function () {
     GridviewApi.prototype.removePanel = function (panel, sizing) {
         this.component.removePanel(panel, sizing);
     };
+    GridviewApi.prototype.movePanel = function (panel, options) {
+        this.component.movePanel(panel, options);
+    };
     GridviewApi.prototype.resizeToFit = function () {
         return this.component.resizeToFit();
     };
@@ -32439,8 +32462,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
 var GridPanelApi = /** @class */ (function (_super) {
     __extends(GridPanelApi, _super);
     //
-    function GridPanelApi() {
-        var _this = _super.call(this) || this;
+    function GridPanelApi(id) {
+        var _this = _super.call(this, id) || this;
         _this._onDidConstraintsChangeInternal = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
         _this.onDidConstraintsChangeInternal = _this._onDidConstraintsChangeInternal.event;
         //
@@ -32502,7 +32525,7 @@ var __extends = (undefined && undefined.__extends) || (function () {
 var GroupPanelApi = /** @class */ (function (_super) {
     __extends(GroupPanelApi, _super);
     function GroupPanelApi(panel, group) {
-        var _this = _super.call(this) || this;
+        var _this = _super.call(this, panel.id) || this;
         _this.panel = panel;
         _this._isGroupVisible = false;
         _this._onDidDirtyChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
@@ -32601,9 +32624,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
 
 var PanePanelApi = /** @class */ (function (_super) {
     __extends(PanePanelApi, _super);
-    function PanePanelApi(pane) {
-        var _this = _super.call(this) || this;
-        _this.pane = pane;
+    function PanePanelApi(id) {
+        var _this = _super.call(this, id) || this;
         _this._onDidExpansionChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
             replay: true,
         });
@@ -32615,12 +32637,19 @@ var PanePanelApi = /** @class */ (function (_super) {
         _this.onMouseLeave = _this._onMouseLeave.event;
         return _this;
     }
+    Object.defineProperty(PanePanelApi.prototype, "pane", {
+        set: function (pane) {
+            this._pane = pane;
+        },
+        enumerable: false,
+        configurable: true
+    });
     PanePanelApi.prototype.setExpanded = function (isExpanded) {
-        this.pane.setExpanded(isExpanded);
+        this._pane.setExpanded(isExpanded);
     };
     Object.defineProperty(PanePanelApi.prototype, "isExpanded", {
         get: function () {
-            return this.pane.isExpanded();
+            return this._pane.isExpanded();
         },
         enumerable: false,
         configurable: true
@@ -32667,8 +32696,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
 var PanelApi = /** @class */ (function (_super) {
     __extends(PanelApi, _super);
     //
-    function PanelApi() {
-        var _this = _super.call(this) || this;
+    function PanelApi(id) {
+        var _this = _super.call(this, id) || this;
         _this._onDidConstraintsChangeInternal = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
         _this.onDidConstraintsChangeInternal = _this._onDidConstraintsChangeInternal.event;
         //
@@ -34788,6 +34817,13 @@ var BaseGrid = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    BaseGrid.prototype.setVisible = function (panel, visible) {
+        this.gridview.setViewVisible((0,_gridview__WEBPACK_IMPORTED_MODULE_1__.getGridLocation)(panel.element), visible);
+        this._onDidLayoutChange.fire({ kind: "LAYOUT" /* LAYOUT */ });
+    };
+    BaseGrid.prototype.isVisible = function (panel) {
+        return this.gridview.isViewVisible((0,_gridview__WEBPACK_IMPORTED_MODULE_1__.getGridLocation)(panel.element));
+    };
     BaseGrid.prototype.doAddGroup = function (group, location, size) {
         if (location === void 0) { location = [0]; }
         this.gridview.addView(group, size !== null && size !== void 0 ? size : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Sizing.Distribute, location);
@@ -35147,11 +35183,12 @@ var BranchNode = /** @class */ (function (_super) {
                 descriptor: descriptor,
                 proportionalLayout: proportionalLayout,
             });
-            _this.setupChildrenEvents();
         }
         _this.addDisposables(_this.splitview.onDidSashEnd(function () {
+            console.log('sash end');
             _this._onDidChange.fire(undefined);
         }));
+        _this.setupChildrenEvents();
         return _this;
     }
     Object.defineProperty(BranchNode.prototype, "width", {
@@ -35509,12 +35546,12 @@ var ComponentGridview = /** @class */ (function (_super) {
         this.groups.clear();
         this.fromJSON(data);
     };
-    ComponentGridview.prototype.setVisible = function (panel, visible) {
-        this.gridview.setViewVisible((0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(panel.element), visible);
-    };
-    ComponentGridview.prototype.isVisible = function (panel) {
-        return this.gridview.isViewVisible((0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(panel.element));
-    };
+    // public setVisible(panel: GridviewPanel, visible: boolean) {
+    //     this.gridview.setViewVisible(getGridLocation(panel.element), visible);
+    // }
+    // public isVisible(panel: GridviewPanel) {
+    //     return this.gridview.isViewVisible(getGridLocation(panel.element));
+    // }
     ComponentGridview.prototype.toggleVisibility = function (panel) {
         this.setVisible(panel, !this.isVisible(panel));
     };
@@ -35529,7 +35566,7 @@ var ComponentGridview = /** @class */ (function (_super) {
         this.groups.clear();
         var width = this.width;
         var height = this.height;
-        this.layout(width, height, true);
+        // this.layout(width, height, true);
         // const yTransform = height / grid.height;
         // const xTransform = width / grid.width;
         // grid.height = yTransform * grid.height;
@@ -35597,6 +35634,20 @@ var ComponentGridview = /** @class */ (function (_super) {
         // this.layout(width, height, true);
         this._onDidLayoutChange.fire({ kind: "NEW_LAYOUT" /* NEW_LAYOUT */ });
     };
+    ComponentGridview.prototype.movePanel = function (panel, options) {
+        var relativeLocation;
+        var removedPanel = this.gridview.remove(panel);
+        var referenceGroup = this.groups.get(options.reference).value;
+        var target = (0,_baseComponentGridview__WEBPACK_IMPORTED_MODULE_3__.toTarget)(options.direction);
+        if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
+            throw new Error(target + " not supported as an option");
+        }
+        else {
+            var location_1 = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+            relativeLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_1, target);
+        }
+        this.doAddGroup(removedPanel, relativeLocation, options.size);
+    };
     ComponentGridview.prototype.addPanel = function (options) {
         var _a;
         var relativeLocation = options.location || [0];
@@ -35608,8 +35659,8 @@ var ComponentGridview = /** @class */ (function (_super) {
                 throw new Error(target + " not supported as an option");
             }
             else {
-                var location_1 = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-                relativeLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_1, target);
+                var location_2 = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+                relativeLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_2, target);
             }
         }
         var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_5__.createComponent)(options.id, options.component, this.options.components, this.options.frameworkComponents, {
@@ -36243,7 +36294,7 @@ var __assign = (undefined && undefined.__assign) || function () {
 var GridviewPanel = /** @class */ (function (_super) {
     __extends(GridviewPanel, _super);
     function GridviewPanel(id, component) {
-        var _this = _super.call(this, id, component, new _api_gridPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridPanelApi()) || this;
+        var _this = _super.call(this, id, component, new _api_gridPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridPanelApi(id)) || this;
         _this._minimumWidth = 0;
         _this._minimumHeight = 0;
         _this._maximumWidth = Number.MAX_SAFE_INTEGER;
@@ -38818,7 +38869,7 @@ var __read = (undefined && undefined.__read) || function (o, n) {
 var PaneviewPanel = /** @class */ (function (_super) {
     __extends(PaneviewPanel, _super);
     function PaneviewPanel(id, component, headerComponent) {
-        var _this = _super.call(this, id, component, new _api_panePanelApi__WEBPACK_IMPORTED_MODULE_0__.PanePanelApi(null)) || this;
+        var _this = _super.call(this, id, component, new _api_panePanelApi__WEBPACK_IMPORTED_MODULE_0__.PanePanelApi(id)) || this;
         _this.headerComponent = headerComponent;
         _this._onDidChangeExpansionState = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
         _this.onDidChangeExpansionState = _this._onDidChangeExpansionState.event;
@@ -41440,7 +41491,7 @@ var __read = (undefined && undefined.__read) || function (o, n) {
 var SplitviewPanel = /** @class */ (function (_super) {
     __extends(SplitviewPanel, _super);
     function SplitviewPanel(id, componentName) {
-        var _this = _super.call(this, id, componentName, new _api_panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApi()) || this;
+        var _this = _super.call(this, id, componentName, new _api_panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApi(id)) || this;
         _this._minimumSize = 0;
         _this._maximumSize = Number.POSITIVE_INFINITY;
         _this._snap = false;
