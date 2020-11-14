@@ -161,6 +161,10 @@ export class ComponentSplitview
     }
 
     addPanel(options: AddSplitviewComponentOptions): void {
+        if (this.panels.has(options.id)) {
+            throw new Error(`panel ${options.id} already exists`);
+        }
+
         const view = createComponent(
             options.id,
             options.component,
@@ -258,6 +262,10 @@ export class ComponentSplitview
                 size,
                 views: views.map((view) => {
                     const data = view.data;
+
+                    if (this.panels.has(data.id)) {
+                        throw new Error(`panel ${data.id} already exists`);
+                    }
 
                     const panel = createComponent(
                         data.id,
