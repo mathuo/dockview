@@ -84,26 +84,8 @@ export class Tab extends CompositeDisposable implements ITab {
                     id: this.accessor.id,
                 };
 
-                // set up a custom ghost image
-                const dragImage = this._element.cloneNode(true) as HTMLElement;
-
-                const box = this._element.getBoundingClientRect();
-
-                // if the style of the tab is determined by CSS by a parent element that style will lost
-                // therefore we must explicility re-add the style features that we know will be lost
-                dragImage.style.height = `${box.height}px`;
-                dragImage.style.width = `${box.width}px`;
-                dragImage.style.position = 'absolute';
-                dragImage.classList.add('dragging');
-
-                document.body.appendChild(dragImage);
-                event.dataTransfer.setDragImage(
-                    dragImage,
-                    event.offsetX,
-                    event.offsetY
-                );
-                setTimeout(() => document.body.removeChild(dragImage), 0);
-                // configure the data-transfer object
+                this.element.classList.add('dragged');
+                setTimeout(() => this.element.classList.remove('dragged'), 0);
 
                 const data = JSON.stringify({
                     type: DragType.ITEM,

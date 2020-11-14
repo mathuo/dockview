@@ -14,7 +14,7 @@
 
 ##
 
-A zero dependency layout manager based on the layering of split-view components with ReactJS support. View the live demo [here](https://mathuo.github.io/dockview/). Automatically generated TypeDocs can be found [here](https://mathuo.github.io/dockview/output/docs/index.html);
+A zero dependency layout manager based on the layering of split-view components with ReactJS support. View the live demo [here](https://mathuo.github.io/dockview/). Automatically generated TypeDocs can be found [here](https://mathuo.github.io/dockview/output/docs/index.html).
 
 ## Installation
 You can install the project from [npm](https://www.npmjs.com/package/dockview). The project comes with TypeScript typings.
@@ -30,6 +30,12 @@ You must import the core css stylesheet but you are free to supply your own them
 ```
 dockview/dist/styles.css
 ```
+
+By default the seperator between panels is `transparent` but this can be set through the CSS varibable `--separator-border`. Alternatively, or if you require the `DockviewComponent` you should attach the classname of an included theme; either `dockview-theme-dark` or `dockview-theme-light`.
+
+
+### Online examples
+[Splitview](https://codesandbox.io/s/simple-splitview-l53nn)
 
 ## React
 

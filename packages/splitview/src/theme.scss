@@ -1,11 +1,19 @@
-:root {
-    //
+@mixin dockview-theme-core-mixin {
     --dockview-accent-color: dodgerblue;
+    --title-font-size: 13px;
+    --title-height: 35px;
+    --tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');
+    --tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');
+    --drag-over-background-color: rgba(83, 89, 93, 0.5);
+    --title-bar-scroll-bar-color: #888;
+}
+
+@mixin dockview-theme-dark-mixin {
+    @include dockview-theme-core-mixin();
     //
     --group-view-background-color: #1e1e1e;
     //
     --title-bar-background-color: #252526;
-    --title-bar-scroll-bar-color: #888;
     //
     --active-tab-background-visible: #1e1e1e;
     --active-tab-background-hidden: #2d2d2d;
@@ -13,23 +21,48 @@
     --inactive-tab-background-hidden: #2d2d2d;
     --tab-divider-color: #1e1e1e;
     //
-    --drag-over-background-color: rgba(83, 89, 93, 0.5);
-    //
     --active-group-visible-panel-color: white;
     --active-group-hidden-panel-color: #969696;
     --inactive-group-visible-panel-color: #8f8f8f;
     --inactive-group-hidden-panel-color: #626262;
     //
-    --tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');
-    --tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');
-    //
     --separator-border: rgb(68, 68, 68);
-
-    --title-font-size: 13px;
-    --title-height: 35px;
+    --paneview-border-color: rgba(204, 204, 204, 0.2);
 }
 
-.visual-studio-theme {
+@mixin dockview-theme-light-mixin {
+    @include dockview-theme-core-mixin();
+    //
+    --group-view-background-color: white;
+    //
+    --title-bar-background-color: #f3f3f3;
+    //
+    --active-tab-background-visible: white;
+    --active-tab-background-hidden: #ececec;
+    --inactive-tab-background-visible: white;
+    --inactive-tab-background-hidden: #ececec;
+    --tab-divider-color: white;
+    //
+    --active-group-visible-panel-color: rgb(51, 51, 51);
+    --active-group-hidden-panel-color: rgba(51, 51, 51, 0.7);
+    --inactive-group-visible-panel-color: rgba(51, 51, 51, 0.7);
+    --inactive-group-hidden-panel-color: rgba(51, 51, 51, 0.35);
+    //
+    --separator-border: rgba(128, 128, 128, 0.35);
+    --paneview-border-color: rgb(51, 51, 51);
+}
+
+.dockview-theme-dark {
+    @include dockview-theme-dark-mixin();
+}
+
+.dockview-theme-light {
+    @include dockview-theme-light-mixin();
+}
+
+.dockview-theme-vs {
+    @include dockview-theme-dark-mixin();
+
     --active-tab-background-visible: dodgerblue;
     --title-height: 18px;
     --title-font-size: 11px;
