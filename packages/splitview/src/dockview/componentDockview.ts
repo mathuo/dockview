@@ -527,11 +527,11 @@ export class ComponentDockview
     public _addPanel(options: AddPanelOptions): IGroupPanel {
         const contentPart = this.createContentComponent(
             options.id,
-            options.componentName
+            options.component
         );
         const headerPart = this.createTabComponent(
             options.id,
-            options.tabComponentName
+            options.tabComponent
         );
 
         const panel = new GroupviewPanel(options.id, this._api);

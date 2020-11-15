@@ -52,8 +52,8 @@ export interface DockviewOptions {
 }
 
 export interface PanelOptions {
-    componentName: string;
-    tabComponentName?: string;
+    component: string;
+    tabComponent?: string;
     params?: { [key: string]: any };
     id: string;
     title?: string;
@@ -61,9 +61,9 @@ export interface PanelOptions {
 }
 
 export interface AddPanelOptions
-    extends Omit<PanelOptions, 'componentName' | 'tabComponentName'> {
-    componentName: string;
-    tabComponentName?: string;
+    extends Omit<PanelOptions, 'component' | 'tabComponent'> {
+    component: string;
+    tabComponent?: string;
     position?: {
         direction?: Direction;
         referencePanel: string;

@@ -4,7 +4,7 @@ import {
     GroupPanelPartInitParameters,
 } from '../../groupview/types';
 import { ReactPart, ReactPortalStore } from '../react';
-import { ActionsbarReference, IGroupPanelProps } from '../dockview/dockview';
+import { ActionsbarReference, IDockviewPanelProps } from '../dockview/dockview';
 import { PanelUpdateEvent } from '../../panel/types';
 import { IGroupview } from '../../groupview/groupview';
 import { IGroupPanelApi } from '../../api/groupPanelApi';
@@ -17,7 +17,7 @@ export interface IGroupPanelActionbarProps {
 
 export class ReactPanelContentPart implements PanelContentPart {
     private _element: HTMLElement;
-    private part?: ReactPart<IGroupPanelProps>;
+    private part?: ReactPart<IDockviewPanelProps>;
     private _group: IGroupview;
     //
     private _actionsElement: HTMLElement;
@@ -35,7 +35,9 @@ export class ReactPanelContentPart implements PanelContentPart {
 
     constructor(
         public readonly id: string,
-        private readonly component: React.FunctionComponent<IGroupPanelProps>,
+        private readonly component: React.FunctionComponent<
+            IDockviewPanelProps
+        >,
         private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');

@@ -34,9 +34,11 @@ dockview/dist/styles.css
 By default the seperator between panels is `transparent` but this can be set through the CSS varibable `--separator-border`. Alternatively, or if you require the `DockviewComponent` you should attach the classname of an included theme; either `dockview-theme-dark` or `dockview-theme-light`.
 
 
-### Online examples
-[Splitview](https://codesandbox.io/s/simple-splitview-l53nn)
-[Gridview](https://codesandbox.io/s/simple-gridview-jrp0n)
+### Sandbox examples
+- [Dockview](https://codesandbox.io/s/simple-dockview-t6491)
+- [Gridview](https://codesandbox.io/s/simple-gridview-jrp0n)
+- [Splitview](https://codesandbox.io/s/simple-splitview-l53nn)
+- [Paneview](https://codesandbox.io/s/simple-paneview-v8qvb)
 
 ## React
 

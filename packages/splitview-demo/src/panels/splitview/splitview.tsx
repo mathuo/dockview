@@ -1,6 +1,5 @@
 import {
     CompositeDisposable,
-    IGroupPanelProps,
     ISplitviewPanelProps,
     Orientation,
     SplitviewApi,
@@ -12,6 +11,7 @@ import {
     VisibilityEvent,
     PanelConstraintChangeEvent,
     IGroupPanel,
+    IDockviewPanelProps,
 } from 'dockview';
 import * as React from 'react';
 import './splitview.scss';
@@ -95,7 +95,7 @@ const components = {
     },
 };
 
-export const SplitviewPanel = (props: IGroupPanelProps) => {
+export const SplitviewPanel = (props: IDockviewPanelProps) => {
     return (
         <div
             style={{
@@ -126,7 +126,7 @@ export const SplitviewPanel = (props: IGroupPanelProps) => {
 };
 
 export const Common = (
-    props: IGroupPanelProps & { orientation: Orientation }
+    props: IDockviewPanelProps & { orientation: Orientation }
 ) => {
     const api = React.useRef<SplitviewApi>();
 

@@ -5,8 +5,8 @@ import {
     Orientation,
     SplitviewReadyEvent,
     SplitviewComponent,
-    IGroupPanelProps,
     SplitviewApi,
+    IDockviewPanelProps,
 } from 'dockview';
 import { useLayoutRegistry } from './registry';
 import './splitPanel.scss';
@@ -58,7 +58,7 @@ const components = {
 
 const SPLIT_PANEL_STATE_KEY = 'splitview_panel_state';
 
-export const SplitPanel = (props: IGroupPanelProps) => {
+export const SplitPanel = (props: IDockviewPanelProps) => {
     const api = React.useRef<SplitviewApi>();
     const registry = useLayoutRegistry();
 

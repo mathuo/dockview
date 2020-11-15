@@ -6,13 +6,12 @@ import {
     GridviewApi,
     GridviewComponent,
     GridviewReadyEvent,
+    IDockviewPanelProps,
     IGridviewPanelProps,
-    IGroupPanelProps,
     LayoutPriority,
     Orientation,
     orthogonal,
     PanelCollection,
-    PanelConstraintChangeEvent,
     PanelDimensionChangeEvent,
     VisibilityEvent,
 } from 'dockview';
@@ -104,7 +103,7 @@ const components: PanelCollection<IGridviewPanelProps> = {
     },
 };
 
-export const GridviewDemoPanel = (props: IGroupPanelProps) => {
+export const GridviewDemoPanel = (props: IDockviewPanelProps) => {
     return (
         <div
             style={{
@@ -128,7 +127,7 @@ export const GridviewDemoPanel = (props: IGroupPanelProps) => {
     );
 };
 
-export const GridviewDemo = (props: IGroupPanelProps) => {
+export const GridviewDemo = (props: IDockviewPanelProps) => {
     const api = React.useRef<GridviewApi>();
 
     const [orientation, setOrientation] = React.useState<Orientation>(

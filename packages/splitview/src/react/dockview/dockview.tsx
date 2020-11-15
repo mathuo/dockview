@@ -27,7 +27,7 @@ export interface IGroupPanelBaseProps {
     [key: string]: any;
 }
 
-export interface IGroupPanelProps extends IGroupPanelBaseProps {
+export interface IDockviewPanelProps extends IGroupPanelBaseProps {
     setActionsbar<P>(
         component: React.FunctionComponent<IGroupPanelActionbarProps & P>,
         props: P
@@ -46,7 +46,7 @@ export interface IWatermarkPanelProps {
 }
 
 export interface IDockviewComponentProps {
-    components?: PanelCollection<IGroupPanelProps>;
+    components?: PanelCollection<IDockviewPanelProps>;
     tabComponents?: PanelCollection<IGroupPanelBaseProps>;
     watermarkComponent?: React.FunctionComponent<IWatermarkPanelProps>;
     onReady?: (event: DockviewReadyEvent) => void;

@@ -19,7 +19,7 @@ export const ControlCenter = () => {
             { element: dragRef.current, content: 'drag me' },
             () => ({
                 id: 'yellow',
-                componentName: 'test_component',
+                component: 'test_component',
             })
         );
 
@@ -38,7 +38,7 @@ export const ControlCenter = () => {
         const id = `${_id}`;
 
         api.addPanel({
-            componentName: 'test_component',
+            component: 'test_component',
             id,
             title: `Item ${id}`,
         });
@@ -54,7 +54,7 @@ export const ControlCenter = () => {
             return;
         }
         api.addPanel({
-            componentName: 'test_component',
+            component: 'test_component',
             id,
             title: `Item ${id}`,
         });
@@ -128,7 +128,7 @@ export const ControlCenter = () => {
 
         api.addPanel({
             id: 'settings',
-            componentName: 'settings',
+            component: 'settings',
             title: 'Settings',
         });
     };

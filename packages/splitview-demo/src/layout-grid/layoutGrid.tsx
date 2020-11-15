@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {
-    IGroupPanelProps,
+    IDockviewPanelProps,
     CompositeDisposable,
     GroupChangeKind,
     IGridviewPanelProps,
@@ -12,7 +12,6 @@ import {
     IWatermarkPanelProps,
     IGroupPanel,
     PanelCollection,
-    GridviewPanel,
 } from 'dockview';
 import { CustomTab } from './customTab';
 import { Settings } from './settingsPanel';
@@ -23,11 +22,11 @@ import { WelcomePanel } from '../panels/welcome/welcome';
 import { SplitviewPanel } from '../panels/splitview/splitview';
 import { GridviewDemoPanel } from '../panels/gridview/gridview';
 
-const components: PanelCollection<IGroupPanelProps> = {
+const components: PanelCollection<IDockviewPanelProps> = {
     welcome: WelcomePanel,
     splitview: SplitviewPanel,
     gridview: GridviewDemoPanel,
-    inner_component: (props: IGroupPanelProps) => {
+    inner_component: (props: IDockviewPanelProps) => {
         const _api = React.useRef<DockviewApi>();
 
         const onReady = (event: DockviewReadyEvent) => {
@@ -38,17 +37,17 @@ const components: PanelCollection<IGroupPanelProps> = {
                 event.api.deserialize(layout);
             } else {
                 event.api.addPanel({
-                    componentName: 'test_component',
+                    component: 'test_component',
                     id: 'inner-1',
                     title: 'inner-1',
                 });
                 event.api.addPanel({
-                    componentName: 'test_component',
+                    component: 'test_component',
                     id: 'inner-2',
                     title: 'inner-2',
                 });
                 event.api.addPanel({
-                    componentName: 'test_component',
+                    component: 'test_component',
                     id: nextGuid(),
                     title: 'inner-3',
                     position: {
@@ -57,7 +56,7 @@ const components: PanelCollection<IGroupPanelProps> = {
                     },
                 });
                 event.api.addPanel({
-                    componentName: 'test_component',
+                    component: 'test_component',
                     id: nextGuid(),
                     title: 'inner-4',
                     position: {
@@ -101,7 +100,7 @@ const components: PanelCollection<IGroupPanelProps> = {
             </div>
         );
     },
-    test_component: (props: IGroupPanelProps & { [key: string]: any }) => {
+    test_component: (props: IDockviewPanelProps & { [key: string]: any }) => {
         const [panelState, setPanelState] = React.useState<{
             isGroupActive: boolean;
             isPanelVisible: boolean;
@@ -275,7 +274,7 @@ export const TestGrid = (props: IGridviewPanelProps) => {
 
             return {
                 id: 'yellow',
-                componentName: 'test_component',
+                component: 'test_component',
             };
         });
 
@@ -287,12 +286,12 @@ export const TestGrid = (props: IGridviewPanelProps) => {
             return {
                 id: Date.now().toString(),
                 title: event.event.dataTransfer.files[0].name,
-                componentName: 'test_component',
+                component: 'test_component',
             };
         });
 
         api.addPanel({
-            componentName: 'welcome',
+            component: 'welcome',
             id: 'welcome',
             title: 'Welcome',
         });
@@ -301,23 +300,23 @@ export const TestGrid = (props: IGridviewPanelProps) => {
         return;
 
         api.addPanel({
-            componentName: 'test_component',
+            component: 'test_component',
             id: nextGuid(),
             title: 'Item 1',
             params: { text: 'how low?' },
         });
         api.addPanel({
-            componentName: 'test_component',
+            component: 'test_component',
             id: 'item2',
             title: 'Item 2',
         });
         api.addPanel({
-            componentName: 'split_panel',
+            component: 'split_panel',
             id: nextGuid(),
             title: 'Item 3 with a long title',
         });
         api.addPanel({
-            componentName: 'test_component',
+            component: 'test_component',
             id: nextGuid(),
             title: 'Item 3',
             position: { direction: 'below', referencePanel: 'item2' },

@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { IGroupPanelProps } from 'dockview';
+import { IDockviewPanelProps } from 'dockview';
 
-export const Settings = (props: IGroupPanelProps) => {
+export const Settings = (props: IDockviewPanelProps) => {
     const [tabHeight, setTabHeight] = React.useState<number>(
         props.containerApi.getTabHeight()
     );

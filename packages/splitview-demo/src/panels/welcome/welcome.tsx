@@ -1,8 +1,8 @@
-import { IGroupPanelProps } from 'dockview';
+import { IDockviewPanelProps } from 'dockview';
 import * as React from 'react';
 import './welcome.scss';
 
-export const WelcomePanel = (props: IGroupPanelProps) => {
+export const WelcomePanel = (props: IDockviewPanelProps) => {
     const onAddSplitview = (event: React.MouseEvent<HTMLDivElement>) => {
         const splitviewPanel = props.containerApi.getPanel('splitview');
         if (splitviewPanel) {
@@ -12,7 +12,7 @@ export const WelcomePanel = (props: IGroupPanelProps) => {
 
         props.containerApi.addPanel({
             id: 'splitview',
-            componentName: 'splitview',
+            component: 'splitview',
             title: 'Splitview Docs',
         });
     };
@@ -26,7 +26,7 @@ export const WelcomePanel = (props: IGroupPanelProps) => {
 
         props.containerApi.addPanel({
             id: 'gridview',
-            componentName: 'gridview',
+            component: 'gridview',
             title: 'Gridview Docs',
         });
     };
