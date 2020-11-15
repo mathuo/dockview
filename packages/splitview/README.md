@@ -36,6 +36,7 @@ By default the seperator between panels is `transparent` but this can be set thr
 
 ### Online examples
 [Splitview](https://codesandbox.io/s/simple-splitview-l53nn)
+[Gridview](https://codesandbox.io/s/simple-gridview-jrp0n)
 
 ## React
 
