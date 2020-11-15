@@ -1,7 +1,7 @@
 export * from './splitview/core/splitview';
-export * from './splitview/componentSplitview';
+export * from './splitview/splitviewComponent';
 export * from './paneview/paneview';
-export * from './paneview/componentPaneview';
+export * from './paneview/paneviewComponent';
 export * from './gridview/gridview';
 export * from './groupview/groupview';
 export * from './groupview/panel/content';
@@ -14,9 +14,9 @@ export * from './api/component.api';
 export * from './react/react';
 export * from './groupview/types';
 export * from './react';
-export * from './dockview/componentDockview';
+export * from './dockview/dockviewComponent';
 export * from './dockview/options';
-export * from './gridview/componentGridview';
+export * from './gridview/gridviewComponent';
 
 export {
     StateObject,

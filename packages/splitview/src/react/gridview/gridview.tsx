@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {
-    ComponentGridview,
-    IComponentGridview,
-} from '../../gridview/componentGridview';
+    GridviewComponent,
+    IGridviewComponent,
+} from '../../gridview/gridviewComponent';
 import { IGridPanelApi } from '../../api/gridPanelApi';
 import { Orientation } from '../../splitview/core/splitview';
 import { ReactGridPanelView } from './view';
@@ -20,7 +20,7 @@ export interface IGridviewPanelProps {
     [key: string]: any;
 }
 
-export interface IGridviewComponentProps {
+export interface IGridviewReactProps {
     orientation: Orientation;
     onReady?: (event: GridviewReadyEvent) => void;
     components: PanelCollection<IGridviewPanelProps>;
@@ -29,15 +29,15 @@ export interface IGridviewComponentProps {
     proportionalLayout?: boolean;
 }
 
-export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps> = (
-    props: IGridviewComponentProps
+export const GridviewReact: React.FunctionComponent<IGridviewReactProps> = (
+    props: IGridviewReactProps
 ) => {
     const domRef = React.useRef<HTMLDivElement>();
-    const gridviewRef = React.useRef<IComponentGridview>();
+    const gridviewRef = React.useRef<IGridviewComponent>();
     const [portals, addPortal] = usePortalsLifecycle();
 
     React.useEffect(() => {
-        const gridview = new ComponentGridview(domRef.current, {
+        const gridview = new GridviewComponent(domRef.current, {
             proportionalLayout: !!props.proportionalLayout,
             orientation: props.orientation,
             frameworkComponents: props.components,
@@ -74,4 +74,4 @@ export const GridviewComponent: React.FunctionComponent<IGridviewComponentProps>
         </div>
     );
 };
-GridviewComponent.displayName = 'GridviewComponent';
+GridviewReact.displayName = 'GridviewComponent';

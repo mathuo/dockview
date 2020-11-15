@@ -1,7 +1,7 @@
 import { PanelDimensionChangeEvent } from '../../api/api';
 import { CompositeDisposable } from '../../lifecycle';
 import { PanelUpdateEvent } from '../../panel/types';
-import { ComponentPaneview } from '../../paneview/componentPaneview';
+import { PaneviewComponent } from '../../paneview/paneviewComponent';
 import {
     PaneviewPanel,
     IPaneBodyPart,
@@ -70,7 +70,7 @@ describe('componentPaneview', () => {
     test('vertical panels', () => {
         const disposables = new CompositeDisposable();
 
-        const paneview = new ComponentPaneview(container, {
+        const paneview = new PaneviewComponent(container, {
             components: {
                 testPanel: TestPanel,
             },

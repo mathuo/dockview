@@ -7,7 +7,7 @@ import {
     IGridviewPanelProps,
     TabContextMenuEvent,
     DockviewReadyEvent,
-    DockviewComponent,
+    DockviewReact,
     DockviewApi,
     IWatermarkPanelProps,
     IGroupPanel,
@@ -91,7 +91,7 @@ const components: PanelCollection<IDockviewPanelProps> = {
                     // borderTop: "1px solid var(--separator-border)",
                 }}
             >
-                <DockviewComponent
+                <DockviewReact
                     onReady={onReady}
                     components={components}
                     tabHeight={20}
@@ -408,7 +408,7 @@ export const TestGrid = (props: IGridviewPanelProps) => {
                     </div>,
                     document.getElementById('anchor')
                 )}
-            <DockviewComponent
+            <DockviewReact
                 onReady={onReady}
                 components={components}
                 tabComponents={tabComponents}

@@ -40,7 +40,7 @@ export interface AddSplitviewComponentOptions extends BaseComponentOptions {
     maximumSize?: number;
 }
 
-export interface IComponentSplitview extends IDisposable {
+export interface ISplitviewPanels extends IDisposable {
     readonly minimumSize: number;
     readonly maximumSize: number;
     readonly height: number;
@@ -64,9 +64,9 @@ export interface IComponentSplitview extends IDisposable {
 /**
  * A high-level implementation of splitview that works using 'panels'
  */
-export class ComponentSplitview
+export class SplitviewComponent
     extends CompositeDisposable
-    implements IComponentSplitview {
+    implements ISplitviewPanels {
     private splitview: Splitview;
     private _activePanel: SplitviewPanel;
     private panels = new Map<string, IDisposable>();

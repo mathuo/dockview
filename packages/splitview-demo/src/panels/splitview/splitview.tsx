@@ -3,7 +3,7 @@ import {
     ISplitviewPanelProps,
     Orientation,
     SplitviewApi,
-    SplitviewComponent,
+    SplitviewReact,
     SplitviewReadyEvent,
     PanelDimensionChangeEvent,
     ActiveEvent,
@@ -257,7 +257,7 @@ export const Common = (
             <h2>{text}</h2>
             <div className="splitview-demo-content">
                 <div className="splitview-demo-view">
-                    <SplitviewComponent
+                    <SplitviewReact
                         orientation={props.orientation}
                         onReady={onReady}
                         components={components}

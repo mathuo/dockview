@@ -4,7 +4,7 @@ import { CompositeDisposable } from '../lifecycle';
 import { IGroupview } from './groupview';
 import { DataTransferSingleton, DATA_KEY, DragType } from '../dnd/dataTransfer';
 import { toggleClass } from '../dom';
-import { IComponentDockview } from '../dockview/componentDockview';
+import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { PanelHeaderPart } from './types';
 import { focusedElement } from '../focusedElement';
 import { IGroupPanel } from './groupviewPanel';
@@ -65,7 +65,7 @@ export class Tab extends CompositeDisposable implements ITab {
 
     constructor(
         public id: string,
-        private readonly accessor: IComponentDockview,
+        private readonly accessor: IDockviewComponent,
         private group: IGroupview
     ) {
         super();

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ComponentDockview } from '../../dockview/componentDockview';
+import { DockviewComponent } from '../../dockview/dockviewComponent';
 import {
     IGroupPanelActionbarProps,
     ReactPanelContentPart,
@@ -45,7 +45,7 @@ export interface IWatermarkPanelProps {
     [key: string]: any;
 }
 
-export interface IDockviewComponentProps {
+export interface IDockviewReactProps {
     components?: PanelCollection<IDockviewPanelProps>;
     tabComponents?: PanelCollection<IGroupPanelBaseProps>;
     watermarkComponent?: React.FunctionComponent<IWatermarkPanelProps>;
@@ -58,11 +58,11 @@ export interface IDockviewComponentProps {
     className?: string;
 }
 
-export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps> = (
-    props: IDockviewComponentProps
+export const DockviewReact: React.FunctionComponent<IDockviewReactProps> = (
+    props: IDockviewReactProps
 ) => {
     const domRef = React.useRef<HTMLDivElement>();
-    const dockviewRef = React.useRef<ComponentDockview>();
+    const dockviewRef = React.useRef<DockviewComponent>();
 
     const [portals, addPortal] = usePortalsLifecycle();
 
@@ -105,7 +105,7 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
 
         const element = document.createElement('div');
 
-        const dockview = new ComponentDockview(element, {
+        const dockview = new DockviewComponent(element, {
             frameworkComponentFactory: factory,
             frameworkComponents: props.components,
             frameworkTabComponents: props.tabComponents,
@@ -160,4 +160,4 @@ export const DockviewComponent: React.FunctionComponent<IDockviewComponentProps>
         </div>
     );
 };
-DockviewComponent.displayName = 'DockviewComponent';
+DockviewReact.displayName = 'DockviewComponent';

@@ -4,9 +4,9 @@ import { IContentContainer, ContentContainer } from './panel/content';
 import { Position, Droptarget, DroptargetEvent } from '../dnd/droptarget';
 import { Event, Emitter, addDisposableListener } from '../events';
 import {
-    IComponentDockview,
-    ComponentDockview,
-} from '../dockview/componentDockview';
+    IDockviewComponent,
+    DockviewComponent,
+} from '../dockview/dockviewComponent';
 import { isAncestor, toggleClass } from '../dom';
 import { WatermarkPart } from './types';
 import { timeoutAsPromise } from '../async';
@@ -273,7 +273,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
 
     constructor(
-        private accessor: IComponentDockview,
+        private accessor: IDockviewComponent,
         public id: string,
         private options: GroupOptions
     ) {
@@ -457,7 +457,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
     private doClose(panel: IGroupPanel) {
         this._removePanel(panel);
-        (this.accessor as ComponentDockview).unregisterPanel(panel);
+        (this.accessor as DockviewComponent).unregisterPanel(panel);
 
         if (this.panels.length === 0) {
             this.accessor.removeGroup(this);

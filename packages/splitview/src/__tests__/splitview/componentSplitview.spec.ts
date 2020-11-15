@@ -1,7 +1,7 @@
 import { PanelDimensionChangeEvent } from '../../api/api';
 import { CompositeDisposable } from '../../lifecycle';
-import { ComponentSplitview } from '../../splitview/componentSplitview';
 import { Orientation } from '../../splitview/core/splitview';
+import { SplitviewComponent } from '../../splitview/splitviewComponent';
 import { SplitviewPanel } from '../../splitview/splitviewPanel';
 
 class TestPanel extends SplitviewPanel {
@@ -28,7 +28,7 @@ describe('componentSplitview', () => {
     test('vertical panels', () => {
         const disposables = new CompositeDisposable();
 
-        const splitview = new ComponentSplitview(container, {
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.VERTICAL,
             components: {
                 testPanel: TestPanel,
@@ -77,7 +77,7 @@ describe('componentSplitview', () => {
     test('horizontal panels', () => {
         const disposables = new CompositeDisposable();
 
-        const splitview = new ComponentSplitview(container, {
+        const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
             components: {
                 testPanel: TestPanel,

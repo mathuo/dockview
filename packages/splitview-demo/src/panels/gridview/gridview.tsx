@@ -4,7 +4,7 @@ import {
     FocusEvent,
     GridConstraintChangeEvent,
     GridviewApi,
-    GridviewComponent,
+    GridviewReact,
     GridviewReadyEvent,
     IDockviewPanelProps,
     IGridviewPanelProps,
@@ -315,7 +315,7 @@ export const GridviewDemo = (props: IDockviewPanelProps) => {
                     backgroundColor: 'grey',
                 }}
             >
-                <GridviewComponent
+                <GridviewReact
                     proportionalLayout={true}
                     components={components}
                     orientation={Orientation.VERTICAL}

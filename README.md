@@ -31,7 +31,7 @@ You must import the core css stylesheet but you are free to supply your own them
 dockview/dist/styles.css
 ```
 
-By default the seperator between panels is `transparent` but this can be set through the CSS varibable `--separator-border`. Alternatively, or if you require the `DockviewComponent` you should attach the classname of an included theme; either `dockview-theme-dark` or `dockview-theme-light`.
+By default the seperator between panels is `transparent` but this can be set through the CSS varibable `--separator-border`. Alternatively, or if you require the `DockviewReact` you should attach the classname of an included theme; either `dockview-theme-dark` or `dockview-theme-light`.
 
 
 ### Sandbox examples
@@ -48,7 +48,7 @@ By default the seperator between panels is `transparent` but this can be set thr
 import { 
     ISplitviewPanelProps, 
     Orientation, 
-    SplitviewComponent,
+    SplitviewReact,
     SplitviewReadyEvent
 } from "dockview";
 
@@ -82,7 +82,7 @@ const Example = () => {
     }
 
     return (
-        <SplitviewComponent
+        <SplitviewReact
             components={components}
             onReady={onReady}
             orientation={Orientation.VERTICAL}

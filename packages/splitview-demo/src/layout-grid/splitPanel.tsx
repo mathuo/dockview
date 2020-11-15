@@ -4,7 +4,7 @@ import {
     ISplitviewPanelProps,
     Orientation,
     SplitviewReadyEvent,
-    SplitviewComponent,
+    SplitviewReact,
     SplitviewApi,
     IDockviewPanelProps,
 } from 'dockview';
@@ -143,7 +143,7 @@ export const SplitPanel = (props: IDockviewPanelProps) => {
                 <button onClick={onAdd}>Add</button>
                 <button onClick={onRemove}>Remove</button>
             </div>
-            <SplitviewComponent
+            <SplitviewReact
                 components={components}
                 onReady={onReady}
                 orientation={Orientation.VERTICAL}

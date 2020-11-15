@@ -1,4 +1,4 @@
-import { ComponentDockview } from '../dockview/componentDockview';
+import { DockviewComponent } from '../dockview/dockviewComponent';
 import { GroupviewPanel, IGroupPanel } from '../groupview/groupviewPanel';
 import { PanelContentPart, PanelHeaderPart } from '../groupview/types';
 import { IPanelDeserializer } from '../dockview/deserializer';
@@ -7,7 +7,7 @@ import { DockviewApi } from '../api/component.api';
 import { DefaultTab } from '../dockview/components/tab/defaultTab';
 
 export class ReactPanelDeserialzier implements IPanelDeserializer {
-    constructor(private readonly layout: ComponentDockview) {}
+    constructor(private readonly layout: DockviewComponent) {}
 
     public fromJSON(panelData: { [index: string]: any }): IGroupPanel {
         const panelId = panelData.id;

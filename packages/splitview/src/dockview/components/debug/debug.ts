@@ -1,11 +1,11 @@
 import { CompositeDisposable } from '../../../lifecycle';
-import { ComponentDockview } from '../../componentDockview';
+import { DockviewComponent } from '../../dockviewComponent';
 import { GroupChangeKind } from '../../../groupview/groupview';
 
 export class DebugWidget extends CompositeDisposable {
     private _element: HTMLElement;
 
-    constructor(private layout: ComponentDockview) {
+    constructor(private layout: DockviewComponent) {
         super();
 
         let container = document.getElementById('layout-debug-container');

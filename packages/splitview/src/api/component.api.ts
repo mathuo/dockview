@@ -1,8 +1,8 @@
 import {
-    IComponentDockview,
+    IDockviewComponent,
     LayoutDropEvent,
     SerializedDockview,
-} from '../dockview/componentDockview';
+} from '../dockview/dockviewComponent';
 import {
     AddGroupOptions,
     AddPanelOptions,
@@ -12,23 +12,23 @@ import {
 import { Direction } from '../gridview/baseComponentGridview';
 import {
     AddComponentOptions,
-    IComponentGridview,
+    IGridviewComponent,
     SerializedGridview,
-} from '../gridview/componentGridview';
+} from '../gridview/gridviewComponent';
 import { GridviewPanel } from '../gridview/gridviewPanel';
 import { IGroupview } from '../groupview/groupview';
 import { IGroupPanel } from '../groupview/groupviewPanel';
 import {
     AddPaneviewCompponentOptions,
     SerializedPaneview,
-} from '../paneview/componentPaneview';
-import { IComponentPaneview } from '../paneview/componentPaneview';
+} from '../paneview/paneviewComponent';
+import { IPaneviewComponent } from '../paneview/paneviewComponent';
 import { PaneviewPanel } from '../paneview/paneviewPanel';
 import {
     AddSplitviewComponentOptions,
-    IComponentSplitview,
+    ISplitviewPanels,
     SerializedSplitview,
-} from '../splitview/componentSplitview';
+} from '../splitview/splitviewComponent';
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { SplitviewPanel } from '../splitview/splitviewPanel';
 
@@ -57,7 +57,7 @@ export class SplitviewApi {
         return this.component.onDidLayoutChange;
     }
 
-    constructor(private readonly component: IComponentSplitview) {}
+    constructor(private readonly component: ISplitviewPanels) {}
 
     removePanel(panel: SplitviewPanel, sizing?: Sizing) {
         this.component.removePanel(panel, sizing);
@@ -121,7 +121,7 @@ export class PaneviewApi {
         return this.component.onDidLayoutChange;
     }
 
-    constructor(private readonly component: IComponentPaneview) {}
+    constructor(private readonly component: IPaneviewComponent) {}
 
     getPanels(): PaneviewPanel[] {
         return this.component.getPanels();
@@ -181,7 +181,7 @@ export class GridviewApi {
         return this.component.onDidLayoutChange;
     }
 
-    constructor(private readonly component: IComponentGridview) {}
+    constructor(private readonly component: IGridviewComponent) {}
 
     get orientation() {
         return this.component.orientation;
@@ -272,7 +272,7 @@ export class DockviewApi {
         return this.component.onDidLayoutChange;
     }
 
-    constructor(private readonly component: IComponentDockview) {}
+    constructor(private readonly component: IDockviewComponent) {}
 
     focus() {
         return this.component.focus();

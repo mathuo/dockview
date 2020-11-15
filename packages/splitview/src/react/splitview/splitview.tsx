@@ -2,9 +2,9 @@ import * as React from 'react';
 import { SplitviewApi } from '../../api/component.api';
 import { IPanelApi } from '../../api/panelApi';
 import {
-    IComponentSplitview,
-    ComponentSplitview,
-} from '../../splitview/componentSplitview';
+    ISplitviewPanels,
+    SplitviewComponent,
+} from '../../splitview/splitviewComponent';
 import { Orientation } from '../../splitview/core/splitview';
 import { usePortalsLifecycle } from '../react';
 import { PanelCollection } from '../types';
@@ -20,7 +20,7 @@ export interface ISplitviewPanelProps {
     [key: string]: any;
 }
 
-export interface ISplitviewComponentProps {
+export interface ISplitviewReactProps {
     orientation: Orientation;
     onReady?: (event: SplitviewReadyEvent) => void;
     components: PanelCollection<ISplitviewPanelProps>;
@@ -29,15 +29,15 @@ export interface ISplitviewComponentProps {
     className?: string;
 }
 
-export const SplitviewComponent: React.FunctionComponent<ISplitviewComponentProps> = (
-    props: ISplitviewComponentProps
+export const SplitviewReact: React.FunctionComponent<ISplitviewReactProps> = (
+    props: ISplitviewReactProps
 ) => {
     const domRef = React.useRef<HTMLDivElement>();
-    const splitviewRef = React.useRef<IComponentSplitview>();
+    const splitviewRef = React.useRef<ISplitviewPanels>();
     const [portals, addPortal] = usePortalsLifecycle();
 
     React.useEffect(() => {
-        const splitview = new ComponentSplitview(domRef.current, {
+        const splitview = new SplitviewComponent(domRef.current, {
             orientation: props.orientation,
             frameworkComponents: props.components,
             frameworkWrapper: {
@@ -76,4 +76,4 @@ export const SplitviewComponent: React.FunctionComponent<ISplitviewComponentProp
         </div>
     );
 };
-SplitviewComponent.displayName = 'SplitviewComponent';
+SplitviewReact.displayName = 'SplitviewComponent';

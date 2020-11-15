@@ -55,7 +55,7 @@ export interface IGridPanelComponentView extends IGridPanelView {
     init: (params: GridviewInitParameters) => void;
 }
 
-export interface IComponentGridview extends IBaseGrid<GridviewPanel> {
+export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
     orientation: Orientation;
     addPanel(options: AddComponentOptions): void;
     removePanel(panel: GridviewPanel, sizing?: Sizing): void;
@@ -69,9 +69,9 @@ export interface IComponentGridview extends IBaseGrid<GridviewPanel> {
     ): void;
 }
 
-export class ComponentGridview
+export class GridviewComponent
     extends BaseGrid<GridviewPanel>
-    implements IComponentGridview {
+    implements IGridviewComponent {
     private _deserializer: IPanelDeserializer;
 
     constructor(

@@ -1,6 +1,6 @@
 import { IDisposable } from '../lifecycle';
 import { IGroupview } from './groupview';
-import { IComponentDockview } from '../dockview/componentDockview';
+import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { IGroupPanelApi } from '../api/groupPanelApi';
 import { PanelInitParameters, IPanel } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
@@ -34,7 +34,7 @@ export interface PanelContentPart extends IPanel {
 // watermark component
 
 export interface WatermarkPartInitParameters {
-    accessor: IComponentDockview;
+    accessor: IDockviewComponent;
 }
 
 export interface WatermarkPart extends IDisposable {

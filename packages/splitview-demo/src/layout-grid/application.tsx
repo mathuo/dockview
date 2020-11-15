@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
     Orientation,
-    GridviewComponent,
+    GridviewReact,
     LayoutPriority,
     GridviewReadyEvent,
     IGridviewPanelProps,
@@ -109,7 +109,7 @@ export const Application = () => {
     }, []);
 
     return (
-        <GridviewComponent
+        <GridviewReact
             // className={'visual-studio-theme'}
             components={rootcomponents}
             onReady={onReady}

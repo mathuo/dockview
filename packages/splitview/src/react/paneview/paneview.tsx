@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { IPanePanelApi } from '../../api/panePanelApi';
 import {
-    ComponentPaneview,
-    IComponentPaneview,
-} from '../../paneview/componentPaneview';
+    PaneviewComponent,
+    IPaneviewComponent,
+} from '../../paneview/paneviewComponent';
 import { usePortalsLifecycle } from '../react';
 import { PaneviewApi } from '../../api/component.api';
 import { PanelBody, PanelHeader } from './view';
@@ -20,22 +20,22 @@ export interface IPaneviewPanelProps {
     [key: string]: any;
 }
 
-export interface IPaneviewComponentProps {
+export interface IPaneviewReactProps {
     onReady?: (event: PaneviewReadyEvent) => void;
     components?: PanelCollection<IPaneviewPanelProps>;
     headerComponents?: PanelCollection<IPaneviewPanelProps>;
     className?: string;
 }
 
-export const PaneviewComponent: React.FunctionComponent<IPaneviewComponentProps> = (
-    props: IPaneviewComponentProps
+export const PaneviewReact: React.FunctionComponent<IPaneviewReactProps> = (
+    props: IPaneviewReactProps
 ) => {
     const domRef = React.useRef<HTMLDivElement>();
-    const paneviewRef = React.useRef<IComponentPaneview>();
+    const paneviewRef = React.useRef<IPaneviewComponent>();
     const [portals, addPortal] = usePortalsLifecycle();
 
     React.useEffect(() => {
-        const paneview = new ComponentPaneview(domRef.current, {
+        const paneview = new PaneviewComponent(domRef.current, {
             frameworkComponents: props.components,
             components: {},
             headerComponents: {},
@@ -89,4 +89,4 @@ export const PaneviewComponent: React.FunctionComponent<IPaneviewComponentProps>
         </div>
     );
 };
-PaneviewComponent.displayName = 'PaneviewComponent';
+PaneviewReact.displayName = 'PaneviewComponent';

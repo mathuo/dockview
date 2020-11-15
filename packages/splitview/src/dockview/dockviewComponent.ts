@@ -67,7 +67,7 @@ export interface SerializedDockview {
     options: { tabHeight: number };
 }
 
-export interface IComponentDockview extends IBaseGrid<IGroupview> {
+export interface IDockviewComponent extends IBaseGrid<IGroupview> {
     readonly activeGroup: IGroupview;
     moveGroupOrPanel(
         referenceGroup: IGroupview,
@@ -118,9 +118,9 @@ export interface LayoutDropEvent {
     event: GroupDropEvent;
 }
 
-export class ComponentDockview
+export class DockviewComponent
     extends BaseGrid<IGroupview>
-    implements IComponentDockview {
+    implements IDockviewComponent {
     private readonly panels = new Map<string, IValueDisposable<IGroupPanel>>();
     private readonly dirtyPanels = new Set<IGroupPanel>();
     private readonly debouncedDeque = debounce(

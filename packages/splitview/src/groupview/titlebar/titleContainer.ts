@@ -13,7 +13,7 @@ import { last } from '../../array';
 import { DataTransferSingleton } from '../../dnd/dataTransfer';
 import { focusedElement } from '../../focusedElement';
 import { IGroupPanel } from '../groupviewPanel';
-import { IComponentDockview } from '../../dockview/componentDockview';
+import { IDockviewComponent } from '../../dockview/dockviewComponent';
 
 export interface TabDropEvent {
     event: DroptargetEvent;
@@ -120,7 +120,7 @@ export class TitleContainer
     }
 
     constructor(
-        private accessor: IComponentDockview,
+        private accessor: IDockviewComponent,
         private group: IGroupview,
         options: { tabHeight: number }
     ) {

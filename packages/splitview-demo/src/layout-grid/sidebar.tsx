@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
     IGridviewPanelProps,
-    PaneviewComponent,
+    PaneviewReact,
     PaneviewReadyEvent,
     IPaneviewPanelProps,
     CompositeDisposable,
@@ -188,7 +188,7 @@ export const Sidebar = (props: IGridviewPanelProps) => {
                 height: '100%',
             }}
         >
-            <PaneviewComponent
+            <PaneviewReact
                 headerComponents={headerComponents}
                 components={components}
                 onReady={onReady}
