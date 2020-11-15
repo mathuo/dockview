@@ -57,7 +57,7 @@ export abstract class PaneviewPanel
 
     private headerSize = 22;
     private _orthogonalSize = 0;
-    private _minimumBodySize: number = 0;
+    private _minimumBodySize = 0;
     private _maximumBodySize: number = Number.POSITIVE_INFINITY;
     private _isExpanded = false;
     protected header: HTMLElement;

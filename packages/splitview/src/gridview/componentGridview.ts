@@ -1,6 +1,6 @@
 import { getRelativeLocation, SerializedGridObject } from './gridview';
 import { Position } from '../dnd/droptarget';
-import { getGridLocation, orthogonal } from './gridview';
+import { getGridLocation } from './gridview';
 import { tail, sequenceEquals } from '../array';
 import { GroupChangeKind } from '../groupview/groupview';
 import { CompositeDisposable } from '../lifecycle';
@@ -162,8 +162,8 @@ export class ComponentGridview
         this.gridview.clear();
         this.groups.clear();
 
-        const width = this.width;
-        const height = this.height;
+        // const width = this.width;
+        // const height = this.height;
 
         // this.layout(width, height, true);
 

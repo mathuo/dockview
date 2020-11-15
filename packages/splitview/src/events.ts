@@ -1,25 +1,5 @@
 import { IDisposable } from './lifecycle';
 
-/**
- * Mimic the basic functionality of a UI-event to provide familar paradigms
- * such as preventDefault()
- */
-export class UIEvent {
-    private _defaultPrevented: boolean;
-
-    get defaultPrevented() {
-        return this._defaultPrevented;
-    }
-
-    constructor() {
-        this._defaultPrevented = false;
-    }
-
-    preventDefault() {
-        this._defaultPrevented = true;
-    }
-}
-
 export interface Event<T> {
     (listener: (e: T) => any): IDisposable;
 }
@@ -51,7 +31,7 @@ export class Emitter<T> implements IDisposable {
 
     private _last?: T;
     private _listeners: Array<(e: T) => any> = [];
-    private _disposed: boolean = false;
+    private _disposed = false;
 
     constructor(private readonly options?: EmitterOptions) {}
 

@@ -21,7 +21,7 @@ describe('array', () => {
     });
 
     it('pushToEnd', () => {
-        let arr1 = [1, 2, 3, 4];
+        const arr1 = [1, 2, 3, 4];
         pushToEnd(arr1, 3);
         expect(arr1).toEqual([1, 2, 4, 3]);
         pushToEnd(arr1, 5);
@@ -29,7 +29,7 @@ describe('array', () => {
     });
 
     it('pushToStart', () => {
-        let arr1 = [1, 2, 3, 4];
+        const arr1 = [1, 2, 3, 4];
         pushToStart(arr1, 3);
         expect(arr1).toEqual([3, 1, 2, 4]);
         pushToStart(arr1, 5);

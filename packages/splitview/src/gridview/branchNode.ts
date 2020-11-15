@@ -108,7 +108,7 @@ export class BranchNode extends CompositeDisposable implements IView {
         readonly orientation: Orientation,
         readonly proportionalLayout: boolean,
         readonly styles: ISplitviewStyles,
-        size: number = 0,
+        size = 0,
         orthogonalSize: number,
         childDescriptors?: INodeDescriptor[]
     ) {
@@ -264,8 +264,6 @@ export class BranchNode extends CompositeDisposable implements IView {
     }
 
     private _removeChild(index: number): Node {
-        const first = index === 0;
-        const last = index === this.children.length - 1;
         const [child] = this.children.splice(index, 1);
         this.setupChildrenEvents();
 

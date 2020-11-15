@@ -111,7 +111,8 @@ export function getRelativeLocation(
     const directionOrientation = getDirectionOrientation(direction);
 
     if (orientation === directionOrientation) {
-        let [rest, index] = tail(location);
+        const [rest, _index] = tail(location);
+        let index = _index;
 
         if (direction === Position.Right || direction === Position.Bottom) {
             index += 1;
@@ -247,7 +248,7 @@ export interface INodeDescriptor {
 }
 
 export interface IViewDeserializer {
-    fromJSON: (data: {}) => IGridView;
+    fromJSON: (data: any) => IGridView;
 }
 
 export class Gridview implements IDisposable {
@@ -432,7 +433,6 @@ export class Gridview implements IDisposable {
     }
 
     private progmaticSelect(location: number[], reverse = false) {
-        const [rest, index] = tail(location);
         const [path, node] = this.getNode(location);
 
         if (!(node instanceof LeafNode)) {

@@ -5,6 +5,7 @@
     "main": "index.js",
     "scripts": {
         "test": "jest",
+        "lint": "eslint packages/**/src/** --ext .ts,.tsx,.js,.jsx",
         "package": "node scripts/package.js",
         "package-all": "npm run build-demo && npm run docs && node scripts/package.js",
         "build": "lerna run build --ignore splitview-demo",
@@ -31,9 +32,12 @@
     "devDependencies": {
         "@testing-library/dom": "^7.26.0",
         "@types/jest": "^26.0.14",
+        "@typescript-eslint/eslint-plugin": "^4.7.0",
+        "@typescript-eslint/parser": "^4.7.0",
         "codecov": "^3.8.0",
         "cross-env": "^7.0.2",
         "css-loader": "^3.6.0",
+        "eslint": "^7.13.0",
         "fs-extra": "^9.0.1",
         "gulp": "^4.0.2",
         "gulp-concat": "^2.6.1",

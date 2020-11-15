@@ -22,11 +22,17 @@ class TestPanel extends PaneviewPanel {
                 return this._element;
             }
 
-            init(params: PanePanelComponentInitParameter) {}
+            init(params: PanePanelComponentInitParameter) {
+                //
+            }
 
-            update(params: PanelUpdateEvent) {}
+            update(params: PanelUpdateEvent) {
+                //
+            }
 
-            dispose() {}
+            dispose() {
+                //
+            }
         })();
     }
 
@@ -38,11 +44,17 @@ class TestPanel extends PaneviewPanel {
                 return this._element;
             }
 
-            init(params: PanePanelComponentInitParameter) {}
+            init(params: PanePanelComponentInitParameter) {
+                //
+            }
 
-            update(params: PanelUpdateEvent) {}
+            update(params: PanelUpdateEvent) {
+                //
+            }
 
-            dispose() {}
+            dispose() {
+                //
+            }
         })();
     }
 }
@@ -77,17 +89,17 @@ describe('componentPaneview', () => {
             title: 'Panel2',
         });
 
-        const panel1 = paneview.getPanel('panel1');
-        const panel2 = paneview.getPanel('panel2');
+        const panel1 = paneview.getPanel('panel1') as PaneviewPanel;
+        const panel2 = paneview.getPanel('panel2') as PaneviewPanel;
 
-        let panel1Dimensions: PanelDimensionChangeEvent;
+        let panel1Dimensions: PanelDimensionChangeEvent | undefined = undefined;
         disposables.addDisposables(
             panel1.api.onDidDimensionsChange((event) => {
                 panel1Dimensions = event;
             })
         );
 
-        let panel2Dimensions: PanelDimensionChangeEvent;
+        let panel2Dimensions: PanelDimensionChangeEvent | undefined = undefined;
         disposables.addDisposables(
             panel2.api.onDidDimensionsChange((event) => {
                 panel2Dimensions = event;

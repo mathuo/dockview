@@ -314,7 +314,7 @@ export class ComponentDockview
         }
 
         const disposable = new CompositeDisposable(
-            panel.onDidStateChange((e) => this.addDirtyPanel(panel))
+            panel.onDidStateChange(() => this.addDirtyPanel(panel))
         );
 
         this.panels.set(panel.id, { value: panel, disposable });
@@ -644,12 +644,14 @@ export class ComponentDockview
         switch (target) {
             case Position.Center:
             case undefined:
-                const groupItem =
-                    sourceGroup?.removePanel(itemId) ||
-                    this.panels.get(itemId).value;
                 if (sourceGroup?.size === 0) {
                     this.doRemoveGroup(sourceGroup);
                 }
+
+                const groupItem =
+                    sourceGroup?.removePanel(itemId) ||
+                    this.panels.get(itemId).value;
+
                 referenceGroup.openPanel(groupItem, index);
 
                 return;

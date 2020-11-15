@@ -1,5 +1,4 @@
 import { Emitter, Event } from '../events';
-import { Paneview } from '../paneview/paneview';
 import { PaneviewPanel } from '../paneview/paneviewPanel';
 import { IPanelApi, PanelApi } from './panelApi';
 

@@ -188,7 +188,7 @@ class FocusTracker extends CompositeDisposable implements IFocusTracker {
         };
 
         this._refreshStateHandler = () => {
-            let currentNodeHasFocus = isAncestor(
+            const currentNodeHasFocus = isAncestor(
                 document.activeElement,
                 <HTMLElement>element
             );

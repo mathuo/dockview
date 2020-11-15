@@ -78,7 +78,7 @@ export class LeafNode implements IView {
         public readonly view: IGridView,
         readonly orientation: Orientation,
         orthogonalSize: number,
-        size: number = 0
+        size = 0
     ) {
         this._orthogonalSize = orthogonalSize;
         this._size = size;

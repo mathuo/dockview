@@ -27,6 +27,3 @@ export interface SplitPanelOptions extends SplitViewOptions {
     };
     frameworkWrapper?: FrameworkFactory<SplitviewPanel>;
 }
-
-export interface ISerializableViewConstructor
-    extends Constructor<ISerializableView> {}

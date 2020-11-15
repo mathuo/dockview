@@ -30,7 +30,7 @@ export interface IGroupPanel extends IDisposable, IPanel {
     setDirty(isDirty: boolean): void;
     close?(): Promise<boolean>;
     init(params: IGroupPanelInitParameters): void;
-    onDidStateChange: Event<any>;
+    onDidStateChange: Event<void>;
 }
 
 export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
@@ -40,7 +40,7 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
     private _group: IGroupview;
     private params?: IGroupPanelInitParameters;
 
-    readonly onDidStateChange: Event<any>;
+    readonly onDidStateChange: Event<void>;
 
     private headerPart?: PanelHeaderPart;
     private contentPart?: PanelContentPart;

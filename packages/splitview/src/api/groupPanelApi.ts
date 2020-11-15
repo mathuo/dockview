@@ -65,11 +65,6 @@ export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
         );
     }
 
-    updateTitleHeader() {
-        if (this.isGroupVisible) {
-        }
-    }
-
     public setTitle(title: string) {
         this._onDidTitleChange.fire({ title });
     }

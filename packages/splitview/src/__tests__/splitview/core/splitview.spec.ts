@@ -12,7 +12,7 @@ class Testview implements IView {
     private _element: HTMLElement = document.createElement('div');
     private _size = 0;
     private _orthogonalSize = 0;
-    private _priority: LayoutPriority;
+    private _priority: LayoutPriority | undefined;
 
     private readonly _onDidChange = new Emitter<number | undefined>();
     readonly onDidChange = this._onDidChange.event;
@@ -66,7 +66,9 @@ class Testview implements IView {
         this._onDidChange.fire(value);
     }
 
-    setVisible(isVisible: boolean) {}
+    setVisible(isVisible: boolean) {
+        //
+    }
 
     dispose() {
         this._onDidChange.dispose();

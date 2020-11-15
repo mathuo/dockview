@@ -96,7 +96,7 @@ export class Splitview {
     private _proportions: number[] | undefined = undefined;
     private proportionalLayout: boolean;
 
-    private _onDidSashEnd = new Emitter<any>();
+    private _onDidSashEnd = new Emitter<void>();
     public onDidSashEnd = this._onDidSashEnd.event;
 
     get size() {
@@ -366,7 +366,7 @@ export class Splitview {
                     item.enabled = false;
                 }
 
-                let start =
+                const start =
                     this._orientation === Orientation.HORIZONTAL
                         ? event.clientX
                         : event.clientY;
@@ -637,7 +637,7 @@ export class Splitview {
     }
 
     private distributeEmptySpace(lowPriorityIndex?: number) {
-        let contentSize = this.views.reduce((r, i) => r + i.size, 0);
+        const contentSize = this.views.reduce((r, i) => r + i.size, 0);
         let emptyDelta = this.size - contentSize;
 
         const indexes = range(this.views.length - 1, -1);
@@ -685,7 +685,7 @@ export class Splitview {
     private layoutViews() {
         this.contentSize = this.views.reduce((r, i) => r + i.size, 0);
         let sum = 0;
-        let x: number[] = [];
+        const x: number[] = [];
 
         this.updateSashEnablement();
 

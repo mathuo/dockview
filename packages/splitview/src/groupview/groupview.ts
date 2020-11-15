@@ -591,7 +591,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         if (!this.watermark) {
             const watermark = this.accessor.createWatermarkComponent();
             watermark.init({
-                containerApi: new DockviewApi(this.accessor as any),
+                containerApi: new DockviewApi(this.accessor),
                 params: {},
                 title: '',
                 api: null,

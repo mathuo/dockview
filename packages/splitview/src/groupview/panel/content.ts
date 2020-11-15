@@ -28,7 +28,7 @@ export class ContentContainer
         this._element.className = 'content-container';
         this._element.tabIndex = -1;
 
-        const { onDidBlur, onDidFocus } = trackFocus(this._element);
+        const { onDidFocus } = trackFocus(this._element);
 
         this.addDisposables(onDidFocus(() => this._onDidFocus.fire()));
     }

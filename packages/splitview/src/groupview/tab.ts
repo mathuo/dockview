@@ -126,7 +126,7 @@ export class Tab extends CompositeDisposable implements ITab {
                  * focused on this tick and ensuring the dragstart event is not interrupted
                  */
 
-                const oldFocus = focusedElement.element as any;
+                const oldFocus = focusedElement.element as HTMLElement;
                 setTimeout(() => {
                     oldFocus.focus();
                     this._onChanged.fire({ kind: MouseEventKind.CLICK, event });

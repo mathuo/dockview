@@ -115,7 +115,9 @@ export class ReactPanelContentPart implements PanelContentPart {
         this._group = group;
     }
 
-    public layout(width: number, height: number): void {}
+    public layout(width: number, height: number): void {
+        // noop
+    }
 
     public close(): Promise<boolean> {
         return Promise.resolve(true);

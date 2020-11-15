@@ -28,7 +28,7 @@ export class ViewItem {
 
         if (visible) {
             this.size = clamp(
-                this._cachedVisibleSize!,
+                this._cachedVisibleSize ?? 0,
                 this.viewMinimumSize,
                 this.viewMaximumSize
             );

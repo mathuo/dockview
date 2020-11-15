@@ -8,7 +8,11 @@ export interface IValueDisposable<T> {
 }
 
 export namespace Disposable {
-    export const NONE: IDisposable = { dispose: () => {} };
+    export const NONE: IDisposable = {
+        dispose: () => {
+            // noop
+        },
+    };
 }
 
 export class CompositeDisposable {
@@ -33,8 +37,6 @@ export class CompositeDisposable {
 
 export class MutableDisposable implements IDisposable {
     private _disposable = Disposable.NONE;
-
-    constructor() {}
 
     set value(disposable: IDisposable) {
         if (this._disposable) {

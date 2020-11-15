@@ -45,12 +45,12 @@ export class TitleContainer
     private actionContainer: HTMLElement;
 
     private tabs: IValueDisposable<ITab>[] = [];
-    private selectedIndex: number = -1;
+    private selectedIndex = -1;
     private active = false;
     private activePanel: IGroupPanel | undefined;
     private actions: HTMLElement;
 
-    private _visible: boolean = true;
+    private _visible = true;
     private _height: number;
 
     private readonly _onDropped = new Emitter<TabDropEvent>();

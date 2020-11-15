@@ -6,7 +6,14 @@ import { SplitviewPanel } from '../../splitview/splitviewPanel';
 
 class TestPanel extends SplitviewPanel {
     getComponent() {
-        return { update: () => {}, dispose: () => {} };
+        return {
+            update: () => {
+                //
+            },
+            dispose: () => {
+                //
+            },
+        };
     }
 }
 
@@ -33,17 +40,17 @@ describe('componentSplitview', () => {
         splitview.addPanel({ id: 'panel1', component: 'testPanel' });
         splitview.addPanel({ id: 'panel2', component: 'testPanel' });
 
-        const panel1 = splitview.getPanel('panel1');
-        const panel2 = splitview.getPanel('panel2');
+        const panel1 = splitview.getPanel('panel1') as SplitviewPanel;
+        const panel2 = splitview.getPanel('panel2') as SplitviewPanel;
 
-        let panel1Dimensions: PanelDimensionChangeEvent;
+        let panel1Dimensions: PanelDimensionChangeEvent | undefined;
         disposables.addDisposables(
             panel1.api.onDidDimensionsChange((event) => {
                 panel1Dimensions = event;
             })
         );
 
-        let panel2Dimensions: PanelDimensionChangeEvent;
+        let panel2Dimensions: PanelDimensionChangeEvent | undefined;
         disposables.addDisposables(
             panel2.api.onDidDimensionsChange((event) => {
                 panel2Dimensions = event;
@@ -82,17 +89,17 @@ describe('componentSplitview', () => {
         splitview.addPanel({ id: 'panel1', component: 'testPanel' });
         splitview.addPanel({ id: 'panel2', component: 'testPanel' });
 
-        const panel1 = splitview.getPanel('panel1');
-        const panel2 = splitview.getPanel('panel2');
+        const panel1 = splitview.getPanel('panel1') as SplitviewPanel;
+        const panel2 = splitview.getPanel('panel2') as SplitviewPanel;
 
-        let panel1Dimensions: PanelDimensionChangeEvent;
+        let panel1Dimensions: PanelDimensionChangeEvent | undefined;
         disposables.addDisposables(
             panel1.api.onDidDimensionsChange((event) => {
                 panel1Dimensions = event;
             })
         );
 
-        let panel2Dimensions: PanelDimensionChangeEvent;
+        let panel2Dimensions: PanelDimensionChangeEvent | undefined;
         disposables.addDisposables(
             panel2.api.onDidDimensionsChange((event) => {
                 panel2Dimensions = event;

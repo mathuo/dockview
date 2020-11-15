@@ -23,13 +23,13 @@ body {
     background: var(--title-bar-scroll-bar-color);
 }
 
-*,
-*::after,
-*::before {
-    // -webkit-user-drag: none;
-    // -webkit-app-region: no-drag;
-    // -webkit-user-select: none;
-}
+// *,
+// *::after,
+// *::before {
+//     -webkit-user-drag: none;
+//     -webkit-app-region: no-drag;
+//     -webkit-user-select: none;
+// }
 
 .close-action {
     &:active {
