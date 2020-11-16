@@ -275,7 +275,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     constructor(
         private accessor: IDockviewComponent,
         public id: string,
-        private options: GroupOptions
+        options: GroupOptions
     ) {
         super();
 
@@ -283,7 +283,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         this._element = document.createElement('div');
         this._element.className = 'groupview';
-        // this._element.tabIndex = -1;
 
         this.tabContainer = new TitleContainer(this.accessor, this, {
             tabHeight: options.tabHeight,
@@ -602,7 +601,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         this.panels.forEach((panel) => panel.setVisible(this._active, this));
 
-        if (this.isEmpty && !this.watermark?.element.parentNode) {
+        if (this.isEmpty && !this.watermark?.element?.parentNode) {
             addDisposableListener(this.watermark.element, 'click', () => {
                 if (!this._active) {
                     this.accessor.doSetGroupActive(this);

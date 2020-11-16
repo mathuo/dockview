@@ -644,13 +644,13 @@ export class DockviewComponent
         switch (target) {
             case Position.Center:
             case undefined:
-                if (sourceGroup?.size === 0) {
-                    this.doRemoveGroup(sourceGroup);
-                }
-
                 const groupItem =
                     sourceGroup?.removePanel(itemId) ||
                     this.panels.get(itemId).value;
+
+                if (sourceGroup?.size === 0) {
+                    this.doRemoveGroup(sourceGroup);
+                }
 
                 referenceGroup.openPanel(groupItem, index);
 

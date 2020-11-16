@@ -1,7 +1,7 @@
 <div align="center">
 <h1>dockview</h1>
 
-<p>zero dependency layout manager and split views with ReactJS support</p>
+<p>Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support</p>
 
 </div>
 

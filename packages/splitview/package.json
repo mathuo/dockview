@@ -1,10 +1,15 @@
 {
     "name": "dockview",
-    "version": "0.0.0-beta.16",
-    "description": "",
+    "version": "0.0.0-beta.17",
+    "description": "Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support",
     "main": "dist/cjs/index.js",
     "types": "dist/cjs/index.d.ts",
     "module": "dist/es6/index.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mathuo/dockview.git"
+      },
+    "homepage":"https://github.com/mathuo/dockview",
     "scripts": {
         "build-gulp": "cross-env ../../node_modules/.bin/gulp run",
         "docs": "typedoc",
@@ -19,13 +24,17 @@
         "test-cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage"
     },
     "files": [
-        "dist"
+        "dist",
+        "README.md"
     ],
     "keywords": [
         "splitview",
         "split-view",
         "gridview",
         "grid-view",
+        "dockview",
+        "dock-view",
+        "tabs",
         "layout",
         "react",
         "react-component",
