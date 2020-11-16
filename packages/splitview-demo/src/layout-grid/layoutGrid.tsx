@@ -124,6 +124,7 @@ const components: PanelCollection<IDockviewPanelProps> = {
                                 height: '100%',
                                 display: 'flex',
                                 backgroundColor: 'rgba(255,255,255,0.1)',
+                                padding: '0px 4px',
                             }}
                         >
                             <span
@@ -131,9 +132,12 @@ const components: PanelCollection<IDockviewPanelProps> = {
                                 style={{
                                     height: '100%',
                                     width: '25px',
-                                    backgroundColor: 'red',
+                                    display: 'flex',
+                                    alignItems: 'center',
                                 }}
-                            ></span>
+                            >
+                                <a className="material-icons">menu</a>
+                            </span>
                         </div>
                     );
                 },
