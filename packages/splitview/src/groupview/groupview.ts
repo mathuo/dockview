@@ -586,6 +586,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
 
     private updateContainer() {
+        this.updateActions();
         toggleClass(this.element, 'empty', this.isEmpty);
 
         if (!this.watermark) {

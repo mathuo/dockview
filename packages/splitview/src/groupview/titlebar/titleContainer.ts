@@ -85,6 +85,9 @@ export class TitleContainer
     }
 
     setActionElement(element: HTMLElement): void {
+        if (this.actions === element) {
+            return;
+        }
         if (this.actions) {
             this.actions.remove();
             this.actions = undefined;
