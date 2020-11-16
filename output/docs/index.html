@@ -81,11 +81,16 @@
 				</a>
 				<p>You must import the core css stylesheet but you are free to supply your own theming in addition to the core stylesheet. The location to reference for the stylesheet is</p>
 				<pre><code>dockview<span class="hljs-regexp">/dist/</span>styles.css</code></pre>
-				<p>By default the seperator between panels is <code>transparent</code> but this can be set through the CSS varibable <code>--separator-border</code>. Alternatively, or if you require the <code>DockviewComponent</code> you should attach the classname of an included theme; either <code>dockview-theme-dark</code> or <code>dockview-theme-light</code>.</p>
-				<a href="#online-examples" id="online-examples" style="color: inherit; text-decoration: none;">
-					<h3>Online examples</h3>
+				<p>By default the seperator between panels is <code>transparent</code> but this can be set through the CSS varibable <code>--separator-border</code>. Alternatively, or if you require the <code>DockviewReact</code> you should attach the classname of an included theme; either <code>dockview-theme-dark</code> or <code>dockview-theme-light</code>.</p>
+				<a href="#sandbox-examples" id="sandbox-examples" style="color: inherit; text-decoration: none;">
+					<h3>Sandbox examples</h3>
 				</a>
-				<p><a href="https://codesandbox.io/s/simple-splitview-l53nn">Splitview</a></p>
+				<ul>
+					<li><a href="https://codesandbox.io/s/simple-dockview-t6491">Dockview</a></li>
+					<li><a href="https://codesandbox.io/s/simple-gridview-jrp0n">Gridview</a></li>
+					<li><a href="https://codesandbox.io/s/simple-splitview-l53nn">Splitview</a></li>
+					<li><a href="https://codesandbox.io/s/simple-paneview-v8qvb">Paneview</a></li>
+				</ul>
 				<a href="#react" id="react" style="color: inherit; text-decoration: none;">
 					<h2>React</h2>
 				</a>
@@ -95,7 +100,7 @@
 				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> {
     ISplitviewPanelProps, 
     Orientation, 
-    SplitviewComponent,
+    SplitviewReact,
     SplitviewReadyEvent
 } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;dockview&quot;</span>;
 
@@ -129,7 +134,7 @@
     }
 
     <span class="hljs-keyword">return</span> (
-        <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">SplitviewComponent</span>
+        <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">SplitviewReact</span>
             <span class="hljs-attr">components</span>=<span class="hljs-string">{components}</span>
             <span class="hljs-attr">onReady</span>=<span class="hljs-string">{onReady}</span>
             <span class="hljs-attr">orientation</span>=<span class="hljs-string">{Orientation.VERTICAL}</span>
@@ -197,18 +202,6 @@
 						<a href="classes/branchnode.html" class="tsd-kind-icon">Branch<wbr>Node</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="classes/componentdockview.html" class="tsd-kind-icon">Component<wbr>Dockview</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/componentgridview.html" class="tsd-kind-icon">Component<wbr>Gridview</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/componentpaneview.html" class="tsd-kind-icon">Component<wbr>Paneview</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/componentsplitview.html" class="tsd-kind-icon">Component<wbr>Splitview</a>
-					</li>
-					<li class=" tsd-kind-class">
 						<a href="classes/compositedisposable.html" class="tsd-kind-icon">Composite<wbr>Disposable</a>
 					</li>
 					<li class=" tsd-kind-class">
@@ -233,6 +226,9 @@
 						<a href="classes/dockviewapi.html" class="tsd-kind-icon">Dockview<wbr>Api</a>
 					</li>
 					<li class=" tsd-kind-class">
+						<a href="classes/dockviewcomponent.html" class="tsd-kind-icon">Dockview<wbr>Component</a>
+					</li>
+					<li class=" tsd-kind-class">
 						<a href="classes/droptarget.html" class="tsd-kind-icon">Droptarget</a>
 					</li>
 					<li class=" tsd-kind-class tsd-has-type-parameter">
@@ -249,6 +245,9 @@
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/gridviewapi.html" class="tsd-kind-icon">Gridview<wbr>Api</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/gridviewcomponent.html" class="tsd-kind-icon">Gridview<wbr>Component</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/gridviewpanel.html" class="tsd-kind-icon">Gridview<wbr>Panel</a>
@@ -293,6 +292,9 @@
 						<a href="classes/paneviewapi.html" class="tsd-kind-icon">Paneview<wbr>Api</a>
 					</li>
 					<li class=" tsd-kind-class">
+						<a href="classes/paneviewcomponent.html" class="tsd-kind-icon">Paneview<wbr>Component</a>
+					</li>
+					<li class=" tsd-kind-class">
 						<a href="classes/paneviewpanel.html" class="tsd-kind-icon">Paneview<wbr>Panel</a>
 					</li>
 					<li class=" tsd-kind-class">
@@ -323,6 +325,9 @@
 						<a href="classes/splitviewapi.html" class="tsd-kind-icon">Splitview<wbr>Api</a>
 					</li>
 					<li class=" tsd-kind-class">
+						<a href="classes/splitviewcomponent.html" class="tsd-kind-icon">Splitview<wbr>Component</a>
+					</li>
+					<li class=" tsd-kind-class">
 						<a href="classes/splitviewpanel.html" class="tsd-kind-icon">Splitview<wbr>Panel</a>
 					</li>
 					<li class=" tsd-kind-class">
@@ -336,9 +341,6 @@
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/titlecontainer.html" class="tsd-kind-icon">Title<wbr>Container</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/uievent.html" class="tsd-kind-icon">UIEvent</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/viewitem.html" class="tsd-kind-icon">View<wbr>Item</a>
@@ -461,25 +463,19 @@
 						<a href="interfaces/ibaseviewapi.html" class="tsd-kind-icon">IBase<wbr>View<wbr>Api</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/icomponentdockview.html" class="tsd-kind-icon">IComponent<wbr>Dockview</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/icomponentgridview.html" class="tsd-kind-icon">IComponent<wbr>Gridview</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/icomponentpaneview.html" class="tsd-kind-icon">IComponent<wbr>Paneview</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/icomponentsplitview.html" class="tsd-kind-icon">IComponent<wbr>Splitview</a>
-					</li>
-					<li class=" tsd-kind-interface">
 						<a href="interfaces/icontentcontainer.html" class="tsd-kind-icon">IContent<wbr>Container</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/idisposable.html" class="tsd-kind-icon">IDisposable</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/idockviewcomponentprops.html" class="tsd-kind-icon">IDockview<wbr>Component<wbr>Props</a>
+						<a href="interfaces/idockviewcomponent.html" class="tsd-kind-icon">IDockview<wbr>Component</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/idockviewpanelprops.html" class="tsd-kind-icon">IDockview<wbr>Panel<wbr>Props</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/idockviewreactprops.html" class="tsd-kind-icon">IDockview<wbr>React<wbr>Props</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/ifocustracker.html" class="tsd-kind-icon">IFocus<wbr>Tracker</a>
@@ -500,10 +496,13 @@
 						<a href="interfaces/igridview.html" class="tsd-kind-icon">IGrid<wbr>View</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/igridviewcomponentprops.html" class="tsd-kind-icon">IGridview<wbr>Component<wbr>Props</a>
+						<a href="interfaces/igridviewcomponent.html" class="tsd-kind-icon">IGridview<wbr>Component</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/igridviewpanelprops.html" class="tsd-kind-icon">IGridview<wbr>Panel<wbr>Props</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/igridviewreactprops.html" class="tsd-kind-icon">IGridview<wbr>React<wbr>Props</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/igroupitem.html" class="tsd-kind-icon">IGroup<wbr>Item</a>
@@ -522,9 +521,6 @@
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/igrouppanelinitparameters.html" class="tsd-kind-icon">IGroup<wbr>Panel<wbr>Init<wbr>Parameters</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/igrouppanelprops.html" class="tsd-kind-icon">IGroup<wbr>Panel<wbr>Props</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/igroupview.html" class="tsd-kind-icon">IGroupview</a>
@@ -560,10 +556,13 @@
 						<a href="interfaces/ipaneview.html" class="tsd-kind-icon">IPaneview</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/ipaneviewcomponentprops.html" class="tsd-kind-icon">IPaneview<wbr>Component<wbr>Props</a>
+						<a href="interfaces/ipaneviewcomponent.html" class="tsd-kind-icon">IPaneview<wbr>Component</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/ipaneviewpanelprops.html" class="tsd-kind-icon">IPaneview<wbr>Panel<wbr>Props</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ipaneviewreactprops.html" class="tsd-kind-icon">IPaneview<wbr>React<wbr>Props</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/isashdragsnapstate.html" class="tsd-kind-icon">ISash<wbr>Drag<wbr>Snap<wbr>State</a>
@@ -575,9 +574,6 @@
 						<a href="interfaces/iserializableview.html" class="tsd-kind-icon">ISerializable<wbr>View</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/iserializableviewconstructor.html" class="tsd-kind-icon">ISerializable<wbr>View<wbr>Constructor</a>
-					</li>
-					<li class=" tsd-kind-interface">
 						<a href="interfaces/iserializedbranchnode.html" class="tsd-kind-icon">ISerialized<wbr>Branch<wbr>Node</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -587,13 +583,16 @@
 						<a href="interfaces/isplitviewdescriptor.html" class="tsd-kind-icon">ISplit<wbr>View<wbr>Descriptor</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/isplitviewcomponentprops.html" class="tsd-kind-icon">ISplitview<wbr>Component<wbr>Props</a>
-					</li>
-					<li class=" tsd-kind-interface">
 						<a href="interfaces/isplitviewpanel.html" class="tsd-kind-icon">ISplitview<wbr>Panel</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/isplitviewpanelprops.html" class="tsd-kind-icon">ISplitview<wbr>Panel<wbr>Props</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/isplitviewpanels.html" class="tsd-kind-icon">ISplitview<wbr>Panels</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/isplitviewreactprops.html" class="tsd-kind-icon">ISplitview<wbr>React<wbr>Props</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/isplitviewstyles.html" class="tsd-kind-icon">ISplitview<wbr>Styles</a>
@@ -806,19 +805,19 @@
 						<a href="globals.html#uniqueportalkeygenerator" class="tsd-kind-icon">unique<wbr>Portal<wbr>Key<wbr>Generator</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#dockviewcomponent" class="tsd-kind-icon">Dockview<wbr>Component</a>
+						<a href="globals.html#dockviewreact" class="tsd-kind-icon">Dockview<wbr>React</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#gridviewcomponent" class="tsd-kind-icon">Gridview<wbr>Component</a>
+						<a href="globals.html#gridviewreact" class="tsd-kind-icon">Gridview<wbr>React</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#paneviewcomponent" class="tsd-kind-icon">Paneview<wbr>Component</a>
+						<a href="globals.html#paneviewreact" class="tsd-kind-icon">Paneview<wbr>React</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#reactcomponentbridge" class="tsd-kind-icon">React<wbr>Component<wbr>Bridge</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#splitviewcomponent" class="tsd-kind-icon">Splitview<wbr>Component</a>
+						<a href="globals.html#splitviewreact" class="tsd-kind-icon">Splitview<wbr>React</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#addclasses" class="tsd-kind-icon">add<wbr>Classes</a>

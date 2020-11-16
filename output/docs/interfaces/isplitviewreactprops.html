@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>IPaneviewComponentProps | dockview</title>
+	<title>ISplitviewReactProps | dockview</title>
 	<meta name="description" content="Documentation for dockview">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -52,10 +52,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="ipaneviewcomponentprops.html">IPaneviewComponentProps</a>
+					<a href="isplitviewreactprops.html">ISplitviewReactProps</a>
 				</li>
 			</ul>
-			<h1>Interface IPaneviewComponentProps</h1>
+			<h1>Interface ISplitviewReactProps</h1>
 		</div>
 	</div>
 </header>
@@ -66,7 +66,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">IPaneviewComponentProps</span>
+						<span class="target">ISplitviewReactProps</span>
 					</li>
 				</ul>
 			</section>
@@ -77,10 +77,12 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ipaneviewcomponentprops.html#classname" class="tsd-kind-icon">class<wbr>Name</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ipaneviewcomponentprops.html#components" class="tsd-kind-icon">components</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ipaneviewcomponentprops.html#headercomponents" class="tsd-kind-icon">header<wbr>Components</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ipaneviewcomponentprops.html#onready" class="tsd-kind-icon">on<wbr>Ready</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="isplitviewreactprops.html#classname" class="tsd-kind-icon">class<wbr>Name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="isplitviewreactprops.html#components" class="tsd-kind-icon">components</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="isplitviewreactprops.html#hideborders" class="tsd-kind-icon">hide<wbr>Borders</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="isplitviewreactprops.html#onready" class="tsd-kind-icon">on<wbr>Ready</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="isplitviewreactprops.html#orientation" class="tsd-kind-icon">orientation</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="isplitviewreactprops.html#proportionallayout" class="tsd-kind-icon">proportional<wbr>Layout</a></li>
 							</ul>
 						</section>
 					</div>
@@ -94,37 +96,37 @@
 					<div class="tsd-signature tsd-kind-icon">class<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/e553556/packages/splitview/src/react/paneview/paneview.tsx#L27">src/react/paneview/paneview.tsx:27</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/52ce5d5/packages/splitview/src/react/splitview/splitview.tsx#L29">src/react/splitview/splitview.tsx:29</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="components" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> components</h3>
-					<div class="tsd-signature tsd-kind-icon">components<span class="tsd-signature-symbol">:</span> <a href="panelcollection.html" class="tsd-signature-type">PanelCollection</a><span class="tsd-signature-symbol">&lt;</span><a href="ipaneviewpanelprops.html" class="tsd-signature-type">IPaneviewPanelProps</a><span class="tsd-signature-symbol">&gt;</span></div>
+					<h3>components</h3>
+					<div class="tsd-signature tsd-kind-icon">components<span class="tsd-signature-symbol">:</span> <a href="panelcollection.html" class="tsd-signature-type">PanelCollection</a><span class="tsd-signature-symbol">&lt;</span><a href="isplitviewpanelprops.html" class="tsd-signature-type">ISplitviewPanelProps</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/e553556/packages/splitview/src/react/paneview/paneview.tsx#L25">src/react/paneview/paneview.tsx:25</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/52ce5d5/packages/splitview/src/react/splitview/splitview.tsx#L26">src/react/splitview/splitview.tsx:26</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="headercomponents" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> header<wbr>Components</h3>
-					<div class="tsd-signature tsd-kind-icon">header<wbr>Components<span class="tsd-signature-symbol">:</span> <a href="panelcollection.html" class="tsd-signature-type">PanelCollection</a><span class="tsd-signature-symbol">&lt;</span><a href="ipaneviewpanelprops.html" class="tsd-signature-type">IPaneviewPanelProps</a><span class="tsd-signature-symbol">&gt;</span></div>
+					<a name="hideborders" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> hide<wbr>Borders</h3>
+					<div class="tsd-signature tsd-kind-icon">hide<wbr>Borders<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/e553556/packages/splitview/src/react/paneview/paneview.tsx#L26">src/react/paneview/paneview.tsx:26</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/52ce5d5/packages/splitview/src/react/splitview/splitview.tsx#L28">src/react/splitview/splitview.tsx:28</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="onready" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> on<wbr>Ready</h3>
-					<div class="tsd-signature tsd-kind-icon">on<wbr>Ready<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><a href="paneviewreadyevent.html" class="tsd-signature-type">PaneviewReadyEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<div class="tsd-signature tsd-kind-icon">on<wbr>Ready<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><a href="splitviewreadyevent.html" class="tsd-signature-type">SplitviewReadyEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/e553556/packages/splitview/src/react/paneview/paneview.tsx#L24">src/react/paneview/paneview.tsx:24</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/52ce5d5/packages/splitview/src/react/splitview/splitview.tsx#L25">src/react/splitview/splitview.tsx:25</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -132,14 +134,14 @@
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter-signature">
 								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><a href="paneviewreadyevent.html" class="tsd-signature-type">PaneviewReadyEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><a href="splitviewreadyevent.html" class="tsd-signature-type">SplitviewReadyEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
 										<h4 class="tsd-parameters-title">Parameters</h4>
 										<ul class="tsd-parameters">
 											<li>
-												<h5>event: <a href="paneviewreadyevent.html" class="tsd-signature-type">PaneviewReadyEvent</a></h5>
+												<h5>event: <a href="splitviewreadyevent.html" class="tsd-signature-type">SplitviewReadyEvent</a></h5>
 											</li>
 										</ul>
 										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -148,6 +150,26 @@
 							</li>
 						</ul>
 					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="orientation" class="tsd-anchor"></a>
+					<h3>orientation</h3>
+					<div class="tsd-signature tsd-kind-icon">orientation<span class="tsd-signature-symbol">:</span> <a href="../enums/orientation.html" class="tsd-signature-type">Orientation</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/52ce5d5/packages/splitview/src/react/splitview/splitview.tsx#L24">src/react/splitview/splitview.tsx:24</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="proportionallayout" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> proportional<wbr>Layout</h3>
+					<div class="tsd-signature tsd-kind-icon">proportional<wbr>Layout<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/52ce5d5/packages/splitview/src/react/splitview/splitview.tsx#L27">src/react/splitview/splitview.tsx:27</a></li>
+						</ul>
+					</aside>
 				</section>
 			</section>
 		</div>
@@ -164,19 +186,25 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="ipaneviewcomponentprops.html" class="tsd-kind-icon">IPaneview<wbr>Component<wbr>Props</a>
+						<a href="isplitviewreactprops.html" class="tsd-kind-icon">ISplitview<wbr>React<wbr>Props</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="ipaneviewcomponentprops.html#classname" class="tsd-kind-icon">class<wbr>Name</a>
+								<a href="isplitviewreactprops.html#classname" class="tsd-kind-icon">class<wbr>Name</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="ipaneviewcomponentprops.html#components" class="tsd-kind-icon">components</a>
+								<a href="isplitviewreactprops.html#components" class="tsd-kind-icon">components</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="ipaneviewcomponentprops.html#headercomponents" class="tsd-kind-icon">header<wbr>Components</a>
+								<a href="isplitviewreactprops.html#hideborders" class="tsd-kind-icon">hide<wbr>Borders</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="ipaneviewcomponentprops.html#onready" class="tsd-kind-icon">on<wbr>Ready</a>
+								<a href="isplitviewreactprops.html#onready" class="tsd-kind-icon">on<wbr>Ready</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="isplitviewreactprops.html#orientation" class="tsd-kind-icon">orientation</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="isplitviewreactprops.html#proportionallayout" class="tsd-kind-icon">proportional<wbr>Layout</a>
 							</li>
 						</ul>
 					</li>

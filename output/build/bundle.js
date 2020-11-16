@@ -913,7 +913,7 @@ var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/
 var ReactDOM = __importStar(__webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js"));
 __webpack_require__(/*! ./index.scss */ "./src/index.scss");
 var application_1 = __webpack_require__(/*! ./layout-grid/application */ "./src/layout-grid/application.tsx");
-document.getElementById('app').classList.add('dockview-theme-darks');
+document.getElementById('app').classList.add('dockview-theme-dark');
 ReactDOM.render(React.createElement(application_1.Application, null), document.getElementById('app'));
 
 
@@ -1127,7 +1127,7 @@ exports.Application = function () {
             window.removeEventListener('resize', onresize);
         };
     }, []);
-    return (React.createElement(dockview_1.GridviewComponent
+    return (React.createElement(dockview_1.GridviewReact
     // className={'visual-studio-theme'}
     , { 
         // className={'visual-studio-theme'}
@@ -1223,7 +1223,7 @@ exports.ControlCenter = function () {
         var api = registry.get('dockview');
         var target = api.createDragTarget({ element: dragRef.current, content: 'drag me' }, function () { return ({
             id: 'yellow',
-            componentName: 'test_component',
+            component: 'test_component',
         }); });
         return function () {
             target.dispose();
@@ -1237,7 +1237,7 @@ exports.ControlCenter = function () {
         var _id = nextGuid();
         var id = "" + _id;
         api.addPanel({
-            componentName: 'test_component',
+            component: 'test_component',
             id: id,
             title: "Item " + id,
         });
@@ -1251,7 +1251,7 @@ exports.ControlCenter = function () {
             return;
         }
         api.addPanel({
-            componentName: 'test_component',
+            component: 'test_component',
             id: id,
             title: "Item " + id,
         });
@@ -1325,7 +1325,7 @@ exports.ControlCenter = function () {
         }
         api.addPanel({
             id: 'settings',
-            componentName: 'settings',
+            component: 'settings',
             title: 'Settings',
         });
     };
@@ -1565,17 +1565,17 @@ var components = {
             }
             else {
                 event.api.addPanel({
-                    componentName: 'test_component',
+                    component: 'test_component',
                     id: 'inner-1',
                     title: 'inner-1',
                 });
                 event.api.addPanel({
-                    componentName: 'test_component',
+                    component: 'test_component',
                     id: 'inner-2',
                     title: 'inner-2',
                 });
                 event.api.addPanel({
-                    componentName: 'test_component',
+                    component: 'test_component',
                     id: exports.nextGuid(),
                     title: 'inner-3',
                     position: {
@@ -1584,7 +1584,7 @@ var components = {
                     },
                 });
                 event.api.addPanel({
-                    componentName: 'test_component',
+                    component: 'test_component',
                     id: exports.nextGuid(),
                     title: 'inner-4',
                     position: {
@@ -1610,7 +1610,7 @@ var components = {
         return (React.createElement("div", { style: {
                 boxSizing: 'border-box',
             } },
-            React.createElement(dockview_1.DockviewComponent, { onReady: onReady, components: components, tabHeight: 20, debug: true })));
+            React.createElement(dockview_1.DockviewReact, { onReady: onReady, components: components, tabHeight: 20, debug: true })));
     },
     test_component: function (props) {
         var _a = __read(React.useState({
@@ -1713,7 +1713,7 @@ exports.TestGrid = function (props) {
             var event = ev.event;
             return {
                 id: 'yellow',
-                componentName: 'test_component',
+                component: 'test_component',
             };
         });
         api.addDndHandle('Files', function (ev) {
@@ -1722,34 +1722,34 @@ exports.TestGrid = function (props) {
             return {
                 id: Date.now().toString(),
                 title: event.event.dataTransfer.files[0].name,
-                componentName: 'test_component',
+                component: 'test_component',
             };
         });
         api.addPanel({
-            componentName: 'welcome',
+            component: 'welcome',
             id: 'welcome',
             title: 'Welcome',
         });
         // event.api.deserialize(require('./layoutGrid.layout.json'));
         return;
         api.addPanel({
-            componentName: 'test_component',
+            component: 'test_component',
             id: exports.nextGuid(),
             title: 'Item 1',
             params: { text: 'how low?' },
         });
         api.addPanel({
-            componentName: 'test_component',
+            component: 'test_component',
             id: 'item2',
             title: 'Item 2',
         });
         api.addPanel({
-            componentName: 'split_panel',
+            component: 'split_panel',
             id: exports.nextGuid(),
             title: 'Item 3 with a long title',
         });
         api.addPanel({
-            componentName: 'test_component',
+            component: 'test_component',
             id: exports.nextGuid(),
             title: 'Item 3',
             position: { direction: 'below', referencePanel: 'item2' },
@@ -1809,7 +1809,7 @@ exports.TestGrid = function (props) {
                 } },
                 React.createElement("div", { className: "context-action", onClick: onClose }, "Close"),
                 React.createElement("div", { className: "context-action", onClick: onChangeName }, "Rename")), document.getElementById('anchor')),
-        React.createElement(dockview_1.DockviewComponent, { onReady: onReady, components: components, tabComponents: tabComponents, debug: false, enableExternalDragEvents: true, onTabContextMenu: onTabContextMenu, watermarkComponent: Watermark })));
+        React.createElement(dockview_1.DockviewReact, { onReady: onReady, components: components, tabComponents: tabComponents, debug: false, enableExternalDragEvents: true, onTabContextMenu: onTabContextMenu, watermarkComponent: Watermark })));
 };
 var Watermark = function (props) {
     var _a = __read(React.useState(props.containerApi.size), 2), groups = _a[0], setGroups = _a[1];
@@ -2267,7 +2267,7 @@ exports.Sidebar = function (props) {
             backgroundColor: 'rgb(37,37,38)',
             height: '100%',
         } },
-        React.createElement(dockview_1.PaneviewComponent, { headerComponents: headerComponents, components: components, onReady: onReady })));
+        React.createElement(dockview_1.PaneviewReact, { headerComponents: headerComponents, components: components, onReady: onReady })));
 };
 
 
@@ -2427,7 +2427,7 @@ exports.SplitPanel = function (props) {
             React.createElement("button", { onClick: onUpdateProps }, "Update props"),
             React.createElement("button", { onClick: onAdd }, "Add"),
             React.createElement("button", { onClick: onRemove }, "Remove")),
-        React.createElement(dockview_1.SplitviewComponent, { components: components, onReady: onReady, orientation: dockview_1.Orientation.VERTICAL })));
+        React.createElement(dockview_1.SplitviewReact, { components: components, onReady: onReady, orientation: dockview_1.Orientation.VERTICAL })));
 };
 
 
@@ -2733,7 +2733,7 @@ exports.GridviewDemo = function (props) {
                 margin: '40px',
                 backgroundColor: 'grey',
             } },
-            React.createElement(dockview_1.GridviewComponent, { proportionalLayout: true, components: components, orientation: dockview_1.Orientation.VERTICAL, onReady: onReady }))));
+            React.createElement(dockview_1.GridviewReact, { proportionalLayout: true, components: components, orientation: dockview_1.Orientation.VERTICAL, onReady: onReady }))));
 };
 
 
@@ -2968,7 +2968,7 @@ exports.Common = function (props) {
         React.createElement("h2", null, text),
         React.createElement("div", { className: "splitview-demo-content" },
             React.createElement("div", { className: "splitview-demo-view" },
-                React.createElement(dockview_1.SplitviewComponent, { orientation: props.orientation, onReady: onReady, components: components })),
+                React.createElement(dockview_1.SplitviewReact, { orientation: props.orientation, onReady: onReady, components: components })),
             React.createElement("div", { className: "api-parameter" },
                 React.createElement("span", null, "Height"),
                 React.createElement("span", null, dimensions.height),
@@ -3036,7 +3036,7 @@ exports.WelcomePanel = function (props) {
         }
         props.containerApi.addPanel({
             id: 'splitview',
-            componentName: 'splitview',
+            component: 'splitview',
             title: 'Splitview Docs',
         });
     };
@@ -3048,7 +3048,7 @@ exports.WelcomePanel = function (props) {
         }
         props.containerApi.addPanel({
             id: 'gridview',
-            componentName: 'gridview',
+            component: 'gridview',
             title: 'Gridview Docs',
         });
     };
@@ -32568,10 +32568,6 @@ var GroupPanelApi = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    GroupPanelApi.prototype.updateTitleHeader = function () {
-        if (this.isGroupVisible) {
-        }
-    };
     GroupPanelApi.prototype.setTitle = function (title) {
         this._onDidTitleChange.fire({ title: title });
     };
@@ -33141,676 +33137,6 @@ var Droptarget = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "../splitview/dist/es6/dockview/componentDockview.js":
-/*!***********************************************************!*\
-  !*** ../splitview/dist/es6/dockview/componentDockview.js ***!
-  \***********************************************************/
-/*! namespace exports */
-/*! export ComponentDockview [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ComponentDockview": () => /* binding */ ComponentDockview
-/* harmony export */ });
-/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../gridview/gridview */ "../splitview/dist/es6/gridview/gridview.js");
-/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
-/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../array */ "../splitview/dist/es6/array.js");
-/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../groupview/groupview */ "../splitview/dist/es6/groupview/groupview.js");
-/* harmony import */ var _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../groupview/groupviewPanel */ "../splitview/dist/es6/groupview/groupviewPanel.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
-/* harmony import */ var _components_watermark_watermark__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/watermark/watermark */ "../splitview/dist/es6/dockview/components/watermark/watermark.js");
-/* harmony import */ var _async__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../async */ "../splitview/dist/es6/async.js");
-/* harmony import */ var _components_debug_debug__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/debug/debug */ "../splitview/dist/es6/dockview/components/debug/debug.js");
-/* harmony import */ var _functions__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../functions */ "../splitview/dist/es6/functions.js");
-/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../math */ "../splitview/dist/es6/math.js");
-/* harmony import */ var _deserializer__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./deserializer */ "../splitview/dist/es6/dockview/deserializer.js");
-/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
-/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../dnd/dataTransfer */ "../splitview/dist/es6/dnd/dataTransfer.js");
-/* harmony import */ var _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../gridview/baseComponentGridview */ "../splitview/dist/es6/gridview/baseComponentGridview.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
-/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../groupview/tab */ "../splitview/dist/es6/groupview/tab.js");
-/* harmony import */ var _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./components/tab/defaultTab */ "../splitview/dist/es6/dockview/components/tab/defaultTab.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var __values = (undefined && undefined.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var nextGroupId = (0,_math__WEBPACK_IMPORTED_MODULE_15__.sequentialNumberGenerator)();
-var ComponentDockview = /** @class */ (function (_super) {
-    __extends(ComponentDockview, _super);
-    function ComponentDockview(element, options) {
-        var _this = _super.call(this, element, {
-            proportionalLayout: true,
-            orientation: options.orientation,
-            styles: options.styles,
-        }) || this;
-        _this.options = options;
-        _this.panels = new Map();
-        _this.dirtyPanels = new Set();
-        _this.debouncedDeque = (0,_functions__WEBPACK_IMPORTED_MODULE_8__.debounce)(_this.syncConfigs.bind(_this), 5000);
-        // events
-        _this._onTabInteractionEvent = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
-        _this.onTabInteractionEvent = _this
-            ._onTabInteractionEvent.event;
-        _this._onTabContextMenu = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
-        _this.onTabContextMenu = _this
-            ._onTabContextMenu.event;
-        // everything else
-        _this.drag = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.MutableDisposable();
-        _this.panelState = {};
-        _this.registry = new Map();
-        if (!_this.options.components) {
-            _this.options.components = {};
-        }
-        if (!_this.options.frameworkComponents) {
-            _this.options.frameworkComponents = {};
-        }
-        if (!_this.options.frameworkTabComponents) {
-            _this.options.frameworkTabComponents = {};
-        }
-        if (!_this.options.tabComponents) {
-            _this.options.tabComponents = {};
-        }
-        if (!_this.options.watermarkComponent &&
-            !_this.options.watermarkFrameworkComponent) {
-            _this.options.watermarkComponent = _components_watermark_watermark__WEBPACK_IMPORTED_MODULE_6__.Watermark;
-        }
-        _this._api = new _api_component_api__WEBPACK_IMPORTED_MODULE_12__.DockviewApi(_this);
-        _this.updateContainer();
-        return _this;
-    }
-    ComponentDockview.prototype.addDndHandle = function (type, cb) {
-        this.registry.set(type, cb);
-    };
-    Object.defineProperty(ComponentDockview.prototype, "totalPanels", {
-        get: function () {
-            return this.panels.size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ComponentDockview.prototype, "deserializer", {
-        get: function () {
-            return this._deserializer;
-        },
-        set: function (value) {
-            this._deserializer = value;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    ComponentDockview.prototype.focus = function () {
-        var _a;
-        (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.focus();
-    };
-    ComponentDockview.prototype.getGroupPanel = function (id) {
-        var _a;
-        return (_a = this.panels.get(id)) === null || _a === void 0 ? void 0 : _a.value;
-    };
-    ComponentDockview.prototype.createDragTarget = function (target, options) {
-        var _this = this;
-        var disposables = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.CompositeDisposable((0,_events__WEBPACK_IMPORTED_MODULE_5__.addDisposableListener)(target.element, 'dragstart', function (event) {
-            var _a;
-            if (!event.dataTransfer) {
-                throw new Error('unsupported');
-            }
-            var panelOptions = typeof options === 'function' ? options() : options;
-            var panel = (_a = _this.panels.get(panelOptions.id)) === null || _a === void 0 ? void 0 : _a.value;
-            if (panel) {
-                _this.drag.value = panel.group.startActiveDrag(panel);
-            }
-            var data = JSON.stringify(__assign({ type: _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_10__.DragType.EXTERNAL }, panelOptions));
-            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_10__.DataTransferSingleton.setData(_this.id, data);
-            event.dataTransfer.effectAllowed = 'move';
-            var dragImage = document.createElement('div');
-            dragImage.textContent = target.content;
-            dragImage.classList.add('custom-dragging');
-            document.body.appendChild(dragImage);
-            event.dataTransfer.setDragImage(dragImage, event.offsetX, event.offsetY);
-            setTimeout(function () { return document.body.removeChild(dragImage); }, 0);
-            event.dataTransfer.setData(_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_10__.DATA_KEY, data);
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_5__.addDisposableListener)(this.element, 'dragend', function (ev) {
-            // drop events fire before dragend so we can remove this safely
-            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_10__.DataTransferSingleton.removeData(_this.id);
-            _this.drag.dispose();
-        }));
-        return disposables;
-    };
-    ComponentDockview.prototype.setActivePanel = function (panel) {
-        this.doSetGroupActive(panel.group);
-        panel.group.openPanel(panel);
-    };
-    ComponentDockview.prototype.moveToNext = function (options) {
-        var _a;
-        if (options === void 0) { options = {}; }
-        if (!options.group) {
-            if (!this.activeGroup) {
-                return;
-            }
-            options.group = this.activeGroup;
-        }
-        if (options.includePanel && options.group) {
-            if (options.group.activePanel !==
-                options.group.panels[options.group.panels.length - 1]) {
-                options.group.moveToNext({ suppressRoll: true });
-                return;
-            }
-        }
-        var location = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(options.group.element);
-        var next = (_a = this.gridview.next(location)) === null || _a === void 0 ? void 0 : _a.view;
-        this.doSetGroupActive(next);
-    };
-    ComponentDockview.prototype.moveToPrevious = function (options) {
-        var _a;
-        if (options === void 0) { options = {}; }
-        if (!options.group) {
-            if (!this.activeGroup) {
-                return;
-            }
-            options.group = this.activeGroup;
-        }
-        if (options.includePanel && options.group) {
-            if (options.group.activePanel !== options.group.panels[0]) {
-                options.group.moveToPrevious({ suppressRoll: true });
-                return;
-            }
-        }
-        var location = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(options.group.element);
-        var next = (_a = this.gridview.previous(location)) === null || _a === void 0 ? void 0 : _a.view;
-        this.doSetGroupActive(next);
-    };
-    ComponentDockview.prototype.registerPanel = function (panel) {
-        var _this = this;
-        if (this.panels.has(panel.id)) {
-            throw new Error("panel " + panel.id + " already exists");
-        }
-        var disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.CompositeDisposable(panel.onDidStateChange(function (e) { return _this.addDirtyPanel(panel); }));
-        this.panels.set(panel.id, { value: panel, disposable: disposable });
-        this._onDidLayoutChange.fire({ kind: "PANEL_CREATED" /* PANEL_CREATED */ });
-    };
-    ComponentDockview.prototype.unregisterPanel = function (panel) {
-        if (!this.panels.has(panel.id)) {
-            throw new Error("panel " + panel.id + " doesn't exist");
-        }
-        var _a = this.panels.get(panel.id), disposable = _a.disposable, unregisteredPanel = _a.value;
-        disposable.dispose();
-        unregisteredPanel.dispose();
-        this.panels.delete(panel.id);
-        this._onDidLayoutChange.fire({ kind: "PANEL_DESTROYED" /* PANEL_DESTROYED */ });
-    };
-    /**
-     * Serialize the current state of the layout
-     *
-     * @returns A JSON respresentation of the layout
-     */
-    ComponentDockview.prototype.toJSON = function () {
-        var _this = this;
-        var _a;
-        this.syncConfigs();
-        var data = this.gridview.serialize();
-        var state = __assign({}, this.panelState);
-        // this.activeGroup.id
-        var panels = Array.from(this.panels.values()).reduce(function (collection, panel) {
-            if (!_this.panelState[panel.value.id]) {
-                collection[panel.value.id] = panel.value.toJSON();
-            }
-            return collection;
-        }, state);
-        return {
-            grid: data,
-            panels: panels,
-            activeGroup: (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.id,
-            options: { tabHeight: this.getTabHeight() },
-        };
-    };
-    /**
-     * Ensure the local copy of the layout state is up-to-date
-     */
-    ComponentDockview.prototype.syncConfigs = function () {
-        var _this = this;
-        var dirtyPanels = Array.from(this.dirtyPanels);
-        if (dirtyPanels.length === 0) {
-            console.debug('[layout#syncConfigs] no dirty panels');
-        }
-        this.dirtyPanels.clear();
-        var partialPanelState = dirtyPanels
-            .map(function (panel) { return _this.panels.get(panel.id); })
-            .filter(function (_) { return !!_; })
-            .reduce(function (collection, panel) {
-            collection[panel.value.id] = panel.value.toJSON();
-            return collection;
-        }, {});
-        this.panelState = __assign(__assign({}, this.panelState), partialPanelState);
-        dirtyPanels
-            .filter(function (p) { return _this.panels.has(p.id); })
-            .forEach(function (panel) {
-            panel.setDirty(false);
-            _this._onDidLayoutChange.fire({
-                kind: "PANEL_CLEAN" /* PANEL_CLEAN */,
-            });
-        });
-        this._onDidLayoutChange.fire({
-            kind: "LAYOUT_CONFIG_UPDATED" /* LAYOUT_CONFIG_UPDATED */,
-        });
-    };
-    ComponentDockview.prototype.deserialize = function (data) {
-        this.gridview.clear();
-        this.panels.forEach(function (panel) {
-            panel.disposable.dispose();
-            panel.value.dispose();
-        });
-        this.panels.clear();
-        this.groups.clear();
-        this.fromJSON(data);
-        this.gridview.layout(this.width, this.height);
-    };
-    ComponentDockview.prototype.fromJSON = function (data) {
-        var _this = this;
-        if (!this.deserializer) {
-            throw new Error('invalid deserializer');
-        }
-        var grid = data.grid, panels = data.panels, options = data.options, activeGroup = data.activeGroup;
-        if (typeof (options === null || options === void 0 ? void 0 : options.tabHeight) === 'number') {
-            this.setTabHeight(options.tabHeight);
-        }
-        this.gridview.deserialize(grid, new _deserializer__WEBPACK_IMPORTED_MODULE_9__.DefaultDeserializer(this, {
-            createPanel: function (id) {
-                var panelData = panels[id];
-                var panel = _this.deserializer.fromJSON(panelData);
-                _this.registerPanel(panel);
-                return panel;
-            },
-        }));
-        if (typeof activeGroup === 'string') {
-            this.doSetGroupActive(this.getPanel(activeGroup));
-        }
-        this._onDidLayoutChange.fire({ kind: "NEW_LAYOUT" /* NEW_LAYOUT */ });
-    };
-    ComponentDockview.prototype.closeAllGroups = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _a, _b, entry, _c, key, group, didCloseAll, e_1_1;
-            var e_1, _d;
-            return __generator(this, function (_e) {
-                switch (_e.label) {
-                    case 0:
-                        _e.trys.push([0, 6, 7, 8]);
-                        _a = __values(this.groups.entries()), _b = _a.next();
-                        _e.label = 1;
-                    case 1:
-                        if (!!_b.done) return [3 /*break*/, 5];
-                        entry = _b.value;
-                        _c = __read(entry, 2), key = _c[0], group = _c[1];
-                        return [4 /*yield*/, group.value.closeAllPanels()];
-                    case 2:
-                        didCloseAll = _e.sent();
-                        if (!didCloseAll) {
-                            return [2 /*return*/, false];
-                        }
-                        return [4 /*yield*/, (0,_async__WEBPACK_IMPORTED_MODULE_16__.timeoutAsPromise)(0)];
-                    case 3:
-                        _e.sent();
-                        _e.label = 4;
-                    case 4:
-                        _b = _a.next();
-                        return [3 /*break*/, 1];
-                    case 5: return [3 /*break*/, 8];
-                    case 6:
-                        e_1_1 = _e.sent();
-                        e_1 = { error: e_1_1 };
-                        return [3 /*break*/, 8];
-                    case 7:
-                        try {
-                            if (_b && !_b.done && (_d = _a.return)) _d.call(_a);
-                        }
-                        finally { if (e_1) throw e_1.error; }
-                        return [7 /*endfinally*/];
-                    case 8: return [2 /*return*/, true];
-                }
-            });
-        });
-    };
-    ComponentDockview.prototype.setTabHeight = function (height) {
-        this.options.tabHeight = height;
-        this.groups.forEach(function (value) {
-            value.value.tabHeight = height;
-        });
-    };
-    ComponentDockview.prototype.getTabHeight = function () {
-        return this.options.tabHeight;
-    };
-    ComponentDockview.prototype.fireMouseEvent = function (event) {
-        switch (event.kind) {
-            case _groupview_tab__WEBPACK_IMPORTED_MODULE_13__.MouseEventKind.CONTEXT_MENU:
-                if (event.tab) {
-                    this._onTabContextMenu.fire({
-                        event: event.event,
-                        api: this._api,
-                        panel: event.panel,
-                    });
-                }
-                break;
-        }
-    };
-    ComponentDockview.prototype.addPanel = function (options) {
-        var _a, _b;
-        var panel = this._addPanel(options);
-        var referenceGroup;
-        if ((_a = options.position) === null || _a === void 0 ? void 0 : _a.referencePanel) {
-            var referencePanel = this.getGroupPanel(options.position.referencePanel);
-            referenceGroup = this.findGroup(referencePanel);
-        }
-        else {
-            referenceGroup = this.activeGroup;
-        }
-        if (referenceGroup) {
-            var target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_11__.toTarget)(((_b = options.position) === null || _b === void 0 ? void 0 : _b.direction) || 'within');
-            if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
-                referenceGroup.openPanel(panel);
-            }
-            else {
-                var location_1 = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-                var relativeLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_1, target);
-                this.addPanelToNewGroup(panel, relativeLocation);
-            }
-        }
-        else {
-            this.addPanelToNewGroup(panel);
-        }
-        return panel;
-    };
-    ComponentDockview.prototype._addPanel = function (options) {
-        var contentPart = this.createContentComponent(options.id, options.componentName);
-        var headerPart = this.createTabComponent(options.id, options.tabComponentName);
-        var panel = new _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_3__.GroupviewPanel(options.id, this._api);
-        panel.init({
-            headerPart: headerPart,
-            contentPart: contentPart,
-            title: options.title || options.id,
-            suppressClosable: options === null || options === void 0 ? void 0 : options.suppressClosable,
-            params: (options === null || options === void 0 ? void 0 : options.params) || {},
-        });
-        this.registerPanel(panel);
-        return panel;
-    };
-    ComponentDockview.prototype.createWatermarkComponent = function () {
-        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_17__.createComponent)('watermark-id', 'watermark-name', this.options.watermarkComponent
-            ? { 'watermark-name': this.options.watermarkComponent }
-            : {}, this.options.watermarkFrameworkComponent
-            ? { 'watermark-name': this.options.watermarkFrameworkComponent }
-            : {}, this.options.frameworkComponentFactory.watermark);
-    };
-    ComponentDockview.prototype.createContentComponent = function (id, componentName) {
-        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_17__.createComponent)(id, componentName, this.options.components, this.options.frameworkComponents, this.options.frameworkComponentFactory.content);
-    };
-    ComponentDockview.prototype.createTabComponent = function (id, componentName) {
-        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_17__.createComponent)(id, componentName, this.options.tabComponents, this.options.frameworkTabComponents, this.options.frameworkComponentFactory.tab, function () { return new _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_14__.DefaultTab(); });
-    };
-    ComponentDockview.prototype.addEmptyGroup = function (options) {
-        var group = this.createGroup();
-        if (options) {
-            var referencePanel = this.panels.get(options.referencePanel)
-                .value;
-            var referenceGroup = this.findGroup(referencePanel);
-            var target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_11__.toTarget)(options.direction);
-            var location_2 = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-            var relativeLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_2, target);
-            this.doAddGroup(group, relativeLocation);
-        }
-        else {
-            this.doAddGroup(group);
-        }
-    };
-    ComponentDockview.prototype.removeGroup = function (group) {
-        if (this.groups.size === 1) {
-            group.panels.forEach(function (panel) { return group.removePanel(panel); });
-            this._activeGroup = group;
-            return;
-        }
-        _super.prototype.removeGroup.call(this, group);
-    };
-    ComponentDockview.prototype.addPanelToNewGroup = function (panel, location) {
-        if (location === void 0) { location = [0]; }
-        var group;
-        if (this.groups.size === 1 &&
-            Array.from(this.groups.values())[0].value.size === 0) {
-            group = Array.from(this.groups.values())[0].value;
-        }
-        else {
-            group = this.createGroup();
-            this.doAddGroup(group, location);
-        }
-        group.openPanel(panel);
-    };
-    ComponentDockview.prototype.moveGroupOrPanel = function (referenceGroup, groupId, itemId, target, index) {
-        var sourceGroup = groupId
-            ? this.groups.get(groupId).value
-            : undefined;
-        switch (target) {
-            case _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center:
-            case undefined:
-                var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.removePanel(itemId)) ||
-                    this.panels.get(itemId).value;
-                if ((sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.size) === 0) {
-                    this.doRemoveGroup(sourceGroup);
-                }
-                referenceGroup.openPanel(groupItem, index);
-                return;
-        }
-        var referenceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-        var targetLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
-        if ((sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.size) < 2) {
-            var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_18__.tail)(targetLocation), 2), targetParentLocation = _a[0], to = _a[1];
-            var sourceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(sourceGroup.element);
-            var _b = __read((0,_array__WEBPACK_IMPORTED_MODULE_18__.tail)(sourceLocation), 2), sourceParentLocation = _b[0], from = _b[1];
-            if ((0,_array__WEBPACK_IMPORTED_MODULE_18__.sequenceEquals)(sourceParentLocation, targetParentLocation)) {
-                // special case when 'swapping' two views within same grid location
-                // if a group has one tab - we are essentially moving the 'group'
-                // which is equivalent to swapping two views in this case
-                this.gridview.moveView(sourceParentLocation, from, to);
-                return;
-            }
-            // source group will become empty so delete the group
-            var targetGroup = this.doRemoveGroup(sourceGroup, {
-                skipActive: true,
-                skipDispose: true,
-            });
-            // after deleting the group we need to re-evaulate the ref location
-            var updatedReferenceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-            var location_3 = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, updatedReferenceLocation, target);
-            this.doAddGroup(targetGroup, location_3);
-        }
-        else {
-            var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.removePanel(itemId)) ||
-                this.panels.get(itemId).value;
-            var dropLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
-            this.addPanelToNewGroup(groupItem, dropLocation);
-        }
-    };
-    ComponentDockview.prototype.createGroup = function (options) {
-        var _this = this;
-        if (!options) {
-            options = {};
-        }
-        if (typeof options.tabHeight !== 'number') {
-            options.tabHeight = this.getTabHeight();
-        }
-        if ((options === null || options === void 0 ? void 0 : options.id) && this.groups.has(options.id)) {
-            throw new Error("duplicate group " + options.id);
-        }
-        var group = new _groupview_groupview__WEBPACK_IMPORTED_MODULE_2__.Groupview(this, (options === null || options === void 0 ? void 0 : options.id) || nextGroupId.next(), options);
-        if (typeof this.options.tabHeight === 'number') {
-            group.tabHeight = this.options.tabHeight;
-        }
-        if (!this.groups.has(group.id)) {
-            var disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.CompositeDisposable(group.onMove(function (event) {
-                var groupId = event.groupId, itemId = event.itemId, target = event.target, index = event.index;
-                _this.moveGroupOrPanel(group, groupId, itemId, target, index);
-            }), group.onDidGroupChange(function (event) {
-                _this._onDidLayoutChange.fire(event);
-            }), group.onDrop(function (event) {
-                var _a;
-                var dragEvent = event.event;
-                var dataTransfer = dragEvent.dataTransfer;
-                if (dataTransfer.types.length === 0) {
-                    return;
-                }
-                var cb = _this.registry.get(dataTransfer.types[0]);
-                if (!cb) {
-                    return;
-                }
-                var panelOptions = cb({ event: event });
-                var panel = _this.getGroupPanel(panelOptions.id);
-                if (!panel) {
-                    panel = _this._addPanel(panelOptions);
-                }
-                _this.moveGroupOrPanel(group, (_a = panel === null || panel === void 0 ? void 0 : panel.group) === null || _a === void 0 ? void 0 : _a.id, panel.id, event.target, event.index);
-            }));
-            this.groups.set(group.id, { value: group, disposable: disposable });
-        }
-        return group;
-    };
-    ComponentDockview.prototype.findGroup = function (panel) {
-        return Array.from(this.groups.values()).find(function (group) {
-            return group.value.containsPanel(panel);
-        }).value;
-    };
-    ComponentDockview.prototype.addDirtyPanel = function (panel) {
-        this.dirtyPanels.add(panel);
-        panel.setDirty(true);
-        this._onDidLayoutChange.fire({ kind: "PANEL_DIRTY" /* PANEL_DIRTY */ });
-        this.debouncedDeque();
-    };
-    ComponentDockview.prototype.dispose = function () {
-        var _a;
-        _super.prototype.dispose.call(this);
-        (_a = this.debugContainer) === null || _a === void 0 ? void 0 : _a.dispose();
-        this._onDidLayoutChange.dispose();
-    };
-    ComponentDockview.prototype.updateContainer = function () {
-        if (this.options.debug) {
-            if (!this.debugContainer) {
-                this.debugContainer = new _components_debug_debug__WEBPACK_IMPORTED_MODULE_7__.DebugWidget(this);
-            }
-            else {
-                this.debugContainer.dispose();
-                this.debugContainer = undefined;
-            }
-        }
-    };
-    return ComponentDockview;
-}(_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_11__.BaseGrid));
-
-
-
-/***/ }),
-
 /***/ "../splitview/dist/es6/dockview/components/debug/debug.js":
 /*!****************************************************************!*\
   !*** ../splitview/dist/es6/dockview/components/debug/debug.js ***!
@@ -34205,6 +33531,676 @@ var DefaultDeserializer = /** @class */ (function () {
 
 /***/ }),
 
+/***/ "../splitview/dist/es6/dockview/dockviewComponent.js":
+/*!***********************************************************!*\
+  !*** ../splitview/dist/es6/dockview/dockviewComponent.js ***!
+  \***********************************************************/
+/*! namespace exports */
+/*! export DockviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DockviewComponent": () => /* binding */ DockviewComponent
+/* harmony export */ });
+/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../gridview/gridview */ "../splitview/dist/es6/gridview/gridview.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
+/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../array */ "../splitview/dist/es6/array.js");
+/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../groupview/groupview */ "../splitview/dist/es6/groupview/groupview.js");
+/* harmony import */ var _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../groupview/groupviewPanel */ "../splitview/dist/es6/groupview/groupviewPanel.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _components_watermark_watermark__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/watermark/watermark */ "../splitview/dist/es6/dockview/components/watermark/watermark.js");
+/* harmony import */ var _async__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../async */ "../splitview/dist/es6/async.js");
+/* harmony import */ var _components_debug_debug__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/debug/debug */ "../splitview/dist/es6/dockview/components/debug/debug.js");
+/* harmony import */ var _functions__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../functions */ "../splitview/dist/es6/functions.js");
+/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../math */ "../splitview/dist/es6/math.js");
+/* harmony import */ var _deserializer__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./deserializer */ "../splitview/dist/es6/dockview/deserializer.js");
+/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
+/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../dnd/dataTransfer */ "../splitview/dist/es6/dnd/dataTransfer.js");
+/* harmony import */ var _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../gridview/baseComponentGridview */ "../splitview/dist/es6/gridview/baseComponentGridview.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
+/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../groupview/tab */ "../splitview/dist/es6/groupview/tab.js");
+/* harmony import */ var _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./components/tab/defaultTab */ "../splitview/dist/es6/dockview/components/tab/defaultTab.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var __values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var nextGroupId = (0,_math__WEBPACK_IMPORTED_MODULE_15__.sequentialNumberGenerator)();
+var DockviewComponent = /** @class */ (function (_super) {
+    __extends(DockviewComponent, _super);
+    function DockviewComponent(element, options) {
+        var _this = _super.call(this, element, {
+            proportionalLayout: true,
+            orientation: options.orientation,
+            styles: options.styles,
+        }) || this;
+        _this.options = options;
+        _this.panels = new Map();
+        _this.dirtyPanels = new Set();
+        _this.debouncedDeque = (0,_functions__WEBPACK_IMPORTED_MODULE_8__.debounce)(_this.syncConfigs.bind(_this), 5000);
+        // events
+        _this._onTabInteractionEvent = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
+        _this.onTabInteractionEvent = _this
+            ._onTabInteractionEvent.event;
+        _this._onTabContextMenu = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
+        _this.onTabContextMenu = _this
+            ._onTabContextMenu.event;
+        // everything else
+        _this.drag = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.MutableDisposable();
+        _this.panelState = {};
+        _this.registry = new Map();
+        if (!_this.options.components) {
+            _this.options.components = {};
+        }
+        if (!_this.options.frameworkComponents) {
+            _this.options.frameworkComponents = {};
+        }
+        if (!_this.options.frameworkTabComponents) {
+            _this.options.frameworkTabComponents = {};
+        }
+        if (!_this.options.tabComponents) {
+            _this.options.tabComponents = {};
+        }
+        if (!_this.options.watermarkComponent &&
+            !_this.options.watermarkFrameworkComponent) {
+            _this.options.watermarkComponent = _components_watermark_watermark__WEBPACK_IMPORTED_MODULE_6__.Watermark;
+        }
+        _this._api = new _api_component_api__WEBPACK_IMPORTED_MODULE_12__.DockviewApi(_this);
+        _this.updateContainer();
+        return _this;
+    }
+    DockviewComponent.prototype.addDndHandle = function (type, cb) {
+        this.registry.set(type, cb);
+    };
+    Object.defineProperty(DockviewComponent.prototype, "totalPanels", {
+        get: function () {
+            return this.panels.size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(DockviewComponent.prototype, "deserializer", {
+        get: function () {
+            return this._deserializer;
+        },
+        set: function (value) {
+            this._deserializer = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    DockviewComponent.prototype.focus = function () {
+        var _a;
+        (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.focus();
+    };
+    DockviewComponent.prototype.getGroupPanel = function (id) {
+        var _a;
+        return (_a = this.panels.get(id)) === null || _a === void 0 ? void 0 : _a.value;
+    };
+    DockviewComponent.prototype.createDragTarget = function (target, options) {
+        var _this = this;
+        var disposables = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.CompositeDisposable((0,_events__WEBPACK_IMPORTED_MODULE_5__.addDisposableListener)(target.element, 'dragstart', function (event) {
+            var _a;
+            if (!event.dataTransfer) {
+                throw new Error('unsupported');
+            }
+            var panelOptions = typeof options === 'function' ? options() : options;
+            var panel = (_a = _this.panels.get(panelOptions.id)) === null || _a === void 0 ? void 0 : _a.value;
+            if (panel) {
+                _this.drag.value = panel.group.startActiveDrag(panel);
+            }
+            var data = JSON.stringify(__assign({ type: _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_10__.DragType.EXTERNAL }, panelOptions));
+            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_10__.DataTransferSingleton.setData(_this.id, data);
+            event.dataTransfer.effectAllowed = 'move';
+            var dragImage = document.createElement('div');
+            dragImage.textContent = target.content;
+            dragImage.classList.add('custom-dragging');
+            document.body.appendChild(dragImage);
+            event.dataTransfer.setDragImage(dragImage, event.offsetX, event.offsetY);
+            setTimeout(function () { return document.body.removeChild(dragImage); }, 0);
+            event.dataTransfer.setData(_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_10__.DATA_KEY, data);
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_5__.addDisposableListener)(this.element, 'dragend', function (ev) {
+            // drop events fire before dragend so we can remove this safely
+            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_10__.DataTransferSingleton.removeData(_this.id);
+            _this.drag.dispose();
+        }));
+        return disposables;
+    };
+    DockviewComponent.prototype.setActivePanel = function (panel) {
+        this.doSetGroupActive(panel.group);
+        panel.group.openPanel(panel);
+    };
+    DockviewComponent.prototype.moveToNext = function (options) {
+        var _a;
+        if (options === void 0) { options = {}; }
+        if (!options.group) {
+            if (!this.activeGroup) {
+                return;
+            }
+            options.group = this.activeGroup;
+        }
+        if (options.includePanel && options.group) {
+            if (options.group.activePanel !==
+                options.group.panels[options.group.panels.length - 1]) {
+                options.group.moveToNext({ suppressRoll: true });
+                return;
+            }
+        }
+        var location = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(options.group.element);
+        var next = (_a = this.gridview.next(location)) === null || _a === void 0 ? void 0 : _a.view;
+        this.doSetGroupActive(next);
+    };
+    DockviewComponent.prototype.moveToPrevious = function (options) {
+        var _a;
+        if (options === void 0) { options = {}; }
+        if (!options.group) {
+            if (!this.activeGroup) {
+                return;
+            }
+            options.group = this.activeGroup;
+        }
+        if (options.includePanel && options.group) {
+            if (options.group.activePanel !== options.group.panels[0]) {
+                options.group.moveToPrevious({ suppressRoll: true });
+                return;
+            }
+        }
+        var location = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(options.group.element);
+        var next = (_a = this.gridview.previous(location)) === null || _a === void 0 ? void 0 : _a.view;
+        this.doSetGroupActive(next);
+    };
+    DockviewComponent.prototype.registerPanel = function (panel) {
+        var _this = this;
+        if (this.panels.has(panel.id)) {
+            throw new Error("panel " + panel.id + " already exists");
+        }
+        var disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.CompositeDisposable(panel.onDidStateChange(function () { return _this.addDirtyPanel(panel); }));
+        this.panels.set(panel.id, { value: panel, disposable: disposable });
+        this._onDidLayoutChange.fire({ kind: "PANEL_CREATED" /* PANEL_CREATED */ });
+    };
+    DockviewComponent.prototype.unregisterPanel = function (panel) {
+        if (!this.panels.has(panel.id)) {
+            throw new Error("panel " + panel.id + " doesn't exist");
+        }
+        var _a = this.panels.get(panel.id), disposable = _a.disposable, unregisteredPanel = _a.value;
+        disposable.dispose();
+        unregisteredPanel.dispose();
+        this.panels.delete(panel.id);
+        this._onDidLayoutChange.fire({ kind: "PANEL_DESTROYED" /* PANEL_DESTROYED */ });
+    };
+    /**
+     * Serialize the current state of the layout
+     *
+     * @returns A JSON respresentation of the layout
+     */
+    DockviewComponent.prototype.toJSON = function () {
+        var _this = this;
+        var _a;
+        this.syncConfigs();
+        var data = this.gridview.serialize();
+        var state = __assign({}, this.panelState);
+        // this.activeGroup.id
+        var panels = Array.from(this.panels.values()).reduce(function (collection, panel) {
+            if (!_this.panelState[panel.value.id]) {
+                collection[panel.value.id] = panel.value.toJSON();
+            }
+            return collection;
+        }, state);
+        return {
+            grid: data,
+            panels: panels,
+            activeGroup: (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.id,
+            options: { tabHeight: this.getTabHeight() },
+        };
+    };
+    /**
+     * Ensure the local copy of the layout state is up-to-date
+     */
+    DockviewComponent.prototype.syncConfigs = function () {
+        var _this = this;
+        var dirtyPanels = Array.from(this.dirtyPanels);
+        if (dirtyPanels.length === 0) {
+            console.debug('[layout#syncConfigs] no dirty panels');
+        }
+        this.dirtyPanels.clear();
+        var partialPanelState = dirtyPanels
+            .map(function (panel) { return _this.panels.get(panel.id); })
+            .filter(function (_) { return !!_; })
+            .reduce(function (collection, panel) {
+            collection[panel.value.id] = panel.value.toJSON();
+            return collection;
+        }, {});
+        this.panelState = __assign(__assign({}, this.panelState), partialPanelState);
+        dirtyPanels
+            .filter(function (p) { return _this.panels.has(p.id); })
+            .forEach(function (panel) {
+            panel.setDirty(false);
+            _this._onDidLayoutChange.fire({
+                kind: "PANEL_CLEAN" /* PANEL_CLEAN */,
+            });
+        });
+        this._onDidLayoutChange.fire({
+            kind: "LAYOUT_CONFIG_UPDATED" /* LAYOUT_CONFIG_UPDATED */,
+        });
+    };
+    DockviewComponent.prototype.deserialize = function (data) {
+        this.gridview.clear();
+        this.panels.forEach(function (panel) {
+            panel.disposable.dispose();
+            panel.value.dispose();
+        });
+        this.panels.clear();
+        this.groups.clear();
+        this.fromJSON(data);
+        this.gridview.layout(this.width, this.height);
+    };
+    DockviewComponent.prototype.fromJSON = function (data) {
+        var _this = this;
+        if (!this.deserializer) {
+            throw new Error('invalid deserializer');
+        }
+        var grid = data.grid, panels = data.panels, options = data.options, activeGroup = data.activeGroup;
+        if (typeof (options === null || options === void 0 ? void 0 : options.tabHeight) === 'number') {
+            this.setTabHeight(options.tabHeight);
+        }
+        this.gridview.deserialize(grid, new _deserializer__WEBPACK_IMPORTED_MODULE_9__.DefaultDeserializer(this, {
+            createPanel: function (id) {
+                var panelData = panels[id];
+                var panel = _this.deserializer.fromJSON(panelData);
+                _this.registerPanel(panel);
+                return panel;
+            },
+        }));
+        if (typeof activeGroup === 'string') {
+            this.doSetGroupActive(this.getPanel(activeGroup));
+        }
+        this._onDidLayoutChange.fire({ kind: "NEW_LAYOUT" /* NEW_LAYOUT */ });
+    };
+    DockviewComponent.prototype.closeAllGroups = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, _b, entry, _c, key, group, didCloseAll, e_1_1;
+            var e_1, _d;
+            return __generator(this, function (_e) {
+                switch (_e.label) {
+                    case 0:
+                        _e.trys.push([0, 6, 7, 8]);
+                        _a = __values(this.groups.entries()), _b = _a.next();
+                        _e.label = 1;
+                    case 1:
+                        if (!!_b.done) return [3 /*break*/, 5];
+                        entry = _b.value;
+                        _c = __read(entry, 2), key = _c[0], group = _c[1];
+                        return [4 /*yield*/, group.value.closeAllPanels()];
+                    case 2:
+                        didCloseAll = _e.sent();
+                        if (!didCloseAll) {
+                            return [2 /*return*/, false];
+                        }
+                        return [4 /*yield*/, (0,_async__WEBPACK_IMPORTED_MODULE_16__.timeoutAsPromise)(0)];
+                    case 3:
+                        _e.sent();
+                        _e.label = 4;
+                    case 4:
+                        _b = _a.next();
+                        return [3 /*break*/, 1];
+                    case 5: return [3 /*break*/, 8];
+                    case 6:
+                        e_1_1 = _e.sent();
+                        e_1 = { error: e_1_1 };
+                        return [3 /*break*/, 8];
+                    case 7:
+                        try {
+                            if (_b && !_b.done && (_d = _a.return)) _d.call(_a);
+                        }
+                        finally { if (e_1) throw e_1.error; }
+                        return [7 /*endfinally*/];
+                    case 8: return [2 /*return*/, true];
+                }
+            });
+        });
+    };
+    DockviewComponent.prototype.setTabHeight = function (height) {
+        this.options.tabHeight = height;
+        this.groups.forEach(function (value) {
+            value.value.tabHeight = height;
+        });
+    };
+    DockviewComponent.prototype.getTabHeight = function () {
+        return this.options.tabHeight;
+    };
+    DockviewComponent.prototype.fireMouseEvent = function (event) {
+        switch (event.kind) {
+            case _groupview_tab__WEBPACK_IMPORTED_MODULE_13__.MouseEventKind.CONTEXT_MENU:
+                if (event.tab) {
+                    this._onTabContextMenu.fire({
+                        event: event.event,
+                        api: this._api,
+                        panel: event.panel,
+                    });
+                }
+                break;
+        }
+    };
+    DockviewComponent.prototype.addPanel = function (options) {
+        var _a, _b;
+        var panel = this._addPanel(options);
+        var referenceGroup;
+        if ((_a = options.position) === null || _a === void 0 ? void 0 : _a.referencePanel) {
+            var referencePanel = this.getGroupPanel(options.position.referencePanel);
+            referenceGroup = this.findGroup(referencePanel);
+        }
+        else {
+            referenceGroup = this.activeGroup;
+        }
+        if (referenceGroup) {
+            var target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_11__.toTarget)(((_b = options.position) === null || _b === void 0 ? void 0 : _b.direction) || 'within');
+            if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
+                referenceGroup.openPanel(panel);
+            }
+            else {
+                var location_1 = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+                var relativeLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_1, target);
+                this.addPanelToNewGroup(panel, relativeLocation);
+            }
+        }
+        else {
+            this.addPanelToNewGroup(panel);
+        }
+        return panel;
+    };
+    DockviewComponent.prototype._addPanel = function (options) {
+        var contentPart = this.createContentComponent(options.id, options.component);
+        var headerPart = this.createTabComponent(options.id, options.tabComponent);
+        var panel = new _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_3__.GroupviewPanel(options.id, this._api);
+        panel.init({
+            headerPart: headerPart,
+            contentPart: contentPart,
+            title: options.title || options.id,
+            suppressClosable: options === null || options === void 0 ? void 0 : options.suppressClosable,
+            params: (options === null || options === void 0 ? void 0 : options.params) || {},
+        });
+        this.registerPanel(panel);
+        return panel;
+    };
+    DockviewComponent.prototype.createWatermarkComponent = function () {
+        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_17__.createComponent)('watermark-id', 'watermark-name', this.options.watermarkComponent
+            ? { 'watermark-name': this.options.watermarkComponent }
+            : {}, this.options.watermarkFrameworkComponent
+            ? { 'watermark-name': this.options.watermarkFrameworkComponent }
+            : {}, this.options.frameworkComponentFactory.watermark);
+    };
+    DockviewComponent.prototype.createContentComponent = function (id, componentName) {
+        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_17__.createComponent)(id, componentName, this.options.components, this.options.frameworkComponents, this.options.frameworkComponentFactory.content);
+    };
+    DockviewComponent.prototype.createTabComponent = function (id, componentName) {
+        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_17__.createComponent)(id, componentName, this.options.tabComponents, this.options.frameworkTabComponents, this.options.frameworkComponentFactory.tab, function () { return new _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_14__.DefaultTab(); });
+    };
+    DockviewComponent.prototype.addEmptyGroup = function (options) {
+        var group = this.createGroup();
+        if (options) {
+            var referencePanel = this.panels.get(options.referencePanel)
+                .value;
+            var referenceGroup = this.findGroup(referencePanel);
+            var target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_11__.toTarget)(options.direction);
+            var location_2 = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+            var relativeLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_2, target);
+            this.doAddGroup(group, relativeLocation);
+        }
+        else {
+            this.doAddGroup(group);
+        }
+    };
+    DockviewComponent.prototype.removeGroup = function (group) {
+        if (this.groups.size === 1) {
+            group.panels.forEach(function (panel) { return group.removePanel(panel); });
+            this._activeGroup = group;
+            return;
+        }
+        _super.prototype.removeGroup.call(this, group);
+    };
+    DockviewComponent.prototype.addPanelToNewGroup = function (panel, location) {
+        if (location === void 0) { location = [0]; }
+        var group;
+        if (this.groups.size === 1 &&
+            Array.from(this.groups.values())[0].value.size === 0) {
+            group = Array.from(this.groups.values())[0].value;
+        }
+        else {
+            group = this.createGroup();
+            this.doAddGroup(group, location);
+        }
+        group.openPanel(panel);
+    };
+    DockviewComponent.prototype.moveGroupOrPanel = function (referenceGroup, groupId, itemId, target, index) {
+        var sourceGroup = groupId
+            ? this.groups.get(groupId).value
+            : undefined;
+        switch (target) {
+            case _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center:
+            case undefined:
+                if ((sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.size) === 0) {
+                    this.doRemoveGroup(sourceGroup);
+                }
+                var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.removePanel(itemId)) ||
+                    this.panels.get(itemId).value;
+                referenceGroup.openPanel(groupItem, index);
+                return;
+        }
+        var referenceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+        var targetLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
+        if ((sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.size) < 2) {
+            var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_18__.tail)(targetLocation), 2), targetParentLocation = _a[0], to = _a[1];
+            var sourceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(sourceGroup.element);
+            var _b = __read((0,_array__WEBPACK_IMPORTED_MODULE_18__.tail)(sourceLocation), 2), sourceParentLocation = _b[0], from = _b[1];
+            if ((0,_array__WEBPACK_IMPORTED_MODULE_18__.sequenceEquals)(sourceParentLocation, targetParentLocation)) {
+                // special case when 'swapping' two views within same grid location
+                // if a group has one tab - we are essentially moving the 'group'
+                // which is equivalent to swapping two views in this case
+                this.gridview.moveView(sourceParentLocation, from, to);
+                return;
+            }
+            // source group will become empty so delete the group
+            var targetGroup = this.doRemoveGroup(sourceGroup, {
+                skipActive: true,
+                skipDispose: true,
+            });
+            // after deleting the group we need to re-evaulate the ref location
+            var updatedReferenceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+            var location_3 = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, updatedReferenceLocation, target);
+            this.doAddGroup(targetGroup, location_3);
+        }
+        else {
+            var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.removePanel(itemId)) ||
+                this.panels.get(itemId).value;
+            var dropLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
+            this.addPanelToNewGroup(groupItem, dropLocation);
+        }
+    };
+    DockviewComponent.prototype.createGroup = function (options) {
+        var _this = this;
+        if (!options) {
+            options = {};
+        }
+        if (typeof options.tabHeight !== 'number') {
+            options.tabHeight = this.getTabHeight();
+        }
+        if ((options === null || options === void 0 ? void 0 : options.id) && this.groups.has(options.id)) {
+            throw new Error("duplicate group " + options.id);
+        }
+        var group = new _groupview_groupview__WEBPACK_IMPORTED_MODULE_2__.Groupview(this, (options === null || options === void 0 ? void 0 : options.id) || nextGroupId.next(), options);
+        if (typeof this.options.tabHeight === 'number') {
+            group.tabHeight = this.options.tabHeight;
+        }
+        if (!this.groups.has(group.id)) {
+            var disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.CompositeDisposable(group.onMove(function (event) {
+                var groupId = event.groupId, itemId = event.itemId, target = event.target, index = event.index;
+                _this.moveGroupOrPanel(group, groupId, itemId, target, index);
+            }), group.onDidGroupChange(function (event) {
+                _this._onDidLayoutChange.fire(event);
+            }), group.onDrop(function (event) {
+                var _a;
+                var dragEvent = event.event;
+                var dataTransfer = dragEvent.dataTransfer;
+                if (dataTransfer.types.length === 0) {
+                    return;
+                }
+                var cb = _this.registry.get(dataTransfer.types[0]);
+                if (!cb) {
+                    return;
+                }
+                var panelOptions = cb({ event: event });
+                var panel = _this.getGroupPanel(panelOptions.id);
+                if (!panel) {
+                    panel = _this._addPanel(panelOptions);
+                }
+                _this.moveGroupOrPanel(group, (_a = panel === null || panel === void 0 ? void 0 : panel.group) === null || _a === void 0 ? void 0 : _a.id, panel.id, event.target, event.index);
+            }));
+            this.groups.set(group.id, { value: group, disposable: disposable });
+        }
+        return group;
+    };
+    DockviewComponent.prototype.findGroup = function (panel) {
+        return Array.from(this.groups.values()).find(function (group) {
+            return group.value.containsPanel(panel);
+        }).value;
+    };
+    DockviewComponent.prototype.addDirtyPanel = function (panel) {
+        this.dirtyPanels.add(panel);
+        panel.setDirty(true);
+        this._onDidLayoutChange.fire({ kind: "PANEL_DIRTY" /* PANEL_DIRTY */ });
+        this.debouncedDeque();
+    };
+    DockviewComponent.prototype.dispose = function () {
+        var _a;
+        _super.prototype.dispose.call(this);
+        (_a = this.debugContainer) === null || _a === void 0 ? void 0 : _a.dispose();
+        this._onDidLayoutChange.dispose();
+    };
+    DockviewComponent.prototype.updateContainer = function () {
+        if (this.options.debug) {
+            if (!this.debugContainer) {
+                this.debugContainer = new _components_debug_debug__WEBPACK_IMPORTED_MODULE_7__.DebugWidget(this);
+            }
+            else {
+                this.debugContainer.dispose();
+                this.debugContainer = undefined;
+            }
+        }
+    };
+    return DockviewComponent;
+}(_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_11__.BaseGrid));
+
+
+
+/***/ }),
+
 /***/ "../splitview/dist/es6/dom.js":
 /*!************************************!*\
   !*** ../splitview/dist/es6/dom.js ***!
@@ -34472,7 +34468,6 @@ var FocusTracker = /** @class */ (function (_super) {
 /*! namespace exports */
 /*! export Emitter [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Event [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export UIEvent [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export addDisposableListener [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export addDisposableWindowListener [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
@@ -34482,33 +34477,11 @@ var FocusTracker = /** @class */ (function (_super) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "UIEvent": () => /* binding */ UIEvent,
 /* harmony export */   "Event": () => /* binding */ Event,
 /* harmony export */   "Emitter": () => /* binding */ Emitter,
 /* harmony export */   "addDisposableWindowListener": () => /* binding */ addDisposableWindowListener,
 /* harmony export */   "addDisposableListener": () => /* binding */ addDisposableListener
 /* harmony export */ });
-/**
- * Mimic the basic functionality of a UI-event to provide familar paradigms
- * such as preventDefault()
- */
-var UIEvent = /** @class */ (function () {
-    function UIEvent() {
-        this._defaultPrevented = false;
-    }
-    Object.defineProperty(UIEvent.prototype, "defaultPrevented", {
-        get: function () {
-            return this._defaultPrevented;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    UIEvent.prototype.preventDefault = function () {
-        this._defaultPrevented = true;
-    };
-    return UIEvent;
-}());
-
 var Event;
 (function (Event) {
     Event.any = function () {
@@ -35398,8 +35371,6 @@ var BranchNode = /** @class */ (function (_super) {
         this.setupChildrenEvents();
     };
     BranchNode.prototype._removeChild = function (index) {
-        var first = index === 0;
-        var last = index === this.children.length - 1;
         var _a = __read(this.children.splice(index, 1), 1), child = _a[0];
         this.setupChildrenEvents();
         return child;
@@ -35423,326 +35394,6 @@ var BranchNode = /** @class */ (function (_super) {
     };
     return BranchNode;
 }(_lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "../splitview/dist/es6/gridview/componentGridview.js":
-/*!***********************************************************!*\
-  !*** ../splitview/dist/es6/gridview/componentGridview.js ***!
-  \***********************************************************/
-/*! namespace exports */
-/*! export ComponentGridview [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ComponentGridview": () => /* binding */ ComponentGridview
-/* harmony export */ });
-/* harmony import */ var _gridview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./gridview */ "../splitview/dist/es6/gridview/gridview.js");
-/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
-/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../array */ "../splitview/dist/es6/array.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
-/* harmony import */ var _baseComponentGridview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./baseComponentGridview */ "../splitview/dist/es6/gridview/baseComponentGridview.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
-/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-
-
-
-
-
-var ComponentGridview = /** @class */ (function (_super) {
-    __extends(ComponentGridview, _super);
-    function ComponentGridview(element, options) {
-        var _this = _super.call(this, element, {
-            proportionalLayout: options.proportionalLayout,
-            orientation: options.orientation,
-            styles: options.styles,
-        }) || this;
-        _this.options = options;
-        if (!_this.options.components) {
-            _this.options.components = {};
-        }
-        if (!_this.options.frameworkComponents) {
-            _this.options.frameworkComponents = {};
-        }
-        return _this;
-    }
-    Object.defineProperty(ComponentGridview.prototype, "orientation", {
-        get: function () {
-            return this.gridview.orientation;
-        },
-        set: function (value) {
-            this.gridview.orientation = value;
-            this.layout(this.gridview.width, this.gridview.height, true);
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ComponentGridview.prototype, "deserializer", {
-        get: function () {
-            return this._deserializer;
-        },
-        set: function (value) {
-            this._deserializer = value;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    ComponentGridview.prototype.removePanel = function (panel, sizing) {
-        this.gridview.remove(panel, sizing);
-    };
-    /**
-     * Serialize the current state of the layout
-     *
-     * @returns A JSON respresentation of the layout
-     */
-    ComponentGridview.prototype.toJSON = function () {
-        var _a;
-        var data = this.gridview.serialize();
-        var serializedData = {
-            grid: data,
-            activePanel: (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.id,
-        };
-        return serializedData;
-    };
-    ComponentGridview.prototype.deserialize = function (data) {
-        this.gridview.clear();
-        this.groups.clear();
-        this.fromJSON(data);
-    };
-    // public setVisible(panel: GridviewPanel, visible: boolean) {
-    //     this.gridview.setViewVisible(getGridLocation(panel.element), visible);
-    // }
-    // public isVisible(panel: GridviewPanel) {
-    //     return this.gridview.isViewVisible(getGridLocation(panel.element));
-    // }
-    ComponentGridview.prototype.toggleVisibility = function (panel) {
-        this.setVisible(panel, !this.isVisible(panel));
-    };
-    ComponentGridview.prototype.focus = function () {
-        var _a;
-        (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.focus();
-    };
-    ComponentGridview.prototype.fromJSON = function (data) {
-        var _this = this;
-        var _a = data, grid = _a.grid, activePanel = _a.activePanel;
-        this.gridview.clear();
-        this.groups.clear();
-        var width = this.width;
-        var height = this.height;
-        // this.layout(width, height, true);
-        // const yTransform = height / grid.height;
-        // const xTransform = width / grid.width;
-        // grid.height = yTransform * grid.height;
-        // grid.width = xTransform * grid.width;
-        // const sizeTransform =
-        //     grid.orientation === Orientation.VERTICAL ? yTransform : xTransform;
-        // const orthogonalSizeTransform =
-        //     grid.orientation === Orientation.HORIZONTAL
-        //         ? yTransform
-        //         : xTransform;
-        // const transform = (
-        //     item: SerializedGridObject<GridPanelViewState>,
-        //     o: Orientation
-        // ) => {
-        //     switch (item.type) {
-        //         case 'branch':
-        //             if (grid.orientation === o) {
-        //                 item.size = sizeTransform * item.size;
-        //             } else {
-        //                 item.size = orthogonalSizeTransform * item.size;
-        //             }
-        //             if (Array.isArray(item.data)) {
-        //                 item.data.forEach((x) => transform(x, orthogonal(o)));
-        //             }
-        //             break;
-        //         case 'leaf':
-        //             if (grid.orientation === o) {
-        //                 item.size = sizeTransform * item.size;
-        //             } else {
-        //                 item.size = orthogonalSizeTransform * item.size;
-        //             }
-        //             break;
-        //     }
-        // };
-        // grid.root.size = grid.root.size * sizeTransform;
-        // if (Array.isArray(grid.root.data)) {
-        //     grid.root.data.forEach((d) => transform(d, grid.orientation));
-        // }
-        this.gridview.deserialize(grid, {
-            fromJSON: function (data) {
-                var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_5__.createComponent)(data.id, data.component, _this.options.components, _this.options.frameworkComponents, {
-                    createComponent: _this.options.frameworkComponentFactory
-                        .createComponent,
-                });
-                view.init({
-                    params: data.params,
-                    minimumWidth: data.minimumWidth,
-                    maximumWidth: data.maximumWidth,
-                    minimumHeight: data.minimumHeight,
-                    maximumHeight: data.maximumHeight,
-                    priority: data.priority,
-                    snap: !!data.snap,
-                    containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_4__.GridviewApi(_this),
-                });
-                _this.registerPanel(view);
-                return view;
-            },
-        });
-        if (typeof activePanel === 'string') {
-            var panel = this.getPanel(activePanel);
-            if (panel) {
-                this.doSetGroupActive(panel);
-            }
-        }
-        // this.layout(width, height, true);
-        this._onDidLayoutChange.fire({ kind: "NEW_LAYOUT" /* NEW_LAYOUT */ });
-    };
-    ComponentGridview.prototype.movePanel = function (panel, options) {
-        var relativeLocation;
-        var removedPanel = this.gridview.remove(panel);
-        var referenceGroup = this.groups.get(options.reference).value;
-        var target = (0,_baseComponentGridview__WEBPACK_IMPORTED_MODULE_3__.toTarget)(options.direction);
-        if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
-            throw new Error(target + " not supported as an option");
-        }
-        else {
-            var location_1 = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-            relativeLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_1, target);
-        }
-        this.doAddGroup(removedPanel, relativeLocation, options.size);
-    };
-    ComponentGridview.prototype.addPanel = function (options) {
-        var _a;
-        var relativeLocation = options.location || [0];
-        if ((_a = options.position) === null || _a === void 0 ? void 0 : _a.reference) {
-            var referenceGroup = this.groups.get(options.position.reference)
-                .value;
-            var target = (0,_baseComponentGridview__WEBPACK_IMPORTED_MODULE_3__.toTarget)(options.position.direction);
-            if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
-                throw new Error(target + " not supported as an option");
-            }
-            else {
-                var location_2 = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-                relativeLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_2, target);
-            }
-        }
-        var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_5__.createComponent)(options.id, options.component, this.options.components, this.options.frameworkComponents, {
-            createComponent: this.options.frameworkComponentFactory
-                .createComponent,
-        });
-        view.init({
-            params: options.params,
-            minimumWidth: options.minimumWidth,
-            maximumWidth: options.maximumWidth,
-            minimumHeight: options.minimumHeight,
-            maximumHeight: options.maximumHeight,
-            priority: options.priority,
-            snap: !!options.snap,
-            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_4__.GridviewApi(this),
-        });
-        this.registerPanel(view);
-        this.doAddGroup(view, relativeLocation, options.size);
-        return { api: view.api };
-    };
-    ComponentGridview.prototype.registerPanel = function (panel) {
-        var _this = this;
-        var disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable(panel.api.onDidFocusChange(function (event) {
-            if (!event.isFocused) {
-                return;
-            }
-            _this.groups.forEach(function (groupItem) {
-                var group = groupItem.value;
-                if (group !== panel) {
-                    group.setActive(false);
-                }
-                else {
-                    group.setActive(true);
-                }
-            });
-        }));
-        this.groups.set(panel.id, {
-            value: panel,
-            disposable: disposable,
-        });
-    };
-    ComponentGridview.prototype.moveGroup = function (referenceGroup, groupId, target) {
-        var sourceGroup = this.getPanel(groupId);
-        if (!sourceGroup) {
-            throw new Error('invalid operation');
-        }
-        var referenceLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-        var targetLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
-        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_6__.tail)(targetLocation), 2), targetParentLocation = _a[0], to = _a[1];
-        var sourceLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(sourceGroup.element);
-        var _b = __read((0,_array__WEBPACK_IMPORTED_MODULE_6__.tail)(sourceLocation), 2), sourceParentLocation = _b[0], from = _b[1];
-        if ((0,_array__WEBPACK_IMPORTED_MODULE_6__.sequenceEquals)(sourceParentLocation, targetParentLocation)) {
-            // special case when 'swapping' two views within same grid location
-            // if a group has one tab - we are essentially moving the 'group'
-            // which is equivalent to swapping two views in this case
-            this.gridview.moveView(sourceParentLocation, from, to);
-            return;
-        }
-        // source group will become empty so delete the group
-        var targetGroup = this.doRemoveGroup(sourceGroup, {
-            skipActive: true,
-            skipDispose: true,
-        });
-        // after deleting the group we need to re-evaulate the ref location
-        var updatedReferenceLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-        var location = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, updatedReferenceLocation, target);
-        this.doAddGroup(targetGroup, location);
-    };
-    ComponentGridview.prototype.removeGroup = function (group) {
-        _super.prototype.removeGroup.call(this, group);
-        var panel = this.groups.get(group.id);
-        if (panel) {
-            panel.disposable.dispose();
-            this.groups.delete(group.id);
-        }
-    };
-    ComponentGridview.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-    };
-    return ComponentGridview;
-}(_baseComponentGridview__WEBPACK_IMPORTED_MODULE_3__.BaseGrid));
 
 
 
@@ -35869,7 +35520,8 @@ function getRelativeLocation(rootOrientation, location, direction) {
     var orientation = getLocationOrientation(rootOrientation, location);
     var directionOrientation = getDirectionOrientation(direction);
     if (orientation === directionOrientation) {
-        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_6__.tail)(location), 2), rest = _a[0], index = _a[1];
+        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_6__.tail)(location), 2), rest = _a[0], _index = _a[1];
+        var index = _index;
         if (direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Right || direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Bottom) {
             index += 1;
         }
@@ -36038,8 +35690,7 @@ var Gridview = /** @class */ (function () {
     };
     Gridview.prototype.progmaticSelect = function (location, reverse) {
         if (reverse === void 0) { reverse = false; }
-        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_6__.tail)(location), 2), rest = _a[0], index = _a[1];
-        var _b = __read(this.getNode(location), 2), path = _b[0], node = _b[1];
+        var _a = __read(this.getNode(location), 2), path = _a[0], node = _a[1];
         if (!(node instanceof _leafNode__WEBPACK_IMPORTED_MODULE_2__.LeafNode)) {
             throw new Error('invalid location');
         }
@@ -36242,6 +35893,326 @@ var Gridview = /** @class */ (function () {
     };
     return Gridview;
 }());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/gridview/gridviewComponent.js":
+/*!***********************************************************!*\
+  !*** ../splitview/dist/es6/gridview/gridviewComponent.js ***!
+  \***********************************************************/
+/*! namespace exports */
+/*! export GridviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "GridviewComponent": () => /* binding */ GridviewComponent
+/* harmony export */ });
+/* harmony import */ var _gridview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./gridview */ "../splitview/dist/es6/gridview/gridview.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
+/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../array */ "../splitview/dist/es6/array.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _baseComponentGridview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./baseComponentGridview */ "../splitview/dist/es6/gridview/baseComponentGridview.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
+/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+
+
+
+
+
+var GridviewComponent = /** @class */ (function (_super) {
+    __extends(GridviewComponent, _super);
+    function GridviewComponent(element, options) {
+        var _this = _super.call(this, element, {
+            proportionalLayout: options.proportionalLayout,
+            orientation: options.orientation,
+            styles: options.styles,
+        }) || this;
+        _this.options = options;
+        if (!_this.options.components) {
+            _this.options.components = {};
+        }
+        if (!_this.options.frameworkComponents) {
+            _this.options.frameworkComponents = {};
+        }
+        return _this;
+    }
+    Object.defineProperty(GridviewComponent.prototype, "orientation", {
+        get: function () {
+            return this.gridview.orientation;
+        },
+        set: function (value) {
+            this.gridview.orientation = value;
+            this.layout(this.gridview.width, this.gridview.height, true);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GridviewComponent.prototype, "deserializer", {
+        get: function () {
+            return this._deserializer;
+        },
+        set: function (value) {
+            this._deserializer = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    GridviewComponent.prototype.removePanel = function (panel, sizing) {
+        this.gridview.remove(panel, sizing);
+    };
+    /**
+     * Serialize the current state of the layout
+     *
+     * @returns A JSON respresentation of the layout
+     */
+    GridviewComponent.prototype.toJSON = function () {
+        var _a;
+        var data = this.gridview.serialize();
+        var serializedData = {
+            grid: data,
+            activePanel: (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.id,
+        };
+        return serializedData;
+    };
+    GridviewComponent.prototype.deserialize = function (data) {
+        this.gridview.clear();
+        this.groups.clear();
+        this.fromJSON(data);
+    };
+    // public setVisible(panel: GridviewPanel, visible: boolean) {
+    //     this.gridview.setViewVisible(getGridLocation(panel.element), visible);
+    // }
+    // public isVisible(panel: GridviewPanel) {
+    //     return this.gridview.isViewVisible(getGridLocation(panel.element));
+    // }
+    GridviewComponent.prototype.toggleVisibility = function (panel) {
+        this.setVisible(panel, !this.isVisible(panel));
+    };
+    GridviewComponent.prototype.focus = function () {
+        var _a;
+        (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.focus();
+    };
+    GridviewComponent.prototype.fromJSON = function (data) {
+        var _this = this;
+        var _a = data, grid = _a.grid, activePanel = _a.activePanel;
+        this.gridview.clear();
+        this.groups.clear();
+        // const width = this.width;
+        // const height = this.height;
+        // this.layout(width, height, true);
+        // const yTransform = height / grid.height;
+        // const xTransform = width / grid.width;
+        // grid.height = yTransform * grid.height;
+        // grid.width = xTransform * grid.width;
+        // const sizeTransform =
+        //     grid.orientation === Orientation.VERTICAL ? yTransform : xTransform;
+        // const orthogonalSizeTransform =
+        //     grid.orientation === Orientation.HORIZONTAL
+        //         ? yTransform
+        //         : xTransform;
+        // const transform = (
+        //     item: SerializedGridObject<GridPanelViewState>,
+        //     o: Orientation
+        // ) => {
+        //     switch (item.type) {
+        //         case 'branch':
+        //             if (grid.orientation === o) {
+        //                 item.size = sizeTransform * item.size;
+        //             } else {
+        //                 item.size = orthogonalSizeTransform * item.size;
+        //             }
+        //             if (Array.isArray(item.data)) {
+        //                 item.data.forEach((x) => transform(x, orthogonal(o)));
+        //             }
+        //             break;
+        //         case 'leaf':
+        //             if (grid.orientation === o) {
+        //                 item.size = sizeTransform * item.size;
+        //             } else {
+        //                 item.size = orthogonalSizeTransform * item.size;
+        //             }
+        //             break;
+        //     }
+        // };
+        // grid.root.size = grid.root.size * sizeTransform;
+        // if (Array.isArray(grid.root.data)) {
+        //     grid.root.data.forEach((d) => transform(d, grid.orientation));
+        // }
+        this.gridview.deserialize(grid, {
+            fromJSON: function (data) {
+                var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_5__.createComponent)(data.id, data.component, _this.options.components, _this.options.frameworkComponents, {
+                    createComponent: _this.options.frameworkComponentFactory
+                        .createComponent,
+                });
+                view.init({
+                    params: data.params,
+                    minimumWidth: data.minimumWidth,
+                    maximumWidth: data.maximumWidth,
+                    minimumHeight: data.minimumHeight,
+                    maximumHeight: data.maximumHeight,
+                    priority: data.priority,
+                    snap: !!data.snap,
+                    containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_4__.GridviewApi(_this),
+                });
+                _this.registerPanel(view);
+                return view;
+            },
+        });
+        if (typeof activePanel === 'string') {
+            var panel = this.getPanel(activePanel);
+            if (panel) {
+                this.doSetGroupActive(panel);
+            }
+        }
+        // this.layout(width, height, true);
+        this._onDidLayoutChange.fire({ kind: "NEW_LAYOUT" /* NEW_LAYOUT */ });
+    };
+    GridviewComponent.prototype.movePanel = function (panel, options) {
+        var relativeLocation;
+        var removedPanel = this.gridview.remove(panel);
+        var referenceGroup = this.groups.get(options.reference).value;
+        var target = (0,_baseComponentGridview__WEBPACK_IMPORTED_MODULE_3__.toTarget)(options.direction);
+        if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
+            throw new Error(target + " not supported as an option");
+        }
+        else {
+            var location_1 = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+            relativeLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_1, target);
+        }
+        this.doAddGroup(removedPanel, relativeLocation, options.size);
+    };
+    GridviewComponent.prototype.addPanel = function (options) {
+        var _a;
+        var relativeLocation = options.location || [0];
+        if ((_a = options.position) === null || _a === void 0 ? void 0 : _a.reference) {
+            var referenceGroup = this.groups.get(options.position.reference)
+                .value;
+            var target = (0,_baseComponentGridview__WEBPACK_IMPORTED_MODULE_3__.toTarget)(options.position.direction);
+            if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
+                throw new Error(target + " not supported as an option");
+            }
+            else {
+                var location_2 = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+                relativeLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_2, target);
+            }
+        }
+        var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_5__.createComponent)(options.id, options.component, this.options.components, this.options.frameworkComponents, {
+            createComponent: this.options.frameworkComponentFactory
+                .createComponent,
+        });
+        view.init({
+            params: options.params,
+            minimumWidth: options.minimumWidth,
+            maximumWidth: options.maximumWidth,
+            minimumHeight: options.minimumHeight,
+            maximumHeight: options.maximumHeight,
+            priority: options.priority,
+            snap: !!options.snap,
+            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_4__.GridviewApi(this),
+        });
+        this.registerPanel(view);
+        this.doAddGroup(view, relativeLocation, options.size);
+        return { api: view.api };
+    };
+    GridviewComponent.prototype.registerPanel = function (panel) {
+        var _this = this;
+        var disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable(panel.api.onDidFocusChange(function (event) {
+            if (!event.isFocused) {
+                return;
+            }
+            _this.groups.forEach(function (groupItem) {
+                var group = groupItem.value;
+                if (group !== panel) {
+                    group.setActive(false);
+                }
+                else {
+                    group.setActive(true);
+                }
+            });
+        }));
+        this.groups.set(panel.id, {
+            value: panel,
+            disposable: disposable,
+        });
+    };
+    GridviewComponent.prototype.moveGroup = function (referenceGroup, groupId, target) {
+        var sourceGroup = this.getPanel(groupId);
+        if (!sourceGroup) {
+            throw new Error('invalid operation');
+        }
+        var referenceLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+        var targetLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
+        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_6__.tail)(targetLocation), 2), targetParentLocation = _a[0], to = _a[1];
+        var sourceLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(sourceGroup.element);
+        var _b = __read((0,_array__WEBPACK_IMPORTED_MODULE_6__.tail)(sourceLocation), 2), sourceParentLocation = _b[0], from = _b[1];
+        if ((0,_array__WEBPACK_IMPORTED_MODULE_6__.sequenceEquals)(sourceParentLocation, targetParentLocation)) {
+            // special case when 'swapping' two views within same grid location
+            // if a group has one tab - we are essentially moving the 'group'
+            // which is equivalent to swapping two views in this case
+            this.gridview.moveView(sourceParentLocation, from, to);
+            return;
+        }
+        // source group will become empty so delete the group
+        var targetGroup = this.doRemoveGroup(sourceGroup, {
+            skipActive: true,
+            skipDispose: true,
+        });
+        // after deleting the group we need to re-evaulate the ref location
+        var updatedReferenceLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+        var location = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, updatedReferenceLocation, target);
+        this.doAddGroup(targetGroup, location);
+    };
+    GridviewComponent.prototype.removeGroup = function (group) {
+        _super.prototype.removeGroup.call(this, group);
+        var panel = this.groups.get(group.id);
+        if (panel) {
+            panel.disposable.dispose();
+            this.groups.delete(group.id);
+        }
+    };
+    GridviewComponent.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+    };
+    return GridviewComponent;
+}(_baseComponentGridview__WEBPACK_IMPORTED_MODULE_3__.BaseGrid));
 
 
 
@@ -37497,7 +37468,7 @@ var ContentContainer = /** @class */ (function (_super) {
         _this._element = document.createElement('div');
         _this._element.className = 'content-container';
         _this._element.tabIndex = -1;
-        var _a = (0,_dom__WEBPACK_IMPORTED_MODULE_2__.trackFocus)(_this._element), onDidBlur = _a.onDidBlur, onDidFocus = _a.onDidFocus;
+        var onDidFocus = (0,_dom__WEBPACK_IMPORTED_MODULE_2__.trackFocus)(_this._element).onDidFocus;
         _this.addDisposables(onDidFocus(function () { return _this._onDidFocus.fire(); }));
         return _this;
     }
@@ -37990,21 +37961,19 @@ var TitleContainer = /** @class */ (function (_super) {
   !*** ../splitview/dist/es6/index.js ***!
   \**************************************/
 /*! namespace exports */
-/*! export ComponentDockview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/dockview/componentDockview.js .ComponentDockview */
-/*! export ComponentGridview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/componentGridview.js .ComponentGridview */
-/*! export ComponentPaneview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/paneview/componentPaneview.js .ComponentPaneview */
-/*! export ComponentSplitview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/componentSplitview.js .ComponentSplitview */
 /*! export CompositeDisposable [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/lifecycle.js .CompositeDisposable */
 /*! export ContentContainer [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/panel/content.js .ContentContainer */
 /*! export Disposable [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/lifecycle.js .Disposable */
 /*! export DockviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/component.api.js .DockviewApi */
-/*! export DockviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/dockview.js .DockviewComponent */
+/*! export DockviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/dockview/dockviewComponent.js .DockviewComponent */
+/*! export DockviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/dockview.js .DockviewReact */
 /*! export Emitter [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .Emitter */
 /*! export Event [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .Event */
 /*! export Gridview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .Gridview */
 /*! export GridviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/component.api.js .GridviewApi */
-/*! export GridviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/gridview/gridview.js .GridviewComponent */
+/*! export GridviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridviewComponent.js .GridviewComponent */
 /*! export GridviewPanel [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridviewPanel.js .GridviewPanel */
+/*! export GridviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/gridview/gridview.js .GridviewReact */
 /*! export GroupPanelApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/groupPanelApi.js .GroupPanelApi */
 /*! export Groupview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/groupview.js .Groupview */
 /*! export GroupviewPanel [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/groupviewPanel.js .GroupviewPanel */
@@ -38012,10 +37981,11 @@ var TitleContainer = /** @class */ (function (_super) {
 /*! export MouseEventKind [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/tab.js .MouseEventKind */
 /*! export MutableDisposable [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/lifecycle.js .MutableDisposable */
 /*! export Orientation [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .Orientation */
-/*! export PaneFramework [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/paneview/componentPaneview.js .PaneFramework */
+/*! export PaneFramework [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/paneview/paneviewComponent.js .PaneFramework */
 /*! export Paneview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/paneview/paneview.js .Paneview */
 /*! export PaneviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/component.api.js .PaneviewApi */
-/*! export PaneviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/paneview/paneview.js .PaneviewComponent */
+/*! export PaneviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/paneview/paneviewComponent.js .PaneviewComponent */
+/*! export PaneviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/paneview/paneview.js .PaneviewReact */
 /*! export ReactPanelContentPart [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/reactContentPart.js .ReactPanelContentPart */
 /*! export ReactPanelHeaderPart [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/reactHeaderPart.js .ReactPanelHeaderPart */
 /*! export ReactPart [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/react.js .ReactPart */
@@ -38023,9 +37993,9 @@ var TitleContainer = /** @class */ (function (_super) {
 /*! export Sizing [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .Sizing */
 /*! export Splitview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .Splitview */
 /*! export SplitviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/component.api.js .SplitviewApi */
-/*! export SplitviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/splitview/splitview.js .SplitviewComponent */
+/*! export SplitviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/splitviewComponent.js .SplitviewComponent */
+/*! export SplitviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/splitview/splitview.js .SplitviewReact */
 /*! export Tab [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/tab.js .Tab */
-/*! export UIEvent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .UIEvent */
 /*! export addDisposableListener [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .addDisposableListener */
 /*! export addDisposableWindowListener [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .addDisposableWindowListener */
 /*! export getDirectionOrientation [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .getDirectionOrientation */
@@ -38048,10 +38018,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "SashState": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.SashState,
 /* harmony export */   "Sizing": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Sizing,
 /* harmony export */   "Splitview": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Splitview,
-/* harmony export */   "ComponentSplitview": () => /* reexport safe */ _splitview_componentSplitview__WEBPACK_IMPORTED_MODULE_1__.ComponentSplitview,
+/* harmony export */   "SplitviewComponent": () => /* reexport safe */ _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_1__.SplitviewComponent,
 /* harmony export */   "Paneview": () => /* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_2__.Paneview,
-/* harmony export */   "ComponentPaneview": () => /* reexport safe */ _paneview_componentPaneview__WEBPACK_IMPORTED_MODULE_3__.ComponentPaneview,
-/* harmony export */   "PaneFramework": () => /* reexport safe */ _paneview_componentPaneview__WEBPACK_IMPORTED_MODULE_3__.PaneFramework,
+/* harmony export */   "PaneFramework": () => /* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_3__.PaneFramework,
+/* harmony export */   "PaneviewComponent": () => /* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_3__.PaneviewComponent,
 /* harmony export */   "Gridview": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.Gridview,
 /* harmony export */   "getDirectionOrientation": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getDirectionOrientation,
 /* harmony export */   "getGridLocation": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getGridLocation,
@@ -38066,7 +38036,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "Tab": () => /* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_7__.Tab,
 /* harmony export */   "Emitter": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.Emitter,
 /* harmony export */   "Event": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.Event,
-/* harmony export */   "UIEvent": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.UIEvent,
 /* harmony export */   "addDisposableListener": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.addDisposableListener,
 /* harmony export */   "addDisposableWindowListener": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.addDisposableWindowListener,
 /* harmony export */   "CompositeDisposable": () => /* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_9__.CompositeDisposable,
@@ -38080,20 +38049,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "SplitviewApi": () => /* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_12__.SplitviewApi,
 /* harmony export */   "ReactPart": () => /* reexport safe */ _react_react__WEBPACK_IMPORTED_MODULE_13__.ReactPart,
 /* harmony export */   "usePortalsLifecycle": () => /* reexport safe */ _react_react__WEBPACK_IMPORTED_MODULE_13__.usePortalsLifecycle,
-/* harmony export */   "DockviewComponent": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_14__.DockviewComponent,
-/* harmony export */   "GridviewComponent": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_14__.GridviewComponent,
+/* harmony export */   "DockviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_14__.DockviewReact,
 /* harmony export */   "GridviewPanel": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_14__.GridviewPanel,
-/* harmony export */   "PaneviewComponent": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_14__.PaneviewComponent,
+/* harmony export */   "GridviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_14__.GridviewReact,
+/* harmony export */   "PaneviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_14__.PaneviewReact,
 /* harmony export */   "ReactPanelContentPart": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_14__.ReactPanelContentPart,
 /* harmony export */   "ReactPanelHeaderPart": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_14__.ReactPanelHeaderPart,
-/* harmony export */   "SplitviewComponent": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_14__.SplitviewComponent,
-/* harmony export */   "ComponentDockview": () => /* reexport safe */ _dockview_componentDockview__WEBPACK_IMPORTED_MODULE_15__.ComponentDockview,
-/* harmony export */   "ComponentGridview": () => /* reexport safe */ _gridview_componentGridview__WEBPACK_IMPORTED_MODULE_16__.ComponentGridview
+/* harmony export */   "SplitviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_14__.SplitviewReact,
+/* harmony export */   "DockviewComponent": () => /* reexport safe */ _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_15__.DockviewComponent,
+/* harmony export */   "GridviewComponent": () => /* reexport safe */ _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_16__.GridviewComponent
 /* harmony export */ });
 /* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
-/* harmony import */ var _splitview_componentSplitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitview/componentSplitview */ "../splitview/dist/es6/splitview/componentSplitview.js");
+/* harmony import */ var _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitview/splitviewComponent */ "../splitview/dist/es6/splitview/splitviewComponent.js");
 /* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./paneview/paneview */ "../splitview/dist/es6/paneview/paneview.js");
-/* harmony import */ var _paneview_componentPaneview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./paneview/componentPaneview */ "../splitview/dist/es6/paneview/componentPaneview.js");
+/* harmony import */ var _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./paneview/paneviewComponent */ "../splitview/dist/es6/paneview/paneviewComponent.js");
 /* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./gridview/gridview */ "../splitview/dist/es6/gridview/gridview.js");
 /* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./groupview/groupview */ "../splitview/dist/es6/groupview/groupview.js");
 /* harmony import */ var _groupview_panel_content__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./groupview/panel/content */ "../splitview/dist/es6/groupview/panel/content.js");
@@ -38105,8 +38074,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./api/component.api */ "../splitview/dist/es6/api/component.api.js");
 /* harmony import */ var _react_react__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./react/react */ "../splitview/dist/es6/react/react.js");
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./react */ "../splitview/dist/es6/react/index.js");
-/* harmony import */ var _dockview_componentDockview__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./dockview/componentDockview */ "../splitview/dist/es6/dockview/componentDockview.js");
-/* harmony import */ var _gridview_componentGridview__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./gridview/componentGridview */ "../splitview/dist/es6/gridview/componentGridview.js");
+/* harmony import */ var _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./dockview/dockviewComponent */ "../splitview/dist/es6/dockview/dockviewComponent.js");
+/* harmony import */ var _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./gridview/gridviewComponent */ "../splitview/dist/es6/gridview/gridviewComponent.js");
 
 
 
@@ -38199,7 +38168,11 @@ var __spread = (undefined && undefined.__spread) || function () {
 };
 var Disposable;
 (function (Disposable) {
-    Disposable.NONE = { dispose: function () { } };
+    Disposable.NONE = {
+        dispose: function () {
+            // noop
+        },
+    };
 })(Disposable || (Disposable = {}));
 var CompositeDisposable = /** @class */ (function () {
     function CompositeDisposable() {
@@ -38327,285 +38300,6 @@ function createComponent(id, componentName, components, frameworkComponents, cre
     }
     return new Component(id, componentName);
 }
-
-
-/***/ }),
-
-/***/ "../splitview/dist/es6/paneview/componentPaneview.js":
-/*!***********************************************************!*\
-  !*** ../splitview/dist/es6/paneview/componentPaneview.js ***!
-  \***********************************************************/
-/*! namespace exports */
-/*! export ComponentPaneview [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export PaneFramework [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PaneFramework": () => /* binding */ PaneFramework,
-/* harmony export */   "ComponentPaneview": () => /* binding */ ComponentPaneview
-/* harmony export */ });
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
-/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
-/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
-/* harmony import */ var _paneview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./paneview */ "../splitview/dist/es6/paneview/paneview.js");
-/* harmony import */ var _paneviewPanel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./paneviewPanel */ "../splitview/dist/es6/paneview/paneviewPanel.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-
-
-
-
-var DefaultHeader = /** @class */ (function (_super) {
-    __extends(DefaultHeader, _super);
-    function DefaultHeader() {
-        var _this = _super.call(this) || this;
-        _this.apiRef = { api: null };
-        _this._element = document.createElement('div');
-        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.element, 'click', function () {
-            var _a;
-            (_a = _this.apiRef.api) === null || _a === void 0 ? void 0 : _a.setExpanded(!_this.apiRef.api.isExpanded);
-        }));
-        return _this;
-    }
-    Object.defineProperty(DefaultHeader.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    DefaultHeader.prototype.init = function (params) {
-        this.apiRef.api = params.api;
-        this._element.textContent = params.title;
-    };
-    DefaultHeader.prototype.update = function (params) {
-        //
-    };
-    return DefaultHeader;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable));
-var PaneFramework = /** @class */ (function (_super) {
-    __extends(PaneFramework, _super);
-    function PaneFramework(options) {
-        var _this = _super.call(this, options.id, options.component, options.headerComponent) || this;
-        _this.options = options;
-        return _this;
-    }
-    PaneFramework.prototype.getBodyComponent = function () {
-        return this.options.body;
-    };
-    PaneFramework.prototype.getHeaderComponent = function () {
-        return this.options.header;
-    };
-    return PaneFramework;
-}(_paneviewPanel__WEBPACK_IMPORTED_MODULE_5__.PaneviewPanel));
-
-var ComponentPaneview = /** @class */ (function (_super) {
-    __extends(ComponentPaneview, _super);
-    function ComponentPaneview(element, options) {
-        var _this = _super.call(this) || this;
-        _this.element = element;
-        _this.options = options;
-        _this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
-        _this.onDidLayoutChange = _this._onDidLayoutChange.event;
-        if (!options.components) {
-            options.components = {};
-        }
-        if (!options.frameworkComponents) {
-            options.frameworkComponents = {};
-        }
-        _this.paneview = new _paneview__WEBPACK_IMPORTED_MODULE_4__.Paneview(_this.element, {
-            // only allow paneview in the vertical orientation for now
-            orientation: _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_3__.Orientation.VERTICAL,
-        });
-        _this.addDisposables(_this.paneview.onDidChange(function () {
-            _this._onDidLayoutChange.fire(undefined);
-        }), _this.paneview);
-        return _this;
-    }
-    Object.defineProperty(ComponentPaneview.prototype, "minimumSize", {
-        get: function () {
-            return this.paneview.minimumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ComponentPaneview.prototype, "maximumSize", {
-        get: function () {
-            return this.paneview.maximumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    ComponentPaneview.prototype.focus = function () {
-        //
-    };
-    ComponentPaneview.prototype.addPanel = function (options) {
-        var _a, _b;
-        var body = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(options.id, options.component, this.options.components, this.options.frameworkComponents, {
-            createComponent: (_a = this.options.frameworkWrapper) === null || _a === void 0 ? void 0 : _a.body.createComponent,
-        });
-        var header;
-        if (options.headerComponent) {
-            header = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(options.id, options.headerComponent, this.options.headerComponents, this.options.headerframeworkComponents, {
-                createComponent: (_b = this.options.frameworkWrapper) === null || _b === void 0 ? void 0 : _b.header.createComponent,
-            });
-        }
-        else {
-            header = new DefaultHeader();
-        }
-        var view = new PaneFramework({
-            id: options.id,
-            component: options.component,
-            headerComponent: options.headerComponent,
-            header: header,
-            body: body,
-        });
-        this.paneview.addPane(view);
-        view.init({
-            params: options.params,
-            minimumBodySize: options.minimumBodySize,
-            maximumBodySize: options.maximumBodySize,
-            isExpanded: options.isExpanded,
-            title: options.title,
-            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_0__.PaneviewApi(this),
-        });
-        view.orientation = this.paneview.orientation;
-        return {
-            dispose: function () {
-                //
-            },
-        };
-    };
-    ComponentPaneview.prototype.getPanels = function () {
-        return this.paneview.getPanes();
-    };
-    ComponentPaneview.prototype.removePanel = function (panel) {
-        var views = this.getPanels();
-        var index = views.findIndex(function (_) { return _ === panel; });
-        this.paneview.removePane(index);
-    };
-    ComponentPaneview.prototype.getPanel = function (id) {
-        return this.getPanels().find(function (view) { return view.id === id; });
-    };
-    ComponentPaneview.prototype.layout = function (width, height) {
-        var _a = __read(this.paneview.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_3__.Orientation.HORIZONTAL
-            ? [width, height]
-            : [height, width], 2), size = _a[0], orthogonalSize = _a[1];
-        this.paneview.layout(size, orthogonalSize);
-    };
-    /**
-     * Resize the layout to fit the parent container
-     */
-    ComponentPaneview.prototype.resizeToFit = function () {
-        if (!this.element.parentElement) {
-            return;
-        }
-        var _a = this.element.parentElement.getBoundingClientRect(), width = _a.width, height = _a.height;
-        this.layout(width, height);
-    };
-    ComponentPaneview.prototype.toJSON = function () {
-        var _this = this;
-        var views = this.paneview
-            .getPanes()
-            .map(function (view, i) {
-            var size = _this.paneview.getViewSize(i);
-            return {
-                size: size,
-                data: view.toJSON(),
-                minimumSize: view.minimumBodySize,
-                maximumSize: view.maximumBodySize,
-                expanded: view.isExpanded(),
-            };
-        });
-        return {
-            views: views,
-            size: this.paneview.size,
-            orientation: this.paneview.orientation,
-        };
-    };
-    ComponentPaneview.prototype.fromJSON = function (data) {
-        var _this = this;
-        var views = data.views, orientation = data.orientation, size = data.size;
-        this.paneview.dispose();
-        this.paneview = new _paneview__WEBPACK_IMPORTED_MODULE_4__.Paneview(this.element, {
-            orientation: orientation,
-            descriptor: {
-                size: size,
-                views: views.map(function (view) {
-                    var _a, _b;
-                    var data = view.data;
-                    var body = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(data.id, data.component, _this.options.components, _this.options.frameworkComponents, {
-                        createComponent: (_a = _this.options.frameworkWrapper) === null || _a === void 0 ? void 0 : _a.body.createComponent,
-                    });
-                    var header;
-                    if (data.headerComponent) {
-                        header = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(data.id, data.headerComponent, _this.options.headerComponents, _this.options.headerframeworkComponents, {
-                            createComponent: (_b = _this.options.frameworkWrapper) === null || _b === void 0 ? void 0 : _b.header.createComponent,
-                        });
-                    }
-                    else {
-                        header = new DefaultHeader();
-                    }
-                    var panel = new PaneFramework({
-                        id: data.id,
-                        component: data.component,
-                        headerComponent: data.headerComponent,
-                        header: header,
-                        body: body,
-                    });
-                    panel.init({
-                        params: data.props,
-                        minimumBodySize: view.minimumSize,
-                        maximumBodySize: view.maximumSize,
-                        title: data.title,
-                        isExpanded: !!view.expanded,
-                        containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_0__.PaneviewApi(_this),
-                    });
-                    panel.orientation = orientation;
-                    return { size: view.size, view: panel };
-                }),
-            },
-        });
-    };
-    return ComponentPaneview;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable));
-
 
 
 /***/ }),
@@ -38788,6 +38482,285 @@ var Paneview = /** @class */ (function (_super) {
     };
     return Paneview;
 }(_lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/paneview/paneviewComponent.js":
+/*!***********************************************************!*\
+  !*** ../splitview/dist/es6/paneview/paneviewComponent.js ***!
+  \***********************************************************/
+/*! namespace exports */
+/*! export PaneFramework [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export PaneviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "PaneFramework": () => /* binding */ PaneFramework,
+/* harmony export */   "PaneviewComponent": () => /* binding */ PaneviewComponent
+/* harmony export */ });
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
+/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
+/* harmony import */ var _paneview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./paneview */ "../splitview/dist/es6/paneview/paneview.js");
+/* harmony import */ var _paneviewPanel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./paneviewPanel */ "../splitview/dist/es6/paneview/paneviewPanel.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+
+
+
+
+var DefaultHeader = /** @class */ (function (_super) {
+    __extends(DefaultHeader, _super);
+    function DefaultHeader() {
+        var _this = _super.call(this) || this;
+        _this.apiRef = { api: null };
+        _this._element = document.createElement('div');
+        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.element, 'click', function () {
+            var _a;
+            (_a = _this.apiRef.api) === null || _a === void 0 ? void 0 : _a.setExpanded(!_this.apiRef.api.isExpanded);
+        }));
+        return _this;
+    }
+    Object.defineProperty(DefaultHeader.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    DefaultHeader.prototype.init = function (params) {
+        this.apiRef.api = params.api;
+        this._element.textContent = params.title;
+    };
+    DefaultHeader.prototype.update = function (params) {
+        //
+    };
+    return DefaultHeader;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable));
+var PaneFramework = /** @class */ (function (_super) {
+    __extends(PaneFramework, _super);
+    function PaneFramework(options) {
+        var _this = _super.call(this, options.id, options.component, options.headerComponent) || this;
+        _this.options = options;
+        return _this;
+    }
+    PaneFramework.prototype.getBodyComponent = function () {
+        return this.options.body;
+    };
+    PaneFramework.prototype.getHeaderComponent = function () {
+        return this.options.header;
+    };
+    return PaneFramework;
+}(_paneviewPanel__WEBPACK_IMPORTED_MODULE_5__.PaneviewPanel));
+
+var PaneviewComponent = /** @class */ (function (_super) {
+    __extends(PaneviewComponent, _super);
+    function PaneviewComponent(element, options) {
+        var _this = _super.call(this) || this;
+        _this.element = element;
+        _this.options = options;
+        _this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
+        _this.onDidLayoutChange = _this._onDidLayoutChange.event;
+        if (!options.components) {
+            options.components = {};
+        }
+        if (!options.frameworkComponents) {
+            options.frameworkComponents = {};
+        }
+        _this.paneview = new _paneview__WEBPACK_IMPORTED_MODULE_4__.Paneview(_this.element, {
+            // only allow paneview in the vertical orientation for now
+            orientation: _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_3__.Orientation.VERTICAL,
+        });
+        _this.addDisposables(_this.paneview.onDidChange(function () {
+            _this._onDidLayoutChange.fire(undefined);
+        }), _this.paneview);
+        return _this;
+    }
+    Object.defineProperty(PaneviewComponent.prototype, "minimumSize", {
+        get: function () {
+            return this.paneview.minimumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PaneviewComponent.prototype, "maximumSize", {
+        get: function () {
+            return this.paneview.maximumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    PaneviewComponent.prototype.focus = function () {
+        //
+    };
+    PaneviewComponent.prototype.addPanel = function (options) {
+        var _a, _b;
+        var body = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(options.id, options.component, this.options.components, this.options.frameworkComponents, {
+            createComponent: (_a = this.options.frameworkWrapper) === null || _a === void 0 ? void 0 : _a.body.createComponent,
+        });
+        var header;
+        if (options.headerComponent) {
+            header = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(options.id, options.headerComponent, this.options.headerComponents, this.options.headerframeworkComponents, {
+                createComponent: (_b = this.options.frameworkWrapper) === null || _b === void 0 ? void 0 : _b.header.createComponent,
+            });
+        }
+        else {
+            header = new DefaultHeader();
+        }
+        var view = new PaneFramework({
+            id: options.id,
+            component: options.component,
+            headerComponent: options.headerComponent,
+            header: header,
+            body: body,
+        });
+        this.paneview.addPane(view);
+        view.init({
+            params: options.params,
+            minimumBodySize: options.minimumBodySize,
+            maximumBodySize: options.maximumBodySize,
+            isExpanded: options.isExpanded,
+            title: options.title,
+            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_0__.PaneviewApi(this),
+        });
+        view.orientation = this.paneview.orientation;
+        return {
+            dispose: function () {
+                //
+            },
+        };
+    };
+    PaneviewComponent.prototype.getPanels = function () {
+        return this.paneview.getPanes();
+    };
+    PaneviewComponent.prototype.removePanel = function (panel) {
+        var views = this.getPanels();
+        var index = views.findIndex(function (_) { return _ === panel; });
+        this.paneview.removePane(index);
+    };
+    PaneviewComponent.prototype.getPanel = function (id) {
+        return this.getPanels().find(function (view) { return view.id === id; });
+    };
+    PaneviewComponent.prototype.layout = function (width, height) {
+        var _a = __read(this.paneview.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_3__.Orientation.HORIZONTAL
+            ? [width, height]
+            : [height, width], 2), size = _a[0], orthogonalSize = _a[1];
+        this.paneview.layout(size, orthogonalSize);
+    };
+    /**
+     * Resize the layout to fit the parent container
+     */
+    PaneviewComponent.prototype.resizeToFit = function () {
+        if (!this.element.parentElement) {
+            return;
+        }
+        var _a = this.element.parentElement.getBoundingClientRect(), width = _a.width, height = _a.height;
+        this.layout(width, height);
+    };
+    PaneviewComponent.prototype.toJSON = function () {
+        var _this = this;
+        var views = this.paneview
+            .getPanes()
+            .map(function (view, i) {
+            var size = _this.paneview.getViewSize(i);
+            return {
+                size: size,
+                data: view.toJSON(),
+                minimumSize: view.minimumBodySize,
+                maximumSize: view.maximumBodySize,
+                expanded: view.isExpanded(),
+            };
+        });
+        return {
+            views: views,
+            size: this.paneview.size,
+            orientation: this.paneview.orientation,
+        };
+    };
+    PaneviewComponent.prototype.fromJSON = function (data) {
+        var _this = this;
+        var views = data.views, orientation = data.orientation, size = data.size;
+        this.paneview.dispose();
+        this.paneview = new _paneview__WEBPACK_IMPORTED_MODULE_4__.Paneview(this.element, {
+            orientation: orientation,
+            descriptor: {
+                size: size,
+                views: views.map(function (view) {
+                    var _a, _b;
+                    var data = view.data;
+                    var body = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(data.id, data.component, _this.options.components, _this.options.frameworkComponents, {
+                        createComponent: (_a = _this.options.frameworkWrapper) === null || _a === void 0 ? void 0 : _a.body.createComponent,
+                    });
+                    var header;
+                    if (data.headerComponent) {
+                        header = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(data.id, data.headerComponent, _this.options.headerComponents, _this.options.headerframeworkComponents, {
+                            createComponent: (_b = _this.options.frameworkWrapper) === null || _b === void 0 ? void 0 : _b.header.createComponent,
+                        });
+                    }
+                    else {
+                        header = new DefaultHeader();
+                    }
+                    var panel = new PaneFramework({
+                        id: data.id,
+                        component: data.component,
+                        headerComponent: data.headerComponent,
+                        header: header,
+                        body: body,
+                    });
+                    panel.init({
+                        params: data.props,
+                        minimumBodySize: view.minimumSize,
+                        maximumBodySize: view.maximumSize,
+                        title: data.title,
+                        isExpanded: !!view.expanded,
+                        containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_0__.PaneviewApi(_this),
+                    });
+                    panel.orientation = orientation;
+                    return { size: view.size, view: panel };
+                }),
+            },
+        });
+    };
+    return PaneviewComponent;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable));
 
 
 
@@ -39086,7 +39059,7 @@ var ReactPanelDeserialzier = /** @class */ (function () {
   !*** ../splitview/dist/es6/react/dockview/dockview.js ***!
   \********************************************************/
 /*! namespace exports */
-/*! export DockviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export DockviewReact [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
 /*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
@@ -39094,10 +39067,10 @@ var ReactPanelDeserialzier = /** @class */ (function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DockviewComponent": () => /* binding */ DockviewComponent
+/* harmony export */   "DockviewReact": () => /* binding */ DockviewReact
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _dockview_componentDockview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../dockview/componentDockview */ "../splitview/dist/es6/dockview/componentDockview.js");
+/* harmony import */ var _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../dockview/dockviewComponent */ "../splitview/dist/es6/dockview/dockviewComponent.js");
 /* harmony import */ var _reactContentPart__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./reactContentPart */ "../splitview/dist/es6/react/dockview/reactContentPart.js");
 /* harmony import */ var _reactHeaderPart__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./reactHeaderPart */ "../splitview/dist/es6/react/dockview/reactHeaderPart.js");
 /* harmony import */ var _deserializer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../deserializer */ "../splitview/dist/es6/react/deserializer.js");
@@ -39128,7 +39101,7 @@ var __read = (undefined && undefined.__read) || function (o, n) {
 
 
 
-var DockviewComponent = function (props) {
+var DockviewReact = function (props) {
     var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
     var dockviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
     var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_5__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
@@ -39158,7 +39131,7 @@ var DockviewComponent = function (props) {
             },
         };
         var element = document.createElement('div');
-        var dockview = new _dockview_componentDockview__WEBPACK_IMPORTED_MODULE_1__.ComponentDockview(element, {
+        var dockview = new _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_1__.DockviewComponent(element, {
             frameworkComponentFactory: factory,
             frameworkComponents: props.components,
             frameworkTabComponents: props.tabComponents,
@@ -39196,7 +39169,7 @@ var DockviewComponent = function (props) {
     }, [props.onTabContextMenu]);
     return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: props.className, style: { height: '100%', width: '100%' }, ref: domRef }, portals));
 };
-DockviewComponent.displayName = 'DockviewComponent';
+DockviewReact.displayName = 'DockviewComponent';
 
 
 /***/ }),
@@ -39295,7 +39268,9 @@ var ReactPanelContentPart = /** @class */ (function () {
     ReactPanelContentPart.prototype.setVisible = function (isPanelVisible, group) {
         this._group = group;
     };
-    ReactPanelContentPart.prototype.layout = function (width, height) { };
+    ReactPanelContentPart.prototype.layout = function (width, height) {
+        // noop
+    };
     ReactPanelContentPart.prototype.close = function () {
         return Promise.resolve(true);
     };
@@ -39461,7 +39436,7 @@ var ReactWatermarkPart = /** @class */ (function () {
   !*** ../splitview/dist/es6/react/gridview/gridview.js ***!
   \********************************************************/
 /*! namespace exports */
-/*! export GridviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export GridviewReact [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
 /*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
@@ -39469,10 +39444,10 @@ var ReactWatermarkPart = /** @class */ (function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GridviewComponent": () => /* binding */ GridviewComponent
+/* harmony export */   "GridviewReact": () => /* binding */ GridviewReact
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _gridview_componentGridview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../gridview/componentGridview */ "../splitview/dist/es6/gridview/componentGridview.js");
+/* harmony import */ var _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../gridview/gridviewComponent */ "../splitview/dist/es6/gridview/gridviewComponent.js");
 /* harmony import */ var _view__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./view */ "../splitview/dist/es6/react/gridview/view.js");
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
 /* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../api/component.api */ "../splitview/dist/es6/api/component.api.js");
@@ -39497,12 +39472,12 @@ var __read = (undefined && undefined.__read) || function (o, n) {
 
 
 
-var GridviewComponent = function (props) {
+var GridviewReact = function (props) {
     var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
     var gridviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
     var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_3__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
     react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
-        var gridview = new _gridview_componentGridview__WEBPACK_IMPORTED_MODULE_1__.ComponentGridview(domRef.current, {
+        var gridview = new _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_1__.GridviewComponent(domRef.current, {
             proportionalLayout: !!props.proportionalLayout,
             orientation: props.orientation,
             frameworkComponents: props.components,
@@ -39527,7 +39502,7 @@ var GridviewComponent = function (props) {
     }, []);
     return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: props.className, style: { height: '100%', width: '100%' }, ref: domRef }, portals));
 };
-GridviewComponent.displayName = 'GridviewComponent';
+GridviewReact.displayName = 'GridviewComponent';
 
 
 /***/ }),
@@ -39599,13 +39574,13 @@ var ReactGridPanelView = /** @class */ (function (_super) {
   !*** ../splitview/dist/es6/react/index.js ***!
   \********************************************/
 /*! namespace exports */
-/*! export DockviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/dockview.js .DockviewComponent */
-/*! export GridviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/gridview/gridview.js .GridviewComponent */
+/*! export DockviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/dockview.js .DockviewReact */
 /*! export GridviewPanel [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridviewPanel.js .GridviewPanel */
-/*! export PaneviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/paneview/paneview.js .PaneviewComponent */
+/*! export GridviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/gridview/gridview.js .GridviewReact */
+/*! export PaneviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/paneview/paneview.js .PaneviewReact */
 /*! export ReactPanelContentPart [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/reactContentPart.js .ReactPanelContentPart */
 /*! export ReactPanelHeaderPart [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/reactHeaderPart.js .ReactPanelHeaderPart */
-/*! export SplitviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/splitview/splitview.js .SplitviewComponent */
+/*! export SplitviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/splitview/splitview.js .SplitviewReact */
 /*! other exports [not provided] [no usage info] */
 /*! runtime requirements: __webpack_require__, __webpack_exports__, __webpack_require__.d, __webpack_require__.r, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
@@ -39613,13 +39588,13 @@ var ReactGridPanelView = /** @class */ (function (_super) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DockviewComponent": () => /* reexport safe */ _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__.DockviewComponent,
-/* harmony export */   "SplitviewComponent": () => /* reexport safe */ _splitview_splitview__WEBPACK_IMPORTED_MODULE_1__.SplitviewComponent,
-/* harmony export */   "GridviewComponent": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_2__.GridviewComponent,
+/* harmony export */   "DockviewReact": () => /* reexport safe */ _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__.DockviewReact,
+/* harmony export */   "SplitviewReact": () => /* reexport safe */ _splitview_splitview__WEBPACK_IMPORTED_MODULE_1__.SplitviewReact,
+/* harmony export */   "GridviewReact": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_2__.GridviewReact,
 /* harmony export */   "ReactPanelContentPart": () => /* reexport safe */ _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_3__.ReactPanelContentPart,
 /* harmony export */   "ReactPanelHeaderPart": () => /* reexport safe */ _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_4__.ReactPanelHeaderPart,
 /* harmony export */   "GridviewPanel": () => /* reexport safe */ _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_5__.GridviewPanel,
-/* harmony export */   "PaneviewComponent": () => /* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__.PaneviewComponent
+/* harmony export */   "PaneviewReact": () => /* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__.PaneviewReact
 /* harmony export */ });
 /* harmony import */ var _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dockview/dockview */ "../splitview/dist/es6/react/dockview/dockview.js");
 /* harmony import */ var _splitview_splitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitview/splitview */ "../splitview/dist/es6/react/splitview/splitview.js");
@@ -39645,7 +39620,7 @@ __webpack_require__.r(__webpack_exports__);
   !*** ../splitview/dist/es6/react/paneview/paneview.js ***!
   \********************************************************/
 /*! namespace exports */
-/*! export PaneviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export PaneviewReact [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
 /*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
@@ -39653,10 +39628,10 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PaneviewComponent": () => /* binding */ PaneviewComponent
+/* harmony export */   "PaneviewReact": () => /* binding */ PaneviewReact
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _paneview_componentPaneview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../paneview/componentPaneview */ "../splitview/dist/es6/paneview/componentPaneview.js");
+/* harmony import */ var _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../paneview/paneviewComponent */ "../splitview/dist/es6/paneview/paneviewComponent.js");
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
 /* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../api/component.api */ "../splitview/dist/es6/api/component.api.js");
 /* harmony import */ var _view__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./view */ "../splitview/dist/es6/react/paneview/view.js");
@@ -39681,12 +39656,12 @@ var __read = (undefined && undefined.__read) || function (o, n) {
 
 
 
-var PaneviewComponent = function (props) {
+var PaneviewReact = function (props) {
     var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
     var paneviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
     var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_2__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
     react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
-        var paneview = new _paneview_componentPaneview__WEBPACK_IMPORTED_MODULE_1__.ComponentPaneview(domRef.current, {
+        var paneview = new _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_1__.PaneviewComponent(domRef.current, {
             frameworkComponents: props.components,
             components: {},
             headerComponents: {},
@@ -39718,7 +39693,7 @@ var PaneviewComponent = function (props) {
     }, []);
     return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: props.className, style: { height: '100%', width: '100%' }, ref: domRef }, portals));
 };
-PaneviewComponent.displayName = 'PaneviewComponent';
+PaneviewReact.displayName = 'PaneviewComponent';
 
 
 /***/ }),
@@ -40002,7 +39977,7 @@ var usePortalsLifecycle = function () {
   !*** ../splitview/dist/es6/react/splitview/splitview.js ***!
   \**********************************************************/
 /*! namespace exports */
-/*! export SplitviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export SplitviewReact [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
 /*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
@@ -40010,11 +39985,11 @@ var usePortalsLifecycle = function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "SplitviewComponent": () => /* binding */ SplitviewComponent
+/* harmony export */   "SplitviewReact": () => /* binding */ SplitviewReact
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../api/component.api */ "../splitview/dist/es6/api/component.api.js");
-/* harmony import */ var _splitview_componentSplitview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../splitview/componentSplitview */ "../splitview/dist/es6/splitview/componentSplitview.js");
+/* harmony import */ var _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../splitview/splitviewComponent */ "../splitview/dist/es6/splitview/splitviewComponent.js");
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
 /* harmony import */ var _view__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./view */ "../splitview/dist/es6/react/splitview/view.js");
 var __read = (undefined && undefined.__read) || function (o, n) {
@@ -40038,12 +40013,12 @@ var __read = (undefined && undefined.__read) || function (o, n) {
 
 
 
-var SplitviewComponent = function (props) {
+var SplitviewReact = function (props) {
     var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
     var splitviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
     var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_3__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
     react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
-        var splitview = new _splitview_componentSplitview__WEBPACK_IMPORTED_MODULE_2__.ComponentSplitview(domRef.current, {
+        var splitview = new _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_2__.SplitviewComponent(domRef.current, {
             orientation: props.orientation,
             frameworkComponents: props.components,
             frameworkWrapper: {
@@ -40069,7 +40044,7 @@ var SplitviewComponent = function (props) {
     }, []);
     return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: props.className, style: { height: '100%', width: '100%' }, ref: domRef }, portals));
 };
-SplitviewComponent.displayName = 'SplitviewComponent';
+SplitviewReact.displayName = 'SplitviewComponent';
 
 
 /***/ }),
@@ -40131,276 +40106,6 @@ var ReactPanelView = /** @class */ (function (_super) {
     };
     return ReactPanelView;
 }(_splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_0__.SplitviewPanel));
-
-
-
-/***/ }),
-
-/***/ "../splitview/dist/es6/splitview/componentSplitview.js":
-/*!*************************************************************!*\
-  !*** ../splitview/dist/es6/splitview/componentSplitview.js ***!
-  \*************************************************************/
-/*! namespace exports */
-/*! export ComponentSplitview [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ComponentSplitview": () => /* binding */ ComponentSplitview
-/* harmony export */ });
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
-/* harmony import */ var _core_splitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
-/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-
-
-/**
- * A high-level implementation of splitview that works using 'panels'
- */
-var ComponentSplitview = /** @class */ (function (_super) {
-    __extends(ComponentSplitview, _super);
-    function ComponentSplitview(element, options) {
-        var _this = _super.call(this) || this;
-        _this.element = element;
-        _this.options = options;
-        _this.panels = new Map();
-        _this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
-        _this.onDidLayoutChange = _this._onDidLayoutChange.event;
-        if (!options.components) {
-            options.components = {};
-        }
-        if (!options.frameworkComponents) {
-            options.frameworkComponents = {};
-        }
-        _this.splitview = new _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Splitview(_this.element, options);
-        _this.addDisposables(_this.splitview.onDidSashEnd(function () {
-            _this._onDidLayoutChange.fire(undefined);
-        }), _this.splitview);
-        return _this;
-    }
-    Object.defineProperty(ComponentSplitview.prototype, "minimumSize", {
-        get: function () {
-            return this.splitview.minimumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ComponentSplitview.prototype, "maximumSize", {
-        get: function () {
-            return this.splitview.maximumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ComponentSplitview.prototype, "height", {
-        get: function () {
-            return this.splitview.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation.HORIZONTAL
-                ? this.splitview.orthogonalSize
-                : this.splitview.size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ComponentSplitview.prototype, "width", {
-        get: function () {
-            return this.splitview.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation.HORIZONTAL
-                ? this.splitview.size
-                : this.splitview.orthogonalSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ComponentSplitview.prototype, "length", {
-        get: function () {
-            return this.panels.size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    ComponentSplitview.prototype.focus = function () {
-        var _a;
-        (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.focus();
-    };
-    ComponentSplitview.prototype.movePanel = function (from, to) {
-        this.splitview.moveView(from, to);
-    };
-    ComponentSplitview.prototype.setVisible = function (panel, visible) {
-        var index = this.getPanels().indexOf(panel);
-        this.splitview.setViewVisible(index, visible);
-    };
-    ComponentSplitview.prototype.setActive = function (view, skipFocus) {
-        this._activePanel = view;
-        this.getPanels()
-            .filter(function (v) { return v !== view; })
-            .forEach(function (v) { return v.setActive(false, skipFocus); });
-        view.setActive(true, skipFocus);
-    };
-    ComponentSplitview.prototype.getPanels = function () {
-        return this.splitview.getViews();
-    };
-    ComponentSplitview.prototype.removePanel = function (panel, sizing) {
-        var disposable = this.panels.get(panel.id);
-        disposable === null || disposable === void 0 ? void 0 : disposable.dispose();
-        this.panels.delete(panel.id);
-        var index = this.getPanels().findIndex(function (_) { return _ === panel; });
-        this.splitview.removeView(index, sizing);
-    };
-    ComponentSplitview.prototype.getPanel = function (id) {
-        return this.getPanels().find(function (view) { return view.id === id; });
-    };
-    ComponentSplitview.prototype.addPanel = function (options) {
-        var _a;
-        if (this.panels.has(options.id)) {
-            throw new Error("panel " + options.id + " already exists");
-        }
-        var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__.createComponent)(options.id, options.component, this.options.components, this.options.frameworkComponents, { createComponent: (_a = this.options.frameworkWrapper) === null || _a === void 0 ? void 0 : _a.createComponent });
-        view.orientation = this.splitview.orientation;
-        view.init({
-            params: options.params,
-            minimumSize: options.minimumSize,
-            maximumSize: options.maximumSize,
-            snap: options.snap,
-            priority: options.priority,
-            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.SplitviewApi(this),
-        });
-        var size = typeof options.size === 'number' ? options.size : _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Sizing.Distribute;
-        var index = typeof options.index === 'number' ? options.index : undefined;
-        this.splitview.addView(view, size, index);
-        this.doAddView(view);
-        this.setActive(view);
-    };
-    /**
-     * Resize the layout to fit the parent container
-     */
-    ComponentSplitview.prototype.resizeToFit = function () {
-        var _a;
-        if (!this.element.parentElement) {
-            return;
-        }
-        var _b = (_a = this.element.parentElement) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect(), width = _b.width, height = _b.height;
-        this.layout(width, height);
-    };
-    ComponentSplitview.prototype.layout = function (width, height) {
-        var _a = __read(this.splitview.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation.HORIZONTAL
-            ? [width, height]
-            : [height, width], 2), size = _a[0], orthogonalSize = _a[1];
-        this.splitview.layout(size, orthogonalSize);
-    };
-    ComponentSplitview.prototype.doAddView = function (view) {
-        var _this = this;
-        var disposable = view.api.onDidFocusChange(function (event) {
-            if (!event.isFocused) {
-                return;
-            }
-            _this.setActive(view, true);
-        });
-        this.panels.set(view.id, disposable);
-    };
-    ComponentSplitview.prototype.toJSON = function () {
-        var _this = this;
-        var _a;
-        var views = this.splitview
-            .getViews()
-            .map(function (view, i) {
-            var size = _this.splitview.getViewSize(i);
-            return {
-                size: size,
-                data: view.toJSON(),
-                minimumSize: view.minimumSize,
-                maximumSize: view.maximumSize,
-                snap: !!view.snap,
-                priority: view.priority,
-            };
-        });
-        return {
-            views: views,
-            activeView: (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.id,
-            size: this.splitview.size,
-            orientation: this.splitview.orientation,
-        };
-    };
-    ComponentSplitview.prototype.fromJSON = function (data) {
-        var _this = this;
-        var _a;
-        var views = data.views, orientation = data.orientation, size = data.size, activeView = data.activeView;
-        this.splitview.dispose();
-        this.splitview = new _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Splitview(this.element, {
-            orientation: orientation,
-            proportionalLayout: this.options.proportionalLayout,
-            descriptor: {
-                size: size,
-                views: views.map(function (view) {
-                    var _a;
-                    var data = view.data;
-                    if (_this.panels.has(data.id)) {
-                        throw new Error("panel " + data.id + " already exists");
-                    }
-                    var panel = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__.createComponent)(data.id, data.component, _this.options.components, _this.options.frameworkComponents, {
-                        createComponent: (_a = _this.options.frameworkWrapper) === null || _a === void 0 ? void 0 : _a.createComponent,
-                    });
-                    panel.init({
-                        params: data.props,
-                        minimumSize: view.minimumSize,
-                        maximumSize: view.maximumSize,
-                        snap: view.snap,
-                        priority: view.priority,
-                        containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.SplitviewApi(_this),
-                    });
-                    panel.orientation = orientation;
-                    _this.doAddView(panel);
-                    return { size: view.size, view: panel };
-                }),
-            },
-        });
-        if (typeof activeView === 'string') {
-            (_a = this.getPanel(activeView)) === null || _a === void 0 ? void 0 : _a.setActive(true);
-        }
-    };
-    ComponentSplitview.prototype.dispose = function () {
-        Array.from(this.panels.values()).forEach(function (value) {
-            value.dispose();
-        });
-        this.panels.clear();
-        _super.prototype.dispose.call(this);
-    };
-    return ComponentSplitview;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
 
 
 
@@ -41350,11 +41055,12 @@ var ViewItem = /** @class */ (function () {
         configurable: true
     });
     ViewItem.prototype.setVisible = function (visible, size) {
+        var _a;
         if (visible === this.visible) {
             return;
         }
         if (visible) {
-            this.size = (0,_math__WEBPACK_IMPORTED_MODULE_0__.clamp)(this._cachedVisibleSize, this.viewMinimumSize, this.viewMaximumSize);
+            this.size = (0,_math__WEBPACK_IMPORTED_MODULE_0__.clamp)((_a = this._cachedVisibleSize) !== null && _a !== void 0 ? _a : 0, this.viewMinimumSize, this.viewMaximumSize);
             this._cachedVisibleSize = undefined;
         }
         else {
@@ -41427,6 +41133,276 @@ var ViewItem = /** @class */ (function () {
     };
     return ViewItem;
 }());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/splitview/splitviewComponent.js":
+/*!*************************************************************!*\
+  !*** ../splitview/dist/es6/splitview/splitviewComponent.js ***!
+  \*************************************************************/
+/*! namespace exports */
+/*! export SplitviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "SplitviewComponent": () => /* binding */ SplitviewComponent
+/* harmony export */ });
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _core_splitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
+/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+
+
+/**
+ * A high-level implementation of splitview that works using 'panels'
+ */
+var SplitviewComponent = /** @class */ (function (_super) {
+    __extends(SplitviewComponent, _super);
+    function SplitviewComponent(element, options) {
+        var _this = _super.call(this) || this;
+        _this.element = element;
+        _this.options = options;
+        _this.panels = new Map();
+        _this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        _this.onDidLayoutChange = _this._onDidLayoutChange.event;
+        if (!options.components) {
+            options.components = {};
+        }
+        if (!options.frameworkComponents) {
+            options.frameworkComponents = {};
+        }
+        _this.splitview = new _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Splitview(_this.element, options);
+        _this.addDisposables(_this.splitview.onDidSashEnd(function () {
+            _this._onDidLayoutChange.fire(undefined);
+        }), _this.splitview);
+        return _this;
+    }
+    Object.defineProperty(SplitviewComponent.prototype, "minimumSize", {
+        get: function () {
+            return this.splitview.minimumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewComponent.prototype, "maximumSize", {
+        get: function () {
+            return this.splitview.maximumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewComponent.prototype, "height", {
+        get: function () {
+            return this.splitview.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation.HORIZONTAL
+                ? this.splitview.orthogonalSize
+                : this.splitview.size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewComponent.prototype, "width", {
+        get: function () {
+            return this.splitview.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation.HORIZONTAL
+                ? this.splitview.size
+                : this.splitview.orthogonalSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewComponent.prototype, "length", {
+        get: function () {
+            return this.panels.size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    SplitviewComponent.prototype.focus = function () {
+        var _a;
+        (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.focus();
+    };
+    SplitviewComponent.prototype.movePanel = function (from, to) {
+        this.splitview.moveView(from, to);
+    };
+    SplitviewComponent.prototype.setVisible = function (panel, visible) {
+        var index = this.getPanels().indexOf(panel);
+        this.splitview.setViewVisible(index, visible);
+    };
+    SplitviewComponent.prototype.setActive = function (view, skipFocus) {
+        this._activePanel = view;
+        this.getPanels()
+            .filter(function (v) { return v !== view; })
+            .forEach(function (v) { return v.setActive(false, skipFocus); });
+        view.setActive(true, skipFocus);
+    };
+    SplitviewComponent.prototype.getPanels = function () {
+        return this.splitview.getViews();
+    };
+    SplitviewComponent.prototype.removePanel = function (panel, sizing) {
+        var disposable = this.panels.get(panel.id);
+        disposable === null || disposable === void 0 ? void 0 : disposable.dispose();
+        this.panels.delete(panel.id);
+        var index = this.getPanels().findIndex(function (_) { return _ === panel; });
+        this.splitview.removeView(index, sizing);
+    };
+    SplitviewComponent.prototype.getPanel = function (id) {
+        return this.getPanels().find(function (view) { return view.id === id; });
+    };
+    SplitviewComponent.prototype.addPanel = function (options) {
+        var _a;
+        if (this.panels.has(options.id)) {
+            throw new Error("panel " + options.id + " already exists");
+        }
+        var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__.createComponent)(options.id, options.component, this.options.components, this.options.frameworkComponents, { createComponent: (_a = this.options.frameworkWrapper) === null || _a === void 0 ? void 0 : _a.createComponent });
+        view.orientation = this.splitview.orientation;
+        view.init({
+            params: options.params,
+            minimumSize: options.minimumSize,
+            maximumSize: options.maximumSize,
+            snap: options.snap,
+            priority: options.priority,
+            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.SplitviewApi(this),
+        });
+        var size = typeof options.size === 'number' ? options.size : _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Sizing.Distribute;
+        var index = typeof options.index === 'number' ? options.index : undefined;
+        this.splitview.addView(view, size, index);
+        this.doAddView(view);
+        this.setActive(view);
+    };
+    /**
+     * Resize the layout to fit the parent container
+     */
+    SplitviewComponent.prototype.resizeToFit = function () {
+        var _a;
+        if (!this.element.parentElement) {
+            return;
+        }
+        var _b = (_a = this.element.parentElement) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect(), width = _b.width, height = _b.height;
+        this.layout(width, height);
+    };
+    SplitviewComponent.prototype.layout = function (width, height) {
+        var _a = __read(this.splitview.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation.HORIZONTAL
+            ? [width, height]
+            : [height, width], 2), size = _a[0], orthogonalSize = _a[1];
+        this.splitview.layout(size, orthogonalSize);
+    };
+    SplitviewComponent.prototype.doAddView = function (view) {
+        var _this = this;
+        var disposable = view.api.onDidFocusChange(function (event) {
+            if (!event.isFocused) {
+                return;
+            }
+            _this.setActive(view, true);
+        });
+        this.panels.set(view.id, disposable);
+    };
+    SplitviewComponent.prototype.toJSON = function () {
+        var _this = this;
+        var _a;
+        var views = this.splitview
+            .getViews()
+            .map(function (view, i) {
+            var size = _this.splitview.getViewSize(i);
+            return {
+                size: size,
+                data: view.toJSON(),
+                minimumSize: view.minimumSize,
+                maximumSize: view.maximumSize,
+                snap: !!view.snap,
+                priority: view.priority,
+            };
+        });
+        return {
+            views: views,
+            activeView: (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.id,
+            size: this.splitview.size,
+            orientation: this.splitview.orientation,
+        };
+    };
+    SplitviewComponent.prototype.fromJSON = function (data) {
+        var _this = this;
+        var _a;
+        var views = data.views, orientation = data.orientation, size = data.size, activeView = data.activeView;
+        this.splitview.dispose();
+        this.splitview = new _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Splitview(this.element, {
+            orientation: orientation,
+            proportionalLayout: this.options.proportionalLayout,
+            descriptor: {
+                size: size,
+                views: views.map(function (view) {
+                    var _a;
+                    var data = view.data;
+                    if (_this.panels.has(data.id)) {
+                        throw new Error("panel " + data.id + " already exists");
+                    }
+                    var panel = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__.createComponent)(data.id, data.component, _this.options.components, _this.options.frameworkComponents, {
+                        createComponent: (_a = _this.options.frameworkWrapper) === null || _a === void 0 ? void 0 : _a.createComponent,
+                    });
+                    panel.init({
+                        params: data.props,
+                        minimumSize: view.minimumSize,
+                        maximumSize: view.maximumSize,
+                        snap: view.snap,
+                        priority: view.priority,
+                        containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.SplitviewApi(_this),
+                    });
+                    panel.orientation = orientation;
+                    _this.doAddView(panel);
+                    return { size: view.size, view: panel };
+                }),
+            },
+        });
+        if (typeof activeView === 'string') {
+            (_a = this.getPanel(activeView)) === null || _a === void 0 ? void 0 : _a.setActive(true);
+        }
+    };
+    SplitviewComponent.prototype.dispose = function () {
+        Array.from(this.panels.values()).forEach(function (value) {
+            value.dispose();
+        });
+        this.panels.clear();
+        _super.prototype.dispose.call(this);
+    };
+    return SplitviewComponent;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
 
 
 
