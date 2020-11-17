@@ -1485,9 +1485,9 @@ exports.Footer = function (props) {
 /*! CommonJS bailout: this is used directly at 32:14-18 */
 /*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 86:24-40 */
 /*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 95:24-40 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 244:16-32 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 255:16-32 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 260:16-32 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 247:16-32 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 258:16-32 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 263:16-32 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -1627,12 +1627,15 @@ var components = {
                         height: '100%',
                         display: 'flex',
                         backgroundColor: 'rgba(255,255,255,0.1)',
+                        padding: '0px 4px',
                     } },
                     React.createElement("span", { onClick: onClick, style: {
                             height: '100%',
                             width: '25px',
-                            backgroundColor: 'red',
-                        } })));
+                            display: 'flex',
+                            alignItems: 'center',
+                        } },
+                        React.createElement("a", { className: "material-icons" }, "menu"))));
             }, { qwerty: 'qwerty' });
         }, []);
         React.useEffect(function () {
@@ -34085,11 +34088,11 @@ var DockviewComponent = /** @class */ (function (_super) {
         switch (target) {
             case _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center:
             case undefined:
+                var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.removePanel(itemId)) ||
+                    this.panels.get(itemId).value;
                 if ((sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.size) === 0) {
                     this.doRemoveGroup(sourceGroup);
                 }
-                var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.removePanel(itemId)) ||
-                    this.panels.get(itemId).value;
                 referenceGroup.openPanel(groupItem, index);
                 return;
         }
@@ -35159,7 +35162,6 @@ var BranchNode = /** @class */ (function (_super) {
             });
         }
         _this.addDisposables(_this.splitview.onDidSashEnd(function () {
-            console.log('sash end');
             _this._onDidChange.fire(undefined);
         }));
         _this.setupChildrenEvents();
@@ -36718,7 +36720,6 @@ var Groupview = /** @class */ (function (_super) {
         var _this = _super.call(this) || this;
         _this.accessor = accessor;
         _this.id = id;
-        _this.options = options;
         _this._active = false;
         _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_4__.Emitter();
         _this.onDidChange = _this._onDidChange
@@ -36756,7 +36757,6 @@ var Groupview = /** @class */ (function (_super) {
         _this.addDisposables(_this._onMove, _this._onDidGroupChange, _this._onDrop);
         _this._element = document.createElement('div');
         _this._element.className = 'groupview';
-        // this._element.tabIndex = -1;
         _this.tabContainer = new _titlebar_titleContainer__WEBPACK_IMPORTED_MODULE_1__.TitleContainer(_this.accessor, _this, {
             tabHeight: options.tabHeight,
         });
@@ -37163,7 +37163,8 @@ var Groupview = /** @class */ (function (_super) {
     };
     Groupview.prototype.updateContainer = function () {
         var _this = this;
-        var _a;
+        var _a, _b;
+        this.updateActions();
         (0,_dom__WEBPACK_IMPORTED_MODULE_5__.toggleClass)(this.element, 'empty', this.isEmpty);
         if (!this.watermark) {
             var watermark = this.accessor.createWatermarkComponent();
@@ -37176,7 +37177,7 @@ var Groupview = /** @class */ (function (_super) {
             this.watermark = watermark;
         }
         this.panels.forEach(function (panel) { return panel.setVisible(_this._active, _this); });
-        if (this.isEmpty && !((_a = this.watermark) === null || _a === void 0 ? void 0 : _a.element.parentNode)) {
+        if (this.isEmpty && !((_b = (_a = this.watermark) === null || _a === void 0 ? void 0 : _a.element) === null || _b === void 0 ? void 0 : _b.parentNode)) {
             (0,_events__WEBPACK_IMPORTED_MODULE_4__.addDisposableListener)(this.watermark.element, 'click', function () {
                 if (!_this._active) {
                     _this.accessor.doSetGroupActive(_this);
@@ -37850,6 +37851,9 @@ var TitleContainer = /** @class */ (function (_super) {
         configurable: true
     });
     TitleContainer.prototype.setActionElement = function (element) {
+        if (this.actions === element) {
+            return;
+        }
         if (this.actions) {
             this.actions.remove();
             this.actions = undefined;
