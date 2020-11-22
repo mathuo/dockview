@@ -1,6 +1,6 @@
 const {join, normalize} = require("path");
 
-const tsConfig = normalize(join(__dirname, "tsconfig.test.json"))
+const tsconfig = normalize(join(__dirname, "tsconfig.test.json"))
 
 module.exports = {
     displayName: { name: "root" },
@@ -12,7 +12,7 @@ module.exports = {
     moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json"],
     globals: {
         "ts-jest": {
-            tsConfig,
+            tsconfig,
             experimental: true,
             compilerHost: true
         }
