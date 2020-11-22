@@ -13,7 +13,7 @@ export interface GridComponentOptions {
     frameworkComponents?: {
         [componentName: string]: any;
     };
-    frameworkComponentFactory: FrameworkFactory<GridviewPanel>;
+    frameworkComponentFactory?: FrameworkFactory<GridviewPanel>;
     tabHeight?: number;
     styles?: ISplitviewStyles;
 }

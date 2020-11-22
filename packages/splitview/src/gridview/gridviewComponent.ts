@@ -221,10 +221,12 @@ export class GridviewComponent
                     data.component,
                     this.options.components,
                     this.options.frameworkComponents,
-                    {
-                        createComponent: this.options.frameworkComponentFactory
-                            .createComponent,
-                    }
+                    this.options.frameworkComponentFactory
+                        ? {
+                              createComponent: this.options
+                                  .frameworkComponentFactory.createComponent,
+                          }
+                        : undefined
                 );
 
                 view.init({
