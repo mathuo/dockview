@@ -214,7 +214,8 @@ export class GridviewComponent
         // }
 
         this.gridview.deserialize(grid, {
-            fromJSON: (data: any) => {
+            fromJSON: (node) => {
+                const { data } = node;
                 const view = createComponent(
                     data.id,
                     data.component,
@@ -235,6 +236,7 @@ export class GridviewComponent
                     priority: data.priority,
                     snap: !!data.snap,
                     containerApi: new GridviewApi(this),
+                    isVisible: !!node.visible,
                 });
 
                 this.registerPanel(view);
@@ -320,6 +322,7 @@ export class GridviewComponent
             priority: options.priority,
             snap: !!options.snap,
             containerApi: new GridviewApi(this),
+            isVisible: true,
         });
 
         this.registerPanel(view);

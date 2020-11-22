@@ -16,6 +16,7 @@ export interface GridviewInitParameters extends PanelInitParameters {
     priority?: LayoutPriority;
     snap?: boolean;
     containerApi: GridviewApi;
+    isVisible?: boolean;
 }
 
 export abstract class GridviewPanel
@@ -164,6 +165,8 @@ export abstract class GridviewPanel
         this._snap = !!parameters.snap;
 
         super.init(parameters);
+
+        this.setVisible(parameters.isVisible);
     }
 
     private updateConstraints() {

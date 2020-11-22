@@ -248,7 +248,7 @@ export interface INodeDescriptor {
 }
 
 export interface IViewDeserializer {
-    fromJSON: (data: any) => IGridView;
+    fromJSON: (data: ISerializedLeafNode) => IGridView;
 }
 
 export class Gridview implements IDisposable {
@@ -342,7 +342,7 @@ export class Gridview implements IDisposable {
             );
         } else {
             result = new LeafNode(
-                deserializer.fromJSON(node.data),
+                deserializer.fromJSON(node),
                 orientation,
                 orthogonalSize,
                 node.size
