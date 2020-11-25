@@ -7,3 +7,4 @@ typedocs/
 .DS_Store
 *-debug.log
 .build
+storybook-static/

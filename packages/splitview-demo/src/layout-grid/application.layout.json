@@ -15,7 +15,7 @@
                                 "minimumWidth": 48,
                                 "maximumWidth": 48
                             },
-                            "size": 48
+                            "size": 1
            
                         },
                         {
@@ -27,7 +27,7 @@
                                 "minimumWidth": 170,
                                 "snap": true
                             },
-                            "size": 400,
+                            "size": 1,
                             "visible": true
                         },
                         {
@@ -43,7 +43,7 @@
                                         "snap": true,
                                         "priority": "high"
                                     },
-                                    "size": 1166
+                                    "size": 1
                                 },
                                 {
                                     "type": "leaf",
@@ -54,10 +54,10 @@
                                         "minimumWidth": 200,
                                         "snap": true
                                     },
-                                    "size": 230
+                                    "size": 1
                                 }
                             ],
-                            "size": 1166
+                            "size": 1
                         }
                     ],
                     "size": 1013
@@ -71,13 +71,13 @@
                         "maximumHeight": 22,
                         "minimumWidth": 200
                     },
-                    "size": 1385
+                    "size": 1
                 }
             ],
-            "size": 1385
+            "size": 1
         },
-        "height": 1035,
-        "width": 1385,
+        "height": 1,
+        "width": 1,
         "orientation": "VERTICAL"
     },
     "activePanel": "3"

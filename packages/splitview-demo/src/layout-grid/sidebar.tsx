@@ -129,6 +129,8 @@ export const Sidebar = (props: IGridviewPanelProps) => {
     const onReady = (event: PaneviewReadyEvent) => {
         api.current = event.api;
 
+        console.log(props.api.width, props.api.height);
+
         event.api.fromJSON(require('./sidebar.layout.json'));
 
         return;

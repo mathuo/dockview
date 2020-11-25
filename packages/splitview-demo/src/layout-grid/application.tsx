@@ -29,6 +29,21 @@ export const Application = () => {
     const api = React.useRef<GridviewApi>();
     const registry = useLayoutRegistry();
 
+    React.useEffect(() => {
+        const onresize = (ev: UIEvent) => {
+            const { innerWidth: width, innerHeight: height } = window;
+            api.current?.layout(width, height); // // fill the entire screen
+        };
+        window.addEventListener('resize', onresize);
+
+        onresize(undefined); // initial render
+        // api.current.getPanel('sidebar').api.setSize({ width: 300 });
+
+        return () => {
+            window.removeEventListener('resize', onresize);
+        };
+    }, []);
+
     const onReady = (event: GridviewReadyEvent) => {
         api.current = event.api;
         registry.register('gridview', event.api);
@@ -92,21 +107,6 @@ export const Application = () => {
             console.log('SAVED', event.api.toJSON());
         });
     };
-
-    React.useEffect(() => {
-        const onresize = (ev: UIEvent) => {
-            const { innerWidth: width, innerHeight: height } = window;
-            api.current?.layout(width, height); // // fill the entire screen
-        };
-        window.addEventListener('resize', onresize);
-
-        onresize(undefined); // initial render
-        // api.current.getPanel('sidebar').api.setSize({ width: 300 });
-
-        return () => {
-            window.removeEventListener('resize', onresize);
-        };
-    }, []);
 
     return (
         <GridviewReact

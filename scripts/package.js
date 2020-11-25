@@ -3,8 +3,10 @@ const path = require("path");
 
 const output = path.join(__dirname, "../output");
 
-const dir1 = path.join(__dirname, "../packages/splitview/typedocs");
-const dir2 = path.join(__dirname, "../packages/splitview-demo/dist");
+const docsDir = path.join(__dirname, "../packages/splitview/typedocs");
+const webpackAppDir = path.join(__dirname, "../packages/splitview-demo/dist");
+const storybookAppDir = path.join(__dirname, "../packages/splitview-demo/storybook-static");
 
-fs.copySync(dir1, path.join(output,'docs'));
-fs.copySync(dir2, path.join(output,'build'));
+fs.copySync(docsDir, path.join(output,'docs'));
+fs.copySync(webpackAppDir, path.join(output,'build'));
+fs.copySync(storybookAppDir, path.join(output,'storybook-static'));
