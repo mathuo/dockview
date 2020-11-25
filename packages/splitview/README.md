@@ -42,6 +42,8 @@ By default the seperator between panels is `transparent` but this can be set thr
 
 ## React
 
+dockview has a peer dependency on `react >= 16.8.0` and `react-dom >= 16.8.0` which is the version that introduces React Hooks.
+
 ### Splitview
 
 ```javascript

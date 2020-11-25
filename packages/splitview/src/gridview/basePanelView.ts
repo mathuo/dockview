@@ -76,6 +76,8 @@ export abstract class BasePanelView<T extends BaseViewApi>
         this._width = width;
         this._height = height;
         this.api._onDidPanelDimensionChange.fire({ width, height });
+
+        this.part?.update(this.params.params);
     }
 
     init(parameters: PanelInitParameters): void {

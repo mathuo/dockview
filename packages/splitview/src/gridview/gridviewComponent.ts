@@ -162,56 +162,7 @@ export class GridviewComponent
         this.gridview.clear();
         this.groups.clear();
 
-        // const width = this.width;
-        // const height = this.height;
-
-        // this.layout(width, height, true);
-
-        // const yTransform = height / grid.height;
-        // const xTransform = width / grid.width;
-
-        // grid.height = yTransform * grid.height;
-        // grid.width = xTransform * grid.width;
-
-        // const sizeTransform =
-        //     grid.orientation === Orientation.VERTICAL ? yTransform : xTransform;
-        // const orthogonalSizeTransform =
-        //     grid.orientation === Orientation.HORIZONTAL
-        //         ? yTransform
-        //         : xTransform;
-
-        // const transform = (
-        //     item: SerializedGridObject<GridPanelViewState>,
-        //     o: Orientation
-        // ) => {
-        //     switch (item.type) {
-        //         case 'branch':
-        //             if (grid.orientation === o) {
-        //                 item.size = sizeTransform * item.size;
-        //             } else {
-        //                 item.size = orthogonalSizeTransform * item.size;
-        //             }
-
-        //             if (Array.isArray(item.data)) {
-        //                 item.data.forEach((x) => transform(x, orthogonal(o)));
-        //             }
-        //             break;
-        //         case 'leaf':
-        //             if (grid.orientation === o) {
-        //                 item.size = sizeTransform * item.size;
-        //             } else {
-        //                 item.size = orthogonalSizeTransform * item.size;
-        //             }
-
-        //             break;
-        //     }
-        // };
-
-        // grid.root.size = grid.root.size * sizeTransform;
-
-        // if (Array.isArray(grid.root.data)) {
-        //     grid.root.data.forEach((d) => transform(d, grid.orientation));
-        // }
+        const queue: Function[] = [];
 
         this.gridview.deserialize(grid, {
             fromJSON: (node) => {
@@ -229,17 +180,19 @@ export class GridviewComponent
                         : undefined
                 );
 
-                view.init({
-                    params: data.params,
-                    minimumWidth: data.minimumWidth,
-                    maximumWidth: data.maximumWidth,
-                    minimumHeight: data.minimumHeight,
-                    maximumHeight: data.maximumHeight,
-                    priority: data.priority,
-                    snap: !!data.snap,
-                    containerApi: new GridviewApi(this),
-                    isVisible: !!node.visible,
-                });
+                queue.push(() =>
+                    view.init({
+                        params: data.params,
+                        minimumWidth: data.minimumWidth,
+                        maximumWidth: data.maximumWidth,
+                        minimumHeight: data.minimumHeight,
+                        maximumHeight: data.maximumHeight,
+                        priority: data.priority,
+                        snap: !!data.snap,
+                        containerApi: new GridviewApi(this),
+                        isVisible: !!node.visible,
+                    })
+                );
 
                 this.registerPanel(view);
 
@@ -247,14 +200,15 @@ export class GridviewComponent
             },
         });
 
+        // .init() renders the view. Delay the render until the layout skelton is loaded
+        queue.forEach((f) => f());
+
         if (typeof activePanel === 'string') {
             const panel = this.getPanel(activePanel);
             if (panel) {
                 this.doSetGroupActive(panel);
             }
         }
-
-        // this.layout(width, height, true);
 
         this._onDidLayoutChange.fire({ kind: GroupChangeKind.NEW_LAYOUT });
     }

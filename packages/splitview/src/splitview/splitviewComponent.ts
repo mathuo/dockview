@@ -255,6 +255,9 @@ export class SplitviewComponent
         const { views, orientation, size, activeView } = data;
 
         this.splitview.dispose();
+
+        const queue: Function[] = [];
+
         this.splitview = new Splitview(this.element, {
             orientation,
             proportionalLayout: this.options.proportionalLayout,
@@ -278,13 +281,15 @@ export class SplitviewComponent
                         }
                     );
 
-                    panel.init({
-                        params: data.props,
-                        minimumSize: view.minimumSize,
-                        maximumSize: view.maximumSize,
-                        snap: view.snap,
-                        priority: view.priority,
-                        containerApi: new SplitviewApi(this),
+                    queue.push(() => {
+                        panel.init({
+                            params: data.props,
+                            minimumSize: view.minimumSize,
+                            maximumSize: view.maximumSize,
+                            snap: view.snap,
+                            priority: view.priority,
+                            containerApi: new SplitviewApi(this),
+                        });
                     });
 
                     panel.orientation = orientation;
@@ -295,6 +300,8 @@ export class SplitviewComponent
                 }),
             },
         });
+
+        queue.forEach((f) => f());
 
         if (typeof activeView === 'string') {
             this.getPanel(activeView)?.setActive(true);

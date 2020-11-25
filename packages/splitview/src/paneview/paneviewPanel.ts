@@ -189,9 +189,6 @@ export abstract class PaneviewPanel
         if (typeof parameters.maximumBodySize === 'number') {
             this.maximumBodySize = parameters.maximumBodySize;
         }
-        if (typeof parameters.isExpanded === 'boolean') {
-            this.setExpanded(parameters.isExpanded);
-        }
 
         this.bodyPart = this.getBodyComponent();
         this.headerPart = this.getHeaderComponent();
@@ -201,6 +198,10 @@ export abstract class PaneviewPanel
 
         this.body.append(this.bodyPart.element);
         this.header.append(this.headerPart.element);
+
+        if (typeof parameters.isExpanded === 'boolean') {
+            this.setExpanded(parameters.isExpanded);
+        }
     }
 
     toJSON(): PanePanelViewState {

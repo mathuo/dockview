@@ -32,9 +32,7 @@ export interface SerializedPaneviewPanel {
 }
 
 export interface SerializedPaneview {
-    orientation: Orientation;
     size: number;
-    expanded?: boolean;
     views: SerializedPaneviewPanel[];
 }
 
@@ -273,16 +271,17 @@ export class PaneviewComponent
         return {
             views,
             size: this.paneview.size,
-            orientation: this.paneview.orientation,
         };
     }
 
     fromJSON(data: SerializedPaneview): void {
-        const { views, orientation, size } = data;
+        const { views, size } = data;
+
+        const queue: Function[] = [];
 
         this.paneview.dispose();
         this.paneview = new Paneview(this.element, {
-            orientation,
+            orientation: Orientation.VERTICAL,
             descriptor: {
                 size,
                 views: views.map((view) => {
@@ -324,20 +323,24 @@ export class PaneviewComponent
                         body,
                     });
 
-                    panel.init({
-                        params: data.props,
-                        minimumBodySize: view.minimumSize,
-                        maximumBodySize: view.maximumSize,
-                        title: data.title,
-                        isExpanded: !!view.expanded,
-                        containerApi: new PaneviewApi(this),
+                    queue.push(() => {
+                        panel.init({
+                            params: data.props,
+                            minimumBodySize: view.minimumSize,
+                            maximumBodySize: view.maximumSize,
+                            title: data.title,
+                            isExpanded: !!view.expanded,
+                            containerApi: new PaneviewApi(this),
+                        });
                     });
 
-                    panel.orientation = orientation;
+                    panel.orientation = Orientation.VERTICAL;
 
                     return { size: view.size, view: panel };
                 }),
             },
         });
+
+        queue.forEach((f) => f());
     }
 }
