@@ -557,7 +557,7 @@ export class DockviewComponent
             this.options.watermarkFrameworkComponent
                 ? { 'watermark-name': this.options.watermarkFrameworkComponent }
                 : {},
-            this.options.frameworkComponentFactory.watermark
+            this.options.frameworkComponentFactory?.watermark
         );
     }
 
@@ -567,7 +567,7 @@ export class DockviewComponent
             componentName,
             this.options.components,
             this.options.frameworkComponents,
-            this.options.frameworkComponentFactory.content
+            this.options.frameworkComponentFactory?.content
         );
     }
 
@@ -577,7 +577,7 @@ export class DockviewComponent
             componentName,
             this.options.tabComponents,
             this.options.frameworkTabComponents,
-            this.options.frameworkComponentFactory.tab,
+            this.options.frameworkComponentFactory?.tab,
             () => new DefaultTab()
         );
     }

@@ -43,7 +43,7 @@ export interface DockviewOptions {
     };
     watermarkComponent?: WatermarkConstructor;
     watermarkFrameworkComponent?: any;
-    frameworkComponentFactory: GroupPanelFrameworkComponentFactory;
+    frameworkComponentFactory?: GroupPanelFrameworkComponentFactory;
     tabHeight?: number;
     debug?: boolean;
     enableExternalDragEvents?: boolean;
