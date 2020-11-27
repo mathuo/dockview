@@ -147,13 +147,13 @@ const components: PanelCollection<IDockviewPanelProps> = {
 
         React.useEffect(() => {
             const disposable = new CompositeDisposable(
-                props.api.onDidFocusChange((event) => {
+                props.api.onDidActiveChange((event) => {
                     setPanelState((_) => ({
                         ..._,
-                        isGroupActive: event.isFocused,
+                        isGroupActive: event.isActive,
                     }));
                 }),
-                props.api.onDidGroupPanelVisibleChange((x) => {
+                props.api.onDidVisibilityChange((x) => {
                     setPanelState((_) => ({
                         ..._,
                         isPanelVisible: x.isVisible,

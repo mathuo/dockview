@@ -63,32 +63,64 @@ describe('dockviewComponent', () => {
 
         const panel1 = dockview.getGroupPanel('panel1');
 
-        expect(panel1?.api.id).toBe('panel1');
-        expect(panel1?.api.isVisible).toBeTruthy();
-        // expect(panel?.api.isActive).toBeTruthy();
-        expect(panel1?.api.isFocused).toBeTruthy();
-        expect(panel1?.api.height).toBe(1000);
-        expect(panel1?.api.width).toBe(500);
-        expect(panel1?.api.isGroupVisible).toBeTruthy();
-        expect(panel1?.api.group).toBe(panel1?.group);
+        expect(panel1!.api.id).toBe('panel1');
+        expect(panel1!.api.isVisible).toBeTruthy();
+        expect(panel1!.api.isActive).toBeTruthy();
+        // expect(panel1?.api.isFocused).toBeTruthy();
+        expect(panel1!.api.height).toBe(1000);
+        expect(panel1!.api.width).toBe(500);
+        expect(panel1!.api.group).toBe(panel1?.group);
+        expect(panel1!.api.isGroupActive).toBeTruthy();
 
         dockview.addPanel({
             id: 'panel2',
             component: 'default',
         });
 
-        expect(panel1?.api.isFocused).toBeFalsy();
-        // expect(panel1?.api.isVisible).toBeFalsy(); //TODO
+        expect(panel1?.api.isActive).toBeFalsy();
+        // expect(panel1?.api.isFocused).toBeFalsy();
+        expect(panel1?.api.isVisible).toBeFalsy();
+        expect(panel1!.api.isGroupActive).toBeTruthy();
 
         const panel2 = dockview.getGroupPanel('panel2');
 
-        expect(panel2?.api.id).toBe('panel2');
-        expect(panel2?.api.isVisible).toBeTruthy();
-        // expect(panel?.api.isActive).toBeTruthy();
-        expect(panel2?.api.isFocused).toBeTruthy();
-        expect(panel2?.api.height).toBe(1000);
-        expect(panel2?.api.width).toBe(500);
-        expect(panel2?.api.isGroupVisible).toBeTruthy();
-        expect(panel2?.api.group).toBe(panel2?.group);
+        expect(panel2!.api.id).toBe('panel2');
+        expect(panel2!.api.isVisible).toBeTruthy();
+        expect(panel2!.api.isActive).toBeTruthy();
+        // expect(panel2?.api.isFocused).toBeTruthy();
+        expect(panel2!.api.height).toBe(1000);
+        expect(panel2!.api.width).toBe(500);
+        expect(panel2!.api.group).toBe(panel2?.group);
+        expect(panel2!.api.isGroupActive).toBeTruthy();
+
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: { referencePanel: 'panel1', direction: 'right' },
+        });
+
+        expect(panel1!.api.isActive).toBeFalsy();
+        expect(panel1!.api.isVisible).toBeFalsy();
+        expect(panel1!.api.isGroupActive).toBeFalsy();
+        expect(panel2!.api.isActive).toBeFalsy();
+        expect(panel2!.api.isVisible).toBeTruthy();
+        expect(panel2!.api.isGroupActive).toBeFalsy();
+
+        const panel3 = dockview.getGroupPanel('panel3');
+
+        expect(panel3!.api.isActive).toBeTruthy();
+        expect(panel3!.api.isGroupActive).toBeTruthy();
+
+        dockview.setActivePanel(panel1!);
+
+        expect(panel1!.api.isActive).toBeTruthy();
+        expect(panel1!.api.isVisible).toBeTruthy();
+        expect(panel1!.api.isGroupActive).toBeTruthy();
+        expect(panel2!.api.isActive).toBeFalsy();
+        expect(panel2!.api.isVisible).toBeFalsy();
+        expect(panel2!.api.isGroupActive).toBeTruthy();
+        expect(panel3!.api.isActive).toBeFalsy();
+        expect(panel3!.api.isVisible).toBeTruthy();
+        expect(panel3!.api.isGroupActive).toBeFalsy();
     });
 });

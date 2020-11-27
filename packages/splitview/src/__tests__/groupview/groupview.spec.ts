@@ -14,7 +14,7 @@ class Watermark implements WatermarkPart {
         //
     }
 
-    setVisible() {
+    updateParentGroup() {
         //
     }
 

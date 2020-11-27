@@ -99,7 +99,7 @@ export abstract class GridviewPanel
         return width;
     }
 
-    get isActive() {
+    get isGroupActive() {
         return false;
     }
 

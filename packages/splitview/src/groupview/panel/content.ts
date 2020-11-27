@@ -41,6 +41,9 @@ export class ContentContainer
     }
 
     public openPanel(panel: { element: HTMLElement }) {
+        if (this.content === panel) {
+            return;
+        }
         if (this.content) {
             this._element.removeChild(this.content.element);
             this.content = undefined;

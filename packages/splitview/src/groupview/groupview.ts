@@ -58,20 +58,21 @@ interface GroupMoveEvent {
 }
 
 export interface GroupOptions {
-    panels?: IGroupPanel[];
-    activePanel?: IGroupPanel;
-    id?: string;
-    tabHeight?: number;
+    readonly panels?: IGroupPanel[];
+    readonly activePanel?: IGroupPanel;
+    readonly id?: string;
+    readonly tabHeight?: number;
 }
 
 export interface GroupChangeEvent {
-    kind: GroupChangeKind;
-    panel?: IGroupPanel;
+    readonly kind: GroupChangeKind;
+    readonly panel?: IGroupPanel;
 }
 
 export interface IGroupview extends IDisposable, IGridPanelView {
-    size: number;
-    panels: IGroupPanel[];
+    readonly isGroupActive: boolean;
+    readonly size: number;
+    readonly panels: IGroupPanel[];
     tabHeight: number;
     // state
     isPanelActive: (panel: IGroupPanel) => boolean;
@@ -110,7 +111,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
     private tabContainer: ITitleContainer;
     private contentContainer: IContentContainer;
-    private _active = false;
+    private _isGroupActive = false;
     private _activePanel: IGroupPanel | undefined;
     private dropTarget: Droptarget;
     private watermark: WatermarkPart | undefined;
@@ -147,8 +148,8 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.layout(this._width, this._height);
     }
 
-    get isActive() {
-        return this._active;
+    get isGroupActive() {
+        return this._isGroupActive;
     }
 
     get panels() {
@@ -342,7 +343,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             this.doSetActivePanel(options.activePanel);
         }
 
-        this.setActive(this.isActive, true, true);
+        this.setActive(this.isGroupActive, true, true);
 
         this.updateContainer();
     }
@@ -471,7 +472,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
 
     updateActions() {
-        if (this.isActive && this._activePanel) {
+        if (this.isGroupActive && this._activePanel) {
             const headerTitle = this._activePanel.content?.actions;
             this.tabContainer.setActionElement(headerTitle);
         } else {
@@ -479,36 +480,38 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
     }
 
-    public setActive(isActive: boolean, skipFocus = false, force = false) {
-        if (!force && this.isActive === isActive) {
+    public setActive(isGroupActive: boolean, skipFocus = false, force = false) {
+        if (!force && this.isGroupActive === isGroupActive) {
             if (!skipFocus) {
                 this._activePanel?.focus();
             }
             return;
         }
 
-        this._active = isActive;
+        this._isGroupActive = isGroupActive;
 
-        toggleClass(this.element, 'active-group', isActive);
-        toggleClass(this.element, 'inactive-group', !isActive);
+        toggleClass(this.element, 'active-group', isGroupActive);
+        toggleClass(this.element, 'inactive-group', !isGroupActive);
 
-        this.tabContainer.setActive(this.isActive);
+        this.tabContainer.setActive(this.isGroupActive);
 
-        this.updateActions();
+        // this.updateActions();
 
         if (!this._activePanel && this.panels.length > 0) {
             this.doSetActivePanel(this.panels[0]);
         }
 
-        this.panels.forEach((panel) =>
-            panel.updateParentGroup(this, this.isActive)
-        );
+        this.updateContainer();
 
-        if (this.watermark?.updateParentGroup) {
-            this.watermark.updateParentGroup(this, this.isActive);
-        }
+        // this.panels.forEach((panel) =>
+        //     panel.updateParentGroup(this, this.isActive)
+        // );
 
-        if (isActive) {
+        // if (this.watermark?.updateParentGroup) {
+        //     this.watermark.updateParentGroup(this, this.isActive);
+        // }
+
+        if (isGroupActive) {
             if (!skipFocus) {
                 this._activePanel?.focus();
             }
@@ -605,12 +608,12 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
 
         this.panels.forEach((panel) =>
-            panel.updateParentGroup(this, this.isActive)
+            panel.updateParentGroup(this, this.isGroupActive)
         );
 
         if (this.isEmpty && !this.watermark?.element?.parentNode) {
             addDisposableListener(this.watermark.element, 'click', () => {
-                if (!this.isActive) {
+                if (!this.isGroupActive) {
                     this.accessor.doSetGroupActive(this);
                 }
             });

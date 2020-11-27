@@ -11,10 +11,11 @@ export interface TitleEvent {
 export interface IGroupPanelApi extends IGridPanelApi {
     // events
     onDidDirtyChange: Event<boolean>;
-    onDidGroupPanelVisibleChange: Event<VisibilityEvent>;
+    // onDidGroupPanelVisibleChange: Event<VisibilityEvent>;
     // misc
-    readonly isGroupVisible: boolean;
+    // readonly isGroupVisible: boolean;
     readonly group: IGroupview;
+    readonly isGroupActive: boolean;
     close: () => Promise<boolean>;
     tryClose: () => Promise<boolean>;
     interceptOnCloseAction(interceptor: () => Promise<boolean>): void;
@@ -22,26 +23,29 @@ export interface IGroupPanelApi extends IGridPanelApi {
 }
 
 export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
-    private _isGroupVisible = false;
     private _group: IGroupview;
     private _interceptor: () => Promise<boolean>;
 
     readonly _onDidDirtyChange = new Emitter<boolean>();
     readonly onDidDirtyChange = this._onDidDirtyChange.event;
-    readonly _onDidGroupPanelVisibleChange = new Emitter<VisibilityEvent>({
-        replay: true,
-    });
-    readonly onDidGroupPanelVisibleChange: Event<VisibilityEvent> = this
-        ._onDidGroupPanelVisibleChange.event;
+    // readonly _onDidGroupPanelVisibleChange = new Emitter<VisibilityEvent>({
+    //     replay: true,
+    // });
+    // readonly onDidGroupPanelVisibleChange: Event<VisibilityEvent> = this
+    //     ._onDidGroupPanelVisibleChange.event;
     readonly _onDidTitleChange = new Emitter<TitleEvent>();
     readonly onDidTitleChange = this._onDidTitleChange.event;
 
-    get isGroupVisible() {
-        return this._isGroupVisible;
-    }
+    // get isGroupVisible() {
+    //     return this._isGroupVisible;
+    // }
 
     get tryClose() {
         return this._interceptor;
+    }
+
+    get isGroupActive() {
+        return this.group.isGroupActive;
     }
 
     set group(value: IGroupview) {
@@ -57,11 +61,11 @@ export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
         this._group = group;
 
         this.addDisposables(
-            this._onDidGroupPanelVisibleChange,
-            this._onDidDirtyChange,
-            this.onDidGroupPanelVisibleChange((event) => {
-                this._isGroupVisible = event.isVisible;
-            })
+            // this._onDidGroupPanelVisibleChange,
+            this._onDidDirtyChange
+            // this.onDidGroupPanelVisibleChange((event) => {
+            //     this._isGroupVisible = event.isVisible;
+            // })
         );
     }
 

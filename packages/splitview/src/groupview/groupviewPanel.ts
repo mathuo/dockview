@@ -134,19 +134,32 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
 
         this.mutableDisposable.value = this._group.onDidGroupChange((ev) => {
             if (ev.kind === GroupChangeKind.GROUP_ACTIVE) {
-                this.api._onDidGroupPanelVisibleChange.fire({
-                    isVisible: this._group.isPanelActive(this),
+                const isPanelVisible = this._group.isPanelActive(this);
+                this.api._onDidActiveChange.fire({
+                    isActive: isGroupActive && isPanelVisible,
+                });
+                this.api._onDidVisibilityChange.fire({
+                    isVisible: isPanelVisible,
                 });
             }
         });
 
         // this.api._onDidChangeFocus.fire({ isFocused: isGroupActive });
-        this.api._onDidGroupPanelVisibleChange.fire({
-            isVisible: this._group.isPanelActive(this),
-        });
+        // this.api._onDidGroupPanelVisibleChange.fire({
+        //     isVisible: this._group.isPanelActive(this),
+        // });
 
-        this.api._onDidGroupPanelVisibleChange.fire({
-            isVisible: this._group.isPanelActive(this),
+        // this.api._onDidGroupPanelVisibleChange.fire({
+        //     isVisible: this._group.isPanelActive(this),
+        // });
+
+        const isPanelVisible = this._group.isPanelActive(this);
+
+        this.api._onDidActiveChange.fire({
+            isActive: isGroupActive && isPanelVisible,
+        });
+        this.api._onDidVisibilityChange.fire({
+            isVisible: isPanelVisible,
         });
 
         this.headerPart?.updateParentGroup(
