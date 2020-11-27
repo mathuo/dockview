@@ -6,69 +6,6 @@ import {
 } from './events';
 import { IDisposable, CompositeDisposable } from './lifecycle';
 
-export function getDomNodePagePosition(domNode: HTMLElement) {
-    const bb = domNode.getBoundingClientRect();
-    return {
-        left: bb.left + window.scrollX,
-        top: bb.top + window.scrollY,
-        width: bb.width,
-        height: bb.height,
-    };
-}
-
-/**
- * Fix the element to the top or bottom of the container depending on whether
- * the element is above or below the containers view portal.
- */
-export const scrollIntoView = (
-    element: HTMLElement,
-    container: HTMLElement
-) => {
-    const { inView, breachPoint } = isElementInView(element, container, true);
-    if (!inView) {
-        const adder = -container.offsetTop;
-        const isUp = breachPoint === 'top';
-        container.scrollTo({
-            top: isUp
-                ? adder + element.offsetTop
-                : adder +
-                  element.offsetTop -
-                  container.clientHeight +
-                  element.clientHeight,
-        });
-    }
-};
-
-export const isElementInView = (
-    element: HTMLElement,
-    container: HTMLElement,
-    fullyInView: boolean
-): { inView: boolean; breachPoint?: 'top' | 'bottom' } => {
-    const containerOfftsetTop = container.offsetTop;
-    const containerTop = containerOfftsetTop + container.scrollTop;
-    const containerBottom =
-        containerTop + container.getBoundingClientRect().height;
-    const elementTop = element.offsetTop;
-    const elementBottom = elementTop + element.getBoundingClientRect().height;
-
-    const isAbove = fullyInView
-        ? containerTop >= elementTop
-        : elementTop > containerBottom;
-    const isBelow = fullyInView
-        ? containerBottom <= elementBottom
-        : elementBottom < containerTop;
-
-    if (isAbove) {
-        return { inView: false, breachPoint: 'top' };
-    }
-
-    if (isBelow) {
-        return { inView: false, breachPoint: 'bottom' };
-    }
-
-    return { inView: true };
-};
-
 export function isHTMLElement(o: any): o is HTMLElement {
     if (typeof HTMLElement === 'object') {
         return o instanceof HTMLElement;
