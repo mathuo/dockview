@@ -67,7 +67,7 @@ export class Watermark extends CompositeDisposable implements WatermarkPart {
         this.render();
     }
 
-    public setVisible(visible: boolean, group: IGroupview): void {
+    public updateParentGroup(group: IGroupview, visible: boolean): void {
         this.group = group;
         this.render();
     }

@@ -35,9 +35,7 @@ export class ReactPanelContentPart implements PanelContentPart {
 
     constructor(
         public readonly id: string,
-        private readonly component: React.FunctionComponent<
-            IDockviewPanelProps
-        >,
+        private readonly component: React.FunctionComponent<IDockviewPanelProps>,
         private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');
@@ -50,7 +48,7 @@ export class ReactPanelContentPart implements PanelContentPart {
     }
 
     focus() {
-        //noop
+        // this._element.focus();
     }
 
     public init(parameters: GroupPanelPartInitParameters): void {
@@ -113,7 +111,7 @@ export class ReactPanelContentPart implements PanelContentPart {
         this.part?.update(params.params);
     }
 
-    public setVisible(isPanelVisible: boolean, group: IGroupview): void {
+    public updateParentGroup(group: IGroupview, isPanelVisible: boolean): void {
         this._group = group;
     }
 

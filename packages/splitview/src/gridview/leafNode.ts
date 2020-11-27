@@ -74,6 +74,18 @@ export class LeafNode implements IView {
         return this.view.element;
     }
 
+    get width() {
+        return this.orientation === Orientation.HORIZONTAL
+            ? this.orthogonalSize
+            : this.size;
+    }
+
+    get height() {
+        return this.orientation === Orientation.HORIZONTAL
+            ? this.size
+            : this.orthogonalSize;
+    }
+
     constructor(
         public readonly view: IGridView,
         readonly orientation: Orientation,
@@ -104,12 +116,7 @@ export class LeafNode implements IView {
         this._size = size;
         this._orthogonalSize = orthogonalSize;
 
-        const [width, height] =
-            this.orientation === Orientation.HORIZONTAL
-                ? [orthogonalSize, size]
-                : [size, orthogonalSize];
-
-        this.view.layout(width, height);
+        this.view.layout(this.width, this.height);
     }
 
     public dispose() {

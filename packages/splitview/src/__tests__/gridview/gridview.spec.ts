@@ -33,6 +33,19 @@ describe('gridview', () => {
         });
     });
 
+    test('added views are visible by default', () => {
+        gridview.layout(800, 400);
+
+        gridview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel = gridview.getPanel('panel_1');
+
+        expect(panel?.api.isVisible).toBeTruthy();
+    });
+
     test('deserialize and serialize a layout', () => {
         gridview.layout(800, 400);
         gridview.fromJSON({
@@ -47,7 +60,6 @@ describe('gridview', () => {
                         {
                             type: 'leaf',
                             size: 300,
-                            visible: true,
                             data: {
                                 id: 'panel_1',
                                 component: 'default',
@@ -79,6 +91,32 @@ describe('gridview', () => {
             },
             activePanel: 'panel_1',
         });
+        gridview.layout(800, 400, true);
+
+        const panel1 = gridview.getPanel('panel_1');
+        const panel2 = gridview.getPanel('panel_2');
+        const panel3 = gridview.getPanel('panel_3');
+
+        expect(panel1?.api.isVisible).toBeTruthy();
+        expect(panel1?.api.id).toBe('panel_1');
+        expect(panel1?.api.isActive).toBeTruthy();
+        expect(panel1?.api.isFocused).toBeFalsy();
+        expect(panel1?.api.height).toBe(400);
+        expect(panel1?.api.width).toBe(300);
+
+        expect(panel2?.api.isVisible).toBeFalsy();
+        expect(panel2?.api.id).toBe('panel_2');
+        expect(panel2?.api.isActive).toBeFalsy();
+        expect(panel2?.api.isFocused).toBeFalsy();
+        expect(panel2?.api.height).toBe(400);
+        expect(panel2?.api.width).toBe(0);
+
+        expect(panel3?.api.isVisible).toBeTruthy();
+        expect(panel3?.api.id).toBe('panel_3');
+        expect(panel3?.api.isActive).toBeFalsy();
+        expect(panel3?.api.isFocused).toBeFalsy();
+        expect(panel3?.api.height).toBe(400);
+        expect(panel3?.api.width).toBe(500);
 
         expect(JSON.parse(JSON.stringify(gridview.toJSON()))).toEqual({
             grid: {
@@ -110,7 +148,7 @@ describe('gridview', () => {
                         },
                         {
                             type: 'leaf',
-                            size: 200,
+                            size: 500,
                             data: {
                                 id: 'panel_3',
                                 component: 'default',

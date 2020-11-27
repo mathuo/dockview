@@ -4,6 +4,7 @@ import { trackFocus } from '../../dom';
 
 export interface IContentContainer extends IDisposable {
     onDidFocus: Event<void>;
+    onDidBlur: Event<void>;
     element: HTMLElement;
     openPanel: (panel: { element: HTMLElement }) => void;
     closePanel: () => void;
@@ -18,6 +19,9 @@ export class ContentContainer
     private readonly _onDidFocus = new Emitter<void>();
     readonly onDidFocus: Event<void> = this._onDidFocus.event;
 
+    private readonly _onDidBlur = new Emitter<void>();
+    readonly onDidBlur: Event<void> = this._onDidBlur.event;
+
     get element() {
         return this._element;
     }
@@ -28,12 +32,18 @@ export class ContentContainer
         this._element.className = 'content-container';
         this._element.tabIndex = -1;
 
-        const { onDidFocus } = trackFocus(this._element);
+        const { onDidFocus, onDidBlur } = trackFocus(this._element);
 
-        this.addDisposables(onDidFocus(() => this._onDidFocus.fire()));
+        this.addDisposables(
+            onDidFocus(() => this._onDidFocus.fire()),
+            onDidBlur(() => this._onDidBlur.fire())
+        );
     }
 
     public openPanel(panel: { element: HTMLElement }) {
+        if (this.content === panel) {
+            return;
+        }
         if (this.content) {
             this._element.removeChild(this.content.element);
             this.content = undefined;

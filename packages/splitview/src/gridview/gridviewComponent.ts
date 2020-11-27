@@ -190,7 +190,7 @@ export class GridviewComponent
                         priority: data.priority,
                         snap: !!data.snap,
                         containerApi: new GridviewApi(this),
-                        isVisible: !!node.visible,
+                        isVisible: node.visible,
                     })
                 );
 
@@ -265,7 +265,7 @@ export class GridviewComponent
             this.options.frameworkComponents,
             {
                 createComponent: this.options.frameworkComponentFactory
-                    .createComponent,
+                    ?.createComponent,
             }
         );
 

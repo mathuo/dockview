@@ -489,7 +489,7 @@ export class Gridview implements IDisposable {
     constructor(
         readonly proportionalLayout: boolean,
         readonly styles: ISplitviewStyles,
-        orientation: Orientation = Orientation.HORIZONTAL
+        orientation: Orientation
     ) {
         this.element = document.createElement('div');
         this.element.className = 'grid-view';

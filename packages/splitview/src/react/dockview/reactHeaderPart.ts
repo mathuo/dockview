@@ -18,9 +18,7 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
 
     constructor(
         public readonly id: string,
-        private readonly component: React.FunctionComponent<
-            IGroupPanelBaseProps
-        >,
+        private readonly component: React.FunctionComponent<IGroupPanelBaseProps>,
         private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');
@@ -57,7 +55,7 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
         // noop - retrieval from api
     }
 
-    public setVisible(isPanelVisible: boolean, group: IGroupview): void {
+    public updateParentGroup(group: IGroupview, isPanelVisible: boolean): void {
         // noop - retrieval from api
     }
 

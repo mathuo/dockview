@@ -26,7 +26,7 @@ export interface IGroupPanel extends IDisposable, IPanel {
     readonly content?: PanelContentPart;
     readonly group: IGroupview;
     readonly api: IGroupPanelApi;
-    setVisible(isGroupActive: boolean, group: IGroupview): void;
+    updateParentGroup(group: IGroupview, isGroupActive: boolean): void;
     setDirty(isDirty: boolean): void;
     close?(): Promise<boolean>;
     init(params: IGroupPanelInitParameters): void;
@@ -128,34 +128,47 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
         });
     }
 
-    public setVisible(isGroupActive: boolean, group: IGroupview) {
+    public updateParentGroup(group: IGroupview, isGroupActive: boolean) {
         this._group = group;
         this.api.group = group;
 
         this.mutableDisposable.value = this._group.onDidGroupChange((ev) => {
             if (ev.kind === GroupChangeKind.GROUP_ACTIVE) {
-                this.api._onDidGroupPanelVisibleChange.fire({
-                    isVisible: this._group.isPanelActive(this),
+                const isPanelVisible = this._group.isPanelActive(this);
+                this.api._onDidActiveChange.fire({
+                    isActive: isGroupActive && isPanelVisible,
+                });
+                this.api._onDidVisibilityChange.fire({
+                    isVisible: isPanelVisible,
                 });
             }
         });
 
-        this.api._onDidChangeFocus.fire({ isFocused: isGroupActive });
-        this.api._onDidGroupPanelVisibleChange.fire({
-            isVisible: this._group.isPanelActive(this),
+        // this.api._onDidChangeFocus.fire({ isFocused: isGroupActive });
+        // this.api._onDidGroupPanelVisibleChange.fire({
+        //     isVisible: this._group.isPanelActive(this),
+        // });
+
+        // this.api._onDidGroupPanelVisibleChange.fire({
+        //     isVisible: this._group.isPanelActive(this),
+        // });
+
+        const isPanelVisible = this._group.isPanelActive(this);
+
+        this.api._onDidActiveChange.fire({
+            isActive: isGroupActive && isPanelVisible,
+        });
+        this.api._onDidVisibilityChange.fire({
+            isVisible: isPanelVisible,
         });
 
-        this.api._onDidGroupPanelVisibleChange.fire({
-            isVisible: this._group.isPanelActive(this),
-        });
-
-        this.headerPart?.setVisible(
-            this._group.isPanelActive(this),
-            this._group
+        this.headerPart?.updateParentGroup(
+            this._group,
+            this._group.isPanelActive(this)
         );
-        this.contentPart?.setVisible(
-            this._group.isPanelActive(this),
-            this._group
+        this.contentPart?.updateParentGroup(
+            this._group,
+            this._group.isPanelActive(this)
         );
     }
 

@@ -22,9 +22,7 @@ export class ReactWatermarkPart implements WatermarkPart {
 
     constructor(
         public readonly id: string,
-        private readonly component: React.FunctionComponent<
-            IWatermarkPanelProps
-        >,
+        private readonly component: React.FunctionComponent<IWatermarkPanelProps>,
         private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');
@@ -55,7 +53,7 @@ export class ReactWatermarkPart implements WatermarkPart {
         // noop - retrieval from api
     }
 
-    public setVisible(isPanelVisible: boolean, group: IGroupview): void {
+    public updateParentGroup(group: IGroupview, isPanelVisible: boolean): void {
         // noop - retrieval from api
         this._groupRef.value = group;
     }
