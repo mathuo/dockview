@@ -61,7 +61,7 @@ export interface GroupOptions {
     readonly panels?: IGroupPanel[];
     readonly activePanel?: IGroupPanel;
     readonly id?: string;
-    readonly tabHeight?: number;
+    tabHeight?: number;
 }
 
 export interface GroupChangeEvent {
