@@ -20,13 +20,13 @@ export interface GroupPanelPartInitParameters
 export interface PanelHeaderPart extends IPanel {
     element: HTMLElement;
     init(parameters: GroupPanelPartInitParameters): void;
-    setVisible(isPanelVisible: boolean, group: IGroupview): void;
+    updateParentGroup(group: IGroupview, isPanelVisible: boolean): void;
 }
 
 export interface PanelContentPart extends IPanel {
     element: HTMLElement;
     actions?: HTMLElement;
-    setVisible(isPanelVisible: boolean, group: IGroupview): void;
+    updateParentGroup(group: IGroupview, isPanelVisible: boolean): void;
     init(parameters: GroupPanelPartInitParameters): void;
     close?(): Promise<boolean>;
 }
@@ -39,7 +39,7 @@ export interface WatermarkPartInitParameters {
 
 export interface WatermarkPart extends IDisposable {
     init: (params: GroupPanelPartInitParameters) => void;
-    setVisible(visible: boolean, group: IGroupview): void;
+    updateParentGroup(group: IGroupview, visible: boolean): void;
     element: HTMLElement;
 }
 

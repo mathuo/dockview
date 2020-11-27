@@ -166,7 +166,9 @@ export abstract class GridviewPanel
 
         super.init(parameters);
 
-        this.setVisible(parameters.isVisible);
+        if (typeof parameters.isVisible === 'boolean') {
+            this.setVisible(parameters.isVisible);
+        }
     }
 
     private updateConstraints() {

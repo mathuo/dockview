@@ -26,7 +26,7 @@ export interface IGroupPanel extends IDisposable, IPanel {
     readonly content?: PanelContentPart;
     readonly group: IGroupview;
     readonly api: IGroupPanelApi;
-    setVisible(isGroupActive: boolean, group: IGroupview): void;
+    updateParentGroup(group: IGroupview, isGroupActive: boolean): void;
     setDirty(isDirty: boolean): void;
     close?(): Promise<boolean>;
     init(params: IGroupPanelInitParameters): void;
@@ -128,7 +128,7 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
         });
     }
 
-    public setVisible(isGroupActive: boolean, group: IGroupview) {
+    public updateParentGroup(group: IGroupview, isGroupActive: boolean) {
         this._group = group;
         this.api.group = group;
 
@@ -140,7 +140,7 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
             }
         });
 
-        this.api._onDidChangeFocus.fire({ isFocused: isGroupActive });
+        // this.api._onDidChangeFocus.fire({ isFocused: isGroupActive });
         this.api._onDidGroupPanelVisibleChange.fire({
             isVisible: this._group.isPanelActive(this),
         });
@@ -149,13 +149,13 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
             isVisible: this._group.isPanelActive(this),
         });
 
-        this.headerPart?.setVisible(
-            this._group.isPanelActive(this),
-            this._group
+        this.headerPart?.updateParentGroup(
+            this._group,
+            this._group.isPanelActive(this)
         );
-        this.contentPart?.setVisible(
-            this._group.isPanelActive(this),
-            this._group
+        this.contentPart?.updateParentGroup(
+            this._group,
+            this._group.isPanelActive(this)
         );
     }
 

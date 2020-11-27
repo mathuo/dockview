@@ -96,7 +96,7 @@ export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
         }
     }
 
-    public setVisible(isPanelVisible: boolean, group: IGroupview) {
+    public updateParentGroup(group: IGroupview, isPanelVisible: boolean) {
         this._isPanelVisible = isPanelVisible;
         this._isGroupActive = group.isActive;
 
