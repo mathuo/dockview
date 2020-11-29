@@ -89,6 +89,10 @@ export abstract class SplitviewPanel
                 const { containerApi } = this.params as PanelViewInitParameters;
                 containerApi.setVisible(this, isVisible);
             }),
+            this.api.onActiveChange(() => {
+                const { containerApi } = this.params as PanelViewInitParameters;
+                containerApi.setActive(this);
+            }),
             this.api.onDidConstraintsChangeInternal((event) => {
                 if (
                     typeof event.minimumSize === 'number' ||
@@ -146,6 +150,22 @@ export abstract class SplitviewPanel
         if (parameters.snap) {
             this._snap = parameters.snap;
         }
+    }
+
+    toJSON() {
+        const maximum = (value: number) =>
+            value === Number.MAX_SAFE_INTEGER ||
+            value === Number.POSITIVE_INFINITY
+                ? undefined
+                : value;
+        const minimum = (value: number) => (value <= 0 ? undefined : value);
+
+        const state = this.api.getState();
+        return {
+            ...super.toJSON(),
+            minimumSize: minimum(this.minimumSize),
+            maximumSize: maximum(this.maximumSize),
+        };
     }
 
     dispose() {

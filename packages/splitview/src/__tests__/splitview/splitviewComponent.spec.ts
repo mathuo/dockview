@@ -25,6 +25,71 @@ describe('componentSplitview', () => {
         container.className = 'container';
     });
 
+    test('horizontal dimensions', () => {
+        const splitview = new SplitviewComponent(container, {
+            orientation: Orientation.HORIZONTAL,
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+        splitview.layout(600, 400);
+
+        expect(splitview.height).toBe(400);
+        expect(splitview.width).toBe(600);
+    });
+
+    test('vertical dimensions', () => {
+        const splitview = new SplitviewComponent(container, {
+            orientation: Orientation.VERTICAL,
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+        splitview.layout(600, 400);
+
+        expect(splitview.height).toBe(400);
+        expect(splitview.width).toBe(600);
+    });
+
+    test('api', () => {
+        const splitview = new SplitviewComponent(container, {
+            orientation: Orientation.HORIZONTAL,
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+
+        splitview.layout(600, 400);
+        splitview.addPanel({ id: 'panel1', component: 'testPanel' });
+
+        const panel1 = splitview.getPanel('panel1');
+
+        expect(panel1!.api.height).toBe(400);
+        expect(panel1!.api.width).toBe(600);
+        expect(panel1!.api.id).toBe('panel1');
+        expect(panel1!.api.isActive).toBeTruthy();
+        // expect(panel1?.api.isFocused).toBeFalsy();
+        expect(panel1!.api.isVisible).toBeTruthy();
+
+        splitview.addPanel({ id: 'panel2', component: 'testPanel' });
+
+        const panel2 = splitview.getPanel('panel2');
+
+        expect(panel1!.api.isActive).toBeFalsy();
+
+        expect(panel2!.api.height).toBe(400);
+        expect(panel2!.api.width).toBe(300);
+        expect(panel2!.api.id).toBe('panel2');
+        expect(panel2!.api.isActive).toBeTruthy();
+        // expect(panel2!.api.isFocused).toBeFalsy();
+        expect(panel2!.api.isVisible).toBeTruthy();
+
+        panel1?.api.setActive();
+
+        expect(panel1!.api.isActive).toBeTruthy();
+        expect(panel2!.api.isActive).toBeFalsy();
+    });
+
     test('vertical panels', () => {
         const disposables = new CompositeDisposable();
 
@@ -121,5 +186,59 @@ describe('componentSplitview', () => {
 
         disposables.dispose();
         splitview.dispose();
+    });
+
+    test('serialization', () => {
+        const splitview = new SplitviewComponent(container, {
+            orientation: Orientation.VERTICAL,
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+        splitview.layout(600, 400);
+
+        splitview.fromJSON({
+            views: [
+                {
+                    size: 1,
+                    data: { id: 'panel1', component: 'testPanel' },
+                    snap: false,
+                },
+                {
+                    size: 2,
+                    data: { id: 'panel2', component: 'testPanel' },
+                    snap: true,
+                },
+                { size: 3, data: { id: 'panel3', component: 'testPanel' } },
+            ],
+            size: 6,
+            orientation: Orientation.VERTICAL,
+            activeView: 'panel1',
+        });
+
+        expect(splitview.length).toBe(3);
+
+        expect(JSON.parse(JSON.stringify(splitview.toJSON()))).toEqual({
+            views: [
+                {
+                    size: 1,
+                    data: { id: 'panel1', component: 'testPanel' },
+                    snap: false,
+                },
+                {
+                    size: 2,
+                    data: { id: 'panel2', component: 'testPanel' },
+                    snap: true,
+                },
+                {
+                    size: 3,
+                    data: { id: 'panel3', component: 'testPanel' },
+                    snap: false,
+                },
+            ],
+            size: 6,
+            orientation: Orientation.VERTICAL,
+            activeView: 'panel1',
+        });
     });
 });

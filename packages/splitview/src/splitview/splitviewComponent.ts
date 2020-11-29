@@ -12,17 +12,19 @@ import { SplitviewApi } from '../api/component.api';
 import { SplitviewPanel } from './splitviewPanel';
 import { createComponent } from '../panel/componentFactory';
 
+export interface SerializedSplitviewPanelData {
+    id: string;
+    component: string;
+    minimumSize?: number;
+    maximumSize?: number;
+    props?: { [index: string]: any };
+    state?: { [index: string]: any };
+}
+
 export interface SerializedSplitviewPanel {
     snap?: boolean;
     priority?: LayoutPriority;
-    minimumSize?: number;
-    maximumSize?: number;
-    data: {
-        id: string;
-        component: string;
-        props?: { [index: string]: any };
-        state?: { [index: string]: any };
-    };
+    data: SerializedSplitviewPanelData;
     size: number;
 }
 
@@ -236,8 +238,6 @@ export class SplitviewComponent
                 return {
                     size,
                     data: view.toJSON(),
-                    minimumSize: view.minimumSize,
-                    maximumSize: view.maximumSize,
                     snap: !!view.snap,
                     priority: view.priority,
                 };
@@ -284,8 +284,8 @@ export class SplitviewComponent
                     queue.push(() => {
                         panel.init({
                             params: data.props,
-                            minimumSize: view.minimumSize,
-                            maximumSize: view.maximumSize,
+                            minimumSize: data.minimumSize,
+                            maximumSize: data.maximumSize,
                             snap: view.snap,
                             priority: view.priority,
                             containerApi: new SplitviewApi(this),
@@ -304,7 +304,8 @@ export class SplitviewComponent
         queue.forEach((f) => f());
 
         if (typeof activeView === 'string') {
-            this.getPanel(activeView)?.setActive(true);
+            const panel = this.getPanel(activeView);
+            this.setActive(panel);
         }
     }
 
