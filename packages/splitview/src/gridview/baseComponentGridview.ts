@@ -37,7 +37,7 @@ export interface BaseGridOptions {
 
 export interface IGridPanelView extends IGridView, IPanel {
     setActive(isActive: boolean, skipFocus?: boolean): void;
-    readonly isGroupActive: boolean;
+    readonly isActive: boolean;
 }
 
 export interface IBaseGrid<T extends IGridPanelView> {

@@ -45,7 +45,7 @@ export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
     }
 
     get isGroupActive() {
-        return this.group.isGroupActive;
+        return this.group.isActive;
     }
 
     set group(value: IGroupview) {

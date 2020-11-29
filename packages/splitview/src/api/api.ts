@@ -51,12 +51,29 @@ export interface IBaseViewApi {
     setState(state: State): void;
     getState: () => State;
     getStateKey: <T extends StateObject>(key: string) => T;
-    //
+    /**
+     * The id of the panel that would have been assigned when the panel was created
+     */
     readonly id: string;
+    /**
+     * Whether the panel holds the current focus
+     */
     readonly isFocused: boolean;
+    /**
+     * Whether the panel is the actively selected panel
+     */
     readonly isActive: boolean;
+    /**
+     * Whether the panel is visible
+     */
     readonly isVisible: boolean;
+    /**
+     * The panel width in pixels
+     */
     readonly width: number;
+    /**
+     * The panel height in pixels
+     */
     readonly height: number;
 }
 
@@ -74,11 +91,11 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
     readonly _onDidStateChange = new Emitter<void>();
     readonly onDidStateChange: Event<void> = this._onDidStateChange.event;
     //
-    readonly _onDidPanelDimensionChange = new Emitter<
-        PanelDimensionChangeEvent
-    >({
-        replay: true,
-    });
+    readonly _onDidPanelDimensionChange = new Emitter<PanelDimensionChangeEvent>(
+        {
+            replay: true,
+        }
+    );
     readonly onDidDimensionsChange = this._onDidPanelDimensionChange.event;
     //
     readonly _onDidChangeFocus = new Emitter<FocusEvent>({

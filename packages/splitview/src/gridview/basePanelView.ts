@@ -21,7 +21,7 @@ export abstract class BasePanelView<T extends BaseViewApi>
     private _height = 0;
     private _width = 0;
     private _element: HTMLElement;
-    private part?: IFrameworkPart;
+    protected part?: IFrameworkPart;
     protected params?: PanelInitParameters;
 
     /**

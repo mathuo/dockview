@@ -99,12 +99,12 @@ export abstract class GridviewPanel
         return width;
     }
 
-    get isGroupActive() {
-        return false;
+    get isActive() {
+        return this.api.isActive;
     }
 
-    constructor(id: string, component: string) {
-        super(id, component, new GridPanelApi(id));
+    constructor(id: string, component: string, api = new GridPanelApi(id)) {
+        super(id, component, api);
 
         this.addDisposables(
             this.api.onVisibilityChange((event) => {
