@@ -261,12 +261,14 @@ export class GridviewComponent
         const view = createComponent(
             options.id,
             options.component,
-            this.options.components,
-            this.options.frameworkComponents,
-            {
-                createComponent: this.options.frameworkComponentFactory
-                    ?.createComponent,
-            }
+            this.options.components || {},
+            this.options.frameworkComponents || {},
+            this.options.frameworkComponentFactory
+                ? {
+                      createComponent: this.options.frameworkComponentFactory
+                          .createComponent,
+                  }
+                : undefined
         );
 
         view.init({

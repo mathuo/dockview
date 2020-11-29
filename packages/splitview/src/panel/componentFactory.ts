@@ -9,7 +9,7 @@ export function createComponent<T>(
     frameworkComponents: {
         [componentName: string]: any;
     },
-    createFrameworkComponent: FrameworkFactory<T>,
+    createFrameworkComponent?: FrameworkFactory<T>,
     fallback?: () => T
 ): T {
     const Component =

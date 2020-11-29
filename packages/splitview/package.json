@@ -1,6 +1,6 @@
 {
     "name": "dockview",
-    "version": "0.0.0-beta.21",
+    "version": "0.0.0-beta.23",
     "description": "Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support",
     "main": "dist/cjs/index.js",
     "types": "dist/cjs/index.d.ts",
@@ -21,7 +21,8 @@
         "rebuild": "npm run clean && npm run build",
         "prepublishOnly": "npm run rebuild && npm run test",
         "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
-        "test-cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage"
+        "test-cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage",
+        "try-strict": "cross-env ../../node_modules/.bin/tsc --project tsconfig.strictNullChecks.json --extendedDiagnostics"
     },
     "files": [
         "dist",

@@ -170,15 +170,20 @@ export class SplitviewComponent
         const view = createComponent(
             options.id,
             options.component,
-            this.options.components,
-            this.options.frameworkComponents,
-            { createComponent: this.options.frameworkWrapper?.createComponent }
+            this.options.components || {},
+            this.options.frameworkComponents || {},
+            this.options.frameworkWrapper
+                ? {
+                      createComponent: this.options.frameworkWrapper
+                          .createComponent,
+                  }
+                : undefined
         );
 
         view.orientation = this.splitview.orientation;
 
         view.init({
-            params: options.params,
+            params: options.params || {},
             minimumSize: options.minimumSize,
             maximumSize: options.maximumSize,
             snap: options.snap,
@@ -273,17 +278,19 @@ export class SplitviewComponent
                     const panel = createComponent(
                         data.id,
                         data.component,
-                        this.options.components,
-                        this.options.frameworkComponents,
-                        {
-                            createComponent: this.options.frameworkWrapper
-                                ?.createComponent,
-                        }
+                        this.options.components || {},
+                        this.options.frameworkComponents || {},
+                        this.options.frameworkWrapper
+                            ? {
+                                  createComponent: this.options.frameworkWrapper
+                                      .createComponent,
+                              }
+                            : undefined
                     );
 
                     queue.push(() => {
                         panel.init({
-                            params: data.props,
+                            params: data.props || {},
                             minimumSize: data.minimumSize,
                             maximumSize: data.maximumSize,
                             snap: view.snap,
@@ -305,7 +312,9 @@ export class SplitviewComponent
 
         if (typeof activeView === 'string') {
             const panel = this.getPanel(activeView);
-            this.setActive(panel);
+            if (panel) {
+                this.setActive(panel);
+            }
         }
     }
 
