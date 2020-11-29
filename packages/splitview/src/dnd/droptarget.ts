@@ -141,6 +141,7 @@ export class Droptarget {
 
     private removeDropTarget() {
         if (this.target) {
+            this._state = undefined;
             this.target.removeEventListener('dragover', this.onDragOver);
             this.target.removeEventListener('dragleave', this.onDragLeave);
             this.target.removeEventListener('drop', this.onDrop);
