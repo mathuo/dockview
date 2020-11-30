@@ -160,7 +160,6 @@ export abstract class SplitviewPanel
                 : value;
         const minimum = (value: number) => (value <= 0 ? undefined : value);
 
-        const state = this.api.getState();
         return {
             ...super.toJSON(),
             minimumSize: minimum(this.minimumSize),

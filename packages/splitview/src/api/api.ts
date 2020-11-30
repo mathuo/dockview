@@ -184,11 +184,11 @@ export class BaseViewApi extends CompositeDisposable implements IBaseViewApi {
     setState(
         key: string | { [key: string]: StateObject },
         value?: StateObject
-    ) {
+    ): void {
         if (typeof key === 'object') {
             this._state = key;
-        } else {
-            this._state[key] = value;
+        } else if (typeof value !== undefined) {
+            this._state[key] = value!;
         }
         this._onDidStateChange.fire(undefined);
     }

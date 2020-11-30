@@ -13,7 +13,7 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
         const panelId = panelData.id;
         const contentId = panelData.contentId;
         const tabId = panelData.tabId;
-        const props = panelData.props;
+        const params = panelData.params;
         const title = panelData.title;
         const state = panelData.state;
         const suppressClosable = panelData.suppressClosable;
@@ -42,7 +42,7 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
             contentPart,
             title,
             suppressClosable,
-            params: props || {},
+            params: params || {},
             state: state || {},
         });
 

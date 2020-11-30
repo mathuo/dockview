@@ -76,7 +76,7 @@ export interface IGroupview extends IDisposable, IGridPanelView {
     tabHeight: number;
     // state
     isPanelActive: (panel: IGroupPanel) => boolean;
-    activePanel: IGroupPanel;
+    activePanel: IGroupPanel | undefined;
     indexOf(panel: IGroupPanel): number;
     // panel lifecycle
     openPanel(panel: IGroupPanel, index?: number): void;
@@ -135,7 +135,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     readonly onDidGroupChange: Event<{ kind: GroupChangeKind }> = this
         ._onDidGroupChange.event;
 
-    get activePanel() {
+    get activePanel(): IGroupPanel | undefined {
         return this._activePanel;
     }
 
@@ -252,6 +252,10 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
         if (!options.panel) {
             options.panel = this.activePanel;
+        }
+
+        if (!options.panel) {
+            return;
         }
 
         const index = this.panels.indexOf(options.panel);
@@ -405,10 +409,9 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
 
     public async closeAllPanels() {
-        const index =
-            typeof this._activePanel === 'number'
-                ? this.panels.indexOf(this._activePanel)
-                : -1;
+        const index = this._activePanel
+            ? this.panels.indexOf(this._activePanel)
+            : -1;
 
         if (index > -1) {
             if (this.panels.indexOf(this._activePanel) < 0) {

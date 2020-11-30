@@ -90,7 +90,7 @@ export class Droptarget {
 
         if (event.defaultPrevented) {
             console.debug('[dragtarget] defaultPrevented');
-        } else {
+        } else if (this._state) {
             this._onDidChange.fire({ position: this._state, event });
         }
 
@@ -104,8 +104,17 @@ export class Droptarget {
             return;
         }
 
-        const width = this.target?.clientWidth;
-        const height = this.target?.clientHeight;
+        if (!this.target || !this.overlay) {
+            return;
+        }
+
+        const width = this.target.clientWidth;
+        const height = this.target.clientHeight;
+
+        if (width === 0 || height === 0) {
+            return; // avoid div!0
+        }
+
         const x = event.offsetX;
         const y = event.offsetY;
         const xp = (100 * x) / width;

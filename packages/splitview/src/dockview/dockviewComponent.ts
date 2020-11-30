@@ -63,7 +63,7 @@ export interface SerializedDockview {
         orientation: Orientation;
     };
     panels: { [key: string]: any };
-    activeGroup: string;
+    activeGroup?: string;
     options: { tabHeight: number };
 }
 
@@ -80,7 +80,7 @@ export interface IDockviewComponent extends IBaseGrid<IGroupview> {
     removeGroup: (group: IGroupview) => void;
     options: DockviewOptions;
     addPanel(options: AddPanelOptions): IGroupPanel;
-    getGroupPanel: (id: string) => IGroupPanel;
+    getGroupPanel: (id: string) => IGroupPanel | undefined;
     fireMouseEvent(event: LayoutMouseEvent): void;
     createWatermarkComponent(): WatermarkPart;
     setAutoResizeToFit(enabled: boolean): void;
@@ -326,12 +326,12 @@ export class DockviewComponent
         if (!this.panels.has(panel.id)) {
             throw new Error(`panel ${panel.id} doesn't exist`);
         }
-        const { disposable, value: unregisteredPanel } = this.panels.get(
-            panel.id
-        );
+        const item = this.panels.get(panel.id);
 
-        disposable.dispose();
-        unregisteredPanel.dispose();
+        if (item) {
+            item.disposable.dispose();
+            item.value.dispose();
+        }
 
         this.panels.delete(panel.id);
 
@@ -386,7 +386,7 @@ export class DockviewComponent
             .map((panel) => this.panels.get(panel.id))
             .filter((_) => !!_)
             .reduce((collection, panel) => {
-                collection[panel.value.id] = panel.value.toJSON();
+                collection[panel!.value.id] = panel!.value.toJSON();
                 return collection;
             }, {} as State);
 
@@ -471,14 +471,14 @@ export class DockviewComponent
         });
     }
 
-    public getTabHeight() {
+    public getTabHeight(): number {
         return this.options.tabHeight;
     }
 
     fireMouseEvent(event: LayoutMouseEvent) {
         switch (event.kind) {
             case MouseEventKind.CONTEXT_MENU:
-                if (event.tab) {
+                if (event.tab && event.panel) {
                     this._onTabContextMenu.fire({
                         event: event.event,
                         api: this._api,
@@ -492,7 +492,7 @@ export class DockviewComponent
     public addPanel(options: AddPanelOptions): IGroupPanel {
         const panel = this._addPanel(options);
 
-        let referenceGroup: IGroupview;
+        let referenceGroup: IGroupview | undefined;
 
         if (options.position?.referencePanel) {
             const referencePanel = this.getGroupPanel(
@@ -587,7 +587,7 @@ export class DockviewComponent
 
         if (options) {
             const referencePanel = this.panels.get(options.referencePanel)
-                .value;
+                ?.value;
             const referenceGroup = this.findGroup(referencePanel);
 
             const target = toTarget(options.direction);
@@ -638,7 +638,7 @@ export class DockviewComponent
         index?: number
     ) {
         const sourceGroup = groupId
-            ? this.groups.get(groupId).value
+            ? this.groups.get(groupId)?.value
             : undefined;
 
         switch (target) {
@@ -664,7 +664,7 @@ export class DockviewComponent
             target
         );
 
-        if (sourceGroup?.size < 2) {
+        if (sourceGroup && sourceGroup.size < 2) {
             const [targetParentLocation, to] = tail(targetLocation);
             const sourceLocation = getGridLocation(sourceGroup.element);
             const [sourceParentLocation, from] = tail(sourceLocation);

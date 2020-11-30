@@ -24,7 +24,7 @@ export interface SerializedPaneviewPanel {
         component: string;
         title: string;
         headerComponent?: string;
-        props?: { [index: string]: any };
+        params?: { [index: string]: any };
         state?: { [index: string]: any };
     };
     size: number;
@@ -38,7 +38,7 @@ export interface SerializedPaneview {
 
 class DefaultHeader extends CompositeDisposable implements IPaneHeaderPart {
     private _element: HTMLElement;
-    private apiRef: { api: PanePanelApi } = { api: null };
+    private apiRef: { api: PanePanelApi | null } = { api: null };
 
     get element() {
         return this._element;
@@ -131,6 +131,18 @@ export class PaneviewComponent
         return this.paneview.maximumSize;
     }
 
+    get height() {
+        return this.paneview.orientation === Orientation.HORIZONTAL
+            ? this.paneview.orthogonalSize
+            : this.paneview.size;
+    }
+
+    get width() {
+        return this.paneview.orientation === Orientation.HORIZONTAL
+            ? this.paneview.size
+            : this.paneview.orthogonalSize;
+    }
+
     constructor(
         private element: HTMLElement,
         private readonly options: PaneviewComponentOptions
@@ -165,12 +177,14 @@ export class PaneviewComponent
         const body = createComponent(
             options.id,
             options.component,
-            this.options.components,
-            this.options.frameworkComponents,
-            {
-                createComponent: this.options.frameworkWrapper?.body
-                    .createComponent,
-            }
+            this.options.components || {},
+            this.options.frameworkComponents || {},
+            this.options.frameworkWrapper
+                ? {
+                      createComponent: this.options.frameworkWrapper.body
+                          .createComponent,
+                  }
+                : undefined
         );
 
         let header: IPaneHeaderPart;
@@ -201,7 +215,7 @@ export class PaneviewComponent
         this.paneview.addPane(view);
 
         view.init({
-            params: options.params,
+            params: options.params || {},
             minimumBodySize: options.minimumBodySize,
             maximumBodySize: options.maximumBodySize,
             isExpanded: options.isExpanded,
@@ -290,12 +304,14 @@ export class PaneviewComponent
                     const body = createComponent(
                         data.id,
                         data.component,
-                        this.options.components,
-                        this.options.frameworkComponents,
-                        {
-                            createComponent: this.options.frameworkWrapper?.body
-                                .createComponent,
-                        }
+                        this.options.components || {},
+                        this.options.frameworkComponents || {},
+                        this.options.frameworkWrapper
+                            ? {
+                                  createComponent: this.options.frameworkWrapper
+                                      .body.createComponent,
+                              }
+                            : undefined
                     );
 
                     let header: IPaneHeaderPart;
@@ -304,12 +320,15 @@ export class PaneviewComponent
                         header = createComponent(
                             data.id,
                             data.headerComponent,
-                            this.options.headerComponents,
-                            this.options.headerframeworkComponents,
-                            {
-                                createComponent: this.options.frameworkWrapper
-                                    ?.header.createComponent,
-                            }
+                            this.options.headerComponents || {},
+                            this.options.headerframeworkComponents || {},
+                            this.options.frameworkWrapper
+                                ? {
+                                      createComponent: this.options
+                                          .frameworkWrapper.header
+                                          .createComponent,
+                                  }
+                                : undefined
                         );
                     } else {
                         header = new DefaultHeader();
@@ -325,7 +344,7 @@ export class PaneviewComponent
 
                     queue.push(() => {
                         panel.init({
-                            params: data.props,
+                            params: data.params || {},
                             minimumBodySize: view.minimumSize,
                             maximumBodySize: view.maximumSize,
                             title: data.title,
@@ -340,6 +359,8 @@ export class PaneviewComponent
                 }),
             },
         });
+
+        this.layout(this.width, this.height);
 
         queue.forEach((f) => f());
     }

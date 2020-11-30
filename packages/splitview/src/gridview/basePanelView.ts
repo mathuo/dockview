@@ -11,7 +11,7 @@ import { BaseViewApi } from '../api/api';
 export interface BasePanelViewState {
     id: string;
     component: string;
-    props?: { [key: string]: any };
+    params?: { [key: string]: any };
     state?: { [key: string]: any };
 }
 
@@ -103,7 +103,11 @@ export abstract class BasePanelView<T extends BaseViewApi>
         return {
             id: this.id,
             component: this.component,
-            props: this.params.params,
+            params: this.params?.params
+                ? Object.keys(this.params.params).length > 0
+                    ? this.params.params
+                    : undefined
+                : undefined,
             state: Object.keys(state).length === 0 ? undefined : state,
         };
     }

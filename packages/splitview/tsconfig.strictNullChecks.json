@@ -1,0 +1,26 @@
+{
+    "extends": "./tsconfig.es6.json",
+    "compilerOptions": {
+        "noEmit": true, 
+        "strictNullChecks": true
+    },
+    "include": [
+        "src/actionbar",
+        "src/panel",
+        "src/splitview/core",
+        "src/array.ts",
+        "src/async.ts",
+        "src/dom.ts",
+        "src/events.ts",
+        "src/focusedElement.ts",
+        "src/functions.ts",
+        "src/json.ts",
+        "src/lifecycle.ts",
+        "src/math.ts",
+        "src/types.ts",
+    ],
+    "exclude": [
+        "**/node_modules",
+        "src/__tests__"
+    ]
+}
