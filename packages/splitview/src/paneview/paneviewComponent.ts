@@ -24,7 +24,7 @@ export interface SerializedPaneviewPanel {
         component: string;
         title: string;
         headerComponent?: string;
-        props?: { [index: string]: any };
+        params?: { [index: string]: any };
         state?: { [index: string]: any };
     };
     size: number;
@@ -332,7 +332,7 @@ export class PaneviewComponent
 
                     queue.push(() => {
                         panel.init({
-                            params: data.props || {},
+                            params: data.params || {},
                             minimumBodySize: view.minimumSize,
                             maximumBodySize: view.maximumSize,
                             title: data.title,

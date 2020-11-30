@@ -17,7 +17,7 @@ export interface SerializedSplitviewPanelData {
     component: string;
     minimumSize?: number;
     maximumSize?: number;
-    props?: { [index: string]: any };
+    params?: { [index: string]: any };
     state?: { [index: string]: any };
 }
 
@@ -290,7 +290,7 @@ export class SplitviewComponent
 
                     queue.push(() => {
                         panel.init({
-                            params: data.props || {},
+                            params: data.params || {},
                             minimumSize: data.minimumSize,
                             maximumSize: data.maximumSize,
                             snap: view.snap,

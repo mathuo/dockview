@@ -95,7 +95,7 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
             id: this.id,
             contentId: this.contentPart?.id,
             tabId: this.headerPart?.id,
-            props: this.params.params,
+            params: this.params.params,
             title: this.params.title,
             suppressClosable: this.params.suppressClosable,
             state: this.api.getState(),
