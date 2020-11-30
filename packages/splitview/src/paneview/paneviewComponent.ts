@@ -131,6 +131,18 @@ export class PaneviewComponent
         return this.paneview.maximumSize;
     }
 
+    get height() {
+        return this.paneview.orientation === Orientation.HORIZONTAL
+            ? this.paneview.orthogonalSize
+            : this.paneview.size;
+    }
+
+    get width() {
+        return this.paneview.orientation === Orientation.HORIZONTAL
+            ? this.paneview.size
+            : this.paneview.orthogonalSize;
+    }
+
     constructor(
         private element: HTMLElement,
         private readonly options: PaneviewComponentOptions
@@ -347,6 +359,8 @@ export class PaneviewComponent
                 }),
             },
         });
+
+        this.layout(this.width, this.height);
 
         queue.forEach((f) => f());
     }

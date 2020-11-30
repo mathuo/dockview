@@ -308,6 +308,8 @@ export class SplitviewComponent
             },
         });
 
+        this.layout(this.width, this.height);
+
         queue.forEach((f) => f());
 
         if (typeof activeView === 'string') {

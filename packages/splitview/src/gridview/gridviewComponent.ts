@@ -200,6 +200,8 @@ export class GridviewComponent
             },
         });
 
+        this.layout(this.width, this.height, true);
+
         // .init() renders the view. Delay the render until the layout skelton is loaded
         queue.forEach((f) => f());
 

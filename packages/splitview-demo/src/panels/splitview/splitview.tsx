@@ -195,26 +195,26 @@ export const Common = (
                     data: {
                         id: 'one',
                         component: 'default',
+                        minimumSize: 10,
                     },
                     size: 1,
-                    minimumSize: 10,
                 },
                 {
                     data: {
                         id: 'two',
                         component: 'default',
+                        minimumSize: 10,
+                        maximumSize: 200,
                     },
                     size: 2,
-                    minimumSize: 10,
-                    maximumSize: 200,
                 },
                 {
                     data: {
                         id: 'three',
                         component: 'default',
+                        minimumSize: 50,
                     },
                     size: 3,
-                    minimumSize: 50,
                     snap: true,
                 },
             ],
