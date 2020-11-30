@@ -80,7 +80,7 @@ export interface IDockviewComponent extends IBaseGrid<IGroupview> {
     removeGroup: (group: IGroupview) => void;
     options: DockviewOptions;
     addPanel(options: AddPanelOptions): IGroupPanel;
-    getGroupPanel: (id: string) => IGroupPanel;
+    getGroupPanel: (id: string) => IGroupPanel | undefined;
     fireMouseEvent(event: LayoutMouseEvent): void;
     createWatermarkComponent(): WatermarkPart;
     setAutoResizeToFit(enabled: boolean): void;
