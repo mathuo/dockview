@@ -161,10 +161,10 @@ export abstract class BaseGrid<T extends IGridPanelView>
             throw new Error('invalid operation');
         }
 
-        const { disposable } = this.groups.get(group.id);
+        const item = this.groups.get(group.id);
 
-        if (!options?.skipDispose) {
-            disposable.dispose();
+        if (item && !options?.skipDispose) {
+            item.disposable.dispose();
             this.groups.delete(group.id);
         }
 

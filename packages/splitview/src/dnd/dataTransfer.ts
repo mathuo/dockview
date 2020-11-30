@@ -41,8 +41,12 @@ export const isCustomDragEvent = (data: any): data is ExternalDragItem => {
     return data.type === DragType.EXTERNAL;
 };
 
-export const extractData = (event: DragEvent): DataObject => {
-    const data = tryParseJSON(event.dataTransfer?.getData(DATA_KEY));
+export const extractData = (event: DragEvent): DataObject | null => {
+    if (!event.dataTransfer) {
+        return null;
+    }
+
+    const data = tryParseJSON(event.dataTransfer.getData(DATA_KEY));
 
     if (!data) {
         console.warn(`[dragEvent] ${DATA_KEY} data is missing`);

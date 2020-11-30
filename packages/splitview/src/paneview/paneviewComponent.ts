@@ -38,7 +38,7 @@ export interface SerializedPaneview {
 
 class DefaultHeader extends CompositeDisposable implements IPaneHeaderPart {
     private _element: HTMLElement;
-    private apiRef: { api: PanePanelApi } = { api: null };
+    private apiRef: { api: PanePanelApi | null } = { api: null };
 
     get element() {
         return this._element;

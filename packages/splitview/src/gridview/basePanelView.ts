@@ -103,7 +103,7 @@ export abstract class BasePanelView<T extends BaseViewApi>
         return {
             id: this.id,
             component: this.component,
-            params: this.params.params
+            params: this.params?.params
                 ? Object.keys(this.params.params).length > 0
                     ? this.params.params
                     : undefined

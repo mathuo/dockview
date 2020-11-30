@@ -35,7 +35,7 @@ export interface SerializedGridview {
         orientation: Orientation;
         root: SerializedGridObject<GridPanelViewState>;
     };
-    activePanel: string;
+    activePanel?: string;
 }
 
 export interface AddComponentOptions extends BaseComponentOptions {
@@ -45,7 +45,7 @@ export interface AddComponentOptions extends BaseComponentOptions {
     minimumHeight?: number;
     maximumHeight?: number;
     position?: {
-        direction?: Direction;
+        direction: Direction;
         reference: string;
     };
     location?: number[];
@@ -170,8 +170,8 @@ export class GridviewComponent
                 const view = createComponent(
                     data.id,
                     data.component,
-                    this.options.components,
-                    this.options.frameworkComponents,
+                    this.options.components || {},
+                    this.options.frameworkComponents || {},
                     this.options.frameworkComponentFactory
                         ? {
                               createComponent: this.options
@@ -274,7 +274,7 @@ export class GridviewComponent
         );
 
         view.init({
-            params: options.params,
+            params: options.params || {},
             minimumWidth: options.minimumWidth,
             maximumWidth: options.maximumWidth,
             minimumHeight: options.minimumHeight,
