@@ -122,4 +122,109 @@ describe('componentPaneview', () => {
         disposables.dispose();
         paneview.dispose();
     });
+
+    test('serialization', () => {
+        const paneview = new PaneviewComponent(container, {
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+
+        paneview.fromJSON({
+            size: 6,
+            views: [
+                {
+                    size: 1,
+                    data: {
+                        id: 'panel1',
+                        component: 'testPanel',
+                        title: 'Panel 1',
+                    },
+                    expanded: true,
+                },
+                {
+                    size: 2,
+                    data: {
+                        id: 'panel2',
+                        component: 'testPanel',
+                        title: 'Panel 2',
+                    },
+                    expanded: false,
+                },
+                {
+                    size: 3,
+                    data: {
+                        id: 'panel3',
+                        component: 'testPanel',
+                        title: 'Panel 3',
+                    },
+                },
+            ],
+        });
+
+        paneview.layout(400, 800);
+
+        const panel1 = paneview.getPanel('panel1');
+
+        expect(panel1!.api.height).toBe(756);
+        expect(panel1!.api.width).toBe(400);
+        expect(panel1!.api.id).toBe('panel1');
+        // expect(panel1!.api.isActive).toBeTruthy();
+        // expect(panel1?.api.isFocused).toBeFalsy();
+        expect(panel1!.api.isVisible).toBeTruthy();
+        expect(panel1!.api.isExpanded).toBeTruthy();
+
+        const panel2 = paneview.getPanel('panel2');
+
+        expect(panel2!.api.height).toBe(22);
+        expect(panel2!.api.width).toBe(400);
+        expect(panel2!.api.id).toBe('panel2');
+        // expect(panel2!.api.isActive).toBeTruthy();
+        // expect(panel2?.api.isFocused).toBeFalsy();
+        expect(panel2!.api.isVisible).toBeTruthy();
+        expect(panel2!.api.isExpanded).toBeFalsy();
+
+        const panel3 = paneview.getPanel('panel3');
+
+        expect(panel3!.api.height).toBe(22);
+        expect(panel3!.api.width).toBe(400);
+        expect(panel3!.api.id).toBe('panel3');
+        // expect(panel3!.api.isActive).toBeTruthy();
+        // expect(panel3?.api.isFocused).toBeFalsy();
+        expect(panel3!.api.isVisible).toBeTruthy();
+        expect(panel3!.api.isExpanded).toBeFalsy();
+
+        expect(JSON.parse(JSON.stringify(paneview.toJSON()))).toEqual({
+            size: 800,
+            views: [
+                {
+                    size: 756,
+                    data: {
+                        id: 'panel1',
+                        component: 'testPanel',
+                        title: 'Panel 1',
+                    },
+                    expanded: true,
+                },
+                {
+                    size: 22,
+                    data: {
+                        id: 'panel2',
+                        component: 'testPanel',
+                        title: 'Panel 2',
+                    },
+                    expanded: false,
+                },
+                {
+                    size: 22,
+                    data: {
+                        id: 'panel3',
+                        component: 'testPanel',
+                        title: 'Panel 3',
+                    },
+                    expanded: false,
+                },
+            ],
+        });
+    });
 });
