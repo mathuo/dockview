@@ -22,6 +22,39 @@ describe('droptarget', () => {
         element = document.createElement('div');
     });
 
+    test('drop', () => {
+        let position: Position | undefined = undefined;
+
+        droptarget = new Droptarget(element, {
+            isDisabled: () => false,
+            isDirectional: true,
+            id: 'test-dnd',
+            enableExternalDragEvents: true,
+        });
+
+        droptarget.onDidChange((event) => {
+            position = event.position;
+        });
+
+        fireEvent.dragEnter(element);
+
+        const target = element.querySelector(
+            '.drop-target-dropzone'
+        ) as HTMLElement;
+
+        jest.spyOn(target, 'clientHeight', 'get').mockImplementation(() => 100);
+        jest.spyOn(target, 'clientWidth', 'get').mockImplementation(() => 200);
+
+        fireEvent(
+            target,
+            createOffsetDragOverEvent({ offsetX: 19, offsetY: 0 })
+        );
+
+        expect(position).toBeUndefined();
+        fireEvent.drop(target);
+        expect(position).toBe(Position.Left);
+    });
+
     test('default', () => {
         droptarget = new Droptarget(element, {
             isDisabled: () => false,
@@ -29,6 +62,7 @@ describe('droptarget', () => {
             id: 'test-dnd',
             enableExternalDragEvents: true,
         });
+
         expect(droptarget.state).toBeUndefined();
 
         fireEvent.dragEnter(element);
@@ -96,7 +130,6 @@ describe('droptarget', () => {
         expect(droptarget.state).toBe(Position.Center);
 
         fireEvent.dragLeave(target);
-
         expect(droptarget.state).toBeUndefined();
         viewQuery = element.querySelectorAll('.drop-target');
         expect(viewQuery.length).toBe(0);

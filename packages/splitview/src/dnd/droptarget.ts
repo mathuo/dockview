@@ -85,16 +85,16 @@ export class Droptarget {
             return;
         }
 
+        const state = this._state;
+
         console.debug('[dragtarget] drop');
         this.removeDropTarget();
 
         if (event.defaultPrevented) {
             console.debug('[dragtarget] defaultPrevented');
-        } else if (this._state) {
-            this._onDidChange.fire({ position: this._state, event });
+        } else if (state) {
+            this._onDidChange.fire({ position: state, event });
         }
-
-        this._state = undefined;
     };
 
     private onDragOver = (event: DragEvent) => {

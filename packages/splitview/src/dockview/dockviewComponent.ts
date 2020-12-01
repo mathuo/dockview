@@ -158,7 +158,7 @@ export class DockviewComponent
     ) {
         super(element, {
             proportionalLayout: true,
-            orientation: options.orientation,
+            orientation: options.orientation || Orientation.HORIZONTAL,
             styles: options.styles,
         });
 

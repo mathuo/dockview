@@ -31,7 +31,7 @@ export function toTarget(direction: Direction) {
 
 export interface BaseGridOptions {
     readonly proportionalLayout?: boolean;
-    readonly orientation?: Orientation;
+    readonly orientation: Orientation;
     readonly styles?: ISplitviewStyles;
 }
 
