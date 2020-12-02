@@ -127,7 +127,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.layout(0, 0, true);
 
         this.addDisposables(
-            this.gridview.onDidChange((event) => {
+            this.gridview.onDidChange(() => {
                 this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT });
             })
         );

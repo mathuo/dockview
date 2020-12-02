@@ -405,10 +405,7 @@ export class Gridview implements IDisposable {
         orientation: Orientation,
         cachedVisibleSize?: number
     ): GridNode<IGridView> {
-        const box =
-            orientation === Orientation.HORIZONTAL
-                ? { height: node.size, width: node.orthogonalSize }
-                : { height: node.orthogonalSize, width: node.size };
+        const box = { height: node.height, width: node.width };
 
         if (node instanceof LeafNode) {
             return { box, view: node.view, cachedVisibleSize };

@@ -186,6 +186,7 @@ export class DockviewComponent
                             GroupChangeKind.REMOVE_GROUP,
                             GroupChangeKind.GROUP_ACTIVE,
                             GroupChangeKind.PANEL_ACTIVE,
+                            GroupChangeKind.LAYOUT,
                         ].includes(event.kind)
                     ) {
                         if (timer) {

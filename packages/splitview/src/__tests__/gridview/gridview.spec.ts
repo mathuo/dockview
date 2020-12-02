@@ -55,7 +55,7 @@ describe('gridview', () => {
                 orientation: Orientation.HORIZONTAL,
                 root: {
                     type: 'branch',
-                    size: 800,
+                    size: 400,
                     data: [
                         {
                             type: 'leaf',
@@ -125,7 +125,7 @@ describe('gridview', () => {
                 orientation: Orientation.HORIZONTAL,
                 root: {
                     type: 'branch',
-                    size: 800,
+                    size: 400,
                     data: [
                         {
                             type: 'leaf',
