@@ -1,48 +1,45 @@
 import {
-    ISplitviewPanelProps,
+    DockviewApi,
+    DockviewReact,
+    DockviewReadyEvent,
+    IDockviewPanelProps,
     Orientation,
     PanelCollection,
-    SplitviewApi,
-    SplitviewReact,
-    SplitviewReadyEvent,
 } from 'dockview';
 import * as React from 'react';
 import { Story, Meta } from '@storybook/react';
 import 'dockview/dist/styles.css';
 
-const components: PanelCollection<ISplitviewPanelProps> = {
+const components: PanelCollection<IDockviewPanelProps> = {
     default: (props) => {
-        return (
-            <div style={{ backgroundColor: props.color, height: '100%' }}>
-                hello world
-            </div>
-        );
+        return <div style={{ height: '100%' }}>hello world</div>;
     },
 };
 
-export const Simple = (props: { orientation: Orientation }) => {
-    const api = React.useRef<SplitviewApi>();
+export const Simple = (props: { theme: string; hideBorders: boolean }) => {
+    const api = React.useRef<DockviewApi>();
 
-    const onReady = (event: SplitviewReadyEvent) => {
+    const onReady = (event: DockviewReadyEvent) => {
         event.api.layout(window.innerWidth, window.innerHeight);
         api.current = event.api;
+
         event.api.addPanel({
             id: 'panel1',
             component: 'default',
-            params: { color: 'red' },
-            minimumSize: 50,
         });
         event.api.addPanel({
             id: 'panel2',
             component: 'default',
-            params: { color: 'green' },
-            minimumSize: 50,
         });
         event.api.addPanel({
             id: 'panel3',
             component: 'default',
-            params: { color: 'purple' },
-            minimumSize: 50,
+            position: { referencePanel: 'panel1', direction: 'right' },
+        });
+        event.api.addPanel({
+            id: 'panel4',
+            component: 'default',
+            position: { referencePanel: 'panel3', direction: 'below' },
         });
     };
 
@@ -53,16 +50,17 @@ export const Simple = (props: { orientation: Orientation }) => {
     }, []);
 
     return (
-        <SplitviewReact
+        <DockviewReact
+            className={props.theme}
             onReady={onReady}
-            orientation={props.orientation}
             components={components}
+            hideBorders={props.hideBorders}
         />
     );
 };
 
 export default {
-    title: 'Splitview',
+    title: 'Dockview',
     component: Simple,
     decorators: [
         (Component) => {
@@ -74,12 +72,12 @@ export default {
             );
         },
     ],
-    args: { orientation: Orientation.VERTICAL },
+    args: { theme: 'dockview-theme-light' },
     argTypes: {
-        orientation: {
+        theme: {
             control: {
-                type: 'inline-radio',
-                options: [Orientation.HORIZONTAL, Orientation.VERTICAL],
+                type: 'select',
+                options: ['dockview-theme-dark', 'dockview-theme-light'],
             },
         },
     },

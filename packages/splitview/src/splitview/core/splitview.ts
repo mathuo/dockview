@@ -183,9 +183,7 @@ export class Splitview {
 
         this.container.appendChild(this.element);
 
-        if (options.styles) {
-            this.style(options.styles);
-        }
+        this.style(options.styles);
 
         // We have an existing set of view, add them now
         if (options.descriptor) {
@@ -216,13 +214,13 @@ export class Splitview {
         }
     }
 
-    style(styles: ISplitviewStyles): void {
-        if (styles.separatorBorder === 'transparent') {
+    style(styles?: ISplitviewStyles): void {
+        if (styles?.separatorBorder === 'transparent') {
             removeClasses(this.element, 'separator-border');
             this.element.style.removeProperty('--separator-border');
         } else {
             addClasses(this.element, 'separator-border');
-            if (styles.separatorBorder) {
+            if (styles?.separatorBorder) {
                 this.element.style.setProperty(
                     '--separator-border',
                     styles.separatorBorder
