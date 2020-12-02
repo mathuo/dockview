@@ -5,7 +5,8 @@ import {
     PanelContentPart,
 } from '../../groupview/types';
 import { PanelUpdateEvent } from '../../panel/types';
-
+import { Orientation } from '../../splitview/core/splitview';
+import { ReactPanelDeserialzier } from '../../react/deserializer';
 class PanelContentPartTest implements PanelContentPart {
     element: HTMLElement = document.createElement('div');
 
@@ -50,6 +51,171 @@ describe('dockviewComponent', () => {
             components: {
                 default: PanelContentPartTest,
             },
+        });
+    });
+
+    test('serialization', () => {
+        dockview.layout(100, 100);
+
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.fromJSON({
+            activeGroup: 'group-1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                            },
+                            size: 50,
+                        },
+                        {
+                            type: 'branch',
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    data: {
+                                        views: ['panel2', 'panel3'],
+                                        id: 'group-2',
+                                    },
+                                    size: 50,
+                                },
+                                {
+                                    type: 'leaf',
+                                    data: { views: ['panel4'], id: 'group-3' },
+                                    size: 50,
+                                },
+                            ],
+                            size: 25,
+                        },
+                        {
+                            type: 'leaf',
+                            data: { views: ['panel5'], id: 'group-4' },
+                            size: 25,
+                        },
+                    ],
+                    size: 100,
+                },
+                height: 100,
+                width: 100,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    contentId: 'default',
+                    title: 'panel1',
+                },
+                panel2: {
+                    id: 'panel2',
+                    contentId: 'default',
+                    title: 'panel2',
+                },
+                panel3: {
+                    id: 'panel3',
+                    contentId: 'default',
+                    title: 'panel3',
+                },
+                panel4: {
+                    id: 'panel4',
+                    contentId: 'default',
+                    title: 'panel4',
+                },
+                panel5: {
+                    id: 'panel5',
+                    contentId: 'default',
+                    title: 'panel5',
+                },
+            },
+            options: { tabHeight: 25 },
+        });
+
+        expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
+            activeGroup: 'group-1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 100,
+                        },
+                        {
+                            type: 'branch',
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    data: {
+                                        views: ['panel2', 'panel3'],
+                                        id: 'group-2',
+                                        activeView: 'panel2',
+                                    },
+                                    size: 100,
+                                },
+                                {
+                                    type: 'leaf',
+                                    data: {
+                                        views: ['panel4'],
+                                        id: 'group-3',
+                                        activeView: 'panel4',
+                                    },
+                                    size: 100,
+                                },
+                            ],
+                            size: 100,
+                        },
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel5'],
+                                id: 'group-4',
+                                activeView: 'panel5',
+                            },
+                            size: 100,
+                        },
+                    ],
+                    size: 100,
+                },
+                height: 100,
+                width: 100,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    contentId: 'default',
+                    title: 'panel1',
+                },
+                panel2: {
+                    id: 'panel2',
+                    contentId: 'default',
+                    title: 'panel2',
+                },
+                panel3: {
+                    id: 'panel3',
+                    contentId: 'default',
+                    title: 'panel3',
+                },
+                panel4: {
+                    id: 'panel4',
+                    contentId: 'default',
+                    title: 'panel4',
+                },
+                panel5: {
+                    id: 'panel5',
+                    contentId: 'default',
+                    title: 'panel5',
+                },
+            },
+            options: { tabHeight: 25 },
         });
     });
 

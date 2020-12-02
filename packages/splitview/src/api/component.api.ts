@@ -177,8 +177,8 @@ export class GridviewApi {
         return this.component.maximumWidth;
     }
 
-    get onDidLayoutChange() {
-        return this.component.onDidLayoutChange;
+    get onGridEvent() {
+        return this.component.onGridEvent;
     }
 
     constructor(private readonly component: IGridviewComponent) {}
@@ -268,6 +268,10 @@ export class DockviewApi {
         return this.component.totalPanels;
     }
 
+    get onGridEvent() {
+        return this.component.onGridEvent;
+    }
+
     get onDidLayoutChange() {
         return this.component.onDidLayoutChange;
     }
@@ -344,8 +348,8 @@ export class DockviewApi {
         return this.component.getPanel(id);
     }
 
-    deserialize(data: SerializedDockview) {
-        return this.component.deserialize(data);
+    fromJSON(data: SerializedDockview) {
+        return this.component.fromJSON(data);
     }
 
     toJSON() {

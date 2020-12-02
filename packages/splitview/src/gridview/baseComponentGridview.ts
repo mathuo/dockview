@@ -49,7 +49,7 @@ export interface IBaseGrid<T extends IGridPanelView> {
     readonly maximumWidth: number;
     readonly activeGroup: T | undefined;
     readonly size: number;
-    readonly onDidLayoutChange: Event<GroupChangeEvent>;
+    readonly onGridEvent: Event<GroupChangeEvent>;
     getPanel(id: string): T | undefined;
     toJSON(): object;
     fromJSON(data: any): void;
@@ -69,9 +69,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
     private resizeTimer?: any;
     protected _activeGroup: T | undefined;
     //
-    protected readonly _onDidLayoutChange = new Emitter<GroupChangeEvent>();
-    readonly onDidLayoutChange: Event<GroupChangeEvent> = this
-        ._onDidLayoutChange.event;
+    protected readonly _onGridEvent = new Emitter<GroupChangeEvent>();
+    readonly onGridEvent: Event<GroupChangeEvent> = this._onGridEvent.event;
 
     get id() {
         return this._id;
@@ -129,7 +128,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
         this.addDisposables(
             this.gridview.onDidChange((event) => {
-                this._onDidLayoutChange.fire({ kind: GroupChangeKind.LAYOUT });
+                this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT });
             })
         );
     }
@@ -139,7 +138,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     public setVisible(panel: T, visible: boolean) {
         this.gridview.setViewVisible(getGridLocation(panel.element), visible);
-        this._onDidLayoutChange.fire({ kind: GroupChangeKind.LAYOUT });
+        this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT });
     }
 
     public isVisible(panel: T) {
@@ -149,8 +148,9 @@ export abstract class BaseGrid<T extends IGridPanelView>
     protected doAddGroup(group: T, location: number[] = [0], size?: number) {
         this.gridview.addView(group, size ?? Sizing.Distribute, location);
 
-        this._onDidLayoutChange.fire({ kind: GroupChangeKind.ADD_GROUP });
         this.doSetGroupActive(group);
+
+        this._onGridEvent.fire({ kind: GroupChangeKind.ADD_GROUP });
     }
 
     protected doRemoveGroup(
@@ -169,11 +169,12 @@ export abstract class BaseGrid<T extends IGridPanelView>
         }
 
         const view = this.gridview.remove(group, Sizing.Distribute);
-        this._onDidLayoutChange.fire({ kind: GroupChangeKind.REMOVE_GROUP });
 
         if (!options?.skipActive && this.groups.size > 0) {
             this.doSetGroupActive(Array.from(this.groups.values())[0].value);
         }
+
+        this._onGridEvent.fire({ kind: GroupChangeKind.REMOVE_GROUP });
 
         return view as T;
     }
@@ -279,7 +280,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
             this.resizeTimer = undefined;
         }
 
-        this._onDidLayoutChange.dispose();
+        this._onGridEvent.dispose();
         this.gridview.dispose();
     }
 }

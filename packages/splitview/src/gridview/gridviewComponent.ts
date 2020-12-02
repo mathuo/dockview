@@ -23,6 +23,7 @@ import { GridPanelApi } from '../api/gridPanelApi';
 import { GridviewApi } from '../api/component.api';
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { createComponent } from '../panel/componentFactory';
+import { Event } from '../events';
 
 interface PanelReference {
     api: GridPanelApi;
@@ -212,7 +213,7 @@ export class GridviewComponent
             }
         }
 
-        this._onDidLayoutChange.fire({ kind: GroupChangeKind.NEW_LAYOUT });
+        this._onGridEvent.fire({ kind: GroupChangeKind.NEW_LAYOUT });
     }
 
     movePanel(

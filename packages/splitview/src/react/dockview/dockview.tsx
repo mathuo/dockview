@@ -135,7 +135,7 @@ export const DockviewReact: React.FunctionComponent<IDockviewReactProps> = (
     }, []);
 
     React.useEffect(() => {
-        if (!props.onTabContextMenu) {
+        if (!props.onTabContextMenu || !dockviewRef.current) {
             return () => {
                 //noop
             };

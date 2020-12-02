@@ -103,7 +103,7 @@ export const ControlCenter = () => {
         const data = localStorage.getItem('layout');
         if (data) {
             const jsonData = JSON.parse(data);
-            api.deserialize(jsonData);
+            api.fromJSON(jsonData);
         }
     };
 

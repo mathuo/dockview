@@ -34,7 +34,7 @@ const components: PanelCollection<IDockviewPanelProps> = {
 
             const layout = props.api.getStateKey<any>('layout');
             if (layout) {
-                event.api.deserialize(layout);
+                event.api.fromJSON(layout);
             } else {
                 event.api.addPanel({
                     component: 'test_component',
@@ -72,7 +72,7 @@ const components: PanelCollection<IDockviewPanelProps> = {
                 props.api.onDidDimensionsChange((event) => {
                     _api.current?.layout(event.width, event.height);
                 }),
-                _api.current.onDidLayoutChange((event) => {
+                _api.current.onGridEvent((event) => {
                     if (event.kind === GroupChangeKind.LAYOUT_CONFIG_UPDATED) {
                         props.api.setState('layout', _api.current.toJSON());
                     }
@@ -294,38 +294,43 @@ export const TestGrid = (props: IGridviewPanelProps) => {
             };
         });
 
-        api.addPanel({
-            component: 'welcome',
-            id: 'welcome',
-            title: 'Welcome',
-        });
+        const state = localStorage.getItem('dockview');
+        if (state) {
+            api.fromJSON(JSON.parse(state));
+        } else {
+            api.addPanel({
+                component: 'welcome',
+                id: 'welcome',
+                title: 'Welcome',
+            });
 
-        // event.api.deserialize(require('./layoutGrid.layout.json'));
-        return;
+            // event.api.deserialize(require('./layoutGrid.layout.json'));
+            return;
 
-        api.addPanel({
-            component: 'test_component',
-            id: nextGuid(),
-            title: 'Item 1',
-            params: { text: 'how low?' },
-        });
-        api.addPanel({
-            component: 'test_component',
-            id: 'item2',
-            title: 'Item 2',
-        });
-        api.addPanel({
-            component: 'split_panel',
-            id: nextGuid(),
-            title: 'Item 3 with a long title',
-        });
-        api.addPanel({
-            component: 'test_component',
-            id: nextGuid(),
-            title: 'Item 3',
-            position: { direction: 'below', referencePanel: 'item2' },
-            suppressClosable: true,
-        });
+            api.addPanel({
+                component: 'test_component',
+                id: nextGuid(),
+                title: 'Item 1',
+                params: { text: 'how low?' },
+            });
+            api.addPanel({
+                component: 'test_component',
+                id: 'item2',
+                title: 'Item 2',
+            });
+            api.addPanel({
+                component: 'split_panel',
+                id: nextGuid(),
+                title: 'Item 3 with a long title',
+            });
+            api.addPanel({
+                component: 'test_component',
+                id: nextGuid(),
+                title: 'Item 3',
+                position: { direction: 'below', referencePanel: 'item2' },
+                suppressClosable: true,
+            });
+        }
     };
 
     React.useEffect(() => {
@@ -335,8 +340,9 @@ export const TestGrid = (props: IGridviewPanelProps) => {
         });
 
         const disposable = new CompositeDisposable(
-            _api.current.onDidLayoutChange((event) => {
-                console.log(event.kind);
+            _api.current.onDidLayoutChange(() => {
+                const state = _api.current.toJSON();
+                localStorage.setItem('dockview', JSON.stringify(state));
             }),
             props.api.onDidDimensionsChange((event) => {
                 const { width, height } = event;

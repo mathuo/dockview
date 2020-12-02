@@ -11,8 +11,13 @@ import {
     GroupOptions,
     GroupChangeKind,
     GroupDropEvent,
+    GroupPanelViewState,
 } from '../groupview/groupview';
-import { GroupviewPanel, IGroupPanel } from '../groupview/groupviewPanel';
+import {
+    GroupviewPanel,
+    GroupviewPanelState,
+    IGroupPanel,
+} from '../groupview/groupviewPanel';
 import {
     CompositeDisposable,
     IDisposable,
@@ -57,12 +62,12 @@ export interface PanelReference {
 
 export interface SerializedDockview {
     grid: {
-        root: SerializedGridObject<any>;
+        root: SerializedGridObject<GroupPanelViewState>;
         height: number;
         width: number;
         orientation: Orientation;
     };
-    panels: { [key: string]: any };
+    panels: { [key: string]: GroupviewPanelState };
     activeGroup?: string;
     options: { tabHeight: number };
 }
@@ -111,7 +116,7 @@ export interface IDockviewComponent extends IBaseGrid<IGroupview> {
     focus(): void;
     toJSON(): SerializedDockview;
     fromJSON(data: SerializedDockview): void;
-    deserialize: (data: SerializedDockview) => void;
+    onDidLayoutChange: Event<void>;
 }
 
 export interface LayoutDropEvent {
@@ -145,6 +150,9 @@ export class DockviewComponent
     >();
     private _api: DockviewApi;
 
+    private _onDidLayoutChange = new Emitter<void>();
+    readonly onDidLayoutChange = this._onDidLayoutChange.event;
+
     addDndHandle(
         type: string,
         cb: (event: LayoutDropEvent) => PanelOptions
@@ -161,6 +169,36 @@ export class DockviewComponent
             orientation: options.orientation || Orientation.HORIZONTAL,
             styles: options.styles,
         });
+
+        this.addDisposables(
+            (() => {
+                /**
+                 * TODO Fix this relatively ugly 'merge and delay'
+                 */
+                let timer: any;
+
+                return this.onGridEvent((event) => {
+                    if (
+                        [
+                            GroupChangeKind.ADD_GROUP,
+                            GroupChangeKind.REMOVE_GROUP,
+                            GroupChangeKind.ADD_PANEL,
+                            GroupChangeKind.REMOVE_GROUP,
+                            GroupChangeKind.GROUP_ACTIVE,
+                            GroupChangeKind.PANEL_ACTIVE,
+                        ].includes(event.kind)
+                    ) {
+                        if (timer) {
+                            clearTimeout(timer);
+                        }
+                        timer = setTimeout(() => {
+                            this._onDidLayoutChange.fire();
+                            clearTimeout(timer);
+                        });
+                    }
+                });
+            })()
+        );
 
         if (!this.options.components) {
             this.options.components = {};
@@ -319,7 +357,7 @@ export class DockviewComponent
 
         this.panels.set(panel.id, { value: panel, disposable });
 
-        this._onDidLayoutChange.fire({ kind: GroupChangeKind.PANEL_CREATED });
+        this._onGridEvent.fire({ kind: GroupChangeKind.PANEL_CREATED });
     }
 
     public unregisterPanel(panel: IGroupPanel) {
@@ -335,7 +373,7 @@ export class DockviewComponent
 
         this.panels.delete(panel.id);
 
-        this._onDidLayoutChange.fire({ kind: GroupChangeKind.PANEL_DESTROYED });
+        this._onGridEvent.fire({ kind: GroupChangeKind.PANEL_DESTROYED });
     }
 
     /**
@@ -348,9 +386,7 @@ export class DockviewComponent
 
         const data = this.gridview.serialize();
 
-        const state = { ...this.panelState };
-
-        // this.activeGroup.id
+        // const state = { ...this.panelState };
 
         const panels = Array.from(this.panels.values()).reduce(
             (collection, panel) => {
@@ -359,7 +395,7 @@ export class DockviewComponent
                 }
                 return collection;
             },
-            state
+            {} as { [key: string]: GroupviewPanelState }
         );
 
         return {
@@ -399,17 +435,17 @@ export class DockviewComponent
             .filter((p) => this.panels.has(p.id))
             .forEach((panel) => {
                 panel.setDirty(false);
-                this._onDidLayoutChange.fire({
+                this._onGridEvent.fire({
                     kind: GroupChangeKind.PANEL_CLEAN,
                 });
             });
 
-        this._onDidLayoutChange.fire({
+        this._onGridEvent.fire({
             kind: GroupChangeKind.LAYOUT_CONFIG_UPDATED,
         });
     }
 
-    public deserialize(data: SerializedDockview) {
+    public fromJSON(data: SerializedDockview) {
         this.gridview.clear();
         this.panels.forEach((panel) => {
             panel.disposable.dispose();
@@ -418,11 +454,6 @@ export class DockviewComponent
         this.panels.clear();
         this.groups.clear();
 
-        this.fromJSON(data);
-        this.gridview.layout(this.width, this.height);
-    }
-
-    public fromJSON(data: SerializedDockview) {
         if (!this.deserializer) {
             throw new Error('invalid deserializer');
         }
@@ -448,7 +479,9 @@ export class DockviewComponent
             this.doSetGroupActive(this.getPanel(activeGroup));
         }
 
-        this._onDidLayoutChange.fire({ kind: GroupChangeKind.NEW_LAYOUT });
+        this.gridview.layout(this.width, this.height);
+
+        this._onGridEvent.fire({ kind: GroupChangeKind.NEW_LAYOUT });
     }
 
     public async closeAllGroups() {
@@ -641,70 +674,67 @@ export class DockviewComponent
             ? this.groups.get(groupId)?.value
             : undefined;
 
-        switch (target) {
-            case Position.Center:
-            case undefined:
-                const groupItem =
-                    sourceGroup?.removePanel(itemId) ||
-                    this.panels.get(itemId).value;
-
-                if (sourceGroup?.size === 0) {
-                    this.doRemoveGroup(sourceGroup);
-                }
-
-                referenceGroup.openPanel(groupItem, index);
-
-                return;
-        }
-
-        const referenceLocation = getGridLocation(referenceGroup.element);
-        const targetLocation = getRelativeLocation(
-            this.gridview.orientation,
-            referenceLocation,
-            target
-        );
-
-        if (sourceGroup && sourceGroup.size < 2) {
-            const [targetParentLocation, to] = tail(targetLocation);
-            const sourceLocation = getGridLocation(sourceGroup.element);
-            const [sourceParentLocation, from] = tail(sourceLocation);
-
-            if (sequenceEquals(sourceParentLocation, targetParentLocation)) {
-                // special case when 'swapping' two views within same grid location
-                // if a group has one tab - we are essentially moving the 'group'
-                // which is equivalent to swapping two views in this case
-                this.gridview.moveView(sourceParentLocation, from, to);
-
-                return;
-            }
-
-            // source group will become empty so delete the group
-            const targetGroup = this.doRemoveGroup(sourceGroup, {
-                skipActive: true,
-                skipDispose: true,
-            }) as IGroupview;
-
-            // after deleting the group we need to re-evaulate the ref location
-            const updatedReferenceLocation = getGridLocation(
-                referenceGroup.element
-            );
-            const location = getRelativeLocation(
-                this.gridview.orientation,
-                updatedReferenceLocation,
-                target
-            );
-            this.doAddGroup(targetGroup, location);
-        } else {
+        if (!target || target === Position.Center) {
             const groupItem =
                 sourceGroup?.removePanel(itemId) ||
                 this.panels.get(itemId).value;
-            const dropLocation = getRelativeLocation(
+
+            if (sourceGroup?.size === 0) {
+                this.doRemoveGroup(sourceGroup);
+            }
+
+            referenceGroup.openPanel(groupItem, index);
+            return;
+        } else {
+            const referenceLocation = getGridLocation(referenceGroup.element);
+            const targetLocation = getRelativeLocation(
                 this.gridview.orientation,
                 referenceLocation,
                 target
             );
 
-            this.addPanelToNewGroup(groupItem, dropLocation);
+            if (sourceGroup && sourceGroup.size < 2) {
+                const [targetParentLocation, to] = tail(targetLocation);
+                const sourceLocation = getGridLocation(sourceGroup.element);
+                const [sourceParentLocation, from] = tail(sourceLocation);
+
+                if (
+                    sequenceEquals(sourceParentLocation, targetParentLocation)
+                ) {
+                    // special case when 'swapping' two views within same grid location
+                    // if a group has one tab - we are essentially moving the 'group'
+                    // which is equivalent to swapping two views in this case
+                    this.gridview.moveView(sourceParentLocation, from, to);
+                } else {
+                    // source group will become empty so delete the group
+                    const targetGroup = this.doRemoveGroup(sourceGroup, {
+                        skipActive: true,
+                        skipDispose: true,
+                    }) as IGroupview;
+
+                    // after deleting the group we need to re-evaulate the ref location
+                    const updatedReferenceLocation = getGridLocation(
+                        referenceGroup.element
+                    );
+                    const location = getRelativeLocation(
+                        this.gridview.orientation,
+                        updatedReferenceLocation,
+                        target
+                    );
+                    this.doAddGroup(targetGroup, location);
+                }
+            } else {
+                const groupItem =
+                    sourceGroup?.removePanel(itemId) ||
+                    this.panels.get(itemId).value;
+                const dropLocation = getRelativeLocation(
+                    this.gridview.orientation,
+                    referenceLocation,
+                    target
+                );
+
+                this.addPanelToNewGroup(groupItem, dropLocation);
+            }
         }
     }
 
@@ -716,15 +746,24 @@ export class DockviewComponent
             options.tabHeight = this.getTabHeight();
         }
 
-        if (options?.id && this.groups.has(options.id)) {
-            throw new Error(`duplicate group ${options.id}`);
+        let id = options?.id;
+
+        if (id && this.groups.has(options.id)) {
+            console.warn(
+                `Duplicate group id ${options.id}. reassigning group id to avoid errors`
+            );
+            id = undefined;
+            // throw new Error(`duplicate group ${options.id}`);
         }
 
-        const group = new Groupview(
-            this,
-            options?.id || nextGroupId.next(),
-            options
-        );
+        if (!id) {
+            id = nextGroupId.next();
+            while (this.groups.has(id)) {
+                id = nextGroupId.next();
+            }
+        }
+
+        const group = new Groupview(this, id, options);
 
         if (typeof this.options.tabHeight === 'number') {
             group.tabHeight = this.options.tabHeight;
@@ -743,7 +782,7 @@ export class DockviewComponent
                     );
                 }),
                 group.onDidGroupChange((event) => {
-                    this._onDidLayoutChange.fire(event);
+                    this._onGridEvent.fire(event);
                 }),
                 group.onDrop((event) => {
                     const dragEvent = event.event;
@@ -789,7 +828,7 @@ export class DockviewComponent
     private addDirtyPanel(panel: IGroupPanel) {
         this.dirtyPanels.add(panel);
         panel.setDirty(true);
-        this._onDidLayoutChange.fire({ kind: GroupChangeKind.PANEL_DIRTY });
+        this._onGridEvent.fire({ kind: GroupChangeKind.PANEL_DIRTY });
         this.debouncedDeque();
     }
 
@@ -798,7 +837,7 @@ export class DockviewComponent
 
         this.debugContainer?.dispose();
 
-        this._onDidLayoutChange.dispose();
+        this._onGridEvent.dispose();
     }
 
     private updateContainer() {

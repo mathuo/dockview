@@ -69,6 +69,12 @@ export interface GroupChangeEvent {
     readonly panel?: IGroupPanel;
 }
 
+export interface GroupPanelViewState {
+    views: string[];
+    activeView?: string;
+    id: string;
+}
+
 export interface IGroupview extends IDisposable, IGridPanelView {
     readonly isActive: boolean;
     readonly size: number;
@@ -195,7 +201,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         return this.tabContainer.indexOf(panel.id);
     }
 
-    public toJSON(): object {
+    public toJSON(): GroupPanelViewState {
         return {
             views: this.panels.map((panel) => panel.id),
             activeView: this._activePanel?.id,

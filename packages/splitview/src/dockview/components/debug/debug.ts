@@ -37,7 +37,7 @@ export class DebugWidget extends CompositeDisposable {
         ];
 
         this.addDisposables(
-            this.layout.onDidLayoutChange((event) => {
+            this.layout.onGridEvent((event) => {
                 if (events.includes(event.kind)) {
                     if (gc) {
                         gc.textContent = this.layout.size.toString();

@@ -13,6 +13,7 @@ import {
 } from './types';
 import { IPanel, PanelInitParameters, PanelUpdateEvent } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
+import { DefaultTab } from '../dockview/components/tab/defaultTab';
 
 export interface IGroupPanelInitParameters
     extends PanelInitParameters,
@@ -31,6 +32,17 @@ export interface IGroupPanel extends IDisposable, IPanel {
     close?(): Promise<boolean>;
     init(params: IGroupPanelInitParameters): void;
     onDidStateChange: Event<void>;
+    toJSON(): GroupviewPanelState;
+}
+
+export interface GroupviewPanelState {
+    id: string;
+    contentId: string;
+    tabId?: string;
+    params?: { [key: string]: any };
+    title: string;
+    suppressClosable?: boolean;
+    state?: { [key: string]: any };
 }
 
 export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
@@ -90,15 +102,22 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
         return Promise.resolve(true);
     }
 
-    public toJSON(): object {
+    public toJSON(): GroupviewPanelState {
+        const params = this.params?.params;
+        const state = this.api.getState();
+
         return {
             id: this.id,
             contentId: this.contentPart?.id,
-            tabId: this.headerPart?.id,
-            params: this.params?.params,
+            tabId:
+                this.headerPart instanceof DefaultTab
+                    ? undefined
+                    : this.headerPart?.id,
+            params:
+                params && Object.keys(params).length > 0 ? params : undefined,
             title: this.params.title,
             suppressClosable: this.params?.suppressClosable,
-            state: this.api.getState(),
+            state: state && Object.keys(state).length > 0 ? state : undefined,
         };
     }
 
