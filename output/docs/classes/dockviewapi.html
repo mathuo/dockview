@@ -88,6 +88,7 @@
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewapi.html#minimumheight" class="tsd-kind-icon">minimum<wbr>Height</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewapi.html#minimumwidth" class="tsd-kind-icon">minimum<wbr>Width</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewapi.html#ondidlayoutchange" class="tsd-kind-icon">on<wbr>Did<wbr>Layout<wbr>Change</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewapi.html#ongridevent" class="tsd-kind-icon">on<wbr>Grid<wbr>Event</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewapi.html#size" class="tsd-kind-icon">size</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewapi.html#totalpanels" class="tsd-kind-icon">total<wbr>Panels</a></li>
 							</ul>
@@ -100,8 +101,8 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="dockviewapi.html#addpanel" class="tsd-kind-icon">add<wbr>Panel</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="dockviewapi.html#closeallgroups" class="tsd-kind-icon">close<wbr>All<wbr>Groups</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="dockviewapi.html#createdragtarget" class="tsd-kind-icon">create<wbr>Drag<wbr>Target</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="dockviewapi.html#deserialize" class="tsd-kind-icon">deserialize</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="dockviewapi.html#focus" class="tsd-kind-icon">focus</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="dockviewapi.html#fromjson" class="tsd-kind-icon">fromJSON</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="dockviewapi.html#getgroup" class="tsd-kind-icon">get<wbr>Group</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="dockviewapi.html#getpanel" class="tsd-kind-icon">get<wbr>Panel</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="dockviewapi.html#gettabheight" class="tsd-kind-icon">get<wbr>Tab<wbr>Height</a></li>
@@ -130,7 +131,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L273">api/component.api.ts:273</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L277">api/component.api.ts:277</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -156,7 +157,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L251">api/component.api.ts:251</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L251">api/component.api.ts:251</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -173,7 +174,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L259">api/component.api.ts:259</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L259">api/component.api.ts:259</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -190,7 +191,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L247">api/component.api.ts:247</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L247">api/component.api.ts:247</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -207,7 +208,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L255">api/component.api.ts:255</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L255">api/component.api.ts:255</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -218,13 +219,30 @@
 					<a name="ondidlayoutchange" class="tsd-anchor"></a>
 					<h3>on<wbr>Did<wbr>Layout<wbr>Change</h3>
 					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> onDidLayoutChange<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/groupchangeevent.html" class="tsd-signature-type">GroupChangeEvent</a><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> onDidLayoutChange<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L271">api/component.api.ts:271</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L275">api/component.api.ts:275</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="../modules/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="ongridevent" class="tsd-anchor"></a>
+					<h3>on<wbr>Grid<wbr>Event</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> onGridEvent<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/groupchangeevent.html" class="tsd-signature-type">GroupChangeEvent</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L271">api/component.api.ts:271</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="../modules/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/groupchangeevent.html" class="tsd-signature-type">GroupChangeEvent</a><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -241,7 +259,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L263">api/component.api.ts:263</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L263">api/component.api.ts:263</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -258,7 +276,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L267">api/component.api.ts:267</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L267">api/component.api.ts:267</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -278,7 +296,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L297">api/component.api.ts:297</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L301">api/component.api.ts:301</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -322,7 +340,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L311">api/component.api.ts:311</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L315">api/component.api.ts:315</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -345,7 +363,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L293">api/component.api.ts:293</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L297">api/component.api.ts:297</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -368,7 +386,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L323">api/component.api.ts:323</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L327">api/component.api.ts:327</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -385,7 +403,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L301">api/component.api.ts:301</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L305">api/component.api.ts:305</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -410,29 +428,6 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="deserialize" class="tsd-anchor"></a>
-					<h3>deserialize</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">deserialize<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><a href="../interfaces/serializeddockview.html" class="tsd-signature-type">SerializedDockview</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L347">api/component.api.ts:347</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>data: <a href="../interfaces/serializeddockview.html" class="tsd-signature-type">SerializedDockview</a></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="focus" class="tsd-anchor"></a>
 					<h3>focus</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -442,9 +437,32 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L277">api/component.api.ts:277</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L281">api/component.api.ts:281</a></li>
 								</ul>
 							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="fromjson" class="tsd-anchor"></a>
+					<h3>fromJSON</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">fromJSON<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><a href="../interfaces/serializeddockview.html" class="tsd-signature-type">SerializedDockview</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L351">api/component.api.ts:351</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>data: <a href="../interfaces/serializeddockview.html" class="tsd-signature-type">SerializedDockview</a></h5>
+								</li>
+							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
@@ -459,7 +477,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L343">api/component.api.ts:343</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L347">api/component.api.ts:347</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -482,7 +500,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L281">api/component.api.ts:281</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L285">api/component.api.ts:285</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -505,7 +523,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L335">api/component.api.ts:335</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L339">api/component.api.ts:339</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -522,7 +540,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L289">api/component.api.ts:289</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L293">api/component.api.ts:293</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -551,7 +569,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L315">api/component.api.ts:315</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L319">api/component.api.ts:319</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -574,7 +592,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L319">api/component.api.ts:319</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L323">api/component.api.ts:323</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -597,7 +615,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L327">api/component.api.ts:327</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L331">api/component.api.ts:331</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -620,7 +638,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L331">api/component.api.ts:331</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L335">api/component.api.ts:335</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -637,7 +655,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L285">api/component.api.ts:285</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L289">api/component.api.ts:289</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -660,7 +678,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L339">api/component.api.ts:339</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L343">api/component.api.ts:343</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -683,7 +701,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/api/component.api.ts#L351">api/component.api.ts:351</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/api/component.api.ts#L355">api/component.api.ts:355</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="../interfaces/serializeddockview.html" class="tsd-signature-type">SerializedDockview</a></h4>
@@ -726,6 +744,9 @@
 								<a href="dockviewapi.html#ondidlayoutchange" class="tsd-kind-icon">on<wbr>Did<wbr>Layout<wbr>Change</a>
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="dockviewapi.html#ongridevent" class="tsd-kind-icon">on<wbr>Grid<wbr>Event</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="dockviewapi.html#size" class="tsd-kind-icon">size</a>
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
@@ -747,10 +768,10 @@
 								<a href="dockviewapi.html#createdragtarget" class="tsd-kind-icon">create<wbr>Drag<wbr>Target</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="dockviewapi.html#deserialize" class="tsd-kind-icon">deserialize</a>
+								<a href="dockviewapi.html#focus" class="tsd-kind-icon">focus</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="dockviewapi.html#focus" class="tsd-kind-icon">focus</a>
+								<a href="dockviewapi.html#fromjson" class="tsd-kind-icon">fromJSON</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="dockviewapi.html#getgroup" class="tsd-kind-icon">get<wbr>Group</a>

@@ -108,11 +108,12 @@
   window.onerror = function onerror(message, source, line, column, err) {
     if (window.CONFIG_TYPE !== 'DEVELOPMENT') return;
     // eslint-disable-next-line no-var, vars-on-top
-    var error = { message: err.message, name: err.name, stack: err.stack };
+    var error = err ? { message: err.message, name: err.name, stack: err.stack } : {};
     window.fetch('/runtime-error', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, source, line, column, error, origin: 'preview' }),
+      // eslint-disable-next-line object-shorthand, prettier/prettier
+      body: JSON.stringify({ message: message, source: source, line: line, column: column, error: error, origin: 'preview' }),
     });
   };</script><style>#root[hidden],
       #docs-root[hidden] {
@@ -121,4 +122,4 @@
             
         
             
-              window['FRAMEWORK_OPTIONS'] = {};</script><script src="runtime~main.42e8d89d2dd69ae109e4.bundle.js"></script><script src="vendors~main.42e8d89d2dd69ae109e4.bundle.js"></script><script src="main.42e8d89d2dd69ae109e4.bundle.js"></script></body></html>
+              window['FRAMEWORK_OPTIONS'] = {};</script><script src="runtime~main.67b1419a04a2a270acbd.bundle.js"></script><script src="vendors~main.67b1419a04a2a270acbd.bundle.js"></script><script src="main.67b1419a04a2a270acbd.bundle.js"></script></body></html>

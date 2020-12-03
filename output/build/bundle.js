@@ -125,7 +125,7 @@ var __read = (this && this.__read) || function (o, n) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Activitybar = void 0;
 var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var dockview_1 = __webpack_require__(/*! dockview */ "./node_modules/dockview/dist/es6/index.js");
+var dockview_1 = __webpack_require__(/*! dockview */ "../splitview/dist/es6/index.js");
 __webpack_require__(/*! ./activitybar.scss */ "./src/layout-grid/activitybar.scss");
 var registry_1 = __webpack_require__(/*! ./registry */ "./src/layout-grid/registry.ts");
 var ActivitybarImage = function (props) { return (React.createElement("a", { style: {
@@ -199,7 +199,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Application = void 0;
 var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var dockview_1 = __webpack_require__(/*! dockview */ "./node_modules/dockview/dist/es6/index.js");
+var dockview_1 = __webpack_require__(/*! dockview */ "../splitview/dist/es6/index.js");
 var activitybar_1 = __webpack_require__(/*! ./activitybar */ "./src/layout-grid/activitybar.tsx");
 var footer_1 = __webpack_require__(/*! ./footer */ "./src/layout-grid/footer.tsx");
 var panel_1 = __webpack_require__(/*! ./panel */ "./src/layout-grid/panel.tsx");
@@ -277,7 +277,7 @@ var Application = function () {
                 snap: true,
             });
         }
-        event.api.onDidLayoutChange(function () {
+        event.api.onGridEvent(function () {
             localStorage.setItem('dockview-layout', JSON.stringify(event.api.toJSON()));
             console.log('SAVED', event.api.toJSON());
         });
@@ -458,7 +458,7 @@ var ControlCenter = function () {
                     data = localStorage.getItem('layout');
                     if (data) {
                         jsonData = JSON.parse(data);
-                        api.deserialize(jsonData);
+                        api.fromJSON(jsonData);
                     }
                     return [2 /*return*/];
             }
@@ -644,9 +644,9 @@ exports.Footer = Footer;
 /*! CommonJS bailout: this is used directly at 32:14-18 */
 /*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 86:24-40 */
 /*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 95:24-40 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 247:16-32 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 258:16-32 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 263:16-32 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 252:20-36 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 263:20-36 */
+/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 268:20-36 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -701,7 +701,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TestGrid = exports.nextGuid = void 0;
 var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 var ReactDOM = __importStar(__webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js"));
-var dockview_1 = __webpack_require__(/*! dockview */ "./node_modules/dockview/dist/es6/index.js");
+var dockview_1 = __webpack_require__(/*! dockview */ "../splitview/dist/es6/index.js");
 var customTab_1 = __webpack_require__(/*! ./customTab */ "./src/layout-grid/customTab.tsx");
 var settingsPanel_1 = __webpack_require__(/*! ./settingsPanel */ "./src/layout-grid/settingsPanel.tsx");
 var registry_1 = __webpack_require__(/*! ./registry */ "./src/layout-grid/registry.ts");
@@ -720,7 +720,7 @@ var components = {
             _api.current = event.api;
             var layout = props.api.getStateKey('layout');
             if (layout) {
-                event.api.deserialize(layout);
+                event.api.fromJSON(layout);
             }
             else {
                 event.api.addPanel({
@@ -757,7 +757,7 @@ var components = {
             var compDis = new dockview_1.CompositeDisposable(props.api.onDidDimensionsChange(function (event) {
                 var _a;
                 (_a = _api.current) === null || _a === void 0 ? void 0 : _a.layout(event.width, event.height);
-            }), _api.current.onDidLayoutChange(function (event) {
+            }), _api.current.onGridEvent(function (event) {
                 if (event.kind === "LAYOUT_CONFIG_UPDATED" /* LAYOUT_CONFIG_UPDATED */) {
                     props.api.setState('layout', _api.current.toJSON());
                 }
@@ -798,9 +798,9 @@ var components = {
             }, { qwerty: 'qwerty' });
         }, []);
         React.useEffect(function () {
-            var disposable = new dockview_1.CompositeDisposable(props.api.onDidFocusChange(function (event) {
-                setPanelState(function (_) { return (__assign(__assign({}, _), { isGroupActive: event.isFocused })); });
-            }), props.api.onDidGroupPanelVisibleChange(function (x) {
+            var disposable = new dockview_1.CompositeDisposable(props.api.onDidActiveChange(function (event) {
+                setPanelState(function (_) { return (__assign(__assign({}, _), { isGroupActive: event.isActive })); });
+            }), props.api.onDidVisibilityChange(function (x) {
                 setPanelState(function (_) { return (__assign(__assign({}, _), { isPanelVisible: x.isVisible })); });
             }), props.api.onFocusEvent(function () {
                 input.current.focus();
@@ -887,44 +887,51 @@ var TestGrid = function (props) {
                 component: 'test_component',
             };
         });
-        api.addPanel({
-            component: 'welcome',
-            id: 'welcome',
-            title: 'Welcome',
-        });
-        // event.api.deserialize(require('./layoutGrid.layout.json'));
-        return;
-        api.addPanel({
-            component: 'test_component',
-            id: exports.nextGuid(),
-            title: 'Item 1',
-            params: { text: 'how low?' },
-        });
-        api.addPanel({
-            component: 'test_component',
-            id: 'item2',
-            title: 'Item 2',
-        });
-        api.addPanel({
-            component: 'split_panel',
-            id: exports.nextGuid(),
-            title: 'Item 3 with a long title',
-        });
-        api.addPanel({
-            component: 'test_component',
-            id: exports.nextGuid(),
-            title: 'Item 3',
-            position: { direction: 'below', referencePanel: 'item2' },
-            suppressClosable: true,
-        });
+        var state = localStorage.getItem('dockview');
+        if (state) {
+            api.fromJSON(JSON.parse(state));
+        }
+        else {
+            api.addPanel({
+                component: 'welcome',
+                id: 'welcome',
+                title: 'Welcome',
+            });
+            // event.api.deserialize(require('./layoutGrid.layout.json'));
+            return;
+            api.addPanel({
+                component: 'test_component',
+                id: exports.nextGuid(),
+                title: 'Item 1',
+                params: { text: 'how low?' },
+            });
+            api.addPanel({
+                component: 'test_component',
+                id: 'item2',
+                title: 'Item 2',
+            });
+            api.addPanel({
+                component: 'split_panel',
+                id: exports.nextGuid(),
+                title: 'Item 3 with a long title',
+            });
+            api.addPanel({
+                component: 'test_component',
+                id: exports.nextGuid(),
+                title: 'Item 3',
+                position: { direction: 'below', referencePanel: 'item2' },
+                suppressClosable: true,
+            });
+        }
     };
     React.useEffect(function () {
         props.api.setConstraints({
             minimumWidth: function () { return _api.current.minimumWidth; },
             minimumHeight: function () { return _api.current.minimumHeight; },
         });
-        var disposable = new dockview_1.CompositeDisposable(_api.current.onDidLayoutChange(function (event) {
-            console.log(event.kind);
+        var disposable = new dockview_1.CompositeDisposable(_api.current.onDidLayoutChange(function () {
+            var state = _api.current.toJSON();
+            localStorage.setItem('dockview', JSON.stringify(state));
         }), props.api.onDidDimensionsChange(function (event) {
             var width = event.width, height = event.height;
             _api.current.layout(width, height);
@@ -1071,7 +1078,7 @@ var __read = (this && this.__read) || function (o, n) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Panel = void 0;
 var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var dockview_1 = __webpack_require__(/*! dockview */ "./node_modules/dockview/dist/es6/index.js");
+var dockview_1 = __webpack_require__(/*! dockview */ "../splitview/dist/es6/index.js");
 var Panel = function (props) {
     var _a = __read(React.useState(), 2), active = _a[0], setActive = _a[1];
     var _b = __read(React.useState(), 2), focused = _b[0], setFocused = _b[1];
@@ -1308,7 +1315,7 @@ var __read = (this && this.__read) || function (o, n) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Sidebar = void 0;
 var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var dockview_1 = __webpack_require__(/*! dockview */ "./node_modules/dockview/dist/es6/index.js");
+var dockview_1 = __webpack_require__(/*! dockview */ "../splitview/dist/es6/index.js");
 var controlCenter_1 = __webpack_require__(/*! ./controlCenter */ "./src/layout-grid/controlCenter.tsx");
 var dom_1 = __webpack_require__(/*! ../dom */ "./src/dom.ts");
 __webpack_require__(/*! ./sidebar.scss */ "./src/layout-grid/sidebar.scss");
@@ -1493,7 +1500,7 @@ var __read = (this && this.__read) || function (o, n) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SplitPanel = void 0;
 var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var dockview_1 = __webpack_require__(/*! dockview */ "./node_modules/dockview/dist/es6/index.js");
+var dockview_1 = __webpack_require__(/*! dockview */ "../splitview/dist/es6/index.js");
 var registry_1 = __webpack_require__(/*! ./registry */ "./src/layout-grid/registry.ts");
 __webpack_require__(/*! ./splitPanel.scss */ "./src/layout-grid/splitPanel.scss");
 var components = {
@@ -1665,7 +1672,7 @@ var __read = (this && this.__read) || function (o, n) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GridviewDemo = exports.GridviewDemoPanel = void 0;
-var dockview_1 = __webpack_require__(/*! dockview */ "./node_modules/dockview/dist/es6/index.js");
+var dockview_1 = __webpack_require__(/*! dockview */ "../splitview/dist/es6/index.js");
 var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 var components = {
     default: function (props) {
@@ -1973,7 +1980,7 @@ var __read = (this && this.__read) || function (o, n) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Common = exports.SplitviewPanel = void 0;
-var dockview_1 = __webpack_require__(/*! dockview */ "./node_modules/dockview/dist/es6/index.js");
+var dockview_1 = __webpack_require__(/*! dockview */ "../splitview/dist/es6/index.js");
 var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 __webpack_require__(/*! ./splitview.scss */ "./src/panels/splitview/splitview.scss");
 var components = {
@@ -2091,26 +2098,26 @@ var Common = function (props) {
                     data: {
                         id: 'one',
                         component: 'default',
+                        minimumSize: 10,
                     },
                     size: 1,
-                    minimumSize: 10,
                 },
                 {
                     data: {
                         id: 'two',
                         component: 'default',
+                        minimumSize: 10,
+                        maximumSize: 200,
                     },
                     size: 2,
-                    minimumSize: 10,
-                    maximumSize: 200,
                 },
                 {
                     data: {
                         id: 'three',
                         component: 'default',
+                        minimumSize: 50,
                     },
                     size: 3,
-                    minimumSize: 50,
                     snap: true,
                 },
             ],
@@ -2256,7 +2263,7 @@ exports.WelcomePanel = WelcomePanel;
 
 // Imports
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
-var ___CSS_LOADER_AT_RULE_IMPORT_0___ = __webpack_require__(/*! -!../node_modules/css-loader/dist/cjs.js!dockview/dist/styles.css */ "./node_modules/css-loader/dist/cjs.js!./node_modules/dockview/dist/styles.css");
+var ___CSS_LOADER_AT_RULE_IMPORT_0___ = __webpack_require__(/*! -!../node_modules/css-loader/dist/cjs.js!dockview/dist/styles.css */ "./node_modules/css-loader/dist/cjs.js!../splitview/dist/styles.css");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 exports.i(___CSS_LOADER_AT_RULE_IMPORT_0___);
 // Module
@@ -2428,10 +2435,10 @@ module.exports = exports;
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/dockview/dist/styles.css":
-/*!*************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/dockview/dist/styles.css ***!
-  \*************************************************************************************/
+/***/ "./node_modules/css-loader/dist/cjs.js!../splitview/dist/styles.css":
+/*!**************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!../splitview/dist/styles.css ***!
+  \**************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_exports__, module, __webpack_require__, module.id */
 /*! CommonJS bailout: exports is used directly at 3:0-7 */
@@ -2441,10 +2448,10 @@ module.exports = exports;
 /***/ ((module, exports, __webpack_require__) => {
 
 // Imports
-var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../splitview-demo/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ".dockview-theme-dark {\n  --dockview-accent-color: dodgerblue;\n  --title-font-size: 13px;\n  --title-height: 35px;\n  --tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');\n  --tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');\n  --drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --title-bar-scroll-bar-color: #888;\n  --group-view-background-color: #1e1e1e;\n  --title-bar-background-color: #252526;\n  --active-tab-background-visible: #1e1e1e;\n  --active-tab-background-hidden: #2d2d2d;\n  --inactive-tab-background-visible: #1e1e1e;\n  --inactive-tab-background-hidden: #2d2d2d;\n  --tab-divider-color: #1e1e1e;\n  --active-group-visible-panel-color: white;\n  --active-group-hidden-panel-color: #969696;\n  --inactive-group-visible-panel-color: #8f8f8f;\n  --inactive-group-hidden-panel-color: #626262;\n  --separator-border: rgb(68, 68, 68);\n  --paneview-border-color: rgba(204, 204, 204, 0.2); }\n\n.dockview-theme-light {\n  --dockview-accent-color: dodgerblue;\n  --title-font-size: 13px;\n  --title-height: 35px;\n  --tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');\n  --tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');\n  --drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --title-bar-scroll-bar-color: #888;\n  --group-view-background-color: white;\n  --title-bar-background-color: #f3f3f3;\n  --active-tab-background-visible: white;\n  --active-tab-background-hidden: #ececec;\n  --inactive-tab-background-visible: white;\n  --inactive-tab-background-hidden: #ececec;\n  --tab-divider-color: white;\n  --active-group-visible-panel-color: rgb(51, 51, 51);\n  --active-group-hidden-panel-color: rgba(51, 51, 51, 0.7);\n  --inactive-group-visible-panel-color: rgba(51, 51, 51, 0.7);\n  --inactive-group-hidden-panel-color: rgba(51, 51, 51, 0.35);\n  --separator-border: rgba(128, 128, 128, 0.35);\n  --paneview-border-color: rgb(51, 51, 51); }\n\n.dockview-theme-vs {\n  --dockview-accent-color: dodgerblue;\n  --title-font-size: 13px;\n  --title-height: 35px;\n  --tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');\n  --tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');\n  --drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --title-bar-scroll-bar-color: #888;\n  --group-view-background-color: #1e1e1e;\n  --title-bar-background-color: #252526;\n  --active-tab-background-visible: #1e1e1e;\n  --active-tab-background-hidden: #2d2d2d;\n  --inactive-tab-background-visible: #1e1e1e;\n  --inactive-tab-background-hidden: #2d2d2d;\n  --tab-divider-color: #1e1e1e;\n  --active-group-visible-panel-color: white;\n  --active-group-hidden-panel-color: #969696;\n  --inactive-group-visible-panel-color: #8f8f8f;\n  --inactive-group-hidden-panel-color: #626262;\n  --separator-border: rgb(68, 68, 68);\n  --paneview-border-color: rgba(204, 204, 204, 0.2);\n  --active-tab-background-visible: dodgerblue;\n  --title-height: 18px;\n  --title-font-size: 11px; }\n  .dockview-theme-vs .groupview.active-group > .title-container {\n    border-bottom: 2px solid var(--active-tab-background-visible); }\n  .dockview-theme-vs .groupview.inactive-group > .title-container {\n    border-bottom: 2px solid var(--inactive-tab-background-visible); }\n\n.actions-bar {\n  text-align: right;\n  width: 28px;\n  display: flex;\n  align-items: center;\n  flex-shrink: 0; }\n  .actions-bar .actions-container {\n    display: flex;\n    padding: 0px;\n    margin: 0px;\n    justify-content: flex-end; }\n    .actions-bar .actions-container a:active {\n      -webkit-mask-size: 100% 100% !important;\n      mask-size: 100% 100% !important; }\n    .actions-bar .actions-container .close-action {\n      background-color: white;\n      height: 16px;\n      width: 16px;\n      display: block;\n      -webkit-mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n      mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n      margin-right: '0.5em';\n      cursor: pointer; }\n\n.drop-target {\n  position: relative; }\n  .drop-target > .drop-target-dropzone {\n    position: absolute;\n    left: 0px;\n    top: 0px;\n    height: 100%;\n    width: 100%;\n    z-index: 10000; }\n    .drop-target > .drop-target-dropzone > .drop-target-selection {\n      position: relative;\n      pointer-events: none;\n      height: 100%;\n      width: 100%;\n      background-color: var(--drag-over-background-color);\n      transition-duration: 0.15s;\n      transition-timing-function: ease-out; }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.left, .drop-target > .drop-target-dropzone > .drop-target-selection.right {\n        width: 50%; }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.right {\n        transform: translate(100%, 0%); }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n        transform: translate(0%, 100%); }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.top, .drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n        height: 50%; }\n\n.custom-dragging {\n  height: 24px;\n  line-height: 24px;\n  font-size: 11px;\n  width: 100px;\n  background-color: dodgerblue;\n  color: ghostwhite;\n  border-radius: 11px;\n  position: absolute;\n  padding-left: 10px; }\n\n.groupview.active-group > .title-container > .tab-container > .tab.active-tab {\n  background-color: var(--active-tab-background-visible);\n  color: var(--active-group-visible-panel-color); }\n  .groupview.active-group > .title-container > .tab-container > .tab.active-tab .tab-action {\n    background-color: var(--active-group-visible-panel-color); }\n\n.groupview.active-group > .title-container > .tab-container > .tab.inactive-tab {\n  background-color: var(--active-tab-background-hidden);\n  color: var(--active-group-hidden-panel-color); }\n  .groupview.active-group > .title-container > .tab-container > .tab.inactive-tab .tab-action {\n    background-color: var(--active-group-hidden-panel-color); }\n\n.groupview.inactive-group > .title-container > .tab-container > .tab.active-tab {\n  background-color: var(--inactive-tab-background-visible);\n  color: var(--inactive-group-visible-panel-color); }\n  .groupview.inactive-group > .title-container > .tab-container > .tab.active-tab .tab-action {\n    background-color: var(--inactive-group-visible-panel-color); }\n\n.groupview.inactive-group > .title-container > .tab-container > .tab.inactive-tab {\n  background-color: var(--inactive-tab-background-hidden);\n  color: var(--inactive-group-hidden-panel-color); }\n  .groupview.inactive-group > .title-container > .tab-container > .tab.inactive-tab .tab-action {\n    background-color: var(--inactive-group-hidden-panel-color); }\n\n/**\r\n * when a tab is dragged we lose the above stylings because they are conditional on parent elements\r\n * therefore we also set some stylings for the dragging event\r\n **/\n.tab.dragging {\n  background-color: var(--active-tab-background-visible);\n  color: var(--active-group-visible-panel-color); }\n\n.groupview {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  background-color: var(--group-view-background-color); }\n  .groupview:focus {\n    outline: none; }\n  .groupview.empty > .title-container {\n    display: none; }\n  .groupview > .content-container {\n    flex-grow: 1;\n    overflow: hidden;\n    outline: none; }\n\n.grid-view,\n.branch-node {\n  height: 100%;\n  width: 100%; }\n\n.pane-container {\n  height: 100%;\n  width: 100%; }\n  .pane-container.animated .view {\n    transition-duration: 0.15s;\n    transition-timing-function: ease-out; }\n  .pane-container .view {\n    overflow: hidden;\n    display: flex;\n    flex-direction: column;\n    padding: 0px !important; }\n    .pane-container .view:not(:first-child)::before {\n      background-color: transparent !important; }\n    .pane-container .view:not(:first-child) .pane > .pane-header {\n      border-top: 1px solid var(--paneview-border-color); }\n  .pane-container:first-of-type > .pane > .pane-header {\n    border-top: none !important; }\n  .pane-container .pane {\n    display: flex;\n    flex-direction: column;\n    overflow: hidden;\n    height: 100%; }\n    .pane-container .pane .pane-header {\n      box-sizing: border-box;\n      user-select: none;\n      position: relative;\n      outline: none; }\n      .pane-container .pane .pane-header:focus:before, .pane-container .pane .pane-header:focus-within:before {\n        position: absolute;\n        top: 0;\n        left: 0;\n        width: 100%;\n        height: 100%;\n        z-index: 5;\n        content: '';\n        pointer-events: none;\n        outline: 1px solid;\n        outline-width: -1px;\n        outline-style: solid;\n        outline-offset: -1px;\n        outline-color: var(--dockview-accent-color); }\n    .pane-container .pane .pane-body {\n      overflow-y: auto;\n      overflow-x: hidden;\n      flex-grow: 1;\n      position: relative;\n      outline: none; }\n      .pane-container .pane .pane-body:focus:before, .pane-container .pane .pane-body:focus-within:before {\n        position: absolute;\n        top: 0;\n        left: 0;\n        width: 100%;\n        height: 100%;\n        z-index: 5;\n        content: '';\n        pointer-events: none;\n        outline: 1px solid;\n        outline-width: -1px;\n        outline-style: solid;\n        outline-offset: -1px;\n        outline-color: var(--dockview-accent-color); }\n\n.title-container {\n  display: flex;\n  background-color: var(--title-bar-background-color);\n  flex-shrink: 0;\n  box-sizing: border-box;\n  height: var(--title-height);\n  font-size: var(--title-font-size); }\n  .title-container.hidden {\n    display: none; }\n  .title-container .tab-container {\n    flex-grow: 1;\n    display: flex;\n    overflow-x: overlay;\n    overflow-y: hidden;\n    /* Track */\n    /* Handle */ }\n    .title-container .tab-container::-webkit-scrollbar {\n      height: 3px; }\n    .title-container .tab-container::-webkit-scrollbar-track {\n      background: transparent; }\n    .title-container .tab-container::-webkit-scrollbar-thumb {\n      background: var(--title-bar-scroll-bar-color); }\n    .title-container .tab-container.drag-over-target {\n      background-color: var(--drag-over-background-color); }\n    .title-container .tab-container .tab {\n      -webkit-user-drag: element;\n      outline: none;\n      min-width: 75px;\n      cursor: pointer;\n      position: relative;\n      box-sizing: border-box; }\n      .title-container .tab-container .tab:not(:first-child)::before {\n        content: ' ';\n        position: absolute;\n        top: 0;\n        left: 0;\n        z-index: 5;\n        pointer-events: none;\n        background-color: var(--tab-divider-color);\n        width: 1px;\n        height: 100%; }\n\n.split-view-container {\n  position: relative;\n  overflow: hidden;\n  height: 100%;\n  width: 100%; }\n  .split-view-container.animation .view,\n  .split-view-container.animation .sash {\n    transition-duration: 0.15s;\n    transition-timing-function: ease-out; }\n  .split-view-container.horizontal {\n    height: 100%; }\n    .split-view-container.horizontal > .sash-container > .sash {\n      height: 100%;\n      width: 4px; }\n      .split-view-container.horizontal > .sash-container > .sash.enabled {\n        cursor: ew-resize; }\n      .split-view-container.horizontal > .sash-container > .sash.disabled {\n        cursor: default; }\n      .split-view-container.horizontal > .sash-container > .sash.maximum {\n        cursor: w-resize; }\n      .split-view-container.horizontal > .sash-container > .sash.minimum {\n        cursor: e-resize; }\n    .split-view-container.horizontal > .view-container > .view:not(:first-child)::before {\n      height: 100%;\n      width: 1px; }\n  .split-view-container.vertical {\n    width: 100%; }\n    .split-view-container.vertical > .sash-container > .sash {\n      width: 100%;\n      height: 4px; }\n      .split-view-container.vertical > .sash-container > .sash.enabled {\n        cursor: ns-resize; }\n      .split-view-container.vertical > .sash-container > .sash.disabled {\n        cursor: default; }\n      .split-view-container.vertical > .sash-container > .sash.maximum {\n        cursor: n-resize; }\n      .split-view-container.vertical > .sash-container > .sash.minimum {\n        cursor: s-resize; }\n    .split-view-container.vertical > .view-container > .view {\n      width: 100%; }\n      .split-view-container.vertical > .view-container > .view:not(:first-child)::before {\n        height: 1px;\n        width: 100%; }\n  .split-view-container .sash-container {\n    height: 100%;\n    width: 100%;\n    position: absolute; }\n    .split-view-container .sash-container .sash {\n      position: absolute;\n      z-index: 99;\n      outline: none; }\n  .split-view-container .view-container {\n    position: relative;\n    height: 100%;\n    width: 100%; }\n    .split-view-container .view-container .view {\n      height: 100%;\n      box-sizing: border-box;\n      overflow: auto;\n      position: absolute; }\n  .split-view-container.separator-border .view:not(:first-child)::before {\n    content: ' ';\n    position: absolute;\n    top: 0;\n    left: 0;\n    z-index: 5;\n    pointer-events: none;\n    background-color: var(--separator-border); }\n\n.layout-debug-container {\n  color: white;\n  position: fixed;\n  top: 0px;\n  right: 0px;\n  z-index: 9999;\n  font-size: 11px;\n  width: 100px; }\n  .layout-debug-container .layout-debug-widget {\n    background-color: black;\n    margin: 1px; }\n    .layout-debug-container .layout-debug-widget .layout-debug-widget-row {\n      padding: 0px 5px;\n      display: flex; }\n      .layout-debug-container .layout-debug-widget .layout-debug-widget-row span:first-child {\n        flex-grow: 1; }\n\n.tab {\n  flex-shrink: 0; }\n  .tab.dragged {\n    transform: translate3d(0px, 0px, 0px);\n    /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */ }\n  .tab.dragging .tab-action {\n    background-color: var(--active-group-visible-panel-color); }\n  .tab.active-tab > .default-tab .tab-action {\n    visibility: visible; }\n  .tab.inactive-tab > .default-tab .tab-action:not(.dirty) {\n    visibility: hidden; }\n  .tab.inactive-tab > .default-tab:hover .tab-action {\n    visibility: visible; }\n  .tab .default-tab {\n    position: relative;\n    height: 100%;\n    display: flex;\n    min-width: 80px;\n    align-items: center;\n    padding-left: 10px;\n    white-space: nowrap;\n    text-overflow: elipsis; }\n    .tab .default-tab .tab-content {\n      flex-grow: 1; }\n    .tab .default-tab .action-container {\n      text-align: right;\n      width: 28px;\n      display: flex; }\n      .tab .default-tab .action-container .tab-list {\n        display: flex;\n        padding: 0px;\n        margin: 0px;\n        justify-content: flex-end; }\n        .tab .default-tab .action-container .tab-list a:active:hover {\n          -webkit-mask-size: 100% 100% !important;\n          mask-size: 100% 100% !important; }\n        .tab .default-tab .action-container .tab-list .tab-action {\n          height: 16px;\n          width: 16px;\n          display: block;\n          -webkit-mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n          mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n          margin-right: '0.5em'; }\n          .tab .default-tab .action-container .tab-list .tab-action.disable-close {\n            display: none; }\n          .tab .default-tab .action-container .tab-list .tab-action.dirty:not(:hover) {\n            display: block;\n            -webkit-mask: var(--tab-dirty-icon) 50% 50%/60% 60% no-repeat;\n            mask: var(--tab-dirty-icon) 50% 50%/60% 60% no-repeat; }\n\n.watermark {\n  display: flex;\n  width: 100%; }\n  .watermark.has-actions .watermark-title .actions-bar {\n    display: none; }\n  .watermark .watermark-title {\n    height: 35px;\n    width: 100%;\n    display: flex; }\n  .watermark .watermark-content {\n    flex-grow: 1; }\n", ""]);
+exports.push([module.id, ".dockview-theme-dark {\n  --dockview-accent-color: dodgerblue;\n  --title-font-size: 13px;\n  --title-height: 35px;\n  --tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');\n  --tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');\n  --drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --title-bar-scroll-bar-color: #888;\n  --group-view-background-color: #1e1e1e;\n  --title-bar-background-color: #252526;\n  --active-tab-background-visible: #1e1e1e;\n  --active-tab-background-hidden: #2d2d2d;\n  --inactive-tab-background-visible: #1e1e1e;\n  --inactive-tab-background-hidden: #2d2d2d;\n  --tab-divider-color: #1e1e1e;\n  --active-group-visible-panel-color: white;\n  --active-group-hidden-panel-color: #969696;\n  --inactive-group-visible-panel-color: #8f8f8f;\n  --inactive-group-hidden-panel-color: #626262;\n  --separator-border: rgb(68, 68, 68);\n  --paneview-border-color: rgba(204, 204, 204, 0.2); }\n\n.dockview-theme-light {\n  --dockview-accent-color: dodgerblue;\n  --title-font-size: 13px;\n  --title-height: 35px;\n  --tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');\n  --tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');\n  --drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --title-bar-scroll-bar-color: #888;\n  --group-view-background-color: white;\n  --title-bar-background-color: #f3f3f3;\n  --active-tab-background-visible: white;\n  --active-tab-background-hidden: #ececec;\n  --inactive-tab-background-visible: white;\n  --inactive-tab-background-hidden: #ececec;\n  --tab-divider-color: white;\n  --active-group-visible-panel-color: rgb(51, 51, 51);\n  --active-group-hidden-panel-color: rgba(51, 51, 51, 0.7);\n  --inactive-group-visible-panel-color: rgba(51, 51, 51, 0.7);\n  --inactive-group-hidden-panel-color: rgba(51, 51, 51, 0.35);\n  --separator-border: rgba(128, 128, 128, 0.35);\n  --paneview-border-color: rgb(51, 51, 51); }\n\n.dockview-theme-vs {\n  --dockview-accent-color: dodgerblue;\n  --title-font-size: 13px;\n  --title-height: 35px;\n  --tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');\n  --tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');\n  --drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --title-bar-scroll-bar-color: #888;\n  --group-view-background-color: #1e1e1e;\n  --title-bar-background-color: #252526;\n  --active-tab-background-visible: #1e1e1e;\n  --active-tab-background-hidden: #2d2d2d;\n  --inactive-tab-background-visible: #1e1e1e;\n  --inactive-tab-background-hidden: #2d2d2d;\n  --tab-divider-color: #1e1e1e;\n  --active-group-visible-panel-color: white;\n  --active-group-hidden-panel-color: #969696;\n  --inactive-group-visible-panel-color: #8f8f8f;\n  --inactive-group-hidden-panel-color: #626262;\n  --separator-border: rgb(68, 68, 68);\n  --paneview-border-color: rgba(204, 204, 204, 0.2);\n  --active-tab-background-visible: dodgerblue;\n  --title-height: 18px;\n  --title-font-size: 11px; }\n  .dockview-theme-vs .groupview.active-group > .title-container {\n    border-bottom: 2px solid var(--active-tab-background-visible); }\n  .dockview-theme-vs .groupview.inactive-group > .title-container {\n    border-bottom: 2px solid var(--inactive-tab-background-visible); }\n\n.actions-bar {\n  text-align: right;\n  width: 28px;\n  display: flex;\n  align-items: center;\n  flex-shrink: 0; }\n  .actions-bar .actions-container {\n    display: flex;\n    padding: 0px;\n    margin: 0px;\n    justify-content: flex-end; }\n    .actions-bar .actions-container a:active {\n      -webkit-mask-size: 100% 100% !important;\n      mask-size: 100% 100% !important; }\n    .actions-bar .actions-container .close-action {\n      background-color: white;\n      height: 16px;\n      width: 16px;\n      display: block;\n      -webkit-mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n      mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n      margin-right: '0.5em';\n      cursor: pointer; }\n\n.drop-target {\n  position: relative; }\n  .drop-target > .drop-target-dropzone {\n    position: absolute;\n    left: 0px;\n    top: 0px;\n    height: 100%;\n    width: 100%;\n    z-index: 10000; }\n    .drop-target > .drop-target-dropzone > .drop-target-selection {\n      position: relative;\n      pointer-events: none;\n      height: 100%;\n      width: 100%;\n      background-color: var(--drag-over-background-color);\n      transition-duration: 0.15s;\n      transition-timing-function: ease-out; }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.left, .drop-target > .drop-target-dropzone > .drop-target-selection.right {\n        width: 50%; }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.right {\n        transform: translate(100%, 0%); }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n        transform: translate(0%, 100%); }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.top, .drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n        height: 50%; }\n\n.custom-dragging {\n  height: 24px;\n  line-height: 24px;\n  font-size: 11px;\n  width: 100px;\n  background-color: dodgerblue;\n  color: ghostwhite;\n  border-radius: 11px;\n  position: absolute;\n  padding-left: 10px; }\n\n.groupview.active-group > .title-container > .tab-container > .tab.active-tab {\n  background-color: var(--active-tab-background-visible);\n  color: var(--active-group-visible-panel-color); }\n  .groupview.active-group > .title-container > .tab-container > .tab.active-tab .tab-action {\n    background-color: var(--active-group-visible-panel-color); }\n\n.groupview.active-group > .title-container > .tab-container > .tab.inactive-tab {\n  background-color: var(--active-tab-background-hidden);\n  color: var(--active-group-hidden-panel-color); }\n  .groupview.active-group > .title-container > .tab-container > .tab.inactive-tab .tab-action {\n    background-color: var(--active-group-hidden-panel-color); }\n\n.groupview.inactive-group > .title-container > .tab-container > .tab.active-tab {\n  background-color: var(--inactive-tab-background-visible);\n  color: var(--inactive-group-visible-panel-color); }\n  .groupview.inactive-group > .title-container > .tab-container > .tab.active-tab .tab-action {\n    background-color: var(--inactive-group-visible-panel-color); }\n\n.groupview.inactive-group > .title-container > .tab-container > .tab.inactive-tab {\n  background-color: var(--inactive-tab-background-hidden);\n  color: var(--inactive-group-hidden-panel-color); }\n  .groupview.inactive-group > .title-container > .tab-container > .tab.inactive-tab .tab-action {\n    background-color: var(--inactive-group-hidden-panel-color); }\n\n/**\n * when a tab is dragged we lose the above stylings because they are conditional on parent elements\n * therefore we also set some stylings for the dragging event\n **/\n.tab.dragging {\n  background-color: var(--active-tab-background-visible);\n  color: var(--active-group-visible-panel-color); }\n\n.grid-view,\n.branch-node {\n  height: 100%;\n  width: 100%; }\n\n.groupview {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  background-color: var(--group-view-background-color); }\n  .groupview:focus {\n    outline: none; }\n  .groupview.empty > .title-container {\n    display: none; }\n  .groupview > .content-container {\n    flex-grow: 1;\n    overflow: hidden;\n    outline: none; }\n\n.pane-container {\n  height: 100%;\n  width: 100%; }\n  .pane-container.animated .view {\n    transition-duration: 0.15s;\n    transition-timing-function: ease-out; }\n  .pane-container .view {\n    overflow: hidden;\n    display: flex;\n    flex-direction: column;\n    padding: 0px !important; }\n    .pane-container .view:not(:first-child)::before {\n      background-color: transparent !important; }\n    .pane-container .view:not(:first-child) .pane > .pane-header {\n      border-top: 1px solid var(--paneview-border-color); }\n  .pane-container:first-of-type > .pane > .pane-header {\n    border-top: none !important; }\n  .pane-container .pane {\n    display: flex;\n    flex-direction: column;\n    overflow: hidden;\n    height: 100%; }\n    .pane-container .pane .pane-header {\n      box-sizing: border-box;\n      user-select: none;\n      position: relative;\n      outline: none; }\n      .pane-container .pane .pane-header:focus:before, .pane-container .pane .pane-header:focus-within:before {\n        position: absolute;\n        top: 0;\n        left: 0;\n        width: 100%;\n        height: 100%;\n        z-index: 5;\n        content: '';\n        pointer-events: none;\n        outline: 1px solid;\n        outline-width: -1px;\n        outline-style: solid;\n        outline-offset: -1px;\n        outline-color: var(--dockview-accent-color); }\n    .pane-container .pane .pane-body {\n      overflow-y: auto;\n      overflow-x: hidden;\n      flex-grow: 1;\n      position: relative;\n      outline: none; }\n      .pane-container .pane .pane-body:focus:before, .pane-container .pane .pane-body:focus-within:before {\n        position: absolute;\n        top: 0;\n        left: 0;\n        width: 100%;\n        height: 100%;\n        z-index: 5;\n        content: '';\n        pointer-events: none;\n        outline: 1px solid;\n        outline-width: -1px;\n        outline-style: solid;\n        outline-offset: -1px;\n        outline-color: var(--dockview-accent-color); }\n\n.title-container {\n  display: flex;\n  background-color: var(--title-bar-background-color);\n  flex-shrink: 0;\n  box-sizing: border-box;\n  height: var(--title-height);\n  font-size: var(--title-font-size); }\n  .title-container.hidden {\n    display: none; }\n  .title-container .tab-container {\n    flex-grow: 1;\n    display: flex;\n    overflow-x: overlay;\n    overflow-y: hidden;\n    /* Track */\n    /* Handle */ }\n    .title-container .tab-container::-webkit-scrollbar {\n      height: 3px; }\n    .title-container .tab-container::-webkit-scrollbar-track {\n      background: transparent; }\n    .title-container .tab-container::-webkit-scrollbar-thumb {\n      background: var(--title-bar-scroll-bar-color); }\n    .title-container .tab-container.drag-over-target {\n      background-color: var(--drag-over-background-color); }\n    .title-container .tab-container .tab {\n      -webkit-user-drag: element;\n      outline: none;\n      min-width: 75px;\n      cursor: pointer;\n      position: relative;\n      box-sizing: border-box; }\n      .title-container .tab-container .tab:not(:first-child)::before {\n        content: ' ';\n        position: absolute;\n        top: 0;\n        left: 0;\n        z-index: 5;\n        pointer-events: none;\n        background-color: var(--tab-divider-color);\n        width: 1px;\n        height: 100%; }\n\n.split-view-container {\n  position: relative;\n  overflow: hidden;\n  height: 100%;\n  width: 100%; }\n  .split-view-container.animation .view,\n  .split-view-container.animation .sash {\n    transition-duration: 0.15s;\n    transition-timing-function: ease-out; }\n  .split-view-container.horizontal {\n    height: 100%; }\n    .split-view-container.horizontal > .sash-container > .sash {\n      height: 100%;\n      width: 4px; }\n      .split-view-container.horizontal > .sash-container > .sash.enabled {\n        cursor: ew-resize; }\n      .split-view-container.horizontal > .sash-container > .sash.disabled {\n        cursor: default; }\n      .split-view-container.horizontal > .sash-container > .sash.maximum {\n        cursor: w-resize; }\n      .split-view-container.horizontal > .sash-container > .sash.minimum {\n        cursor: e-resize; }\n    .split-view-container.horizontal > .view-container > .view:not(:first-child)::before {\n      height: 100%;\n      width: 1px; }\n  .split-view-container.vertical {\n    width: 100%; }\n    .split-view-container.vertical > .sash-container > .sash {\n      width: 100%;\n      height: 4px; }\n      .split-view-container.vertical > .sash-container > .sash.enabled {\n        cursor: ns-resize; }\n      .split-view-container.vertical > .sash-container > .sash.disabled {\n        cursor: default; }\n      .split-view-container.vertical > .sash-container > .sash.maximum {\n        cursor: n-resize; }\n      .split-view-container.vertical > .sash-container > .sash.minimum {\n        cursor: s-resize; }\n    .split-view-container.vertical > .view-container > .view {\n      width: 100%; }\n      .split-view-container.vertical > .view-container > .view:not(:first-child)::before {\n        height: 1px;\n        width: 100%; }\n  .split-view-container .sash-container {\n    height: 100%;\n    width: 100%;\n    position: absolute; }\n    .split-view-container .sash-container .sash {\n      position: absolute;\n      z-index: 99;\n      outline: none; }\n  .split-view-container .view-container {\n    position: relative;\n    height: 100%;\n    width: 100%; }\n    .split-view-container .view-container .view {\n      height: 100%;\n      box-sizing: border-box;\n      overflow: auto;\n      position: absolute; }\n  .split-view-container.separator-border .view:not(:first-child)::before {\n    content: ' ';\n    position: absolute;\n    top: 0;\n    left: 0;\n    z-index: 5;\n    pointer-events: none;\n    background-color: var(--separator-border); }\n\n.layout-debug-container {\n  color: white;\n  position: fixed;\n  top: 0px;\n  right: 0px;\n  z-index: 9999;\n  font-size: 11px;\n  width: 100px; }\n  .layout-debug-container .layout-debug-widget {\n    background-color: black;\n    margin: 1px; }\n    .layout-debug-container .layout-debug-widget .layout-debug-widget-row {\n      padding: 0px 5px;\n      display: flex; }\n      .layout-debug-container .layout-debug-widget .layout-debug-widget-row span:first-child {\n        flex-grow: 1; }\n\n.tab {\n  flex-shrink: 0; }\n  .tab.dragged {\n    transform: translate3d(0px, 0px, 0px);\n    /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */ }\n  .tab.dragging .tab-action {\n    background-color: var(--active-group-visible-panel-color); }\n  .tab.active-tab > .default-tab .tab-action {\n    visibility: visible; }\n  .tab.inactive-tab > .default-tab .tab-action:not(.dirty) {\n    visibility: hidden; }\n  .tab.inactive-tab > .default-tab:hover .tab-action {\n    visibility: visible; }\n  .tab .default-tab {\n    position: relative;\n    height: 100%;\n    display: flex;\n    min-width: 80px;\n    align-items: center;\n    padding-left: 10px;\n    white-space: nowrap;\n    text-overflow: elipsis; }\n    .tab .default-tab .tab-content {\n      flex-grow: 1; }\n    .tab .default-tab .action-container {\n      text-align: right;\n      width: 28px;\n      display: flex; }\n      .tab .default-tab .action-container .tab-list {\n        display: flex;\n        padding: 0px;\n        margin: 0px;\n        justify-content: flex-end; }\n        .tab .default-tab .action-container .tab-list a:active:hover {\n          -webkit-mask-size: 100% 100% !important;\n          mask-size: 100% 100% !important; }\n        .tab .default-tab .action-container .tab-list .tab-action {\n          height: 16px;\n          width: 16px;\n          display: block;\n          -webkit-mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n          mask: var(--tab-close-icon) 50% 50%/90% 90% no-repeat;\n          margin-right: '0.5em'; }\n          .tab .default-tab .action-container .tab-list .tab-action.disable-close {\n            display: none; }\n          .tab .default-tab .action-container .tab-list .tab-action.dirty:not(:hover) {\n            display: block;\n            -webkit-mask: var(--tab-dirty-icon) 50% 50%/60% 60% no-repeat;\n            mask: var(--tab-dirty-icon) 50% 50%/60% 60% no-repeat; }\n\n.watermark {\n  display: flex;\n  width: 100%; }\n  .watermark.has-actions .watermark-title .actions-bar {\n    display: none; }\n  .watermark .watermark-title {\n    height: 35px;\n    width: 100%;\n    display: flex; }\n  .watermark .watermark-content {\n    flex-grow: 1; }\n", ""]);
 // Exports
 module.exports = exports;
 
@@ -2555,9771 +2562,6 @@ function toComment(sourceMap) {
   var data = "sourceMappingURL=data:application/json;charset=utf-8;base64,".concat(base64);
   return "/*# ".concat(data, " */");
 }
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/actionbar/actionsContainer.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/actionbar/actionsContainer.js ***!
-  \**********************************************************************/
-/*! namespace exports */
-/*! export ActionContainer [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ActionContainer": () => /* binding */ ActionContainer
-/* harmony export */ });
-var ActionContainer = /** @class */ (function () {
-    function ActionContainer() {
-        this._element = document.createElement('div');
-        this._element.className = 'actions-bar';
-        this._list = document.createElement('ul');
-        this._list.className = 'actions-container';
-        this._element.appendChild(this._list);
-    }
-    Object.defineProperty(ActionContainer.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    ActionContainer.prototype.add = function (element) {
-        var listItem = document.createElement('li');
-        listItem.className = 'action-item';
-        this._list.appendChild(element);
-    };
-    return ActionContainer;
-}());
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/api/api.js":
-/*!***************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/api/api.js ***!
-  \***************************************************/
-/*! namespace exports */
-/*! export BaseViewApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "BaseViewApi": () => /* binding */ BaseViewApi
-/* harmony export */ });
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-
-/**
- * A core api implementation that should be used across all panel-like objects
- */
-var BaseViewApi = /** @class */ (function (_super) {
-    __extends(BaseViewApi, _super);
-    function BaseViewApi(id) {
-        var _this = _super.call(this) || this;
-        _this.id = id;
-        _this._state = {};
-        _this._isFocused = false;
-        _this._isActive = false;
-        _this._isVisible = true;
-        _this._width = 0;
-        _this._height = 0;
-        _this._onDidStateChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onDidStateChange = _this._onDidStateChange.event;
-        //
-        _this._onDidPanelDimensionChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
-            replay: true,
-        });
-        _this.onDidDimensionsChange = _this._onDidPanelDimensionChange.event;
-        //
-        _this._onDidChangeFocus = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
-            replay: true,
-        });
-        _this.onDidFocusChange = _this._onDidChangeFocus.event;
-        //
-        _this._onFocusEvent = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onFocusEvent = _this._onFocusEvent.event;
-        //
-        _this._onDidVisibilityChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
-            replay: true,
-        });
-        _this.onDidVisibilityChange = _this
-            ._onDidVisibilityChange.event;
-        //
-        _this._onVisibilityChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onVisibilityChange = _this
-            ._onVisibilityChange.event;
-        //
-        _this._onDidActiveChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
-            replay: true,
-        });
-        _this.onDidActiveChange = _this._onDidActiveChange
-            .event;
-        _this.addDisposables(_this._onDidStateChange, _this._onDidPanelDimensionChange, _this._onDidChangeFocus, _this._onDidVisibilityChange, _this._onDidActiveChange, _this._onFocusEvent, _this.onDidFocusChange(function (event) {
-            _this._isFocused = event.isFocused;
-        }), _this.onDidActiveChange(function (event) {
-            _this._isActive = event.isActive;
-        }), _this.onDidVisibilityChange(function (event) {
-            _this._isVisible = event.isVisible;
-        }), _this.onDidDimensionsChange(function (event) {
-            _this._width = event.width;
-            _this._height = event.height;
-        }));
-        return _this;
-    }
-    Object.defineProperty(BaseViewApi.prototype, "isFocused", {
-        //
-        get: function () {
-            return this._isFocused;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseViewApi.prototype, "isActive", {
-        get: function () {
-            return this._isActive;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseViewApi.prototype, "isVisible", {
-        get: function () {
-            return this._isVisible;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseViewApi.prototype, "width", {
-        get: function () {
-            return this._width;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseViewApi.prototype, "height", {
-        get: function () {
-            return this._height;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    BaseViewApi.prototype.setVisible = function (isVisible) {
-        this._onVisibilityChange.fire({ isVisible: isVisible });
-    };
-    BaseViewApi.prototype.setState = function (key, value) {
-        if (typeof key === 'object') {
-            this._state = key;
-        }
-        else {
-            this._state[key] = value;
-        }
-        this._onDidStateChange.fire(undefined);
-    };
-    BaseViewApi.prototype.getState = function () {
-        return this._state;
-    };
-    BaseViewApi.prototype.getStateKey = function (key) {
-        return this._state[key];
-    };
-    BaseViewApi.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-    };
-    return BaseViewApi;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/api/component.api.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/api/component.api.js ***!
-  \*************************************************************/
-/*! namespace exports */
-/*! export DockviewApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export GridviewApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export PaneviewApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export SplitviewApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "SplitviewApi": () => /* binding */ SplitviewApi,
-/* harmony export */   "PaneviewApi": () => /* binding */ PaneviewApi,
-/* harmony export */   "GridviewApi": () => /* binding */ GridviewApi,
-/* harmony export */   "DockviewApi": () => /* binding */ DockviewApi
-/* harmony export */ });
-var SplitviewApi = /** @class */ (function () {
-    function SplitviewApi(component) {
-        this.component = component;
-    }
-    Object.defineProperty(SplitviewApi.prototype, "minimumSize", {
-        get: function () {
-            return this.component.minimumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(SplitviewApi.prototype, "maximumSize", {
-        get: function () {
-            return this.component.maximumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(SplitviewApi.prototype, "height", {
-        get: function () {
-            return this.component.height;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(SplitviewApi.prototype, "width", {
-        get: function () {
-            return this.component.width;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(SplitviewApi.prototype, "length", {
-        get: function () {
-            return this.component.length;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(SplitviewApi.prototype, "onDidLayoutChange", {
-        get: function () {
-            return this.component.onDidLayoutChange;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    SplitviewApi.prototype.removePanel = function (panel, sizing) {
-        this.component.removePanel(panel, sizing);
-    };
-    SplitviewApi.prototype.setVisible = function (panel, isVisible) {
-        return this.component.setVisible(panel, isVisible);
-    };
-    SplitviewApi.prototype.getPanels = function () {
-        return this.component.getPanels();
-    };
-    SplitviewApi.prototype.focus = function () {
-        return this.component.focus();
-    };
-    SplitviewApi.prototype.getPanel = function (id) {
-        return this.component.getPanel(id);
-    };
-    SplitviewApi.prototype.setActive = function (panel) {
-        return this.component.setActive(panel);
-    };
-    SplitviewApi.prototype.layout = function (width, height) {
-        return this.component.layout(width, height);
-    };
-    SplitviewApi.prototype.addPanel = function (options) {
-        return this.component.addPanel(options);
-    };
-    SplitviewApi.prototype.resizeToFit = function () {
-        return this.component.resizeToFit();
-    };
-    SplitviewApi.prototype.movePanel = function (from, to) {
-        this.component.movePanel(from, to);
-    };
-    SplitviewApi.prototype.fromJSON = function (data) {
-        return this.component.fromJSON(data);
-    };
-    SplitviewApi.prototype.toJSON = function () {
-        return this.component.toJSON();
-    };
-    return SplitviewApi;
-}());
-
-var PaneviewApi = /** @class */ (function () {
-    function PaneviewApi(component) {
-        this.component = component;
-    }
-    Object.defineProperty(PaneviewApi.prototype, "minimumSize", {
-        get: function () {
-            return this.component.minimumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(PaneviewApi.prototype, "maximumSize", {
-        get: function () {
-            return this.component.maximumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(PaneviewApi.prototype, "onDidLayoutChange", {
-        get: function () {
-            return this.component.onDidLayoutChange;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    PaneviewApi.prototype.getPanels = function () {
-        return this.component.getPanels();
-    };
-    PaneviewApi.prototype.removePanel = function (panel) {
-        this.component.removePanel(panel);
-    };
-    PaneviewApi.prototype.getPanel = function (id) {
-        return this.component.getPanel(id);
-    };
-    PaneviewApi.prototype.focus = function () {
-        return this.component.focus();
-    };
-    PaneviewApi.prototype.layout = function (width, height) {
-        return this.component.layout(width, height);
-    };
-    PaneviewApi.prototype.addPanel = function (options) {
-        return this.component.addPanel(options);
-    };
-    PaneviewApi.prototype.resizeToFit = function () {
-        return this.component.resizeToFit();
-    };
-    PaneviewApi.prototype.fromJSON = function (data) {
-        return this.component.fromJSON(data);
-    };
-    PaneviewApi.prototype.toJSON = function () {
-        return this.component.toJSON();
-    };
-    return PaneviewApi;
-}());
-
-var GridviewApi = /** @class */ (function () {
-    function GridviewApi(component) {
-        this.component = component;
-    }
-    Object.defineProperty(GridviewApi.prototype, "minimumHeight", {
-        get: function () {
-            return this.component.minimumHeight;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GridviewApi.prototype, "maximumHeight", {
-        get: function () {
-            return this.component.maximumHeight;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GridviewApi.prototype, "minimumWidth", {
-        get: function () {
-            return this.component.minimumWidth;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GridviewApi.prototype, "maximumWidth", {
-        get: function () {
-            return this.component.maximumWidth;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GridviewApi.prototype, "onDidLayoutChange", {
-        get: function () {
-            return this.component.onDidLayoutChange;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GridviewApi.prototype, "orientation", {
-        get: function () {
-            return this.component.orientation;
-        },
-        set: function (value) {
-            this.component.orientation = value;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    GridviewApi.prototype.focus = function () {
-        return this.component.focus();
-    };
-    GridviewApi.prototype.layout = function (width, height, force) {
-        if (force === void 0) { force = false; }
-        return this.component.layout(width, height, force);
-    };
-    GridviewApi.prototype.addPanel = function (options) {
-        return this.component.addPanel(options);
-    };
-    GridviewApi.prototype.removePanel = function (panel, sizing) {
-        this.component.removePanel(panel, sizing);
-    };
-    GridviewApi.prototype.movePanel = function (panel, options) {
-        this.component.movePanel(panel, options);
-    };
-    GridviewApi.prototype.resizeToFit = function () {
-        return this.component.resizeToFit();
-    };
-    GridviewApi.prototype.getPanel = function (id) {
-        return this.component.getPanel(id);
-    };
-    GridviewApi.prototype.toggleVisibility = function (panel) {
-        return this.component.toggleVisibility(panel);
-    };
-    GridviewApi.prototype.isVisible = function (panel) {
-        return this.component.isVisible(panel);
-    };
-    GridviewApi.prototype.setVisible = function (panel, visible) {
-        return this.component.setVisible(panel, visible);
-    };
-    GridviewApi.prototype.fromJSON = function (data) {
-        return this.component.fromJSON(data);
-    };
-    GridviewApi.prototype.toJSON = function () {
-        return this.component.toJSON();
-    };
-    return GridviewApi;
-}());
-
-var DockviewApi = /** @class */ (function () {
-    function DockviewApi(component) {
-        this.component = component;
-    }
-    Object.defineProperty(DockviewApi.prototype, "minimumHeight", {
-        get: function () {
-            return this.component.minimumHeight;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(DockviewApi.prototype, "maximumHeight", {
-        get: function () {
-            return this.component.maximumHeight;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(DockviewApi.prototype, "minimumWidth", {
-        get: function () {
-            return this.component.minimumWidth;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(DockviewApi.prototype, "maximumWidth", {
-        get: function () {
-            return this.component.maximumWidth;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(DockviewApi.prototype, "size", {
-        get: function () {
-            return this.component.size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(DockviewApi.prototype, "totalPanels", {
-        get: function () {
-            return this.component.totalPanels;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(DockviewApi.prototype, "onDidLayoutChange", {
-        get: function () {
-            return this.component.onDidLayoutChange;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    DockviewApi.prototype.focus = function () {
-        return this.component.focus();
-    };
-    DockviewApi.prototype.getPanel = function (id) {
-        return this.component.getGroupPanel(id);
-    };
-    DockviewApi.prototype.setActivePanel = function (panel) {
-        return this.component.setActivePanel(panel);
-    };
-    DockviewApi.prototype.layout = function (width, height, force) {
-        if (force === void 0) { force = false; }
-        return this.component.layout(width, height, force);
-    };
-    DockviewApi.prototype.addPanel = function (options) {
-        return this.component.addPanel(options);
-    };
-    DockviewApi.prototype.addDndHandle = function (type, cb) {
-        return this.component.addDndHandle(type, cb);
-    };
-    DockviewApi.prototype.createDragTarget = function (target, options) {
-        return this.component.createDragTarget(target, options);
-    };
-    DockviewApi.prototype.addEmptyGroup = function (options) {
-        return this.component.addEmptyGroup(options);
-    };
-    DockviewApi.prototype.moveToNext = function (options) {
-        return this.component.moveToNext(options);
-    };
-    DockviewApi.prototype.moveToPrevious = function (options) {
-        return this.component.moveToPrevious(options);
-    };
-    DockviewApi.prototype.closeAllGroups = function () {
-        return this.component.closeAllGroups();
-    };
-    DockviewApi.prototype.removeGroup = function (group) {
-        return this.component.removeGroup(group);
-    };
-    DockviewApi.prototype.resizeToFit = function () {
-        return this.component.resizeToFit();
-    };
-    DockviewApi.prototype.getTabHeight = function () {
-        return this.component.getTabHeight();
-    };
-    DockviewApi.prototype.setTabHeight = function (height) {
-        this.component.setTabHeight(height);
-    };
-    DockviewApi.prototype.getGroup = function (id) {
-        return this.component.getPanel(id);
-    };
-    DockviewApi.prototype.deserialize = function (data) {
-        return this.component.deserialize(data);
-    };
-    DockviewApi.prototype.toJSON = function () {
-        return this.component.toJSON();
-    };
-    return DockviewApi;
-}());
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/api/gridPanelApi.js":
-/*!************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/api/gridPanelApi.js ***!
-  \************************************************************/
-/*! namespace exports */
-/*! export GridPanelApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GridPanelApi": () => /* binding */ GridPanelApi
-/* harmony export */ });
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./api */ "./node_modules/dockview/dist/es6/api/api.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-
-var GridPanelApi = /** @class */ (function (_super) {
-    __extends(GridPanelApi, _super);
-    //
-    function GridPanelApi(id) {
-        var _this = _super.call(this, id) || this;
-        _this._onDidConstraintsChangeInternal = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onDidConstraintsChangeInternal = _this._onDidConstraintsChangeInternal.event;
-        //
-        _this._onDidConstraintsChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
-            replay: true,
-        });
-        _this.onDidConstraintsChange = _this
-            ._onDidConstraintsChange.event;
-        //
-        _this._onDidSizeChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onDidSizeChange = _this._onDidSizeChange.event;
-        return _this;
-    }
-    GridPanelApi.prototype.setConstraints = function (value) {
-        this._onDidConstraintsChangeInternal.fire(value);
-    };
-    GridPanelApi.prototype.setSize = function (event) {
-        this._onDidSizeChange.fire(event);
-    };
-    return GridPanelApi;
-}(_api__WEBPACK_IMPORTED_MODULE_1__.BaseViewApi));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/api/groupPanelApi.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/api/groupPanelApi.js ***!
-  \*************************************************************/
-/*! namespace exports */
-/*! export GroupPanelApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GroupPanelApi": () => /* binding */ GroupPanelApi
-/* harmony export */ });
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _gridPanelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./gridPanelApi */ "./node_modules/dockview/dist/es6/api/gridPanelApi.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-
-var GroupPanelApi = /** @class */ (function (_super) {
-    __extends(GroupPanelApi, _super);
-    function GroupPanelApi(panel, group) {
-        var _this = _super.call(this, panel.id) || this;
-        _this.panel = panel;
-        _this._isGroupVisible = false;
-        _this._onDidDirtyChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onDidDirtyChange = _this._onDidDirtyChange.event;
-        _this._onDidGroupPanelVisibleChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
-            replay: true,
-        });
-        _this.onDidGroupPanelVisibleChange = _this
-            ._onDidGroupPanelVisibleChange.event;
-        _this._onDidTitleChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onDidTitleChange = _this._onDidTitleChange.event;
-        _this._group = group;
-        _this.addDisposables(_this._onDidGroupPanelVisibleChange, _this._onDidDirtyChange, _this.onDidGroupPanelVisibleChange(function (event) {
-            _this._isGroupVisible = event.isVisible;
-        }));
-        return _this;
-    }
-    Object.defineProperty(GroupPanelApi.prototype, "isGroupVisible", {
-        get: function () {
-            return this._isGroupVisible;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GroupPanelApi.prototype, "tryClose", {
-        get: function () {
-            return this._interceptor;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GroupPanelApi.prototype, "group", {
-        get: function () {
-            return this._group;
-        },
-        set: function (value) {
-            this._group = value;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    GroupPanelApi.prototype.setTitle = function (title) {
-        this._onDidTitleChange.fire({ title: title });
-    };
-    GroupPanelApi.prototype.close = function () {
-        return this.group.closePanel(this.panel);
-    };
-    GroupPanelApi.prototype.interceptOnCloseAction = function (interceptor) {
-        this._interceptor = interceptor;
-    };
-    GroupPanelApi.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-    };
-    return GroupPanelApi;
-}(_gridPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridPanelApi));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/api/panePanelApi.js":
-/*!************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/api/panePanelApi.js ***!
-  \************************************************************/
-/*! namespace exports */
-/*! export PanePanelApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PanePanelApi": () => /* binding */ PanePanelApi
-/* harmony export */ });
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _panelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./panelApi */ "./node_modules/dockview/dist/es6/api/panelApi.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-
-var PanePanelApi = /** @class */ (function (_super) {
-    __extends(PanePanelApi, _super);
-    function PanePanelApi(id) {
-        var _this = _super.call(this, id) || this;
-        _this._onDidExpansionChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
-            replay: true,
-        });
-        _this.onDidExpansionChange = _this
-            ._onDidExpansionChange.event;
-        _this._onMouseEnter = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({});
-        _this.onMouseEnter = _this._onMouseEnter.event;
-        _this._onMouseLeave = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({});
-        _this.onMouseLeave = _this._onMouseLeave.event;
-        return _this;
-    }
-    Object.defineProperty(PanePanelApi.prototype, "pane", {
-        set: function (pane) {
-            this._pane = pane;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    PanePanelApi.prototype.setExpanded = function (isExpanded) {
-        this._pane.setExpanded(isExpanded);
-    };
-    Object.defineProperty(PanePanelApi.prototype, "isExpanded", {
-        get: function () {
-            return this._pane.isExpanded();
-        },
-        enumerable: false,
-        configurable: true
-    });
-    return PanePanelApi;
-}(_panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApi));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/api/panelApi.js":
-/*!********************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/api/panelApi.js ***!
-  \********************************************************/
-/*! namespace exports */
-/*! export PanelApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PanelApi": () => /* binding */ PanelApi
-/* harmony export */ });
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./api */ "./node_modules/dockview/dist/es6/api/api.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-
-var PanelApi = /** @class */ (function (_super) {
-    __extends(PanelApi, _super);
-    //
-    function PanelApi(id) {
-        var _this = _super.call(this, id) || this;
-        _this._onDidConstraintsChangeInternal = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onDidConstraintsChangeInternal = _this._onDidConstraintsChangeInternal.event;
-        //
-        _this._onDidConstraintsChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
-            replay: true,
-        });
-        _this.onDidConstraintsChange = _this
-            ._onDidConstraintsChange.event;
-        //
-        _this._onDidSizeChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onDidSizeChange = _this._onDidSizeChange
-            .event;
-        return _this;
-    }
-    PanelApi.prototype.setConstraints = function (value) {
-        this._onDidConstraintsChangeInternal.fire(value);
-    };
-    PanelApi.prototype.setSize = function (event) {
-        this._onDidSizeChange.fire(event);
-    };
-    PanelApi.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-        this._onDidConstraintsChange.dispose();
-        this._onDidSizeChange.dispose();
-    };
-    return PanelApi;
-}(_api__WEBPACK_IMPORTED_MODULE_1__.BaseViewApi));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/array.js":
-/*!*************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/array.js ***!
-  \*************************************************/
-/*! namespace exports */
-/*! export firstIndex [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export last [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export pushToEnd [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export pushToStart [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export range [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export sequenceEquals [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export tail [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "tail": () => /* binding */ tail,
-/* harmony export */   "last": () => /* binding */ last,
-/* harmony export */   "sequenceEquals": () => /* binding */ sequenceEquals,
-/* harmony export */   "pushToStart": () => /* binding */ pushToStart,
-/* harmony export */   "pushToEnd": () => /* binding */ pushToEnd,
-/* harmony export */   "range": () => /* binding */ range,
-/* harmony export */   "firstIndex": () => /* binding */ firstIndex
-/* harmony export */ });
-function tail(arr) {
-    if (arr.length === 0) {
-        throw new Error('Invalid tail call');
-    }
-    return [arr.slice(0, arr.length - 1), arr[arr.length - 1]];
-}
-function last(arr) {
-    return arr.length > 0 ? arr[arr.length - 1] : undefined;
-}
-function sequenceEquals(arr1, arr2) {
-    if (arr1.length !== arr2.length) {
-        return false;
-    }
-    for (var i = 0; i < arr1.length; i++) {
-        if (arr1[i] !== arr2[i]) {
-            return false;
-        }
-    }
-    return true;
-}
-/**
- * Pushes an element to the start of the array, if found.
- */
-function pushToStart(arr, value) {
-    var index = arr.indexOf(value);
-    if (index > -1) {
-        arr.splice(index, 1);
-        arr.unshift(value);
-    }
-}
-/**
- * Pushes an element to the end of the array, if found.
- */
-function pushToEnd(arr, value) {
-    var index = arr.indexOf(value);
-    if (index > -1) {
-        arr.splice(index, 1);
-        arr.push(value);
-    }
-}
-var range = function (from, to) {
-    var result = [];
-    if (typeof to !== 'number') {
-        to = from;
-        from = 0;
-    }
-    if (from <= to) {
-        for (var i = from; i < to; i++) {
-            result.push(i);
-        }
-    }
-    else {
-        for (var i = from; i > to; i--) {
-            result.push(i);
-        }
-    }
-    return result;
-};
-function firstIndex(array, fn) {
-    for (var i = 0; i < array.length; i++) {
-        var element = array[i];
-        if (fn(element)) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/async.js":
-/*!*************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/async.js ***!
-  \*************************************************/
-/*! namespace exports */
-/*! export timeoutAsPromise [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "timeoutAsPromise": () => /* binding */ timeoutAsPromise
-/* harmony export */ });
-function timeoutAsPromise(timeout) {
-    return new Promise(function (resolve) {
-        setTimeout(function () {
-            resolve();
-        }, timeout);
-    });
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/dnd/dataTransfer.js":
-/*!************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/dnd/dataTransfer.js ***!
-  \************************************************************/
-/*! namespace exports */
-/*! export DATA_KEY [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export DataTransferSingleton [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export DragType [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export LocalSelectionTransfer [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export extractData [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isCustomDragEvent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isPanelTransferEvent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isTabDragEvent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DATA_KEY": () => /* binding */ DATA_KEY,
-/* harmony export */   "isPanelTransferEvent": () => /* binding */ isPanelTransferEvent,
-/* harmony export */   "DragType": () => /* binding */ DragType,
-/* harmony export */   "isTabDragEvent": () => /* binding */ isTabDragEvent,
-/* harmony export */   "isCustomDragEvent": () => /* binding */ isCustomDragEvent,
-/* harmony export */   "extractData": () => /* binding */ extractData,
-/* harmony export */   "DataTransferSingleton": () => /* binding */ DataTransferSingleton,
-/* harmony export */   "LocalSelectionTransfer": () => /* binding */ LocalSelectionTransfer
-/* harmony export */ });
-/* harmony import */ var _json__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../json */ "./node_modules/dockview/dist/es6/json.js");
-
-var DATA_KEY = 'splitview/transfer';
-var isPanelTransferEvent = function (event) {
-    if (!event.dataTransfer) {
-        return false;
-    }
-    return event.dataTransfer.types.includes(DATA_KEY);
-};
-var DragType;
-(function (DragType) {
-    DragType["ITEM"] = "group_drag";
-    DragType["EXTERNAL"] = "external_group_drag";
-})(DragType || (DragType = {}));
-/**
- * Determine whether this data belong to that of an event that was started by
- * dragging a tab component
- */
-var isTabDragEvent = function (data) {
-    return data.type === DragType.ITEM;
-};
-/**
- * Determine whether this data belong to that of an event that was started by
- * a custom drag-enable component
- */
-var isCustomDragEvent = function (data) {
-    return data.type === DragType.EXTERNAL;
-};
-var extractData = function (event) {
-    var _a;
-    var data = (0,_json__WEBPACK_IMPORTED_MODULE_0__.tryParseJSON)((_a = event.dataTransfer) === null || _a === void 0 ? void 0 : _a.getData(DATA_KEY));
-    if (!data) {
-        console.warn("[dragEvent] " + DATA_KEY + " data is missing");
-    }
-    if (typeof data.type !== 'string') {
-        console.warn("[dragEvent] invalid type " + data.type);
-    }
-    return data;
-};
-var DataTransfer = /** @class */ (function () {
-    function DataTransfer() {
-        this.map = new Map();
-    }
-    DataTransfer.prototype.setData = function (format, data) {
-        this.map.set(format, data);
-    };
-    DataTransfer.prototype.getData = function (format) {
-        var data = this.map.get(format);
-        return data;
-    };
-    DataTransfer.prototype.has = function (format) {
-        return this.map.has(format);
-    };
-    DataTransfer.prototype.removeData = function (format) {
-        var data = this.getData(format);
-        this.map.delete(format);
-        return data;
-    };
-    Object.defineProperty(DataTransfer.prototype, "size", {
-        get: function () {
-            return this.map.size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    return DataTransfer;
-}());
-var DataTransferSingleton = new DataTransfer();
-/**
- * A singleton to store transfer data during drag & drop operations that are only valid within the application.
- */
-var LocalSelectionTransfer = /** @class */ (function () {
-    function LocalSelectionTransfer() {
-        // protect against external instantiation
-    }
-    LocalSelectionTransfer.getInstance = function () {
-        return LocalSelectionTransfer.INSTANCE;
-    };
-    LocalSelectionTransfer.prototype.hasData = function (proto) {
-        return proto && proto === this.proto;
-    };
-    LocalSelectionTransfer.prototype.clearData = function (proto) {
-        if (this.hasData(proto)) {
-            this.proto = undefined;
-            this.data = undefined;
-        }
-    };
-    LocalSelectionTransfer.prototype.getData = function (proto) {
-        if (this.hasData(proto)) {
-            return this.data;
-        }
-        return undefined;
-    };
-    LocalSelectionTransfer.prototype.setData = function (data, proto) {
-        if (proto) {
-            this.data = data;
-            this.proto = proto;
-        }
-    };
-    LocalSelectionTransfer.INSTANCE = new LocalSelectionTransfer();
-    return LocalSelectionTransfer;
-}());
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/dnd/droptarget.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/dnd/droptarget.js ***!
-  \**********************************************************/
-/*! namespace exports */
-/*! export Droptarget [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Position [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Position": () => /* binding */ Position,
-/* harmony export */   "Droptarget": () => /* binding */ Droptarget
-/* harmony export */ });
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dom */ "./node_modules/dockview/dist/es6/dom.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _dataTransfer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./dataTransfer */ "./node_modules/dockview/dist/es6/dnd/dataTransfer.js");
-
-
-
-var Position;
-(function (Position) {
-    Position["Top"] = "Top";
-    Position["Left"] = "Left";
-    Position["Bottom"] = "Bottom";
-    Position["Right"] = "Right";
-    Position["Center"] = "Center";
-})(Position || (Position = {}));
-var Droptarget = /** @class */ (function () {
-    function Droptarget(element, options) {
-        var _this = this;
-        this.element = element;
-        this.options = options;
-        this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
-        this.onDidChange = this._onDidChange.event;
-        this.onDragEnter = function (event) {
-            if (!_this.options.enableExternalDragEvents &&
-                !_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.DataTransferSingleton.has(_this.options.id)) {
-                console.debug('[droptarget] invalid event');
-                return;
-            }
-            if (_this.options.isDisabled()) {
-                return;
-            }
-            event.preventDefault();
-            if (!_this.target) {
-                console.debug('[droptarget] created');
-                _this.target = document.createElement('div');
-                _this.target.className = 'drop-target-dropzone';
-                _this.overlay = document.createElement('div');
-                _this.overlay.className = 'drop-target-selection';
-                //
-                _this.target.addEventListener('dragover', _this.onDragOver);
-                _this.target.addEventListener('dragleave', _this.onDragLeave);
-                _this.target.addEventListener('drop', _this.onDrop);
-                _this.target.appendChild(_this.overlay);
-                _this.element.classList.add('drop-target');
-                _this.element.append(_this.target);
-            }
-        };
-        this.onDrop = function (event) {
-            if (!_this.options.enableExternalDragEvents &&
-                !_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.DataTransferSingleton.has(_this.options.id)) {
-                console.debug('[dragtarget] invalid');
-                return;
-            }
-            console.debug('[dragtarget] drop');
-            _this.removeDropTarget();
-            if (event.defaultPrevented) {
-                console.debug('[dragtarget] defaultPrevented');
-            }
-            else {
-                _this._onDidChange.fire({ position: _this._state, event: event });
-            }
-            _this._state = undefined;
-        };
-        this.onDragOver = function (event) {
-            var _a, _b;
-            event.preventDefault();
-            if (!_this.options.isDirectional) {
-                return;
-            }
-            var width = (_a = _this.target) === null || _a === void 0 ? void 0 : _a.clientWidth;
-            var height = (_b = _this.target) === null || _b === void 0 ? void 0 : _b.clientHeight;
-            var x = event.offsetX;
-            var y = event.offsetY;
-            var xp = (100 * x) / width;
-            var yp = (100 * y) / height;
-            var isRight = xp > 80;
-            var isLeft = xp < 20;
-            var isTop = !isRight && !isLeft && yp < 20;
-            var isBottom = !isRight && !isLeft && yp > 80;
-            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(_this.overlay, 'right', isRight);
-            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(_this.overlay, 'left', isLeft);
-            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(_this.overlay, 'top', isTop);
-            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(_this.overlay, 'bottom', isBottom);
-            if (isRight) {
-                _this._state = Position.Right;
-            }
-            else if (isLeft) {
-                _this._state = Position.Left;
-            }
-            else if (isTop) {
-                _this._state = Position.Top;
-            }
-            else if (isBottom) {
-                _this._state = Position.Bottom;
-            }
-            else {
-                _this._state = Position.Center;
-            }
-        };
-        this.onDragLeave = function (event) {
-            console.debug('[droptarget] leave');
-            _this.removeDropTarget();
-        };
-        this.element.addEventListener('dragenter', this.onDragEnter);
-    }
-    Object.defineProperty(Droptarget.prototype, "state", {
-        get: function () {
-            return this._state;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Droptarget.prototype.dispose = function () {
-        this._onDidChange.dispose();
-        this.removeDropTarget();
-        this.element.removeEventListener('dragenter', this.onDragEnter);
-    };
-    Droptarget.prototype.removeDropTarget = function () {
-        if (this.target) {
-            this.target.removeEventListener('dragover', this.onDragOver);
-            this.target.removeEventListener('dragleave', this.onDragLeave);
-            this.target.removeEventListener('drop', this.onDrop);
-            this.element.removeChild(this.target);
-            this.target = undefined;
-            this.element.classList.remove('drop-target');
-        }
-    };
-    return Droptarget;
-}());
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/dockview/components/debug/debug.js":
-/*!***************************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/dockview/components/debug/debug.js ***!
-  \***************************************************************************/
-/*! namespace exports */
-/*! export DebugWidget [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DebugWidget": () => /* binding */ DebugWidget
-/* harmony export */ });
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-var DebugWidget = /** @class */ (function (_super) {
-    __extends(DebugWidget, _super);
-    function DebugWidget(layout) {
-        var _this = _super.call(this) || this;
-        _this.layout = layout;
-        var container = document.getElementById('layout-debug-container');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'layout-debug-container';
-            container.className = 'layout-debug-container';
-            document.body.appendChild(container);
-        }
-        _this._element = document.createElement('div');
-        _this._element.innerHTML =
-            "<div class='layout-debug-widget'>" +
-                "<div class='layout-debug-widget-row'><span>Groups:</span><span id='group-count'>0</span></div>" +
-                "<div class='layout-debug-widget-row'><span>Panels:</span><span id='panel-count'>0</span></div>" +
-                "</div>";
-        container.appendChild(_this._element);
-        var gc = _this._element.querySelector('#group-count');
-        var pc = _this._element.querySelector('#panel-count');
-        var events = [
-            "PANEL_CREATED" /* PANEL_CREATED */,
-            "PANEL_DESTROYED" /* PANEL_DESTROYED */,
-            "ADD_GROUP" /* ADD_GROUP */,
-            "REMOVE_GROUP" /* REMOVE_GROUP */,
-        ];
-        _this.addDisposables(_this.layout.onDidLayoutChange(function (event) {
-            if (events.includes(event.kind)) {
-                if (gc) {
-                    gc.textContent = _this.layout.size.toString();
-                }
-                if (pc) {
-                    pc.textContent = _this.layout.totalPanels.toString();
-                }
-            }
-        }));
-        return _this;
-    }
-    DebugWidget.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-        this._element.remove();
-        var container = document.getElementById('layout-debug-container');
-        if (container && container.children.length === 0) {
-            container.remove();
-        }
-    };
-    return DebugWidget;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/dockview/components/tab/defaultTab.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/dockview/components/tab/defaultTab.js ***!
-  \******************************************************************************/
-/*! namespace exports */
-/*! export DefaultTab [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DefaultTab": () => /* binding */ DefaultTab
-/* harmony export */ });
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../dom */ "./node_modules/dockview/dist/es6/dom.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-
-
-
-var DefaultTab = /** @class */ (function (_super) {
-    __extends(DefaultTab, _super);
-    function DefaultTab() {
-        var _this = _super.call(this) || this;
-        _this._isPanelVisible = false;
-        _this._isGroupActive = false;
-        //
-        _this.params = {};
-        //
-        _this.isDirtyDisposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_0__.MutableDisposable();
-        _this._element = document.createElement('div');
-        _this._element.className = 'default-tab';
-        //
-        _this._content = document.createElement('div');
-        _this._content.className = 'tab-content';
-        //
-        _this._actionContainer = document.createElement('div');
-        _this._actionContainer.className = 'action-container';
-        //
-        _this._list = document.createElement('ul');
-        _this._list.className = 'tab-list';
-        //
-        _this.action = document.createElement('a');
-        _this.action.className = 'tab-action';
-        //
-        _this._element.appendChild(_this._content);
-        _this._element.appendChild(_this._actionContainer);
-        _this._actionContainer.appendChild(_this._list);
-        _this._list.appendChild(_this.action);
-        //
-        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this._actionContainer, 'mousedown', function (ev) {
-            ev.preventDefault();
-        }));
-        _this.render();
-        return _this;
-    }
-    Object.defineProperty(DefaultTab.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(DefaultTab.prototype, "id", {
-        get: function () {
-            return '__DEFAULT_TAB__';
-        },
-        enumerable: false,
-        configurable: true
-    });
-    DefaultTab.prototype.update = function (event) {
-        this.params = __assign(__assign({}, this.params), event.params);
-        this.render();
-    };
-    DefaultTab.prototype.toJSON = function () {
-        return { id: this.id };
-    };
-    DefaultTab.prototype.focus = function () {
-        //noop
-    };
-    DefaultTab.prototype.init = function (params) {
-        var _this = this;
-        this.params = params;
-        this._content.textContent = params.title;
-        this.isDirtyDisposable.value = this.params.api.onDidDirtyChange(function (event) {
-            var isDirty = event;
-            (0,_dom__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(_this.action, 'dirty', isDirty);
-        });
-        if (!this.params.suppressClosable) {
-            (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.action, 'click', function (ev) {
-                ev.preventDefault(); //
-                _this.params.api.close();
-            });
-        }
-        else {
-            this.action.classList.add('disable-close');
-        }
-    };
-    DefaultTab.prototype.setVisible = function (isPanelVisible, group) {
-        this._isPanelVisible = isPanelVisible;
-        this._isGroupActive = group.isActive;
-        this.render();
-    };
-    DefaultTab.prototype.layout = function (width, height) {
-        // noop
-    };
-    DefaultTab.prototype.render = function () {
-        this._content.textContent = this.params.title;
-    };
-    return DefaultTab;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/dockview/components/watermark/watermark.js":
-/*!***********************************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/dockview/components/watermark/watermark.js ***!
-  \***********************************************************************************/
-/*! namespace exports */
-/*! export Watermark [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Watermark": () => /* binding */ Watermark
-/* harmony export */ });
-/* harmony import */ var _actionbar_actionsContainer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../actionbar/actionsContainer */ "./node_modules/dockview/dist/es6/actionbar/actionsContainer.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../dom */ "./node_modules/dockview/dist/es6/dom.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-
-
-
-var Watermark = /** @class */ (function (_super) {
-    __extends(Watermark, _super);
-    function Watermark() {
-        var _this = _super.call(this) || this;
-        _this._element = document.createElement('div');
-        _this._element.className = 'watermark';
-        var title = document.createElement('div');
-        title.className = 'watermark-title';
-        var emptySpace = document.createElement('span');
-        emptySpace.style.flexGrow = '1';
-        var content = document.createElement('div');
-        content.className = 'watermark-content';
-        _this._element.appendChild(title);
-        _this._element.appendChild(content);
-        var actions = new _actionbar_actionsContainer__WEBPACK_IMPORTED_MODULE_0__.ActionContainer();
-        title.appendChild(emptySpace);
-        title.appendChild(actions.element);
-        var closeAnchor = document.createElement('a');
-        closeAnchor.className = 'close-action';
-        actions.add(closeAnchor);
-        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(closeAnchor, 'click', function (ev) {
-            ev.preventDefault();
-            _this.params.containerApi.removeGroup(_this.group);
-        }));
-        return _this;
-    }
-    Object.defineProperty(Watermark.prototype, "id", {
-        get: function () {
-            return 'watermark';
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Watermark.prototype.layout = function (width, height) {
-        // noop
-    };
-    Watermark.prototype.init = function (params) {
-        var _this = this;
-        this.params = params;
-        this.addDisposables(this.params.containerApi.onDidLayoutChange(function (event) {
-            _this.render();
-        }));
-        this.render();
-    };
-    Watermark.prototype.setVisible = function (visible, group) {
-        this.group = group;
-        this.render();
-    };
-    Object.defineProperty(Watermark.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Watermark.prototype.render = function () {
-        var isOneGroup = this.params.containerApi.size <= 1;
-        (0,_dom__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(this.element, 'has-actions', isOneGroup);
-    };
-    Watermark.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-    };
-    return Watermark;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/dockview/deserializer.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/dockview/deserializer.js ***!
-  \*****************************************************************/
-/*! namespace exports */
-/*! export DefaultDeserializer [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DefaultDeserializer": () => /* binding */ DefaultDeserializer
-/* harmony export */ });
-var __values = (undefined && undefined.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
-var DefaultDeserializer = /** @class */ (function () {
-    function DefaultDeserializer(layout, panelDeserializer) {
-        this.layout = layout;
-        this.panelDeserializer = panelDeserializer;
-    }
-    DefaultDeserializer.prototype.fromJSON = function (data) {
-        var e_1, _a;
-        var children = data.views;
-        var active = data.activeView;
-        var panels = [];
-        try {
-            for (var children_1 = __values(children), children_1_1 = children_1.next(); !children_1_1.done; children_1_1 = children_1.next()) {
-                var child = children_1_1.value;
-                var panel = this.panelDeserializer.createPanel(child);
-                panels.push(panel);
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (children_1_1 && !children_1_1.done && (_a = children_1.return)) _a.call(children_1);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        var group = this.layout.createGroup({
-            panels: panels,
-            activePanel: panels.find(function (p) { return p.id === active; }),
-            id: data.id,
-        });
-        return group;
-    };
-    return DefaultDeserializer;
-}());
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/dockview/dockviewComponent.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/dockview/dockviewComponent.js ***!
-  \**********************************************************************/
-/*! namespace exports */
-/*! export DockviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DockviewComponent": () => /* binding */ DockviewComponent
-/* harmony export */ });
-/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../gridview/gridview */ "./node_modules/dockview/dist/es6/gridview/gridview.js");
-/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "./node_modules/dockview/dist/es6/dnd/droptarget.js");
-/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../array */ "./node_modules/dockview/dist/es6/array.js");
-/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../groupview/groupview */ "./node_modules/dockview/dist/es6/groupview/groupview.js");
-/* harmony import */ var _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../groupview/groupviewPanel */ "./node_modules/dockview/dist/es6/groupview/groupviewPanel.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _components_watermark_watermark__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/watermark/watermark */ "./node_modules/dockview/dist/es6/dockview/components/watermark/watermark.js");
-/* harmony import */ var _async__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../async */ "./node_modules/dockview/dist/es6/async.js");
-/* harmony import */ var _components_debug_debug__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/debug/debug */ "./node_modules/dockview/dist/es6/dockview/components/debug/debug.js");
-/* harmony import */ var _functions__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../functions */ "./node_modules/dockview/dist/es6/functions.js");
-/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../math */ "./node_modules/dockview/dist/es6/math.js");
-/* harmony import */ var _deserializer__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./deserializer */ "./node_modules/dockview/dist/es6/dockview/deserializer.js");
-/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../panel/componentFactory */ "./node_modules/dockview/dist/es6/panel/componentFactory.js");
-/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../dnd/dataTransfer */ "./node_modules/dockview/dist/es6/dnd/dataTransfer.js");
-/* harmony import */ var _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../gridview/baseComponentGridview */ "./node_modules/dockview/dist/es6/gridview/baseComponentGridview.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../api/component.api */ "./node_modules/dockview/dist/es6/api/component.api.js");
-/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../groupview/tab */ "./node_modules/dockview/dist/es6/groupview/tab.js");
-/* harmony import */ var _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./components/tab/defaultTab */ "./node_modules/dockview/dist/es6/dockview/components/tab/defaultTab.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var __values = (undefined && undefined.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var nextGroupId = (0,_math__WEBPACK_IMPORTED_MODULE_11__.sequentialNumberGenerator)();
-var DockviewComponent = /** @class */ (function (_super) {
-    __extends(DockviewComponent, _super);
-    function DockviewComponent(element, options) {
-        var _this = _super.call(this, element, {
-            proportionalLayout: true,
-            orientation: options.orientation,
-            styles: options.styles,
-        }) || this;
-        _this.options = options;
-        _this.panels = new Map();
-        _this.dirtyPanels = new Set();
-        _this.debouncedDeque = (0,_functions__WEBPACK_IMPORTED_MODULE_10__.debounce)(_this.syncConfigs.bind(_this), 5000);
-        // events
-        _this._onTabInteractionEvent = new _events__WEBPACK_IMPORTED_MODULE_6__.Emitter();
-        _this.onTabInteractionEvent = _this
-            ._onTabInteractionEvent.event;
-        _this._onTabContextMenu = new _events__WEBPACK_IMPORTED_MODULE_6__.Emitter();
-        _this.onTabContextMenu = _this
-            ._onTabContextMenu.event;
-        // everything else
-        _this.drag = new _lifecycle__WEBPACK_IMPORTED_MODULE_5__.MutableDisposable();
-        _this.panelState = {};
-        _this.registry = new Map();
-        if (!_this.options.components) {
-            _this.options.components = {};
-        }
-        if (!_this.options.frameworkComponents) {
-            _this.options.frameworkComponents = {};
-        }
-        if (!_this.options.frameworkTabComponents) {
-            _this.options.frameworkTabComponents = {};
-        }
-        if (!_this.options.tabComponents) {
-            _this.options.tabComponents = {};
-        }
-        if (!_this.options.watermarkComponent &&
-            !_this.options.watermarkFrameworkComponent) {
-            _this.options.watermarkComponent = _components_watermark_watermark__WEBPACK_IMPORTED_MODULE_7__.Watermark;
-        }
-        _this._api = new _api_component_api__WEBPACK_IMPORTED_MODULE_16__.DockviewApi(_this);
-        _this.updateContainer();
-        return _this;
-    }
-    DockviewComponent.prototype.addDndHandle = function (type, cb) {
-        this.registry.set(type, cb);
-    };
-    Object.defineProperty(DockviewComponent.prototype, "totalPanels", {
-        get: function () {
-            return this.panels.size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(DockviewComponent.prototype, "deserializer", {
-        get: function () {
-            return this._deserializer;
-        },
-        set: function (value) {
-            this._deserializer = value;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    DockviewComponent.prototype.focus = function () {
-        var _a;
-        (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.focus();
-    };
-    DockviewComponent.prototype.getGroupPanel = function (id) {
-        var _a;
-        return (_a = this.panels.get(id)) === null || _a === void 0 ? void 0 : _a.value;
-    };
-    DockviewComponent.prototype.createDragTarget = function (target, options) {
-        var _this = this;
-        var disposables = new _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposable((0,_events__WEBPACK_IMPORTED_MODULE_6__.addDisposableListener)(target.element, 'dragstart', function (event) {
-            var _a;
-            if (!event.dataTransfer) {
-                throw new Error('unsupported');
-            }
-            var panelOptions = typeof options === 'function' ? options() : options;
-            var panel = (_a = _this.panels.get(panelOptions.id)) === null || _a === void 0 ? void 0 : _a.value;
-            if (panel) {
-                _this.drag.value = panel.group.startActiveDrag(panel);
-            }
-            var data = JSON.stringify(__assign({ type: _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_14__.DragType.EXTERNAL }, panelOptions));
-            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_14__.DataTransferSingleton.setData(_this.id, data);
-            event.dataTransfer.effectAllowed = 'move';
-            var dragImage = document.createElement('div');
-            dragImage.textContent = target.content;
-            dragImage.classList.add('custom-dragging');
-            document.body.appendChild(dragImage);
-            event.dataTransfer.setDragImage(dragImage, event.offsetX, event.offsetY);
-            setTimeout(function () { return document.body.removeChild(dragImage); }, 0);
-            event.dataTransfer.setData(_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_14__.DATA_KEY, data);
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_6__.addDisposableListener)(this.element, 'dragend', function (ev) {
-            // drop events fire before dragend so we can remove this safely
-            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_14__.DataTransferSingleton.removeData(_this.id);
-            _this.drag.dispose();
-        }));
-        return disposables;
-    };
-    DockviewComponent.prototype.setActivePanel = function (panel) {
-        this.doSetGroupActive(panel.group);
-        panel.group.openPanel(panel);
-    };
-    DockviewComponent.prototype.moveToNext = function (options) {
-        var _a;
-        if (options === void 0) { options = {}; }
-        if (!options.group) {
-            if (!this.activeGroup) {
-                return;
-            }
-            options.group = this.activeGroup;
-        }
-        if (options.includePanel && options.group) {
-            if (options.group.activePanel !==
-                options.group.panels[options.group.panels.length - 1]) {
-                options.group.moveToNext({ suppressRoll: true });
-                return;
-            }
-        }
-        var location = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(options.group.element);
-        var next = (_a = this.gridview.next(location)) === null || _a === void 0 ? void 0 : _a.view;
-        this.doSetGroupActive(next);
-    };
-    DockviewComponent.prototype.moveToPrevious = function (options) {
-        var _a;
-        if (options === void 0) { options = {}; }
-        if (!options.group) {
-            if (!this.activeGroup) {
-                return;
-            }
-            options.group = this.activeGroup;
-        }
-        if (options.includePanel && options.group) {
-            if (options.group.activePanel !== options.group.panels[0]) {
-                options.group.moveToPrevious({ suppressRoll: true });
-                return;
-            }
-        }
-        var location = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(options.group.element);
-        var next = (_a = this.gridview.previous(location)) === null || _a === void 0 ? void 0 : _a.view;
-        this.doSetGroupActive(next);
-    };
-    DockviewComponent.prototype.registerPanel = function (panel) {
-        var _this = this;
-        if (this.panels.has(panel.id)) {
-            throw new Error("panel " + panel.id + " already exists");
-        }
-        var disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposable(panel.onDidStateChange(function () { return _this.addDirtyPanel(panel); }));
-        this.panels.set(panel.id, { value: panel, disposable: disposable });
-        this._onDidLayoutChange.fire({ kind: "PANEL_CREATED" /* PANEL_CREATED */ });
-    };
-    DockviewComponent.prototype.unregisterPanel = function (panel) {
-        if (!this.panels.has(panel.id)) {
-            throw new Error("panel " + panel.id + " doesn't exist");
-        }
-        var _a = this.panels.get(panel.id), disposable = _a.disposable, unregisteredPanel = _a.value;
-        disposable.dispose();
-        unregisteredPanel.dispose();
-        this.panels.delete(panel.id);
-        this._onDidLayoutChange.fire({ kind: "PANEL_DESTROYED" /* PANEL_DESTROYED */ });
-    };
-    /**
-     * Serialize the current state of the layout
-     *
-     * @returns A JSON respresentation of the layout
-     */
-    DockviewComponent.prototype.toJSON = function () {
-        var _this = this;
-        var _a;
-        this.syncConfigs();
-        var data = this.gridview.serialize();
-        var state = __assign({}, this.panelState);
-        // this.activeGroup.id
-        var panels = Array.from(this.panels.values()).reduce(function (collection, panel) {
-            if (!_this.panelState[panel.value.id]) {
-                collection[panel.value.id] = panel.value.toJSON();
-            }
-            return collection;
-        }, state);
-        return {
-            grid: data,
-            panels: panels,
-            activeGroup: (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.id,
-            options: { tabHeight: this.getTabHeight() },
-        };
-    };
-    /**
-     * Ensure the local copy of the layout state is up-to-date
-     */
-    DockviewComponent.prototype.syncConfigs = function () {
-        var _this = this;
-        var dirtyPanels = Array.from(this.dirtyPanels);
-        if (dirtyPanels.length === 0) {
-            console.debug('[layout#syncConfigs] no dirty panels');
-        }
-        this.dirtyPanels.clear();
-        var partialPanelState = dirtyPanels
-            .map(function (panel) { return _this.panels.get(panel.id); })
-            .filter(function (_) { return !!_; })
-            .reduce(function (collection, panel) {
-            collection[panel.value.id] = panel.value.toJSON();
-            return collection;
-        }, {});
-        this.panelState = __assign(__assign({}, this.panelState), partialPanelState);
-        dirtyPanels
-            .filter(function (p) { return _this.panels.has(p.id); })
-            .forEach(function (panel) {
-            panel.setDirty(false);
-            _this._onDidLayoutChange.fire({
-                kind: "PANEL_CLEAN" /* PANEL_CLEAN */,
-            });
-        });
-        this._onDidLayoutChange.fire({
-            kind: "LAYOUT_CONFIG_UPDATED" /* LAYOUT_CONFIG_UPDATED */,
-        });
-    };
-    DockviewComponent.prototype.deserialize = function (data) {
-        this.gridview.clear();
-        this.panels.forEach(function (panel) {
-            panel.disposable.dispose();
-            panel.value.dispose();
-        });
-        this.panels.clear();
-        this.groups.clear();
-        this.fromJSON(data);
-        this.gridview.layout(this.width, this.height);
-    };
-    DockviewComponent.prototype.fromJSON = function (data) {
-        var _this = this;
-        if (!this.deserializer) {
-            throw new Error('invalid deserializer');
-        }
-        var grid = data.grid, panels = data.panels, options = data.options, activeGroup = data.activeGroup;
-        if (typeof (options === null || options === void 0 ? void 0 : options.tabHeight) === 'number') {
-            this.setTabHeight(options.tabHeight);
-        }
-        this.gridview.deserialize(grid, new _deserializer__WEBPACK_IMPORTED_MODULE_12__.DefaultDeserializer(this, {
-            createPanel: function (id) {
-                var panelData = panels[id];
-                var panel = _this.deserializer.fromJSON(panelData);
-                _this.registerPanel(panel);
-                return panel;
-            },
-        }));
-        if (typeof activeGroup === 'string') {
-            this.doSetGroupActive(this.getPanel(activeGroup));
-        }
-        this._onDidLayoutChange.fire({ kind: "NEW_LAYOUT" /* NEW_LAYOUT */ });
-    };
-    DockviewComponent.prototype.closeAllGroups = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _a, _b, entry, _c, key, group, didCloseAll, e_1_1;
-            var e_1, _d;
-            return __generator(this, function (_e) {
-                switch (_e.label) {
-                    case 0:
-                        _e.trys.push([0, 6, 7, 8]);
-                        _a = __values(this.groups.entries()), _b = _a.next();
-                        _e.label = 1;
-                    case 1:
-                        if (!!_b.done) return [3 /*break*/, 5];
-                        entry = _b.value;
-                        _c = __read(entry, 2), key = _c[0], group = _c[1];
-                        return [4 /*yield*/, group.value.closeAllPanels()];
-                    case 2:
-                        didCloseAll = _e.sent();
-                        if (!didCloseAll) {
-                            return [2 /*return*/, false];
-                        }
-                        return [4 /*yield*/, (0,_async__WEBPACK_IMPORTED_MODULE_8__.timeoutAsPromise)(0)];
-                    case 3:
-                        _e.sent();
-                        _e.label = 4;
-                    case 4:
-                        _b = _a.next();
-                        return [3 /*break*/, 1];
-                    case 5: return [3 /*break*/, 8];
-                    case 6:
-                        e_1_1 = _e.sent();
-                        e_1 = { error: e_1_1 };
-                        return [3 /*break*/, 8];
-                    case 7:
-                        try {
-                            if (_b && !_b.done && (_d = _a.return)) _d.call(_a);
-                        }
-                        finally { if (e_1) throw e_1.error; }
-                        return [7 /*endfinally*/];
-                    case 8: return [2 /*return*/, true];
-                }
-            });
-        });
-    };
-    DockviewComponent.prototype.setTabHeight = function (height) {
-        this.options.tabHeight = height;
-        this.groups.forEach(function (value) {
-            value.value.tabHeight = height;
-        });
-    };
-    DockviewComponent.prototype.getTabHeight = function () {
-        return this.options.tabHeight;
-    };
-    DockviewComponent.prototype.fireMouseEvent = function (event) {
-        switch (event.kind) {
-            case _groupview_tab__WEBPACK_IMPORTED_MODULE_17__.MouseEventKind.CONTEXT_MENU:
-                if (event.tab) {
-                    this._onTabContextMenu.fire({
-                        event: event.event,
-                        api: this._api,
-                        panel: event.panel,
-                    });
-                }
-                break;
-        }
-    };
-    DockviewComponent.prototype.addPanel = function (options) {
-        var _a, _b;
-        var panel = this._addPanel(options);
-        var referenceGroup;
-        if ((_a = options.position) === null || _a === void 0 ? void 0 : _a.referencePanel) {
-            var referencePanel = this.getGroupPanel(options.position.referencePanel);
-            referenceGroup = this.findGroup(referencePanel);
-        }
-        else {
-            referenceGroup = this.activeGroup;
-        }
-        if (referenceGroup) {
-            var target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_15__.toTarget)(((_b = options.position) === null || _b === void 0 ? void 0 : _b.direction) || 'within');
-            if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
-                referenceGroup.openPanel(panel);
-            }
-            else {
-                var location_1 = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-                var relativeLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_1, target);
-                this.addPanelToNewGroup(panel, relativeLocation);
-            }
-        }
-        else {
-            this.addPanelToNewGroup(panel);
-        }
-        return panel;
-    };
-    DockviewComponent.prototype._addPanel = function (options) {
-        var contentPart = this.createContentComponent(options.id, options.component);
-        var headerPart = this.createTabComponent(options.id, options.tabComponent);
-        var panel = new _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_4__.GroupviewPanel(options.id, this._api);
-        panel.init({
-            headerPart: headerPart,
-            contentPart: contentPart,
-            title: options.title || options.id,
-            suppressClosable: options === null || options === void 0 ? void 0 : options.suppressClosable,
-            params: (options === null || options === void 0 ? void 0 : options.params) || {},
-        });
-        this.registerPanel(panel);
-        return panel;
-    };
-    DockviewComponent.prototype.createWatermarkComponent = function () {
-        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_13__.createComponent)('watermark-id', 'watermark-name', this.options.watermarkComponent
-            ? { 'watermark-name': this.options.watermarkComponent }
-            : {}, this.options.watermarkFrameworkComponent
-            ? { 'watermark-name': this.options.watermarkFrameworkComponent }
-            : {}, this.options.frameworkComponentFactory.watermark);
-    };
-    DockviewComponent.prototype.createContentComponent = function (id, componentName) {
-        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_13__.createComponent)(id, componentName, this.options.components, this.options.frameworkComponents, this.options.frameworkComponentFactory.content);
-    };
-    DockviewComponent.prototype.createTabComponent = function (id, componentName) {
-        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_13__.createComponent)(id, componentName, this.options.tabComponents, this.options.frameworkTabComponents, this.options.frameworkComponentFactory.tab, function () { return new _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_18__.DefaultTab(); });
-    };
-    DockviewComponent.prototype.addEmptyGroup = function (options) {
-        var group = this.createGroup();
-        if (options) {
-            var referencePanel = this.panels.get(options.referencePanel)
-                .value;
-            var referenceGroup = this.findGroup(referencePanel);
-            var target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_15__.toTarget)(options.direction);
-            var location_2 = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-            var relativeLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_2, target);
-            this.doAddGroup(group, relativeLocation);
-        }
-        else {
-            this.doAddGroup(group);
-        }
-    };
-    DockviewComponent.prototype.removeGroup = function (group) {
-        if (this.groups.size === 1) {
-            group.panels.forEach(function (panel) { return group.removePanel(panel); });
-            this._activeGroup = group;
-            return;
-        }
-        _super.prototype.removeGroup.call(this, group);
-    };
-    DockviewComponent.prototype.addPanelToNewGroup = function (panel, location) {
-        if (location === void 0) { location = [0]; }
-        var group;
-        if (this.groups.size === 1 &&
-            Array.from(this.groups.values())[0].value.size === 0) {
-            group = Array.from(this.groups.values())[0].value;
-        }
-        else {
-            group = this.createGroup();
-            this.doAddGroup(group, location);
-        }
-        group.openPanel(panel);
-    };
-    DockviewComponent.prototype.moveGroupOrPanel = function (referenceGroup, groupId, itemId, target, index) {
-        var sourceGroup = groupId
-            ? this.groups.get(groupId).value
-            : undefined;
-        switch (target) {
-            case _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center:
-            case undefined:
-                var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.removePanel(itemId)) ||
-                    this.panels.get(itemId).value;
-                if ((sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.size) === 0) {
-                    this.doRemoveGroup(sourceGroup);
-                }
-                referenceGroup.openPanel(groupItem, index);
-                return;
-        }
-        var referenceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-        var targetLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
-        if ((sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.size) < 2) {
-            var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(targetLocation), 2), targetParentLocation = _a[0], to = _a[1];
-            var sourceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(sourceGroup.element);
-            var _b = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(sourceLocation), 2), sourceParentLocation = _b[0], from = _b[1];
-            if ((0,_array__WEBPACK_IMPORTED_MODULE_2__.sequenceEquals)(sourceParentLocation, targetParentLocation)) {
-                // special case when 'swapping' two views within same grid location
-                // if a group has one tab - we are essentially moving the 'group'
-                // which is equivalent to swapping two views in this case
-                this.gridview.moveView(sourceParentLocation, from, to);
-                return;
-            }
-            // source group will become empty so delete the group
-            var targetGroup = this.doRemoveGroup(sourceGroup, {
-                skipActive: true,
-                skipDispose: true,
-            });
-            // after deleting the group we need to re-evaulate the ref location
-            var updatedReferenceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-            var location_3 = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, updatedReferenceLocation, target);
-            this.doAddGroup(targetGroup, location_3);
-        }
-        else {
-            var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.removePanel(itemId)) ||
-                this.panels.get(itemId).value;
-            var dropLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
-            this.addPanelToNewGroup(groupItem, dropLocation);
-        }
-    };
-    DockviewComponent.prototype.createGroup = function (options) {
-        var _this = this;
-        if (!options) {
-            options = {};
-        }
-        if (typeof options.tabHeight !== 'number') {
-            options.tabHeight = this.getTabHeight();
-        }
-        if ((options === null || options === void 0 ? void 0 : options.id) && this.groups.has(options.id)) {
-            throw new Error("duplicate group " + options.id);
-        }
-        var group = new _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.Groupview(this, (options === null || options === void 0 ? void 0 : options.id) || nextGroupId.next(), options);
-        if (typeof this.options.tabHeight === 'number') {
-            group.tabHeight = this.options.tabHeight;
-        }
-        if (!this.groups.has(group.id)) {
-            var disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposable(group.onMove(function (event) {
-                var groupId = event.groupId, itemId = event.itemId, target = event.target, index = event.index;
-                _this.moveGroupOrPanel(group, groupId, itemId, target, index);
-            }), group.onDidGroupChange(function (event) {
-                _this._onDidLayoutChange.fire(event);
-            }), group.onDrop(function (event) {
-                var _a;
-                var dragEvent = event.event;
-                var dataTransfer = dragEvent.dataTransfer;
-                if (dataTransfer.types.length === 0) {
-                    return;
-                }
-                var cb = _this.registry.get(dataTransfer.types[0]);
-                if (!cb) {
-                    return;
-                }
-                var panelOptions = cb({ event: event });
-                var panel = _this.getGroupPanel(panelOptions.id);
-                if (!panel) {
-                    panel = _this._addPanel(panelOptions);
-                }
-                _this.moveGroupOrPanel(group, (_a = panel === null || panel === void 0 ? void 0 : panel.group) === null || _a === void 0 ? void 0 : _a.id, panel.id, event.target, event.index);
-            }));
-            this.groups.set(group.id, { value: group, disposable: disposable });
-        }
-        return group;
-    };
-    DockviewComponent.prototype.findGroup = function (panel) {
-        return Array.from(this.groups.values()).find(function (group) {
-            return group.value.containsPanel(panel);
-        }).value;
-    };
-    DockviewComponent.prototype.addDirtyPanel = function (panel) {
-        this.dirtyPanels.add(panel);
-        panel.setDirty(true);
-        this._onDidLayoutChange.fire({ kind: "PANEL_DIRTY" /* PANEL_DIRTY */ });
-        this.debouncedDeque();
-    };
-    DockviewComponent.prototype.dispose = function () {
-        var _a;
-        _super.prototype.dispose.call(this);
-        (_a = this.debugContainer) === null || _a === void 0 ? void 0 : _a.dispose();
-        this._onDidLayoutChange.dispose();
-    };
-    DockviewComponent.prototype.updateContainer = function () {
-        if (this.options.debug) {
-            if (!this.debugContainer) {
-                this.debugContainer = new _components_debug_debug__WEBPACK_IMPORTED_MODULE_9__.DebugWidget(this);
-            }
-            else {
-                this.debugContainer.dispose();
-                this.debugContainer = undefined;
-            }
-        }
-    };
-    return DockviewComponent;
-}(_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_15__.BaseGrid));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/dockview/options.js":
-/*!************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/dockview/options.js ***!
-  \************************************************************/
-/*! namespace exports */
-/*! exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/dom.js":
-/*!***********************************************!*\
-  !*** ./node_modules/dockview/dist/es6/dom.js ***!
-  \***********************************************/
-/*! namespace exports */
-/*! export addClasses [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export getDomNodePagePosition [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isAncestor [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isElementInView [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isHTMLElement [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isInTree [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export removeClasses [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export scrollIntoView [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export toggleClass [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export trackFocus [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "getDomNodePagePosition": () => /* binding */ getDomNodePagePosition,
-/* harmony export */   "scrollIntoView": () => /* binding */ scrollIntoView,
-/* harmony export */   "isElementInView": () => /* binding */ isElementInView,
-/* harmony export */   "isHTMLElement": () => /* binding */ isHTMLElement,
-/* harmony export */   "isInTree": () => /* binding */ isInTree,
-/* harmony export */   "removeClasses": () => /* binding */ removeClasses,
-/* harmony export */   "addClasses": () => /* binding */ addClasses,
-/* harmony export */   "toggleClass": () => /* binding */ toggleClass,
-/* harmony export */   "isAncestor": () => /* binding */ isAncestor,
-/* harmony export */   "trackFocus": () => /* binding */ trackFocus
-/* harmony export */ });
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __values = (undefined && undefined.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
-
-
-function getDomNodePagePosition(domNode) {
-    var bb = domNode.getBoundingClientRect();
-    return {
-        left: bb.left + window.scrollX,
-        top: bb.top + window.scrollY,
-        width: bb.width,
-        height: bb.height,
-    };
-}
-/**
- * Fix the element to the top or bottom of the container depending on whether
- * the element is above or below the containers view portal.
- */
-var scrollIntoView = function (element, container) {
-    var _a = isElementInView(element, container, true), inView = _a.inView, breachPoint = _a.breachPoint;
-    if (!inView) {
-        var adder = -container.offsetTop;
-        var isUp = breachPoint === 'top';
-        container.scrollTo({
-            top: isUp
-                ? adder + element.offsetTop
-                : adder +
-                    element.offsetTop -
-                    container.clientHeight +
-                    element.clientHeight,
-        });
-    }
-};
-var isElementInView = function (element, container, fullyInView) {
-    var containerOfftsetTop = container.offsetTop;
-    var containerTop = containerOfftsetTop + container.scrollTop;
-    var containerBottom = containerTop + container.getBoundingClientRect().height;
-    var elementTop = element.offsetTop;
-    var elementBottom = elementTop + element.getBoundingClientRect().height;
-    var isAbove = fullyInView
-        ? containerTop >= elementTop
-        : elementTop > containerBottom;
-    var isBelow = fullyInView
-        ? containerBottom <= elementBottom
-        : elementBottom < containerTop;
-    if (isAbove) {
-        return { inView: false, breachPoint: 'top' };
-    }
-    if (isBelow) {
-        return { inView: false, breachPoint: 'bottom' };
-    }
-    return { inView: true };
-};
-function isHTMLElement(o) {
-    if (typeof HTMLElement === 'object') {
-        return o instanceof HTMLElement;
-    }
-    return (o &&
-        typeof o === 'object' &&
-        o.nodeType === 1 &&
-        typeof o.nodeName === 'string');
-}
-var isInTree = function (element, className) {
-    var _element = element;
-    while (_element) {
-        if (_element.classList.contains(className)) {
-            return true;
-        }
-        _element = _element.parentElement;
-    }
-    return false;
-};
-var removeClasses = function (element) {
-    var e_1, _a;
-    var classes = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        classes[_i - 1] = arguments[_i];
-    }
-    try {
-        for (var classes_1 = __values(classes), classes_1_1 = classes_1.next(); !classes_1_1.done; classes_1_1 = classes_1.next()) {
-            var classname = classes_1_1.value;
-            if (element.classList.contains(classname)) {
-                element.classList.remove(classname);
-            }
-        }
-    }
-    catch (e_1_1) { e_1 = { error: e_1_1 }; }
-    finally {
-        try {
-            if (classes_1_1 && !classes_1_1.done && (_a = classes_1.return)) _a.call(classes_1);
-        }
-        finally { if (e_1) throw e_1.error; }
-    }
-};
-var addClasses = function (element) {
-    var e_2, _a;
-    var classes = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        classes[_i - 1] = arguments[_i];
-    }
-    try {
-        for (var classes_2 = __values(classes), classes_2_1 = classes_2.next(); !classes_2_1.done; classes_2_1 = classes_2.next()) {
-            var classname = classes_2_1.value;
-            if (!element.classList.contains(classname)) {
-                element.classList.add(classname);
-            }
-        }
-    }
-    catch (e_2_1) { e_2 = { error: e_2_1 }; }
-    finally {
-        try {
-            if (classes_2_1 && !classes_2_1.done && (_a = classes_2.return)) _a.call(classes_2);
-        }
-        finally { if (e_2) throw e_2.error; }
-    }
-};
-var toggleClass = function (element, className, isToggled) {
-    var hasClass = element.classList.contains(className);
-    if (isToggled && !hasClass) {
-        element.classList.add(className);
-    }
-    if (!isToggled && hasClass) {
-        element.classList.remove(className);
-    }
-};
-function isAncestor(testChild, testAncestor) {
-    while (testChild) {
-        if (testChild === testAncestor) {
-            return true;
-        }
-        testChild = testChild.parentNode;
-    }
-    return false;
-}
-function trackFocus(element) {
-    return new FocusTracker(element);
-}
-/**
- * Track focus on an element. Ensure tabIndex is set when an HTMLElement is not focusable by default
- */
-var FocusTracker = /** @class */ (function (_super) {
-    __extends(FocusTracker, _super);
-    function FocusTracker(element) {
-        var _this = _super.call(this) || this;
-        _this._onDidFocus = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onDidFocus = _this._onDidFocus.event;
-        _this._onDidBlur = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onDidBlur = _this._onDidBlur.event;
-        var hasFocus = isAncestor(document.activeElement, element);
-        var loosingFocus = false;
-        var onFocus = function () {
-            loosingFocus = false;
-            if (!hasFocus) {
-                hasFocus = true;
-                _this._onDidFocus.fire();
-            }
-        };
-        var onBlur = function () {
-            if (hasFocus) {
-                loosingFocus = true;
-                window.setTimeout(function () {
-                    if (loosingFocus) {
-                        loosingFocus = false;
-                        hasFocus = false;
-                        _this._onDidBlur.fire();
-                    }
-                }, 0);
-            }
-        };
-        _this._refreshStateHandler = function () {
-            var currentNodeHasFocus = isAncestor(document.activeElement, element);
-            if (currentNodeHasFocus !== hasFocus) {
-                if (hasFocus) {
-                    onBlur();
-                }
-                else {
-                    onFocus();
-                }
-            }
-        };
-        if (element instanceof HTMLElement) {
-            _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(element, 'focus', onFocus, true));
-            _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(element, 'blur', onBlur, true));
-        }
-        else {
-            _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableWindowListener)(element, 'focus', onFocus, true));
-            _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableWindowListener)(element, 'blur', onBlur, true));
-        }
-        return _this;
-    }
-    FocusTracker.prototype.refreshState = function () {
-        this._refreshStateHandler();
-    };
-    FocusTracker.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-        this._onDidBlur.dispose();
-        this._onDidFocus.dispose();
-    };
-    return FocusTracker;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable));
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/events.js":
-/*!**************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/events.js ***!
-  \**************************************************/
-/*! namespace exports */
-/*! export Emitter [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Event [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export addDisposableListener [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export addDisposableWindowListener [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Event": () => /* binding */ Event,
-/* harmony export */   "Emitter": () => /* binding */ Emitter,
-/* harmony export */   "addDisposableWindowListener": () => /* binding */ addDisposableWindowListener,
-/* harmony export */   "addDisposableListener": () => /* binding */ addDisposableListener
-/* harmony export */ });
-var Event;
-(function (Event) {
-    Event.any = function () {
-        var children = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            children[_i] = arguments[_i];
-        }
-        return function (listener) {
-            var disposables = children.map(function (child) { return child(listener); });
-            return {
-                dispose: function () {
-                    disposables.forEach(function (d) {
-                        d.dispose();
-                    });
-                },
-            };
-        };
-    };
-})(Event || (Event = {}));
-// dumb event emitter with better typings than nodes event emitter
-// https://github.com/microsoft/vscode/blob/master/src/vs/base/common/event.ts
-var Emitter = /** @class */ (function () {
-    function Emitter(options) {
-        this.options = options;
-        this._listeners = [];
-        this._disposed = false;
-    }
-    Object.defineProperty(Emitter.prototype, "event", {
-        get: function () {
-            var _this = this;
-            if (!this._event) {
-                this._event = function (listener) {
-                    var _a;
-                    if (((_a = _this.options) === null || _a === void 0 ? void 0 : _a.replay) && _this._last !== undefined) {
-                        listener(_this._last);
-                    }
-                    _this._listeners.push(listener);
-                    return {
-                        dispose: function () {
-                            var index = _this._listeners.indexOf(listener);
-                            if (index > -1) {
-                                _this._listeners.splice(index, 1);
-                            }
-                        },
-                    };
-                };
-            }
-            return this._event;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Emitter.prototype.fire = function (e) {
-        this._last = e;
-        this._listeners.forEach(function (listener) {
-            listener(e);
-        });
-    };
-    Emitter.prototype.dispose = function () {
-        this._listeners = [];
-        this._disposed = true;
-    };
-    return Emitter;
-}());
-
-function addDisposableWindowListener(element, type, listener, options) {
-    element.addEventListener(type, listener, options);
-    return {
-        dispose: function () {
-            element.removeEventListener(type, listener);
-        },
-    };
-}
-function addDisposableListener(element, type, listener, options) {
-    element.addEventListener(type, listener, options);
-    return {
-        dispose: function () {
-            element.removeEventListener(type, listener);
-        },
-    };
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/focusedElement.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/focusedElement.js ***!
-  \**********************************************************/
-/*! namespace exports */
-/*! export focusedElement [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "focusedElement": () => /* binding */ focusedElement
-/* harmony export */ });
-var focusedElement = { element: undefined };
-//TODO somebody could call .stopPropagation() on this - can you do this at the event capture-stage instead?
-window.addEventListener('focusin', function () {
-    focusedElement.element = document.activeElement;
-});
-focusedElement.element = document.activeElement;
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/functions.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/functions.js ***!
-  \*****************************************************/
-/*! namespace exports */
-/*! export debounce [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "debounce": () => /* binding */ debounce
-/* harmony export */ });
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
-};
-function debounce(cb, wait) {
-    var timeout;
-    var callable = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        clearTimeout(timeout);
-        timeout = setTimeout(function () { return cb.apply(void 0, __spread(args)); }, wait);
-    };
-    return callable;
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/gridview/baseComponentGridview.js":
-/*!**************************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/gridview/baseComponentGridview.js ***!
-  \**************************************************************************/
-/*! namespace exports */
-/*! export BaseGrid [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export toTarget [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "toTarget": () => /* binding */ toTarget,
-/* harmony export */   "BaseGrid": () => /* binding */ BaseGrid
-/* harmony export */ });
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _gridview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./gridview */ "./node_modules/dockview/dist/es6/gridview/gridview.js");
-/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../dnd/droptarget */ "./node_modules/dockview/dist/es6/dnd/droptarget.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../math */ "./node_modules/dockview/dist/es6/math.js");
-/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../splitview/core/splitview */ "./node_modules/dockview/dist/es6/splitview/core/splitview.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-
-
-
-
-
-var nextLayoutId = (0,_math__WEBPACK_IMPORTED_MODULE_4__.sequentialNumberGenerator)();
-function toTarget(direction) {
-    switch (direction) {
-        case 'left':
-            return _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Left;
-        case 'right':
-            return _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Right;
-        case 'above':
-            return _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Top;
-        case 'below':
-            return _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Bottom;
-        case 'within':
-        default:
-            return _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Center;
-    }
-}
-var BaseGrid = /** @class */ (function (_super) {
-    __extends(BaseGrid, _super);
-    function BaseGrid(_element, options) {
-        var _this = _super.call(this) || this;
-        _this._element = _element;
-        _this._id = nextLayoutId.next();
-        _this.groups = new Map();
-        //
-        _this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onDidLayoutChange = _this
-            ._onDidLayoutChange.event;
-        _this.gridview = new _gridview__WEBPACK_IMPORTED_MODULE_1__.Gridview(!!options.proportionalLayout, options.styles, options.orientation);
-        _this.element.appendChild(_this.gridview.element);
-        // TODO for some reason this is required before anything will layout correctly
-        _this.layout(0, 0, true);
-        _this.addDisposables(_this.gridview.onDidChange(function (event) {
-            _this._onDidLayoutChange.fire({ kind: "LAYOUT" /* LAYOUT */ });
-        }));
-        return _this;
-    }
-    Object.defineProperty(BaseGrid.prototype, "id", {
-        get: function () {
-            return this._id;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseGrid.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseGrid.prototype, "size", {
-        get: function () {
-            return this.groups.size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseGrid.prototype, "width", {
-        get: function () {
-            return this.gridview.width;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseGrid.prototype, "height", {
-        get: function () {
-            return this.gridview.height;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseGrid.prototype, "minimumHeight", {
-        get: function () {
-            return this.gridview.minimumHeight;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseGrid.prototype, "maximumHeight", {
-        get: function () {
-            return this.gridview.maximumHeight;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseGrid.prototype, "minimumWidth", {
-        get: function () {
-            return this.gridview.minimumWidth;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseGrid.prototype, "maximumWidth", {
-        get: function () {
-            return this.gridview.maximumWidth;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseGrid.prototype, "activeGroup", {
-        get: function () {
-            return this._activeGroup;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    BaseGrid.prototype.setVisible = function (panel, visible) {
-        this.gridview.setViewVisible((0,_gridview__WEBPACK_IMPORTED_MODULE_1__.getGridLocation)(panel.element), visible);
-        this._onDidLayoutChange.fire({ kind: "LAYOUT" /* LAYOUT */ });
-    };
-    BaseGrid.prototype.isVisible = function (panel) {
-        return this.gridview.isViewVisible((0,_gridview__WEBPACK_IMPORTED_MODULE_1__.getGridLocation)(panel.element));
-    };
-    BaseGrid.prototype.doAddGroup = function (group, location, size) {
-        if (location === void 0) { location = [0]; }
-        this.gridview.addView(group, size !== null && size !== void 0 ? size : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__.Sizing.Distribute, location);
-        this._onDidLayoutChange.fire({ kind: "ADD_GROUP" /* ADD_GROUP */ });
-        this.doSetGroupActive(group);
-    };
-    BaseGrid.prototype.doRemoveGroup = function (group, options) {
-        if (!this.groups.has(group.id)) {
-            throw new Error('invalid operation');
-        }
-        var disposable = this.groups.get(group.id).disposable;
-        if (!(options === null || options === void 0 ? void 0 : options.skipDispose)) {
-            disposable.dispose();
-            this.groups.delete(group.id);
-        }
-        var view = this.gridview.remove(group, _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__.Sizing.Distribute);
-        this._onDidLayoutChange.fire({ kind: "REMOVE_GROUP" /* REMOVE_GROUP */ });
-        if (!(options === null || options === void 0 ? void 0 : options.skipActive) && this.groups.size > 0) {
-            this.doSetGroupActive(Array.from(this.groups.values())[0].value);
-        }
-        return view;
-    };
-    BaseGrid.prototype.getPanel = function (id) {
-        var _a;
-        return (_a = this.groups.get(id)) === null || _a === void 0 ? void 0 : _a.value;
-    };
-    BaseGrid.prototype.doSetGroupActive = function (group, skipFocus) {
-        if (this._activeGroup === group) {
-            return;
-        }
-        if (this._activeGroup) {
-            this._activeGroup.setActive(false, skipFocus);
-        }
-        group.setActive(true, skipFocus);
-        this._activeGroup = group;
-    };
-    BaseGrid.prototype.removeGroup = function (group) {
-        if (group === this._activeGroup) {
-            this._activeGroup = undefined;
-        }
-        this.doRemoveGroup(group);
-    };
-    BaseGrid.prototype.moveToNext = function (options) {
-        var _a;
-        if (!options) {
-            options = {};
-        }
-        if (!options.group) {
-            if (!this.activeGroup) {
-                return;
-            }
-            options.group = this.activeGroup;
-        }
-        var location = (0,_gridview__WEBPACK_IMPORTED_MODULE_1__.getGridLocation)(options.group.element);
-        var next = (_a = this.gridview.next(location)) === null || _a === void 0 ? void 0 : _a.view;
-        this.doSetGroupActive(next);
-    };
-    BaseGrid.prototype.moveToPrevious = function (options) {
-        var _a;
-        if (!options) {
-            options = {};
-        }
-        if (!options.group) {
-            if (!this.activeGroup) {
-                return;
-            }
-            options.group = this.activeGroup;
-        }
-        var location = (0,_gridview__WEBPACK_IMPORTED_MODULE_1__.getGridLocation)(options.group.element);
-        var next = (_a = this.gridview.previous(location)) === null || _a === void 0 ? void 0 : _a.view;
-        this.doSetGroupActive(next);
-    };
-    BaseGrid.prototype.layout = function (width, height, forceResize) {
-        var different = forceResize || width !== this.width || height !== this.height;
-        if (!different) {
-            return;
-        }
-        this.element.style.height = height + "px";
-        this.element.style.width = width + "px";
-        this.gridview.layout(width, height);
-    };
-    BaseGrid.prototype.setAutoResizeToFit = function (enabled) {
-        var _this = this;
-        if (this.resizeTimer) {
-            clearInterval(this.resizeTimer);
-        }
-        if (enabled) {
-            this.resizeTimer = setInterval(function () {
-                _this.resizeToFit();
-            }, 500);
-        }
-    };
-    /**
-     * Resize the layout to fit the parent container
-     */
-    BaseGrid.prototype.resizeToFit = function () {
-        if (!this.element.parentElement) {
-            return;
-        }
-        var _a = this.element.parentElement.getBoundingClientRect(), width = _a.width, height = _a.height;
-        this.layout(width, height);
-    };
-    BaseGrid.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-        if (this.resizeTimer) {
-            clearInterval(this.resizeTimer);
-            this.resizeTimer = undefined;
-        }
-        this._onDidLayoutChange.dispose();
-        this.gridview.dispose();
-    };
-    return BaseGrid;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/gridview/basePanelView.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/gridview/basePanelView.js ***!
-  \******************************************************************/
-/*! namespace exports */
-/*! export BasePanelView [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "BasePanelView": () => /* binding */ BasePanelView
-/* harmony export */ });
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dom */ "./node_modules/dockview/dist/es6/dom.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-
-
-var BasePanelView = /** @class */ (function (_super) {
-    __extends(BasePanelView, _super);
-    function BasePanelView(id, component, api) {
-        var _this = _super.call(this) || this;
-        _this.id = id;
-        _this.component = component;
-        _this.api = api;
-        _this._height = 0;
-        _this._width = 0;
-        _this._element = document.createElement('div');
-        _this._element.tabIndex = -1;
-        _this._element.style.outline = 'none';
-        _this._element.style.height = '100%';
-        _this._element.style.width = '100%';
-        _this._element.style.overflow = 'hidden';
-        var _a = (0,_dom__WEBPACK_IMPORTED_MODULE_0__.trackFocus)(_this._element), onDidFocus = _a.onDidFocus, onDidBlur = _a.onDidBlur;
-        _this.addDisposables(_this.api, onDidFocus(function () {
-            _this.api._onDidChangeFocus.fire({ isFocused: true });
-        }), onDidBlur(function () {
-            _this.api._onDidChangeFocus.fire({ isFocused: false });
-        }));
-        return _this;
-    }
-    Object.defineProperty(BasePanelView.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BasePanelView.prototype, "width", {
-        get: function () {
-            return this._width;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BasePanelView.prototype, "height", {
-        get: function () {
-            return this._height;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    BasePanelView.prototype.focus = function () {
-        this.api._onFocusEvent.fire();
-    };
-    BasePanelView.prototype.layout = function (width, height) {
-        this._width = width;
-        this._height = height;
-        this.api._onDidPanelDimensionChange.fire({ width: width, height: height });
-    };
-    BasePanelView.prototype.init = function (parameters) {
-        this.params = parameters;
-        this.part = this.getComponent();
-    };
-    BasePanelView.prototype.setVisible = function (isVisible) {
-        this.api._onDidVisibilityChange.fire({ isVisible: isVisible });
-    };
-    BasePanelView.prototype.setActive = function (isActive) {
-        this.api._onDidActiveChange.fire({ isActive: isActive });
-    };
-    BasePanelView.prototype.update = function (params) {
-        var _a;
-        this.params = __assign(__assign({}, this.params), { params: params.params });
-        (_a = this.part) === null || _a === void 0 ? void 0 : _a.update(this.params.params);
-    };
-    BasePanelView.prototype.toJSON = function () {
-        var state = this.api.getState();
-        return {
-            id: this.id,
-            component: this.component,
-            props: this.params.params,
-            state: Object.keys(state).length === 0 ? undefined : state,
-        };
-    };
-    BasePanelView.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-        this.api.dispose();
-    };
-    return BasePanelView;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/gridview/branchNode.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/gridview/branchNode.js ***!
-  \***************************************************************/
-/*! namespace exports */
-/*! export BranchNode [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "BranchNode": () => /* binding */ BranchNode
-/* harmony export */ });
-/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../splitview/core/splitview */ "./node_modules/dockview/dist/es6/splitview/core/splitview.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _leafNode__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./leafNode */ "./node_modules/dockview/dist/es6/gridview/leafNode.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
-};
-var __values = (undefined && undefined.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
-
-
-
-
-var BranchNode = /** @class */ (function (_super) {
-    __extends(BranchNode, _super);
-    function BranchNode(orientation, proportionalLayout, styles, size, orthogonalSize, childDescriptors) {
-        if (size === void 0) { size = 0; }
-        var _this = _super.call(this) || this;
-        _this.orientation = orientation;
-        _this.proportionalLayout = proportionalLayout;
-        _this.styles = styles;
-        _this.children = [];
-        _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
-        _this.onDidChange = _this._onDidChange.event;
-        _this._childrenDisposable = _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Disposable.NONE;
-        _this._orthogonalSize = orthogonalSize;
-        _this._size = size;
-        _this.element = document.createElement('div');
-        _this.element.className = 'branch-node';
-        if (!childDescriptors) {
-            _this.splitview = new _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Splitview(_this.element, {
-                orientation: _this.orientation,
-                proportionalLayout: proportionalLayout,
-                styles: styles,
-            });
-            _this.splitview.layout(_this.size, _this.orthogonalSize);
-        }
-        else {
-            var descriptor = {
-                views: childDescriptors.map(function (childDescriptor) {
-                    return {
-                        view: childDescriptor.node,
-                        size: childDescriptor.node.size,
-                        visible: childDescriptor.node instanceof _leafNode__WEBPACK_IMPORTED_MODULE_2__.LeafNode &&
-                            childDescriptor.visible !== undefined
-                            ? childDescriptor.visible
-                            : true,
-                    };
-                }),
-                size: _this.orthogonalSize,
-            };
-            _this.children = childDescriptors.map(function (c) { return c.node; });
-            _this.splitview = new _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Splitview(_this.element, {
-                orientation: _this.orientation,
-                descriptor: descriptor,
-                proportionalLayout: proportionalLayout,
-            });
-        }
-        _this.addDisposables(_this.splitview.onDidSashEnd(function () {
-            _this._onDidChange.fire(undefined);
-        }));
-        _this.setupChildrenEvents();
-        return _this;
-    }
-    Object.defineProperty(BranchNode.prototype, "width", {
-        get: function () {
-            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
-                ? this.size
-                : this.orthogonalSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BranchNode.prototype, "height", {
-        get: function () {
-            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
-                ? this.orthogonalSize
-                : this.size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BranchNode.prototype, "minimumSize", {
-        get: function () {
-            return this.children.length === 0
-                ? 0
-                : Math.max.apply(Math, __spread(this.children.map(function (c) { return c.minimumOrthogonalSize; })));
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BranchNode.prototype, "maximumSize", {
-        get: function () {
-            return Math.min.apply(Math, __spread(this.children.map(function (c) { return c.maximumOrthogonalSize; })));
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BranchNode.prototype, "minimumOrthogonalSize", {
-        get: function () {
-            return this.splitview.minimumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BranchNode.prototype, "maximumOrthogonalSize", {
-        get: function () {
-            return this.splitview.maximumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BranchNode.prototype, "orthogonalSize", {
-        get: function () {
-            return this._orthogonalSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BranchNode.prototype, "size", {
-        get: function () {
-            return this._size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BranchNode.prototype, "minimumWidth", {
-        get: function () {
-            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
-                ? this.minimumOrthogonalSize
-                : this.minimumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BranchNode.prototype, "minimumHeight", {
-        get: function () {
-            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
-                ? this.minimumSize
-                : this.minimumOrthogonalSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BranchNode.prototype, "maximumWidth", {
-        get: function () {
-            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
-                ? this.maximumOrthogonalSize
-                : this.maximumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BranchNode.prototype, "maximumHeight", {
-        get: function () {
-            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
-                ? this.maximumSize
-                : this.maximumOrthogonalSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BranchNode.prototype, "priority", {
-        get: function () {
-            if (this.children.length === 0) {
-                return _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority.Normal;
-            }
-            var priorities = this.children.map(function (c) {
-                return typeof c.priority === 'undefined'
-                    ? _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority.Normal
-                    : c.priority;
-            });
-            if (priorities.some(function (p) { return p === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority.High; })) {
-                return _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority.High;
-            }
-            else if (priorities.some(function (p) { return p === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority.Low; })) {
-                return _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority.Low;
-            }
-            return _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority.Normal;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    BranchNode.prototype.setVisible = function (visible) {
-        var e_1, _a;
-        try {
-            for (var _b = __values(this.children), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var child = _c.value;
-                child.setVisible(visible);
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-    };
-    BranchNode.prototype.isChildVisible = function (index) {
-        if (index < 0 || index >= this.children.length) {
-            throw new Error('Invalid index');
-        }
-        return this.splitview.isViewVisible(index);
-    };
-    BranchNode.prototype.setChildVisible = function (index, visible) {
-        if (index < 0 || index >= this.children.length) {
-            throw new Error('Invalid index');
-        }
-        if (this.splitview.isViewVisible(index) === visible) {
-            return;
-        }
-        this.splitview.setViewVisible(index, visible);
-    };
-    BranchNode.prototype.moveChild = function (from, to) {
-        if (from === to) {
-            return;
-        }
-        if (from < 0 || from >= this.children.length) {
-            throw new Error('Invalid from index');
-        }
-        if (from < to) {
-            to--;
-        }
-        this.splitview.moveView(from, to);
-        var child = this._removeChild(from);
-        this._addChild(child, to);
-    };
-    BranchNode.prototype.getChildSize = function (index) {
-        if (index < 0 || index >= this.children.length) {
-            throw new Error('Invalid index');
-        }
-        return this.splitview.getViewSize(index);
-    };
-    BranchNode.prototype.resizeChild = function (index, size) {
-        if (index < 0 || index >= this.children.length) {
-            throw new Error('Invalid index');
-        }
-        this.splitview.resizeView(index, size);
-    };
-    BranchNode.prototype.layout = function (size, orthogonalSize) {
-        this._size = size;
-        this._orthogonalSize = orthogonalSize;
-        this.splitview.layout(this.orthogonalSize, this.size);
-    };
-    BranchNode.prototype.addChild = function (node, size, index, skipLayout) {
-        if (index < 0 || index > this.children.length) {
-            throw new Error('Invalid index');
-        }
-        this.splitview.addView(node, size, index, skipLayout);
-        this._addChild(node, index);
-    };
-    BranchNode.prototype.getChildCachedVisibleSize = function (index) {
-        if (index < 0 || index >= this.children.length) {
-            throw new Error('Invalid index');
-        }
-        return this.splitview.getViewCachedVisibleSize(index);
-    };
-    BranchNode.prototype.removeChild = function (index, sizing) {
-        if (index < 0 || index >= this.children.length) {
-            throw new Error('Invalid index');
-        }
-        this.splitview.removeView(index, sizing);
-        this._removeChild(index);
-    };
-    BranchNode.prototype._addChild = function (node, index) {
-        this.children.splice(index, 0, node);
-        this.setupChildrenEvents();
-    };
-    BranchNode.prototype._removeChild = function (index) {
-        var _a = __read(this.children.splice(index, 1), 1), child = _a[0];
-        this.setupChildrenEvents();
-        return child;
-    };
-    BranchNode.prototype.setupChildrenEvents = function () {
-        var _this = this;
-        this._childrenDisposable.dispose();
-        this._childrenDisposable = _events__WEBPACK_IMPORTED_MODULE_1__.Event.any.apply(_events__WEBPACK_IMPORTED_MODULE_1__.Event, __spread(this.children.map(function (c) { return c.onDidChange; })))(function (e) {
-            /**
-             * indicate a change has occured to allows any re-rendering but don't bubble
-             * event because that was specific to this branch
-             */
-            _this._onDidChange.fire(undefined);
-        });
-    };
-    BranchNode.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-        this._childrenDisposable.dispose();
-        this.children.forEach(function (child) { return child.dispose(); });
-        this.splitview.dispose();
-    };
-    return BranchNode;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/gridview/gridview.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/gridview/gridview.js ***!
-  \*************************************************************/
-/*! namespace exports */
-/*! export Gridview [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export getDirectionOrientation [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export getGridLocation [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export getLocationOrientation [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export getRelativeLocation [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export indexInParent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isGridBranchNode [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export orthogonal [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "indexInParent": () => /* binding */ indexInParent,
-/* harmony export */   "getGridLocation": () => /* binding */ getGridLocation,
-/* harmony export */   "getRelativeLocation": () => /* binding */ getRelativeLocation,
-/* harmony export */   "getDirectionOrientation": () => /* binding */ getDirectionOrientation,
-/* harmony export */   "getLocationOrientation": () => /* binding */ getLocationOrientation,
-/* harmony export */   "orthogonal": () => /* binding */ orthogonal,
-/* harmony export */   "isGridBranchNode": () => /* binding */ isGridBranchNode,
-/* harmony export */   "Gridview": () => /* binding */ Gridview
-/* harmony export */ });
-/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../splitview/core/splitview */ "./node_modules/dockview/dist/es6/splitview/core/splitview.js");
-/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "./node_modules/dockview/dist/es6/dnd/droptarget.js");
-/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../array */ "./node_modules/dockview/dist/es6/array.js");
-/* harmony import */ var _leafNode__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./leafNode */ "./node_modules/dockview/dist/es6/gridview/leafNode.js");
-/* harmony import */ var _branchNode__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./branchNode */ "./node_modules/dockview/dist/es6/gridview/branchNode.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
-};
-
-
-
-
-
-
-
-function flipNode(node, size, orthogonalSize) {
-    if (node instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode) {
-        var result = new _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode(orthogonal(node.orientation), node.proportionalLayout, node.styles, size, orthogonalSize);
-        var totalSize = 0;
-        for (var i = node.children.length - 1; i >= 0; i--) {
-            var child = node.children[i];
-            var childSize = child instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode ? child.orthogonalSize : child.size;
-            var newSize = node.size === 0
-                ? 0
-                : Math.round((size * childSize) / node.size);
-            totalSize += newSize;
-            // The last view to add should adjust to rounding errors
-            if (i === 0) {
-                newSize += size - totalSize;
-            }
-            result.addChild(flipNode(child, orthogonalSize, newSize), newSize, 0, true);
-        }
-        return result;
-    }
-    else {
-        return new _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode(node.view, orthogonal(node.orientation), orthogonalSize);
-    }
-}
-function indexInParent(element) {
-    var parentElement = element.parentElement;
-    if (!parentElement) {
-        throw new Error('Invalid grid element');
-    }
-    var el = parentElement.firstElementChild;
-    var index = 0;
-    while (el !== element && el !== parentElement.lastElementChild && el) {
-        el = el.nextElementSibling;
-        index++;
-    }
-    return index;
-}
-/**
- * Find the grid location of a specific DOM element by traversing the parent
- * chain and finding each child index on the way.
- *
- * This will break as soon as DOM structures of the Splitview or Gridview change.
- */
-function getGridLocation(element) {
-    var parentElement = element.parentElement;
-    if (!parentElement) {
-        throw new Error('Invalid grid element');
-    }
-    if (/\bgrid-view\b/.test(parentElement.className)) {
-        return [];
-    }
-    var index = indexInParent(parentElement);
-    var ancestor = parentElement.parentElement.parentElement.parentElement;
-    return __spread(getGridLocation(ancestor), [index]);
-}
-function getRelativeLocation(rootOrientation, location, direction) {
-    var orientation = getLocationOrientation(rootOrientation, location);
-    var directionOrientation = getDirectionOrientation(direction);
-    if (orientation === directionOrientation) {
-        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(location), 2), rest = _a[0], _index = _a[1];
-        var index = _index;
-        if (direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Right || direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Bottom) {
-            index += 1;
-        }
-        return __spread(rest, [index]);
-    }
-    else {
-        var index = direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Right || direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Bottom
-            ? 1
-            : 0;
-        return __spread(location, [index]);
-    }
-}
-function getDirectionOrientation(direction) {
-    return direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Top || direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Bottom
-        ? _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.VERTICAL
-        : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL;
-}
-function getLocationOrientation(rootOrientation, location) {
-    return location.length % 2 === 0
-        ? orthogonal(rootOrientation)
-        : rootOrientation;
-}
-var orthogonal = function (orientation) {
-    return orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
-        ? _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.VERTICAL
-        : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL;
-};
-function isGridBranchNode(node) {
-    return !!node.children;
-}
-var serializeBranchNode = function (node, orientation) {
-    var size = orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.VERTICAL ? node.box.width : node.box.height;
-    if (!isGridBranchNode(node)) {
-        if (typeof node.cachedVisibleSize === 'number') {
-            return {
-                type: 'leaf',
-                data: node.view.toJSON(),
-                size: node.cachedVisibleSize,
-                visible: false,
-            };
-        }
-        return { type: 'leaf', data: node.view.toJSON(), size: size };
-    }
-    return {
-        type: 'branch',
-        data: node.children.map(function (c) {
-            return serializeBranchNode(c, orthogonal(orientation));
-        }),
-        size: size,
-    };
-};
-var Gridview = /** @class */ (function () {
-    function Gridview(proportionalLayout, styles, orientation) {
-        if (orientation === void 0) { orientation = _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL; }
-        this.proportionalLayout = proportionalLayout;
-        this.styles = styles;
-        this.disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_6__.MutableDisposable();
-        this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
-        this.onDidChange = this._onDidChange.event;
-        this.element = document.createElement('div');
-        this.element.className = 'grid-view';
-        this.root = new _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode(orientation, proportionalLayout, styles, 0, 0);
-    }
-    Gridview.prototype.serialize = function () {
-        return {
-            root: serializeBranchNode(this.getView(), this.orientation),
-            height: this.height,
-            width: this.width,
-            orientation: this.orientation,
-        };
-    };
-    Gridview.prototype.dispose = function () {
-        this._onDidChange.dispose();
-        this.root.dispose();
-    };
-    Gridview.prototype.clear = function () {
-        var orientation = this.root.orientation;
-        this.root = new _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode(orientation, this.proportionalLayout, this.styles, this.root.size, this.root.orthogonalSize);
-    };
-    Gridview.prototype.deserialize = function (json, deserializer) {
-        var orientation = json.orientation;
-        var height = json.height;
-        this.orientation = orientation;
-        this._deserialize(json.root, orientation, deserializer, height);
-    };
-    Gridview.prototype._deserialize = function (root, orientation, deserializer, orthogonalSize) {
-        this.root = this._deserializeNode(root, orientation, deserializer, orthogonalSize);
-    };
-    Gridview.prototype._deserializeNode = function (node, orientation, deserializer, orthogonalSize) {
-        var _this = this;
-        var result;
-        if (node.type === 'branch') {
-            var serializedChildren = node.data;
-            var children = serializedChildren.map(function (serializedChild) {
-                return {
-                    node: _this._deserializeNode(serializedChild, orthogonal(orientation), deserializer, node.size),
-                    visible: serializedChild.visible,
-                };
-            });
-            result = new _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode(orientation, this.proportionalLayout, this.styles, node.size, orthogonalSize, children);
-        }
-        else {
-            result = new _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode(deserializer.fromJSON(node.data), orientation, orthogonalSize, node.size);
-        }
-        return result;
-    };
-    Object.defineProperty(Gridview.prototype, "orientation", {
-        get: function () {
-            return this.root.orientation;
-        },
-        set: function (orientation) {
-            if (this._root.orientation === orientation) {
-                return;
-            }
-            var _a = this._root, size = _a.size, orthogonalSize = _a.orthogonalSize;
-            this.root = flipNode(this._root, orthogonalSize, size);
-            this.root.layout(size, orthogonalSize);
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Gridview.prototype, "root", {
-        get: function () {
-            return this._root;
-        },
-        set: function (root) {
-            var _this = this;
-            var oldRoot = this._root;
-            if (oldRoot) {
-                oldRoot.dispose();
-                this.element.removeChild(oldRoot.element);
-            }
-            this._root = root;
-            this.element.appendChild(this._root.element);
-            this.disposable.value = this._root.onDidChange(function (e) {
-                _this._onDidChange.fire(e);
-            });
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Gridview.prototype.next = function (location) {
-        return this.progmaticSelect(location);
-    };
-    Gridview.prototype.previous = function (location) {
-        return this.progmaticSelect(location, true);
-    };
-    Gridview.prototype.getView = function (location) {
-        var node = location ? this.getNode(location)[1] : this._root;
-        return this._getViews(node, this.orientation);
-    };
-    Gridview.prototype._getViews = function (node, orientation, cachedVisibleSize) {
-        var box = orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
-            ? { height: node.size, width: node.orthogonalSize }
-            : { height: node.orthogonalSize, width: node.size };
-        if (node instanceof _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode) {
-            return { box: box, view: node.view, cachedVisibleSize: cachedVisibleSize };
-        }
-        var children = [];
-        for (var i = 0; i < node.children.length; i++) {
-            var child = node.children[i];
-            var cachedVisibleSize_1 = node.getChildCachedVisibleSize(i);
-            children.push(this._getViews(child, orthogonal(orientation), cachedVisibleSize_1));
-        }
-        return { box: box, children: children };
-    };
-    Gridview.prototype.progmaticSelect = function (location, reverse) {
-        if (reverse === void 0) { reverse = false; }
-        var _a = __read(this.getNode(location), 2), path = _a[0], node = _a[1];
-        if (!(node instanceof _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode)) {
-            throw new Error('invalid location');
-        }
-        var findLeaf = function (node, last) {
-            if (node instanceof _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode) {
-                return node;
-            }
-            if (node instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode) {
-                return findLeaf(node.children[last ? node.children.length - 1 : 0], last);
-            }
-            throw new Error('invalid node');
-        };
-        for (var i = path.length - 1; i > -1; i--) {
-            var n = path[i];
-            var l = location[i] || 0;
-            var canProgressInCurrentLevel = reverse
-                ? l - 1 > -1
-                : l + 1 < n.children.length;
-            if (canProgressInCurrentLevel) {
-                return findLeaf(n.children[reverse ? l - 1 : l + 1], reverse);
-            }
-        }
-        return findLeaf(this.root, reverse);
-    };
-    Object.defineProperty(Gridview.prototype, "width", {
-        get: function () {
-            return this.root.width;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Gridview.prototype, "height", {
-        get: function () {
-            return this.root.height;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Gridview.prototype, "minimumWidth", {
-        get: function () {
-            return this.root.minimumWidth;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Gridview.prototype, "minimumHeight", {
-        get: function () {
-            return this.root.minimumHeight;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Gridview.prototype, "maximumWidth", {
-        get: function () {
-            return this.root.maximumHeight;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Gridview.prototype, "maximumHeight", {
-        get: function () {
-            return this.root.maximumHeight;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Gridview.prototype.isViewVisible = function (location) {
-        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(location), 2), rest = _a[0], index = _a[1];
-        var _b = __read(this.getNode(rest), 2), parent = _b[1];
-        if (!(parent instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode)) {
-            throw new Error('Invalid from location');
-        }
-        return parent.isChildVisible(index);
-    };
-    Gridview.prototype.setViewVisible = function (location, visible) {
-        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(location), 2), rest = _a[0], index = _a[1];
-        var _b = __read(this.getNode(rest), 2), parent = _b[1];
-        if (!(parent instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode)) {
-            throw new Error('Invalid from location');
-        }
-        parent.setChildVisible(index, visible);
-    };
-    Gridview.prototype.moveView = function (parentLocation, from, to) {
-        var _a = __read(this.getNode(parentLocation), 2), parent = _a[1];
-        if (!(parent instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode)) {
-            throw new Error('Invalid location');
-        }
-        parent.moveChild(from, to);
-    };
-    Gridview.prototype.addView = function (view, size, location) {
-        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(location), 2), rest = _a[0], index = _a[1];
-        var _b = __read(this.getNode(rest), 2), pathToParent = _b[0], parent = _b[1];
-        if (parent instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode) {
-            var node = new _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode(view, orthogonal(parent.orientation), parent.orthogonalSize);
-            parent.addChild(node, size, index);
-        }
-        else {
-            var _c = __read(__spread(pathToParent).reverse()), grandParent = _c[0], _ = _c.slice(1);
-            var _d = __read(__spread(rest).reverse()), parentIndex = _d[0], __ = _d.slice(1);
-            var newSiblingSize = 0;
-            var newSiblingCachedVisibleSize = grandParent.getChildCachedVisibleSize(parentIndex);
-            if (typeof newSiblingCachedVisibleSize === 'number') {
-                newSiblingSize = _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Sizing.Invisible(newSiblingCachedVisibleSize);
-            }
-            grandParent.removeChild(parentIndex);
-            var newParent = new _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode(parent.orientation, this.proportionalLayout, this.styles, parent.size, parent.orthogonalSize);
-            grandParent.addChild(newParent, parent.size, parentIndex);
-            var newSibling = new _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode(parent.view, grandParent.orientation, parent.size);
-            newParent.addChild(newSibling, newSiblingSize, 0);
-            if (typeof size !== 'number' && size.type === 'split') {
-                size = { type: 'split', index: 0 };
-            }
-            var node = new _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode(view, grandParent.orientation, parent.size);
-            newParent.addChild(node, size, index);
-        }
-    };
-    Gridview.prototype.remove = function (view, sizing) {
-        var location = getGridLocation(view.element);
-        return this.removeView(location, sizing);
-    };
-    Gridview.prototype.removeView = function (location, sizing) {
-        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(location), 2), rest = _a[0], index = _a[1];
-        var _b = __read(this.getNode(rest), 2), pathToParent = _b[0], parent = _b[1];
-        if (!(parent instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode)) {
-            throw new Error('Invalid location');
-        }
-        var node = parent.children[index];
-        if (!(node instanceof _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode)) {
-            throw new Error('Invalid location');
-        }
-        parent.removeChild(index, sizing);
-        if (parent.children.length === 0) {
-            throw new Error('Invalid grid state');
-        }
-        if (parent.children.length > 1) {
-            return node.view;
-        }
-        if (pathToParent.length === 0) {
-            // parent is root
-            var sibling_1 = parent.children[0];
-            if (sibling_1 instanceof _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode) {
-                return node.view;
-            }
-            // we must promote sibling to be the new root
-            parent.removeChild(0, sizing);
-            this.root = sibling_1;
-            return node.view;
-        }
-        var _c = __read(__spread(pathToParent).reverse()), grandParent = _c[0], _ = _c.slice(1);
-        var _d = __read(__spread(rest).reverse()), parentIndex = _d[0], __ = _d.slice(1);
-        var sibling = parent.children[0];
-        var isSiblingVisible = parent.isChildVisible(0);
-        parent.removeChild(0, sizing);
-        var sizes = grandParent.children.map(function (_, i) {
-            return grandParent.getChildSize(i);
-        });
-        grandParent.removeChild(parentIndex, sizing);
-        if (sibling instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode) {
-            sizes.splice.apply(sizes, __spread([parentIndex,
-                1], sibling.children.map(function (c) { return c.size; })));
-            for (var i = 0; i < sibling.children.length; i++) {
-                var child = sibling.children[i];
-                grandParent.addChild(child, child.size, parentIndex + i);
-            }
-        }
-        else {
-            var newSibling = new _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode(sibling.view, orthogonal(sibling.orientation), sibling.size);
-            var sizing_1 = isSiblingVisible
-                ? sibling.orthogonalSize
-                : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Sizing.Invisible(sibling.orthogonalSize);
-            grandParent.addChild(newSibling, sizing_1, parentIndex);
-        }
-        for (var i = 0; i < sizes.length; i++) {
-            grandParent.resizeChild(i, sizes[i]);
-        }
-        return node.view;
-    };
-    Gridview.prototype.layout = function (width, height) {
-        var _a = __read(this.root.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
-            ? [height, width]
-            : [width, height], 2), size = _a[0], orthogonalSize = _a[1];
-        this.root.layout(size, orthogonalSize);
-    };
-    Gridview.prototype.getNode = function (location, node, path) {
-        if (node === void 0) { node = this.root; }
-        if (path === void 0) { path = []; }
-        if (location.length === 0) {
-            return [path, node];
-        }
-        if (!(node instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode)) {
-            throw new Error('Invalid location');
-        }
-        var _a = __read(location), index = _a[0], rest = _a.slice(1);
-        if (index < 0 || index >= node.children.length) {
-            throw new Error('Invalid location');
-        }
-        var child = node.children[index];
-        path.push(node);
-        return this.getNode(rest, child, path);
-    };
-    return Gridview;
-}());
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/gridview/gridviewComponent.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/gridview/gridviewComponent.js ***!
-  \**********************************************************************/
-/*! namespace exports */
-/*! export GridviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GridviewComponent": () => /* binding */ GridviewComponent
-/* harmony export */ });
-/* harmony import */ var _gridview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./gridview */ "./node_modules/dockview/dist/es6/gridview/gridview.js");
-/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "./node_modules/dockview/dist/es6/dnd/droptarget.js");
-/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../array */ "./node_modules/dockview/dist/es6/array.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-/* harmony import */ var _baseComponentGridview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./baseComponentGridview */ "./node_modules/dockview/dist/es6/gridview/baseComponentGridview.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../api/component.api */ "./node_modules/dockview/dist/es6/api/component.api.js");
-/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../panel/componentFactory */ "./node_modules/dockview/dist/es6/panel/componentFactory.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-
-
-
-
-
-var GridviewComponent = /** @class */ (function (_super) {
-    __extends(GridviewComponent, _super);
-    function GridviewComponent(element, options) {
-        var _this = _super.call(this, element, {
-            proportionalLayout: options.proportionalLayout,
-            orientation: options.orientation,
-            styles: options.styles,
-        }) || this;
-        _this.options = options;
-        if (!_this.options.components) {
-            _this.options.components = {};
-        }
-        if (!_this.options.frameworkComponents) {
-            _this.options.frameworkComponents = {};
-        }
-        return _this;
-    }
-    Object.defineProperty(GridviewComponent.prototype, "orientation", {
-        get: function () {
-            return this.gridview.orientation;
-        },
-        set: function (value) {
-            this.gridview.orientation = value;
-            this.layout(this.gridview.width, this.gridview.height, true);
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GridviewComponent.prototype, "deserializer", {
-        get: function () {
-            return this._deserializer;
-        },
-        set: function (value) {
-            this._deserializer = value;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    GridviewComponent.prototype.removePanel = function (panel, sizing) {
-        this.gridview.remove(panel, sizing);
-    };
-    /**
-     * Serialize the current state of the layout
-     *
-     * @returns A JSON respresentation of the layout
-     */
-    GridviewComponent.prototype.toJSON = function () {
-        var _a;
-        var data = this.gridview.serialize();
-        var serializedData = {
-            grid: data,
-            activePanel: (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.id,
-        };
-        return serializedData;
-    };
-    GridviewComponent.prototype.deserialize = function (data) {
-        this.gridview.clear();
-        this.groups.clear();
-        this.fromJSON(data);
-    };
-    // public setVisible(panel: GridviewPanel, visible: boolean) {
-    //     this.gridview.setViewVisible(getGridLocation(panel.element), visible);
-    // }
-    // public isVisible(panel: GridviewPanel) {
-    //     return this.gridview.isViewVisible(getGridLocation(panel.element));
-    // }
-    GridviewComponent.prototype.toggleVisibility = function (panel) {
-        this.setVisible(panel, !this.isVisible(panel));
-    };
-    GridviewComponent.prototype.focus = function () {
-        var _a;
-        (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.focus();
-    };
-    GridviewComponent.prototype.fromJSON = function (data) {
-        var _this = this;
-        var _a = data, grid = _a.grid, activePanel = _a.activePanel;
-        this.gridview.clear();
-        this.groups.clear();
-        // const width = this.width;
-        // const height = this.height;
-        // this.layout(width, height, true);
-        // const yTransform = height / grid.height;
-        // const xTransform = width / grid.width;
-        // grid.height = yTransform * grid.height;
-        // grid.width = xTransform * grid.width;
-        // const sizeTransform =
-        //     grid.orientation === Orientation.VERTICAL ? yTransform : xTransform;
-        // const orthogonalSizeTransform =
-        //     grid.orientation === Orientation.HORIZONTAL
-        //         ? yTransform
-        //         : xTransform;
-        // const transform = (
-        //     item: SerializedGridObject<GridPanelViewState>,
-        //     o: Orientation
-        // ) => {
-        //     switch (item.type) {
-        //         case 'branch':
-        //             if (grid.orientation === o) {
-        //                 item.size = sizeTransform * item.size;
-        //             } else {
-        //                 item.size = orthogonalSizeTransform * item.size;
-        //             }
-        //             if (Array.isArray(item.data)) {
-        //                 item.data.forEach((x) => transform(x, orthogonal(o)));
-        //             }
-        //             break;
-        //         case 'leaf':
-        //             if (grid.orientation === o) {
-        //                 item.size = sizeTransform * item.size;
-        //             } else {
-        //                 item.size = orthogonalSizeTransform * item.size;
-        //             }
-        //             break;
-        //     }
-        // };
-        // grid.root.size = grid.root.size * sizeTransform;
-        // if (Array.isArray(grid.root.data)) {
-        //     grid.root.data.forEach((d) => transform(d, grid.orientation));
-        // }
-        this.gridview.deserialize(grid, {
-            fromJSON: function (data) {
-                var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(data.id, data.component, _this.options.components, _this.options.frameworkComponents, {
-                    createComponent: _this.options.frameworkComponentFactory
-                        .createComponent,
-                });
-                view.init({
-                    params: data.params,
-                    minimumWidth: data.minimumWidth,
-                    maximumWidth: data.maximumWidth,
-                    minimumHeight: data.minimumHeight,
-                    maximumHeight: data.maximumHeight,
-                    priority: data.priority,
-                    snap: !!data.snap,
-                    containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_5__.GridviewApi(_this),
-                });
-                _this.registerPanel(view);
-                return view;
-            },
-        });
-        if (typeof activePanel === 'string') {
-            var panel = this.getPanel(activePanel);
-            if (panel) {
-                this.doSetGroupActive(panel);
-            }
-        }
-        // this.layout(width, height, true);
-        this._onDidLayoutChange.fire({ kind: "NEW_LAYOUT" /* NEW_LAYOUT */ });
-    };
-    GridviewComponent.prototype.movePanel = function (panel, options) {
-        var relativeLocation;
-        var removedPanel = this.gridview.remove(panel);
-        var referenceGroup = this.groups.get(options.reference).value;
-        var target = (0,_baseComponentGridview__WEBPACK_IMPORTED_MODULE_4__.toTarget)(options.direction);
-        if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
-            throw new Error(target + " not supported as an option");
-        }
-        else {
-            var location_1 = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-            relativeLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_1, target);
-        }
-        this.doAddGroup(removedPanel, relativeLocation, options.size);
-    };
-    GridviewComponent.prototype.addPanel = function (options) {
-        var _a;
-        var relativeLocation = options.location || [0];
-        if ((_a = options.position) === null || _a === void 0 ? void 0 : _a.reference) {
-            var referenceGroup = this.groups.get(options.position.reference)
-                .value;
-            var target = (0,_baseComponentGridview__WEBPACK_IMPORTED_MODULE_4__.toTarget)(options.position.direction);
-            if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
-                throw new Error(target + " not supported as an option");
-            }
-            else {
-                var location_2 = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-                relativeLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_2, target);
-            }
-        }
-        var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(options.id, options.component, this.options.components, this.options.frameworkComponents, {
-            createComponent: this.options.frameworkComponentFactory
-                .createComponent,
-        });
-        view.init({
-            params: options.params,
-            minimumWidth: options.minimumWidth,
-            maximumWidth: options.maximumWidth,
-            minimumHeight: options.minimumHeight,
-            maximumHeight: options.maximumHeight,
-            priority: options.priority,
-            snap: !!options.snap,
-            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_5__.GridviewApi(this),
-        });
-        this.registerPanel(view);
-        this.doAddGroup(view, relativeLocation, options.size);
-        return { api: view.api };
-    };
-    GridviewComponent.prototype.registerPanel = function (panel) {
-        var _this = this;
-        var disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable(panel.api.onDidFocusChange(function (event) {
-            if (!event.isFocused) {
-                return;
-            }
-            _this.groups.forEach(function (groupItem) {
-                var group = groupItem.value;
-                if (group !== panel) {
-                    group.setActive(false);
-                }
-                else {
-                    group.setActive(true);
-                }
-            });
-        }));
-        this.groups.set(panel.id, {
-            value: panel,
-            disposable: disposable,
-        });
-    };
-    GridviewComponent.prototype.moveGroup = function (referenceGroup, groupId, target) {
-        var sourceGroup = this.getPanel(groupId);
-        if (!sourceGroup) {
-            throw new Error('invalid operation');
-        }
-        var referenceLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-        var targetLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
-        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(targetLocation), 2), targetParentLocation = _a[0], to = _a[1];
-        var sourceLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(sourceGroup.element);
-        var _b = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(sourceLocation), 2), sourceParentLocation = _b[0], from = _b[1];
-        if ((0,_array__WEBPACK_IMPORTED_MODULE_2__.sequenceEquals)(sourceParentLocation, targetParentLocation)) {
-            // special case when 'swapping' two views within same grid location
-            // if a group has one tab - we are essentially moving the 'group'
-            // which is equivalent to swapping two views in this case
-            this.gridview.moveView(sourceParentLocation, from, to);
-            return;
-        }
-        // source group will become empty so delete the group
-        var targetGroup = this.doRemoveGroup(sourceGroup, {
-            skipActive: true,
-            skipDispose: true,
-        });
-        // after deleting the group we need to re-evaulate the ref location
-        var updatedReferenceLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
-        var location = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, updatedReferenceLocation, target);
-        this.doAddGroup(targetGroup, location);
-    };
-    GridviewComponent.prototype.removeGroup = function (group) {
-        _super.prototype.removeGroup.call(this, group);
-        var panel = this.groups.get(group.id);
-        if (panel) {
-            panel.disposable.dispose();
-            this.groups.delete(group.id);
-        }
-    };
-    GridviewComponent.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-    };
-    return GridviewComponent;
-}(_baseComponentGridview__WEBPACK_IMPORTED_MODULE_4__.BaseGrid));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/gridview/gridviewPanel.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/gridview/gridviewPanel.js ***!
-  \******************************************************************/
-/*! namespace exports */
-/*! export GridviewPanel [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GridviewPanel": () => /* binding */ GridviewPanel
-/* harmony export */ });
-/* harmony import */ var _basePanelView__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./basePanelView */ "./node_modules/dockview/dist/es6/gridview/basePanelView.js");
-/* harmony import */ var _api_gridPanelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/gridPanelApi */ "./node_modules/dockview/dist/es6/api/gridPanelApi.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-
-
-
-var GridviewPanel = /** @class */ (function (_super) {
-    __extends(GridviewPanel, _super);
-    function GridviewPanel(id, component) {
-        var _this = _super.call(this, id, component, new _api_gridPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridPanelApi(id)) || this;
-        _this._minimumWidth = 0;
-        _this._minimumHeight = 0;
-        _this._maximumWidth = Number.MAX_SAFE_INTEGER;
-        _this._maximumHeight = Number.MAX_SAFE_INTEGER;
-        _this._snap = false;
-        _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
-        _this.onDidChange = _this._onDidChange
-            .event;
-        _this.addDisposables(_this.api.onVisibilityChange(function (event) {
-            var isVisible = event.isVisible;
-            var containerApi = _this.params.containerApi;
-            containerApi.setVisible(_this, isVisible);
-        }), _this.api.onDidConstraintsChangeInternal(function (event) {
-            if (typeof event.minimumWidth === 'number' ||
-                typeof event.minimumWidth === 'function') {
-                _this._minimumWidth = event.minimumWidth;
-            }
-            if (typeof event.minimumHeight === 'number' ||
-                typeof event.minimumHeight === 'function') {
-                _this._minimumHeight = event.minimumHeight;
-            }
-            if (typeof event.maximumWidth === 'number' ||
-                typeof event.maximumWidth === 'function') {
-                _this._maximumWidth = event.maximumWidth;
-            }
-            if (typeof event.maximumHeight === 'number' ||
-                typeof event.maximumHeight === 'function') {
-                _this._maximumHeight = event.maximumHeight;
-            }
-        }), _this.api.onDidSizeChange(function (event) {
-            _this._onDidChange.fire({
-                height: event.height,
-                width: event.width,
-            });
-        }));
-        return _this;
-    }
-    Object.defineProperty(GridviewPanel.prototype, "priority", {
-        get: function () {
-            return this._priority;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GridviewPanel.prototype, "snap", {
-        get: function () {
-            return this._snap;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GridviewPanel.prototype, "minimumWidth", {
-        get: function () {
-            var width = typeof this._minimumWidth === 'function'
-                ? this._minimumWidth()
-                : this._minimumWidth;
-            if (width !== this._evaluatedMinimumWidth) {
-                this._evaluatedMinimumWidth = width;
-                this.updateConstraints();
-            }
-            return width;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GridviewPanel.prototype, "minimumHeight", {
-        get: function () {
-            var height = typeof this._minimumHeight === 'function'
-                ? this._minimumHeight()
-                : this._minimumHeight;
-            if (height !== this._evaluatedMinimumHeight) {
-                this._evaluatedMinimumHeight = height;
-                this.updateConstraints();
-            }
-            return height;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GridviewPanel.prototype, "maximumHeight", {
-        get: function () {
-            var height = typeof this._maximumHeight === 'function'
-                ? this._maximumHeight()
-                : this._maximumHeight;
-            if (height !== this._evaluatedMaximumHeight) {
-                this._evaluatedMaximumHeight = height;
-                this.updateConstraints();
-            }
-            return height;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GridviewPanel.prototype, "maximumWidth", {
-        get: function () {
-            var width = typeof this._maximumWidth === 'function'
-                ? this._maximumWidth()
-                : this._maximumWidth;
-            if (width !== this._evaluatedMaximumWidth) {
-                this._evaluatedMaximumWidth = width;
-                this.updateConstraints();
-            }
-            return width;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GridviewPanel.prototype, "isActive", {
-        get: function () {
-            return false;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    GridviewPanel.prototype.init = function (parameters) {
-        if (parameters.maximumHeight) {
-            this._maximumHeight = parameters.maximumHeight;
-        }
-        if (parameters.minimumHeight) {
-            this._minimumHeight = parameters.minimumHeight;
-        }
-        if (parameters.maximumWidth) {
-            this._maximumWidth = parameters.maximumWidth;
-        }
-        if (parameters.minimumWidth) {
-            this._minimumWidth = parameters.minimumWidth;
-        }
-        this._priority = parameters.priority;
-        this._snap = !!parameters.snap;
-        _super.prototype.init.call(this, parameters);
-    };
-    GridviewPanel.prototype.updateConstraints = function () {
-        this.api._onDidConstraintsChange.fire({
-            minimumWidth: this._evaluatedMinimumWidth,
-            maximumWidth: this._evaluatedMaximumWidth,
-            minimumHeight: this._evaluatedMinimumHeight,
-            maximumHeight: this._evaluatedMaximumHeight,
-        });
-    };
-    GridviewPanel.prototype.toJSON = function () {
-        var state = _super.prototype.toJSON.call(this);
-        var maximum = function (value) {
-            return value === Number.MAX_SAFE_INTEGER ? undefined : value;
-        };
-        var minimum = function (value) { return (value <= 0 ? undefined : value); };
-        return __assign(__assign({}, state), { minimumHeight: minimum(this.minimumHeight), maximumHeight: maximum(this.maximumHeight), minimumWidth: minimum(this.minimumWidth), maximumWidth: maximum(this.maximumWidth), snap: this.snap, priority: this.priority });
-    };
-    GridviewPanel.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-    };
-    return GridviewPanel;
-}(_basePanelView__WEBPACK_IMPORTED_MODULE_0__.BasePanelView));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/gridview/leafNode.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/gridview/leafNode.js ***!
-  \*************************************************************/
-/*! namespace exports */
-/*! export LeafNode [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "LeafNode": () => /* binding */ LeafNode
-/* harmony export */ });
-/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../splitview/core/splitview */ "./node_modules/dockview/dist/es6/splitview/core/splitview.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-var LeafNode = /** @class */ (function () {
-    function LeafNode(view, orientation, orthogonalSize, size) {
-        var _this = this;
-        if (size === void 0) { size = 0; }
-        this.view = view;
-        this.orientation = orientation;
-        this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
-        this.onDidChange = this._onDidChange.event;
-        this._orthogonalSize = orthogonalSize;
-        this._size = size;
-        this._disposable = this.view.onDidChange(function (event) {
-            return _this._onDidChange.fire(event
-                ? _this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.VERTICAL
-                    ? event.width
-                    : event.height
-                : undefined);
-        });
-    }
-    Object.defineProperty(LeafNode.prototype, "minimumWidth", {
-        get: function () {
-            return this.view.minimumWidth;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(LeafNode.prototype, "maximumWidth", {
-        get: function () {
-            return this.view.maximumWidth;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(LeafNode.prototype, "minimumHeight", {
-        get: function () {
-            return this.view.minimumHeight;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(LeafNode.prototype, "maximumHeight", {
-        get: function () {
-            return this.view.maximumHeight;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(LeafNode.prototype, "priority", {
-        get: function () {
-            return this.view.priority;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(LeafNode.prototype, "snap", {
-        get: function () {
-            return this.view.snap;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(LeafNode.prototype, "minimumSize", {
-        get: function () {
-            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
-                ? this.minimumHeight
-                : this.minimumWidth;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(LeafNode.prototype, "maximumSize", {
-        get: function () {
-            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
-                ? this.maximumHeight
-                : this.maximumWidth;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(LeafNode.prototype, "minimumOrthogonalSize", {
-        get: function () {
-            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
-                ? this.minimumWidth
-                : this.minimumHeight;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(LeafNode.prototype, "maximumOrthogonalSize", {
-        get: function () {
-            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
-                ? this.maximumWidth
-                : this.maximumHeight;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(LeafNode.prototype, "orthogonalSize", {
-        get: function () {
-            return this._orthogonalSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(LeafNode.prototype, "size", {
-        get: function () {
-            return this._size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(LeafNode.prototype, "element", {
-        get: function () {
-            return this.view.element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    LeafNode.prototype.setVisible = function (visible) {
-        if (this.view.setVisible) {
-            this.view.setVisible(visible);
-        }
-    };
-    LeafNode.prototype.layout = function (size, orthogonalSize) {
-        this._size = size;
-        this._orthogonalSize = orthogonalSize;
-        var _a = __read(this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
-            ? [orthogonalSize, size]
-            : [size, orthogonalSize], 2), width = _a[0], height = _a[1];
-        this.view.layout(width, height);
-    };
-    LeafNode.prototype.dispose = function () {
-        this._disposable.dispose();
-    };
-    return LeafNode;
-}());
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/groupview/groupview.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/groupview/groupview.js ***!
-  \***************************************************************/
-/*! namespace exports */
-/*! export Groupview [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Groupview": () => /* binding */ Groupview
-/* harmony export */ });
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-/* harmony import */ var _titlebar_titleContainer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./titlebar/titleContainer */ "./node_modules/dockview/dist/es6/groupview/titlebar/titleContainer.js");
-/* harmony import */ var _panel_content__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./panel/content */ "./node_modules/dockview/dist/es6/groupview/panel/content.js");
-/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dnd/droptarget */ "./node_modules/dockview/dist/es6/dnd/droptarget.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../dom */ "./node_modules/dockview/dist/es6/dom.js");
-/* harmony import */ var _async__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../async */ "./node_modules/dockview/dist/es6/async.js");
-/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../dnd/dataTransfer */ "./node_modules/dockview/dist/es6/dnd/dataTransfer.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../api/component.api */ "./node_modules/dockview/dist/es6/api/component.api.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
-};
-var __values = (undefined && undefined.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
-
-
-
-
-
-
-
-
-
-var Groupview = /** @class */ (function (_super) {
-    __extends(Groupview, _super);
-    function Groupview(accessor, id, options) {
-        var _this = _super.call(this) || this;
-        _this.accessor = accessor;
-        _this.id = id;
-        _this._active = false;
-        _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_4__.Emitter();
-        _this.onDidChange = _this._onDidChange
-            .event;
-        _this._width = 0;
-        _this._height = 0;
-        _this._panels = [];
-        _this._onMove = new _events__WEBPACK_IMPORTED_MODULE_4__.Emitter();
-        _this.onMove = _this._onMove.event;
-        _this._onDrop = new _events__WEBPACK_IMPORTED_MODULE_4__.Emitter();
-        _this.onDrop = _this._onDrop.event;
-        _this._onDidGroupChange = new _events__WEBPACK_IMPORTED_MODULE_4__.Emitter();
-        _this.onDidGroupChange = _this
-            ._onDidGroupChange.event;
-        _this.closePanel = function (panel) { return __awaiter(_this, void 0, void 0, function () {
-            var _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        _a = panel.close;
-                        if (!_a) return [3 /*break*/, 2];
-                        return [4 /*yield*/, panel.close()];
-                    case 1:
-                        _a = !(_b.sent());
-                        _b.label = 2;
-                    case 2:
-                        if (_a) {
-                            return [2 /*return*/, false];
-                        }
-                        this.doClose(panel);
-                        return [2 /*return*/, true];
-                }
-            });
-        }); };
-        _this.addDisposables(_this._onMove, _this._onDidGroupChange, _this._onDrop);
-        _this._element = document.createElement('div');
-        _this._element.className = 'groupview';
-        _this.tabContainer = new _titlebar_titleContainer__WEBPACK_IMPORTED_MODULE_1__.TitleContainer(_this.accessor, _this, {
-            tabHeight: options.tabHeight,
-        });
-        _this.contentContainer = new _panel_content__WEBPACK_IMPORTED_MODULE_2__.ContentContainer();
-        _this.dropTarget = new _dnd_droptarget__WEBPACK_IMPORTED_MODULE_3__.Droptarget(_this.contentContainer.element, {
-            isDirectional: true,
-            id: _this.accessor.id,
-            isDisabled: function () {
-                // disable the drop target if we only have one tab, and that is also the tab we are moving
-                return (_this._panels.length === 1 &&
-                    _this.tabContainer.hasActiveDragEvent);
-            },
-            enableExternalDragEvents: _this.accessor.options
-                .enableExternalDragEvents,
-        });
-        _this._element.append(_this.tabContainer.element, _this.contentContainer.element);
-        _this.addDisposables(_this._onMove, _this._onDidGroupChange, _this.tabContainer.onDropEvent(function (event) {
-            return _this.handleDropEvent(event.event, event.index);
-        }), _this.contentContainer.onDidFocus(function () {
-            _this.accessor.doSetGroupActive(_this, true);
-        }), _this.dropTarget.onDidChange(function (event) {
-            // if we've center dropped on ourself then ignore
-            if (event.position === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_3__.Position.Center &&
-                _this.tabContainer.hasActiveDragEvent) {
-                return;
-            }
-            _this.handleDropEvent(event);
-        }));
-        if (options === null || options === void 0 ? void 0 : options.panels) {
-            options.panels.forEach(function (panel) {
-                _this.doAddPanel(panel);
-            });
-        }
-        if (options === null || options === void 0 ? void 0 : options.activePanel) {
-            _this.doSetActivePanel(options.activePanel);
-        }
-        _this.setActive(_this._active, true, true);
-        _this.updateContainer();
-        return _this;
-    }
-    Object.defineProperty(Groupview.prototype, "activePanel", {
-        get: function () {
-            return this._activePanel;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Groupview.prototype, "tabHeight", {
-        get: function () {
-            return this.tabContainer.height;
-        },
-        set: function (height) {
-            this.tabContainer.height = height;
-            this.layout(this._width, this._height);
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Groupview.prototype, "isActive", {
-        get: function () {
-            return this._active;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Groupview.prototype, "panels", {
-        get: function () {
-            return this._panels;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Groupview.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Groupview.prototype, "size", {
-        get: function () {
-            return this._panels.length;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Groupview.prototype, "isEmpty", {
-        get: function () {
-            return this._panels.length === 0;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Groupview.prototype, "minimumHeight", {
-        get: function () {
-            return 100;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Groupview.prototype, "maximumHeight", {
-        get: function () {
-            return Number.MAX_SAFE_INTEGER;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Groupview.prototype, "minimumWidth", {
-        get: function () {
-            return 100;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Groupview.prototype, "maximumWidth", {
-        get: function () {
-            return Number.MAX_SAFE_INTEGER;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Groupview.prototype.isAncestor = function (element) {
-        return (element === this.contentContainer.element ||
-            (0,_dom__WEBPACK_IMPORTED_MODULE_5__.isAncestor)(element, this.contentContainer.element));
-    };
-    Groupview.prototype.indexOf = function (panel) {
-        return this.tabContainer.indexOf(panel.id);
-    };
-    Groupview.prototype.toJSON = function () {
-        var _a;
-        return {
-            views: this.panels.map(function (panel) { return panel.id; }),
-            activeView: (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.id,
-            id: this.id,
-        };
-    };
-    Groupview.prototype.startActiveDrag = function (panel) {
-        var index = this.tabContainer.indexOf(panel.id);
-        if (index > -1) {
-            var tab_1 = this.tabContainer.at(index);
-            tab_1.startDragEvent();
-            return {
-                dispose: function () {
-                    tab_1.stopDragEvent();
-                },
-            };
-        }
-        return _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Disposable.NONE;
-    };
-    Groupview.prototype.moveToNext = function (options) {
-        if (!options) {
-            options = {};
-        }
-        if (!options.panel) {
-            options.panel = this.activePanel;
-        }
-        var index = this.panels.indexOf(options.panel);
-        var normalizedIndex;
-        if (index < this.panels.length - 1) {
-            normalizedIndex = index + 1;
-        }
-        else if (!options.suppressRoll) {
-            normalizedIndex = 0;
-        }
-        else {
-            return;
-        }
-        this.openPanel(this.panels[normalizedIndex]);
-    };
-    Groupview.prototype.moveToPrevious = function (options) {
-        if (!options) {
-            options = {};
-        }
-        if (!options.panel) {
-            options.panel = this.activePanel;
-        }
-        var index = this.panels.indexOf(options.panel);
-        var normalizedIndex;
-        if (index > 0) {
-            normalizedIndex = index - 1;
-        }
-        else if (!options.suppressRoll) {
-            normalizedIndex = this.panels.length - 1;
-        }
-        else {
-            return;
-        }
-        this.openPanel(this.panels[normalizedIndex]);
-    };
-    Groupview.prototype.containsPanel = function (panel) {
-        return this.panels.includes(panel);
-    };
-    Groupview.prototype.init = function (params) {
-        //noop
-    };
-    Groupview.prototype.update = function (params) {
-        //noop
-    };
-    Groupview.prototype.focus = function () {
-        var _a;
-        (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.focus();
-    };
-    Groupview.prototype.openPanel = function (panel, index) {
-        if (index === void 0) { index = this.panels.length; }
-        if (this._activePanel === panel) {
-            this.accessor.doSetGroupActive(this);
-            return;
-        }
-        this.doAddPanel(panel, index);
-        this.doSetActivePanel(panel);
-        this.accessor.doSetGroupActive(this);
-        this.updateContainer();
-    };
-    Groupview.prototype.setPanel = function (panel, skipFocus) {
-        if (this._activePanel === panel) {
-            this.accessor.doSetGroupActive(this, skipFocus);
-            return;
-        }
-        this.tabContainer.openPanel(panel, this.panels.indexOf(panel));
-        this.contentContainer.openPanel(panel.content);
-        this.doSetActivePanel(panel);
-        this.accessor.doSetGroupActive(this, skipFocus);
-        this.updateContainer();
-    };
-    Groupview.prototype.removePanel = function (groupItemOrId) {
-        var id = typeof groupItemOrId === 'string'
-            ? groupItemOrId
-            : groupItemOrId.id;
-        var panel = this._panels.find(function (panel) { return panel.id === id; });
-        if (!panel) {
-            throw new Error('invalid operation');
-        }
-        return this._removePanel(panel);
-    };
-    Groupview.prototype.closeAllPanels = function () {
-        var _a;
-        return __awaiter(this, void 0, void 0, function () {
-            var index, canClose, _b, i, panel, canClose, arrPanelCpy;
-            var _this = this;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
-                    case 0:
-                        index = typeof this._activePanel === 'number'
-                            ? this.panels.indexOf(this._activePanel)
-                            : -1;
-                        if (!(index > -1)) return [3 /*break*/, 3];
-                        if (this.panels.indexOf(this._activePanel) < 0) {
-                            console.warn('active panel not tracked');
-                        }
-                        _b = !((_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.close);
-                        if (_b) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this._activePanel.close()];
-                    case 1:
-                        _b = (_c.sent());
-                        _c.label = 2;
-                    case 2:
-                        canClose = _b;
-                        if (!canClose) {
-                            return [2 /*return*/, false];
-                        }
-                        _c.label = 3;
-                    case 3:
-                        i = 0;
-                        _c.label = 4;
-                    case 4:
-                        if (!(i < this.panels.length)) return [3 /*break*/, 8];
-                        if (i === index) {
-                            return [3 /*break*/, 7];
-                        }
-                        panel = this.panels[i];
-                        this.openPanel(panel);
-                        if (!panel.close) return [3 /*break*/, 7];
-                        return [4 /*yield*/, (0,_async__WEBPACK_IMPORTED_MODULE_6__.timeoutAsPromise)(0)];
-                    case 5:
-                        _c.sent();
-                        return [4 /*yield*/, panel.close()];
-                    case 6:
-                        canClose = _c.sent();
-                        if (!canClose) {
-                            return [2 /*return*/, false];
-                        }
-                        _c.label = 7;
-                    case 7:
-                        i++;
-                        return [3 /*break*/, 4];
-                    case 8:
-                        if (!(this.panels.length > 0)) return [3 /*break*/, 10];
-                        arrPanelCpy = __spread(this.panels);
-                        return [4 /*yield*/, Promise.all(arrPanelCpy.map(function (p) { return _this.doClose(p); }))];
-                    case 9:
-                        _c.sent();
-                        return [3 /*break*/, 11];
-                    case 10:
-                        this.accessor.removeGroup(this);
-                        _c.label = 11;
-                    case 11: return [2 /*return*/, true];
-                }
-            });
-        });
-    };
-    Groupview.prototype.doClose = function (panel) {
-        this._removePanel(panel);
-        this.accessor.unregisterPanel(panel);
-        if (this.panels.length === 0) {
-            this.accessor.removeGroup(this);
-        }
-    };
-    Groupview.prototype.isPanelActive = function (panel) {
-        return this._activePanel === panel;
-    };
-    Groupview.prototype.updateActions = function () {
-        var _a;
-        if (this._active && this._activePanel) {
-            var headerTitle = (_a = this._activePanel.content) === null || _a === void 0 ? void 0 : _a.actions;
-            this.tabContainer.setActionElement(headerTitle);
-        }
-        else {
-            this.tabContainer.setActionElement(undefined);
-        }
-    };
-    Groupview.prototype.setActive = function (isActive, skipFocus, force) {
-        var _this = this;
-        var _a, _b, _c;
-        if (skipFocus === void 0) { skipFocus = false; }
-        if (force === void 0) { force = false; }
-        if (!force && this._active === isActive) {
-            if (!skipFocus) {
-                (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.focus();
-            }
-            return;
-        }
-        this._active = isActive;
-        (0,_dom__WEBPACK_IMPORTED_MODULE_5__.toggleClass)(this.element, 'active-group', isActive);
-        (0,_dom__WEBPACK_IMPORTED_MODULE_5__.toggleClass)(this.element, 'inactive-group', !isActive);
-        this.tabContainer.setActive(this._active);
-        this.updateActions();
-        if (!this._activePanel && this.panels.length > 0) {
-            this.doSetActivePanel(this.panels[0]);
-        }
-        this.panels.forEach(function (panel) { return panel.setVisible(_this._active, _this); });
-        if ((_b = this.watermark) === null || _b === void 0 ? void 0 : _b.setVisible) {
-            this.watermark.setVisible(this._active, this);
-        }
-        if (isActive) {
-            if (!skipFocus) {
-                (_c = this._activePanel) === null || _c === void 0 ? void 0 : _c.focus();
-            }
-            this._onDidGroupChange.fire({ kind: "GROUP_ACTIVE" /* GROUP_ACTIVE */ });
-        }
-    };
-    Groupview.prototype.layout = function (width, height) {
-        var _a;
-        this._width = width;
-        this._height = height;
-        if ((_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.layout) {
-            this._activePanel.layout(this._width, this._height);
-        }
-    };
-    Groupview.prototype._removePanel = function (panel) {
-        var index = this._panels.indexOf(panel);
-        var isActivePanel = this._activePanel === panel;
-        this.doRemovePanel(panel);
-        if (isActivePanel && this.panels.length > 0) {
-            var nextPanel = this.panels[Math.max(0, index - 1)];
-            this.openPanel(nextPanel);
-        }
-        if (this._activePanel && this.panels.length === 0) {
-            this._activePanel = undefined;
-        }
-        this.updateContainer();
-        return panel;
-    };
-    Groupview.prototype.doRemovePanel = function (panel) {
-        var index = this.panels.indexOf(panel);
-        if (this._activePanel === panel) {
-            this.contentContainer.closePanel();
-        }
-        this.tabContainer.delete(panel.id);
-        this._panels.splice(index, 1);
-        this._onDidGroupChange.fire({
-            kind: "REMOVE_PANEL" /* REMOVE_PANEL */,
-            panel: panel,
-        });
-    };
-    Groupview.prototype.doAddPanel = function (panel, index) {
-        if (index === void 0) { index = this.panels.length; }
-        var existingPanel = this._panels.indexOf(panel);
-        var hasExistingPanel = existingPanel > -1;
-        this.tabContainer.openPanel(panel, index);
-        this.contentContainer.openPanel(panel.content);
-        if (hasExistingPanel) {
-            // TODO - need to ensure ordering hasn't changed and if it has need to re-order this.panels
-            return;
-        }
-        this.panels.splice(index, 0, panel);
-        this._onDidGroupChange.fire({ kind: "ADD_PANEL" /* ADD_PANEL */ });
-    };
-    Groupview.prototype.doSetActivePanel = function (panel) {
-        this._activePanel = panel;
-        this.tabContainer.setActivePanel(panel);
-        // this.contentContainer.openPanel(panel.content);
-        panel.layout(this._width, this._height);
-        this._onDidGroupChange.fire({ kind: "PANEL_ACTIVE" /* PANEL_ACTIVE */ });
-    };
-    Groupview.prototype.updateContainer = function () {
-        var _this = this;
-        var _a, _b;
-        this.updateActions();
-        (0,_dom__WEBPACK_IMPORTED_MODULE_5__.toggleClass)(this.element, 'empty', this.isEmpty);
-        if (!this.watermark) {
-            var watermark = this.accessor.createWatermarkComponent();
-            watermark.init({
-                containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_8__.DockviewApi(this.accessor),
-                params: {},
-                title: '',
-                api: null,
-            });
-            this.watermark = watermark;
-        }
-        this.panels.forEach(function (panel) { return panel.setVisible(_this._active, _this); });
-        if (this.isEmpty && !((_b = (_a = this.watermark) === null || _a === void 0 ? void 0 : _a.element) === null || _b === void 0 ? void 0 : _b.parentNode)) {
-            (0,_events__WEBPACK_IMPORTED_MODULE_4__.addDisposableListener)(this.watermark.element, 'click', function () {
-                if (!_this._active) {
-                    _this.accessor.doSetGroupActive(_this);
-                }
-            });
-            this.contentContainer.openPanel(this.watermark);
-            this.watermark.setVisible(true, this);
-        }
-        if (!this.isEmpty && this.watermark.element.parentNode) {
-            this.watermark.dispose();
-            this.watermark = undefined;
-            this.contentContainer.closePanel();
-        }
-    };
-    Groupview.prototype.handleDropEvent = function (event, index) {
-        if ((0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_7__.isPanelTransferEvent)(event.event)) {
-            this.handlePanelDropEvent(event.event, event.position, index);
-            return;
-        }
-        this._onDrop.fire({
-            event: event.event,
-            target: event.position,
-            index: index,
-        });
-        console.debug('[customDropEvent]');
-    };
-    Groupview.prototype.handlePanelDropEvent = function (event, target, index) {
-        var _a;
-        var dataObject = (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_7__.extractData)(event);
-        if ((0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_7__.isTabDragEvent)(dataObject)) {
-            var groupId = dataObject.groupId, itemId = dataObject.itemId;
-            var isSameGroup = this.id === groupId;
-            if (isSameGroup && !target) {
-                var oldIndex = this.tabContainer.indexOf(itemId);
-                if (oldIndex === index) {
-                    console.debug('[tabs] drop indicates no change in position');
-                    return;
-                }
-            }
-            this._onMove.fire({
-                target: target,
-                groupId: dataObject.groupId,
-                itemId: dataObject.itemId,
-                index: index,
-            });
-        }
-        if ((0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_7__.isCustomDragEvent)(dataObject)) {
-            var panel = this.accessor.getGroupPanel(dataObject.id);
-            if (!panel) {
-                panel = this.accessor.addPanel(dataObject);
-            }
-            this._onMove.fire({
-                target: target,
-                groupId: (_a = panel.group) === null || _a === void 0 ? void 0 : _a.id,
-                itemId: panel.id,
-                index: index,
-            });
-        }
-    };
-    Groupview.prototype.dispose = function () {
-        var e_1, _a;
-        try {
-            for (var _b = __values(this.panels), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var panel = _c.value;
-                panel.dispose();
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        _super.prototype.dispose.call(this);
-        this.dropTarget.dispose();
-        this.tabContainer.dispose();
-        this.contentContainer.dispose();
-    };
-    return Groupview;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/groupview/groupviewPanel.js":
-/*!********************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/groupview/groupviewPanel.js ***!
-  \********************************************************************/
-/*! namespace exports */
-/*! export GroupviewPanel [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GroupviewPanel": () => /* binding */ GroupviewPanel
-/* harmony export */ });
-/* harmony import */ var _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/groupPanelApi */ "./node_modules/dockview/dist/es6/api/groupPanelApi.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-
-
-var GroupviewPanel = /** @class */ (function (_super) {
-    __extends(GroupviewPanel, _super);
-    function GroupviewPanel(id, containerApi) {
-        var _this = _super.call(this) || this;
-        _this.id = id;
-        _this.containerApi = containerApi;
-        _this.mutableDisposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_1__.MutableDisposable();
-        _this.api = new _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_0__.GroupPanelApi(_this, _this._group);
-        _this.onDidStateChange = _this.api.onDidStateChange;
-        _this.addDisposables(_this.api.onDidTitleChange(function (event) {
-            var title = event.title;
-            _this.update({ params: { title: title } });
-        }));
-        return _this;
-    }
-    Object.defineProperty(GroupviewPanel.prototype, "group", {
-        get: function () {
-            return this._group;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GroupviewPanel.prototype, "header", {
-        get: function () {
-            return this.headerPart;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GroupviewPanel.prototype, "content", {
-        get: function () {
-            return this.contentPart;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    GroupviewPanel.prototype.focus = function () {
-        this.api._onFocusEvent.fire();
-    };
-    GroupviewPanel.prototype.setDirty = function (isDirty) {
-        this.api._onDidDirtyChange.fire(isDirty);
-    };
-    GroupviewPanel.prototype.close = function () {
-        if (this.api.tryClose) {
-            return this.api.tryClose();
-        }
-        return Promise.resolve(true);
-    };
-    GroupviewPanel.prototype.toJSON = function () {
-        var _a, _b;
-        return {
-            id: this.id,
-            contentId: (_a = this.contentPart) === null || _a === void 0 ? void 0 : _a.id,
-            tabId: (_b = this.headerPart) === null || _b === void 0 ? void 0 : _b.id,
-            props: this.params.params,
-            title: this.params.title,
-            suppressClosable: this.params.suppressClosable,
-            state: this.api.getState(),
-        };
-    };
-    GroupviewPanel.prototype.update = function (params) {
-        var _a, _b;
-        this.params.params = __assign(__assign({}, this.params.params), params);
-        (_a = this.contentPart) === null || _a === void 0 ? void 0 : _a.update(params);
-        (_b = this.headerPart) === null || _b === void 0 ? void 0 : _b.update(params);
-    };
-    GroupviewPanel.prototype.init = function (params) {
-        var _a, _b;
-        this.params = params;
-        this.contentPart = params.contentPart;
-        this.headerPart = params.headerPart;
-        this.api.setState(this.params.state);
-        (_a = this.content) === null || _a === void 0 ? void 0 : _a.init(__assign(__assign({}, params), { api: this.api, containerApi: this.containerApi }));
-        (_b = this.header) === null || _b === void 0 ? void 0 : _b.init(__assign(__assign({}, params), { api: this.api, containerApi: this.containerApi }));
-    };
-    GroupviewPanel.prototype.setVisible = function (isGroupActive, group) {
-        var _this = this;
-        var _a, _b;
-        this._group = group;
-        this.api.group = group;
-        this.mutableDisposable.value = this._group.onDidGroupChange(function (ev) {
-            if (ev.kind === "GROUP_ACTIVE" /* GROUP_ACTIVE */) {
-                _this.api._onDidGroupPanelVisibleChange.fire({
-                    isVisible: _this._group.isPanelActive(_this),
-                });
-            }
-        });
-        this.api._onDidChangeFocus.fire({ isFocused: isGroupActive });
-        this.api._onDidGroupPanelVisibleChange.fire({
-            isVisible: this._group.isPanelActive(this),
-        });
-        this.api._onDidGroupPanelVisibleChange.fire({
-            isVisible: this._group.isPanelActive(this),
-        });
-        (_a = this.headerPart) === null || _a === void 0 ? void 0 : _a.setVisible(this._group.isPanelActive(this), this._group);
-        (_b = this.contentPart) === null || _b === void 0 ? void 0 : _b.setVisible(this._group.isPanelActive(this), this._group);
-    };
-    GroupviewPanel.prototype.layout = function (width, height) {
-        var _a;
-        // the obtain the correct dimensions of the content panel we must deduct the tab height
-        this.api._onDidPanelDimensionChange.fire({
-            width: width,
-            height: height - (((_a = this.group) === null || _a === void 0 ? void 0 : _a.tabHeight) || 0),
-        });
-    };
-    GroupviewPanel.prototype.dispose = function () {
-        var _a, _b;
-        this.api.dispose();
-        this.mutableDisposable.dispose();
-        (_a = this.headerPart) === null || _a === void 0 ? void 0 : _a.dispose();
-        (_b = this.contentPart) === null || _b === void 0 ? void 0 : _b.dispose();
-    };
-    return GroupviewPanel;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/groupview/panel/content.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/groupview/panel/content.js ***!
-  \*******************************************************************/
-/*! namespace exports */
-/*! export ContentContainer [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ContentContainer": () => /* binding */ ContentContainer
-/* harmony export */ });
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../dom */ "./node_modules/dockview/dist/es6/dom.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-
-
-var ContentContainer = /** @class */ (function (_super) {
-    __extends(ContentContainer, _super);
-    function ContentContainer() {
-        var _this = _super.call(this) || this;
-        _this._onDidFocus = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
-        _this.onDidFocus = _this._onDidFocus.event;
-        _this._element = document.createElement('div');
-        _this._element.className = 'content-container';
-        _this._element.tabIndex = -1;
-        var onDidFocus = (0,_dom__WEBPACK_IMPORTED_MODULE_2__.trackFocus)(_this._element).onDidFocus;
-        _this.addDisposables(onDidFocus(function () { return _this._onDidFocus.fire(); }));
-        return _this;
-    }
-    Object.defineProperty(ContentContainer.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    ContentContainer.prototype.openPanel = function (panel) {
-        if (this.content) {
-            this._element.removeChild(this.content.element);
-            this.content = undefined;
-        }
-        this.content = panel;
-        this._element.appendChild(this.content.element);
-    };
-    ContentContainer.prototype.closePanel = function () {
-        if (this.content) {
-            this._element.removeChild(this.content.element);
-            this.content = undefined;
-        }
-    };
-    ContentContainer.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-    };
-    return ContentContainer;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/groupview/tab.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/groupview/tab.js ***!
-  \*********************************************************/
-/*! namespace exports */
-/*! export MouseEventKind [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Tab [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "MouseEventKind": () => /* binding */ MouseEventKind,
-/* harmony export */   "Tab": () => /* binding */ Tab
-/* harmony export */ });
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "./node_modules/dockview/dist/es6/dnd/droptarget.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dnd/dataTransfer */ "./node_modules/dockview/dist/es6/dnd/dataTransfer.js");
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../dom */ "./node_modules/dockview/dist/es6/dom.js");
-/* harmony import */ var _focusedElement__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../focusedElement */ "./node_modules/dockview/dist/es6/focusedElement.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-
-
-
-
-
-var MouseEventKind;
-(function (MouseEventKind) {
-    MouseEventKind["CLICK"] = "CLICK";
-    MouseEventKind["CONTEXT_MENU"] = "CONTEXT_MENU";
-})(MouseEventKind || (MouseEventKind = {}));
-var Tab = /** @class */ (function (_super) {
-    __extends(Tab, _super);
-    function Tab(id, accessor, group) {
-        var _this = _super.call(this) || this;
-        _this.id = id;
-        _this.accessor = accessor;
-        _this.group = group;
-        _this.dragInPlayDetails = {
-            isDragging: false,
-        };
-        _this._onChanged = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onChanged = _this._onChanged.event;
-        _this._onDropped = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onDropped = _this._onDropped.event;
-        _this.addDisposables(_this._onChanged, _this._onDropped);
-        _this._element = document.createElement('div');
-        _this._element.className = 'tab';
-        _this._element.tabIndex = 0;
-        _this._element.draggable = true;
-        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(_this._element, 'dragstart', function (event) {
-            _this.dragInPlayDetails = {
-                isDragging: true,
-                id: _this.accessor.id,
-            };
-            _this.element.classList.add('dragged');
-            setTimeout(function () { return _this.element.classList.remove('dragged'); }, 0);
-            var data = JSON.stringify({
-                type: _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.DragType.ITEM,
-                itemId: _this.id,
-                groupId: _this.group.id,
-            });
-            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.DataTransferSingleton.setData(_this.dragInPlayDetails.id, data);
-            event.dataTransfer.setData(_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.DATA_KEY, data);
-            event.dataTransfer.effectAllowed = 'move';
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(_this._element, 'dragend', function (ev) {
-            // drop events fire before dragend so we can remove this safely
-            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.DataTransferSingleton.removeData(_this.dragInPlayDetails.id);
-            _this.dragInPlayDetails = {
-                isDragging: false,
-                id: undefined,
-            };
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(_this._element, 'mousedown', function (event) {
-            if (event.defaultPrevented) {
-                return;
-            }
-            /**
-             * TODO: alternative to stopPropagation
-             *
-             * I need to stop the event propagation here since otherwise it'll be intercepted by event handlers
-             * on the tab-container. I cannot use event.preventDefault() since I need the on DragStart event to occur
-             */
-            event.stopPropagation();
-            /**
-             * //TODO mousedown focusing with draggable element (is there a better approach?)
-             *
-             * this mousedown event wants to focus the tab itself but if we call preventDefault()
-             * this would also prevent the dragStart event from firing. To get around this we propagate
-             * the onChanged event during the next tick of the event-loop, allowing the tab element to become
-             * focused on this tick and ensuring the dragstart event is not interrupted
-             */
-            var oldFocus = _focusedElement__WEBPACK_IMPORTED_MODULE_5__.focusedElement.element;
-            setTimeout(function () {
-                oldFocus.focus();
-                _this._onChanged.fire({ kind: MouseEventKind.CLICK, event: event });
-            }, 0);
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(_this._element, 'contextmenu', function (event) {
-            _this._onChanged.fire({
-                kind: MouseEventKind.CONTEXT_MENU,
-                event: event,
-            });
-        }));
-        _this.droptarget = new _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Droptarget(_this._element, {
-            isDirectional: false,
-            isDisabled: function () { return _this.dragInPlayDetails.isDragging; },
-            id: _this.accessor.id,
-            enableExternalDragEvents: _this.accessor.options
-                .enableExternalDragEvents,
-        });
-        _this.addDisposables(_this.droptarget.onDidChange(function (event) {
-            event.event.preventDefault();
-            _this._onDropped.fire(event);
-        }));
-        return _this;
-    }
-    Object.defineProperty(Tab.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Tab.prototype, "hasActiveDragEvent", {
-        get: function () {
-            var _a;
-            return (_a = this.dragInPlayDetails) === null || _a === void 0 ? void 0 : _a.isDragging;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Tab.prototype.startDragEvent = function () {
-        this.dragInPlayDetails = { isDragging: true, id: this.accessor.id };
-    };
-    Tab.prototype.stopDragEvent = function () {
-        this.dragInPlayDetails = { isDragging: false, id: undefined };
-    };
-    Tab.prototype.setActive = function (isActive) {
-        (0,_dom__WEBPACK_IMPORTED_MODULE_4__.toggleClass)(this.element, 'active-tab', isActive);
-        (0,_dom__WEBPACK_IMPORTED_MODULE_4__.toggleClass)(this.element, 'inactive-tab', !isActive);
-    };
-    Tab.prototype.setContent = function (part) {
-        if (this.content) {
-            this._element.removeChild(this.content.element);
-        }
-        this.content = part;
-        this._element.appendChild(this.content.element);
-    };
-    Tab.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-        this.droptarget.dispose();
-    };
-    return Tab;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/groupview/titlebar/titleContainer.js":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/groupview/titlebar/titleContainer.js ***!
-  \*****************************************************************************/
-/*! namespace exports */
-/*! export TitleContainer [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "TitleContainer": () => /* binding */ TitleContainer
-/* harmony export */ });
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _tab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../tab */ "./node_modules/dockview/dist/es6/groupview/tab.js");
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../dom */ "./node_modules/dockview/dist/es6/dom.js");
-/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../dnd/droptarget */ "./node_modules/dockview/dist/es6/dnd/droptarget.js");
-/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../array */ "./node_modules/dockview/dist/es6/array.js");
-/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../dnd/dataTransfer */ "./node_modules/dockview/dist/es6/dnd/dataTransfer.js");
-/* harmony import */ var _focusedElement__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../focusedElement */ "./node_modules/dockview/dist/es6/focusedElement.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
-};
-
-
-
-
-
-
-
-
-var TitleContainer = /** @class */ (function (_super) {
-    __extends(TitleContainer, _super);
-    function TitleContainer(accessor, group, options) {
-        var _this = _super.call(this) || this;
-        _this.accessor = accessor;
-        _this.group = group;
-        _this.tabs = [];
-        _this.selectedIndex = -1;
-        _this.active = false;
-        _this._visible = true;
-        _this._onDropped = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
-        _this.onDropEvent = _this._onDropped.event;
-        _this.addDisposables(_this._onDropped);
-        _this._element = document.createElement('div');
-        _this._element.className = 'title-container';
-        _this.height = options.tabHeight;
-        _this.actionContainer = document.createElement('div');
-        _this.actionContainer.className = 'action-container';
-        _this.tabContainer = document.createElement('div');
-        _this.tabContainer.className = 'tab-container';
-        _this._element.appendChild(_this.tabContainer);
-        _this._element.appendChild(_this.actionContainer);
-        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.tabContainer, 'mousedown', function (event) {
-            if (event.defaultPrevented) {
-                return;
-            }
-            _this.accessor.doSetGroupActive(_this.group);
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.tabContainer, 'dragenter', function (event) {
-            if (!_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_6__.DataTransferSingleton.has(_this.accessor.id)) {
-                console.debug('[tabs] invalid drop event');
-                return;
-            }
-            if (!(0,_array__WEBPACK_IMPORTED_MODULE_5__.last)(_this.tabs).value.hasActiveDragEvent) {
-                (0,_dom__WEBPACK_IMPORTED_MODULE_3__.addClasses)(_this.tabContainer, 'drag-over-target');
-            }
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.tabContainer, 'dragover', function (event) {
-            event.preventDefault();
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.tabContainer, 'dragleave', function (event) {
-            (0,_dom__WEBPACK_IMPORTED_MODULE_3__.removeClasses)(_this.tabContainer, 'drag-over-target');
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.tabContainer, 'drop', function (event) {
-            if (!_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_6__.DataTransferSingleton.has(_this.accessor.id)) {
-                console.debug('[tabs] invalid drop event');
-                return;
-            }
-            if (event.defaultPrevented) {
-                console.debug('[tab] drop event defaultprevented');
-                return;
-            }
-            (0,_dom__WEBPACK_IMPORTED_MODULE_3__.removeClasses)(_this.tabContainer, 'drag-over-target');
-            var activetab = _this.tabs.find(function (tab) { return tab.value.hasActiveDragEvent; });
-            var ignore = !!(activetab &&
-                event
-                    .composedPath()
-                    .find(function (x) { return activetab.value.element === x; }));
-            if (ignore) {
-                console.debug('[tabs] ignore event');
-                return;
-            }
-            _this._onDropped.fire({
-                event: { event: event, position: _dnd_droptarget__WEBPACK_IMPORTED_MODULE_4__.Position.Center },
-                index: _this.tabs.length - (activetab ? 1 : 0),
-            });
-        }));
-        return _this;
-    }
-    Object.defineProperty(TitleContainer.prototype, "visible", {
-        get: function () {
-            return this._visible;
-        },
-        set: function (value) {
-            this._visible = value;
-            (0,_dom__WEBPACK_IMPORTED_MODULE_3__.toggleClass)(this.element, 'hidden', !this._visible);
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(TitleContainer.prototype, "height", {
-        get: function () {
-            return this._height;
-        },
-        set: function (value) {
-            this._height = value;
-            if (typeof value !== 'number') {
-                // removeClasses(this.element, 'separator-border');
-                this.element.style.removeProperty('--title-height');
-            }
-            else {
-                // addClasses(this.element, 'separator-border');
-                // if (styles?.separatorBorder) {
-                this.element.style.setProperty('--title-height', value + "px");
-                // }
-            }
-            // this._element.style.height = `${this.height}px`;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    TitleContainer.prototype.setActionElement = function (element) {
-        if (this.actions === element) {
-            return;
-        }
-        if (this.actions) {
-            this.actions.remove();
-            this.actions = undefined;
-        }
-        if (element) {
-            this.actionContainer.appendChild(element);
-            this.actions = element;
-        }
-    };
-    Object.defineProperty(TitleContainer.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    TitleContainer.prototype.isActive = function (tab) {
-        return (this.selectedIndex > -1 &&
-            this.tabs[this.selectedIndex].value === tab);
-    };
-    Object.defineProperty(TitleContainer.prototype, "hasActiveDragEvent", {
-        get: function () {
-            return !!this.tabs.find(function (tab) { return tab.value.hasActiveDragEvent; });
-        },
-        enumerable: false,
-        configurable: true
-    });
-    TitleContainer.prototype.at = function (index) {
-        var _a;
-        return (_a = this.tabs[index]) === null || _a === void 0 ? void 0 : _a.value;
-    };
-    TitleContainer.prototype.indexOf = function (tabOrId) {
-        var id = typeof tabOrId === 'string' ? tabOrId : tabOrId.id;
-        return this.tabs.findIndex(function (tab) { return tab.value.id === id; });
-    };
-    TitleContainer.prototype.setActive = function (isGroupActive) {
-        this.active = isGroupActive;
-    };
-    TitleContainer.prototype.addTab = function (tab, index) {
-        if (index === void 0) { index = this.tabs.length; }
-        if (index < 0 || index > this.tabs.length) {
-            throw new Error('invalid location');
-        }
-        this.tabContainer.insertBefore(tab.value.element, this.tabContainer.children[index]);
-        this.tabs = __spread(this.tabs.slice(0, index), [
-            tab
-        ], this.tabs.slice(index));
-        if (this.selectedIndex < 0) {
-            this.selectedIndex = index;
-        }
-    };
-    TitleContainer.prototype.delete = function (id) {
-        var index = this.tabs.findIndex(function (tab) { return tab.value.id === id; });
-        var tab = this.tabs.splice(index, 1)[0];
-        var value = tab.value, disposable = tab.disposable;
-        disposable.dispose();
-        value.element.remove();
-    };
-    TitleContainer.prototype.setActivePanel = function (panel) {
-        this.tabs.forEach(function (tab) {
-            var isActivePanel = panel.id === tab.value.id;
-            tab.value.setActive(isActivePanel);
-        });
-    };
-    TitleContainer.prototype.openPanel = function (panel, index) {
-        var _this = this;
-        if (index === void 0) { index = this.tabs.length; }
-        if (this.tabs.find(function (tab) { return tab.value.id === panel.id; })) {
-            return;
-        }
-        var tab = new _tab__WEBPACK_IMPORTED_MODULE_2__.Tab(panel.id, this.accessor, this.group);
-        tab.setContent(panel.header);
-        var disposable = _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable.from(tab.onChanged(function (event) {
-            var _a;
-            var alreadyFocused = panel.id === ((_a = _this.group.activePanel) === null || _a === void 0 ? void 0 : _a.id) &&
-                _this.group.isAncestor(_focusedElement__WEBPACK_IMPORTED_MODULE_7__.focusedElement.element);
-            switch (event.kind) {
-                case _tab__WEBPACK_IMPORTED_MODULE_2__.MouseEventKind.CLICK:
-                    _this.group.setPanel(panel, alreadyFocused);
-                    break;
-            }
-            _this.accessor.fireMouseEvent(__assign(__assign({}, event), { panel: panel, tab: true }));
-        }), tab.onDropped(function (event) {
-            _this._onDropped.fire({ event: event, index: _this.indexOf(tab) });
-        }));
-        var value = { value: tab, disposable: disposable };
-        this.addTab(value, index);
-        this.activePanel = panel;
-    };
-    TitleContainer.prototype.closePanel = function (panel) {
-        this.delete(panel.id);
-    };
-    TitleContainer.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-        this.tabs.forEach(function (tab) {
-            tab.disposable.dispose();
-        });
-        this.tabs = [];
-    };
-    return TitleContainer;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/groupview/types.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/groupview/types.js ***!
-  \***********************************************************/
-/*! namespace exports */
-/*! exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/index.js":
-/*!*************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/index.js ***!
-  \*************************************************/
-/*! namespace exports */
-/*! export CompositeDisposable [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/lifecycle.js .CompositeDisposable */
-/*! export ContentContainer [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/groupview/panel/content.js .ContentContainer */
-/*! export Disposable [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/lifecycle.js .Disposable */
-/*! export DockviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/api/component.api.js .DockviewApi */
-/*! export DockviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/dockview/dockviewComponent.js .DockviewComponent */
-/*! export DockviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/react/dockview/dockview.js .DockviewReact */
-/*! export Emitter [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/events.js .Emitter */
-/*! export Event [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/events.js .Event */
-/*! export Gridview [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/gridview/gridview.js .Gridview */
-/*! export GridviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/api/component.api.js .GridviewApi */
-/*! export GridviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/gridview/gridviewComponent.js .GridviewComponent */
-/*! export GridviewPanel [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/gridview/gridviewPanel.js .GridviewPanel */
-/*! export GridviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/react/gridview/gridview.js .GridviewReact */
-/*! export GroupPanelApi [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/api/groupPanelApi.js .GroupPanelApi */
-/*! export Groupview [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/groupview/groupview.js .Groupview */
-/*! export GroupviewPanel [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/groupview/groupviewPanel.js .GroupviewPanel */
-/*! export LayoutPriority [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/splitview/core/splitview.js .LayoutPriority */
-/*! export MouseEventKind [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/groupview/tab.js .MouseEventKind */
-/*! export MutableDisposable [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/lifecycle.js .MutableDisposable */
-/*! export Orientation [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/splitview/core/splitview.js .Orientation */
-/*! export PaneFramework [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/paneview/paneviewComponent.js .PaneFramework */
-/*! export Paneview [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/paneview/paneview.js .Paneview */
-/*! export PaneviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/api/component.api.js .PaneviewApi */
-/*! export PaneviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/paneview/paneviewComponent.js .PaneviewComponent */
-/*! export PaneviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/react/paneview/paneview.js .PaneviewReact */
-/*! export ReactPanelContentPart [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/react/dockview/reactContentPart.js .ReactPanelContentPart */
-/*! export ReactPanelHeaderPart [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/react/dockview/reactHeaderPart.js .ReactPanelHeaderPart */
-/*! export ReactPart [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/react/react.js .ReactPart */
-/*! export SashState [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/splitview/core/splitview.js .SashState */
-/*! export Sizing [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/splitview/core/splitview.js .Sizing */
-/*! export Splitview [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/splitview/core/splitview.js .Splitview */
-/*! export SplitviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/api/component.api.js .SplitviewApi */
-/*! export SplitviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/splitview/splitviewComponent.js .SplitviewComponent */
-/*! export SplitviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/react/splitview/splitview.js .SplitviewReact */
-/*! export Tab [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/groupview/tab.js .Tab */
-/*! export addDisposableListener [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/events.js .addDisposableListener */
-/*! export addDisposableWindowListener [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/events.js .addDisposableWindowListener */
-/*! export getDirectionOrientation [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/gridview/gridview.js .getDirectionOrientation */
-/*! export getGridLocation [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/gridview/gridview.js .getGridLocation */
-/*! export getLocationOrientation [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/gridview/gridview.js .getLocationOrientation */
-/*! export getRelativeLocation [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/gridview/gridview.js .getRelativeLocation */
-/*! export indexInParent [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/gridview/gridview.js .indexInParent */
-/*! export isGridBranchNode [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/gridview/gridview.js .isGridBranchNode */
-/*! export orthogonal [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/gridview/gridview.js .orthogonal */
-/*! export usePortalsLifecycle [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/react/react.js .usePortalsLifecycle */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_exports__, __webpack_require__.d, __webpack_require__.r, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "LayoutPriority": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority,
-/* harmony export */   "Orientation": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation,
-/* harmony export */   "SashState": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.SashState,
-/* harmony export */   "Sizing": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Sizing,
-/* harmony export */   "Splitview": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Splitview,
-/* harmony export */   "SplitviewComponent": () => /* reexport safe */ _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_1__.SplitviewComponent,
-/* harmony export */   "Paneview": () => /* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_2__.Paneview,
-/* harmony export */   "PaneFramework": () => /* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_3__.PaneFramework,
-/* harmony export */   "PaneviewComponent": () => /* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_3__.PaneviewComponent,
-/* harmony export */   "Gridview": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.Gridview,
-/* harmony export */   "getDirectionOrientation": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getDirectionOrientation,
-/* harmony export */   "getGridLocation": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getGridLocation,
-/* harmony export */   "getLocationOrientation": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getLocationOrientation,
-/* harmony export */   "getRelativeLocation": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getRelativeLocation,
-/* harmony export */   "indexInParent": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.indexInParent,
-/* harmony export */   "isGridBranchNode": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.isGridBranchNode,
-/* harmony export */   "orthogonal": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.orthogonal,
-/* harmony export */   "Groupview": () => /* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_5__.Groupview,
-/* harmony export */   "ContentContainer": () => /* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_6__.ContentContainer,
-/* harmony export */   "MouseEventKind": () => /* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_7__.MouseEventKind,
-/* harmony export */   "Tab": () => /* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_7__.Tab,
-/* harmony export */   "Emitter": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.Emitter,
-/* harmony export */   "Event": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.Event,
-/* harmony export */   "addDisposableListener": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.addDisposableListener,
-/* harmony export */   "addDisposableWindowListener": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.addDisposableWindowListener,
-/* harmony export */   "CompositeDisposable": () => /* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_9__.CompositeDisposable,
-/* harmony export */   "Disposable": () => /* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_9__.Disposable,
-/* harmony export */   "MutableDisposable": () => /* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_9__.MutableDisposable,
-/* harmony export */   "GroupviewPanel": () => /* reexport safe */ _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_10__.GroupviewPanel,
-/* harmony export */   "GroupPanelApi": () => /* reexport safe */ _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_11__.GroupPanelApi,
-/* harmony export */   "DockviewApi": () => /* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_12__.DockviewApi,
-/* harmony export */   "GridviewApi": () => /* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_12__.GridviewApi,
-/* harmony export */   "PaneviewApi": () => /* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_12__.PaneviewApi,
-/* harmony export */   "SplitviewApi": () => /* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_12__.SplitviewApi,
-/* harmony export */   "ReactPart": () => /* reexport safe */ _react_react__WEBPACK_IMPORTED_MODULE_13__.ReactPart,
-/* harmony export */   "usePortalsLifecycle": () => /* reexport safe */ _react_react__WEBPACK_IMPORTED_MODULE_13__.usePortalsLifecycle,
-/* harmony export */   "DockviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.DockviewReact,
-/* harmony export */   "GridviewPanel": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.GridviewPanel,
-/* harmony export */   "GridviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.GridviewReact,
-/* harmony export */   "PaneviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.PaneviewReact,
-/* harmony export */   "ReactPanelContentPart": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.ReactPanelContentPart,
-/* harmony export */   "ReactPanelHeaderPart": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.ReactPanelHeaderPart,
-/* harmony export */   "SplitviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.SplitviewReact,
-/* harmony export */   "DockviewComponent": () => /* reexport safe */ _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_16__.DockviewComponent,
-/* harmony export */   "GridviewComponent": () => /* reexport safe */ _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_18__.GridviewComponent
-/* harmony export */ });
-/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./splitview/core/splitview */ "./node_modules/dockview/dist/es6/splitview/core/splitview.js");
-/* harmony import */ var _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitview/splitviewComponent */ "./node_modules/dockview/dist/es6/splitview/splitviewComponent.js");
-/* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./paneview/paneview */ "./node_modules/dockview/dist/es6/paneview/paneview.js");
-/* harmony import */ var _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./paneview/paneviewComponent */ "./node_modules/dockview/dist/es6/paneview/paneviewComponent.js");
-/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./gridview/gridview */ "./node_modules/dockview/dist/es6/gridview/gridview.js");
-/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./groupview/groupview */ "./node_modules/dockview/dist/es6/groupview/groupview.js");
-/* harmony import */ var _groupview_panel_content__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./groupview/panel/content */ "./node_modules/dockview/dist/es6/groupview/panel/content.js");
-/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./groupview/tab */ "./node_modules/dockview/dist/es6/groupview/tab.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-/* harmony import */ var _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./groupview/groupviewPanel */ "./node_modules/dockview/dist/es6/groupview/groupviewPanel.js");
-/* harmony import */ var _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./api/groupPanelApi */ "./node_modules/dockview/dist/es6/api/groupPanelApi.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./api/component.api */ "./node_modules/dockview/dist/es6/api/component.api.js");
-/* harmony import */ var _react_react__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./react/react */ "./node_modules/dockview/dist/es6/react/react.js");
-/* harmony import */ var _groupview_types__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./groupview/types */ "./node_modules/dockview/dist/es6/groupview/types.js");
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./react */ "./node_modules/dockview/dist/es6/react/index.js");
-/* harmony import */ var _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./dockview/dockviewComponent */ "./node_modules/dockview/dist/es6/dockview/dockviewComponent.js");
-/* harmony import */ var _dockview_options__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./dockview/options */ "./node_modules/dockview/dist/es6/dockview/options.js");
-/* harmony import */ var _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./gridview/gridviewComponent */ "./node_modules/dockview/dist/es6/gridview/gridviewComponent.js");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/json.js":
-/*!************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/json.js ***!
-  \************************************************/
-/*! namespace exports */
-/*! export tryParseJSON [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "tryParseJSON": () => /* binding */ tryParseJSON
-/* harmony export */ });
-function tryParseJSON(text, reviver) {
-    try {
-        return JSON.parse(text, reviver);
-    }
-    catch (err) {
-        console.warn('failed to parse JSON');
-        return undefined;
-    }
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/lifecycle.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/lifecycle.js ***!
-  \*****************************************************/
-/*! namespace exports */
-/*! export CompositeDisposable [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Disposable [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export MutableDisposable [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Disposable": () => /* binding */ Disposable,
-/* harmony export */   "CompositeDisposable": () => /* binding */ CompositeDisposable,
-/* harmony export */   "MutableDisposable": () => /* binding */ MutableDisposable
-/* harmony export */ });
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
-};
-var Disposable;
-(function (Disposable) {
-    Disposable.NONE = {
-        dispose: function () {
-            // noop
-        },
-    };
-})(Disposable || (Disposable = {}));
-var CompositeDisposable = /** @class */ (function () {
-    function CompositeDisposable() {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        this.disposables = args;
-    }
-    CompositeDisposable.from = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        return new (CompositeDisposable.bind.apply(CompositeDisposable, __spread([void 0], args)))();
-    };
-    CompositeDisposable.prototype.addDisposables = function () {
-        var _this = this;
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        args === null || args === void 0 ? void 0 : args.forEach(function (arg) { return _this.disposables.push(arg); });
-    };
-    CompositeDisposable.prototype.dispose = function () {
-        this.disposables.forEach(function (arg) { return arg.dispose(); });
-    };
-    return CompositeDisposable;
-}());
-
-var MutableDisposable = /** @class */ (function () {
-    function MutableDisposable() {
-        this._disposable = Disposable.NONE;
-    }
-    Object.defineProperty(MutableDisposable.prototype, "value", {
-        set: function (disposable) {
-            if (this._disposable) {
-                this._disposable.dispose();
-            }
-            this._disposable = disposable;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    MutableDisposable.prototype.dispose = function () {
-        if (this._disposable) {
-            this._disposable.dispose();
-        }
-    };
-    return MutableDisposable;
-}());
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/math.js":
-/*!************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/math.js ***!
-  \************************************************/
-/*! namespace exports */
-/*! export clamp [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export sequentialNumberGenerator [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "clamp": () => /* binding */ clamp,
-/* harmony export */   "sequentialNumberGenerator": () => /* binding */ sequentialNumberGenerator
-/* harmony export */ });
-var clamp = function (value, min, max) {
-    if (min > max) {
-        throw new Error('min >= max condition failed');
-    }
-    return Math.min(max, Math.max(value, min));
-};
-var sequentialNumberGenerator = function () {
-    var value = 1;
-    return { next: function () { return (value++).toString(); } };
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/panel/componentFactory.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/panel/componentFactory.js ***!
-  \******************************************************************/
-/*! namespace exports */
-/*! export createComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "createComponent": () => /* binding */ createComponent
-/* harmony export */ });
-function createComponent(id, componentName, components, frameworkComponents, createFrameworkComponent, fallback) {
-    var Component = typeof componentName === 'string'
-        ? components[componentName]
-        : componentName;
-    var FrameworkComponent = typeof componentName === 'string'
-        ? frameworkComponents[componentName]
-        : componentName;
-    if (Component && FrameworkComponent) {
-        throw new Error("cannot register component " + componentName + " as both a component and frameworkComponent");
-    }
-    if (FrameworkComponent) {
-        if (!createFrameworkComponent) {
-            throw new Error('you must register a frameworkPanelWrapper to use framework components');
-        }
-        var wrappedComponent = createFrameworkComponent.createComponent(id, componentName, FrameworkComponent);
-        return wrappedComponent;
-    }
-    if (!Component) {
-        if (fallback) {
-            return fallback();
-        }
-        throw new Error('invalid component');
-    }
-    return new Component(id, componentName);
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/paneview/paneview.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/paneview/paneview.js ***!
-  \*************************************************************/
-/*! namespace exports */
-/*! export Paneview [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Paneview": () => /* binding */ Paneview
-/* harmony export */ });
-/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../splitview/core/splitview */ "./node_modules/dockview/dist/es6/splitview/core/splitview.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dom */ "./node_modules/dockview/dist/es6/dom.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-
-
-
-var Paneview = /** @class */ (function (_super) {
-    __extends(Paneview, _super);
-    function Paneview(container, options) {
-        var _a;
-        var _this = _super.call(this) || this;
-        _this.paneItems = [];
-        _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
-        _this.onDidChange = _this._onDidChange.event;
-        _this._orientation = (_a = options.orientation) !== null && _a !== void 0 ? _a : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.VERTICAL;
-        _this.element = document.createElement('div');
-        _this.element.className = 'pane-container';
-        container.appendChild(_this.element);
-        _this.splitview = new _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Splitview(_this.element, {
-            orientation: _this._orientation,
-            proportionalLayout: false,
-            descriptor: options.descriptor,
-        });
-        // if we've added views from the descriptor we need to
-        // add the panes to our Pane array and setup animation
-        _this.getPanes().forEach(function (pane, index) {
-            var disposable = pane.onDidChangeExpansionState(function () {
-                _this.setupAnimation();
-            });
-            var paneItem = {
-                pane: pane,
-                disposable: {
-                    dispose: function () {
-                        disposable.dispose();
-                    },
-                },
-            };
-            _this.paneItems.splice(index, 0, paneItem);
-            pane.orthogonalSize = _this.splitview.orthogonalSize;
-        });
-        _this.addDisposables(_this.splitview.onDidSashEnd(function () {
-            _this._onDidChange.fire(undefined);
-        }));
-        return _this;
-    }
-    Object.defineProperty(Paneview.prototype, "minimumSize", {
-        get: function () {
-            return this.splitview.minimumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Paneview.prototype, "maximumSize", {
-        get: function () {
-            return this.splitview.maximumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Paneview.prototype, "orientation", {
-        get: function () {
-            return this.splitview.orientation;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Paneview.prototype, "size", {
-        get: function () {
-            return this.splitview.size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Paneview.prototype, "orthogonalSize", {
-        get: function () {
-            return this.splitview.orthogonalSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Paneview.prototype.addPane = function (pane, size, index, skipLayout) {
-        var _this = this;
-        if (index === void 0) { index = this.splitview.length; }
-        if (skipLayout === void 0) { skipLayout = false; }
-        var disposable = pane.onDidChangeExpansionState(function () {
-            _this.setupAnimation();
-        });
-        var paneItem = {
-            pane: pane,
-            disposable: {
-                dispose: function () {
-                    disposable.dispose();
-                },
-            },
-        };
-        this.paneItems.splice(index, 0, paneItem);
-        pane.orthogonalSize = this.splitview.orthogonalSize;
-        this.splitview.addView(pane, size, index, skipLayout);
-    };
-    Paneview.prototype.getViewSize = function (index) {
-        return this.splitview.getViewSize(index);
-    };
-    Paneview.prototype.getPanes = function () {
-        return this.splitview.getViews();
-    };
-    Paneview.prototype.removePane = function (index) {
-        this.splitview.removeView(index);
-        var paneItem = this.paneItems.splice(index, 1)[0];
-        paneItem.disposable.dispose();
-        return paneItem;
-    };
-    Paneview.prototype.moveView = function (from, to) {
-        var view = this.removePane(from);
-        this.addPane(view.pane, to);
-    };
-    Paneview.prototype.layout = function (size, orthogonalSize) {
-        // for (const paneItem of this.paneItems) {
-        //     paneItem.pane.orthogonalSize = orthogonalSize;
-        // }
-        this.splitview.layout(size, orthogonalSize);
-    };
-    Paneview.prototype.setupAnimation = function () {
-        var _this = this;
-        if (this.animationTimer) {
-            clearTimeout(this.animationTimer);
-            this.animationTimer = undefined;
-        }
-        (0,_dom__WEBPACK_IMPORTED_MODULE_3__.addClasses)(this.element, 'animated');
-        this.animationTimer = setTimeout(function () {
-            _this.animationTimer = undefined;
-            (0,_dom__WEBPACK_IMPORTED_MODULE_3__.removeClasses)(_this.element, 'animated');
-        }, 200);
-    };
-    Paneview.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-        this.splitview.dispose();
-        if (this.animationTimer) {
-            clearTimeout(this.animationTimer);
-            this.animationTimer = undefined;
-        }
-        this.paneItems.forEach(function (paneItem) {
-            paneItem.disposable.dispose();
-        });
-        this.paneItems = [];
-        this.element.remove();
-    };
-    return Paneview;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/paneview/paneviewComponent.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/paneview/paneviewComponent.js ***!
-  \**********************************************************************/
-/*! namespace exports */
-/*! export PaneFramework [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export PaneviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PaneFramework": () => /* binding */ PaneFramework,
-/* harmony export */   "PaneviewComponent": () => /* binding */ PaneviewComponent
-/* harmony export */ });
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/component.api */ "./node_modules/dockview/dist/es6/api/component.api.js");
-/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../panel/componentFactory */ "./node_modules/dockview/dist/es6/panel/componentFactory.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../splitview/core/splitview */ "./node_modules/dockview/dist/es6/splitview/core/splitview.js");
-/* harmony import */ var _paneview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./paneview */ "./node_modules/dockview/dist/es6/paneview/paneview.js");
-/* harmony import */ var _paneviewPanel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./paneviewPanel */ "./node_modules/dockview/dist/es6/paneview/paneviewPanel.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-
-
-
-
-var DefaultHeader = /** @class */ (function (_super) {
-    __extends(DefaultHeader, _super);
-    function DefaultHeader() {
-        var _this = _super.call(this) || this;
-        _this.apiRef = { api: null };
-        _this._element = document.createElement('div');
-        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_2__.addDisposableListener)(_this.element, 'click', function () {
-            var _a;
-            (_a = _this.apiRef.api) === null || _a === void 0 ? void 0 : _a.setExpanded(!_this.apiRef.api.isExpanded);
-        }));
-        return _this;
-    }
-    Object.defineProperty(DefaultHeader.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    DefaultHeader.prototype.init = function (params) {
-        this.apiRef.api = params.api;
-        this._element.textContent = params.title;
-    };
-    DefaultHeader.prototype.update = function (params) {
-        //
-    };
-    return DefaultHeader;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable));
-var PaneFramework = /** @class */ (function (_super) {
-    __extends(PaneFramework, _super);
-    function PaneFramework(options) {
-        var _this = _super.call(this, options.id, options.component, options.headerComponent) || this;
-        _this.options = options;
-        return _this;
-    }
-    PaneFramework.prototype.getBodyComponent = function () {
-        return this.options.body;
-    };
-    PaneFramework.prototype.getHeaderComponent = function () {
-        return this.options.header;
-    };
-    return PaneFramework;
-}(_paneviewPanel__WEBPACK_IMPORTED_MODULE_6__.PaneviewPanel));
-
-var PaneviewComponent = /** @class */ (function (_super) {
-    __extends(PaneviewComponent, _super);
-    function PaneviewComponent(element, options) {
-        var _this = _super.call(this) || this;
-        _this.element = element;
-        _this.options = options;
-        _this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
-        _this.onDidLayoutChange = _this._onDidLayoutChange.event;
-        if (!options.components) {
-            options.components = {};
-        }
-        if (!options.frameworkComponents) {
-            options.frameworkComponents = {};
-        }
-        _this.paneview = new _paneview__WEBPACK_IMPORTED_MODULE_5__.Paneview(_this.element, {
-            // only allow paneview in the vertical orientation for now
-            orientation: _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation.VERTICAL,
-        });
-        _this.addDisposables(_this.paneview.onDidChange(function () {
-            _this._onDidLayoutChange.fire(undefined);
-        }), _this.paneview);
-        return _this;
-    }
-    Object.defineProperty(PaneviewComponent.prototype, "minimumSize", {
-        get: function () {
-            return this.paneview.minimumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(PaneviewComponent.prototype, "maximumSize", {
-        get: function () {
-            return this.paneview.maximumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    PaneviewComponent.prototype.focus = function () {
-        //
-    };
-    PaneviewComponent.prototype.addPanel = function (options) {
-        var _a, _b;
-        var body = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(options.id, options.component, this.options.components, this.options.frameworkComponents, {
-            createComponent: (_a = this.options.frameworkWrapper) === null || _a === void 0 ? void 0 : _a.body.createComponent,
-        });
-        var header;
-        if (options.headerComponent) {
-            header = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(options.id, options.headerComponent, this.options.headerComponents, this.options.headerframeworkComponents, {
-                createComponent: (_b = this.options.frameworkWrapper) === null || _b === void 0 ? void 0 : _b.header.createComponent,
-            });
-        }
-        else {
-            header = new DefaultHeader();
-        }
-        var view = new PaneFramework({
-            id: options.id,
-            component: options.component,
-            headerComponent: options.headerComponent,
-            header: header,
-            body: body,
-        });
-        this.paneview.addPane(view);
-        view.init({
-            params: options.params,
-            minimumBodySize: options.minimumBodySize,
-            maximumBodySize: options.maximumBodySize,
-            isExpanded: options.isExpanded,
-            title: options.title,
-            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_0__.PaneviewApi(this),
-        });
-        view.orientation = this.paneview.orientation;
-        return {
-            dispose: function () {
-                //
-            },
-        };
-    };
-    PaneviewComponent.prototype.getPanels = function () {
-        return this.paneview.getPanes();
-    };
-    PaneviewComponent.prototype.removePanel = function (panel) {
-        var views = this.getPanels();
-        var index = views.findIndex(function (_) { return _ === panel; });
-        this.paneview.removePane(index);
-    };
-    PaneviewComponent.prototype.getPanel = function (id) {
-        return this.getPanels().find(function (view) { return view.id === id; });
-    };
-    PaneviewComponent.prototype.layout = function (width, height) {
-        var _a = __read(this.paneview.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation.HORIZONTAL
-            ? [width, height]
-            : [height, width], 2), size = _a[0], orthogonalSize = _a[1];
-        this.paneview.layout(size, orthogonalSize);
-    };
-    /**
-     * Resize the layout to fit the parent container
-     */
-    PaneviewComponent.prototype.resizeToFit = function () {
-        if (!this.element.parentElement) {
-            return;
-        }
-        var _a = this.element.parentElement.getBoundingClientRect(), width = _a.width, height = _a.height;
-        this.layout(width, height);
-    };
-    PaneviewComponent.prototype.toJSON = function () {
-        var _this = this;
-        var views = this.paneview
-            .getPanes()
-            .map(function (view, i) {
-            var size = _this.paneview.getViewSize(i);
-            return {
-                size: size,
-                data: view.toJSON(),
-                minimumSize: view.minimumBodySize,
-                maximumSize: view.maximumBodySize,
-                expanded: view.isExpanded(),
-            };
-        });
-        return {
-            views: views,
-            size: this.paneview.size,
-            orientation: this.paneview.orientation,
-        };
-    };
-    PaneviewComponent.prototype.fromJSON = function (data) {
-        var _this = this;
-        var views = data.views, orientation = data.orientation, size = data.size;
-        this.paneview.dispose();
-        this.paneview = new _paneview__WEBPACK_IMPORTED_MODULE_5__.Paneview(this.element, {
-            orientation: orientation,
-            descriptor: {
-                size: size,
-                views: views.map(function (view) {
-                    var _a, _b;
-                    var data = view.data;
-                    var body = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(data.id, data.component, _this.options.components, _this.options.frameworkComponents, {
-                        createComponent: (_a = _this.options.frameworkWrapper) === null || _a === void 0 ? void 0 : _a.body.createComponent,
-                    });
-                    var header;
-                    if (data.headerComponent) {
-                        header = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(data.id, data.headerComponent, _this.options.headerComponents, _this.options.headerframeworkComponents, {
-                            createComponent: (_b = _this.options.frameworkWrapper) === null || _b === void 0 ? void 0 : _b.header.createComponent,
-                        });
-                    }
-                    else {
-                        header = new DefaultHeader();
-                    }
-                    var panel = new PaneFramework({
-                        id: data.id,
-                        component: data.component,
-                        headerComponent: data.headerComponent,
-                        header: header,
-                        body: body,
-                    });
-                    panel.init({
-                        params: data.props,
-                        minimumBodySize: view.minimumSize,
-                        maximumBodySize: view.maximumSize,
-                        title: data.title,
-                        isExpanded: !!view.expanded,
-                        containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_0__.PaneviewApi(_this),
-                    });
-                    panel.orientation = orientation;
-                    return { size: view.size, view: panel };
-                }),
-            },
-        });
-    };
-    return PaneviewComponent;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/paneview/paneviewPanel.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/paneview/paneviewPanel.js ***!
-  \******************************************************************/
-/*! namespace exports */
-/*! export PaneviewPanel [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PaneviewPanel": () => /* binding */ PaneviewPanel
-/* harmony export */ });
-/* harmony import */ var _api_panePanelApi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/panePanelApi */ "./node_modules/dockview/dist/es6/api/panePanelApi.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../gridview/basePanelView */ "./node_modules/dockview/dist/es6/gridview/basePanelView.js");
-/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../splitview/core/splitview */ "./node_modules/dockview/dist/es6/splitview/core/splitview.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-
-var PaneviewPanel = /** @class */ (function (_super) {
-    __extends(PaneviewPanel, _super);
-    function PaneviewPanel(id, component, headerComponent) {
-        var _this = _super.call(this, id, component, new _api_panePanelApi__WEBPACK_IMPORTED_MODULE_0__.PanePanelApi(id)) || this;
-        _this.headerComponent = headerComponent;
-        _this._onDidChangeExpansionState = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
-        _this.onDidChangeExpansionState = _this._onDidChangeExpansionState.event;
-        _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
-        _this.onDidChange = _this._onDidChange.event;
-        _this.headerSize = 22;
-        _this._orthogonalSize = 0;
-        _this._minimumBodySize = 0;
-        _this._maximumBodySize = Number.POSITIVE_INFINITY;
-        _this._isExpanded = false;
-        _this.api.pane = _this; // TODO cannot use 'this' before 'super'
-        _this.element.classList.add('pane');
-        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.element, 'mouseenter', function (ev) {
-            _this.api._onMouseEnter.fire(ev);
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.element, 'mouseleave', function (ev) {
-            _this.api._onMouseLeave.fire(ev);
-        }));
-        _this.addDisposables(_this._onDidChangeExpansionState, _this.onDidChangeExpansionState(function (isExpanded) {
-            _this.api._onDidExpansionChange.fire({ isExpanded: isExpanded });
-        }));
-        _this.render();
-        return _this;
-    }
-    Object.defineProperty(PaneviewPanel.prototype, "orientation", {
-        get: function () {
-            return this._orientation;
-        },
-        set: function (value) {
-            this._orientation = value;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(PaneviewPanel.prototype, "minimumSize", {
-        get: function () {
-            var headerSize = this.headerSize;
-            var expanded = this.isExpanded();
-            var minimumBodySize = expanded ? this._minimumBodySize : 0;
-            return headerSize + minimumBodySize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(PaneviewPanel.prototype, "maximumSize", {
-        get: function () {
-            var headerSize = this.headerSize;
-            var expanded = this.isExpanded();
-            var maximumBodySize = expanded ? this._maximumBodySize : 0;
-            return headerSize + maximumBodySize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(PaneviewPanel.prototype, "orthogonalSize", {
-        get: function () {
-            return this._orthogonalSize;
-        },
-        set: function (size) {
-            this._orthogonalSize = size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(PaneviewPanel.prototype, "minimumBodySize", {
-        set: function (value) {
-            this._minimumBodySize = typeof value === 'number' ? value : 0;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(PaneviewPanel.prototype, "maximumBodySize", {
-        set: function (value) {
-            this._maximumBodySize =
-                typeof value === 'number' ? value : Number.POSITIVE_INFINITY;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    PaneviewPanel.prototype.isExpanded = function () {
-        return this._isExpanded;
-    };
-    PaneviewPanel.prototype.setExpanded = function (expanded) {
-        var _this = this;
-        this._isExpanded = expanded;
-        if (expanded) {
-            if (this.animationTimer) {
-                clearTimeout(this.animationTimer);
-            }
-            this.element.appendChild(this.body);
-        }
-        else {
-            this.animationTimer = setTimeout(function () {
-                _this.body.remove();
-            }, 200);
-        }
-        this._onDidChangeExpansionState.fire(expanded);
-        this._onDidChange.fire(expanded ? this.expandedSize : undefined);
-    };
-    PaneviewPanel.prototype.layout = function (size, orthogonalSize) {
-        var _a = __read(this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_3__.Orientation.HORIZONTAL
-            ? [size, orthogonalSize]
-            : [orthogonalSize, size], 2), width = _a[0], height = _a[1];
-        if (this.isExpanded()) {
-            this.expandedSize = width;
-        }
-        _super.prototype.layout.call(this, width, height);
-    };
-    PaneviewPanel.prototype.init = function (parameters) {
-        _super.prototype.init.call(this, parameters);
-        if (typeof parameters.minimumBodySize === 'number') {
-            this.minimumBodySize = parameters.minimumBodySize;
-        }
-        if (typeof parameters.maximumBodySize === 'number') {
-            this.maximumBodySize = parameters.maximumBodySize;
-        }
-        if (typeof parameters.isExpanded === 'boolean') {
-            this.setExpanded(parameters.isExpanded);
-        }
-        this.bodyPart = this.getBodyComponent();
-        this.headerPart = this.getHeaderComponent();
-        this.bodyPart.init(__assign(__assign({}, parameters), { api: this.api }));
-        this.headerPart.init(__assign(__assign({}, parameters), { api: this.api }));
-        this.body.append(this.bodyPart.element);
-        this.header.append(this.headerPart.element);
-    };
-    PaneviewPanel.prototype.toJSON = function () {
-        var params = this.params;
-        return __assign(__assign({}, _super.prototype.toJSON.call(this)), { headerComponent: this.headerComponent, title: params.title });
-    };
-    PaneviewPanel.prototype.render = function () {
-        this.header = document.createElement('div');
-        this.header.tabIndex = -1;
-        this.header.className = 'pane-header';
-        this.header.style.height = this.headerSize + "px";
-        this.header.style.lineHeight = this.headerSize + "px";
-        this.header.style.minHeight = this.headerSize + "px";
-        this.header.style.maxHeight = this.headerSize + "px";
-        this.element.appendChild(this.header);
-        this.body = document.createElement('div');
-        this.body.tabIndex = -1;
-        this.body.className = 'pane-body';
-        this.element.appendChild(this.body);
-    };
-    // TODO slightly hacky by-pass of the component to create a body and header component
-    PaneviewPanel.prototype.getComponent = function () {
-        var _this = this;
-        return {
-            update: function (params) {
-                var _a, _b;
-                (_a = _this.bodyPart) === null || _a === void 0 ? void 0 : _a.update({ params: params });
-                (_b = _this.headerPart) === null || _b === void 0 ? void 0 : _b.update({ params: params });
-            },
-            dispose: function () {
-                var _a, _b;
-                (_a = _this.bodyPart) === null || _a === void 0 ? void 0 : _a.dispose();
-                (_b = _this.headerPart) === null || _b === void 0 ? void 0 : _b.dispose();
-            },
-        };
-    };
-    return PaneviewPanel;
-}(_gridview_basePanelView__WEBPACK_IMPORTED_MODULE_2__.BasePanelView));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/react/deserializer.js":
-/*!**************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/react/deserializer.js ***!
-  \**************************************************************/
-/*! namespace exports */
-/*! export ReactPanelDeserialzier [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ReactPanelDeserialzier": () => /* binding */ ReactPanelDeserialzier
-/* harmony export */ });
-/* harmony import */ var _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../groupview/groupviewPanel */ "./node_modules/dockview/dist/es6/groupview/groupviewPanel.js");
-/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../panel/componentFactory */ "./node_modules/dockview/dist/es6/panel/componentFactory.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../api/component.api */ "./node_modules/dockview/dist/es6/api/component.api.js");
-/* harmony import */ var _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dockview/components/tab/defaultTab */ "./node_modules/dockview/dist/es6/dockview/components/tab/defaultTab.js");
-
-
-
-
-var ReactPanelDeserialzier = /** @class */ (function () {
-    function ReactPanelDeserialzier(layout) {
-        this.layout = layout;
-    }
-    ReactPanelDeserialzier.prototype.fromJSON = function (panelData) {
-        var panelId = panelData.id;
-        var contentId = panelData.contentId;
-        var tabId = panelData.tabId;
-        var props = panelData.props;
-        var title = panelData.title;
-        var state = panelData.state;
-        var suppressClosable = panelData.suppressClosable;
-        var contentPart = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(contentId, contentId, this.layout.options.components, this.layout.options.frameworkComponents, this.layout.options.frameworkComponentFactory.content);
-        var headerPart = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(tabId, tabId, this.layout.options.tabComponents, this.layout.options.frameworkComponentFactory, this.layout.options.frameworkComponentFactory.tab, function () { return new _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_3__.DefaultTab(); });
-        var panel = new _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_0__.GroupviewPanel(panelId, new _api_component_api__WEBPACK_IMPORTED_MODULE_2__.DockviewApi(this.layout));
-        panel.init({
-            headerPart: headerPart,
-            contentPart: contentPart,
-            title: title,
-            suppressClosable: suppressClosable,
-            params: props || {},
-            state: state || {},
-        });
-        return panel;
-    };
-    return ReactPanelDeserialzier;
-}());
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/react/dockview/dockview.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/react/dockview/dockview.js ***!
-  \*******************************************************************/
-/*! namespace exports */
-/*! export DockviewReact [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DockviewReact": () => /* binding */ DockviewReact
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../dockview/dockviewComponent */ "./node_modules/dockview/dist/es6/dockview/dockviewComponent.js");
-/* harmony import */ var _reactContentPart__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./reactContentPart */ "./node_modules/dockview/dist/es6/react/dockview/reactContentPart.js");
-/* harmony import */ var _reactHeaderPart__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./reactHeaderPart */ "./node_modules/dockview/dist/es6/react/dockview/reactHeaderPart.js");
-/* harmony import */ var _deserializer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../deserializer */ "./node_modules/dockview/dist/es6/react/deserializer.js");
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../react */ "./node_modules/dockview/dist/es6/react/react.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../api/component.api */ "./node_modules/dockview/dist/es6/api/component.api.js");
-/* harmony import */ var _reactWatermarkPart__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./reactWatermarkPart */ "./node_modules/dockview/dist/es6/react/dockview/reactWatermarkPart.js");
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-
-
-
-
-
-var DockviewReact = function (props) {
-    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
-    var dockviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
-    var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_5__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
-    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
-        var _a;
-        var factory = {
-            content: {
-                createComponent: function (id, componentId, component) {
-                    return new _reactContentPart__WEBPACK_IMPORTED_MODULE_2__.ReactPanelContentPart(componentId, component, {
-                        addPortal: addPortal,
-                    });
-                },
-            },
-            tab: {
-                createComponent: function (id, componentId, component) {
-                    return new _reactHeaderPart__WEBPACK_IMPORTED_MODULE_3__.ReactPanelHeaderPart(componentId, component, {
-                        addPortal: addPortal,
-                    });
-                },
-            },
-            watermark: {
-                createComponent: function (id, componentId, component) {
-                    return new _reactWatermarkPart__WEBPACK_IMPORTED_MODULE_7__.ReactWatermarkPart(componentId, component, {
-                        addPortal: addPortal,
-                    });
-                },
-            },
-        };
-        var element = document.createElement('div');
-        var dockview = new _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_1__.DockviewComponent(element, {
-            frameworkComponentFactory: factory,
-            frameworkComponents: props.components,
-            frameworkTabComponents: props.tabComponents,
-            tabHeight: props.tabHeight,
-            debug: props.debug,
-            enableExternalDragEvents: props.enableExternalDragEvents,
-            watermarkFrameworkComponent: props.watermarkComponent,
-            styles: props.hideBorders
-                ? { separatorBorder: 'transparent' }
-                : undefined,
-        });
-        (_a = domRef.current) === null || _a === void 0 ? void 0 : _a.appendChild(dockview.element);
-        dockview.deserializer = new _deserializer__WEBPACK_IMPORTED_MODULE_4__.ReactPanelDeserialzier(dockview);
-        dockview.resizeToFit();
-        if (props.onReady) {
-            props.onReady({ api: new _api_component_api__WEBPACK_IMPORTED_MODULE_6__.DockviewApi(dockview) });
-        }
-        dockviewRef.current = dockview;
-        return function () {
-            dockview.dispose();
-        };
-    }, []);
-    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
-        if (!props.onTabContextMenu) {
-            return function () {
-                //noop
-            };
-        }
-        var disposable = dockviewRef.current.onTabContextMenu(function (event) {
-            props.onTabContextMenu(event);
-        });
-        return function () {
-            disposable.dispose();
-        };
-    }, [props.onTabContextMenu]);
-    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: props.className, style: { height: '100%', width: '100%' }, ref: domRef }, portals));
-};
-DockviewReact.displayName = 'DockviewComponent';
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/react/dockview/reactContentPart.js":
-/*!***************************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/react/dockview/reactContentPart.js ***!
-  \***************************************************************************/
-/*! namespace exports */
-/*! export ReactPanelContentPart [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ReactPanelContentPart": () => /* binding */ ReactPanelContentPart
-/* harmony export */ });
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react */ "./node_modules/dockview/dist/es6/react/react.js");
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-
-var ReactPanelContentPart = /** @class */ (function () {
-    function ReactPanelContentPart(id, component, reactPortalStore) {
-        this.id = id;
-        this.component = component;
-        this.reactPortalStore = reactPortalStore;
-        this._element = document.createElement('div');
-        this._element.style.height = '100%';
-        this._element.style.width = '100%';
-        this._actionsElement = document.createElement('div');
-        this._actionsElement.style.height = '100%';
-        this._actionsElement.style.width = '100%';
-    }
-    Object.defineProperty(ReactPanelContentPart.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ReactPanelContentPart.prototype, "actions", {
-        get: function () {
-            return this._actionsElement;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    ReactPanelContentPart.prototype.focus = function () {
-        //noop
-    };
-    ReactPanelContentPart.prototype.init = function (parameters) {
-        this.parameters = parameters;
-        this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, __assign(__assign({}, parameters.params), { api: parameters.api, containerApi: parameters.containerApi, setActionsbar: this.setActionsbar.bind(this) }));
-    };
-    ReactPanelContentPart.prototype.setActionsbar = function (component, props) {
-        var _this = this;
-        var _a;
-        if (this.actionsPart) {
-            console.debug('removed existing panel-actions portal');
-            this.actionsPart.dispose();
-            this.actionsPart = undefined;
-        }
-        this.actionsPart = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this._actionsElement, this.reactPortalStore, component, __assign(__assign({}, props), { api: this.parameters.api, containerApi: this.parameters.containerApi }));
-        (_a = this._group) === null || _a === void 0 ? void 0 : _a.updateActions();
-        return {
-            update: function (props) {
-                _this.actionsPart.update(props);
-            },
-            dispose: function () {
-                _this.actionsPart.dispose();
-                _this.actionsPart = undefined;
-            },
-        };
-    };
-    ReactPanelContentPart.prototype.toJSON = function () {
-        return {
-            id: this.id,
-        };
-    };
-    ReactPanelContentPart.prototype.update = function (params) {
-        var _a;
-        this.parameters.params = params.params;
-        (_a = this.part) === null || _a === void 0 ? void 0 : _a.update(params.params);
-    };
-    ReactPanelContentPart.prototype.setVisible = function (isPanelVisible, group) {
-        this._group = group;
-    };
-    ReactPanelContentPart.prototype.layout = function (width, height) {
-        // noop
-    };
-    ReactPanelContentPart.prototype.close = function () {
-        return Promise.resolve(true);
-    };
-    ReactPanelContentPart.prototype.dispose = function () {
-        var _a, _b;
-        (_a = this.part) === null || _a === void 0 ? void 0 : _a.dispose();
-        (_b = this.actionsPart) === null || _b === void 0 ? void 0 : _b.dispose();
-    };
-    return ReactPanelContentPart;
-}());
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/react/dockview/reactHeaderPart.js":
-/*!**************************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/react/dockview/reactHeaderPart.js ***!
-  \**************************************************************************/
-/*! namespace exports */
-/*! export ReactPanelHeaderPart [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ReactPanelHeaderPart": () => /* binding */ ReactPanelHeaderPart
-/* harmony export */ });
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react */ "./node_modules/dockview/dist/es6/react/react.js");
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-
-var ReactPanelHeaderPart = /** @class */ (function () {
-    function ReactPanelHeaderPart(id, component, reactPortalStore) {
-        this.id = id;
-        this.component = component;
-        this.reactPortalStore = reactPortalStore;
-        this._element = document.createElement('div');
-    }
-    Object.defineProperty(ReactPanelHeaderPart.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    ReactPanelHeaderPart.prototype.focus = function () {
-        //noop
-    };
-    ReactPanelHeaderPart.prototype.init = function (parameters) {
-        this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, __assign(__assign({}, parameters.params), { api: parameters.api, containerApi: parameters.containerApi }));
-    };
-    ReactPanelHeaderPart.prototype.update = function (event) {
-        //noop
-    };
-    ReactPanelHeaderPart.prototype.toJSON = function () {
-        return {
-            id: this.id,
-        };
-    };
-    ReactPanelHeaderPart.prototype.layout = function (width, height) {
-        // noop - retrieval from api
-    };
-    ReactPanelHeaderPart.prototype.setVisible = function (isPanelVisible, group) {
-        // noop - retrieval from api
-    };
-    ReactPanelHeaderPart.prototype.dispose = function () {
-        var _a;
-        (_a = this.part) === null || _a === void 0 ? void 0 : _a.dispose();
-    };
-    return ReactPanelHeaderPart;
-}());
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/react/dockview/reactWatermarkPart.js":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/react/dockview/reactWatermarkPart.js ***!
-  \*****************************************************************************/
-/*! namespace exports */
-/*! export ReactWatermarkPart [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ReactWatermarkPart": () => /* binding */ ReactWatermarkPart
-/* harmony export */ });
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react */ "./node_modules/dockview/dist/es6/react/react.js");
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-
-var ReactWatermarkPart = /** @class */ (function () {
-    function ReactWatermarkPart(id, component, reactPortalStore) {
-        this.id = id;
-        this.component = component;
-        this.reactPortalStore = reactPortalStore;
-        this._groupRef = { value: undefined };
-        this._element = document.createElement('div');
-    }
-    Object.defineProperty(ReactWatermarkPart.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    ReactWatermarkPart.prototype.init = function (parameters) {
-        var _this = this;
-        this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, __assign(__assign({}, parameters.params), { api: parameters.api, containerApi: parameters.containerApi, close: function () {
-                return parameters.containerApi.removeGroup(_this._groupRef.value);
-            } }));
-    };
-    ReactWatermarkPart.prototype.toJSON = function () {
-        return {
-            id: this.id,
-        };
-    };
-    ReactWatermarkPart.prototype.layout = function (width, height) {
-        // noop - retrieval from api
-    };
-    ReactWatermarkPart.prototype.setVisible = function (isPanelVisible, group) {
-        // noop - retrieval from api
-        this._groupRef.value = group;
-    };
-    ReactWatermarkPart.prototype.dispose = function () {
-        var _a;
-        (_a = this.part) === null || _a === void 0 ? void 0 : _a.dispose();
-    };
-    return ReactWatermarkPart;
-}());
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/react/gridview/gridview.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/react/gridview/gridview.js ***!
-  \*******************************************************************/
-/*! namespace exports */
-/*! export GridviewReact [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GridviewReact": () => /* binding */ GridviewReact
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../gridview/gridviewComponent */ "./node_modules/dockview/dist/es6/gridview/gridviewComponent.js");
-/* harmony import */ var _view__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./view */ "./node_modules/dockview/dist/es6/react/gridview/view.js");
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../react */ "./node_modules/dockview/dist/es6/react/react.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../api/component.api */ "./node_modules/dockview/dist/es6/api/component.api.js");
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-
-
-var GridviewReact = function (props) {
-    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
-    var gridviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
-    var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_3__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
-    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
-        var gridview = new _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_1__.GridviewComponent(domRef.current, {
-            proportionalLayout: !!props.proportionalLayout,
-            orientation: props.orientation,
-            frameworkComponents: props.components,
-            frameworkComponentFactory: {
-                createComponent: function (id, componentId, component) {
-                    return new _view__WEBPACK_IMPORTED_MODULE_2__.ReactGridPanelView(id, componentId, component, {
-                        addPortal: addPortal,
-                    });
-                },
-            },
-            styles: props.hideBorders
-                ? { separatorBorder: 'transparent' }
-                : undefined,
-        });
-        if (props.onReady) {
-            props.onReady({ api: new _api_component_api__WEBPACK_IMPORTED_MODULE_4__.GridviewApi(gridview) });
-        }
-        gridviewRef.current = gridview;
-        return function () {
-            gridview.dispose();
-        };
-    }, []);
-    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: props.className, style: { height: '100%', width: '100%' }, ref: domRef }, portals));
-};
-GridviewReact.displayName = 'GridviewComponent';
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/react/gridview/view.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/react/gridview/view.js ***!
-  \***************************************************************/
-/*! namespace exports */
-/*! export ReactGridPanelView [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ReactGridPanelView": () => /* binding */ ReactGridPanelView
-/* harmony export */ });
-/* harmony import */ var _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../gridview/gridviewPanel */ "./node_modules/dockview/dist/es6/gridview/gridviewPanel.js");
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../react */ "./node_modules/dockview/dist/es6/react/react.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-
-
-var ReactGridPanelView = /** @class */ (function (_super) {
-    __extends(ReactGridPanelView, _super);
-    function ReactGridPanelView(id, component, reactComponent, reactPortalStore) {
-        var _this = _super.call(this, id, component) || this;
-        _this.reactComponent = reactComponent;
-        _this.reactPortalStore = reactPortalStore;
-        return _this;
-    }
-    ReactGridPanelView.prototype.getComponent = function () {
-        return new _react__WEBPACK_IMPORTED_MODULE_1__.ReactPart(this.element, this.reactPortalStore, this.reactComponent, __assign(__assign({}, this.params.params), { api: this.api, containerApi: this.params
-                .containerApi }));
-    };
-    return ReactGridPanelView;
-}(_gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_0__.GridviewPanel));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/react/index.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/react/index.js ***!
-  \*******************************************************/
-/*! namespace exports */
-/*! export DockviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/react/dockview/dockview.js .DockviewReact */
-/*! export GridviewPanel [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/gridview/gridviewPanel.js .GridviewPanel */
-/*! export GridviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/react/gridview/gridview.js .GridviewReact */
-/*! export PaneviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/react/paneview/paneview.js .PaneviewReact */
-/*! export ReactPanelContentPart [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/react/dockview/reactContentPart.js .ReactPanelContentPart */
-/*! export ReactPanelHeaderPart [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/react/dockview/reactHeaderPart.js .ReactPanelHeaderPart */
-/*! export SplitviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/dockview/dist/es6/react/splitview/splitview.js .SplitviewReact */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_exports__, __webpack_require__.d, __webpack_require__.r, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DockviewReact": () => /* reexport safe */ _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__.DockviewReact,
-/* harmony export */   "SplitviewReact": () => /* reexport safe */ _splitview_splitview__WEBPACK_IMPORTED_MODULE_1__.SplitviewReact,
-/* harmony export */   "GridviewReact": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_2__.GridviewReact,
-/* harmony export */   "ReactPanelContentPart": () => /* reexport safe */ _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_3__.ReactPanelContentPart,
-/* harmony export */   "ReactPanelHeaderPart": () => /* reexport safe */ _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_4__.ReactPanelHeaderPart,
-/* harmony export */   "GridviewPanel": () => /* reexport safe */ _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_5__.GridviewPanel,
-/* harmony export */   "PaneviewReact": () => /* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__.PaneviewReact
-/* harmony export */ });
-/* harmony import */ var _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dockview/dockview */ "./node_modules/dockview/dist/es6/react/dockview/dockview.js");
-/* harmony import */ var _splitview_splitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitview/splitview */ "./node_modules/dockview/dist/es6/react/splitview/splitview.js");
-/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./gridview/gridview */ "./node_modules/dockview/dist/es6/react/gridview/gridview.js");
-/* harmony import */ var _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./dockview/reactContentPart */ "./node_modules/dockview/dist/es6/react/dockview/reactContentPart.js");
-/* harmony import */ var _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./dockview/reactHeaderPart */ "./node_modules/dockview/dist/es6/react/dockview/reactHeaderPart.js");
-/* harmony import */ var _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../gridview/gridviewPanel */ "./node_modules/dockview/dist/es6/gridview/gridviewPanel.js");
-/* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./paneview/paneview */ "./node_modules/dockview/dist/es6/react/paneview/paneview.js");
-/* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./types */ "./node_modules/dockview/dist/es6/react/types.js");
-
-
-
-
-
-
-
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/react/paneview/paneview.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/react/paneview/paneview.js ***!
-  \*******************************************************************/
-/*! namespace exports */
-/*! export PaneviewReact [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PaneviewReact": () => /* binding */ PaneviewReact
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../paneview/paneviewComponent */ "./node_modules/dockview/dist/es6/paneview/paneviewComponent.js");
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../react */ "./node_modules/dockview/dist/es6/react/react.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../api/component.api */ "./node_modules/dockview/dist/es6/api/component.api.js");
-/* harmony import */ var _view__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./view */ "./node_modules/dockview/dist/es6/react/paneview/view.js");
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-
-
-var PaneviewReact = function (props) {
-    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
-    var paneviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
-    var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_2__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
-    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
-        var paneview = new _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_1__.PaneviewComponent(domRef.current, {
-            frameworkComponents: props.components,
-            components: {},
-            headerComponents: {},
-            headerframeworkComponents: props.headerComponents,
-            frameworkWrapper: {
-                header: {
-                    createComponent: function (id, componentId, component) {
-                        return new _view__WEBPACK_IMPORTED_MODULE_4__.PanelHeader(id, component, { addPortal: addPortal });
-                    },
-                },
-                body: {
-                    createComponent: function (id, componentId, component) {
-                        return new _view__WEBPACK_IMPORTED_MODULE_4__.PanelBody(id, component, { addPortal: addPortal });
-                    },
-                },
-            },
-        });
-        var _a = domRef.current.getBoundingClientRect(), width = _a.width, height = _a.height;
-        var _b = __read([height, width], 2), size = _b[0], orthogonalSize = _b[1];
-        paneview.layout(size, orthogonalSize);
-        if (props.onReady) {
-            props.onReady({ api: new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.PaneviewApi(paneview) });
-        }
-        paneview.resizeToFit();
-        paneviewRef.current = paneview;
-        return function () {
-            paneview.dispose();
-        };
-    }, []);
-    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: props.className, style: { height: '100%', width: '100%' }, ref: domRef }, portals));
-};
-PaneviewReact.displayName = 'PaneviewComponent';
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/react/paneview/view.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/react/paneview/view.js ***!
-  \***************************************************************/
-/*! namespace exports */
-/*! export PanelBody [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export PanelHeader [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PanelBody": () => /* binding */ PanelBody,
-/* harmony export */   "PanelHeader": () => /* binding */ PanelHeader
-/* harmony export */ });
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react */ "./node_modules/dockview/dist/es6/react/react.js");
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-
-var PanelBody = /** @class */ (function () {
-    function PanelBody(id, component, reactPortalStore) {
-        this.id = id;
-        this.component = component;
-        this.reactPortalStore = reactPortalStore;
-        this._element = document.createElement('div');
-        this._element.style.height = '100%';
-        this._element.style.width = '100%';
-    }
-    Object.defineProperty(PanelBody.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    PanelBody.prototype.init = function (parameters) {
-        this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, __assign(__assign({}, parameters.params), { api: parameters.api, title: parameters.title, containerApi: parameters.containerApi }));
-    };
-    PanelBody.prototype.toJSON = function () {
-        return {
-            id: this.id,
-        };
-    };
-    PanelBody.prototype.update = function (params) {
-        var _a;
-        (_a = this.part) === null || _a === void 0 ? void 0 : _a.update(params.params);
-    };
-    PanelBody.prototype.dispose = function () {
-        var _a;
-        (_a = this.part) === null || _a === void 0 ? void 0 : _a.dispose();
-    };
-    return PanelBody;
-}());
-
-var PanelHeader = /** @class */ (function () {
-    function PanelHeader(id, component, reactPortalStore) {
-        this.id = id;
-        this.component = component;
-        this.reactPortalStore = reactPortalStore;
-        this._element = document.createElement('div');
-        this._element.style.height = '100%';
-        this._element.style.width = '100%';
-    }
-    Object.defineProperty(PanelHeader.prototype, "element", {
-        get: function () {
-            return this._element;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    PanelHeader.prototype.init = function (parameters) {
-        this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, __assign(__assign({}, parameters.params), { api: parameters.api, title: parameters.title, containerApi: parameters.containerApi }));
-    };
-    PanelHeader.prototype.toJSON = function () {
-        return {
-            id: this.id,
-        };
-    };
-    PanelHeader.prototype.update = function (params) {
-        var _a;
-        (_a = this.part) === null || _a === void 0 ? void 0 : _a.update(params.params);
-    };
-    PanelHeader.prototype.dispose = function () {
-        var _a;
-        (_a = this.part) === null || _a === void 0 ? void 0 : _a.dispose();
-    };
-    return PanelHeader;
-}());
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/react/react.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/react/react.js ***!
-  \*******************************************************/
-/*! namespace exports */
-/*! export ReactPart [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export usePortalsLifecycle [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ReactPart": () => /* binding */ ReactPart,
-/* harmony export */   "usePortalsLifecycle": () => /* binding */ usePortalsLifecycle
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
-/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../math */ "./node_modules/dockview/dist/es6/math.js");
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
-};
-
-
-
-/**
- * This component is intended to interface between vanilla-js and React hence we need to be
- * creative in how we update props.
- * A ref of the component is exposed with an update method; which when called stores the props
- * as a ref within this component and forcefully triggers a re-render of the component using
- * the ref of props we just set on the renderered component as the props passed to the inner
- * component
- */
-var ReactComponentBridge = function (props, ref) {
-    var _a = __read(react__WEBPACK_IMPORTED_MODULE_0__.useState(), 2), _ = _a[0], triggerRender = _a[1];
-    var _props = react__WEBPACK_IMPORTED_MODULE_0__.useRef(props.componentProps);
-    react__WEBPACK_IMPORTED_MODULE_0__.useImperativeHandle(ref, function () { return ({
-        update: function (props) {
-            _props.current = __assign(__assign({}, _props.current), props);
-            /**
-             * setting a arbitrary piece of state within this component will
-             * trigger a re-render.
-             * we use this rather than updating through a prop since we can
-             * pass a ref into the vanilla-js world.
-             */
-            triggerRender(Date.now());
-        },
-    }); }, []);
-    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
-        console.debug('[reactwrapper] component mounted ');
-        return function () {
-            console.debug('[reactwrapper] component unmounted ');
-        };
-    }, []);
-    return react__WEBPACK_IMPORTED_MODULE_0__.createElement(props.component, _props.current);
-};
-ReactComponentBridge.displayName = 'PanelWrapper';
-/**
- * Since we are storing the React.Portal references in a rendered array they
- * require a key property like any other React element rendered in an array
- * to prevent excessive re-rendering
- */
-var uniquePortalKeyGenerator = (0,_math__WEBPACK_IMPORTED_MODULE_2__.sequentialNumberGenerator)();
-var ReactPart = /** @class */ (function () {
-    function ReactPart(parent, portalStore, component, parameters) {
-        this.parent = parent;
-        this.portalStore = portalStore;
-        this.component = component;
-        this.parameters = parameters;
-        this.createPortal();
-    }
-    ReactPart.prototype.update = function (props) {
-        var _a;
-        if (this.disposed) {
-            throw new Error('invalid operation');
-        }
-        (_a = this.componentInstance) === null || _a === void 0 ? void 0 : _a.update(props);
-    };
-    ReactPart.prototype.createPortal = function () {
-        var _this = this;
-        if (this.disposed) {
-            throw new Error('invalid operation');
-        }
-        // TODO use a better check for isReactFunctionalComponent
-        if (typeof this.component !== 'function') {
-            /**
-             * we know this isn't a React.FunctionComponent so throw an error here.
-             * if we do not intercept this the React library will throw a very obsure error
-             * for the same reason, at least at this point we will emit a sensible stacktrace.
-             */
-            throw new Error('invalid operation');
-        }
-        var bridgeComponent = react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(ReactComponentBridge), {
-            component: this
-                .component,
-            componentProps: this.parameters,
-            ref: function (element) {
-                _this.componentInstance = element;
-            },
-        });
-        var portal = react_dom__WEBPACK_IMPORTED_MODULE_1__.createPortal(bridgeComponent, this.parent, uniquePortalKeyGenerator.next());
-        this.ref = {
-            portal: portal,
-            disposable: this.portalStore.addPortal(portal),
-        };
-    };
-    ReactPart.prototype.dispose = function () {
-        var _a;
-        (_a = this.ref) === null || _a === void 0 ? void 0 : _a.disposable.dispose();
-        this.disposed = true;
-    };
-    return ReactPart;
-}());
-
-/**
- * A React Hook that returns an array of portals to be rendered by the user of this hook
- * and a disposable function to add a portal. Calling dispose removes this portal from the
- * portal array
- */
-var usePortalsLifecycle = function () {
-    var _a = __read(react__WEBPACK_IMPORTED_MODULE_0__.useState([]), 2), portals = _a[0], setPortals = _a[1];
-    react__WEBPACK_IMPORTED_MODULE_0__.useDebugValue("Portal count: " + portals.length);
-    var addPortal = react__WEBPACK_IMPORTED_MODULE_0__.useCallback(function (portal) {
-        setPortals(function (portals) { return __spread(portals, [portal]); });
-        var disposed = false;
-        return {
-            dispose: function () {
-                if (disposed) {
-                    throw new Error('invalid operation');
-                }
-                disposed = true;
-                setPortals(function (portals) { return portals.filter(function (p) { return p !== portal; }); });
-            },
-        };
-    }, []);
-    return [portals, addPortal];
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/react/splitview/splitview.js":
-/*!*********************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/react/splitview/splitview.js ***!
-  \*********************************************************************/
-/*! namespace exports */
-/*! export SplitviewReact [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "SplitviewReact": () => /* binding */ SplitviewReact
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../api/component.api */ "./node_modules/dockview/dist/es6/api/component.api.js");
-/* harmony import */ var _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../splitview/splitviewComponent */ "./node_modules/dockview/dist/es6/splitview/splitviewComponent.js");
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../react */ "./node_modules/dockview/dist/es6/react/react.js");
-/* harmony import */ var _view__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./view */ "./node_modules/dockview/dist/es6/react/splitview/view.js");
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-
-
-var SplitviewReact = function (props) {
-    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
-    var splitviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
-    var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_3__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
-    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
-        var splitview = new _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_2__.SplitviewComponent(domRef.current, {
-            orientation: props.orientation,
-            frameworkComponents: props.components,
-            frameworkWrapper: {
-                createComponent: function (id, componentId, component) {
-                    return new _view__WEBPACK_IMPORTED_MODULE_4__.ReactPanelView(id, componentId, component, {
-                        addPortal: addPortal,
-                    });
-                },
-            },
-            proportionalLayout: props.proportionalLayout,
-            styles: props.hideBorders
-                ? { separatorBorder: 'transparent' }
-                : undefined,
-        });
-        splitview.resizeToFit();
-        if (props.onReady) {
-            props.onReady({ api: new _api_component_api__WEBPACK_IMPORTED_MODULE_1__.SplitviewApi(splitview) });
-        }
-        splitviewRef.current = splitview;
-        return function () {
-            splitview.dispose();
-        };
-    }, []);
-    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: props.className, style: { height: '100%', width: '100%' }, ref: domRef }, portals));
-};
-SplitviewReact.displayName = 'SplitviewComponent';
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/react/splitview/view.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/react/splitview/view.js ***!
-  \****************************************************************/
-/*! namespace exports */
-/*! export ReactPanelView [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ReactPanelView": () => /* binding */ ReactPanelView
-/* harmony export */ });
-/* harmony import */ var _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../splitview/splitviewPanel */ "./node_modules/dockview/dist/es6/splitview/splitviewPanel.js");
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../react */ "./node_modules/dockview/dist/es6/react/react.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-
-
-var ReactPanelView = /** @class */ (function (_super) {
-    __extends(ReactPanelView, _super);
-    function ReactPanelView(id, component, reactComponent, reactPortalStore) {
-        var _this = _super.call(this, id, component) || this;
-        _this.reactComponent = reactComponent;
-        _this.reactPortalStore = reactPortalStore;
-        return _this;
-    }
-    ReactPanelView.prototype.getComponent = function () {
-        return new _react__WEBPACK_IMPORTED_MODULE_1__.ReactPart(this.element, this.reactPortalStore, this.reactComponent, __assign(__assign({}, this.params.params), { api: this.api, containerApi: this.params
-                .containerApi }));
-    };
-    return ReactPanelView;
-}(_splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_0__.SplitviewPanel));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/react/types.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/react/types.js ***!
-  \*******************************************************/
-/*! namespace exports */
-/*! exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/splitview/core/splitview.js":
-/*!********************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/splitview/core/splitview.js ***!
-  \********************************************************************/
-/*! namespace exports */
-/*! export LayoutPriority [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Orientation [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export SashState [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Sizing [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Splitview [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Orientation": () => /* binding */ Orientation,
-/* harmony export */   "SashState": () => /* binding */ SashState,
-/* harmony export */   "LayoutPriority": () => /* binding */ LayoutPriority,
-/* harmony export */   "Sizing": () => /* binding */ Sizing,
-/* harmony export */   "Splitview": () => /* binding */ Splitview
-/* harmony export */ });
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../dom */ "./node_modules/dockview/dist/es6/dom.js");
-/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../math */ "./node_modules/dockview/dist/es6/math.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../array */ "./node_modules/dockview/dist/es6/array.js");
-/* harmony import */ var _viewItem__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./viewItem */ "./node_modules/dockview/dist/es6/splitview/core/viewItem.js");
-var __values = (undefined && undefined.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
-};
-
-
-
-
-
-var Orientation;
-(function (Orientation) {
-    Orientation["HORIZONTAL"] = "HORIZONTAL";
-    Orientation["VERTICAL"] = "VERTICAL";
-})(Orientation || (Orientation = {}));
-var SashState;
-(function (SashState) {
-    SashState[SashState["MAXIMUM"] = 0] = "MAXIMUM";
-    SashState[SashState["MINIMUM"] = 1] = "MINIMUM";
-    SashState[SashState["DISABLED"] = 2] = "DISABLED";
-    SashState[SashState["ENABLED"] = 3] = "ENABLED";
-})(SashState || (SashState = {}));
-var LayoutPriority;
-(function (LayoutPriority) {
-    LayoutPriority["Low"] = "low";
-    LayoutPriority["High"] = "high";
-    LayoutPriority["Normal"] = "normal";
-})(LayoutPriority || (LayoutPriority = {}));
-var Sizing;
-(function (Sizing) {
-    Sizing.Distribute = { type: 'distribute' };
-    function Split(index) {
-        return { type: 'split', index: index };
-    }
-    Sizing.Split = Split;
-    function Invisible(cachedVisibleSize) {
-        return { type: 'invisible', cachedVisibleSize: cachedVisibleSize };
-    }
-    Sizing.Invisible = Invisible;
-})(Sizing || (Sizing = {}));
-var Splitview = /** @class */ (function () {
-    function Splitview(container, options) {
-        var _this = this;
-        this.container = container;
-        this.views = [];
-        this.sashes = [];
-        this._size = 0;
-        this._orthogonalSize = 0;
-        this.contentSize = 0;
-        this._proportions = undefined;
-        this._onDidSashEnd = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
-        this.onDidSashEnd = this._onDidSashEnd.event;
-        this._startSnappingEnabled = true;
-        this._endSnappingEnabled = true;
-        this.resize = function (index, delta, sizes, lowPriorityIndexes, highPriorityIndexes, overloadMinDelta, overloadMaxDelta, snapBefore, snapAfter) {
-            var e_1, _a, e_2, _b;
-            if (sizes === void 0) { sizes = _this.views.map(function (x) { return x.size; }); }
-            if (overloadMinDelta === void 0) { overloadMinDelta = Number.NEGATIVE_INFINITY; }
-            if (overloadMaxDelta === void 0) { overloadMaxDelta = Number.POSITIVE_INFINITY; }
-            if (index < 0 || index > _this.views.length) {
-                return 0;
-            }
-            var upIndexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(index, -1);
-            var downIndexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(index + 1, _this.views.length);
-            //
-            if (highPriorityIndexes) {
-                try {
-                    for (var highPriorityIndexes_1 = __values(highPriorityIndexes), highPriorityIndexes_1_1 = highPriorityIndexes_1.next(); !highPriorityIndexes_1_1.done; highPriorityIndexes_1_1 = highPriorityIndexes_1.next()) {
-                        var index_1 = highPriorityIndexes_1_1.value;
-                        (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToStart)(upIndexes, index_1);
-                        (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToStart)(downIndexes, index_1);
-                    }
-                }
-                catch (e_1_1) { e_1 = { error: e_1_1 }; }
-                finally {
-                    try {
-                        if (highPriorityIndexes_1_1 && !highPriorityIndexes_1_1.done && (_a = highPriorityIndexes_1.return)) _a.call(highPriorityIndexes_1);
-                    }
-                    finally { if (e_1) throw e_1.error; }
-                }
-            }
-            if (lowPriorityIndexes) {
-                try {
-                    for (var lowPriorityIndexes_1 = __values(lowPriorityIndexes), lowPriorityIndexes_1_1 = lowPriorityIndexes_1.next(); !lowPriorityIndexes_1_1.done; lowPriorityIndexes_1_1 = lowPriorityIndexes_1.next()) {
-                        var index_2 = lowPriorityIndexes_1_1.value;
-                        (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToEnd)(upIndexes, index_2);
-                        (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToEnd)(downIndexes, index_2);
-                    }
-                }
-                catch (e_2_1) { e_2 = { error: e_2_1 }; }
-                finally {
-                    try {
-                        if (lowPriorityIndexes_1_1 && !lowPriorityIndexes_1_1.done && (_b = lowPriorityIndexes_1.return)) _b.call(lowPriorityIndexes_1);
-                    }
-                    finally { if (e_2) throw e_2.error; }
-                }
-            }
-            //
-            var upItems = upIndexes.map(function (i) { return _this.views[i]; });
-            var upSizes = upIndexes.map(function (i) { return sizes[i]; });
-            //
-            var downItems = downIndexes.map(function (i) { return _this.views[i]; });
-            var downSizes = downIndexes.map(function (i) { return sizes[i]; });
-            //
-            var minDeltaUp = upIndexes.reduce(function (_, i) { return _ + _this.views[i].minimumSize - sizes[i]; }, 0);
-            var maxDeltaUp = upIndexes.reduce(function (_, i) { return _ + _this.views[i].maximumSize - sizes[i]; }, 0);
-            //
-            var maxDeltaDown = downIndexes.length === 0
-                ? Number.POSITIVE_INFINITY
-                : downIndexes.reduce(function (_, i) { return _ + sizes[i] - _this.views[i].minimumSize; }, 0);
-            var minDeltaDown = downIndexes.length === 0
-                ? Number.NEGATIVE_INFINITY
-                : downIndexes.reduce(function (_, i) { return _ + sizes[i] - _this.views[i].maximumSize; }, 0);
-            //
-            var minDelta = Math.max(minDeltaUp, minDeltaDown);
-            var maxDelta = Math.min(maxDeltaDown, maxDeltaUp);
-            //
-            var snapped = false;
-            if (snapBefore) {
-                var snapView = _this.views[snapBefore.index];
-                var visible = delta >= snapBefore.limitDelta;
-                snapped = visible !== snapView.visible;
-                snapView.setVisible(visible, snapBefore.size);
-            }
-            if (!snapped && snapAfter) {
-                var snapView = _this.views[snapAfter.index];
-                var visible = delta < snapAfter.limitDelta;
-                snapped = visible !== snapView.visible;
-                snapView.setVisible(visible, snapAfter.size);
-            }
-            if (snapped) {
-                return _this.resize(index, delta, sizes, lowPriorityIndexes, highPriorityIndexes, overloadMinDelta, overloadMaxDelta);
-            }
-            //
-            var tentativeDelta = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(delta, minDelta, maxDelta);
-            var actualDelta = 0;
-            //
-            var deltaUp = tentativeDelta;
-            for (var i = 0; i < upItems.length; i++) {
-                var item = upItems[i];
-                var size = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(upSizes[i] + deltaUp, item.minimumSize, item.maximumSize);
-                var viewDelta = size - upSizes[i];
-                actualDelta += viewDelta;
-                deltaUp -= viewDelta;
-                item.size = size;
-            }
-            //
-            var deltaDown = actualDelta;
-            for (var i = 0; i < downItems.length; i++) {
-                var item = downItems[i];
-                var size = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(downSizes[i] - deltaDown, item.minimumSize, item.maximumSize);
-                var viewDelta = size - downSizes[i];
-                deltaDown += viewDelta;
-                item.size = size;
-            }
-            //
-            return delta;
-        };
-        this._orientation = options.orientation;
-        this.element = this.createContainer();
-        this.proportionalLayout =
-            options.proportionalLayout === undefined
-                ? true
-                : !!options.proportionalLayout;
-        this.viewContainer = this.createViewContainer();
-        this.sashContainer = this.createSashContainer();
-        this.element.appendChild(this.sashContainer);
-        this.element.appendChild(this.viewContainer);
-        this.container.appendChild(this.element);
-        this.style(options.styles);
-        // We have an existing set of view, add them now
-        if (options.descriptor) {
-            this._size = options.descriptor.size;
-            options.descriptor.views.forEach(function (viewDescriptor, index) {
-                var sizing = viewDescriptor.visible === undefined ||
-                    viewDescriptor.visible
-                    ? viewDescriptor.size
-                    : {
-                        type: 'invisible',
-                        cachedVisibleSize: viewDescriptor.size,
-                    };
-                var view = viewDescriptor.view;
-                _this.addView(view, sizing, index, true
-                // true skip layout
-                );
-            });
-            // Initialize content size and proportions for first layout
-            this.contentSize = this.views.reduce(function (r, i) { return r + i.size; }, 0);
-            this.saveProportions();
-        }
-    }
-    Object.defineProperty(Splitview.prototype, "size", {
-        get: function () {
-            return this._size;
-        },
-        set: function (value) {
-            this._size = value;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Splitview.prototype, "orthogonalSize", {
-        get: function () {
-            return this._orthogonalSize;
-        },
-        set: function (value) {
-            this._orthogonalSize = value;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Splitview.prototype, "length", {
-        get: function () {
-            return this.views.length;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Splitview.prototype, "proportions", {
-        get: function () {
-            return this._proportions ? __spread(this._proportions) : undefined;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Splitview.prototype, "orientation", {
-        get: function () {
-            return this._orientation;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Splitview.prototype, "minimumSize", {
-        get: function () {
-            return this.views.reduce(function (r, item) { return r + item.minimumSize; }, 0);
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Splitview.prototype, "maximumSize", {
-        get: function () {
-            return this.length === 0
-                ? Number.POSITIVE_INFINITY
-                : this.views.reduce(function (r, item) { return r + item.maximumSize; }, 0);
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Splitview.prototype, "startSnappingEnabled", {
-        get: function () {
-            return this._startSnappingEnabled;
-        },
-        set: function (startSnappingEnabled) {
-            if (this._startSnappingEnabled === startSnappingEnabled) {
-                return;
-            }
-            this._startSnappingEnabled = startSnappingEnabled;
-            this.updateSashEnablement();
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Splitview.prototype, "endSnappingEnabled", {
-        get: function () {
-            return this._endSnappingEnabled;
-        },
-        set: function (endSnappingEnabled) {
-            if (this._endSnappingEnabled === endSnappingEnabled) {
-                return;
-            }
-            this._endSnappingEnabled = endSnappingEnabled;
-            this.updateSashEnablement();
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Splitview.prototype.style = function (styles) {
-        if ((styles === null || styles === void 0 ? void 0 : styles.separatorBorder) === 'transparent') {
-            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.removeClasses)(this.element, 'separator-border');
-            this.element.style.removeProperty('--separator-border');
-        }
-        else {
-            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.addClasses)(this.element, 'separator-border');
-            if (styles === null || styles === void 0 ? void 0 : styles.separatorBorder) {
-                this.element.style.setProperty('--separator-border', styles.separatorBorder);
-            }
-        }
-    };
-    Splitview.prototype.isViewVisible = function (index) {
-        if (index < 0 || index >= this.views.length) {
-            throw new Error('Index out of bounds');
-        }
-        var viewItem = this.views[index];
-        return viewItem.visible;
-    };
-    Splitview.prototype.setViewVisible = function (index, visible) {
-        if (index < 0 || index >= this.views.length) {
-            throw new Error('Index out of bounds');
-        }
-        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.container, 'visible', visible);
-        var viewItem = this.views[index];
-        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.container, 'visible', visible);
-        viewItem.setVisible(visible, viewItem.size);
-        this.distributeEmptySpace(index);
-        this.layoutViews();
-        this.saveProportions();
-    };
-    Splitview.prototype.getViewSize = function (index) {
-        if (index < 0 || index >= this.views.length) {
-            return -1;
-        }
-        return this.views[index].size;
-    };
-    Splitview.prototype.resizeView = function (index, size) {
-        var _this = this;
-        if (index < 0 || index >= this.views.length) {
-            return;
-        }
-        var indexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(this.views.length).filter(function (i) { return i !== index; });
-        var lowPriorityIndexes = __spread(indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.Low; }), [
-            index,
-        ]);
-        var highPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.High; });
-        var item = this.views[index];
-        size = Math.round(size);
-        size = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(size, item.minimumSize, Math.min(item.maximumSize, this._size));
-        item.size = size;
-        this.relayout(lowPriorityIndexes, highPriorityIndexes);
-    };
-    Splitview.prototype.getViews = function () {
-        return this.views.map(function (x) { return x.view; });
-    };
-    Splitview.prototype.onDidChange = function (item, size) {
-        var index = this.views.indexOf(item);
-        if (index < 0 || index >= this.views.length) {
-            return;
-        }
-        size = typeof size === 'number' ? size : item.size;
-        size = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(size, item.minimumSize, item.maximumSize);
-        item.size = size;
-        this.relayout([index], undefined);
-    };
-    Splitview.prototype.addView = function (view, size, index, skipLayout) {
-        var _this = this;
-        if (size === void 0) { size = { type: 'distribute' }; }
-        if (index === void 0) { index = this.views.length; }
-        var container = document.createElement('div');
-        container.className = 'view';
-        container.appendChild(view.element);
-        var viewSize;
-        if (typeof size === 'number') {
-            viewSize = size;
-        }
-        else if (size.type === 'split') {
-            viewSize = this.getViewSize(size.index) / 2;
-        }
-        else if (size.type === 'invisible') {
-            viewSize = { cachedVisibleSize: size.cachedVisibleSize };
-        }
-        else {
-            viewSize = view.minimumSize;
-        }
-        var disposable = view.onDidChange(function (size) {
-            return _this.onDidChange(viewItem, size);
-        });
-        var dispose = function () {
-            disposable === null || disposable === void 0 ? void 0 : disposable.dispose();
-            _this.viewContainer.removeChild(container);
-        };
-        var viewItem = new _viewItem__WEBPACK_IMPORTED_MODULE_4__.ViewItem(container, view, viewSize, { dispose: dispose });
-        if (index === this.views.length) {
-            this.viewContainer.appendChild(container);
-        }
-        else {
-            this.viewContainer.insertBefore(container, this.viewContainer.children.item(index));
-        }
-        this.views.splice(index, 0, viewItem);
-        if (this.views.length > 1) {
-            //add sash
-            var sash_1 = document.createElement('div');
-            sash_1.className = 'sash';
-            var onStart_1 = function (event) {
-                var e_3, _a;
-                try {
-                    for (var _b = __values(_this.views), _c = _b.next(); !_c.done; _c = _b.next()) {
-                        var item = _c.value;
-                        item.enabled = false;
-                    }
-                }
-                catch (e_3_1) { e_3 = { error: e_3_1 }; }
-                finally {
-                    try {
-                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                    }
-                    finally { if (e_3) throw e_3.error; }
-                }
-                var start = _this._orientation === Orientation.HORIZONTAL
-                    ? event.clientX
-                    : event.clientY;
-                var index = (0,_array__WEBPACK_IMPORTED_MODULE_3__.firstIndex)(_this.sashes, function (s) { return s.container === sash_1; });
-                //
-                var sizes = _this.views.map(function (x) { return x.size; });
-                //
-                var snapBefore;
-                var snapAfter;
-                var upIndexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(index, -1);
-                var downIndexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(index + 1, _this.views.length);
-                var minDeltaUp = upIndexes.reduce(function (r, i) { return r + (_this.views[i].minimumSize - sizes[i]); }, 0);
-                var maxDeltaUp = upIndexes.reduce(function (r, i) { return r + (_this.views[i].viewMaximumSize - sizes[i]); }, 0);
-                var maxDeltaDown = downIndexes.length === 0
-                    ? Number.POSITIVE_INFINITY
-                    : downIndexes.reduce(function (r, i) {
-                        return r + (sizes[i] - _this.views[i].minimumSize);
-                    }, 0);
-                var minDeltaDown = downIndexes.length === 0
-                    ? Number.NEGATIVE_INFINITY
-                    : downIndexes.reduce(function (r, i) {
-                        return r +
-                            (sizes[i] - _this.views[i].viewMaximumSize);
-                    }, 0);
-                var minDelta = Math.max(minDeltaUp, minDeltaDown);
-                var maxDelta = Math.min(maxDeltaDown, maxDeltaUp);
-                var snapBeforeIndex = _this.findFirstSnapIndex(upIndexes);
-                var snapAfterIndex = _this.findFirstSnapIndex(downIndexes);
-                if (typeof snapBeforeIndex === 'number') {
-                    var viewItem_1 = _this.views[snapBeforeIndex];
-                    var halfSize = Math.floor(viewItem_1.viewMinimumSize / 2);
-                    snapBefore = {
-                        index: snapBeforeIndex,
-                        limitDelta: viewItem_1.visible
-                            ? minDelta - halfSize
-                            : minDelta + halfSize,
-                        size: viewItem_1.size,
-                    };
-                }
-                if (typeof snapAfterIndex === 'number') {
-                    var viewItem_2 = _this.views[snapAfterIndex];
-                    var halfSize = Math.floor(viewItem_2.viewMinimumSize / 2);
-                    snapAfter = {
-                        index: snapAfterIndex,
-                        limitDelta: viewItem_2.visible
-                            ? maxDelta + halfSize
-                            : maxDelta - halfSize,
-                        size: viewItem_2.size,
-                    };
-                }
-                //
-                var mousemove = function (event) {
-                    var current = _this._orientation === Orientation.HORIZONTAL
-                        ? event.clientX
-                        : event.clientY;
-                    var delta = current - start;
-                    _this.resize(index, delta, sizes, undefined, undefined, minDelta, maxDelta, snapBefore, snapAfter);
-                    _this.distributeEmptySpace();
-                    _this.layoutViews();
-                };
-                var end = function () {
-                    var e_4, _a;
-                    try {
-                        for (var _b = __values(_this.views), _c = _b.next(); !_c.done; _c = _b.next()) {
-                            var item = _c.value;
-                            item.enabled = true;
-                        }
-                    }
-                    catch (e_4_1) { e_4 = { error: e_4_1 }; }
-                    finally {
-                        try {
-                            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-                        }
-                        finally { if (e_4) throw e_4.error; }
-                    }
-                    _this.saveProportions();
-                    document.removeEventListener('mousemove', mousemove);
-                    document.removeEventListener('mouseup', end);
-                    document.removeEventListener('mouseend', end);
-                    _this._onDidSashEnd.fire(undefined);
-                };
-                document.addEventListener('mousemove', mousemove);
-                document.addEventListener('mouseup', end);
-                document.addEventListener('mouseend', end);
-            };
-            sash_1.addEventListener('mousedown', onStart_1);
-            var disposable_1 = function () {
-                sash_1.removeEventListener('mousedown', onStart_1);
-                _this.sashContainer.removeChild(sash_1);
-            };
-            var sashItem = { container: sash_1, disposable: disposable_1 };
-            this.sashContainer.appendChild(sash_1);
-            this.sashes.push(sashItem);
-        }
-        if (!skipLayout) {
-            this.relayout([index]);
-        }
-        if (!skipLayout &&
-            typeof size !== 'number' &&
-            size.type === 'distribute') {
-            this.distributeViewSizes();
-        }
-    };
-    Splitview.prototype.distributeViewSizes = function () {
-        var e_5, _a, e_6, _b;
-        var _this = this;
-        var flexibleViewItems = [];
-        var flexibleSize = 0;
-        try {
-            for (var _c = __values(this.views), _d = _c.next(); !_d.done; _d = _c.next()) {
-                var item = _d.value;
-                if (item.maximumSize - item.minimumSize > 0) {
-                    flexibleViewItems.push(item);
-                    flexibleSize += item.size;
-                }
-            }
-        }
-        catch (e_5_1) { e_5 = { error: e_5_1 }; }
-        finally {
-            try {
-                if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
-            }
-            finally { if (e_5) throw e_5.error; }
-        }
-        var size = Math.floor(flexibleSize / flexibleViewItems.length);
-        try {
-            for (var flexibleViewItems_1 = __values(flexibleViewItems), flexibleViewItems_1_1 = flexibleViewItems_1.next(); !flexibleViewItems_1_1.done; flexibleViewItems_1_1 = flexibleViewItems_1.next()) {
-                var item = flexibleViewItems_1_1.value;
-                item.size = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(size, item.minimumSize, item.maximumSize);
-            }
-        }
-        catch (e_6_1) { e_6 = { error: e_6_1 }; }
-        finally {
-            try {
-                if (flexibleViewItems_1_1 && !flexibleViewItems_1_1.done && (_b = flexibleViewItems_1.return)) _b.call(flexibleViewItems_1);
-            }
-            finally { if (e_6) throw e_6.error; }
-        }
-        var indexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(this.views.length);
-        var lowPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.Low; });
-        var highPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.High; });
-        this.relayout(lowPriorityIndexes, highPriorityIndexes);
-    };
-    Splitview.prototype.removeView = function (index, sizing, skipLayout) {
-        if (skipLayout === void 0) { skipLayout = false; }
-        // Remove view
-        var viewItem = this.views.splice(index, 1)[0];
-        viewItem.dispose();
-        // Remove sash
-        if (this.views.length >= 1) {
-            var sashIndex = Math.max(index - 1, 0);
-            var sashItem = this.sashes.splice(sashIndex, 1)[0];
-            sashItem.disposable();
-        }
-        if (!skipLayout) {
-            this.relayout();
-        }
-        if (sizing && sizing.type === 'distribute') {
-            this.distributeViewSizes();
-        }
-        return viewItem.view;
-    };
-    Splitview.prototype.getViewCachedVisibleSize = function (index) {
-        if (index < 0 || index >= this.views.length) {
-            throw new Error('Index out of bounds');
-        }
-        var viewItem = this.views[index];
-        return viewItem.cachedVisibleSize;
-    };
-    Splitview.prototype.moveView = function (from, to) {
-        var cachedVisibleSize = this.getViewCachedVisibleSize(from);
-        var sizing = typeof cachedVisibleSize === 'undefined'
-            ? this.getViewSize(from)
-            : Sizing.Invisible(cachedVisibleSize);
-        var view = this.removeView(from, undefined, true);
-        this.addView(view, sizing, to);
-    };
-    Splitview.prototype.layout = function (size, orthogonalSize) {
-        var _this = this;
-        var previousSize = Math.max(this.size, this.contentSize);
-        this.size = size;
-        this.orthogonalSize = orthogonalSize;
-        if (!this.proportions) {
-            var indexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(this.views.length);
-            var lowPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.Low; });
-            var highPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.High; });
-            this.resize(this.views.length - 1, size - previousSize, undefined, lowPriorityIndexes, highPriorityIndexes);
-        }
-        else {
-            for (var i = 0; i < this.views.length; i++) {
-                var item = this.views[i];
-                item.size = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(Math.round(this._proportions[i] * size), item.minimumSize, item.maximumSize);
-            }
-        }
-        this.distributeEmptySpace();
-        this.layoutViews();
-    };
-    Splitview.prototype.relayout = function (lowPriorityIndexes, highPriorityIndexes) {
-        var contentSize = this.views.reduce(function (r, i) { return r + i.size; }, 0);
-        this.resize(this.views.length - 1, this._size - contentSize, undefined, lowPriorityIndexes, highPriorityIndexes);
-        this.distributeEmptySpace();
-        this.layoutViews();
-        this.saveProportions();
-    };
-    Splitview.prototype.distributeEmptySpace = function (lowPriorityIndex) {
-        var e_7, _a, e_8, _b;
-        var _this = this;
-        var contentSize = this.views.reduce(function (r, i) { return r + i.size; }, 0);
-        var emptyDelta = this.size - contentSize;
-        var indexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(this.views.length - 1, -1);
-        var lowPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.Low; });
-        var highPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.High; });
-        try {
-            for (var highPriorityIndexes_2 = __values(highPriorityIndexes), highPriorityIndexes_2_1 = highPriorityIndexes_2.next(); !highPriorityIndexes_2_1.done; highPriorityIndexes_2_1 = highPriorityIndexes_2.next()) {
-                var index = highPriorityIndexes_2_1.value;
-                (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToStart)(indexes, index);
-            }
-        }
-        catch (e_7_1) { e_7 = { error: e_7_1 }; }
-        finally {
-            try {
-                if (highPriorityIndexes_2_1 && !highPriorityIndexes_2_1.done && (_a = highPriorityIndexes_2.return)) _a.call(highPriorityIndexes_2);
-            }
-            finally { if (e_7) throw e_7.error; }
-        }
-        try {
-            for (var lowPriorityIndexes_2 = __values(lowPriorityIndexes), lowPriorityIndexes_2_1 = lowPriorityIndexes_2.next(); !lowPriorityIndexes_2_1.done; lowPriorityIndexes_2_1 = lowPriorityIndexes_2.next()) {
-                var index = lowPriorityIndexes_2_1.value;
-                (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToEnd)(indexes, index);
-            }
-        }
-        catch (e_8_1) { e_8 = { error: e_8_1 }; }
-        finally {
-            try {
-                if (lowPriorityIndexes_2_1 && !lowPriorityIndexes_2_1.done && (_b = lowPriorityIndexes_2.return)) _b.call(lowPriorityIndexes_2);
-            }
-            finally { if (e_8) throw e_8.error; }
-        }
-        if (typeof lowPriorityIndex === 'number') {
-            (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToEnd)(indexes, lowPriorityIndex);
-        }
-        for (var i = 0; emptyDelta !== 0 && i < indexes.length; i++) {
-            var item = this.views[indexes[i]];
-            var size = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(item.size + emptyDelta, item.minimumSize, item.maximumSize);
-            var viewDelta = size - item.size;
-            emptyDelta -= viewDelta;
-            item.size = size;
-        }
-    };
-    Splitview.prototype.saveProportions = function () {
-        var _this = this;
-        if (this.proportionalLayout && this.contentSize > 0) {
-            this._proportions = this.views.map(function (i) { return i.size / _this.contentSize; });
-        }
-    };
-    Splitview.prototype.layoutViews = function () {
-        var _this = this;
-        this.contentSize = this.views.reduce(function (r, i) { return r + i.size; }, 0);
-        var sum = 0;
-        var x = [];
-        this.updateSashEnablement();
-        for (var i = 0; i < this.views.length - 1; i++) {
-            sum += this.views[i].size;
-            x.push(sum);
-            var offset = Math.min(Math.max(0, sum - 2), this.size - 4);
-            if (this._orientation === Orientation.HORIZONTAL) {
-                this.sashes[i].container.style.left = offset + "px";
-                this.sashes[i].container.style.top = "0px";
-            }
-            if (this._orientation === Orientation.VERTICAL) {
-                this.sashes[i].container.style.left = "0px";
-                this.sashes[i].container.style.top = offset + "px";
-            }
-        }
-        this.views.forEach(function (view, i) {
-            if (_this._orientation === Orientation.HORIZONTAL) {
-                view.container.style.width = view.size + "px";
-                view.container.style.left = i == 0 ? '0px' : x[i - 1] + "px";
-                view.container.style.top = '';
-                view.container.style.height = '';
-            }
-            if (_this._orientation === Orientation.VERTICAL) {
-                view.container.style.height = view.size + "px";
-                view.container.style.top = i == 0 ? '0px' : x[i - 1] + "px";
-                view.container.style.width = '';
-                view.container.style.left = '';
-            }
-            view.view.layout(view.size, _this._orthogonalSize);
-        });
-    };
-    Splitview.prototype.findFirstSnapIndex = function (indexes) {
-        var e_9, _a, e_10, _b;
-        try {
-            // visible views first
-            for (var indexes_1 = __values(indexes), indexes_1_1 = indexes_1.next(); !indexes_1_1.done; indexes_1_1 = indexes_1.next()) {
-                var index = indexes_1_1.value;
-                var viewItem = this.views[index];
-                if (!viewItem.visible) {
-                    continue;
-                }
-                if (viewItem.snap) {
-                    return index;
-                }
-            }
-        }
-        catch (e_9_1) { e_9 = { error: e_9_1 }; }
-        finally {
-            try {
-                if (indexes_1_1 && !indexes_1_1.done && (_a = indexes_1.return)) _a.call(indexes_1);
-            }
-            finally { if (e_9) throw e_9.error; }
-        }
-        try {
-            // then, hidden views
-            for (var indexes_2 = __values(indexes), indexes_2_1 = indexes_2.next(); !indexes_2_1.done; indexes_2_1 = indexes_2.next()) {
-                var index = indexes_2_1.value;
-                var viewItem = this.views[index];
-                if (viewItem.visible &&
-                    viewItem.maximumSize - viewItem.minimumSize > 0) {
-                    return undefined;
-                }
-                if (!viewItem.visible && viewItem.snap) {
-                    return index;
-                }
-            }
-        }
-        catch (e_10_1) { e_10 = { error: e_10_1 }; }
-        finally {
-            try {
-                if (indexes_2_1 && !indexes_2_1.done && (_b = indexes_2.return)) _b.call(indexes_2);
-            }
-            finally { if (e_10) throw e_10.error; }
-        }
-        return undefined;
-    };
-    Splitview.prototype.updateSashEnablement = function () {
-        var previous = false;
-        var collapsesDown = this.views.map(function (i) { return (previous = i.size - i.minimumSize > 0 || previous); });
-        previous = false;
-        var expandsDown = this.views.map(function (i) { return (previous = i.maximumSize - i.size > 0 || previous); });
-        var reverseViews = __spread(this.views).reverse();
-        previous = false;
-        var collapsesUp = reverseViews
-            .map(function (i) { return (previous = i.size - i.minimumSize > 0 || previous); })
-            .reverse();
-        previous = false;
-        var expandsUp = reverseViews
-            .map(function (i) { return (previous = i.maximumSize - i.size > 0 || previous); })
-            .reverse();
-        var position = 0;
-        for (var index = 0; index < this.sashes.length; index++) {
-            var sash = this.sashes[index];
-            var viewItem = this.views[index];
-            position += viewItem.size;
-            var min = !(collapsesDown[index] && expandsUp[index + 1]);
-            var max = !(expandsDown[index] && collapsesUp[index + 1]);
-            if (min && max) {
-                var upIndexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(index, -1);
-                var downIndexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(index + 1, this.views.length);
-                var snapBeforeIndex = this.findFirstSnapIndex(upIndexes);
-                var snapAfterIndex = this.findFirstSnapIndex(downIndexes);
-                var snappedBefore = typeof snapBeforeIndex === 'number' &&
-                    !this.views[snapBeforeIndex].visible;
-                var snappedAfter = typeof snapAfterIndex === 'number' &&
-                    !this.views[snapAfterIndex].visible;
-                if (snappedBefore &&
-                    collapsesUp[index] &&
-                    (position > 0 || this.startSnappingEnabled)) {
-                    this.updateSash(sash, SashState.MINIMUM);
-                    // sash.state = SashState.Minimum;
-                }
-                else if (snappedAfter &&
-                    collapsesDown[index] &&
-                    (position < this.contentSize || this.endSnappingEnabled)) {
-                    // sash.state = SashState.Maximum;
-                    this.updateSash(sash, SashState.MAXIMUM);
-                }
-                else {
-                    // sash.state = SashState.Disabled;
-                    this.updateSash(sash, SashState.DISABLED);
-                }
-            }
-            else if (min && !max) {
-                // sash.state = SashState.Minimum;
-                this.updateSash(sash, SashState.MINIMUM);
-            }
-            else if (!min && max) {
-                // sash.state = SashState.Maximum;
-                this.updateSash(sash, SashState.MAXIMUM);
-            }
-            else {
-                // sash.state = SashState.Enabled;
-                this.updateSash(sash, SashState.ENABLED);
-            }
-        }
-    };
-    Splitview.prototype.updateSash = function (sash, state) {
-        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(sash.container, 'disabled', state === SashState.DISABLED);
-        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(sash.container, 'enabled', state === SashState.ENABLED);
-        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(sash.container, 'maximum', state === SashState.MAXIMUM);
-        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(sash.container, 'minimum', state === SashState.MINIMUM);
-    };
-    Splitview.prototype.createViewContainer = function () {
-        var element = document.createElement('div');
-        element.className = 'view-container';
-        return element;
-    };
-    Splitview.prototype.createSashContainer = function () {
-        var element = document.createElement('div');
-        element.className = 'sash-container';
-        return element;
-    };
-    Splitview.prototype.createContainer = function () {
-        var element = document.createElement('div');
-        var orientationClassname = this._orientation === Orientation.HORIZONTAL
-            ? 'horizontal'
-            : 'vertical';
-        element.className = "split-view-container " + orientationClassname;
-        return element;
-    };
-    Splitview.prototype.dispose = function () {
-        this.element.remove();
-        for (var i = 0; i < this.element.children.length; i++) {
-            if (this.element.children.item(i) === this.element) {
-                this.element.removeChild(this.element);
-                break;
-            }
-        }
-    };
-    return Splitview;
-}());
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/splitview/core/viewItem.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/splitview/core/viewItem.js ***!
-  \*******************************************************************/
-/*! namespace exports */
-/*! export ViewItem [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ViewItem": () => /* binding */ ViewItem
-/* harmony export */ });
-/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../math */ "./node_modules/dockview/dist/es6/math.js");
-
-var ViewItem = /** @class */ (function () {
-    function ViewItem(container, view, size, disposable) {
-        this.container = container;
-        this.view = view;
-        this.disposable = disposable;
-        this._cachedVisibleSize = undefined;
-        if (typeof size === 'number') {
-            this._size = size;
-            this._cachedVisibleSize = undefined;
-            container.classList.add('visible');
-        }
-        else {
-            this._size = 0;
-            this._cachedVisibleSize = size.cachedVisibleSize;
-        }
-    }
-    Object.defineProperty(ViewItem.prototype, "size", {
-        get: function () {
-            return this._size;
-        },
-        set: function (size) {
-            this._size = size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ViewItem.prototype, "cachedVisibleSize", {
-        get: function () {
-            return this._cachedVisibleSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ViewItem.prototype, "visible", {
-        get: function () {
-            return typeof this._cachedVisibleSize === 'undefined';
-        },
-        enumerable: false,
-        configurable: true
-    });
-    ViewItem.prototype.setVisible = function (visible, size) {
-        var _a;
-        if (visible === this.visible) {
-            return;
-        }
-        if (visible) {
-            this.size = (0,_math__WEBPACK_IMPORTED_MODULE_0__.clamp)((_a = this._cachedVisibleSize) !== null && _a !== void 0 ? _a : 0, this.viewMinimumSize, this.viewMaximumSize);
-            this._cachedVisibleSize = undefined;
-        }
-        else {
-            this._cachedVisibleSize =
-                typeof size === 'number' ? size : this.size;
-            this.size = 0;
-        }
-        this.container.classList.toggle('visible', visible);
-        if (this.view.setVisible) {
-            this.view.setVisible(visible);
-        }
-    };
-    Object.defineProperty(ViewItem.prototype, "minimumSize", {
-        get: function () {
-            return this.visible ? this.view.minimumSize : 0;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ViewItem.prototype, "viewMinimumSize", {
-        get: function () {
-            return this.view.minimumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ViewItem.prototype, "maximumSize", {
-        get: function () {
-            return this.visible ? this.view.maximumSize : 0;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ViewItem.prototype, "viewMaximumSize", {
-        get: function () {
-            return this.view.maximumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ViewItem.prototype, "priority", {
-        get: function () {
-            return this.view.priority;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ViewItem.prototype, "snap", {
-        get: function () {
-            return !!this.view.snap;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ViewItem.prototype, "enabled", {
-        set: function (enabled) {
-            this.container.style.pointerEvents = enabled ? '' : 'none';
-        },
-        enumerable: false,
-        configurable: true
-    });
-    // layout(offset: number, layoutContext: TLayoutContext | undefined): void {
-    //     this.layoutContainer(offset);
-    //     this.view.layout(this.size, offset, layoutContext);
-    // }
-    // abstract layoutContainer(offset: number): void;
-    ViewItem.prototype.dispose = function () {
-        this.disposable.dispose();
-        return this.view;
-    };
-    return ViewItem;
-}());
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/splitview/splitviewComponent.js":
-/*!************************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/splitview/splitviewComponent.js ***!
-  \************************************************************************/
-/*! namespace exports */
-/*! export SplitviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "SplitviewComponent": () => /* binding */ SplitviewComponent
-/* harmony export */ });
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lifecycle */ "./node_modules/dockview/dist/es6/lifecycle.js");
-/* harmony import */ var _core_splitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./core/splitview */ "./node_modules/dockview/dist/es6/splitview/core/splitview.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../api/component.api */ "./node_modules/dockview/dist/es6/api/component.api.js");
-/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../panel/componentFactory */ "./node_modules/dockview/dist/es6/panel/componentFactory.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-
-
-/**
- * A high-level implementation of splitview that works using 'panels'
- */
-var SplitviewComponent = /** @class */ (function (_super) {
-    __extends(SplitviewComponent, _super);
-    function SplitviewComponent(element, options) {
-        var _this = _super.call(this) || this;
-        _this.element = element;
-        _this.options = options;
-        _this.panels = new Map();
-        _this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
-        _this.onDidLayoutChange = _this._onDidLayoutChange.event;
-        if (!options.components) {
-            options.components = {};
-        }
-        if (!options.frameworkComponents) {
-            options.frameworkComponents = {};
-        }
-        _this.splitview = new _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Splitview(_this.element, options);
-        _this.addDisposables(_this.splitview.onDidSashEnd(function () {
-            _this._onDidLayoutChange.fire(undefined);
-        }), _this.splitview);
-        return _this;
-    }
-    Object.defineProperty(SplitviewComponent.prototype, "minimumSize", {
-        get: function () {
-            return this.splitview.minimumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(SplitviewComponent.prototype, "maximumSize", {
-        get: function () {
-            return this.splitview.maximumSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(SplitviewComponent.prototype, "height", {
-        get: function () {
-            return this.splitview.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation.HORIZONTAL
-                ? this.splitview.orthogonalSize
-                : this.splitview.size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(SplitviewComponent.prototype, "width", {
-        get: function () {
-            return this.splitview.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation.HORIZONTAL
-                ? this.splitview.size
-                : this.splitview.orthogonalSize;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(SplitviewComponent.prototype, "length", {
-        get: function () {
-            return this.panels.size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    SplitviewComponent.prototype.focus = function () {
-        var _a;
-        (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.focus();
-    };
-    SplitviewComponent.prototype.movePanel = function (from, to) {
-        this.splitview.moveView(from, to);
-    };
-    SplitviewComponent.prototype.setVisible = function (panel, visible) {
-        var index = this.getPanels().indexOf(panel);
-        this.splitview.setViewVisible(index, visible);
-    };
-    SplitviewComponent.prototype.setActive = function (view, skipFocus) {
-        this._activePanel = view;
-        this.getPanels()
-            .filter(function (v) { return v !== view; })
-            .forEach(function (v) { return v.setActive(false, skipFocus); });
-        view.setActive(true, skipFocus);
-    };
-    SplitviewComponent.prototype.getPanels = function () {
-        return this.splitview.getViews();
-    };
-    SplitviewComponent.prototype.removePanel = function (panel, sizing) {
-        var disposable = this.panels.get(panel.id);
-        disposable === null || disposable === void 0 ? void 0 : disposable.dispose();
-        this.panels.delete(panel.id);
-        var index = this.getPanels().findIndex(function (_) { return _ === panel; });
-        this.splitview.removeView(index, sizing);
-    };
-    SplitviewComponent.prototype.getPanel = function (id) {
-        return this.getPanels().find(function (view) { return view.id === id; });
-    };
-    SplitviewComponent.prototype.addPanel = function (options) {
-        var _a;
-        if (this.panels.has(options.id)) {
-            throw new Error("panel " + options.id + " already exists");
-        }
-        var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__.createComponent)(options.id, options.component, this.options.components, this.options.frameworkComponents, { createComponent: (_a = this.options.frameworkWrapper) === null || _a === void 0 ? void 0 : _a.createComponent });
-        view.orientation = this.splitview.orientation;
-        view.init({
-            params: options.params,
-            minimumSize: options.minimumSize,
-            maximumSize: options.maximumSize,
-            snap: options.snap,
-            priority: options.priority,
-            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.SplitviewApi(this),
-        });
-        var size = typeof options.size === 'number' ? options.size : _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Sizing.Distribute;
-        var index = typeof options.index === 'number' ? options.index : undefined;
-        this.splitview.addView(view, size, index);
-        this.doAddView(view);
-        this.setActive(view);
-    };
-    /**
-     * Resize the layout to fit the parent container
-     */
-    SplitviewComponent.prototype.resizeToFit = function () {
-        var _a;
-        if (!this.element.parentElement) {
-            return;
-        }
-        var _b = (_a = this.element.parentElement) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect(), width = _b.width, height = _b.height;
-        this.layout(width, height);
-    };
-    SplitviewComponent.prototype.layout = function (width, height) {
-        var _a = __read(this.splitview.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation.HORIZONTAL
-            ? [width, height]
-            : [height, width], 2), size = _a[0], orthogonalSize = _a[1];
-        this.splitview.layout(size, orthogonalSize);
-    };
-    SplitviewComponent.prototype.doAddView = function (view) {
-        var _this = this;
-        var disposable = view.api.onDidFocusChange(function (event) {
-            if (!event.isFocused) {
-                return;
-            }
-            _this.setActive(view, true);
-        });
-        this.panels.set(view.id, disposable);
-    };
-    SplitviewComponent.prototype.toJSON = function () {
-        var _this = this;
-        var _a;
-        var views = this.splitview
-            .getViews()
-            .map(function (view, i) {
-            var size = _this.splitview.getViewSize(i);
-            return {
-                size: size,
-                data: view.toJSON(),
-                minimumSize: view.minimumSize,
-                maximumSize: view.maximumSize,
-                snap: !!view.snap,
-                priority: view.priority,
-            };
-        });
-        return {
-            views: views,
-            activeView: (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.id,
-            size: this.splitview.size,
-            orientation: this.splitview.orientation,
-        };
-    };
-    SplitviewComponent.prototype.fromJSON = function (data) {
-        var _this = this;
-        var _a;
-        var views = data.views, orientation = data.orientation, size = data.size, activeView = data.activeView;
-        this.splitview.dispose();
-        this.splitview = new _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Splitview(this.element, {
-            orientation: orientation,
-            proportionalLayout: this.options.proportionalLayout,
-            descriptor: {
-                size: size,
-                views: views.map(function (view) {
-                    var _a;
-                    var data = view.data;
-                    if (_this.panels.has(data.id)) {
-                        throw new Error("panel " + data.id + " already exists");
-                    }
-                    var panel = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__.createComponent)(data.id, data.component, _this.options.components, _this.options.frameworkComponents, {
-                        createComponent: (_a = _this.options.frameworkWrapper) === null || _a === void 0 ? void 0 : _a.createComponent,
-                    });
-                    panel.init({
-                        params: data.props,
-                        minimumSize: view.minimumSize,
-                        maximumSize: view.maximumSize,
-                        snap: view.snap,
-                        priority: view.priority,
-                        containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.SplitviewApi(_this),
-                    });
-                    panel.orientation = orientation;
-                    _this.doAddView(panel);
-                    return { size: view.size, view: panel };
-                }),
-            },
-        });
-        if (typeof activeView === 'string') {
-            (_a = this.getPanel(activeView)) === null || _a === void 0 ? void 0 : _a.setActive(true);
-        }
-    };
-    SplitviewComponent.prototype.dispose = function () {
-        Array.from(this.panels.values()).forEach(function (value) {
-            value.dispose();
-        });
-        this.panels.clear();
-        _super.prototype.dispose.call(this);
-    };
-    return SplitviewComponent;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
-
-
-
-/***/ }),
-
-/***/ "./node_modules/dockview/dist/es6/splitview/splitviewPanel.js":
-/*!********************************************************************!*\
-  !*** ./node_modules/dockview/dist/es6/splitview/splitviewPanel.js ***!
-  \********************************************************************/
-/*! namespace exports */
-/*! export SplitviewPanel [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "SplitviewPanel": () => /* binding */ SplitviewPanel
-/* harmony export */ });
-/* harmony import */ var _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../gridview/basePanelView */ "./node_modules/dockview/dist/es6/gridview/basePanelView.js");
-/* harmony import */ var _api_panelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/panelApi */ "./node_modules/dockview/dist/es6/api/panelApi.js");
-/* harmony import */ var _core_splitview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./core/splitview */ "./node_modules/dockview/dist/es6/splitview/core/splitview.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../events */ "./node_modules/dockview/dist/es6/events.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __read = (undefined && undefined.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-
-
-
-
-var SplitviewPanel = /** @class */ (function (_super) {
-    __extends(SplitviewPanel, _super);
-    function SplitviewPanel(id, componentName) {
-        var _this = _super.call(this, id, componentName, new _api_panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApi(id)) || this;
-        _this._minimumSize = 0;
-        _this._maximumSize = Number.POSITIVE_INFINITY;
-        _this._snap = false;
-        _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_3__.Emitter();
-        _this.onDidChange = _this._onDidChange.event;
-        _this.addDisposables(_this.api.onVisibilityChange(function (event) {
-            var isVisible = event.isVisible;
-            var containerApi = _this.params.containerApi;
-            containerApi.setVisible(_this, isVisible);
-        }), _this.api.onDidConstraintsChangeInternal(function (event) {
-            if (typeof event.minimumSize === 'number' ||
-                typeof event.minimumSize === 'function') {
-                _this._minimumSize = event.minimumSize;
-            }
-            if (typeof event.maximumSize === 'number' ||
-                typeof event.maximumSize === 'function') {
-                _this._maximumSize = event.maximumSize;
-            }
-            _this.updateConstraints();
-        }), _this.api.onDidSizeChange(function (event) {
-            _this._onDidChange.fire(event.size);
-        }));
-        return _this;
-    }
-    Object.defineProperty(SplitviewPanel.prototype, "priority", {
-        get: function () {
-            return this._priority;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(SplitviewPanel.prototype, "orientation", {
-        get: function () {
-            return this._orientation;
-        },
-        set: function (value) {
-            this._orientation = value;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(SplitviewPanel.prototype, "minimumSize", {
-        get: function () {
-            var size = typeof this._minimumSize === 'function'
-                ? this._minimumSize()
-                : this._minimumSize;
-            if (size !== this._evaluatedMinimumSize) {
-                this._evaluatedMinimumSize = size;
-                this.updateConstraints();
-            }
-            return size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(SplitviewPanel.prototype, "maximumSize", {
-        get: function () {
-            var size = typeof this._maximumSize === 'function'
-                ? this._maximumSize()
-                : this._maximumSize;
-            if (size !== this._evaluatedMaximumSize) {
-                this._evaluatedMaximumSize = size;
-                this.updateConstraints();
-            }
-            return size;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(SplitviewPanel.prototype, "snap", {
-        get: function () {
-            return this._snap;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    SplitviewPanel.prototype.layout = function (size, orthogonalSize) {
-        var _a = __read(this.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_2__.Orientation.HORIZONTAL
-            ? [size, orthogonalSize]
-            : [orthogonalSize, size], 2), width = _a[0], height = _a[1];
-        _super.prototype.layout.call(this, width, height);
-    };
-    SplitviewPanel.prototype.updateConstraints = function () {
-        this.api._onDidConstraintsChange.fire({
-            maximumSize: this._evaluatedMaximumSize,
-            minimumSize: this._evaluatedMinimumSize,
-        });
-    };
-    SplitviewPanel.prototype.setActive = function (isActive, skipFocus) {
-        _super.prototype.setActive.call(this, isActive);
-        if (!skipFocus) {
-            this.focus();
-        }
-    };
-    SplitviewPanel.prototype.init = function (parameters) {
-        _super.prototype.init.call(this, parameters);
-        this._priority = parameters.priority;
-        if (parameters.minimumSize) {
-            this._minimumSize = parameters.minimumSize;
-        }
-        if (parameters.maximumSize) {
-            this._maximumSize = parameters.maximumSize;
-        }
-        if (parameters.snap) {
-            this._snap = parameters.snap;
-        }
-    };
-    SplitviewPanel.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-    };
-    return SplitviewPanel;
-}(_gridview_basePanelView__WEBPACK_IMPORTED_MODULE_0__.BasePanelView));
-
-
 
 /***/ }),
 
@@ -43159,6 +33401,9859 @@ module.exports = JSON.parse("{\"views\":[{\"size\":22,\"data\":{\"id\":\"1\",\"c
 
 "use strict";
 module.exports = JSON.parse("{\"views\":[{\"size\":200,\"data\":{\"id\":\"1\",\"component\":\"default1\",\"props\":{\"text\":\"hiya\"}},\"minimumSize\":200,\"maximumSize\":9007199254740991,\"snap\":true},{\"size\":409,\"data\":{\"id\":\"2\",\"component\":\"default1\"},\"minimumSize\":200,\"maximumSize\":9007199254740991}],\"activeView\":\"2\",\"size\":609,\"orientation\":\"VERTICAL\"}");
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/actionbar/actionsContainer.js":
+/*!***********************************************************!*\
+  !*** ../splitview/dist/es6/actionbar/actionsContainer.js ***!
+  \***********************************************************/
+/*! namespace exports */
+/*! export ActionContainer [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ActionContainer": () => /* binding */ ActionContainer
+/* harmony export */ });
+var ActionContainer = /** @class */ (function () {
+    function ActionContainer() {
+        this._element = document.createElement('div');
+        this._element.className = 'actions-bar';
+        this._list = document.createElement('ul');
+        this._list.className = 'actions-container';
+        this._element.appendChild(this._list);
+    }
+    Object.defineProperty(ActionContainer.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    ActionContainer.prototype.add = function (element) {
+        var listItem = document.createElement('li');
+        listItem.className = 'action-item';
+        this._list.appendChild(element);
+    };
+    return ActionContainer;
+}());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/api/api.js":
+/*!****************************************!*\
+  !*** ../splitview/dist/es6/api/api.js ***!
+  \****************************************/
+/*! namespace exports */
+/*! export BaseViewApi [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "BaseViewApi": () => /* binding */ BaseViewApi
+/* harmony export */ });
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+/**
+ * A core api implementation that should be used across all panel-like objects
+ */
+var BaseViewApi = /** @class */ (function (_super) {
+    __extends(BaseViewApi, _super);
+    function BaseViewApi(id) {
+        var _this = _super.call(this) || this;
+        _this.id = id;
+        _this._state = {};
+        _this._isFocused = false;
+        _this._isActive = false;
+        _this._isVisible = true;
+        _this._width = 0;
+        _this._height = 0;
+        _this._onDidStateChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onDidStateChange = _this._onDidStateChange.event;
+        //
+        _this._onDidPanelDimensionChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
+            replay: true,
+        });
+        _this.onDidDimensionsChange = _this._onDidPanelDimensionChange.event;
+        //
+        _this._onDidChangeFocus = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
+            replay: true,
+        });
+        _this.onDidFocusChange = _this._onDidChangeFocus.event;
+        //
+        _this._onFocusEvent = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onFocusEvent = _this._onFocusEvent.event;
+        //
+        _this._onDidVisibilityChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
+            replay: true,
+        });
+        _this.onDidVisibilityChange = _this
+            ._onDidVisibilityChange.event;
+        //
+        _this._onVisibilityChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onVisibilityChange = _this
+            ._onVisibilityChange.event;
+        //
+        _this._onDidActiveChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
+            replay: true,
+        });
+        _this.onDidActiveChange = _this._onDidActiveChange
+            .event;
+        //
+        _this._onActiveChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onActiveChange = _this._onActiveChange.event;
+        _this.addDisposables(_this._onDidStateChange, _this._onDidPanelDimensionChange, _this._onDidChangeFocus, _this._onDidVisibilityChange, _this._onDidActiveChange, _this._onFocusEvent, _this.onDidFocusChange(function (event) {
+            _this._isFocused = event.isFocused;
+        }), _this.onDidActiveChange(function (event) {
+            _this._isActive = event.isActive;
+        }), _this.onDidVisibilityChange(function (event) {
+            _this._isVisible = event.isVisible;
+        }), _this.onDidDimensionsChange(function (event) {
+            _this._width = event.width;
+            _this._height = event.height;
+        }));
+        return _this;
+    }
+    Object.defineProperty(BaseViewApi.prototype, "isFocused", {
+        //
+        get: function () {
+            return this._isFocused;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BaseViewApi.prototype, "isActive", {
+        get: function () {
+            return this._isActive;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BaseViewApi.prototype, "isVisible", {
+        get: function () {
+            return this._isVisible;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BaseViewApi.prototype, "width", {
+        get: function () {
+            return this._width;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BaseViewApi.prototype, "height", {
+        get: function () {
+            return this._height;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    BaseViewApi.prototype.setVisible = function (isVisible) {
+        this._onVisibilityChange.fire({ isVisible: isVisible });
+    };
+    BaseViewApi.prototype.setActive = function () {
+        this._onActiveChange.fire();
+    };
+    BaseViewApi.prototype.setState = function (key, value) {
+        if (typeof key === 'object') {
+            this._state = key;
+        }
+        else if (typeof value !== undefined) {
+            this._state[key] = value;
+        }
+        this._onDidStateChange.fire(undefined);
+    };
+    BaseViewApi.prototype.getState = function () {
+        return this._state;
+    };
+    BaseViewApi.prototype.getStateKey = function (key) {
+        return this._state[key];
+    };
+    BaseViewApi.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+    };
+    return BaseViewApi;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/api/component.api.js":
+/*!**************************************************!*\
+  !*** ../splitview/dist/es6/api/component.api.js ***!
+  \**************************************************/
+/*! namespace exports */
+/*! export DockviewApi [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export GridviewApi [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export PaneviewApi [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export SplitviewApi [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "SplitviewApi": () => /* binding */ SplitviewApi,
+/* harmony export */   "PaneviewApi": () => /* binding */ PaneviewApi,
+/* harmony export */   "GridviewApi": () => /* binding */ GridviewApi,
+/* harmony export */   "DockviewApi": () => /* binding */ DockviewApi
+/* harmony export */ });
+var SplitviewApi = /** @class */ (function () {
+    function SplitviewApi(component) {
+        this.component = component;
+    }
+    Object.defineProperty(SplitviewApi.prototype, "minimumSize", {
+        get: function () {
+            return this.component.minimumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewApi.prototype, "maximumSize", {
+        get: function () {
+            return this.component.maximumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewApi.prototype, "height", {
+        get: function () {
+            return this.component.height;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewApi.prototype, "width", {
+        get: function () {
+            return this.component.width;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewApi.prototype, "length", {
+        get: function () {
+            return this.component.length;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewApi.prototype, "onDidLayoutChange", {
+        get: function () {
+            return this.component.onDidLayoutChange;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    SplitviewApi.prototype.removePanel = function (panel, sizing) {
+        this.component.removePanel(panel, sizing);
+    };
+    SplitviewApi.prototype.setVisible = function (panel, isVisible) {
+        return this.component.setVisible(panel, isVisible);
+    };
+    SplitviewApi.prototype.getPanels = function () {
+        return this.component.getPanels();
+    };
+    SplitviewApi.prototype.focus = function () {
+        return this.component.focus();
+    };
+    SplitviewApi.prototype.getPanel = function (id) {
+        return this.component.getPanel(id);
+    };
+    SplitviewApi.prototype.setActive = function (panel) {
+        return this.component.setActive(panel);
+    };
+    SplitviewApi.prototype.layout = function (width, height) {
+        return this.component.layout(width, height);
+    };
+    SplitviewApi.prototype.addPanel = function (options) {
+        return this.component.addPanel(options);
+    };
+    SplitviewApi.prototype.resizeToFit = function () {
+        return this.component.resizeToFit();
+    };
+    SplitviewApi.prototype.movePanel = function (from, to) {
+        this.component.movePanel(from, to);
+    };
+    SplitviewApi.prototype.fromJSON = function (data) {
+        return this.component.fromJSON(data);
+    };
+    SplitviewApi.prototype.toJSON = function () {
+        return this.component.toJSON();
+    };
+    return SplitviewApi;
+}());
+
+var PaneviewApi = /** @class */ (function () {
+    function PaneviewApi(component) {
+        this.component = component;
+    }
+    Object.defineProperty(PaneviewApi.prototype, "minimumSize", {
+        get: function () {
+            return this.component.minimumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PaneviewApi.prototype, "maximumSize", {
+        get: function () {
+            return this.component.maximumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PaneviewApi.prototype, "onDidLayoutChange", {
+        get: function () {
+            return this.component.onDidLayoutChange;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    PaneviewApi.prototype.getPanels = function () {
+        return this.component.getPanels();
+    };
+    PaneviewApi.prototype.removePanel = function (panel) {
+        this.component.removePanel(panel);
+    };
+    PaneviewApi.prototype.getPanel = function (id) {
+        return this.component.getPanel(id);
+    };
+    PaneviewApi.prototype.focus = function () {
+        return this.component.focus();
+    };
+    PaneviewApi.prototype.layout = function (width, height) {
+        return this.component.layout(width, height);
+    };
+    PaneviewApi.prototype.addPanel = function (options) {
+        return this.component.addPanel(options);
+    };
+    PaneviewApi.prototype.resizeToFit = function () {
+        return this.component.resizeToFit();
+    };
+    PaneviewApi.prototype.fromJSON = function (data) {
+        return this.component.fromJSON(data);
+    };
+    PaneviewApi.prototype.toJSON = function () {
+        return this.component.toJSON();
+    };
+    return PaneviewApi;
+}());
+
+var GridviewApi = /** @class */ (function () {
+    function GridviewApi(component) {
+        this.component = component;
+    }
+    Object.defineProperty(GridviewApi.prototype, "minimumHeight", {
+        get: function () {
+            return this.component.minimumHeight;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GridviewApi.prototype, "maximumHeight", {
+        get: function () {
+            return this.component.maximumHeight;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GridviewApi.prototype, "minimumWidth", {
+        get: function () {
+            return this.component.minimumWidth;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GridviewApi.prototype, "maximumWidth", {
+        get: function () {
+            return this.component.maximumWidth;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GridviewApi.prototype, "onGridEvent", {
+        get: function () {
+            return this.component.onGridEvent;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GridviewApi.prototype, "orientation", {
+        get: function () {
+            return this.component.orientation;
+        },
+        set: function (value) {
+            this.component.orientation = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    GridviewApi.prototype.focus = function () {
+        return this.component.focus();
+    };
+    GridviewApi.prototype.layout = function (width, height, force) {
+        if (force === void 0) { force = false; }
+        return this.component.layout(width, height, force);
+    };
+    GridviewApi.prototype.addPanel = function (options) {
+        return this.component.addPanel(options);
+    };
+    GridviewApi.prototype.removePanel = function (panel, sizing) {
+        this.component.removePanel(panel, sizing);
+    };
+    GridviewApi.prototype.movePanel = function (panel, options) {
+        this.component.movePanel(panel, options);
+    };
+    GridviewApi.prototype.resizeToFit = function () {
+        return this.component.resizeToFit();
+    };
+    GridviewApi.prototype.getPanel = function (id) {
+        return this.component.getPanel(id);
+    };
+    GridviewApi.prototype.toggleVisibility = function (panel) {
+        return this.component.toggleVisibility(panel);
+    };
+    GridviewApi.prototype.isVisible = function (panel) {
+        return this.component.isVisible(panel);
+    };
+    GridviewApi.prototype.setVisible = function (panel, visible) {
+        return this.component.setVisible(panel, visible);
+    };
+    GridviewApi.prototype.fromJSON = function (data) {
+        return this.component.fromJSON(data);
+    };
+    GridviewApi.prototype.toJSON = function () {
+        return this.component.toJSON();
+    };
+    return GridviewApi;
+}());
+
+var DockviewApi = /** @class */ (function () {
+    function DockviewApi(component) {
+        this.component = component;
+    }
+    Object.defineProperty(DockviewApi.prototype, "minimumHeight", {
+        get: function () {
+            return this.component.minimumHeight;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(DockviewApi.prototype, "maximumHeight", {
+        get: function () {
+            return this.component.maximumHeight;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(DockviewApi.prototype, "minimumWidth", {
+        get: function () {
+            return this.component.minimumWidth;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(DockviewApi.prototype, "maximumWidth", {
+        get: function () {
+            return this.component.maximumWidth;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(DockviewApi.prototype, "size", {
+        get: function () {
+            return this.component.size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(DockviewApi.prototype, "totalPanels", {
+        get: function () {
+            return this.component.totalPanels;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(DockviewApi.prototype, "onGridEvent", {
+        get: function () {
+            return this.component.onGridEvent;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(DockviewApi.prototype, "onDidLayoutChange", {
+        get: function () {
+            return this.component.onDidLayoutChange;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    DockviewApi.prototype.focus = function () {
+        return this.component.focus();
+    };
+    DockviewApi.prototype.getPanel = function (id) {
+        return this.component.getGroupPanel(id);
+    };
+    DockviewApi.prototype.setActivePanel = function (panel) {
+        return this.component.setActivePanel(panel);
+    };
+    DockviewApi.prototype.layout = function (width, height, force) {
+        if (force === void 0) { force = false; }
+        return this.component.layout(width, height, force);
+    };
+    DockviewApi.prototype.addPanel = function (options) {
+        return this.component.addPanel(options);
+    };
+    DockviewApi.prototype.addDndHandle = function (type, cb) {
+        return this.component.addDndHandle(type, cb);
+    };
+    DockviewApi.prototype.createDragTarget = function (target, options) {
+        return this.component.createDragTarget(target, options);
+    };
+    DockviewApi.prototype.addEmptyGroup = function (options) {
+        return this.component.addEmptyGroup(options);
+    };
+    DockviewApi.prototype.moveToNext = function (options) {
+        return this.component.moveToNext(options);
+    };
+    DockviewApi.prototype.moveToPrevious = function (options) {
+        return this.component.moveToPrevious(options);
+    };
+    DockviewApi.prototype.closeAllGroups = function () {
+        return this.component.closeAllGroups();
+    };
+    DockviewApi.prototype.removeGroup = function (group) {
+        return this.component.removeGroup(group);
+    };
+    DockviewApi.prototype.resizeToFit = function () {
+        return this.component.resizeToFit();
+    };
+    DockviewApi.prototype.getTabHeight = function () {
+        return this.component.getTabHeight();
+    };
+    DockviewApi.prototype.setTabHeight = function (height) {
+        this.component.setTabHeight(height);
+    };
+    DockviewApi.prototype.getGroup = function (id) {
+        return this.component.getPanel(id);
+    };
+    DockviewApi.prototype.fromJSON = function (data) {
+        return this.component.fromJSON(data);
+    };
+    DockviewApi.prototype.toJSON = function () {
+        return this.component.toJSON();
+    };
+    return DockviewApi;
+}());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/api/gridPanelApi.js":
+/*!*************************************************!*\
+  !*** ../splitview/dist/es6/api/gridPanelApi.js ***!
+  \*************************************************/
+/*! namespace exports */
+/*! export GridPanelApi [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "GridPanelApi": () => /* binding */ GridPanelApi
+/* harmony export */ });
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./api */ "../splitview/dist/es6/api/api.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+var GridPanelApi = /** @class */ (function (_super) {
+    __extends(GridPanelApi, _super);
+    //
+    function GridPanelApi(id) {
+        var _this = _super.call(this, id) || this;
+        _this._onDidConstraintsChangeInternal = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onDidConstraintsChangeInternal = _this._onDidConstraintsChangeInternal.event;
+        //
+        _this._onDidConstraintsChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
+            replay: true,
+        });
+        _this.onDidConstraintsChange = _this
+            ._onDidConstraintsChange.event;
+        //
+        _this._onDidSizeChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onDidSizeChange = _this._onDidSizeChange.event;
+        return _this;
+    }
+    GridPanelApi.prototype.setConstraints = function (value) {
+        this._onDidConstraintsChangeInternal.fire(value);
+    };
+    GridPanelApi.prototype.setSize = function (event) {
+        this._onDidSizeChange.fire(event);
+    };
+    return GridPanelApi;
+}(_api__WEBPACK_IMPORTED_MODULE_1__.BaseViewApi));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/api/groupPanelApi.js":
+/*!**************************************************!*\
+  !*** ../splitview/dist/es6/api/groupPanelApi.js ***!
+  \**************************************************/
+/*! namespace exports */
+/*! export GroupPanelApi [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "GroupPanelApi": () => /* binding */ GroupPanelApi
+/* harmony export */ });
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _gridPanelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./gridPanelApi */ "../splitview/dist/es6/api/gridPanelApi.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+var GroupPanelApi = /** @class */ (function (_super) {
+    __extends(GroupPanelApi, _super);
+    function GroupPanelApi(panel, group) {
+        var _this = _super.call(this, panel.id) || this;
+        _this.panel = panel;
+        _this._onDidDirtyChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onDidDirtyChange = _this._onDidDirtyChange.event;
+        // readonly _onDidGroupPanelVisibleChange = new Emitter<VisibilityEvent>({
+        //     replay: true,
+        // });
+        // readonly onDidGroupPanelVisibleChange: Event<VisibilityEvent> = this
+        //     ._onDidGroupPanelVisibleChange.event;
+        _this._onDidTitleChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onDidTitleChange = _this._onDidTitleChange.event;
+        _this._group = group;
+        _this.addDisposables(
+        // this._onDidGroupPanelVisibleChange,
+        _this._onDidDirtyChange
+        // this.onDidGroupPanelVisibleChange((event) => {
+        //     this._isGroupVisible = event.isVisible;
+        // })
+        );
+        return _this;
+    }
+    Object.defineProperty(GroupPanelApi.prototype, "tryClose", {
+        // get isGroupVisible() {
+        //     return this._isGroupVisible;
+        // }
+        get: function () {
+            return this._interceptor;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GroupPanelApi.prototype, "isGroupActive", {
+        get: function () {
+            return this.group.isActive;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GroupPanelApi.prototype, "group", {
+        get: function () {
+            return this._group;
+        },
+        set: function (value) {
+            this._group = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    GroupPanelApi.prototype.setTitle = function (title) {
+        this._onDidTitleChange.fire({ title: title });
+    };
+    GroupPanelApi.prototype.close = function () {
+        return this.group.closePanel(this.panel);
+    };
+    GroupPanelApi.prototype.interceptOnCloseAction = function (interceptor) {
+        this._interceptor = interceptor;
+    };
+    GroupPanelApi.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+    };
+    return GroupPanelApi;
+}(_gridPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridPanelApi));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/api/panePanelApi.js":
+/*!*************************************************!*\
+  !*** ../splitview/dist/es6/api/panePanelApi.js ***!
+  \*************************************************/
+/*! namespace exports */
+/*! export PanePanelApi [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "PanePanelApi": () => /* binding */ PanePanelApi
+/* harmony export */ });
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _panelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./panelApi */ "../splitview/dist/es6/api/panelApi.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+var PanePanelApi = /** @class */ (function (_super) {
+    __extends(PanePanelApi, _super);
+    function PanePanelApi(id) {
+        var _this = _super.call(this, id) || this;
+        _this._onDidExpansionChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
+            replay: true,
+        });
+        _this.onDidExpansionChange = _this
+            ._onDidExpansionChange.event;
+        _this._onMouseEnter = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({});
+        _this.onMouseEnter = _this._onMouseEnter.event;
+        _this._onMouseLeave = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({});
+        _this.onMouseLeave = _this._onMouseLeave.event;
+        return _this;
+    }
+    Object.defineProperty(PanePanelApi.prototype, "pane", {
+        set: function (pane) {
+            this._pane = pane;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    PanePanelApi.prototype.setExpanded = function (isExpanded) {
+        this._pane.setExpanded(isExpanded);
+    };
+    Object.defineProperty(PanePanelApi.prototype, "isExpanded", {
+        get: function () {
+            return this._pane.isExpanded();
+        },
+        enumerable: false,
+        configurable: true
+    });
+    return PanePanelApi;
+}(_panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApi));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/api/panelApi.js":
+/*!*********************************************!*\
+  !*** ../splitview/dist/es6/api/panelApi.js ***!
+  \*********************************************/
+/*! namespace exports */
+/*! export PanelApi [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "PanelApi": () => /* binding */ PanelApi
+/* harmony export */ });
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./api */ "../splitview/dist/es6/api/api.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+var PanelApi = /** @class */ (function (_super) {
+    __extends(PanelApi, _super);
+    //
+    function PanelApi(id) {
+        var _this = _super.call(this, id) || this;
+        _this._onDidConstraintsChangeInternal = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onDidConstraintsChangeInternal = _this._onDidConstraintsChangeInternal.event;
+        //
+        _this._onDidConstraintsChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
+            replay: true,
+        });
+        _this.onDidConstraintsChange = _this
+            ._onDidConstraintsChange.event;
+        //
+        _this._onDidSizeChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onDidSizeChange = _this._onDidSizeChange
+            .event;
+        return _this;
+    }
+    PanelApi.prototype.setConstraints = function (value) {
+        this._onDidConstraintsChangeInternal.fire(value);
+    };
+    PanelApi.prototype.setSize = function (event) {
+        this._onDidSizeChange.fire(event);
+    };
+    PanelApi.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+        this._onDidConstraintsChange.dispose();
+        this._onDidSizeChange.dispose();
+    };
+    return PanelApi;
+}(_api__WEBPACK_IMPORTED_MODULE_1__.BaseViewApi));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/array.js":
+/*!**************************************!*\
+  !*** ../splitview/dist/es6/array.js ***!
+  \**************************************/
+/*! namespace exports */
+/*! export firstIndex [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export last [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export pushToEnd [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export pushToStart [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export range [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export sequenceEquals [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export tail [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "tail": () => /* binding */ tail,
+/* harmony export */   "last": () => /* binding */ last,
+/* harmony export */   "sequenceEquals": () => /* binding */ sequenceEquals,
+/* harmony export */   "pushToStart": () => /* binding */ pushToStart,
+/* harmony export */   "pushToEnd": () => /* binding */ pushToEnd,
+/* harmony export */   "range": () => /* binding */ range,
+/* harmony export */   "firstIndex": () => /* binding */ firstIndex
+/* harmony export */ });
+function tail(arr) {
+    if (arr.length === 0) {
+        throw new Error('Invalid tail call');
+    }
+    return [arr.slice(0, arr.length - 1), arr[arr.length - 1]];
+}
+function last(arr) {
+    return arr.length > 0 ? arr[arr.length - 1] : undefined;
+}
+function sequenceEquals(arr1, arr2) {
+    if (arr1.length !== arr2.length) {
+        return false;
+    }
+    for (var i = 0; i < arr1.length; i++) {
+        if (arr1[i] !== arr2[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+/**
+ * Pushes an element to the start of the array, if found.
+ */
+function pushToStart(arr, value) {
+    var index = arr.indexOf(value);
+    if (index > -1) {
+        arr.splice(index, 1);
+        arr.unshift(value);
+    }
+}
+/**
+ * Pushes an element to the end of the array, if found.
+ */
+function pushToEnd(arr, value) {
+    var index = arr.indexOf(value);
+    if (index > -1) {
+        arr.splice(index, 1);
+        arr.push(value);
+    }
+}
+var range = function (from, to) {
+    var result = [];
+    if (typeof to !== 'number') {
+        to = from;
+        from = 0;
+    }
+    if (from <= to) {
+        for (var i = from; i < to; i++) {
+            result.push(i);
+        }
+    }
+    else {
+        for (var i = from; i > to; i--) {
+            result.push(i);
+        }
+    }
+    return result;
+};
+function firstIndex(array, fn) {
+    for (var i = 0; i < array.length; i++) {
+        var element = array[i];
+        if (fn(element)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/async.js":
+/*!**************************************!*\
+  !*** ../splitview/dist/es6/async.js ***!
+  \**************************************/
+/*! namespace exports */
+/*! export timeoutAsPromise [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "timeoutAsPromise": () => /* binding */ timeoutAsPromise
+/* harmony export */ });
+function timeoutAsPromise(timeout) {
+    return new Promise(function (resolve) {
+        setTimeout(function () {
+            resolve();
+        }, timeout);
+    });
+}
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/dnd/dataTransfer.js":
+/*!*************************************************!*\
+  !*** ../splitview/dist/es6/dnd/dataTransfer.js ***!
+  \*************************************************/
+/*! namespace exports */
+/*! export DATA_KEY [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export DataTransferSingleton [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export DragType [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export LocalSelectionTransfer [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export extractData [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export isCustomDragEvent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export isPanelTransferEvent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export isTabDragEvent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DATA_KEY": () => /* binding */ DATA_KEY,
+/* harmony export */   "isPanelTransferEvent": () => /* binding */ isPanelTransferEvent,
+/* harmony export */   "DragType": () => /* binding */ DragType,
+/* harmony export */   "isTabDragEvent": () => /* binding */ isTabDragEvent,
+/* harmony export */   "isCustomDragEvent": () => /* binding */ isCustomDragEvent,
+/* harmony export */   "extractData": () => /* binding */ extractData,
+/* harmony export */   "DataTransferSingleton": () => /* binding */ DataTransferSingleton,
+/* harmony export */   "LocalSelectionTransfer": () => /* binding */ LocalSelectionTransfer
+/* harmony export */ });
+/* harmony import */ var _json__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../json */ "../splitview/dist/es6/json.js");
+
+var DATA_KEY = 'splitview/transfer';
+var isPanelTransferEvent = function (event) {
+    if (!event.dataTransfer) {
+        return false;
+    }
+    return event.dataTransfer.types.includes(DATA_KEY);
+};
+var DragType;
+(function (DragType) {
+    DragType["ITEM"] = "group_drag";
+    DragType["EXTERNAL"] = "external_group_drag";
+})(DragType || (DragType = {}));
+/**
+ * Determine whether this data belong to that of an event that was started by
+ * dragging a tab component
+ */
+var isTabDragEvent = function (data) {
+    return data.type === DragType.ITEM;
+};
+/**
+ * Determine whether this data belong to that of an event that was started by
+ * a custom drag-enable component
+ */
+var isCustomDragEvent = function (data) {
+    return data.type === DragType.EXTERNAL;
+};
+var extractData = function (event) {
+    if (!event.dataTransfer) {
+        return null;
+    }
+    var data = (0,_json__WEBPACK_IMPORTED_MODULE_0__.tryParseJSON)(event.dataTransfer.getData(DATA_KEY));
+    if (!data) {
+        console.warn("[dragEvent] " + DATA_KEY + " data is missing");
+    }
+    if (typeof data.type !== 'string') {
+        console.warn("[dragEvent] invalid type " + data.type);
+    }
+    return data;
+};
+var DataTransfer = /** @class */ (function () {
+    function DataTransfer() {
+        this.map = new Map();
+    }
+    DataTransfer.prototype.setData = function (format, data) {
+        this.map.set(format, data);
+    };
+    DataTransfer.prototype.getData = function (format) {
+        var data = this.map.get(format);
+        return data;
+    };
+    DataTransfer.prototype.has = function (format) {
+        return this.map.has(format);
+    };
+    DataTransfer.prototype.removeData = function (format) {
+        var data = this.getData(format);
+        this.map.delete(format);
+        return data;
+    };
+    Object.defineProperty(DataTransfer.prototype, "size", {
+        get: function () {
+            return this.map.size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    return DataTransfer;
+}());
+var DataTransferSingleton = new DataTransfer();
+/**
+ * A singleton to store transfer data during drag & drop operations that are only valid within the application.
+ */
+var LocalSelectionTransfer = /** @class */ (function () {
+    function LocalSelectionTransfer() {
+        // protect against external instantiation
+    }
+    LocalSelectionTransfer.getInstance = function () {
+        return LocalSelectionTransfer.INSTANCE;
+    };
+    LocalSelectionTransfer.prototype.hasData = function (proto) {
+        return proto && proto === this.proto;
+    };
+    LocalSelectionTransfer.prototype.clearData = function (proto) {
+        if (this.hasData(proto)) {
+            this.proto = undefined;
+            this.data = undefined;
+        }
+    };
+    LocalSelectionTransfer.prototype.getData = function (proto) {
+        if (this.hasData(proto)) {
+            return this.data;
+        }
+        return undefined;
+    };
+    LocalSelectionTransfer.prototype.setData = function (data, proto) {
+        if (proto) {
+            this.data = data;
+            this.proto = proto;
+        }
+    };
+    LocalSelectionTransfer.INSTANCE = new LocalSelectionTransfer();
+    return LocalSelectionTransfer;
+}());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/dnd/droptarget.js":
+/*!***********************************************!*\
+  !*** ../splitview/dist/es6/dnd/droptarget.js ***!
+  \***********************************************/
+/*! namespace exports */
+/*! export Droptarget [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Position [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Position": () => /* binding */ Position,
+/* harmony export */   "Droptarget": () => /* binding */ Droptarget
+/* harmony export */ });
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dom */ "../splitview/dist/es6/dom.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _dataTransfer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./dataTransfer */ "../splitview/dist/es6/dnd/dataTransfer.js");
+
+
+
+var Position;
+(function (Position) {
+    Position["Top"] = "Top";
+    Position["Left"] = "Left";
+    Position["Bottom"] = "Bottom";
+    Position["Right"] = "Right";
+    Position["Center"] = "Center";
+})(Position || (Position = {}));
+var Droptarget = /** @class */ (function () {
+    function Droptarget(element, options) {
+        var _this = this;
+        this.element = element;
+        this.options = options;
+        this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
+        this.onDidChange = this._onDidChange.event;
+        this.onDragEnter = function (event) {
+            if (!_this.options.enableExternalDragEvents &&
+                !_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.DataTransferSingleton.has(_this.options.id)) {
+                console.debug('[droptarget] invalid event');
+                return;
+            }
+            if (_this.options.isDisabled()) {
+                return;
+            }
+            event.preventDefault();
+            if (!_this.target) {
+                console.debug('[droptarget] created');
+                _this.target = document.createElement('div');
+                _this.target.className = 'drop-target-dropzone';
+                _this.overlay = document.createElement('div');
+                _this.overlay.className = 'drop-target-selection';
+                //
+                _this.target.addEventListener('dragover', _this.onDragOver);
+                _this.target.addEventListener('dragleave', _this.onDragLeave);
+                _this.target.addEventListener('drop', _this.onDrop);
+                _this.target.appendChild(_this.overlay);
+                _this.element.classList.add('drop-target');
+                _this.element.append(_this.target);
+            }
+        };
+        this.onDrop = function (event) {
+            if (!_this.options.enableExternalDragEvents &&
+                !_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.DataTransferSingleton.has(_this.options.id)) {
+                console.debug('[dragtarget] invalid');
+                return;
+            }
+            var state = _this._state;
+            console.debug('[dragtarget] drop');
+            _this.removeDropTarget();
+            if (event.defaultPrevented) {
+                console.debug('[dragtarget] defaultPrevented');
+            }
+            else if (state) {
+                _this._onDidChange.fire({ position: state, event: event });
+            }
+        };
+        this.onDragOver = function (event) {
+            event.preventDefault();
+            if (!_this.options.isDirectional) {
+                return;
+            }
+            if (!_this.target || !_this.overlay) {
+                return;
+            }
+            var width = _this.target.clientWidth;
+            var height = _this.target.clientHeight;
+            if (width === 0 || height === 0) {
+                return; // avoid div!0
+            }
+            var x = event.offsetX;
+            var y = event.offsetY;
+            var xp = (100 * x) / width;
+            var yp = (100 * y) / height;
+            var isRight = xp > 80;
+            var isLeft = xp < 20;
+            var isTop = !isRight && !isLeft && yp < 20;
+            var isBottom = !isRight && !isLeft && yp > 80;
+            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(_this.overlay, 'right', isRight);
+            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(_this.overlay, 'left', isLeft);
+            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(_this.overlay, 'top', isTop);
+            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(_this.overlay, 'bottom', isBottom);
+            if (isRight) {
+                _this._state = Position.Right;
+            }
+            else if (isLeft) {
+                _this._state = Position.Left;
+            }
+            else if (isTop) {
+                _this._state = Position.Top;
+            }
+            else if (isBottom) {
+                _this._state = Position.Bottom;
+            }
+            else {
+                _this._state = Position.Center;
+            }
+        };
+        this.onDragLeave = function (event) {
+            console.debug('[droptarget] leave');
+            _this.removeDropTarget();
+        };
+        this.element.addEventListener('dragenter', this.onDragEnter);
+    }
+    Object.defineProperty(Droptarget.prototype, "state", {
+        get: function () {
+            return this._state;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Droptarget.prototype.dispose = function () {
+        this._onDidChange.dispose();
+        this.removeDropTarget();
+        this.element.removeEventListener('dragenter', this.onDragEnter);
+    };
+    Droptarget.prototype.removeDropTarget = function () {
+        if (this.target) {
+            this._state = undefined;
+            this.target.removeEventListener('dragover', this.onDragOver);
+            this.target.removeEventListener('dragleave', this.onDragLeave);
+            this.target.removeEventListener('drop', this.onDrop);
+            this.element.removeChild(this.target);
+            this.target = undefined;
+            this.element.classList.remove('drop-target');
+        }
+    };
+    return Droptarget;
+}());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/dockview/components/debug/debug.js":
+/*!****************************************************************!*\
+  !*** ../splitview/dist/es6/dockview/components/debug/debug.js ***!
+  \****************************************************************/
+/*! namespace exports */
+/*! export DebugWidget [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DebugWidget": () => /* binding */ DebugWidget
+/* harmony export */ });
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+var DebugWidget = /** @class */ (function (_super) {
+    __extends(DebugWidget, _super);
+    function DebugWidget(layout) {
+        var _this = _super.call(this) || this;
+        _this.layout = layout;
+        var container = document.getElementById('layout-debug-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'layout-debug-container';
+            container.className = 'layout-debug-container';
+            document.body.appendChild(container);
+        }
+        _this._element = document.createElement('div');
+        _this._element.innerHTML =
+            "<div class='layout-debug-widget'>" +
+                "<div class='layout-debug-widget-row'><span>Groups:</span><span id='group-count'>0</span></div>" +
+                "<div class='layout-debug-widget-row'><span>Panels:</span><span id='panel-count'>0</span></div>" +
+                "</div>";
+        container.appendChild(_this._element);
+        var gc = _this._element.querySelector('#group-count');
+        var pc = _this._element.querySelector('#panel-count');
+        var events = [
+            "PANEL_CREATED" /* PANEL_CREATED */,
+            "PANEL_DESTROYED" /* PANEL_DESTROYED */,
+            "ADD_GROUP" /* ADD_GROUP */,
+            "REMOVE_GROUP" /* REMOVE_GROUP */,
+        ];
+        _this.addDisposables(_this.layout.onGridEvent(function (event) {
+            if (events.includes(event.kind)) {
+                if (gc) {
+                    gc.textContent = _this.layout.size.toString();
+                }
+                if (pc) {
+                    pc.textContent = _this.layout.totalPanels.toString();
+                }
+            }
+        }));
+        return _this;
+    }
+    DebugWidget.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+        this._element.remove();
+        var container = document.getElementById('layout-debug-container');
+        if (container && container.children.length === 0) {
+            container.remove();
+        }
+    };
+    return DebugWidget;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/dockview/components/tab/defaultTab.js":
+/*!*******************************************************************!*\
+  !*** ../splitview/dist/es6/dockview/components/tab/defaultTab.js ***!
+  \*******************************************************************/
+/*! namespace exports */
+/*! export DefaultTab [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DefaultTab": () => /* binding */ DefaultTab
+/* harmony export */ });
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../dom */ "../splitview/dist/es6/dom.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+
+
+var DefaultTab = /** @class */ (function (_super) {
+    __extends(DefaultTab, _super);
+    function DefaultTab() {
+        var _this = _super.call(this) || this;
+        _this._isPanelVisible = false;
+        _this._isGroupActive = false;
+        //
+        _this.params = {};
+        //
+        _this.isDirtyDisposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_0__.MutableDisposable();
+        _this._element = document.createElement('div');
+        _this._element.className = 'default-tab';
+        //
+        _this._content = document.createElement('div');
+        _this._content.className = 'tab-content';
+        //
+        _this._actionContainer = document.createElement('div');
+        _this._actionContainer.className = 'action-container';
+        //
+        _this._list = document.createElement('ul');
+        _this._list.className = 'tab-list';
+        //
+        _this.action = document.createElement('a');
+        _this.action.className = 'tab-action';
+        //
+        _this._element.appendChild(_this._content);
+        _this._element.appendChild(_this._actionContainer);
+        _this._actionContainer.appendChild(_this._list);
+        _this._list.appendChild(_this.action);
+        //
+        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this._actionContainer, 'mousedown', function (ev) {
+            ev.preventDefault();
+        }));
+        _this.render();
+        return _this;
+    }
+    Object.defineProperty(DefaultTab.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(DefaultTab.prototype, "id", {
+        get: function () {
+            return '__DEFAULT_TAB__';
+        },
+        enumerable: false,
+        configurable: true
+    });
+    DefaultTab.prototype.update = function (event) {
+        this.params = __assign(__assign({}, this.params), event.params);
+        this.render();
+    };
+    DefaultTab.prototype.toJSON = function () {
+        return { id: this.id };
+    };
+    DefaultTab.prototype.focus = function () {
+        //noop
+    };
+    DefaultTab.prototype.init = function (params) {
+        var _this = this;
+        this.params = params;
+        this._content.textContent = params.title;
+        this.isDirtyDisposable.value = this.params.api.onDidDirtyChange(function (event) {
+            var isDirty = event;
+            (0,_dom__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(_this.action, 'dirty', isDirty);
+        });
+        if (!this.params.suppressClosable) {
+            (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.action, 'click', function (ev) {
+                ev.preventDefault(); //
+                _this.params.api.close();
+            });
+        }
+        else {
+            this.action.classList.add('disable-close');
+        }
+    };
+    DefaultTab.prototype.updateParentGroup = function (group, isPanelVisible) {
+        this._isPanelVisible = isPanelVisible;
+        this._isGroupActive = group.isActive;
+        this.render();
+    };
+    DefaultTab.prototype.layout = function (width, height) {
+        // noop
+    };
+    DefaultTab.prototype.render = function () {
+        this._content.textContent = this.params.title;
+    };
+    return DefaultTab;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/dockview/components/watermark/watermark.js":
+/*!************************************************************************!*\
+  !*** ../splitview/dist/es6/dockview/components/watermark/watermark.js ***!
+  \************************************************************************/
+/*! namespace exports */
+/*! export Watermark [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Watermark": () => /* binding */ Watermark
+/* harmony export */ });
+/* harmony import */ var _actionbar_actionsContainer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../actionbar/actionsContainer */ "../splitview/dist/es6/actionbar/actionsContainer.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../dom */ "../splitview/dist/es6/dom.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+
+
+var Watermark = /** @class */ (function (_super) {
+    __extends(Watermark, _super);
+    function Watermark() {
+        var _this = _super.call(this) || this;
+        _this._element = document.createElement('div');
+        _this._element.className = 'watermark';
+        var title = document.createElement('div');
+        title.className = 'watermark-title';
+        var emptySpace = document.createElement('span');
+        emptySpace.style.flexGrow = '1';
+        var content = document.createElement('div');
+        content.className = 'watermark-content';
+        _this._element.appendChild(title);
+        _this._element.appendChild(content);
+        var actions = new _actionbar_actionsContainer__WEBPACK_IMPORTED_MODULE_0__.ActionContainer();
+        title.appendChild(emptySpace);
+        title.appendChild(actions.element);
+        var closeAnchor = document.createElement('a');
+        closeAnchor.className = 'close-action';
+        actions.add(closeAnchor);
+        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(closeAnchor, 'click', function (ev) {
+            ev.preventDefault();
+            _this.params.containerApi.removeGroup(_this.group);
+        }));
+        return _this;
+    }
+    Object.defineProperty(Watermark.prototype, "id", {
+        get: function () {
+            return 'watermark';
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Watermark.prototype.layout = function (width, height) {
+        // noop
+    };
+    Watermark.prototype.init = function (params) {
+        var _this = this;
+        this.params = params;
+        this.addDisposables(this.params.containerApi.onDidLayoutChange(function (event) {
+            _this.render();
+        }));
+        this.render();
+    };
+    Watermark.prototype.updateParentGroup = function (group, visible) {
+        this.group = group;
+        this.render();
+    };
+    Object.defineProperty(Watermark.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Watermark.prototype.render = function () {
+        var isOneGroup = this.params.containerApi.size <= 1;
+        (0,_dom__WEBPACK_IMPORTED_MODULE_2__.toggleClass)(this.element, 'has-actions', isOneGroup);
+    };
+    Watermark.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+    };
+    return Watermark;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/dockview/deserializer.js":
+/*!******************************************************!*\
+  !*** ../splitview/dist/es6/dockview/deserializer.js ***!
+  \******************************************************/
+/*! namespace exports */
+/*! export DefaultDeserializer [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DefaultDeserializer": () => /* binding */ DefaultDeserializer
+/* harmony export */ });
+var __values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+var DefaultDeserializer = /** @class */ (function () {
+    function DefaultDeserializer(layout, panelDeserializer) {
+        this.layout = layout;
+        this.panelDeserializer = panelDeserializer;
+    }
+    DefaultDeserializer.prototype.fromJSON = function (node) {
+        var e_1, _a;
+        var children = node.data.views;
+        var active = node.data.activeView;
+        var panels = [];
+        try {
+            for (var children_1 = __values(children), children_1_1 = children_1.next(); !children_1_1.done; children_1_1 = children_1.next()) {
+                var child = children_1_1.value;
+                var panel = this.panelDeserializer.createPanel(child);
+                panels.push(panel);
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (children_1_1 && !children_1_1.done && (_a = children_1.return)) _a.call(children_1);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        var group = this.layout.createGroup({
+            panels: panels,
+            activePanel: panels.find(function (p) { return p.id === active; }),
+            id: node.data.id,
+        });
+        return group;
+    };
+    return DefaultDeserializer;
+}());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/dockview/dockviewComponent.js":
+/*!***********************************************************!*\
+  !*** ../splitview/dist/es6/dockview/dockviewComponent.js ***!
+  \***********************************************************/
+/*! namespace exports */
+/*! export DockviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DockviewComponent": () => /* binding */ DockviewComponent
+/* harmony export */ });
+/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../gridview/gridview */ "../splitview/dist/es6/gridview/gridview.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
+/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../array */ "../splitview/dist/es6/array.js");
+/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../groupview/groupview */ "../splitview/dist/es6/groupview/groupview.js");
+/* harmony import */ var _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../groupview/groupviewPanel */ "../splitview/dist/es6/groupview/groupviewPanel.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _components_watermark_watermark__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/watermark/watermark */ "../splitview/dist/es6/dockview/components/watermark/watermark.js");
+/* harmony import */ var _async__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../async */ "../splitview/dist/es6/async.js");
+/* harmony import */ var _components_debug_debug__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/debug/debug */ "../splitview/dist/es6/dockview/components/debug/debug.js");
+/* harmony import */ var _functions__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../functions */ "../splitview/dist/es6/functions.js");
+/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../math */ "../splitview/dist/es6/math.js");
+/* harmony import */ var _deserializer__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./deserializer */ "../splitview/dist/es6/dockview/deserializer.js");
+/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
+/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../dnd/dataTransfer */ "../splitview/dist/es6/dnd/dataTransfer.js");
+/* harmony import */ var _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../gridview/baseComponentGridview */ "../splitview/dist/es6/gridview/baseComponentGridview.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
+/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../groupview/tab */ "../splitview/dist/es6/groupview/tab.js");
+/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
+/* harmony import */ var _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./components/tab/defaultTab */ "../splitview/dist/es6/dockview/components/tab/defaultTab.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var __values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var nextGroupId = (0,_math__WEBPACK_IMPORTED_MODULE_11__.sequentialNumberGenerator)();
+var DockviewComponent = /** @class */ (function (_super) {
+    __extends(DockviewComponent, _super);
+    function DockviewComponent(element, options) {
+        var _this = _super.call(this, element, {
+            proportionalLayout: true,
+            orientation: options.orientation || _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_18__.Orientation.HORIZONTAL,
+            styles: options.styles,
+        }) || this;
+        _this.options = options;
+        _this.panels = new Map();
+        _this.dirtyPanels = new Set();
+        _this.debouncedDeque = (0,_functions__WEBPACK_IMPORTED_MODULE_10__.debounce)(_this.syncConfigs.bind(_this), 5000);
+        // events
+        _this._onTabInteractionEvent = new _events__WEBPACK_IMPORTED_MODULE_6__.Emitter();
+        _this.onTabInteractionEvent = _this
+            ._onTabInteractionEvent.event;
+        _this._onTabContextMenu = new _events__WEBPACK_IMPORTED_MODULE_6__.Emitter();
+        _this.onTabContextMenu = _this
+            ._onTabContextMenu.event;
+        // everything else
+        _this.drag = new _lifecycle__WEBPACK_IMPORTED_MODULE_5__.MutableDisposable();
+        _this.panelState = {};
+        _this.registry = new Map();
+        _this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_6__.Emitter();
+        _this.onDidLayoutChange = _this._onDidLayoutChange.event;
+        _this.addDisposables((function () {
+            /**
+             * TODO Fix this relatively ugly 'merge and delay'
+             */
+            var timer;
+            return _this.onGridEvent(function (event) {
+                if ([
+                    "ADD_GROUP" /* ADD_GROUP */,
+                    "REMOVE_GROUP" /* REMOVE_GROUP */,
+                    "ADD_PANEL" /* ADD_PANEL */,
+                    "REMOVE_GROUP" /* REMOVE_GROUP */,
+                    "GROUP_ACTIVE" /* GROUP_ACTIVE */,
+                    "PANEL_ACTIVE" /* PANEL_ACTIVE */,
+                    "LAYOUT" /* LAYOUT */,
+                ].includes(event.kind)) {
+                    if (timer) {
+                        clearTimeout(timer);
+                    }
+                    timer = setTimeout(function () {
+                        _this._onDidLayoutChange.fire();
+                        clearTimeout(timer);
+                    });
+                }
+            });
+        })());
+        if (!_this.options.components) {
+            _this.options.components = {};
+        }
+        if (!_this.options.frameworkComponents) {
+            _this.options.frameworkComponents = {};
+        }
+        if (!_this.options.frameworkTabComponents) {
+            _this.options.frameworkTabComponents = {};
+        }
+        if (!_this.options.tabComponents) {
+            _this.options.tabComponents = {};
+        }
+        if (!_this.options.watermarkComponent &&
+            !_this.options.watermarkFrameworkComponent) {
+            _this.options.watermarkComponent = _components_watermark_watermark__WEBPACK_IMPORTED_MODULE_7__.Watermark;
+        }
+        _this._api = new _api_component_api__WEBPACK_IMPORTED_MODULE_16__.DockviewApi(_this);
+        _this.updateContainer();
+        return _this;
+    }
+    DockviewComponent.prototype.addDndHandle = function (type, cb) {
+        this.registry.set(type, cb);
+    };
+    Object.defineProperty(DockviewComponent.prototype, "totalPanels", {
+        get: function () {
+            return this.panels.size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(DockviewComponent.prototype, "deserializer", {
+        get: function () {
+            return this._deserializer;
+        },
+        set: function (value) {
+            this._deserializer = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    DockviewComponent.prototype.focus = function () {
+        var _a;
+        (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.focus();
+    };
+    DockviewComponent.prototype.getGroupPanel = function (id) {
+        var _a;
+        return (_a = this.panels.get(id)) === null || _a === void 0 ? void 0 : _a.value;
+    };
+    DockviewComponent.prototype.createDragTarget = function (target, options) {
+        var _this = this;
+        var disposables = new _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposable((0,_events__WEBPACK_IMPORTED_MODULE_6__.addDisposableListener)(target.element, 'dragstart', function (event) {
+            var _a;
+            if (!event.dataTransfer) {
+                throw new Error('unsupported');
+            }
+            var panelOptions = typeof options === 'function' ? options() : options;
+            var panel = (_a = _this.panels.get(panelOptions.id)) === null || _a === void 0 ? void 0 : _a.value;
+            if (panel) {
+                _this.drag.value = panel.group.startActiveDrag(panel);
+            }
+            var data = JSON.stringify(__assign({ type: _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_14__.DragType.EXTERNAL }, panelOptions));
+            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_14__.DataTransferSingleton.setData(_this.id, data);
+            event.dataTransfer.effectAllowed = 'move';
+            var dragImage = document.createElement('div');
+            dragImage.textContent = target.content;
+            dragImage.classList.add('custom-dragging');
+            document.body.appendChild(dragImage);
+            event.dataTransfer.setDragImage(dragImage, event.offsetX, event.offsetY);
+            setTimeout(function () { return document.body.removeChild(dragImage); }, 0);
+            event.dataTransfer.setData(_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_14__.DATA_KEY, data);
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_6__.addDisposableListener)(this.element, 'dragend', function (ev) {
+            // drop events fire before dragend so we can remove this safely
+            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_14__.DataTransferSingleton.removeData(_this.id);
+            _this.drag.dispose();
+        }));
+        return disposables;
+    };
+    DockviewComponent.prototype.setActivePanel = function (panel) {
+        this.doSetGroupActive(panel.group);
+        panel.group.openPanel(panel);
+    };
+    DockviewComponent.prototype.moveToNext = function (options) {
+        var _a;
+        if (options === void 0) { options = {}; }
+        if (!options.group) {
+            if (!this.activeGroup) {
+                return;
+            }
+            options.group = this.activeGroup;
+        }
+        if (options.includePanel && options.group) {
+            if (options.group.activePanel !==
+                options.group.panels[options.group.panels.length - 1]) {
+                options.group.moveToNext({ suppressRoll: true });
+                return;
+            }
+        }
+        var location = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(options.group.element);
+        var next = (_a = this.gridview.next(location)) === null || _a === void 0 ? void 0 : _a.view;
+        this.doSetGroupActive(next);
+    };
+    DockviewComponent.prototype.moveToPrevious = function (options) {
+        var _a;
+        if (options === void 0) { options = {}; }
+        if (!options.group) {
+            if (!this.activeGroup) {
+                return;
+            }
+            options.group = this.activeGroup;
+        }
+        if (options.includePanel && options.group) {
+            if (options.group.activePanel !== options.group.panels[0]) {
+                options.group.moveToPrevious({ suppressRoll: true });
+                return;
+            }
+        }
+        var location = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(options.group.element);
+        var next = (_a = this.gridview.previous(location)) === null || _a === void 0 ? void 0 : _a.view;
+        this.doSetGroupActive(next);
+    };
+    DockviewComponent.prototype.registerPanel = function (panel) {
+        var _this = this;
+        if (this.panels.has(panel.id)) {
+            throw new Error("panel " + panel.id + " already exists");
+        }
+        var disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposable(panel.onDidStateChange(function () { return _this.addDirtyPanel(panel); }));
+        this.panels.set(panel.id, { value: panel, disposable: disposable });
+        this._onGridEvent.fire({ kind: "PANEL_CREATED" /* PANEL_CREATED */ });
+    };
+    DockviewComponent.prototype.unregisterPanel = function (panel) {
+        if (!this.panels.has(panel.id)) {
+            throw new Error("panel " + panel.id + " doesn't exist");
+        }
+        var item = this.panels.get(panel.id);
+        if (item) {
+            item.disposable.dispose();
+            item.value.dispose();
+        }
+        this.panels.delete(panel.id);
+        this._onGridEvent.fire({ kind: "PANEL_DESTROYED" /* PANEL_DESTROYED */ });
+    };
+    /**
+     * Serialize the current state of the layout
+     *
+     * @returns A JSON respresentation of the layout
+     */
+    DockviewComponent.prototype.toJSON = function () {
+        var _this = this;
+        var _a;
+        this.syncConfigs();
+        var data = this.gridview.serialize();
+        // const state = { ...this.panelState };
+        var panels = Array.from(this.panels.values()).reduce(function (collection, panel) {
+            if (!_this.panelState[panel.value.id]) {
+                collection[panel.value.id] = panel.value.toJSON();
+            }
+            return collection;
+        }, {});
+        return {
+            grid: data,
+            panels: panels,
+            activeGroup: (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.id,
+            options: { tabHeight: this.getTabHeight() },
+        };
+    };
+    /**
+     * Ensure the local copy of the layout state is up-to-date
+     */
+    DockviewComponent.prototype.syncConfigs = function () {
+        var _this = this;
+        var dirtyPanels = Array.from(this.dirtyPanels);
+        if (dirtyPanels.length === 0) {
+            console.debug('[layout#syncConfigs] no dirty panels');
+        }
+        this.dirtyPanels.clear();
+        var partialPanelState = dirtyPanels
+            .map(function (panel) { return _this.panels.get(panel.id); })
+            .filter(function (_) { return !!_; })
+            .reduce(function (collection, panel) {
+            collection[panel.value.id] = panel.value.toJSON();
+            return collection;
+        }, {});
+        this.panelState = __assign(__assign({}, this.panelState), partialPanelState);
+        dirtyPanels
+            .filter(function (p) { return _this.panels.has(p.id); })
+            .forEach(function (panel) {
+            panel.setDirty(false);
+            _this._onGridEvent.fire({
+                kind: "PANEL_CLEAN" /* PANEL_CLEAN */,
+            });
+        });
+        this._onGridEvent.fire({
+            kind: "LAYOUT_CONFIG_UPDATED" /* LAYOUT_CONFIG_UPDATED */,
+        });
+    };
+    DockviewComponent.prototype.fromJSON = function (data) {
+        var _this = this;
+        this.gridview.clear();
+        this.panels.forEach(function (panel) {
+            panel.disposable.dispose();
+            panel.value.dispose();
+        });
+        this.panels.clear();
+        this.groups.clear();
+        if (!this.deserializer) {
+            throw new Error('invalid deserializer');
+        }
+        var grid = data.grid, panels = data.panels, options = data.options, activeGroup = data.activeGroup;
+        if (typeof (options === null || options === void 0 ? void 0 : options.tabHeight) === 'number') {
+            this.setTabHeight(options.tabHeight);
+        }
+        this.gridview.deserialize(grid, new _deserializer__WEBPACK_IMPORTED_MODULE_12__.DefaultDeserializer(this, {
+            createPanel: function (id) {
+                var panelData = panels[id];
+                var panel = _this.deserializer.fromJSON(panelData);
+                _this.registerPanel(panel);
+                return panel;
+            },
+        }));
+        if (typeof activeGroup === 'string') {
+            this.doSetGroupActive(this.getPanel(activeGroup));
+        }
+        this.gridview.layout(this.width, this.height);
+        this._onGridEvent.fire({ kind: "NEW_LAYOUT" /* NEW_LAYOUT */ });
+    };
+    DockviewComponent.prototype.closeAllGroups = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, _b, entry, _c, key, group, didCloseAll, e_1_1;
+            var e_1, _d;
+            return __generator(this, function (_e) {
+                switch (_e.label) {
+                    case 0:
+                        _e.trys.push([0, 6, 7, 8]);
+                        _a = __values(this.groups.entries()), _b = _a.next();
+                        _e.label = 1;
+                    case 1:
+                        if (!!_b.done) return [3 /*break*/, 5];
+                        entry = _b.value;
+                        _c = __read(entry, 2), key = _c[0], group = _c[1];
+                        return [4 /*yield*/, group.value.closeAllPanels()];
+                    case 2:
+                        didCloseAll = _e.sent();
+                        if (!didCloseAll) {
+                            return [2 /*return*/, false];
+                        }
+                        return [4 /*yield*/, (0,_async__WEBPACK_IMPORTED_MODULE_8__.timeoutAsPromise)(0)];
+                    case 3:
+                        _e.sent();
+                        _e.label = 4;
+                    case 4:
+                        _b = _a.next();
+                        return [3 /*break*/, 1];
+                    case 5: return [3 /*break*/, 8];
+                    case 6:
+                        e_1_1 = _e.sent();
+                        e_1 = { error: e_1_1 };
+                        return [3 /*break*/, 8];
+                    case 7:
+                        try {
+                            if (_b && !_b.done && (_d = _a.return)) _d.call(_a);
+                        }
+                        finally { if (e_1) throw e_1.error; }
+                        return [7 /*endfinally*/];
+                    case 8: return [2 /*return*/, true];
+                }
+            });
+        });
+    };
+    DockviewComponent.prototype.setTabHeight = function (height) {
+        this.options.tabHeight = height;
+        this.groups.forEach(function (value) {
+            value.value.tabHeight = height;
+        });
+    };
+    DockviewComponent.prototype.getTabHeight = function () {
+        return this.options.tabHeight;
+    };
+    DockviewComponent.prototype.fireMouseEvent = function (event) {
+        switch (event.kind) {
+            case _groupview_tab__WEBPACK_IMPORTED_MODULE_17__.MouseEventKind.CONTEXT_MENU:
+                if (event.tab && event.panel) {
+                    this._onTabContextMenu.fire({
+                        event: event.event,
+                        api: this._api,
+                        panel: event.panel,
+                    });
+                }
+                break;
+        }
+    };
+    DockviewComponent.prototype.addPanel = function (options) {
+        var _a, _b;
+        var panel = this._addPanel(options);
+        var referenceGroup;
+        if ((_a = options.position) === null || _a === void 0 ? void 0 : _a.referencePanel) {
+            var referencePanel = this.getGroupPanel(options.position.referencePanel);
+            referenceGroup = this.findGroup(referencePanel);
+        }
+        else {
+            referenceGroup = this.activeGroup;
+        }
+        if (referenceGroup) {
+            var target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_15__.toTarget)(((_b = options.position) === null || _b === void 0 ? void 0 : _b.direction) || 'within');
+            if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
+                referenceGroup.openPanel(panel);
+            }
+            else {
+                var location_1 = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+                var relativeLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_1, target);
+                this.addPanelToNewGroup(panel, relativeLocation);
+            }
+        }
+        else {
+            this.addPanelToNewGroup(panel);
+        }
+        return panel;
+    };
+    DockviewComponent.prototype._addPanel = function (options) {
+        var contentPart = this.createContentComponent(options.id, options.component);
+        var headerPart = this.createTabComponent(options.id, options.tabComponent);
+        var panel = new _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_4__.GroupviewPanel(options.id, this._api);
+        panel.init({
+            headerPart: headerPart,
+            contentPart: contentPart,
+            title: options.title || options.id,
+            suppressClosable: options === null || options === void 0 ? void 0 : options.suppressClosable,
+            params: (options === null || options === void 0 ? void 0 : options.params) || {},
+        });
+        this.registerPanel(panel);
+        return panel;
+    };
+    DockviewComponent.prototype.createWatermarkComponent = function () {
+        var _a;
+        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_13__.createComponent)('watermark-id', 'watermark-name', this.options.watermarkComponent
+            ? { 'watermark-name': this.options.watermarkComponent }
+            : {}, this.options.watermarkFrameworkComponent
+            ? { 'watermark-name': this.options.watermarkFrameworkComponent }
+            : {}, (_a = this.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.watermark);
+    };
+    DockviewComponent.prototype.createContentComponent = function (id, componentName) {
+        var _a;
+        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_13__.createComponent)(id, componentName, this.options.components, this.options.frameworkComponents, (_a = this.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.content);
+    };
+    DockviewComponent.prototype.createTabComponent = function (id, componentName) {
+        var _a;
+        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_13__.createComponent)(id, componentName, this.options.tabComponents, this.options.frameworkTabComponents, (_a = this.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.tab, function () { return new _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_19__.DefaultTab(); });
+    };
+    DockviewComponent.prototype.addEmptyGroup = function (options) {
+        var _a;
+        var group = this.createGroup();
+        if (options) {
+            var referencePanel = (_a = this.panels.get(options.referencePanel)) === null || _a === void 0 ? void 0 : _a.value;
+            var referenceGroup = this.findGroup(referencePanel);
+            var target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_15__.toTarget)(options.direction);
+            var location_2 = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+            var relativeLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_2, target);
+            this.doAddGroup(group, relativeLocation);
+        }
+        else {
+            this.doAddGroup(group);
+        }
+    };
+    DockviewComponent.prototype.removeGroup = function (group) {
+        if (this.groups.size === 1) {
+            group.panels.forEach(function (panel) { return group.removePanel(panel); });
+            this._activeGroup = group;
+            return;
+        }
+        _super.prototype.removeGroup.call(this, group);
+    };
+    DockviewComponent.prototype.addPanelToNewGroup = function (panel, location) {
+        if (location === void 0) { location = [0]; }
+        var group;
+        if (this.groups.size === 1 &&
+            Array.from(this.groups.values())[0].value.size === 0) {
+            group = Array.from(this.groups.values())[0].value;
+        }
+        else {
+            group = this.createGroup();
+            this.doAddGroup(group, location);
+        }
+        group.openPanel(panel);
+    };
+    DockviewComponent.prototype.moveGroupOrPanel = function (referenceGroup, groupId, itemId, target, index) {
+        var _a;
+        var sourceGroup = groupId
+            ? (_a = this.groups.get(groupId)) === null || _a === void 0 ? void 0 : _a.value : undefined;
+        if (!target || target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
+            var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.removePanel(itemId)) ||
+                this.panels.get(itemId).value;
+            if ((sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.size) === 0) {
+                this.doRemoveGroup(sourceGroup);
+            }
+            referenceGroup.openPanel(groupItem, index);
+            return;
+        }
+        else {
+            var referenceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+            var targetLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
+            if (sourceGroup && sourceGroup.size < 2) {
+                var _b = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(targetLocation), 2), targetParentLocation = _b[0], to = _b[1];
+                var sourceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(sourceGroup.element);
+                var _c = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(sourceLocation), 2), sourceParentLocation = _c[0], from = _c[1];
+                if ((0,_array__WEBPACK_IMPORTED_MODULE_2__.sequenceEquals)(sourceParentLocation, targetParentLocation)) {
+                    // special case when 'swapping' two views within same grid location
+                    // if a group has one tab - we are essentially moving the 'group'
+                    // which is equivalent to swapping two views in this case
+                    this.gridview.moveView(sourceParentLocation, from, to);
+                }
+                else {
+                    // source group will become empty so delete the group
+                    var targetGroup = this.doRemoveGroup(sourceGroup, {
+                        skipActive: true,
+                        skipDispose: true,
+                    });
+                    // after deleting the group we need to re-evaulate the ref location
+                    var updatedReferenceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+                    var location_3 = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, updatedReferenceLocation, target);
+                    this.doAddGroup(targetGroup, location_3);
+                }
+            }
+            else {
+                var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.removePanel(itemId)) ||
+                    this.panels.get(itemId).value;
+                var dropLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
+                this.addPanelToNewGroup(groupItem, dropLocation);
+            }
+        }
+    };
+    DockviewComponent.prototype.createGroup = function (options) {
+        var _this = this;
+        if (!options) {
+            options = {};
+        }
+        if (typeof options.tabHeight !== 'number') {
+            options.tabHeight = this.getTabHeight();
+        }
+        var id = options === null || options === void 0 ? void 0 : options.id;
+        if (id && this.groups.has(options.id)) {
+            console.warn("Duplicate group id " + options.id + ". reassigning group id to avoid errors");
+            id = undefined;
+            // throw new Error(`duplicate group ${options.id}`);
+        }
+        if (!id) {
+            id = nextGroupId.next();
+            while (this.groups.has(id)) {
+                id = nextGroupId.next();
+            }
+        }
+        var group = new _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.Groupview(this, id, options);
+        if (typeof this.options.tabHeight === 'number') {
+            group.tabHeight = this.options.tabHeight;
+        }
+        if (!this.groups.has(group.id)) {
+            var disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposable(group.onMove(function (event) {
+                var groupId = event.groupId, itemId = event.itemId, target = event.target, index = event.index;
+                _this.moveGroupOrPanel(group, groupId, itemId, target, index);
+            }), group.onDidGroupChange(function (event) {
+                _this._onGridEvent.fire(event);
+            }), group.onDrop(function (event) {
+                var _a;
+                var dragEvent = event.event;
+                var dataTransfer = dragEvent.dataTransfer;
+                if (dataTransfer.types.length === 0) {
+                    return;
+                }
+                var cb = _this.registry.get(dataTransfer.types[0]);
+                if (!cb) {
+                    return;
+                }
+                var panelOptions = cb({ event: event });
+                var panel = _this.getGroupPanel(panelOptions.id);
+                if (!panel) {
+                    panel = _this._addPanel(panelOptions);
+                }
+                _this.moveGroupOrPanel(group, (_a = panel === null || panel === void 0 ? void 0 : panel.group) === null || _a === void 0 ? void 0 : _a.id, panel.id, event.target, event.index);
+            }));
+            this.groups.set(group.id, { value: group, disposable: disposable });
+        }
+        return group;
+    };
+    DockviewComponent.prototype.findGroup = function (panel) {
+        return Array.from(this.groups.values()).find(function (group) {
+            return group.value.containsPanel(panel);
+        }).value;
+    };
+    DockviewComponent.prototype.addDirtyPanel = function (panel) {
+        this.dirtyPanels.add(panel);
+        panel.setDirty(true);
+        this._onGridEvent.fire({ kind: "PANEL_DIRTY" /* PANEL_DIRTY */ });
+        this.debouncedDeque();
+    };
+    DockviewComponent.prototype.dispose = function () {
+        var _a;
+        _super.prototype.dispose.call(this);
+        (_a = this.debugContainer) === null || _a === void 0 ? void 0 : _a.dispose();
+        this._onGridEvent.dispose();
+    };
+    DockviewComponent.prototype.updateContainer = function () {
+        if (this.options.debug) {
+            if (!this.debugContainer) {
+                this.debugContainer = new _components_debug_debug__WEBPACK_IMPORTED_MODULE_9__.DebugWidget(this);
+            }
+            else {
+                this.debugContainer.dispose();
+                this.debugContainer = undefined;
+            }
+        }
+    };
+    return DockviewComponent;
+}(_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_15__.BaseGrid));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/dockview/options.js":
+/*!*************************************************!*\
+  !*** ../splitview/dist/es6/dockview/options.js ***!
+  \*************************************************/
+/*! namespace exports */
+/*! exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/dom.js":
+/*!************************************!*\
+  !*** ../splitview/dist/es6/dom.js ***!
+  \************************************/
+/*! namespace exports */
+/*! export addClasses [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export isAncestor [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export isHTMLElement [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export isInTree [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export removeClasses [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export toggleClass [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export trackFocus [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "isHTMLElement": () => /* binding */ isHTMLElement,
+/* harmony export */   "isInTree": () => /* binding */ isInTree,
+/* harmony export */   "removeClasses": () => /* binding */ removeClasses,
+/* harmony export */   "addClasses": () => /* binding */ addClasses,
+/* harmony export */   "toggleClass": () => /* binding */ toggleClass,
+/* harmony export */   "isAncestor": () => /* binding */ isAncestor,
+/* harmony export */   "trackFocus": () => /* binding */ trackFocus
+/* harmony export */ });
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lifecycle */ "../splitview/dist/es6/lifecycle.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+
+
+function isHTMLElement(o) {
+    if (typeof HTMLElement === 'object') {
+        return o instanceof HTMLElement;
+    }
+    return (o &&
+        typeof o === 'object' &&
+        o.nodeType === 1 &&
+        typeof o.nodeName === 'string');
+}
+var isInTree = function (element, className) {
+    var _element = element;
+    while (_element) {
+        if (_element.classList.contains(className)) {
+            return true;
+        }
+        _element = _element.parentElement;
+    }
+    return false;
+};
+var removeClasses = function (element) {
+    var e_1, _a;
+    var classes = [];
+    for (var _i = 1; _i < arguments.length; _i++) {
+        classes[_i - 1] = arguments[_i];
+    }
+    try {
+        for (var classes_1 = __values(classes), classes_1_1 = classes_1.next(); !classes_1_1.done; classes_1_1 = classes_1.next()) {
+            var classname = classes_1_1.value;
+            if (element.classList.contains(classname)) {
+                element.classList.remove(classname);
+            }
+        }
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (classes_1_1 && !classes_1_1.done && (_a = classes_1.return)) _a.call(classes_1);
+        }
+        finally { if (e_1) throw e_1.error; }
+    }
+};
+var addClasses = function (element) {
+    var e_2, _a;
+    var classes = [];
+    for (var _i = 1; _i < arguments.length; _i++) {
+        classes[_i - 1] = arguments[_i];
+    }
+    try {
+        for (var classes_2 = __values(classes), classes_2_1 = classes_2.next(); !classes_2_1.done; classes_2_1 = classes_2.next()) {
+            var classname = classes_2_1.value;
+            if (!element.classList.contains(classname)) {
+                element.classList.add(classname);
+            }
+        }
+    }
+    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+    finally {
+        try {
+            if (classes_2_1 && !classes_2_1.done && (_a = classes_2.return)) _a.call(classes_2);
+        }
+        finally { if (e_2) throw e_2.error; }
+    }
+};
+var toggleClass = function (element, className, isToggled) {
+    var hasClass = element.classList.contains(className);
+    if (isToggled && !hasClass) {
+        element.classList.add(className);
+    }
+    if (!isToggled && hasClass) {
+        element.classList.remove(className);
+    }
+};
+function isAncestor(testChild, testAncestor) {
+    while (testChild) {
+        if (testChild === testAncestor) {
+            return true;
+        }
+        testChild = testChild.parentNode;
+    }
+    return false;
+}
+function trackFocus(element) {
+    return new FocusTracker(element);
+}
+/**
+ * Track focus on an element. Ensure tabIndex is set when an HTMLElement is not focusable by default
+ */
+var FocusTracker = /** @class */ (function (_super) {
+    __extends(FocusTracker, _super);
+    function FocusTracker(element) {
+        var _this = _super.call(this) || this;
+        _this._onDidFocus = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onDidFocus = _this._onDidFocus.event;
+        _this._onDidBlur = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onDidBlur = _this._onDidBlur.event;
+        var hasFocus = isAncestor(document.activeElement, element);
+        var loosingFocus = false;
+        var onFocus = function () {
+            loosingFocus = false;
+            if (!hasFocus) {
+                hasFocus = true;
+                _this._onDidFocus.fire();
+            }
+        };
+        var onBlur = function () {
+            if (hasFocus) {
+                loosingFocus = true;
+                window.setTimeout(function () {
+                    if (loosingFocus) {
+                        loosingFocus = false;
+                        hasFocus = false;
+                        _this._onDidBlur.fire();
+                    }
+                }, 0);
+            }
+        };
+        _this._refreshStateHandler = function () {
+            var currentNodeHasFocus = isAncestor(document.activeElement, element);
+            if (currentNodeHasFocus !== hasFocus) {
+                if (hasFocus) {
+                    onBlur();
+                }
+                else {
+                    onFocus();
+                }
+            }
+        };
+        if (element instanceof HTMLElement) {
+            _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(element, 'focus', onFocus, true));
+            _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(element, 'blur', onBlur, true));
+        }
+        else {
+            _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableWindowListener)(element, 'focus', onFocus, true));
+            _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableWindowListener)(element, 'blur', onBlur, true));
+        }
+        return _this;
+    }
+    FocusTracker.prototype.refreshState = function () {
+        this._refreshStateHandler();
+    };
+    FocusTracker.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+        this._onDidBlur.dispose();
+        this._onDidFocus.dispose();
+    };
+    return FocusTracker;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable));
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/events.js":
+/*!***************************************!*\
+  !*** ../splitview/dist/es6/events.js ***!
+  \***************************************/
+/*! namespace exports */
+/*! export Emitter [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Event [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export addDisposableListener [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export addDisposableWindowListener [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Event": () => /* binding */ Event,
+/* harmony export */   "Emitter": () => /* binding */ Emitter,
+/* harmony export */   "addDisposableWindowListener": () => /* binding */ addDisposableWindowListener,
+/* harmony export */   "addDisposableListener": () => /* binding */ addDisposableListener
+/* harmony export */ });
+var Event;
+(function (Event) {
+    Event.any = function () {
+        var children = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            children[_i] = arguments[_i];
+        }
+        return function (listener) {
+            var disposables = children.map(function (child) { return child(listener); });
+            return {
+                dispose: function () {
+                    disposables.forEach(function (d) {
+                        d.dispose();
+                    });
+                },
+            };
+        };
+    };
+})(Event || (Event = {}));
+// dumb event emitter with better typings than nodes event emitter
+// https://github.com/microsoft/vscode/blob/master/src/vs/base/common/event.ts
+var Emitter = /** @class */ (function () {
+    function Emitter(options) {
+        this.options = options;
+        this._listeners = [];
+        this._disposed = false;
+    }
+    Object.defineProperty(Emitter.prototype, "event", {
+        get: function () {
+            var _this = this;
+            if (!this._event) {
+                this._event = function (listener) {
+                    var _a;
+                    if (((_a = _this.options) === null || _a === void 0 ? void 0 : _a.replay) && _this._last !== undefined) {
+                        listener(_this._last);
+                    }
+                    var firstListener = _this._listeners.length === 0;
+                    _this._listeners.push(listener);
+                    return {
+                        dispose: function () {
+                            var index = _this._listeners.indexOf(listener);
+                            if (index > -1) {
+                                _this._listeners.splice(index, 1);
+                            }
+                        },
+                    };
+                };
+            }
+            return this._event;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Emitter.prototype.fire = function (e) {
+        this._last = e;
+        this._listeners.forEach(function (listener) {
+            listener(e);
+        });
+    };
+    Emitter.prototype.dispose = function () {
+        this._listeners = [];
+        this._disposed = true;
+    };
+    return Emitter;
+}());
+
+function addDisposableWindowListener(element, type, listener, options) {
+    element.addEventListener(type, listener, options);
+    return {
+        dispose: function () {
+            element.removeEventListener(type, listener);
+        },
+    };
+}
+function addDisposableListener(element, type, listener, options) {
+    element.addEventListener(type, listener, options);
+    return {
+        dispose: function () {
+            element.removeEventListener(type, listener);
+        },
+    };
+}
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/focusedElement.js":
+/*!***********************************************!*\
+  !*** ../splitview/dist/es6/focusedElement.js ***!
+  \***********************************************/
+/*! namespace exports */
+/*! export focusedElement [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "focusedElement": () => /* binding */ focusedElement
+/* harmony export */ });
+var focusedElement = { element: null };
+//TODO somebody could call .stopPropagation() on this - can you do this at the event capture-stage instead?
+window.addEventListener('focusin', function () {
+    focusedElement.element = document.activeElement;
+});
+focusedElement.element = document.activeElement;
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/functions.js":
+/*!******************************************!*\
+  !*** ../splitview/dist/es6/functions.js ***!
+  \******************************************/
+/*! namespace exports */
+/*! export debounce [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "debounce": () => /* binding */ debounce
+/* harmony export */ });
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (undefined && undefined.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
+function debounce(cb, wait) {
+    var timeout;
+    var callable = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        clearTimeout(timeout);
+        timeout = setTimeout(function () { return cb.apply(void 0, __spread(args)); }, wait);
+    };
+    return callable;
+}
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/gridview/baseComponentGridview.js":
+/*!***************************************************************!*\
+  !*** ../splitview/dist/es6/gridview/baseComponentGridview.js ***!
+  \***************************************************************/
+/*! namespace exports */
+/*! export BaseGrid [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export toTarget [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "toTarget": () => /* binding */ toTarget,
+/* harmony export */   "BaseGrid": () => /* binding */ BaseGrid
+/* harmony export */ });
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _gridview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./gridview */ "../splitview/dist/es6/gridview/gridview.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../math */ "../splitview/dist/es6/math.js");
+/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+
+
+
+
+var nextLayoutId = (0,_math__WEBPACK_IMPORTED_MODULE_4__.sequentialNumberGenerator)();
+function toTarget(direction) {
+    switch (direction) {
+        case 'left':
+            return _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Left;
+        case 'right':
+            return _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Right;
+        case 'above':
+            return _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Top;
+        case 'below':
+            return _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Bottom;
+        case 'within':
+        default:
+            return _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Center;
+    }
+}
+var BaseGrid = /** @class */ (function (_super) {
+    __extends(BaseGrid, _super);
+    function BaseGrid(_element, options) {
+        var _this = _super.call(this) || this;
+        _this._element = _element;
+        _this._id = nextLayoutId.next();
+        _this.groups = new Map();
+        //
+        _this._onGridEvent = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onGridEvent = _this._onGridEvent.event;
+        _this.gridview = new _gridview__WEBPACK_IMPORTED_MODULE_1__.Gridview(!!options.proportionalLayout, options.styles, options.orientation);
+        _this.element.appendChild(_this.gridview.element);
+        // TODO for some reason this is required before anything will layout correctly
+        _this.layout(0, 0, true);
+        _this.addDisposables(_this.gridview.onDidChange(function () {
+            _this._onGridEvent.fire({ kind: "LAYOUT" /* LAYOUT */ });
+        }));
+        return _this;
+    }
+    Object.defineProperty(BaseGrid.prototype, "id", {
+        get: function () {
+            return this._id;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BaseGrid.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BaseGrid.prototype, "size", {
+        get: function () {
+            return this.groups.size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BaseGrid.prototype, "width", {
+        get: function () {
+            return this.gridview.width;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BaseGrid.prototype, "height", {
+        get: function () {
+            return this.gridview.height;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BaseGrid.prototype, "minimumHeight", {
+        get: function () {
+            return this.gridview.minimumHeight;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BaseGrid.prototype, "maximumHeight", {
+        get: function () {
+            return this.gridview.maximumHeight;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BaseGrid.prototype, "minimumWidth", {
+        get: function () {
+            return this.gridview.minimumWidth;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BaseGrid.prototype, "maximumWidth", {
+        get: function () {
+            return this.gridview.maximumWidth;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BaseGrid.prototype, "activeGroup", {
+        get: function () {
+            return this._activeGroup;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    BaseGrid.prototype.setVisible = function (panel, visible) {
+        this.gridview.setViewVisible((0,_gridview__WEBPACK_IMPORTED_MODULE_1__.getGridLocation)(panel.element), visible);
+        this._onGridEvent.fire({ kind: "LAYOUT" /* LAYOUT */ });
+    };
+    BaseGrid.prototype.isVisible = function (panel) {
+        return this.gridview.isViewVisible((0,_gridview__WEBPACK_IMPORTED_MODULE_1__.getGridLocation)(panel.element));
+    };
+    BaseGrid.prototype.doAddGroup = function (group, location, size) {
+        if (location === void 0) { location = [0]; }
+        this.gridview.addView(group, size !== null && size !== void 0 ? size : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__.Sizing.Distribute, location);
+        this.doSetGroupActive(group);
+        this._onGridEvent.fire({ kind: "ADD_GROUP" /* ADD_GROUP */ });
+    };
+    BaseGrid.prototype.doRemoveGroup = function (group, options) {
+        if (!this.groups.has(group.id)) {
+            throw new Error('invalid operation');
+        }
+        var item = this.groups.get(group.id);
+        if (item && !(options === null || options === void 0 ? void 0 : options.skipDispose)) {
+            item.disposable.dispose();
+            this.groups.delete(group.id);
+        }
+        var view = this.gridview.remove(group, _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__.Sizing.Distribute);
+        if (!(options === null || options === void 0 ? void 0 : options.skipActive) && this.groups.size > 0) {
+            this.doSetGroupActive(Array.from(this.groups.values())[0].value);
+        }
+        this._onGridEvent.fire({ kind: "REMOVE_GROUP" /* REMOVE_GROUP */ });
+        return view;
+    };
+    BaseGrid.prototype.getPanel = function (id) {
+        var _a;
+        return (_a = this.groups.get(id)) === null || _a === void 0 ? void 0 : _a.value;
+    };
+    BaseGrid.prototype.doSetGroupActive = function (group, skipFocus) {
+        if (this._activeGroup === group) {
+            return;
+        }
+        if (this._activeGroup) {
+            this._activeGroup.setActive(false, skipFocus);
+        }
+        group.setActive(true, skipFocus);
+        this._activeGroup = group;
+    };
+    BaseGrid.prototype.removeGroup = function (group) {
+        if (group === this._activeGroup) {
+            this._activeGroup = undefined;
+        }
+        this.doRemoveGroup(group);
+    };
+    BaseGrid.prototype.moveToNext = function (options) {
+        var _a;
+        if (!options) {
+            options = {};
+        }
+        if (!options.group) {
+            if (!this.activeGroup) {
+                return;
+            }
+            options.group = this.activeGroup;
+        }
+        var location = (0,_gridview__WEBPACK_IMPORTED_MODULE_1__.getGridLocation)(options.group.element);
+        var next = (_a = this.gridview.next(location)) === null || _a === void 0 ? void 0 : _a.view;
+        this.doSetGroupActive(next);
+    };
+    BaseGrid.prototype.moveToPrevious = function (options) {
+        var _a;
+        if (!options) {
+            options = {};
+        }
+        if (!options.group) {
+            if (!this.activeGroup) {
+                return;
+            }
+            options.group = this.activeGroup;
+        }
+        var location = (0,_gridview__WEBPACK_IMPORTED_MODULE_1__.getGridLocation)(options.group.element);
+        var next = (_a = this.gridview.previous(location)) === null || _a === void 0 ? void 0 : _a.view;
+        this.doSetGroupActive(next);
+    };
+    BaseGrid.prototype.layout = function (width, height, forceResize) {
+        var different = forceResize || width !== this.width || height !== this.height;
+        if (!different) {
+            return;
+        }
+        this.element.style.height = height + "px";
+        this.element.style.width = width + "px";
+        this.gridview.layout(width, height);
+    };
+    BaseGrid.prototype.setAutoResizeToFit = function (enabled) {
+        var _this = this;
+        if (this.resizeTimer) {
+            clearInterval(this.resizeTimer);
+        }
+        if (enabled) {
+            this.resizeTimer = setInterval(function () {
+                _this.resizeToFit();
+            }, 500);
+        }
+    };
+    /**
+     * Resize the layout to fit the parent container
+     */
+    BaseGrid.prototype.resizeToFit = function () {
+        if (!this.element.parentElement) {
+            return;
+        }
+        var _a = this.element.parentElement.getBoundingClientRect(), width = _a.width, height = _a.height;
+        this.layout(width, height);
+    };
+    BaseGrid.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+        if (this.resizeTimer) {
+            clearInterval(this.resizeTimer);
+            this.resizeTimer = undefined;
+        }
+        this._onGridEvent.dispose();
+        this.gridview.dispose();
+    };
+    return BaseGrid;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/gridview/basePanelView.js":
+/*!*******************************************************!*\
+  !*** ../splitview/dist/es6/gridview/basePanelView.js ***!
+  \*******************************************************/
+/*! namespace exports */
+/*! export BasePanelView [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "BasePanelView": () => /* binding */ BasePanelView
+/* harmony export */ });
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dom */ "../splitview/dist/es6/dom.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+
+var BasePanelView = /** @class */ (function (_super) {
+    __extends(BasePanelView, _super);
+    function BasePanelView(id, component, api) {
+        var _this = _super.call(this) || this;
+        _this.id = id;
+        _this.component = component;
+        _this.api = api;
+        _this._height = 0;
+        _this._width = 0;
+        _this._element = document.createElement('div');
+        _this._element.tabIndex = -1;
+        _this._element.style.outline = 'none';
+        _this._element.style.height = '100%';
+        _this._element.style.width = '100%';
+        _this._element.style.overflow = 'hidden';
+        var _a = (0,_dom__WEBPACK_IMPORTED_MODULE_0__.trackFocus)(_this._element), onDidFocus = _a.onDidFocus, onDidBlur = _a.onDidBlur;
+        _this.addDisposables(_this.api, onDidFocus(function () {
+            _this.api._onDidChangeFocus.fire({ isFocused: true });
+        }), onDidBlur(function () {
+            _this.api._onDidChangeFocus.fire({ isFocused: false });
+        }));
+        return _this;
+    }
+    Object.defineProperty(BasePanelView.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BasePanelView.prototype, "width", {
+        get: function () {
+            return this._width;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BasePanelView.prototype, "height", {
+        get: function () {
+            return this._height;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    BasePanelView.prototype.focus = function () {
+        this.api._onFocusEvent.fire();
+    };
+    BasePanelView.prototype.layout = function (width, height) {
+        var _a;
+        this._width = width;
+        this._height = height;
+        this.api._onDidPanelDimensionChange.fire({ width: width, height: height });
+        (_a = this.part) === null || _a === void 0 ? void 0 : _a.update(this.params.params);
+    };
+    BasePanelView.prototype.init = function (parameters) {
+        this.params = parameters;
+        this.part = this.getComponent();
+    };
+    BasePanelView.prototype.setVisible = function (isVisible) {
+        this.api._onDidVisibilityChange.fire({ isVisible: isVisible });
+    };
+    BasePanelView.prototype.setActive = function (isActive) {
+        this.api._onDidActiveChange.fire({ isActive: isActive });
+    };
+    BasePanelView.prototype.update = function (params) {
+        var _a;
+        this.params = __assign(__assign({}, this.params), { params: params.params });
+        (_a = this.part) === null || _a === void 0 ? void 0 : _a.update(this.params.params);
+    };
+    BasePanelView.prototype.toJSON = function () {
+        var _a;
+        var state = this.api.getState();
+        return {
+            id: this.id,
+            component: this.component,
+            params: ((_a = this.params) === null || _a === void 0 ? void 0 : _a.params) ? Object.keys(this.params.params).length > 0
+                ? this.params.params
+                : undefined
+                : undefined,
+            state: Object.keys(state).length === 0 ? undefined : state,
+        };
+    };
+    BasePanelView.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+        this.api.dispose();
+    };
+    return BasePanelView;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/gridview/branchNode.js":
+/*!****************************************************!*\
+  !*** ../splitview/dist/es6/gridview/branchNode.js ***!
+  \****************************************************/
+/*! namespace exports */
+/*! export BranchNode [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "BranchNode": () => /* binding */ BranchNode
+/* harmony export */ });
+/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _leafNode__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./leafNode */ "../splitview/dist/es6/gridview/leafNode.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (undefined && undefined.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
+var __values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+
+
+
+
+var BranchNode = /** @class */ (function (_super) {
+    __extends(BranchNode, _super);
+    function BranchNode(orientation, proportionalLayout, styles, size, orthogonalSize, childDescriptors) {
+        if (size === void 0) { size = 0; }
+        var _this = _super.call(this) || this;
+        _this.orientation = orientation;
+        _this.proportionalLayout = proportionalLayout;
+        _this.styles = styles;
+        _this.children = [];
+        _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
+        _this.onDidChange = _this._onDidChange.event;
+        _this._childrenDisposable = _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Disposable.NONE;
+        _this._orthogonalSize = orthogonalSize;
+        _this._size = size;
+        _this.element = document.createElement('div');
+        _this.element.className = 'branch-node';
+        if (!childDescriptors) {
+            _this.splitview = new _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Splitview(_this.element, {
+                orientation: _this.orientation,
+                proportionalLayout: proportionalLayout,
+                styles: styles,
+            });
+            _this.splitview.layout(_this.size, _this.orthogonalSize);
+        }
+        else {
+            var descriptor = {
+                views: childDescriptors.map(function (childDescriptor) {
+                    return {
+                        view: childDescriptor.node,
+                        size: childDescriptor.node.size,
+                        visible: childDescriptor.node instanceof _leafNode__WEBPACK_IMPORTED_MODULE_2__.LeafNode &&
+                            childDescriptor.visible !== undefined
+                            ? childDescriptor.visible
+                            : true,
+                    };
+                }),
+                size: _this.orthogonalSize,
+            };
+            _this.children = childDescriptors.map(function (c) { return c.node; });
+            _this.splitview = new _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Splitview(_this.element, {
+                orientation: _this.orientation,
+                descriptor: descriptor,
+                proportionalLayout: proportionalLayout,
+            });
+        }
+        _this.addDisposables(_this.splitview.onDidSashEnd(function () {
+            _this._onDidChange.fire(undefined);
+        }));
+        _this.setupChildrenEvents();
+        return _this;
+    }
+    Object.defineProperty(BranchNode.prototype, "width", {
+        get: function () {
+            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
+                ? this.size
+                : this.orthogonalSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BranchNode.prototype, "height", {
+        get: function () {
+            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
+                ? this.orthogonalSize
+                : this.size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BranchNode.prototype, "minimumSize", {
+        get: function () {
+            return this.children.length === 0
+                ? 0
+                : Math.max.apply(Math, __spread(this.children.map(function (c) { return c.minimumOrthogonalSize; })));
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BranchNode.prototype, "maximumSize", {
+        get: function () {
+            return Math.min.apply(Math, __spread(this.children.map(function (c) { return c.maximumOrthogonalSize; })));
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BranchNode.prototype, "minimumOrthogonalSize", {
+        get: function () {
+            return this.splitview.minimumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BranchNode.prototype, "maximumOrthogonalSize", {
+        get: function () {
+            return this.splitview.maximumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BranchNode.prototype, "orthogonalSize", {
+        get: function () {
+            return this._orthogonalSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BranchNode.prototype, "size", {
+        get: function () {
+            return this._size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BranchNode.prototype, "minimumWidth", {
+        get: function () {
+            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
+                ? this.minimumOrthogonalSize
+                : this.minimumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BranchNode.prototype, "minimumHeight", {
+        get: function () {
+            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
+                ? this.minimumSize
+                : this.minimumOrthogonalSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BranchNode.prototype, "maximumWidth", {
+        get: function () {
+            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
+                ? this.maximumOrthogonalSize
+                : this.maximumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BranchNode.prototype, "maximumHeight", {
+        get: function () {
+            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
+                ? this.maximumSize
+                : this.maximumOrthogonalSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BranchNode.prototype, "priority", {
+        get: function () {
+            if (this.children.length === 0) {
+                return _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority.Normal;
+            }
+            var priorities = this.children.map(function (c) {
+                return typeof c.priority === 'undefined'
+                    ? _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority.Normal
+                    : c.priority;
+            });
+            if (priorities.some(function (p) { return p === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority.High; })) {
+                return _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority.High;
+            }
+            else if (priorities.some(function (p) { return p === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority.Low; })) {
+                return _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority.Low;
+            }
+            return _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority.Normal;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    BranchNode.prototype.setVisible = function (visible) {
+        var e_1, _a;
+        try {
+            for (var _b = __values(this.children), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var child = _c.value;
+                child.setVisible(visible);
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+    };
+    BranchNode.prototype.isChildVisible = function (index) {
+        if (index < 0 || index >= this.children.length) {
+            throw new Error('Invalid index');
+        }
+        return this.splitview.isViewVisible(index);
+    };
+    BranchNode.prototype.setChildVisible = function (index, visible) {
+        if (index < 0 || index >= this.children.length) {
+            throw new Error('Invalid index');
+        }
+        if (this.splitview.isViewVisible(index) === visible) {
+            return;
+        }
+        this.splitview.setViewVisible(index, visible);
+    };
+    BranchNode.prototype.moveChild = function (from, to) {
+        if (from === to) {
+            return;
+        }
+        if (from < 0 || from >= this.children.length) {
+            throw new Error('Invalid from index');
+        }
+        if (from < to) {
+            to--;
+        }
+        this.splitview.moveView(from, to);
+        var child = this._removeChild(from);
+        this._addChild(child, to);
+    };
+    BranchNode.prototype.getChildSize = function (index) {
+        if (index < 0 || index >= this.children.length) {
+            throw new Error('Invalid index');
+        }
+        return this.splitview.getViewSize(index);
+    };
+    BranchNode.prototype.resizeChild = function (index, size) {
+        if (index < 0 || index >= this.children.length) {
+            throw new Error('Invalid index');
+        }
+        this.splitview.resizeView(index, size);
+    };
+    BranchNode.prototype.layout = function (size, orthogonalSize) {
+        this._size = orthogonalSize;
+        this._orthogonalSize = size;
+        this.splitview.layout(this.size, this.orthogonalSize);
+    };
+    BranchNode.prototype.addChild = function (node, size, index, skipLayout) {
+        if (index < 0 || index > this.children.length) {
+            throw new Error('Invalid index');
+        }
+        this.splitview.addView(node, size, index, skipLayout);
+        this._addChild(node, index);
+    };
+    BranchNode.prototype.getChildCachedVisibleSize = function (index) {
+        if (index < 0 || index >= this.children.length) {
+            throw new Error('Invalid index');
+        }
+        return this.splitview.getViewCachedVisibleSize(index);
+    };
+    BranchNode.prototype.removeChild = function (index, sizing) {
+        if (index < 0 || index >= this.children.length) {
+            throw new Error('Invalid index');
+        }
+        this.splitview.removeView(index, sizing);
+        this._removeChild(index);
+    };
+    BranchNode.prototype._addChild = function (node, index) {
+        this.children.splice(index, 0, node);
+        this.setupChildrenEvents();
+    };
+    BranchNode.prototype._removeChild = function (index) {
+        var _a = __read(this.children.splice(index, 1), 1), child = _a[0];
+        this.setupChildrenEvents();
+        return child;
+    };
+    BranchNode.prototype.setupChildrenEvents = function () {
+        var _this = this;
+        this._childrenDisposable.dispose();
+        this._childrenDisposable = _events__WEBPACK_IMPORTED_MODULE_1__.Event.any.apply(_events__WEBPACK_IMPORTED_MODULE_1__.Event, __spread(this.children.map(function (c) { return c.onDidChange; })))(function (e) {
+            /**
+             * indicate a change has occured to allows any re-rendering but don't bubble
+             * event because that was specific to this branch
+             */
+            _this._onDidChange.fire(undefined);
+        });
+    };
+    BranchNode.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+        this._childrenDisposable.dispose();
+        this.children.forEach(function (child) { return child.dispose(); });
+        this.splitview.dispose();
+    };
+    return BranchNode;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/gridview/gridview.js":
+/*!**************************************************!*\
+  !*** ../splitview/dist/es6/gridview/gridview.js ***!
+  \**************************************************/
+/*! namespace exports */
+/*! export Gridview [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export getDirectionOrientation [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export getGridLocation [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export getLocationOrientation [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export getRelativeLocation [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export indexInParent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export isGridBranchNode [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export orthogonal [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "indexInParent": () => /* binding */ indexInParent,
+/* harmony export */   "getGridLocation": () => /* binding */ getGridLocation,
+/* harmony export */   "getRelativeLocation": () => /* binding */ getRelativeLocation,
+/* harmony export */   "getDirectionOrientation": () => /* binding */ getDirectionOrientation,
+/* harmony export */   "getLocationOrientation": () => /* binding */ getLocationOrientation,
+/* harmony export */   "orthogonal": () => /* binding */ orthogonal,
+/* harmony export */   "isGridBranchNode": () => /* binding */ isGridBranchNode,
+/* harmony export */   "Gridview": () => /* binding */ Gridview
+/* harmony export */ });
+/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
+/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../array */ "../splitview/dist/es6/array.js");
+/* harmony import */ var _leafNode__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./leafNode */ "../splitview/dist/es6/gridview/leafNode.js");
+/* harmony import */ var _branchNode__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./branchNode */ "../splitview/dist/es6/gridview/branchNode.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (undefined && undefined.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
+
+
+
+
+
+
+
+function flipNode(node, size, orthogonalSize) {
+    if (node instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode) {
+        var result = new _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode(orthogonal(node.orientation), node.proportionalLayout, node.styles, size, orthogonalSize);
+        var totalSize = 0;
+        for (var i = node.children.length - 1; i >= 0; i--) {
+            var child = node.children[i];
+            var childSize = child instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode ? child.orthogonalSize : child.size;
+            var newSize = node.size === 0
+                ? 0
+                : Math.round((size * childSize) / node.size);
+            totalSize += newSize;
+            // The last view to add should adjust to rounding errors
+            if (i === 0) {
+                newSize += size - totalSize;
+            }
+            result.addChild(flipNode(child, orthogonalSize, newSize), newSize, 0, true);
+        }
+        return result;
+    }
+    else {
+        return new _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode(node.view, orthogonal(node.orientation), orthogonalSize);
+    }
+}
+function indexInParent(element) {
+    var parentElement = element.parentElement;
+    if (!parentElement) {
+        throw new Error('Invalid grid element');
+    }
+    var el = parentElement.firstElementChild;
+    var index = 0;
+    while (el !== element && el !== parentElement.lastElementChild && el) {
+        el = el.nextElementSibling;
+        index++;
+    }
+    return index;
+}
+/**
+ * Find the grid location of a specific DOM element by traversing the parent
+ * chain and finding each child index on the way.
+ *
+ * This will break as soon as DOM structures of the Splitview or Gridview change.
+ */
+function getGridLocation(element) {
+    var parentElement = element.parentElement;
+    if (!parentElement) {
+        throw new Error('Invalid grid element');
+    }
+    if (/\bgrid-view\b/.test(parentElement.className)) {
+        return [];
+    }
+    var index = indexInParent(parentElement);
+    var ancestor = parentElement.parentElement.parentElement.parentElement;
+    return __spread(getGridLocation(ancestor), [index]);
+}
+function getRelativeLocation(rootOrientation, location, direction) {
+    var orientation = getLocationOrientation(rootOrientation, location);
+    var directionOrientation = getDirectionOrientation(direction);
+    if (orientation === directionOrientation) {
+        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(location), 2), rest = _a[0], _index = _a[1];
+        var index = _index;
+        if (direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Right || direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Bottom) {
+            index += 1;
+        }
+        return __spread(rest, [index]);
+    }
+    else {
+        var index = direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Right || direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Bottom
+            ? 1
+            : 0;
+        return __spread(location, [index]);
+    }
+}
+function getDirectionOrientation(direction) {
+    return direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Top || direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Bottom
+        ? _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.VERTICAL
+        : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL;
+}
+function getLocationOrientation(rootOrientation, location) {
+    return location.length % 2 === 0
+        ? orthogonal(rootOrientation)
+        : rootOrientation;
+}
+var orthogonal = function (orientation) {
+    return orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
+        ? _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.VERTICAL
+        : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL;
+};
+function isGridBranchNode(node) {
+    return !!node.children;
+}
+var serializeBranchNode = function (node, orientation) {
+    var size = orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.VERTICAL ? node.box.width : node.box.height;
+    if (!isGridBranchNode(node)) {
+        if (typeof node.cachedVisibleSize === 'number') {
+            return {
+                type: 'leaf',
+                data: node.view.toJSON(),
+                size: node.cachedVisibleSize,
+                visible: false,
+            };
+        }
+        return { type: 'leaf', data: node.view.toJSON(), size: size };
+    }
+    return {
+        type: 'branch',
+        data: node.children.map(function (c) {
+            return serializeBranchNode(c, orthogonal(orientation));
+        }),
+        size: size,
+    };
+};
+var Gridview = /** @class */ (function () {
+    function Gridview(proportionalLayout, styles, orientation) {
+        this.proportionalLayout = proportionalLayout;
+        this.styles = styles;
+        this.disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_6__.MutableDisposable();
+        this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
+        this.onDidChange = this._onDidChange.event;
+        this.element = document.createElement('div');
+        this.element.className = 'grid-view';
+        this.root = new _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode(orientation, proportionalLayout, styles, 0, 0);
+    }
+    Gridview.prototype.serialize = function () {
+        return {
+            root: serializeBranchNode(this.getView(), this.orientation),
+            height: this.height,
+            width: this.width,
+            orientation: this.orientation,
+        };
+    };
+    Gridview.prototype.dispose = function () {
+        this._onDidChange.dispose();
+        this.root.dispose();
+    };
+    Gridview.prototype.clear = function () {
+        var orientation = this.root.orientation;
+        this.root = new _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode(orientation, this.proportionalLayout, this.styles, this.root.size, this.root.orthogonalSize);
+    };
+    Gridview.prototype.deserialize = function (json, deserializer) {
+        var orientation = json.orientation;
+        var height = json.height;
+        this.orientation = orientation;
+        this._deserialize(json.root, orientation, deserializer, height);
+    };
+    Gridview.prototype._deserialize = function (root, orientation, deserializer, orthogonalSize) {
+        this.root = this._deserializeNode(root, orientation, deserializer, orthogonalSize);
+    };
+    Gridview.prototype._deserializeNode = function (node, orientation, deserializer, orthogonalSize) {
+        var _this = this;
+        var result;
+        if (node.type === 'branch') {
+            var serializedChildren = node.data;
+            var children = serializedChildren.map(function (serializedChild) {
+                return {
+                    node: _this._deserializeNode(serializedChild, orthogonal(orientation), deserializer, node.size),
+                    visible: serializedChild.visible,
+                };
+            });
+            result = new _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode(orientation, this.proportionalLayout, this.styles, node.size, orthogonalSize, children);
+        }
+        else {
+            result = new _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode(deserializer.fromJSON(node), orientation, orthogonalSize, node.size);
+        }
+        return result;
+    };
+    Object.defineProperty(Gridview.prototype, "orientation", {
+        get: function () {
+            return this.root.orientation;
+        },
+        set: function (orientation) {
+            if (this._root.orientation === orientation) {
+                return;
+            }
+            var _a = this._root, size = _a.size, orthogonalSize = _a.orthogonalSize;
+            this.root = flipNode(this._root, orthogonalSize, size);
+            this.root.layout(size, orthogonalSize);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Gridview.prototype, "root", {
+        get: function () {
+            return this._root;
+        },
+        set: function (root) {
+            var _this = this;
+            var oldRoot = this._root;
+            if (oldRoot) {
+                oldRoot.dispose();
+                this.element.removeChild(oldRoot.element);
+            }
+            this._root = root;
+            this.element.appendChild(this._root.element);
+            this.disposable.value = this._root.onDidChange(function (e) {
+                _this._onDidChange.fire(e);
+            });
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Gridview.prototype.next = function (location) {
+        return this.progmaticSelect(location);
+    };
+    Gridview.prototype.previous = function (location) {
+        return this.progmaticSelect(location, true);
+    };
+    Gridview.prototype.getView = function (location) {
+        var node = location ? this.getNode(location)[1] : this._root;
+        return this._getViews(node, this.orientation);
+    };
+    Gridview.prototype._getViews = function (node, orientation, cachedVisibleSize) {
+        var box = { height: node.height, width: node.width };
+        if (node instanceof _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode) {
+            return { box: box, view: node.view, cachedVisibleSize: cachedVisibleSize };
+        }
+        var children = [];
+        for (var i = 0; i < node.children.length; i++) {
+            var child = node.children[i];
+            var cachedVisibleSize_1 = node.getChildCachedVisibleSize(i);
+            children.push(this._getViews(child, orthogonal(orientation), cachedVisibleSize_1));
+        }
+        return { box: box, children: children };
+    };
+    Gridview.prototype.progmaticSelect = function (location, reverse) {
+        if (reverse === void 0) { reverse = false; }
+        var _a = __read(this.getNode(location), 2), path = _a[0], node = _a[1];
+        if (!(node instanceof _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode)) {
+            throw new Error('invalid location');
+        }
+        var findLeaf = function (node, last) {
+            if (node instanceof _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode) {
+                return node;
+            }
+            if (node instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode) {
+                return findLeaf(node.children[last ? node.children.length - 1 : 0], last);
+            }
+            throw new Error('invalid node');
+        };
+        for (var i = path.length - 1; i > -1; i--) {
+            var n = path[i];
+            var l = location[i] || 0;
+            var canProgressInCurrentLevel = reverse
+                ? l - 1 > -1
+                : l + 1 < n.children.length;
+            if (canProgressInCurrentLevel) {
+                return findLeaf(n.children[reverse ? l - 1 : l + 1], reverse);
+            }
+        }
+        return findLeaf(this.root, reverse);
+    };
+    Object.defineProperty(Gridview.prototype, "width", {
+        get: function () {
+            return this.root.width;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Gridview.prototype, "height", {
+        get: function () {
+            return this.root.height;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Gridview.prototype, "minimumWidth", {
+        get: function () {
+            return this.root.minimumWidth;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Gridview.prototype, "minimumHeight", {
+        get: function () {
+            return this.root.minimumHeight;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Gridview.prototype, "maximumWidth", {
+        get: function () {
+            return this.root.maximumHeight;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Gridview.prototype, "maximumHeight", {
+        get: function () {
+            return this.root.maximumHeight;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Gridview.prototype.isViewVisible = function (location) {
+        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(location), 2), rest = _a[0], index = _a[1];
+        var _b = __read(this.getNode(rest), 2), parent = _b[1];
+        if (!(parent instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode)) {
+            throw new Error('Invalid from location');
+        }
+        return parent.isChildVisible(index);
+    };
+    Gridview.prototype.setViewVisible = function (location, visible) {
+        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(location), 2), rest = _a[0], index = _a[1];
+        var _b = __read(this.getNode(rest), 2), parent = _b[1];
+        if (!(parent instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode)) {
+            throw new Error('Invalid from location');
+        }
+        parent.setChildVisible(index, visible);
+    };
+    Gridview.prototype.moveView = function (parentLocation, from, to) {
+        var _a = __read(this.getNode(parentLocation), 2), parent = _a[1];
+        if (!(parent instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode)) {
+            throw new Error('Invalid location');
+        }
+        parent.moveChild(from, to);
+    };
+    Gridview.prototype.addView = function (view, size, location) {
+        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(location), 2), rest = _a[0], index = _a[1];
+        var _b = __read(this.getNode(rest), 2), pathToParent = _b[0], parent = _b[1];
+        if (parent instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode) {
+            var node = new _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode(view, orthogonal(parent.orientation), parent.orthogonalSize);
+            parent.addChild(node, size, index);
+        }
+        else {
+            var _c = __read(__spread(pathToParent).reverse()), grandParent = _c[0], _ = _c.slice(1);
+            var _d = __read(__spread(rest).reverse()), parentIndex = _d[0], __ = _d.slice(1);
+            var newSiblingSize = 0;
+            var newSiblingCachedVisibleSize = grandParent.getChildCachedVisibleSize(parentIndex);
+            if (typeof newSiblingCachedVisibleSize === 'number') {
+                newSiblingSize = _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Sizing.Invisible(newSiblingCachedVisibleSize);
+            }
+            grandParent.removeChild(parentIndex);
+            var newParent = new _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode(parent.orientation, this.proportionalLayout, this.styles, parent.size, parent.orthogonalSize);
+            grandParent.addChild(newParent, parent.size, parentIndex);
+            var newSibling = new _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode(parent.view, grandParent.orientation, parent.size);
+            newParent.addChild(newSibling, newSiblingSize, 0);
+            if (typeof size !== 'number' && size.type === 'split') {
+                size = { type: 'split', index: 0 };
+            }
+            var node = new _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode(view, grandParent.orientation, parent.size);
+            newParent.addChild(node, size, index);
+        }
+    };
+    Gridview.prototype.remove = function (view, sizing) {
+        var location = getGridLocation(view.element);
+        return this.removeView(location, sizing);
+    };
+    Gridview.prototype.removeView = function (location, sizing) {
+        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(location), 2), rest = _a[0], index = _a[1];
+        var _b = __read(this.getNode(rest), 2), pathToParent = _b[0], parent = _b[1];
+        if (!(parent instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode)) {
+            throw new Error('Invalid location');
+        }
+        var node = parent.children[index];
+        if (!(node instanceof _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode)) {
+            throw new Error('Invalid location');
+        }
+        parent.removeChild(index, sizing);
+        if (parent.children.length === 0) {
+            throw new Error('Invalid grid state');
+        }
+        if (parent.children.length > 1) {
+            return node.view;
+        }
+        if (pathToParent.length === 0) {
+            // parent is root
+            var sibling_1 = parent.children[0];
+            if (sibling_1 instanceof _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode) {
+                return node.view;
+            }
+            // we must promote sibling to be the new root
+            parent.removeChild(0, sizing);
+            this.root = sibling_1;
+            return node.view;
+        }
+        var _c = __read(__spread(pathToParent).reverse()), grandParent = _c[0], _ = _c.slice(1);
+        var _d = __read(__spread(rest).reverse()), parentIndex = _d[0], __ = _d.slice(1);
+        var sibling = parent.children[0];
+        var isSiblingVisible = parent.isChildVisible(0);
+        parent.removeChild(0, sizing);
+        var sizes = grandParent.children.map(function (_, i) {
+            return grandParent.getChildSize(i);
+        });
+        grandParent.removeChild(parentIndex, sizing);
+        if (sibling instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode) {
+            sizes.splice.apply(sizes, __spread([parentIndex,
+                1], sibling.children.map(function (c) { return c.size; })));
+            for (var i = 0; i < sibling.children.length; i++) {
+                var child = sibling.children[i];
+                grandParent.addChild(child, child.size, parentIndex + i);
+            }
+        }
+        else {
+            var newSibling = new _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode(sibling.view, orthogonal(sibling.orientation), sibling.size);
+            var sizing_1 = isSiblingVisible
+                ? sibling.orthogonalSize
+                : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Sizing.Invisible(sibling.orthogonalSize);
+            grandParent.addChild(newSibling, sizing_1, parentIndex);
+        }
+        for (var i = 0; i < sizes.length; i++) {
+            grandParent.resizeChild(i, sizes[i]);
+        }
+        return node.view;
+    };
+    Gridview.prototype.layout = function (width, height) {
+        var _a = __read(this.root.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
+            ? [height, width]
+            : [width, height], 2), size = _a[0], orthogonalSize = _a[1];
+        this.root.layout(size, orthogonalSize);
+    };
+    Gridview.prototype.getNode = function (location, node, path) {
+        if (node === void 0) { node = this.root; }
+        if (path === void 0) { path = []; }
+        if (location.length === 0) {
+            return [path, node];
+        }
+        if (!(node instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode)) {
+            throw new Error('Invalid location');
+        }
+        var _a = __read(location), index = _a[0], rest = _a.slice(1);
+        if (index < 0 || index >= node.children.length) {
+            throw new Error('Invalid location');
+        }
+        var child = node.children[index];
+        path.push(node);
+        return this.getNode(rest, child, path);
+    };
+    return Gridview;
+}());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/gridview/gridviewComponent.js":
+/*!***********************************************************!*\
+  !*** ../splitview/dist/es6/gridview/gridviewComponent.js ***!
+  \***********************************************************/
+/*! namespace exports */
+/*! export GridviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "GridviewComponent": () => /* binding */ GridviewComponent
+/* harmony export */ });
+/* harmony import */ var _gridview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./gridview */ "../splitview/dist/es6/gridview/gridview.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
+/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../array */ "../splitview/dist/es6/array.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _baseComponentGridview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./baseComponentGridview */ "../splitview/dist/es6/gridview/baseComponentGridview.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
+/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+
+
+
+
+
+var GridviewComponent = /** @class */ (function (_super) {
+    __extends(GridviewComponent, _super);
+    function GridviewComponent(element, options) {
+        var _this = _super.call(this, element, {
+            proportionalLayout: options.proportionalLayout,
+            orientation: options.orientation,
+            styles: options.styles,
+        }) || this;
+        _this.options = options;
+        if (!_this.options.components) {
+            _this.options.components = {};
+        }
+        if (!_this.options.frameworkComponents) {
+            _this.options.frameworkComponents = {};
+        }
+        return _this;
+    }
+    Object.defineProperty(GridviewComponent.prototype, "orientation", {
+        get: function () {
+            return this.gridview.orientation;
+        },
+        set: function (value) {
+            this.gridview.orientation = value;
+            this.layout(this.gridview.width, this.gridview.height, true);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GridviewComponent.prototype, "deserializer", {
+        get: function () {
+            return this._deserializer;
+        },
+        set: function (value) {
+            this._deserializer = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    GridviewComponent.prototype.removePanel = function (panel, sizing) {
+        this.gridview.remove(panel, sizing);
+    };
+    /**
+     * Serialize the current state of the layout
+     *
+     * @returns A JSON respresentation of the layout
+     */
+    GridviewComponent.prototype.toJSON = function () {
+        var _a;
+        var data = this.gridview.serialize();
+        var serializedData = {
+            grid: data,
+            activePanel: (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.id,
+        };
+        return serializedData;
+    };
+    GridviewComponent.prototype.deserialize = function (data) {
+        this.gridview.clear();
+        this.groups.clear();
+        this.fromJSON(data);
+    };
+    // public setVisible(panel: GridviewPanel, visible: boolean) {
+    //     this.gridview.setViewVisible(getGridLocation(panel.element), visible);
+    // }
+    // public isVisible(panel: GridviewPanel) {
+    //     return this.gridview.isViewVisible(getGridLocation(panel.element));
+    // }
+    GridviewComponent.prototype.toggleVisibility = function (panel) {
+        this.setVisible(panel, !this.isVisible(panel));
+    };
+    GridviewComponent.prototype.focus = function () {
+        var _a;
+        (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.focus();
+    };
+    GridviewComponent.prototype.fromJSON = function (data) {
+        var _this = this;
+        var _a = data, grid = _a.grid, activePanel = _a.activePanel;
+        this.gridview.clear();
+        this.groups.clear();
+        var queue = [];
+        this.gridview.deserialize(grid, {
+            fromJSON: function (node) {
+                var data = node.data;
+                var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(data.id, data.component, _this.options.components || {}, _this.options.frameworkComponents || {}, _this.options.frameworkComponentFactory
+                    ? {
+                        createComponent: _this.options
+                            .frameworkComponentFactory.createComponent,
+                    }
+                    : undefined);
+                queue.push(function () {
+                    return view.init({
+                        params: data.params,
+                        minimumWidth: data.minimumWidth,
+                        maximumWidth: data.maximumWidth,
+                        minimumHeight: data.minimumHeight,
+                        maximumHeight: data.maximumHeight,
+                        priority: data.priority,
+                        snap: !!data.snap,
+                        containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_5__.GridviewApi(_this),
+                        isVisible: node.visible,
+                    });
+                });
+                _this.registerPanel(view);
+                return view;
+            },
+        });
+        this.layout(this.width, this.height, true);
+        // .init() renders the view. Delay the render until the layout skelton is loaded
+        queue.forEach(function (f) { return f(); });
+        if (typeof activePanel === 'string') {
+            var panel = this.getPanel(activePanel);
+            if (panel) {
+                this.doSetGroupActive(panel);
+            }
+        }
+        this._onGridEvent.fire({ kind: "NEW_LAYOUT" /* NEW_LAYOUT */ });
+    };
+    GridviewComponent.prototype.movePanel = function (panel, options) {
+        var relativeLocation;
+        var removedPanel = this.gridview.remove(panel);
+        var referenceGroup = this.groups.get(options.reference).value;
+        var target = (0,_baseComponentGridview__WEBPACK_IMPORTED_MODULE_4__.toTarget)(options.direction);
+        if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
+            throw new Error(target + " not supported as an option");
+        }
+        else {
+            var location_1 = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+            relativeLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_1, target);
+        }
+        this.doAddGroup(removedPanel, relativeLocation, options.size);
+    };
+    GridviewComponent.prototype.addPanel = function (options) {
+        var _a;
+        var relativeLocation = options.location || [0];
+        if ((_a = options.position) === null || _a === void 0 ? void 0 : _a.reference) {
+            var referenceGroup = this.groups.get(options.position.reference)
+                .value;
+            var target = (0,_baseComponentGridview__WEBPACK_IMPORTED_MODULE_4__.toTarget)(options.position.direction);
+            if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
+                throw new Error(target + " not supported as an option");
+            }
+            else {
+                var location_2 = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+                relativeLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_2, target);
+            }
+        }
+        var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(options.id, options.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkComponentFactory
+            ? {
+                createComponent: this.options.frameworkComponentFactory
+                    .createComponent,
+            }
+            : undefined);
+        view.init({
+            params: options.params || {},
+            minimumWidth: options.minimumWidth,
+            maximumWidth: options.maximumWidth,
+            minimumHeight: options.minimumHeight,
+            maximumHeight: options.maximumHeight,
+            priority: options.priority,
+            snap: !!options.snap,
+            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_5__.GridviewApi(this),
+            isVisible: true,
+        });
+        this.registerPanel(view);
+        this.doAddGroup(view, relativeLocation, options.size);
+        return { api: view.api };
+    };
+    GridviewComponent.prototype.registerPanel = function (panel) {
+        var _this = this;
+        var disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable(panel.api.onDidFocusChange(function (event) {
+            if (!event.isFocused) {
+                return;
+            }
+            _this.groups.forEach(function (groupItem) {
+                var group = groupItem.value;
+                if (group !== panel) {
+                    group.setActive(false);
+                }
+                else {
+                    group.setActive(true);
+                }
+            });
+        }));
+        this.groups.set(panel.id, {
+            value: panel,
+            disposable: disposable,
+        });
+    };
+    GridviewComponent.prototype.moveGroup = function (referenceGroup, groupId, target) {
+        var sourceGroup = this.getPanel(groupId);
+        if (!sourceGroup) {
+            throw new Error('invalid operation');
+        }
+        var referenceLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+        var targetLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
+        var _a = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(targetLocation), 2), targetParentLocation = _a[0], to = _a[1];
+        var sourceLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(sourceGroup.element);
+        var _b = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(sourceLocation), 2), sourceParentLocation = _b[0], from = _b[1];
+        if ((0,_array__WEBPACK_IMPORTED_MODULE_2__.sequenceEquals)(sourceParentLocation, targetParentLocation)) {
+            // special case when 'swapping' two views within same grid location
+            // if a group has one tab - we are essentially moving the 'group'
+            // which is equivalent to swapping two views in this case
+            this.gridview.moveView(sourceParentLocation, from, to);
+            return;
+        }
+        // source group will become empty so delete the group
+        var targetGroup = this.doRemoveGroup(sourceGroup, {
+            skipActive: true,
+            skipDispose: true,
+        });
+        // after deleting the group we need to re-evaulate the ref location
+        var updatedReferenceLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
+        var location = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, updatedReferenceLocation, target);
+        this.doAddGroup(targetGroup, location);
+    };
+    GridviewComponent.prototype.removeGroup = function (group) {
+        _super.prototype.removeGroup.call(this, group);
+        var panel = this.groups.get(group.id);
+        if (panel) {
+            panel.disposable.dispose();
+            this.groups.delete(group.id);
+        }
+    };
+    GridviewComponent.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+    };
+    return GridviewComponent;
+}(_baseComponentGridview__WEBPACK_IMPORTED_MODULE_4__.BaseGrid));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/gridview/gridviewPanel.js":
+/*!*******************************************************!*\
+  !*** ../splitview/dist/es6/gridview/gridviewPanel.js ***!
+  \*******************************************************/
+/*! namespace exports */
+/*! export GridviewPanel [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "GridviewPanel": () => /* binding */ GridviewPanel
+/* harmony export */ });
+/* harmony import */ var _basePanelView__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./basePanelView */ "../splitview/dist/es6/gridview/basePanelView.js");
+/* harmony import */ var _api_gridPanelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/gridPanelApi */ "../splitview/dist/es6/api/gridPanelApi.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+
+
+var GridviewPanel = /** @class */ (function (_super) {
+    __extends(GridviewPanel, _super);
+    function GridviewPanel(id, component, api) {
+        if (api === void 0) { api = new _api_gridPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridPanelApi(id); }
+        var _this = _super.call(this, id, component, api) || this;
+        _this._minimumWidth = 0;
+        _this._minimumHeight = 0;
+        _this._maximumWidth = Number.MAX_SAFE_INTEGER;
+        _this._maximumHeight = Number.MAX_SAFE_INTEGER;
+        _this._snap = false;
+        _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        _this.onDidChange = _this._onDidChange
+            .event;
+        _this.addDisposables(_this.api.onVisibilityChange(function (event) {
+            var isVisible = event.isVisible;
+            var containerApi = _this.params.containerApi;
+            containerApi.setVisible(_this, isVisible);
+        }), _this.api.onDidConstraintsChangeInternal(function (event) {
+            if (typeof event.minimumWidth === 'number' ||
+                typeof event.minimumWidth === 'function') {
+                _this._minimumWidth = event.minimumWidth;
+            }
+            if (typeof event.minimumHeight === 'number' ||
+                typeof event.minimumHeight === 'function') {
+                _this._minimumHeight = event.minimumHeight;
+            }
+            if (typeof event.maximumWidth === 'number' ||
+                typeof event.maximumWidth === 'function') {
+                _this._maximumWidth = event.maximumWidth;
+            }
+            if (typeof event.maximumHeight === 'number' ||
+                typeof event.maximumHeight === 'function') {
+                _this._maximumHeight = event.maximumHeight;
+            }
+        }), _this.api.onDidSizeChange(function (event) {
+            _this._onDidChange.fire({
+                height: event.height,
+                width: event.width,
+            });
+        }));
+        return _this;
+    }
+    Object.defineProperty(GridviewPanel.prototype, "priority", {
+        get: function () {
+            return this._priority;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GridviewPanel.prototype, "snap", {
+        get: function () {
+            return this._snap;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GridviewPanel.prototype, "minimumWidth", {
+        get: function () {
+            var width = typeof this._minimumWidth === 'function'
+                ? this._minimumWidth()
+                : this._minimumWidth;
+            if (width !== this._evaluatedMinimumWidth) {
+                this._evaluatedMinimumWidth = width;
+                this.updateConstraints();
+            }
+            return width;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GridviewPanel.prototype, "minimumHeight", {
+        get: function () {
+            var height = typeof this._minimumHeight === 'function'
+                ? this._minimumHeight()
+                : this._minimumHeight;
+            if (height !== this._evaluatedMinimumHeight) {
+                this._evaluatedMinimumHeight = height;
+                this.updateConstraints();
+            }
+            return height;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GridviewPanel.prototype, "maximumHeight", {
+        get: function () {
+            var height = typeof this._maximumHeight === 'function'
+                ? this._maximumHeight()
+                : this._maximumHeight;
+            if (height !== this._evaluatedMaximumHeight) {
+                this._evaluatedMaximumHeight = height;
+                this.updateConstraints();
+            }
+            return height;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GridviewPanel.prototype, "maximumWidth", {
+        get: function () {
+            var width = typeof this._maximumWidth === 'function'
+                ? this._maximumWidth()
+                : this._maximumWidth;
+            if (width !== this._evaluatedMaximumWidth) {
+                this._evaluatedMaximumWidth = width;
+                this.updateConstraints();
+            }
+            return width;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GridviewPanel.prototype, "isActive", {
+        get: function () {
+            return this.api.isActive;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    GridviewPanel.prototype.init = function (parameters) {
+        if (parameters.maximumHeight) {
+            this._maximumHeight = parameters.maximumHeight;
+        }
+        if (parameters.minimumHeight) {
+            this._minimumHeight = parameters.minimumHeight;
+        }
+        if (parameters.maximumWidth) {
+            this._maximumWidth = parameters.maximumWidth;
+        }
+        if (parameters.minimumWidth) {
+            this._minimumWidth = parameters.minimumWidth;
+        }
+        this._priority = parameters.priority;
+        this._snap = !!parameters.snap;
+        _super.prototype.init.call(this, parameters);
+        if (typeof parameters.isVisible === 'boolean') {
+            this.setVisible(parameters.isVisible);
+        }
+    };
+    GridviewPanel.prototype.updateConstraints = function () {
+        this.api._onDidConstraintsChange.fire({
+            minimumWidth: this._evaluatedMinimumWidth,
+            maximumWidth: this._evaluatedMaximumWidth,
+            minimumHeight: this._evaluatedMinimumHeight,
+            maximumHeight: this._evaluatedMaximumHeight,
+        });
+    };
+    GridviewPanel.prototype.toJSON = function () {
+        var state = _super.prototype.toJSON.call(this);
+        var maximum = function (value) {
+            return value === Number.MAX_SAFE_INTEGER ? undefined : value;
+        };
+        var minimum = function (value) { return (value <= 0 ? undefined : value); };
+        return __assign(__assign({}, state), { minimumHeight: minimum(this.minimumHeight), maximumHeight: maximum(this.maximumHeight), minimumWidth: minimum(this.minimumWidth), maximumWidth: maximum(this.maximumWidth), snap: this.snap, priority: this.priority });
+    };
+    GridviewPanel.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+    };
+    return GridviewPanel;
+}(_basePanelView__WEBPACK_IMPORTED_MODULE_0__.BasePanelView));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/gridview/leafNode.js":
+/*!**************************************************!*\
+  !*** ../splitview/dist/es6/gridview/leafNode.js ***!
+  \**************************************************/
+/*! namespace exports */
+/*! export LeafNode [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "LeafNode": () => /* binding */ LeafNode
+/* harmony export */ });
+/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+
+
+var LeafNode = /** @class */ (function () {
+    function LeafNode(view, orientation, orthogonalSize, size) {
+        var _this = this;
+        if (size === void 0) { size = 0; }
+        this.view = view;
+        this.orientation = orientation;
+        this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
+        this.onDidChange = this._onDidChange.event;
+        this._orthogonalSize = orthogonalSize;
+        this._size = size;
+        this._disposable = this.view.onDidChange(function (event) {
+            return _this._onDidChange.fire(event
+                ? _this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.VERTICAL
+                    ? event.width
+                    : event.height
+                : undefined);
+        });
+    }
+    Object.defineProperty(LeafNode.prototype, "minimumWidth", {
+        get: function () {
+            return this.view.minimumWidth;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(LeafNode.prototype, "maximumWidth", {
+        get: function () {
+            return this.view.maximumWidth;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(LeafNode.prototype, "minimumHeight", {
+        get: function () {
+            return this.view.minimumHeight;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(LeafNode.prototype, "maximumHeight", {
+        get: function () {
+            return this.view.maximumHeight;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(LeafNode.prototype, "priority", {
+        get: function () {
+            return this.view.priority;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(LeafNode.prototype, "snap", {
+        get: function () {
+            return this.view.snap;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(LeafNode.prototype, "minimumSize", {
+        get: function () {
+            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
+                ? this.minimumHeight
+                : this.minimumWidth;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(LeafNode.prototype, "maximumSize", {
+        get: function () {
+            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
+                ? this.maximumHeight
+                : this.maximumWidth;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(LeafNode.prototype, "minimumOrthogonalSize", {
+        get: function () {
+            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
+                ? this.minimumWidth
+                : this.minimumHeight;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(LeafNode.prototype, "maximumOrthogonalSize", {
+        get: function () {
+            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
+                ? this.maximumWidth
+                : this.maximumHeight;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(LeafNode.prototype, "orthogonalSize", {
+        get: function () {
+            return this._orthogonalSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(LeafNode.prototype, "size", {
+        get: function () {
+            return this._size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(LeafNode.prototype, "element", {
+        get: function () {
+            return this.view.element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(LeafNode.prototype, "width", {
+        get: function () {
+            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
+                ? this.orthogonalSize
+                : this.size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(LeafNode.prototype, "height", {
+        get: function () {
+            return this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.HORIZONTAL
+                ? this.size
+                : this.orthogonalSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    LeafNode.prototype.setVisible = function (visible) {
+        if (this.view.setVisible) {
+            this.view.setVisible(visible);
+        }
+    };
+    LeafNode.prototype.layout = function (size, orthogonalSize) {
+        this._size = size;
+        this._orthogonalSize = orthogonalSize;
+        this.view.layout(this.width, this.height);
+    };
+    LeafNode.prototype.dispose = function () {
+        this._disposable.dispose();
+    };
+    return LeafNode;
+}());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/groupview/groupview.js":
+/*!****************************************************!*\
+  !*** ../splitview/dist/es6/groupview/groupview.js ***!
+  \****************************************************/
+/*! namespace exports */
+/*! export Groupview [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Groupview": () => /* binding */ Groupview
+/* harmony export */ });
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _titlebar_titleContainer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./titlebar/titleContainer */ "../splitview/dist/es6/groupview/titlebar/titleContainer.js");
+/* harmony import */ var _panel_content__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./panel/content */ "../splitview/dist/es6/groupview/panel/content.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../dom */ "../splitview/dist/es6/dom.js");
+/* harmony import */ var _async__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../async */ "../splitview/dist/es6/async.js");
+/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../dnd/dataTransfer */ "../splitview/dist/es6/dnd/dataTransfer.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (undefined && undefined.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
+var __values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+
+
+
+
+
+
+
+
+
+var Groupview = /** @class */ (function (_super) {
+    __extends(Groupview, _super);
+    function Groupview(accessor, id, options) {
+        var _this = _super.call(this) || this;
+        _this.accessor = accessor;
+        _this.id = id;
+        _this._isGroupActive = false;
+        _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_4__.Emitter();
+        _this.onDidChange = _this._onDidChange
+            .event;
+        _this._width = 0;
+        _this._height = 0;
+        _this._panels = [];
+        _this._onMove = new _events__WEBPACK_IMPORTED_MODULE_4__.Emitter();
+        _this.onMove = _this._onMove.event;
+        _this._onDrop = new _events__WEBPACK_IMPORTED_MODULE_4__.Emitter();
+        _this.onDrop = _this._onDrop.event;
+        _this._onDidGroupChange = new _events__WEBPACK_IMPORTED_MODULE_4__.Emitter();
+        _this.onDidGroupChange = _this
+            ._onDidGroupChange.event;
+        _this.closePanel = function (panel) { return __awaiter(_this, void 0, void 0, function () {
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = panel.close;
+                        if (!_a) return [3 /*break*/, 2];
+                        return [4 /*yield*/, panel.close()];
+                    case 1:
+                        _a = !(_b.sent());
+                        _b.label = 2;
+                    case 2:
+                        if (_a) {
+                            return [2 /*return*/, false];
+                        }
+                        this.doClose(panel);
+                        return [2 /*return*/, true];
+                }
+            });
+        }); };
+        _this.addDisposables(_this._onMove, _this._onDidGroupChange, _this._onDrop);
+        _this._element = document.createElement('div');
+        _this._element.className = 'groupview';
+        _this.tabContainer = new _titlebar_titleContainer__WEBPACK_IMPORTED_MODULE_1__.TitleContainer(_this.accessor, _this, {
+            tabHeight: options.tabHeight,
+        });
+        _this.contentContainer = new _panel_content__WEBPACK_IMPORTED_MODULE_2__.ContentContainer();
+        _this.dropTarget = new _dnd_droptarget__WEBPACK_IMPORTED_MODULE_3__.Droptarget(_this.contentContainer.element, {
+            isDirectional: true,
+            id: _this.accessor.id,
+            isDisabled: function () {
+                // disable the drop target if we only have one tab, and that is also the tab we are moving
+                return (_this._panels.length === 1 &&
+                    _this.tabContainer.hasActiveDragEvent);
+            },
+            enableExternalDragEvents: _this.accessor.options
+                .enableExternalDragEvents,
+        });
+        _this._element.append(_this.tabContainer.element, _this.contentContainer.element);
+        _this.addDisposables(_this._onMove, _this._onDidGroupChange, _this.tabContainer.onDropEvent(function (event) {
+            return _this.handleDropEvent(event.event, event.index);
+        }), _this.contentContainer.onDidFocus(function () {
+            _this.accessor.doSetGroupActive(_this, true);
+        }), _this.contentContainer.onDidBlur(function () {
+            // this._activePanel?.api._ondid
+        }), _this.dropTarget.onDidChange(function (event) {
+            // if we've center dropped on ourself then ignore
+            if (event.position === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_3__.Position.Center &&
+                _this.tabContainer.hasActiveDragEvent) {
+                return;
+            }
+            _this.handleDropEvent(event);
+        }));
+        if (options === null || options === void 0 ? void 0 : options.panels) {
+            options.panels.forEach(function (panel) {
+                _this.doAddPanel(panel);
+            });
+        }
+        if (options === null || options === void 0 ? void 0 : options.activePanel) {
+            _this.doSetActivePanel(options.activePanel);
+        }
+        _this.setActive(_this.isActive, true, true);
+        _this.updateContainer();
+        return _this;
+    }
+    Object.defineProperty(Groupview.prototype, "activePanel", {
+        get: function () {
+            return this._activePanel;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Groupview.prototype, "tabHeight", {
+        get: function () {
+            return this.tabContainer.height;
+        },
+        set: function (height) {
+            this.tabContainer.height = height;
+            this.layout(this._width, this._height);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Groupview.prototype, "isActive", {
+        get: function () {
+            return this._isGroupActive;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Groupview.prototype, "panels", {
+        get: function () {
+            return this._panels;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Groupview.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Groupview.prototype, "size", {
+        get: function () {
+            return this._panels.length;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Groupview.prototype, "isEmpty", {
+        get: function () {
+            return this._panels.length === 0;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Groupview.prototype, "minimumHeight", {
+        get: function () {
+            return 100;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Groupview.prototype, "maximumHeight", {
+        get: function () {
+            return Number.MAX_SAFE_INTEGER;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Groupview.prototype, "minimumWidth", {
+        get: function () {
+            return 100;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Groupview.prototype, "maximumWidth", {
+        get: function () {
+            return Number.MAX_SAFE_INTEGER;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Groupview.prototype.isAncestor = function (element) {
+        return (element === this.contentContainer.element ||
+            (0,_dom__WEBPACK_IMPORTED_MODULE_5__.isAncestor)(element, this.contentContainer.element));
+    };
+    Groupview.prototype.indexOf = function (panel) {
+        return this.tabContainer.indexOf(panel.id);
+    };
+    Groupview.prototype.toJSON = function () {
+        var _a;
+        return {
+            views: this.panels.map(function (panel) { return panel.id; }),
+            activeView: (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.id,
+            id: this.id,
+        };
+    };
+    Groupview.prototype.startActiveDrag = function (panel) {
+        var index = this.tabContainer.indexOf(panel.id);
+        if (index > -1) {
+            var tab_1 = this.tabContainer.at(index);
+            tab_1.startDragEvent();
+            return {
+                dispose: function () {
+                    tab_1.stopDragEvent();
+                },
+            };
+        }
+        return _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Disposable.NONE;
+    };
+    Groupview.prototype.moveToNext = function (options) {
+        if (!options) {
+            options = {};
+        }
+        if (!options.panel) {
+            options.panel = this.activePanel;
+        }
+        var index = this.panels.indexOf(options.panel);
+        var normalizedIndex;
+        if (index < this.panels.length - 1) {
+            normalizedIndex = index + 1;
+        }
+        else if (!options.suppressRoll) {
+            normalizedIndex = 0;
+        }
+        else {
+            return;
+        }
+        this.openPanel(this.panels[normalizedIndex]);
+    };
+    Groupview.prototype.moveToPrevious = function (options) {
+        if (!options) {
+            options = {};
+        }
+        if (!options.panel) {
+            options.panel = this.activePanel;
+        }
+        if (!options.panel) {
+            return;
+        }
+        var index = this.panels.indexOf(options.panel);
+        var normalizedIndex;
+        if (index > 0) {
+            normalizedIndex = index - 1;
+        }
+        else if (!options.suppressRoll) {
+            normalizedIndex = this.panels.length - 1;
+        }
+        else {
+            return;
+        }
+        this.openPanel(this.panels[normalizedIndex]);
+    };
+    Groupview.prototype.containsPanel = function (panel) {
+        return this.panels.includes(panel);
+    };
+    Groupview.prototype.init = function (params) {
+        //noop
+    };
+    Groupview.prototype.update = function (params) {
+        //noop
+    };
+    Groupview.prototype.focus = function () {
+        var _a;
+        (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.focus();
+    };
+    Groupview.prototype.openPanel = function (panel, index) {
+        if (index === void 0) { index = this.panels.length; }
+        if (this._activePanel === panel) {
+            this.accessor.doSetGroupActive(this);
+            return;
+        }
+        this.doAddPanel(panel, index);
+        this.doSetActivePanel(panel);
+        this.accessor.doSetGroupActive(this);
+        this.updateContainer();
+    };
+    Groupview.prototype.setPanel = function (panel, skipFocus) {
+        if (this._activePanel === panel) {
+            this.accessor.doSetGroupActive(this, skipFocus);
+            return;
+        }
+        this.tabContainer.openPanel(panel, this.panels.indexOf(panel));
+        this.contentContainer.openPanel(panel.content);
+        this.doSetActivePanel(panel);
+        this.accessor.doSetGroupActive(this, skipFocus);
+        this.updateContainer();
+    };
+    Groupview.prototype.removePanel = function (groupItemOrId) {
+        var id = typeof groupItemOrId === 'string'
+            ? groupItemOrId
+            : groupItemOrId.id;
+        var panel = this._panels.find(function (panel) { return panel.id === id; });
+        if (!panel) {
+            throw new Error('invalid operation');
+        }
+        return this._removePanel(panel);
+    };
+    Groupview.prototype.closeAllPanels = function () {
+        var _a;
+        return __awaiter(this, void 0, void 0, function () {
+            var index, canClose, _b, i, panel, canClose, arrPanelCpy;
+            var _this = this;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        index = this._activePanel
+                            ? this.panels.indexOf(this._activePanel)
+                            : -1;
+                        if (!(index > -1)) return [3 /*break*/, 3];
+                        if (this.panels.indexOf(this._activePanel) < 0) {
+                            console.warn('active panel not tracked');
+                        }
+                        _b = !((_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.close);
+                        if (_b) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this._activePanel.close()];
+                    case 1:
+                        _b = (_c.sent());
+                        _c.label = 2;
+                    case 2:
+                        canClose = _b;
+                        if (!canClose) {
+                            return [2 /*return*/, false];
+                        }
+                        _c.label = 3;
+                    case 3:
+                        i = 0;
+                        _c.label = 4;
+                    case 4:
+                        if (!(i < this.panels.length)) return [3 /*break*/, 8];
+                        if (i === index) {
+                            return [3 /*break*/, 7];
+                        }
+                        panel = this.panels[i];
+                        this.openPanel(panel);
+                        if (!panel.close) return [3 /*break*/, 7];
+                        return [4 /*yield*/, (0,_async__WEBPACK_IMPORTED_MODULE_6__.timeoutAsPromise)(0)];
+                    case 5:
+                        _c.sent();
+                        return [4 /*yield*/, panel.close()];
+                    case 6:
+                        canClose = _c.sent();
+                        if (!canClose) {
+                            return [2 /*return*/, false];
+                        }
+                        _c.label = 7;
+                    case 7:
+                        i++;
+                        return [3 /*break*/, 4];
+                    case 8:
+                        if (!(this.panels.length > 0)) return [3 /*break*/, 10];
+                        arrPanelCpy = __spread(this.panels);
+                        return [4 /*yield*/, Promise.all(arrPanelCpy.map(function (p) { return _this.doClose(p); }))];
+                    case 9:
+                        _c.sent();
+                        return [3 /*break*/, 11];
+                    case 10:
+                        this.accessor.removeGroup(this);
+                        _c.label = 11;
+                    case 11: return [2 /*return*/, true];
+                }
+            });
+        });
+    };
+    Groupview.prototype.doClose = function (panel) {
+        this._removePanel(panel);
+        this.accessor.unregisterPanel(panel);
+        if (this.panels.length === 0) {
+            this.accessor.removeGroup(this);
+        }
+    };
+    Groupview.prototype.isPanelActive = function (panel) {
+        return this._activePanel === panel;
+    };
+    Groupview.prototype.updateActions = function () {
+        var _a;
+        if (this.isActive && this._activePanel) {
+            var headerTitle = (_a = this._activePanel.content) === null || _a === void 0 ? void 0 : _a.actions;
+            this.tabContainer.setActionElement(headerTitle);
+        }
+        else {
+            this.tabContainer.setActionElement(undefined);
+        }
+    };
+    Groupview.prototype.setActive = function (isGroupActive, skipFocus, force) {
+        var _a, _b;
+        if (skipFocus === void 0) { skipFocus = false; }
+        if (force === void 0) { force = false; }
+        if (!force && this.isActive === isGroupActive) {
+            if (!skipFocus) {
+                (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.focus();
+            }
+            return;
+        }
+        this._isGroupActive = isGroupActive;
+        (0,_dom__WEBPACK_IMPORTED_MODULE_5__.toggleClass)(this.element, 'active-group', isGroupActive);
+        (0,_dom__WEBPACK_IMPORTED_MODULE_5__.toggleClass)(this.element, 'inactive-group', !isGroupActive);
+        this.tabContainer.setActive(this.isActive);
+        // this.updateActions();
+        if (!this._activePanel && this.panels.length > 0) {
+            this.doSetActivePanel(this.panels[0]);
+        }
+        this.updateContainer();
+        // this.panels.forEach((panel) =>
+        //     panel.updateParentGroup(this, this.isActive)
+        // );
+        // if (this.watermark?.updateParentGroup) {
+        //     this.watermark.updateParentGroup(this, this.isActive);
+        // }
+        if (isGroupActive) {
+            if (!skipFocus) {
+                (_b = this._activePanel) === null || _b === void 0 ? void 0 : _b.focus();
+            }
+            this._onDidGroupChange.fire({ kind: "GROUP_ACTIVE" /* GROUP_ACTIVE */ });
+        }
+    };
+    Groupview.prototype.layout = function (width, height) {
+        var _a;
+        this._width = width;
+        this._height = height;
+        if ((_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.layout) {
+            this._activePanel.layout(this._width, this._height);
+        }
+    };
+    Groupview.prototype._removePanel = function (panel) {
+        var index = this._panels.indexOf(panel);
+        var isActivePanel = this._activePanel === panel;
+        this.doRemovePanel(panel);
+        if (isActivePanel && this.panels.length > 0) {
+            var nextPanel = this.panels[Math.max(0, index - 1)];
+            this.openPanel(nextPanel);
+        }
+        if (this._activePanel && this.panels.length === 0) {
+            this._activePanel = undefined;
+        }
+        this.updateContainer();
+        return panel;
+    };
+    Groupview.prototype.doRemovePanel = function (panel) {
+        var index = this.panels.indexOf(panel);
+        if (this._activePanel === panel) {
+            this.contentContainer.closePanel();
+        }
+        this.tabContainer.delete(panel.id);
+        this._panels.splice(index, 1);
+        this._onDidGroupChange.fire({
+            kind: "REMOVE_PANEL" /* REMOVE_PANEL */,
+            panel: panel,
+        });
+    };
+    Groupview.prototype.doAddPanel = function (panel, index) {
+        if (index === void 0) { index = this.panels.length; }
+        var existingPanel = this._panels.indexOf(panel);
+        var hasExistingPanel = existingPanel > -1;
+        this.tabContainer.openPanel(panel, index);
+        this.contentContainer.openPanel(panel.content);
+        if (hasExistingPanel) {
+            // TODO - need to ensure ordering hasn't changed and if it has need to re-order this.panels
+            return;
+        }
+        this.panels.splice(index, 0, panel);
+        this._onDidGroupChange.fire({ kind: "ADD_PANEL" /* ADD_PANEL */ });
+    };
+    Groupview.prototype.doSetActivePanel = function (panel) {
+        this._activePanel = panel;
+        this.tabContainer.setActivePanel(panel);
+        // this.contentContainer.openPanel(panel.content);
+        panel.layout(this._width, this._height);
+        this._onDidGroupChange.fire({ kind: "PANEL_ACTIVE" /* PANEL_ACTIVE */ });
+    };
+    Groupview.prototype.updateContainer = function () {
+        var _this = this;
+        var _a, _b;
+        this.updateActions();
+        (0,_dom__WEBPACK_IMPORTED_MODULE_5__.toggleClass)(this.element, 'empty', this.isEmpty);
+        if (!this.watermark) {
+            var watermark = this.accessor.createWatermarkComponent();
+            watermark.init({
+                containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_8__.DockviewApi(this.accessor),
+                params: {},
+                title: '',
+                api: null,
+            });
+            this.watermark = watermark;
+        }
+        this.panels.forEach(function (panel) {
+            return panel.updateParentGroup(_this, _this.isActive);
+        });
+        if (this.isEmpty && !((_b = (_a = this.watermark) === null || _a === void 0 ? void 0 : _a.element) === null || _b === void 0 ? void 0 : _b.parentNode)) {
+            (0,_events__WEBPACK_IMPORTED_MODULE_4__.addDisposableListener)(this.watermark.element, 'click', function () {
+                if (!_this.isActive) {
+                    _this.accessor.doSetGroupActive(_this);
+                }
+            });
+            this.contentContainer.openPanel(this.watermark);
+            this.watermark.updateParentGroup(this, true);
+        }
+        if (!this.isEmpty && this.watermark.element.parentNode) {
+            this.watermark.dispose();
+            this.watermark = undefined;
+            this.contentContainer.closePanel();
+        }
+    };
+    Groupview.prototype.handleDropEvent = function (event, index) {
+        if ((0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_7__.isPanelTransferEvent)(event.event)) {
+            this.handlePanelDropEvent(event.event, event.position, index);
+            return;
+        }
+        this._onDrop.fire({
+            event: event.event,
+            target: event.position,
+            index: index,
+        });
+        console.debug('[customDropEvent]');
+    };
+    Groupview.prototype.handlePanelDropEvent = function (event, target, index) {
+        var _a;
+        var dataObject = (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_7__.extractData)(event);
+        if ((0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_7__.isTabDragEvent)(dataObject)) {
+            var groupId = dataObject.groupId, itemId = dataObject.itemId;
+            var isSameGroup = this.id === groupId;
+            if (isSameGroup && !target) {
+                var oldIndex = this.tabContainer.indexOf(itemId);
+                if (oldIndex === index) {
+                    console.debug('[tabs] drop indicates no change in position');
+                    return;
+                }
+            }
+            this._onMove.fire({
+                target: target,
+                groupId: dataObject.groupId,
+                itemId: dataObject.itemId,
+                index: index,
+            });
+        }
+        if ((0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_7__.isCustomDragEvent)(dataObject)) {
+            var panel = this.accessor.getGroupPanel(dataObject.id);
+            if (!panel) {
+                panel = this.accessor.addPanel(dataObject);
+            }
+            this._onMove.fire({
+                target: target,
+                groupId: (_a = panel.group) === null || _a === void 0 ? void 0 : _a.id,
+                itemId: panel.id,
+                index: index,
+            });
+        }
+    };
+    Groupview.prototype.dispose = function () {
+        var e_1, _a;
+        try {
+            for (var _b = __values(this.panels), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var panel = _c.value;
+                panel.dispose();
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        _super.prototype.dispose.call(this);
+        this.dropTarget.dispose();
+        this.tabContainer.dispose();
+        this.contentContainer.dispose();
+    };
+    return Groupview;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/groupview/groupviewPanel.js":
+/*!*********************************************************!*\
+  !*** ../splitview/dist/es6/groupview/groupviewPanel.js ***!
+  \*********************************************************/
+/*! namespace exports */
+/*! export GroupviewPanel [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "GroupviewPanel": () => /* binding */ GroupviewPanel
+/* harmony export */ });
+/* harmony import */ var _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/groupPanelApi */ "../splitview/dist/es6/api/groupPanelApi.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../dockview/components/tab/defaultTab */ "../splitview/dist/es6/dockview/components/tab/defaultTab.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+
+
+var GroupviewPanel = /** @class */ (function (_super) {
+    __extends(GroupviewPanel, _super);
+    function GroupviewPanel(id, containerApi) {
+        var _this = _super.call(this) || this;
+        _this.id = id;
+        _this.containerApi = containerApi;
+        _this.mutableDisposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_1__.MutableDisposable();
+        _this.api = new _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_0__.GroupPanelApi(_this, _this._group);
+        _this.onDidStateChange = _this.api.onDidStateChange;
+        _this.addDisposables(_this.api.onDidTitleChange(function (event) {
+            var title = event.title;
+            _this.update({ params: { title: title } });
+        }));
+        return _this;
+    }
+    Object.defineProperty(GroupviewPanel.prototype, "group", {
+        get: function () {
+            return this._group;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GroupviewPanel.prototype, "header", {
+        get: function () {
+            return this.headerPart;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(GroupviewPanel.prototype, "content", {
+        get: function () {
+            return this.contentPart;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    GroupviewPanel.prototype.focus = function () {
+        this.api._onFocusEvent.fire();
+    };
+    GroupviewPanel.prototype.setDirty = function (isDirty) {
+        this.api._onDidDirtyChange.fire(isDirty);
+    };
+    GroupviewPanel.prototype.close = function () {
+        if (this.api.tryClose) {
+            return this.api.tryClose();
+        }
+        return Promise.resolve(true);
+    };
+    GroupviewPanel.prototype.toJSON = function () {
+        var _a, _b, _c, _d;
+        var params = (_a = this.params) === null || _a === void 0 ? void 0 : _a.params;
+        var state = this.api.getState();
+        return {
+            id: this.id,
+            contentId: (_b = this.contentPart) === null || _b === void 0 ? void 0 : _b.id,
+            tabId: this.headerPart instanceof _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_2__.DefaultTab
+                ? undefined
+                : (_c = this.headerPart) === null || _c === void 0 ? void 0 : _c.id,
+            params: params && Object.keys(params).length > 0 ? params : undefined,
+            title: this.params.title,
+            suppressClosable: (_d = this.params) === null || _d === void 0 ? void 0 : _d.suppressClosable,
+            state: state && Object.keys(state).length > 0 ? state : undefined,
+        };
+    };
+    GroupviewPanel.prototype.update = function (params) {
+        var _a, _b;
+        this.params.params = __assign(__assign({}, this.params.params), params);
+        (_a = this.contentPart) === null || _a === void 0 ? void 0 : _a.update(params);
+        (_b = this.headerPart) === null || _b === void 0 ? void 0 : _b.update(params);
+    };
+    GroupviewPanel.prototype.init = function (params) {
+        var _a, _b;
+        this.params = params;
+        this.contentPart = params.contentPart;
+        this.headerPart = params.headerPart;
+        this.api.setState(this.params.state);
+        (_a = this.content) === null || _a === void 0 ? void 0 : _a.init(__assign(__assign({}, params), { api: this.api, containerApi: this.containerApi }));
+        (_b = this.header) === null || _b === void 0 ? void 0 : _b.init(__assign(__assign({}, params), { api: this.api, containerApi: this.containerApi }));
+    };
+    GroupviewPanel.prototype.updateParentGroup = function (group, isGroupActive) {
+        var _this = this;
+        var _a, _b;
+        this._group = group;
+        this.api.group = group;
+        this.mutableDisposable.value = this._group.onDidGroupChange(function (ev) {
+            if (ev.kind === "GROUP_ACTIVE" /* GROUP_ACTIVE */) {
+                var isPanelVisible_1 = _this._group.isPanelActive(_this);
+                _this.api._onDidActiveChange.fire({
+                    isActive: isGroupActive && isPanelVisible_1,
+                });
+                _this.api._onDidVisibilityChange.fire({
+                    isVisible: isPanelVisible_1,
+                });
+            }
+        });
+        // this.api._onDidChangeFocus.fire({ isFocused: isGroupActive });
+        // this.api._onDidGroupPanelVisibleChange.fire({
+        //     isVisible: this._group.isPanelActive(this),
+        // });
+        // this.api._onDidGroupPanelVisibleChange.fire({
+        //     isVisible: this._group.isPanelActive(this),
+        // });
+        var isPanelVisible = this._group.isPanelActive(this);
+        this.api._onDidActiveChange.fire({
+            isActive: isGroupActive && isPanelVisible,
+        });
+        this.api._onDidVisibilityChange.fire({
+            isVisible: isPanelVisible,
+        });
+        (_a = this.headerPart) === null || _a === void 0 ? void 0 : _a.updateParentGroup(this._group, this._group.isPanelActive(this));
+        (_b = this.contentPart) === null || _b === void 0 ? void 0 : _b.updateParentGroup(this._group, this._group.isPanelActive(this));
+    };
+    GroupviewPanel.prototype.layout = function (width, height) {
+        var _a;
+        // the obtain the correct dimensions of the content panel we must deduct the tab height
+        this.api._onDidPanelDimensionChange.fire({
+            width: width,
+            height: height - (((_a = this.group) === null || _a === void 0 ? void 0 : _a.tabHeight) || 0),
+        });
+    };
+    GroupviewPanel.prototype.dispose = function () {
+        var _a, _b;
+        this.api.dispose();
+        this.mutableDisposable.dispose();
+        (_a = this.headerPart) === null || _a === void 0 ? void 0 : _a.dispose();
+        (_b = this.contentPart) === null || _b === void 0 ? void 0 : _b.dispose();
+    };
+    return GroupviewPanel;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/groupview/panel/content.js":
+/*!********************************************************!*\
+  !*** ../splitview/dist/es6/groupview/panel/content.js ***!
+  \********************************************************/
+/*! namespace exports */
+/*! export ContentContainer [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ContentContainer": () => /* binding */ ContentContainer
+/* harmony export */ });
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../dom */ "../splitview/dist/es6/dom.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+
+var ContentContainer = /** @class */ (function (_super) {
+    __extends(ContentContainer, _super);
+    function ContentContainer() {
+        var _this = _super.call(this) || this;
+        _this._onDidFocus = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
+        _this.onDidFocus = _this._onDidFocus.event;
+        _this._onDidBlur = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
+        _this.onDidBlur = _this._onDidBlur.event;
+        _this._element = document.createElement('div');
+        _this._element.className = 'content-container';
+        _this._element.tabIndex = -1;
+        var _a = (0,_dom__WEBPACK_IMPORTED_MODULE_2__.trackFocus)(_this._element), onDidFocus = _a.onDidFocus, onDidBlur = _a.onDidBlur;
+        _this.addDisposables(onDidFocus(function () { return _this._onDidFocus.fire(); }), onDidBlur(function () { return _this._onDidBlur.fire(); }));
+        return _this;
+    }
+    Object.defineProperty(ContentContainer.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    ContentContainer.prototype.openPanel = function (panel) {
+        if (this.content === panel) {
+            return;
+        }
+        if (this.content) {
+            this._element.removeChild(this.content.element);
+            this.content = undefined;
+        }
+        this.content = panel;
+        this._element.appendChild(this.content.element);
+    };
+    ContentContainer.prototype.closePanel = function () {
+        if (this.content) {
+            this._element.removeChild(this.content.element);
+            this.content = undefined;
+        }
+    };
+    ContentContainer.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+    };
+    return ContentContainer;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/groupview/tab.js":
+/*!**********************************************!*\
+  !*** ../splitview/dist/es6/groupview/tab.js ***!
+  \**********************************************/
+/*! namespace exports */
+/*! export MouseEventKind [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Tab [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "MouseEventKind": () => /* binding */ MouseEventKind,
+/* harmony export */   "Tab": () => /* binding */ Tab
+/* harmony export */ });
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dnd/dataTransfer */ "../splitview/dist/es6/dnd/dataTransfer.js");
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../dom */ "../splitview/dist/es6/dom.js");
+/* harmony import */ var _focusedElement__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../focusedElement */ "../splitview/dist/es6/focusedElement.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+
+
+
+
+var MouseEventKind;
+(function (MouseEventKind) {
+    MouseEventKind["CLICK"] = "CLICK";
+    MouseEventKind["CONTEXT_MENU"] = "CONTEXT_MENU";
+})(MouseEventKind || (MouseEventKind = {}));
+var Tab = /** @class */ (function (_super) {
+    __extends(Tab, _super);
+    function Tab(id, accessor, group) {
+        var _this = _super.call(this) || this;
+        _this.id = id;
+        _this.accessor = accessor;
+        _this.group = group;
+        _this.dragInPlayDetails = {
+            isDragging: false,
+        };
+        _this._onChanged = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onChanged = _this._onChanged.event;
+        _this._onDropped = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onDropped = _this._onDropped.event;
+        _this.addDisposables(_this._onChanged, _this._onDropped);
+        _this._element = document.createElement('div');
+        _this._element.className = 'tab';
+        _this._element.tabIndex = 0;
+        _this._element.draggable = true;
+        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(_this._element, 'dragstart', function (event) {
+            _this.dragInPlayDetails = {
+                isDragging: true,
+                id: _this.accessor.id,
+            };
+            _this.element.classList.add('dragged');
+            setTimeout(function () { return _this.element.classList.remove('dragged'); }, 0);
+            var data = JSON.stringify({
+                type: _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.DragType.ITEM,
+                itemId: _this.id,
+                groupId: _this.group.id,
+            });
+            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.DataTransferSingleton.setData(_this.dragInPlayDetails.id, data);
+            event.dataTransfer.setData(_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.DATA_KEY, data);
+            event.dataTransfer.effectAllowed = 'move';
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(_this._element, 'dragend', function (ev) {
+            // drop events fire before dragend so we can remove this safely
+            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.DataTransferSingleton.removeData(_this.dragInPlayDetails.id);
+            _this.dragInPlayDetails = {
+                isDragging: false,
+                id: undefined,
+            };
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(_this._element, 'mousedown', function (event) {
+            if (event.defaultPrevented) {
+                return;
+            }
+            /**
+             * TODO: alternative to stopPropagation
+             *
+             * I need to stop the event propagation here since otherwise it'll be intercepted by event handlers
+             * on the tab-container. I cannot use event.preventDefault() since I need the on DragStart event to occur
+             */
+            event.stopPropagation();
+            /**
+             * //TODO mousedown focusing with draggable element (is there a better approach?)
+             *
+             * this mousedown event wants to focus the tab itself but if we call preventDefault()
+             * this would also prevent the dragStart event from firing. To get around this we propagate
+             * the onChanged event during the next tick of the event-loop, allowing the tab element to become
+             * focused on this tick and ensuring the dragstart event is not interrupted
+             */
+            var oldFocus = _focusedElement__WEBPACK_IMPORTED_MODULE_5__.focusedElement.element;
+            setTimeout(function () {
+                oldFocus.focus();
+                _this._onChanged.fire({ kind: MouseEventKind.CLICK, event: event });
+            }, 0);
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(_this._element, 'contextmenu', function (event) {
+            _this._onChanged.fire({
+                kind: MouseEventKind.CONTEXT_MENU,
+                event: event,
+            });
+        }));
+        _this.droptarget = new _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Droptarget(_this._element, {
+            isDirectional: false,
+            isDisabled: function () { return _this.dragInPlayDetails.isDragging; },
+            id: _this.accessor.id,
+            enableExternalDragEvents: _this.accessor.options
+                .enableExternalDragEvents,
+        });
+        _this.addDisposables(_this.droptarget.onDidChange(function (event) {
+            event.event.preventDefault();
+            _this._onDropped.fire(event);
+        }));
+        return _this;
+    }
+    Object.defineProperty(Tab.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Tab.prototype, "hasActiveDragEvent", {
+        get: function () {
+            var _a;
+            return (_a = this.dragInPlayDetails) === null || _a === void 0 ? void 0 : _a.isDragging;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Tab.prototype.startDragEvent = function () {
+        this.dragInPlayDetails = { isDragging: true, id: this.accessor.id };
+    };
+    Tab.prototype.stopDragEvent = function () {
+        this.dragInPlayDetails = { isDragging: false, id: undefined };
+    };
+    Tab.prototype.setActive = function (isActive) {
+        (0,_dom__WEBPACK_IMPORTED_MODULE_4__.toggleClass)(this.element, 'active-tab', isActive);
+        (0,_dom__WEBPACK_IMPORTED_MODULE_4__.toggleClass)(this.element, 'inactive-tab', !isActive);
+    };
+    Tab.prototype.setContent = function (part) {
+        if (this.content) {
+            this._element.removeChild(this.content.element);
+        }
+        this.content = part;
+        this._element.appendChild(this.content.element);
+    };
+    Tab.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+        this.droptarget.dispose();
+    };
+    return Tab;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/groupview/titlebar/titleContainer.js":
+/*!******************************************************************!*\
+  !*** ../splitview/dist/es6/groupview/titlebar/titleContainer.js ***!
+  \******************************************************************/
+/*! namespace exports */
+/*! export TitleContainer [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "TitleContainer": () => /* binding */ TitleContainer
+/* harmony export */ });
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _tab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../tab */ "../splitview/dist/es6/groupview/tab.js");
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../dom */ "../splitview/dist/es6/dom.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
+/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../array */ "../splitview/dist/es6/array.js");
+/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../dnd/dataTransfer */ "../splitview/dist/es6/dnd/dataTransfer.js");
+/* harmony import */ var _focusedElement__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../focusedElement */ "../splitview/dist/es6/focusedElement.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (undefined && undefined.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
+
+
+
+
+
+
+
+
+var TitleContainer = /** @class */ (function (_super) {
+    __extends(TitleContainer, _super);
+    function TitleContainer(accessor, group, options) {
+        var _this = _super.call(this) || this;
+        _this.accessor = accessor;
+        _this.group = group;
+        _this.tabs = [];
+        _this.selectedIndex = -1;
+        _this.active = false;
+        _this._visible = true;
+        _this._onDropped = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
+        _this.onDropEvent = _this._onDropped.event;
+        _this.addDisposables(_this._onDropped);
+        _this._element = document.createElement('div');
+        _this._element.className = 'title-container';
+        _this.height = options.tabHeight;
+        _this.actionContainer = document.createElement('div');
+        _this.actionContainer.className = 'action-container';
+        _this.tabContainer = document.createElement('div');
+        _this.tabContainer.className = 'tab-container';
+        _this._element.appendChild(_this.tabContainer);
+        _this._element.appendChild(_this.actionContainer);
+        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.tabContainer, 'mousedown', function (event) {
+            if (event.defaultPrevented) {
+                return;
+            }
+            _this.accessor.doSetGroupActive(_this.group);
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.tabContainer, 'dragenter', function (event) {
+            if (!_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_6__.DataTransferSingleton.has(_this.accessor.id)) {
+                console.debug('[tabs] invalid drop event');
+                return;
+            }
+            if (!(0,_array__WEBPACK_IMPORTED_MODULE_5__.last)(_this.tabs).value.hasActiveDragEvent) {
+                (0,_dom__WEBPACK_IMPORTED_MODULE_3__.addClasses)(_this.tabContainer, 'drag-over-target');
+            }
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.tabContainer, 'dragover', function (event) {
+            event.preventDefault();
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.tabContainer, 'dragleave', function (event) {
+            (0,_dom__WEBPACK_IMPORTED_MODULE_3__.removeClasses)(_this.tabContainer, 'drag-over-target');
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.tabContainer, 'drop', function (event) {
+            if (!_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_6__.DataTransferSingleton.has(_this.accessor.id)) {
+                console.debug('[tabs] invalid drop event');
+                return;
+            }
+            if (event.defaultPrevented) {
+                console.debug('[tab] drop event defaultprevented');
+                return;
+            }
+            (0,_dom__WEBPACK_IMPORTED_MODULE_3__.removeClasses)(_this.tabContainer, 'drag-over-target');
+            var activetab = _this.tabs.find(function (tab) { return tab.value.hasActiveDragEvent; });
+            var ignore = !!(activetab &&
+                event
+                    .composedPath()
+                    .find(function (x) { return activetab.value.element === x; }));
+            if (ignore) {
+                console.debug('[tabs] ignore event');
+                return;
+            }
+            _this._onDropped.fire({
+                event: { event: event, position: _dnd_droptarget__WEBPACK_IMPORTED_MODULE_4__.Position.Center },
+                index: _this.tabs.length - (activetab ? 1 : 0),
+            });
+        }));
+        return _this;
+    }
+    Object.defineProperty(TitleContainer.prototype, "visible", {
+        get: function () {
+            return this._visible;
+        },
+        set: function (value) {
+            this._visible = value;
+            (0,_dom__WEBPACK_IMPORTED_MODULE_3__.toggleClass)(this.element, 'hidden', !this._visible);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(TitleContainer.prototype, "height", {
+        get: function () {
+            return this._height;
+        },
+        set: function (value) {
+            this._height = value;
+            if (typeof value !== 'number') {
+                // removeClasses(this.element, 'separator-border');
+                this.element.style.removeProperty('--title-height');
+            }
+            else {
+                // addClasses(this.element, 'separator-border');
+                // if (styles?.separatorBorder) {
+                this.element.style.setProperty('--title-height', value + "px");
+                // }
+            }
+            // this._element.style.height = `${this.height}px`;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    TitleContainer.prototype.setActionElement = function (element) {
+        if (this.actions === element) {
+            return;
+        }
+        if (this.actions) {
+            this.actions.remove();
+            this.actions = undefined;
+        }
+        if (element) {
+            this.actionContainer.appendChild(element);
+            this.actions = element;
+        }
+    };
+    Object.defineProperty(TitleContainer.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    TitleContainer.prototype.isActive = function (tab) {
+        return (this.selectedIndex > -1 &&
+            this.tabs[this.selectedIndex].value === tab);
+    };
+    Object.defineProperty(TitleContainer.prototype, "hasActiveDragEvent", {
+        get: function () {
+            return !!this.tabs.find(function (tab) { return tab.value.hasActiveDragEvent; });
+        },
+        enumerable: false,
+        configurable: true
+    });
+    TitleContainer.prototype.at = function (index) {
+        var _a;
+        return (_a = this.tabs[index]) === null || _a === void 0 ? void 0 : _a.value;
+    };
+    TitleContainer.prototype.indexOf = function (tabOrId) {
+        var id = typeof tabOrId === 'string' ? tabOrId : tabOrId.id;
+        return this.tabs.findIndex(function (tab) { return tab.value.id === id; });
+    };
+    TitleContainer.prototype.setActive = function (isGroupActive) {
+        this.active = isGroupActive;
+    };
+    TitleContainer.prototype.addTab = function (tab, index) {
+        if (index === void 0) { index = this.tabs.length; }
+        if (index < 0 || index > this.tabs.length) {
+            throw new Error('invalid location');
+        }
+        this.tabContainer.insertBefore(tab.value.element, this.tabContainer.children[index]);
+        this.tabs = __spread(this.tabs.slice(0, index), [
+            tab
+        ], this.tabs.slice(index));
+        if (this.selectedIndex < 0) {
+            this.selectedIndex = index;
+        }
+    };
+    TitleContainer.prototype.delete = function (id) {
+        var index = this.tabs.findIndex(function (tab) { return tab.value.id === id; });
+        var tab = this.tabs.splice(index, 1)[0];
+        var value = tab.value, disposable = tab.disposable;
+        disposable.dispose();
+        value.element.remove();
+    };
+    TitleContainer.prototype.setActivePanel = function (panel) {
+        this.tabs.forEach(function (tab) {
+            var isActivePanel = panel.id === tab.value.id;
+            tab.value.setActive(isActivePanel);
+        });
+    };
+    TitleContainer.prototype.openPanel = function (panel, index) {
+        var _this = this;
+        if (index === void 0) { index = this.tabs.length; }
+        if (this.tabs.find(function (tab) { return tab.value.id === panel.id; })) {
+            return;
+        }
+        var tab = new _tab__WEBPACK_IMPORTED_MODULE_2__.Tab(panel.id, this.accessor, this.group);
+        tab.setContent(panel.header);
+        var disposable = _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable.from(tab.onChanged(function (event) {
+            var _a;
+            var alreadyFocused = panel.id === ((_a = _this.group.activePanel) === null || _a === void 0 ? void 0 : _a.id) &&
+                _this.group.isAncestor(_focusedElement__WEBPACK_IMPORTED_MODULE_7__.focusedElement.element);
+            switch (event.kind) {
+                case _tab__WEBPACK_IMPORTED_MODULE_2__.MouseEventKind.CLICK:
+                    _this.group.setPanel(panel, alreadyFocused);
+                    break;
+            }
+            _this.accessor.fireMouseEvent(__assign(__assign({}, event), { panel: panel, tab: true }));
+        }), tab.onDropped(function (event) {
+            _this._onDropped.fire({ event: event, index: _this.indexOf(tab) });
+        }));
+        var value = { value: tab, disposable: disposable };
+        this.addTab(value, index);
+        this.activePanel = panel;
+    };
+    TitleContainer.prototype.closePanel = function (panel) {
+        this.delete(panel.id);
+    };
+    TitleContainer.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+        this.tabs.forEach(function (tab) {
+            tab.disposable.dispose();
+        });
+        this.tabs = [];
+    };
+    return TitleContainer;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/groupview/types.js":
+/*!************************************************!*\
+  !*** ../splitview/dist/es6/groupview/types.js ***!
+  \************************************************/
+/*! namespace exports */
+/*! exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/index.js":
+/*!**************************************!*\
+  !*** ../splitview/dist/es6/index.js ***!
+  \**************************************/
+/*! namespace exports */
+/*! export CompositeDisposable [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/lifecycle.js .CompositeDisposable */
+/*! export ContentContainer [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/panel/content.js .ContentContainer */
+/*! export Disposable [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/lifecycle.js .Disposable */
+/*! export DockviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/component.api.js .DockviewApi */
+/*! export DockviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/dockview/dockviewComponent.js .DockviewComponent */
+/*! export DockviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/dockview.js .DockviewReact */
+/*! export Emitter [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .Emitter */
+/*! export Event [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .Event */
+/*! export Gridview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .Gridview */
+/*! export GridviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/component.api.js .GridviewApi */
+/*! export GridviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridviewComponent.js .GridviewComponent */
+/*! export GridviewPanel [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridviewPanel.js .GridviewPanel */
+/*! export GridviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/gridview/gridview.js .GridviewReact */
+/*! export GroupPanelApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/groupPanelApi.js .GroupPanelApi */
+/*! export Groupview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/groupview.js .Groupview */
+/*! export GroupviewPanel [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/groupviewPanel.js .GroupviewPanel */
+/*! export LayoutPriority [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .LayoutPriority */
+/*! export MouseEventKind [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/tab.js .MouseEventKind */
+/*! export MutableDisposable [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/lifecycle.js .MutableDisposable */
+/*! export Orientation [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .Orientation */
+/*! export PaneFramework [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/paneview/paneviewComponent.js .PaneFramework */
+/*! export Paneview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/paneview/paneview.js .Paneview */
+/*! export PaneviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/component.api.js .PaneviewApi */
+/*! export PaneviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/paneview/paneviewComponent.js .PaneviewComponent */
+/*! export PaneviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/paneview/paneview.js .PaneviewReact */
+/*! export ReactPanelContentPart [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/reactContentPart.js .ReactPanelContentPart */
+/*! export ReactPanelHeaderPart [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/reactHeaderPart.js .ReactPanelHeaderPart */
+/*! export ReactPart [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/react.js .ReactPart */
+/*! export SashState [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .SashState */
+/*! export Sizing [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .Sizing */
+/*! export Splitview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .Splitview */
+/*! export SplitviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/component.api.js .SplitviewApi */
+/*! export SplitviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/splitviewComponent.js .SplitviewComponent */
+/*! export SplitviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/splitview/splitview.js .SplitviewReact */
+/*! export Tab [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/tab.js .Tab */
+/*! export addDisposableListener [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .addDisposableListener */
+/*! export addDisposableWindowListener [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .addDisposableWindowListener */
+/*! export getDirectionOrientation [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .getDirectionOrientation */
+/*! export getGridLocation [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .getGridLocation */
+/*! export getLocationOrientation [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .getLocationOrientation */
+/*! export getRelativeLocation [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .getRelativeLocation */
+/*! export indexInParent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .indexInParent */
+/*! export isGridBranchNode [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .isGridBranchNode */
+/*! export orthogonal [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .orthogonal */
+/*! export usePortalsLifecycle [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/react.js .usePortalsLifecycle */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_exports__, __webpack_require__.d, __webpack_require__.r, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "LayoutPriority": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority,
+/* harmony export */   "Orientation": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation,
+/* harmony export */   "SashState": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.SashState,
+/* harmony export */   "Sizing": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Sizing,
+/* harmony export */   "Splitview": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Splitview,
+/* harmony export */   "SplitviewComponent": () => /* reexport safe */ _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_1__.SplitviewComponent,
+/* harmony export */   "Paneview": () => /* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_2__.Paneview,
+/* harmony export */   "PaneFramework": () => /* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_3__.PaneFramework,
+/* harmony export */   "PaneviewComponent": () => /* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_3__.PaneviewComponent,
+/* harmony export */   "Gridview": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.Gridview,
+/* harmony export */   "getDirectionOrientation": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getDirectionOrientation,
+/* harmony export */   "getGridLocation": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getGridLocation,
+/* harmony export */   "getLocationOrientation": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getLocationOrientation,
+/* harmony export */   "getRelativeLocation": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getRelativeLocation,
+/* harmony export */   "indexInParent": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.indexInParent,
+/* harmony export */   "isGridBranchNode": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.isGridBranchNode,
+/* harmony export */   "orthogonal": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.orthogonal,
+/* harmony export */   "Groupview": () => /* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_5__.Groupview,
+/* harmony export */   "ContentContainer": () => /* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_6__.ContentContainer,
+/* harmony export */   "MouseEventKind": () => /* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_7__.MouseEventKind,
+/* harmony export */   "Tab": () => /* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_7__.Tab,
+/* harmony export */   "Emitter": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.Emitter,
+/* harmony export */   "Event": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.Event,
+/* harmony export */   "addDisposableListener": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.addDisposableListener,
+/* harmony export */   "addDisposableWindowListener": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.addDisposableWindowListener,
+/* harmony export */   "CompositeDisposable": () => /* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_9__.CompositeDisposable,
+/* harmony export */   "Disposable": () => /* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_9__.Disposable,
+/* harmony export */   "MutableDisposable": () => /* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_9__.MutableDisposable,
+/* harmony export */   "GroupviewPanel": () => /* reexport safe */ _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_10__.GroupviewPanel,
+/* harmony export */   "GroupPanelApi": () => /* reexport safe */ _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_11__.GroupPanelApi,
+/* harmony export */   "DockviewApi": () => /* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_12__.DockviewApi,
+/* harmony export */   "GridviewApi": () => /* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_12__.GridviewApi,
+/* harmony export */   "PaneviewApi": () => /* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_12__.PaneviewApi,
+/* harmony export */   "SplitviewApi": () => /* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_12__.SplitviewApi,
+/* harmony export */   "ReactPart": () => /* reexport safe */ _react_react__WEBPACK_IMPORTED_MODULE_13__.ReactPart,
+/* harmony export */   "usePortalsLifecycle": () => /* reexport safe */ _react_react__WEBPACK_IMPORTED_MODULE_13__.usePortalsLifecycle,
+/* harmony export */   "DockviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.DockviewReact,
+/* harmony export */   "GridviewPanel": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.GridviewPanel,
+/* harmony export */   "GridviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.GridviewReact,
+/* harmony export */   "PaneviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.PaneviewReact,
+/* harmony export */   "ReactPanelContentPart": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.ReactPanelContentPart,
+/* harmony export */   "ReactPanelHeaderPart": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.ReactPanelHeaderPart,
+/* harmony export */   "SplitviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.SplitviewReact,
+/* harmony export */   "DockviewComponent": () => /* reexport safe */ _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_16__.DockviewComponent,
+/* harmony export */   "GridviewComponent": () => /* reexport safe */ _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_18__.GridviewComponent
+/* harmony export */ });
+/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
+/* harmony import */ var _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitview/splitviewComponent */ "../splitview/dist/es6/splitview/splitviewComponent.js");
+/* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./paneview/paneview */ "../splitview/dist/es6/paneview/paneview.js");
+/* harmony import */ var _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./paneview/paneviewComponent */ "../splitview/dist/es6/paneview/paneviewComponent.js");
+/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./gridview/gridview */ "../splitview/dist/es6/gridview/gridview.js");
+/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./groupview/groupview */ "../splitview/dist/es6/groupview/groupview.js");
+/* harmony import */ var _groupview_panel_content__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./groupview/panel/content */ "../splitview/dist/es6/groupview/panel/content.js");
+/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./groupview/tab */ "../splitview/dist/es6/groupview/tab.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./groupview/groupviewPanel */ "../splitview/dist/es6/groupview/groupviewPanel.js");
+/* harmony import */ var _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./api/groupPanelApi */ "../splitview/dist/es6/api/groupPanelApi.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./api/component.api */ "../splitview/dist/es6/api/component.api.js");
+/* harmony import */ var _react_react__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./react/react */ "../splitview/dist/es6/react/react.js");
+/* harmony import */ var _groupview_types__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./groupview/types */ "../splitview/dist/es6/groupview/types.js");
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./react */ "../splitview/dist/es6/react/index.js");
+/* harmony import */ var _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./dockview/dockviewComponent */ "../splitview/dist/es6/dockview/dockviewComponent.js");
+/* harmony import */ var _dockview_options__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./dockview/options */ "../splitview/dist/es6/dockview/options.js");
+/* harmony import */ var _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./gridview/gridviewComponent */ "../splitview/dist/es6/gridview/gridviewComponent.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/json.js":
+/*!*************************************!*\
+  !*** ../splitview/dist/es6/json.js ***!
+  \*************************************/
+/*! namespace exports */
+/*! export tryParseJSON [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "tryParseJSON": () => /* binding */ tryParseJSON
+/* harmony export */ });
+function tryParseJSON(text, reviver) {
+    try {
+        return JSON.parse(text, reviver);
+    }
+    catch (err) {
+        console.warn('failed to parse JSON');
+        return undefined;
+    }
+}
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/lifecycle.js":
+/*!******************************************!*\
+  !*** ../splitview/dist/es6/lifecycle.js ***!
+  \******************************************/
+/*! namespace exports */
+/*! export CompositeDisposable [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Disposable [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export MutableDisposable [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Disposable": () => /* binding */ Disposable,
+/* harmony export */   "CompositeDisposable": () => /* binding */ CompositeDisposable,
+/* harmony export */   "MutableDisposable": () => /* binding */ MutableDisposable
+/* harmony export */ });
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (undefined && undefined.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
+var Disposable;
+(function (Disposable) {
+    Disposable.NONE = {
+        dispose: function () {
+            // noop
+        },
+    };
+})(Disposable || (Disposable = {}));
+var CompositeDisposable = /** @class */ (function () {
+    function CompositeDisposable() {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        this.disposables = args;
+    }
+    CompositeDisposable.from = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        return new (CompositeDisposable.bind.apply(CompositeDisposable, __spread([void 0], args)))();
+    };
+    CompositeDisposable.prototype.addDisposables = function () {
+        var _this = this;
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        args === null || args === void 0 ? void 0 : args.forEach(function (arg) { return _this.disposables.push(arg); });
+    };
+    CompositeDisposable.prototype.dispose = function () {
+        this.disposables.forEach(function (arg) { return arg.dispose(); });
+    };
+    return CompositeDisposable;
+}());
+
+var MutableDisposable = /** @class */ (function () {
+    function MutableDisposable() {
+        this._disposable = Disposable.NONE;
+    }
+    Object.defineProperty(MutableDisposable.prototype, "value", {
+        set: function (disposable) {
+            if (this._disposable) {
+                this._disposable.dispose();
+            }
+            this._disposable = disposable;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    MutableDisposable.prototype.dispose = function () {
+        if (this._disposable) {
+            this._disposable.dispose();
+        }
+    };
+    return MutableDisposable;
+}());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/math.js":
+/*!*************************************!*\
+  !*** ../splitview/dist/es6/math.js ***!
+  \*************************************/
+/*! namespace exports */
+/*! export clamp [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export sequentialNumberGenerator [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "clamp": () => /* binding */ clamp,
+/* harmony export */   "sequentialNumberGenerator": () => /* binding */ sequentialNumberGenerator
+/* harmony export */ });
+var clamp = function (value, min, max) {
+    if (min > max) {
+        throw new Error(min + " > " + max + " is an invalid condition");
+    }
+    return Math.min(max, Math.max(value, min));
+};
+var sequentialNumberGenerator = function () {
+    var value = 1;
+    return { next: function () { return (value++).toString(); } };
+};
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/panel/componentFactory.js":
+/*!*******************************************************!*\
+  !*** ../splitview/dist/es6/panel/componentFactory.js ***!
+  \*******************************************************/
+/*! namespace exports */
+/*! export createComponent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createComponent": () => /* binding */ createComponent
+/* harmony export */ });
+function createComponent(id, componentName, components, frameworkComponents, createFrameworkComponent, fallback) {
+    var Component = typeof componentName === 'string'
+        ? components[componentName]
+        : componentName;
+    var FrameworkComponent = typeof componentName === 'string'
+        ? frameworkComponents[componentName]
+        : componentName;
+    if (Component && FrameworkComponent) {
+        throw new Error("cannot register component " + componentName + " as both a component and frameworkComponent");
+    }
+    if (FrameworkComponent) {
+        if (!createFrameworkComponent) {
+            throw new Error('you must register a frameworkPanelWrapper to use framework components');
+        }
+        var wrappedComponent = createFrameworkComponent.createComponent(id, componentName, FrameworkComponent);
+        return wrappedComponent;
+    }
+    if (!Component) {
+        if (fallback) {
+            return fallback();
+        }
+        throw new Error('invalid component');
+    }
+    return new Component(id, componentName);
+}
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/paneview/paneview.js":
+/*!**************************************************!*\
+  !*** ../splitview/dist/es6/paneview/paneview.js ***!
+  \**************************************************/
+/*! namespace exports */
+/*! export Paneview [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Paneview": () => /* binding */ Paneview
+/* harmony export */ });
+/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dom */ "../splitview/dist/es6/dom.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+
+
+var Paneview = /** @class */ (function (_super) {
+    __extends(Paneview, _super);
+    function Paneview(container, options) {
+        var _a;
+        var _this = _super.call(this) || this;
+        _this.paneItems = [];
+        _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        _this.onDidChange = _this._onDidChange.event;
+        _this._orientation = (_a = options.orientation) !== null && _a !== void 0 ? _a : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.VERTICAL;
+        _this.element = document.createElement('div');
+        _this.element.className = 'pane-container';
+        container.appendChild(_this.element);
+        _this.splitview = new _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Splitview(_this.element, {
+            orientation: _this._orientation,
+            proportionalLayout: false,
+            descriptor: options.descriptor,
+        });
+        // if we've added views from the descriptor we need to
+        // add the panes to our Pane array and setup animation
+        _this.getPanes().forEach(function (pane, index) {
+            var disposable = pane.onDidChangeExpansionState(function () {
+                _this.setupAnimation();
+            });
+            var paneItem = {
+                pane: pane,
+                disposable: {
+                    dispose: function () {
+                        disposable.dispose();
+                    },
+                },
+            };
+            _this.paneItems.splice(index, 0, paneItem);
+            pane.orthogonalSize = _this.splitview.orthogonalSize;
+        });
+        _this.addDisposables(_this.splitview.onDidSashEnd(function () {
+            _this._onDidChange.fire(undefined);
+        }));
+        return _this;
+    }
+    Object.defineProperty(Paneview.prototype, "minimumSize", {
+        get: function () {
+            return this.splitview.minimumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Paneview.prototype, "maximumSize", {
+        get: function () {
+            return this.splitview.maximumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Paneview.prototype, "orientation", {
+        get: function () {
+            return this.splitview.orientation;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Paneview.prototype, "size", {
+        get: function () {
+            return this.splitview.size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Paneview.prototype, "orthogonalSize", {
+        get: function () {
+            return this.splitview.orthogonalSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Paneview.prototype.addPane = function (pane, size, index, skipLayout) {
+        var _this = this;
+        if (index === void 0) { index = this.splitview.length; }
+        if (skipLayout === void 0) { skipLayout = false; }
+        var disposable = pane.onDidChangeExpansionState(function () {
+            _this.setupAnimation();
+        });
+        var paneItem = {
+            pane: pane,
+            disposable: {
+                dispose: function () {
+                    disposable.dispose();
+                },
+            },
+        };
+        this.paneItems.splice(index, 0, paneItem);
+        pane.orthogonalSize = this.splitview.orthogonalSize;
+        this.splitview.addView(pane, size, index, skipLayout);
+    };
+    Paneview.prototype.getViewSize = function (index) {
+        return this.splitview.getViewSize(index);
+    };
+    Paneview.prototype.getPanes = function () {
+        return this.splitview.getViews();
+    };
+    Paneview.prototype.removePane = function (index) {
+        this.splitview.removeView(index);
+        var paneItem = this.paneItems.splice(index, 1)[0];
+        paneItem.disposable.dispose();
+        return paneItem;
+    };
+    Paneview.prototype.moveView = function (from, to) {
+        var view = this.removePane(from);
+        this.addPane(view.pane, to);
+    };
+    Paneview.prototype.layout = function (size, orthogonalSize) {
+        // for (const paneItem of this.paneItems) {
+        //     paneItem.pane.orthogonalSize = orthogonalSize;
+        // }
+        this.splitview.layout(size, orthogonalSize);
+    };
+    Paneview.prototype.setupAnimation = function () {
+        var _this = this;
+        if (this.animationTimer) {
+            clearTimeout(this.animationTimer);
+            this.animationTimer = undefined;
+        }
+        (0,_dom__WEBPACK_IMPORTED_MODULE_3__.addClasses)(this.element, 'animated');
+        this.animationTimer = setTimeout(function () {
+            _this.animationTimer = undefined;
+            (0,_dom__WEBPACK_IMPORTED_MODULE_3__.removeClasses)(_this.element, 'animated');
+        }, 200);
+    };
+    Paneview.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+        this.splitview.dispose();
+        if (this.animationTimer) {
+            clearTimeout(this.animationTimer);
+            this.animationTimer = undefined;
+        }
+        this.paneItems.forEach(function (paneItem) {
+            paneItem.disposable.dispose();
+        });
+        this.paneItems = [];
+        this.element.remove();
+    };
+    return Paneview;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/paneview/paneviewComponent.js":
+/*!***********************************************************!*\
+  !*** ../splitview/dist/es6/paneview/paneviewComponent.js ***!
+  \***********************************************************/
+/*! namespace exports */
+/*! export PaneFramework [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export PaneviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "PaneFramework": () => /* binding */ PaneFramework,
+/* harmony export */   "PaneviewComponent": () => /* binding */ PaneviewComponent
+/* harmony export */ });
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
+/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
+/* harmony import */ var _paneview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./paneview */ "../splitview/dist/es6/paneview/paneview.js");
+/* harmony import */ var _paneviewPanel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./paneviewPanel */ "../splitview/dist/es6/paneview/paneviewPanel.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+
+
+
+
+var DefaultHeader = /** @class */ (function (_super) {
+    __extends(DefaultHeader, _super);
+    function DefaultHeader() {
+        var _this = _super.call(this) || this;
+        _this.apiRef = { api: null };
+        _this._element = document.createElement('div');
+        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_2__.addDisposableListener)(_this.element, 'click', function () {
+            var _a;
+            (_a = _this.apiRef.api) === null || _a === void 0 ? void 0 : _a.setExpanded(!_this.apiRef.api.isExpanded);
+        }));
+        return _this;
+    }
+    Object.defineProperty(DefaultHeader.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    DefaultHeader.prototype.init = function (params) {
+        this.apiRef.api = params.api;
+        this._element.textContent = params.title;
+    };
+    DefaultHeader.prototype.update = function (params) {
+        //
+    };
+    return DefaultHeader;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable));
+var PaneFramework = /** @class */ (function (_super) {
+    __extends(PaneFramework, _super);
+    function PaneFramework(options) {
+        var _this = _super.call(this, options.id, options.component, options.headerComponent) || this;
+        _this.options = options;
+        return _this;
+    }
+    PaneFramework.prototype.getBodyComponent = function () {
+        return this.options.body;
+    };
+    PaneFramework.prototype.getHeaderComponent = function () {
+        return this.options.header;
+    };
+    return PaneFramework;
+}(_paneviewPanel__WEBPACK_IMPORTED_MODULE_6__.PaneviewPanel));
+
+var PaneviewComponent = /** @class */ (function (_super) {
+    __extends(PaneviewComponent, _super);
+    function PaneviewComponent(element, options) {
+        var _this = _super.call(this) || this;
+        _this.element = element;
+        _this.options = options;
+        _this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        _this.onDidLayoutChange = _this._onDidLayoutChange.event;
+        if (!options.components) {
+            options.components = {};
+        }
+        if (!options.frameworkComponents) {
+            options.frameworkComponents = {};
+        }
+        _this.paneview = new _paneview__WEBPACK_IMPORTED_MODULE_5__.Paneview(_this.element, {
+            // only allow paneview in the vertical orientation for now
+            orientation: _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation.VERTICAL,
+        });
+        _this.addDisposables(_this.paneview.onDidChange(function () {
+            _this._onDidLayoutChange.fire(undefined);
+        }), _this.paneview);
+        return _this;
+    }
+    Object.defineProperty(PaneviewComponent.prototype, "minimumSize", {
+        get: function () {
+            return this.paneview.minimumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PaneviewComponent.prototype, "maximumSize", {
+        get: function () {
+            return this.paneview.maximumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PaneviewComponent.prototype, "height", {
+        get: function () {
+            return this.paneview.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation.HORIZONTAL
+                ? this.paneview.orthogonalSize
+                : this.paneview.size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PaneviewComponent.prototype, "width", {
+        get: function () {
+            return this.paneview.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation.HORIZONTAL
+                ? this.paneview.size
+                : this.paneview.orthogonalSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    PaneviewComponent.prototype.focus = function () {
+        //
+    };
+    PaneviewComponent.prototype.addPanel = function (options) {
+        var _a;
+        var body = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(options.id, options.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkWrapper
+            ? {
+                createComponent: this.options.frameworkWrapper.body
+                    .createComponent,
+            }
+            : undefined);
+        var header;
+        if (options.headerComponent) {
+            header = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(options.id, options.headerComponent, this.options.headerComponents, this.options.headerframeworkComponents, {
+                createComponent: (_a = this.options.frameworkWrapper) === null || _a === void 0 ? void 0 : _a.header.createComponent,
+            });
+        }
+        else {
+            header = new DefaultHeader();
+        }
+        var view = new PaneFramework({
+            id: options.id,
+            component: options.component,
+            headerComponent: options.headerComponent,
+            header: header,
+            body: body,
+        });
+        this.paneview.addPane(view);
+        view.init({
+            params: options.params || {},
+            minimumBodySize: options.minimumBodySize,
+            maximumBodySize: options.maximumBodySize,
+            isExpanded: options.isExpanded,
+            title: options.title,
+            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_0__.PaneviewApi(this),
+        });
+        view.orientation = this.paneview.orientation;
+        return {
+            dispose: function () {
+                //
+            },
+        };
+    };
+    PaneviewComponent.prototype.getPanels = function () {
+        return this.paneview.getPanes();
+    };
+    PaneviewComponent.prototype.removePanel = function (panel) {
+        var views = this.getPanels();
+        var index = views.findIndex(function (_) { return _ === panel; });
+        this.paneview.removePane(index);
+    };
+    PaneviewComponent.prototype.getPanel = function (id) {
+        return this.getPanels().find(function (view) { return view.id === id; });
+    };
+    PaneviewComponent.prototype.layout = function (width, height) {
+        var _a = __read(this.paneview.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation.HORIZONTAL
+            ? [width, height]
+            : [height, width], 2), size = _a[0], orthogonalSize = _a[1];
+        this.paneview.layout(size, orthogonalSize);
+    };
+    /**
+     * Resize the layout to fit the parent container
+     */
+    PaneviewComponent.prototype.resizeToFit = function () {
+        if (!this.element.parentElement) {
+            return;
+        }
+        var _a = this.element.parentElement.getBoundingClientRect(), width = _a.width, height = _a.height;
+        this.layout(width, height);
+    };
+    PaneviewComponent.prototype.toJSON = function () {
+        var _this = this;
+        var views = this.paneview
+            .getPanes()
+            .map(function (view, i) {
+            var size = _this.paneview.getViewSize(i);
+            return {
+                size: size,
+                data: view.toJSON(),
+                minimumSize: view.minimumBodySize,
+                maximumSize: view.maximumBodySize,
+                expanded: view.isExpanded(),
+            };
+        });
+        return {
+            views: views,
+            size: this.paneview.size,
+        };
+    };
+    PaneviewComponent.prototype.fromJSON = function (data) {
+        var _this = this;
+        var views = data.views, size = data.size;
+        var queue = [];
+        this.paneview.dispose();
+        this.paneview = new _paneview__WEBPACK_IMPORTED_MODULE_5__.Paneview(this.element, {
+            orientation: _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation.VERTICAL,
+            descriptor: {
+                size: size,
+                views: views.map(function (view) {
+                    var data = view.data;
+                    var body = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(data.id, data.component, _this.options.components || {}, _this.options.frameworkComponents || {}, _this.options.frameworkWrapper
+                        ? {
+                            createComponent: _this.options.frameworkWrapper
+                                .body.createComponent,
+                        }
+                        : undefined);
+                    var header;
+                    if (data.headerComponent) {
+                        header = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(data.id, data.headerComponent, _this.options.headerComponents || {}, _this.options.headerframeworkComponents || {}, _this.options.frameworkWrapper
+                            ? {
+                                createComponent: _this.options
+                                    .frameworkWrapper.header
+                                    .createComponent,
+                            }
+                            : undefined);
+                    }
+                    else {
+                        header = new DefaultHeader();
+                    }
+                    var panel = new PaneFramework({
+                        id: data.id,
+                        component: data.component,
+                        headerComponent: data.headerComponent,
+                        header: header,
+                        body: body,
+                    });
+                    queue.push(function () {
+                        panel.init({
+                            params: data.params || {},
+                            minimumBodySize: view.minimumSize,
+                            maximumBodySize: view.maximumSize,
+                            title: data.title,
+                            isExpanded: !!view.expanded,
+                            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_0__.PaneviewApi(_this),
+                        });
+                    });
+                    panel.orientation = _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation.VERTICAL;
+                    return { size: view.size, view: panel };
+                }),
+            },
+        });
+        this.layout(this.width, this.height);
+        queue.forEach(function (f) { return f(); });
+    };
+    return PaneviewComponent;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/paneview/paneviewPanel.js":
+/*!*******************************************************!*\
+  !*** ../splitview/dist/es6/paneview/paneviewPanel.js ***!
+  \*******************************************************/
+/*! namespace exports */
+/*! export PaneviewPanel [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "PaneviewPanel": () => /* binding */ PaneviewPanel
+/* harmony export */ });
+/* harmony import */ var _api_panePanelApi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/panePanelApi */ "../splitview/dist/es6/api/panePanelApi.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../gridview/basePanelView */ "../splitview/dist/es6/gridview/basePanelView.js");
+/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+
+var PaneviewPanel = /** @class */ (function (_super) {
+    __extends(PaneviewPanel, _super);
+    function PaneviewPanel(id, component, headerComponent) {
+        var _this = _super.call(this, id, component, new _api_panePanelApi__WEBPACK_IMPORTED_MODULE_0__.PanePanelApi(id)) || this;
+        _this.headerComponent = headerComponent;
+        _this._onDidChangeExpansionState = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
+        _this.onDidChangeExpansionState = _this._onDidChangeExpansionState.event;
+        _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
+        _this.onDidChange = _this._onDidChange.event;
+        _this.headerSize = 22;
+        _this._orthogonalSize = 0;
+        _this._minimumBodySize = 0;
+        _this._maximumBodySize = Number.POSITIVE_INFINITY;
+        _this._isExpanded = false;
+        _this.api.pane = _this; // TODO cannot use 'this' before 'super'
+        _this.element.classList.add('pane');
+        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.element, 'mouseenter', function (ev) {
+            _this.api._onMouseEnter.fire(ev);
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.element, 'mouseleave', function (ev) {
+            _this.api._onMouseLeave.fire(ev);
+        }));
+        _this.addDisposables(_this._onDidChangeExpansionState, _this.onDidChangeExpansionState(function (isExpanded) {
+            _this.api._onDidExpansionChange.fire({ isExpanded: isExpanded });
+        }));
+        _this.render();
+        return _this;
+    }
+    Object.defineProperty(PaneviewPanel.prototype, "orientation", {
+        get: function () {
+            return this._orientation;
+        },
+        set: function (value) {
+            this._orientation = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PaneviewPanel.prototype, "minimumSize", {
+        get: function () {
+            var headerSize = this.headerSize;
+            var expanded = this.isExpanded();
+            var minimumBodySize = expanded ? this._minimumBodySize : 0;
+            return headerSize + minimumBodySize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PaneviewPanel.prototype, "maximumSize", {
+        get: function () {
+            var headerSize = this.headerSize;
+            var expanded = this.isExpanded();
+            var maximumBodySize = expanded ? this._maximumBodySize : 0;
+            return headerSize + maximumBodySize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PaneviewPanel.prototype, "orthogonalSize", {
+        get: function () {
+            return this._orthogonalSize;
+        },
+        set: function (size) {
+            this._orthogonalSize = size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PaneviewPanel.prototype, "minimumBodySize", {
+        set: function (value) {
+            this._minimumBodySize = typeof value === 'number' ? value : 0;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PaneviewPanel.prototype, "maximumBodySize", {
+        set: function (value) {
+            this._maximumBodySize =
+                typeof value === 'number' ? value : Number.POSITIVE_INFINITY;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    PaneviewPanel.prototype.isExpanded = function () {
+        return this._isExpanded;
+    };
+    PaneviewPanel.prototype.setExpanded = function (expanded) {
+        var _this = this;
+        this._isExpanded = expanded;
+        if (expanded) {
+            if (this.animationTimer) {
+                clearTimeout(this.animationTimer);
+            }
+            this.element.appendChild(this.body);
+        }
+        else {
+            this.animationTimer = setTimeout(function () {
+                _this.body.remove();
+            }, 200);
+        }
+        this._onDidChangeExpansionState.fire(expanded);
+        this._onDidChange.fire(expanded ? this.expandedSize : undefined);
+    };
+    PaneviewPanel.prototype.layout = function (size, orthogonalSize) {
+        var _a = __read(this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_3__.Orientation.HORIZONTAL
+            ? [size, orthogonalSize]
+            : [orthogonalSize, size], 2), width = _a[0], height = _a[1];
+        if (this.isExpanded()) {
+            this.expandedSize = width;
+        }
+        _super.prototype.layout.call(this, width, height);
+    };
+    PaneviewPanel.prototype.init = function (parameters) {
+        _super.prototype.init.call(this, parameters);
+        if (typeof parameters.minimumBodySize === 'number') {
+            this.minimumBodySize = parameters.minimumBodySize;
+        }
+        if (typeof parameters.maximumBodySize === 'number') {
+            this.maximumBodySize = parameters.maximumBodySize;
+        }
+        this.bodyPart = this.getBodyComponent();
+        this.headerPart = this.getHeaderComponent();
+        this.bodyPart.init(__assign(__assign({}, parameters), { api: this.api }));
+        this.headerPart.init(__assign(__assign({}, parameters), { api: this.api }));
+        this.body.append(this.bodyPart.element);
+        this.header.append(this.headerPart.element);
+        if (typeof parameters.isExpanded === 'boolean') {
+            this.setExpanded(parameters.isExpanded);
+        }
+    };
+    PaneviewPanel.prototype.toJSON = function () {
+        var params = this.params;
+        return __assign(__assign({}, _super.prototype.toJSON.call(this)), { headerComponent: this.headerComponent, title: params.title });
+    };
+    PaneviewPanel.prototype.render = function () {
+        this.header = document.createElement('div');
+        this.header.tabIndex = -1;
+        this.header.className = 'pane-header';
+        this.header.style.height = this.headerSize + "px";
+        this.header.style.lineHeight = this.headerSize + "px";
+        this.header.style.minHeight = this.headerSize + "px";
+        this.header.style.maxHeight = this.headerSize + "px";
+        this.element.appendChild(this.header);
+        this.body = document.createElement('div');
+        this.body.tabIndex = -1;
+        this.body.className = 'pane-body';
+        this.element.appendChild(this.body);
+    };
+    // TODO slightly hacky by-pass of the component to create a body and header component
+    PaneviewPanel.prototype.getComponent = function () {
+        var _this = this;
+        return {
+            update: function (params) {
+                var _a, _b;
+                (_a = _this.bodyPart) === null || _a === void 0 ? void 0 : _a.update({ params: params });
+                (_b = _this.headerPart) === null || _b === void 0 ? void 0 : _b.update({ params: params });
+            },
+            dispose: function () {
+                var _a, _b;
+                (_a = _this.bodyPart) === null || _a === void 0 ? void 0 : _a.dispose();
+                (_b = _this.headerPart) === null || _b === void 0 ? void 0 : _b.dispose();
+            },
+        };
+    };
+    return PaneviewPanel;
+}(_gridview_basePanelView__WEBPACK_IMPORTED_MODULE_2__.BasePanelView));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/react/deserializer.js":
+/*!***************************************************!*\
+  !*** ../splitview/dist/es6/react/deserializer.js ***!
+  \***************************************************/
+/*! namespace exports */
+/*! export ReactPanelDeserialzier [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ReactPanelDeserialzier": () => /* binding */ ReactPanelDeserialzier
+/* harmony export */ });
+/* harmony import */ var _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../groupview/groupviewPanel */ "../splitview/dist/es6/groupview/groupviewPanel.js");
+/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
+/* harmony import */ var _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dockview/components/tab/defaultTab */ "../splitview/dist/es6/dockview/components/tab/defaultTab.js");
+
+
+
+
+var ReactPanelDeserialzier = /** @class */ (function () {
+    function ReactPanelDeserialzier(layout) {
+        this.layout = layout;
+    }
+    ReactPanelDeserialzier.prototype.fromJSON = function (panelData) {
+        var _a, _b;
+        var panelId = panelData.id;
+        var contentId = panelData.contentId;
+        var tabId = panelData.tabId;
+        var params = panelData.params;
+        var title = panelData.title;
+        var state = panelData.state;
+        var suppressClosable = panelData.suppressClosable;
+        var contentPart = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(contentId, contentId, this.layout.options.components, this.layout.options.frameworkComponents, (_a = this.layout.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.content);
+        var headerPart = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(tabId, tabId, this.layout.options.tabComponents, this.layout.options.frameworkComponentFactory, (_b = this.layout.options.frameworkComponentFactory) === null || _b === void 0 ? void 0 : _b.tab, function () { return new _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_3__.DefaultTab(); });
+        var panel = new _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_0__.GroupviewPanel(panelId, new _api_component_api__WEBPACK_IMPORTED_MODULE_2__.DockviewApi(this.layout));
+        panel.init({
+            headerPart: headerPart,
+            contentPart: contentPart,
+            title: title,
+            suppressClosable: suppressClosable,
+            params: params || {},
+            state: state || {},
+        });
+        return panel;
+    };
+    return ReactPanelDeserialzier;
+}());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/react/dockview/dockview.js":
+/*!********************************************************!*\
+  !*** ../splitview/dist/es6/react/dockview/dockview.js ***!
+  \********************************************************/
+/*! namespace exports */
+/*! export DockviewReact [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DockviewReact": () => /* binding */ DockviewReact
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../dockview/dockviewComponent */ "../splitview/dist/es6/dockview/dockviewComponent.js");
+/* harmony import */ var _reactContentPart__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./reactContentPart */ "../splitview/dist/es6/react/dockview/reactContentPart.js");
+/* harmony import */ var _reactHeaderPart__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./reactHeaderPart */ "../splitview/dist/es6/react/dockview/reactHeaderPart.js");
+/* harmony import */ var _deserializer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../deserializer */ "../splitview/dist/es6/react/deserializer.js");
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../api/component.api */ "../splitview/dist/es6/api/component.api.js");
+/* harmony import */ var _reactWatermarkPart__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./reactWatermarkPart */ "../splitview/dist/es6/react/dockview/reactWatermarkPart.js");
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+
+
+
+
+
+var DockviewReact = function (props) {
+    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
+    var dockviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
+    var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_5__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
+    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
+        var _a;
+        var factory = {
+            content: {
+                createComponent: function (id, componentId, component) {
+                    return new _reactContentPart__WEBPACK_IMPORTED_MODULE_2__.ReactPanelContentPart(componentId, component, {
+                        addPortal: addPortal,
+                    });
+                },
+            },
+            tab: {
+                createComponent: function (id, componentId, component) {
+                    return new _reactHeaderPart__WEBPACK_IMPORTED_MODULE_3__.ReactPanelHeaderPart(componentId, component, {
+                        addPortal: addPortal,
+                    });
+                },
+            },
+            watermark: {
+                createComponent: function (id, componentId, component) {
+                    return new _reactWatermarkPart__WEBPACK_IMPORTED_MODULE_7__.ReactWatermarkPart(componentId, component, {
+                        addPortal: addPortal,
+                    });
+                },
+            },
+        };
+        var element = document.createElement('div');
+        var dockview = new _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_1__.DockviewComponent(element, {
+            frameworkComponentFactory: factory,
+            frameworkComponents: props.components,
+            frameworkTabComponents: props.tabComponents,
+            tabHeight: props.tabHeight,
+            debug: props.debug,
+            enableExternalDragEvents: props.enableExternalDragEvents,
+            watermarkFrameworkComponent: props.watermarkComponent,
+            styles: props.hideBorders
+                ? { separatorBorder: 'transparent' }
+                : undefined,
+        });
+        (_a = domRef.current) === null || _a === void 0 ? void 0 : _a.appendChild(dockview.element);
+        dockview.deserializer = new _deserializer__WEBPACK_IMPORTED_MODULE_4__.ReactPanelDeserialzier(dockview);
+        dockview.resizeToFit();
+        if (props.onReady) {
+            props.onReady({ api: new _api_component_api__WEBPACK_IMPORTED_MODULE_6__.DockviewApi(dockview) });
+        }
+        dockviewRef.current = dockview;
+        return function () {
+            dockview.dispose();
+        };
+    }, []);
+    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
+        if (!props.onTabContextMenu || !dockviewRef.current) {
+            return function () {
+                //noop
+            };
+        }
+        var disposable = dockviewRef.current.onTabContextMenu(function (event) {
+            props.onTabContextMenu(event);
+        });
+        return function () {
+            disposable.dispose();
+        };
+    }, [props.onTabContextMenu]);
+    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: props.className, style: { height: '100%', width: '100%' }, ref: domRef }, portals));
+};
+DockviewReact.displayName = 'DockviewComponent';
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/react/dockview/reactContentPart.js":
+/*!****************************************************************!*\
+  !*** ../splitview/dist/es6/react/dockview/reactContentPart.js ***!
+  \****************************************************************/
+/*! namespace exports */
+/*! export ReactPanelContentPart [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ReactPanelContentPart": () => /* binding */ ReactPanelContentPart
+/* harmony export */ });
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+var ReactPanelContentPart = /** @class */ (function () {
+    function ReactPanelContentPart(id, component, reactPortalStore) {
+        this.id = id;
+        this.component = component;
+        this.reactPortalStore = reactPortalStore;
+        this._element = document.createElement('div');
+        this._element.style.height = '100%';
+        this._element.style.width = '100%';
+        this._actionsElement = document.createElement('div');
+        this._actionsElement.style.height = '100%';
+        this._actionsElement.style.width = '100%';
+    }
+    Object.defineProperty(ReactPanelContentPart.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ReactPanelContentPart.prototype, "actions", {
+        get: function () {
+            return this._actionsElement;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    ReactPanelContentPart.prototype.focus = function () {
+        // this._element.focus();
+    };
+    ReactPanelContentPart.prototype.init = function (parameters) {
+        this.parameters = parameters;
+        this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, __assign(__assign({}, parameters.params), { api: parameters.api, containerApi: parameters.containerApi, setActionsbar: this.setActionsbar.bind(this) }));
+    };
+    ReactPanelContentPart.prototype.setActionsbar = function (component, props) {
+        var _this = this;
+        var _a;
+        if (this.actionsPart) {
+            console.debug('removed existing panel-actions portal');
+            this.actionsPart.dispose();
+            this.actionsPart = undefined;
+        }
+        this.actionsPart = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this._actionsElement, this.reactPortalStore, component, __assign(__assign({}, props), { api: this.parameters.api, containerApi: this.parameters.containerApi }));
+        (_a = this._group) === null || _a === void 0 ? void 0 : _a.updateActions();
+        return {
+            update: function (props) {
+                _this.actionsPart.update(props);
+            },
+            dispose: function () {
+                _this.actionsPart.dispose();
+                _this.actionsPart = undefined;
+            },
+        };
+    };
+    ReactPanelContentPart.prototype.toJSON = function () {
+        return {
+            id: this.id,
+        };
+    };
+    ReactPanelContentPart.prototype.update = function (params) {
+        var _a;
+        this.parameters.params = params.params;
+        (_a = this.part) === null || _a === void 0 ? void 0 : _a.update(params.params);
+    };
+    ReactPanelContentPart.prototype.updateParentGroup = function (group, isPanelVisible) {
+        this._group = group;
+    };
+    ReactPanelContentPart.prototype.layout = function (width, height) {
+        // noop
+    };
+    ReactPanelContentPart.prototype.close = function () {
+        return Promise.resolve(true);
+    };
+    ReactPanelContentPart.prototype.dispose = function () {
+        var _a, _b;
+        (_a = this.part) === null || _a === void 0 ? void 0 : _a.dispose();
+        (_b = this.actionsPart) === null || _b === void 0 ? void 0 : _b.dispose();
+    };
+    return ReactPanelContentPart;
+}());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/react/dockview/reactHeaderPart.js":
+/*!***************************************************************!*\
+  !*** ../splitview/dist/es6/react/dockview/reactHeaderPart.js ***!
+  \***************************************************************/
+/*! namespace exports */
+/*! export ReactPanelHeaderPart [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ReactPanelHeaderPart": () => /* binding */ ReactPanelHeaderPart
+/* harmony export */ });
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+var ReactPanelHeaderPart = /** @class */ (function () {
+    function ReactPanelHeaderPart(id, component, reactPortalStore) {
+        this.id = id;
+        this.component = component;
+        this.reactPortalStore = reactPortalStore;
+        this._element = document.createElement('div');
+    }
+    Object.defineProperty(ReactPanelHeaderPart.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    ReactPanelHeaderPart.prototype.focus = function () {
+        //noop
+    };
+    ReactPanelHeaderPart.prototype.init = function (parameters) {
+        this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, __assign(__assign({}, parameters.params), { api: parameters.api, containerApi: parameters.containerApi }));
+    };
+    ReactPanelHeaderPart.prototype.update = function (event) {
+        //noop
+    };
+    ReactPanelHeaderPart.prototype.toJSON = function () {
+        return {
+            id: this.id,
+        };
+    };
+    ReactPanelHeaderPart.prototype.layout = function (width, height) {
+        // noop - retrieval from api
+    };
+    ReactPanelHeaderPart.prototype.updateParentGroup = function (group, isPanelVisible) {
+        // noop - retrieval from api
+    };
+    ReactPanelHeaderPart.prototype.dispose = function () {
+        var _a;
+        (_a = this.part) === null || _a === void 0 ? void 0 : _a.dispose();
+    };
+    return ReactPanelHeaderPart;
+}());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/react/dockview/reactWatermarkPart.js":
+/*!******************************************************************!*\
+  !*** ../splitview/dist/es6/react/dockview/reactWatermarkPart.js ***!
+  \******************************************************************/
+/*! namespace exports */
+/*! export ReactWatermarkPart [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ReactWatermarkPart": () => /* binding */ ReactWatermarkPart
+/* harmony export */ });
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+var ReactWatermarkPart = /** @class */ (function () {
+    function ReactWatermarkPart(id, component, reactPortalStore) {
+        this.id = id;
+        this.component = component;
+        this.reactPortalStore = reactPortalStore;
+        this._groupRef = { value: undefined };
+        this._element = document.createElement('div');
+    }
+    Object.defineProperty(ReactWatermarkPart.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    ReactWatermarkPart.prototype.init = function (parameters) {
+        var _this = this;
+        this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, __assign(__assign({}, parameters.params), { api: parameters.api, containerApi: parameters.containerApi, close: function () {
+                return parameters.containerApi.removeGroup(_this._groupRef.value);
+            } }));
+    };
+    ReactWatermarkPart.prototype.toJSON = function () {
+        return {
+            id: this.id,
+        };
+    };
+    ReactWatermarkPart.prototype.layout = function (width, height) {
+        // noop - retrieval from api
+    };
+    ReactWatermarkPart.prototype.updateParentGroup = function (group, isPanelVisible) {
+        // noop - retrieval from api
+        this._groupRef.value = group;
+    };
+    ReactWatermarkPart.prototype.dispose = function () {
+        var _a;
+        (_a = this.part) === null || _a === void 0 ? void 0 : _a.dispose();
+    };
+    return ReactWatermarkPart;
+}());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/react/gridview/gridview.js":
+/*!********************************************************!*\
+  !*** ../splitview/dist/es6/react/gridview/gridview.js ***!
+  \********************************************************/
+/*! namespace exports */
+/*! export GridviewReact [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "GridviewReact": () => /* binding */ GridviewReact
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../gridview/gridviewComponent */ "../splitview/dist/es6/gridview/gridviewComponent.js");
+/* harmony import */ var _view__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./view */ "../splitview/dist/es6/react/gridview/view.js");
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../api/component.api */ "../splitview/dist/es6/api/component.api.js");
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+
+
+var GridviewReact = function (props) {
+    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
+    var gridviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
+    var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_3__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
+    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
+        var gridview = new _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_1__.GridviewComponent(domRef.current, {
+            proportionalLayout: !!props.proportionalLayout,
+            orientation: props.orientation,
+            frameworkComponents: props.components,
+            frameworkComponentFactory: {
+                createComponent: function (id, componentId, component) {
+                    return new _view__WEBPACK_IMPORTED_MODULE_2__.ReactGridPanelView(id, componentId, component, {
+                        addPortal: addPortal,
+                    });
+                },
+            },
+            styles: props.hideBorders
+                ? { separatorBorder: 'transparent' }
+                : undefined,
+        });
+        if (props.onReady) {
+            props.onReady({ api: new _api_component_api__WEBPACK_IMPORTED_MODULE_4__.GridviewApi(gridview) });
+        }
+        gridviewRef.current = gridview;
+        return function () {
+            gridview.dispose();
+        };
+    }, []);
+    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: props.className, style: { height: '100%', width: '100%' }, ref: domRef }, portals));
+};
+GridviewReact.displayName = 'GridviewComponent';
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/react/gridview/view.js":
+/*!****************************************************!*\
+  !*** ../splitview/dist/es6/react/gridview/view.js ***!
+  \****************************************************/
+/*! namespace exports */
+/*! export ReactGridPanelView [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ReactGridPanelView": () => /* binding */ ReactGridPanelView
+/* harmony export */ });
+/* harmony import */ var _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../gridview/gridviewPanel */ "../splitview/dist/es6/gridview/gridviewPanel.js");
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+
+var ReactGridPanelView = /** @class */ (function (_super) {
+    __extends(ReactGridPanelView, _super);
+    function ReactGridPanelView(id, component, reactComponent, reactPortalStore) {
+        var _this = _super.call(this, id, component) || this;
+        _this.reactComponent = reactComponent;
+        _this.reactPortalStore = reactPortalStore;
+        return _this;
+    }
+    ReactGridPanelView.prototype.getComponent = function () {
+        return new _react__WEBPACK_IMPORTED_MODULE_1__.ReactPart(this.element, this.reactPortalStore, this.reactComponent, __assign(__assign({}, this.params.params), { api: this.api, containerApi: this.params
+                .containerApi }));
+    };
+    return ReactGridPanelView;
+}(_gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_0__.GridviewPanel));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/react/index.js":
+/*!********************************************!*\
+  !*** ../splitview/dist/es6/react/index.js ***!
+  \********************************************/
+/*! namespace exports */
+/*! export DockviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/dockview.js .DockviewReact */
+/*! export GridviewPanel [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridviewPanel.js .GridviewPanel */
+/*! export GridviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/gridview/gridview.js .GridviewReact */
+/*! export PaneviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/paneview/paneview.js .PaneviewReact */
+/*! export ReactPanelContentPart [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/reactContentPart.js .ReactPanelContentPart */
+/*! export ReactPanelHeaderPart [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/reactHeaderPart.js .ReactPanelHeaderPart */
+/*! export SplitviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/splitview/splitview.js .SplitviewReact */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_exports__, __webpack_require__.d, __webpack_require__.r, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DockviewReact": () => /* reexport safe */ _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__.DockviewReact,
+/* harmony export */   "SplitviewReact": () => /* reexport safe */ _splitview_splitview__WEBPACK_IMPORTED_MODULE_1__.SplitviewReact,
+/* harmony export */   "GridviewReact": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_2__.GridviewReact,
+/* harmony export */   "ReactPanelContentPart": () => /* reexport safe */ _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_3__.ReactPanelContentPart,
+/* harmony export */   "ReactPanelHeaderPart": () => /* reexport safe */ _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_4__.ReactPanelHeaderPart,
+/* harmony export */   "GridviewPanel": () => /* reexport safe */ _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_5__.GridviewPanel,
+/* harmony export */   "PaneviewReact": () => /* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__.PaneviewReact
+/* harmony export */ });
+/* harmony import */ var _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dockview/dockview */ "../splitview/dist/es6/react/dockview/dockview.js");
+/* harmony import */ var _splitview_splitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitview/splitview */ "../splitview/dist/es6/react/splitview/splitview.js");
+/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./gridview/gridview */ "../splitview/dist/es6/react/gridview/gridview.js");
+/* harmony import */ var _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./dockview/reactContentPart */ "../splitview/dist/es6/react/dockview/reactContentPart.js");
+/* harmony import */ var _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./dockview/reactHeaderPart */ "../splitview/dist/es6/react/dockview/reactHeaderPart.js");
+/* harmony import */ var _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../gridview/gridviewPanel */ "../splitview/dist/es6/gridview/gridviewPanel.js");
+/* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./paneview/paneview */ "../splitview/dist/es6/react/paneview/paneview.js");
+/* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./types */ "../splitview/dist/es6/react/types.js");
+
+
+
+
+
+
+
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/react/paneview/paneview.js":
+/*!********************************************************!*\
+  !*** ../splitview/dist/es6/react/paneview/paneview.js ***!
+  \********************************************************/
+/*! namespace exports */
+/*! export PaneviewReact [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "PaneviewReact": () => /* binding */ PaneviewReact
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../paneview/paneviewComponent */ "../splitview/dist/es6/paneview/paneviewComponent.js");
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../api/component.api */ "../splitview/dist/es6/api/component.api.js");
+/* harmony import */ var _view__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./view */ "../splitview/dist/es6/react/paneview/view.js");
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+
+
+var PaneviewReact = function (props) {
+    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
+    var paneviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
+    var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_2__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
+    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
+        var paneview = new _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_1__.PaneviewComponent(domRef.current, {
+            frameworkComponents: props.components,
+            components: {},
+            headerComponents: {},
+            headerframeworkComponents: props.headerComponents,
+            frameworkWrapper: {
+                header: {
+                    createComponent: function (id, componentId, component) {
+                        return new _view__WEBPACK_IMPORTED_MODULE_4__.PanelHeader(id, component, { addPortal: addPortal });
+                    },
+                },
+                body: {
+                    createComponent: function (id, componentId, component) {
+                        return new _view__WEBPACK_IMPORTED_MODULE_4__.PanelBody(id, component, { addPortal: addPortal });
+                    },
+                },
+            },
+        });
+        var _a = domRef.current.getBoundingClientRect(), width = _a.width, height = _a.height;
+        var _b = __read([height, width], 2), size = _b[0], orthogonalSize = _b[1];
+        paneview.layout(size, orthogonalSize);
+        if (props.onReady) {
+            props.onReady({ api: new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.PaneviewApi(paneview) });
+        }
+        paneview.resizeToFit();
+        paneviewRef.current = paneview;
+        return function () {
+            paneview.dispose();
+        };
+    }, []);
+    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: props.className, style: { height: '100%', width: '100%' }, ref: domRef }, portals));
+};
+PaneviewReact.displayName = 'PaneviewComponent';
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/react/paneview/view.js":
+/*!****************************************************!*\
+  !*** ../splitview/dist/es6/react/paneview/view.js ***!
+  \****************************************************/
+/*! namespace exports */
+/*! export PanelBody [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export PanelHeader [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "PanelBody": () => /* binding */ PanelBody,
+/* harmony export */   "PanelHeader": () => /* binding */ PanelHeader
+/* harmony export */ });
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+var PanelBody = /** @class */ (function () {
+    function PanelBody(id, component, reactPortalStore) {
+        this.id = id;
+        this.component = component;
+        this.reactPortalStore = reactPortalStore;
+        this._element = document.createElement('div');
+        this._element.style.height = '100%';
+        this._element.style.width = '100%';
+    }
+    Object.defineProperty(PanelBody.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    PanelBody.prototype.init = function (parameters) {
+        this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, __assign(__assign({}, parameters.params), { api: parameters.api, title: parameters.title, containerApi: parameters.containerApi }));
+    };
+    PanelBody.prototype.toJSON = function () {
+        return {
+            id: this.id,
+        };
+    };
+    PanelBody.prototype.update = function (params) {
+        var _a;
+        (_a = this.part) === null || _a === void 0 ? void 0 : _a.update(params.params);
+    };
+    PanelBody.prototype.dispose = function () {
+        var _a;
+        (_a = this.part) === null || _a === void 0 ? void 0 : _a.dispose();
+    };
+    return PanelBody;
+}());
+
+var PanelHeader = /** @class */ (function () {
+    function PanelHeader(id, component, reactPortalStore) {
+        this.id = id;
+        this.component = component;
+        this.reactPortalStore = reactPortalStore;
+        this._element = document.createElement('div');
+        this._element.style.height = '100%';
+        this._element.style.width = '100%';
+    }
+    Object.defineProperty(PanelHeader.prototype, "element", {
+        get: function () {
+            return this._element;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    PanelHeader.prototype.init = function (parameters) {
+        this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, __assign(__assign({}, parameters.params), { api: parameters.api, title: parameters.title, containerApi: parameters.containerApi }));
+    };
+    PanelHeader.prototype.toJSON = function () {
+        return {
+            id: this.id,
+        };
+    };
+    PanelHeader.prototype.update = function (params) {
+        var _a;
+        (_a = this.part) === null || _a === void 0 ? void 0 : _a.update(params.params);
+    };
+    PanelHeader.prototype.dispose = function () {
+        var _a;
+        (_a = this.part) === null || _a === void 0 ? void 0 : _a.dispose();
+    };
+    return PanelHeader;
+}());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/react/react.js":
+/*!********************************************!*\
+  !*** ../splitview/dist/es6/react/react.js ***!
+  \********************************************/
+/*! namespace exports */
+/*! export ReactPart [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export usePortalsLifecycle [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ReactPart": () => /* binding */ ReactPart,
+/* harmony export */   "usePortalsLifecycle": () => /* binding */ usePortalsLifecycle
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../math */ "../splitview/dist/es6/math.js");
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (undefined && undefined.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
+
+
+
+/**
+ * This component is intended to interface between vanilla-js and React hence we need to be
+ * creative in how we update props.
+ * A ref of the component is exposed with an update method; which when called stores the props
+ * as a ref within this component and forcefully triggers a re-render of the component using
+ * the ref of props we just set on the renderered component as the props passed to the inner
+ * component
+ */
+var ReactComponentBridge = function (props, ref) {
+    var _a = __read(react__WEBPACK_IMPORTED_MODULE_0__.useState(), 2), _ = _a[0], triggerRender = _a[1];
+    var _props = react__WEBPACK_IMPORTED_MODULE_0__.useRef(props.componentProps);
+    react__WEBPACK_IMPORTED_MODULE_0__.useImperativeHandle(ref, function () { return ({
+        update: function (props) {
+            _props.current = __assign(__assign({}, _props.current), props);
+            /**
+             * setting a arbitrary piece of state within this component will
+             * trigger a re-render.
+             * we use this rather than updating through a prop since we can
+             * pass a ref into the vanilla-js world.
+             */
+            triggerRender(Date.now());
+        },
+    }); }, []);
+    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
+        console.debug('[reactwrapper] component mounted ');
+        return function () {
+            console.debug('[reactwrapper] component unmounted ');
+        };
+    }, []);
+    return react__WEBPACK_IMPORTED_MODULE_0__.createElement(props.component, _props.current);
+};
+ReactComponentBridge.displayName = 'PanelWrapper';
+/**
+ * Since we are storing the React.Portal references in a rendered array they
+ * require a key property like any other React element rendered in an array
+ * to prevent excessive re-rendering
+ */
+var uniquePortalKeyGenerator = (0,_math__WEBPACK_IMPORTED_MODULE_2__.sequentialNumberGenerator)();
+var ReactPart = /** @class */ (function () {
+    function ReactPart(parent, portalStore, component, parameters) {
+        this.parent = parent;
+        this.portalStore = portalStore;
+        this.component = component;
+        this.parameters = parameters;
+        this.createPortal();
+    }
+    ReactPart.prototype.update = function (props) {
+        var _a;
+        if (this.disposed) {
+            throw new Error('invalid operation');
+        }
+        (_a = this.componentInstance) === null || _a === void 0 ? void 0 : _a.update(props);
+    };
+    ReactPart.prototype.createPortal = function () {
+        var _this = this;
+        if (this.disposed) {
+            throw new Error('invalid operation');
+        }
+        // TODO use a better check for isReactFunctionalComponent
+        if (typeof this.component !== 'function') {
+            /**
+             * we know this isn't a React.FunctionComponent so throw an error here.
+             * if we do not intercept this the React library will throw a very obsure error
+             * for the same reason, at least at this point we will emit a sensible stacktrace.
+             */
+            throw new Error('invalid operation');
+        }
+        var bridgeComponent = react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(ReactComponentBridge), {
+            component: this
+                .component,
+            componentProps: this.parameters,
+            ref: function (element) {
+                _this.componentInstance = element;
+            },
+        });
+        var portal = react_dom__WEBPACK_IMPORTED_MODULE_1__.createPortal(bridgeComponent, this.parent, uniquePortalKeyGenerator.next());
+        this.ref = {
+            portal: portal,
+            disposable: this.portalStore.addPortal(portal),
+        };
+    };
+    ReactPart.prototype.dispose = function () {
+        var _a;
+        (_a = this.ref) === null || _a === void 0 ? void 0 : _a.disposable.dispose();
+        this.disposed = true;
+    };
+    return ReactPart;
+}());
+
+/**
+ * A React Hook that returns an array of portals to be rendered by the user of this hook
+ * and a disposable function to add a portal. Calling dispose removes this portal from the
+ * portal array
+ */
+var usePortalsLifecycle = function () {
+    var _a = __read(react__WEBPACK_IMPORTED_MODULE_0__.useState([]), 2), portals = _a[0], setPortals = _a[1];
+    react__WEBPACK_IMPORTED_MODULE_0__.useDebugValue("Portal count: " + portals.length);
+    var addPortal = react__WEBPACK_IMPORTED_MODULE_0__.useCallback(function (portal) {
+        setPortals(function (portals) { return __spread(portals, [portal]); });
+        var disposed = false;
+        return {
+            dispose: function () {
+                if (disposed) {
+                    throw new Error('invalid operation');
+                }
+                disposed = true;
+                setPortals(function (portals) { return portals.filter(function (p) { return p !== portal; }); });
+            },
+        };
+    }, []);
+    return [portals, addPortal];
+};
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/react/splitview/splitview.js":
+/*!**********************************************************!*\
+  !*** ../splitview/dist/es6/react/splitview/splitview.js ***!
+  \**********************************************************/
+/*! namespace exports */
+/*! export SplitviewReact [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "SplitviewReact": () => /* binding */ SplitviewReact
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../api/component.api */ "../splitview/dist/es6/api/component.api.js");
+/* harmony import */ var _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../splitview/splitviewComponent */ "../splitview/dist/es6/splitview/splitviewComponent.js");
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
+/* harmony import */ var _view__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./view */ "../splitview/dist/es6/react/splitview/view.js");
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+
+
+var SplitviewReact = function (props) {
+    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
+    var splitviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
+    var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_3__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
+    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
+        var splitview = new _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_2__.SplitviewComponent(domRef.current, {
+            orientation: props.orientation,
+            frameworkComponents: props.components,
+            frameworkWrapper: {
+                createComponent: function (id, componentId, component) {
+                    return new _view__WEBPACK_IMPORTED_MODULE_4__.ReactPanelView(id, componentId, component, {
+                        addPortal: addPortal,
+                    });
+                },
+            },
+            proportionalLayout: props.proportionalLayout,
+            styles: props.hideBorders
+                ? { separatorBorder: 'transparent' }
+                : undefined,
+        });
+        splitview.resizeToFit();
+        if (props.onReady) {
+            props.onReady({ api: new _api_component_api__WEBPACK_IMPORTED_MODULE_1__.SplitviewApi(splitview) });
+        }
+        splitviewRef.current = splitview;
+        return function () {
+            splitview.dispose();
+        };
+    }, []);
+    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: props.className, style: { height: '100%', width: '100%' }, ref: domRef }, portals));
+};
+SplitviewReact.displayName = 'SplitviewComponent';
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/react/splitview/view.js":
+/*!*****************************************************!*\
+  !*** ../splitview/dist/es6/react/splitview/view.js ***!
+  \*****************************************************/
+/*! namespace exports */
+/*! export ReactPanelView [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ReactPanelView": () => /* binding */ ReactPanelView
+/* harmony export */ });
+/* harmony import */ var _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../splitview/splitviewPanel */ "../splitview/dist/es6/splitview/splitviewPanel.js");
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+
+var ReactPanelView = /** @class */ (function (_super) {
+    __extends(ReactPanelView, _super);
+    function ReactPanelView(id, component, reactComponent, reactPortalStore) {
+        var _this = _super.call(this, id, component) || this;
+        _this.reactComponent = reactComponent;
+        _this.reactPortalStore = reactPortalStore;
+        return _this;
+    }
+    ReactPanelView.prototype.getComponent = function () {
+        return new _react__WEBPACK_IMPORTED_MODULE_1__.ReactPart(this.element, this.reactPortalStore, this.reactComponent, __assign(__assign({}, this.params.params), { api: this.api, containerApi: this.params
+                .containerApi }));
+    };
+    return ReactPanelView;
+}(_splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_0__.SplitviewPanel));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/react/types.js":
+/*!********************************************!*\
+  !*** ../splitview/dist/es6/react/types.js ***!
+  \********************************************/
+/*! namespace exports */
+/*! exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/splitview/core/splitview.js":
+/*!*********************************************************!*\
+  !*** ../splitview/dist/es6/splitview/core/splitview.js ***!
+  \*********************************************************/
+/*! namespace exports */
+/*! export LayoutPriority [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Orientation [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export SashState [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Sizing [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Splitview [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Orientation": () => /* binding */ Orientation,
+/* harmony export */   "SashState": () => /* binding */ SashState,
+/* harmony export */   "LayoutPriority": () => /* binding */ LayoutPriority,
+/* harmony export */   "Sizing": () => /* binding */ Sizing,
+/* harmony export */   "Splitview": () => /* binding */ Splitview
+/* harmony export */ });
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../dom */ "../splitview/dist/es6/dom.js");
+/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../math */ "../splitview/dist/es6/math.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../array */ "../splitview/dist/es6/array.js");
+/* harmony import */ var _viewItem__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./viewItem */ "../splitview/dist/es6/splitview/core/viewItem.js");
+var __values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (undefined && undefined.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
+
+
+
+
+
+var Orientation;
+(function (Orientation) {
+    Orientation["HORIZONTAL"] = "HORIZONTAL";
+    Orientation["VERTICAL"] = "VERTICAL";
+})(Orientation || (Orientation = {}));
+var SashState;
+(function (SashState) {
+    SashState[SashState["MAXIMUM"] = 0] = "MAXIMUM";
+    SashState[SashState["MINIMUM"] = 1] = "MINIMUM";
+    SashState[SashState["DISABLED"] = 2] = "DISABLED";
+    SashState[SashState["ENABLED"] = 3] = "ENABLED";
+})(SashState || (SashState = {}));
+var LayoutPriority;
+(function (LayoutPriority) {
+    LayoutPriority["Low"] = "low";
+    LayoutPriority["High"] = "high";
+    LayoutPriority["Normal"] = "normal";
+})(LayoutPriority || (LayoutPriority = {}));
+var Sizing;
+(function (Sizing) {
+    Sizing.Distribute = { type: 'distribute' };
+    function Split(index) {
+        return { type: 'split', index: index };
+    }
+    Sizing.Split = Split;
+    function Invisible(cachedVisibleSize) {
+        return { type: 'invisible', cachedVisibleSize: cachedVisibleSize };
+    }
+    Sizing.Invisible = Invisible;
+})(Sizing || (Sizing = {}));
+var Splitview = /** @class */ (function () {
+    function Splitview(container, options) {
+        var _this = this;
+        this.container = container;
+        this.views = [];
+        this.sashes = [];
+        this._size = 0;
+        this._orthogonalSize = 0;
+        this.contentSize = 0;
+        this._proportions = undefined;
+        this._onDidSashEnd = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        this.onDidSashEnd = this._onDidSashEnd.event;
+        this._startSnappingEnabled = true;
+        this._endSnappingEnabled = true;
+        this.resize = function (index, delta, sizes, lowPriorityIndexes, highPriorityIndexes, overloadMinDelta, overloadMaxDelta, snapBefore, snapAfter) {
+            var e_1, _a, e_2, _b;
+            if (sizes === void 0) { sizes = _this.views.map(function (x) { return x.size; }); }
+            if (overloadMinDelta === void 0) { overloadMinDelta = Number.NEGATIVE_INFINITY; }
+            if (overloadMaxDelta === void 0) { overloadMaxDelta = Number.POSITIVE_INFINITY; }
+            if (index < 0 || index > _this.views.length) {
+                return 0;
+            }
+            var upIndexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(index, -1);
+            var downIndexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(index + 1, _this.views.length);
+            //
+            if (highPriorityIndexes) {
+                try {
+                    for (var highPriorityIndexes_1 = __values(highPriorityIndexes), highPriorityIndexes_1_1 = highPriorityIndexes_1.next(); !highPriorityIndexes_1_1.done; highPriorityIndexes_1_1 = highPriorityIndexes_1.next()) {
+                        var index_1 = highPriorityIndexes_1_1.value;
+                        (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToStart)(upIndexes, index_1);
+                        (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToStart)(downIndexes, index_1);
+                    }
+                }
+                catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                finally {
+                    try {
+                        if (highPriorityIndexes_1_1 && !highPriorityIndexes_1_1.done && (_a = highPriorityIndexes_1.return)) _a.call(highPriorityIndexes_1);
+                    }
+                    finally { if (e_1) throw e_1.error; }
+                }
+            }
+            if (lowPriorityIndexes) {
+                try {
+                    for (var lowPriorityIndexes_1 = __values(lowPriorityIndexes), lowPriorityIndexes_1_1 = lowPriorityIndexes_1.next(); !lowPriorityIndexes_1_1.done; lowPriorityIndexes_1_1 = lowPriorityIndexes_1.next()) {
+                        var index_2 = lowPriorityIndexes_1_1.value;
+                        (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToEnd)(upIndexes, index_2);
+                        (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToEnd)(downIndexes, index_2);
+                    }
+                }
+                catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                finally {
+                    try {
+                        if (lowPriorityIndexes_1_1 && !lowPriorityIndexes_1_1.done && (_b = lowPriorityIndexes_1.return)) _b.call(lowPriorityIndexes_1);
+                    }
+                    finally { if (e_2) throw e_2.error; }
+                }
+            }
+            //
+            var upItems = upIndexes.map(function (i) { return _this.views[i]; });
+            var upSizes = upIndexes.map(function (i) { return sizes[i]; });
+            //
+            var downItems = downIndexes.map(function (i) { return _this.views[i]; });
+            var downSizes = downIndexes.map(function (i) { return sizes[i]; });
+            //
+            var minDeltaUp = upIndexes.reduce(function (_, i) { return _ + _this.views[i].minimumSize - sizes[i]; }, 0);
+            var maxDeltaUp = upIndexes.reduce(function (_, i) { return _ + _this.views[i].maximumSize - sizes[i]; }, 0);
+            //
+            var maxDeltaDown = downIndexes.length === 0
+                ? Number.POSITIVE_INFINITY
+                : downIndexes.reduce(function (_, i) { return _ + sizes[i] - _this.views[i].minimumSize; }, 0);
+            var minDeltaDown = downIndexes.length === 0
+                ? Number.NEGATIVE_INFINITY
+                : downIndexes.reduce(function (_, i) { return _ + sizes[i] - _this.views[i].maximumSize; }, 0);
+            //
+            var minDelta = Math.max(minDeltaUp, minDeltaDown);
+            var maxDelta = Math.min(maxDeltaDown, maxDeltaUp);
+            //
+            var snapped = false;
+            if (snapBefore) {
+                var snapView = _this.views[snapBefore.index];
+                var visible = delta >= snapBefore.limitDelta;
+                snapped = visible !== snapView.visible;
+                snapView.setVisible(visible, snapBefore.size);
+            }
+            if (!snapped && snapAfter) {
+                var snapView = _this.views[snapAfter.index];
+                var visible = delta < snapAfter.limitDelta;
+                snapped = visible !== snapView.visible;
+                snapView.setVisible(visible, snapAfter.size);
+            }
+            if (snapped) {
+                return _this.resize(index, delta, sizes, lowPriorityIndexes, highPriorityIndexes, overloadMinDelta, overloadMaxDelta);
+            }
+            //
+            var tentativeDelta = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(delta, minDelta, maxDelta);
+            var actualDelta = 0;
+            //
+            var deltaUp = tentativeDelta;
+            for (var i = 0; i < upItems.length; i++) {
+                var item = upItems[i];
+                var size = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(upSizes[i] + deltaUp, item.minimumSize, item.maximumSize);
+                var viewDelta = size - upSizes[i];
+                actualDelta += viewDelta;
+                deltaUp -= viewDelta;
+                item.size = size;
+            }
+            //
+            var deltaDown = actualDelta;
+            for (var i = 0; i < downItems.length; i++) {
+                var item = downItems[i];
+                var size = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(downSizes[i] - deltaDown, item.minimumSize, item.maximumSize);
+                var viewDelta = size - downSizes[i];
+                deltaDown += viewDelta;
+                item.size = size;
+            }
+            //
+            return delta;
+        };
+        this._orientation = options.orientation;
+        this.element = this.createContainer();
+        this.proportionalLayout =
+            options.proportionalLayout === undefined
+                ? true
+                : !!options.proportionalLayout;
+        this.viewContainer = this.createViewContainer();
+        this.sashContainer = this.createSashContainer();
+        this.element.appendChild(this.sashContainer);
+        this.element.appendChild(this.viewContainer);
+        this.container.appendChild(this.element);
+        this.style(options.styles);
+        // We have an existing set of view, add them now
+        if (options.descriptor) {
+            this._size = options.descriptor.size;
+            options.descriptor.views.forEach(function (viewDescriptor, index) {
+                var sizing = viewDescriptor.visible === undefined ||
+                    viewDescriptor.visible
+                    ? viewDescriptor.size
+                    : {
+                        type: 'invisible',
+                        cachedVisibleSize: viewDescriptor.size,
+                    };
+                var view = viewDescriptor.view;
+                _this.addView(view, sizing, index, true
+                // true skip layout
+                );
+            });
+            // Initialize content size and proportions for first layout
+            this.contentSize = this.views.reduce(function (r, i) { return r + i.size; }, 0);
+            this.saveProportions();
+        }
+    }
+    Object.defineProperty(Splitview.prototype, "size", {
+        get: function () {
+            return this._size;
+        },
+        set: function (value) {
+            this._size = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Splitview.prototype, "orthogonalSize", {
+        get: function () {
+            return this._orthogonalSize;
+        },
+        set: function (value) {
+            this._orthogonalSize = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Splitview.prototype, "length", {
+        get: function () {
+            return this.views.length;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Splitview.prototype, "proportions", {
+        get: function () {
+            return this._proportions ? __spread(this._proportions) : undefined;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Splitview.prototype, "orientation", {
+        get: function () {
+            return this._orientation;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Splitview.prototype, "minimumSize", {
+        get: function () {
+            return this.views.reduce(function (r, item) { return r + item.minimumSize; }, 0);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Splitview.prototype, "maximumSize", {
+        get: function () {
+            return this.length === 0
+                ? Number.POSITIVE_INFINITY
+                : this.views.reduce(function (r, item) { return r + item.maximumSize; }, 0);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Splitview.prototype, "startSnappingEnabled", {
+        get: function () {
+            return this._startSnappingEnabled;
+        },
+        set: function (startSnappingEnabled) {
+            if (this._startSnappingEnabled === startSnappingEnabled) {
+                return;
+            }
+            this._startSnappingEnabled = startSnappingEnabled;
+            this.updateSashEnablement();
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Splitview.prototype, "endSnappingEnabled", {
+        get: function () {
+            return this._endSnappingEnabled;
+        },
+        set: function (endSnappingEnabled) {
+            if (this._endSnappingEnabled === endSnappingEnabled) {
+                return;
+            }
+            this._endSnappingEnabled = endSnappingEnabled;
+            this.updateSashEnablement();
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Splitview.prototype.style = function (styles) {
+        if ((styles === null || styles === void 0 ? void 0 : styles.separatorBorder) === 'transparent') {
+            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.removeClasses)(this.element, 'separator-border');
+            this.element.style.removeProperty('--separator-border');
+        }
+        else {
+            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.addClasses)(this.element, 'separator-border');
+            if (styles === null || styles === void 0 ? void 0 : styles.separatorBorder) {
+                this.element.style.setProperty('--separator-border', styles.separatorBorder);
+            }
+        }
+    };
+    Splitview.prototype.isViewVisible = function (index) {
+        if (index < 0 || index >= this.views.length) {
+            throw new Error('Index out of bounds');
+        }
+        var viewItem = this.views[index];
+        return viewItem.visible;
+    };
+    Splitview.prototype.setViewVisible = function (index, visible) {
+        if (index < 0 || index >= this.views.length) {
+            throw new Error('Index out of bounds');
+        }
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.container, 'visible', visible);
+        var viewItem = this.views[index];
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.container, 'visible', visible);
+        viewItem.setVisible(visible, viewItem.size);
+        this.distributeEmptySpace(index);
+        this.layoutViews();
+        this.saveProportions();
+    };
+    Splitview.prototype.getViewSize = function (index) {
+        if (index < 0 || index >= this.views.length) {
+            return -1;
+        }
+        return this.views[index].size;
+    };
+    Splitview.prototype.resizeView = function (index, size) {
+        var _this = this;
+        if (index < 0 || index >= this.views.length) {
+            return;
+        }
+        var indexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(this.views.length).filter(function (i) { return i !== index; });
+        var lowPriorityIndexes = __spread(indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.Low; }), [
+            index,
+        ]);
+        var highPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.High; });
+        var item = this.views[index];
+        size = Math.round(size);
+        size = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(size, item.minimumSize, Math.min(item.maximumSize, this._size));
+        item.size = size;
+        this.relayout(lowPriorityIndexes, highPriorityIndexes);
+    };
+    Splitview.prototype.getViews = function () {
+        return this.views.map(function (x) { return x.view; });
+    };
+    Splitview.prototype.onDidChange = function (item, size) {
+        var index = this.views.indexOf(item);
+        if (index < 0 || index >= this.views.length) {
+            return;
+        }
+        size = typeof size === 'number' ? size : item.size;
+        size = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(size, item.minimumSize, item.maximumSize);
+        item.size = size;
+        this.relayout([index], undefined);
+    };
+    Splitview.prototype.addView = function (view, size, index, skipLayout) {
+        var _this = this;
+        if (size === void 0) { size = { type: 'distribute' }; }
+        if (index === void 0) { index = this.views.length; }
+        var container = document.createElement('div');
+        container.className = 'view';
+        container.appendChild(view.element);
+        var viewSize;
+        if (typeof size === 'number') {
+            viewSize = size;
+        }
+        else if (size.type === 'split') {
+            viewSize = this.getViewSize(size.index) / 2;
+        }
+        else if (size.type === 'invisible') {
+            viewSize = { cachedVisibleSize: size.cachedVisibleSize };
+        }
+        else {
+            viewSize = view.minimumSize;
+        }
+        var disposable = view.onDidChange(function (size) {
+            return _this.onDidChange(viewItem, size);
+        });
+        var dispose = function () {
+            disposable === null || disposable === void 0 ? void 0 : disposable.dispose();
+            _this.viewContainer.removeChild(container);
+        };
+        var viewItem = new _viewItem__WEBPACK_IMPORTED_MODULE_4__.ViewItem(container, view, viewSize, { dispose: dispose });
+        if (index === this.views.length) {
+            this.viewContainer.appendChild(container);
+        }
+        else {
+            this.viewContainer.insertBefore(container, this.viewContainer.children.item(index));
+        }
+        this.views.splice(index, 0, viewItem);
+        if (this.views.length > 1) {
+            //add sash
+            var sash_1 = document.createElement('div');
+            sash_1.className = 'sash';
+            var onStart_1 = function (event) {
+                var e_3, _a;
+                try {
+                    for (var _b = __values(_this.views), _c = _b.next(); !_c.done; _c = _b.next()) {
+                        var item = _c.value;
+                        item.enabled = false;
+                    }
+                }
+                catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                finally {
+                    try {
+                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                    }
+                    finally { if (e_3) throw e_3.error; }
+                }
+                var start = _this._orientation === Orientation.HORIZONTAL
+                    ? event.clientX
+                    : event.clientY;
+                var index = (0,_array__WEBPACK_IMPORTED_MODULE_3__.firstIndex)(_this.sashes, function (s) { return s.container === sash_1; });
+                //
+                var sizes = _this.views.map(function (x) { return x.size; });
+                //
+                var snapBefore;
+                var snapAfter;
+                var upIndexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(index, -1);
+                var downIndexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(index + 1, _this.views.length);
+                var minDeltaUp = upIndexes.reduce(function (r, i) { return r + (_this.views[i].minimumSize - sizes[i]); }, 0);
+                var maxDeltaUp = upIndexes.reduce(function (r, i) { return r + (_this.views[i].viewMaximumSize - sizes[i]); }, 0);
+                var maxDeltaDown = downIndexes.length === 0
+                    ? Number.POSITIVE_INFINITY
+                    : downIndexes.reduce(function (r, i) {
+                        return r + (sizes[i] - _this.views[i].minimumSize);
+                    }, 0);
+                var minDeltaDown = downIndexes.length === 0
+                    ? Number.NEGATIVE_INFINITY
+                    : downIndexes.reduce(function (r, i) {
+                        return r +
+                            (sizes[i] - _this.views[i].viewMaximumSize);
+                    }, 0);
+                var minDelta = Math.max(minDeltaUp, minDeltaDown);
+                var maxDelta = Math.min(maxDeltaDown, maxDeltaUp);
+                var snapBeforeIndex = _this.findFirstSnapIndex(upIndexes);
+                var snapAfterIndex = _this.findFirstSnapIndex(downIndexes);
+                if (typeof snapBeforeIndex === 'number') {
+                    var viewItem_1 = _this.views[snapBeforeIndex];
+                    var halfSize = Math.floor(viewItem_1.viewMinimumSize / 2);
+                    snapBefore = {
+                        index: snapBeforeIndex,
+                        limitDelta: viewItem_1.visible
+                            ? minDelta - halfSize
+                            : minDelta + halfSize,
+                        size: viewItem_1.size,
+                    };
+                }
+                if (typeof snapAfterIndex === 'number') {
+                    var viewItem_2 = _this.views[snapAfterIndex];
+                    var halfSize = Math.floor(viewItem_2.viewMinimumSize / 2);
+                    snapAfter = {
+                        index: snapAfterIndex,
+                        limitDelta: viewItem_2.visible
+                            ? maxDelta + halfSize
+                            : maxDelta - halfSize,
+                        size: viewItem_2.size,
+                    };
+                }
+                //
+                var mousemove = function (event) {
+                    var current = _this._orientation === Orientation.HORIZONTAL
+                        ? event.clientX
+                        : event.clientY;
+                    var delta = current - start;
+                    _this.resize(index, delta, sizes, undefined, undefined, minDelta, maxDelta, snapBefore, snapAfter);
+                    _this.distributeEmptySpace();
+                    _this.layoutViews();
+                };
+                var end = function () {
+                    var e_4, _a;
+                    try {
+                        for (var _b = __values(_this.views), _c = _b.next(); !_c.done; _c = _b.next()) {
+                            var item = _c.value;
+                            item.enabled = true;
+                        }
+                    }
+                    catch (e_4_1) { e_4 = { error: e_4_1 }; }
+                    finally {
+                        try {
+                            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                        }
+                        finally { if (e_4) throw e_4.error; }
+                    }
+                    _this.saveProportions();
+                    document.removeEventListener('mousemove', mousemove);
+                    document.removeEventListener('mouseup', end);
+                    document.removeEventListener('mouseend', end);
+                    _this._onDidSashEnd.fire(undefined);
+                };
+                document.addEventListener('mousemove', mousemove);
+                document.addEventListener('mouseup', end);
+                document.addEventListener('mouseend', end);
+            };
+            sash_1.addEventListener('mousedown', onStart_1);
+            var disposable_1 = function () {
+                sash_1.removeEventListener('mousedown', onStart_1);
+                _this.sashContainer.removeChild(sash_1);
+            };
+            var sashItem = { container: sash_1, disposable: disposable_1 };
+            this.sashContainer.appendChild(sash_1);
+            this.sashes.push(sashItem);
+        }
+        if (!skipLayout) {
+            this.relayout([index]);
+        }
+        if (!skipLayout &&
+            typeof size !== 'number' &&
+            size.type === 'distribute') {
+            this.distributeViewSizes();
+        }
+    };
+    Splitview.prototype.distributeViewSizes = function () {
+        var e_5, _a, e_6, _b;
+        var _this = this;
+        var flexibleViewItems = [];
+        var flexibleSize = 0;
+        try {
+            for (var _c = __values(this.views), _d = _c.next(); !_d.done; _d = _c.next()) {
+                var item = _d.value;
+                if (item.maximumSize - item.minimumSize > 0) {
+                    flexibleViewItems.push(item);
+                    flexibleSize += item.size;
+                }
+            }
+        }
+        catch (e_5_1) { e_5 = { error: e_5_1 }; }
+        finally {
+            try {
+                if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
+            }
+            finally { if (e_5) throw e_5.error; }
+        }
+        var size = Math.floor(flexibleSize / flexibleViewItems.length);
+        try {
+            for (var flexibleViewItems_1 = __values(flexibleViewItems), flexibleViewItems_1_1 = flexibleViewItems_1.next(); !flexibleViewItems_1_1.done; flexibleViewItems_1_1 = flexibleViewItems_1.next()) {
+                var item = flexibleViewItems_1_1.value;
+                item.size = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(size, item.minimumSize, item.maximumSize);
+            }
+        }
+        catch (e_6_1) { e_6 = { error: e_6_1 }; }
+        finally {
+            try {
+                if (flexibleViewItems_1_1 && !flexibleViewItems_1_1.done && (_b = flexibleViewItems_1.return)) _b.call(flexibleViewItems_1);
+            }
+            finally { if (e_6) throw e_6.error; }
+        }
+        var indexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(this.views.length);
+        var lowPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.Low; });
+        var highPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.High; });
+        this.relayout(lowPriorityIndexes, highPriorityIndexes);
+    };
+    Splitview.prototype.removeView = function (index, sizing, skipLayout) {
+        if (skipLayout === void 0) { skipLayout = false; }
+        // Remove view
+        var viewItem = this.views.splice(index, 1)[0];
+        viewItem.dispose();
+        // Remove sash
+        if (this.views.length >= 1) {
+            var sashIndex = Math.max(index - 1, 0);
+            var sashItem = this.sashes.splice(sashIndex, 1)[0];
+            sashItem.disposable();
+        }
+        if (!skipLayout) {
+            this.relayout();
+        }
+        if (sizing && sizing.type === 'distribute') {
+            this.distributeViewSizes();
+        }
+        return viewItem.view;
+    };
+    Splitview.prototype.getViewCachedVisibleSize = function (index) {
+        if (index < 0 || index >= this.views.length) {
+            throw new Error('Index out of bounds');
+        }
+        var viewItem = this.views[index];
+        return viewItem.cachedVisibleSize;
+    };
+    Splitview.prototype.moveView = function (from, to) {
+        var cachedVisibleSize = this.getViewCachedVisibleSize(from);
+        var sizing = typeof cachedVisibleSize === 'undefined'
+            ? this.getViewSize(from)
+            : Sizing.Invisible(cachedVisibleSize);
+        var view = this.removeView(from, undefined, true);
+        this.addView(view, sizing, to);
+    };
+    Splitview.prototype.layout = function (size, orthogonalSize) {
+        var _this = this;
+        var previousSize = Math.max(this.size, this.contentSize);
+        this.size = size;
+        this.orthogonalSize = orthogonalSize;
+        if (!this.proportions) {
+            var indexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(this.views.length);
+            var lowPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.Low; });
+            var highPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.High; });
+            this.resize(this.views.length - 1, size - previousSize, undefined, lowPriorityIndexes, highPriorityIndexes);
+        }
+        else {
+            for (var i = 0; i < this.views.length; i++) {
+                var item = this.views[i];
+                item.size = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(Math.round(this.proportions[i] * size), item.minimumSize, item.maximumSize);
+            }
+        }
+        this.distributeEmptySpace();
+        this.layoutViews();
+    };
+    Splitview.prototype.relayout = function (lowPriorityIndexes, highPriorityIndexes) {
+        var contentSize = this.views.reduce(function (r, i) { return r + i.size; }, 0);
+        this.resize(this.views.length - 1, this._size - contentSize, undefined, lowPriorityIndexes, highPriorityIndexes);
+        this.distributeEmptySpace();
+        this.layoutViews();
+        this.saveProportions();
+    };
+    Splitview.prototype.distributeEmptySpace = function (lowPriorityIndex) {
+        var e_7, _a, e_8, _b;
+        var _this = this;
+        var contentSize = this.views.reduce(function (r, i) { return r + i.size; }, 0);
+        var emptyDelta = this.size - contentSize;
+        var indexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(this.views.length - 1, -1);
+        var lowPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.Low; });
+        var highPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.High; });
+        try {
+            for (var highPriorityIndexes_2 = __values(highPriorityIndexes), highPriorityIndexes_2_1 = highPriorityIndexes_2.next(); !highPriorityIndexes_2_1.done; highPriorityIndexes_2_1 = highPriorityIndexes_2.next()) {
+                var index = highPriorityIndexes_2_1.value;
+                (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToStart)(indexes, index);
+            }
+        }
+        catch (e_7_1) { e_7 = { error: e_7_1 }; }
+        finally {
+            try {
+                if (highPriorityIndexes_2_1 && !highPriorityIndexes_2_1.done && (_a = highPriorityIndexes_2.return)) _a.call(highPriorityIndexes_2);
+            }
+            finally { if (e_7) throw e_7.error; }
+        }
+        try {
+            for (var lowPriorityIndexes_2 = __values(lowPriorityIndexes), lowPriorityIndexes_2_1 = lowPriorityIndexes_2.next(); !lowPriorityIndexes_2_1.done; lowPriorityIndexes_2_1 = lowPriorityIndexes_2.next()) {
+                var index = lowPriorityIndexes_2_1.value;
+                (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToEnd)(indexes, index);
+            }
+        }
+        catch (e_8_1) { e_8 = { error: e_8_1 }; }
+        finally {
+            try {
+                if (lowPriorityIndexes_2_1 && !lowPriorityIndexes_2_1.done && (_b = lowPriorityIndexes_2.return)) _b.call(lowPriorityIndexes_2);
+            }
+            finally { if (e_8) throw e_8.error; }
+        }
+        if (typeof lowPriorityIndex === 'number') {
+            (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToEnd)(indexes, lowPriorityIndex);
+        }
+        for (var i = 0; emptyDelta !== 0 && i < indexes.length; i++) {
+            var item = this.views[indexes[i]];
+            var size = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(item.size + emptyDelta, item.minimumSize, item.maximumSize);
+            var viewDelta = size - item.size;
+            emptyDelta -= viewDelta;
+            item.size = size;
+        }
+    };
+    Splitview.prototype.saveProportions = function () {
+        var _this = this;
+        if (this.proportionalLayout && this.contentSize > 0) {
+            this._proportions = this.views.map(function (i) { return i.size / _this.contentSize; });
+        }
+    };
+    Splitview.prototype.layoutViews = function () {
+        var _this = this;
+        this.contentSize = this.views.reduce(function (r, i) { return r + i.size; }, 0);
+        var sum = 0;
+        var x = [];
+        this.updateSashEnablement();
+        for (var i = 0; i < this.views.length - 1; i++) {
+            sum += this.views[i].size;
+            x.push(sum);
+            var offset = Math.min(Math.max(0, sum - 2), this.size - 4);
+            if (this._orientation === Orientation.HORIZONTAL) {
+                this.sashes[i].container.style.left = offset + "px";
+                this.sashes[i].container.style.top = "0px";
+            }
+            if (this._orientation === Orientation.VERTICAL) {
+                this.sashes[i].container.style.left = "0px";
+                this.sashes[i].container.style.top = offset + "px";
+            }
+        }
+        this.views.forEach(function (view, i) {
+            if (_this._orientation === Orientation.HORIZONTAL) {
+                view.container.style.width = view.size + "px";
+                view.container.style.left = i == 0 ? '0px' : x[i - 1] + "px";
+                view.container.style.top = '';
+                view.container.style.height = '';
+            }
+            if (_this._orientation === Orientation.VERTICAL) {
+                view.container.style.height = view.size + "px";
+                view.container.style.top = i == 0 ? '0px' : x[i - 1] + "px";
+                view.container.style.width = '';
+                view.container.style.left = '';
+            }
+            view.view.layout(view.size, _this._orthogonalSize);
+        });
+    };
+    Splitview.prototype.findFirstSnapIndex = function (indexes) {
+        var e_9, _a, e_10, _b;
+        try {
+            // visible views first
+            for (var indexes_1 = __values(indexes), indexes_1_1 = indexes_1.next(); !indexes_1_1.done; indexes_1_1 = indexes_1.next()) {
+                var index = indexes_1_1.value;
+                var viewItem = this.views[index];
+                if (!viewItem.visible) {
+                    continue;
+                }
+                if (viewItem.snap) {
+                    return index;
+                }
+            }
+        }
+        catch (e_9_1) { e_9 = { error: e_9_1 }; }
+        finally {
+            try {
+                if (indexes_1_1 && !indexes_1_1.done && (_a = indexes_1.return)) _a.call(indexes_1);
+            }
+            finally { if (e_9) throw e_9.error; }
+        }
+        try {
+            // then, hidden views
+            for (var indexes_2 = __values(indexes), indexes_2_1 = indexes_2.next(); !indexes_2_1.done; indexes_2_1 = indexes_2.next()) {
+                var index = indexes_2_1.value;
+                var viewItem = this.views[index];
+                if (viewItem.visible &&
+                    viewItem.maximumSize - viewItem.minimumSize > 0) {
+                    return undefined;
+                }
+                if (!viewItem.visible && viewItem.snap) {
+                    return index;
+                }
+            }
+        }
+        catch (e_10_1) { e_10 = { error: e_10_1 }; }
+        finally {
+            try {
+                if (indexes_2_1 && !indexes_2_1.done && (_b = indexes_2.return)) _b.call(indexes_2);
+            }
+            finally { if (e_10) throw e_10.error; }
+        }
+        return undefined;
+    };
+    Splitview.prototype.updateSashEnablement = function () {
+        var previous = false;
+        var collapsesDown = this.views.map(function (i) { return (previous = i.size - i.minimumSize > 0 || previous); });
+        previous = false;
+        var expandsDown = this.views.map(function (i) { return (previous = i.maximumSize - i.size > 0 || previous); });
+        var reverseViews = __spread(this.views).reverse();
+        previous = false;
+        var collapsesUp = reverseViews
+            .map(function (i) { return (previous = i.size - i.minimumSize > 0 || previous); })
+            .reverse();
+        previous = false;
+        var expandsUp = reverseViews
+            .map(function (i) { return (previous = i.maximumSize - i.size > 0 || previous); })
+            .reverse();
+        var position = 0;
+        for (var index = 0; index < this.sashes.length; index++) {
+            var sash = this.sashes[index];
+            var viewItem = this.views[index];
+            position += viewItem.size;
+            var min = !(collapsesDown[index] && expandsUp[index + 1]);
+            var max = !(expandsDown[index] && collapsesUp[index + 1]);
+            if (min && max) {
+                var upIndexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(index, -1);
+                var downIndexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(index + 1, this.views.length);
+                var snapBeforeIndex = this.findFirstSnapIndex(upIndexes);
+                var snapAfterIndex = this.findFirstSnapIndex(downIndexes);
+                var snappedBefore = typeof snapBeforeIndex === 'number' &&
+                    !this.views[snapBeforeIndex].visible;
+                var snappedAfter = typeof snapAfterIndex === 'number' &&
+                    !this.views[snapAfterIndex].visible;
+                if (snappedBefore &&
+                    collapsesUp[index] &&
+                    (position > 0 || this.startSnappingEnabled)) {
+                    this.updateSash(sash, SashState.MINIMUM);
+                    // sash.state = SashState.Minimum;
+                }
+                else if (snappedAfter &&
+                    collapsesDown[index] &&
+                    (position < this.contentSize || this.endSnappingEnabled)) {
+                    // sash.state = SashState.Maximum;
+                    this.updateSash(sash, SashState.MAXIMUM);
+                }
+                else {
+                    // sash.state = SashState.Disabled;
+                    this.updateSash(sash, SashState.DISABLED);
+                }
+            }
+            else if (min && !max) {
+                // sash.state = SashState.Minimum;
+                this.updateSash(sash, SashState.MINIMUM);
+            }
+            else if (!min && max) {
+                // sash.state = SashState.Maximum;
+                this.updateSash(sash, SashState.MAXIMUM);
+            }
+            else {
+                // sash.state = SashState.Enabled;
+                this.updateSash(sash, SashState.ENABLED);
+            }
+        }
+    };
+    Splitview.prototype.updateSash = function (sash, state) {
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(sash.container, 'disabled', state === SashState.DISABLED);
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(sash.container, 'enabled', state === SashState.ENABLED);
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(sash.container, 'maximum', state === SashState.MAXIMUM);
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(sash.container, 'minimum', state === SashState.MINIMUM);
+    };
+    Splitview.prototype.createViewContainer = function () {
+        var element = document.createElement('div');
+        element.className = 'view-container';
+        return element;
+    };
+    Splitview.prototype.createSashContainer = function () {
+        var element = document.createElement('div');
+        element.className = 'sash-container';
+        return element;
+    };
+    Splitview.prototype.createContainer = function () {
+        var element = document.createElement('div');
+        var orientationClassname = this._orientation === Orientation.HORIZONTAL
+            ? 'horizontal'
+            : 'vertical';
+        element.className = "split-view-container " + orientationClassname;
+        return element;
+    };
+    Splitview.prototype.dispose = function () {
+        this.element.remove();
+        for (var i = 0; i < this.element.children.length; i++) {
+            if (this.element.children.item(i) === this.element) {
+                this.element.removeChild(this.element);
+                break;
+            }
+        }
+    };
+    return Splitview;
+}());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/splitview/core/viewItem.js":
+/*!********************************************************!*\
+  !*** ../splitview/dist/es6/splitview/core/viewItem.js ***!
+  \********************************************************/
+/*! namespace exports */
+/*! export ViewItem [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ViewItem": () => /* binding */ ViewItem
+/* harmony export */ });
+/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../math */ "../splitview/dist/es6/math.js");
+
+var ViewItem = /** @class */ (function () {
+    function ViewItem(container, view, size, disposable) {
+        this.container = container;
+        this.view = view;
+        this.disposable = disposable;
+        this._cachedVisibleSize = undefined;
+        if (typeof size === 'number') {
+            this._size = size;
+            this._cachedVisibleSize = undefined;
+            container.classList.add('visible');
+        }
+        else {
+            this._size = 0;
+            this._cachedVisibleSize = size.cachedVisibleSize;
+        }
+    }
+    Object.defineProperty(ViewItem.prototype, "size", {
+        get: function () {
+            return this._size;
+        },
+        set: function (size) {
+            this._size = size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ViewItem.prototype, "cachedVisibleSize", {
+        get: function () {
+            return this._cachedVisibleSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ViewItem.prototype, "visible", {
+        get: function () {
+            return typeof this._cachedVisibleSize === 'undefined';
+        },
+        enumerable: false,
+        configurable: true
+    });
+    ViewItem.prototype.setVisible = function (visible, size) {
+        var _a;
+        if (visible === this.visible) {
+            return;
+        }
+        if (visible) {
+            this.size = (0,_math__WEBPACK_IMPORTED_MODULE_0__.clamp)((_a = this._cachedVisibleSize) !== null && _a !== void 0 ? _a : 0, this.viewMinimumSize, this.viewMaximumSize);
+            this._cachedVisibleSize = undefined;
+        }
+        else {
+            this._cachedVisibleSize =
+                typeof size === 'number' ? size : this.size;
+            this.size = 0;
+        }
+        this.container.classList.toggle('visible', visible);
+        if (this.view.setVisible) {
+            this.view.setVisible(visible);
+        }
+    };
+    Object.defineProperty(ViewItem.prototype, "minimumSize", {
+        get: function () {
+            return this.visible ? this.view.minimumSize : 0;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ViewItem.prototype, "viewMinimumSize", {
+        get: function () {
+            return this.view.minimumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ViewItem.prototype, "maximumSize", {
+        get: function () {
+            return this.visible ? this.view.maximumSize : 0;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ViewItem.prototype, "viewMaximumSize", {
+        get: function () {
+            return this.view.maximumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ViewItem.prototype, "priority", {
+        get: function () {
+            return this.view.priority;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ViewItem.prototype, "snap", {
+        get: function () {
+            return !!this.view.snap;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ViewItem.prototype, "enabled", {
+        set: function (enabled) {
+            this.container.style.pointerEvents = enabled ? '' : 'none';
+        },
+        enumerable: false,
+        configurable: true
+    });
+    // layout(offset: number, layoutContext: TLayoutContext | undefined): void {
+    //     this.layoutContainer(offset);
+    //     this.view.layout(this.size, offset, layoutContext);
+    // }
+    // abstract layoutContainer(offset: number): void;
+    ViewItem.prototype.dispose = function () {
+        this.disposable.dispose();
+        return this.view;
+    };
+    return ViewItem;
+}());
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/splitview/splitviewComponent.js":
+/*!*************************************************************!*\
+  !*** ../splitview/dist/es6/splitview/splitviewComponent.js ***!
+  \*************************************************************/
+/*! namespace exports */
+/*! export SplitviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "SplitviewComponent": () => /* binding */ SplitviewComponent
+/* harmony export */ });
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _core_splitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
+/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+
+
+/**
+ * A high-level implementation of splitview that works using 'panels'
+ */
+var SplitviewComponent = /** @class */ (function (_super) {
+    __extends(SplitviewComponent, _super);
+    function SplitviewComponent(element, options) {
+        var _this = _super.call(this) || this;
+        _this.element = element;
+        _this.options = options;
+        _this.panels = new Map();
+        _this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        _this.onDidLayoutChange = _this._onDidLayoutChange.event;
+        if (!options.components) {
+            options.components = {};
+        }
+        if (!options.frameworkComponents) {
+            options.frameworkComponents = {};
+        }
+        _this.splitview = new _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Splitview(_this.element, options);
+        _this.addDisposables(_this.splitview.onDidSashEnd(function () {
+            _this._onDidLayoutChange.fire(undefined);
+        }), _this.splitview);
+        return _this;
+    }
+    Object.defineProperty(SplitviewComponent.prototype, "minimumSize", {
+        get: function () {
+            return this.splitview.minimumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewComponent.prototype, "maximumSize", {
+        get: function () {
+            return this.splitview.maximumSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewComponent.prototype, "height", {
+        get: function () {
+            return this.splitview.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation.HORIZONTAL
+                ? this.splitview.orthogonalSize
+                : this.splitview.size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewComponent.prototype, "width", {
+        get: function () {
+            return this.splitview.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation.HORIZONTAL
+                ? this.splitview.size
+                : this.splitview.orthogonalSize;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewComponent.prototype, "length", {
+        get: function () {
+            return this.panels.size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    SplitviewComponent.prototype.focus = function () {
+        var _a;
+        (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.focus();
+    };
+    SplitviewComponent.prototype.movePanel = function (from, to) {
+        this.splitview.moveView(from, to);
+    };
+    SplitviewComponent.prototype.setVisible = function (panel, visible) {
+        var index = this.getPanels().indexOf(panel);
+        this.splitview.setViewVisible(index, visible);
+    };
+    SplitviewComponent.prototype.setActive = function (view, skipFocus) {
+        this._activePanel = view;
+        this.getPanels()
+            .filter(function (v) { return v !== view; })
+            .forEach(function (v) { return v.setActive(false, skipFocus); });
+        view.setActive(true, skipFocus);
+    };
+    SplitviewComponent.prototype.getPanels = function () {
+        return this.splitview.getViews();
+    };
+    SplitviewComponent.prototype.removePanel = function (panel, sizing) {
+        var disposable = this.panels.get(panel.id);
+        disposable === null || disposable === void 0 ? void 0 : disposable.dispose();
+        this.panels.delete(panel.id);
+        var index = this.getPanels().findIndex(function (_) { return _ === panel; });
+        this.splitview.removeView(index, sizing);
+    };
+    SplitviewComponent.prototype.getPanel = function (id) {
+        return this.getPanels().find(function (view) { return view.id === id; });
+    };
+    SplitviewComponent.prototype.addPanel = function (options) {
+        if (this.panels.has(options.id)) {
+            throw new Error("panel " + options.id + " already exists");
+        }
+        var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__.createComponent)(options.id, options.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkWrapper
+            ? {
+                createComponent: this.options.frameworkWrapper
+                    .createComponent,
+            }
+            : undefined);
+        view.orientation = this.splitview.orientation;
+        view.init({
+            params: options.params || {},
+            minimumSize: options.minimumSize,
+            maximumSize: options.maximumSize,
+            snap: options.snap,
+            priority: options.priority,
+            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.SplitviewApi(this),
+        });
+        var size = typeof options.size === 'number' ? options.size : _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Sizing.Distribute;
+        var index = typeof options.index === 'number' ? options.index : undefined;
+        this.splitview.addView(view, size, index);
+        this.doAddView(view);
+        this.setActive(view);
+    };
+    /**
+     * Resize the layout to fit the parent container
+     */
+    SplitviewComponent.prototype.resizeToFit = function () {
+        var _a;
+        if (!this.element.parentElement) {
+            return;
+        }
+        var _b = (_a = this.element.parentElement) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect(), width = _b.width, height = _b.height;
+        this.layout(width, height);
+    };
+    SplitviewComponent.prototype.layout = function (width, height) {
+        var _a = __read(this.splitview.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation.HORIZONTAL
+            ? [width, height]
+            : [height, width], 2), size = _a[0], orthogonalSize = _a[1];
+        this.splitview.layout(size, orthogonalSize);
+    };
+    SplitviewComponent.prototype.doAddView = function (view) {
+        var _this = this;
+        var disposable = view.api.onDidFocusChange(function (event) {
+            if (!event.isFocused) {
+                return;
+            }
+            _this.setActive(view, true);
+        });
+        this.panels.set(view.id, disposable);
+    };
+    SplitviewComponent.prototype.toJSON = function () {
+        var _this = this;
+        var _a;
+        var views = this.splitview
+            .getViews()
+            .map(function (view, i) {
+            var size = _this.splitview.getViewSize(i);
+            return {
+                size: size,
+                data: view.toJSON(),
+                snap: !!view.snap,
+                priority: view.priority,
+            };
+        });
+        return {
+            views: views,
+            activeView: (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.id,
+            size: this.splitview.size,
+            orientation: this.splitview.orientation,
+        };
+    };
+    SplitviewComponent.prototype.fromJSON = function (data) {
+        var _this = this;
+        var views = data.views, orientation = data.orientation, size = data.size, activeView = data.activeView;
+        this.splitview.dispose();
+        var queue = [];
+        this.splitview = new _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Splitview(this.element, {
+            orientation: orientation,
+            proportionalLayout: this.options.proportionalLayout,
+            descriptor: {
+                size: size,
+                views: views.map(function (view) {
+                    var data = view.data;
+                    if (_this.panels.has(data.id)) {
+                        throw new Error("panel " + data.id + " already exists");
+                    }
+                    var panel = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__.createComponent)(data.id, data.component, _this.options.components || {}, _this.options.frameworkComponents || {}, _this.options.frameworkWrapper
+                        ? {
+                            createComponent: _this.options.frameworkWrapper
+                                .createComponent,
+                        }
+                        : undefined);
+                    queue.push(function () {
+                        panel.init({
+                            params: data.params || {},
+                            minimumSize: data.minimumSize,
+                            maximumSize: data.maximumSize,
+                            snap: view.snap,
+                            priority: view.priority,
+                            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.SplitviewApi(_this),
+                        });
+                    });
+                    panel.orientation = orientation;
+                    _this.doAddView(panel);
+                    return { size: view.size, view: panel };
+                }),
+            },
+        });
+        this.layout(this.width, this.height);
+        queue.forEach(function (f) { return f(); });
+        if (typeof activeView === 'string') {
+            var panel = this.getPanel(activeView);
+            if (panel) {
+                this.setActive(panel);
+            }
+        }
+    };
+    SplitviewComponent.prototype.dispose = function () {
+        Array.from(this.panels.values()).forEach(function (value) {
+            value.dispose();
+        });
+        this.panels.clear();
+        _super.prototype.dispose.call(this);
+    };
+    return SplitviewComponent;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/splitview/splitviewPanel.js":
+/*!*********************************************************!*\
+  !*** ../splitview/dist/es6/splitview/splitviewPanel.js ***!
+  \*********************************************************/
+/*! namespace exports */
+/*! export SplitviewPanel [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "SplitviewPanel": () => /* binding */ SplitviewPanel
+/* harmony export */ });
+/* harmony import */ var _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../gridview/basePanelView */ "../splitview/dist/es6/gridview/basePanelView.js");
+/* harmony import */ var _api_panelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/panelApi */ "../splitview/dist/es6/api/panelApi.js");
+/* harmony import */ var _core_splitview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+
+
+
+
+var SplitviewPanel = /** @class */ (function (_super) {
+    __extends(SplitviewPanel, _super);
+    function SplitviewPanel(id, componentName) {
+        var _this = _super.call(this, id, componentName, new _api_panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApi(id)) || this;
+        _this._minimumSize = 0;
+        _this._maximumSize = Number.POSITIVE_INFINITY;
+        _this._snap = false;
+        _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_3__.Emitter();
+        _this.onDidChange = _this._onDidChange.event;
+        _this.addDisposables(_this.api.onVisibilityChange(function (event) {
+            var isVisible = event.isVisible;
+            var containerApi = _this.params.containerApi;
+            containerApi.setVisible(_this, isVisible);
+        }), _this.api.onActiveChange(function () {
+            var containerApi = _this.params.containerApi;
+            containerApi.setActive(_this);
+        }), _this.api.onDidConstraintsChangeInternal(function (event) {
+            if (typeof event.minimumSize === 'number' ||
+                typeof event.minimumSize === 'function') {
+                _this._minimumSize = event.minimumSize;
+            }
+            if (typeof event.maximumSize === 'number' ||
+                typeof event.maximumSize === 'function') {
+                _this._maximumSize = event.maximumSize;
+            }
+            _this.updateConstraints();
+        }), _this.api.onDidSizeChange(function (event) {
+            _this._onDidChange.fire(event.size);
+        }));
+        return _this;
+    }
+    Object.defineProperty(SplitviewPanel.prototype, "priority", {
+        get: function () {
+            return this._priority;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewPanel.prototype, "orientation", {
+        get: function () {
+            return this._orientation;
+        },
+        set: function (value) {
+            this._orientation = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewPanel.prototype, "minimumSize", {
+        get: function () {
+            var size = typeof this._minimumSize === 'function'
+                ? this._minimumSize()
+                : this._minimumSize;
+            if (size !== this._evaluatedMinimumSize) {
+                this._evaluatedMinimumSize = size;
+                this.updateConstraints();
+            }
+            return size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewPanel.prototype, "maximumSize", {
+        get: function () {
+            var size = typeof this._maximumSize === 'function'
+                ? this._maximumSize()
+                : this._maximumSize;
+            if (size !== this._evaluatedMaximumSize) {
+                this._evaluatedMaximumSize = size;
+                this.updateConstraints();
+            }
+            return size;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SplitviewPanel.prototype, "snap", {
+        get: function () {
+            return this._snap;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    SplitviewPanel.prototype.layout = function (size, orthogonalSize) {
+        var _a = __read(this.orientation === _core_splitview__WEBPACK_IMPORTED_MODULE_2__.Orientation.HORIZONTAL
+            ? [size, orthogonalSize]
+            : [orthogonalSize, size], 2), width = _a[0], height = _a[1];
+        _super.prototype.layout.call(this, width, height);
+    };
+    SplitviewPanel.prototype.updateConstraints = function () {
+        this.api._onDidConstraintsChange.fire({
+            maximumSize: this._evaluatedMaximumSize,
+            minimumSize: this._evaluatedMinimumSize,
+        });
+    };
+    SplitviewPanel.prototype.setActive = function (isActive, skipFocus) {
+        _super.prototype.setActive.call(this, isActive);
+        if (!skipFocus) {
+            this.focus();
+        }
+    };
+    SplitviewPanel.prototype.init = function (parameters) {
+        _super.prototype.init.call(this, parameters);
+        this._priority = parameters.priority;
+        if (parameters.minimumSize) {
+            this._minimumSize = parameters.minimumSize;
+        }
+        if (parameters.maximumSize) {
+            this._maximumSize = parameters.maximumSize;
+        }
+        if (parameters.snap) {
+            this._snap = parameters.snap;
+        }
+    };
+    SplitviewPanel.prototype.toJSON = function () {
+        var maximum = function (value) {
+            return value === Number.MAX_SAFE_INTEGER ||
+                value === Number.POSITIVE_INFINITY
+                ? undefined
+                : value;
+        };
+        var minimum = function (value) { return (value <= 0 ? undefined : value); };
+        return __assign(__assign({}, _super.prototype.toJSON.call(this)), { minimumSize: minimum(this.minimumSize), maximumSize: maximum(this.maximumSize) });
+    };
+    SplitviewPanel.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+    };
+    return SplitviewPanel;
+}(_gridview_basePanelView__WEBPACK_IMPORTED_MODULE_0__.BasePanelView));
+
+
 
 /***/ })
 

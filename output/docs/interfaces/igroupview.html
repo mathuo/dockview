@@ -95,7 +95,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite tsd-is-inherited"><a href="igroupview.html#dispose" class="tsd-kind-icon">dispose</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="igroupview.html#element" class="tsd-kind-icon">element</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="igroupview.html#id" class="tsd-kind-icon">id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="igroupview.html#isactive" class="tsd-kind-icon">is<wbr>Active</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite"><a href="igroupview.html#isactive" class="tsd-kind-icon">is<wbr>Active</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="igroupview.html#ispanelactive" class="tsd-kind-icon">is<wbr>Panel<wbr>Active</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="igroupview.html#maximumheight" class="tsd-kind-icon">maximum<wbr>Height</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="igroupview.html#maximumwidth" class="tsd-kind-icon">maximum<wbr>Width</a></li>
@@ -144,10 +144,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="activepanel" class="tsd-anchor"></a>
 					<h3>active<wbr>Panel</h3>
-					<div class="tsd-signature tsd-kind-icon">active<wbr>Panel<span class="tsd-signature-symbol">:</span> <a href="igrouppanel.html" class="tsd-signature-type">IGroupPanel</a></div>
+					<div class="tsd-signature tsd-kind-icon">active<wbr>Panel<span class="tsd-signature-symbol">:</span> <a href="igrouppanel.html" class="tsd-signature-type">IGroupPanel</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L78">groupview/groupview.ts:78</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L85">groupview/groupview.ts:85</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -159,7 +159,7 @@
 						<p>Inherited from <a href="idisposable.html">IDisposable</a>.<a href="idisposable.html#dispose">dispose</a></p>
 						<p>Overrides <a href="idisposable.html">IDisposable</a>.<a href="idisposable.html#dispose">dispose</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/lifecycle.ts#L2">lifecycle.ts:2</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/lifecycle.ts#L2">lifecycle.ts:2</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -183,9 +183,9 @@
 					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> element</h3>
 					<div class="tsd-signature tsd-kind-icon">element<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">HTMLElement</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="igroupview.html">IGroupview</a>.<a href="igroupview.html#element">element</a></p>
+						<p>Inherited from <a href="igridview.html">IGridView</a>.<a href="igridview.html#element">element</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/gridview/gridview.ts#L153">gridview/gridview.ts:153</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/gridview/gridview.ts#L153">gridview/gridview.ts:153</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -196,18 +196,18 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="ipanel.html">IPanel</a>.<a href="ipanel.html#id">id</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/panel/types.ts#L22">panel/types.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/panel/types.ts#L22">panel/types.ts:22</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
 					<a name="isactive" class="tsd-anchor"></a>
-					<h3>is<wbr>Active</h3>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> is<wbr>Active</h3>
 					<div class="tsd-signature tsd-kind-icon">is<wbr>Active<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="igroupview.html">IGroupview</a>.<a href="igroupview.html#isactive">isActive</a></p>
+						<p>Overrides <a href="igridpanelview.html">IGridPanelView</a>.<a href="igridpanelview.html#isactive">isActive</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/gridview/baseComponentGridview.ts#L40">gridview/baseComponentGridview.ts:40</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L79">groupview/groupview.ts:79</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -217,7 +217,7 @@
 					<div class="tsd-signature tsd-kind-icon">is<wbr>Panel<wbr>Active<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>panel<span class="tsd-signature-symbol">: </span><a href="igrouppanel.html" class="tsd-signature-type">IGroupPanel</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L77">groupview/groupview.ts:77</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L84">groupview/groupview.ts:84</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -247,9 +247,9 @@
 					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> maximum<wbr>Height</h3>
 					<div class="tsd-signature tsd-kind-icon">maximum<wbr>Height<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="igroupview.html">IGroupview</a>.<a href="igroupview.html#maximumheight">maximumHeight</a></p>
+						<p>Inherited from <a href="igridview.html">IGridView</a>.<a href="igridview.html#maximumheight">maximumHeight</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/gridview/gridview.ts#L157">gridview/gridview.ts:157</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/gridview/gridview.ts#L157">gridview/gridview.ts:157</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -258,9 +258,9 @@
 					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> maximum<wbr>Width</h3>
 					<div class="tsd-signature tsd-kind-icon">maximum<wbr>Width<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="igroupview.html">IGroupview</a>.<a href="igroupview.html#maximumwidth">maximumWidth</a></p>
+						<p>Inherited from <a href="igridview.html">IGridView</a>.<a href="igridview.html#maximumwidth">maximumWidth</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/gridview/gridview.ts#L155">gridview/gridview.ts:155</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/gridview/gridview.ts#L155">gridview/gridview.ts:155</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -269,9 +269,9 @@
 					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> minimum<wbr>Height</h3>
 					<div class="tsd-signature tsd-kind-icon">minimum<wbr>Height<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="igroupview.html">IGroupview</a>.<a href="igroupview.html#minimumheight">minimumHeight</a></p>
+						<p>Inherited from <a href="igridview.html">IGridView</a>.<a href="igridview.html#minimumheight">minimumHeight</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/gridview/gridview.ts#L156">gridview/gridview.ts:156</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/gridview/gridview.ts#L156">gridview/gridview.ts:156</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -280,9 +280,9 @@
 					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> minimum<wbr>Width</h3>
 					<div class="tsd-signature tsd-kind-icon">minimum<wbr>Width<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="igroupview.html">IGroupview</a>.<a href="igroupview.html#minimumwidth">minimumWidth</a></p>
+						<p>Inherited from <a href="igridview.html">IGridView</a>.<a href="igridview.html#minimumwidth">minimumWidth</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/gridview/gridview.ts#L154">gridview/gridview.ts:154</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/gridview/gridview.ts#L154">gridview/gridview.ts:154</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -291,9 +291,9 @@
 					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> on<wbr>Did<wbr>Change</h3>
 					<div class="tsd-signature tsd-kind-icon">on<wbr>Did<wbr>Change<span class="tsd-signature-symbol">:</span> <a href="../modules/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><a href="iviewsize.html" class="tsd-signature-type">IViewSize</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="igroupview.html">IGroupview</a>.<a href="igroupview.html#ondidchange">onDidChange</a></p>
+						<p>Inherited from <a href="igridview.html">IGridView</a>.<a href="igridview.html#ondidchange">onDidChange</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/gridview/gridview.ts#L152">gridview/gridview.ts:152</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/gridview/gridview.ts#L152">gridview/gridview.ts:152</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -303,7 +303,7 @@
 					<div class="tsd-signature tsd-kind-icon">on<wbr>Did<wbr>Group<wbr>Change<span class="tsd-signature-symbol">:</span> <a href="../modules/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>kind<span class="tsd-signature-symbol">: </span><a href="../enums/groupchangekind.html" class="tsd-signature-type">GroupChangeKind</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L87">groupview/groupview.ts:87</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L94">groupview/groupview.ts:94</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -313,17 +313,17 @@
 					<div class="tsd-signature tsd-kind-icon">on<wbr>Move<span class="tsd-signature-symbol">:</span> <a href="../modules/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><a href="groupmoveevent.html" class="tsd-signature-type">GroupMoveEvent</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L88">groupview/groupview.ts:88</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L95">groupview/groupview.ts:95</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="panels" class="tsd-anchor"></a>
-					<h3>panels</h3>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> panels</h3>
 					<div class="tsd-signature tsd-kind-icon">panels<span class="tsd-signature-symbol">:</span> <a href="igrouppanel.html" class="tsd-signature-type">IGroupPanel</a><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L74">groupview/groupview.ts:74</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L81">groupview/groupview.ts:81</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -332,9 +332,9 @@
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> priority</h3>
 					<div class="tsd-signature tsd-kind-icon">priority<span class="tsd-signature-symbol">:</span> <a href="../enums/layoutpriority.html" class="tsd-signature-type">LayoutPriority</a></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="igroupview.html">IGroupview</a>.<a href="igroupview.html#priority">priority</a></p>
+						<p>Inherited from <a href="igridview.html">IGridView</a>.<a href="igridview.html#priority">priority</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/gridview/gridview.ts#L158">gridview/gridview.ts:158</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/gridview/gridview.ts#L158">gridview/gridview.ts:158</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -344,7 +344,7 @@
 					<div class="tsd-signature tsd-kind-icon">remove<wbr>Panel<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>panelOrId<span class="tsd-signature-symbol">: </span><a href="igrouppanel.html" class="tsd-signature-type">IGroupPanel</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="igrouppanel.html" class="tsd-signature-type">IGroupPanel</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L85">groupview/groupview.ts:85</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L92">groupview/groupview.ts:92</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -371,11 +371,11 @@
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="size" class="tsd-anchor"></a>
-					<h3>size</h3>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> size</h3>
 					<div class="tsd-signature tsd-kind-icon">size<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L73">groupview/groupview.ts:73</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L80">groupview/groupview.ts:80</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -384,9 +384,9 @@
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> snap</h3>
 					<div class="tsd-signature tsd-kind-icon">snap<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="igroupview.html">IGroupview</a>.<a href="igroupview.html#snap">snap</a></p>
+						<p>Inherited from <a href="igridview.html">IGridView</a>.<a href="igridview.html#snap">snap</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/gridview/gridview.ts#L166">gridview/gridview.ts:166</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/gridview/gridview.ts#L166">gridview/gridview.ts:166</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -396,7 +396,7 @@
 					<div class="tsd-signature tsd-kind-icon">tab<wbr>Height<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L75">groupview/groupview.ts:75</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L82">groupview/groupview.ts:82</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -413,7 +413,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L83">groupview/groupview.ts:83</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L90">groupview/groupview.ts:90</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -430,7 +430,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L82">groupview/groupview.ts:82</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L89">groupview/groupview.ts:89</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -453,7 +453,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L84">groupview/groupview.ts:84</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L91">groupview/groupview.ts:91</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -477,7 +477,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="ipanel.html">IPanel</a>.<a href="ipanel.html#focus">focus</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/panel/types.ts#L27">panel/types.ts:27</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/panel/types.ts#L27">panel/types.ts:27</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -493,9 +493,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="igroupview.html">IGroupview</a>.<a href="igroupview.html#fromjson">fromJSON</a></p>
+								<p>Inherited from <a href="igridview.html">IGridView</a>.<a href="igridview.html#fromjson">fromJSON</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/gridview/gridview.ts#L165">gridview/gridview.ts:165</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/gridview/gridview.ts#L165">gridview/gridview.ts:165</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -518,7 +518,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L79">groupview/groupview.ts:79</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L86">groupview/groupview.ts:86</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -542,7 +542,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="ipanel.html">IPanel</a>.<a href="ipanel.html#init">init</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/panel/types.ts#L23">panel/types.ts:23</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/panel/types.ts#L23">panel/types.ts:23</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -565,7 +565,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L98">groupview/groupview.ts:98</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L105">groupview/groupview.ts:105</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -587,10 +587,10 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="igroupview.html">IGroupview</a>.<a href="igroupview.html#layout">layout</a></p>
+								<p>Inherited from <a href="igridview.html">IGridView</a>.<a href="igridview.html#layout">layout</a></p>
 								<p>Overrides <a href="ipanel.html">IPanel</a>.<a href="ipanel.html#layout">layout</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/gridview/gridview.ts#L159">gridview/gridview.ts:159</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/gridview/gridview.ts#L159">gridview/gridview.ts:159</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -616,7 +616,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L92">groupview/groupview.ts:92</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L99">groupview/groupview.ts:99</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -647,7 +647,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L93">groupview/groupview.ts:93</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L100">groupview/groupview.ts:100</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -678,7 +678,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L81">groupview/groupview.ts:81</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L88">groupview/groupview.ts:88</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -703,9 +703,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="igroupview.html">IGroupview</a>.<a href="igroupview.html#setactive">setActive</a></p>
+								<p>Inherited from <a href="igridpanelview.html">IGridPanelView</a>.<a href="igridpanelview.html#setactive">setActive</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/gridview/baseComponentGridview.ts#L39">gridview/baseComponentGridview.ts:39</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/gridview/baseComponentGridview.ts#L39">gridview/baseComponentGridview.ts:39</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -731,7 +731,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L97">groupview/groupview.ts:97</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L104">groupview/groupview.ts:104</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -756,9 +756,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="igroupview.html">IGroupview</a>.<a href="igroupview.html#setvisible">setVisible</a></p>
+								<p>Inherited from <a href="igridview.html">IGridView</a>.<a href="igridview.html#setvisible">setVisible</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/gridview/gridview.ts#L167">gridview/gridview.ts:167</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/gridview/gridview.ts#L167">gridview/gridview.ts:167</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -781,7 +781,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L90">groupview/groupview.ts:90</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L97">groupview/groupview.ts:97</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -803,10 +803,10 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Inherited from <a href="igroupview.html">IGroupview</a>.<a href="igroupview.html#tojson">toJSON</a></p>
+								<p>Inherited from <a href="igridview.html">IGridView</a>.<a href="igridview.html#tojson">toJSON</a></p>
 								<p>Overrides <a href="ipanel.html">IPanel</a>.<a href="ipanel.html#tojson">toJSON</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/gridview/gridview.ts#L164">gridview/gridview.ts:164</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/gridview/gridview.ts#L164">gridview/gridview.ts:164</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">object</span></h4>
@@ -824,7 +824,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="ipanel.html">IPanel</a>.<a href="ipanel.html#update">update</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/panel/types.ts#L25">panel/types.ts:25</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/panel/types.ts#L25">panel/types.ts:25</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -847,7 +847,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/47500bb/packages/splitview/src/groupview/groupview.ts#L99">groupview/groupview.ts:99</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/8804f1e/packages/splitview/src/groupview/groupview.ts#L106">groupview/groupview.ts:106</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -883,7 +883,7 @@
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 								<a href="igroupview.html#id" class="tsd-kind-icon">id</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-overwrite">
 								<a href="igroupview.html#isactive" class="tsd-kind-icon">is<wbr>Active</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
