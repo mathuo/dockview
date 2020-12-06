@@ -26,6 +26,44 @@ export const Simple = (props: { orientation: Orientation }) => {
     const onReady = (event: GridviewReadyEvent) => {
         event.api.layout(window.innerWidth, window.innerHeight);
         api.current = event.api;
+
+        event.api.fromJSON({
+            grid: {
+                height: 2,
+                width: 2,
+                orientation: props.orientation,
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                id: 'panel1',
+                                component: 'default',
+                                params: { color: 'red' },
+                                minimumHeight: 50,
+                                minimumWidth: 50,
+                            },
+                            size: 1,
+                        },
+                        {
+                            type: 'leaf',
+                            data: {
+                                id: 'panel2',
+                                component: 'default',
+                                params: { color: 'green' },
+                                minimumHeight: 50,
+                                minimumWidth: 50,
+                            },
+                            size: 1,
+                        },
+                    ],
+                },
+            },
+        });
+
+        return;
+
         event.api.addPanel({
             id: 'panel_1',
             component: 'default',
