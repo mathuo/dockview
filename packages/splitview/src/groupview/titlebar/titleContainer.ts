@@ -25,6 +25,7 @@ export interface ITitleContainer extends IDisposable {
     visible: boolean;
     height: number;
     hasActiveDragEvent: boolean;
+    readonly panels: string[];
     delete: (id: string) => void;
     indexOf: (tabOrId: ITab | string) => number;
     at: (index: number) => ITab;
@@ -55,6 +56,10 @@ export class TitleContainer
 
     private readonly _onDropped = new Emitter<TabDropEvent>();
     readonly onDropEvent: Event<TabDropEvent> = this._onDropped.event;
+
+    get panels() {
+        return this.tabs.map((_) => _.value.id);
+    }
 
     get visible() {
         return this._visible;

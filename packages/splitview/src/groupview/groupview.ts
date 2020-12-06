@@ -122,6 +122,8 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     private dropTarget: Droptarget;
     private watermark: WatermarkPart | undefined;
 
+    private mostRecentlyUsed: IGroupPanel[] = [];
+
     private readonly _onDidChange = new Emitter<IViewSize | undefined>();
     readonly onDidChange: Event<IViewSize | undefined> = this._onDidChange
         .event;
@@ -203,7 +205,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
     public toJSON(): GroupPanelViewState {
         return {
-            views: this.panels.map((panel) => panel.id),
+            views: this.tabContainer.panels,
             activeView: this._activePanel?.id,
             id: this.id,
         };
@@ -545,7 +547,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.doRemovePanel(panel);
 
         if (isActivePanel && this.panels.length > 0) {
-            const nextPanel = this.panels[Math.max(0, index - 1)];
+            const nextPanel = this.mostRecentlyUsed[0];
             this.openPanel(nextPanel);
         }
 
@@ -566,6 +568,13 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         this.tabContainer.delete(panel.id);
         this._panels.splice(index, 1);
+
+        if (this.mostRecentlyUsed.includes(panel)) {
+            this.mostRecentlyUsed.splice(
+                this.mostRecentlyUsed.indexOf(panel),
+                1
+            );
+        }
 
         this._onDidGroupChange.fire({
             kind: GroupChangeKind.REMOVE_PANEL,
@@ -598,7 +607,19 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         panel.layout(this._width, this._height);
 
+        this.updateMru(panel);
+
         this._onDidGroupChange.fire({ kind: GroupChangeKind.PANEL_ACTIVE });
+    }
+
+    private updateMru(panel: IGroupPanel) {
+        if (this.mostRecentlyUsed.includes(panel)) {
+            this.mostRecentlyUsed.splice(
+                this.mostRecentlyUsed.indexOf(panel),
+                1
+            );
+        }
+        this.mostRecentlyUsed = [panel, ...this.mostRecentlyUsed];
     }
 
     private updateContainer() {
