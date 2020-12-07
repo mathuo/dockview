@@ -27,43 +27,6 @@ export const Simple = (props: { orientation: Orientation }) => {
         event.api.layout(window.innerWidth, window.innerHeight);
         api.current = event.api;
 
-        event.api.fromJSON({
-            grid: {
-                height: 2,
-                width: 2,
-                orientation: props.orientation,
-                root: {
-                    type: 'branch',
-                    data: [
-                        {
-                            type: 'leaf',
-                            data: {
-                                id: 'panel1',
-                                component: 'default',
-                                params: { color: 'red' },
-                                minimumHeight: 50,
-                                minimumWidth: 50,
-                            },
-                            size: 1,
-                        },
-                        {
-                            type: 'leaf',
-                            data: {
-                                id: 'panel2',
-                                component: 'default',
-                                params: { color: 'green' },
-                                minimumHeight: 50,
-                                minimumWidth: 50,
-                            },
-                            size: 1,
-                        },
-                    ],
-                },
-            },
-        });
-
-        return;
-
         event.api.addPanel({
             id: 'panel_1',
             component: 'default',
@@ -77,7 +40,7 @@ export const Simple = (props: { orientation: Orientation }) => {
             params: { color: 'green' },
             minimumHeight: 50,
             minimumWidth: 50,
-            position: { reference: 'panel_1', direction: 'right' },
+            location: [0, 0],
         });
         event.api.addPanel({
             id: 'panel_3',
@@ -85,7 +48,7 @@ export const Simple = (props: { orientation: Orientation }) => {
             params: { color: 'purple' },
             minimumHeight: 50,
             minimumWidth: 50,
-            position: { reference: 'panel_2', direction: 'below' },
+            location: [0, 0, 0],
         });
         event.api.addPanel({
             id: 'panel_4',
@@ -93,7 +56,7 @@ export const Simple = (props: { orientation: Orientation }) => {
             params: { color: 'yellow' },
             minimumHeight: 50,
             minimumWidth: 50,
-            position: { reference: 'panel_3', direction: 'right' },
+            location: [0, 0, 0, 0],
         });
         event.api.addPanel({
             id: 'panel_5',
@@ -101,7 +64,7 @@ export const Simple = (props: { orientation: Orientation }) => {
             params: { color: 'dodgerblue' },
             minimumHeight: 50,
             minimumWidth: 50,
-            position: { reference: 'panel_4', direction: 'below' },
+            location: [0, 0, 0, 0, 0],
         });
     };
 

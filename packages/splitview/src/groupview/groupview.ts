@@ -22,7 +22,7 @@ import { DockviewApi } from '../api/component.api';
 import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
 import { IGroupPanel } from './groupviewPanel';
 
-export const enum GroupChangeKind {
+export enum GroupChangeKind {
     GROUP_ACTIVE = 'GROUP_ACTIVE',
     ADD_GROUP = 'ADD_GROUP',
     REMOVE_GROUP = 'REMOVE_GROUP',
@@ -626,7 +626,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.updateActions();
         toggleClass(this.element, 'empty', this.isEmpty);
 
-        if (!this.watermark) {
+        this.panels.forEach((panel) =>
+            panel.updateParentGroup(this, this.isActive)
+        );
+
+        if (this.isEmpty && !this.watermark) {
             const watermark = this.accessor.createWatermarkComponent();
             watermark.init({
                 containerApi: new DockviewApi(this.accessor),
@@ -635,13 +639,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 api: null,
             });
             this.watermark = watermark;
-        }
 
-        this.panels.forEach((panel) =>
-            panel.updateParentGroup(this, this.isActive)
-        );
-
-        if (this.isEmpty && !this.watermark?.element?.parentNode) {
             addDisposableListener(this.watermark.element, 'click', () => {
                 if (!this.isActive) {
                     this.accessor.doSetGroupActive(this);
@@ -651,7 +649,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             this.contentContainer.openPanel(this.watermark);
             this.watermark.updateParentGroup(this, true);
         }
-        if (!this.isEmpty && this.watermark.element.parentNode) {
+        if (!this.isEmpty && this.watermark) {
             this.watermark.dispose();
             this.watermark = undefined;
             this.contentContainer.closePanel();

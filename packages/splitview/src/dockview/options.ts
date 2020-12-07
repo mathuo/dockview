@@ -66,7 +66,7 @@ export interface AddPanelOptions
     tabComponent?: string;
     position?: {
         direction?: Direction;
-        referencePanel: string;
+        referencePanel?: string;
     };
 }
 

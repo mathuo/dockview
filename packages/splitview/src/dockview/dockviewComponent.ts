@@ -651,15 +651,15 @@ export class DockviewComponent
     private addPanelToNewGroup(panel: IGroupPanel, location: number[] = [0]) {
         let group: IGroupview;
 
-        if (
-            this.groups.size === 1 &&
-            Array.from(this.groups.values())[0].value.size === 0
-        ) {
-            group = Array.from(this.groups.values())[0].value;
-        } else {
-            group = this.createGroup();
-            this.doAddGroup(group, location);
-        }
+        // if (
+        //     this.groups.size === 1 &&
+        //     Array.from(this.groups.values())[0].value.size === 0
+        // ) {
+        //     group = Array.from(this.groups.values())[0].value;
+        // } else {
+        group! = this.createGroup();
+        this.doAddGroup(group, location);
+        // }
 
         group.openPanel(panel);
     }
