@@ -38260,6 +38260,7 @@ var Groupview = /** @class */ (function (_super) {
         _this.accessor = accessor;
         _this.id = id;
         _this._isGroupActive = false;
+        _this.mostRecentlyUsed = [];
         _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_4__.Emitter();
         _this.onDidChange = _this._onDidChange
             .event;
@@ -38429,7 +38430,7 @@ var Groupview = /** @class */ (function (_super) {
     Groupview.prototype.toJSON = function () {
         var _a;
         return {
-            views: this.panels.map(function (panel) { return panel.id; }),
+            views: this.tabContainer.panels,
             activeView: (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.id,
             id: this.id,
         };
@@ -38666,7 +38667,7 @@ var Groupview = /** @class */ (function (_super) {
         var isActivePanel = this._activePanel === panel;
         this.doRemovePanel(panel);
         if (isActivePanel && this.panels.length > 0) {
-            var nextPanel = this.panels[Math.max(0, index - 1)];
+            var nextPanel = this.mostRecentlyUsed[0];
             this.openPanel(nextPanel);
         }
         if (this._activePanel && this.panels.length === 0) {
@@ -38682,6 +38683,9 @@ var Groupview = /** @class */ (function (_super) {
         }
         this.tabContainer.delete(panel.id);
         this._panels.splice(index, 1);
+        if (this.mostRecentlyUsed.includes(panel)) {
+            this.mostRecentlyUsed.splice(this.mostRecentlyUsed.indexOf(panel), 1);
+        }
         this._onDidGroupChange.fire({
             kind: "REMOVE_PANEL" /* REMOVE_PANEL */,
             panel: panel,
@@ -38705,7 +38709,14 @@ var Groupview = /** @class */ (function (_super) {
         this.tabContainer.setActivePanel(panel);
         // this.contentContainer.openPanel(panel.content);
         panel.layout(this._width, this._height);
+        this.updateMru(panel);
         this._onDidGroupChange.fire({ kind: "PANEL_ACTIVE" /* PANEL_ACTIVE */ });
+    };
+    Groupview.prototype.updateMru = function (panel) {
+        if (this.mostRecentlyUsed.includes(panel)) {
+            this.mostRecentlyUsed.splice(this.mostRecentlyUsed.indexOf(panel), 1);
+        }
+        this.mostRecentlyUsed = __spread([panel], this.mostRecentlyUsed);
     };
     Groupview.prototype.updateContainer = function () {
         var _this = this;
@@ -39388,6 +39399,13 @@ var TitleContainer = /** @class */ (function (_super) {
         }));
         return _this;
     }
+    Object.defineProperty(TitleContainer.prototype, "panels", {
+        get: function () {
+            return this.tabs.map(function (_) { return _.value.id; });
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(TitleContainer.prototype, "visible", {
         get: function () {
             return this._visible;
