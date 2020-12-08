@@ -70,6 +70,68 @@ export const Simple = (props: { theme: string }) => {
     );
 };
 
+export const Deserialization = (props: { theme: string }) => {
+    const api = React.useRef<PaneviewApi>();
+
+    const onReady = (event: PaneviewReadyEvent) => {
+        event.api.layout(window.innerWidth, window.innerHeight);
+        api.current = event.api;
+
+        event.api.fromJSON({
+            size: 100,
+            views: [
+                {
+                    size: 80,
+                    expanded: true,
+                    minimumSize: 100,
+                    data: {
+                        id: 'panel1',
+                        component: 'default',
+                        title: 'Panel 1',
+                    },
+                },
+                {
+                    size: 20,
+                    expanded: true,
+                    minimumSize: 100,
+                    data: {
+                        id: 'panel2',
+                        component: 'default',
+                        title: 'Panel 2',
+                    },
+                },
+                {
+                    size: 20,
+                    expanded: false,
+                    minimumSize: 100,
+                    data: {
+                        id: 'panel3',
+                        component: 'default',
+                        title: 'Panel 3',
+                    },
+                },
+            ],
+        });
+
+        event.api.layout(window.innerWidth, window.innerHeight);
+        event.api.getPanel('panel2').api.setSize({ size: 60 });
+    };
+
+    React.useEffect(() => {
+        window.addEventListener('resize', () => {
+            api.current?.layout(window.innerWidth, window.innerHeight);
+        });
+    }, []);
+
+    return (
+        <PaneviewReact
+            className={props.theme}
+            onReady={onReady}
+            components={components}
+        />
+    );
+};
+
 export default {
     title: 'Paneview',
     component: Simple,

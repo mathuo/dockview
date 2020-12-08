@@ -122,6 +122,69 @@ export const SnappablePanel = (props: {
     );
 };
 
+export const Deserialization = (props: { orientation: Orientation }) => {
+    const api = React.useRef<SplitviewApi>();
+
+    const onReady = (event: SplitviewReadyEvent) => {
+        event.api.layout(window.innerWidth, window.innerHeight);
+        api.current = event.api;
+
+        event.api.fromJSON({
+            size: 100,
+            views: [
+                {
+                    size: 20,
+                    data: {
+                        id: 'panel1',
+                        component: 'default',
+                        params: {
+                            color: 'red',
+                        },
+                    },
+                },
+                {
+                    size: 40,
+                    data: {
+                        id: 'panel2',
+                        component: 'default',
+                        params: {
+                            color: 'green',
+                        },
+                    },
+                },
+                {
+                    size: 60,
+                    data: {
+                        id: 'panel3',
+                        component: 'default',
+                        params: {
+                            color: 'purple',
+                        },
+                    },
+                },
+            ],
+            orientation: props.orientation,
+            activeView: 'panel1',
+        });
+
+        event.api.layout(window.innerWidth, window.innerHeight);
+    };
+
+    React.useEffect(() => {
+        window.addEventListener('resize', () => {
+            api.current?.layout(window.innerWidth, window.innerHeight);
+        });
+    }, []);
+
+    return (
+        <SplitviewReact
+            onReady={onReady}
+            orientation={props.orientation}
+            components={components}
+        />
+    );
+};
+
 export default {
     title: 'Splitview',
     component: Simple,
@@ -135,7 +198,7 @@ export default {
             );
         },
     ],
-    args: { orientation: Orientation.VERTICAL },
+    args: { orientation: Orientation.VERTICAL, proportionalLayout: true },
     argTypes: {
         orientation: {
             control: {

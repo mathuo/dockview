@@ -109,7 +109,7 @@ export default {
             );
         },
     ],
-    args: { orientation: Orientation.VERTICAL },
+    args: { orientation: Orientation.VERTICAL, proportionalLayout: true },
     argTypes: {
         orientation: {
             control: {
