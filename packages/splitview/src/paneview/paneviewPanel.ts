@@ -48,9 +48,7 @@ export interface IPaneview extends IView {
 export abstract class PaneviewPanel
     extends BasePanelView<PanePanelApi>
     implements IPaneview {
-    private _onDidChangeExpansionState: Emitter<boolean> = new Emitter<
-        boolean
-    >();
+    private _onDidChangeExpansionState: Emitter<boolean> = new Emitter<boolean>();
     onDidChangeExpansionState = this._onDidChangeExpansionState.event;
     private readonly _onDidChange = new Emitter<number | undefined>();
     readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
@@ -121,6 +119,9 @@ export abstract class PaneviewPanel
         this.element.classList.add('pane');
 
         this.addDisposables(
+            this.api.onDidSizeChange((event) => {
+                this._onDidChange.fire(event.size);
+            }),
             addDisposableListener(
                 this.element,
                 'mouseenter',
