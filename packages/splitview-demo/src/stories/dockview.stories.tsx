@@ -14,7 +14,9 @@ import 'dockview/dist/styles.css';
 
 const components: PanelCollection<IDockviewPanelProps> = {
     default: (props) => {
-        return <div style={{ height: '100%' }}>hello world</div>;
+        return (
+            <div style={{ padding: '10px', height: '100%' }}>hello world</div>
+        );
     },
 };
 

@@ -13,14 +13,24 @@ import 'dockview/dist/styles.css';
 const components: PanelCollection<IGridviewPanelProps> = {
     default: (props) => {
         return (
-            <div style={{ backgroundColor: props.color, height: '100%' }}>
+            <div
+                style={{
+                    padding: '10px',
+                    backgroundColor: props.color,
+                    height: '100%',
+                }}
+            >
                 hello world
             </div>
         );
     },
 };
 
-export const Simple = (props: { orientation: Orientation }) => {
+export const Simple = (props: {
+    orientation: Orientation;
+    hideBorders: boolean;
+    proportionalLayout: boolean;
+}) => {
     const api = React.useRef<GridviewApi>();
 
     const onReady = (event: GridviewReadyEvent) => {
@@ -33,6 +43,7 @@ export const Simple = (props: { orientation: Orientation }) => {
             params: { color: 'red' },
             minimumHeight: 50,
             minimumWidth: 50,
+            location: [0],
         });
         event.api.addPanel({
             id: 'panel_2',
@@ -79,6 +90,8 @@ export const Simple = (props: { orientation: Orientation }) => {
             onReady={onReady}
             orientation={props.orientation}
             components={components}
+            hideBorders={props.hideBorders}
+            proportionalLayout={props.proportionalLayout}
         />
     );
 };
@@ -90,7 +103,7 @@ export default {
         (Component) => {
             document.body.style.padding = '0px';
             return (
-                <div style={{ height: '100vh' }}>
+                <div style={{ height: '100vh', fontFamily: 'Arial' }}>
                     <Component />
                 </div>
             );
