@@ -51,6 +51,58 @@ describe('componentSplitview', () => {
         expect(splitview.width).toBe(600);
     });
 
+    test('api resize', () => {
+        const splitview = new SplitviewComponent(container, {
+            orientation: Orientation.VERTICAL,
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+
+        splitview.layout(400, 600);
+        splitview.addPanel({ id: 'panel1', component: 'testPanel' });
+        splitview.addPanel({ id: 'panel2', component: 'testPanel' });
+        splitview.addPanel({ id: 'panel3', component: 'testPanel' });
+
+        const panel1 = splitview.getPanel('panel1');
+        const panel2 = splitview.getPanel('panel2');
+        const panel3 = splitview.getPanel('panel3');
+
+        expect(panel1.width).toBe(400);
+        expect(panel1.height).toBe(200);
+        expect(panel2.width).toBe(400);
+        expect(panel2.height).toBe(200);
+        expect(panel3.width).toBe(400);
+        expect(panel3.height).toBe(200);
+
+        panel1.api.setSize({ size: 100 });
+
+        expect(panel1.width).toBe(400);
+        expect(panel1.height).toBe(100);
+        expect(panel2.width).toBe(400);
+        expect(panel2.height).toBe(200);
+        expect(panel3.width).toBe(400);
+        expect(panel3.height).toBe(300);
+
+        panel2.api.setSize({ size: 100 });
+
+        expect(panel1.width).toBe(400);
+        expect(panel1.height).toBe(100);
+        expect(panel2.width).toBe(400);
+        expect(panel2.height).toBe(100);
+        expect(panel3.width).toBe(400);
+        expect(panel3.height).toBe(400);
+
+        panel3.api.setSize({ size: 100 });
+
+        expect(panel1.width).toBe(400);
+        expect(panel1.height).toBe(100);
+        expect(panel2.width).toBe(400);
+        expect(panel2.height).toBe(400);
+        expect(panel3.width).toBe(400);
+        expect(panel3.height).toBe(100);
+    });
+
     test('api', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,

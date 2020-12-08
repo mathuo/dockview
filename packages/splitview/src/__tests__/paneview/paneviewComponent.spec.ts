@@ -119,6 +119,22 @@ describe('componentPaneview', () => {
         expect(panel1Dimensions).toEqual({ width: 200, height: 22 });
         expect(panel2Dimensions).toEqual({ width: 200, height: 22 });
 
+        panel1.api.setExpanded(true);
+
+        expect(panel1Dimensions).toEqual({ width: 200, height: 578 });
+        expect(panel2Dimensions).toEqual({ width: 200, height: 22 });
+
+        panel2.api.setExpanded(true);
+        panel1.api.setSize({ size: 300 });
+
+        expect(panel1Dimensions).toEqual({ width: 200, height: 300 });
+        expect(panel2Dimensions).toEqual({ width: 200, height: 300 });
+
+        panel1.api.setSize({ size: 200 });
+
+        expect(panel1Dimensions).toEqual({ width: 200, height: 200 });
+        expect(panel2Dimensions).toEqual({ width: 200, height: 400 });
+
         disposables.dispose();
         paneview.dispose();
     });
