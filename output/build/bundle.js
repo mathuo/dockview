@@ -758,7 +758,7 @@ var components = {
                 var _a;
                 (_a = _api.current) === null || _a === void 0 ? void 0 : _a.layout(event.width, event.height);
             }), _api.current.onGridEvent(function (event) {
-                if (event.kind === "LAYOUT_CONFIG_UPDATED" /* LAYOUT_CONFIG_UPDATED */) {
+                if (event.kind === dockview_1.GroupChangeKind.LAYOUT_CONFIG_UPDATED) {
                     props.api.setState('layout', _api.current.toJSON());
                 }
             }));
@@ -34716,6 +34716,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "DebugWidget": () => /* binding */ DebugWidget
 /* harmony export */ });
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../groupview/groupview */ "../splitview/dist/es6/groupview/groupview.js");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -34729,6 +34730,7 @@ var __extends = (undefined && undefined.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 
 var DebugWidget = /** @class */ (function (_super) {
     __extends(DebugWidget, _super);
@@ -34752,10 +34754,10 @@ var DebugWidget = /** @class */ (function (_super) {
         var gc = _this._element.querySelector('#group-count');
         var pc = _this._element.querySelector('#panel-count');
         var events = [
-            "PANEL_CREATED" /* PANEL_CREATED */,
-            "PANEL_DESTROYED" /* PANEL_DESTROYED */,
-            "ADD_GROUP" /* ADD_GROUP */,
-            "REMOVE_GROUP" /* REMOVE_GROUP */,
+            _groupview_groupview__WEBPACK_IMPORTED_MODULE_1__.GroupChangeKind.PANEL_CREATED,
+            _groupview_groupview__WEBPACK_IMPORTED_MODULE_1__.GroupChangeKind.PANEL_DESTROYED,
+            _groupview_groupview__WEBPACK_IMPORTED_MODULE_1__.GroupChangeKind.ADD_GROUP,
+            _groupview_groupview__WEBPACK_IMPORTED_MODULE_1__.GroupChangeKind.REMOVE_GROUP,
         ];
         _this.addDisposables(_this.layout.onGridEvent(function (event) {
             if (events.includes(event.kind)) {
@@ -35270,13 +35272,13 @@ var DockviewComponent = /** @class */ (function (_super) {
             var timer;
             return _this.onGridEvent(function (event) {
                 if ([
-                    "ADD_GROUP" /* ADD_GROUP */,
-                    "REMOVE_GROUP" /* REMOVE_GROUP */,
-                    "ADD_PANEL" /* ADD_PANEL */,
-                    "REMOVE_GROUP" /* REMOVE_GROUP */,
-                    "GROUP_ACTIVE" /* GROUP_ACTIVE */,
-                    "PANEL_ACTIVE" /* PANEL_ACTIVE */,
-                    "LAYOUT" /* LAYOUT */,
+                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.ADD_GROUP,
+                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.REMOVE_GROUP,
+                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.ADD_PANEL,
+                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.REMOVE_GROUP,
+                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.GROUP_ACTIVE,
+                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.PANEL_ACTIVE,
+                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.LAYOUT,
                 ].includes(event.kind)) {
                     if (timer) {
                         clearTimeout(timer);
@@ -35415,7 +35417,7 @@ var DockviewComponent = /** @class */ (function (_super) {
         }
         var disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposable(panel.onDidStateChange(function () { return _this.addDirtyPanel(panel); }));
         this.panels.set(panel.id, { value: panel, disposable: disposable });
-        this._onGridEvent.fire({ kind: "PANEL_CREATED" /* PANEL_CREATED */ });
+        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.PANEL_CREATED });
     };
     DockviewComponent.prototype.unregisterPanel = function (panel) {
         if (!this.panels.has(panel.id)) {
@@ -35427,7 +35429,7 @@ var DockviewComponent = /** @class */ (function (_super) {
             item.value.dispose();
         }
         this.panels.delete(panel.id);
-        this._onGridEvent.fire({ kind: "PANEL_DESTROYED" /* PANEL_DESTROYED */ });
+        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.PANEL_DESTROYED });
     };
     /**
      * Serialize the current state of the layout
@@ -35476,11 +35478,11 @@ var DockviewComponent = /** @class */ (function (_super) {
             .forEach(function (panel) {
             panel.setDirty(false);
             _this._onGridEvent.fire({
-                kind: "PANEL_CLEAN" /* PANEL_CLEAN */,
+                kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.PANEL_CLEAN,
             });
         });
         this._onGridEvent.fire({
-            kind: "LAYOUT_CONFIG_UPDATED" /* LAYOUT_CONFIG_UPDATED */,
+            kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.LAYOUT_CONFIG_UPDATED,
         });
     };
     DockviewComponent.prototype.fromJSON = function (data) {
@@ -35511,7 +35513,7 @@ var DockviewComponent = /** @class */ (function (_super) {
             this.doSetGroupActive(this.getPanel(activeGroup));
         }
         this.gridview.layout(this.width, this.height);
-        this._onGridEvent.fire({ kind: "NEW_LAYOUT" /* NEW_LAYOUT */ });
+        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.NEW_LAYOUT });
     };
     DockviewComponent.prototype.closeAllGroups = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -35661,14 +35663,15 @@ var DockviewComponent = /** @class */ (function (_super) {
     DockviewComponent.prototype.addPanelToNewGroup = function (panel, location) {
         if (location === void 0) { location = [0]; }
         var group;
-        if (this.groups.size === 1 &&
-            Array.from(this.groups.values())[0].value.size === 0) {
-            group = Array.from(this.groups.values())[0].value;
-        }
-        else {
-            group = this.createGroup();
-            this.doAddGroup(group, location);
-        }
+        // if (
+        //     this.groups.size === 1 &&
+        //     Array.from(this.groups.values())[0].value.size === 0
+        // ) {
+        //     group = Array.from(this.groups.values())[0].value;
+        // } else {
+        group = this.createGroup();
+        this.doAddGroup(group, location);
+        // }
         group.openPanel(panel);
     };
     DockviewComponent.prototype.moveGroupOrPanel = function (referenceGroup, groupId, itemId, target, index) {
@@ -35777,7 +35780,7 @@ var DockviewComponent = /** @class */ (function (_super) {
     DockviewComponent.prototype.addDirtyPanel = function (panel) {
         this.dirtyPanels.add(panel);
         panel.setDirty(true);
-        this._onGridEvent.fire({ kind: "PANEL_DIRTY" /* PANEL_DIRTY */ });
+        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.PANEL_DIRTY });
         this.debouncedDeque();
     };
     DockviewComponent.prototype.dispose = function () {
@@ -36229,9 +36232,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
 /* harmony import */ var _gridview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./gridview */ "../splitview/dist/es6/gridview/gridview.js");
 /* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
-/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../math */ "../splitview/dist/es6/math.js");
-/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
+/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../groupview/groupview */ "../splitview/dist/es6/groupview/groupview.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../math */ "../splitview/dist/es6/math.js");
+/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -36251,7 +36255,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
 
 
 
-var nextLayoutId = (0,_math__WEBPACK_IMPORTED_MODULE_4__.sequentialNumberGenerator)();
+
+var nextLayoutId = (0,_math__WEBPACK_IMPORTED_MODULE_5__.sequentialNumberGenerator)();
 function toTarget(direction) {
     switch (direction) {
         case 'left':
@@ -36282,7 +36287,7 @@ var BaseGrid = /** @class */ (function (_super) {
         // TODO for some reason this is required before anything will layout correctly
         _this.layout(0, 0, true);
         _this.addDisposables(_this.gridview.onDidChange(function () {
-            _this._onGridEvent.fire({ kind: "LAYOUT" /* LAYOUT */ });
+            _this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.LAYOUT });
         }));
         return _this;
     }
@@ -36358,16 +36363,16 @@ var BaseGrid = /** @class */ (function (_super) {
     });
     BaseGrid.prototype.setVisible = function (panel, visible) {
         this.gridview.setViewVisible((0,_gridview__WEBPACK_IMPORTED_MODULE_1__.getGridLocation)(panel.element), visible);
-        this._onGridEvent.fire({ kind: "LAYOUT" /* LAYOUT */ });
+        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.LAYOUT });
     };
     BaseGrid.prototype.isVisible = function (panel) {
         return this.gridview.isViewVisible((0,_gridview__WEBPACK_IMPORTED_MODULE_1__.getGridLocation)(panel.element));
     };
     BaseGrid.prototype.doAddGroup = function (group, location, size) {
         if (location === void 0) { location = [0]; }
-        this.gridview.addView(group, size !== null && size !== void 0 ? size : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__.Sizing.Distribute, location);
+        this.gridview.addView(group, size !== null && size !== void 0 ? size : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_6__.Sizing.Distribute, location);
         this.doSetGroupActive(group);
-        this._onGridEvent.fire({ kind: "ADD_GROUP" /* ADD_GROUP */ });
+        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.ADD_GROUP });
     };
     BaseGrid.prototype.doRemoveGroup = function (group, options) {
         if (!this.groups.has(group.id)) {
@@ -36378,11 +36383,11 @@ var BaseGrid = /** @class */ (function (_super) {
             item.disposable.dispose();
             this.groups.delete(group.id);
         }
-        var view = this.gridview.remove(group, _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__.Sizing.Distribute);
+        var view = this.gridview.remove(group, _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_6__.Sizing.Distribute);
         if (!(options === null || options === void 0 ? void 0 : options.skipActive) && this.groups.size > 0) {
             this.doSetGroupActive(Array.from(this.groups.values())[0].value);
         }
-        this._onGridEvent.fire({ kind: "REMOVE_GROUP" /* REMOVE_GROUP */ });
+        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.REMOVE_GROUP });
         return view;
     };
     BaseGrid.prototype.getPanel = function (id) {
@@ -36475,7 +36480,7 @@ var BaseGrid = /** @class */ (function (_super) {
         this.gridview.dispose();
     };
     return BaseGrid;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable));
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_4__.CompositeDisposable));
 
 
 
@@ -37483,10 +37488,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _gridview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./gridview */ "../splitview/dist/es6/gridview/gridview.js");
 /* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
 /* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../array */ "../splitview/dist/es6/array.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
-/* harmony import */ var _baseComponentGridview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./baseComponentGridview */ "../splitview/dist/es6/gridview/baseComponentGridview.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
-/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
+/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../groupview/groupview */ "../splitview/dist/es6/groupview/groupview.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _baseComponentGridview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./baseComponentGridview */ "../splitview/dist/es6/gridview/baseComponentGridview.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
+/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -37516,6 +37522,7 @@ var __read = (undefined && undefined.__read) || function (o, n) {
     }
     return ar;
 };
+
 
 
 
@@ -37606,7 +37613,7 @@ var GridviewComponent = /** @class */ (function (_super) {
         this.gridview.deserialize(grid, {
             fromJSON: function (node) {
                 var data = node.data;
-                var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(data.id, data.component, _this.options.components || {}, _this.options.frameworkComponents || {}, _this.options.frameworkComponentFactory
+                var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_7__.createComponent)(data.id, data.component, _this.options.components || {}, _this.options.frameworkComponents || {}, _this.options.frameworkComponentFactory
                     ? {
                         createComponent: _this.options
                             .frameworkComponentFactory.createComponent,
@@ -37621,7 +37628,7 @@ var GridviewComponent = /** @class */ (function (_super) {
                         maximumHeight: data.maximumHeight,
                         priority: data.priority,
                         snap: !!data.snap,
-                        containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_5__.GridviewApi(_this),
+                        containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_6__.GridviewApi(_this),
                         isVisible: node.visible,
                     });
                 });
@@ -37638,13 +37645,13 @@ var GridviewComponent = /** @class */ (function (_super) {
                 this.doSetGroupActive(panel);
             }
         }
-        this._onGridEvent.fire({ kind: "NEW_LAYOUT" /* NEW_LAYOUT */ });
+        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_3__.GroupChangeKind.NEW_LAYOUT });
     };
     GridviewComponent.prototype.movePanel = function (panel, options) {
         var relativeLocation;
         var removedPanel = this.gridview.remove(panel);
         var referenceGroup = this.groups.get(options.reference).value;
-        var target = (0,_baseComponentGridview__WEBPACK_IMPORTED_MODULE_4__.toTarget)(options.direction);
+        var target = (0,_baseComponentGridview__WEBPACK_IMPORTED_MODULE_5__.toTarget)(options.direction);
         if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
             throw new Error(target + " not supported as an option");
         }
@@ -37660,7 +37667,7 @@ var GridviewComponent = /** @class */ (function (_super) {
         if ((_a = options.position) === null || _a === void 0 ? void 0 : _a.reference) {
             var referenceGroup = this.groups.get(options.position.reference)
                 .value;
-            var target = (0,_baseComponentGridview__WEBPACK_IMPORTED_MODULE_4__.toTarget)(options.position.direction);
+            var target = (0,_baseComponentGridview__WEBPACK_IMPORTED_MODULE_5__.toTarget)(options.position.direction);
             if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
                 throw new Error(target + " not supported as an option");
             }
@@ -37669,7 +37676,7 @@ var GridviewComponent = /** @class */ (function (_super) {
                 relativeLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location_2, target);
             }
         }
-        var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(options.id, options.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkComponentFactory
+        var view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_7__.createComponent)(options.id, options.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkComponentFactory
             ? {
                 createComponent: this.options.frameworkComponentFactory
                     .createComponent,
@@ -37683,7 +37690,7 @@ var GridviewComponent = /** @class */ (function (_super) {
             maximumHeight: options.maximumHeight,
             priority: options.priority,
             snap: !!options.snap,
-            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_5__.GridviewApi(this),
+            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_6__.GridviewApi(this),
             isVisible: true,
         });
         this.registerPanel(view);
@@ -37692,7 +37699,7 @@ var GridviewComponent = /** @class */ (function (_super) {
     };
     GridviewComponent.prototype.registerPanel = function (panel) {
         var _this = this;
-        var disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable(panel.api.onDidFocusChange(function (event) {
+        var disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.CompositeDisposable(panel.api.onDidFocusChange(function (event) {
             if (!event.isFocused) {
                 return;
             }
@@ -37750,7 +37757,7 @@ var GridviewComponent = /** @class */ (function (_super) {
         _super.prototype.dispose.call(this);
     };
     return GridviewComponent;
-}(_baseComponentGridview__WEBPACK_IMPORTED_MODULE_4__.BaseGrid));
+}(_baseComponentGridview__WEBPACK_IMPORTED_MODULE_5__.BaseGrid));
 
 
 
@@ -38145,6 +38152,7 @@ var LeafNode = /** @class */ (function () {
   !*** ../splitview/dist/es6/groupview/groupview.js ***!
   \****************************************************/
 /*! namespace exports */
+/*! export GroupChangeKind [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Groupview [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
 /*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
@@ -38153,6 +38161,7 @@ var LeafNode = /** @class */ (function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "GroupChangeKind": () => /* binding */ GroupChangeKind,
 /* harmony export */   "Groupview": () => /* binding */ Groupview
 /* harmony export */ });
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
@@ -38253,6 +38262,28 @@ var __values = (undefined && undefined.__values) || function(o) {
 
 
 
+var GroupChangeKind;
+(function (GroupChangeKind) {
+    GroupChangeKind["GROUP_ACTIVE"] = "GROUP_ACTIVE";
+    GroupChangeKind["ADD_GROUP"] = "ADD_GROUP";
+    GroupChangeKind["REMOVE_GROUP"] = "REMOVE_GROUP";
+    //
+    GroupChangeKind["ADD_PANEL"] = "ADD_PANEL";
+    GroupChangeKind["REMOVE_PANEL"] = "REMOVE_PANEL";
+    GroupChangeKind["PANEL_OPEN"] = "PANEL_OPEN";
+    GroupChangeKind["PANEL_CLOSE"] = "PANEL_CLOSE";
+    GroupChangeKind["PANEL_ACTIVE"] = "PANEL_ACTIVE";
+    //
+    GroupChangeKind["NEW_LAYOUT"] = "NEW_LAYOUT";
+    GroupChangeKind["LAYOUT"] = "LAYOUT";
+    //
+    GroupChangeKind["PANEL_CREATED"] = "PANEL_CREATED";
+    GroupChangeKind["PANEL_DESTROYED"] = "PANEL_DESTROYED";
+    GroupChangeKind["PANEL_DIRTY"] = "PANEL_DIRTY";
+    GroupChangeKind["PANEL_CLEAN"] = "PANEL_CLEAN";
+    //
+    GroupChangeKind["LAYOUT_CONFIG_UPDATED"] = "LAYOUT_CONFIG_UPDATED";
+})(GroupChangeKind || (GroupChangeKind = {}));
 var Groupview = /** @class */ (function (_super) {
     __extends(Groupview, _super);
     function Groupview(accessor, id, options) {
@@ -38651,7 +38682,7 @@ var Groupview = /** @class */ (function (_super) {
             if (!skipFocus) {
                 (_b = this._activePanel) === null || _b === void 0 ? void 0 : _b.focus();
             }
-            this._onDidGroupChange.fire({ kind: "GROUP_ACTIVE" /* GROUP_ACTIVE */ });
+            this._onDidGroupChange.fire({ kind: GroupChangeKind.GROUP_ACTIVE });
         }
     };
     Groupview.prototype.layout = function (width, height) {
@@ -38687,7 +38718,7 @@ var Groupview = /** @class */ (function (_super) {
             this.mostRecentlyUsed.splice(this.mostRecentlyUsed.indexOf(panel), 1);
         }
         this._onDidGroupChange.fire({
-            kind: "REMOVE_PANEL" /* REMOVE_PANEL */,
+            kind: GroupChangeKind.REMOVE_PANEL,
             panel: panel,
         });
     };
@@ -38702,7 +38733,7 @@ var Groupview = /** @class */ (function (_super) {
             return;
         }
         this.panels.splice(index, 0, panel);
-        this._onDidGroupChange.fire({ kind: "ADD_PANEL" /* ADD_PANEL */ });
+        this._onDidGroupChange.fire({ kind: GroupChangeKind.ADD_PANEL });
     };
     Groupview.prototype.doSetActivePanel = function (panel) {
         this._activePanel = panel;
@@ -38710,7 +38741,7 @@ var Groupview = /** @class */ (function (_super) {
         // this.contentContainer.openPanel(panel.content);
         panel.layout(this._width, this._height);
         this.updateMru(panel);
-        this._onDidGroupChange.fire({ kind: "PANEL_ACTIVE" /* PANEL_ACTIVE */ });
+        this._onDidGroupChange.fire({ kind: GroupChangeKind.PANEL_ACTIVE });
     };
     Groupview.prototype.updateMru = function (panel) {
         if (this.mostRecentlyUsed.includes(panel)) {
@@ -38720,10 +38751,12 @@ var Groupview = /** @class */ (function (_super) {
     };
     Groupview.prototype.updateContainer = function () {
         var _this = this;
-        var _a, _b;
         this.updateActions();
         (0,_dom__WEBPACK_IMPORTED_MODULE_5__.toggleClass)(this.element, 'empty', this.isEmpty);
-        if (!this.watermark) {
+        this.panels.forEach(function (panel) {
+            return panel.updateParentGroup(_this, _this.isActive);
+        });
+        if (this.isEmpty && !this.watermark) {
             var watermark = this.accessor.createWatermarkComponent();
             watermark.init({
                 containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_8__.DockviewApi(this.accessor),
@@ -38732,11 +38765,6 @@ var Groupview = /** @class */ (function (_super) {
                 api: null,
             });
             this.watermark = watermark;
-        }
-        this.panels.forEach(function (panel) {
-            return panel.updateParentGroup(_this, _this.isActive);
-        });
-        if (this.isEmpty && !((_b = (_a = this.watermark) === null || _a === void 0 ? void 0 : _a.element) === null || _b === void 0 ? void 0 : _b.parentNode)) {
             (0,_events__WEBPACK_IMPORTED_MODULE_4__.addDisposableListener)(this.watermark.element, 'click', function () {
                 if (!_this.isActive) {
                     _this.accessor.doSetGroupActive(_this);
@@ -38745,7 +38773,7 @@ var Groupview = /** @class */ (function (_super) {
             this.contentContainer.openPanel(this.watermark);
             this.watermark.updateParentGroup(this, true);
         }
-        if (!this.isEmpty && this.watermark.element.parentNode) {
+        if (!this.isEmpty && this.watermark) {
             this.watermark.dispose();
             this.watermark = undefined;
             this.contentContainer.closePanel();
@@ -38839,8 +38867,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "GroupviewPanel": () => /* binding */ GroupviewPanel
 /* harmony export */ });
 /* harmony import */ var _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/groupPanelApi */ "../splitview/dist/es6/api/groupPanelApi.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
-/* harmony import */ var _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../dockview/components/tab/defaultTab */ "../splitview/dist/es6/dockview/components/tab/defaultTab.js");
+/* harmony import */ var _groupview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./groupview */ "../splitview/dist/es6/groupview/groupview.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dockview/components/tab/defaultTab */ "../splitview/dist/es6/dockview/components/tab/defaultTab.js");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -38868,13 +38897,14 @@ var __assign = (undefined && undefined.__assign) || function () {
 
 
 
+
 var GroupviewPanel = /** @class */ (function (_super) {
     __extends(GroupviewPanel, _super);
     function GroupviewPanel(id, containerApi) {
         var _this = _super.call(this) || this;
         _this.id = id;
         _this.containerApi = containerApi;
-        _this.mutableDisposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_1__.MutableDisposable();
+        _this.mutableDisposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_2__.MutableDisposable();
         _this.api = new _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_0__.GroupPanelApi(_this, _this._group);
         _this.onDidStateChange = _this.api.onDidStateChange;
         _this.addDisposables(_this.api.onDidTitleChange(function (event) {
@@ -38923,7 +38953,7 @@ var GroupviewPanel = /** @class */ (function (_super) {
         return {
             id: this.id,
             contentId: (_b = this.contentPart) === null || _b === void 0 ? void 0 : _b.id,
-            tabId: this.headerPart instanceof _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_2__.DefaultTab
+            tabId: this.headerPart instanceof _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_3__.DefaultTab
                 ? undefined
                 : (_c = this.headerPart) === null || _c === void 0 ? void 0 : _c.id,
             params: params && Object.keys(params).length > 0 ? params : undefined,
@@ -38953,7 +38983,7 @@ var GroupviewPanel = /** @class */ (function (_super) {
         this._group = group;
         this.api.group = group;
         this.mutableDisposable.value = this._group.onDidGroupChange(function (ev) {
-            if (ev.kind === "GROUP_ACTIVE" /* GROUP_ACTIVE */) {
+            if (ev.kind === _groupview__WEBPACK_IMPORTED_MODULE_1__.GroupChangeKind.GROUP_ACTIVE) {
                 var isPanelVisible_1 = _this._group.isPanelActive(_this);
                 _this.api._onDidActiveChange.fire({
                     isActive: isGroupActive && isPanelVisible_1,
@@ -38996,7 +39026,7 @@ var GroupviewPanel = /** @class */ (function (_super) {
         (_b = this.contentPart) === null || _b === void 0 ? void 0 : _b.dispose();
     };
     return GroupviewPanel;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable));
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable));
 
 
 
@@ -39582,6 +39612,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! export GridviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridviewComponent.js .GridviewComponent */
 /*! export GridviewPanel [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridviewPanel.js .GridviewPanel */
 /*! export GridviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/gridview/gridview.js .GridviewReact */
+/*! export GroupChangeKind [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/groupview.js .GroupChangeKind */
 /*! export GroupPanelApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/groupPanelApi.js .GroupPanelApi */
 /*! export Groupview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/groupview.js .Groupview */
 /*! export GroupviewPanel [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/groupviewPanel.js .GroupviewPanel */
@@ -39638,6 +39669,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "indexInParent": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.indexInParent,
 /* harmony export */   "isGridBranchNode": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.isGridBranchNode,
 /* harmony export */   "orthogonal": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.orthogonal,
+/* harmony export */   "GroupChangeKind": () => /* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_5__.GroupChangeKind,
 /* harmony export */   "Groupview": () => /* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_5__.Groupview,
 /* harmony export */   "ContentContainer": () => /* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_6__.ContentContainer,
 /* harmony export */   "MouseEventKind": () => /* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_7__.MouseEventKind,
