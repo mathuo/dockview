@@ -40518,7 +40518,9 @@ var PaneviewPanel = /** @class */ (function (_super) {
         _this._isExpanded = false;
         _this.api.pane = _this; // TODO cannot use 'this' before 'super'
         _this.element.classList.add('pane');
-        _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.element, 'mouseenter', function (ev) {
+        _this.addDisposables(_this.api.onDidSizeChange(function (event) {
+            _this._onDidChange.fire(event.size);
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.element, 'mouseenter', function (ev) {
             _this.api._onMouseEnter.fire(ev);
         }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(_this.element, 'mouseleave', function (ev) {
             _this.api._onMouseLeave.fire(ev);
