@@ -3,6 +3,7 @@
     flex-direction: column;
     height: 100%;
     background-color: var(--group-view-background-color);
+    overflow: hidden;
 
     &:focus {
         outline: none;

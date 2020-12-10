@@ -57,6 +57,51 @@ describe('dockviewComponent', () => {
         });
     });
 
+    test('add a panel and move to a new group', () => {
+        dockview.layout(500, 1000);
+
+        dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        expect(dockview.size).toBe(1);
+        expect(dockview.totalPanels).toBe(2);
+
+        const panel1 = dockview.getGroupPanel('panel1');
+        const panel2 = dockview.getGroupPanel('panel2');
+
+        expect(panel1.group).toBe(panel2.group);
+
+        const group = panel1.group;
+
+        expect(group.size).toBe(2);
+        expect(group.containsPanel(panel1)).toBeTruthy();
+        expect(group.containsPanel(panel2)).toBeTruthy();
+        expect(group.activePanel).toBe(panel2);
+
+        expect(group.indexOf(panel1)).toBe(0);
+        expect(group.indexOf(panel2)).toBe(1);
+
+        dockview.moveGroupOrPanel(group, group.id, 'panel1', Position.Right);
+
+        expect(dockview.size).toBe(2);
+        expect(dockview.totalPanels).toBe(2);
+
+        expect(panel1.group).not.toBe(panel2.group);
+        expect(panel1.group.size).toBe(1);
+        expect(panel2.group.size).toBe(1);
+        expect(panel1.group.containsPanel(panel1)).toBeTruthy();
+        expect(panel2.group.containsPanel(panel2)).toBeTruthy();
+        expect(panel1.group.activePanel).toBe(panel1);
+        expect(panel2.group.activePanel).toBe(panel2);
+    });
+
     test('panel content added to content-container css check', () => {
         dockview.layout(500, 1000);
 
