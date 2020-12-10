@@ -33,6 +33,14 @@ dockview/dist/styles.css
 
 By default the seperator between panels is `transparent` but this can be set through the CSS varibable `--separator-border`. Alternatively, or if you require the `DockviewReact` you should attach the classname of an included theme; either `dockview-theme-dark` or `dockview-theme-light`.
 
+### FAQ
+
+-  The panel or grid isn't appearing
+   - Have you called `api.layout(...)`? 
+   - The grid need to be provided with a width and height to layout correctly. 
+   - If you are nesting panels and grids you can get the panels current dimensions through the panels api `api.onDimensionsChanged(({width,height} => {...}))`
+   - The top level view should probably be set as a function of the window `resize` event.
+
 
 ### Sandbox examples
 - [Dockview](https://codesandbox.io/s/simple-dockview-t6491)

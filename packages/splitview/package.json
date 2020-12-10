@@ -1,6 +1,6 @@
 {
     "name": "dockview",
-    "version": "0.0.0-beta.30",
+    "version": "0.0.1",
     "description": "Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support",
     "main": "dist/cjs/index.js",
     "types": "dist/cjs/index.d.ts",
@@ -19,10 +19,12 @@
         "build": "npm run build-cjs && npm run build-es6 && npm run build-css",
         "clean": "rimraf dist/ .build/",
         "rebuild": "npm run clean && npm run build",
-        "prepublishOnly": "npm run rebuild && npm run test",
         "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
         "test-cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage",
-        "try-strict": "cross-env ../../node_modules/.bin/tsc --project tsconfig.strictNullChecks.json --extendedDiagnostics"
+        "try-strict": "cross-env ../../node_modules/.bin/tsc --project tsconfig.strictNullChecks.json --extendedDiagnostics",
+        "preversion": "npm run rebuild && npm run test",
+        "postversion": "npm publish --tag=beta",
+        "postpublish": "git push && git push --tags"
     },
     "files": [
         "dist",
