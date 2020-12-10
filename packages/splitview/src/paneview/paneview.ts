@@ -2,6 +2,7 @@ import {
     Splitview,
     Orientation,
     ISplitViewDescriptor,
+    Sizing,
 } from '../splitview/core/splitview';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { Emitter, Event } from '../events';
@@ -91,7 +92,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
 
     public addPane(
         pane: PaneviewPanel,
-        size?: number,
+        size?: number | Sizing,
         index = this.splitview.length,
         skipLayout = false
     ) {

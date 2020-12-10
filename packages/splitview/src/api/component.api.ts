@@ -135,6 +135,10 @@ export class PaneviewApi {
         return this.component.getPanel(id);
     }
 
+    movePanel(from: number, to: number) {
+        this.component.movePanel(from, to);
+    }
+
     focus() {
         return this.component.focus();
     }

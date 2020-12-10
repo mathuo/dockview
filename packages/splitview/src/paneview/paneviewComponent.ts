@@ -4,7 +4,11 @@ import { createComponent } from '../panel/componentFactory';
 import { addDisposableListener, Emitter, Event } from '../events';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { PanelUpdateEvent } from '../panel/types';
-import { LayoutPriority, Orientation } from '../splitview/core/splitview';
+import {
+    LayoutPriority,
+    Orientation,
+    Sizing,
+} from '../splitview/core/splitview';
 import { PaneviewComponentOptions } from './options';
 import { Paneview } from './paneview';
 import {
@@ -98,6 +102,8 @@ export interface AddPaneviewCompponentOptions {
     maximumBodySize?: number;
     isExpanded?: boolean;
     title: string;
+    index?: number;
+    size?: number;
 }
 
 export interface IPaneviewComponent extends IDisposable {
@@ -113,6 +119,7 @@ export interface IPaneviewComponent extends IDisposable {
     getPanels(): PaneviewPanel[];
     removePanel(panel: PaneviewPanel): void;
     getPanel(id: string): PaneviewPanel | undefined;
+    movePanel(from: number, to: number): void;
 }
 
 export class PaneviewComponent
@@ -212,7 +219,12 @@ export class PaneviewComponent
             body,
         });
 
-        this.paneview.addPane(view);
+        const size: Sizing | number =
+            typeof options.size === 'number' ? options.size : Sizing.Distribute;
+        const index =
+            typeof options.index === 'number' ? options.index : undefined;
+
+        this.paneview.addPane(view, size, index);
 
         view.init({
             params: options.params || {},
@@ -240,6 +252,10 @@ export class PaneviewComponent
         const views = this.getPanels();
         const index = views.findIndex((_) => _ === panel);
         this.paneview.removePane(index);
+    }
+
+    movePanel(from: number, to: number): void {
+        this.paneview.moveView(from, to);
     }
 
     getPanel(id: string): PaneviewPanel | undefined {
