@@ -7,10 +7,13 @@ import {
 import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/core/splitview';
 import { ReactPanelDeserialzier } from '../../react/deserializer';
+import { Position } from '../../dnd/droptarget';
 class PanelContentPartTest implements PanelContentPart {
     element: HTMLElement = document.createElement('div');
 
-    constructor(public readonly id: string, component: string) {}
+    constructor(public readonly id: string, component: string) {
+        this.element.classList.add(`testpanel-${id}`);
+    }
 
     updateParentGroup(group: IGroupview, isPanelVisible: boolean): void {
         //noop
@@ -42,16 +45,63 @@ class PanelContentPartTest implements PanelContentPart {
 }
 
 describe('dockviewComponent', () => {
-    let element: HTMLElement;
+    let container: HTMLElement;
     let dockview: DockviewComponent;
 
     beforeEach(() => {
-        element = document.createElement('div');
-        dockview = new DockviewComponent(element, {
+        container = document.createElement('div');
+        dockview = new DockviewComponent(container, {
             components: {
                 default: PanelContentPartTest,
             },
         });
+    });
+
+    test('panel content added to content-container css check', () => {
+        dockview.layout(500, 1000);
+
+        dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        let viewQuery = container.querySelectorAll(
+            '.branch-node > .split-view-container > .view-container > .view'
+        );
+
+        expect(viewQuery.length).toBe(1);
+
+        viewQuery = container.querySelectorAll(
+            '.branch-node > .split-view-container > .view-container > .view:nth-child(1) >.groupview > .content-container > .testpanel-panel2'
+        );
+
+        expect(viewQuery.length).toBe(1);
+
+        const group = dockview.getGroupPanel('panel1').group;
+        dockview.moveGroupOrPanel(group, group.id, 'panel1', Position.Right);
+
+        viewQuery = container.querySelectorAll(
+            '.branch-node > .split-view-container > .view-container > .view'
+        );
+
+        expect(viewQuery.length).toBe(2);
+
+        viewQuery = container.querySelectorAll(
+            '.branch-node > .split-view-container > .view-container > .view:nth-child(1) >.groupview > .content-container > .testpanel-panel2'
+        );
+
+        expect(viewQuery.length).toBe(1);
+
+        viewQuery = container.querySelectorAll(
+            '.branch-node > .split-view-container > .view-container > .view:nth-child(2) >.groupview > .content-container > .testpanel-panel1'
+        );
+
+        expect(viewQuery.length).toBe(1);
     });
 
     test('serialization', () => {

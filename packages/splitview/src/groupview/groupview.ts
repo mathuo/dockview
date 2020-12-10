@@ -652,7 +652,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         if (!this.isEmpty && this.watermark) {
             this.watermark.dispose();
             this.watermark = undefined;
-            this.contentContainer.closePanel();
         }
     }
 
