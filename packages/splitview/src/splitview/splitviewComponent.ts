@@ -167,6 +167,11 @@ export class SplitviewComponent
 
         const index = this.getPanels().findIndex((_) => _ === panel);
         this.splitview.removeView(index, sizing);
+
+        const panels = this.getPanels();
+        if (panels.length > 0) {
+            this.setActive(panels[panels.length - 1]);
+        }
     }
 
     getPanel(id: string): SplitviewPanel | undefined {

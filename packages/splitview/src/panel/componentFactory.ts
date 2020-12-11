@@ -8,28 +8,22 @@ export function createComponent<T>(
     },
     frameworkComponents: {
         [componentName: string]: any;
-    },
+    } = {},
     createFrameworkComponent?: FrameworkFactory<T>,
     fallback?: () => T
 ): T {
-    const Component =
-        typeof componentName === 'string'
-            ? components[componentName]
-            : componentName;
+    const Component = components[componentName];
+    const FrameworkComponent = frameworkComponents[componentName];
 
-    const FrameworkComponent =
-        typeof componentName === 'string'
-            ? frameworkComponents[componentName]
-            : componentName;
     if (Component && FrameworkComponent) {
         throw new Error(
-            `cannot register component ${componentName} as both a component and frameworkComponent`
+            `Cannot create '${id}'. component '${componentName}' registered as both a component and frameworkComponent`
         );
     }
     if (FrameworkComponent) {
         if (!createFrameworkComponent) {
             throw new Error(
-                'you must register a frameworkPanelWrapper to use framework components'
+                `Cannot create '${id}' for framework component '${componentName}'. you must register a frameworkPanelWrapper to use framework components`
             );
         }
         const wrappedComponent = createFrameworkComponent.createComponent(
@@ -44,7 +38,9 @@ export function createComponent<T>(
         if (fallback) {
             return fallback();
         }
-        throw new Error('invalid component');
+        throw new Error(
+            `Cannot create '${id}', no component '${componentName}' provided`
+        );
     }
 
     return new Component(id, componentName) as T;

@@ -27,7 +27,6 @@ import {
 import { Event, Emitter, addDisposableListener } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import { timeoutAsPromise } from '../async';
-import { DebugWidget } from './components/debug/debug';
 import { WatermarkPart } from '../groupview/types';
 import { debounce } from '../functions';
 import { sequentialNumberGenerator } from '../math';
@@ -142,7 +141,6 @@ export class DockviewComponent
     // everything else
     private drag = new MutableDisposable();
     private _deserializer: IPanelDeserializer;
-    private debugContainer: DebugWidget | undefined;
     private panelState: State = {};
     private registry = new Map<
         string,
@@ -221,8 +219,6 @@ export class DockviewComponent
         }
 
         this._api = new DockviewApi(this);
-
-        this.updateContainer();
     }
 
     get totalPanels() {
@@ -639,8 +635,13 @@ export class DockviewComponent
     }
 
     public removeGroup(group: IGroupview) {
+        const panels = [...group.panels]; // reassign since group panels will mutate
+        panels.forEach((panel) => {
+            group.removePanel(panel);
+            this.unregisterPanel(panel);
+        });
+
         if (this.groups.size === 1) {
-            group.panels.forEach((panel) => group.removePanel(panel));
             this._activeGroup = group;
             return;
         }
@@ -836,19 +837,6 @@ export class DockviewComponent
     public dispose() {
         super.dispose();
 
-        this.debugContainer?.dispose();
-
         this._onGridEvent.dispose();
-    }
-
-    private updateContainer() {
-        if (this.options.debug) {
-            if (!this.debugContainer) {
-                this.debugContainer = new DebugWidget(this);
-            } else {
-                this.debugContainer.dispose();
-                this.debugContainer = undefined;
-            }
-        }
     }
 }
