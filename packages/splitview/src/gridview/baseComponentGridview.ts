@@ -36,7 +36,7 @@ export interface BaseGridOptions {
 }
 
 export interface IGridPanelView extends IGridView, IPanel {
-    setActive(isActive: boolean, skipFocus?: boolean): void;
+    setActive(isActive: boolean): void;
     readonly isActive: boolean;
 }
 
@@ -163,12 +163,12 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
         const item = this.groups.get(group.id);
 
+        const view = this.gridview.remove(group, Sizing.Distribute);
+
         if (item && !options?.skipDispose) {
             item.disposable.dispose();
             this.groups.delete(group.id);
         }
-
-        const view = this.gridview.remove(group, Sizing.Distribute);
 
         if (!options?.skipActive && this.groups.size > 0) {
             this.doSetGroupActive(Array.from(this.groups.values())[0].value);
@@ -188,9 +188,15 @@ export abstract class BaseGrid<T extends IGridPanelView>
             return;
         }
         if (this._activeGroup) {
-            this._activeGroup.setActive(false, skipFocus);
+            this._activeGroup.setActive(false);
+            if (!skipFocus) {
+                this._activeGroup.focus();
+            }
         }
-        group.setActive(true, skipFocus);
+        group.setActive(true);
+        if (!skipFocus) {
+            group.focus();
+        }
         this._activeGroup = group;
     }
 

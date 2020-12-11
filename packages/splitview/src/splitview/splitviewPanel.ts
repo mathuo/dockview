@@ -1,24 +1,20 @@
 import { ISerializableView, PanelViewInitParameters } from './core/options';
-import { BasePanelView } from '../gridview/basePanelView';
+import {
+    BasePanelView,
+    BasePanelViewExported,
+} from '../gridview/basePanelView';
 import { PanelApi } from '../api/panelApi';
 import { LayoutPriority, Orientation } from './core/splitview';
 import { FunctionOrValue } from '../types';
 import { Emitter, Event } from '../events';
 
-export interface ISplitviewPanel
-    extends Readonly<
-        Pick<
-            ISerializableView,
-            | 'maximumSize'
-            | 'minimumSize'
-            | 'snap'
-            | 'priority'
-            | 'id'
-            | 'toJSON'
-            | 'update'
-            | 'onDidChange'
-        >
-    > {}
+export interface ISplitviewPanel extends BasePanelViewExported<PanelApi> {
+    readonly priority: LayoutPriority;
+    readonly minimumSize: number;
+    readonly maximumSize: number;
+    readonly snap: boolean;
+    readonly orientation: Orientation;
+}
 
 export abstract class SplitviewPanel
     extends BasePanelView<PanelApi>
@@ -114,26 +110,20 @@ export abstract class SplitviewPanel
         );
     }
 
+    setVisible(isVisible: boolean) {
+        this.api._onDidVisibilityChange.fire({ isVisible });
+    }
+
+    setActive(isActive: boolean) {
+        this.api._onDidActiveChange.fire({ isActive });
+    }
+
     layout(size: number, orthogonalSize: number) {
         const [width, height] =
             this.orientation === Orientation.HORIZONTAL
                 ? [size, orthogonalSize]
                 : [orthogonalSize, size];
         super.layout(width, height);
-    }
-
-    private updateConstraints() {
-        this.api._onDidConstraintsChange.fire({
-            maximumSize: this._evaluatedMaximumSize,
-            minimumSize: this._evaluatedMinimumSize,
-        });
-    }
-
-    setActive(isActive: boolean, skipFocus?: boolean) {
-        super.setActive(isActive);
-        if (!skipFocus) {
-            this.focus();
-        }
     }
 
     init(parameters: PanelViewInitParameters): void {
@@ -167,7 +157,10 @@ export abstract class SplitviewPanel
         };
     }
 
-    dispose() {
-        super.dispose();
+    private updateConstraints() {
+        this.api._onDidConstraintsChange.fire({
+            maximumSize: this._evaluatedMaximumSize,
+            minimumSize: this._evaluatedMinimumSize,
+        });
     }
 }

@@ -1,7 +1,11 @@
 import { PaneviewApi } from '../api/component.api';
 import { PanePanelApi } from '../api/panePanelApi';
 import { addDisposableListener, Emitter, Event } from '../events';
-import { BasePanelView, BasePanelViewState } from '../gridview/basePanelView';
+import {
+    BasePanelView,
+    BasePanelViewExported,
+    BasePanelViewState,
+} from '../gridview/basePanelView';
 import { IDisposable } from '../lifecycle';
 import {
     IFrameworkPart,
@@ -45,9 +49,18 @@ export interface IPaneview extends IView {
     onDidChangeExpansionState: Event<boolean>;
 }
 
+export interface IPaneviewPanel extends BasePanelViewExported<PanePanelApi> {
+    readonly minimumSize: number;
+    readonly maximumSize: number;
+    readonly minimumBodySize: number;
+    readonly maximumBodySize: number;
+    isExpanded(): boolean;
+    setExpanded(isExpanded: boolean): void;
+}
+
 export abstract class PaneviewPanel
     extends BasePanelView<PanePanelApi>
-    implements IPaneview {
+    implements IPaneview, IPaneviewPanel {
     private _onDidChangeExpansionState: Emitter<boolean> = new Emitter<boolean>();
     onDidChangeExpansionState = this._onDidChangeExpansionState.event;
     private readonly _onDidChange = new Emitter<number | undefined>();
@@ -148,11 +161,19 @@ export abstract class PaneviewPanel
         this.render();
     }
 
-    isExpanded() {
+    setVisible(isVisible: boolean) {
+        this.api._onDidVisibilityChange.fire({ isVisible });
+    }
+
+    setActive(isActive: boolean) {
+        this.api._onDidActiveChange.fire({ isActive });
+    }
+
+    isExpanded(): boolean {
         return this._isExpanded;
     }
 
-    setExpanded(expanded: boolean) {
+    setExpanded(expanded: boolean): void {
         this._isExpanded = expanded;
 
         if (expanded) {

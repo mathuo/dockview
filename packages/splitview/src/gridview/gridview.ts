@@ -609,7 +609,8 @@ export class Gridview implements IDisposable {
         parent.removeChild(index, sizing);
 
         if (parent.children.length === 0) {
-            throw new Error('Invalid grid state');
+            // throw new Error('Invalid grid state');
+            return node.view;
         }
 
         if (parent.children.length > 1) {

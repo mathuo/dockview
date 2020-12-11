@@ -1,7 +1,11 @@
 import { PanelInitParameters } from '../panel/types';
 import { IGridPanelComponentView } from './gridviewComponent';
 import { FunctionOrValue } from '../types';
-import { BasePanelView, BasePanelViewState } from './basePanelView';
+import {
+    BasePanelView,
+    BasePanelViewExported,
+    BasePanelViewState,
+} from './basePanelView';
 import { GridPanelApi } from '../api/gridPanelApi';
 import { LayoutPriority } from '../splitview/core/splitview';
 import { Emitter, Event } from '../events';
@@ -19,9 +23,18 @@ export interface GridviewInitParameters extends PanelInitParameters {
     isVisible?: boolean;
 }
 
+export interface IGridviewPanel extends BasePanelViewExported<GridPanelApi> {
+    readonly minimumWidth: number;
+    readonly maximumWidth: number;
+    readonly minimumHeight: number;
+    readonly maximumHeight: number;
+    readonly priority: LayoutPriority;
+    readonly snap: boolean;
+}
+
 export abstract class GridviewPanel
     extends BasePanelView<GridPanelApi>
-    implements IGridPanelComponentView {
+    implements IGridPanelComponentView, IGridviewPanel {
     private _evaluatedMinimumWidth: number;
     private _evaluatedMaximumWidth: number;
     private _evaluatedMinimumHeight: number;
@@ -110,7 +123,12 @@ export abstract class GridviewPanel
             this.api.onVisibilityChange((event) => {
                 const { isVisible } = event;
                 const { containerApi } = this.params as GridviewInitParameters;
+                // this.api.setVisible(isVisible);
                 containerApi.setVisible(this, isVisible);
+            }),
+            this.api.onActiveChange(() => {
+                const { containerApi } = this.params as GridviewInitParameters;
+                containerApi.setActive(this);
             }),
             this.api.onDidConstraintsChangeInternal((event) => {
                 if (
@@ -145,6 +163,14 @@ export abstract class GridviewPanel
                 });
             })
         );
+    }
+
+    setVisible(isVisible: boolean) {
+        this.api._onDidVisibilityChange.fire({ isVisible });
+    }
+
+    setActive(isActive: boolean) {
+        this.api._onDidActiveChange.fire({ isActive });
     }
 
     init(parameters: GridviewInitParameters): void {

@@ -9,7 +9,7 @@ import { SplitPanelOptions } from './core/options';
 import { BaseComponentOptions } from '../panel/types';
 import { Emitter, Event } from '../events';
 import { SplitviewApi } from '../api/component.api';
-import { SplitviewPanel } from './splitviewPanel';
+import { SplitviewPanel, ISplitviewPanel } from './splitviewPanel';
 import { createComponent } from '../panel/componentFactory';
 
 export interface SerializedSplitviewPanelData {
@@ -55,11 +55,11 @@ export interface ISplitviewPanels extends IDisposable {
     fromJSON(data: SerializedSplitview): void;
     resizeToFit(): void;
     focus(): void;
-    getPanel(id: string): SplitviewPanel | undefined;
-    setActive(view: SplitviewPanel, skipFocus?: boolean): void;
-    removePanel(panel: SplitviewPanel, sizing?: Sizing): void;
+    getPanel(id: string): ISplitviewPanel | undefined;
+    setActive(view: ISplitviewPanel, skipFocus?: boolean): void;
+    removePanel(panel: ISplitviewPanel, sizing?: Sizing): void;
     getPanels(): SplitviewPanel[];
-    setVisible(panel: SplitviewPanel, visible: boolean): void;
+    setVisible(panel: ISplitviewPanel, visible: boolean): void;
     movePanel(from: number, to: number): void;
 }
 
@@ -141,8 +141,19 @@ export class SplitviewComponent
 
         this.getPanels()
             .filter((v) => v !== view)
-            .forEach((v) => v.setActive(false, skipFocus));
-        view.setActive(true, skipFocus);
+            .forEach((v) => {
+                // v.api._;
+                v.api._onDidActiveChange.fire({ isActive: false });
+                if (!skipFocus) {
+                    v.focus();
+                }
+                // v.setActive(false, skipFocus);
+            });
+        view.api._onDidActiveChange.fire({ isActive: true });
+        if (!skipFocus) {
+            view.focus();
+        }
+        // view.setActive(true, skipFocus);
     }
 
     getPanels(): SplitviewPanel[] {

@@ -79,6 +79,9 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
         this.onDidStateChange = this.api.onDidStateChange;
 
         this.addDisposables(
+            this.api.onActiveChange(() => {
+                this.containerApi.setActivePanel(this);
+            }),
             this.api.onDidTitleChange((event) => {
                 const title = event.title;
                 this.update({ params: { title } });

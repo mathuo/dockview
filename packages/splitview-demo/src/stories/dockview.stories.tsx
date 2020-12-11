@@ -51,6 +51,8 @@ export const Simple = (props: {
             component: 'default',
             position: { referencePanel: 'panel3', direction: 'below' },
         });
+
+        // event.api.getPanel('panel1').api;
     };
 
     React.useEffect(() => {

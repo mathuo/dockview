@@ -15,9 +15,18 @@ export interface BasePanelViewState {
     state?: { [key: string]: any };
 }
 
+export interface BasePanelViewExported<T extends BaseViewApi> {
+    readonly id: string;
+    readonly api: T;
+    readonly width: number;
+    readonly height: number;
+    focus(): void;
+    toJSON(): object;
+}
+
 export abstract class BasePanelView<T extends BaseViewApi>
     extends CompositeDisposable
-    implements IPanel {
+    implements IPanel, BasePanelViewExported<T> {
     private _height = 0;
     private _width = 0;
     private _element: HTMLElement;
@@ -83,14 +92,6 @@ export abstract class BasePanelView<T extends BaseViewApi>
     init(parameters: PanelInitParameters): void {
         this.params = parameters;
         this.part = this.getComponent();
-    }
-
-    setVisible(isVisible: boolean) {
-        this.api._onDidVisibilityChange.fire({ isVisible });
-    }
-
-    setActive(isActive: boolean) {
-        this.api._onDidActiveChange.fire({ isActive });
     }
 
     update(params: PanelUpdateEvent) {

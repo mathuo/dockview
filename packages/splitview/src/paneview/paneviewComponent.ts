@@ -16,6 +16,7 @@ import {
     IPaneHeaderPart,
     PaneviewPanel,
     PanePanelInitParameter,
+    IPaneviewPanel,
 } from './paneviewPanel';
 
 export interface SerializedPaneviewPanel {
@@ -116,9 +117,9 @@ export interface IPaneviewComponent extends IDisposable {
     fromJSON(data: SerializedPaneview): void;
     resizeToFit(): void;
     focus(): void;
-    getPanels(): PaneviewPanel[];
-    removePanel(panel: PaneviewPanel): void;
-    getPanel(id: string): PaneviewPanel | undefined;
+    getPanels(): IPaneviewPanel[];
+    removePanel(panel: IPaneviewPanel): void;
+    getPanel(id: string): IPaneviewPanel | undefined;
     movePanel(from: number, to: number): void;
 }
 

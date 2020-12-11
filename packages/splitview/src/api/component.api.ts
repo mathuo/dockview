@@ -15,7 +15,7 @@ import {
     IGridviewComponent,
     SerializedGridview,
 } from '../gridview/gridviewComponent';
-import { GridviewPanel } from '../gridview/gridviewPanel';
+import { IGridviewPanel } from '../gridview/gridviewPanel';
 import { IGroupview } from '../groupview/groupview';
 import { IGroupPanel } from '../groupview/groupviewPanel';
 import {
@@ -23,14 +23,14 @@ import {
     SerializedPaneview,
 } from '../paneview/paneviewComponent';
 import { IPaneviewComponent } from '../paneview/paneviewComponent';
-import { PaneviewPanel } from '../paneview/paneviewPanel';
+import { IPaneviewPanel } from '../paneview/paneviewPanel';
 import {
     AddSplitviewComponentOptions,
     ISplitviewPanels,
     SerializedSplitview,
 } from '../splitview/splitviewComponent';
 import { Orientation, Sizing } from '../splitview/core/splitview';
-import { SplitviewPanel } from '../splitview/splitviewPanel';
+import { ISplitviewPanel } from '../splitview/splitviewPanel';
 
 export class SplitviewApi {
     get minimumSize() {
@@ -59,15 +59,15 @@ export class SplitviewApi {
 
     constructor(private readonly component: ISplitviewPanels) {}
 
-    removePanel(panel: SplitviewPanel, sizing?: Sizing) {
+    removePanel(panel: ISplitviewPanel, sizing?: Sizing) {
         this.component.removePanel(panel, sizing);
     }
 
-    setVisible(panel: SplitviewPanel, isVisible: boolean) {
+    setVisible(panel: ISplitviewPanel, isVisible: boolean) {
         return this.component.setVisible(panel, isVisible);
     }
 
-    getPanels(): SplitviewPanel[] {
+    getPanels(): ISplitviewPanel[] {
         return this.component.getPanels();
     }
 
@@ -79,7 +79,7 @@ export class SplitviewApi {
         return this.component.getPanel(id);
     }
 
-    setActive(panel: SplitviewPanel) {
+    setActive(panel: ISplitviewPanel) {
         return this.component.setActive(panel);
     }
 
@@ -123,15 +123,15 @@ export class PaneviewApi {
 
     constructor(private readonly component: IPaneviewComponent) {}
 
-    getPanels(): PaneviewPanel[] {
+    getPanels(): IPaneviewPanel[] {
         return this.component.getPanels();
     }
 
-    removePanel(panel: PaneviewPanel): void {
+    removePanel(panel: IPaneviewPanel): void {
         this.component.removePanel(panel);
     }
 
-    getPanel(id: string): PaneviewPanel | undefined {
+    getPanel(id: string): IPaneviewPanel | undefined {
         return this.component.getPanel(id);
     }
 
@@ -207,12 +207,12 @@ export class GridviewApi {
         return this.component.addPanel(options);
     }
 
-    removePanel(panel: GridviewPanel, sizing?: Sizing): void {
+    removePanel(panel: IGridviewPanel, sizing?: Sizing): void {
         this.component.removePanel(panel, sizing);
     }
 
     movePanel(
-        panel: GridviewPanel,
+        panel: IGridviewPanel,
         options: { direction: Direction; reference: string; size?: number }
     ) {
         this.component.movePanel(panel, options);
@@ -226,16 +226,20 @@ export class GridviewApi {
         return this.component.getPanel(id);
     }
 
-    toggleVisibility(panel: GridviewPanel) {
+    toggleVisibility(panel: IGridviewPanel) {
         return this.component.toggleVisibility(panel);
     }
 
-    isVisible(panel: GridviewPanel) {
-        return this.component.isVisible(panel);
+    // isVisible(panel: IGridviewPanel) {
+    //     return this.component.isVisible(panel);
+    // }
+
+    setVisible(panel: IGridviewPanel, visible: boolean) {
+        return this.component.setVisible(panel, visible);
     }
 
-    setVisible(panel: GridviewPanel, visible: boolean) {
-        return this.component.setVisible(panel, visible);
+    setActive(panel: IGridviewPanel): void {
+        this.component.setActive(panel);
     }
 
     fromJSON(data: SerializedGridview) {

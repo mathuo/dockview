@@ -17,6 +17,7 @@ import {
     GridviewPanel,
     GridviewInitParameters,
     GridPanelViewState,
+    IGridviewPanel,
 } from './gridviewPanel';
 import { BaseComponentOptions } from '../panel/types';
 import { GridPanelApi } from '../api/gridPanelApi';
@@ -59,15 +60,17 @@ export interface IGridPanelComponentView extends IGridPanelView {
 export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
     orientation: Orientation;
     addPanel(options: AddComponentOptions): void;
-    removePanel(panel: GridviewPanel, sizing?: Sizing): void;
-    toggleVisibility(panel: GridviewPanel): void;
+    removePanel(panel: IGridviewPanel, sizing?: Sizing): void;
+    toggleVisibility(panel: IGridviewPanel): void;
     focus(): void;
     fromJSON(data: SerializedGridview): void;
     toJSON(): SerializedGridview;
     movePanel(
-        panel: GridviewPanel,
+        panel: IGridviewPanel,
         options: { direction: Direction; reference: string; size?: number }
     ): void;
+    setVisible(panel: IGridviewPanel, visible: boolean): void;
+    setActive(panel: IGridviewPanel): void;
 }
 
 export class GridviewComponent
@@ -110,8 +113,8 @@ export class GridviewComponent
         this._deserializer = value;
     }
 
-    removePanel(panel: GridviewPanel, sizing?: Sizing) {
-        this.gridview.remove(panel, sizing);
+    removePanel(panel: GridviewPanel) {
+        this.removeGroup(panel);
     }
 
     /**
@@ -141,15 +144,17 @@ export class GridviewComponent
         this.fromJSON(data);
     }
 
-    // public setVisible(panel: GridviewPanel, visible: boolean) {
-    //     this.gridview.setViewVisible(getGridLocation(panel.element), visible);
-    // }
+    setVisible(panel: GridviewPanel, visible: boolean): void {
+        this.gridview.setViewVisible(getGridLocation(panel.element), visible);
+    }
 
-    // public isVisible(panel: GridviewPanel) {
-    //     return this.gridview.isViewVisible(getGridLocation(panel.element));
-    // }
+    setActive(panel: GridviewPanel): void {
+        this.groups.forEach((value, key) => {
+            value.value.setActive(panel === value.value);
+        });
+    }
 
-    public toggleVisibility(panel: GridviewPanel) {
+    toggleVisibility(panel: GridviewPanel) {
         this.setVisible(panel, !this.isVisible(panel));
     }
 
@@ -303,8 +308,12 @@ export class GridviewComponent
                     const group = groupItem.value;
                     if (group !== panel) {
                         group.setActive(false);
+                        // group.api._onDidActiveChange.fire({ isActive: false });
+                        // group.api.setActive(false);
                     } else {
                         group.setActive(true);
+                        // group.api._onDidActiveChange.fire({ isActive: true });
+                        // group.setActive(true);
                     }
                 });
             })
@@ -365,7 +374,7 @@ export class GridviewComponent
         this.doAddGroup(targetGroup, location);
     }
 
-    public removeGroup(group: GridviewPanel) {
+    removeGroup(group: GridviewPanel) {
         super.removeGroup(group);
 
         const panel = this.groups.get(group.id);

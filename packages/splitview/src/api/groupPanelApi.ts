@@ -8,14 +8,15 @@ export interface TitleEvent {
     title: string;
 }
 
-export interface IGroupPanelApi extends IGridPanelApi {
-    // events
-    onDidDirtyChange: Event<boolean>;
-    // onDidGroupPanelVisibleChange: Event<VisibilityEvent>;
-    // misc
-    // readonly isGroupVisible: boolean;
+/*
+ * omit visibility modifiers since the visibility of a single group doesn't make sense
+ * because it belongs to a groupview
+ */
+export interface IGroupPanelApi
+    extends Omit<IGridPanelApi, 'setVisible' | 'visible'> {
     readonly group: IGroupview;
     readonly isGroupActive: boolean;
+    onDidDirtyChange: Event<boolean>;
     close: () => Promise<boolean>;
     tryClose: () => Promise<boolean>;
     interceptOnCloseAction(interceptor: () => Promise<boolean>): void;
