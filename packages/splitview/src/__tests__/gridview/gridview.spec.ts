@@ -46,6 +46,84 @@ describe('gridview', () => {
         expect(panel?.api.isVisible).toBeTruthy();
     });
 
+    test('remove last panel', () => {
+        gridview.layout(800, 400);
+
+        gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        expect(gridview.size).toBe(1);
+
+        const panel1 = gridview.getPanel('panel1');
+
+        gridview.removePanel(panel1);
+
+        expect(gridview.size).toBe(0);
+
+        gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        expect(gridview.size).toBe(1);
+    });
+
+    test('active panel', () => {
+        gridview.layout(800, 400);
+
+        gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        gridview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+        gridview.addPanel({
+            id: 'panel3',
+            component: 'default',
+        });
+
+        const panel1 = gridview.getPanel('panel1');
+        const panel2 = gridview.getPanel('panel2');
+        const panel3 = gridview.getPanel('panel3');
+
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeTruthy();
+
+        panel1.api.setActive();
+
+        expect(panel1.api.isActive).toBeTruthy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeFalsy();
+
+        panel2.api.setActive();
+
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeTruthy();
+        expect(panel3.api.isActive).toBeFalsy();
+
+        panel3.api.setActive();
+
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeTruthy();
+
+        gridview.removePanel(panel3);
+
+        expect(panel1.api.isActive).toBeTruthy();
+        expect(panel2.api.isActive).toBeFalsy();
+
+        gridview.removePanel(panel1);
+
+        expect(panel2.api.isActive).toBeTruthy();
+
+        gridview.removePanel(panel2);
+    });
+
     test('deserialize and serialize a layout', () => {
         gridview.layout(800, 400);
         gridview.fromJSON({
@@ -117,6 +195,11 @@ describe('gridview', () => {
         expect(panel3?.api.isFocused).toBeFalsy();
         expect(panel3?.api.height).toBe(400);
         expect(panel3?.api.width).toBe(500);
+
+        panel2.api.setActive();
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeTruthy();
+        expect(panel3.api.isActive).toBeFalsy();
 
         expect(JSON.parse(JSON.stringify(gridview.toJSON()))).toEqual({
             grid: {

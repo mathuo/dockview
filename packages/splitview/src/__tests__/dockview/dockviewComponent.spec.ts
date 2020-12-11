@@ -57,7 +57,91 @@ describe('dockviewComponent', () => {
         });
     });
 
-    test('add a panel and move to a new group', () => {
+    test('active panel', () => {
+        dockview.layout(500, 1000);
+
+        dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+        });
+        dockview.addPanel({
+            id: 'panel4',
+            component: 'default',
+        });
+
+        const panel1 = dockview.getGroupPanel('panel1');
+        const panel2 = dockview.getGroupPanel('panel2');
+        const panel3 = dockview.getGroupPanel('panel3');
+        const panel4 = dockview.getGroupPanel('panel4');
+
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeFalsy();
+        expect(panel4.api.isActive).toBeTruthy();
+
+        panel1.api.setActive();
+
+        expect(panel1.api.isActive).toBeTruthy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeFalsy();
+        expect(panel4.api.isActive).toBeFalsy();
+
+        panel2.api.setActive();
+
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeTruthy();
+        expect(panel3.api.isActive).toBeFalsy();
+        expect(panel4.api.isActive).toBeFalsy();
+
+        const group1 = panel1.group;
+        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', Position.Right);
+        const group2 = panel1.group;
+        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', Position.Center);
+
+        expect(dockview.size).toBe(2);
+        expect(panel1.group).toBe(panel3.group);
+        expect(panel2.group).toBe(panel4.group);
+        expect(panel1.group).not.toBe(panel2.group);
+
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeTruthy();
+        expect(panel4.api.isActive).toBeFalsy();
+
+        panel1.api.setActive();
+        expect(panel1.api.isActive).toBeTruthy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeFalsy();
+        expect(panel4.api.isActive).toBeFalsy();
+
+        panel2.api.setActive();
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeTruthy();
+        expect(panel3.api.isActive).toBeFalsy();
+        expect(panel4.api.isActive).toBeFalsy();
+
+        panel3.api.setActive();
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeTruthy();
+        expect(panel4.api.isActive).toBeFalsy();
+
+        panel4.api.setActive();
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeFalsy();
+        expect(panel4.api.isActive).toBeTruthy();
+    });
+
+    test('add a panel and move to a new group', async () => {
         dockview.layout(500, 1000);
 
         dockview.addPanel({
@@ -100,6 +184,16 @@ describe('dockviewComponent', () => {
         expect(panel2.group.containsPanel(panel2)).toBeTruthy();
         expect(panel1.group.activePanel).toBe(panel1);
         expect(panel2.group.activePanel).toBe(panel2);
+
+        await panel1.api.close();
+
+        expect(dockview.size).toBe(1);
+        expect(dockview.totalPanels).toBe(1);
+
+        await panel2.api.close();
+
+        expect(dockview.size).toBe(1);
+        expect(dockview.totalPanels).toBe(0);
     });
 
     test('panel content added to content-container css check', () => {
