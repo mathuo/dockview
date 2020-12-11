@@ -46,7 +46,7 @@ describe('gridview', () => {
         expect(panel?.api.isVisible).toBeTruthy();
     });
 
-    test('remove last panel', () => {
+    test('remove panel', () => {
         gridview.layout(800, 400);
 
         gridview.addPanel({

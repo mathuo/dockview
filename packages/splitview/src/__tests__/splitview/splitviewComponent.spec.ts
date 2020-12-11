@@ -25,6 +25,41 @@ describe('componentSplitview', () => {
         container.className = 'container';
     });
 
+    test('remove panel', () => {
+        const splitview = new SplitviewComponent(container, {
+            orientation: Orientation.VERTICAL,
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+        splitview.layout(600, 400);
+
+        splitview.addPanel({ id: 'panel1', component: 'testPanel' });
+        splitview.addPanel({ id: 'panel2', component: 'testPanel' });
+        splitview.addPanel({ id: 'panel3', component: 'testPanel' });
+
+        const panel1 = splitview.getPanel('panel1');
+        const panel2 = splitview.getPanel('panel2');
+        const panel3 = splitview.getPanel('panel3');
+
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeFalsy();
+        expect(panel3.api.isActive).toBeTruthy();
+
+        splitview.removePanel(panel3);
+
+        expect(panel1.api.isActive).toBeFalsy();
+        expect(panel2.api.isActive).toBeTruthy();
+        expect(splitview.length).toBe(2);
+
+        splitview.removePanel(panel1);
+        expect(panel2.api.isActive).toBeTruthy();
+        expect(splitview.length).toBe(1);
+
+        splitview.removePanel(panel2);
+        expect(splitview.length).toBe(0);
+    });
+
     test('horizontal dimensions', () => {
         const splitview = new SplitviewComponent(container, {
             orientation: Orientation.HORIZONTAL,
