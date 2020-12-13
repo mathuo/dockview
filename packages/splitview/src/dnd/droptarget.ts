@@ -1,6 +1,6 @@
 import { toggleClass } from '../dom';
 import { Emitter, Event } from '../events';
-import { DataTransferSingleton } from './dataTransfer';
+import { LocalSelectionTransfer } from './dataTransfer';
 
 export enum Position {
     Top = 'Top',
@@ -48,7 +48,7 @@ export class Droptarget {
     private onDragEnter = (event: DragEvent) => {
         if (
             !this.options.enableExternalDragEvents &&
-            !DataTransferSingleton.has(this.options.id)
+            !LocalSelectionTransfer.getInstance().hasData(this.options.id)
         ) {
             console.debug('[droptarget] invalid event');
             return;
@@ -66,6 +66,7 @@ export class Droptarget {
             this.overlay = document.createElement('div');
             this.overlay.className = 'drop-target-selection';
             //
+            this._state = Position.Center;
             this.target.addEventListener('dragover', this.onDragOver);
             this.target.addEventListener('dragleave', this.onDragLeave);
             this.target.addEventListener('drop', this.onDrop);
@@ -79,7 +80,7 @@ export class Droptarget {
     private onDrop = (event: DragEvent) => {
         if (
             !this.options.enableExternalDragEvents &&
-            !DataTransferSingleton.has(this.options.id)
+            !LocalSelectionTransfer.getInstance().hasData(this.options.id)
         ) {
             console.debug('[dragtarget] invalid');
             return;

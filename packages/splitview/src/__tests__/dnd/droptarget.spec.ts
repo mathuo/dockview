@@ -22,6 +22,29 @@ describe('droptarget', () => {
         element = document.createElement('div');
     });
 
+    test('non-directional', () => {
+        let position: Position | undefined = undefined;
+
+        droptarget = new Droptarget(element, {
+            isDisabled: () => false,
+            isDirectional: false,
+            id: 'test-dnd',
+            enableExternalDragEvents: true,
+        });
+
+        droptarget.onDidChange((event) => {
+            position = event.position;
+        });
+
+        fireEvent.dragEnter(element);
+
+        const target = element.querySelector(
+            '.drop-target-dropzone'
+        ) as HTMLElement;
+        fireEvent.drop(target);
+        expect(position).toBe(Position.Center);
+    });
+
     test('drop', () => {
         let position: Position | undefined = undefined;
 

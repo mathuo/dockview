@@ -25,7 +25,7 @@ export const Activitybar = (props: IGridviewPanelProps) => {
         const api = registry.get<GridviewApi>('gridview');
 
         const sidebarPanel = api.getPanel('sidebar');
-        if (api.isVisible(sidebarPanel)) {
+        if (sidebarPanel.api.isVisible) {
             api.setVisible(sidebarPanel, false);
         } else {
             event.preventDefault(); // prevent focus

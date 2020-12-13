@@ -61,7 +61,7 @@ export interface GroupOptions {
     readonly panels?: IGroupPanel[];
     readonly activePanel?: IGroupPanel;
     readonly id?: string;
-    tabHeight?: number;
+    tabHeight: number;
 }
 
 export interface GroupChangeEvent {
@@ -236,7 +236,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             options.panel = this.activePanel;
         }
 
-        const index = this.panels.indexOf(options.panel);
+        const index = options.panel ? this.panels.indexOf(options.panel) : -1;
 
         let normalizedIndex: number;
 
@@ -421,7 +421,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             ? this.panels.indexOf(this._activePanel)
             : -1;
 
-        if (index > -1) {
+        if (this._activePanel && index > -1) {
             if (this.panels.indexOf(this._activePanel) < 0) {
                 console.warn('active panel not tracked');
             }

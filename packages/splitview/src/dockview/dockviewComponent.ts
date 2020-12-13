@@ -27,7 +27,11 @@ import {
 import { Event, Emitter, addDisposableListener } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import { timeoutAsPromise } from '../async';
-import { WatermarkPart } from '../groupview/types';
+import {
+    PanelContentPart,
+    PanelHeaderPart,
+    WatermarkPart,
+} from '../groupview/types';
 import { debounce } from '../functions';
 import { sequentialNumberGenerator } from '../math';
 import { DefaultDeserializer, IPanelDeserializer } from './deserializer';
@@ -40,7 +44,11 @@ import {
     MovementOptions,
     TabContextMenuEvent,
 } from './options';
-import { DataTransferSingleton, DATA_KEY, DragType } from '../dnd/dataTransfer';
+import {
+    DATA_KEY,
+    DragType,
+    LocalSelectionTransfer,
+} from '../dnd/dataTransfer';
 import {
     BaseGrid,
     IBaseGrid,
@@ -72,7 +80,7 @@ export interface SerializedDockview {
 }
 
 export interface IDockviewComponent extends IBaseGrid<IGroupview> {
-    readonly activeGroup: IGroupview;
+    readonly activeGroup: IGroupview | undefined;
     moveGroupOrPanel(
         referenceGroup: IGroupview,
         groupId: string,
@@ -221,11 +229,11 @@ export class DockviewComponent
         this._api = new DockviewApi(this);
     }
 
-    get totalPanels() {
+    get totalPanels(): number {
         return this.panels.size;
     }
 
-    get deserializer() {
+    get deserializer(): IPanelDeserializer {
         return this._deserializer;
     }
 
@@ -233,7 +241,7 @@ export class DockviewComponent
         this._deserializer = value;
     }
 
-    focus() {
+    focus(): void {
         this.activeGroup?.focus();
     }
 
@@ -267,7 +275,7 @@ export class DockviewComponent
                     ...panelOptions,
                 });
 
-                DataTransferSingleton.setData(this.id, data);
+                LocalSelectionTransfer.getInstance().setData([data], this.id);
 
                 event.dataTransfer.effectAllowed = 'move';
 
@@ -287,7 +295,7 @@ export class DockviewComponent
             }),
             addDisposableListener(this.element, 'dragend', (ev) => {
                 // drop events fire before dragend so we can remove this safely
-                DataTransferSingleton.removeData(this.id);
+                LocalSelectionTransfer.getInstance().clearData(this.id);
                 this.drag.dispose();
             })
         );
@@ -295,12 +303,12 @@ export class DockviewComponent
         return disposables;
     }
 
-    setActivePanel(panel: IGroupPanel) {
+    setActivePanel(panel: IGroupPanel): void {
         this.doSetGroupActive(panel.group);
         panel.group.openPanel(panel);
     }
 
-    public moveToNext(options: MovementOptions = {}) {
+    public moveToNext(options: MovementOptions = {}): void {
         if (!options.group) {
             if (!this.activeGroup) {
                 return;
@@ -323,7 +331,7 @@ export class DockviewComponent
         this.doSetGroupActive(next);
     }
 
-    public moveToPrevious(options: MovementOptions = {}) {
+    public moveToPrevious(options: MovementOptions = {}): void {
         if (!options.group) {
             if (!this.activeGroup) {
                 return;
@@ -339,11 +347,13 @@ export class DockviewComponent
         }
 
         const location = getGridLocation(options.group.element);
-        const next = this.gridview.previous(location)?.view as IGroupview;
-        this.doSetGroupActive(next);
+        const next = this.gridview.previous(location)?.view;
+        if (next) {
+            this.doSetGroupActive(next as IGroupview);
+        }
     }
 
-    public registerPanel(panel: IGroupPanel) {
+    public registerPanel(panel: IGroupPanel): void {
         if (this.panels.has(panel.id)) {
             throw new Error(`panel ${panel.id} already exists`);
         }
@@ -357,7 +367,7 @@ export class DockviewComponent
         this._onGridEvent.fire({ kind: GroupChangeKind.PANEL_CREATED });
     }
 
-    public unregisterPanel(panel: IGroupPanel) {
+    public unregisterPanel(panel: IGroupPanel): void {
         if (!this.panels.has(panel.id)) {
             throw new Error(`panel ${panel.id} doesn't exist`);
         }
@@ -406,7 +416,7 @@ export class DockviewComponent
     /**
      * Ensure the local copy of the layout state is up-to-date
      */
-    private syncConfigs() {
+    private syncConfigs(): void {
         const dirtyPanels = Array.from(this.dirtyPanels);
 
         if (dirtyPanels.length === 0) {
@@ -442,7 +452,7 @@ export class DockviewComponent
         });
     }
 
-    public fromJSON(data: SerializedDockview) {
+    public fromJSON(data: SerializedDockview): void {
         this.gridview.clear();
         this.panels.forEach((panel) => {
             panel.disposable.dispose();
@@ -473,7 +483,10 @@ export class DockviewComponent
         );
 
         if (typeof activeGroup === 'string') {
-            this.doSetGroupActive(this.getPanel(activeGroup));
+            const panel = this.getPanel(activeGroup);
+            if (panel) {
+                this.doSetGroupActive(panel);
+            }
         }
 
         this.gridview.layout(this.width, this.height);
@@ -481,7 +494,7 @@ export class DockviewComponent
         this._onGridEvent.fire({ kind: GroupChangeKind.NEW_LAYOUT });
     }
 
-    public async closeAllGroups() {
+    public async closeAllGroups(): Promise<boolean> {
         for (const entry of this.groups.entries()) {
             const [key, group] = entry;
 
@@ -494,7 +507,7 @@ export class DockviewComponent
         return true;
     }
 
-    public setTabHeight(height: number | undefined) {
+    public setTabHeight(height: number | undefined): void {
         this.options.tabHeight = height;
         this.groups.forEach((value) => {
             value.value.tabHeight = height;
@@ -505,7 +518,7 @@ export class DockviewComponent
         return this.options.tabHeight;
     }
 
-    fireMouseEvent(event: LayoutMouseEvent) {
+    fireMouseEvent(event: LayoutMouseEvent): void {
         switch (event.kind) {
             case MouseEventKind.CONTEXT_MENU:
                 if (event.tab && event.panel) {
@@ -528,6 +541,12 @@ export class DockviewComponent
             const referencePanel = this.getGroupPanel(
                 options.position.referencePanel
             );
+
+            if (!referencePanel) {
+                throw new Error(
+                    `referencePanel ${options.position.referencePanel} does not exist`
+                );
+            }
 
             referenceGroup = this.findGroup(referencePanel);
         } else {
@@ -577,7 +596,7 @@ export class DockviewComponent
         return panel;
     }
 
-    createWatermarkComponent() {
+    createWatermarkComponent(): WatermarkPart {
         return createComponent(
             'watermark-id',
             'watermark-name',
@@ -591,36 +610,55 @@ export class DockviewComponent
         );
     }
 
-    private createContentComponent(id: string, componentName: string) {
+    private createContentComponent(
+        id: string,
+        componentName: string
+    ): PanelContentPart {
         return createComponent(
             id,
             componentName,
-            this.options.components,
+            this.options.components || {},
             this.options.frameworkComponents,
             this.options.frameworkComponentFactory?.content
         );
     }
 
-    private createTabComponent(id: string, componentName: string) {
+    private createTabComponent(
+        id: string,
+        componentName?: string
+    ): PanelHeaderPart {
         return createComponent(
             id,
             componentName,
-            this.options.tabComponents,
+            this.options.tabComponents || {},
             this.options.frameworkTabComponents,
             this.options.frameworkComponentFactory?.tab,
             () => new DefaultTab()
         );
     }
 
-    public addEmptyGroup(options: AddGroupOptions) {
+    public addEmptyGroup(options: AddGroupOptions): void {
         const group = this.createGroup();
 
         if (options) {
             const referencePanel = this.panels.get(options.referencePanel)
                 ?.value;
+
+            if (!referencePanel) {
+                throw new Error(
+                    `reference panel ${options.referencePanel} does not exist`
+                );
+            }
+
             const referenceGroup = this.findGroup(referencePanel);
 
-            const target = toTarget(options.direction);
+            if (!referenceGroup) {
+                throw new Error(
+                    `reference group for reference panel ${options.referencePanel} does not exist`
+                );
+            }
+
+            const target = toTarget(options.direction || 'within');
 
             const location = getGridLocation(referenceGroup.element);
             const relativeLocation = getRelativeLocation(
@@ -634,7 +672,7 @@ export class DockviewComponent
         }
     }
 
-    public removeGroup(group: IGroupview) {
+    public removeGroup(group: IGroupview): void {
         const panels = [...group.panels]; // reassign since group panels will mutate
         panels.forEach((panel) => {
             group.removePanel(panel);
@@ -649,7 +687,10 @@ export class DockviewComponent
         super.removeGroup(group);
     }
 
-    private addPanelToNewGroup(panel: IGroupPanel, location: number[] = [0]) {
+    private addPanelToNewGroup(
+        panel: IGroupPanel,
+        location: number[] = [0]
+    ): void {
         let group: IGroupview;
 
         // if (
@@ -671,7 +712,7 @@ export class DockviewComponent
         itemId: string,
         target: Position,
         index?: number
-    ) {
+    ): void {
         const sourceGroup = groupId
             ? this.groups.get(groupId)?.value
             : undefined;
@@ -726,9 +767,9 @@ export class DockviewComponent
                     this.doAddGroup(targetGroup, location);
                 }
             } else {
-                const groupItem =
+                const groupItem: IGroupPanel | undefined =
                     sourceGroup?.removePanel(itemId) ||
-                    this.panels.get(itemId).value;
+                    this.panels.get(itemId)?.value;
                 const dropLocation = getRelativeLocation(
                     this.gridview.orientation,
                     referenceLocation,
@@ -740,9 +781,9 @@ export class DockviewComponent
         }
     }
 
-    createGroup(options?: GroupOptions) {
+    createGroup(options?: GroupOptions): IGroupview {
         if (!options) {
-            options = {};
+            options = { tabHeight: this.getTabHeight() };
         }
         if (typeof options.tabHeight !== 'number') {
             options.tabHeight = this.getTabHeight();
@@ -752,7 +793,7 @@ export class DockviewComponent
 
         if (id && this.groups.has(options.id)) {
             console.warn(
-                `Duplicate group id ${options.id}. reassigning group id to avoid errors`
+                `Duplicate group id ${options?.id}. reassigning group id to avoid errors`
             );
             id = undefined;
             // throw new Error(`duplicate group ${options.id}`);
@@ -789,6 +830,7 @@ export class DockviewComponent
                 group.onDrop((event) => {
                     const dragEvent = event.event;
                     const dataTransfer = dragEvent.dataTransfer;
+
                     if (dataTransfer.types.length === 0) {
                         return;
                     }
@@ -824,17 +866,17 @@ export class DockviewComponent
     private findGroup(panel: IGroupPanel): IGroupview | undefined {
         return Array.from(this.groups.values()).find((group) =>
             group.value.containsPanel(panel)
-        ).value;
+        )?.value;
     }
 
-    private addDirtyPanel(panel: IGroupPanel) {
+    private addDirtyPanel(panel: IGroupPanel): void {
         this.dirtyPanels.add(panel);
         panel.setDirty(true);
         this._onGridEvent.fire({ kind: GroupChangeKind.PANEL_DIRTY });
         this.debouncedDeque();
     }
 
-    public dispose() {
+    public dispose(): void {
         super.dispose();
 
         this._onGridEvent.dispose();

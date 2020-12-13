@@ -9,7 +9,7 @@ import { FunctionOrValue } from '../types';
 import { Emitter, Event } from '../events';
 
 export interface ISplitviewPanel extends BasePanelViewExported<PanelApi> {
-    readonly priority: LayoutPriority;
+    readonly priority: LayoutPriority | undefined;
     readonly minimumSize: number;
     readonly maximumSize: number;
     readonly snap: boolean;
@@ -32,7 +32,7 @@ export abstract class SplitviewPanel
     private readonly _onDidChange = new Emitter<number | undefined>();
     readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
 
-    get priority() {
+    get priority(): LayoutPriority | undefined {
         return this._priority;
     }
 
@@ -40,11 +40,11 @@ export abstract class SplitviewPanel
         this._orientation = value;
     }
 
-    get orientation() {
+    get orientation(): Orientation {
         return this._orientation;
     }
 
-    get minimumSize() {
+    get minimumSize(): number {
         const size =
             typeof this._minimumSize === 'function'
                 ? this._minimumSize()
@@ -58,7 +58,7 @@ export abstract class SplitviewPanel
         return size;
     }
 
-    get maximumSize() {
+    get maximumSize(): number {
         const size =
             typeof this._maximumSize === 'function'
                 ? this._maximumSize()
@@ -72,7 +72,7 @@ export abstract class SplitviewPanel
         return size;
     }
 
-    get snap() {
+    get snap(): boolean {
         return this._snap;
     }
 
@@ -110,15 +110,15 @@ export abstract class SplitviewPanel
         );
     }
 
-    setVisible(isVisible: boolean) {
+    setVisible(isVisible: boolean): void {
         this.api._onDidVisibilityChange.fire({ isVisible });
     }
 
-    setActive(isActive: boolean) {
+    setActive(isActive: boolean): void {
         this.api._onDidActiveChange.fire({ isActive });
     }
 
-    layout(size: number, orthogonalSize: number) {
+    layout(size: number, orthogonalSize: number): void {
         const [width, height] =
             this.orientation === Orientation.HORIZONTAL
                 ? [size, orthogonalSize]
@@ -157,7 +157,7 @@ export abstract class SplitviewPanel
         };
     }
 
-    private updateConstraints() {
+    private updateConstraints(): void {
         this.api._onDidConstraintsChange.fire({
             maximumSize: this._evaluatedMaximumSize,
             minimumSize: this._evaluatedMinimumSize,

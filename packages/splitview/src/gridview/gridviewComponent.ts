@@ -229,7 +229,13 @@ export class GridviewComponent
 
         const removedPanel = this.gridview.remove(panel) as GridviewPanel;
 
-        const referenceGroup = this.groups.get(options.reference).value;
+        const referenceGroup = this.groups.get(options.reference)?.value;
+
+        if (!referenceGroup) {
+            throw new Error(
+                `reference group ${options.reference} does not exist`
+            );
+        }
 
         const target = toTarget(options.direction);
         if (target === Position.Center) {
@@ -251,7 +257,13 @@ export class GridviewComponent
 
         if (options.position?.reference) {
             const referenceGroup = this.groups.get(options.position.reference)
-                .value;
+                ?.value;
+
+            if (!referenceGroup) {
+                throw new Error(
+                    `reference group ${options.position.reference} does not exist`
+                );
+            }
 
             const target = toTarget(options.position.direction);
             if (target === Position.Center) {

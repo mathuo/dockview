@@ -105,7 +105,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         return this.gridview.maximumWidth;
     }
 
-    get activeGroup() {
+    get activeGroup(): T | undefined {
         return this._activeGroup;
     }
 

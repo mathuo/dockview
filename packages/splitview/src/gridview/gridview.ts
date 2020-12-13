@@ -485,7 +485,7 @@ export class Gridview implements IDisposable {
 
     constructor(
         readonly proportionalLayout: boolean,
-        readonly styles: ISplitviewStyles,
+        readonly styles: ISplitviewStyles | undefined,
         orientation: Orientation
     ) {
         this.element = document.createElement('div');

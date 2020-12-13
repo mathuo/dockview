@@ -32,6 +32,7 @@ export class DefaultDeserializer implements IViewDeserializer {
             panels,
             activePanel: panels.find((p) => p.id === active),
             id: node.data.id,
+            tabHeight: undefined,
         });
 
         return group;

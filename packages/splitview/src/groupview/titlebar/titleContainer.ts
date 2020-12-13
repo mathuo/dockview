@@ -10,10 +10,10 @@ import { DroptargetEvent, Position } from '../../dnd/droptarget';
 
 import { IGroupview } from '../groupview';
 import { last } from '../../array';
-import { DataTransferSingleton } from '../../dnd/dataTransfer';
 import { focusedElement } from '../../focusedElement';
 import { IGroupPanel } from '../groupviewPanel';
 import { IDockviewComponent } from '../../dockview/dockviewComponent';
+import { LocalSelectionTransfer } from '../../dnd/dataTransfer';
 
 export interface TabDropEvent {
     event: DroptargetEvent;
@@ -35,7 +35,7 @@ export interface ITitleContainer extends IDisposable {
     isActive: (tab: ITab) => boolean;
     closePanel: (panel: IGroupPanel) => void;
     openPanel: (panel: IGroupPanel, index?: number) => void;
-    setActionElement(element: HTMLElement): void;
+    setActionElement(element: HTMLElement | undefined): void;
 }
 
 export class TitleContainer
@@ -49,7 +49,7 @@ export class TitleContainer
     private selectedIndex = -1;
     private active = false;
     private activePanel: IGroupPanel | undefined;
-    private actions: HTMLElement;
+    private actions: HTMLElement | undefined;
 
     private _visible = true;
     private _height: number;
@@ -89,7 +89,7 @@ export class TitleContainer
         // this._element.style.height = `${this.height}px`;
     }
 
-    setActionElement(element: HTMLElement): void {
+    setActionElement(element: HTMLElement | undefined): void {
         if (this.actions === element) {
             return;
         }
@@ -158,11 +158,15 @@ export class TitleContainer
                 this.accessor.doSetGroupActive(this.group);
             }),
             addDisposableListener(this.tabContainer, 'dragenter', (event) => {
-                if (!DataTransferSingleton.has(this.accessor.id)) {
+                if (
+                    !LocalSelectionTransfer.getInstance().hasData(
+                        this.accessor.id
+                    )
+                ) {
                     console.debug('[tabs] invalid drop event');
                     return;
                 }
-                if (!last(this.tabs).value.hasActiveDragEvent) {
+                if (!last(this.tabs)?.value.hasActiveDragEvent) {
                     addClasses(this.tabContainer, 'drag-over-target');
                 }
             }),
@@ -173,7 +177,11 @@ export class TitleContainer
                 removeClasses(this.tabContainer, 'drag-over-target');
             }),
             addDisposableListener(this.tabContainer, 'drop', (event) => {
-                if (!DataTransferSingleton.has(this.accessor.id)) {
+                if (
+                    !LocalSelectionTransfer.getInstance().hasData(
+                        this.accessor.id
+                    )
+                ) {
                     console.debug('[tabs] invalid drop event');
                     return;
                 }
@@ -259,13 +267,16 @@ export class TitleContainer
             return;
         }
         const tab = new Tab(panel.id, this.accessor, this.group);
+        if (!panel.header) {
+            throw new Error('invalid header component');
+        }
         tab.setContent(panel.header);
 
         const disposable = CompositeDisposable.from(
             tab.onChanged((event) => {
                 const alreadyFocused =
                     panel.id === this.group.activePanel?.id &&
-                    this.group.isAncestor(focusedElement.element);
+                    this.group.isAncestor(focusedElement.element!);
                 switch (event.kind) {
                     case MouseEventKind.CLICK:
                         this.group.setPanel(panel, alreadyFocused);

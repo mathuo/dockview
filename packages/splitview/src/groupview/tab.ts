@@ -2,7 +2,11 @@ import { addDisposableListener, Emitter, Event } from '../events';
 import { Droptarget, DroptargetEvent } from '../dnd/droptarget';
 import { CompositeDisposable } from '../lifecycle';
 import { IGroupview } from './groupview';
-import { DataTransferSingleton, DATA_KEY, DragType } from '../dnd/dataTransfer';
+import {
+    DATA_KEY,
+    DragType,
+    LocalSelectionTransfer,
+} from '../dnd/dataTransfer';
 import { toggleClass } from '../dom';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { PanelHeaderPart } from './types';
@@ -92,14 +96,21 @@ export class Tab extends CompositeDisposable implements ITab {
                     itemId: this.id,
                     groupId: this.group.id,
                 });
-                DataTransferSingleton.setData(this.dragInPlayDetails.id, data);
+                LocalSelectionTransfer.getInstance().setData(
+                    [data],
+                    this.dragInPlayDetails.id
+                );
 
-                event.dataTransfer.setData(DATA_KEY, data);
-                event.dataTransfer.effectAllowed = 'move';
+                if (event.dataTransfer) {
+                    event.dataTransfer.setData(DATA_KEY, data);
+                    event.dataTransfer.effectAllowed = 'move';
+                }
             }),
             addDisposableListener(this._element, 'dragend', (ev) => {
                 // drop events fire before dragend so we can remove this safely
-                DataTransferSingleton.removeData(this.dragInPlayDetails.id);
+                LocalSelectionTransfer.getInstance().clearData(
+                    this.dragInPlayDetails.id
+                );
                 this.dragInPlayDetails = {
                     isDragging: false,
                     id: undefined,

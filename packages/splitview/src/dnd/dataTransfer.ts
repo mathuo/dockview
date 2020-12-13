@@ -59,35 +59,6 @@ export const extractData = (event: DragEvent): DataObject | null => {
     return data;
 };
 
-class DataTransfer {
-    private map = new Map<string, string>();
-
-    public setData(format: string, data: string) {
-        this.map.set(format, data);
-    }
-
-    public getData(format: string) {
-        const data = this.map.get(format);
-        return data;
-    }
-
-    public has(format: string) {
-        return this.map.has(format);
-    }
-
-    public removeData(format: string) {
-        const data = this.getData(format);
-        this.map.delete(format);
-        return data;
-    }
-
-    get size() {
-        return this.map.size;
-    }
-}
-
-export const DataTransferSingleton = new DataTransfer();
-
 /**
  * A singleton to store transfer data during drag & drop operations that are only valid within the application.
  */

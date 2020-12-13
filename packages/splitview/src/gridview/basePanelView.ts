@@ -22,6 +22,7 @@ export interface BasePanelViewExported<T extends BaseViewApi> {
     readonly height: number;
     focus(): void;
     toJSON(): object;
+    update(params: PanelUpdateEvent): void;
 }
 
 export abstract class BasePanelView<T extends BaseViewApi>

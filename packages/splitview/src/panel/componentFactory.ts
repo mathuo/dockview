@@ -2,18 +2,24 @@ import { FrameworkFactory } from '../types';
 
 export function createComponent<T>(
     id: string,
-    componentName: string,
+    componentName?: string,
     components: {
         [componentName: string]: { new (id: string, component: string): T };
-    },
+    } = {},
     frameworkComponents: {
         [componentName: string]: any;
     } = {},
     createFrameworkComponent?: FrameworkFactory<T>,
     fallback?: () => T
 ): T {
-    const Component = components[componentName];
-    const FrameworkComponent = frameworkComponents[componentName];
+    const Component =
+        typeof componentName === 'string'
+            ? components[componentName]
+            : undefined;
+    const FrameworkComponent =
+        typeof componentName === 'string'
+            ? frameworkComponents[componentName]
+            : undefined;
 
     if (Component && FrameworkComponent) {
         throw new Error(
@@ -28,7 +34,7 @@ export function createComponent<T>(
         }
         const wrappedComponent = createFrameworkComponent.createComponent(
             id,
-            componentName,
+            componentName!,
             FrameworkComponent
         );
         return wrappedComponent;
@@ -43,5 +49,5 @@ export function createComponent<T>(
         );
     }
 
-    return new Component(id, componentName) as T;
+    return new Component(id, componentName!) as T;
 }

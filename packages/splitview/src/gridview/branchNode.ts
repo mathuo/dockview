@@ -107,7 +107,7 @@ export class BranchNode extends CompositeDisposable implements IView {
     constructor(
         readonly orientation: Orientation,
         readonly proportionalLayout: boolean,
-        readonly styles: ISplitviewStyles,
+        readonly styles: ISplitviewStyles | undefined,
         size = 0,
         orthogonalSize: number,
         childDescriptors?: INodeDescriptor[]

@@ -28,7 +28,7 @@ export interface IGridviewPanel extends BasePanelViewExported<GridPanelApi> {
     readonly maximumWidth: number;
     readonly minimumHeight: number;
     readonly maximumHeight: number;
-    readonly priority: LayoutPriority;
+    readonly priority: LayoutPriority | undefined;
     readonly snap: boolean;
 }
 
@@ -51,7 +51,7 @@ export abstract class GridviewPanel
     readonly onDidChange: Event<IViewSize | undefined> = this._onDidChange
         .event;
 
-    get priority() {
+    get priority(): LayoutPriority | undefined {
         return this._priority;
     }
 

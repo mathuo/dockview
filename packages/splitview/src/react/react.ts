@@ -83,7 +83,7 @@ export class ReactPart<P extends object> implements IFrameworkPart {
 
     public update(props: { [index: string]: any }) {
         if (this.disposed) {
-            throw new Error('invalid operation');
+            throw new Error('invalid operation: resource is already disposed');
         }
 
         this.componentInstance?.update(props);
@@ -91,7 +91,7 @@ export class ReactPart<P extends object> implements IFrameworkPart {
 
     private createPortal() {
         if (this.disposed) {
-            throw new Error('invalid operation');
+            throw new Error('invalid operation: resource is already disposed');
         }
 
         // TODO use a better check for isReactFunctionalComponent
@@ -101,7 +101,9 @@ export class ReactPart<P extends object> implements IFrameworkPart {
              * if we do not intercept this the React library will throw a very obsure error
              * for the same reason, at least at this point we will emit a sensible stacktrace.
              */
-            throw new Error('invalid operation');
+            throw new Error(
+                'invalid operation: only functional components are supported'
+            );
         }
 
         const bridgeComponent = React.createElement(
@@ -154,7 +156,9 @@ export const usePortalsLifecycle: PortalLifecycleHook = () => {
         return {
             dispose: () => {
                 if (disposed) {
-                    throw new Error('invalid operation');
+                    throw new Error(
+                        'invalid operation: resource already disposed'
+                    );
                 }
                 disposed = true;
                 setPortals((portals) => portals.filter((p) => p !== portal));

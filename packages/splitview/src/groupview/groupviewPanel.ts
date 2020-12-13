@@ -25,7 +25,7 @@ export interface IGroupPanelInitParameters
 export interface IGroupPanel extends IDisposable, IPanel {
     readonly header?: PanelHeaderPart;
     readonly content?: PanelContentPart;
-    readonly group: IGroupview;
+    readonly group?: IGroupview;
     readonly api: IGroupPanelApi;
     updateParentGroup(group: IGroupview, isGroupActive: boolean): void;
     setDirty(isDirty: boolean): void;
@@ -38,7 +38,7 @@ export interface IGroupPanel extends IDisposable, IPanel {
 export interface GroupviewPanelState {
     id: string;
     contentId: string;
-    tabId?: string;
+    tabId: string | undefined;
     params?: { [key: string]: any };
     title: string;
     suppressClosable?: boolean;
@@ -111,14 +111,14 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
 
         return {
             id: this.id,
-            contentId: this.contentPart?.id,
+            contentId: this.contentPart?.id as string,
             tabId:
                 this.headerPart instanceof DefaultTab
                     ? undefined
                     : this.headerPart?.id,
             params:
                 params && Object.keys(params).length > 0 ? params : undefined,
-            title: this.params.title,
+            title: this.params?.title as string,
             suppressClosable: this.params?.suppressClosable,
             state: state && Object.keys(state).length > 0 ? state : undefined,
         };
@@ -136,7 +136,7 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
         this.contentPart = params.contentPart;
         this.headerPart = params.headerPart;
 
-        this.api.setState(this.params.state);
+        this.api.setState(this.params?.state);
 
         this.content?.init({
             ...params,

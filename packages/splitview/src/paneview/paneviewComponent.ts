@@ -75,7 +75,7 @@ export class PaneFramework extends PaneviewPanel {
         private readonly options: {
             id: string;
             component: string;
-            headerComponent: string;
+            headerComponent: string | undefined;
             body: IPaneBodyPart;
             header: IPaneHeaderPart;
         }
@@ -201,12 +201,14 @@ export class PaneviewComponent
             header = createComponent(
                 options.id,
                 options.headerComponent,
-                this.options.headerComponents,
+                this.options.headerComponents || {},
                 this.options.headerframeworkComponents,
-                {
-                    createComponent: this.options.frameworkWrapper?.header
-                        .createComponent,
-                }
+                this.options.frameworkWrapper
+                    ? {
+                          createComponent: this.options.frameworkWrapper.header
+                              .createComponent,
+                      }
+                    : undefined
             );
         } else {
             header = new DefaultHeader();
