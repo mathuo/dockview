@@ -38,7 +38,7 @@ export interface IGroupPanel extends IDisposable, IPanel {
 export interface GroupviewPanelState {
     id: string;
     contentId: string;
-    tabId: string | undefined;
+    tabId?: string;
     params?: { [key: string]: any };
     title: string;
     suppressClosable?: boolean;
