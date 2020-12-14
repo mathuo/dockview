@@ -26,6 +26,10 @@ import { Position } from '../../dnd/droptarget';
 class Watermark implements WatermarkPart {
     public readonly element = document.createElement('div');
 
+    get id() {
+        return 'watermark-id';
+    }
+
     init(params: GroupPanelPartInitParameters) {
         //
     }
@@ -199,6 +203,64 @@ describe('groupview', () => {
             tabHeight: 30,
         };
         groupview = new Groupview(dockview, 'groupview-1', options);
+    });
+
+    test('serialized layout shows active panel', () => {
+        const panel1 = new TestPanel('panel1', jest.fn() as any);
+        const panel2 = new TestPanel('panel2', jest.fn() as any);
+        const panel3 = new TestPanel('panel3', jest.fn() as any);
+
+        const groupview2 = new Groupview(dockview, 'groupview-2', {
+            tabHeight: 25,
+            panels: [panel1, panel2, panel3],
+            activePanel: panel2,
+        });
+
+        expect(groupview2.activePanel).toBe(panel2);
+
+        expect(
+            groupview2.element.querySelector('.content-part-panel1')
+        ).toBeFalsy();
+        expect(
+            groupview2.element.querySelector('.content-part-panel2')
+        ).toBeTruthy();
+        expect(
+            groupview2.element.querySelector('.content-part-panel3')
+        ).toBeFalsy();
+    });
+
+    test('moveToPrevious and moveToNext', () => {
+        const panel1 = new TestPanel('panel1', jest.fn() as any);
+        const panel2 = new TestPanel('panel2', jest.fn() as any);
+        const panel3 = new TestPanel('panel3', jest.fn() as any);
+
+        groupview.openPanel(panel1);
+        groupview.openPanel(panel2);
+        groupview.openPanel(panel3);
+
+        groupview.openPanel(panel2); // set active
+
+        groupview.moveToPrevious();
+        expect(groupview.activePanel).toBe(panel1);
+
+        groupview.moveToPrevious({ suppressRoll: true });
+        expect(groupview.activePanel).toBe(panel1);
+
+        groupview.moveToPrevious();
+        expect(groupview.activePanel).toBe(panel3);
+
+        groupview.moveToNext({ suppressRoll: true });
+        expect(groupview.activePanel).toBe(panel3);
+
+        groupview.moveToNext({ suppressRoll: false });
+        expect(groupview.activePanel).toBe(panel1);
+
+        groupview.moveToPrevious({ suppressRoll: false });
+        expect(groupview.activePanel).toBe(panel3);
+
+        groupview.moveToNext();
+        groupview.moveToNext();
+        expect(groupview.activePanel).toBe(panel2);
     });
 
     test('default', () => {

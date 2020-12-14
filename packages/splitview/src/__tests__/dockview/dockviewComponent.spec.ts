@@ -57,6 +57,61 @@ describe('dockviewComponent', () => {
         });
     });
 
+    test('set active panel', () => {
+        dockview.layout(500, 1000);
+
+        dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+        });
+        dockview.addPanel({
+            id: 'panel4',
+            component: 'default',
+        });
+
+        const panel1 = dockview.getGroupPanel('panel1');
+        const panel2 = dockview.getGroupPanel('panel2');
+        const panel3 = dockview.getGroupPanel('panel3');
+        const panel4 = dockview.getGroupPanel('panel4');
+
+        const group1 = panel1.group;
+        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', Position.Right);
+        const group2 = panel1.group;
+        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', Position.Center);
+
+        expect(dockview.activeGroup).toBe(group2);
+        expect(dockview.activeGroup.activePanel).toBe(panel3);
+        expect(dockview.activeGroup.indexOf(panel3)).toBe(1);
+
+        dockview.moveToPrevious({ includePanel: true });
+        expect(dockview.activeGroup).toBe(group2);
+        expect(dockview.activeGroup.activePanel).toBe(panel1);
+
+        dockview.moveToNext({ includePanel: true });
+        expect(dockview.activeGroup).toBe(group2);
+        expect(dockview.activeGroup.activePanel).toBe(panel3);
+
+        dockview.moveToPrevious({ includePanel: false });
+        expect(dockview.activeGroup).toBe(group1);
+        expect(dockview.activeGroup.activePanel).toBe(panel4);
+
+        dockview.moveToPrevious({ includePanel: true });
+        expect(dockview.activeGroup).toBe(group1);
+        expect(dockview.activeGroup.activePanel).toBe(panel2);
+
+        dockview.moveToNext({ includePanel: false });
+        expect(dockview.activeGroup).toBe(group2);
+        expect(dockview.activeGroup.activePanel).toBe(panel3);
+    });
+
     test('remove group', () => {
         dockview.layout(500, 1000);
 

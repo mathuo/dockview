@@ -1,16 +1,19 @@
 import { GridviewComponent } from '../../gridview/gridviewComponent';
 import { GridviewPanel } from '../../gridview/gridviewPanel';
+import { GroupChangeEvent } from '../../groupview/groupview';
 import { IFrameworkPart } from '../../panel/types';
 import { Orientation } from '../../splitview/core/splitview';
 
 class TestGridview extends GridviewPanel {
     constructor(id: string, componentName: string) {
         super(id, componentName);
+
+        this.element.id = id;
     }
 
     getComponent(): IFrameworkPart {
         return {
-            update: (parmas) => {
+            update: (params) => {
                 //
             },
             dispose: () => {
