@@ -6,7 +6,7 @@ export interface IContentContainer extends IDisposable {
     onDidFocus: Event<void>;
     onDidBlur: Event<void>;
     element: HTMLElement;
-    openPanel: (panel: { element: HTMLElement }) => void;
+    openPanel: (panel: { element: HTMLElement; id: string }) => void;
     closePanel: () => void;
 }
 
@@ -40,21 +40,24 @@ export class ContentContainer
         );
     }
 
-    public openPanel(panel: { element: HTMLElement }) {
+    public openPanel(panel: { element: HTMLElement; id: string }) {
         if (this.content === panel) {
             return;
         }
         if (this.content) {
             this._element.removeChild(this.content.element);
+            // this._element.id = null;
             this.content = undefined;
         }
         this.content = panel;
         this._element.appendChild(this.content.element);
+        // this._element.id = panel.id;
     }
 
     public closePanel() {
         if (this.content) {
             this._element.removeChild(this.content.element);
+            // this._element.id = null;
             this.content = undefined;
         }
     }

@@ -352,7 +352,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
 
         if (options?.activePanel) {
-            this.doSetActivePanel(options.activePanel);
+            this.openPanel(options.activePanel);
         }
 
         this.setActive(this.isActive, true, true);

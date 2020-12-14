@@ -38,6 +38,7 @@ export interface WatermarkPartInitParameters {
 }
 
 export interface WatermarkPart extends IDisposable {
+    id: string;
     init: (params: GroupPanelPartInitParameters) => void;
     updateParentGroup(group: IGroupview, visible: boolean): void;
     element: HTMLElement;
