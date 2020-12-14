@@ -82,6 +82,18 @@
 				<p>You must import the core css stylesheet but you are free to supply your own theming in addition to the core stylesheet. The location to reference for the stylesheet is</p>
 				<pre><code>dockview<span class="hljs-regexp">/dist/</span>styles.css</code></pre>
 				<p>By default the seperator between panels is <code>transparent</code> but this can be set through the CSS varibable <code>--separator-border</code>. Alternatively, or if you require the <code>DockviewReact</code> you should attach the classname of an included theme; either <code>dockview-theme-dark</code> or <code>dockview-theme-light</code>.</p>
+				<a href="#faq" id="faq" style="color: inherit; text-decoration: none;">
+					<h3>FAQ</h3>
+				</a>
+				<ul>
+					<li>The panel or grid isn&#39;t appearing<ul>
+							<li>Have you called <code>api.layout(...)</code>? </li>
+							<li>The grid need to be provided with a width and height to layout correctly. </li>
+							<li>If you are nesting panels and grids you can get the panels current dimensions through the panels api <code>api.onDimensionsChanged(({width,height} =&gt; {...}))</code></li>
+							<li>The top level view should probably be set as a function of the window <code>resize</code> event.</li>
+						</ul>
+					</li>
+				</ul>
 				<a href="#sandbox-examples" id="sandbox-examples" style="color: inherit; text-decoration: none;">
 					<h3>Sandbox examples</h3>
 				</a>
@@ -207,12 +219,6 @@
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/contentcontainer.html" class="tsd-kind-icon">Content<wbr>Container</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/datatransfer.html" class="tsd-kind-icon">Data<wbr>Transfer</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/debugwidget.html" class="tsd-kind-icon">Debug<wbr>Widget</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/defaultdeserializer.html" class="tsd-kind-icon">Default<wbr>Deserializer</a>
@@ -344,7 +350,13 @@
 						<a href="classes/tab.html" class="tsd-kind-icon">Tab</a>
 					</li>
 					<li class=" tsd-kind-class">
+						<a href="classes/testcontentpart.html" class="tsd-kind-icon">Test<wbr>Content<wbr>Part</a>
+					</li>
+					<li class=" tsd-kind-class">
 						<a href="classes/testgridview.html" class="tsd-kind-icon">Test<wbr>Gridview</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/testheaderpart.html" class="tsd-kind-icon">Test<wbr>Header<wbr>Part</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/testpanel.html" class="tsd-kind-icon">Test<wbr>Panel</a>
@@ -387,6 +399,9 @@
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/basegridoptions.html" class="tsd-kind-icon">Base<wbr>Grid<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/basepanelviewexported.html" class="tsd-kind-icon">Base<wbr>Panel<wbr>View<wbr>Exported</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/basepanelviewstate.html" class="tsd-kind-icon">Base<wbr>Panel<wbr>View<wbr>State</a>
@@ -518,6 +533,9 @@
 						<a href="interfaces/igridviewcomponent.html" class="tsd-kind-icon">IGridview<wbr>Component</a>
 					</li>
 					<li class=" tsd-kind-interface">
+						<a href="interfaces/igridviewpanel.html" class="tsd-kind-icon">IGridview<wbr>Panel</a>
+					</li>
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/igridviewpanelprops.html" class="tsd-kind-icon">IGridview<wbr>Panel<wbr>Props</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -579,6 +597,9 @@
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/ipaneviewcomponent.html" class="tsd-kind-icon">IPaneview<wbr>Component</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ipaneviewpanel.html" class="tsd-kind-icon">IPaneview<wbr>Panel</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/ipaneviewpanelprops.html" class="tsd-kind-icon">IPaneview<wbr>Panel<wbr>Props</a>
@@ -816,9 +837,6 @@
 					</li>
 					<li class=" tsd-kind-variable">
 						<a href="globals.html#data_key" class="tsd-kind-icon">DATA_<wbr>KEY</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="globals.html#datatransfersingleton" class="tsd-kind-icon">Data<wbr>Transfer<wbr>Singleton</a>
 					</li>
 					<li class=" tsd-kind-variable">
 						<a href="globals.html#nextgroupid" class="tsd-kind-icon">next<wbr>Group<wbr>Id</a>
