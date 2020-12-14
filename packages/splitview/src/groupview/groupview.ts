@@ -85,7 +85,10 @@ export interface IGroupview extends IDisposable, IGridPanelView {
     activePanel: IGroupPanel | undefined;
     indexOf(panel: IGroupPanel): number;
     // panel lifecycle
-    openPanel(panel: IGroupPanel, index?: number): void;
+    openPanel(
+        panel: IGroupPanel,
+        options?: { index?: number; skipFocus?: boolean }
+    ): void;
     closePanel(panel: IGroupPanel): Promise<boolean>;
     closeAllPanels(): Promise<boolean>;
     containsPanel(panel: IGroupPanel): boolean;
@@ -101,7 +104,6 @@ export interface IGroupview extends IDisposable, IGridPanelView {
         panel?: IGroupPanel;
         suppressRoll?: boolean;
     }): void;
-    setPanel(panel: IGroupPanel, skipFocus?: boolean): void;
     isAncestor(element: Element): boolean;
     updateActions(): void;
 }
@@ -372,31 +374,22 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this._activePanel?.focus();
     }
 
-    public openPanel(panel: IGroupPanel, index: number = this.panels.length) {
+    public openPanel(
+        panel: IGroupPanel,
+        options: { index?: number; skipFocus?: boolean } = {}
+    ) {
+        if (typeof options.index !== 'number') {
+            options.index = this.panels.length;
+        }
         if (this._activePanel === panel) {
             this.accessor.doSetGroupActive(this);
             return;
         }
 
-        this.doAddPanel(panel, index);
+        this.doAddPanel(panel, options.index);
 
         this.doSetActivePanel(panel);
-        this.accessor.doSetGroupActive(this);
-
-        this.updateContainer();
-    }
-
-    public setPanel(panel: IGroupPanel, skipFocus?: boolean) {
-        if (this._activePanel === panel) {
-            this.accessor.doSetGroupActive(this, skipFocus);
-            return;
-        }
-
-        this.tabContainer.openPanel(panel, this.panels.indexOf(panel));
-        this.contentContainer.openPanel(panel.content);
-
-        this.doSetActivePanel(panel);
-        this.accessor.doSetGroupActive(this, skipFocus);
+        this.accessor.doSetGroupActive(this, !!options.skipFocus);
 
         this.updateContainer();
     }

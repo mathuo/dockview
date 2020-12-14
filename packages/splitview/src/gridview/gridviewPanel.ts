@@ -72,6 +72,7 @@ export abstract class GridviewPanel
 
         return width;
     }
+
     get minimumHeight() {
         const height =
             typeof this._minimumHeight === 'function'
@@ -85,6 +86,7 @@ export abstract class GridviewPanel
 
         return height;
     }
+
     get maximumHeight() {
         const height =
             typeof this._maximumHeight === 'function'
@@ -98,6 +100,7 @@ export abstract class GridviewPanel
 
         return height;
     }
+
     get maximumWidth() {
         const width =
             typeof this._maximumWidth === 'function'

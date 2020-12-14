@@ -726,7 +726,7 @@ export class DockviewComponent
                 this.doRemoveGroup(sourceGroup);
             }
 
-            referenceGroup.openPanel(groupItem, index);
+            referenceGroup.openPanel(groupItem, { index });
             return;
         } else {
             const referenceLocation = getGridLocation(referenceGroup.element);

@@ -279,7 +279,9 @@ export class TitleContainer
                     this.group.isAncestor(focusedElement.element!);
                 switch (event.kind) {
                     case MouseEventKind.CLICK:
-                        this.group.setPanel(panel, alreadyFocused);
+                        this.group.openPanel(panel, {
+                            skipFocus: alreadyFocused,
+                        });
                         break;
                 }
                 this.accessor.fireMouseEvent({ ...event, panel, tab: true });
