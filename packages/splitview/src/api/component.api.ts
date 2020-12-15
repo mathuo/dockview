@@ -26,7 +26,7 @@ import { IPaneviewComponent } from '../paneview/paneviewComponent';
 import { IPaneviewPanel } from '../paneview/paneviewPanel';
 import {
     AddSplitviewComponentOptions,
-    ISplitviewPanels,
+    ISplitviewComponent,
     SerializedSplitview,
 } from '../splitview/splitviewComponent';
 import { Orientation, Sizing } from '../splitview/core/splitview';
@@ -57,7 +57,7 @@ export class SplitviewApi {
         return this.component.onDidLayoutChange;
     }
 
-    constructor(private readonly component: ISplitviewPanels) {}
+    constructor(private readonly component: ISplitviewComponent) {}
 
     removePanel(panel: ISplitviewPanel, sizing?: Sizing) {
         this.component.removePanel(panel, sizing);
@@ -99,8 +99,8 @@ export class SplitviewApi {
         this.component.movePanel(from, to);
     }
 
-    fromJSON(data: SerializedSplitview) {
-        return this.component.fromJSON(data);
+    fromJSON(data: SerializedSplitview, deferComponentLayout?: boolean) {
+        return this.component.fromJSON(data, deferComponentLayout);
     }
 
     toJSON() {
@@ -155,8 +155,8 @@ export class PaneviewApi {
         return this.component.resizeToFit();
     }
 
-    fromJSON(data: SerializedPaneview) {
-        return this.component.fromJSON(data);
+    fromJSON(data: SerializedPaneview, deferComponentLayout?: boolean) {
+        return this.component.fromJSON(data, deferComponentLayout);
     }
 
     toJSON() {
@@ -242,8 +242,8 @@ export class GridviewApi {
         this.component.setActive(panel);
     }
 
-    fromJSON(data: SerializedGridview) {
-        return this.component.fromJSON(data);
+    fromJSON(data: SerializedGridview, deferComponentLayout?: boolean) {
+        return this.component.fromJSON(data, deferComponentLayout);
     }
 
     toJSON() {

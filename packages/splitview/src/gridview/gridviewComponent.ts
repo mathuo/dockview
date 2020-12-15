@@ -63,7 +63,7 @@ export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
     removePanel(panel: IGridviewPanel, sizing?: Sizing): void;
     toggleVisibility(panel: IGridviewPanel): void;
     focus(): void;
-    fromJSON(data: SerializedGridview): void;
+    fromJSON(data: SerializedGridview, deferComponentLayout?: boolean): void;
     toJSON(): SerializedGridview;
     movePanel(
         panel: IGridviewPanel,
@@ -137,13 +137,6 @@ export class GridviewComponent
         return serializedData;
     }
 
-    public deserialize(data: SerializedGridview) {
-        this.gridview.clear();
-        this.groups.clear();
-
-        this.fromJSON(data);
-    }
-
     setVisible(panel: GridviewPanel, visible: boolean): void {
         this.gridview.setViewVisible(getGridLocation(panel.element), visible);
     }
@@ -162,7 +155,7 @@ export class GridviewComponent
         this.activeGroup?.focus();
     }
 
-    public fromJSON(data: SerializedGridview) {
+    public fromJSON(data: SerializedGridview, deferComponentLayout?: boolean) {
         const { grid, activePanel } = data as SerializedGridview;
 
         this.gridview.clear();
@@ -208,8 +201,13 @@ export class GridviewComponent
 
         this.layout(this.width, this.height, true);
 
-        // .init() renders the view. Delay the render until the layout skelton is loaded
-        queue.forEach((f) => f());
+        if (deferComponentLayout) {
+            setTimeout(() => {
+                queue.forEach((f) => f());
+            }, 0);
+        } else {
+            queue.forEach((f) => f());
+        }
 
         if (typeof activePanel === 'string') {
             const panel = this.getPanel(activePanel);

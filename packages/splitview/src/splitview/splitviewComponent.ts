@@ -42,7 +42,7 @@ export interface AddSplitviewComponentOptions extends BaseComponentOptions {
     maximumSize?: number;
 }
 
-export interface ISplitviewPanels extends IDisposable {
+export interface ISplitviewComponent extends IDisposable {
     readonly minimumSize: number;
     readonly maximumSize: number;
     readonly height: number;
@@ -52,7 +52,7 @@ export interface ISplitviewPanels extends IDisposable {
     layout(width: number, height: number): void;
     onDidLayoutChange: Event<void>;
     toJSON(): SerializedSplitview;
-    fromJSON(data: SerializedSplitview): void;
+    fromJSON(data: SerializedSplitview, deferComponentLayout?: boolean): void;
     resizeToFit(): void;
     focus(): void;
     getPanel(id: string): ISplitviewPanel | undefined;
@@ -68,7 +68,7 @@ export interface ISplitviewPanels extends IDisposable {
  */
 export class SplitviewComponent
     extends CompositeDisposable
-    implements ISplitviewPanels {
+    implements ISplitviewComponent {
     private splitview: Splitview;
     private _activePanel: SplitviewPanel;
     private panels = new Map<string, IDisposable>();
@@ -272,7 +272,7 @@ export class SplitviewComponent
         };
     }
 
-    fromJSON(data: SerializedSplitview): void {
+    fromJSON(data: SerializedSplitview, deferComponentLayout = false): void {
         const { views, orientation, size, activeView } = data;
 
         this.splitview.dispose();
@@ -326,7 +326,13 @@ export class SplitviewComponent
 
         this.layout(this.width, this.height);
 
-        queue.forEach((f) => f());
+        if (deferComponentLayout) {
+            setTimeout(() => {
+                queue.forEach((f) => f());
+            }, 0);
+        } else {
+            queue.forEach((f) => f());
+        }
 
         if (typeof activeView === 'string') {
             const panel = this.getPanel(activeView);

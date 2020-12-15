@@ -2,7 +2,7 @@ import * as React from 'react';
 import { SplitviewApi } from '../../api/component.api';
 import { IPanelApi } from '../../api/panelApi';
 import {
-    ISplitviewPanels,
+    ISplitviewComponent,
     SplitviewComponent,
 } from '../../splitview/splitviewComponent';
 import { Orientation } from '../../splitview/core/splitview';
@@ -33,7 +33,7 @@ export const SplitviewReact: React.FunctionComponent<ISplitviewReactProps> = (
     props: ISplitviewReactProps
 ) => {
     const domRef = React.useRef<HTMLDivElement>(null);
-    const splitviewRef = React.useRef<ISplitviewPanels>();
+    const splitviewRef = React.useRef<ISplitviewComponent>();
     const [portals, addPortal] = usePortalsLifecycle();
 
     React.useEffect(() => {
