@@ -35595,7 +35595,7 @@ var DockviewComponent = /** @class */ (function (_super) {
             if ((sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.size) === 0) {
                 this.doRemoveGroup(sourceGroup);
             }
-            referenceGroup.openPanel(groupItem, index);
+            referenceGroup.openPanel(groupItem, { index: index });
             return;
         }
         else {
@@ -38051,6 +38051,7 @@ var LeafNode = /** @class */ (function () {
     LeafNode.prototype.setVisible = function (visible) {
         if (this.view.setVisible) {
             this.view.setVisible(visible);
+            this._onDidChange.fire(undefined);
         }
     };
     LeafNode.prototype.layout = function (size, orthogonalSize) {
@@ -38285,7 +38286,7 @@ var Groupview = /** @class */ (function (_super) {
             });
         }
         if (options === null || options === void 0 ? void 0 : options.activePanel) {
-            _this.doSetActivePanel(options.activePanel);
+            _this.openPanel(options.activePanel);
         }
         _this.setActive(_this.isActive, true, true);
         _this.updateContainer();
@@ -38456,26 +38457,18 @@ var Groupview = /** @class */ (function (_super) {
         var _a;
         (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.focus();
     };
-    Groupview.prototype.openPanel = function (panel, index) {
-        if (index === void 0) { index = this.panels.length; }
+    Groupview.prototype.openPanel = function (panel, options) {
+        if (options === void 0) { options = {}; }
+        if (typeof options.index !== 'number') {
+            options.index = this.panels.length;
+        }
         if (this._activePanel === panel) {
             this.accessor.doSetGroupActive(this);
             return;
         }
-        this.doAddPanel(panel, index);
+        this.doAddPanel(panel, options.index);
         this.doSetActivePanel(panel);
-        this.accessor.doSetGroupActive(this);
-        this.updateContainer();
-    };
-    Groupview.prototype.setPanel = function (panel, skipFocus) {
-        if (this._activePanel === panel) {
-            this.accessor.doSetGroupActive(this, skipFocus);
-            return;
-        }
-        this.tabContainer.openPanel(panel, this.panels.indexOf(panel));
-        this.contentContainer.openPanel(panel.content);
-        this.doSetActivePanel(panel);
-        this.accessor.doSetGroupActive(this, skipFocus);
+        this.accessor.doSetGroupActive(this, !!options.skipFocus);
         this.updateContainer();
     };
     Groupview.prototype.removePanel = function (groupItemOrId) {
@@ -39016,14 +39009,17 @@ var ContentContainer = /** @class */ (function (_super) {
         }
         if (this.content) {
             this._element.removeChild(this.content.element);
+            // this._element.id = null;
             this.content = undefined;
         }
         this.content = panel;
         this._element.appendChild(this.content.element);
+        // this._element.id = panel.id;
     };
     ContentContainer.prototype.closePanel = function () {
         if (this.content) {
             this._element.removeChild(this.content.element);
+            // this._element.id = null;
             this.content = undefined;
         }
     };
@@ -39478,7 +39474,9 @@ var TitleContainer = /** @class */ (function (_super) {
                 _this.group.isAncestor(_focusedElement__WEBPACK_IMPORTED_MODULE_6__.focusedElement.element);
             switch (event.kind) {
                 case _tab__WEBPACK_IMPORTED_MODULE_2__.MouseEventKind.CLICK:
-                    _this.group.setPanel(panel, alreadyFocused);
+                    _this.group.openPanel(panel, {
+                        skipFocus: alreadyFocused,
+                    });
                     break;
             }
             _this.accessor.fireMouseEvent(__assign(__assign({}, event), { panel: panel, tab: true }));
