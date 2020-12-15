@@ -30,12 +30,12 @@ export interface IPaneviewReactProps {
 export const PaneviewReact: React.FunctionComponent<IPaneviewReactProps> = (
     props: IPaneviewReactProps
 ) => {
-    const domRef = React.useRef<HTMLDivElement>();
+    const domRef = React.useRef<HTMLDivElement>(null);
     const paneviewRef = React.useRef<IPaneviewComponent>();
     const [portals, addPortal] = usePortalsLifecycle();
 
     React.useEffect(() => {
-        const paneview = new PaneviewComponent(domRef.current, {
+        const paneview = new PaneviewComponent(domRef.current!, {
             frameworkComponents: props.components,
             components: {},
             headerComponents: {},
@@ -62,7 +62,7 @@ export const PaneviewReact: React.FunctionComponent<IPaneviewReactProps> = (
             },
         });
 
-        const { width, height } = domRef.current.getBoundingClientRect();
+        const { width, height } = domRef.current!.getBoundingClientRect();
         const [size, orthogonalSize] = [height, width];
         paneview.layout(size, orthogonalSize);
 

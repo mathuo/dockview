@@ -49,7 +49,7 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
     private readonly mutableDisposable = new MutableDisposable();
 
     readonly api: GroupPanelApi;
-    private _group: IGroupview;
+    private _group: IGroupview | undefined;
     private params?: IGroupPanelInitParameters;
 
     readonly onDidStateChange: Event<void>;
@@ -57,7 +57,7 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
     private headerPart?: PanelHeaderPart;
     private contentPart?: PanelContentPart;
 
-    get group() {
+    get group(): IGroupview | undefined {
         return this._group;
     }
 
@@ -125,7 +125,9 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
     }
 
     public update(params: PanelUpdateEvent): void {
-        this.params.params = { ...this.params.params, ...params };
+        if (this.params) {
+            this.params.params = { ...(this.params?.params || {}), ...params };
+        }
 
         this.contentPart?.update(params);
         this.headerPart?.update(params);
@@ -136,7 +138,9 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
         this.contentPart = params.contentPart;
         this.headerPart = params.headerPart;
 
-        this.api.setState(this.params?.state);
+        if (params.state) {
+            this.api.setState(params.state);
+        }
 
         this.content?.init({
             ...params,

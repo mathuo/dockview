@@ -5,19 +5,7 @@
         "strictNullChecks": true
     },
     "include": [
-        "src/actionbar",
-        "src/panel",
-        "src/splitview/core",
-        "src/array.ts",
-        "src/async.ts",
-        "src/dom.ts",
-        "src/events.ts",
-        "src/focusedElement.ts",
-        "src/functions.ts",
-        "src/json.ts",
-        "src/lifecycle.ts",
-        "src/math.ts",
-        "src/types.ts",
+        "src"
     ],
     "exclude": [
         "**/node_modules",

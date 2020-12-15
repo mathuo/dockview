@@ -47,7 +47,11 @@ export class Groupview extends GridviewPanel {
     ) {
         super(id, 'groupview_default', new GroupApi(id));
 
-        this.group = new GroupComponent(this.element, this.accessor, null);
+        this.group = new GroupComponent(
+            this.element,
+            this.accessor,
+            null as any
+        );
         (this.api as GroupApi).group = this.group;
     }
 

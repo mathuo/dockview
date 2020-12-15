@@ -37,8 +37,13 @@ export class ReactWatermarkPart implements WatermarkPart {
                 ...parameters.params,
                 api: parameters.api,
                 containerApi: parameters.containerApi,
-                close: () =>
-                    parameters.containerApi.removeGroup(this._groupRef.value),
+                close: () => {
+                    if (this._groupRef.value) {
+                        parameters.containerApi.removeGroup(
+                            this._groupRef.value
+                        );
+                    }
+                },
             }
         );
     }

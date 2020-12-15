@@ -91,10 +91,10 @@ export class ReactPanelContentPart implements PanelContentPart {
 
         return {
             update: (props: Partial<P>) => {
-                this.actionsPart.update(props);
+                this.actionsPart?.update(props);
             },
             dispose: () => {
-                this.actionsPart.dispose();
+                this.actionsPart?.dispose();
                 this.actionsPart = undefined;
             },
         };

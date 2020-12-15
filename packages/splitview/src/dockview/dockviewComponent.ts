@@ -12,6 +12,7 @@ import {
     GroupChangeKind,
     GroupDropEvent,
     GroupPanelViewState,
+    IGroupItem,
 } from '../groupview/groupview';
 import {
     GroupviewPanel,
@@ -76,7 +77,7 @@ export interface SerializedDockview {
     };
     panels: { [key: string]: GroupviewPanelState };
     activeGroup?: string;
-    options: { tabHeight: number };
+    options: { tabHeight?: number };
 }
 
 export interface IDockviewComponent extends IBaseGrid<IGroupview> {
@@ -97,7 +98,7 @@ export interface IDockviewComponent extends IBaseGrid<IGroupview> {
     createWatermarkComponent(): WatermarkPart;
     setAutoResizeToFit(enabled: boolean): void;
     setTabHeight(height: number | undefined): void;
-    getTabHeight(): number;
+    getTabHeight(): number | undefined;
     totalPanels: number;
     // lifecycle
     addEmptyGroup(options?: AddGroupOptions): void;
@@ -267,7 +268,7 @@ export class DockviewComponent
 
                 const panel = this.panels.get(panelOptions.id)?.value;
                 if (panel) {
-                    this.drag.value = panel.group.startActiveDrag(panel);
+                    this.drag.value = panel.group!.startActiveDrag(panel);
                 }
 
                 const data = JSON.stringify({
@@ -304,6 +305,9 @@ export class DockviewComponent
     }
 
     setActivePanel(panel: IGroupPanel): void {
+        if (!panel.group) {
+            throw new Error(`Panel ${panel.id} has no associated group`);
+        }
         this.doSetGroupActive(panel.group);
         panel.group.openPanel(panel);
     }
@@ -514,7 +518,7 @@ export class DockviewComponent
         });
     }
 
-    public getTabHeight(): number {
+    public getTabHeight(): number | undefined {
         return this.options.tabHeight;
     }
 
@@ -718,9 +722,13 @@ export class DockviewComponent
             : undefined;
 
         if (!target || target === Position.Center) {
-            const groupItem =
+            const groupItem: IGroupPanel | undefined =
                 sourceGroup?.removePanel(itemId) ||
-                this.panels.get(itemId).value;
+                this.panels.get(itemId)?.value;
+
+            if (!groupItem) {
+                throw new Error(`No panel with id ${itemId}`);
+            }
 
             if (sourceGroup?.size === 0) {
                 this.doRemoveGroup(sourceGroup);
@@ -770,6 +778,11 @@ export class DockviewComponent
                 const groupItem: IGroupPanel | undefined =
                     sourceGroup?.removePanel(itemId) ||
                     this.panels.get(itemId)?.value;
+
+                if (!groupItem) {
+                    throw new Error(`No panel with id ${itemId}`);
+                }
+
                 const dropLocation = getRelativeLocation(
                     this.gridview.orientation,
                     referenceLocation,
@@ -791,7 +804,7 @@ export class DockviewComponent
 
         let id = options?.id;
 
-        if (id && this.groups.has(options.id)) {
+        if (id && this.groups.has(options.id!)) {
             console.warn(
                 `Duplicate group id ${options?.id}. reassigning group id to avoid errors`
             );
@@ -831,6 +844,10 @@ export class DockviewComponent
                     const dragEvent = event.event;
                     const dataTransfer = dragEvent.dataTransfer;
 
+                    if (!dataTransfer) {
+                        return;
+                    }
+
                     if (dataTransfer.types.length === 0) {
                         return;
                     }
@@ -847,9 +864,18 @@ export class DockviewComponent
                     if (!panel) {
                         panel = this._addPanel(panelOptions);
                     }
+
+                    const groupId = panel.group?.id;
+
+                    if (!groupId) {
+                        throw new Error(
+                            `Panel ${panel.id} has no associated group`
+                        );
+                    }
+
                     this.moveGroupOrPanel(
                         group,
-                        panel?.group?.id,
+                        groupId,
                         panel.id,
                         event.target,
                         event.index

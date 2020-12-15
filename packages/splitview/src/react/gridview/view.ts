@@ -9,9 +9,7 @@ export class ReactGridPanelView extends GridviewPanel {
     constructor(
         id: string,
         component: string,
-        private readonly reactComponent: React.FunctionComponent<
-            IGridviewPanelProps
-        >,
+        private readonly reactComponent: React.FunctionComponent<IGridviewPanelProps>,
         private readonly reactPortalStore: ReactPortalStore
     ) {
         super(id, component);
@@ -23,7 +21,7 @@ export class ReactGridPanelView extends GridviewPanel {
             this.reactPortalStore,
             this.reactComponent,
             {
-                ...this.params.params,
+                ...(this.params?.params || {}),
                 api: this.api,
                 containerApi: (this.params as GridviewInitParameters)
                     .containerApi,

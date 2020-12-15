@@ -61,7 +61,7 @@ export interface IDockviewReactProps {
 export const DockviewReact: React.FunctionComponent<IDockviewReactProps> = (
     props: IDockviewReactProps
 ) => {
-    const domRef = React.useRef<HTMLDivElement>();
+    const domRef = React.useRef<HTMLDivElement>(null);
     const dockviewRef = React.useRef<DockviewComponent>();
 
     const [portals, addPortal] = usePortalsLifecycle();
@@ -142,7 +142,9 @@ export const DockviewReact: React.FunctionComponent<IDockviewReactProps> = (
         }
 
         const disposable = dockviewRef.current.onTabContextMenu((event) => {
-            props.onTabContextMenu(event);
+            if (props.onTabContextMenu) {
+                props.onTabContextMenu(event);
+            }
         });
 
         return () => {

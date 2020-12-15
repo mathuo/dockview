@@ -23,7 +23,7 @@ export interface TabDropEvent {
 export interface ITitleContainer extends IDisposable {
     element: HTMLElement;
     visible: boolean;
-    height: number;
+    height: number | undefined;
     hasActiveDragEvent: boolean;
     readonly panels: string[];
     delete: (id: string) => void;
@@ -52,7 +52,7 @@ export class TitleContainer
     private actions: HTMLElement | undefined;
 
     private _visible = true;
-    private _height: number;
+    private _height: number | undefined;
 
     private readonly _onDropped = new Emitter<TabDropEvent>();
     readonly onDropEvent: Event<TabDropEvent> = this._onDropped.event;
@@ -71,11 +71,11 @@ export class TitleContainer
         toggleClass(this.element, 'hidden', !this._visible);
     }
 
-    get height() {
+    get height(): number | undefined {
         return this._height;
     }
 
-    set height(value: number) {
+    set height(value: number | undefined) {
         this._height = value;
         if (typeof value !== 'number') {
             // removeClasses(this.element, 'separator-border');
@@ -130,7 +130,7 @@ export class TitleContainer
     constructor(
         private accessor: IDockviewComponent,
         private group: IGroupview,
-        options: { tabHeight: number }
+        options: { tabHeight?: number }
     ) {
         super();
 

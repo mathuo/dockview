@@ -35,10 +35,10 @@ export interface IGridviewPanel extends BasePanelViewExported<GridPanelApi> {
 export abstract class GridviewPanel
     extends BasePanelView<GridPanelApi>
     implements IGridPanelComponentView, IGridviewPanel {
-    private _evaluatedMinimumWidth: number;
-    private _evaluatedMaximumWidth: number;
-    private _evaluatedMinimumHeight: number;
-    private _evaluatedMaximumHeight: number;
+    private _evaluatedMinimumWidth = 0;
+    private _evaluatedMaximumWidth = Number.MAX_SAFE_INTEGER;
+    private _evaluatedMinimumHeight = 0;
+    private _evaluatedMaximumHeight = Number.MAX_SAFE_INTEGER;
 
     private _minimumWidth: FunctionOrValue<number> = 0;
     private _minimumHeight: FunctionOrValue<number> = 0;

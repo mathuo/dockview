@@ -30,14 +30,16 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
             this.layout.options.frameworkComponentFactory?.content
         ) as PanelContentPart;
 
-        const headerPart = createComponent(
-            tabId,
-            tabId,
-            this.layout.options.tabComponents,
-            this.layout.options.frameworkComponentFactory,
-            this.layout.options.frameworkComponentFactory?.tab,
-            () => new DefaultTab()
-        ) as PanelHeaderPart;
+        const headerPart = tabId
+            ? createComponent(
+                  tabId,
+                  tabId,
+                  this.layout.options.tabComponents,
+                  this.layout.options.frameworkComponentFactory,
+                  this.layout.options.frameworkComponentFactory?.tab,
+                  () => new DefaultTab()
+              )
+            : (new DefaultTab() as PanelHeaderPart);
 
         const panel = new GroupviewPanel(panelId, new DockviewApi(this.layout));
 

@@ -7,9 +7,7 @@ export class ReactPanelView extends SplitviewPanel {
     constructor(
         id: string,
         component: string,
-        private readonly reactComponent: React.FunctionComponent<
-            ISplitviewPanelProps
-        >,
+        private readonly reactComponent: React.FunctionComponent<ISplitviewPanelProps>,
         private readonly reactPortalStore: ReactPortalStore
     ) {
         super(id, component);
@@ -21,7 +19,7 @@ export class ReactPanelView extends SplitviewPanel {
             this.reactPortalStore,
             this.reactComponent,
             {
-                ...this.params.params,
+                ...(this.params?.params || {}),
                 api: this.api,
                 containerApi: (this.params as PanelViewInitParameters)
                     .containerApi,

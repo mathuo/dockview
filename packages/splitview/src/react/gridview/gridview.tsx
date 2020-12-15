@@ -32,12 +32,12 @@ export interface IGridviewReactProps {
 export const GridviewReact: React.FunctionComponent<IGridviewReactProps> = (
     props: IGridviewReactProps
 ) => {
-    const domRef = React.useRef<HTMLDivElement>();
+    const domRef = React.useRef<HTMLDivElement>(null);
     const gridviewRef = React.useRef<IGridviewComponent>();
     const [portals, addPortal] = usePortalsLifecycle();
 
     React.useEffect(() => {
-        const gridview = new GridviewComponent(domRef.current, {
+        const gridview = new GridviewComponent(domRef.current!, {
             proportionalLayout: !!props.proportionalLayout,
             orientation: props.orientation,
             frameworkComponents: props.components,

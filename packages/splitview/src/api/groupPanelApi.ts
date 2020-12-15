@@ -25,7 +25,7 @@ export interface IGroupPanelApi
 
 export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
     private _group: IGroupview;
-    private _interceptor: () => Promise<boolean>;
+    private _interceptor: undefined | (() => Promise<boolean>);
 
     readonly _onDidDirtyChange = new Emitter<boolean>();
     readonly onDidDirtyChange = this._onDidDirtyChange.event;

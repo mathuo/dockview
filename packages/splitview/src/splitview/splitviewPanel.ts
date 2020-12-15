@@ -19,8 +19,8 @@ export interface ISplitviewPanel extends BasePanelViewExported<PanelApi> {
 export abstract class SplitviewPanel
     extends BasePanelView<PanelApi>
     implements ISerializableView, ISplitviewPanel {
-    private _evaluatedMinimumSize: number;
-    private _evaluatedMaximumSize: number;
+    private _evaluatedMinimumSize = 0;
+    private _evaluatedMaximumSize = Number.POSITIVE_INFINITY;
 
     private _minimumSize: FunctionOrValue<number> = 0;
     private _maximumSize: FunctionOrValue<number> = Number.POSITIVE_INFINITY;

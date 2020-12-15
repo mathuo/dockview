@@ -32,12 +32,12 @@ export interface ISplitviewReactProps {
 export const SplitviewReact: React.FunctionComponent<ISplitviewReactProps> = (
     props: ISplitviewReactProps
 ) => {
-    const domRef = React.useRef<HTMLDivElement>();
+    const domRef = React.useRef<HTMLDivElement>(null);
     const splitviewRef = React.useRef<ISplitviewPanels>();
     const [portals, addPortal] = usePortalsLifecycle();
 
     React.useEffect(() => {
-        const splitview = new SplitviewComponent(domRef.current, {
+        const splitview = new SplitviewComponent(domRef.current!, {
             orientation: props.orientation,
             frameworkComponents: props.components,
             frameworkWrapper: {

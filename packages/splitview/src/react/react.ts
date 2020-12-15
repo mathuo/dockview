@@ -70,7 +70,7 @@ const uniquePortalKeyGenerator = sequentialNumberGenerator();
 export class ReactPart<P extends object> implements IFrameworkPart {
     private componentInstance: IPanelWrapperRef;
     private ref?: { portal: React.ReactPortal; disposable: IDisposable };
-    private disposed: boolean;
+    private disposed = false;
 
     constructor(
         private readonly parent: HTMLElement,
@@ -112,7 +112,7 @@ export class ReactPart<P extends object> implements IFrameworkPart {
                 component: (this
                     .component as unknown) as React.FunctionComponent<{}>,
                 componentProps: (this.parameters as unknown) as {},
-                ref: (element) => {
+                ref: (element: IPanelWrapperRef) => {
                     this.componentInstance = element;
                 },
             }

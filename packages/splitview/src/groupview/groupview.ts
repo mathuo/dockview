@@ -21,6 +21,7 @@ import { IViewSize } from '../gridview/gridview';
 import { DockviewApi } from '../api/component.api';
 import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
 import { IGroupPanel } from './groupviewPanel';
+import { GroupPanelApi } from '../api/groupPanelApi';
 
 export enum GroupChangeKind {
     GROUP_ACTIVE = 'GROUP_ACTIVE',
@@ -61,7 +62,7 @@ export interface GroupOptions {
     readonly panels?: IGroupPanel[];
     readonly activePanel?: IGroupPanel;
     readonly id?: string;
-    tabHeight: number;
+    tabHeight?: number;
 }
 
 export interface GroupChangeEvent {
@@ -79,7 +80,7 @@ export interface IGroupview extends IDisposable, IGridPanelView {
     readonly isActive: boolean;
     readonly size: number;
     readonly panels: IGroupPanel[];
-    tabHeight: number;
+    tabHeight: number | undefined;
     // state
     isPanelActive: (panel: IGroupPanel) => boolean;
     activePanel: IGroupPanel | undefined;
@@ -149,11 +150,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         return this._activePanel;
     }
 
-    get tabHeight() {
+    get tabHeight(): number | undefined {
         return this.tabContainer.height;
     }
 
-    set tabHeight(height: number) {
+    set tabHeight(height: number | undefined) {
         this.tabContainer.height = height;
         this.layout(this._width, this._height);
     }
@@ -580,7 +581,8 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         const hasExistingPanel = existingPanel > -1;
 
         this.tabContainer.openPanel(panel, index);
-        this.contentContainer.openPanel(panel.content);
+
+        this.contentContainer.openPanel(panel.content!);
 
         if (hasExistingPanel) {
             // TODO - need to ensure ordering hasn't changed and if it has need to re-order this.panels
@@ -629,7 +631,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 containerApi: new DockviewApi(this.accessor),
                 params: {},
                 title: '',
-                api: null,
+                api: null as any,
             });
             this.watermark = watermark;
 
@@ -698,9 +700,13 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 panel = this.accessor.addPanel(dataObject);
             }
 
+            if (!panel.group) {
+                throw new Error(`panel ${panel.id} has no associated group`);
+            }
+
             this._onMove.fire({
                 target,
-                groupId: panel.group?.id,
+                groupId: panel.group.id,
                 itemId: panel.id,
                 index,
             });
