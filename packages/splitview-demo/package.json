@@ -1,7 +1,7 @@
 {
   "name": "splitview-demo",
   "private": true,
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dockview": "^0.0.4",
+    "dockview": "^0.0.5",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
   },
