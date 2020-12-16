@@ -33702,8 +33702,8 @@ var SplitviewApi = /** @class */ (function () {
     SplitviewApi.prototype.movePanel = function (from, to) {
         this.component.movePanel(from, to);
     };
-    SplitviewApi.prototype.fromJSON = function (data) {
-        return this.component.fromJSON(data);
+    SplitviewApi.prototype.fromJSON = function (data, deferComponentLayout) {
+        return this.component.fromJSON(data, deferComponentLayout);
     };
     SplitviewApi.prototype.toJSON = function () {
         return this.component.toJSON();
@@ -33760,8 +33760,8 @@ var PaneviewApi = /** @class */ (function () {
     PaneviewApi.prototype.resizeToFit = function () {
         return this.component.resizeToFit();
     };
-    PaneviewApi.prototype.fromJSON = function (data) {
-        return this.component.fromJSON(data);
+    PaneviewApi.prototype.fromJSON = function (data, deferComponentLayout) {
+        return this.component.fromJSON(data, deferComponentLayout);
     };
     PaneviewApi.prototype.toJSON = function () {
         return this.component.toJSON();
@@ -33852,8 +33852,8 @@ var GridviewApi = /** @class */ (function () {
     GridviewApi.prototype.setActive = function (panel) {
         this.component.setActive(panel);
     };
-    GridviewApi.prototype.fromJSON = function (data) {
-        return this.component.fromJSON(data);
+    GridviewApi.prototype.fromJSON = function (data, deferComponentLayout) {
+        return this.component.fromJSON(data, deferComponentLayout);
     };
     GridviewApi.prototype.toJSON = function () {
         return this.component.toJSON();
@@ -34976,7 +34976,6 @@ var DefaultDeserializer = /** @class */ (function () {
             panels: panels,
             activePanel: panels.find(function (p) { return p.id === active; }),
             id: node.data.id,
-            tabHeight: undefined,
         });
         return group;
     };
@@ -35260,6 +35259,9 @@ var DockviewComponent = /** @class */ (function (_super) {
         return disposables;
     };
     DockviewComponent.prototype.setActivePanel = function (panel) {
+        if (!panel.group) {
+            throw new Error("Panel " + panel.id + " has no associated group");
+        }
         this.doSetGroupActive(panel.group);
         panel.group.openPanel(panel);
     };
@@ -35586,12 +35588,14 @@ var DockviewComponent = /** @class */ (function (_super) {
         group.openPanel(panel);
     };
     DockviewComponent.prototype.moveGroupOrPanel = function (referenceGroup, groupId, itemId, target, index) {
-        var _a, _b;
+        var _a, _b, _c;
         var sourceGroup = groupId
             ? (_a = this.groups.get(groupId)) === null || _a === void 0 ? void 0 : _a.value : undefined;
         if (!target || target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
-            var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.removePanel(itemId)) ||
-                this.panels.get(itemId).value;
+            var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.removePanel(itemId)) || ((_b = this.panels.get(itemId)) === null || _b === void 0 ? void 0 : _b.value);
+            if (!groupItem) {
+                throw new Error("No panel with id " + itemId);
+            }
             if ((sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.size) === 0) {
                 this.doRemoveGroup(sourceGroup);
             }
@@ -35602,9 +35606,9 @@ var DockviewComponent = /** @class */ (function (_super) {
             var referenceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
             var targetLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
             if (sourceGroup && sourceGroup.size < 2) {
-                var _c = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(targetLocation), 2), targetParentLocation = _c[0], to = _c[1];
+                var _d = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(targetLocation), 2), targetParentLocation = _d[0], to = _d[1];
                 var sourceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(sourceGroup.element);
-                var _d = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(sourceLocation), 2), sourceParentLocation = _d[0], from = _d[1];
+                var _e = __read((0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(sourceLocation), 2), sourceParentLocation = _e[0], from = _e[1];
                 if ((0,_array__WEBPACK_IMPORTED_MODULE_2__.sequenceEquals)(sourceParentLocation, targetParentLocation)) {
                     // special case when 'swapping' two views within same grid location
                     // if a group has one tab - we are essentially moving the 'group'
@@ -35624,7 +35628,10 @@ var DockviewComponent = /** @class */ (function (_super) {
                 }
             }
             else {
-                var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.removePanel(itemId)) || ((_b = this.panels.get(itemId)) === null || _b === void 0 ? void 0 : _b.value);
+                var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.removePanel(itemId)) || ((_c = this.panels.get(itemId)) === null || _c === void 0 ? void 0 : _c.value);
+                if (!groupItem) {
+                    throw new Error("No panel with id " + itemId);
+                }
                 var dropLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
                 this.addPanelToNewGroup(groupItem, dropLocation);
             }
@@ -35664,6 +35671,9 @@ var DockviewComponent = /** @class */ (function (_super) {
                 var _a;
                 var dragEvent = event.event;
                 var dataTransfer = dragEvent.dataTransfer;
+                if (!dataTransfer) {
+                    return;
+                }
                 if (dataTransfer.types.length === 0) {
                     return;
                 }
@@ -35676,7 +35686,11 @@ var DockviewComponent = /** @class */ (function (_super) {
                 if (!panel) {
                     panel = _this._addPanel(panelOptions);
                 }
-                _this.moveGroupOrPanel(group, (_a = panel === null || panel === void 0 ? void 0 : panel.group) === null || _a === void 0 ? void 0 : _a.id, panel.id, event.target, event.index);
+                var groupId = (_a = panel.group) === null || _a === void 0 ? void 0 : _a.id;
+                if (!groupId) {
+                    throw new Error("Panel " + panel.id + " has no associated group");
+                }
+                _this.moveGroupOrPanel(group, groupId, panel.id, event.target, event.index);
             }));
             this.groups.set(group.id, { value: group, disposable: disposable });
         }
@@ -36481,11 +36495,12 @@ var BasePanelView = /** @class */ (function (_super) {
         this.api._onFocusEvent.fire();
     };
     BasePanelView.prototype.layout = function (width, height) {
-        var _a;
         this._width = width;
         this._height = height;
         this.api._onDidPanelDimensionChange.fire({ width: width, height: height });
-        (_a = this.part) === null || _a === void 0 ? void 0 : _a.update(this.params.params);
+        if (this.part && this.params) {
+            this.part.update(this.params.params);
+        }
     };
     BasePanelView.prototype.init = function (parameters) {
         this.params = parameters;
@@ -37485,11 +37500,6 @@ var GridviewComponent = /** @class */ (function (_super) {
         };
         return serializedData;
     };
-    GridviewComponent.prototype.deserialize = function (data) {
-        this.gridview.clear();
-        this.groups.clear();
-        this.fromJSON(data);
-    };
     GridviewComponent.prototype.setVisible = function (panel, visible) {
         this.gridview.setViewVisible((0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(panel.element), visible);
     };
@@ -37505,7 +37515,7 @@ var GridviewComponent = /** @class */ (function (_super) {
         var _a;
         (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.focus();
     };
-    GridviewComponent.prototype.fromJSON = function (data) {
+    GridviewComponent.prototype.fromJSON = function (data, deferComponentLayout) {
         var _this = this;
         var _a = data, grid = _a.grid, activePanel = _a.activePanel;
         this.gridview.clear();
@@ -37538,8 +37548,14 @@ var GridviewComponent = /** @class */ (function (_super) {
             },
         });
         this.layout(this.width, this.height, true);
-        // .init() renders the view. Delay the render until the layout skelton is loaded
-        queue.forEach(function (f) { return f(); });
+        if (deferComponentLayout) {
+            setTimeout(function () {
+                queue.forEach(function (f) { return f(); });
+            }, 0);
+        }
+        else {
+            queue.forEach(function (f) { return f(); });
+        }
         if (typeof activePanel === 'string') {
             var panel = this.getPanel(activePanel);
             if (panel) {
@@ -37724,6 +37740,10 @@ var GridviewPanel = /** @class */ (function (_super) {
     function GridviewPanel(id, component, api) {
         if (api === void 0) { api = new _api_gridPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridPanelApi(id); }
         var _this = _super.call(this, id, component, api) || this;
+        _this._evaluatedMinimumWidth = 0;
+        _this._evaluatedMaximumWidth = Number.MAX_SAFE_INTEGER;
+        _this._evaluatedMinimumHeight = 0;
+        _this._evaluatedMaximumHeight = Number.MAX_SAFE_INTEGER;
         _this._minimumWidth = 0;
         _this._minimumHeight = 0;
         _this._maximumWidth = Number.MAX_SAFE_INTEGER;
@@ -38705,7 +38725,6 @@ var Groupview = /** @class */ (function (_super) {
         console.debug('[customDropEvent]');
     };
     Groupview.prototype.handlePanelDropEvent = function (event, target, index) {
-        var _a;
         var dataObject = (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_7__.extractData)(event);
         if ((0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_7__.isTabDragEvent)(dataObject)) {
             var groupId = dataObject.groupId, itemId = dataObject.itemId;
@@ -38729,9 +38748,12 @@ var Groupview = /** @class */ (function (_super) {
             if (!panel) {
                 panel = this.accessor.addPanel(dataObject);
             }
+            if (!panel.group) {
+                throw new Error("panel " + panel.id + " has no associated group");
+            }
             this._onMove.fire({
                 target: target,
-                groupId: (_a = panel.group) === null || _a === void 0 ? void 0 : _a.id,
+                groupId: panel.group.id,
                 itemId: panel.id,
                 index: index,
             });
@@ -38878,19 +38900,23 @@ var GroupviewPanel = /** @class */ (function (_super) {
         };
     };
     GroupviewPanel.prototype.update = function (params) {
-        var _a, _b;
-        this.params.params = __assign(__assign({}, this.params.params), params);
-        (_a = this.contentPart) === null || _a === void 0 ? void 0 : _a.update(params);
-        (_b = this.headerPart) === null || _b === void 0 ? void 0 : _b.update(params);
+        var _a, _b, _c;
+        if (this.params) {
+            this.params.params = __assign(__assign({}, (((_a = this.params) === null || _a === void 0 ? void 0 : _a.params) || {})), params);
+        }
+        (_b = this.contentPart) === null || _b === void 0 ? void 0 : _b.update(params);
+        (_c = this.headerPart) === null || _c === void 0 ? void 0 : _c.update(params);
     };
     GroupviewPanel.prototype.init = function (params) {
-        var _a, _b, _c;
+        var _a, _b;
         this.params = params;
         this.contentPart = params.contentPart;
         this.headerPart = params.headerPart;
-        this.api.setState((_a = this.params) === null || _a === void 0 ? void 0 : _a.state);
-        (_b = this.content) === null || _b === void 0 ? void 0 : _b.init(__assign(__assign({}, params), { api: this.api, containerApi: this.containerApi }));
-        (_c = this.header) === null || _c === void 0 ? void 0 : _c.init(__assign(__assign({}, params), { api: this.api, containerApi: this.containerApi }));
+        if (params.state) {
+            this.api.setState(params.state);
+        }
+        (_a = this.content) === null || _a === void 0 ? void 0 : _a.init(__assign(__assign({}, params), { api: this.api, containerApi: this.containerApi }));
+        (_b = this.header) === null || _b === void 0 ? void 0 : _b.init(__assign(__assign({}, params), { api: this.api, containerApi: this.containerApi }));
     };
     GroupviewPanel.prototype.updateParentGroup = function (group, isGroupActive) {
         var _this = this;
@@ -40312,7 +40338,7 @@ var PaneviewComponent = /** @class */ (function (_super) {
             size: this.paneview.size,
         };
     };
-    PaneviewComponent.prototype.fromJSON = function (data) {
+    PaneviewComponent.prototype.fromJSON = function (data, deferComponentLayout) {
         var _this = this;
         var views = data.views, size = data.size;
         var queue = [];
@@ -40365,7 +40391,14 @@ var PaneviewComponent = /** @class */ (function (_super) {
             },
         });
         this.layout(this.width, this.height);
-        queue.forEach(function (f) { return f(); });
+        if (deferComponentLayout) {
+            setTimeout(function () {
+                queue.forEach(function (f) { return f(); });
+            }, 0);
+        }
+        else {
+            queue.forEach(function (f) { return f(); });
+        }
     };
     return PaneviewComponent;
 }(_lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable));
@@ -40652,7 +40685,9 @@ var ReactPanelDeserialzier = /** @class */ (function () {
         var state = panelData.state;
         var suppressClosable = panelData.suppressClosable;
         var contentPart = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(contentId, contentId, this.layout.options.components, this.layout.options.frameworkComponents, (_a = this.layout.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.content);
-        var headerPart = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(tabId, tabId, this.layout.options.tabComponents, this.layout.options.frameworkComponentFactory, (_b = this.layout.options.frameworkComponentFactory) === null || _b === void 0 ? void 0 : _b.tab, function () { return new _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_3__.DefaultTab(); });
+        var headerPart = tabId
+            ? (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(tabId, tabId, this.layout.options.tabComponents, this.layout.options.frameworkComponentFactory, (_b = this.layout.options.frameworkComponentFactory) === null || _b === void 0 ? void 0 : _b.tab, function () { return new _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_3__.DefaultTab(); })
+            : new _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_3__.DefaultTab();
         var panel = new _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_0__.GroupviewPanel(panelId, new _api_component_api__WEBPACK_IMPORTED_MODULE_2__.DockviewApi(this.layout));
         panel.init({
             headerPart: headerPart,
@@ -40719,7 +40754,7 @@ var __read = (undefined && undefined.__read) || function (o, n) {
 
 
 var DockviewReact = function (props) {
-    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
+    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef(null);
     var dockviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
     var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_5__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
     react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
@@ -40778,7 +40813,9 @@ var DockviewReact = function (props) {
             };
         }
         var disposable = dockviewRef.current.onTabContextMenu(function (event) {
-            props.onTabContextMenu(event);
+            if (props.onTabContextMenu) {
+                props.onTabContextMenu(event);
+            }
         });
         return function () {
             disposable.dispose();
@@ -40864,10 +40901,12 @@ var ReactPanelContentPart = /** @class */ (function () {
         (_a = this._group) === null || _a === void 0 ? void 0 : _a.updateActions();
         return {
             update: function (props) {
-                _this.actionsPart.update(props);
+                var _a;
+                (_a = _this.actionsPart) === null || _a === void 0 ? void 0 : _a.update(props);
             },
             dispose: function () {
-                _this.actionsPart.dispose();
+                var _a;
+                (_a = _this.actionsPart) === null || _a === void 0 ? void 0 : _a.dispose();
                 _this.actionsPart = undefined;
             },
         };
@@ -41022,7 +41061,9 @@ var ReactWatermarkPart = /** @class */ (function () {
     ReactWatermarkPart.prototype.init = function (parameters) {
         var _this = this;
         this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, __assign(__assign({}, parameters.params), { api: parameters.api, containerApi: parameters.containerApi, close: function () {
-                return parameters.containerApi.removeGroup(_this._groupRef.value);
+                if (_this._groupRef.value) {
+                    parameters.containerApi.removeGroup(_this._groupRef.value);
+                }
             } }));
     };
     ReactWatermarkPart.prototype.toJSON = function () {
@@ -41090,7 +41131,7 @@ var __read = (undefined && undefined.__read) || function (o, n) {
 
 
 var GridviewReact = function (props) {
-    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
+    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef(null);
     var gridviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
     var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_3__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
     react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
@@ -41176,7 +41217,8 @@ var ReactGridPanelView = /** @class */ (function (_super) {
         return _this;
     }
     ReactGridPanelView.prototype.getComponent = function () {
-        return new _react__WEBPACK_IMPORTED_MODULE_1__.ReactPart(this.element, this.reactPortalStore, this.reactComponent, __assign(__assign({}, this.params.params), { api: this.api, containerApi: this.params
+        var _a;
+        return new _react__WEBPACK_IMPORTED_MODULE_1__.ReactPart(this.element, this.reactPortalStore, this.reactComponent, __assign(__assign({}, (((_a = this.params) === null || _a === void 0 ? void 0 : _a.params) || {})), { api: this.api, containerApi: this.params
                 .containerApi }));
     };
     return ReactGridPanelView;
@@ -41275,7 +41317,7 @@ var __read = (undefined && undefined.__read) || function (o, n) {
 
 
 var PaneviewReact = function (props) {
-    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
+    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef(null);
     var paneviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
     var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_2__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
     react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
@@ -41518,6 +41560,7 @@ var ReactPart = /** @class */ (function () {
         this.portalStore = portalStore;
         this.component = component;
         this.parameters = parameters;
+        this.disposed = false;
         this.createPortal();
     }
     ReactPart.prototype.update = function (props) {
@@ -41632,7 +41675,7 @@ var __read = (undefined && undefined.__read) || function (o, n) {
 
 
 var SplitviewReact = function (props) {
-    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
+    var domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef(null);
     var splitviewRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
     var _a = __read((0,_react__WEBPACK_IMPORTED_MODULE_3__.usePortalsLifecycle)(), 2), portals = _a[0], addPortal = _a[1];
     react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
@@ -41719,7 +41762,8 @@ var ReactPanelView = /** @class */ (function (_super) {
         return _this;
     }
     ReactPanelView.prototype.getComponent = function () {
-        return new _react__WEBPACK_IMPORTED_MODULE_1__.ReactPart(this.element, this.reactPortalStore, this.reactComponent, __assign(__assign({}, this.params.params), { api: this.api, containerApi: this.params
+        var _a;
+        return new _react__WEBPACK_IMPORTED_MODULE_1__.ReactPart(this.element, this.reactPortalStore, this.reactComponent, __assign(__assign({}, (((_a = this.params) === null || _a === void 0 ? void 0 : _a.params) || {})), { api: this.api, containerApi: this.params
                 .containerApi }));
     };
     return ReactPanelView;
@@ -43008,8 +43052,9 @@ var SplitviewComponent = /** @class */ (function (_super) {
             orientation: this.splitview.orientation,
         };
     };
-    SplitviewComponent.prototype.fromJSON = function (data) {
+    SplitviewComponent.prototype.fromJSON = function (data, deferComponentLayout) {
         var _this = this;
+        if (deferComponentLayout === void 0) { deferComponentLayout = false; }
         var views = data.views, orientation = data.orientation, size = data.size, activeView = data.activeView;
         this.splitview.dispose();
         var queue = [];
@@ -43046,7 +43091,14 @@ var SplitviewComponent = /** @class */ (function (_super) {
             },
         });
         this.layout(this.width, this.height);
-        queue.forEach(function (f) { return f(); });
+        if (deferComponentLayout) {
+            setTimeout(function () {
+                queue.forEach(function (f) { return f(); });
+            }, 0);
+        }
+        else {
+            queue.forEach(function (f) { return f(); });
+        }
         if (typeof activeView === 'string') {
             var panel = this.getPanel(activeView);
             if (panel) {
@@ -43135,6 +43187,8 @@ var SplitviewPanel = /** @class */ (function (_super) {
     __extends(SplitviewPanel, _super);
     function SplitviewPanel(id, componentName) {
         var _this = _super.call(this, id, componentName, new _api_panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApi(id)) || this;
+        _this._evaluatedMinimumSize = 0;
+        _this._evaluatedMaximumSize = Number.POSITIVE_INFINITY;
         _this._minimumSize = 0;
         _this._maximumSize = Number.POSITIVE_INFINITY;
         _this._snap = false;
