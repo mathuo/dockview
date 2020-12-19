@@ -75,6 +75,10 @@ export function isAncestor(
     return false;
 }
 
+export function getElementsByTagName(tag: string): HTMLElement[] {
+    return Array.prototype.slice.call(document.getElementsByTagName(tag), 0);
+}
+
 export interface IFocusTracker extends IDisposable {
     onDidFocus: Event<void>;
     onDidBlur: Event<void>;

@@ -1,13 +1,13 @@
 import { addDisposableListener, Emitter, Event } from '../events';
 import { Droptarget, DroptargetEvent } from '../dnd/droptarget';
-import { CompositeDisposable } from '../lifecycle';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { IGroupview } from './groupview';
 import {
     DATA_KEY,
     DragType,
     LocalSelectionTransfer,
 } from '../dnd/dataTransfer';
-import { toggleClass } from '../dom';
+import { getElementsByTagName, toggleClass } from '../dom';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { PanelHeaderPart } from './types';
 import { focusedElement } from '../focusedElement';
@@ -67,6 +67,8 @@ export class Tab extends CompositeDisposable implements ITab {
         this.dragInPlayDetails = { isDragging: false, id: undefined };
     }
 
+    private iframes: HTMLElement[] = [];
+
     constructor(
         public id: string,
         private readonly accessor: IDockviewComponent,
@@ -88,6 +90,15 @@ export class Tab extends CompositeDisposable implements ITab {
                     id: this.accessor.id,
                 };
 
+                this.iframes = [
+                    ...getElementsByTagName('iframe'),
+                    ...getElementsByTagName('webview'),
+                ];
+
+                for (const iframe of this.iframes) {
+                    iframe.style.pointerEvents = 'none';
+                }
+
                 this.element.classList.add('dragged');
                 setTimeout(() => this.element.classList.remove('dragged'), 0);
 
@@ -107,6 +118,11 @@ export class Tab extends CompositeDisposable implements ITab {
                 }
             }),
             addDisposableListener(this._element, 'dragend', (ev) => {
+                for (const iframe of this.iframes) {
+                    iframe.style.pointerEvents = 'auto';
+                }
+                this.iframes = [];
+
                 // drop events fire before dragend so we can remove this safely
                 LocalSelectionTransfer.getInstance().clearData(
                     this.dragInPlayDetails.id

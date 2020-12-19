@@ -18,6 +18,54 @@ const components: PanelCollection<IDockviewPanelProps> = {
             <div style={{ padding: '10px', height: '100%' }}>hello world</div>
         );
     },
+    iframe: (props) => {
+        return (
+            <div style={{ height: '100%', width: '100%' }}>
+                <iframe src="./" style={{ height: '100%', width: '100%' }}>
+                    Hello world
+                </iframe>
+            </div>
+        );
+    },
+};
+
+export const IFrame = (props: {
+    onEvent: (name: string) => void;
+    theme: string;
+    hideBorders: boolean;
+}) => {
+    const api = React.useRef<DockviewApi>();
+
+    const onReady = (event: DockviewReadyEvent) => {
+        event.api.layout(window.innerWidth, window.innerHeight);
+        api.current = event.api;
+
+        event.api.onGridEvent((e) => props.onEvent(e.kind));
+
+        event.api.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        event.api.addPanel({
+            id: 'panel2',
+            component: 'iframe',
+        });
+    };
+
+    React.useEffect(() => {
+        window.addEventListener('resize', () => {
+            api.current?.layout(window.innerWidth, window.innerHeight);
+        });
+    }, []);
+
+    return (
+        <DockviewReact
+            className={props.theme}
+            onReady={onReady}
+            components={components}
+            hideBorders={props.hideBorders}
+        />
+    );
 };
 
 export const Simple = (props: {

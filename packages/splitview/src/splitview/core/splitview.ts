@@ -1,4 +1,9 @@
-import { removeClasses, addClasses, toggleClass } from '../../dom';
+import {
+    removeClasses,
+    addClasses,
+    toggleClass,
+    getElementsByTagName,
+} from '../../dom';
 import { clamp } from '../../math';
 import { Event, Emitter } from '../../events';
 import { pushToStart, pushToEnd, range, firstIndex } from '../../array';
@@ -366,6 +371,15 @@ export class Splitview {
                     item.enabled = false;
                 }
 
+                const iframes = [
+                    ...getElementsByTagName('iframe'),
+                    ...getElementsByTagName('webview'),
+                ];
+
+                for (const iframe of iframes) {
+                    iframe.style.pointerEvents = 'none';
+                }
+
                 const start =
                     this._orientation === Orientation.HORIZONTAL
                         ? event.clientX
@@ -465,6 +479,10 @@ export class Splitview {
                 const end = () => {
                     for (const item of this.views) {
                         item.enabled = true;
+                    }
+
+                    for (const iframe of iframes) {
+                        iframe.style.pointerEvents = 'auto';
                     }
 
                     this.saveProportions();
