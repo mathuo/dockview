@@ -589,6 +589,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             return;
         }
 
+        this.updateMru(panel);
         this.panels.splice(index, 0, panel);
 
         this._onDidGroupChange.fire({ kind: GroupChangeKind.ADD_PANEL });
