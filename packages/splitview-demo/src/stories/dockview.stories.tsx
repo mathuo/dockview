@@ -33,6 +33,7 @@ export const IFrame = (props: {
     onEvent: (name: string) => void;
     theme: string;
     hideBorders: boolean;
+    disableAutoResizing: boolean;
 }) => {
     const api = React.useRef<DockviewApi>();
 
@@ -64,6 +65,7 @@ export const IFrame = (props: {
             onReady={onReady}
             components={components}
             hideBorders={props.hideBorders}
+            disableAutoResizing={props.disableAutoResizing}
         />
     );
 };
@@ -72,6 +74,7 @@ export const Simple = (props: {
     onEvent: (name: string) => void;
     theme: string;
     hideBorders: boolean;
+    disableAutoResizing: boolean;
 }) => {
     const api = React.useRef<DockviewApi>();
 
@@ -115,6 +118,7 @@ export const Simple = (props: {
             onReady={onReady}
             components={components}
             hideBorders={props.hideBorders}
+            disableAutoResizing={props.disableAutoResizing}
         />
     );
 };
@@ -190,6 +194,7 @@ export const CustomWatermark = (props: {
     onEvent: (name: string) => void;
     theme: string;
     hideBorders: boolean;
+    disableAutoResizing: boolean;
 }) => {
     const api = React.useRef<DockviewApi>();
 
@@ -215,6 +220,7 @@ export const CustomWatermark = (props: {
             components={components}
             hideBorders={props.hideBorders}
             watermarkComponent={Watermark}
+            disableAutoResizing={props.disableAutoResizing}
         />
     );
 };

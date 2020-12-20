@@ -28,7 +28,7 @@ export interface IGridviewReactProps {
     hideBorders?: boolean;
     className?: string;
     proportionalLayout?: boolean;
-    disableAutoResizing?: number;
+    disableAutoResizing?: boolean;
 }
 
 export const GridviewReact: React.FunctionComponent<IGridviewReactProps> = (

@@ -32,7 +32,7 @@ export const Application = () => {
     React.useEffect(() => {
         const onresize = (ev: UIEvent) => {
             const { innerWidth: width, innerHeight: height } = window;
-            api.current?.layout(width, height); // // fill the entire screen
+            // api.current?.layout(width, height); // // fill the entire screen
         };
         window.addEventListener('resize', onresize);
 

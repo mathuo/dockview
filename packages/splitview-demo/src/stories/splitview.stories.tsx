@@ -30,6 +30,7 @@ export const Simple = (props: {
     orientation: Orientation;
     hideBorders: boolean;
     proportionalLayout: boolean;
+    disableAutoResizing: boolean;
 }) => {
     const api = React.useRef<SplitviewApi>();
 
@@ -58,7 +59,7 @@ export const Simple = (props: {
 
     React.useEffect(() => {
         window.addEventListener('resize', () => {
-            api.current?.layout(window.innerWidth, window.innerHeight);
+            // api.current?.layout(window.innerWidth, window.innerHeight);
         });
     }, []);
 
@@ -69,6 +70,7 @@ export const Simple = (props: {
             components={components}
             hideBorders={props.hideBorders}
             proportionalLayout={props.proportionalLayout}
+            disableAutoResizing={props.disableAutoResizing}
         />
     );
 };
@@ -77,6 +79,7 @@ export const SnappablePanel = (props: {
     orientation: Orientation;
     hideBorders: boolean;
     proportionalLayout: boolean;
+    disableAutoResizing: boolean;
 }) => {
     const api = React.useRef<SplitviewApi>();
 
@@ -118,11 +121,17 @@ export const SnappablePanel = (props: {
             components={components}
             hideBorders={props.hideBorders}
             proportionalLayout={props.proportionalLayout}
+            disableAutoResizing={props.disableAutoResizing}
         />
     );
 };
 
-export const Deserialization = (props: { orientation: Orientation }) => {
+export const Deserialization = (props: {
+    orientation: Orientation;
+    hideBorders: boolean;
+    proportionalLayout: boolean;
+    disableAutoResizing: boolean;
+}) => {
     const api = React.useRef<SplitviewApi>();
 
     const onReady = (event: SplitviewReadyEvent) => {
@@ -181,6 +190,9 @@ export const Deserialization = (props: { orientation: Orientation }) => {
             onReady={onReady}
             orientation={props.orientation}
             components={components}
+            disableAutoResizing={props.disableAutoResizing}
+            hideBorders={props.hideBorders}
+            proportionalLayout={props.proportionalLayout}
         />
     );
 };
@@ -198,7 +210,11 @@ export default {
             );
         },
     ],
-    args: { orientation: Orientation.VERTICAL, proportionalLayout: true },
+    args: {
+        orientation: Orientation.VERTICAL,
+        proportionalLayout: true,
+        disableAutoResizing: false,
+    },
     argTypes: {
         orientation: {
             control: {

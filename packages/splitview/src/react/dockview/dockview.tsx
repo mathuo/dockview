@@ -139,8 +139,6 @@ export const DockviewReact: React.FunctionComponent<IDockviewReactProps> = (
         domRef.current?.appendChild(dockview.element);
         dockview.deserializer = new ReactPanelDeserialzier(dockview);
 
-        // dockview.resizeToFit();
-
         if (props.onReady) {
             props.onReady({ api: new DockviewApi(dockview) });
         }

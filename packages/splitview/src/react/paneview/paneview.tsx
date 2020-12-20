@@ -89,8 +89,6 @@ export const PaneviewReact: React.FunctionComponent<IPaneviewReactProps> = (
             props.onReady({ api: new PaneviewApi(paneview) });
         }
 
-        paneview.resizeToFit();
-
         paneviewRef.current = paneview;
 
         return () => {

@@ -3,11 +3,6 @@ import { DockviewApi, GridviewApi, SplitviewApi } from 'dockview';
 import { useLayoutRegistry } from './registry';
 import './controlCenter.scss';
 
-const nextGuid = (() => {
-    let counter = 0;
-    return () => counter++;
-})();
-
 export const ControlCenter = () => {
     const registry = useLayoutRegistry();
 
@@ -34,7 +29,7 @@ export const ControlCenter = () => {
 
     const onAdd = () => {
         const api = registry.get<DockviewApi>('dockview');
-        const _id = nextGuid();
+        const _id = Date.now();
         const id = `${_id}`;
 
         api.addPanel({

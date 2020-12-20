@@ -30,6 +30,7 @@ export const Simple = (props: {
     orientation: Orientation;
     hideBorders: boolean;
     proportionalLayout: boolean;
+    disableAutoResizing: boolean;
 }) => {
     const api = React.useRef<GridviewApi>();
 
@@ -92,6 +93,7 @@ export const Simple = (props: {
             components={components}
             hideBorders={props.hideBorders}
             proportionalLayout={props.proportionalLayout}
+            disableAutoResizing={props.disableAutoResizing}
         />
     );
 };
@@ -109,7 +111,11 @@ export default {
             );
         },
     ],
-    args: { orientation: Orientation.VERTICAL, proportionalLayout: true },
+    args: {
+        orientation: Orientation.VERTICAL,
+        proportionalLayout: true,
+        disableAutoResizing: false,
+    },
     argTypes: {
         orientation: {
             control: {

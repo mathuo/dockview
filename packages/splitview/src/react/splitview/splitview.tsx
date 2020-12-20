@@ -72,8 +72,6 @@ export const SplitviewReact: React.FunctionComponent<ISplitviewReactProps> = (
                 : undefined,
         });
 
-        splitview.resizeToFit();
-
         if (props.onReady) {
             props.onReady({ api: new SplitviewApi(splitview) });
         }

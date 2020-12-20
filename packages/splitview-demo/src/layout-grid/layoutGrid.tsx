@@ -70,7 +70,7 @@ const components: PanelCollection<IDockviewPanelProps> = {
         React.useEffect(() => {
             const compDis = new CompositeDisposable(
                 props.api.onDidDimensionsChange((event) => {
-                    _api.current?.layout(event.width, event.height);
+                    // _api.current?.layout(event.width, event.height);
                 }),
                 _api.current.onGridEvent((event) => {
                     if (event.kind === GroupChangeKind.LAYOUT_CONFIG_UPDATED) {
@@ -346,7 +346,7 @@ export const TestGrid = (props: IGridviewPanelProps) => {
             }),
             props.api.onDidDimensionsChange((event) => {
                 const { width, height } = event;
-                _api.current.layout(width, height);
+                // _api.current.layout(width, height);
             })
         );
 

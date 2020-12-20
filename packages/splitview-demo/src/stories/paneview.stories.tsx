@@ -25,7 +25,10 @@ const components: PanelCollection<IPaneviewPanelProps> = {
     },
 };
 
-export const Simple = (props: { theme: string }) => {
+export const Simple = (props: {
+    theme: string;
+    disableAutoResizing: boolean;
+}) => {
     const api = React.useRef<PaneviewApi>();
 
     const onReady = (event: PaneviewReadyEvent) => {
@@ -66,11 +69,15 @@ export const Simple = (props: { theme: string }) => {
             className={props.theme}
             onReady={onReady}
             components={components}
+            disableAutoResizing={props.disableAutoResizing}
         />
     );
 };
 
-export const Deserialization = (props: { theme: string }) => {
+export const Deserialization = (props: {
+    theme: string;
+    disableAutoResizing: boolean;
+}) => {
     const api = React.useRef<PaneviewApi>();
 
     const onReady = (event: PaneviewReadyEvent) => {
@@ -128,6 +135,7 @@ export const Deserialization = (props: { theme: string }) => {
             className={props.theme}
             onReady={onReady}
             components={components}
+            disableAutoResizing={props.disableAutoResizing}
         />
     );
 };
@@ -145,7 +153,7 @@ export default {
             );
         },
     ],
-    args: { theme: 'dockview-theme-light' },
+    args: { theme: 'dockview-theme-light', disableAutoResizing: false },
     argTypes: {
         theme: {
             control: {
