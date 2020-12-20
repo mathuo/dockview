@@ -35741,6 +35741,7 @@ __webpack_require__.r(__webpack_exports__);
   \************************************/
 /*! namespace exports */
 /*! export addClasses [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export getElementsByTagName [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export isAncestor [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export isHTMLElement [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export isInTree [provided] [no usage info] [missing usage info prevents renaming] */
@@ -35760,6 +35761,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "addClasses": () => /* binding */ addClasses,
 /* harmony export */   "toggleClass": () => /* binding */ toggleClass,
 /* harmony export */   "isAncestor": () => /* binding */ isAncestor,
+/* harmony export */   "getElementsByTagName": () => /* binding */ getElementsByTagName,
 /* harmony export */   "trackFocus": () => /* binding */ trackFocus
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./events */ "../splitview/dist/es6/events.js");
@@ -35870,6 +35872,9 @@ function isAncestor(testChild, testAncestor) {
         testChild = testChild.parentNode;
     }
     return false;
+}
+function getElementsByTagName(tag) {
+    return Array.prototype.slice.call(document.getElementsByTagName(tag), 0);
 }
 function trackFocus(element) {
     return new FocusTracker(element);
@@ -39095,6 +39100,37 @@ var __extends = (undefined && undefined.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (undefined && undefined.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
+var __values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 
 
 
@@ -39120,16 +39156,32 @@ var Tab = /** @class */ (function (_super) {
         _this.onChanged = _this._onChanged.event;
         _this._onDropped = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
         _this.onDropped = _this._onDropped.event;
+        _this.iframes = [];
         _this.addDisposables(_this._onChanged, _this._onDropped);
         _this._element = document.createElement('div');
         _this._element.className = 'tab';
         _this._element.tabIndex = 0;
         _this._element.draggable = true;
         _this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(_this._element, 'dragstart', function (event) {
+            var e_1, _a;
             _this.dragInPlayDetails = {
                 isDragging: true,
                 id: _this.accessor.id,
             };
+            _this.iframes = __spread((0,_dom__WEBPACK_IMPORTED_MODULE_4__.getElementsByTagName)('iframe'), (0,_dom__WEBPACK_IMPORTED_MODULE_4__.getElementsByTagName)('webview'));
+            try {
+                for (var _b = __values(_this.iframes), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var iframe = _c.value;
+                    iframe.style.pointerEvents = 'none';
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
             _this.element.classList.add('dragged');
             setTimeout(function () { return _this.element.classList.remove('dragged'); }, 0);
             var data = JSON.stringify({
@@ -39143,6 +39195,21 @@ var Tab = /** @class */ (function (_super) {
                 event.dataTransfer.effectAllowed = 'move';
             }
         }), (0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(_this._element, 'dragend', function (ev) {
+            var e_2, _a;
+            try {
+                for (var _b = __values(_this.iframes), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var iframe = _c.value;
+                    iframe.style.pointerEvents = 'auto';
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_2) throw e_2.error; }
+            }
+            _this.iframes = [];
             // drop events fire before dragend so we can remove this safely
             _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.LocalSelectionTransfer.getInstance().clearData(_this.dragInPlayDetails.id);
             _this.dragInPlayDetails = {
@@ -42225,19 +42292,33 @@ var Splitview = /** @class */ (function () {
             var sash_1 = document.createElement('div');
             sash_1.className = 'sash';
             var onStart_1 = function (event) {
-                var e_3, _a;
+                var e_3, _a, e_4, _b;
                 try {
-                    for (var _b = __values(_this.views), _c = _b.next(); !_c.done; _c = _b.next()) {
-                        var item = _c.value;
+                    for (var _c = __values(_this.views), _d = _c.next(); !_d.done; _d = _c.next()) {
+                        var item = _d.value;
                         item.enabled = false;
                     }
                 }
                 catch (e_3_1) { e_3 = { error: e_3_1 }; }
                 finally {
                     try {
-                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                        if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
                     }
                     finally { if (e_3) throw e_3.error; }
+                }
+                var iframes = __spread((0,_dom__WEBPACK_IMPORTED_MODULE_0__.getElementsByTagName)('iframe'), (0,_dom__WEBPACK_IMPORTED_MODULE_0__.getElementsByTagName)('webview'));
+                try {
+                    for (var iframes_1 = __values(iframes), iframes_1_1 = iframes_1.next(); !iframes_1_1.done; iframes_1_1 = iframes_1.next()) {
+                        var iframe = iframes_1_1.value;
+                        iframe.style.pointerEvents = 'none';
+                    }
+                }
+                catch (e_4_1) { e_4 = { error: e_4_1 }; }
+                finally {
+                    try {
+                        if (iframes_1_1 && !iframes_1_1.done && (_b = iframes_1.return)) _b.call(iframes_1);
+                    }
+                    finally { if (e_4) throw e_4.error; }
                 }
                 var start = _this._orientation === Orientation.HORIZONTAL
                     ? event.clientX
@@ -42300,19 +42381,32 @@ var Splitview = /** @class */ (function () {
                     _this.layoutViews();
                 };
                 var end = function () {
-                    var e_4, _a;
+                    var e_5, _a, e_6, _b;
                     try {
-                        for (var _b = __values(_this.views), _c = _b.next(); !_c.done; _c = _b.next()) {
-                            var item = _c.value;
+                        for (var _c = __values(_this.views), _d = _c.next(); !_d.done; _d = _c.next()) {
+                            var item = _d.value;
                             item.enabled = true;
                         }
                     }
-                    catch (e_4_1) { e_4 = { error: e_4_1 }; }
+                    catch (e_5_1) { e_5 = { error: e_5_1 }; }
                     finally {
                         try {
-                            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                            if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
                         }
-                        finally { if (e_4) throw e_4.error; }
+                        finally { if (e_5) throw e_5.error; }
+                    }
+                    try {
+                        for (var iframes_2 = __values(iframes), iframes_2_1 = iframes_2.next(); !iframes_2_1.done; iframes_2_1 = iframes_2.next()) {
+                            var iframe = iframes_2_1.value;
+                            iframe.style.pointerEvents = 'auto';
+                        }
+                    }
+                    catch (e_6_1) { e_6 = { error: e_6_1 }; }
+                    finally {
+                        try {
+                            if (iframes_2_1 && !iframes_2_1.done && (_b = iframes_2.return)) _b.call(iframes_2);
+                        }
+                        finally { if (e_6) throw e_6.error; }
                     }
                     _this.saveProportions();
                     document.removeEventListener('mousemove', mousemove);
@@ -42343,7 +42437,7 @@ var Splitview = /** @class */ (function () {
         }
     };
     Splitview.prototype.distributeViewSizes = function () {
-        var e_5, _a, e_6, _b;
+        var e_7, _a, e_8, _b;
         var _this = this;
         var flexibleViewItems = [];
         var flexibleSize = 0;
@@ -42356,12 +42450,12 @@ var Splitview = /** @class */ (function () {
                 }
             }
         }
-        catch (e_5_1) { e_5 = { error: e_5_1 }; }
+        catch (e_7_1) { e_7 = { error: e_7_1 }; }
         finally {
             try {
                 if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
             }
-            finally { if (e_5) throw e_5.error; }
+            finally { if (e_7) throw e_7.error; }
         }
         var size = Math.floor(flexibleSize / flexibleViewItems.length);
         try {
@@ -42370,12 +42464,12 @@ var Splitview = /** @class */ (function () {
                 item.size = (0,_math__WEBPACK_IMPORTED_MODULE_1__.clamp)(size, item.minimumSize, item.maximumSize);
             }
         }
-        catch (e_6_1) { e_6 = { error: e_6_1 }; }
+        catch (e_8_1) { e_8 = { error: e_8_1 }; }
         finally {
             try {
                 if (flexibleViewItems_1_1 && !flexibleViewItems_1_1.done && (_b = flexibleViewItems_1.return)) _b.call(flexibleViewItems_1);
             }
-            finally { if (e_6) throw e_6.error; }
+            finally { if (e_8) throw e_8.error; }
         }
         var indexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(this.views.length);
         var lowPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.Low; });
@@ -42444,7 +42538,7 @@ var Splitview = /** @class */ (function () {
         this.saveProportions();
     };
     Splitview.prototype.distributeEmptySpace = function (lowPriorityIndex) {
-        var e_7, _a, e_8, _b;
+        var e_9, _a, e_10, _b;
         var _this = this;
         var contentSize = this.views.reduce(function (r, i) { return r + i.size; }, 0);
         var emptyDelta = this.size - contentSize;
@@ -42457,12 +42551,12 @@ var Splitview = /** @class */ (function () {
                 (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToStart)(indexes, index);
             }
         }
-        catch (e_7_1) { e_7 = { error: e_7_1 }; }
+        catch (e_9_1) { e_9 = { error: e_9_1 }; }
         finally {
             try {
                 if (highPriorityIndexes_2_1 && !highPriorityIndexes_2_1.done && (_a = highPriorityIndexes_2.return)) _a.call(highPriorityIndexes_2);
             }
-            finally { if (e_7) throw e_7.error; }
+            finally { if (e_9) throw e_9.error; }
         }
         try {
             for (var lowPriorityIndexes_2 = __values(lowPriorityIndexes), lowPriorityIndexes_2_1 = lowPriorityIndexes_2.next(); !lowPriorityIndexes_2_1.done; lowPriorityIndexes_2_1 = lowPriorityIndexes_2.next()) {
@@ -42470,12 +42564,12 @@ var Splitview = /** @class */ (function () {
                 (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToEnd)(indexes, index);
             }
         }
-        catch (e_8_1) { e_8 = { error: e_8_1 }; }
+        catch (e_10_1) { e_10 = { error: e_10_1 }; }
         finally {
             try {
                 if (lowPriorityIndexes_2_1 && !lowPriorityIndexes_2_1.done && (_b = lowPriorityIndexes_2.return)) _b.call(lowPriorityIndexes_2);
             }
-            finally { if (e_8) throw e_8.error; }
+            finally { if (e_10) throw e_10.error; }
         }
         if (typeof lowPriorityIndex === 'number') {
             (0,_array__WEBPACK_IMPORTED_MODULE_3__.pushToEnd)(indexes, lowPriorityIndex);
@@ -42530,7 +42624,7 @@ var Splitview = /** @class */ (function () {
         });
     };
     Splitview.prototype.findFirstSnapIndex = function (indexes) {
-        var e_9, _a, e_10, _b;
+        var e_11, _a, e_12, _b;
         try {
             // visible views first
             for (var indexes_1 = __values(indexes), indexes_1_1 = indexes_1.next(); !indexes_1_1.done; indexes_1_1 = indexes_1.next()) {
@@ -42544,12 +42638,12 @@ var Splitview = /** @class */ (function () {
                 }
             }
         }
-        catch (e_9_1) { e_9 = { error: e_9_1 }; }
+        catch (e_11_1) { e_11 = { error: e_11_1 }; }
         finally {
             try {
                 if (indexes_1_1 && !indexes_1_1.done && (_a = indexes_1.return)) _a.call(indexes_1);
             }
-            finally { if (e_9) throw e_9.error; }
+            finally { if (e_11) throw e_11.error; }
         }
         try {
             // then, hidden views
@@ -42565,12 +42659,12 @@ var Splitview = /** @class */ (function () {
                 }
             }
         }
-        catch (e_10_1) { e_10 = { error: e_10_1 }; }
+        catch (e_12_1) { e_12 = { error: e_12_1 }; }
         finally {
             try {
                 if (indexes_2_1 && !indexes_2_1.done && (_b = indexes_2.return)) _b.call(indexes_2);
             }
-            finally { if (e_10) throw e_10.error; }
+            finally { if (e_12) throw e_12.error; }
         }
         return undefined;
     };
