@@ -8,6 +8,7 @@ import { usePortalsLifecycle } from '../react';
 import { PaneviewApi } from '../../api/component.api';
 import { PanelBody, PanelHeader } from './view';
 import { PanelCollection } from '../types';
+import { watchElementResize } from '../../dom';
 
 export interface PaneviewReadyEvent {
     api: PaneviewApi;
@@ -25,6 +26,7 @@ export interface IPaneviewReactProps {
     components?: PanelCollection<IPaneviewPanelProps>;
     headerComponents?: PanelCollection<IPaneviewPanelProps>;
     className?: string;
+    disableAutoResizing?: boolean;
 }
 
 export const PaneviewReact: React.FunctionComponent<IPaneviewReactProps> = (
@@ -33,6 +35,23 @@ export const PaneviewReact: React.FunctionComponent<IPaneviewReactProps> = (
     const domRef = React.useRef<HTMLDivElement>(null);
     const paneviewRef = React.useRef<IPaneviewComponent>();
     const [portals, addPortal] = usePortalsLifecycle();
+
+    React.useEffect(() => {
+        if (props.disableAutoResizing) {
+            return () => {
+                //
+            };
+        }
+
+        const watcher = watchElementResize(domRef.current, (entry) => {
+            const { width, height } = entry.contentRect;
+            paneviewRef.current?.layout(width, height);
+        });
+
+        return () => {
+            watcher.dispose();
+        };
+    }, [props.disableAutoResizing]);
 
     React.useEffect(() => {
         const paneview = new PaneviewComponent(domRef.current!, {

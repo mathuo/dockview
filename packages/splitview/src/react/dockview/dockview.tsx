@@ -16,6 +16,7 @@ import { DockviewApi } from '../../api/component.api';
 import { ReactWatermarkPart } from './reactWatermarkPart';
 import { PanelCollection } from '../types';
 import { IDisposable } from '../../lifecycle';
+import { watchElementResize } from '../../dom';
 
 export interface ActionsbarReference<P> extends IDisposable {
     update(params: Partial<P>): void;
@@ -56,6 +57,7 @@ export interface IDockviewReactProps {
     onTabContextMenu?: (event: TabContextMenuEvent) => void;
     hideBorders?: boolean;
     className?: string;
+    disableAutoResizing?: boolean;
 }
 
 export const DockviewReact: React.FunctionComponent<IDockviewReactProps> = (
@@ -63,8 +65,24 @@ export const DockviewReact: React.FunctionComponent<IDockviewReactProps> = (
 ) => {
     const domRef = React.useRef<HTMLDivElement>(null);
     const dockviewRef = React.useRef<DockviewComponent>();
-
     const [portals, addPortal] = usePortalsLifecycle();
+
+    React.useEffect(() => {
+        if (props.disableAutoResizing) {
+            return () => {
+                //
+            };
+        }
+
+        const watcher = watchElementResize(domRef.current, (entry) => {
+            const { width, height } = entry.contentRect;
+            dockviewRef.current?.layout(width, height);
+        });
+
+        return () => {
+            watcher.dispose();
+        };
+    }, [props.disableAutoResizing]);
 
     React.useEffect(() => {
         const factory: GroupPanelFrameworkComponentFactory = {
@@ -121,7 +139,7 @@ export const DockviewReact: React.FunctionComponent<IDockviewReactProps> = (
         domRef.current?.appendChild(dockview.element);
         dockview.deserializer = new ReactPanelDeserialzier(dockview);
 
-        dockview.resizeToFit();
+        // dockview.resizeToFit();
 
         if (props.onReady) {
             props.onReady({ api: new DockviewApi(dockview) });

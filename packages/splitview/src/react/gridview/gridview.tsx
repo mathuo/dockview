@@ -9,6 +9,7 @@ import { ReactGridPanelView } from './view';
 import { usePortalsLifecycle } from '../react';
 import { GridviewApi } from '../../api/component.api';
 import { PanelCollection } from '../types';
+import { watchElementResize } from '../../dom';
 
 export interface GridviewReadyEvent {
     api: GridviewApi;
@@ -27,6 +28,7 @@ export interface IGridviewReactProps {
     hideBorders?: boolean;
     className?: string;
     proportionalLayout?: boolean;
+    disableAutoResizing?: number;
 }
 
 export const GridviewReact: React.FunctionComponent<IGridviewReactProps> = (
@@ -37,7 +39,26 @@ export const GridviewReact: React.FunctionComponent<IGridviewReactProps> = (
     const [portals, addPortal] = usePortalsLifecycle();
 
     React.useEffect(() => {
-        const gridview = new GridviewComponent(domRef.current!, {
+        if (props.disableAutoResizing) {
+            return () => {
+                //
+            };
+        }
+
+        const watcher = watchElementResize(domRef.current, (entry) => {
+            const { width, height } = entry.contentRect;
+            gridviewRef.current?.layout(width, height);
+        });
+
+        return () => {
+            watcher.dispose();
+        };
+    }, [props.disableAutoResizing]);
+
+    React.useEffect(() => {
+        const element = document.createElement('div');
+
+        const gridview = new GridviewComponent(element, {
             proportionalLayout: !!props.proportionalLayout,
             orientation: props.orientation,
             frameworkComponents: props.components,
@@ -52,6 +73,8 @@ export const GridviewReact: React.FunctionComponent<IGridviewReactProps> = (
                 ? { separatorBorder: 'transparent' }
                 : undefined,
         });
+
+        domRef.current?.appendChild(gridview.element);
 
         if (props.onReady) {
             props.onReady({ api: new GridviewApi(gridview) });

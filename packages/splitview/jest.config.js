@@ -13,9 +13,10 @@ module.exports = {
     collectCoverageFrom:[
         "<rootDir>/packages/splitview/src/**/*.{js,jsx,ts,tsx}",
     ],
+    setupFiles: ["<rootDir>/packages/splitview/src/__tests__/__mocks__/resizeObserver.js"],
     coveragePathIgnorePatterns: [
         "/node_modules/",
-        "<rootDir>packages/splitview/src/__tests__/",
     ],
+    modulePathIgnorePatterns: ["<rootDir>/packages/splitview/src/__tests__/__mocks__",],
     coverageDirectory: "coverage"
 }

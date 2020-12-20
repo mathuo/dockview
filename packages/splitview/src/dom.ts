@@ -5,6 +5,26 @@ import {
     addDisposableWindowListener,
 } from './events';
 import { IDisposable, CompositeDisposable } from './lifecycle';
+import ResizeObserver from 'resize-observer-polyfill';
+
+export function watchElementResize(
+    element: HTMLElement,
+    cb: (entry: ResizeObserverEntry) => void
+): IDisposable {
+    const observer = new ResizeObserver((entires) => {
+        const element = entires[0];
+        cb(element);
+    });
+
+    observer.observe(element);
+
+    return {
+        dispose: () => {
+            observer.unobserve(element);
+            observer.disconnect();
+        },
+    };
+}
 
 export function isHTMLElement(o: any): o is HTMLElement {
     if (typeof HTMLElement === 'object') {

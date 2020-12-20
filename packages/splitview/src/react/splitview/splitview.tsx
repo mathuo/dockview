@@ -9,6 +9,7 @@ import { Orientation } from '../../splitview/core/splitview';
 import { usePortalsLifecycle } from '../react';
 import { PanelCollection } from '../types';
 import { ReactPanelView } from './view';
+import { watchElementResize } from '../../dom';
 
 export interface SplitviewReadyEvent {
     api: SplitviewApi;
@@ -27,6 +28,7 @@ export interface ISplitviewReactProps {
     proportionalLayout?: boolean;
     hideBorders?: boolean;
     className?: string;
+    disableAutoResizing?: boolean;
 }
 
 export const SplitviewReact: React.FunctionComponent<ISplitviewReactProps> = (
@@ -35,6 +37,23 @@ export const SplitviewReact: React.FunctionComponent<ISplitviewReactProps> = (
     const domRef = React.useRef<HTMLDivElement>(null);
     const splitviewRef = React.useRef<ISplitviewComponent>();
     const [portals, addPortal] = usePortalsLifecycle();
+
+    React.useEffect(() => {
+        if (props.disableAutoResizing) {
+            return () => {
+                //
+            };
+        }
+
+        const watcher = watchElementResize(domRef.current, (entry) => {
+            const { width, height } = entry.contentRect;
+            splitviewRef.current?.layout(width, height);
+        });
+
+        return () => {
+            watcher.dispose();
+        };
+    }, [props.disableAutoResizing]);
 
     React.useEffect(() => {
         const splitview = new SplitviewComponent(domRef.current!, {
