@@ -96,7 +96,6 @@ export interface IDockviewComponent extends IBaseGrid<IGroupview> {
     getGroupPanel: (id: string) => IGroupPanel | undefined;
     fireMouseEvent(event: LayoutMouseEvent): void;
     createWatermarkComponent(): WatermarkPart;
-    setAutoResizeToFit(enabled: boolean): void;
     setTabHeight(height: number | undefined): void;
     getTabHeight(): number | undefined;
     totalPanels: number;
