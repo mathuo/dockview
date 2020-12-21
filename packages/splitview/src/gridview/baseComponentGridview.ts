@@ -66,7 +66,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
     protected readonly groups = new Map<string, IValueDisposable<T>>();
     protected readonly gridview: Gridview;
     //
-    private resizeTimer?: any;
     protected _activeGroup: T | undefined;
     //
     protected readonly _onGridEvent = new Emitter<GroupChangeEvent>();
@@ -253,17 +252,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.gridview.layout(width, height);
     }
 
-    public setAutoResizeToFit(enabled: boolean): void {
-        if (this.resizeTimer) {
-            clearInterval(this.resizeTimer);
-        }
-        if (enabled) {
-            this.resizeTimer = setInterval(() => {
-                this.resizeToFit();
-            }, 500);
-        }
-    }
-
     /**
      * Resize the layout to fit the parent container
      */
@@ -280,11 +268,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     public dispose(): void {
         super.dispose();
-
-        if (this.resizeTimer) {
-            clearInterval(this.resizeTimer);
-            this.resizeTimer = undefined;
-        }
 
         this._onGridEvent.dispose();
         this.gridview.dispose();
