@@ -1,55 +1,55 @@
 @mixin dockview-theme-core-mixin {
-    --dockview-accent-color: dodgerblue;
-    --title-font-size: 13px;
-    --title-height: 35px;
-    --tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');
-    --tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');
-    --drag-over-background-color: rgba(83, 89, 93, 0.5);
-    --title-bar-scroll-bar-color: #888;
+    --dv-accent-color: dodgerblue;
+    --dv-title-font-size: 13px;
+    --dv-title-height: 35px;
+    --dv-tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');
+    --dv-tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');
+    --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);
+    --dv-title-bar-scroll-bar-color: #888;
 }
 
 @mixin dockview-theme-dark-mixin {
     @include dockview-theme-core-mixin();
     //
-    --group-view-background-color: #1e1e1e;
+    --dv-group-view-background-color: #1e1e1e;
     //
-    --title-bar-background-color: #252526;
+    --dv-title-bar-background-color: #252526;
     //
-    --active-tab-background-visible: #1e1e1e;
-    --active-tab-background-hidden: #2d2d2d;
-    --inactive-tab-background-visible: #1e1e1e;
-    --inactive-tab-background-hidden: #2d2d2d;
-    --tab-divider-color: #1e1e1e;
+    --dv-active-tab-background-visible: #1e1e1e;
+    --dv-active-tab-background-hidden: #2d2d2d;
+    --dv-inactive-tab-background-visible: #1e1e1e;
+    --dv-inactive-tab-background-hidden: #2d2d2d;
+    --dv-tab-divider-color: #1e1e1e;
     //
-    --active-group-visible-panel-color: white;
-    --active-group-hidden-panel-color: #969696;
-    --inactive-group-visible-panel-color: #8f8f8f;
-    --inactive-group-hidden-panel-color: #626262;
+    --dv-active-group-visible-panel-color: white;
+    --dv-active-group-hidden-panel-color: #969696;
+    --dv-inactive-group-visible-panel-color: #8f8f8f;
+    --dv-inactive-group-hidden-panel-color: #626262;
     //
-    --separator-border: rgb(68, 68, 68);
-    --paneview-border-color: rgba(204, 204, 204, 0.2);
+    --dv-separator-border: rgb(68, 68, 68);
+    --dv-paneview-border-color: rgba(204, 204, 204, 0.2);
 }
 
 @mixin dockview-theme-light-mixin {
     @include dockview-theme-core-mixin();
     //
-    --group-view-background-color: white;
+    --dv-group-view-background-color: white;
     //
-    --title-bar-background-color: #f3f3f3;
+    --dv-title-bar-background-color: #f3f3f3;
     //
-    --active-tab-background-visible: white;
-    --active-tab-background-hidden: #ececec;
-    --inactive-tab-background-visible: white;
-    --inactive-tab-background-hidden: #ececec;
-    --tab-divider-color: white;
+    --dv-active-tab-background-visible: white;
+    --dv-active-tab-background-hidden: #ececec;
+    --dv-inactive-tab-background-visible: white;
+    --dv-inactive-tab-background-hidden: #ececec;
+    --dv-tab-divider-color: white;
     //
-    --active-group-visible-panel-color: rgb(51, 51, 51);
-    --active-group-hidden-panel-color: rgba(51, 51, 51, 0.7);
-    --inactive-group-visible-panel-color: rgba(51, 51, 51, 0.7);
-    --inactive-group-hidden-panel-color: rgba(51, 51, 51, 0.35);
+    --dv-active-group-visible-panel-color: rgb(51, 51, 51);
+    --dv-active-group-hidden-panel-color: rgba(51, 51, 51, 0.7);
+    --dv-inactive-group-visible-panel-color: rgba(51, 51, 51, 0.7);
+    --dv-inactive-group-hidden-panel-color: rgba(51, 51, 51, 0.35);
     //
-    --separator-border: rgba(128, 128, 128, 0.35);
-    --paneview-border-color: rgb(51, 51, 51);
+    --dv-separator-border: rgba(128, 128, 128, 0.35);
+    --dv-paneview-border-color: rgb(51, 51, 51);
 }
 
 .dockview-theme-dark {
@@ -63,19 +63,20 @@
 .dockview-theme-vs {
     @include dockview-theme-dark-mixin();
 
-    --active-tab-background-visible: dodgerblue;
-    --title-height: 18px;
-    --title-font-size: 11px;
+    --dv-active-tab-background-visible: dodgerblue;
+    --dv-title-height: 18px;
+    --dv-title-font-size: 11px;
 
     .groupview {
         &.active-group {
             > .title-container {
-                border-bottom: 2px solid var(--active-tab-background-visible);
+                border-bottom: 2px solid var(--dv-active-tab-background-visible);
             }
         }
         &.inactive-group {
             > .title-container {
-                border-bottom: 2px solid var(--inactive-tab-background-visible);
+                border-bottom: 2px solid
+                    var(--dv-inactive-tab-background-visible);
             }
         }
     }

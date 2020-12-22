@@ -222,12 +222,12 @@ export class Splitview {
     style(styles?: ISplitviewStyles): void {
         if (styles?.separatorBorder === 'transparent') {
             removeClasses(this.element, 'separator-border');
-            this.element.style.removeProperty('--separator-border');
+            this.element.style.removeProperty('--dv-separator-border');
         } else {
             addClasses(this.element, 'separator-border');
             if (styles?.separatorBorder) {
                 this.element.style.setProperty(
-                    '--separator-border',
+                    '--dv-separator-border',
                     styles.separatorBorder
                 );
             }

@@ -1,10 +1,10 @@
 .title-container {
     display: flex;
-    background-color: var(--title-bar-background-color);
+    background-color: var(--dv-title-bar-background-color);
     flex-shrink: 0;
     box-sizing: border-box;
-    height: var(--title-height);
-    font-size: var(--title-font-size);
+    height: var(--dv-title-height);
+    font-size: var(--dv-title-font-size);
 
     &.hidden {
         display: none;
@@ -27,11 +27,11 @@
 
         /* Handle */
         &::-webkit-scrollbar-thumb {
-            background: var(--title-bar-scroll-bar-color);
+            background: var(--dv-title-bar-scroll-bar-color);
         }
 
         &.drag-over-target {
-            background-color: var(--drag-over-background-color);
+            background-color: var(--dv-drag-over-background-color);
         }
 
         .tab {
@@ -49,7 +49,7 @@
                 left: 0;
                 z-index: 5;
                 pointer-events: none;
-                background-color: var(--tab-divider-color);
+                background-color: var(--dv-tab-divider-color);
                 width: 1px;
                 height: 100%;
             }

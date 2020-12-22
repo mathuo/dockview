@@ -79,11 +79,11 @@ export class TitleContainer
         this._height = value;
         if (typeof value !== 'number') {
             // removeClasses(this.element, 'separator-border');
-            this.element.style.removeProperty('--title-height');
+            this.element.style.removeProperty('--dv-title-height');
         } else {
             // addClasses(this.element, 'separator-border');
             // if (styles?.separatorBorder) {
-            this.element.style.setProperty('--title-height', `${value}px`);
+            this.element.style.setProperty('--dv-title-height', `${value}px`);
             // }
         }
         // this._element.style.height = `${this.height}px`;

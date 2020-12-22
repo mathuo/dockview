@@ -12,7 +12,7 @@
 
     &.dragging {
         .tab-action {
-            background-color: var(--active-group-visible-panel-color);
+            background-color: var(--dv-active-group-visible-panel-color);
         }
     }
 
@@ -67,9 +67,9 @@
                     height: 16px;
                     width: 16px;
                     display: block;
-                    -webkit-mask: var(--tab-close-icon) 50% 50% / 90% 90%
+                    -webkit-mask: var(--dv-tab-close-icon) 50% 50% / 90% 90%
                         no-repeat;
-                    mask: var(--tab-close-icon) 50% 50% / 90% 90% no-repeat;
+                    mask: var(--dv-tab-close-icon) 50% 50% / 90% 90% no-repeat;
                     margin-right: '0.5em';
 
                     &.disable-close {
@@ -78,9 +78,10 @@
 
                     &.dirty:not(:hover) {
                         display: block;
-                        -webkit-mask: var(--tab-dirty-icon) 50% 50% / 60% 60%
+                        -webkit-mask: var(--dv-tab-dirty-icon) 50% 50% / 60% 60%
                             no-repeat;
-                        mask: var(--tab-dirty-icon) 50% 50% / 60% 60% no-repeat;
+                        mask: var(--dv-tab-dirty-icon) 50% 50% / 60% 60%
+                            no-repeat;
                     }
                 }
             }

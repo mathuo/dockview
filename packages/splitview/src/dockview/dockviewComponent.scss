@@ -14,19 +14,21 @@
     &.active-group {
         > .title-container > .tab-container > .tab {
             &.active-tab {
-                background-color: var(--active-tab-background-visible);
-                color: var(--active-group-visible-panel-color);
+                background-color: var(--dv-active-tab-background-visible);
+                color: var(--dv-active-group-visible-panel-color);
 
                 .tab-action {
-                    background-color: var(--active-group-visible-panel-color);
+                    background-color: var(
+                        --dv-active-group-visible-panel-color
+                    );
                 }
             }
             &.inactive-tab {
-                background-color: var(--active-tab-background-hidden);
-                color: var(--active-group-hidden-panel-color);
+                background-color: var(--dv-active-tab-background-hidden);
+                color: var(--dv-active-group-hidden-panel-color);
 
                 .tab-action {
-                    background-color: var(--active-group-hidden-panel-color);
+                    background-color: var(--dv-active-group-hidden-panel-color);
                 }
             }
         }
@@ -34,19 +36,23 @@
     &.inactive-group {
         > .title-container > .tab-container > .tab {
             &.active-tab {
-                background-color: var(--inactive-tab-background-visible);
-                color: var(--inactive-group-visible-panel-color);
+                background-color: var(--dv-inactive-tab-background-visible);
+                color: var(--dv-inactive-group-visible-panel-color);
 
                 .tab-action {
-                    background-color: var(--inactive-group-visible-panel-color);
+                    background-color: var(
+                        --dv-inactive-group-visible-panel-color
+                    );
                 }
             }
             &.inactive-tab {
-                background-color: var(--inactive-tab-background-hidden);
-                color: var(--inactive-group-hidden-panel-color);
+                background-color: var(--dv-inactive-tab-background-hidden);
+                color: var(--dv-inactive-group-hidden-panel-color);
 
                 .tab-action {
-                    background-color: var(--inactive-group-hidden-panel-color);
+                    background-color: var(
+                        --dv-inactive-group-hidden-panel-color
+                    );
                 }
             }
         }
@@ -59,7 +65,7 @@
  **/
 .tab {
     &.dragging {
-        background-color: var(--active-tab-background-visible);
-        color: var(--active-group-visible-panel-color);
+        background-color: var(--dv-active-tab-background-visible);
+        color: var(--dv-active-group-visible-panel-color);
     }
 }
