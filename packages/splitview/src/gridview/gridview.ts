@@ -252,7 +252,7 @@ export interface IViewDeserializer {
 }
 
 export class Gridview implements IDisposable {
-    private _root: BranchNode;
+    private _root: BranchNode | undefined;
     public readonly element: HTMLElement;
     private disposable: MutableDisposable = new MutableDisposable();
 
@@ -357,17 +357,17 @@ export class Gridview implements IDisposable {
     }
 
     public set orientation(orientation: Orientation) {
-        if (this._root.orientation === orientation) {
+        if (this.root.orientation === orientation) {
             return;
         }
 
-        const { size, orthogonalSize } = this._root;
-        this.root = flipNode(this._root, orthogonalSize, size);
+        const { size, orthogonalSize } = this.root;
+        this.root = flipNode(this.root, orthogonalSize, size);
         this.root.layout(size, orthogonalSize);
     }
 
     private get root(): BranchNode {
-        return this._root;
+        return this._root!;
     }
 
     private set root(root: BranchNode) {
@@ -396,7 +396,7 @@ export class Gridview implements IDisposable {
     getView(): GridBranchNode<IGridView>;
     getView(location?: number[]): GridNode<IGridView>;
     getView(location?: number[]): GridNode<IGridView> {
-        const node = location ? this.getNode(location)[1] : this._root;
+        const node = location ? this.getNode(location)[1] : this.root;
         return this._getViews(node, this.orientation);
     }
 

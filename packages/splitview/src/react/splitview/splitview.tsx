@@ -45,7 +45,7 @@ export const SplitviewReact: React.FunctionComponent<ISplitviewReactProps> = (
             };
         }
 
-        const watcher = watchElementResize(domRef.current, (entry) => {
+        const watcher = watchElementResize(domRef.current!, (entry) => {
             const { width, height } = entry.contentRect;
             splitviewRef.current?.layout(width, height);
         });

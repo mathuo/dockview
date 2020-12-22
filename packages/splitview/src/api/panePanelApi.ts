@@ -26,7 +26,7 @@ export class PanePanelApi extends PanelApi implements IPanePanelApi {
     readonly _onMouseLeave = new Emitter<MouseEvent>({});
     readonly onMouseLeave: Event<MouseEvent> = this._onMouseLeave.event;
 
-    private _pane: PaneviewPanel;
+    private _pane: PaneviewPanel | undefined;
 
     set pane(pane: PaneviewPanel) {
         this._pane = pane;
@@ -37,10 +37,10 @@ export class PanePanelApi extends PanelApi implements IPanePanelApi {
     }
 
     setExpanded(isExpanded: boolean): void {
-        this._pane.setExpanded(isExpanded);
+        this._pane?.setExpanded(isExpanded);
     }
 
-    get isExpanded() {
-        return this._pane.isExpanded();
+    get isExpanded(): boolean {
+        return !!this._pane?.isExpanded();
     }
 }

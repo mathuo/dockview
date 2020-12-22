@@ -27,7 +27,7 @@ export abstract class SplitviewPanel
     private _priority?: LayoutPriority;
     private _snap = false;
 
-    private _orientation: Orientation;
+    private _orientation?: Orientation;
 
     private readonly _onDidChange = new Emitter<number | undefined>();
     readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
@@ -41,7 +41,7 @@ export abstract class SplitviewPanel
     }
 
     get orientation(): Orientation {
-        return this._orientation;
+        return this._orientation!;
     }
 
     get minimumSize(): number {

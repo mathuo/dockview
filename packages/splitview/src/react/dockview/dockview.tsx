@@ -74,7 +74,7 @@ export const DockviewReact: React.FunctionComponent<IDockviewReactProps> = (
             };
         }
 
-        const watcher = watchElementResize(domRef.current, (entry) => {
+        const watcher = watchElementResize(domRef.current!, (entry) => {
             const { width, height } = entry.contentRect;
             dockviewRef.current?.layout(width, height);
         });

@@ -9,7 +9,7 @@ import { IGroupPanel } from './groupviewPanel';
 interface IGroupApi extends IGridPanelApi {}
 
 class GroupApi extends GridPanelApi implements IGroupApi {
-    private _value: GroupComponent;
+    private _value?: GroupComponent;
 
     set group(value: GroupComponent) {
         this._value = value;

@@ -14,17 +14,17 @@ export interface TitleEvent {
  */
 export interface IGroupPanelApi
     extends Omit<IGridPanelApi, 'setVisible' | 'visible'> {
-    readonly group: IGroupview;
+    readonly group: IGroupview | undefined;
     readonly isGroupActive: boolean;
     onDidDirtyChange: Event<boolean>;
     close: () => Promise<boolean>;
-    tryClose: () => Promise<boolean>;
+    tryClose: undefined | (() => Promise<boolean>);
     interceptOnCloseAction(interceptor: () => Promise<boolean>): void;
     setTitle(title: string): void;
 }
 
 export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
-    private _group: IGroupview;
+    private _group: IGroupview | undefined;
     private _interceptor: undefined | (() => Promise<boolean>);
 
     readonly _onDidDirtyChange = new Emitter<boolean>();
@@ -41,23 +41,23 @@ export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
     //     return this._isGroupVisible;
     // }
 
-    get tryClose() {
+    get tryClose(): undefined | (() => Promise<boolean>) {
         return this._interceptor;
     }
 
     get isGroupActive() {
-        return this.group.isActive;
+        return !!this.group?.isActive;
     }
 
-    set group(value: IGroupview) {
+    set group(value: IGroupview | undefined) {
         this._group = value;
     }
 
-    get group() {
+    get group(): IGroupview | undefined {
         return this._group;
     }
 
-    constructor(private panel: IGroupPanel, group: IGroupview) {
+    constructor(private panel: IGroupPanel, group: IGroupview | undefined) {
         super(panel.id);
         this._group = group;
 
@@ -74,7 +74,10 @@ export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
         this._onDidTitleChange.fire({ title });
     }
 
-    public close() {
+    public close(): Promise<boolean> {
+        if (!this.group) {
+            throw new Error(`panel ${this.id} has no group`);
+        }
         return this.group.closePanel(this.panel);
     }
 

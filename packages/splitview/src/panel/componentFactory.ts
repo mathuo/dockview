@@ -1,3 +1,4 @@
+import { Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
 
 export function createComponent<T>(

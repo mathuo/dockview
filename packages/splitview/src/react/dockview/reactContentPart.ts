@@ -18,18 +18,18 @@ export interface IGroupPanelActionbarProps {
 export class ReactPanelContentPart implements PanelContentPart {
     private _element: HTMLElement;
     private part?: ReactPart<IDockviewPanelProps>;
-    private _group: IGroupview;
+    private _group: IGroupview | undefined;
     //
     private _actionsElement: HTMLElement;
     private actionsPart?: ReactPart<any>;
 
-    private parameters: GroupPanelPartInitParameters;
+    private parameters: GroupPanelPartInitParameters | undefined;
 
-    get element() {
+    get element(): HTMLElement {
         return this._element;
     }
 
-    get actions() {
+    get actions(): HTMLElement {
         return this._actionsElement;
     }
 
@@ -82,8 +82,8 @@ export class ReactPanelContentPart implements PanelContentPart {
             component,
             {
                 ...props,
-                api: this.parameters.api,
-                containerApi: this.parameters.containerApi,
+                api: this.parameters!.api,
+                containerApi: this.parameters!.containerApi,
             }
         );
 
@@ -107,7 +107,10 @@ export class ReactPanelContentPart implements PanelContentPart {
     }
 
     public update(params: PanelUpdateEvent) {
-        this.parameters.params = params.params;
+        if (this.parameters) {
+            this.parameters.params = params.params;
+        }
+
         this.part?.update(params.params);
     }
 

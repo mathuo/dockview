@@ -60,6 +60,7 @@ import { State } from '../api/api';
 import { LayoutMouseEvent, MouseEventKind } from '../groupview/tab';
 import { Orientation } from '../splitview/core/splitview';
 import { DefaultTab } from './components/tab/defaultTab';
+import { IGroupPanelApi } from '../api/groupPanelApi';
 
 const nextGroupId = sequentialNumberGenerator();
 
@@ -102,7 +103,7 @@ export interface IDockviewComponent extends IBaseGrid<IGroupview> {
     // lifecycle
     addEmptyGroup(options?: AddGroupOptions): void;
     closeAllGroups: () => Promise<boolean>;
-    deserializer: IPanelDeserializer;
+    deserializer: IPanelDeserializer | undefined;
     // events
     onTabInteractionEvent: Event<LayoutMouseEvent>;
     onTabContextMenu: Event<TabContextMenuEvent>;
@@ -148,7 +149,7 @@ export class DockviewComponent
         ._onTabContextMenu.event;
     // everything else
     private drag = new MutableDisposable();
-    private _deserializer: IPanelDeserializer;
+    private _deserializer: IPanelDeserializer | undefined;
     private panelState: State = {};
     private registry = new Map<
         string,
@@ -233,11 +234,11 @@ export class DockviewComponent
         return this.panels.size;
     }
 
-    get deserializer(): IPanelDeserializer {
+    get deserializer(): IPanelDeserializer | undefined {
         return this._deserializer;
     }
 
-    set deserializer(value: IPanelDeserializer) {
+    set deserializer(value: IPanelDeserializer | undefined) {
         this._deserializer = value;
     }
 
@@ -473,12 +474,16 @@ export class DockviewComponent
             this.setTabHeight(options.tabHeight);
         }
 
+        if (!this.deserializer) {
+            throw new Error('no deserializer provided');
+        }
+
         this.gridview.deserialize(
             grid,
             new DefaultDeserializer(this, {
                 createPanel: (id) => {
                     const panelData = panels[id];
-                    const panel = this.deserializer.fromJSON(panelData);
+                    const panel = this.deserializer!.fromJSON(panelData);
                     this.registerPanel(panel);
                     return panel;
                 },
@@ -586,7 +591,7 @@ export class DockviewComponent
             options.tabComponent
         );
 
-        const panel = new GroupviewPanel(options.id, this._api);
+        const panel: IGroupPanel = new GroupviewPanel(options.id, this._api);
         panel.init({
             headerPart,
             contentPart,

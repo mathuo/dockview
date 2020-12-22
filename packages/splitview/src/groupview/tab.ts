@@ -43,7 +43,7 @@ export class Tab extends CompositeDisposable implements ITab {
         isDragging: false,
     };
     private droptarget: Droptarget;
-    private content: PanelHeaderPart;
+    private content?: PanelHeaderPart;
 
     private readonly _onChanged = new Emitter<LayoutMouseEvent>();
     readonly onChanged: Event<LayoutMouseEvent> = this._onChanged.event;

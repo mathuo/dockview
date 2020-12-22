@@ -11,13 +11,7 @@
         "noImplicitAny": true,
         "allowUnreachableCode": false,
         "forceConsistentCasingInFileNames": true, 
-        // "strict": true,
-        "strictBindCallApply": true, // pass
-        "alwaysStrict": true, // pass
-        "noImplicitThis": true, // pass
-        "strictFunctionTypes": true, // pass
-        "strictNullChecks": false,
-        "strictPropertyInitialization": false,
+        "strict": true,
         "lib": [
 			"ES2015",
 			"ES2016.Array.Include",

@@ -45,7 +45,7 @@ export const GridviewReact: React.FunctionComponent<IGridviewReactProps> = (
             };
         }
 
-        const watcher = watchElementResize(domRef.current, (entry) => {
+        const watcher = watchElementResize(domRef.current!, (entry) => {
             const { width, height } = entry.contentRect;
             gridviewRef.current?.layout(width, height);
         });

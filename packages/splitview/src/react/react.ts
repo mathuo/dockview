@@ -68,7 +68,7 @@ ReactComponentBridge.displayName = 'PanelWrapper';
 const uniquePortalKeyGenerator = sequentialNumberGenerator();
 
 export class ReactPart<P extends object> implements IFrameworkPart {
-    private componentInstance: IPanelWrapperRef;
+    private componentInstance?: IPanelWrapperRef;
     private ref?: { portal: React.ReactPortal; disposable: IDisposable };
     private disposed = false;
 

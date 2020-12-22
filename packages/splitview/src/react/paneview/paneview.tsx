@@ -43,7 +43,7 @@ export const PaneviewReact: React.FunctionComponent<IPaneviewReactProps> = (
             };
         }
 
-        const watcher = watchElementResize(domRef.current, (entry) => {
+        const watcher = watchElementResize(domRef.current!, (entry) => {
             const { width, height } = entry.contentRect;
             paneviewRef.current?.layout(width, height);
         });

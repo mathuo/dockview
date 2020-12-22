@@ -24,7 +24,6 @@ import { GridPanelApi } from '../api/gridPanelApi';
 import { GridviewApi } from '../api/component.api';
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { createComponent } from '../panel/componentFactory';
-import { Event } from '../events';
 
 interface PanelReference {
     api: GridPanelApi;
@@ -76,7 +75,7 @@ export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
 export class GridviewComponent
     extends BaseGrid<GridviewPanel>
     implements IGridviewComponent {
-    private _deserializer: IPanelDeserializer;
+    private _deserializer: IPanelDeserializer | undefined;
 
     constructor(
         element: HTMLElement,
@@ -105,11 +104,11 @@ export class GridviewComponent
         this.layout(this.gridview.width, this.gridview.height, true);
     }
 
-    get deserializer() {
+    get deserializer(): IPanelDeserializer | undefined {
         return this._deserializer;
     }
 
-    set deserializer(value: IPanelDeserializer) {
+    set deserializer(value: IPanelDeserializer | undefined) {
         this._deserializer = value;
     }
 

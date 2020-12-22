@@ -71,11 +71,11 @@ export abstract class PaneviewPanel
     private _minimumBodySize = 0;
     private _maximumBodySize: number = Number.POSITIVE_INFINITY;
     private _isExpanded = false;
-    protected header: HTMLElement;
-    protected body: HTMLElement;
+    protected header?: HTMLElement;
+    protected body?: HTMLElement;
     private bodyPart?: IPaneHeaderPart;
     private headerPart?: IPaneBodyPart;
-    private expandedSize: number;
+    private expandedSize = 0;
     private animationTimer: any | undefined;
 
     private _orientation: Orientation;
@@ -124,10 +124,13 @@ export abstract class PaneviewPanel
     constructor(
         id: string,
         component: string,
-        private readonly headerComponent: string | undefined
+        private readonly headerComponent: string | undefined,
+        orientation: Orientation
     ) {
         super(id, component, new PanePanelApi(id));
         this.api.pane = this; // TODO cannot use 'this' before 'super'
+
+        this._orientation = orientation;
 
         this.element.classList.add('pane');
 
@@ -180,10 +183,12 @@ export abstract class PaneviewPanel
             if (this.animationTimer) {
                 clearTimeout(this.animationTimer);
             }
-            this.element.appendChild(this.body);
+            if (this.body) {
+                this.element.appendChild(this.body);
+            }
         } else {
             this.animationTimer = setTimeout(() => {
-                this.body.remove();
+                this.body?.remove();
             }, 200);
         }
 
@@ -218,8 +223,8 @@ export abstract class PaneviewPanel
         this.bodyPart.init({ ...parameters, api: this.api });
         this.headerPart.init({ ...parameters, api: this.api });
 
-        this.body.append(this.bodyPart.element);
-        this.header.append(this.headerPart.element);
+        this.body?.append(this.bodyPart.element);
+        this.header?.append(this.headerPart.element);
 
         if (typeof parameters.isExpanded === 'boolean') {
             this.setExpanded(parameters.isExpanded);

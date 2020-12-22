@@ -21,7 +21,6 @@
         "rebuild": "npm run clean && npm run build",
         "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
         "test-cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage",
-        "try-strict": "cross-env ../../node_modules/.bin/tsc --project tsconfig.strictNullChecks.json --extendedDiagnostics",
         "preversion": "npm run rebuild && npm run test"
     },
     "files": [

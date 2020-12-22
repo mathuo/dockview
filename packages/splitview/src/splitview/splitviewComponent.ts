@@ -31,7 +31,7 @@ export interface SerializedSplitviewPanel {
 export interface SerializedSplitview {
     orientation: Orientation;
     size: number;
-    activeView: string;
+    activeView?: string;
     views: SerializedSplitviewPanel[];
 }
 
@@ -70,7 +70,7 @@ export class SplitviewComponent
     extends CompositeDisposable
     implements ISplitviewComponent {
     private splitview: Splitview;
-    private _activePanel: SplitviewPanel;
+    private _activePanel: SplitviewPanel | undefined;
     private panels = new Map<string, IDisposable>();
 
     private readonly _onDidLayoutChange = new Emitter<void>();

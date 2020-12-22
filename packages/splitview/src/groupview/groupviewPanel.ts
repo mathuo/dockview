@@ -160,7 +160,7 @@ export class GroupviewPanel extends CompositeDisposable implements IGroupPanel {
 
         this.mutableDisposable.value = this._group.onDidGroupChange((ev) => {
             if (ev.kind === GroupChangeKind.GROUP_ACTIVE) {
-                const isPanelVisible = this._group.isPanelActive(this);
+                const isPanelVisible = !!this._group?.isPanelActive(this);
                 this.api._onDidActiveChange.fire({
                     isActive: isGroupActive && isPanelVisible,
                 });

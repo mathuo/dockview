@@ -78,9 +78,15 @@ export class PaneFramework extends PaneviewPanel {
             headerComponent: string | undefined;
             body: IPaneBodyPart;
             header: IPaneHeaderPart;
+            orientation: Orientation;
         }
     ) {
-        super(options.id, options.component, options.headerComponent);
+        super(
+            options.id,
+            options.component,
+            options.headerComponent,
+            options.orientation
+        );
     }
 
     getBodyComponent() {
@@ -220,6 +226,7 @@ export class PaneviewComponent
             headerComponent: options.headerComponent,
             header,
             body,
+            orientation: Orientation.VERTICAL,
         });
 
         const size: Sizing | number =
@@ -359,6 +366,7 @@ export class PaneviewComponent
                         headerComponent: data.headerComponent,
                         header,
                         body,
+                        orientation: Orientation.VERTICAL,
                     });
 
                     queue.push(() => {
@@ -371,8 +379,6 @@ export class PaneviewComponent
                             containerApi: new PaneviewApi(this),
                         });
                     });
-
-                    panel.orientation = Orientation.VERTICAL;
 
                     return { size: view.size, view: panel };
                 }),
