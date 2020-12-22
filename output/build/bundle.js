@@ -36383,17 +36383,6 @@ var BaseGrid = /** @class */ (function (_super) {
         this.element.style.width = width + "px";
         this.gridview.layout(width, height);
     };
-    BaseGrid.prototype.setAutoResizeToFit = function (enabled) {
-        var _this = this;
-        if (this.resizeTimer) {
-            clearInterval(this.resizeTimer);
-        }
-        if (enabled) {
-            this.resizeTimer = setInterval(function () {
-                _this.resizeToFit();
-            }, 500);
-        }
-    };
     /**
      * Resize the layout to fit the parent container
      */
@@ -36406,10 +36395,6 @@ var BaseGrid = /** @class */ (function (_super) {
     };
     BaseGrid.prototype.dispose = function () {
         _super.prototype.dispose.call(this);
-        if (this.resizeTimer) {
-            clearInterval(this.resizeTimer);
-            this.resizeTimer = undefined;
-        }
         this._onGridEvent.dispose();
         this.gridview.dispose();
     };
