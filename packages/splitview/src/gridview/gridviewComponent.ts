@@ -2,7 +2,6 @@ import { getRelativeLocation, SerializedGridObject } from './gridview';
 import { Position } from '../dnd/droptarget';
 import { getGridLocation } from './gridview';
 import { tail, sequenceEquals } from '../array';
-import { GroupChangeKind } from '../groupview/groupview';
 import { CompositeDisposable } from '../lifecycle';
 import { IPanelDeserializer } from '../dockview/deserializer';
 import { GridComponentOptions } from './options';
@@ -24,6 +23,7 @@ import { GridPanelApi } from '../api/gridPanelApi';
 import { GridviewApi } from '../api/component.api';
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { createComponent } from '../panel/componentFactory';
+import { GroupChangeKind } from '../groupview/v2/component';
 
 interface PanelReference {
     api: GridPanelApi;

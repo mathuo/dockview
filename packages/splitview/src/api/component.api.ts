@@ -16,8 +16,7 @@ import {
     SerializedGridview,
 } from '../gridview/gridviewComponent';
 import { IGridviewPanel } from '../gridview/gridviewPanel';
-import { IGroupview } from '../groupview/groupview';
-import { IGroupPanel } from '../groupview/groupviewPanel';
+import { IGroupPanel } from '../groupview/groupPanel';
 import {
     AddPaneviewCompponentOptions,
     SerializedPaneview,
@@ -31,6 +30,7 @@ import {
 } from '../splitview/splitviewComponent';
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { ISplitviewPanel } from '../splitview/splitviewPanel';
+import { GroupviewPanel } from '../groupview/v2/groupviewPanel';
 
 export class SplitviewApi {
     get minimumSize() {
@@ -336,7 +336,7 @@ export class DockviewApi {
         return this.component.closeAllGroups();
     }
 
-    removeGroup(group: IGroupview) {
+    removeGroup(group: GroupviewPanel) {
         return this.component.removeGroup(group);
     }
 

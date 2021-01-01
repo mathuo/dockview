@@ -1,13 +1,13 @@
 import { Emitter, Event } from '../events';
 import { getGridLocation, Gridview, IGridView } from './gridview';
 import { Position } from '../dnd/droptarget';
-import { GroupChangeEvent, GroupChangeKind } from '../groupview/groupview';
 import { CompositeDisposable, IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
 import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { IPanel } from '../panel/types';
 import { Sizing } from '../splitview/core/splitview';
 import { MovementOptions2 } from '../dockview/options';
+import { GroupChangeEvent, GroupChangeKind } from '../groupview/v2/component';
 
 const nextLayoutId = sequentialNumberGenerator();
 

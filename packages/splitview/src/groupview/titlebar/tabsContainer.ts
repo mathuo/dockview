@@ -5,29 +5,27 @@ import {
 } from '../../lifecycle';
 import { addDisposableListener, Emitter, Event } from '../../events';
 import { ITab, MouseEventKind, Tab } from '../tab';
-import { removeClasses, addClasses, toggleClass } from '../../dom';
+import { removeClasses, addClasses } from '../../dom';
 import { DroptargetEvent, Position } from '../../dnd/droptarget';
-
-import { IGroupview } from '../groupview';
 import { last } from '../../array';
 import { focusedElement } from '../../focusedElement';
-import { IGroupPanel } from '../groupviewPanel';
+import { IGroupPanel } from '../groupPanel';
 import { IDockviewComponent } from '../../dockview/dockviewComponent';
 import { LocalSelectionTransfer } from '../../dnd/dataTransfer';
+import { GroupviewPanel } from '../v2/groupviewPanel';
 
 export interface TabDropEvent {
-    event: DroptargetEvent;
-    index?: number;
+    readonly event: DroptargetEvent;
+    readonly index?: number;
 }
 
-export interface ITitleContainer extends IDisposable {
-    element: HTMLElement;
-    visible: boolean;
-    height: number | undefined;
-    hasActiveDragEvent: boolean;
+export interface ITabsContainer extends IDisposable {
+    readonly element: HTMLElement;
     readonly panels: string[];
+    readonly hasActiveDragEvent: boolean;
+    height: number | undefined;
     delete: (id: string) => void;
-    indexOf: (tabOrId: ITab | string) => number;
+    indexOf: (id: string) => number;
     at: (index: number) => ITab;
     onDropEvent: Event<TabDropEvent>;
     setActive: (isGroupActive: boolean) => void;
@@ -36,14 +34,16 @@ export interface ITitleContainer extends IDisposable {
     closePanel: (panel: IGroupPanel) => void;
     openPanel: (panel: IGroupPanel, index?: number) => void;
     setActionElement(element: HTMLElement | undefined): void;
+    show(): void;
+    hide(): void;
 }
 
-export class TitleContainer
+export class TabsContainer
     extends CompositeDisposable
-    implements ITitleContainer {
-    private tabContainer: HTMLElement;
-    private _element: HTMLElement;
-    private actionContainer: HTMLElement;
+    implements ITabsContainer {
+    private readonly _element: HTMLElement;
+    private readonly tabContainer: HTMLElement;
+    private readonly actionContainer: HTMLElement;
 
     private tabs: IValueDisposable<ITab>[] = [];
     private selectedIndex = -1;
@@ -51,7 +51,6 @@ export class TitleContainer
     private activePanel: IGroupPanel | undefined;
     private actions: HTMLElement | undefined;
 
-    private _visible = true;
     private _height: number | undefined;
 
     private readonly _onDropped = new Emitter<TabDropEvent>();
@@ -59,16 +58,6 @@ export class TitleContainer
 
     get panels() {
         return this.tabs.map((_) => _.value.id);
-    }
-
-    get visible() {
-        return this._visible;
-    }
-
-    set visible(value: boolean) {
-        this._visible = value;
-
-        toggleClass(this.element, 'hidden', !this._visible);
     }
 
     get height(): number | undefined {
@@ -87,6 +76,14 @@ export class TitleContainer
             // }
         }
         // this._element.style.height = `${this.height}px`;
+    }
+
+    show() {
+        this.element.style.display = '';
+    }
+
+    hide() {
+        this.element.style.display = 'none';
     }
 
     setActionElement(element: HTMLElement | undefined): void {
@@ -122,14 +119,13 @@ export class TitleContainer
         return this.tabs[index]?.value;
     }
 
-    public indexOf(tabOrId: ITab | string): number {
-        const id = typeof tabOrId === 'string' ? tabOrId : tabOrId.id;
+    public indexOf(id: string): number {
         return this.tabs.findIndex((tab) => tab.value.id === id);
     }
 
     constructor(
         private accessor: IDockviewComponent,
-        private group: IGroupview,
+        private group: GroupviewPanel,
         options: { tabHeight?: number }
     ) {
         super();
@@ -267,19 +263,19 @@ export class TitleContainer
             return;
         }
         const tab = new Tab(panel.id, this.accessor, this.group);
-        if (!panel.header) {
+        if (!panel.view?.tab) {
             throw new Error('invalid header component');
         }
-        tab.setContent(panel.header);
+        tab.setContent(panel.view.tab);
 
         const disposable = CompositeDisposable.from(
             tab.onChanged((event) => {
                 const alreadyFocused =
-                    panel.id === this.group.activePanel?.id &&
-                    this.group.isAncestor(focusedElement.element!);
+                    panel.id === this.group.group.activePanel?.id &&
+                    this.group.group.isAncestor(focusedElement.element!);
                 switch (event.kind) {
                     case MouseEventKind.CLICK:
-                        this.group.openPanel(panel, {
+                        this.group.group.openPanel(panel, {
                             skipFocus: alreadyFocused,
                         });
                         break;
@@ -287,7 +283,10 @@ export class TitleContainer
                 this.accessor.fireMouseEvent({ ...event, panel, tab: true });
             }),
             tab.onDropped((event) => {
-                this._onDropped.fire({ event, index: this.indexOf(tab) });
+                this._onDropped.fire({
+                    event,
+                    index: this.tabs.findIndex((x) => x.value === tab),
+                });
             })
         );
 

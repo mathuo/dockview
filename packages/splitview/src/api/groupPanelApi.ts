@@ -1,8 +1,7 @@
-import { IGroupview } from '../groupview/groupview';
 import { Emitter, Event } from '../events';
 import { GridPanelApi, IGridPanelApi } from './gridPanelApi';
-import { IGroupPanel } from '../groupview/groupviewPanel';
-import { VisibilityEvent } from './api';
+import { IGroupPanel } from '../groupview/groupPanel';
+import { GroupviewPanel } from '../groupview/v2/groupviewPanel';
 
 export interface TitleEvent {
     title: string;
@@ -14,7 +13,7 @@ export interface TitleEvent {
  */
 export interface IGroupPanelApi
     extends Omit<IGridPanelApi, 'setVisible' | 'visible'> {
-    readonly group: IGroupview | undefined;
+    readonly group: GroupviewPanel | undefined;
     readonly isGroupActive: boolean;
     onDidDirtyChange: Event<boolean>;
     close: () => Promise<boolean>;
@@ -24,7 +23,7 @@ export interface IGroupPanelApi
 }
 
 export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
-    private _group: IGroupview | undefined;
+    private _group: GroupviewPanel | undefined;
     private _interceptor: undefined | (() => Promise<boolean>);
 
     readonly _onDidDirtyChange = new Emitter<boolean>();
@@ -49,15 +48,15 @@ export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
         return !!this.group?.isActive;
     }
 
-    set group(value: IGroupview | undefined) {
+    set group(value: GroupviewPanel | undefined) {
         this._group = value;
     }
 
-    get group(): IGroupview | undefined {
+    get group(): GroupviewPanel | undefined {
         return this._group;
     }
 
-    constructor(private panel: IGroupPanel, group: IGroupview | undefined) {
+    constructor(private panel: IGroupPanel, group: GroupviewPanel | undefined) {
         super(panel.id);
         this._group = group;
 
@@ -78,7 +77,7 @@ export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
         if (!this.group) {
             throw new Error(`panel ${this.id} has no group`);
         }
-        return this.group.closePanel(this.panel);
+        return this.group.group.closePanel(this.panel);
     }
 
     public interceptOnCloseAction(interceptor: () => Promise<boolean>) {

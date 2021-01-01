@@ -1,20 +1,21 @@
 import { DockviewApi } from '../api/component.api';
 import { Direction } from '../gridview/baseComponentGridview';
 import { IGridView } from '../gridview/gridview';
-import { IGroupview } from '../groupview/groupview';
-import { IGroupPanel } from '../groupview/groupviewPanel';
+import { IGroupPanel } from '../groupview/groupPanel';
 import {
-    PanelContentPart,
-    PanelHeaderPart,
+    IContentRenderer,
+    ITabRenderer,
     WatermarkConstructor,
     WatermarkPart,
 } from '../groupview/types';
+import { GroupviewPanel } from '../groupview/v2/groupviewPanel';
+import { IGroupPanelView } from '../react/dockview/v2/defaultGroupPanelView';
 import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
 
 export interface GroupPanelFrameworkComponentFactory {
-    content: FrameworkFactory<PanelContentPart>;
-    tab: FrameworkFactory<PanelHeaderPart>;
+    content: FrameworkFactory<IContentRenderer>;
+    tab: FrameworkFactory<ITabRenderer>;
     watermark: FrameworkFactory<WatermarkPart>;
 }
 
@@ -24,15 +25,15 @@ export interface TabContextMenuEvent {
     panel: IGroupPanel;
 }
 
-export interface DockviewOptions {
+export interface DockviewRenderFunctions {
     tabComponents?: {
         [componentName: string]: {
-            new (id: string, component: string): PanelHeaderPart;
+            new (id: string, component: string): ITabRenderer;
         };
     };
     components?: {
         [componentName: string]: {
-            new (id: string, component: string): PanelContentPart;
+            new (id: string, component: string): IContentRenderer;
         };
     };
     frameworkTabComponents?: {
@@ -41,6 +42,19 @@ export interface DockviewOptions {
     frameworkComponents?: {
         [componentName: string]: any;
     };
+}
+
+export interface ViewFactoryData {
+    content: string;
+    tab?: string;
+}
+
+export interface DockviewOptions extends DockviewRenderFunctions {
+    // viewFactory: (
+    //     id: string,
+    //     data: ViewFactoryData,
+    //     options: DockviewRenderFunctions
+    // ) => IGroupPanelView;
     watermarkComponent?: WatermarkConstructor;
     watermarkFrameworkComponent?: any;
     frameworkComponentFactory?: GroupPanelFrameworkComponentFactory;
@@ -81,5 +95,5 @@ export interface MovementOptions2 {
 
 export interface MovementOptions extends MovementOptions2 {
     includePanel?: boolean;
-    group?: IGroupview;
+    group?: GroupviewPanel;
 }

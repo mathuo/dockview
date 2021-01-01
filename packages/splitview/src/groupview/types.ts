@@ -1,9 +1,10 @@
 import { IDisposable } from '../lifecycle';
-import { IGroupview } from './groupview';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { IGroupPanelApi } from '../api/groupPanelApi';
 import { PanelInitParameters, IPanel } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
+import { GroupviewPanel } from './v2/groupviewPanel';
+import { Event } from '../events';
 
 export interface HeaderPartInitParameters {
     title: string;
@@ -17,16 +18,29 @@ export interface GroupPanelPartInitParameters
     containerApi: DockviewApi;
 }
 
-export interface PanelHeaderPart extends IPanel {
+export interface WatermarkPart extends IDisposable {
+    readonly id: string;
+    init: (params: GroupPanelPartInitParameters) => void;
+    updateParentGroup(group: GroupviewPanel, visible: boolean): void;
     element: HTMLElement;
-    init(parameters: GroupPanelPartInitParameters): void;
-    updateParentGroup(group: IGroupview, isPanelVisible: boolean): void;
 }
 
-export interface PanelContentPart extends IPanel {
-    element: HTMLElement;
-    actions?: HTMLElement;
-    updateParentGroup(group: IGroupview, isPanelVisible: boolean): void;
+export interface ITabRenderer extends IPanel {
+    readonly element: HTMLElement;
+    init(parameters: GroupPanelPartInitParameters): void;
+    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void;
+}
+
+export interface IActionsRenderer extends IDisposable {
+    readonly element: HTMLElement;
+}
+
+export interface IContentRenderer extends IPanel {
+    readonly element: HTMLElement;
+    readonly actions?: HTMLElement;
+    readonly onDidFocus?: Event<void>;
+    readonly onDidBlur?: Event<void>;
+    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void;
     init(parameters: GroupPanelPartInitParameters): void;
     close?(): Promise<boolean>;
 }
@@ -37,20 +51,13 @@ export interface WatermarkPartInitParameters {
     accessor: IDockviewComponent;
 }
 
-export interface WatermarkPart extends IDisposable {
-    id: string;
-    init: (params: GroupPanelPartInitParameters) => void;
-    updateParentGroup(group: IGroupview, visible: boolean): void;
-    element: HTMLElement;
-}
-
 // constructors
 
 export interface PanelHeaderPartConstructor {
-    new (): PanelHeaderPart;
+    new (): ITabRenderer;
 }
 export interface PanelContentPartConstructor {
-    new (): PanelContentPart;
+    new (): IContentRenderer;
 }
 
 export interface WatermarkConstructor {

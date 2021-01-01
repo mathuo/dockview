@@ -45,7 +45,7 @@ export const Panel = (props: IGridviewPanelProps) => {
     return (
         <div
             style={{
-                borderTop: `1px solid var(--separator-border)`,
+                borderTop: `1px solid var(--dv-separator-border)`,
                 boxSizing: 'border-box',
                 backgroundColor: 'rgb(30,30,30)',
                 height: '100%',

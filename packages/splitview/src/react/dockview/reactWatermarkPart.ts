@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { IGroupview } from '../../groupview/groupview';
 import {
     GroupPanelPartInitParameters,
     WatermarkPart,
 } from '../../groupview/types';
+import { GroupviewPanel } from '../../groupview/v2/groupviewPanel';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IGroupPanelBaseProps } from './dockview';
 
@@ -14,7 +14,9 @@ interface IWatermarkPanelProps extends IGroupPanelBaseProps {
 export class ReactWatermarkPart implements WatermarkPart {
     private _element: HTMLElement;
     private part?: ReactPart<IWatermarkPanelProps>;
-    private _groupRef: { value: IGroupview | undefined } = { value: undefined };
+    private _groupRef: { value: GroupviewPanel | undefined } = {
+        value: undefined,
+    };
 
     get element() {
         return this._element;
@@ -58,7 +60,10 @@ export class ReactWatermarkPart implements WatermarkPart {
         // noop - retrieval from api
     }
 
-    public updateParentGroup(group: IGroupview, isPanelVisible: boolean): void {
+    public updateParentGroup(
+        group: GroupviewPanel,
+        isPanelVisible: boolean
+    ): void {
         // noop - retrieval from api
         this._groupRef.value = group;
     }

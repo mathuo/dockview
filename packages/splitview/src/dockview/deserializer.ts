@@ -3,7 +3,7 @@ import {
     ISerializedLeafNode,
     IViewDeserializer,
 } from '../gridview/gridview';
-import { GroupviewPanelState, IGroupPanel } from '../groupview/groupviewPanel';
+import { GroupviewPanelState, IGroupPanel } from '../groupview/groupPanel';
 import { DockviewComponent } from './dockviewComponent';
 
 export interface IPanelDeserializer {

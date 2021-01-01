@@ -1,14 +1,14 @@
 import { CompositeDisposable, MutableDisposable } from '../../../lifecycle';
 import {
-    PanelHeaderPart,
+    ITabRenderer,
     GroupPanelPartInitParameters,
 } from '../../../groupview/types';
 import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
 import { PanelUpdateEvent } from '../../../panel/types';
-import { IGroupview } from '../../../groupview/groupview';
+import { GroupviewPanel } from '../../../groupview/v2/groupviewPanel';
 
-export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
+export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     private _element: HTMLElement;
 
     private _isPanelVisible = false;
@@ -96,7 +96,7 @@ export class DefaultTab extends CompositeDisposable implements PanelHeaderPart {
         }
     }
 
-    public updateParentGroup(group: IGroupview, isPanelVisible: boolean) {
+    public updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean) {
         this._isPanelVisible = isPanelVisible;
         this._isGroupActive = group.isActive;
 

@@ -7,6 +7,8 @@ import {
 import { ReactPanelHeaderPart } from './reactHeaderPart';
 import { ReactPanelDeserialzier } from '../deserializer';
 import {
+    DockviewOptions,
+    DockviewRenderFunctions,
     GroupPanelFrameworkComponentFactory,
     TabContextMenuEvent,
 } from '../../dockview/options';
@@ -17,6 +19,8 @@ import { ReactWatermarkPart } from './reactWatermarkPart';
 import { PanelCollection } from '../types';
 import { IDisposable } from '../../lifecycle';
 import { watchElementResize } from '../../dom';
+import { ReactGroupPanelView } from './v2/reactGroupPanelView';
+import { IContentRenderer, ITabRenderer } from '../../groupview/types';
 
 export interface ActionsbarReference<P> extends IDisposable {
     update(params: Partial<P>): void;
@@ -91,7 +95,7 @@ export const DockviewReact: React.FunctionComponent<IDockviewReactProps> = (
                     id: string,
                     componentId: string,
                     component: React.FunctionComponent<IGroupPanelBaseProps>
-                ) => {
+                ): IContentRenderer => {
                     return new ReactPanelContentPart(componentId, component, {
                         addPortal,
                     });
@@ -102,7 +106,7 @@ export const DockviewReact: React.FunctionComponent<IDockviewReactProps> = (
                     id: string,
                     componentId: string,
                     component: React.FunctionComponent<IGroupPanelBaseProps>
-                ) => {
+                ): ITabRenderer => {
                     return new ReactPanelHeaderPart(componentId, component, {
                         addPortal,
                     });

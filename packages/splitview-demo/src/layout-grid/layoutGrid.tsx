@@ -88,7 +88,7 @@ const components: PanelCollection<IDockviewPanelProps> = {
             <div
                 style={{
                     boxSizing: 'border-box',
-                    // borderTop: "1px solid var(--separator-border)",
+                    // borderTop: "1px solid var(--dv-separator-border)",
                 }}
             >
                 <DockviewReact

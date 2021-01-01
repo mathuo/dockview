@@ -2,26 +2,26 @@ import { IGroupPanelApi } from '../../api/groupPanelApi';
 import { IDockviewComponent } from '../../dockview/dockviewComponent';
 import { Emitter } from '../../events';
 import {
-    GroupDropEvent,
-    GroupOptions,
-    Groupview,
-    IGroupview,
-} from '../../groupview/groupview';
-import {
     GroupviewPanelState,
     IGroupPanel,
     IGroupPanelInitParameters,
-} from '../../groupview/groupviewPanel';
+} from '../../groupview/groupPanel';
 import {
     GroupPanelPartInitParameters,
-    PanelContentPart,
-    PanelHeaderPart,
+    IContentRenderer,
+    ITabRenderer,
     WatermarkPart,
 } from '../../groupview/types';
 import { PanelUpdateEvent } from '../../panel/types';
 import { fireEvent } from '@testing-library/dom';
 import { LocalSelectionTransfer } from '../../dnd/dataTransfer';
 import { Position } from '../../dnd/droptarget';
+import { GroupviewPanel } from '../../groupview/v2/groupviewPanel';
+import {
+    DefaultGroupPanelView,
+    IGroupPanelView,
+} from '../../react/dockview/v2/defaultGroupPanelView';
+import { GroupOptions, GroupDropEvent } from '../../groupview/v2/component';
 
 class Watermark implements WatermarkPart {
     public readonly element = document.createElement('div');
@@ -43,7 +43,7 @@ class Watermark implements WatermarkPart {
     }
 }
 
-class TestContentPart implements PanelContentPart {
+class TestContentPart implements IContentRenderer {
     public element = document.createElement('div');
 
     constructor(public readonly id: string) {
@@ -62,7 +62,7 @@ class TestContentPart implements PanelContentPart {
         //void
     }
 
-    updateParentGroup(group: IGroupview, isPanelVisible: boolean) {
+    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean) {
         //noop
     }
 
@@ -78,7 +78,7 @@ class TestContentPart implements PanelContentPart {
         return {};
     }
 }
-class TestHeaderPart implements PanelHeaderPart {
+class TestHeaderPart implements ITabRenderer {
     public element = document.createElement('div');
 
     constructor(public readonly id: string) {
@@ -97,7 +97,7 @@ class TestHeaderPart implements PanelHeaderPart {
         //void
     }
 
-    updateParentGroup(group: IGroupview, isPanelVisible: boolean) {
+    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean) {
         //noop
     }
 
@@ -115,37 +115,33 @@ class TestHeaderPart implements PanelHeaderPart {
 }
 
 class TestPanel implements IGroupPanel {
-    private _header: PanelHeaderPart | undefined;
-    private _content: PanelContentPart | undefined;
-    private _group: IGroupview | undefined;
+    private _view: IGroupPanelView | undefined;
+    private _group: GroupviewPanel | undefined;
     private _params: IGroupPanelInitParameters;
     private _onDidChangeState = new Emitter<void>();
     readonly onDidStateChange = this._onDidChangeState.event;
-
-    get header() {
-        return this._header;
-    }
-
-    get content() {
-        return this._content;
-    }
 
     get group() {
         return this._group;
     }
 
+    get view() {
+        return this._view;
+    }
+
     constructor(public readonly id: string, public api: IGroupPanelApi) {
         this.init({
-            headerPart: new TestHeaderPart(id),
-            contentPart: new TestContentPart(id),
+            view: new DefaultGroupPanelView({
+                tab: new TestHeaderPart(id),
+                content: new TestContentPart(id),
+            }),
             title: `${id}`,
             params: {},
         });
     }
 
     init(params: IGroupPanelInitParameters) {
-        this._header = params.headerPart;
-        this._content = params.contentPart;
+        this._view = params.view;
 
         this._params = params;
     }
@@ -154,7 +150,7 @@ class TestPanel implements IGroupPanel {
         //noop
     }
 
-    updateParentGroup(group: IGroupview, isGroupActive: boolean) {
+    updateParentGroup(group: GroupviewPanel, isGroupActive: boolean) {
         this._group = group;
     }
 
@@ -173,8 +169,7 @@ class TestPanel implements IGroupPanel {
     toJSON(): GroupviewPanelState {
         return {
             id: this.id,
-            contentId: this.content?.id,
-            tabId: this._header?.id,
+            view: this._view.toJSON(),
             title: this._params?.title,
         };
     }
@@ -185,7 +180,7 @@ class TestPanel implements IGroupPanel {
 }
 
 describe('groupview', () => {
-    let groupview: Groupview;
+    let groupview: GroupviewPanel;
     let dockview: IDockviewComponent;
     let options: GroupOptions;
 
@@ -202,7 +197,7 @@ describe('groupview', () => {
         options = {
             tabHeight: 30,
         };
-        groupview = new Groupview(dockview, 'groupview-1', options);
+        groupview = new GroupviewPanel(dockview, 'groupview-1', options);
     });
 
     test('serialized layout shows active panel', () => {
@@ -210,13 +205,13 @@ describe('groupview', () => {
         const panel2 = new TestPanel('panel2', jest.fn() as any);
         const panel3 = new TestPanel('panel3', jest.fn() as any);
 
-        const groupview2 = new Groupview(dockview, 'groupview-2', {
+        const groupview2 = new GroupviewPanel(dockview, 'groupview-2', {
             tabHeight: 25,
             panels: [panel1, panel2, panel3],
             activePanel: panel2,
         });
 
-        expect(groupview2.activePanel).toBe(panel2);
+        expect(groupview2.group.activePanel).toBe(panel2);
 
         expect(
             groupview2.element.querySelector('.content-part-panel1')
@@ -234,33 +229,33 @@ describe('groupview', () => {
         const panel2 = new TestPanel('panel2', jest.fn() as any);
         const panel3 = new TestPanel('panel3', jest.fn() as any);
 
-        groupview.openPanel(panel1);
-        groupview.openPanel(panel2);
-        groupview.openPanel(panel3);
+        groupview.group.openPanel(panel1);
+        groupview.group.openPanel(panel2);
+        groupview.group.openPanel(panel3);
 
-        groupview.openPanel(panel2); // set active
+        groupview.group.openPanel(panel2); // set active
 
-        groupview.moveToPrevious();
-        expect(groupview.activePanel).toBe(panel1);
+        groupview.group.moveToPrevious();
+        expect(groupview.group.activePanel).toBe(panel1);
 
-        groupview.moveToPrevious({ suppressRoll: true });
-        expect(groupview.activePanel).toBe(panel1);
+        groupview.group.moveToPrevious({ suppressRoll: true });
+        expect(groupview.group.activePanel).toBe(panel1);
 
-        groupview.moveToPrevious();
-        expect(groupview.activePanel).toBe(panel3);
+        groupview.group.moveToPrevious();
+        expect(groupview.group.activePanel).toBe(panel3);
 
-        groupview.moveToNext({ suppressRoll: true });
-        expect(groupview.activePanel).toBe(panel3);
+        groupview.group.moveToNext({ suppressRoll: true });
+        expect(groupview.group.activePanel).toBe(panel3);
 
-        groupview.moveToNext({ suppressRoll: false });
-        expect(groupview.activePanel).toBe(panel1);
+        groupview.group.moveToNext({ suppressRoll: false });
+        expect(groupview.group.activePanel).toBe(panel1);
 
-        groupview.moveToPrevious({ suppressRoll: false });
-        expect(groupview.activePanel).toBe(panel3);
+        groupview.group.moveToPrevious({ suppressRoll: false });
+        expect(groupview.group.activePanel).toBe(panel3);
 
-        groupview.moveToNext();
-        groupview.moveToNext();
-        expect(groupview.activePanel).toBe(panel2);
+        groupview.group.moveToNext();
+        groupview.group.moveToNext();
+        expect(groupview.group.activePanel).toBe(panel2);
     });
 
     test('default', () => {
@@ -279,12 +274,12 @@ describe('groupview', () => {
         const panel1 = new TestPanel('panel1', jest.fn() as any);
         const panel2 = new TestPanel('panel2', jest.fn() as any);
 
-        groupview.openPanel(panel1);
-        groupview.openPanel(panel2);
+        groupview.group.openPanel(panel1);
+        groupview.group.openPanel(panel2);
 
         const events: GroupDropEvent[] = [];
 
-        groupview.onDrop((event) => {
+        groupview.group.onDrop((event) => {
             events.push(event);
         });
 

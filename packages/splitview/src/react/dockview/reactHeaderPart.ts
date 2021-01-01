@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { IGroupview } from '../../groupview/groupview';
 import {
-    PanelHeaderPart,
+    ITabRenderer,
     GroupPanelPartInitParameters,
 } from '../../groupview/types';
+import { GroupviewPanel } from '../../groupview/v2/groupviewPanel';
 import { PanelUpdateEvent } from '../../panel/types';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IGroupPanelBaseProps } from './dockview';
 
-export class ReactPanelHeaderPart implements PanelHeaderPart {
+export class ReactPanelHeaderPart implements ITabRenderer {
     private _element: HTMLElement;
     private part?: ReactPart<IGroupPanelBaseProps>;
 
@@ -55,7 +55,10 @@ export class ReactPanelHeaderPart implements PanelHeaderPart {
         // noop - retrieval from api
     }
 
-    public updateParentGroup(group: IGroupview, isPanelVisible: boolean): void {
+    public updateParentGroup(
+        group: GroupviewPanel,
+        isPanelVisible: boolean
+    ): void {
         // noop - retrieval from api
     }
 

@@ -121,7 +121,7 @@ export const Deserialization = (props: {
         });
 
         event.api.layout(window.innerWidth, window.innerHeight);
-        event.api.getPanel('panel2').api.setSize({ size: 60 });
+        event.api.getPanel('panel2')?.api.setSize({ size: 60 });
     };
 
     React.useEffect(() => {

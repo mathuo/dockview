@@ -2,15 +2,15 @@ import {
     GroupPanelPartInitParameters,
     WatermarkPart,
 } from '../../../groupview/types';
-import { IGroupview } from '../../../groupview/groupview';
 import { ActionContainer } from '../../../actionbar/actionsContainer';
 import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
 import { CompositeDisposable } from '../../../lifecycle';
+import { GroupviewPanel } from '../../../groupview/v2/groupviewPanel';
 
 export class Watermark extends CompositeDisposable implements WatermarkPart {
     private _element: HTMLElement;
-    private group: IGroupview | undefined;
+    private group: GroupviewPanel | undefined;
     private params: GroupPanelPartInitParameters | undefined;
 
     get id() {
@@ -69,7 +69,7 @@ export class Watermark extends CompositeDisposable implements WatermarkPart {
         this.render();
     }
 
-    public updateParentGroup(group: IGroupview, visible: boolean): void {
+    public updateParentGroup(group: GroupviewPanel, visible: boolean): void {
         this.group = group;
         this.render();
     }

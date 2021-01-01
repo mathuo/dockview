@@ -8,7 +8,8 @@
         "allowUnreachableCode": true,
         "noImplicitAny": false,
         "sourceMap": true,
-        "declaration": false
+        "declaration": false,
+        "strictNullChecks":false
     },
     "include": ["src"],
     "exclude": ["**/node_modules", "src/__tests__"]

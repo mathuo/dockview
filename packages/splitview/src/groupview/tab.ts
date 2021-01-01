@@ -1,7 +1,6 @@
 import { addDisposableListener, Emitter, Event } from '../events';
 import { Droptarget, DroptargetEvent } from '../dnd/droptarget';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
-import { IGroupview } from './groupview';
 import {
     DATA_KEY,
     DragType,
@@ -9,9 +8,10 @@ import {
 } from '../dnd/dataTransfer';
 import { getElementsByTagName, toggleClass } from '../dom';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
-import { PanelHeaderPart } from './types';
+import { ITabRenderer } from './types';
 import { focusedElement } from '../focusedElement';
-import { IGroupPanel } from './groupviewPanel';
+import { IGroupPanel } from './groupPanel';
+import { GroupviewPanel } from './v2/groupviewPanel';
 
 export enum MouseEventKind {
     CLICK = 'CLICK',
@@ -29,7 +29,7 @@ export interface ITab {
     id: string;
     element: HTMLElement;
     hasActiveDragEvent: boolean;
-    setContent: (element: PanelHeaderPart) => void;
+    setContent: (element: ITabRenderer) => void;
     onChanged: Event<LayoutMouseEvent>;
     onDropped: Event<DroptargetEvent>;
     setActive(isActive: boolean): void;
@@ -43,7 +43,7 @@ export class Tab extends CompositeDisposable implements ITab {
         isDragging: false,
     };
     private droptarget: Droptarget;
-    private content?: PanelHeaderPart;
+    private content?: ITabRenderer;
 
     private readonly _onChanged = new Emitter<LayoutMouseEvent>();
     readonly onChanged: Event<LayoutMouseEvent> = this._onChanged.event;
@@ -72,7 +72,7 @@ export class Tab extends CompositeDisposable implements ITab {
     constructor(
         public id: string,
         private readonly accessor: IDockviewComponent,
-        private group: IGroupview
+        private group: GroupviewPanel
     ) {
         super();
 
@@ -188,7 +188,7 @@ export class Tab extends CompositeDisposable implements ITab {
         toggleClass(this.element, 'inactive-tab', !isActive);
     }
 
-    public setContent(part: PanelHeaderPart) {
+    public setContent(part: ITabRenderer) {
         if (this.content) {
             this._element.removeChild(this.content.element);
         }
