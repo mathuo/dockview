@@ -73,7 +73,7 @@
 			<section class="tsd-panel">
 				<h3>Implements</h3>
 				<ul class="tsd-hierarchy">
-					<li><a href="../interfaces/panelcontentpart.html" class="tsd-signature-type">PanelContentPart</a></li>
+					<li><a href="../interfaces/icontentrenderer.html" class="tsd-signature-type">IContentRenderer</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -90,6 +90,8 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="reactpanelcontentpart.html#id" class="tsd-kind-icon">id</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="reactpanelcontentpart.html#ondidblur" class="tsd-kind-icon">on<wbr>Did<wbr>Blur</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="reactpanelcontentpart.html#ondidfocus" class="tsd-kind-icon">on<wbr>Did<wbr>Focus</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -127,7 +129,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/react/dockview/reactContentPart.ts#L34">react/dockview/reactContentPart.ts:34</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/react/dockview/reactContentPart.ts#L116">react/dockview/reactContentPart.ts:116</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -154,9 +156,31 @@
 					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> id</h3>
 					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
-						<p>Implementation of <a href="../interfaces/panelcontentpart.html">PanelContentPart</a>.<a href="../interfaces/panelcontentpart.html#id">id</a></p>
+						<p>Implementation of <a href="../interfaces/icontentrenderer.html">IContentRenderer</a>.<a href="../interfaces/icontentrenderer.html#id">id</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/react/dockview/reactContentPart.ts#L37">react/dockview/reactContentPart.ts:37</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/react/dockview/reactContentPart.ts#L119">react/dockview/reactContentPart.ts:119</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="ondidblur" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> on<wbr>Did<wbr>Blur</h3>
+					<div class="tsd-signature tsd-kind-icon">on<wbr>Did<wbr>Blur<span class="tsd-signature-symbol">:</span> <a href="../modules/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = this._onDidBlur.event</span></div>
+					<aside class="tsd-sources">
+						<p>Implementation of <a href="../interfaces/icontentrenderer.html">IContentRenderer</a>.<a href="../interfaces/icontentrenderer.html#ondidblur">onDidBlur</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/react/dockview/reactContentPart.ts#L108">react/dockview/reactContentPart.ts:108</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="ondidfocus" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> on<wbr>Did<wbr>Focus</h3>
+					<div class="tsd-signature tsd-kind-icon">on<wbr>Did<wbr>Focus<span class="tsd-signature-symbol">:</span> <a href="../modules/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = this._onDidFocus.event</span></div>
+					<aside class="tsd-sources">
+						<p>Implementation of <a href="../interfaces/icontentrenderer.html">IContentRenderer</a>.<a href="../interfaces/icontentrenderer.html#ondidfocus">onDidFocus</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/react/dockview/reactContentPart.ts#L105">react/dockview/reactContentPart.ts:105</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -173,7 +197,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/react/dockview/reactContentPart.ts#L32">react/dockview/reactContentPart.ts:32</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/react/dockview/reactContentPart.ts#L114">react/dockview/reactContentPart.ts:114</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">HTMLElement</span></h4>
@@ -190,7 +214,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/react/dockview/reactContentPart.ts#L28">react/dockview/reactContentPart.ts:28</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/react/dockview/reactContentPart.ts#L110">react/dockview/reactContentPart.ts:110</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">HTMLElement</span></h4>
@@ -209,9 +233,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/panelcontentpart.html">PanelContentPart</a>.<a href="../interfaces/panelcontentpart.html#close">close</a></p>
+								<p>Implementation of <a href="../interfaces/icontentrenderer.html">IContentRenderer</a>.<a href="../interfaces/icontentrenderer.html#close">close</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/react/dockview/reactContentPart.ts#L122">react/dockview/reactContentPart.ts:122</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/react/dockview/reactContentPart.ts#L234">react/dockview/reactContentPart.ts:234</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -228,7 +252,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/react/dockview/reactContentPart.ts#L126">react/dockview/reactContentPart.ts:126</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/react/dockview/reactContentPart.ts#L238">react/dockview/reactContentPart.ts:238</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -244,9 +268,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/panelcontentpart.html">PanelContentPart</a>.<a href="../interfaces/panelcontentpart.html#focus">focus</a></p>
+								<p>Implementation of <a href="../interfaces/icontentrenderer.html">IContentRenderer</a>.<a href="../interfaces/icontentrenderer.html#focus">focus</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/react/dockview/reactContentPart.ts#L50">react/dockview/reactContentPart.ts:50</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/react/dockview/reactContentPart.ts#L139">react/dockview/reactContentPart.ts:139</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -262,9 +286,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/panelcontentpart.html">PanelContentPart</a>.<a href="../interfaces/panelcontentpart.html#init">init</a></p>
+								<p>Implementation of <a href="../interfaces/icontentrenderer.html">IContentRenderer</a>.<a href="../interfaces/icontentrenderer.html#init">init</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/react/dockview/reactContentPart.ts#L54">react/dockview/reactContentPart.ts:54</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/react/dockview/reactContentPart.ts#L143">react/dockview/reactContentPart.ts:143</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -286,9 +310,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/panelcontentpart.html">PanelContentPart</a>.<a href="../interfaces/panelcontentpart.html#layout">layout</a></p>
+								<p>Implementation of <a href="../interfaces/icontentrenderer.html">IContentRenderer</a>.<a href="../interfaces/icontentrenderer.html#layout">layout</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/react/dockview/reactContentPart.ts#L118">react/dockview/reactContentPart.ts:118</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/react/dockview/reactContentPart.ts#L226">react/dockview/reactContentPart.ts:226</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -313,9 +337,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/panelcontentpart.html">PanelContentPart</a>.<a href="../interfaces/panelcontentpart.html#tojson">toJSON</a></p>
+								<p>Implementation of <a href="../interfaces/icontentrenderer.html">IContentRenderer</a>.<a href="../interfaces/icontentrenderer.html#tojson">toJSON</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/react/dockview/reactContentPart.ts#L103">react/dockview/reactContentPart.ts:103</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/react/dockview/reactContentPart.ts#L205">react/dockview/reactContentPart.ts:205</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{ </span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h4>
@@ -336,9 +360,9 @@
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/panelcontentpart.html">PanelContentPart</a>.<a href="../interfaces/panelcontentpart.html#update">update</a></p>
+								<p>Implementation of <a href="../interfaces/icontentrenderer.html">IContentRenderer</a>.<a href="../interfaces/icontentrenderer.html#update">update</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/react/dockview/reactContentPart.ts#L109">react/dockview/reactContentPart.ts:109</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/react/dockview/reactContentPart.ts#L211">react/dockview/reactContentPart.ts:211</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -355,20 +379,20 @@
 					<a name="updateparentgroup" class="tsd-anchor"></a>
 					<h3>update<wbr>Parent<wbr>Group</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">update<wbr>Parent<wbr>Group<span class="tsd-signature-symbol">(</span>group<span class="tsd-signature-symbol">: </span><a href="../interfaces/igroupview.html" class="tsd-signature-type">IGroupview</a>, isPanelVisible<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">update<wbr>Parent<wbr>Group<span class="tsd-signature-symbol">(</span>group<span class="tsd-signature-symbol">: </span><a href="groupviewpanel.html" class="tsd-signature-type">GroupviewPanel</a>, isPanelVisible<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/panelcontentpart.html">PanelContentPart</a>.<a href="../interfaces/panelcontentpart.html#updateparentgroup">updateParentGroup</a></p>
+								<p>Implementation of <a href="../interfaces/icontentrenderer.html">IContentRenderer</a>.<a href="../interfaces/icontentrenderer.html#updateparentgroup">updateParentGroup</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/react/dockview/reactContentPart.ts#L114">react/dockview/reactContentPart.ts:114</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/react/dockview/reactContentPart.ts#L219">react/dockview/reactContentPart.ts:219</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>group: <a href="../interfaces/igroupview.html" class="tsd-signature-type">IGroupview</a></h5>
+									<h5>group: <a href="groupviewpanel.html" class="tsd-signature-type">GroupviewPanel</a></h5>
 								</li>
 								<li>
 									<h5>isPanelVisible: <span class="tsd-signature-type">boolean</span></h5>
@@ -400,6 +424,12 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="reactpanelcontentpart.html#id" class="tsd-kind-icon">id</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="reactpanelcontentpart.html#ondidblur" class="tsd-kind-icon">on<wbr>Did<wbr>Blur</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="reactpanelcontentpart.html#ondidfocus" class="tsd-kind-icon">on<wbr>Did<wbr>Focus</a>
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="reactpanelcontentpart.html#actions" class="tsd-kind-icon">actions</a>

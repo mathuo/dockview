@@ -96,6 +96,14 @@
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="icontentcontainer.html#openpanel" class="tsd-kind-icon">open<wbr>Panel</a></li>
 							</ul>
 						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="icontentcontainer.html#hide" class="tsd-kind-icon">hide</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="icontentcontainer.html#layout" class="tsd-kind-icon">layout</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="icontentcontainer.html#show" class="tsd-kind-icon">show</a></li>
+							</ul>
+						</section>
 					</div>
 				</section>
 			</section>
@@ -107,7 +115,7 @@
 					<div class="tsd-signature tsd-kind-icon">close<wbr>Panel<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/groupview/panel/content.ts#L10">groupview/panel/content.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/groupview/panel/content.ts#L25">groupview/panel/content.ts:25</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -133,7 +141,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="idisposable.html">IDisposable</a>.<a href="idisposable.html#dispose">dispose</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/lifecycle.ts#L2">lifecycle.ts:2</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/lifecycle.ts#L2">lifecycle.ts:2</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -158,7 +166,7 @@
 					<div class="tsd-signature tsd-kind-icon">element<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">HTMLElement</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/groupview/panel/content.ts#L8">groupview/panel/content.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/groupview/panel/content.ts#L22">groupview/panel/content.ts:22</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -168,7 +176,7 @@
 					<div class="tsd-signature tsd-kind-icon">on<wbr>Did<wbr>Blur<span class="tsd-signature-symbol">:</span> <a href="../modules/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/groupview/panel/content.ts#L7">groupview/panel/content.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/groupview/panel/content.ts#L21">groupview/panel/content.ts:21</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -178,17 +186,17 @@
 					<div class="tsd-signature tsd-kind-icon">on<wbr>Did<wbr>Focus<span class="tsd-signature-symbol">:</span> <a href="../modules/event.html" class="tsd-signature-type">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/groupview/panel/content.ts#L6">groupview/panel/content.ts:6</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/groupview/panel/content.ts#L20">groupview/panel/content.ts:20</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="openpanel" class="tsd-anchor"></a>
 					<h3>open<wbr>Panel</h3>
-					<div class="tsd-signature tsd-kind-icon">open<wbr>Panel<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>panel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>element<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">HTMLElement</span><span class="tsd-signature-symbol">; </span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<div class="tsd-signature tsd-kind-icon">open<wbr>Panel<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>panel<span class="tsd-signature-symbol">: </span><a href="igrouppanel.html" class="tsd-signature-type">IGroupPanel</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/a3776e9/packages/splitview/src/groupview/panel/content.ts#L9">groupview/panel/content.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/groupview/panel/content.ts#L24">groupview/panel/content.ts:24</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -196,22 +204,14 @@
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter-signature">
 								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>panel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>element<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">HTMLElement</span><span class="tsd-signature-symbol">; </span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>panel<span class="tsd-signature-symbol">: </span><a href="igrouppanel.html" class="tsd-signature-type">IGroupPanel</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
 										<h4 class="tsd-parameters-title">Parameters</h4>
 										<ul class="tsd-parameters">
 											<li>
-												<h5>panel: <span class="tsd-signature-symbol">{ </span>element<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">HTMLElement</span><span class="tsd-signature-symbol">; </span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
-												<ul class="tsd-parameters">
-													<li class="tsd-parameter">
-														<h5>element<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">HTMLElement</span></h5>
-													</li>
-													<li class="tsd-parameter">
-														<h5>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
-													</li>
-												</ul>
+												<h5>panel: <a href="igrouppanel.html" class="tsd-signature-type">IGroupPanel</a></h5>
 											</li>
 										</ul>
 										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -220,6 +220,69 @@
 							</li>
 						</ul>
 					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="hide" class="tsd-anchor"></a>
+					<h3>hide</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">hide<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/groupview/panel/content.ts#L27">groupview/panel/content.ts:27</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="layout" class="tsd-anchor"></a>
+					<h3>layout</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">layout<span class="tsd-signature-symbol">(</span>width<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, height<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/groupview/panel/content.ts#L23">groupview/panel/content.ts:23</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>width: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>height: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="show" class="tsd-anchor"></a>
+					<h3>show</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">show<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/9cb46ad/packages/splitview/src/groupview/panel/content.ts#L26">groupview/panel/content.ts:26</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -255,6 +318,15 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="icontentcontainer.html#openpanel" class="tsd-kind-icon">open<wbr>Panel</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="icontentcontainer.html#hide" class="tsd-kind-icon">hide</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="icontentcontainer.html#layout" class="tsd-kind-icon">layout</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="icontentcontainer.html#show" class="tsd-kind-icon">show</a>
 							</li>
 						</ul>
 					</li>
