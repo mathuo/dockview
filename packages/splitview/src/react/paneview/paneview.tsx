@@ -81,10 +81,6 @@ export const PaneviewReact: React.FunctionComponent<IPaneviewReactProps> = (
             },
         });
 
-        const { width, height } = domRef.current!.getBoundingClientRect();
-        const [size, orthogonalSize] = [height, width];
-        paneview.layout(size, orthogonalSize);
-
         if (props.onReady) {
             props.onReady({ api: new PaneviewApi(paneview) });
         }

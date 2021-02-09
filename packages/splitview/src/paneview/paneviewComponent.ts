@@ -2,7 +2,11 @@ import { PaneviewApi } from '../api/component.api';
 import { PanePanelApi } from '../api/panePanelApi';
 import { createComponent } from '../panel/componentFactory';
 import { addDisposableListener, Emitter, Event } from '../events';
-import { CompositeDisposable, IDisposable } from '../lifecycle';
+import {
+    CompositeDisposable,
+    IDisposable,
+    MutableDisposable,
+} from '../lifecycle';
 import { PanelUpdateEvent } from '../panel/types';
 import {
     LayoutPriority,
@@ -79,13 +83,15 @@ export class PaneFramework extends PaneviewPanel {
             body: IPaneBodyPart;
             header: IPaneHeaderPart;
             orientation: Orientation;
+            isExpanded: boolean;
         }
     ) {
         super(
             options.id,
             options.component,
             options.headerComponent,
-            options.orientation
+            options.orientation,
+            options.isExpanded
         );
     }
 
@@ -132,10 +138,25 @@ export interface IPaneviewComponent extends IDisposable {
 export class PaneviewComponent
     extends CompositeDisposable
     implements IPaneviewComponent {
-    private paneview: Paneview;
+    private _disposable = new MutableDisposable();
+    private _paneview!: Paneview;
 
     private readonly _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
+
+    set paneview(value: Paneview) {
+        this._paneview = value;
+
+        this._disposable.value = new CompositeDisposable(
+            this.paneview.onDidChange(() => {
+                this._onDidLayoutChange.fire(undefined);
+            })
+        );
+    }
+
+    get paneview() {
+        return this._paneview;
+    }
 
     get minimumSize() {
         return this.paneview.minimumSize;
@@ -174,13 +195,6 @@ export class PaneviewComponent
             // only allow paneview in the vertical orientation for now
             orientation: Orientation.VERTICAL,
         });
-
-        this.addDisposables(
-            this.paneview.onDidChange(() => {
-                this._onDidLayoutChange.fire(undefined);
-            }),
-            this.paneview
-        );
     }
 
     focus() {
@@ -227,6 +241,7 @@ export class PaneviewComponent
             header,
             body,
             orientation: Orientation.VERTICAL,
+            isExpanded: !!options.isExpanded,
         });
 
         const size: Sizing | number =
@@ -295,6 +310,13 @@ export class PaneviewComponent
     }
 
     toJSON(): SerializedPaneview {
+        const maximum = (value: number) =>
+            value === Number.MAX_SAFE_INTEGER ||
+            value === Number.POSITIVE_INFINITY
+                ? undefined
+                : value;
+        const minimum = (value: number) => (value <= 0 ? undefined : value);
+
         const views: SerializedPaneviewPanel[] = this.paneview
             .getPanes()
             .map((view, i) => {
@@ -302,8 +324,8 @@ export class PaneviewComponent
                 return {
                     size,
                     data: view.toJSON(),
-                    minimumSize: view.minimumBodySize,
-                    maximumSize: view.maximumBodySize,
+                    minimumSize: minimum(view.minimumBodySize),
+                    maximumSize: maximum(view.maximumBodySize),
                     expanded: view.isExpanded(),
                 };
             });
@@ -320,6 +342,7 @@ export class PaneviewComponent
         const queue: Function[] = [];
 
         this.paneview.dispose();
+
         this.paneview = new Paneview(this.element, {
             orientation: Orientation.VERTICAL,
             descriptor: {
@@ -367,6 +390,7 @@ export class PaneviewComponent
                         header,
                         body,
                         orientation: Orientation.VERTICAL,
+                        isExpanded: !!view.expanded,
                     });
 
                     queue.push(() => {
@@ -378,6 +402,7 @@ export class PaneviewComponent
                             isExpanded: !!view.expanded,
                             containerApi: new PaneviewApi(this),
                         });
+                        panel.orientation = this.paneview.orientation;
                     });
 
                     return { size: view.size, view: panel };

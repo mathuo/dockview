@@ -4,6 +4,7 @@ import {
     PaneviewApi,
     PaneviewReadyEvent,
     IPaneviewPanelProps,
+    SerializedPaneview,
 } from 'dockview';
 import * as React from 'react';
 import { Story, Meta } from '@storybook/react';
@@ -11,6 +12,10 @@ import 'dockview/dist/styles.css';
 
 const components: PanelCollection<IPaneviewPanelProps> = {
     default: (props) => {
+        const resize = () => {
+            props.api.setSize({ size: 300 });
+        };
+
         return (
             <div
                 style={{
@@ -19,7 +24,8 @@ const components: PanelCollection<IPaneviewPanelProps> = {
                     height: '100%',
                 }}
             >
-                hello world
+                <div>hello world</div>
+                <button onClick={resize}>Resize</button>
             </div>
         );
     },
@@ -83,6 +89,84 @@ export const Deserialization = (props: {
     const onReady = (event: PaneviewReadyEvent) => {
         event.api.layout(window.innerWidth, window.innerHeight);
         api.current = event.api;
+
+        event.api.fromJSON({
+            size: 100,
+            views: [
+                {
+                    size: 80,
+                    expanded: true,
+                    minimumSize: 100,
+                    data: {
+                        id: 'panel1',
+                        component: 'default',
+                        title: 'Panel 1',
+                    },
+                },
+                {
+                    size: 20,
+                    expanded: true,
+                    minimumSize: 100,
+                    data: {
+                        id: 'panel2',
+                        component: 'default',
+                        title: 'Panel 2',
+                    },
+                },
+                {
+                    size: 20,
+                    expanded: false,
+                    minimumSize: 100,
+                    data: {
+                        id: 'panel3',
+                        component: 'default',
+                        title: 'Panel 3',
+                    },
+                },
+            ],
+        });
+
+        event.api.layout(window.innerWidth, window.innerHeight);
+        event.api.getPanel('panel2')?.api.setSize({ size: 60 });
+    };
+
+    React.useEffect(() => {
+        window.addEventListener('resize', () => {
+            api.current?.layout(window.innerWidth, window.innerHeight);
+        });
+    }, []);
+
+    return (
+        <PaneviewReact
+            className={props.theme}
+            onReady={onReady}
+            components={components}
+            disableAutoResizing={props.disableAutoResizing}
+        />
+    );
+};
+
+export const LocalStorageSave = (props: {
+    theme: string;
+    disableAutoResizing: boolean;
+}) => {
+    const api = React.useRef<PaneviewApi>();
+
+    const onReady = (event: PaneviewReadyEvent) => {
+        event.api.layout(window.innerWidth, window.innerHeight);
+        api.current = event.api;
+
+        event.api.onDidLayoutChange(() => {
+            const state = event.api.toJSON();
+            localStorage.setItem('paneview.test.layout', JSON.stringify(state));
+            console.log(JSON.stringify(state, null, 4));
+        });
+
+        const state = localStorage.getItem('paneview.test.layout');
+        if (state) {
+            event.api.fromJSON(JSON.parse(state) as SerializedPaneview);
+            return;
+        }
 
         event.api.fromJSON({
             size: 100,

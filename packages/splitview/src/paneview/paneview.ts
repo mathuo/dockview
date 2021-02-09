@@ -68,6 +68,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         this.getPanes().forEach((pane, index) => {
             const disposable = pane.onDidChangeExpansionState(() => {
                 this.setupAnimation();
+                this._onDidChange.fire(undefined);
             });
 
             const paneItem: PaneItem = {
@@ -79,7 +80,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
                 },
             };
 
-            this.paneItems.splice(index, 0, paneItem);
+            this.paneItems.push(paneItem);
             pane.orthogonalSize = this.splitview.orthogonalSize;
         });
 
@@ -98,6 +99,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
     ) {
         const disposable = pane.onDidChangeExpansionState(() => {
             this.setupAnimation();
+            this._onDidChange.fire(undefined);
         });
 
         const paneItem: PaneItem = {

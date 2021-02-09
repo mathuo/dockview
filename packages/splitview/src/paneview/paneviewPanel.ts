@@ -112,8 +112,16 @@ export abstract class PaneviewPanel
         this._orthogonalSize = size;
     }
 
+    get minimumBodySize() {
+        return this._minimumBodySize;
+    }
+
     set minimumBodySize(value: number) {
         this._minimumBodySize = typeof value === 'number' ? value : 0;
+    }
+
+    get maximumBodySize() {
+        return this._maximumBodySize;
     }
 
     set maximumBodySize(value: number) {
@@ -125,10 +133,12 @@ export abstract class PaneviewPanel
         id: string,
         component: string,
         private readonly headerComponent: string | undefined,
-        orientation: Orientation
+        orientation: Orientation,
+        isExpanded: boolean
     ) {
         super(id, component, new PanePanelApi(id));
         this.api.pane = this; // TODO cannot use 'this' before 'super'
+        this._isExpanded = isExpanded;
 
         this._orientation = orientation;
 
@@ -177,6 +187,10 @@ export abstract class PaneviewPanel
     }
 
     setExpanded(expanded: boolean): void {
+        if (this._isExpanded === expanded) {
+            return;
+        }
+
         this._isExpanded = expanded;
 
         if (expanded) {
@@ -193,7 +207,7 @@ export abstract class PaneviewPanel
         }
 
         this._onDidChangeExpansionState.fire(expanded);
-        this._onDidChange.fire(expanded ? this.expandedSize : undefined);
+        this._onDidChange.fire(expanded ? this.width : undefined);
     }
 
     layout(size: number, orthogonalSize: number) {
