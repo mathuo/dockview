@@ -195,6 +195,8 @@ export class PaneviewComponent
             // only allow paneview in the vertical orientation for now
             orientation: Orientation.VERTICAL,
         });
+
+        this.addDisposables(this._disposable);
     }
 
     focus() {

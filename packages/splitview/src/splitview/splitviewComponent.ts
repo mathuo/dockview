@@ -1,4 +1,8 @@
-import { CompositeDisposable, IDisposable } from '../lifecycle';
+import {
+    CompositeDisposable,
+    IDisposable,
+    MutableDisposable,
+} from '../lifecycle';
 import {
     LayoutPriority,
     Orientation,
@@ -69,9 +73,24 @@ export interface ISplitviewComponent extends IDisposable {
 export class SplitviewComponent
     extends CompositeDisposable
     implements ISplitviewComponent {
-    private splitview: Splitview;
+    private _disposable = new MutableDisposable();
+    private _splitview!: Splitview;
     private _activePanel: SplitviewPanel | undefined;
     private panels = new Map<string, IDisposable>();
+
+    get splitview() {
+        return this._splitview;
+    }
+
+    set splitview(value: Splitview) {
+        this._splitview = value;
+
+        this._disposable.value = new CompositeDisposable(
+            this._splitview.onDidSashEnd(() => {
+                this._onDidLayoutChange.fire(undefined);
+            })
+        );
+    }
 
     private readonly _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
@@ -115,12 +134,7 @@ export class SplitviewComponent
 
         this.splitview = new Splitview(this.element, options);
 
-        this.addDisposables(
-            this.splitview.onDidSashEnd(() => {
-                this._onDidLayoutChange.fire(undefined);
-            }),
-            this.splitview
-        );
+        this.addDisposables(this._disposable);
     }
 
     focus() {
