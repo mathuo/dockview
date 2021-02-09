@@ -50,9 +50,9 @@ const ReactComponentBridge: React.ForwardRefRenderFunction<
     );
 
     React.useEffect(() => {
-        console.debug('[reactwrapper] component mounted ');
+        // console.debug('[reactwrapper] component mounted ');
         return () => {
-            console.debug('[reactwrapper] component unmounted ');
+            // console.debug('[reactwrapper] component unmounted ');
         };
     }, []);
 

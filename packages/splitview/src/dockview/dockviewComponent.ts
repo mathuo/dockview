@@ -434,7 +434,7 @@ export class DockviewComponent
         const dirtyPanels = Array.from(this.dirtyPanels);
 
         if (dirtyPanels.length === 0) {
-            console.debug('[layout#syncConfigs] no dirty panels');
+            // console.debug('[layout#syncConfigs] no dirty panels');
         }
 
         this.dirtyPanels.clear();
