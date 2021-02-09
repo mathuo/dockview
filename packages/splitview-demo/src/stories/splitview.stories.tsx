@@ -2,6 +2,7 @@ import {
     ISplitviewPanelProps,
     Orientation,
     PanelCollection,
+    SerializedSplitview,
     SplitviewApi,
     SplitviewReact,
     SplitviewReadyEvent,
@@ -12,6 +13,10 @@ import 'dockview/dist/styles.css';
 
 const components: PanelCollection<ISplitviewPanelProps> = {
     default: (props) => {
+        const resize = () => {
+            props.api.setSize({ size: 300 });
+        };
+
         return (
             <div
                 style={{
@@ -20,7 +25,8 @@ const components: PanelCollection<ISplitviewPanelProps> = {
                     height: '100%',
                 }}
             >
-                hello world
+                <div>hello world</div>
+                <button onClick={resize}>Resize</button>
             </div>
         );
     },
@@ -137,6 +143,92 @@ export const Deserialization = (props: {
     const onReady = (event: SplitviewReadyEvent) => {
         event.api.layout(window.innerWidth, window.innerHeight);
         api.current = event.api;
+
+        event.api.fromJSON({
+            size: 100,
+            views: [
+                {
+                    size: 20,
+                    data: {
+                        id: 'panel1',
+                        component: 'default',
+                        params: {
+                            color: 'red',
+                        },
+                    },
+                },
+                {
+                    size: 40,
+                    data: {
+                        id: 'panel2',
+                        component: 'default',
+                        params: {
+                            color: 'green',
+                        },
+                    },
+                },
+                {
+                    size: 60,
+                    data: {
+                        id: 'panel3',
+                        component: 'default',
+                        params: {
+                            color: 'purple',
+                        },
+                    },
+                },
+            ],
+            orientation: props.orientation,
+            activeView: 'panel1',
+        });
+
+        event.api.layout(window.innerWidth, window.innerHeight);
+    };
+
+    React.useEffect(() => {
+        window.addEventListener('resize', () => {
+            api.current?.layout(window.innerWidth, window.innerHeight);
+        });
+    }, []);
+
+    return (
+        <SplitviewReact
+            onReady={onReady}
+            orientation={props.orientation}
+            components={components}
+            disableAutoResizing={props.disableAutoResizing}
+            hideBorders={props.hideBorders}
+            proportionalLayout={props.proportionalLayout}
+        />
+    );
+};
+
+export const LocalStorageSave = (props: {
+    orientation: Orientation;
+    hideBorders: boolean;
+    proportionalLayout: boolean;
+    disableAutoResizing: boolean;
+}) => {
+    const api = React.useRef<SplitviewApi>();
+
+    const onReady = (event: SplitviewReadyEvent) => {
+        event.api.layout(window.innerWidth, window.innerHeight);
+        api.current = event.api;
+
+        event.api.onDidLayoutChange(() => {
+            const state = event.api.toJSON();
+            localStorage.setItem(
+                'splitview.test.layout',
+                JSON.stringify(state)
+            );
+            console.log(JSON.stringify(state, null, 4));
+        });
+
+        const state = localStorage.getItem('splitview.test.layout');
+        if (state) {
+            event.api.fromJSON(JSON.parse(state) as SerializedSplitview);
+            return;
+        }
 
         event.api.fromJSON({
             size: 100,
