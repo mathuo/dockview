@@ -35366,7 +35366,7 @@ var DockviewComponent = /** @class */ (function (_super) {
         var _this = this;
         var dirtyPanels = Array.from(this.dirtyPanels);
         if (dirtyPanels.length === 0) {
-            console.debug('[layout#syncConfigs] no dirty panels');
+            // console.debug('[layout#syncConfigs] no dirty panels');
         }
         this.dirtyPanels.clear();
         var partialPanelState = dirtyPanels
@@ -40256,6 +40256,7 @@ var Paneview = /** @class */ (function (_super) {
         _this.getPanes().forEach(function (pane, index) {
             var disposable = pane.onDidChangeExpansionState(function () {
                 _this.setupAnimation();
+                _this._onDidChange.fire(undefined);
             });
             var paneItem = {
                 pane: pane,
@@ -40265,7 +40266,7 @@ var Paneview = /** @class */ (function (_super) {
                     },
                 },
             };
-            _this.paneItems.splice(index, 0, paneItem);
+            _this.paneItems.push(paneItem);
             pane.orthogonalSize = _this.splitview.orthogonalSize;
         });
         _this.addDisposables(_this.splitview.onDidSashEnd(function () {
@@ -40314,6 +40315,7 @@ var Paneview = /** @class */ (function (_super) {
         if (skipLayout === void 0) { skipLayout = false; }
         var disposable = pane.onDidChangeExpansionState(function () {
             _this.setupAnimation();
+            _this._onDidChange.fire(undefined);
         });
         var paneItem = {
             pane: pane,
@@ -40472,7 +40474,7 @@ var DefaultHeader = /** @class */ (function (_super) {
 var PaneFramework = /** @class */ (function (_super) {
     __extends(PaneFramework, _super);
     function PaneFramework(options) {
-        var _this = _super.call(this, options.id, options.component, options.headerComponent, options.orientation) || this;
+        var _this = _super.call(this, options.id, options.component, options.headerComponent, options.orientation, options.isExpanded) || this;
         _this.options = options;
         return _this;
     }
@@ -40491,6 +40493,7 @@ var PaneviewComponent = /** @class */ (function (_super) {
         var _this = _super.call(this) || this;
         _this.element = element;
         _this.options = options;
+        _this._disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_3__.MutableDisposable();
         _this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
         _this.onDidLayoutChange = _this._onDidLayoutChange.event;
         if (!options.components) {
@@ -40503,11 +40506,23 @@ var PaneviewComponent = /** @class */ (function (_super) {
             // only allow paneview in the vertical orientation for now
             orientation: _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation.VERTICAL,
         });
-        _this.addDisposables(_this.paneview.onDidChange(function () {
-            _this._onDidLayoutChange.fire(undefined);
-        }), _this.paneview);
+        _this.addDisposables(_this._disposable);
         return _this;
     }
+    Object.defineProperty(PaneviewComponent.prototype, "paneview", {
+        get: function () {
+            return this._paneview;
+        },
+        set: function (value) {
+            var _this = this;
+            this._paneview = value;
+            this._disposable.value = new _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable(this.paneview.onDidChange(function () {
+                _this._onDidLayoutChange.fire(undefined);
+            }));
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(PaneviewComponent.prototype, "minimumSize", {
         get: function () {
             return this.paneview.minimumSize;
@@ -40569,6 +40584,7 @@ var PaneviewComponent = /** @class */ (function (_super) {
             header: header,
             body: body,
             orientation: _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation.VERTICAL,
+            isExpanded: !!options.isExpanded,
         });
         var size = typeof options.size === 'number' ? options.size : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Sizing.Distribute;
         var index = typeof options.index === 'number' ? options.index : undefined;
@@ -40620,6 +40636,13 @@ var PaneviewComponent = /** @class */ (function (_super) {
     };
     PaneviewComponent.prototype.toJSON = function () {
         var _this = this;
+        var maximum = function (value) {
+            return value === Number.MAX_SAFE_INTEGER ||
+                value === Number.POSITIVE_INFINITY
+                ? undefined
+                : value;
+        };
+        var minimum = function (value) { return (value <= 0 ? undefined : value); };
         var views = this.paneview
             .getPanes()
             .map(function (view, i) {
@@ -40627,8 +40650,8 @@ var PaneviewComponent = /** @class */ (function (_super) {
             return {
                 size: size,
                 data: view.toJSON(),
-                minimumSize: view.minimumBodySize,
-                maximumSize: view.maximumBodySize,
+                minimumSize: minimum(view.minimumBodySize),
+                maximumSize: maximum(view.maximumBodySize),
                 expanded: view.isExpanded(),
             };
         });
@@ -40674,6 +40697,7 @@ var PaneviewComponent = /** @class */ (function (_super) {
                         header: header,
                         body: body,
                         orientation: _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation.VERTICAL,
+                        isExpanded: !!view.expanded,
                     });
                     queue.push(function () {
                         panel.init({
@@ -40684,6 +40708,7 @@ var PaneviewComponent = /** @class */ (function (_super) {
                             isExpanded: !!view.expanded,
                             containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_0__.PaneviewApi(_this),
                         });
+                        panel.orientation = _this.paneview.orientation;
                     });
                     return { size: view.size, view: panel };
                 }),
@@ -40771,7 +40796,7 @@ var __read = (undefined && undefined.__read) || function (o, n) {
 
 var PaneviewPanel = /** @class */ (function (_super) {
     __extends(PaneviewPanel, _super);
-    function PaneviewPanel(id, component, headerComponent, orientation) {
+    function PaneviewPanel(id, component, headerComponent, orientation, isExpanded) {
         var _this = _super.call(this, id, component, new _api_panePanelApi__WEBPACK_IMPORTED_MODULE_0__.PanePanelApi(id)) || this;
         _this.headerComponent = headerComponent;
         _this._onDidChangeExpansionState = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
@@ -40785,6 +40810,7 @@ var PaneviewPanel = /** @class */ (function (_super) {
         _this._isExpanded = false;
         _this.expandedSize = 0;
         _this.api.pane = _this; // TODO cannot use 'this' before 'super'
+        _this._isExpanded = isExpanded;
         _this._orientation = orientation;
         _this.element.classList.add('pane');
         _this.addDisposables(_this.api.onDidSizeChange(function (event) {
@@ -40841,6 +40867,9 @@ var PaneviewPanel = /** @class */ (function (_super) {
         configurable: true
     });
     Object.defineProperty(PaneviewPanel.prototype, "minimumBodySize", {
+        get: function () {
+            return this._minimumBodySize;
+        },
         set: function (value) {
             this._minimumBodySize = typeof value === 'number' ? value : 0;
         },
@@ -40848,6 +40877,9 @@ var PaneviewPanel = /** @class */ (function (_super) {
         configurable: true
     });
     Object.defineProperty(PaneviewPanel.prototype, "maximumBodySize", {
+        get: function () {
+            return this._maximumBodySize;
+        },
         set: function (value) {
             this._maximumBodySize =
                 typeof value === 'number' ? value : Number.POSITIVE_INFINITY;
@@ -40866,6 +40898,9 @@ var PaneviewPanel = /** @class */ (function (_super) {
     };
     PaneviewPanel.prototype.setExpanded = function (expanded) {
         var _this = this;
+        if (this._isExpanded === expanded) {
+            return;
+        }
         this._isExpanded = expanded;
         if (expanded) {
             if (this.animationTimer) {
@@ -40882,7 +40917,7 @@ var PaneviewPanel = /** @class */ (function (_super) {
             }, 200);
         }
         this._onDidChangeExpansionState.fire(expanded);
-        this._onDidChange.fire(expanded ? this.expandedSize : undefined);
+        this._onDidChange.fire(expanded ? this.width : undefined);
     };
     PaneviewPanel.prototype.layout = function (size, orthogonalSize) {
         var _a = __read(this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_3__.Orientation.HORIZONTAL
@@ -41899,9 +41934,6 @@ var PaneviewReact = function (props) {
                 },
             },
         });
-        var _a = domRef.current.getBoundingClientRect(), width = _a.width, height = _a.height;
-        var _b = __read([height, width], 2), size = _b[0], orthogonalSize = _b[1];
-        paneview.layout(size, orthogonalSize);
         if (props.onReady) {
             props.onReady({ api: new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.PaneviewApi(paneview) });
         }
@@ -42099,9 +42131,9 @@ var ReactComponentBridge = function (props, ref) {
         },
     }); }, []);
     react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
-        console.debug('[reactwrapper] component mounted ');
+        // console.debug('[reactwrapper] component mounted ');
         return function () {
-            console.debug('[reactwrapper] component unmounted ');
+            // console.debug('[reactwrapper] component unmounted ');
         };
     }, []);
     return react__WEBPACK_IMPORTED_MODULE_0__.createElement(props.component, _props.current);
@@ -43481,6 +43513,7 @@ var SplitviewComponent = /** @class */ (function (_super) {
         var _this = _super.call(this) || this;
         _this.element = element;
         _this.options = options;
+        _this._disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_0__.MutableDisposable();
         _this.panels = new Map();
         _this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
         _this.onDidLayoutChange = _this._onDidLayoutChange.event;
@@ -43491,11 +43524,23 @@ var SplitviewComponent = /** @class */ (function (_super) {
             options.frameworkComponents = {};
         }
         _this.splitview = new _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Splitview(_this.element, options);
-        _this.addDisposables(_this.splitview.onDidSashEnd(function () {
-            _this._onDidLayoutChange.fire(undefined);
-        }), _this.splitview);
+        _this.addDisposables(_this._disposable);
         return _this;
     }
+    Object.defineProperty(SplitviewComponent.prototype, "splitview", {
+        get: function () {
+            return this._splitview;
+        },
+        set: function (value) {
+            var _this = this;
+            this._splitview = value;
+            this._disposable.value = new _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable(this._splitview.onDidSashEnd(function () {
+                _this._onDidLayoutChange.fire(undefined);
+            }));
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(SplitviewComponent.prototype, "minimumSize", {
         get: function () {
             return this.splitview.minimumSize;
