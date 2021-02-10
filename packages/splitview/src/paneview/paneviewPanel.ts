@@ -206,8 +206,8 @@ export abstract class PaneviewPanel
             }, 200);
         }
 
-        this._onDidChangeExpansionState.fire(expanded);
         this._onDidChange.fire(expanded ? this.width : undefined);
+        this._onDidChangeExpansionState.fire(expanded);
     }
 
     layout(size: number, orthogonalSize: number) {
