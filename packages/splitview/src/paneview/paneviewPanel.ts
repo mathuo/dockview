@@ -61,7 +61,9 @@ export interface IPaneviewPanel extends BasePanelViewExported<PanePanelApi> {
 export abstract class PaneviewPanel
     extends BasePanelView<PanePanelApi>
     implements IPaneview, IPaneviewPanel {
-    private _onDidChangeExpansionState: Emitter<boolean> = new Emitter<boolean>();
+    private _onDidChangeExpansionState: Emitter<boolean> = new Emitter<boolean>(
+        { replay: true }
+    );
     onDidChangeExpansionState = this._onDidChangeExpansionState.event;
     private readonly _onDidChange = new Emitter<number | undefined>();
     readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
@@ -139,6 +141,8 @@ export abstract class PaneviewPanel
         super(id, component, new PanePanelApi(id));
         this.api.pane = this; // TODO cannot use 'this' before 'super'
         this._isExpanded = isExpanded;
+
+        this._onDidChangeExpansionState.fire(this.isExpanded()); // initialize value
 
         this._orientation = orientation;
 
