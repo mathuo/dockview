@@ -23,6 +23,7 @@ const components: PanelCollection<ISplitviewPanelProps> = {
                     padding: '10px',
                     backgroundColor: props.color,
                     height: '100%',
+                    boxSizing: 'border-box',
                 }}
             >
                 <div>hello world</div>
