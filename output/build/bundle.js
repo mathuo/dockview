@@ -40799,7 +40799,7 @@ var PaneviewPanel = /** @class */ (function (_super) {
     function PaneviewPanel(id, component, headerComponent, orientation, isExpanded) {
         var _this = _super.call(this, id, component, new _api_panePanelApi__WEBPACK_IMPORTED_MODULE_0__.PanePanelApi(id)) || this;
         _this.headerComponent = headerComponent;
-        _this._onDidChangeExpansionState = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
+        _this._onDidChangeExpansionState = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter({ replay: true });
         _this.onDidChangeExpansionState = _this._onDidChangeExpansionState.event;
         _this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
         _this.onDidChange = _this._onDidChange.event;
@@ -40811,6 +40811,7 @@ var PaneviewPanel = /** @class */ (function (_super) {
         _this.expandedSize = 0;
         _this.api.pane = _this; // TODO cannot use 'this' before 'super'
         _this._isExpanded = isExpanded;
+        _this._onDidChangeExpansionState.fire(_this.isExpanded()); // initialize value
         _this._orientation = orientation;
         _this.element.classList.add('pane');
         _this.addDisposables(_this.api.onDidSizeChange(function (event) {
@@ -40916,8 +40917,8 @@ var PaneviewPanel = /** @class */ (function (_super) {
                 (_a = _this.body) === null || _a === void 0 ? void 0 : _a.remove();
             }, 200);
         }
-        this._onDidChangeExpansionState.fire(expanded);
         this._onDidChange.fire(expanded ? this.width : undefined);
+        this._onDidChangeExpansionState.fire(expanded);
     };
     PaneviewPanel.prototype.layout = function (size, orthogonalSize) {
         var _a = __read(this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_3__.Orientation.HORIZONTAL
