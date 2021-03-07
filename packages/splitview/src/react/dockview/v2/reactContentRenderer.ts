@@ -55,7 +55,6 @@ export class ReactContentRenderer implements IContentRenderer {
 
         parameters.api.onDidVisibilityChange((event) => {
             if (event.isVisible) {
-                console.log(event.isVisible, this.id);
                 this._hostedContainer.show();
                 this._hostedContainer.layout(this.element);
             } else {
