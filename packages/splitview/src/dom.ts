@@ -5,7 +5,6 @@ import {
     addDisposableWindowListener,
 } from './events';
 import { IDisposable, CompositeDisposable } from './lifecycle';
-import ResizeObserver from 'resize-observer-polyfill';
 
 export function watchElementResize(
     element: HTMLElement,
