@@ -1,5 +1,5 @@
 const gulp = require('gulp');
-const gulpSass = require('gulp-sass');
+const gulpSass = require('gulp-dart-sass');
 const concat = require('gulp-concat');
 
 const init = () => {
