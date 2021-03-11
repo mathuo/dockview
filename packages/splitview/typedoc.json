@@ -1,11 +1,8 @@
 {
     "out": "typedocs",
-    "mode": "file",
-    "inputFiles": ["./src"],
+    "entryPoints": ["./src/index.ts"],
     "exclude": ["**/_test/**/*.*", "**/index.ts"],
-    "ignoreCompilerErrors": true,
     "disableOutputCheck": true,
     "excludeExternals": true,
-    "excludePrivate": true,
-    "excludeNotExported": true
+    "excludePrivate": true
 }
