@@ -28,6 +28,8 @@ export class ReactWatermarkPart implements WatermarkPart {
         private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');
+        this._element.style.height = '100%';
+        this._element.style.width = '100%';
     }
 
     public init(parameters: GroupPanelPartInitParameters): void {
