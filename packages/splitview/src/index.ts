@@ -1,3 +1,5 @@
+import './footnote';
+
 export * from './splitview/core/splitview';
 export * from './splitview/splitviewComponent';
 export * from './paneview/paneview';
