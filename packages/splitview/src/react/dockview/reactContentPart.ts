@@ -6,14 +6,14 @@ import {
 import { ReactPart, ReactPortalStore } from '../react';
 import { ActionsbarReference, IDockviewPanelProps } from '../dockview/dockview';
 import { PanelUpdateEvent } from '../../panel/types';
-import { IGroupPanelApi } from '../../api/groupPanelApi';
+import { IDockviewPanelApi } from '../../api/groupPanelApi';
 import { DockviewApi } from '../../api/component.api';
 import { HostedContainer } from '../../hostedContainer';
 import { GroupviewPanel } from '../../groupview/v2/groupviewPanel';
 import { Emitter, Event } from '../../events';
 
 export interface IGroupPanelActionbarProps {
-    api: IGroupPanelApi;
+    api: IDockviewPanelApi;
     containerApi: DockviewApi;
 }
 

@@ -1,10 +1,10 @@
-import { BaseViewApi, StateObject } from '../../api/api';
+import { PanelApi, StateObject } from '../../api/panelApi';
 
 describe('api', () => {
-    let api: BaseViewApi;
+    let api: PanelApi;
 
     beforeEach(() => {
-        api = new BaseViewApi('dummy_id');
+        api = new PanelApi('dummy_id');
     });
 
     it('sets api state', () => {

@@ -1,5 +1,5 @@
 import { PaneviewApi } from '../api/component.api';
-import { PanePanelApi } from '../api/panePanelApi';
+import { PaneviewPanelApi } from '../api/paneviewPanelApi';
 import { addDisposableListener, Emitter, Event } from '../events';
 import {
     BasePanelView,
@@ -30,7 +30,7 @@ export interface PanePanelInitParameter extends PanelInitParameters {
 
 export interface PanePanelComponentInitParameter
     extends PanePanelInitParameter {
-    api: PanePanelApi;
+    api: PaneviewPanelApi;
 }
 
 export interface IPaneBodyPart extends IDisposable {
@@ -49,7 +49,8 @@ export interface IPaneview extends IView {
     onDidChangeExpansionState: Event<boolean>;
 }
 
-export interface IPaneviewPanel extends BasePanelViewExported<PanePanelApi> {
+export interface IPaneviewPanel
+    extends BasePanelViewExported<PaneviewPanelApi> {
     readonly minimumSize: number;
     readonly maximumSize: number;
     readonly minimumBodySize: number;
@@ -59,7 +60,7 @@ export interface IPaneviewPanel extends BasePanelViewExported<PanePanelApi> {
 }
 
 export abstract class PaneviewPanel
-    extends BasePanelView<PanePanelApi>
+    extends BasePanelView<PaneviewPanelApi>
     implements IPaneview, IPaneviewPanel {
     private _onDidChangeExpansionState: Emitter<boolean> = new Emitter<boolean>(
         { replay: true }
@@ -138,7 +139,7 @@ export abstract class PaneviewPanel
         orientation: Orientation,
         isExpanded: boolean
     ) {
-        super(id, component, new PanePanelApi(id));
+        super(id, component, new PaneviewPanelApi(id));
         this.api.pane = this; // TODO cannot use 'this' before 'super'
         this._isExpanded = isExpanded;
 

@@ -1,4 +1,4 @@
-import { PanelDimensionChangeEvent } from '../../api/api';
+import { PanelDimensionChangeEvent } from '../../api/panelApi';
 import { CompositeDisposable } from '../../lifecycle';
 import { PanelUpdateEvent } from '../../panel/types';
 import { PaneviewComponent } from '../../paneview/paneviewComponent';

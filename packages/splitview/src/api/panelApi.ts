@@ -1,64 +1,207 @@
 import { Emitter, Event } from '../events';
-import { IDisposable } from '../lifecycle';
-import { FunctionOrValue } from '../types';
-import { BaseViewApi, IBaseViewApi } from './api';
+import { CompositeDisposable } from '../lifecycle';
 
-interface PanelConstraintChangeEvent2 {
-    minimumSize?: FunctionOrValue<number>;
-    maximumSize?: FunctionOrValue<number>;
+/**
+ * A valid JSON type
+ */
+export type StateObject =
+    | number
+    | string
+    | boolean
+    | null
+    | object
+    | StateObject[]
+    | { [key: string]: StateObject };
+
+/**
+ * A JSON-serializable object
+ */
+export interface State {
+    [key: string]: StateObject;
 }
 
-export interface PanelConstraintChangeEvent {
-    minimumSize?: number;
-    maximumSize?: number;
+export interface FocusEvent {
+    isFocused: boolean;
+}
+export interface PanelDimensionChangeEvent {
+    width: number;
+    height: number;
 }
 
-export interface PanelSizeEvent {
-    size: number;
+export interface VisibilityEvent {
+    isVisible: boolean;
 }
 
-export interface IPanelApi extends IBaseViewApi {
-    onDidConstraintsChange: Event<PanelConstraintChangeEvent>;
-    setConstraints(value: PanelConstraintChangeEvent2): void;
-    setSize(event: PanelSizeEvent): void;
+export interface ActiveEvent {
+    isActive: boolean;
 }
 
-export class PanelApi extends BaseViewApi implements IPanelApi, IDisposable {
-    readonly _onDidConstraintsChangeInternal = new Emitter<
-        PanelConstraintChangeEvent2
-    >();
-    readonly onDidConstraintsChangeInternal: Event<
-        PanelConstraintChangeEvent2
-    > = this._onDidConstraintsChangeInternal.event;
+export interface IPanelApi {
+    // events
+    onDidDimensionsChange: Event<PanelDimensionChangeEvent>;
+    onDidStateChange: Event<void>;
+    onDidFocusChange: Event<FocusEvent>;
+    onDidVisibilityChange: Event<VisibilityEvent>;
+    onDidActiveChange: Event<ActiveEvent>;
+    onFocusEvent: Event<void>;
     //
+    setVisible(isVisible: boolean): void;
+    setActive(): void;
+    // state
+    setState(key: string, value: StateObject): void;
+    setState(state: State): void;
+    getState: () => State;
+    getStateKey: <T extends StateObject>(key: string) => T;
+    /**
+     * The id of the panel that would have been assigned when the panel was created
+     */
+    readonly id: string;
+    /**
+     * Whether the panel holds the current focus
+     */
+    readonly isFocused: boolean;
+    /**
+     * Whether the panel is the actively selected panel
+     */
+    readonly isActive: boolean;
+    /**
+     * Whether the panel is visible
+     */
+    readonly isVisible: boolean;
+    /**
+     * The panel width in pixels
+     */
+    readonly width: number;
+    /**
+     * The panel height in pixels
+     */
+    readonly height: number;
+}
 
-    readonly _onDidConstraintsChange = new Emitter<PanelConstraintChangeEvent>({
+/**
+ * A core api implementation that should be used across all panel-like objects
+ */
+export class PanelApi extends CompositeDisposable implements IPanelApi {
+    private _state: State = {};
+    private _isFocused = false;
+    private _isActive = false;
+    private _isVisible = true;
+    private _width = 0;
+    private _height = 0;
+
+    readonly _onDidStateChange = new Emitter<void>();
+    readonly onDidStateChange: Event<void> = this._onDidStateChange.event;
+    //
+    readonly _onDidPanelDimensionChange = new Emitter<PanelDimensionChangeEvent>(
+        {
+            replay: true,
+        }
+    );
+    readonly onDidDimensionsChange = this._onDidPanelDimensionChange.event;
+    //
+    readonly _onDidChangeFocus = new Emitter<FocusEvent>({
         replay: true,
     });
-    readonly onDidConstraintsChange: Event<PanelConstraintChangeEvent> = this
-        ._onDidConstraintsChange.event;
+    readonly onDidFocusChange: Event<FocusEvent> = this._onDidChangeFocus.event;
+    //
+    readonly _onFocusEvent = new Emitter<void>();
+    readonly onFocusEvent: Event<void> = this._onFocusEvent.event;
+    //
+    readonly _onDidVisibilityChange = new Emitter<VisibilityEvent>({
+        replay: true,
+    });
+    readonly onDidVisibilityChange: Event<VisibilityEvent> = this
+        ._onDidVisibilityChange.event;
     //
 
-    readonly _onDidSizeChange = new Emitter<PanelSizeEvent>();
-    readonly onDidSizeChange: Event<PanelSizeEvent> = this._onDidSizeChange
+    readonly _onVisibilityChange = new Emitter<VisibilityEvent>();
+    readonly onVisibilityChange: Event<VisibilityEvent> = this
+        ._onVisibilityChange.event;
+    //
+    readonly _onDidActiveChange = new Emitter<ActiveEvent>({
+        replay: true,
+    });
+    readonly onDidActiveChange: Event<ActiveEvent> = this._onDidActiveChange
         .event;
     //
+    readonly _onActiveChange = new Emitter<void>();
+    readonly onActiveChange: Event<void> = this._onActiveChange.event;
+    //
 
-    constructor(id: string) {
-        super(id);
+    get isFocused() {
+        return this._isFocused;
     }
 
-    setConstraints(value: PanelConstraintChangeEvent2) {
-        this._onDidConstraintsChangeInternal.fire(value);
+    get isActive() {
+        return this._isActive;
+    }
+    get isVisible() {
+        return this._isVisible;
     }
 
-    setSize(event: PanelSizeEvent) {
-        this._onDidSizeChange.fire(event);
+    get width() {
+        return this._width;
+    }
+
+    get height() {
+        return this._height;
+    }
+
+    constructor(readonly id: string) {
+        super();
+
+        this.addDisposables(
+            this._onDidStateChange,
+            this._onDidPanelDimensionChange,
+            this._onDidChangeFocus,
+            this._onDidVisibilityChange,
+            this._onDidActiveChange,
+            this._onFocusEvent,
+            this.onDidFocusChange((event) => {
+                this._isFocused = event.isFocused;
+            }),
+            this.onDidActiveChange((event) => {
+                this._isActive = event.isActive;
+            }),
+            this.onDidVisibilityChange((event) => {
+                this._isVisible = event.isVisible;
+            }),
+            this.onDidDimensionsChange((event) => {
+                this._width = event.width;
+                this._height = event.height;
+            })
+        );
+    }
+
+    setVisible(isVisible: boolean) {
+        this._onVisibilityChange.fire({ isVisible });
+    }
+
+    setActive(): void {
+        this._onActiveChange.fire();
+    }
+
+    setState(
+        key: string | { [key: string]: StateObject },
+        value?: StateObject
+    ): void {
+        if (typeof key === 'object') {
+            this._state = key;
+        } else if (typeof value !== undefined) {
+            this._state[key] = value!;
+        }
+        this._onDidStateChange.fire(undefined);
+    }
+
+    getState(): State {
+        return this._state;
+    }
+
+    getStateKey<T extends StateObject>(key: string): T {
+        return this._state[key] as T;
     }
 
     dispose() {
         super.dispose();
-        this._onDidConstraintsChange.dispose();
-        this._onDidSizeChange.dispose();
     }
 }

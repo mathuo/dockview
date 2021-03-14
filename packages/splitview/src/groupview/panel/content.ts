@@ -6,7 +6,7 @@ import {
 import { Emitter, Event } from '../../events';
 import { trackFocus } from '../../dom';
 import { HostedContainer } from '../../hostedContainer';
-import { IGroupPanelApi } from '../../api/groupPanelApi';
+import { IDockviewPanelApi } from '../../api/groupPanelApi';
 import { IGroupPanel } from '../groupPanel';
 
 export interface IRenderable {

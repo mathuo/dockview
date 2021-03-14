@@ -19,14 +19,14 @@ import {
     IGridviewPanel,
 } from './gridviewPanel';
 import { BaseComponentOptions } from '../panel/types';
-import { GridPanelApi } from '../api/gridPanelApi';
+import { GridviewPanelApi } from '../api/gridviewPanelApi';
 import { GridviewApi } from '../api/component.api';
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { createComponent } from '../panel/componentFactory';
 import { GroupChangeKind } from '../groupview/v2/component';
 
 interface PanelReference {
-    api: GridPanelApi;
+    api: GridviewPanelApi;
 }
 
 export interface SerializedGridview {

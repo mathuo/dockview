@@ -1,4 +1,3 @@
-import { IGroupPanelApi } from '../../api/groupPanelApi';
 import { IDockviewComponent } from '../../dockview/dockviewComponent';
 import { Emitter } from '../../events';
 import {
@@ -22,6 +21,7 @@ import {
     IGroupPanelView,
 } from '../../react/dockview/v2/defaultGroupPanelView';
 import { GroupOptions, GroupDropEvent } from '../../groupview/v2/component';
+import { IDockviewPanelApi } from '../../api/groupPanelApi';
 
 class Watermark implements WatermarkPart {
     public readonly element = document.createElement('div');
@@ -129,7 +129,7 @@ class TestPanel implements IGroupPanel {
         return this._view;
     }
 
-    constructor(public readonly id: string, public api: IGroupPanelApi) {
+    constructor(public readonly id: string, public api: IDockviewPanelApi) {
         this.init({
             view: new DefaultGroupPanelView({
                 tab: new TestHeaderPart(id),

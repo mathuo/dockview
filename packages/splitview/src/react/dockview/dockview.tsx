@@ -12,7 +12,7 @@ import {
     GroupPanelFrameworkComponentFactory,
     TabContextMenuEvent,
 } from '../../dockview/options';
-import { IGroupPanelApi } from '../../api/groupPanelApi';
+import { IDockviewPanelApi } from '../../api/groupPanelApi';
 import { usePortalsLifecycle } from '../react';
 import { DockviewApi } from '../../api/component.api';
 import { ReactWatermarkPart } from './reactWatermarkPart';
@@ -27,7 +27,7 @@ export interface ActionsbarReference<P> extends IDisposable {
 }
 
 export interface IGroupPanelBaseProps {
-    api: IGroupPanelApi;
+    api: IDockviewPanelApi;
     containerApi: DockviewApi;
     [key: string]: any;
 }

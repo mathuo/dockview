@@ -1,5 +1,5 @@
 import { PaneviewApi } from '../api/component.api';
-import { PanePanelApi } from '../api/panePanelApi';
+import { PaneviewPanelApi } from '../api/paneviewPanelApi';
 import { createComponent } from '../panel/componentFactory';
 import { addDisposableListener, Emitter, Event } from '../events';
 import {
@@ -47,7 +47,7 @@ export interface SerializedPaneview {
 
 class DefaultHeader extends CompositeDisposable implements IPaneHeaderPart {
     private _element: HTMLElement;
-    private apiRef: { api: PanePanelApi | null } = { api: null };
+    private apiRef: { api: PaneviewPanelApi | null } = { api: null };
 
     get element() {
         return this._element;
@@ -64,7 +64,7 @@ class DefaultHeader extends CompositeDisposable implements IPaneHeaderPart {
         );
     }
 
-    init(params: PanePanelInitParameter & { api: PanePanelApi }) {
+    init(params: PanePanelInitParameter & { api: PaneviewPanelApi }) {
         this.apiRef.api = params.api;
         this._element.textContent = params.title;
     }

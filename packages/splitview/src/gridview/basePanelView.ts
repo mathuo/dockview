@@ -6,7 +6,7 @@ import {
     PanelInitParameters,
     IPanel,
 } from '../panel/types';
-import { BaseViewApi } from '../api/api';
+import { PanelApi } from '../api/panelApi';
 
 export interface BasePanelViewState {
     id: string;
@@ -15,7 +15,7 @@ export interface BasePanelViewState {
     state?: { [key: string]: any };
 }
 
-export interface BasePanelViewExported<T extends BaseViewApi> {
+export interface BasePanelViewExported<T extends PanelApi> {
     readonly id: string;
     readonly api: T;
     readonly width: number;
@@ -25,7 +25,7 @@ export interface BasePanelViewExported<T extends BaseViewApi> {
     update(params: PanelUpdateEvent): void;
 }
 
-export abstract class BasePanelView<T extends BaseViewApi>
+export abstract class BasePanelView<T extends PanelApi>
     extends CompositeDisposable
     implements IPanel, BasePanelViewExported<T> {
     private _height = 0;

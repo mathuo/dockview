@@ -47,7 +47,7 @@ import {
     toTarget,
 } from '../gridview/baseComponentGridview';
 import { DockviewApi } from '../api/component.api';
-import { State } from '../api/api';
+import { State } from '../api/panelApi';
 import { LayoutMouseEvent, MouseEventKind } from '../groupview/tab';
 import { Orientation } from '../splitview/core/splitview';
 import { DefaultTab } from './components/tab/defaultTab';

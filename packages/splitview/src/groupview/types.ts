@@ -1,6 +1,6 @@
 import { IDisposable } from '../lifecycle';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
-import { IGroupPanelApi } from '../api/groupPanelApi';
+import { IDockviewPanelApi } from '../api/groupPanelApi';
 import { PanelInitParameters, IPanel } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
 import { GroupviewPanel } from './v2/groupviewPanel';
@@ -14,7 +14,7 @@ export interface HeaderPartInitParameters {
 export interface GroupPanelPartInitParameters
     extends PanelInitParameters,
         HeaderPartInitParameters {
-    api: IGroupPanelApi;
+    api: IDockviewPanelApi;
     containerApi: DockviewApi;
 }
 

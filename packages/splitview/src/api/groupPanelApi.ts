@@ -1,5 +1,5 @@
 import { Emitter, Event } from '../events';
-import { GridPanelApi, IGridPanelApi } from './gridPanelApi';
+import { GridviewPanelApi, IGridviewPanelApi } from './gridviewPanelApi';
 import { IGroupPanel } from '../groupview/groupPanel';
 import { GroupviewPanel } from '../groupview/v2/groupviewPanel';
 
@@ -11,8 +11,8 @@ export interface TitleEvent {
  * omit visibility modifiers since the visibility of a single group doesn't make sense
  * because it belongs to a groupview
  */
-export interface IGroupPanelApi
-    extends Omit<IGridPanelApi, 'setVisible' | 'visible'> {
+export interface IDockviewPanelApi
+    extends Omit<IGridviewPanelApi, 'setVisible' | 'visible'> {
     readonly group: GroupviewPanel | undefined;
     readonly isGroupActive: boolean;
     onDidDirtyChange: Event<boolean>;
@@ -22,7 +22,9 @@ export interface IGroupPanelApi
     setTitle(title: string): void;
 }
 
-export class GroupPanelApi extends GridPanelApi implements IGroupPanelApi {
+export class DockviewPanelApi
+    extends GridviewPanelApi
+    implements IDockviewPanelApi {
     private _group: GroupviewPanel | undefined;
     private _interceptor: undefined | (() => Promise<boolean>);
 

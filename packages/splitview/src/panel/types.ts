@@ -1,4 +1,4 @@
-import { State } from '../api/api';
+import { State } from '../api/panelApi';
 import { IDisposable } from '../lifecycle';
 import { LayoutPriority } from '../splitview/core/splitview';
 

@@ -27,16 +27,16 @@ export {
     PanelDimensionChangeEvent,
     VisibilityEvent,
     ActiveEvent,
-} from './api/api';
+} from './api/panelApi';
 export {
     SizeEvent,
-    IGridPanelApi,
+    IGridviewPanelApi,
     GridConstraintChangeEvent,
-} from './api/gridPanelApi';
-export { TitleEvent, IGroupPanelApi } from './api/groupPanelApi';
+} from './api/gridviewPanelApi';
+export { TitleEvent, IDockviewPanelApi } from './api/groupPanelApi';
 export {
     PanelSizeEvent,
     PanelConstraintChangeEvent,
-    IPanelApi,
-} from './api/panelApi';
-export { ExpansionEvent, IPanePanelApi } from './api/panePanelApi';
+    ISplitviewPanelApi,
+} from './api/splitviewPanelApi';
+export { ExpansionEvent, IPaneviewPanelApi } from './api/paneviewPanelApi';
