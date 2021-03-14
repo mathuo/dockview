@@ -14,91 +14,55 @@
 
 ##
 
-A zero dependency layout manager based on the layering of split-view components with ReactJS support. View the live demo [here](https://mathuo.github.io/dockview/). Automatically generated TypeDocs can be found [here](https://mathuo.github.io/dockview/output/docs/index.html).
+A zero dependency layout manager based on the layering of split-view components with ReactJS support.
+- View the live demo [here](https://mathuo.github.io/dockview/). 
+- Storybook demo [here](https://mathuo.github.io/dockview/output/storybook-static).
+- Code examples [here](https://github.com/mathuo/dockview/tree/master/packages/splitview-demo/src/stories).
+- Generated TypeDocs can be found [here](https://mathuo.github.io/dockview/output/docs/index.html).
+
+### Features
+- Simple splitviews, nested splitviews (i.e. gridviews) supporting full layout managment with
+dockable and tabular views
+- Extensive API support at the component level and at the indivdual view level
+- Themable and customizable
+- Serialization / deserialization
+- Tabular views with Drag and Drop support
+- Documentation and examples
+
 
 ## Installation
 You can install the project from [npm](https://www.npmjs.com/package/dockview). The project comes with TypeScript typings.
 
-```bash
+```
 npm install --save dockview
 ```
 
-## Configuration
+## Setup
 
-You must import the core css stylesheet but you are free to supply your own theming in addition to the core stylesheet. The location to reference for the stylesheet is
+You must import or reference the stylesheet at `dockview/dist/styles.css`. For example:
 
+```css
+@import '~dockview/dist/styles.css';
 ```
-dockview/dist/styles.css
+
+You should also attach a dockview theme to an element containing your components. For example:
+
+```html
+<body classname="dockview-theme-light">
+</body>
 ```
 
-By default the seperator between panels is `transparent` but this can be set through the CSS varibable `--separator-border`. Alternatively, or if you require the `DockviewReact` you should attach the classname of an included theme; either `dockview-theme-dark` or `dockview-theme-light`.
+dockview has a peer dependency on `react >= 16.8.0` and `react-dom >= 16.8.0` which is the version that introduced [React Hooks](https://reactjs.org/docs/hooks-intro.html).
 
-### FAQ
+## FAQ
+### Can I use this library without React?
+In theory, yes. The library is written in plain-old JS and the parts written in ReactJS are merely wrappers around the plain-old JS components. Currently everything is published as one package though so maybe that's something to change in the future.
 
--  The panel or grid isn't appearing
-   - Have you called `api.layout(...)`? 
-   - The grid need to be provided with a width and height to layout correctly. 
-   - If you are nesting panels and grids you can get the panels current dimensions through the panels api `api.onDimensionsChanged(({width,height} => {...}))`
-   - The top level view should probably be set as a function of the window `resize` event.
-
-
-### Sandbox examples
+### Can I use this library with AngularJS/Vue.js or any other arbitrarily named JavaScript library/framework?
+Yes but with some extra work. Dockview is written in plain-old JS so you can either interact directly with the plain-old JS components or create a wrapper using your prefered library/framework. The React wrapper may give some ideas on how this wrapper implementation could be done for other libraries/frameworks. Maybe that's something to change in the future.
+## Sandbox examples
 - [Dockview](https://codesandbox.io/s/simple-dockview-t6491)
 - [Gridview](https://codesandbox.io/s/simple-gridview-jrp0n)
 - [Splitview](https://codesandbox.io/s/simple-splitview-l53nn)
 - [Paneview](https://codesandbox.io/s/simple-paneview-v8qvb)
 
-## React
-
-dockview has a peer dependency on `react >= 16.8.0` and `react-dom >= 16.8.0` which is the version that introduces React Hooks.
-
-### Splitview
-
-```javascript
-import { 
-    ISplitviewPanelProps, 
-    Orientation, 
-    SplitviewReact,
-    SplitviewReadyEvent
-} from "dockview";
-
-const components = {
-    "my-component": (props: ISplitviewPanelProps) => {
-        return (
-            <div>
-                <span>This is a panel</span>
-                <span>{props.arbitraryProp}</span>
-            </div>
-        )
-    }
-}
-
-const Example = () => {
-    const onReady = (event: SplitviewReadyEvent) => {
-        event.addPanel({
-            id: "panel-1",
-            component: "my-component",
-            params: {
-                arbitraryProp: "Hello World"
-            }
-        });
-        event.addPanel({
-            id: "panel-2",
-            component: "my-component",
-            params: {
-                arbitraryProp: "World Hello"
-            }
-        });
-    }
-
-    return (
-        <SplitviewReact
-            components={components}
-            onReady={onReady}
-            orientation={Orientation.VERTICAL}
-        />
-    )
-}
-```
-
-## Run the demo locally
