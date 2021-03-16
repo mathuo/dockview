@@ -5,11 +5,6 @@
 /*!********************!*\
   !*** ./src/dom.ts ***!
   \********************/
-/*! flagged exports */
-/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export toggleClass [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_exports__ */
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -34,11 +29,6 @@ exports.toggleClass = toggleClass;
 /*!***********************!*\
   !*** ./src/index.tsx ***!
   \***********************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 2:23-27 */
-/*! CommonJS bailout: this is used directly at 9:26-30 */
-/*! CommonJS bailout: this is used directly at 14:20-24 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -77,12 +67,6 @@ ReactDOM.render(React.createElement(application_1.Application, null), document.g
 /*!*****************************************!*\
   !*** ./src/layout-grid/activitybar.tsx ***!
   \*****************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 2:23-27 */
-/*! CommonJS bailout: this is used directly at 9:26-30 */
-/*! CommonJS bailout: this is used directly at 14:20-24 */
-/*! CommonJS bailout: this is used directly at 21:14-18 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -168,11 +152,6 @@ exports.Activitybar = Activitybar;
 /*!*****************************************!*\
   !*** ./src/layout-grid/application.tsx ***!
   \*****************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 2:23-27 */
-/*! CommonJS bailout: this is used directly at 9:26-30 */
-/*! CommonJS bailout: this is used directly at 14:20-24 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -296,13 +275,6 @@ exports.Application = Application;
 /*!*******************************************!*\
   !*** ./src/layout-grid/controlCenter.tsx ***!
   \*******************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 2:23-27 */
-/*! CommonJS bailout: this is used directly at 9:26-30 */
-/*! CommonJS bailout: this is used directly at 14:20-24 */
-/*! CommonJS bailout: this is used directly at 21:17-21 */
-/*! CommonJS bailout: this is used directly at 30:19-23 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -541,11 +513,6 @@ exports.ControlCenter = ControlCenter;
 /*!***************************************!*\
   !*** ./src/layout-grid/customTab.tsx ***!
   \***************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 2:23-27 */
-/*! CommonJS bailout: this is used directly at 9:26-30 */
-/*! CommonJS bailout: this is used directly at 14:20-24 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -584,11 +551,6 @@ exports.CustomTab = CustomTab;
 /*!************************************!*\
   !*** ./src/layout-grid/footer.tsx ***!
   \************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 2:23-27 */
-/*! CommonJS bailout: this is used directly at 9:26-30 */
-/*! CommonJS bailout: this is used directly at 14:20-24 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -630,18 +592,6 @@ exports.Footer = Footer;
 /*!****************************************!*\
   !*** ./src/layout-grid/layoutGrid.tsx ***!
   \****************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 2:16-20 */
-/*! CommonJS bailout: this is used directly at 13:23-27 */
-/*! CommonJS bailout: this is used directly at 20:26-30 */
-/*! CommonJS bailout: this is used directly at 25:20-24 */
-/*! CommonJS bailout: this is used directly at 32:14-18 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 86:24-40 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 95:24-40 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 251:20-36 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 262:20-36 */
-/*! CommonJS bailout: exports.nextGuid(...) prevents optimization as exports is passed as call context at 267:20-36 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -762,6 +712,7 @@ var components = {
         }, []);
         return (React.createElement("div", { style: {
                 boxSizing: 'border-box',
+                // borderTop: "1px solid var(--dv-separator-border)",
             } },
             React.createElement(dockview_1.DockviewReact, { onReady: onReady, components: components, tabHeight: 20, debug: true })));
     },
@@ -1024,12 +975,6 @@ var Watermark = function (props) {
 /*!***********************************!*\
   !*** ./src/layout-grid/panel.tsx ***!
   \***********************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 2:23-27 */
-/*! CommonJS bailout: this is used directly at 9:26-30 */
-/*! CommonJS bailout: this is used directly at 14:20-24 */
-/*! CommonJS bailout: this is used directly at 21:14-18 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -1126,11 +1071,6 @@ exports.Panel = Panel;
 /*!*************************************!*\
   !*** ./src/layout-grid/registry.ts ***!
   \*************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 2:23-27 */
-/*! CommonJS bailout: this is used directly at 9:26-30 */
-/*! CommonJS bailout: this is used directly at 14:20-24 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -1183,12 +1123,6 @@ exports.useLayoutRegistry = useLayoutRegistry;
 /*!*******************************************!*\
   !*** ./src/layout-grid/settingsPanel.tsx ***!
   \*******************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 2:23-27 */
-/*! CommonJS bailout: this is used directly at 9:26-30 */
-/*! CommonJS bailout: this is used directly at 14:20-24 */
-/*! CommonJS bailout: this is used directly at 21:14-18 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -1261,12 +1195,6 @@ exports.Settings = Settings;
 /*!*************************************!*\
   !*** ./src/layout-grid/sidebar.tsx ***!
   \*************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 2:23-27 */
-/*! CommonJS bailout: this is used directly at 9:26-30 */
-/*! CommonJS bailout: this is used directly at 14:20-24 */
-/*! CommonJS bailout: this is used directly at 21:14-18 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -1446,12 +1374,6 @@ exports.Sidebar = Sidebar;
 /*!****************************************!*\
   !*** ./src/layout-grid/splitPanel.tsx ***!
   \****************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 2:23-27 */
-/*! CommonJS bailout: this is used directly at 9:26-30 */
-/*! CommonJS bailout: this is used directly at 14:20-24 */
-/*! CommonJS bailout: this is used directly at 21:14-18 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -1607,13 +1529,6 @@ exports.SplitPanel = SplitPanel;
 /*!******************************************!*\
   !*** ./src/panels/gridview/gridview.tsx ***!
   \******************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 2:16-20 */
-/*! CommonJS bailout: this is used directly at 13:23-27 */
-/*! CommonJS bailout: this is used directly at 20:26-30 */
-/*! CommonJS bailout: this is used directly at 25:20-24 */
-/*! CommonJS bailout: this is used directly at 32:14-18 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -1915,13 +1830,6 @@ exports.GridviewDemo = GridviewDemo;
 /*!********************************************!*\
   !*** ./src/panels/splitview/splitview.tsx ***!
   \********************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 2:16-20 */
-/*! CommonJS bailout: this is used directly at 13:23-27 */
-/*! CommonJS bailout: this is used directly at 20:26-30 */
-/*! CommonJS bailout: this is used directly at 25:20-24 */
-/*! CommonJS bailout: this is used directly at 32:14-18 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -2169,11 +2077,6 @@ exports.Common = Common;
 /*!****************************************!*\
   !*** ./src/panels/welcome/welcome.tsx ***!
   \****************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 2:23-27 */
-/*! CommonJS bailout: this is used directly at 9:26-30 */
-/*! CommonJS bailout: this is used directly at 14:20-24 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -2246,13 +2149,6 @@ exports.WelcomePanel = WelcomePanel;
 /*!*********************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/index.scss ***!
   \*********************************************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: __webpack_exports__, module, __webpack_require__, module.id */
-/*! CommonJS bailout: exports is used directly at 4:0-7 */
-/*! CommonJS bailout: exports.i(...) prevents optimization as exports is passed as call context at 5:0-9 */
-/*! CommonJS bailout: exports.push(...) prevents optimization as exports is passed as call context at 7:0-12 */
-/*! CommonJS bailout: exports is used directly at 9:17-24 */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
 /***/ ((module, exports, __webpack_require__) => {
 
 // Imports
@@ -2261,7 +2157,7 @@ var ___CSS_LOADER_AT_RULE_IMPORT_0___ = __webpack_require__(/*! -!../node_module
 exports = ___CSS_LOADER_API_IMPORT___(false);
 exports.i(___CSS_LOADER_AT_RULE_IMPORT_0___);
 // Module
-exports.push([module.id, "body {\n  margin: 0;\n  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;\n  overflow: hidden;\n  color: white;\n  font-size: 13px; }\n\n::-webkit-scrollbar {\n  height: 8px;\n  width: 8px; }\n\n/* Track */\n::-webkit-scrollbar-track {\n  background: transparent; }\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n  background: var(--dv-title-bar-scroll-bar-color); }\n\n.close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: '0.5em';\n  cursor: pointer; }\n  .close-action:active {\n    -webkit-mask-size: 100% 100% !important;\n    mask-size: 100% 100% !important; }\n\nbutton {\n  max-width: 125px;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  white-space: nowrap;\n  border: none;\n  background-color: #0e639c;\n  color: white;\n  font-family: inherit;\n  outline: none;\n  padding: 2px 14px;\n  margin: 2px 0px; }\n  button:hover {\n    background-color: #1177bb;\n    cursor: pointer; }\n", ""]);
+exports.push([module.id, "body {\n  margin: 0;\n  font-family: Arial, \"Helvetica Neue\", Helvetica, sans-serif;\n  overflow: hidden;\n  color: white;\n  font-size: 13px;\n}\n\n::-webkit-scrollbar {\n  height: 8px;\n  width: 8px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n  background: transparent;\n}\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n  background: var(--dv-title-bar-scroll-bar-color);\n}\n\n.close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n  cursor: pointer;\n}\n.close-action:active {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n\nbutton {\n  max-width: 125px;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  white-space: nowrap;\n  border: none;\n  background-color: #0e639c;\n  color: white;\n  font-family: inherit;\n  outline: none;\n  padding: 2px 14px;\n  margin: 2px 0px;\n}\nbutton:hover {\n  background-color: #1177bb;\n  cursor: pointer;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -2272,19 +2168,13 @@ module.exports = exports;
 /*!***************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/activitybar.scss ***!
   \***************************************************************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: __webpack_exports__, module, __webpack_require__, module.id */
-/*! CommonJS bailout: exports is used directly at 3:0-7 */
-/*! CommonJS bailout: exports.push(...) prevents optimization as exports is passed as call context at 5:0-12 */
-/*! CommonJS bailout: exports is used directly at 7:17-24 */
-/*! CommonJS bailout: module.exports is used directly at 7:0-14 */
 /***/ ((module, exports, __webpack_require__) => {
 
 // Imports
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ".activity-bar {\n  height: 100%;\n  background-color: #333333; }\n  .activity-bar .activity-bar-item {\n    width: 100%;\n    padding-bottom: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    cursor: pointer;\n    position: relative; }\n    .activity-bar .activity-bar-item:hover {\n      background-color: rgba(90, 90, 90, 0.5); }\n    .activity-bar .activity-bar-item .activity-bar-item-image {\n      -webkit-mask-size: 65% 65%;\n      mask-size: 65% 65%;\n      -webkit-mask-position: 50% 50%;\n      mask-position: 50% 50%;\n      -webkit-mask-repeat: no-repeat;\n      mask-repeat: no-repeat;\n      height: 100%;\n      width: 100%;\n      display: block;\n      background-color: gray;\n      position: absolute;\n      top: 0;\n      left: 0; }\n", ""]);
+exports.push([module.id, ".activity-bar {\n  height: 100%;\n  background-color: #333333;\n}\n.activity-bar .activity-bar-item {\n  width: 100%;\n  padding-bottom: 100%;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  cursor: pointer;\n  position: relative;\n}\n.activity-bar .activity-bar-item:hover {\n  background-color: rgba(90, 90, 90, 0.5);\n}\n.activity-bar .activity-bar-item .activity-bar-item-image {\n  -webkit-mask-size: 65% 65%;\n  mask-size: 65% 65%;\n  -webkit-mask-position: 50% 50%;\n  mask-position: 50% 50%;\n  -webkit-mask-repeat: no-repeat;\n  mask-repeat: no-repeat;\n  height: 100%;\n  width: 100%;\n  display: block;\n  background-color: gray;\n  position: absolute;\n  top: 0;\n  left: 0;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -2295,19 +2185,13 @@ module.exports = exports;
 /*!*****************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/controlCenter.scss ***!
   \*****************************************************************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: __webpack_exports__, module, __webpack_require__, module.id */
-/*! CommonJS bailout: exports is used directly at 3:0-7 */
-/*! CommonJS bailout: exports.push(...) prevents optimization as exports is passed as call context at 5:0-12 */
-/*! CommonJS bailout: exports is used directly at 7:17-24 */
-/*! CommonJS bailout: module.exports is used directly at 7:0-14 */
 /***/ ((module, exports, __webpack_require__) => {
 
 // Imports
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ".control-center {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  padding: 2px;\n  box-sizing: border-box; }\n  .control-center .control-center-row {\n    height: 25px;\n    box-sizing: border-box; }\n    .control-center .control-center-row button {\n      width: 125px;\n      text-overflow: ellipsis;\n      overflow: hidden;\n      white-space: nowrap;\n      border: none;\n      background-color: #0e639c;\n      color: white;\n      font-family: inherit;\n      outline: none;\n      padding: 2px 14px;\n      margin: 2px 0px; }\n      .control-center .control-center-row button:hover {\n        background-color: #1177bb; }\n", ""]);
+exports.push([module.id, ".control-center {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  padding: 2px;\n  box-sizing: border-box;\n}\n.control-center .control-center-row {\n  height: 25px;\n  box-sizing: border-box;\n}\n.control-center .control-center-row button {\n  width: 125px;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  white-space: nowrap;\n  border: none;\n  background-color: #0e639c;\n  color: white;\n  font-family: inherit;\n  outline: none;\n  padding: 2px 14px;\n  margin: 2px 0px;\n}\n.control-center .control-center-row button:hover {\n  background-color: #1177bb;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -2318,19 +2202,13 @@ module.exports = exports;
 /*!**************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/layoutGrid.scss ***!
   \**************************************************************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: __webpack_exports__, module, __webpack_require__, module.id */
-/*! CommonJS bailout: exports is used directly at 3:0-7 */
-/*! CommonJS bailout: exports.push(...) prevents optimization as exports is passed as call context at 5:0-12 */
-/*! CommonJS bailout: exports is used directly at 7:17-24 */
-/*! CommonJS bailout: module.exports is used directly at 7:0-14 */
 /***/ ((module, exports, __webpack_require__) => {
 
 // Imports
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ".context-menu {\n  position: absolute;\n  height: 100px;\n  width: 170px;\n  font-size: 13px;\n  z-index: 999;\n  color: #cccccc;\n  background: #252526;\n  box-shadow: black 0px 2px 4px;\n  padding: 10px 0px; }\n  .context-menu .context-action {\n    height: 20px;\n    line-height: 20px;\n    padding: 2px 10px;\n    cursor: pointer; }\n    .context-menu .context-action:hover {\n      background-color: #333333; }\n", ""]);
+exports.push([module.id, ".context-menu {\n  position: absolute;\n  height: 100px;\n  width: 170px;\n  font-size: 13px;\n  z-index: 999;\n  color: #cccccc;\n  background: #252526;\n  box-shadow: black 0px 2px 4px;\n  padding: 10px 0px;\n}\n.context-menu .context-action {\n  height: 20px;\n  line-height: 20px;\n  padding: 2px 10px;\n  cursor: pointer;\n}\n.context-menu .context-action:hover {\n  background-color: #333333;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -2341,19 +2219,13 @@ module.exports = exports;
 /*!***********************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/sidebar.scss ***!
   \***********************************************************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: __webpack_exports__, module, __webpack_require__, module.id */
-/*! CommonJS bailout: exports is used directly at 3:0-7 */
-/*! CommonJS bailout: exports.push(...) prevents optimization as exports is passed as call context at 5:0-12 */
-/*! CommonJS bailout: exports is used directly at 7:17-24 */
-/*! CommonJS bailout: module.exports is used directly at 7:0-14 */
 /***/ ((module, exports, __webpack_require__) => {
 
 // Imports
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ".pane-header .my-header .actions {\n  display: none; }\n\n.pane-header .my-header.within .actions {\n  display: flex; }\n\n.pane-header:focus .actions {\n  display: flex; }\n", ""]);
+exports.push([module.id, ".pane-header .my-header .actions {\n  display: none;\n}\n.pane-header .my-header.within .actions {\n  display: flex;\n}\n.pane-header:focus .actions {\n  display: flex;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -2364,12 +2236,6 @@ module.exports = exports;
 /*!**************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/splitPanel.scss ***!
   \**************************************************************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: __webpack_exports__, module, __webpack_require__, module.id */
-/*! CommonJS bailout: exports is used directly at 3:0-7 */
-/*! CommonJS bailout: exports.push(...) prevents optimization as exports is passed as call context at 5:0-12 */
-/*! CommonJS bailout: exports is used directly at 7:17-24 */
-/*! CommonJS bailout: module.exports is used directly at 7:0-14 */
 /***/ ((module, exports, __webpack_require__) => {
 
 // Imports
@@ -2387,19 +2253,13 @@ module.exports = exports;
 /*!******************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/splitview/splitview.scss ***!
   \******************************************************************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: __webpack_exports__, module, __webpack_require__, module.id */
-/*! CommonJS bailout: exports is used directly at 3:0-7 */
-/*! CommonJS bailout: exports.push(...) prevents optimization as exports is passed as call context at 5:0-12 */
-/*! CommonJS bailout: exports is used directly at 7:17-24 */
-/*! CommonJS bailout: module.exports is used directly at 7:0-14 */
 /***/ ((module, exports, __webpack_require__) => {
 
 // Imports
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ".splitview-demo-container {\n  width: 100%;\n  padding: 0px 20px;\n  box-sizing: border-box; }\n  .splitview-demo-container .splitview-demo-content {\n    display: flex;\n    --dv-separator-border: white; }\n  .splitview-demo-container.vertical .api-parameter {\n    padding-left: 10px; }\n  .splitview-demo-container.vertical .splitview-demo-view {\n    height: 500px;\n    width: 150px; }\n    .splitview-demo-container.vertical .splitview-demo-view .api-parameter {\n      padding-left: 0px; }\n  .splitview-demo-container.horizontal .splitview-demo-content {\n    flex-direction: column; }\n  .splitview-demo-container.horizontal .api-parameter {\n    padding-top: 10px; }\n  .splitview-demo-container.horizontal .splitview-demo-view {\n    height: 150px;\n    width: 500px; }\n    .splitview-demo-container.horizontal .splitview-demo-view .api-parameter {\n      padding-top: 0px; }\n\n.api-parameter {\n  display: grid;\n  grid-template-columns: 70px 50px;\n  grid-auto-rows: 15px; }\n  .api-parameter span:nth-child(2n) {\n    text-align: right; }\n  .api-parameter .visibility-toggle {\n    outline: 1px solid dodgerblue;\n    outline-offset: -1px;\n    padding: 0px 4px;\n    display: flex;\n    cursor: pointer; }\n    .api-parameter .visibility-toggle:not(:first-child) {\n      margin-left: 4px; }\n\n.splitview-demo-panel {\n  background-color: #2d2d2d;\n  height: 100%;\n  padding: 10px;\n  box-sizing: border-box;\n  overflow: hidden; }\n", ""]);
+exports.push([module.id, ".splitview-demo-container {\n  width: 100%;\n  padding: 0px 20px;\n  box-sizing: border-box;\n}\n.splitview-demo-container .splitview-demo-content {\n  display: flex;\n  --dv-separator-border: white;\n}\n.splitview-demo-container.vertical .api-parameter {\n  padding-left: 10px;\n}\n.splitview-demo-container.vertical .splitview-demo-view {\n  height: 500px;\n  width: 150px;\n}\n.splitview-demo-container.vertical .splitview-demo-view .api-parameter {\n  padding-left: 0px;\n}\n.splitview-demo-container.horizontal .splitview-demo-content {\n  flex-direction: column;\n}\n.splitview-demo-container.horizontal .api-parameter {\n  padding-top: 10px;\n}\n.splitview-demo-container.horizontal .splitview-demo-view {\n  height: 150px;\n  width: 500px;\n}\n.splitview-demo-container.horizontal .splitview-demo-view .api-parameter {\n  padding-top: 0px;\n}\n\n.api-parameter {\n  display: grid;\n  grid-template-columns: 70px 50px;\n  grid-auto-rows: 15px;\n}\n.api-parameter span:nth-child(2n) {\n  text-align: right;\n}\n.api-parameter .visibility-toggle {\n  outline: 1px solid dodgerblue;\n  outline-offset: -1px;\n  padding: 0px 4px;\n  display: flex;\n  cursor: pointer;\n}\n.api-parameter .visibility-toggle:not(:first-child) {\n  margin-left: 4px;\n}\n\n.splitview-demo-panel {\n  background-color: #2d2d2d;\n  height: 100%;\n  padding: 10px;\n  box-sizing: border-box;\n  overflow: hidden;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -2410,19 +2270,13 @@ module.exports = exports;
 /*!**************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/welcome/welcome.scss ***!
   \**************************************************************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: __webpack_exports__, module, __webpack_require__, module.id */
-/*! CommonJS bailout: exports is used directly at 3:0-7 */
-/*! CommonJS bailout: exports.push(...) prevents optimization as exports is passed as call context at 5:0-12 */
-/*! CommonJS bailout: exports is used directly at 7:17-24 */
-/*! CommonJS bailout: module.exports is used directly at 7:0-14 */
 /***/ ((module, exports, __webpack_require__) => {
 
 // Imports
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ".welcome-panel {\n  color: #cccccc;\n  margin: 40px; }\n  .welcome-panel .welcome-header {\n    margin-bottom: 40px; }\n    .welcome-panel .welcome-header h1 {\n      font-size: 30px; }\n    .welcome-panel .welcome-header h2 {\n      font-size: 20px; }\n  .welcome-panel .directory .directory-title {\n    font-size: 16px;\n    height: 25px;\n    line-height: 25px; }\n  .welcome-panel .directory .directory-item {\n    font-size: 13px;\n    height: 20px;\n    line-height: 20px;\n    color: dodgerblue;\n    cursor: pointer; }\n    .welcome-panel .directory .directory-item:hover {\n      text-decoration: underline; }\n", ""]);
+exports.push([module.id, ".welcome-panel {\n  color: #cccccc;\n  margin: 40px;\n}\n.welcome-panel .welcome-header {\n  margin-bottom: 40px;\n}\n.welcome-panel .welcome-header h1 {\n  font-size: 30px;\n}\n.welcome-panel .welcome-header h2 {\n  font-size: 20px;\n}\n.welcome-panel .directory .directory-title {\n  font-size: 16px;\n  height: 25px;\n  line-height: 25px;\n}\n.welcome-panel .directory .directory-item {\n  font-size: 13px;\n  height: 20px;\n  line-height: 20px;\n  color: dodgerblue;\n  cursor: pointer;\n}\n.welcome-panel .directory .directory-item:hover {\n  text-decoration: underline;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -2433,19 +2287,13 @@ module.exports = exports;
 /*!**************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js!../splitview/dist/styles.css ***!
   \**************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: __webpack_exports__, module, __webpack_require__, module.id */
-/*! CommonJS bailout: exports is used directly at 3:0-7 */
-/*! CommonJS bailout: exports.push(...) prevents optimization as exports is passed as call context at 5:0-12 */
-/*! CommonJS bailout: exports is used directly at 7:17-24 */
-/*! CommonJS bailout: module.exports is used directly at 7:0-14 */
 /***/ ((module, exports, __webpack_require__) => {
 
 // Imports
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../splitview-demo/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ".dockview-theme-dark {\n  --dv-accent-color: dodgerblue;\n  --dv-title-font-size: 13px;\n  --dv-title-height: 35px;\n  --dv-tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');\n  --dv-tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-title-bar-scroll-bar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-title-bar-background-color: #252526;\n  --dv-active-tab-background-visible: #1e1e1e;\n  --dv-active-tab-background-hidden: #2d2d2d;\n  --dv-inactive-tab-background-visible: #1e1e1e;\n  --dv-inactive-tab-background-hidden: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-active-group-visible-panel-color: white;\n  --dv-active-group-hidden-panel-color: #969696;\n  --dv-inactive-group-visible-panel-color: #8f8f8f;\n  --dv-inactive-group-hidden-panel-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-border-color: rgba(204, 204, 204, 0.2); }\n\n.dockview-theme-light {\n  --dv-accent-color: dodgerblue;\n  --dv-title-font-size: 13px;\n  --dv-title-height: 35px;\n  --dv-tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');\n  --dv-tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-title-bar-scroll-bar-color: #888;\n  --dv-group-view-background-color: white;\n  --dv-title-bar-background-color: #f3f3f3;\n  --dv-active-tab-background-visible: white;\n  --dv-active-tab-background-hidden: #ececec;\n  --dv-inactive-tab-background-visible: white;\n  --dv-inactive-tab-background-hidden: #ececec;\n  --dv-tab-divider-color: white;\n  --dv-active-group-visible-panel-color: rgb(51, 51, 51);\n  --dv-active-group-hidden-panel-color: rgba(51, 51, 51, 0.7);\n  --dv-inactive-group-visible-panel-color: rgba(51, 51, 51, 0.7);\n  --dv-inactive-group-hidden-panel-color: rgba(51, 51, 51, 0.35);\n  --dv-separator-border: rgba(128, 128, 128, 0.35);\n  --dv-paneview-border-color: rgb(51, 51, 51); }\n\n.dockview-theme-vs {\n  --dv-accent-color: dodgerblue;\n  --dv-title-font-size: 13px;\n  --dv-title-height: 35px;\n  --dv-tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');\n  --dv-tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-title-bar-scroll-bar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-title-bar-background-color: #252526;\n  --dv-active-tab-background-visible: #1e1e1e;\n  --dv-active-tab-background-hidden: #2d2d2d;\n  --dv-inactive-tab-background-visible: #1e1e1e;\n  --dv-inactive-tab-background-hidden: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-active-group-visible-panel-color: white;\n  --dv-active-group-hidden-panel-color: #969696;\n  --dv-inactive-group-visible-panel-color: #8f8f8f;\n  --dv-inactive-group-hidden-panel-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-border-color: rgba(204, 204, 204, 0.2);\n  --dv-active-tab-background-visible: dodgerblue;\n  --dv-title-height: 18px;\n  --dv-title-font-size: 11px; }\n  .dockview-theme-vs .groupview.active-group > .title-container {\n    border-bottom: 2px solid var(--dv-active-tab-background-visible); }\n  .dockview-theme-vs .groupview.inactive-group > .title-container {\n    border-bottom: 2px solid var(--dv-inactive-tab-background-visible); }\n\n.actions-bar {\n  text-align: right;\n  width: 28px;\n  display: flex;\n  align-items: center;\n  flex-shrink: 0; }\n  .actions-bar .actions-container {\n    display: flex;\n    padding: 0px;\n    margin: 0px;\n    justify-content: flex-end; }\n    .actions-bar .actions-container a:active {\n      -webkit-mask-size: 100% 100% !important;\n      mask-size: 100% 100% !important; }\n    .actions-bar .actions-container .close-action {\n      background-color: white;\n      height: 16px;\n      width: 16px;\n      display: block;\n      -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n      mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n      margin-right: '0.5em';\n      cursor: pointer; }\n\n.drop-target {\n  position: relative; }\n  .drop-target > .drop-target-dropzone {\n    position: absolute;\n    left: 0px;\n    top: 0px;\n    height: 100%;\n    width: 100%;\n    z-index: 10000; }\n    .drop-target > .drop-target-dropzone > .drop-target-selection {\n      position: relative;\n      pointer-events: none;\n      height: 100%;\n      width: 100%;\n      background-color: var(--dv-drag-over-background-color);\n      transition-duration: 0.15s;\n      transition-timing-function: ease-out; }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.left, .drop-target > .drop-target-dropzone > .drop-target-selection.right {\n        width: 50%; }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.right {\n        transform: translate(100%, 0%); }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n        transform: translate(0%, 100%); }\n      .drop-target > .drop-target-dropzone > .drop-target-selection.top, .drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n        height: 50%; }\n\n.custom-dragging {\n  height: 24px;\n  line-height: 24px;\n  font-size: 11px;\n  width: 100px;\n  background-color: dodgerblue;\n  color: ghostwhite;\n  border-radius: 11px;\n  position: absolute;\n  padding-left: 10px; }\n\n.groupview.active-group > .title-container > .tab-container > .tab.active-tab {\n  background-color: var(--dv-active-tab-background-visible);\n  color: var(--dv-active-group-visible-panel-color); }\n  .groupview.active-group > .title-container > .tab-container > .tab.active-tab .tab-action {\n    background-color: var(--dv-active-group-visible-panel-color); }\n\n.groupview.active-group > .title-container > .tab-container > .tab.inactive-tab {\n  background-color: var(--dv-active-tab-background-hidden);\n  color: var(--dv-active-group-hidden-panel-color); }\n  .groupview.active-group > .title-container > .tab-container > .tab.inactive-tab .tab-action {\n    background-color: var(--dv-active-group-hidden-panel-color); }\n\n.groupview.inactive-group > .title-container > .tab-container > .tab.active-tab {\n  background-color: var(--dv-inactive-tab-background-visible);\n  color: var(--dv-inactive-group-visible-panel-color); }\n  .groupview.inactive-group > .title-container > .tab-container > .tab.active-tab .tab-action {\n    background-color: var(--dv-inactive-group-visible-panel-color); }\n\n.groupview.inactive-group > .title-container > .tab-container > .tab.inactive-tab {\n  background-color: var(--dv-inactive-tab-background-hidden);\n  color: var(--dv-inactive-group-hidden-panel-color); }\n  .groupview.inactive-group > .title-container > .tab-container > .tab.inactive-tab .tab-action {\n    background-color: var(--dv-inactive-group-hidden-panel-color); }\n\n/**\n * when a tab is dragged we lose the above stylings because they are conditional on parent elements\n * therefore we also set some stylings for the dragging event\n **/\n.tab.dragging {\n  background-color: var(--dv-active-tab-background-visible);\n  color: var(--dv-active-group-visible-panel-color); }\n\n.grid-view,\n.branch-node {\n  height: 100%;\n  width: 100%; }\n\n.groupview {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  background-color: var(--dv-group-view-background-color);\n  overflow: hidden; }\n  .groupview:focus {\n    outline: none; }\n  .groupview.empty > .title-container {\n    display: none; }\n  .groupview > .content-container {\n    flex-grow: 1;\n    overflow: hidden;\n    outline: none; }\n\n.pane-container {\n  height: 100%;\n  width: 100%; }\n  .pane-container.animated .view {\n    transition-duration: 0.15s;\n    transition-timing-function: ease-out; }\n  .pane-container .view {\n    overflow: hidden;\n    display: flex;\n    flex-direction: column;\n    padding: 0px !important; }\n    .pane-container .view:not(:first-child)::before {\n      background-color: transparent !important; }\n    .pane-container .view:not(:first-child) .pane > .pane-header {\n      border-top: 1px solid var(--dv-paneview-border-color); }\n  .pane-container:first-of-type > .pane > .pane-header {\n    border-top: none !important; }\n  .pane-container .pane {\n    display: flex;\n    flex-direction: column;\n    overflow: hidden;\n    height: 100%; }\n    .pane-container .pane .pane-header {\n      box-sizing: border-box;\n      user-select: none;\n      position: relative;\n      outline: none; }\n      .pane-container .pane .pane-header:focus:before, .pane-container .pane .pane-header:focus-within:before {\n        position: absolute;\n        top: 0;\n        left: 0;\n        width: 100%;\n        height: 100%;\n        z-index: 5;\n        content: '';\n        pointer-events: none;\n        outline: 1px solid;\n        outline-width: -1px;\n        outline-style: solid;\n        outline-offset: -1px;\n        outline-color: var(--dv-accent-color); }\n    .pane-container .pane .pane-body {\n      overflow-y: auto;\n      overflow-x: hidden;\n      flex-grow: 1;\n      position: relative;\n      outline: none; }\n      .pane-container .pane .pane-body:focus:before, .pane-container .pane .pane-body:focus-within:before {\n        position: absolute;\n        top: 0;\n        left: 0;\n        width: 100%;\n        height: 100%;\n        z-index: 5;\n        content: '';\n        pointer-events: none;\n        outline: 1px solid;\n        outline-width: -1px;\n        outline-style: solid;\n        outline-offset: -1px;\n        outline-color: var(--dv-accent-color); }\n\n.title-container {\n  display: flex;\n  background-color: var(--dv-title-bar-background-color);\n  flex-shrink: 0;\n  box-sizing: border-box;\n  height: var(--dv-title-height);\n  font-size: var(--dv-title-font-size); }\n  .title-container.hidden {\n    display: none; }\n  .title-container .tab-container {\n    flex-grow: 1;\n    display: flex;\n    overflow-x: overlay;\n    overflow-y: hidden;\n    /* Track */\n    /* Handle */ }\n    .title-container .tab-container::-webkit-scrollbar {\n      height: 3px; }\n    .title-container .tab-container::-webkit-scrollbar-track {\n      background: transparent; }\n    .title-container .tab-container::-webkit-scrollbar-thumb {\n      background: var(--dv-title-bar-scroll-bar-color); }\n    .title-container .tab-container.drag-over-target {\n      background-color: var(--dv-drag-over-background-color); }\n    .title-container .tab-container .tab {\n      -webkit-user-drag: element;\n      outline: none;\n      min-width: 75px;\n      cursor: pointer;\n      position: relative;\n      box-sizing: border-box; }\n      .title-container .tab-container .tab:not(:first-child)::before {\n        content: ' ';\n        position: absolute;\n        top: 0;\n        left: 0;\n        z-index: 5;\n        pointer-events: none;\n        background-color: var(--dv-tab-divider-color);\n        width: 1px;\n        height: 100%; }\n\n.split-view-container {\n  position: relative;\n  overflow: hidden;\n  height: 100%;\n  width: 100%; }\n  .split-view-container.animation .view,\n  .split-view-container.animation .sash {\n    transition-duration: 0.15s;\n    transition-timing-function: ease-out; }\n  .split-view-container.horizontal {\n    height: 100%; }\n    .split-view-container.horizontal > .sash-container > .sash {\n      height: 100%;\n      width: 4px; }\n      .split-view-container.horizontal > .sash-container > .sash.enabled {\n        cursor: ew-resize; }\n      .split-view-container.horizontal > .sash-container > .sash.disabled {\n        cursor: default; }\n      .split-view-container.horizontal > .sash-container > .sash.maximum {\n        cursor: w-resize; }\n      .split-view-container.horizontal > .sash-container > .sash.minimum {\n        cursor: e-resize; }\n    .split-view-container.horizontal > .view-container > .view:not(:first-child)::before {\n      height: 100%;\n      width: 1px; }\n  .split-view-container.vertical {\n    width: 100%; }\n    .split-view-container.vertical > .sash-container > .sash {\n      width: 100%;\n      height: 4px; }\n      .split-view-container.vertical > .sash-container > .sash.enabled {\n        cursor: ns-resize; }\n      .split-view-container.vertical > .sash-container > .sash.disabled {\n        cursor: default; }\n      .split-view-container.vertical > .sash-container > .sash.maximum {\n        cursor: n-resize; }\n      .split-view-container.vertical > .sash-container > .sash.minimum {\n        cursor: s-resize; }\n    .split-view-container.vertical > .view-container > .view {\n      width: 100%; }\n      .split-view-container.vertical > .view-container > .view:not(:first-child)::before {\n        height: 1px;\n        width: 100%; }\n  .split-view-container .sash-container {\n    height: 100%;\n    width: 100%;\n    position: absolute; }\n    .split-view-container .sash-container .sash {\n      position: absolute;\n      z-index: 99;\n      outline: none; }\n  .split-view-container .view-container {\n    position: relative;\n    height: 100%;\n    width: 100%; }\n    .split-view-container .view-container .view {\n      height: 100%;\n      box-sizing: border-box;\n      overflow: auto;\n      position: absolute; }\n  .split-view-container.separator-border .view:not(:first-child)::before {\n    content: ' ';\n    position: absolute;\n    top: 0;\n    left: 0;\n    z-index: 5;\n    pointer-events: none;\n    background-color: var(--dv-separator-border); }\n\n.tab {\n  flex-shrink: 0; }\n  .tab.dragged {\n    transform: translate3d(0px, 0px, 0px);\n    /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */ }\n  .tab.dragging .tab-action {\n    background-color: var(--dv-active-group-visible-panel-color); }\n  .tab.active-tab > .default-tab .tab-action {\n    visibility: visible; }\n  .tab.inactive-tab > .default-tab .tab-action:not(.dirty) {\n    visibility: hidden; }\n  .tab.inactive-tab > .default-tab:hover .tab-action {\n    visibility: visible; }\n  .tab .default-tab {\n    position: relative;\n    height: 100%;\n    display: flex;\n    min-width: 80px;\n    align-items: center;\n    padding-left: 10px;\n    white-space: nowrap;\n    text-overflow: elipsis; }\n    .tab .default-tab .tab-content {\n      flex-grow: 1; }\n    .tab .default-tab .action-container {\n      text-align: right;\n      width: 28px;\n      display: flex; }\n      .tab .default-tab .action-container .tab-list {\n        display: flex;\n        padding: 0px;\n        margin: 0px;\n        justify-content: flex-end; }\n        .tab .default-tab .action-container .tab-list a:active:hover {\n          -webkit-mask-size: 100% 100% !important;\n          mask-size: 100% 100% !important; }\n        .tab .default-tab .action-container .tab-list .tab-action {\n          height: 16px;\n          width: 16px;\n          display: block;\n          -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n          mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n          margin-right: '0.5em'; }\n          .tab .default-tab .action-container .tab-list .tab-action.disable-close {\n            display: none; }\n          .tab .default-tab .action-container .tab-list .tab-action.dirty:not(:hover) {\n            display: block;\n            -webkit-mask: var(--dv-tab-dirty-icon) 50% 50%/60% 60% no-repeat;\n            mask: var(--dv-tab-dirty-icon) 50% 50%/60% 60% no-repeat; }\n\n.watermark {\n  display: flex;\n  width: 100%; }\n  .watermark.has-actions .watermark-title .actions-bar {\n    display: none; }\n  .watermark .watermark-title {\n    height: 35px;\n    width: 100%;\n    display: flex; }\n  .watermark .watermark-content {\n    flex-grow: 1; }\n", ""]);
+exports.push([module.id, ".dockview-theme-dark {\n  --dv-accent-color: dodgerblue;\n  --dv-title-font-size: 13px;\n  --dv-title-height: 35px;\n  --dv-tab-close-icon: url(\"https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg\");\n  --dv-tab-dirty-icon: url(\"https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg\");\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-title-bar-scroll-bar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-title-bar-background-color: #252526;\n  --dv-active-tab-background-visible: #1e1e1e;\n  --dv-active-tab-background-hidden: #2d2d2d;\n  --dv-inactive-tab-background-visible: #1e1e1e;\n  --dv-inactive-tab-background-hidden: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-active-group-visible-panel-color: white;\n  --dv-active-group-hidden-panel-color: #969696;\n  --dv-inactive-group-visible-panel-color: #8f8f8f;\n  --dv-inactive-group-hidden-panel-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-border-color: rgba(204, 204, 204, 0.2);\n}\n\n.dockview-theme-light {\n  --dv-accent-color: dodgerblue;\n  --dv-title-font-size: 13px;\n  --dv-title-height: 35px;\n  --dv-tab-close-icon: url(\"https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg\");\n  --dv-tab-dirty-icon: url(\"https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg\");\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-title-bar-scroll-bar-color: #888;\n  --dv-group-view-background-color: white;\n  --dv-title-bar-background-color: #f3f3f3;\n  --dv-active-tab-background-visible: white;\n  --dv-active-tab-background-hidden: #ececec;\n  --dv-inactive-tab-background-visible: white;\n  --dv-inactive-tab-background-hidden: #ececec;\n  --dv-tab-divider-color: white;\n  --dv-active-group-visible-panel-color: rgb(51, 51, 51);\n  --dv-active-group-hidden-panel-color: rgba(51, 51, 51, 0.7);\n  --dv-inactive-group-visible-panel-color: rgba(51, 51, 51, 0.7);\n  --dv-inactive-group-hidden-panel-color: rgba(51, 51, 51, 0.35);\n  --dv-separator-border: rgba(128, 128, 128, 0.35);\n  --dv-paneview-border-color: rgb(51, 51, 51);\n}\n\n.dockview-theme-vs {\n  --dv-accent-color: dodgerblue;\n  --dv-title-font-size: 13px;\n  --dv-title-height: 35px;\n  --dv-tab-close-icon: url(\"https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg\");\n  --dv-tab-dirty-icon: url(\"https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg\");\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-title-bar-scroll-bar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-title-bar-background-color: #252526;\n  --dv-active-tab-background-visible: #1e1e1e;\n  --dv-active-tab-background-hidden: #2d2d2d;\n  --dv-inactive-tab-background-visible: #1e1e1e;\n  --dv-inactive-tab-background-hidden: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-active-group-visible-panel-color: white;\n  --dv-active-group-hidden-panel-color: #969696;\n  --dv-inactive-group-visible-panel-color: #8f8f8f;\n  --dv-inactive-group-hidden-panel-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-border-color: rgba(204, 204, 204, 0.2);\n  --dv-active-tab-background-visible: dodgerblue;\n  --dv-title-height: 18px;\n  --dv-title-font-size: 11px;\n}\n.dockview-theme-vs .groupview.active-group > .title-container {\n  border-bottom: 2px solid var(--dv-active-tab-background-visible);\n}\n.dockview-theme-vs .groupview.inactive-group > .title-container {\n  border-bottom: 2px solid var(--dv-inactive-tab-background-visible);\n}\n.actions-bar {\n  text-align: right;\n  width: 28px;\n  display: flex;\n  align-items: center;\n  flex-shrink: 0;\n}\n.actions-bar .actions-container {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.actions-bar .actions-container a:active {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.actions-bar .actions-container .close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n  cursor: pointer;\n}\n.drop-target {\n  position: relative;\n}\n.drop-target > .drop-target-dropzone {\n  position: absolute;\n  left: 0px;\n  top: 0px;\n  height: 100%;\n  width: 100%;\n  z-index: 10000;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection {\n  position: relative;\n  pointer-events: none;\n  height: 100%;\n  width: 100%;\n  background-color: var(--dv-drag-over-background-color);\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.left, .drop-target > .drop-target-dropzone > .drop-target-selection.right {\n  width: 50%;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.right {\n  transform: translate(100%, 0%);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n  transform: translate(0%, 100%);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.top, .drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n  height: 50%;\n}\n.custom-dragging {\n  height: 24px;\n  line-height: 24px;\n  font-size: 11px;\n  width: 100px;\n  background-color: dodgerblue;\n  color: ghostwhite;\n  border-radius: 11px;\n  position: absolute;\n  padding-left: 10px;\n}\n\n.groupview.active-group > .title-container > .tab-container > .tab.active-tab {\n  background-color: var(--dv-active-tab-background-visible);\n  color: var(--dv-active-group-visible-panel-color);\n}\n.groupview.active-group > .title-container > .tab-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-active-group-visible-panel-color);\n}\n.groupview.active-group > .title-container > .tab-container > .tab.inactive-tab {\n  background-color: var(--dv-active-tab-background-hidden);\n  color: var(--dv-active-group-hidden-panel-color);\n}\n.groupview.active-group > .title-container > .tab-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-active-group-hidden-panel-color);\n}\n.groupview.inactive-group > .title-container > .tab-container > .tab.active-tab {\n  background-color: var(--dv-inactive-tab-background-visible);\n  color: var(--dv-inactive-group-visible-panel-color);\n}\n.groupview.inactive-group > .title-container > .tab-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-inactive-group-visible-panel-color);\n}\n.groupview.inactive-group > .title-container > .tab-container > .tab.inactive-tab {\n  background-color: var(--dv-inactive-tab-background-hidden);\n  color: var(--dv-inactive-group-hidden-panel-color);\n}\n.groupview.inactive-group > .title-container > .tab-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-inactive-group-hidden-panel-color);\n}\n\n/**\n * when a tab is dragged we lose the above stylings because they are conditional on parent elements\n * therefore we also set some stylings for the dragging event\n **/\n.tab.dragging {\n  background-color: var(--dv-active-tab-background-visible);\n  color: var(--dv-active-group-visible-panel-color);\n}\n.grid-view,\n.branch-node {\n  height: 100%;\n  width: 100%;\n}\n.groupview {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  background-color: var(--dv-group-view-background-color);\n  overflow: hidden;\n}\n.groupview:focus {\n  outline: none;\n}\n.groupview.empty > .title-container {\n  display: none;\n}\n.groupview > .content-container {\n  flex-grow: 1;\n  overflow: hidden;\n  outline: none;\n}\n.pane-container {\n  height: 100%;\n  width: 100%;\n}\n.pane-container.animated .view {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.pane-container .view {\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  padding: 0px !important;\n}\n.pane-container .view:not(:first-child)::before {\n  background-color: transparent !important;\n}\n.pane-container .view:not(:first-child) .pane > .pane-header {\n  border-top: 1px solid var(--dv-paneview-border-color);\n}\n.pane-container:first-of-type > .pane > .pane-header {\n  border-top: none !important;\n}\n.pane-container .pane {\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  height: 100%;\n}\n.pane-container .pane .pane-header {\n  box-sizing: border-box;\n  user-select: none;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-header:focus:before, .pane-container .pane .pane-header:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-accent-color);\n}\n.pane-container .pane .pane-body {\n  overflow-y: auto;\n  overflow-x: hidden;\n  flex-grow: 1;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-body:focus:before, .pane-container .pane .pane-body:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-accent-color);\n}\n.title-container {\n  display: flex;\n  background-color: var(--dv-title-bar-background-color);\n  flex-shrink: 0;\n  box-sizing: border-box;\n  height: var(--dv-title-height);\n  font-size: var(--dv-title-font-size);\n}\n.title-container.hidden {\n  display: none;\n}\n.title-container .tab-container {\n  flex-grow: 1;\n  display: flex;\n  overflow-x: overlay;\n  overflow-y: hidden;\n  /* Track */\n  /* Handle */\n}\n.title-container .tab-container::-webkit-scrollbar {\n  height: 3px;\n}\n.title-container .tab-container::-webkit-scrollbar-track {\n  background: transparent;\n}\n.title-container .tab-container::-webkit-scrollbar-thumb {\n  background: var(--dv-title-bar-scroll-bar-color);\n}\n.title-container .tab-container.drag-over-target {\n  background-color: var(--dv-drag-over-background-color);\n}\n.title-container .tab-container .tab {\n  -webkit-user-drag: element;\n  outline: none;\n  min-width: 75px;\n  cursor: pointer;\n  position: relative;\n  box-sizing: border-box;\n}\n.title-container .tab-container .tab:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-tab-divider-color);\n  width: 1px;\n  height: 100%;\n}\n.split-view-container {\n  position: relative;\n  overflow: hidden;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container.animation .view,\n.split-view-container.animation .sash {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.split-view-container.horizontal {\n  height: 100%;\n}\n.split-view-container.horizontal > .sash-container > .sash {\n  height: 100%;\n  width: 4px;\n}\n.split-view-container.horizontal > .sash-container > .sash.enabled {\n  cursor: ew-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.horizontal > .sash-container > .sash.maximum {\n  cursor: w-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.minimum {\n  cursor: e-resize;\n}\n.split-view-container.horizontal > .view-container > .view:not(:first-child)::before {\n  height: 100%;\n  width: 1px;\n}\n.split-view-container.vertical {\n  width: 100%;\n}\n.split-view-container.vertical > .sash-container > .sash {\n  width: 100%;\n  height: 4px;\n}\n.split-view-container.vertical > .sash-container > .sash.enabled {\n  cursor: ns-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.vertical > .sash-container > .sash.maximum {\n  cursor: n-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.minimum {\n  cursor: s-resize;\n}\n.split-view-container.vertical > .view-container > .view {\n  width: 100%;\n}\n.split-view-container.vertical > .view-container > .view:not(:first-child)::before {\n  height: 1px;\n  width: 100%;\n}\n.split-view-container .sash-container {\n  height: 100%;\n  width: 100%;\n  position: absolute;\n}\n.split-view-container .sash-container .sash {\n  position: absolute;\n  z-index: 99;\n  outline: none;\n}\n.split-view-container .view-container {\n  position: relative;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container .view-container .view {\n  height: 100%;\n  box-sizing: border-box;\n  overflow: auto;\n  position: absolute;\n}\n.split-view-container.separator-border .view:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-separator-border);\n}\n.tab {\n  flex-shrink: 0;\n}\n.tab.dragged {\n  transform: translate3d(0px, 0px, 0px);\n  /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */\n}\n.tab.dragging .tab-action {\n  background-color: var(--dv-active-group-visible-panel-color);\n}\n.tab.active-tab > .default-tab .tab-action {\n  visibility: visible;\n}\n.tab.inactive-tab > .default-tab .tab-action:not(.dirty) {\n  visibility: hidden;\n}\n.tab.inactive-tab > .default-tab:hover .tab-action {\n  visibility: visible;\n}\n.tab .default-tab {\n  position: relative;\n  height: 100%;\n  display: flex;\n  min-width: 80px;\n  align-items: center;\n  padding-left: 10px;\n  white-space: nowrap;\n  text-overflow: elipsis;\n}\n.tab .default-tab .tab-content {\n  flex-grow: 1;\n}\n.tab .default-tab .action-container {\n  text-align: right;\n  width: 28px;\n  display: flex;\n}\n.tab .default-tab .action-container .tab-list {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.tab .default-tab .action-container .tab-list a:active:hover {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.tab .default-tab .action-container .tab-list .tab-action {\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n}\n.tab .default-tab .action-container .tab-list .tab-action.disable-close {\n  display: none;\n}\n.tab .default-tab .action-container .tab-list .tab-action.dirty:not(:hover) {\n  display: block;\n  -webkit-mask: var(--dv-tab-dirty-icon) 50% 50%/60% 60% no-repeat;\n  mask: var(--dv-tab-dirty-icon) 50% 50%/60% 60% no-repeat;\n}\n.watermark {\n  display: flex;\n  width: 100%;\n}\n.watermark.has-actions .watermark-title .actions-bar {\n  display: none;\n}\n.watermark .watermark-title {\n  height: 35px;\n  width: 100%;\n  display: flex;\n}\n.watermark .watermark-content {\n  flex-grow: 1;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -2456,9 +2304,6 @@ module.exports = exports;
 /*!*****************************************************!*\
   !*** ./node_modules/css-loader/dist/runtime/api.js ***!
   \*****************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
 /***/ ((module) => {
 
 "use strict";
@@ -2563,9 +2408,6 @@ function toComment(sourceMap) {
 /*!*********************************************!*\
   !*** ./node_modules/object-assign/index.js ***!
   \*********************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 65:0-14 */
 /***/ ((module) => {
 
 "use strict";
@@ -2667,20 +2509,6 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 /*!*************************************************************!*\
   !*** ./node_modules/react-dom/cjs/react-dom.development.js ***!
   \*************************************************************/
-/*! default exports */
-/*! export __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export createPortal [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export findDOMNode [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export flushSync [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export hydrate [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export render [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unmountComponentAtNode [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_batchedUpdates [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_createPortal [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_renderSubtreeIntoContainer [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export version [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_exports__, __webpack_require__ */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
@@ -28949,21 +28777,6 @@ exports.version = ReactVersion;
 /*!*****************************************!*\
   !*** ./node_modules/react-dom/index.js ***!
   \*****************************************/
-/*! dynamic exports */
-/*! export __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react-dom/cjs/react-dom.development.js .__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED */
-/*! export __esModule [not provided] [no usage info] [missing usage info prevents renaming] */
-/*! export createPortal [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react-dom/cjs/react-dom.development.js .createPortal */
-/*! export findDOMNode [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react-dom/cjs/react-dom.development.js .findDOMNode */
-/*! export flushSync [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react-dom/cjs/react-dom.development.js .flushSync */
-/*! export hydrate [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react-dom/cjs/react-dom.development.js .hydrate */
-/*! export render [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react-dom/cjs/react-dom.development.js .render */
-/*! export unmountComponentAtNode [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react-dom/cjs/react-dom.development.js .unmountComponentAtNode */
-/*! export unstable_batchedUpdates [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react-dom/cjs/react-dom.development.js .unstable_batchedUpdates */
-/*! export unstable_createPortal [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react-dom/cjs/react-dom.development.js .unstable_createPortal */
-/*! export unstable_renderSubtreeIntoContainer [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react-dom/cjs/react-dom.development.js .unstable_renderSubtreeIntoContainer */
-/*! export version [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react-dom/cjs/react-dom.development.js .version */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: module, __webpack_require__ */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
@@ -29008,37 +28821,6 @@ if (false) {} else {
 /*!*****************************************************!*\
   !*** ./node_modules/react/cjs/react.development.js ***!
   \*****************************************************/
-/*! default exports */
-/*! export Children [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Component [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Fragment [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Profiler [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export PureComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export StrictMode [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Suspense [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export cloneElement [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export createContext [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export createElement [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export createFactory [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export createRef [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export forwardRef [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isValidElement [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export lazy [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export memo [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export useCallback [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export useContext [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export useDebugValue [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export useEffect [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export useImperativeHandle [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export useLayoutEffect [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export useMemo [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export useReducer [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export useRef [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export useState [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export version [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_exports__, __webpack_require__ */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
@@ -31383,38 +31165,6 @@ exports.version = ReactVersion;
 /*!*************************************!*\
   !*** ./node_modules/react/index.js ***!
   \*************************************/
-/*! dynamic exports */
-/*! export Children [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .Children */
-/*! export Component [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .Component */
-/*! export Fragment [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .Fragment */
-/*! export Profiler [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .Profiler */
-/*! export PureComponent [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .PureComponent */
-/*! export StrictMode [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .StrictMode */
-/*! export Suspense [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .Suspense */
-/*! export __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED */
-/*! export __esModule [not provided] [no usage info] [missing usage info prevents renaming] */
-/*! export cloneElement [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .cloneElement */
-/*! export createContext [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .createContext */
-/*! export createElement [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .createElement */
-/*! export createFactory [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .createFactory */
-/*! export createRef [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .createRef */
-/*! export forwardRef [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .forwardRef */
-/*! export isValidElement [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .isValidElement */
-/*! export lazy [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .lazy */
-/*! export memo [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .memo */
-/*! export useCallback [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .useCallback */
-/*! export useContext [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .useContext */
-/*! export useDebugValue [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .useDebugValue */
-/*! export useEffect [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .useEffect */
-/*! export useImperativeHandle [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .useImperativeHandle */
-/*! export useLayoutEffect [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .useLayoutEffect */
-/*! export useMemo [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .useMemo */
-/*! export useReducer [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .useReducer */
-/*! export useRef [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .useRef */
-/*! export useState [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .useState */
-/*! export version [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/react/cjs/react.development.js .version */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: module, __webpack_require__ */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
@@ -31431,18 +31181,6 @@ if (false) {} else {
 /*!*********************************************************************!*\
   !*** ./node_modules/scheduler/cjs/scheduler-tracing.development.js ***!
   \*********************************************************************/
-/*! default exports */
-/*! export __interactionsRef [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export __subscriberRef [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_clear [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_getCurrent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_getThreadID [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_subscribe [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_trace [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_unsubscribe [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_wrap [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_exports__ */
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -31801,38 +31539,6 @@ exports.unstable_wrap = unstable_wrap;
 /*!*************************************************************!*\
   !*** ./node_modules/scheduler/cjs/scheduler.development.js ***!
   \*************************************************************/
-/*! default exports */
-/*! export unstable_IdlePriority [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_ImmediatePriority [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_LowPriority [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_NormalPriority [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_Profiling [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_UserBlockingPriority [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_cancelCallback [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_continueExecution [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_forceFrameRate [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_getCurrentPriorityLevel [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_getFirstCallbackNode [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_next [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_now [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_pauseExecution [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_requestPaint [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_runWithPriority [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_scheduleCallback [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_shouldYield [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export unstable_wrapCallback [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_exports__ */
-/*! CommonJS bailout: exports.unstable_now(...) prevents optimization as exports is passed as call context at 52:26-46 */
-/*! CommonJS bailout: exports.unstable_now(...) prevents optimization as exports is passed as call context at 125:13-33 */
-/*! CommonJS bailout: exports.unstable_now(...) prevents optimization as exports is passed as call context at 149:24-44 */
-/*! CommonJS bailout: exports.unstable_now(...) prevents optimization as exports is passed as call context at 193:15-35 */
-/*! CommonJS bailout: exports.unstable_now(...) prevents optimization as exports is passed as call context at 548:28-48 */
-/*! CommonJS bailout: exports.unstable_now(...) prevents optimization as exports is passed as call context at 565:25-45 */
-/*! CommonJS bailout: exports.unstable_shouldYield(...) prevents optimization as exports is passed as call context at 578:74-102 */
-/*! CommonJS bailout: exports.unstable_now(...) prevents optimization as exports is passed as call context at 591:20-40 */
-/*! CommonJS bailout: exports.unstable_now(...) prevents optimization as exports is passed as call context at 695:20-40 */
-/*! CommonJS bailout: exports.unstable_now(...) prevents optimization as exports is passed as call context at 804:24-44 */
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -32688,28 +32394,6 @@ exports.unstable_wrapCallback = unstable_wrapCallback;
 /*!*****************************************!*\
   !*** ./node_modules/scheduler/index.js ***!
   \*****************************************/
-/*! dynamic exports */
-/*! export unstable_IdlePriority [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_IdlePriority */
-/*! export unstable_ImmediatePriority [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_ImmediatePriority */
-/*! export unstable_LowPriority [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_LowPriority */
-/*! export unstable_NormalPriority [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_NormalPriority */
-/*! export unstable_Profiling [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_Profiling */
-/*! export unstable_UserBlockingPriority [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_UserBlockingPriority */
-/*! export unstable_cancelCallback [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_cancelCallback */
-/*! export unstable_continueExecution [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_continueExecution */
-/*! export unstable_forceFrameRate [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_forceFrameRate */
-/*! export unstable_getCurrentPriorityLevel [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_getCurrentPriorityLevel */
-/*! export unstable_getFirstCallbackNode [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_getFirstCallbackNode */
-/*! export unstable_next [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_next */
-/*! export unstable_now [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_now */
-/*! export unstable_pauseExecution [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_pauseExecution */
-/*! export unstable_requestPaint [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_requestPaint */
-/*! export unstable_runWithPriority [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_runWithPriority */
-/*! export unstable_scheduleCallback [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_scheduleCallback */
-/*! export unstable_shouldYield [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_shouldYield */
-/*! export unstable_wrapCallback [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler.development.js .unstable_wrapCallback */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: module, __webpack_require__ */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
@@ -32726,18 +32410,6 @@ if (false) {} else {
 /*!*******************************************!*\
   !*** ./node_modules/scheduler/tracing.js ***!
   \*******************************************/
-/*! dynamic exports */
-/*! export __interactionsRef [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler-tracing.development.js .__interactionsRef */
-/*! export __subscriberRef [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler-tracing.development.js .__subscriberRef */
-/*! export unstable_clear [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler-tracing.development.js .unstable_clear */
-/*! export unstable_getCurrent [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler-tracing.development.js .unstable_getCurrent */
-/*! export unstable_getThreadID [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler-tracing.development.js .unstable_getThreadID */
-/*! export unstable_subscribe [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler-tracing.development.js .unstable_subscribe */
-/*! export unstable_trace [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler-tracing.development.js .unstable_trace */
-/*! export unstable_unsubscribe [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler-tracing.development.js .unstable_unsubscribe */
-/*! export unstable_wrap [provided] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/scheduler/cjs/scheduler-tracing.development.js .unstable_wrap */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: module, __webpack_require__ */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
@@ -32754,9 +32426,6 @@ if (false) {} else {
 /*!************************!*\
   !*** ./src/index.scss ***!
   \************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__, module.id */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var api = __webpack_require__(/*! !../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
@@ -32785,9 +32454,6 @@ module.exports = content.locals || {};
 /*!******************************************!*\
   !*** ./src/layout-grid/activitybar.scss ***!
   \******************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__, module.id */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var api = __webpack_require__(/*! !../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
@@ -32816,9 +32482,6 @@ module.exports = content.locals || {};
 /*!********************************************!*\
   !*** ./src/layout-grid/controlCenter.scss ***!
   \********************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__, module.id */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var api = __webpack_require__(/*! !../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
@@ -32847,9 +32510,6 @@ module.exports = content.locals || {};
 /*!*****************************************!*\
   !*** ./src/layout-grid/layoutGrid.scss ***!
   \*****************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__, module.id */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var api = __webpack_require__(/*! !../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
@@ -32878,9 +32538,6 @@ module.exports = content.locals || {};
 /*!**************************************!*\
   !*** ./src/layout-grid/sidebar.scss ***!
   \**************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__, module.id */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var api = __webpack_require__(/*! !../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
@@ -32909,9 +32566,6 @@ module.exports = content.locals || {};
 /*!*****************************************!*\
   !*** ./src/layout-grid/splitPanel.scss ***!
   \*****************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__, module.id */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var api = __webpack_require__(/*! !../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
@@ -32940,9 +32594,6 @@ module.exports = content.locals || {};
 /*!*********************************************!*\
   !*** ./src/panels/splitview/splitview.scss ***!
   \*********************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__, module.id */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var api = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
@@ -32971,9 +32622,6 @@ module.exports = content.locals || {};
 /*!*****************************************!*\
   !*** ./src/panels/welcome/welcome.scss ***!
   \*****************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__, module.id */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var api = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
@@ -33002,9 +32650,6 @@ module.exports = content.locals || {};
 /*!****************************************************************************!*\
   !*** ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js ***!
   \****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__.nc, __webpack_require__.* */
-/*! CommonJS bailout: module.exports is used directly at 230:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
@@ -33284,76 +32929,10 @@ module.exports = function (list, options) {
 /*!*********************************************!*\
   !*** ./src/layout-grid/sidebar.layout.json ***!
   \*********************************************/
-/*! default exports */
-/*! export orientation [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export size [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export views [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export 0 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export data [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export component [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export headerComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export id [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export props [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         exports [not provided] [no usage info] */
-/*!       export state [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         exports [not provided] [no usage info] */
-/*!       export title [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       other exports [not provided] [no usage info] */
-/*!     export minimumSize [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export size [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     other exports [not provided] [no usage info] */
-/*!   export 1 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export data [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export component [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export headerComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export id [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export props [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         exports [not provided] [no usage info] */
-/*!       export state [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         exports [not provided] [no usage info] */
-/*!       export title [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       other exports [not provided] [no usage info] */
-/*!     export expanded [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export minimumSize [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export size [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     other exports [not provided] [no usage info] */
-/*!   export 2 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export data [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export component [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export headerComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export id [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export props [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         exports [not provided] [no usage info] */
-/*!       export state [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         exports [not provided] [no usage info] */
-/*!       export title [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       other exports [not provided] [no usage info] */
-/*!     export expanded [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export minimumSize [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export size [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     other exports [not provided] [no usage info] */
-/*!   export 3 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export data [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export component [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export headerComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export id [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export props [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         exports [not provided] [no usage info] */
-/*!       export state [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         exports [not provided] [no usage info] */
-/*!       export title [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       other exports [not provided] [no usage info] */
-/*!     export expanded [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export minimumSize [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export size [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     other exports [not provided] [no usage info] */
-/*!   other exports [not provided] [no usage info] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: module */
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse("{\"views\":[{\"size\":22,\"data\":{\"id\":\"1\",\"component\":\"controlCenter\",\"headerComponent\":\"default\",\"props\":{},\"title\":\"Control Center\",\"state\":{}},\"minimumSize\":120},{\"size\":508,\"data\":{\"id\":\"2\",\"component\":\"default\",\"headerComponent\":\"default\",\"props\":{},\"title\":\"Panel 1\",\"state\":{}},\"minimumSize\":120,\"expanded\":true},{\"size\":248,\"data\":{\"id\":\"3\",\"component\":\"default\",\"headerComponent\":\"default\",\"props\":{},\"title\":\"Panel 2\",\"state\":{}},\"minimumSize\":120,\"expanded\":true},{\"size\":22,\"data\":{\"id\":\"4\",\"component\":\"default\",\"headerComponent\":\"default\",\"props\":{},\"title\":\"Panel 3\",\"state\":{}},\"minimumSize\":120,\"expanded\":false}],\"size\":800,\"orientation\":\"VERTICAL\"}");
+module.exports = JSON.parse('{"views":[{"size":22,"data":{"id":"1","component":"controlCenter","headerComponent":"default","props":{},"title":"Control Center","state":{}},"minimumSize":120},{"size":508,"data":{"id":"2","component":"default","headerComponent":"default","props":{},"title":"Panel 1","state":{}},"minimumSize":120,"expanded":true},{"size":248,"data":{"id":"3","component":"default","headerComponent":"default","props":{},"title":"Panel 2","state":{}},"minimumSize":120,"expanded":true},{"size":22,"data":{"id":"4","component":"default","headerComponent":"default","props":{},"title":"Panel 3","state":{}},"minimumSize":120,"expanded":false}],"size":800,"orientation":"VERTICAL"}');
 
 /***/ }),
 
@@ -33361,40 +32940,10 @@ module.exports = JSON.parse("{\"views\":[{\"size\":22,\"data\":{\"id\":\"1\",\"c
 /*!************************************************!*\
   !*** ./src/layout-grid/splitpanel.layout.json ***!
   \************************************************/
-/*! default exports */
-/*! export activeView [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export orientation [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export size [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export views [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export 0 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export data [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export component [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export id [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export props [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         export text [provided] [no usage info] [missing usage info prevents renaming] */
-/*!         other exports [not provided] [no usage info] */
-/*!       other exports [not provided] [no usage info] */
-/*!     export maximumSize [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export minimumSize [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export size [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export snap [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     other exports [not provided] [no usage info] */
-/*!   export 1 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export data [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export component [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       export id [provided] [no usage info] [missing usage info prevents renaming] */
-/*!       other exports [not provided] [no usage info] */
-/*!     export maximumSize [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export minimumSize [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export size [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     other exports [not provided] [no usage info] */
-/*!   other exports [not provided] [no usage info] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: module */
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse("{\"views\":[{\"size\":200,\"data\":{\"id\":\"1\",\"component\":\"default1\",\"props\":{\"text\":\"hiya\"}},\"minimumSize\":200,\"maximumSize\":9007199254740991,\"snap\":true},{\"size\":409,\"data\":{\"id\":\"2\",\"component\":\"default1\"},\"minimumSize\":200,\"maximumSize\":9007199254740991}],\"activeView\":\"2\",\"size\":609,\"orientation\":\"VERTICAL\"}");
+module.exports = JSON.parse('{"views":[{"size":200,"data":{"id":"1","component":"default1","props":{"text":"hiya"}},"minimumSize":200,"maximumSize":9007199254740991,"snap":true},{"size":409,"data":{"id":"2","component":"default1"},"minimumSize":200,"maximumSize":9007199254740991}],"activeView":"2","size":609,"orientation":"VERTICAL"}');
 
 /***/ }),
 
@@ -33402,16 +32951,12 @@ module.exports = JSON.parse("{\"views\":[{\"size\":200,\"data\":{\"id\":\"1\",\"
 /*!***********************************************************!*\
   !*** ../splitview/dist/es6/actionbar/actionsContainer.js ***!
   \***********************************************************/
-/*! namespace exports */
-/*! export ActionContainer [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ActionContainer": () => /* binding */ ActionContainer
+/* harmony export */   "ActionContainer": () => (/* binding */ ActionContainer)
 /* harmony export */ });
 var ActionContainer = /** @class */ (function () {
     function ActionContainer() {
@@ -33440,185 +32985,19 @@ var ActionContainer = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "../splitview/dist/es6/api/api.js":
-/*!****************************************!*\
-  !*** ../splitview/dist/es6/api/api.js ***!
-  \****************************************/
-/*! namespace exports */
-/*! export BaseViewApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "BaseViewApi": () => /* binding */ BaseViewApi
-/* harmony export */ });
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-
-/**
- * A core api implementation that should be used across all panel-like objects
- */
-var BaseViewApi = /** @class */ (function (_super) {
-    __extends(BaseViewApi, _super);
-    function BaseViewApi(id) {
-        var _this = _super.call(this) || this;
-        _this.id = id;
-        _this._state = {};
-        _this._isFocused = false;
-        _this._isActive = false;
-        _this._isVisible = true;
-        _this._width = 0;
-        _this._height = 0;
-        _this._onDidStateChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onDidStateChange = _this._onDidStateChange.event;
-        //
-        _this._onDidPanelDimensionChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
-            replay: true,
-        });
-        _this.onDidDimensionsChange = _this._onDidPanelDimensionChange.event;
-        //
-        _this._onDidChangeFocus = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
-            replay: true,
-        });
-        _this.onDidFocusChange = _this._onDidChangeFocus.event;
-        //
-        _this._onFocusEvent = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onFocusEvent = _this._onFocusEvent.event;
-        //
-        _this._onDidVisibilityChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
-            replay: true,
-        });
-        _this.onDidVisibilityChange = _this
-            ._onDidVisibilityChange.event;
-        //
-        _this._onVisibilityChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onVisibilityChange = _this
-            ._onVisibilityChange.event;
-        //
-        _this._onDidActiveChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
-            replay: true,
-        });
-        _this.onDidActiveChange = _this._onDidActiveChange
-            .event;
-        //
-        _this._onActiveChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onActiveChange = _this._onActiveChange.event;
-        _this.addDisposables(_this._onDidStateChange, _this._onDidPanelDimensionChange, _this._onDidChangeFocus, _this._onDidVisibilityChange, _this._onDidActiveChange, _this._onFocusEvent, _this.onDidFocusChange(function (event) {
-            _this._isFocused = event.isFocused;
-        }), _this.onDidActiveChange(function (event) {
-            _this._isActive = event.isActive;
-        }), _this.onDidVisibilityChange(function (event) {
-            _this._isVisible = event.isVisible;
-        }), _this.onDidDimensionsChange(function (event) {
-            _this._width = event.width;
-            _this._height = event.height;
-        }));
-        return _this;
-    }
-    Object.defineProperty(BaseViewApi.prototype, "isFocused", {
-        //
-        get: function () {
-            return this._isFocused;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseViewApi.prototype, "isActive", {
-        get: function () {
-            return this._isActive;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseViewApi.prototype, "isVisible", {
-        get: function () {
-            return this._isVisible;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseViewApi.prototype, "width", {
-        get: function () {
-            return this._width;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseViewApi.prototype, "height", {
-        get: function () {
-            return this._height;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    BaseViewApi.prototype.setVisible = function (isVisible) {
-        this._onVisibilityChange.fire({ isVisible: isVisible });
-    };
-    BaseViewApi.prototype.setActive = function () {
-        this._onActiveChange.fire();
-    };
-    BaseViewApi.prototype.setState = function (key, value) {
-        if (typeof key === 'object') {
-            this._state = key;
-        }
-        else if (typeof value !== undefined) {
-            this._state[key] = value;
-        }
-        this._onDidStateChange.fire(undefined);
-    };
-    BaseViewApi.prototype.getState = function () {
-        return this._state;
-    };
-    BaseViewApi.prototype.getStateKey = function (key) {
-        return this._state[key];
-    };
-    BaseViewApi.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
-    };
-    return BaseViewApi;
-}(_lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable));
-
-
-
-/***/ }),
-
 /***/ "../splitview/dist/es6/api/component.api.js":
 /*!**************************************************!*\
   !*** ../splitview/dist/es6/api/component.api.js ***!
   \**************************************************/
-/*! namespace exports */
-/*! export DockviewApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export GridviewApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export PaneviewApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export SplitviewApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "SplitviewApi": () => /* binding */ SplitviewApi,
-/* harmony export */   "PaneviewApi": () => /* binding */ PaneviewApi,
-/* harmony export */   "GridviewApi": () => /* binding */ GridviewApi,
-/* harmony export */   "DockviewApi": () => /* binding */ DockviewApi
+/* harmony export */   "SplitviewApi": () => (/* binding */ SplitviewApi),
+/* harmony export */   "PaneviewApi": () => (/* binding */ PaneviewApi),
+/* harmony export */   "GridviewApi": () => (/* binding */ GridviewApi),
+/* harmony export */   "DockviewApi": () => (/* binding */ DockviewApi)
 /* harmony export */ });
 var SplitviewApi = /** @class */ (function () {
     function SplitviewApi(component) {
@@ -33977,23 +33356,19 @@ var DockviewApi = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "../splitview/dist/es6/api/gridPanelApi.js":
-/*!*************************************************!*\
-  !*** ../splitview/dist/es6/api/gridPanelApi.js ***!
-  \*************************************************/
-/*! namespace exports */
-/*! export GridPanelApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ "../splitview/dist/es6/api/gridviewPanelApi.js":
+/*!*****************************************************!*\
+  !*** ../splitview/dist/es6/api/gridviewPanelApi.js ***!
+  \*****************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GridPanelApi": () => /* binding */ GridPanelApi
+/* harmony export */   "GridviewPanelApi": () => (/* binding */ GridviewPanelApi)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
-/* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./api */ "../splitview/dist/es6/api/api.js");
+/* harmony import */ var _panelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./panelApi */ "../splitview/dist/es6/api/panelApi.js");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -34002,6 +33377,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -34009,13 +33386,14 @@ var __extends = (undefined && undefined.__extends) || (function () {
 })();
 
 
-var GridPanelApi = /** @class */ (function (_super) {
-    __extends(GridPanelApi, _super);
+var GridviewPanelApi = /** @class */ (function (_super) {
+    __extends(GridviewPanelApi, _super);
     //
-    function GridPanelApi(id) {
+    function GridviewPanelApi(id) {
         var _this = _super.call(this, id) || this;
         _this._onDidConstraintsChangeInternal = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onDidConstraintsChangeInternal = _this._onDidConstraintsChangeInternal.event;
+        _this.onDidConstraintsChangeInternal = _this
+            ._onDidConstraintsChangeInternal.event;
         //
         _this._onDidConstraintsChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
             replay: true,
@@ -34027,14 +33405,14 @@ var GridPanelApi = /** @class */ (function (_super) {
         _this.onDidSizeChange = _this._onDidSizeChange.event;
         return _this;
     }
-    GridPanelApi.prototype.setConstraints = function (value) {
+    GridviewPanelApi.prototype.setConstraints = function (value) {
         this._onDidConstraintsChangeInternal.fire(value);
     };
-    GridPanelApi.prototype.setSize = function (event) {
+    GridviewPanelApi.prototype.setSize = function (event) {
         this._onDidSizeChange.fire(event);
     };
-    return GridPanelApi;
-}(_api__WEBPACK_IMPORTED_MODULE_1__.BaseViewApi));
+    return GridviewPanelApi;
+}(_panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApi));
 
 
 
@@ -34044,19 +33422,15 @@ var GridPanelApi = /** @class */ (function (_super) {
 /*!**************************************************!*\
   !*** ../splitview/dist/es6/api/groupPanelApi.js ***!
   \**************************************************/
-/*! namespace exports */
-/*! export GroupPanelApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GroupPanelApi": () => /* binding */ GroupPanelApi
+/* harmony export */   "DockviewPanelApi": () => (/* binding */ DockviewPanelApi)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
-/* harmony import */ var _gridPanelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./gridPanelApi */ "../splitview/dist/es6/api/gridPanelApi.js");
+/* harmony import */ var _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./gridviewPanelApi */ "../splitview/dist/es6/api/gridviewPanelApi.js");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -34065,6 +33439,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -34072,9 +33448,9 @@ var __extends = (undefined && undefined.__extends) || (function () {
 })();
 
 
-var GroupPanelApi = /** @class */ (function (_super) {
-    __extends(GroupPanelApi, _super);
-    function GroupPanelApi(panel, group) {
+var DockviewPanelApi = /** @class */ (function (_super) {
+    __extends(DockviewPanelApi, _super);
+    function DockviewPanelApi(panel, group) {
         var _this = _super.call(this, panel.id) || this;
         _this.panel = panel;
         _this._onDidDirtyChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
@@ -34096,7 +33472,7 @@ var GroupPanelApi = /** @class */ (function (_super) {
         );
         return _this;
     }
-    Object.defineProperty(GroupPanelApi.prototype, "tryClose", {
+    Object.defineProperty(DockviewPanelApi.prototype, "tryClose", {
         // get isGroupVisible() {
         //     return this._isGroupVisible;
         // }
@@ -34106,7 +33482,7 @@ var GroupPanelApi = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(GroupPanelApi.prototype, "isGroupActive", {
+    Object.defineProperty(DockviewPanelApi.prototype, "isGroupActive", {
         get: function () {
             var _a;
             return !!((_a = this.group) === null || _a === void 0 ? void 0 : _a.isActive);
@@ -34114,7 +33490,7 @@ var GroupPanelApi = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(GroupPanelApi.prototype, "group", {
+    Object.defineProperty(DockviewPanelApi.prototype, "group", {
         get: function () {
             return this._group;
         },
@@ -34124,45 +33500,41 @@ var GroupPanelApi = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    GroupPanelApi.prototype.setTitle = function (title) {
+    DockviewPanelApi.prototype.setTitle = function (title) {
         this._onDidTitleChange.fire({ title: title });
     };
-    GroupPanelApi.prototype.close = function () {
+    DockviewPanelApi.prototype.close = function () {
         if (!this.group) {
             throw new Error("panel " + this.id + " has no group");
         }
         return this.group.group.closePanel(this.panel);
     };
-    GroupPanelApi.prototype.interceptOnCloseAction = function (interceptor) {
+    DockviewPanelApi.prototype.interceptOnCloseAction = function (interceptor) {
         this._interceptor = interceptor;
     };
-    GroupPanelApi.prototype.dispose = function () {
+    DockviewPanelApi.prototype.dispose = function () {
         _super.prototype.dispose.call(this);
     };
-    return GroupPanelApi;
-}(_gridPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridPanelApi));
+    return DockviewPanelApi;
+}(_gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridviewPanelApi));
 
 
 
 /***/ }),
 
-/***/ "../splitview/dist/es6/api/panePanelApi.js":
-/*!*************************************************!*\
-  !*** ../splitview/dist/es6/api/panePanelApi.js ***!
-  \*************************************************/
-/*! namespace exports */
-/*! export PanePanelApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ "../splitview/dist/es6/api/panelApi.js":
+/*!*********************************************!*\
+  !*** ../splitview/dist/es6/api/panelApi.js ***!
+  \*********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PanePanelApi": () => /* binding */ PanePanelApi
+/* harmony export */   "PanelApi": () => (/* binding */ PanelApi)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
-/* harmony import */ var _panelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./panelApi */ "../splitview/dist/es6/api/panelApi.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -34171,6 +33543,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -34178,9 +33552,166 @@ var __extends = (undefined && undefined.__extends) || (function () {
 })();
 
 
-var PanePanelApi = /** @class */ (function (_super) {
-    __extends(PanePanelApi, _super);
-    function PanePanelApi(id) {
+/**
+ * A core api implementation that should be used across all panel-like objects
+ */
+var PanelApi = /** @class */ (function (_super) {
+    __extends(PanelApi, _super);
+    function PanelApi(id) {
+        var _this = _super.call(this) || this;
+        _this.id = id;
+        _this._state = {};
+        _this._isFocused = false;
+        _this._isActive = false;
+        _this._isVisible = true;
+        _this._width = 0;
+        _this._height = 0;
+        _this._onDidStateChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onDidStateChange = _this._onDidStateChange.event;
+        //
+        _this._onDidPanelDimensionChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
+            replay: true,
+        });
+        _this.onDidDimensionsChange = _this._onDidPanelDimensionChange.event;
+        //
+        _this._onDidChangeFocus = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
+            replay: true,
+        });
+        _this.onDidFocusChange = _this._onDidChangeFocus.event;
+        //
+        _this._onFocusEvent = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onFocusEvent = _this._onFocusEvent.event;
+        //
+        _this._onDidVisibilityChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
+            replay: true,
+        });
+        _this.onDidVisibilityChange = _this
+            ._onDidVisibilityChange.event;
+        //
+        _this._onVisibilityChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onVisibilityChange = _this
+            ._onVisibilityChange.event;
+        //
+        _this._onDidActiveChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
+            replay: true,
+        });
+        _this.onDidActiveChange = _this._onDidActiveChange
+            .event;
+        //
+        _this._onActiveChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        _this.onActiveChange = _this._onActiveChange.event;
+        _this.addDisposables(_this._onDidStateChange, _this._onDidPanelDimensionChange, _this._onDidChangeFocus, _this._onDidVisibilityChange, _this._onDidActiveChange, _this._onFocusEvent, _this.onDidFocusChange(function (event) {
+            _this._isFocused = event.isFocused;
+        }), _this.onDidActiveChange(function (event) {
+            _this._isActive = event.isActive;
+        }), _this.onDidVisibilityChange(function (event) {
+            _this._isVisible = event.isVisible;
+        }), _this.onDidDimensionsChange(function (event) {
+            _this._width = event.width;
+            _this._height = event.height;
+        }));
+        return _this;
+    }
+    Object.defineProperty(PanelApi.prototype, "isFocused", {
+        //
+        get: function () {
+            return this._isFocused;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PanelApi.prototype, "isActive", {
+        get: function () {
+            return this._isActive;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PanelApi.prototype, "isVisible", {
+        get: function () {
+            return this._isVisible;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PanelApi.prototype, "width", {
+        get: function () {
+            return this._width;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PanelApi.prototype, "height", {
+        get: function () {
+            return this._height;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    PanelApi.prototype.setVisible = function (isVisible) {
+        this._onVisibilityChange.fire({ isVisible: isVisible });
+    };
+    PanelApi.prototype.setActive = function () {
+        this._onActiveChange.fire();
+    };
+    PanelApi.prototype.setState = function (key, value) {
+        if (typeof key === 'object') {
+            this._state = key;
+        }
+        else if (typeof value !== undefined) {
+            this._state[key] = value;
+        }
+        this._onDidStateChange.fire(undefined);
+    };
+    PanelApi.prototype.getState = function () {
+        return this._state;
+    };
+    PanelApi.prototype.getStateKey = function (key) {
+        return this._state[key];
+    };
+    PanelApi.prototype.dispose = function () {
+        _super.prototype.dispose.call(this);
+    };
+    return PanelApi;
+}(_lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable));
+
+
+
+/***/ }),
+
+/***/ "../splitview/dist/es6/api/paneviewPanelApi.js":
+/*!*****************************************************!*\
+  !*** ../splitview/dist/es6/api/paneviewPanelApi.js ***!
+  \*****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "PaneviewPanelApi": () => (/* binding */ PaneviewPanelApi)
+/* harmony export */ });
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _splitviewPanelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitviewPanelApi */ "../splitview/dist/es6/api/splitviewPanelApi.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+var PaneviewPanelApi = /** @class */ (function (_super) {
+    __extends(PaneviewPanelApi, _super);
+    function PaneviewPanelApi(id) {
         var _this = _super.call(this, id) || this;
         _this._onDidExpansionChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
             replay: true,
@@ -34193,18 +33724,18 @@ var PanePanelApi = /** @class */ (function (_super) {
         _this.onMouseLeave = _this._onMouseLeave.event;
         return _this;
     }
-    Object.defineProperty(PanePanelApi.prototype, "pane", {
+    Object.defineProperty(PaneviewPanelApi.prototype, "pane", {
         set: function (pane) {
             this._pane = pane;
         },
         enumerable: false,
         configurable: true
     });
-    PanePanelApi.prototype.setExpanded = function (isExpanded) {
+    PaneviewPanelApi.prototype.setExpanded = function (isExpanded) {
         var _a;
         (_a = this._pane) === null || _a === void 0 ? void 0 : _a.setExpanded(isExpanded);
     };
-    Object.defineProperty(PanePanelApi.prototype, "isExpanded", {
+    Object.defineProperty(PaneviewPanelApi.prototype, "isExpanded", {
         get: function () {
             var _a;
             return !!((_a = this._pane) === null || _a === void 0 ? void 0 : _a.isExpanded());
@@ -34212,30 +33743,26 @@ var PanePanelApi = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    return PanePanelApi;
-}(_panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApi));
+    return PaneviewPanelApi;
+}(_splitviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.SplitviewPanelApi));
 
 
 
 /***/ }),
 
-/***/ "../splitview/dist/es6/api/panelApi.js":
-/*!*********************************************!*\
-  !*** ../splitview/dist/es6/api/panelApi.js ***!
-  \*********************************************/
-/*! namespace exports */
-/*! export PanelApi [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ "../splitview/dist/es6/api/splitviewPanelApi.js":
+/*!******************************************************!*\
+  !*** ../splitview/dist/es6/api/splitviewPanelApi.js ***!
+  \******************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PanelApi": () => /* binding */ PanelApi
+/* harmony export */   "SplitviewPanelApi": () => (/* binding */ SplitviewPanelApi)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
-/* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./api */ "../splitview/dist/es6/api/api.js");
+/* harmony import */ var _panelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./panelApi */ "../splitview/dist/es6/api/panelApi.js");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -34244,6 +33771,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -34251,13 +33780,14 @@ var __extends = (undefined && undefined.__extends) || (function () {
 })();
 
 
-var PanelApi = /** @class */ (function (_super) {
-    __extends(PanelApi, _super);
+var SplitviewPanelApi = /** @class */ (function (_super) {
+    __extends(SplitviewPanelApi, _super);
     //
-    function PanelApi(id) {
+    function SplitviewPanelApi(id) {
         var _this = _super.call(this, id) || this;
         _this._onDidConstraintsChangeInternal = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        _this.onDidConstraintsChangeInternal = _this._onDidConstraintsChangeInternal.event;
+        _this.onDidConstraintsChangeInternal = _this
+            ._onDidConstraintsChangeInternal.event;
         //
         _this._onDidConstraintsChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
             replay: true,
@@ -34270,19 +33800,19 @@ var PanelApi = /** @class */ (function (_super) {
             .event;
         return _this;
     }
-    PanelApi.prototype.setConstraints = function (value) {
+    SplitviewPanelApi.prototype.setConstraints = function (value) {
         this._onDidConstraintsChangeInternal.fire(value);
     };
-    PanelApi.prototype.setSize = function (event) {
+    SplitviewPanelApi.prototype.setSize = function (event) {
         this._onDidSizeChange.fire(event);
     };
-    PanelApi.prototype.dispose = function () {
+    SplitviewPanelApi.prototype.dispose = function () {
         _super.prototype.dispose.call(this);
         this._onDidConstraintsChange.dispose();
         this._onDidSizeChange.dispose();
     };
-    return PanelApi;
-}(_api__WEBPACK_IMPORTED_MODULE_1__.BaseViewApi));
+    return SplitviewPanelApi;
+}(_panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApi));
 
 
 
@@ -34292,28 +33822,18 @@ var PanelApi = /** @class */ (function (_super) {
 /*!**************************************!*\
   !*** ../splitview/dist/es6/array.js ***!
   \**************************************/
-/*! namespace exports */
-/*! export firstIndex [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export last [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export pushToEnd [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export pushToStart [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export range [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export sequenceEquals [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export tail [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "tail": () => /* binding */ tail,
-/* harmony export */   "last": () => /* binding */ last,
-/* harmony export */   "sequenceEquals": () => /* binding */ sequenceEquals,
-/* harmony export */   "pushToStart": () => /* binding */ pushToStart,
-/* harmony export */   "pushToEnd": () => /* binding */ pushToEnd,
-/* harmony export */   "range": () => /* binding */ range,
-/* harmony export */   "firstIndex": () => /* binding */ firstIndex
+/* harmony export */   "tail": () => (/* binding */ tail),
+/* harmony export */   "last": () => (/* binding */ last),
+/* harmony export */   "sequenceEquals": () => (/* binding */ sequenceEquals),
+/* harmony export */   "pushToStart": () => (/* binding */ pushToStart),
+/* harmony export */   "pushToEnd": () => (/* binding */ pushToEnd),
+/* harmony export */   "range": () => (/* binding */ range),
+/* harmony export */   "firstIndex": () => (/* binding */ firstIndex)
 /* harmony export */ });
 function tail(arr) {
     if (arr.length === 0) {
@@ -34390,16 +33910,12 @@ function firstIndex(array, fn) {
 /*!**************************************!*\
   !*** ../splitview/dist/es6/async.js ***!
   \**************************************/
-/*! namespace exports */
-/*! export timeoutAsPromise [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "timeoutAsPromise": () => /* binding */ timeoutAsPromise
+/* harmony export */   "timeoutAsPromise": () => (/* binding */ timeoutAsPromise)
 /* harmony export */ });
 function timeoutAsPromise(timeout) {
     return new Promise(function (resolve) {
@@ -34416,28 +33932,18 @@ function timeoutAsPromise(timeout) {
 /*!*************************************************!*\
   !*** ../splitview/dist/es6/dnd/dataTransfer.js ***!
   \*************************************************/
-/*! namespace exports */
-/*! export DATA_KEY [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export DragType [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export LocalSelectionTransfer [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export extractData [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isCustomDragEvent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isPanelTransferEvent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isTabDragEvent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DATA_KEY": () => /* binding */ DATA_KEY,
-/* harmony export */   "isPanelTransferEvent": () => /* binding */ isPanelTransferEvent,
-/* harmony export */   "DragType": () => /* binding */ DragType,
-/* harmony export */   "isTabDragEvent": () => /* binding */ isTabDragEvent,
-/* harmony export */   "isCustomDragEvent": () => /* binding */ isCustomDragEvent,
-/* harmony export */   "extractData": () => /* binding */ extractData,
-/* harmony export */   "LocalSelectionTransfer": () => /* binding */ LocalSelectionTransfer
+/* harmony export */   "DATA_KEY": () => (/* binding */ DATA_KEY),
+/* harmony export */   "isPanelTransferEvent": () => (/* binding */ isPanelTransferEvent),
+/* harmony export */   "DragType": () => (/* binding */ DragType),
+/* harmony export */   "isTabDragEvent": () => (/* binding */ isTabDragEvent),
+/* harmony export */   "isCustomDragEvent": () => (/* binding */ isCustomDragEvent),
+/* harmony export */   "extractData": () => (/* binding */ extractData),
+/* harmony export */   "LocalSelectionTransfer": () => (/* binding */ LocalSelectionTransfer)
 /* harmony export */ });
 /* harmony import */ var _json__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../json */ "../splitview/dist/es6/json.js");
 
@@ -34523,18 +34029,13 @@ var LocalSelectionTransfer = /** @class */ (function () {
 /*!***********************************************!*\
   !*** ../splitview/dist/es6/dnd/droptarget.js ***!
   \***********************************************/
-/*! namespace exports */
-/*! export Droptarget [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Position [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Position": () => /* binding */ Position,
-/* harmony export */   "Droptarget": () => /* binding */ Droptarget
+/* harmony export */   "Position": () => (/* binding */ Position),
+/* harmony export */   "Droptarget": () => (/* binding */ Droptarget)
 /* harmony export */ });
 /* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dom */ "../splitview/dist/es6/dom.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
@@ -34680,16 +34181,12 @@ var Droptarget = /** @class */ (function () {
 /*!*******************************************************************!*\
   !*** ../splitview/dist/es6/dockview/components/tab/defaultTab.js ***!
   \*******************************************************************/
-/*! namespace exports */
-/*! export DefaultTab [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DefaultTab": () => /* binding */ DefaultTab
+/* harmony export */   "DefaultTab": () => (/* binding */ DefaultTab)
 /* harmony export */ });
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../lifecycle */ "../splitview/dist/es6/lifecycle.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../events */ "../splitview/dist/es6/events.js");
@@ -34702,6 +34199,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -34821,16 +34320,12 @@ var DefaultTab = /** @class */ (function (_super) {
 /*!************************************************************************!*\
   !*** ../splitview/dist/es6/dockview/components/watermark/watermark.js ***!
   \************************************************************************/
-/*! namespace exports */
-/*! export Watermark [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Watermark": () => /* binding */ Watermark
+/* harmony export */   "Watermark": () => (/* binding */ Watermark)
 /* harmony export */ });
 /* harmony import */ var _actionbar_actionsContainer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../actionbar/actionsContainer */ "../splitview/dist/es6/actionbar/actionsContainer.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../events */ "../splitview/dist/es6/events.js");
@@ -34844,6 +34339,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -34929,16 +34426,12 @@ var Watermark = /** @class */ (function (_super) {
 /*!******************************************************!*\
   !*** ../splitview/dist/es6/dockview/deserializer.js ***!
   \******************************************************/
-/*! namespace exports */
-/*! export DefaultDeserializer [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DefaultDeserializer": () => /* binding */ DefaultDeserializer
+/* harmony export */   "DefaultDeserializer": () => (/* binding */ DefaultDeserializer)
 /* harmony export */ });
 var __values = (undefined && undefined.__values) || function(o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
@@ -34993,16 +34486,12 @@ var DefaultDeserializer = /** @class */ (function () {
 /*!***********************************************************!*\
   !*** ../splitview/dist/es6/dockview/dockviewComponent.js ***!
   \***********************************************************/
-/*! namespace exports */
-/*! export DockviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DockviewComponent": () => /* binding */ DockviewComponent
+/* harmony export */   "DockviewComponent": () => (/* binding */ DockviewComponent)
 /* harmony export */ });
 /* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../gridview/gridview */ "../splitview/dist/es6/gridview/gridview.js");
 /* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
@@ -35033,6 +34522,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -35112,9 +34603,10 @@ var __read = (undefined && undefined.__read) || function (o, n) {
     }
     return ar;
 };
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
+var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 
 
@@ -35574,7 +35066,7 @@ var DockviewComponent = /** @class */ (function (_super) {
     };
     DockviewComponent.prototype.removeGroup = function (group) {
         var _this = this;
-        var panels = __spread(group.group.panels); // reassign since group panels will mutate
+        var panels = __spreadArray([], __read(group.group.panels)); // reassign since group panels will mutate
         panels.forEach(function (panel) {
             group.group.removePanel(panel);
             _this.unregisterPanel(panel);
@@ -35602,9 +35094,11 @@ var DockviewComponent = /** @class */ (function (_super) {
     DockviewComponent.prototype.moveGroupOrPanel = function (referenceGroup, groupId, itemId, target, index) {
         var _a, _b, _c;
         var sourceGroup = groupId
-            ? (_a = this.groups.get(groupId)) === null || _a === void 0 ? void 0 : _a.value : undefined;
+            ? (_a = this.groups.get(groupId)) === null || _a === void 0 ? void 0 : _a.value
+            : undefined;
         if (!target || target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
-            var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.group.removePanel(itemId)) || ((_b = this.panels.get(itemId)) === null || _b === void 0 ? void 0 : _b.value);
+            var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.group.removePanel(itemId)) ||
+                ((_b = this.panels.get(itemId)) === null || _b === void 0 ? void 0 : _b.value);
             if (!groupItem) {
                 throw new Error("No panel with id " + itemId);
             }
@@ -35640,7 +35134,8 @@ var DockviewComponent = /** @class */ (function (_super) {
                 }
             }
             else {
-                var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.group.removePanel(itemId)) || ((_c = this.panels.get(itemId)) === null || _c === void 0 ? void 0 : _c.value);
+                var groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.group.removePanel(itemId)) ||
+                    ((_c = this.panels.get(itemId)) === null || _c === void 0 ? void 0 : _c.value);
                 if (!groupItem) {
                     throw new Error("No panel with id " + itemId);
                 }
@@ -35735,9 +35230,6 @@ var DockviewComponent = /** @class */ (function (_super) {
 /*!*************************************************!*\
   !*** ../splitview/dist/es6/dockview/options.js ***!
   \*************************************************/
-/*! namespace exports */
-/*! exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -35751,36 +35243,23 @@ __webpack_require__.r(__webpack_exports__);
 /*!************************************!*\
   !*** ../splitview/dist/es6/dom.js ***!
   \************************************/
-/*! namespace exports */
-/*! export addClasses [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export getElementsByTagName [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isAncestor [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isHTMLElement [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isInTree [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export removeClasses [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export toggleClass [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export trackFocus [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export watchElementResize [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "watchElementResize": () => /* binding */ watchElementResize,
-/* harmony export */   "isHTMLElement": () => /* binding */ isHTMLElement,
-/* harmony export */   "isInTree": () => /* binding */ isInTree,
-/* harmony export */   "removeClasses": () => /* binding */ removeClasses,
-/* harmony export */   "addClasses": () => /* binding */ addClasses,
-/* harmony export */   "toggleClass": () => /* binding */ toggleClass,
-/* harmony export */   "isAncestor": () => /* binding */ isAncestor,
-/* harmony export */   "getElementsByTagName": () => /* binding */ getElementsByTagName,
-/* harmony export */   "trackFocus": () => /* binding */ trackFocus
+/* harmony export */   "watchElementResize": () => (/* binding */ watchElementResize),
+/* harmony export */   "isHTMLElement": () => (/* binding */ isHTMLElement),
+/* harmony export */   "isInTree": () => (/* binding */ isInTree),
+/* harmony export */   "removeClasses": () => (/* binding */ removeClasses),
+/* harmony export */   "addClasses": () => (/* binding */ addClasses),
+/* harmony export */   "toggleClass": () => (/* binding */ toggleClass),
+/* harmony export */   "isAncestor": () => (/* binding */ isAncestor),
+/* harmony export */   "getElementsByTagName": () => (/* binding */ getElementsByTagName),
+/* harmony export */   "trackFocus": () => (/* binding */ trackFocus)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./events */ "../splitview/dist/es6/events.js");
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lifecycle */ "../splitview/dist/es6/lifecycle.js");
-/* harmony import */ var resize_observer_polyfill__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! resize-observer-polyfill */ "../splitview/node_modules/resize-observer-polyfill/dist/ResizeObserver.es.js");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -35789,6 +35268,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -35807,9 +35288,8 @@ var __values = (undefined && undefined.__values) || function(o) {
 };
 
 
-
 function watchElementResize(element, cb) {
-    var observer = new resize_observer_polyfill__WEBPACK_IMPORTED_MODULE_2__.default(function (entires) {
+    var observer = new ResizeObserver(function (entires) {
         var element = entires[0];
         cb(element);
     });
@@ -35979,22 +35459,15 @@ var FocusTracker = /** @class */ (function (_super) {
 /*!***************************************!*\
   !*** ../splitview/dist/es6/events.js ***!
   \***************************************/
-/*! namespace exports */
-/*! export Emitter [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Event [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export addDisposableListener [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export addDisposableWindowListener [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Event": () => /* binding */ Event,
-/* harmony export */   "Emitter": () => /* binding */ Emitter,
-/* harmony export */   "addDisposableWindowListener": () => /* binding */ addDisposableWindowListener,
-/* harmony export */   "addDisposableListener": () => /* binding */ addDisposableListener
+/* harmony export */   "Event": () => (/* binding */ Event),
+/* harmony export */   "Emitter": () => (/* binding */ Emitter),
+/* harmony export */   "addDisposableWindowListener": () => (/* binding */ addDisposableWindowListener),
+/* harmony export */   "addDisposableListener": () => (/* binding */ addDisposableListener)
 /* harmony export */ });
 var Event;
 (function (Event) {
@@ -36086,16 +35559,12 @@ function addDisposableListener(element, type, listener, options) {
 /*!***********************************************!*\
   !*** ../splitview/dist/es6/focusedElement.js ***!
   \***********************************************/
-/*! namespace exports */
-/*! export focusedElement [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "focusedElement": () => /* binding */ focusedElement
+/* harmony export */   "focusedElement": () => (/* binding */ focusedElement)
 /* harmony export */ });
 var focusedElement = { element: null };
 //TODO somebody could call .stopPropagation() on this - can you do this at the event capture-stage instead?
@@ -36107,20 +35576,38 @@ focusedElement.element = document.activeElement;
 
 /***/ }),
 
+/***/ "../splitview/dist/es6/footnote.js":
+/*!*****************************************!*\
+  !*** ../splitview/dist/es6/footnote.js ***!
+  \*****************************************/
+/***/ (() => {
+
+"use strict";
+
+var DOCKVIEW_SUPPRESS_WATERMARK = 'DOCKVIEW_WATERMARK_SUPPRESSED';
+var isSuppressed = !!window[DOCKVIEW_SUPPRESS_WATERMARK];
+if (!isSuppressed) {
+    console.log([
+        'dockview: https://github.com/mathuo/dockview for examples and documentation',
+        'dockview: https://www.npmjs.com/package/dockview',
+        "dockview: To suppress this message set window." + DOCKVIEW_SUPPRESS_WATERMARK + "=1 before importing the dockview package",
+        '',
+    ].join('\n'));
+}
+
+
+/***/ }),
+
 /***/ "../splitview/dist/es6/functions.js":
 /*!******************************************!*\
   !*** ../splitview/dist/es6/functions.js ***!
   \******************************************/
-/*! namespace exports */
-/*! export debounce [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "debounce": () => /* binding */ debounce
+/* harmony export */   "debounce": () => (/* binding */ debounce)
 /* harmony export */ });
 var __read = (undefined && undefined.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
@@ -36138,9 +35625,10 @@ var __read = (undefined && undefined.__read) || function (o, n) {
     }
     return ar;
 };
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
+var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 function debounce(cb, wait) {
     var timeout;
@@ -36150,7 +35638,7 @@ function debounce(cb, wait) {
             args[_i] = arguments[_i];
         }
         clearTimeout(timeout);
-        timeout = setTimeout(function () { return cb.apply(void 0, __spread(args)); }, wait);
+        timeout = setTimeout(function () { return cb.apply(void 0, __spreadArray([], __read(args))); }, wait);
     };
     return callable;
 }
@@ -36162,18 +35650,13 @@ function debounce(cb, wait) {
 /*!***************************************************************!*\
   !*** ../splitview/dist/es6/gridview/baseComponentGridview.js ***!
   \***************************************************************/
-/*! namespace exports */
-/*! export BaseGrid [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export toTarget [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "toTarget": () => /* binding */ toTarget,
-/* harmony export */   "BaseGrid": () => /* binding */ BaseGrid
+/* harmony export */   "toTarget": () => (/* binding */ toTarget),
+/* harmony export */   "BaseGrid": () => (/* binding */ BaseGrid)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
 /* harmony import */ var _gridview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./gridview */ "../splitview/dist/es6/gridview/gridview.js");
@@ -36190,6 +35673,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -36427,16 +35912,12 @@ var BaseGrid = /** @class */ (function (_super) {
 /*!*******************************************************!*\
   !*** ../splitview/dist/es6/gridview/basePanelView.js ***!
   \*******************************************************/
-/*! namespace exports */
-/*! export BasePanelView [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "BasePanelView": () => /* binding */ BasePanelView
+/* harmony export */   "BasePanelView": () => (/* binding */ BasePanelView)
 /* harmony export */ });
 /* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dom */ "../splitview/dist/es6/dom.js");
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
@@ -36448,6 +35929,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -36536,9 +36019,10 @@ var BasePanelView = /** @class */ (function (_super) {
         return {
             id: this.id,
             component: this.component,
-            params: ((_a = this.params) === null || _a === void 0 ? void 0 : _a.params) ? Object.keys(this.params.params).length > 0
-                ? this.params.params
-                : undefined
+            params: ((_a = this.params) === null || _a === void 0 ? void 0 : _a.params)
+                ? Object.keys(this.params.params).length > 0
+                    ? this.params.params
+                    : undefined
                 : undefined,
             state: Object.keys(state).length === 0 ? undefined : state,
         };
@@ -36558,16 +36042,12 @@ var BasePanelView = /** @class */ (function (_super) {
 /*!****************************************************!*\
   !*** ../splitview/dist/es6/gridview/branchNode.js ***!
   \****************************************************/
-/*! namespace exports */
-/*! export BranchNode [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "BranchNode": () => /* binding */ BranchNode
+/* harmony export */   "BranchNode": () => (/* binding */ BranchNode)
 /* harmony export */ });
 /* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
@@ -36581,6 +36061,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -36602,9 +36084,10 @@ var __read = (undefined && undefined.__read) || function (o, n) {
     }
     return ar;
 };
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
+var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 var __values = (undefined && undefined.__values) || function(o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
@@ -36694,14 +36177,14 @@ var BranchNode = /** @class */ (function (_super) {
         get: function () {
             return this.children.length === 0
                 ? 0
-                : Math.max.apply(Math, __spread(this.children.map(function (c) { return c.minimumOrthogonalSize; })));
+                : Math.max.apply(Math, __spreadArray([], __read(this.children.map(function (c) { return c.minimumOrthogonalSize; }))));
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BranchNode.prototype, "maximumSize", {
         get: function () {
-            return Math.min.apply(Math, __spread(this.children.map(function (c) { return c.maximumOrthogonalSize; })));
+            return Math.min.apply(Math, __spreadArray([], __read(this.children.map(function (c) { return c.maximumOrthogonalSize; }))));
         },
         enumerable: false,
         configurable: true
@@ -36885,7 +36368,7 @@ var BranchNode = /** @class */ (function (_super) {
     BranchNode.prototype.setupChildrenEvents = function () {
         var _this = this;
         this._childrenDisposable.dispose();
-        this._childrenDisposable = _events__WEBPACK_IMPORTED_MODULE_1__.Event.any.apply(_events__WEBPACK_IMPORTED_MODULE_1__.Event, __spread(this.children.map(function (c) { return c.onDidChange; })))(function (e) {
+        this._childrenDisposable = _events__WEBPACK_IMPORTED_MODULE_1__.Event.any.apply(_events__WEBPACK_IMPORTED_MODULE_1__.Event, __spreadArray([], __read(this.children.map(function (c) { return c.onDidChange; }))))(function (e) {
             /**
              * indicate a change has occured to allows any re-rendering but don't bubble
              * event because that was specific to this branch
@@ -36910,30 +36393,19 @@ var BranchNode = /** @class */ (function (_super) {
 /*!**************************************************!*\
   !*** ../splitview/dist/es6/gridview/gridview.js ***!
   \**************************************************/
-/*! namespace exports */
-/*! export Gridview [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export getDirectionOrientation [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export getGridLocation [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export getLocationOrientation [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export getRelativeLocation [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export indexInParent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export isGridBranchNode [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export orthogonal [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "indexInParent": () => /* binding */ indexInParent,
-/* harmony export */   "getGridLocation": () => /* binding */ getGridLocation,
-/* harmony export */   "getRelativeLocation": () => /* binding */ getRelativeLocation,
-/* harmony export */   "getDirectionOrientation": () => /* binding */ getDirectionOrientation,
-/* harmony export */   "getLocationOrientation": () => /* binding */ getLocationOrientation,
-/* harmony export */   "orthogonal": () => /* binding */ orthogonal,
-/* harmony export */   "isGridBranchNode": () => /* binding */ isGridBranchNode,
-/* harmony export */   "Gridview": () => /* binding */ Gridview
+/* harmony export */   "indexInParent": () => (/* binding */ indexInParent),
+/* harmony export */   "getGridLocation": () => (/* binding */ getGridLocation),
+/* harmony export */   "getRelativeLocation": () => (/* binding */ getRelativeLocation),
+/* harmony export */   "getDirectionOrientation": () => (/* binding */ getDirectionOrientation),
+/* harmony export */   "getLocationOrientation": () => (/* binding */ getLocationOrientation),
+/* harmony export */   "orthogonal": () => (/* binding */ orthogonal),
+/* harmony export */   "isGridBranchNode": () => (/* binding */ isGridBranchNode),
+/* harmony export */   "Gridview": () => (/* binding */ Gridview)
 /* harmony export */ });
 /* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
 /* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
@@ -36958,9 +36430,10 @@ var __read = (undefined && undefined.__read) || function (o, n) {
     }
     return ar;
 };
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
+var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 
 
@@ -37021,7 +36494,7 @@ function getGridLocation(element) {
     }
     var index = indexInParent(parentElement);
     var ancestor = parentElement.parentElement.parentElement.parentElement;
-    return __spread(getGridLocation(ancestor), [index]);
+    return __spreadArray(__spreadArray([], __read(getGridLocation(ancestor))), [index]);
 }
 function getRelativeLocation(rootOrientation, location, direction) {
     var orientation = getLocationOrientation(rootOrientation, location);
@@ -37032,13 +36505,13 @@ function getRelativeLocation(rootOrientation, location, direction) {
         if (direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Right || direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Bottom) {
             index += 1;
         }
-        return __spread(rest, [index]);
+        return __spreadArray(__spreadArray([], __read(rest)), [index]);
     }
     else {
         var index = direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Right || direction === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Bottom
             ? 1
             : 0;
-        return __spread(location, [index]);
+        return __spreadArray(__spreadArray([], __read(location)), [index]);
     }
 }
 function getDirectionOrientation(direction) {
@@ -37292,8 +36765,8 @@ var Gridview = /** @class */ (function () {
             parent.addChild(node, size, index);
         }
         else {
-            var _c = __read(__spread(pathToParent).reverse()), grandParent = _c[0], _ = _c.slice(1);
-            var _d = __read(__spread(rest).reverse()), parentIndex = _d[0], __ = _d.slice(1);
+            var _c = __read(__spreadArray([], __read(pathToParent)).reverse()), grandParent = _c[0], _ = _c.slice(1);
+            var _d = __read(__spreadArray([], __read(rest)).reverse()), parentIndex = _d[0], __ = _d.slice(1);
             var newSiblingSize = 0;
             var newSiblingCachedVisibleSize = grandParent.getChildCachedVisibleSize(parentIndex);
             if (typeof newSiblingCachedVisibleSize === 'number') {
@@ -37344,8 +36817,8 @@ var Gridview = /** @class */ (function () {
             this.root = sibling_1;
             return node.view;
         }
-        var _c = __read(__spread(pathToParent).reverse()), grandParent = _c[0], _ = _c.slice(1);
-        var _d = __read(__spread(rest).reverse()), parentIndex = _d[0], __ = _d.slice(1);
+        var _c = __read(__spreadArray([], __read(pathToParent)).reverse()), grandParent = _c[0], _ = _c.slice(1);
+        var _d = __read(__spreadArray([], __read(rest)).reverse()), parentIndex = _d[0], __ = _d.slice(1);
         var sibling = parent.children[0];
         var isSiblingVisible = parent.isChildVisible(0);
         parent.removeChild(0, sizing);
@@ -37354,8 +36827,8 @@ var Gridview = /** @class */ (function () {
         });
         grandParent.removeChild(parentIndex, sizing);
         if (sibling instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode) {
-            sizes.splice.apply(sizes, __spread([parentIndex,
-                1], sibling.children.map(function (c) { return c.size; })));
+            sizes.splice.apply(sizes, __spreadArray([parentIndex,
+                1], __read(sibling.children.map(function (c) { return c.size; }))));
             for (var i = 0; i < sibling.children.length; i++) {
                 var child = sibling.children[i];
                 grandParent.addChild(child, child.size, parentIndex + i);
@@ -37407,16 +36880,12 @@ var Gridview = /** @class */ (function () {
 /*!***********************************************************!*\
   !*** ../splitview/dist/es6/gridview/gridviewComponent.js ***!
   \***********************************************************/
-/*! namespace exports */
-/*! export GridviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GridviewComponent": () => /* binding */ GridviewComponent
+/* harmony export */   "GridviewComponent": () => (/* binding */ GridviewComponent)
 /* harmony export */ });
 /* harmony import */ var _gridview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./gridview */ "../splitview/dist/es6/gridview/gridview.js");
 /* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
@@ -37434,6 +36903,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -37713,19 +37184,15 @@ var GridviewComponent = /** @class */ (function (_super) {
 /*!*******************************************************!*\
   !*** ../splitview/dist/es6/gridview/gridviewPanel.js ***!
   \*******************************************************/
-/*! namespace exports */
-/*! export GridviewPanel [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GridviewPanel": () => /* binding */ GridviewPanel
+/* harmony export */   "GridviewPanel": () => (/* binding */ GridviewPanel)
 /* harmony export */ });
 /* harmony import */ var _basePanelView__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./basePanelView */ "../splitview/dist/es6/gridview/basePanelView.js");
-/* harmony import */ var _api_gridPanelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/gridPanelApi */ "../splitview/dist/es6/api/gridPanelApi.js");
+/* harmony import */ var _api_gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/gridviewPanelApi */ "../splitview/dist/es6/api/gridviewPanelApi.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -37735,6 +37202,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -37757,7 +37226,7 @@ var __assign = (undefined && undefined.__assign) || function () {
 var GridviewPanel = /** @class */ (function (_super) {
     __extends(GridviewPanel, _super);
     function GridviewPanel(id, component, api) {
-        if (api === void 0) { api = new _api_gridPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridPanelApi(id); }
+        if (api === void 0) { api = new _api_gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridviewPanelApi(id); }
         var _this = _super.call(this, id, component, api) || this;
         _this._evaluatedMinimumWidth = 0;
         _this._evaluatedMaximumWidth = Number.MAX_SAFE_INTEGER;
@@ -37937,16 +37406,12 @@ var GridviewPanel = /** @class */ (function (_super) {
 /*!**************************************************!*\
   !*** ../splitview/dist/es6/gridview/leafNode.js ***!
   \**************************************************/
-/*! namespace exports */
-/*! export LeafNode [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "LeafNode": () => /* binding */ LeafNode
+/* harmony export */   "LeafNode": () => (/* binding */ LeafNode)
 /* harmony export */ });
 /* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
@@ -38112,16 +37577,12 @@ var LeafNode = /** @class */ (function () {
 /*!*****************************************************!*\
   !*** ../splitview/dist/es6/groupview/groupPanel.js ***!
   \*****************************************************/
-/*! namespace exports */
-/*! export GroupPanel [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GroupPanel": () => /* binding */ GroupPanel
+/* harmony export */   "GroupPanel": () => (/* binding */ GroupPanel)
 /* harmony export */ });
 /* harmony import */ var _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/groupPanelApi */ "../splitview/dist/es6/api/groupPanelApi.js");
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
@@ -38134,6 +37595,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -38160,7 +37623,7 @@ var GroupPanel = /** @class */ (function (_super) {
         _this.id = id;
         _this.containerApi = containerApi;
         _this.mutableDisposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_1__.MutableDisposable();
-        _this.api = new _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_0__.GroupPanelApi(_this, _this._group);
+        _this.api = new _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_0__.DockviewPanelApi(_this, _this._group);
         _this.onDidStateChange = _this.api.onDidStateChange;
         _this.addDisposables(_this.api.onActiveChange(function () {
             _this.containerApi.setActivePanel(_this);
@@ -38320,18 +37783,13 @@ var GroupPanel = /** @class */ (function (_super) {
 /*!********************************************************!*\
   !*** ../splitview/dist/es6/groupview/panel/content.js ***!
   \********************************************************/
-/*! namespace exports */
-/*! export ContentContainer [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export HostedPanel [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "HostedPanel": () => /* binding */ HostedPanel,
-/* harmony export */   "ContentContainer": () => /* binding */ ContentContainer
+/* harmony export */   "HostedPanel": () => (/* binding */ HostedPanel),
+/* harmony export */   "ContentContainer": () => (/* binding */ ContentContainer)
 /* harmony export */ });
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lifecycle */ "../splitview/dist/es6/lifecycle.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../events */ "../splitview/dist/es6/events.js");
@@ -38344,6 +37802,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -38503,18 +37963,13 @@ var ContentContainer = /** @class */ (function (_super) {
 /*!**********************************************!*\
   !*** ../splitview/dist/es6/groupview/tab.js ***!
   \**********************************************/
-/*! namespace exports */
-/*! export MouseEventKind [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Tab [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "MouseEventKind": () => /* binding */ MouseEventKind,
-/* harmony export */   "Tab": () => /* binding */ Tab
+/* harmony export */   "MouseEventKind": () => (/* binding */ MouseEventKind),
+/* harmony export */   "Tab": () => (/* binding */ Tab)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
 /* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../splitview/dist/es6/dnd/droptarget.js");
@@ -38530,6 +37985,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -38551,9 +38008,10 @@ var __read = (undefined && undefined.__read) || function (o, n) {
     }
     return ar;
 };
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
+var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 var __values = (undefined && undefined.__values) || function(o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
@@ -38603,7 +38061,7 @@ var Tab = /** @class */ (function (_super) {
                 isDragging: true,
                 id: _this.accessor.id,
             };
-            _this.iframes = __spread((0,_dom__WEBPACK_IMPORTED_MODULE_4__.getElementsByTagName)('iframe'), (0,_dom__WEBPACK_IMPORTED_MODULE_4__.getElementsByTagName)('webview'));
+            _this.iframes = __spreadArray(__spreadArray([], __read((0,_dom__WEBPACK_IMPORTED_MODULE_4__.getElementsByTagName)('iframe'))), __read((0,_dom__WEBPACK_IMPORTED_MODULE_4__.getElementsByTagName)('webview')));
             try {
                 for (var _b = __values(_this.iframes), _c = _b.next(); !_c.done; _c = _b.next()) {
                     var iframe = _c.value;
@@ -38741,16 +38199,12 @@ var Tab = /** @class */ (function (_super) {
 /*!*****************************************************************!*\
   !*** ../splitview/dist/es6/groupview/titlebar/tabsContainer.js ***!
   \*****************************************************************/
-/*! namespace exports */
-/*! export TabsContainer [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "TabsContainer": () => /* binding */ TabsContainer
+/* harmony export */   "TabsContainer": () => (/* binding */ TabsContainer)
 /* harmony export */ });
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lifecycle */ "../splitview/dist/es6/lifecycle.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../events */ "../splitview/dist/es6/events.js");
@@ -38768,6 +38222,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -38800,9 +38256,10 @@ var __read = (undefined && undefined.__read) || function (o, n) {
     }
     return ar;
 };
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
+var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 
 
@@ -38958,9 +38415,9 @@ var TabsContainer = /** @class */ (function (_super) {
             throw new Error('invalid location');
         }
         this.tabContainer.insertBefore(tab.value.element, this.tabContainer.children[index]);
-        this.tabs = __spread(this.tabs.slice(0, index), [
+        this.tabs = __spreadArray(__spreadArray(__spreadArray([], __read(this.tabs.slice(0, index))), [
             tab
-        ], this.tabs.slice(index));
+        ]), __read(this.tabs.slice(index)));
         if (this.selectedIndex < 0) {
             this.selectedIndex = index;
         }
@@ -39033,9 +38490,6 @@ var TabsContainer = /** @class */ (function (_super) {
 /*!************************************************!*\
   !*** ../splitview/dist/es6/groupview/types.js ***!
   \************************************************/
-/*! namespace exports */
-/*! exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -39049,18 +38503,13 @@ __webpack_require__.r(__webpack_exports__);
 /*!*******************************************************!*\
   !*** ../splitview/dist/es6/groupview/v2/component.js ***!
   \*******************************************************/
-/*! namespace exports */
-/*! export GroupChangeKind [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export GroupComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GroupChangeKind": () => /* binding */ GroupChangeKind,
-/* harmony export */   "GroupComponent": () => /* binding */ GroupComponent
+/* harmony export */   "GroupChangeKind": () => (/* binding */ GroupChangeKind),
+/* harmony export */   "GroupComponent": () => (/* binding */ GroupComponent)
 /* harmony export */ });
 /* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../api/component.api */ "../splitview/dist/es6/api/component.api.js");
 /* harmony import */ var _async__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../async */ "../splitview/dist/es6/async.js");
@@ -39079,6 +38528,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -39136,9 +38587,10 @@ var __read = (undefined && undefined.__read) || function (o, n) {
     }
     return ar;
 };
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
+var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 var __values = (undefined && undefined.__values) || function(o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
@@ -39516,7 +38968,7 @@ var GroupComponent = /** @class */ (function (_super) {
                         return [3 /*break*/, 4];
                     case 8:
                         if (!(this.panels.length > 0)) return [3 /*break*/, 10];
-                        arrPanelCpy = __spread(this.panels);
+                        arrPanelCpy = __spreadArray([], __read(this.panels));
                         return [4 /*yield*/, Promise.all(arrPanelCpy.map(function (p) { return _this.doClose(p); }))];
                     case 9:
                         _c.sent();
@@ -39646,7 +39098,7 @@ var GroupComponent = /** @class */ (function (_super) {
         if (this.mostRecentlyUsed.includes(panel)) {
             this.mostRecentlyUsed.splice(this.mostRecentlyUsed.indexOf(panel), 1);
         }
-        this.mostRecentlyUsed = __spread([panel], this.mostRecentlyUsed);
+        this.mostRecentlyUsed = __spreadArray([panel], __read(this.mostRecentlyUsed));
     };
     GroupComponent.prototype.updateContainer = function () {
         var _this = this;
@@ -39761,18 +39213,14 @@ var GroupComponent = /** @class */ (function (_super) {
 /*!************************************************************!*\
   !*** ../splitview/dist/es6/groupview/v2/groupviewPanel.js ***!
   \************************************************************/
-/*! namespace exports */
-/*! export GroupviewPanel [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GroupviewPanel": () => /* binding */ GroupviewPanel
+/* harmony export */   "GroupviewPanel": () => (/* binding */ GroupviewPanel)
 /* harmony export */ });
-/* harmony import */ var _api_gridPanelApi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../api/gridPanelApi */ "../splitview/dist/es6/api/gridPanelApi.js");
+/* harmony import */ var _api_gridviewPanelApi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../api/gridviewPanelApi */ "../splitview/dist/es6/api/gridviewPanelApi.js");
 /* harmony import */ var _component__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./component */ "../splitview/dist/es6/groupview/v2/component.js");
 /* harmony import */ var _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../gridview/gridviewPanel */ "../splitview/dist/es6/gridview/gridviewPanel.js");
 var __extends = (undefined && undefined.__extends) || (function () {
@@ -39783,6 +39231,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -39804,7 +39254,7 @@ var GroupApi = /** @class */ (function (_super) {
         configurable: true
     });
     return GroupApi;
-}(_api_gridPanelApi__WEBPACK_IMPORTED_MODULE_0__.GridPanelApi));
+}(_api_gridviewPanelApi__WEBPACK_IMPORTED_MODULE_0__.GridviewPanelApi));
 var GroupviewPanel = /** @class */ (function (_super) {
     __extends(GroupviewPanel, _super);
     function GroupviewPanel(accessor, id, options) {
@@ -39846,128 +39296,81 @@ var GroupviewPanel = /** @class */ (function (_super) {
 /*!**************************************!*\
   !*** ../splitview/dist/es6/index.js ***!
   \**************************************/
-/*! namespace exports */
-/*! export CompositeDisposable [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/lifecycle.js .CompositeDisposable */
-/*! export ContentContainer [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/panel/content.js .ContentContainer */
-/*! export Disposable [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/lifecycle.js .Disposable */
-/*! export DockviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/component.api.js .DockviewApi */
-/*! export DockviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/dockview/dockviewComponent.js .DockviewComponent */
-/*! export DockviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/dockview.js .DockviewReact */
-/*! export Emitter [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .Emitter */
-/*! export Event [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .Event */
-/*! export Gridview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .Gridview */
-/*! export GridviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/component.api.js .GridviewApi */
-/*! export GridviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridviewComponent.js .GridviewComponent */
-/*! export GridviewPanel [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridviewPanel.js .GridviewPanel */
-/*! export GridviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/gridview/gridview.js .GridviewReact */
-/*! export GroupChangeKind [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/v2/component.js .GroupChangeKind */
-/*! export GroupComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/v2/component.js .GroupComponent */
-/*! export GroupPanel [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/groupPanel.js .GroupPanel */
-/*! export GroupPanelApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/groupPanelApi.js .GroupPanelApi */
-/*! export HostedPanel [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/panel/content.js .HostedPanel */
-/*! export LayoutPriority [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .LayoutPriority */
-/*! export MouseEventKind [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/tab.js .MouseEventKind */
-/*! export MutableDisposable [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/lifecycle.js .MutableDisposable */
-/*! export Orientation [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .Orientation */
-/*! export PaneFramework [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/paneview/paneviewComponent.js .PaneFramework */
-/*! export Paneview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/paneview/paneview.js .Paneview */
-/*! export PaneviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/component.api.js .PaneviewApi */
-/*! export PaneviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/paneview/paneviewComponent.js .PaneviewComponent */
-/*! export PaneviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/paneview/paneview.js .PaneviewReact */
-/*! export ReactPanelContentPart [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/reactContentPart.js .ReactPanelContentPart */
-/*! export ReactPanelHeaderPart [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/reactHeaderPart.js .ReactPanelHeaderPart */
-/*! export ReactPart [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/react.js .ReactPart */
-/*! export SashState [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .SashState */
-/*! export Sizing [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .Sizing */
-/*! export Splitview [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/core/splitview.js .Splitview */
-/*! export SplitviewApi [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/api/component.api.js .SplitviewApi */
-/*! export SplitviewComponent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/splitview/splitviewComponent.js .SplitviewComponent */
-/*! export SplitviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/splitview/splitview.js .SplitviewReact */
-/*! export Tab [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/groupview/tab.js .Tab */
-/*! export addDisposableListener [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .addDisposableListener */
-/*! export addDisposableWindowListener [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/events.js .addDisposableWindowListener */
-/*! export getDirectionOrientation [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .getDirectionOrientation */
-/*! export getGridLocation [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .getGridLocation */
-/*! export getLocationOrientation [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .getLocationOrientation */
-/*! export getRelativeLocation [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .getRelativeLocation */
-/*! export indexInParent [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .indexInParent */
-/*! export isGridBranchNode [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .isGridBranchNode */
-/*! export orthogonal [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridview.js .orthogonal */
-/*! export usePortalsLifecycle [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/react.js .usePortalsLifecycle */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_exports__, __webpack_require__.d, __webpack_require__.r, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "LayoutPriority": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.LayoutPriority,
-/* harmony export */   "Orientation": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation,
-/* harmony export */   "SashState": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.SashState,
-/* harmony export */   "Sizing": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Sizing,
-/* harmony export */   "Splitview": () => /* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Splitview,
-/* harmony export */   "SplitviewComponent": () => /* reexport safe */ _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_1__.SplitviewComponent,
-/* harmony export */   "Paneview": () => /* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_2__.Paneview,
-/* harmony export */   "PaneFramework": () => /* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_3__.PaneFramework,
-/* harmony export */   "PaneviewComponent": () => /* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_3__.PaneviewComponent,
-/* harmony export */   "Gridview": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.Gridview,
-/* harmony export */   "getDirectionOrientation": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getDirectionOrientation,
-/* harmony export */   "getGridLocation": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getGridLocation,
-/* harmony export */   "getLocationOrientation": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getLocationOrientation,
-/* harmony export */   "getRelativeLocation": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getRelativeLocation,
-/* harmony export */   "indexInParent": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.indexInParent,
-/* harmony export */   "isGridBranchNode": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.isGridBranchNode,
-/* harmony export */   "orthogonal": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.orthogonal,
-/* harmony export */   "GroupChangeKind": () => /* reexport safe */ _groupview_v2_component__WEBPACK_IMPORTED_MODULE_5__.GroupChangeKind,
-/* harmony export */   "GroupComponent": () => /* reexport safe */ _groupview_v2_component__WEBPACK_IMPORTED_MODULE_5__.GroupComponent,
-/* harmony export */   "ContentContainer": () => /* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_6__.ContentContainer,
-/* harmony export */   "HostedPanel": () => /* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_6__.HostedPanel,
-/* harmony export */   "MouseEventKind": () => /* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_7__.MouseEventKind,
-/* harmony export */   "Tab": () => /* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_7__.Tab,
-/* harmony export */   "Emitter": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.Emitter,
-/* harmony export */   "Event": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.Event,
-/* harmony export */   "addDisposableListener": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.addDisposableListener,
-/* harmony export */   "addDisposableWindowListener": () => /* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_8__.addDisposableWindowListener,
-/* harmony export */   "CompositeDisposable": () => /* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_9__.CompositeDisposable,
-/* harmony export */   "Disposable": () => /* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_9__.Disposable,
-/* harmony export */   "MutableDisposable": () => /* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_9__.MutableDisposable,
-/* harmony export */   "GroupPanel": () => /* reexport safe */ _groupview_groupPanel__WEBPACK_IMPORTED_MODULE_10__.GroupPanel,
-/* harmony export */   "GroupPanelApi": () => /* reexport safe */ _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_11__.GroupPanelApi,
-/* harmony export */   "DockviewApi": () => /* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_12__.DockviewApi,
-/* harmony export */   "GridviewApi": () => /* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_12__.GridviewApi,
-/* harmony export */   "PaneviewApi": () => /* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_12__.PaneviewApi,
-/* harmony export */   "SplitviewApi": () => /* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_12__.SplitviewApi,
-/* harmony export */   "ReactPart": () => /* reexport safe */ _react_react__WEBPACK_IMPORTED_MODULE_13__.ReactPart,
-/* harmony export */   "usePortalsLifecycle": () => /* reexport safe */ _react_react__WEBPACK_IMPORTED_MODULE_13__.usePortalsLifecycle,
-/* harmony export */   "DockviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.DockviewReact,
-/* harmony export */   "GridviewPanel": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.GridviewPanel,
-/* harmony export */   "GridviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.GridviewReact,
-/* harmony export */   "PaneviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.PaneviewReact,
-/* harmony export */   "ReactPanelContentPart": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.ReactPanelContentPart,
-/* harmony export */   "ReactPanelHeaderPart": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.ReactPanelHeaderPart,
-/* harmony export */   "SplitviewReact": () => /* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_15__.SplitviewReact,
-/* harmony export */   "DockviewComponent": () => /* reexport safe */ _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_16__.DockviewComponent,
-/* harmony export */   "GridviewComponent": () => /* reexport safe */ _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_18__.GridviewComponent
+/* harmony export */   "LayoutPriority": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_1__.LayoutPriority),
+/* harmony export */   "Orientation": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation),
+/* harmony export */   "SashState": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_1__.SashState),
+/* harmony export */   "Sizing": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_1__.Sizing),
+/* harmony export */   "Splitview": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_1__.Splitview),
+/* harmony export */   "SplitviewComponent": () => (/* reexport safe */ _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_2__.SplitviewComponent),
+/* harmony export */   "Paneview": () => (/* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_3__.Paneview),
+/* harmony export */   "PaneFramework": () => (/* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_4__.PaneFramework),
+/* harmony export */   "PaneviewComponent": () => (/* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_4__.PaneviewComponent),
+/* harmony export */   "Gridview": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_5__.Gridview),
+/* harmony export */   "getDirectionOrientation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_5__.getDirectionOrientation),
+/* harmony export */   "getGridLocation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_5__.getGridLocation),
+/* harmony export */   "getLocationOrientation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_5__.getLocationOrientation),
+/* harmony export */   "getRelativeLocation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_5__.getRelativeLocation),
+/* harmony export */   "indexInParent": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_5__.indexInParent),
+/* harmony export */   "isGridBranchNode": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_5__.isGridBranchNode),
+/* harmony export */   "orthogonal": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_5__.orthogonal),
+/* harmony export */   "GroupChangeKind": () => (/* reexport safe */ _groupview_v2_component__WEBPACK_IMPORTED_MODULE_6__.GroupChangeKind),
+/* harmony export */   "GroupComponent": () => (/* reexport safe */ _groupview_v2_component__WEBPACK_IMPORTED_MODULE_6__.GroupComponent),
+/* harmony export */   "ContentContainer": () => (/* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_7__.ContentContainer),
+/* harmony export */   "HostedPanel": () => (/* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_7__.HostedPanel),
+/* harmony export */   "MouseEventKind": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_8__.MouseEventKind),
+/* harmony export */   "Tab": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_8__.Tab),
+/* harmony export */   "Emitter": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_9__.Emitter),
+/* harmony export */   "Event": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_9__.Event),
+/* harmony export */   "addDisposableListener": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_9__.addDisposableListener),
+/* harmony export */   "addDisposableWindowListener": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_9__.addDisposableWindowListener),
+/* harmony export */   "CompositeDisposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_10__.CompositeDisposable),
+/* harmony export */   "Disposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_10__.Disposable),
+/* harmony export */   "MutableDisposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_10__.MutableDisposable),
+/* harmony export */   "GroupPanel": () => (/* reexport safe */ _groupview_groupPanel__WEBPACK_IMPORTED_MODULE_11__.GroupPanel),
+/* harmony export */   "DockviewPanelApi": () => (/* reexport safe */ _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_12__.DockviewPanelApi),
+/* harmony export */   "DockviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_13__.DockviewApi),
+/* harmony export */   "GridviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_13__.GridviewApi),
+/* harmony export */   "PaneviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_13__.PaneviewApi),
+/* harmony export */   "SplitviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_13__.SplitviewApi),
+/* harmony export */   "ReactPart": () => (/* reexport safe */ _react_react__WEBPACK_IMPORTED_MODULE_14__.ReactPart),
+/* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react_react__WEBPACK_IMPORTED_MODULE_14__.usePortalsLifecycle),
+/* harmony export */   "DockviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_16__.DockviewReact),
+/* harmony export */   "GridviewPanel": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_16__.GridviewPanel),
+/* harmony export */   "GridviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_16__.GridviewReact),
+/* harmony export */   "PaneviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_16__.PaneviewReact),
+/* harmony export */   "ReactPanelContentPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_16__.ReactPanelContentPart),
+/* harmony export */   "ReactPanelHeaderPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_16__.ReactPanelHeaderPart),
+/* harmony export */   "SplitviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_16__.SplitviewReact),
+/* harmony export */   "DockviewComponent": () => (/* reexport safe */ _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_17__.DockviewComponent),
+/* harmony export */   "GridviewComponent": () => (/* reexport safe */ _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_19__.GridviewComponent)
 /* harmony export */ });
-/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
-/* harmony import */ var _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitview/splitviewComponent */ "../splitview/dist/es6/splitview/splitviewComponent.js");
-/* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./paneview/paneview */ "../splitview/dist/es6/paneview/paneview.js");
-/* harmony import */ var _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./paneview/paneviewComponent */ "../splitview/dist/es6/paneview/paneviewComponent.js");
-/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./gridview/gridview */ "../splitview/dist/es6/gridview/gridview.js");
-/* harmony import */ var _groupview_v2_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./groupview/v2/component */ "../splitview/dist/es6/groupview/v2/component.js");
-/* harmony import */ var _groupview_panel_content__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./groupview/panel/content */ "../splitview/dist/es6/groupview/panel/content.js");
-/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./groupview/tab */ "../splitview/dist/es6/groupview/tab.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./events */ "../splitview/dist/es6/events.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./lifecycle */ "../splitview/dist/es6/lifecycle.js");
-/* harmony import */ var _groupview_groupPanel__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./groupview/groupPanel */ "../splitview/dist/es6/groupview/groupPanel.js");
-/* harmony import */ var _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./api/groupPanelApi */ "../splitview/dist/es6/api/groupPanelApi.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./api/component.api */ "../splitview/dist/es6/api/component.api.js");
-/* harmony import */ var _react_react__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./react/react */ "../splitview/dist/es6/react/react.js");
-/* harmony import */ var _groupview_types__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./groupview/types */ "../splitview/dist/es6/groupview/types.js");
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./react */ "../splitview/dist/es6/react/index.js");
-/* harmony import */ var _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./dockview/dockviewComponent */ "../splitview/dist/es6/dockview/dockviewComponent.js");
-/* harmony import */ var _dockview_options__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./dockview/options */ "../splitview/dist/es6/dockview/options.js");
-/* harmony import */ var _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./gridview/gridviewComponent */ "../splitview/dist/es6/gridview/gridviewComponent.js");
+/* harmony import */ var _footnote__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./footnote */ "../splitview/dist/es6/footnote.js");
+/* harmony import */ var _footnote__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_footnote__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
+/* harmony import */ var _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./splitview/splitviewComponent */ "../splitview/dist/es6/splitview/splitviewComponent.js");
+/* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./paneview/paneview */ "../splitview/dist/es6/paneview/paneview.js");
+/* harmony import */ var _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./paneview/paneviewComponent */ "../splitview/dist/es6/paneview/paneviewComponent.js");
+/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./gridview/gridview */ "../splitview/dist/es6/gridview/gridview.js");
+/* harmony import */ var _groupview_v2_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./groupview/v2/component */ "../splitview/dist/es6/groupview/v2/component.js");
+/* harmony import */ var _groupview_panel_content__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./groupview/panel/content */ "../splitview/dist/es6/groupview/panel/content.js");
+/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./groupview/tab */ "../splitview/dist/es6/groupview/tab.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./events */ "../splitview/dist/es6/events.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./lifecycle */ "../splitview/dist/es6/lifecycle.js");
+/* harmony import */ var _groupview_groupPanel__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./groupview/groupPanel */ "../splitview/dist/es6/groupview/groupPanel.js");
+/* harmony import */ var _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./api/groupPanelApi */ "../splitview/dist/es6/api/groupPanelApi.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./api/component.api */ "../splitview/dist/es6/api/component.api.js");
+/* harmony import */ var _react_react__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./react/react */ "../splitview/dist/es6/react/react.js");
+/* harmony import */ var _groupview_types__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./groupview/types */ "../splitview/dist/es6/groupview/types.js");
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./react */ "../splitview/dist/es6/react/index.js");
+/* harmony import */ var _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./dockview/dockviewComponent */ "../splitview/dist/es6/dockview/dockviewComponent.js");
+/* harmony import */ var _dockview_options__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./dockview/options */ "../splitview/dist/es6/dockview/options.js");
+/* harmony import */ var _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./gridview/gridviewComponent */ "../splitview/dist/es6/gridview/gridviewComponent.js");
+
 
 
 
@@ -39995,16 +39398,12 @@ __webpack_require__.r(__webpack_exports__);
 /*!*************************************!*\
   !*** ../splitview/dist/es6/json.js ***!
   \*************************************/
-/*! namespace exports */
-/*! export tryParseJSON [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "tryParseJSON": () => /* binding */ tryParseJSON
+/* harmony export */   "tryParseJSON": () => (/* binding */ tryParseJSON)
 /* harmony export */ });
 function tryParseJSON(text, reviver) {
     try {
@@ -40023,20 +39422,14 @@ function tryParseJSON(text, reviver) {
 /*!******************************************!*\
   !*** ../splitview/dist/es6/lifecycle.js ***!
   \******************************************/
-/*! namespace exports */
-/*! export CompositeDisposable [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Disposable [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export MutableDisposable [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Disposable": () => /* binding */ Disposable,
-/* harmony export */   "CompositeDisposable": () => /* binding */ CompositeDisposable,
-/* harmony export */   "MutableDisposable": () => /* binding */ MutableDisposable
+/* harmony export */   "Disposable": () => (/* binding */ Disposable),
+/* harmony export */   "CompositeDisposable": () => (/* binding */ CompositeDisposable),
+/* harmony export */   "MutableDisposable": () => (/* binding */ MutableDisposable)
 /* harmony export */ });
 var __read = (undefined && undefined.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
@@ -40054,9 +39447,10 @@ var __read = (undefined && undefined.__read) || function (o, n) {
     }
     return ar;
 };
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
+var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 var Disposable;
 (function (Disposable) {
@@ -40079,7 +39473,7 @@ var CompositeDisposable = /** @class */ (function () {
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        return new (CompositeDisposable.bind.apply(CompositeDisposable, __spread([void 0], args)))();
+        return new (CompositeDisposable.bind.apply(CompositeDisposable, __spreadArray([void 0], __read(args))))();
     };
     CompositeDisposable.prototype.addDisposables = function () {
         var _this = this;
@@ -40125,18 +39519,13 @@ var MutableDisposable = /** @class */ (function () {
 /*!*************************************!*\
   !*** ../splitview/dist/es6/math.js ***!
   \*************************************/
-/*! namespace exports */
-/*! export clamp [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export sequentialNumberGenerator [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "clamp": () => /* binding */ clamp,
-/* harmony export */   "sequentialNumberGenerator": () => /* binding */ sequentialNumberGenerator
+/* harmony export */   "clamp": () => (/* binding */ clamp),
+/* harmony export */   "sequentialNumberGenerator": () => (/* binding */ sequentialNumberGenerator)
 /* harmony export */ });
 var clamp = function (value, min, max) {
     if (min > max) {
@@ -40156,16 +39545,12 @@ var sequentialNumberGenerator = function () {
 /*!*******************************************************!*\
   !*** ../splitview/dist/es6/panel/componentFactory.js ***!
   \*******************************************************/
-/*! namespace exports */
-/*! export createComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "createComponent": () => /* binding */ createComponent
+/* harmony export */   "createComponent": () => (/* binding */ createComponent)
 /* harmony export */ });
 function createComponent(id, componentName, components, frameworkComponents, createFrameworkComponent, fallback) {
     if (components === void 0) { components = {}; }
@@ -40202,16 +39587,12 @@ function createComponent(id, componentName, components, frameworkComponents, cre
 /*!**************************************************!*\
   !*** ../splitview/dist/es6/paneview/paneview.js ***!
   \**************************************************/
-/*! namespace exports */
-/*! export Paneview [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Paneview": () => /* binding */ Paneview
+/* harmony export */   "Paneview": () => (/* binding */ Paneview)
 /* harmony export */ });
 /* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
@@ -40225,6 +39606,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -40387,18 +39770,13 @@ var Paneview = /** @class */ (function (_super) {
 /*!***********************************************************!*\
   !*** ../splitview/dist/es6/paneview/paneviewComponent.js ***!
   \***********************************************************/
-/*! namespace exports */
-/*! export PaneFramework [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export PaneviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PaneFramework": () => /* binding */ PaneFramework,
-/* harmony export */   "PaneviewComponent": () => /* binding */ PaneviewComponent
+/* harmony export */   "PaneFramework": () => (/* binding */ PaneFramework),
+/* harmony export */   "PaneviewComponent": () => (/* binding */ PaneviewComponent)
 /* harmony export */ });
 /* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/es6/api/component.api.js");
 /* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
@@ -40415,6 +39793,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -40735,18 +40115,14 @@ var PaneviewComponent = /** @class */ (function (_super) {
 /*!*******************************************************!*\
   !*** ../splitview/dist/es6/paneview/paneviewPanel.js ***!
   \*******************************************************/
-/*! namespace exports */
-/*! export PaneviewPanel [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PaneviewPanel": () => /* binding */ PaneviewPanel
+/* harmony export */   "PaneviewPanel": () => (/* binding */ PaneviewPanel)
 /* harmony export */ });
-/* harmony import */ var _api_panePanelApi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/panePanelApi */ "../splitview/dist/es6/api/panePanelApi.js");
+/* harmony import */ var _api_paneviewPanelApi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/paneviewPanelApi */ "../splitview/dist/es6/api/paneviewPanelApi.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
 /* harmony import */ var _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../gridview/basePanelView */ "../splitview/dist/es6/gridview/basePanelView.js");
 /* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../splitview/core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
@@ -40758,6 +40134,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -40797,7 +40175,7 @@ var __read = (undefined && undefined.__read) || function (o, n) {
 var PaneviewPanel = /** @class */ (function (_super) {
     __extends(PaneviewPanel, _super);
     function PaneviewPanel(id, component, headerComponent, orientation, isExpanded) {
-        var _this = _super.call(this, id, component, new _api_panePanelApi__WEBPACK_IMPORTED_MODULE_0__.PanePanelApi(id)) || this;
+        var _this = _super.call(this, id, component, new _api_paneviewPanelApi__WEBPACK_IMPORTED_MODULE_0__.PaneviewPanelApi(id)) || this;
         _this.headerComponent = headerComponent;
         _this._onDidChangeExpansionState = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter({ replay: true });
         _this.onDidChangeExpansionState = _this._onDidChangeExpansionState.event;
@@ -40993,16 +40371,12 @@ var PaneviewPanel = /** @class */ (function (_super) {
 /*!***************************************************!*\
   !*** ../splitview/dist/es6/react/deserializer.js ***!
   \***************************************************/
-/*! namespace exports */
-/*! export ReactPanelDeserialzier [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ReactPanelDeserialzier": () => /* binding */ ReactPanelDeserialzier
+/* harmony export */   "ReactPanelDeserialzier": () => (/* binding */ ReactPanelDeserialzier)
 /* harmony export */ });
 /* harmony import */ var _groupview_groupPanel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../groupview/groupPanel */ "../splitview/dist/es6/groupview/groupPanel.js");
 /* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/es6/panel/componentFactory.js");
@@ -41028,7 +40402,8 @@ var ReactPanelDeserialzier = /** @class */ (function () {
         var viewData = panelData.view;
         var view = new _dockview_v2_defaultGroupPanelView__WEBPACK_IMPORTED_MODULE_4__.DefaultGroupPanelView({
             content: (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(viewData.content.id, viewData.content.id, this.layout.options.components, this.layout.options.frameworkComponents, (_a = this.layout.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.content),
-            tab: ((_b = viewData.tab) === null || _b === void 0 ? void 0 : _b.id) ? (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(viewData.tab.id, viewData.tab.id, this.layout.options.components, this.layout.options.frameworkComponents, (_c = this.layout.options.frameworkComponentFactory) === null || _c === void 0 ? void 0 : _c.content)
+            tab: ((_b = viewData.tab) === null || _b === void 0 ? void 0 : _b.id)
+                ? (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(viewData.tab.id, viewData.tab.id, this.layout.options.components, this.layout.options.frameworkComponents, (_c = this.layout.options.frameworkComponentFactory) === null || _c === void 0 ? void 0 : _c.content)
                 : new _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_3__.DefaultTab(),
         });
         var panel = new _groupview_groupPanel__WEBPACK_IMPORTED_MODULE_0__.GroupPanel(panelId, new _api_component_api__WEBPACK_IMPORTED_MODULE_2__.DockviewApi(this.layout));
@@ -41052,16 +40427,12 @@ var ReactPanelDeserialzier = /** @class */ (function () {
 /*!********************************************************!*\
   !*** ../splitview/dist/es6/react/dockview/dockview.js ***!
   \********************************************************/
-/*! namespace exports */
-/*! export DockviewReact [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DockviewReact": () => /* binding */ DockviewReact
+/* harmony export */   "DockviewReact": () => (/* binding */ DockviewReact)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../dockview/dockviewComponent */ "../splitview/dist/es6/dockview/dockviewComponent.js");
@@ -41190,16 +40561,12 @@ DockviewReact.displayName = 'DockviewComponent';
 /*!****************************************************************!*\
   !*** ../splitview/dist/es6/react/dockview/reactContentPart.js ***!
   \****************************************************************/
-/*! namespace exports */
-/*! export ReactPanelContentPart [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ReactPanelContentPart": () => /* binding */ ReactPanelContentPart
+/* harmony export */   "ReactPanelContentPart": () => (/* binding */ ReactPanelContentPart)
 /* harmony export */ });
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../events */ "../splitview/dist/es6/events.js");
@@ -41390,16 +40757,12 @@ var ReactPanelContentPart = /** @class */ (function () {
 /*!***************************************************************!*\
   !*** ../splitview/dist/es6/react/dockview/reactHeaderPart.js ***!
   \***************************************************************/
-/*! namespace exports */
-/*! export ReactPanelHeaderPart [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ReactPanelHeaderPart": () => /* binding */ ReactPanelHeaderPart
+/* harmony export */   "ReactPanelHeaderPart": () => (/* binding */ ReactPanelHeaderPart)
 /* harmony export */ });
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
 var __assign = (undefined && undefined.__assign) || function () {
@@ -41463,16 +40826,12 @@ var ReactPanelHeaderPart = /** @class */ (function () {
 /*!******************************************************************!*\
   !*** ../splitview/dist/es6/react/dockview/reactWatermarkPart.js ***!
   \******************************************************************/
-/*! namespace exports */
-/*! export ReactWatermarkPart [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ReactWatermarkPart": () => /* binding */ ReactWatermarkPart
+/* harmony export */   "ReactWatermarkPart": () => (/* binding */ ReactWatermarkPart)
 /* harmony export */ });
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
 var __assign = (undefined && undefined.__assign) || function () {
@@ -41496,6 +40855,8 @@ var ReactWatermarkPart = /** @class */ (function () {
             value: undefined,
         };
         this._element = document.createElement('div');
+        this._element.style.height = '100%';
+        this._element.style.width = '100%';
     }
     Object.defineProperty(ReactWatermarkPart.prototype, "element", {
         get: function () {
@@ -41539,16 +40900,12 @@ var ReactWatermarkPart = /** @class */ (function () {
 /*!************************************************************************!*\
   !*** ../splitview/dist/es6/react/dockview/v2/defaultGroupPanelView.js ***!
   \************************************************************************/
-/*! namespace exports */
-/*! export DefaultGroupPanelView [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DefaultGroupPanelView": () => /* binding */ DefaultGroupPanelView
+/* harmony export */   "DefaultGroupPanelView": () => (/* binding */ DefaultGroupPanelView)
 /* harmony export */ });
 /* harmony import */ var _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../dockview/components/tab/defaultTab */ "../splitview/dist/es6/dockview/components/tab/defaultTab.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../events */ "../splitview/dist/es6/events.js");
@@ -41652,16 +41009,12 @@ var DefaultGroupPanelView = /** @class */ (function () {
 /*!********************************************************!*\
   !*** ../splitview/dist/es6/react/gridview/gridview.js ***!
   \********************************************************/
-/*! namespace exports */
-/*! export GridviewReact [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GridviewReact": () => /* binding */ GridviewReact
+/* harmony export */   "GridviewReact": () => (/* binding */ GridviewReact)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../gridview/gridviewComponent */ "../splitview/dist/es6/gridview/gridviewComponent.js");
@@ -41748,16 +41101,12 @@ GridviewReact.displayName = 'GridviewComponent';
 /*!****************************************************!*\
   !*** ../splitview/dist/es6/react/gridview/view.js ***!
   \****************************************************/
-/*! namespace exports */
-/*! export ReactGridPanelView [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ReactGridPanelView": () => /* binding */ ReactGridPanelView
+/* harmony export */   "ReactGridPanelView": () => (/* binding */ ReactGridPanelView)
 /* harmony export */ });
 /* harmony import */ var _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../gridview/gridviewPanel */ "../splitview/dist/es6/gridview/gridviewPanel.js");
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
@@ -41769,6 +41118,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -41811,28 +41162,18 @@ var ReactGridPanelView = /** @class */ (function (_super) {
 /*!********************************************!*\
   !*** ../splitview/dist/es6/react/index.js ***!
   \********************************************/
-/*! namespace exports */
-/*! export DockviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/dockview.js .DockviewReact */
-/*! export GridviewPanel [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/gridview/gridviewPanel.js .GridviewPanel */
-/*! export GridviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/gridview/gridview.js .GridviewReact */
-/*! export PaneviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/paneview/paneview.js .PaneviewReact */
-/*! export ReactPanelContentPart [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/reactContentPart.js .ReactPanelContentPart */
-/*! export ReactPanelHeaderPart [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/dockview/reactHeaderPart.js .ReactPanelHeaderPart */
-/*! export SplitviewReact [provided] [no usage info] [missing usage info prevents renaming] -> ../splitview/dist/es6/react/splitview/splitview.js .SplitviewReact */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_exports__, __webpack_require__.d, __webpack_require__.r, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DockviewReact": () => /* reexport safe */ _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__.DockviewReact,
-/* harmony export */   "SplitviewReact": () => /* reexport safe */ _splitview_splitview__WEBPACK_IMPORTED_MODULE_1__.SplitviewReact,
-/* harmony export */   "GridviewReact": () => /* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_2__.GridviewReact,
-/* harmony export */   "ReactPanelContentPart": () => /* reexport safe */ _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_3__.ReactPanelContentPart,
-/* harmony export */   "ReactPanelHeaderPart": () => /* reexport safe */ _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_4__.ReactPanelHeaderPart,
-/* harmony export */   "GridviewPanel": () => /* reexport safe */ _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_5__.GridviewPanel,
-/* harmony export */   "PaneviewReact": () => /* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__.PaneviewReact
+/* harmony export */   "DockviewReact": () => (/* reexport safe */ _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__.DockviewReact),
+/* harmony export */   "SplitviewReact": () => (/* reexport safe */ _splitview_splitview__WEBPACK_IMPORTED_MODULE_1__.SplitviewReact),
+/* harmony export */   "GridviewReact": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_2__.GridviewReact),
+/* harmony export */   "ReactPanelContentPart": () => (/* reexport safe */ _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_3__.ReactPanelContentPart),
+/* harmony export */   "ReactPanelHeaderPart": () => (/* reexport safe */ _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_4__.ReactPanelHeaderPart),
+/* harmony export */   "GridviewPanel": () => (/* reexport safe */ _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_5__.GridviewPanel),
+/* harmony export */   "PaneviewReact": () => (/* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__.PaneviewReact)
 /* harmony export */ });
 /* harmony import */ var _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dockview/dockview */ "../splitview/dist/es6/react/dockview/dockview.js");
 /* harmony import */ var _splitview_splitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitview/splitview */ "../splitview/dist/es6/react/splitview/splitview.js");
@@ -41858,16 +41199,12 @@ __webpack_require__.r(__webpack_exports__);
 /*!********************************************************!*\
   !*** ../splitview/dist/es6/react/paneview/paneview.js ***!
   \********************************************************/
-/*! namespace exports */
-/*! export PaneviewReact [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PaneviewReact": () => /* binding */ PaneviewReact
+/* harmony export */   "PaneviewReact": () => (/* binding */ PaneviewReact)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../paneview/paneviewComponent */ "../splitview/dist/es6/paneview/paneviewComponent.js");
@@ -41954,18 +41291,13 @@ PaneviewReact.displayName = 'PaneviewComponent';
 /*!****************************************************!*\
   !*** ../splitview/dist/es6/react/paneview/view.js ***!
   \****************************************************/
-/*! namespace exports */
-/*! export PanelBody [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export PanelHeader [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PanelBody": () => /* binding */ PanelBody,
-/* harmony export */   "PanelHeader": () => /* binding */ PanelHeader
+/* harmony export */   "PanelBody": () => (/* binding */ PanelBody),
+/* harmony export */   "PanelHeader": () => (/* binding */ PanelHeader)
 /* harmony export */ });
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
 var __assign = (undefined && undefined.__assign) || function () {
@@ -42058,18 +41390,13 @@ var PanelHeader = /** @class */ (function () {
 /*!********************************************!*\
   !*** ../splitview/dist/es6/react/react.js ***!
   \********************************************/
-/*! namespace exports */
-/*! export ReactPart [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export usePortalsLifecycle [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ReactPart": () => /* binding */ ReactPart,
-/* harmony export */   "usePortalsLifecycle": () => /* binding */ usePortalsLifecycle
+/* harmony export */   "ReactPart": () => (/* binding */ ReactPart),
+/* harmony export */   "usePortalsLifecycle": () => (/* binding */ usePortalsLifecycle)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
@@ -42101,9 +41428,10 @@ var __read = (undefined && undefined.__read) || function (o, n) {
     }
     return ar;
 };
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
+var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 
 
@@ -42207,7 +41535,7 @@ var usePortalsLifecycle = function () {
     var _a = __read(react__WEBPACK_IMPORTED_MODULE_0__.useState([]), 2), portals = _a[0], setPortals = _a[1];
     react__WEBPACK_IMPORTED_MODULE_0__.useDebugValue("Portal count: " + portals.length);
     var addPortal = react__WEBPACK_IMPORTED_MODULE_0__.useCallback(function (portal) {
-        setPortals(function (portals) { return __spread(portals, [portal]); });
+        setPortals(function (portals) { return __spreadArray(__spreadArray([], __read(portals)), [portal]); });
         var disposed = false;
         return {
             dispose: function () {
@@ -42229,16 +41557,12 @@ var usePortalsLifecycle = function () {
 /*!**********************************************************!*\
   !*** ../splitview/dist/es6/react/splitview/splitview.js ***!
   \**********************************************************/
-/*! namespace exports */
-/*! export SplitviewReact [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "SplitviewReact": () => /* binding */ SplitviewReact
+/* harmony export */   "SplitviewReact": () => (/* binding */ SplitviewReact)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../api/component.api */ "../splitview/dist/es6/api/component.api.js");
@@ -42322,16 +41646,12 @@ SplitviewReact.displayName = 'SplitviewComponent';
 /*!*****************************************************!*\
   !*** ../splitview/dist/es6/react/splitview/view.js ***!
   \*****************************************************/
-/*! namespace exports */
-/*! export ReactPanelView [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ReactPanelView": () => /* binding */ ReactPanelView
+/* harmony export */   "ReactPanelView": () => (/* binding */ ReactPanelView)
 /* harmony export */ });
 /* harmony import */ var _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../splitview/splitviewPanel */ "../splitview/dist/es6/splitview/splitviewPanel.js");
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../react */ "../splitview/dist/es6/react/react.js");
@@ -42343,6 +41663,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -42385,9 +41707,6 @@ var ReactPanelView = /** @class */ (function (_super) {
 /*!********************************************!*\
   !*** ../splitview/dist/es6/react/types.js ***!
   \********************************************/
-/*! namespace exports */
-/*! exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -42401,24 +41720,16 @@ __webpack_require__.r(__webpack_exports__);
 /*!*********************************************************!*\
   !*** ../splitview/dist/es6/splitview/core/splitview.js ***!
   \*********************************************************/
-/*! namespace exports */
-/*! export LayoutPriority [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Orientation [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export SashState [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Sizing [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Splitview [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Orientation": () => /* binding */ Orientation,
-/* harmony export */   "SashState": () => /* binding */ SashState,
-/* harmony export */   "LayoutPriority": () => /* binding */ LayoutPriority,
-/* harmony export */   "Sizing": () => /* binding */ Sizing,
-/* harmony export */   "Splitview": () => /* binding */ Splitview
+/* harmony export */   "Orientation": () => (/* binding */ Orientation),
+/* harmony export */   "SashState": () => (/* binding */ SashState),
+/* harmony export */   "LayoutPriority": () => (/* binding */ LayoutPriority),
+/* harmony export */   "Sizing": () => (/* binding */ Sizing),
+/* harmony export */   "Splitview": () => (/* binding */ Splitview)
 /* harmony export */ });
 /* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../dom */ "../splitview/dist/es6/dom.js");
 /* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../math */ "../splitview/dist/es6/math.js");
@@ -42452,9 +41763,10 @@ var __read = (undefined && undefined.__read) || function (o, n) {
     }
     return ar;
 };
-var __spread = (undefined && undefined.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
+var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 
 
@@ -42671,7 +41983,7 @@ var Splitview = /** @class */ (function () {
     });
     Object.defineProperty(Splitview.prototype, "proportions", {
         get: function () {
-            return this._proportions ? __spread(this._proportions) : undefined;
+            return this._proportions ? __spreadArray([], __read(this._proportions)) : undefined;
         },
         enumerable: false,
         configurable: true
@@ -42770,7 +42082,7 @@ var Splitview = /** @class */ (function () {
             return;
         }
         var indexes = (0,_array__WEBPACK_IMPORTED_MODULE_3__.range)(this.views.length).filter(function (i) { return i !== index; });
-        var lowPriorityIndexes = __spread(indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.Low; }), [
+        var lowPriorityIndexes = __spreadArray(__spreadArray([], __read(indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.Low; }))), [
             index,
         ]);
         var highPriorityIndexes = indexes.filter(function (i) { return _this.views[i].priority === LayoutPriority.High; });
@@ -42847,7 +42159,7 @@ var Splitview = /** @class */ (function () {
                     }
                     finally { if (e_3) throw e_3.error; }
                 }
-                var iframes = __spread((0,_dom__WEBPACK_IMPORTED_MODULE_0__.getElementsByTagName)('iframe'), (0,_dom__WEBPACK_IMPORTED_MODULE_0__.getElementsByTagName)('webview'));
+                var iframes = __spreadArray(__spreadArray([], __read((0,_dom__WEBPACK_IMPORTED_MODULE_0__.getElementsByTagName)('iframe'))), __read((0,_dom__WEBPACK_IMPORTED_MODULE_0__.getElementsByTagName)('webview')));
                 try {
                     for (var iframes_1 = __values(iframes), iframes_1_1 = iframes_1.next(); !iframes_1_1.done; iframes_1_1 = iframes_1.next()) {
                         var iframe = iframes_1_1.value;
@@ -43214,7 +42526,7 @@ var Splitview = /** @class */ (function () {
         var collapsesDown = this.views.map(function (i) { return (previous = i.size - i.minimumSize > 0 || previous); });
         previous = false;
         var expandsDown = this.views.map(function (i) { return (previous = i.maximumSize - i.size > 0 || previous); });
-        var reverseViews = __spread(this.views).reverse();
+        var reverseViews = __spreadArray([], __read(this.views)).reverse();
         previous = false;
         var collapsesUp = reverseViews
             .map(function (i) { return (previous = i.size - i.minimumSize > 0 || previous); })
@@ -43314,16 +42626,12 @@ var Splitview = /** @class */ (function () {
 /*!********************************************************!*\
   !*** ../splitview/dist/es6/splitview/core/viewItem.js ***!
   \********************************************************/
-/*! namespace exports */
-/*! export ViewItem [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ViewItem": () => /* binding */ ViewItem
+/* harmony export */   "ViewItem": () => (/* binding */ ViewItem)
 /* harmony export */ });
 /* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../math */ "../splitview/dist/es6/math.js");
 
@@ -43455,16 +42763,12 @@ var ViewItem = /** @class */ (function () {
 /*!*************************************************************!*\
   !*** ../splitview/dist/es6/splitview/splitviewComponent.js ***!
   \*************************************************************/
-/*! namespace exports */
-/*! export SplitviewComponent [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "SplitviewComponent": () => /* binding */ SplitviewComponent
+/* harmony export */   "SplitviewComponent": () => (/* binding */ SplitviewComponent)
 /* harmony export */ });
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lifecycle */ "../splitview/dist/es6/lifecycle.js");
 /* harmony import */ var _core_splitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
@@ -43479,6 +42783,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -43772,19 +43078,15 @@ var SplitviewComponent = /** @class */ (function (_super) {
 /*!*********************************************************!*\
   !*** ../splitview/dist/es6/splitview/splitviewPanel.js ***!
   \*********************************************************/
-/*! namespace exports */
-/*! export SplitviewPanel [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "SplitviewPanel": () => /* binding */ SplitviewPanel
+/* harmony export */   "SplitviewPanel": () => (/* binding */ SplitviewPanel)
 /* harmony export */ });
 /* harmony import */ var _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../gridview/basePanelView */ "../splitview/dist/es6/gridview/basePanelView.js");
-/* harmony import */ var _api_panelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/panelApi */ "../splitview/dist/es6/api/panelApi.js");
+/* harmony import */ var _api_splitviewPanelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/splitviewPanelApi */ "../splitview/dist/es6/api/splitviewPanelApi.js");
 /* harmony import */ var _core_splitview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./core/splitview */ "../splitview/dist/es6/splitview/core/splitview.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../events */ "../splitview/dist/es6/events.js");
 var __extends = (undefined && undefined.__extends) || (function () {
@@ -43795,6 +43097,8 @@ var __extends = (undefined && undefined.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -43834,7 +43138,7 @@ var __read = (undefined && undefined.__read) || function (o, n) {
 var SplitviewPanel = /** @class */ (function (_super) {
     __extends(SplitviewPanel, _super);
     function SplitviewPanel(id, componentName) {
-        var _this = _super.call(this, id, componentName, new _api_panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApi(id)) || this;
+        var _this = _super.call(this, id, componentName, new _api_splitviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.SplitviewPanelApi(id)) || this;
         _this._evaluatedMinimumSize = 0;
         _this._evaluatedMaximumSize = Number.POSITIVE_INFINITY;
         _this._minimumSize = 0;
@@ -43962,953 +43266,6 @@ var SplitviewPanel = /** @class */ (function (_super) {
 
 
 
-/***/ }),
-
-/***/ "../splitview/node_modules/resize-observer-polyfill/dist/ResizeObserver.es.js":
-/*!************************************************************************************!*\
-  !*** ../splitview/node_modules/resize-observer-polyfill/dist/ResizeObserver.es.js ***!
-  \************************************************************************************/
-/*! namespace exports */
-/*! export default [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_exports__, __webpack_require__.r, __webpack_require__.g, __webpack_require__.d, __webpack_require__.* */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
-/* harmony export */ });
-/**
- * A collection of shims that provide minimal functionality of the ES6 collections.
- *
- * These implementations are not meant to be used outside of the ResizeObserver
- * modules as they cover only a limited range of use cases.
- */
-/* eslint-disable require-jsdoc, valid-jsdoc */
-var MapShim = (function () {
-    if (typeof Map !== 'undefined') {
-        return Map;
-    }
-    /**
-     * Returns index in provided array that matches the specified key.
-     *
-     * @param {Array<Array>} arr
-     * @param {*} key
-     * @returns {number}
-     */
-    function getIndex(arr, key) {
-        var result = -1;
-        arr.some(function (entry, index) {
-            if (entry[0] === key) {
-                result = index;
-                return true;
-            }
-            return false;
-        });
-        return result;
-    }
-    return /** @class */ (function () {
-        function class_1() {
-            this.__entries__ = [];
-        }
-        Object.defineProperty(class_1.prototype, "size", {
-            /**
-             * @returns {boolean}
-             */
-            get: function () {
-                return this.__entries__.length;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        /**
-         * @param {*} key
-         * @returns {*}
-         */
-        class_1.prototype.get = function (key) {
-            var index = getIndex(this.__entries__, key);
-            var entry = this.__entries__[index];
-            return entry && entry[1];
-        };
-        /**
-         * @param {*} key
-         * @param {*} value
-         * @returns {void}
-         */
-        class_1.prototype.set = function (key, value) {
-            var index = getIndex(this.__entries__, key);
-            if (~index) {
-                this.__entries__[index][1] = value;
-            }
-            else {
-                this.__entries__.push([key, value]);
-            }
-        };
-        /**
-         * @param {*} key
-         * @returns {void}
-         */
-        class_1.prototype.delete = function (key) {
-            var entries = this.__entries__;
-            var index = getIndex(entries, key);
-            if (~index) {
-                entries.splice(index, 1);
-            }
-        };
-        /**
-         * @param {*} key
-         * @returns {void}
-         */
-        class_1.prototype.has = function (key) {
-            return !!~getIndex(this.__entries__, key);
-        };
-        /**
-         * @returns {void}
-         */
-        class_1.prototype.clear = function () {
-            this.__entries__.splice(0);
-        };
-        /**
-         * @param {Function} callback
-         * @param {*} [ctx=null]
-         * @returns {void}
-         */
-        class_1.prototype.forEach = function (callback, ctx) {
-            if (ctx === void 0) { ctx = null; }
-            for (var _i = 0, _a = this.__entries__; _i < _a.length; _i++) {
-                var entry = _a[_i];
-                callback.call(ctx, entry[1], entry[0]);
-            }
-        };
-        return class_1;
-    }());
-})();
-
-/**
- * Detects whether window and document objects are available in current environment.
- */
-var isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined' && window.document === document;
-
-// Returns global object of a current environment.
-var global$1 = (function () {
-    if (typeof __webpack_require__.g !== 'undefined' && __webpack_require__.g.Math === Math) {
-        return __webpack_require__.g;
-    }
-    if (typeof self !== 'undefined' && self.Math === Math) {
-        return self;
-    }
-    if (typeof window !== 'undefined' && window.Math === Math) {
-        return window;
-    }
-    // eslint-disable-next-line no-new-func
-    return Function('return this')();
-})();
-
-/**
- * A shim for the requestAnimationFrame which falls back to the setTimeout if
- * first one is not supported.
- *
- * @returns {number} Requests' identifier.
- */
-var requestAnimationFrame$1 = (function () {
-    if (typeof requestAnimationFrame === 'function') {
-        // It's required to use a bounded function because IE sometimes throws
-        // an "Invalid calling object" error if rAF is invoked without the global
-        // object on the left hand side.
-        return requestAnimationFrame.bind(global$1);
-    }
-    return function (callback) { return setTimeout(function () { return callback(Date.now()); }, 1000 / 60); };
-})();
-
-// Defines minimum timeout before adding a trailing call.
-var trailingTimeout = 2;
-/**
- * Creates a wrapper function which ensures that provided callback will be
- * invoked only once during the specified delay period.
- *
- * @param {Function} callback - Function to be invoked after the delay period.
- * @param {number} delay - Delay after which to invoke callback.
- * @returns {Function}
- */
-function throttle (callback, delay) {
-    var leadingCall = false, trailingCall = false, lastCallTime = 0;
-    /**
-     * Invokes the original callback function and schedules new invocation if
-     * the "proxy" was called during current request.
-     *
-     * @returns {void}
-     */
-    function resolvePending() {
-        if (leadingCall) {
-            leadingCall = false;
-            callback();
-        }
-        if (trailingCall) {
-            proxy();
-        }
-    }
-    /**
-     * Callback invoked after the specified delay. It will further postpone
-     * invocation of the original function delegating it to the
-     * requestAnimationFrame.
-     *
-     * @returns {void}
-     */
-    function timeoutCallback() {
-        requestAnimationFrame$1(resolvePending);
-    }
-    /**
-     * Schedules invocation of the original function.
-     *
-     * @returns {void}
-     */
-    function proxy() {
-        var timeStamp = Date.now();
-        if (leadingCall) {
-            // Reject immediately following calls.
-            if (timeStamp - lastCallTime < trailingTimeout) {
-                return;
-            }
-            // Schedule new call to be in invoked when the pending one is resolved.
-            // This is important for "transitions" which never actually start
-            // immediately so there is a chance that we might miss one if change
-            // happens amids the pending invocation.
-            trailingCall = true;
-        }
-        else {
-            leadingCall = true;
-            trailingCall = false;
-            setTimeout(timeoutCallback, delay);
-        }
-        lastCallTime = timeStamp;
-    }
-    return proxy;
-}
-
-// Minimum delay before invoking the update of observers.
-var REFRESH_DELAY = 20;
-// A list of substrings of CSS properties used to find transition events that
-// might affect dimensions of observed elements.
-var transitionKeys = ['top', 'right', 'bottom', 'left', 'width', 'height', 'size', 'weight'];
-// Check if MutationObserver is available.
-var mutationObserverSupported = typeof MutationObserver !== 'undefined';
-/**
- * Singleton controller class which handles updates of ResizeObserver instances.
- */
-var ResizeObserverController = /** @class */ (function () {
-    /**
-     * Creates a new instance of ResizeObserverController.
-     *
-     * @private
-     */
-    function ResizeObserverController() {
-        /**
-         * Indicates whether DOM listeners have been added.
-         *
-         * @private {boolean}
-         */
-        this.connected_ = false;
-        /**
-         * Tells that controller has subscribed for Mutation Events.
-         *
-         * @private {boolean}
-         */
-        this.mutationEventsAdded_ = false;
-        /**
-         * Keeps reference to the instance of MutationObserver.
-         *
-         * @private {MutationObserver}
-         */
-        this.mutationsObserver_ = null;
-        /**
-         * A list of connected observers.
-         *
-         * @private {Array<ResizeObserverSPI>}
-         */
-        this.observers_ = [];
-        this.onTransitionEnd_ = this.onTransitionEnd_.bind(this);
-        this.refresh = throttle(this.refresh.bind(this), REFRESH_DELAY);
-    }
-    /**
-     * Adds observer to observers list.
-     *
-     * @param {ResizeObserverSPI} observer - Observer to be added.
-     * @returns {void}
-     */
-    ResizeObserverController.prototype.addObserver = function (observer) {
-        if (!~this.observers_.indexOf(observer)) {
-            this.observers_.push(observer);
-        }
-        // Add listeners if they haven't been added yet.
-        if (!this.connected_) {
-            this.connect_();
-        }
-    };
-    /**
-     * Removes observer from observers list.
-     *
-     * @param {ResizeObserverSPI} observer - Observer to be removed.
-     * @returns {void}
-     */
-    ResizeObserverController.prototype.removeObserver = function (observer) {
-        var observers = this.observers_;
-        var index = observers.indexOf(observer);
-        // Remove observer if it's present in registry.
-        if (~index) {
-            observers.splice(index, 1);
-        }
-        // Remove listeners if controller has no connected observers.
-        if (!observers.length && this.connected_) {
-            this.disconnect_();
-        }
-    };
-    /**
-     * Invokes the update of observers. It will continue running updates insofar
-     * it detects changes.
-     *
-     * @returns {void}
-     */
-    ResizeObserverController.prototype.refresh = function () {
-        var changesDetected = this.updateObservers_();
-        // Continue running updates if changes have been detected as there might
-        // be future ones caused by CSS transitions.
-        if (changesDetected) {
-            this.refresh();
-        }
-    };
-    /**
-     * Updates every observer from observers list and notifies them of queued
-     * entries.
-     *
-     * @private
-     * @returns {boolean} Returns "true" if any observer has detected changes in
-     *      dimensions of it's elements.
-     */
-    ResizeObserverController.prototype.updateObservers_ = function () {
-        // Collect observers that have active observations.
-        var activeObservers = this.observers_.filter(function (observer) {
-            return observer.gatherActive(), observer.hasActive();
-        });
-        // Deliver notifications in a separate cycle in order to avoid any
-        // collisions between observers, e.g. when multiple instances of
-        // ResizeObserver are tracking the same element and the callback of one
-        // of them changes content dimensions of the observed target. Sometimes
-        // this may result in notifications being blocked for the rest of observers.
-        activeObservers.forEach(function (observer) { return observer.broadcastActive(); });
-        return activeObservers.length > 0;
-    };
-    /**
-     * Initializes DOM listeners.
-     *
-     * @private
-     * @returns {void}
-     */
-    ResizeObserverController.prototype.connect_ = function () {
-        // Do nothing if running in a non-browser environment or if listeners
-        // have been already added.
-        if (!isBrowser || this.connected_) {
-            return;
-        }
-        // Subscription to the "Transitionend" event is used as a workaround for
-        // delayed transitions. This way it's possible to capture at least the
-        // final state of an element.
-        document.addEventListener('transitionend', this.onTransitionEnd_);
-        window.addEventListener('resize', this.refresh);
-        if (mutationObserverSupported) {
-            this.mutationsObserver_ = new MutationObserver(this.refresh);
-            this.mutationsObserver_.observe(document, {
-                attributes: true,
-                childList: true,
-                characterData: true,
-                subtree: true
-            });
-        }
-        else {
-            document.addEventListener('DOMSubtreeModified', this.refresh);
-            this.mutationEventsAdded_ = true;
-        }
-        this.connected_ = true;
-    };
-    /**
-     * Removes DOM listeners.
-     *
-     * @private
-     * @returns {void}
-     */
-    ResizeObserverController.prototype.disconnect_ = function () {
-        // Do nothing if running in a non-browser environment or if listeners
-        // have been already removed.
-        if (!isBrowser || !this.connected_) {
-            return;
-        }
-        document.removeEventListener('transitionend', this.onTransitionEnd_);
-        window.removeEventListener('resize', this.refresh);
-        if (this.mutationsObserver_) {
-            this.mutationsObserver_.disconnect();
-        }
-        if (this.mutationEventsAdded_) {
-            document.removeEventListener('DOMSubtreeModified', this.refresh);
-        }
-        this.mutationsObserver_ = null;
-        this.mutationEventsAdded_ = false;
-        this.connected_ = false;
-    };
-    /**
-     * "Transitionend" event handler.
-     *
-     * @private
-     * @param {TransitionEvent} event
-     * @returns {void}
-     */
-    ResizeObserverController.prototype.onTransitionEnd_ = function (_a) {
-        var _b = _a.propertyName, propertyName = _b === void 0 ? '' : _b;
-        // Detect whether transition may affect dimensions of an element.
-        var isReflowProperty = transitionKeys.some(function (key) {
-            return !!~propertyName.indexOf(key);
-        });
-        if (isReflowProperty) {
-            this.refresh();
-        }
-    };
-    /**
-     * Returns instance of the ResizeObserverController.
-     *
-     * @returns {ResizeObserverController}
-     */
-    ResizeObserverController.getInstance = function () {
-        if (!this.instance_) {
-            this.instance_ = new ResizeObserverController();
-        }
-        return this.instance_;
-    };
-    /**
-     * Holds reference to the controller's instance.
-     *
-     * @private {ResizeObserverController}
-     */
-    ResizeObserverController.instance_ = null;
-    return ResizeObserverController;
-}());
-
-/**
- * Defines non-writable/enumerable properties of the provided target object.
- *
- * @param {Object} target - Object for which to define properties.
- * @param {Object} props - Properties to be defined.
- * @returns {Object} Target object.
- */
-var defineConfigurable = (function (target, props) {
-    for (var _i = 0, _a = Object.keys(props); _i < _a.length; _i++) {
-        var key = _a[_i];
-        Object.defineProperty(target, key, {
-            value: props[key],
-            enumerable: false,
-            writable: false,
-            configurable: true
-        });
-    }
-    return target;
-});
-
-/**
- * Returns the global object associated with provided element.
- *
- * @param {Object} target
- * @returns {Object}
- */
-var getWindowOf = (function (target) {
-    // Assume that the element is an instance of Node, which means that it
-    // has the "ownerDocument" property from which we can retrieve a
-    // corresponding global object.
-    var ownerGlobal = target && target.ownerDocument && target.ownerDocument.defaultView;
-    // Return the local global object if it's not possible extract one from
-    // provided element.
-    return ownerGlobal || global$1;
-});
-
-// Placeholder of an empty content rectangle.
-var emptyRect = createRectInit(0, 0, 0, 0);
-/**
- * Converts provided string to a number.
- *
- * @param {number|string} value
- * @returns {number}
- */
-function toFloat(value) {
-    return parseFloat(value) || 0;
-}
-/**
- * Extracts borders size from provided styles.
- *
- * @param {CSSStyleDeclaration} styles
- * @param {...string} positions - Borders positions (top, right, ...)
- * @returns {number}
- */
-function getBordersSize(styles) {
-    var positions = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        positions[_i - 1] = arguments[_i];
-    }
-    return positions.reduce(function (size, position) {
-        var value = styles['border-' + position + '-width'];
-        return size + toFloat(value);
-    }, 0);
-}
-/**
- * Extracts paddings sizes from provided styles.
- *
- * @param {CSSStyleDeclaration} styles
- * @returns {Object} Paddings box.
- */
-function getPaddings(styles) {
-    var positions = ['top', 'right', 'bottom', 'left'];
-    var paddings = {};
-    for (var _i = 0, positions_1 = positions; _i < positions_1.length; _i++) {
-        var position = positions_1[_i];
-        var value = styles['padding-' + position];
-        paddings[position] = toFloat(value);
-    }
-    return paddings;
-}
-/**
- * Calculates content rectangle of provided SVG element.
- *
- * @param {SVGGraphicsElement} target - Element content rectangle of which needs
- *      to be calculated.
- * @returns {DOMRectInit}
- */
-function getSVGContentRect(target) {
-    var bbox = target.getBBox();
-    return createRectInit(0, 0, bbox.width, bbox.height);
-}
-/**
- * Calculates content rectangle of provided HTMLElement.
- *
- * @param {HTMLElement} target - Element for which to calculate the content rectangle.
- * @returns {DOMRectInit}
- */
-function getHTMLElementContentRect(target) {
-    // Client width & height properties can't be
-    // used exclusively as they provide rounded values.
-    var clientWidth = target.clientWidth, clientHeight = target.clientHeight;
-    // By this condition we can catch all non-replaced inline, hidden and
-    // detached elements. Though elements with width & height properties less
-    // than 0.5 will be discarded as well.
-    //
-    // Without it we would need to implement separate methods for each of
-    // those cases and it's not possible to perform a precise and performance
-    // effective test for hidden elements. E.g. even jQuery's ':visible' filter
-    // gives wrong results for elements with width & height less than 0.5.
-    if (!clientWidth && !clientHeight) {
-        return emptyRect;
-    }
-    var styles = getWindowOf(target).getComputedStyle(target);
-    var paddings = getPaddings(styles);
-    var horizPad = paddings.left + paddings.right;
-    var vertPad = paddings.top + paddings.bottom;
-    // Computed styles of width & height are being used because they are the
-    // only dimensions available to JS that contain non-rounded values. It could
-    // be possible to utilize the getBoundingClientRect if only it's data wasn't
-    // affected by CSS transformations let alone paddings, borders and scroll bars.
-    var width = toFloat(styles.width), height = toFloat(styles.height);
-    // Width & height include paddings and borders when the 'border-box' box
-    // model is applied (except for IE).
-    if (styles.boxSizing === 'border-box') {
-        // Following conditions are required to handle Internet Explorer which
-        // doesn't include paddings and borders to computed CSS dimensions.
-        //
-        // We can say that if CSS dimensions + paddings are equal to the "client"
-        // properties then it's either IE, and thus we don't need to subtract
-        // anything, or an element merely doesn't have paddings/borders styles.
-        if (Math.round(width + horizPad) !== clientWidth) {
-            width -= getBordersSize(styles, 'left', 'right') + horizPad;
-        }
-        if (Math.round(height + vertPad) !== clientHeight) {
-            height -= getBordersSize(styles, 'top', 'bottom') + vertPad;
-        }
-    }
-    // Following steps can't be applied to the document's root element as its
-    // client[Width/Height] properties represent viewport area of the window.
-    // Besides, it's as well not necessary as the <html> itself neither has
-    // rendered scroll bars nor it can be clipped.
-    if (!isDocumentElement(target)) {
-        // In some browsers (only in Firefox, actually) CSS width & height
-        // include scroll bars size which can be removed at this step as scroll
-        // bars are the only difference between rounded dimensions + paddings
-        // and "client" properties, though that is not always true in Chrome.
-        var vertScrollbar = Math.round(width + horizPad) - clientWidth;
-        var horizScrollbar = Math.round(height + vertPad) - clientHeight;
-        // Chrome has a rather weird rounding of "client" properties.
-        // E.g. for an element with content width of 314.2px it sometimes gives
-        // the client width of 315px and for the width of 314.7px it may give
-        // 314px. And it doesn't happen all the time. So just ignore this delta
-        // as a non-relevant.
-        if (Math.abs(vertScrollbar) !== 1) {
-            width -= vertScrollbar;
-        }
-        if (Math.abs(horizScrollbar) !== 1) {
-            height -= horizScrollbar;
-        }
-    }
-    return createRectInit(paddings.left, paddings.top, width, height);
-}
-/**
- * Checks whether provided element is an instance of the SVGGraphicsElement.
- *
- * @param {Element} target - Element to be checked.
- * @returns {boolean}
- */
-var isSVGGraphicsElement = (function () {
-    // Some browsers, namely IE and Edge, don't have the SVGGraphicsElement
-    // interface.
-    if (typeof SVGGraphicsElement !== 'undefined') {
-        return function (target) { return target instanceof getWindowOf(target).SVGGraphicsElement; };
-    }
-    // If it's so, then check that element is at least an instance of the
-    // SVGElement and that it has the "getBBox" method.
-    // eslint-disable-next-line no-extra-parens
-    return function (target) { return (target instanceof getWindowOf(target).SVGElement &&
-        typeof target.getBBox === 'function'); };
-})();
-/**
- * Checks whether provided element is a document element (<html>).
- *
- * @param {Element} target - Element to be checked.
- * @returns {boolean}
- */
-function isDocumentElement(target) {
-    return target === getWindowOf(target).document.documentElement;
-}
-/**
- * Calculates an appropriate content rectangle for provided html or svg element.
- *
- * @param {Element} target - Element content rectangle of which needs to be calculated.
- * @returns {DOMRectInit}
- */
-function getContentRect(target) {
-    if (!isBrowser) {
-        return emptyRect;
-    }
-    if (isSVGGraphicsElement(target)) {
-        return getSVGContentRect(target);
-    }
-    return getHTMLElementContentRect(target);
-}
-/**
- * Creates rectangle with an interface of the DOMRectReadOnly.
- * Spec: https://drafts.fxtf.org/geometry/#domrectreadonly
- *
- * @param {DOMRectInit} rectInit - Object with rectangle's x/y coordinates and dimensions.
- * @returns {DOMRectReadOnly}
- */
-function createReadOnlyRect(_a) {
-    var x = _a.x, y = _a.y, width = _a.width, height = _a.height;
-    // If DOMRectReadOnly is available use it as a prototype for the rectangle.
-    var Constr = typeof DOMRectReadOnly !== 'undefined' ? DOMRectReadOnly : Object;
-    var rect = Object.create(Constr.prototype);
-    // Rectangle's properties are not writable and non-enumerable.
-    defineConfigurable(rect, {
-        x: x, y: y, width: width, height: height,
-        top: y,
-        right: x + width,
-        bottom: height + y,
-        left: x
-    });
-    return rect;
-}
-/**
- * Creates DOMRectInit object based on the provided dimensions and the x/y coordinates.
- * Spec: https://drafts.fxtf.org/geometry/#dictdef-domrectinit
- *
- * @param {number} x - X coordinate.
- * @param {number} y - Y coordinate.
- * @param {number} width - Rectangle's width.
- * @param {number} height - Rectangle's height.
- * @returns {DOMRectInit}
- */
-function createRectInit(x, y, width, height) {
-    return { x: x, y: y, width: width, height: height };
-}
-
-/**
- * Class that is responsible for computations of the content rectangle of
- * provided DOM element and for keeping track of it's changes.
- */
-var ResizeObservation = /** @class */ (function () {
-    /**
-     * Creates an instance of ResizeObservation.
-     *
-     * @param {Element} target - Element to be observed.
-     */
-    function ResizeObservation(target) {
-        /**
-         * Broadcasted width of content rectangle.
-         *
-         * @type {number}
-         */
-        this.broadcastWidth = 0;
-        /**
-         * Broadcasted height of content rectangle.
-         *
-         * @type {number}
-         */
-        this.broadcastHeight = 0;
-        /**
-         * Reference to the last observed content rectangle.
-         *
-         * @private {DOMRectInit}
-         */
-        this.contentRect_ = createRectInit(0, 0, 0, 0);
-        this.target = target;
-    }
-    /**
-     * Updates content rectangle and tells whether it's width or height properties
-     * have changed since the last broadcast.
-     *
-     * @returns {boolean}
-     */
-    ResizeObservation.prototype.isActive = function () {
-        var rect = getContentRect(this.target);
-        this.contentRect_ = rect;
-        return (rect.width !== this.broadcastWidth ||
-            rect.height !== this.broadcastHeight);
-    };
-    /**
-     * Updates 'broadcastWidth' and 'broadcastHeight' properties with a data
-     * from the corresponding properties of the last observed content rectangle.
-     *
-     * @returns {DOMRectInit} Last observed content rectangle.
-     */
-    ResizeObservation.prototype.broadcastRect = function () {
-        var rect = this.contentRect_;
-        this.broadcastWidth = rect.width;
-        this.broadcastHeight = rect.height;
-        return rect;
-    };
-    return ResizeObservation;
-}());
-
-var ResizeObserverEntry = /** @class */ (function () {
-    /**
-     * Creates an instance of ResizeObserverEntry.
-     *
-     * @param {Element} target - Element that is being observed.
-     * @param {DOMRectInit} rectInit - Data of the element's content rectangle.
-     */
-    function ResizeObserverEntry(target, rectInit) {
-        var contentRect = createReadOnlyRect(rectInit);
-        // According to the specification following properties are not writable
-        // and are also not enumerable in the native implementation.
-        //
-        // Property accessors are not being used as they'd require to define a
-        // private WeakMap storage which may cause memory leaks in browsers that
-        // don't support this type of collections.
-        defineConfigurable(this, { target: target, contentRect: contentRect });
-    }
-    return ResizeObserverEntry;
-}());
-
-var ResizeObserverSPI = /** @class */ (function () {
-    /**
-     * Creates a new instance of ResizeObserver.
-     *
-     * @param {ResizeObserverCallback} callback - Callback function that is invoked
-     *      when one of the observed elements changes it's content dimensions.
-     * @param {ResizeObserverController} controller - Controller instance which
-     *      is responsible for the updates of observer.
-     * @param {ResizeObserver} callbackCtx - Reference to the public
-     *      ResizeObserver instance which will be passed to callback function.
-     */
-    function ResizeObserverSPI(callback, controller, callbackCtx) {
-        /**
-         * Collection of resize observations that have detected changes in dimensions
-         * of elements.
-         *
-         * @private {Array<ResizeObservation>}
-         */
-        this.activeObservations_ = [];
-        /**
-         * Registry of the ResizeObservation instances.
-         *
-         * @private {Map<Element, ResizeObservation>}
-         */
-        this.observations_ = new MapShim();
-        if (typeof callback !== 'function') {
-            throw new TypeError('The callback provided as parameter 1 is not a function.');
-        }
-        this.callback_ = callback;
-        this.controller_ = controller;
-        this.callbackCtx_ = callbackCtx;
-    }
-    /**
-     * Starts observing provided element.
-     *
-     * @param {Element} target - Element to be observed.
-     * @returns {void}
-     */
-    ResizeObserverSPI.prototype.observe = function (target) {
-        if (!arguments.length) {
-            throw new TypeError('1 argument required, but only 0 present.');
-        }
-        // Do nothing if current environment doesn't have the Element interface.
-        if (typeof Element === 'undefined' || !(Element instanceof Object)) {
-            return;
-        }
-        if (!(target instanceof getWindowOf(target).Element)) {
-            throw new TypeError('parameter 1 is not of type "Element".');
-        }
-        var observations = this.observations_;
-        // Do nothing if element is already being observed.
-        if (observations.has(target)) {
-            return;
-        }
-        observations.set(target, new ResizeObservation(target));
-        this.controller_.addObserver(this);
-        // Force the update of observations.
-        this.controller_.refresh();
-    };
-    /**
-     * Stops observing provided element.
-     *
-     * @param {Element} target - Element to stop observing.
-     * @returns {void}
-     */
-    ResizeObserverSPI.prototype.unobserve = function (target) {
-        if (!arguments.length) {
-            throw new TypeError('1 argument required, but only 0 present.');
-        }
-        // Do nothing if current environment doesn't have the Element interface.
-        if (typeof Element === 'undefined' || !(Element instanceof Object)) {
-            return;
-        }
-        if (!(target instanceof getWindowOf(target).Element)) {
-            throw new TypeError('parameter 1 is not of type "Element".');
-        }
-        var observations = this.observations_;
-        // Do nothing if element is not being observed.
-        if (!observations.has(target)) {
-            return;
-        }
-        observations.delete(target);
-        if (!observations.size) {
-            this.controller_.removeObserver(this);
-        }
-    };
-    /**
-     * Stops observing all elements.
-     *
-     * @returns {void}
-     */
-    ResizeObserverSPI.prototype.disconnect = function () {
-        this.clearActive();
-        this.observations_.clear();
-        this.controller_.removeObserver(this);
-    };
-    /**
-     * Collects observation instances the associated element of which has changed
-     * it's content rectangle.
-     *
-     * @returns {void}
-     */
-    ResizeObserverSPI.prototype.gatherActive = function () {
-        var _this = this;
-        this.clearActive();
-        this.observations_.forEach(function (observation) {
-            if (observation.isActive()) {
-                _this.activeObservations_.push(observation);
-            }
-        });
-    };
-    /**
-     * Invokes initial callback function with a list of ResizeObserverEntry
-     * instances collected from active resize observations.
-     *
-     * @returns {void}
-     */
-    ResizeObserverSPI.prototype.broadcastActive = function () {
-        // Do nothing if observer doesn't have active observations.
-        if (!this.hasActive()) {
-            return;
-        }
-        var ctx = this.callbackCtx_;
-        // Create ResizeObserverEntry instance for every active observation.
-        var entries = this.activeObservations_.map(function (observation) {
-            return new ResizeObserverEntry(observation.target, observation.broadcastRect());
-        });
-        this.callback_.call(ctx, entries, ctx);
-        this.clearActive();
-    };
-    /**
-     * Clears the collection of active observations.
-     *
-     * @returns {void}
-     */
-    ResizeObserverSPI.prototype.clearActive = function () {
-        this.activeObservations_.splice(0);
-    };
-    /**
-     * Tells whether observer has active observations.
-     *
-     * @returns {boolean}
-     */
-    ResizeObserverSPI.prototype.hasActive = function () {
-        return this.activeObservations_.length > 0;
-    };
-    return ResizeObserverSPI;
-}());
-
-// Registry of internal observers. If WeakMap is not available use current shim
-// for the Map collection as it has all required methods and because WeakMap
-// can't be fully polyfilled anyway.
-var observers = typeof WeakMap !== 'undefined' ? new WeakMap() : new MapShim();
-/**
- * ResizeObserver API. Encapsulates the ResizeObserver SPI implementation
- * exposing only those methods and properties that are defined in the spec.
- */
-var ResizeObserver = /** @class */ (function () {
-    /**
-     * Creates a new instance of ResizeObserver.
-     *
-     * @param {ResizeObserverCallback} callback - Callback that is invoked when
-     *      dimensions of the observed elements change.
-     */
-    function ResizeObserver(callback) {
-        if (!(this instanceof ResizeObserver)) {
-            throw new TypeError('Cannot call a class as a function.');
-        }
-        if (!arguments.length) {
-            throw new TypeError('1 argument required, but only 0 present.');
-        }
-        var controller = ResizeObserverController.getInstance();
-        var observer = new ResizeObserverSPI(callback, controller, this);
-        observers.set(this, observer);
-    }
-    return ResizeObserver;
-}());
-// Expose public methods of ResizeObserver.
-[
-    'observe',
-    'unobserve',
-    'disconnect'
-].forEach(function (method) {
-    ResizeObserver.prototype[method] = function () {
-        var _a;
-        return (_a = observers.get(this))[method].apply(_a, arguments);
-    };
-});
-
-var index = (function () {
-    // Export existing implementation if available.
-    if (typeof global$1.ResizeObserver !== 'undefined') {
-        return global$1.ResizeObserver;
-    }
-    return ResizeObserver;
-})();
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (index);
-
-
 /***/ })
 
 /******/ 	});
@@ -44937,6 +43294,18 @@ var index = (function () {
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -44949,21 +43318,9 @@ var index = (function () {
 /******/ 		};
 /******/ 	})();
 /******/ 	
-/******/ 	/* webpack/runtime/global */
-/******/ 	(() => {
-/******/ 		__webpack_require__.g = (function() {
-/******/ 			if (typeof globalThis === 'object') return globalThis;
-/******/ 			try {
-/******/ 				return this || new Function('return this')();
-/******/ 			} catch (e) {
-/******/ 				if (typeof window === 'object') return window;
-/******/ 			}
-/******/ 		})();
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
@@ -44978,10 +43335,12 @@ var index = (function () {
 /******/ 	})();
 /******/ 	
 /************************************************************************/
+/******/ 	
 /******/ 	// startup
-/******/ 	// Load entry module
+/******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	__webpack_require__("./src/index.tsx");
+/******/ 	var __webpack_exports__ = __webpack_require__("./src/index.tsx");
+/******/ 	
 /******/ })()
 ;
 //# sourceMappingURL=bundle.js.map

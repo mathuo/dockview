@@ -108,13 +108,21 @@
   window.onerror = function onerror(message, source, line, column, err) {
     if (window.CONFIG_TYPE !== 'DEVELOPMENT') return;
     // eslint-disable-next-line no-var, vars-on-top
-    var error = err ? { message: err.message, name: err.name, stack: err.stack } : {};
-    window.fetch('/runtime-error', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      // eslint-disable-next-line object-shorthand, prettier/prettier
-      body: JSON.stringify({ message: message, source: source, line: line, column: column, error: error, origin: 'preview' }),
-    });
+    var xhr = new window.XMLHttpRequest();
+    xhr.open('POST', '/runtime-error');
+    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+    xhr.send(
+      JSON.stringify({
+        /* eslint-disable object-shorthand */
+        message: message,
+        source: source,
+        line: line,
+        column: column,
+        error: err && { message: err.message, name: err.name, stack: err.stack },
+        origin: 'preview',
+        /* eslint-enable object-shorthand */
+      })
+    );
   };</script><style>#root[hidden],
       #docs-root[hidden] {
         display: none !important;
@@ -122,4 +130,4 @@
             
         
             
-              window['FRAMEWORK_OPTIONS'] = {};</script><script src="runtime~main.bf40cb86e112cef6dc4e.bundle.js"></script><script src="vendors~main.bf40cb86e112cef6dc4e.bundle.js"></script><script src="main.bf40cb86e112cef6dc4e.bundle.js"></script></body></html>
+              window['FRAMEWORK_OPTIONS'] = {};</script><script src="runtime~main.fa5f4b5c1c72113498b6.bundle.js"></script><script src="969.fa5f4b5c1c72113498b6.bundle.js"></script><script src="main.fa5f4b5c1c72113498b6.bundle.js"></script></body></html>
