@@ -2,7 +2,7 @@
     "compilerOptions": {
         "module": "es6",
         "declaration": true,
-        "target": "es5",
+        "target": "es6",
         "moduleResolution": "node",
         "esModuleInterop": true,
         "downlevelIteration": true,

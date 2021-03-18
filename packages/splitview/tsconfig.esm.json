@@ -1,8 +1,8 @@
 {
-    "extends": "../../module-build/tsconfig.es6.json",
+    "extends": "../../module-build/tsconfig.esm.json",
     "compilerOptions": {
-        "outDir": "dist/es6",
-        "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.es6",
+        "outDir": "dist/esm",
+        "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.esm",
         "jsx": "react",
         // "baseUrl": "."
         "rootDir": "src"
