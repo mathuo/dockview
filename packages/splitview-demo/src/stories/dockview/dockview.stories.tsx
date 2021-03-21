@@ -29,99 +29,7 @@ const components: PanelCollection<IDockviewPanelProps> = {
     },
 };
 
-export const IFrame = (props: {
-    onEvent: (name: string) => void;
-    theme: string;
-    hideBorders: boolean;
-    disableAutoResizing: boolean;
-}) => {
-    const api = React.useRef<DockviewApi>();
 
-    const onReady = (event: DockviewReadyEvent) => {
-        event.api.layout(window.innerWidth, window.innerHeight);
-        api.current = event.api;
-
-        event.api.onGridEvent((e) => props.onEvent(e.kind));
-
-        event.api.addPanel({
-            id: 'panel1',
-            component: 'default',
-        });
-        event.api.addPanel({
-            id: 'panel2',
-            component: 'iframe',
-        });
-    };
-
-    React.useEffect(() => {
-        window.addEventListener('resize', () => {
-            api.current?.layout(window.innerWidth, window.innerHeight);
-        });
-    }, []);
-
-    return (
-        <DockviewReact
-            className={props.theme}
-            onReady={onReady}
-            components={components}
-            hideBorders={props.hideBorders}
-            disableAutoResizing={props.disableAutoResizing}
-        />
-    );
-};
-
-export const Simple = (props: {
-    onEvent: (name: string) => void;
-    theme: string;
-    hideBorders: boolean;
-    disableAutoResizing: boolean;
-}) => {
-    const api = React.useRef<DockviewApi>();
-
-    const onReady = (event: DockviewReadyEvent) => {
-        event.api.layout(window.innerWidth, window.innerHeight);
-        api.current = event.api;
-
-        event.api.onGridEvent((e) => props.onEvent(e.kind));
-
-        event.api.addPanel({
-            id: 'panel1',
-            component: 'default',
-        });
-        event.api.addPanel({
-            id: 'panel2',
-            component: 'default',
-        });
-        event.api.addPanel({
-            id: 'panel3',
-            component: 'default',
-            position: { referencePanel: 'panel1', direction: 'right' },
-        });
-        event.api.addPanel({
-            id: 'panel4',
-            component: 'default',
-            position: { referencePanel: 'panel3', direction: 'below' },
-        });
-
-        // event.api.getPanel('panel1').api;
-    };
-
-    React.useEffect(() => {
-        window.addEventListener('resize', () => {
-            api.current?.layout(window.innerWidth, window.innerHeight);
-        });
-    }, []);
-
-    return (
-        <DockviewReact
-            className={props.theme}
-            onReady={onReady}
-            components={components}
-            hideBorders={props.hideBorders}
-            disableAutoResizing={props.disableAutoResizing}
-        />
-    );
-};
 
 const Watermark = (props: IWatermarkPanelProps) => {
     const [size, setSize] = React.useState<number>(props.containerApi.size);
@@ -226,8 +134,8 @@ export const CustomWatermark = (props: {
 };
 
 export default {
-    title: 'Dockview',
-    component: Simple,
+    title: 'Dockview/CustomWatermark',
+    component: CustomWatermark,
     decorators: [
         (Component) => {
             document.body.style.padding = '0px';

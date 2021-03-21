@@ -77,55 +77,6 @@ const components: PanelCollection<IPaneviewPanelProps> = {
     },
 };
 
-export const Simple = (props: {
-    theme: string;
-    disableAutoResizing: boolean;
-}) => {
-    const api = React.useRef<PaneviewApi>();
-
-    const onReady = (event: PaneviewReadyEvent) => {
-        event.api.layout(window.innerWidth, window.innerHeight);
-        api.current = event.api;
-
-        event.api.addPanel({
-            id: 'panel1',
-            component: 'default',
-            params: { color: 'red' },
-            title: 'Panel1',
-            minimumBodySize: 100,
-        });
-        event.api.addPanel({
-            id: 'panel2',
-            component: 'default',
-            params: { color: 'green' },
-            title: 'Panel 2',
-            minimumBodySize: 100,
-        });
-        event.api.addPanel({
-            id: 'panel3',
-            component: 'default',
-            params: { color: 'purple' },
-            title: 'Panel 3',
-            minimumBodySize: 100,
-        });
-    };
-
-    React.useEffect(() => {
-        window.addEventListener('resize', () => {
-            api.current?.layout(window.innerWidth, window.innerHeight);
-        });
-    }, []);
-
-    return (
-        <PaneviewReact
-            className={props.theme}
-            onReady={onReady}
-            components={components}
-            disableAutoResizing={props.disableAutoResizing}
-        />
-    );
-};
-
 export const Deserialization = (props: {
     theme: string;
     disableAutoResizing: boolean;
@@ -192,87 +143,11 @@ export const Deserialization = (props: {
     );
 };
 
-export const LocalStorageSave = (props: {
-    theme: string;
-    disableAutoResizing: boolean;
-}) => {
-    const api = React.useRef<PaneviewApi>();
 
-    const onReady = (event: PaneviewReadyEvent) => {
-        event.api.layout(window.innerWidth, window.innerHeight);
-        api.current = event.api;
-
-        event.api.onDidLayoutChange(() => {
-            const state = event.api.toJSON();
-            localStorage.setItem('paneview.test.layout', JSON.stringify(state));
-            console.log(JSON.stringify(state, null, 4));
-        });
-
-        const state = localStorage.getItem('paneview.test.layout');
-        if (state) {
-            event.api.fromJSON(JSON.parse(state) as SerializedPaneview);
-            return;
-        }
-
-        event.api.fromJSON({
-            size: 100,
-            views: [
-                {
-                    size: 80,
-                    expanded: true,
-                    minimumSize: 100,
-                    data: {
-                        id: 'panel1',
-                        component: 'default',
-                        title: 'Panel 1',
-                    },
-                },
-                {
-                    size: 20,
-                    expanded: true,
-                    minimumSize: 100,
-                    data: {
-                        id: 'panel2',
-                        component: 'default',
-                        title: 'Panel 2',
-                    },
-                },
-                {
-                    size: 20,
-                    expanded: false,
-                    minimumSize: 100,
-                    data: {
-                        id: 'panel3',
-                        component: 'default',
-                        title: 'Panel 3',
-                    },
-                },
-            ],
-        });
-
-        event.api.layout(window.innerWidth, window.innerHeight);
-        event.api.getPanel('panel2')?.api.setSize({ size: 60 });
-    };
-
-    React.useEffect(() => {
-        window.addEventListener('resize', () => {
-            api.current?.layout(window.innerWidth, window.innerHeight);
-        });
-    }, []);
-
-    return (
-        <PaneviewReact
-            className={props.theme}
-            onReady={onReady}
-            components={components}
-            disableAutoResizing={props.disableAutoResizing}
-        />
-    );
-};
 
 export default {
-    title: 'Paneview',
-    component: Simple,
+    title: 'Paneview/Deserialization',
+    component: Deserialization,
     decorators: [
         (Component) => {
             document.body.style.padding = '0px';

@@ -291,7 +291,7 @@ export const LocalStorageSave = (props: {
 };
 
 export default {
-    title: 'Splitview',
+    title: 'Splitview/Simple',
     component: Simple,
     decorators: [
         (Component) => {

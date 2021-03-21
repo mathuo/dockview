@@ -99,7 +99,7 @@ export const Simple = (props: {
 };
 
 export default {
-    title: 'Gridview',
+    title: 'Gridview/Simple',
     component: Simple,
     decorators: [
         (Component) => {

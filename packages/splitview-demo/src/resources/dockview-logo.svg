@@ -1,0 +1,16 @@
+<svg width="70" height="70" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 30H45V70H5C2.23858 70 0 67.7614 0 65V30Z" fill="#1E90FF"/>
+<path d="M45 30H70V65C70 67.7614 67.7614 70 65 70H45V30Z" fill="#FF1E90"/>
+<rect x="45" y="30" width="25" height="5" fill="#AC1160"/>
+<rect x="45" y="30" width="10" height="5" fill="#EB1D85"/>
+<rect y="30" width="45" height="5" fill="#1863AD"/>
+<rect y="30" width="10" height="5" fill="#1A84EC"/>
+<rect x="10" y="30" width="10" height="5" fill="#1973CB"/>
+<path d="M0 5C0 2.23858 2.23858 0 5 0H30V30H0V5Z" fill="#1EFF8D"/>
+<path d="M0 5C0 2.23858 2.23858 0 5 0H30V5H0V5Z" fill="#1BCA71"/>
+<path d="M0 5C0 2.23858 2.23858 0 5 0H10V5H0V5Z" fill="#1DF387"/>
+<path d="M30 0H65C67.7614 0 70 2.23858 70 5V30H30V0Z" fill="#FF8D1E"/>
+<path d="M30 0H65C67.7614 0 70 2.23858 70 5V5H30V0Z" fill="#BA6817"/>
+<rect x="30" width="10" height="5" fill="#EF841B"/>
+<rect x="40" width="10" height="5" fill="#DC7A1B"/>
+</svg>
