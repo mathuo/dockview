@@ -13,12 +13,12 @@ export * from './lifecycle';
 export * from './groupview/groupPanel';
 export * from './api/groupPanelApi';
 export * from './api/component.api';
-export * from './react/react';
 export * from './groupview/types';
-export * from './react';
 export * from './dockview/dockviewComponent';
 export * from './dockview/options';
 export * from './gridview/gridviewComponent';
+
+export * from './react'; // TODO: should be conditional on whether user wants the React wrappers
 
 export {
     StateObject,
