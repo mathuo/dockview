@@ -14,19 +14,21 @@ import {
 } from 'dockview';
 import * as React from 'react';
 import { Story, Meta } from '@storybook/react';
-import 'dockview/dist/styles.css';
 
 const components: PanelCollection<IPaneviewPanelProps> = {
     default: (props) => {
-        const [constraints, setConstraints] = React.useState<
-            PanelConstraintChangeEvent
-        >();
-        const [dimensions, setDimensions] = React.useState<
-            PanelDimensionChangeEvent
-        >();
-        const [expansionState, setExpansionState] = React.useState<
-            ExpansionEvent
-        >();
+        const [
+            constraints,
+            setConstraints,
+        ] = React.useState<PanelConstraintChangeEvent>();
+        const [
+            dimensions,
+            setDimensions,
+        ] = React.useState<PanelDimensionChangeEvent>();
+        const [
+            expansionState,
+            setExpansionState,
+        ] = React.useState<ExpansionEvent>();
         const [active, setActive] = React.useState<ActiveEvent>();
         const [focus, setFocus] = React.useState<FocusEvent>();
 
@@ -126,7 +128,6 @@ export const Simple = (props: {
     );
 };
 
-
 export default {
     title: 'Paneview/Simple',
     component: Simple,
@@ -150,4 +151,3 @@ export default {
         },
     },
 } as Meta;
- 

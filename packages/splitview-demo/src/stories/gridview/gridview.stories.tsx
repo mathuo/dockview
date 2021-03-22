@@ -8,7 +8,6 @@ import {
 } from 'dockview';
 import * as React from 'react';
 import { Story, Meta } from '@storybook/react';
-import 'dockview/dist/styles.css';
 
 const components: PanelCollection<IGridviewPanelProps> = {
     default: (props) => {

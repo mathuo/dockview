@@ -39,10 +39,10 @@ npm install --save dockview
 
 ## Setup
 
-You must import or reference the stylesheet at `dockview/dist/styles.css`. For example:
+You must import or reference the stylesheet at `dockview/dist/styles/dockview.css`. For example:
 
 ```css
-@import '~dockview/dist/styles.css';
+@import '~dockview/dist/styles/dockview.css';
 ```
 
 You should also attach a dockview theme to an element containing your components. For example:

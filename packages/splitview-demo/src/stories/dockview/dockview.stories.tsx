@@ -10,7 +10,6 @@ import {
 } from 'dockview';
 import * as React from 'react';
 import { Meta } from '@storybook/react';
-import 'dockview/dist/styles.css';
 
 const components: PanelCollection<IDockviewPanelProps> = {
     default: (props) => {
@@ -28,8 +27,6 @@ const components: PanelCollection<IDockviewPanelProps> = {
         );
     },
 };
-
-
 
 const Watermark = (props: IWatermarkPanelProps) => {
     const [size, setSize] = React.useState<number>(props.containerApi.size);
