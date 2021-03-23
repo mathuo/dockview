@@ -2,9 +2,9 @@
     "name": "dockview",
     "version": "0.0.12",
     "description": "Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support",
-    "main": "dist/cjs/index.js",
-    "types": "dist/cjs/index.d.ts",
-    "module": "dist/esm/index.js",
+    "main": "./dist/cjs/index.js",
+    "types": "./dist/cjs/index.d.ts",
+    "module": "./dist/esm/index.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/mathuo/dockview.git"
@@ -26,7 +26,6 @@
         "rebuild": "npm run clean && npm run build",
         "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
         "test-cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage"
-        
     },
     "files": [
         "dist",
@@ -48,8 +47,8 @@
         "react-component",
         "grid"
     ],
-    "author": "",
-    "license": "ISC",
+    "author": "https://github.com/mathuo",
+    "license": "MIT",
     "devDependencies": {
         "@rollup/plugin-typescript": "^8.2.0",
         "@testing-library/react": "^11.2.5",

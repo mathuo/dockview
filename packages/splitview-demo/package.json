@@ -2,8 +2,7 @@
   "name": "splitview-demo",
   "private": true,
   "version": "0.0.12",
-  "description": "",
-  "main": "index.js",
+  "description": "Demo project for https://github.com/mathuo/dockview",
   "scripts": {
     "build": "npm run build-webpack && npm run build-storybook",
     "build-webpack": "cross-env ../../node_modules/.bin/webpack --config webpack.config.js",
@@ -12,8 +11,8 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "https://github.com/mathuo",
+  "license": "MIT",
   "dependencies": {
     "dockview": "^0.0.12",
     "react": "^17.0.1",
