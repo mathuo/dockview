@@ -8,3 +8,4 @@ typedocs/
 *-debug.log
 .build
 storybook-static/
+.rollup.cache/
