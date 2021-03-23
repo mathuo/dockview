@@ -1,14 +1,9 @@
 import * as React from 'react';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
-import {
-    IGroupPanelActionbarProps,
-    ReactPanelContentPart,
-} from './reactContentPart';
+import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
 import { ReactPanelDeserialzier } from '../deserializer';
 import {
-    DockviewOptions,
-    DockviewRenderFunctions,
     GroupPanelFrameworkComponentFactory,
     TabContextMenuEvent,
 } from '../../dockview/options';
@@ -19,7 +14,6 @@ import { ReactWatermarkPart } from './reactWatermarkPart';
 import { PanelCollection } from '../types';
 import { IDisposable } from '../../lifecycle';
 import { watchElementResize } from '../../dom';
-import { ReactGroupPanelView } from './v2/reactGroupPanelView';
 import { IContentRenderer, ITabRenderer } from '../../groupview/types';
 
 export interface ActionsbarReference<P> extends IDisposable {
@@ -33,10 +27,6 @@ export interface IGroupPanelBaseProps {
 }
 
 export interface IDockviewPanelProps extends IGroupPanelBaseProps {
-    setActionsbar<P>(
-        component: React.FunctionComponent<IGroupPanelActionbarProps & P>,
-        props: P
-    ): ActionsbarReference<IGroupPanelActionbarProps & P>;
     [key: string]: any;
 }
 

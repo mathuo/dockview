@@ -2,15 +2,17 @@ import * as React from 'react';
 import {
     IContentRenderer,
     GroupPanelPartInitParameters,
+    GroupPanelContentPartInitParameters,
 } from '../../groupview/types';
 import { ReactPart, ReactPortalStore } from '../react';
 import { ActionsbarReference, IDockviewPanelProps } from '../dockview/dockview';
 import { PanelUpdateEvent } from '../../panel/types';
-import { IDockviewPanelApi } from '../../api/groupPanelApi';
+import { DockviewPanelApi, IDockviewPanelApi } from '../../api/groupPanelApi';
 import { DockviewApi } from '../../api/component.api';
 import { HostedContainer } from '../../hostedContainer';
 import { GroupviewPanel } from '../../groupview/v2/groupviewPanel';
 import { Emitter, Event } from '../../events';
+import { WrappedTab } from '../../dockview/components/tab/defaultTab';
 
 export interface IGroupPanelActionbarProps {
     api: IDockviewPanelApi;
@@ -89,6 +91,13 @@ class BasePanelContentPart implements IContentRenderer {
     }
 }
 
+export interface ReactContentPartContext {
+    api: IDockviewPanelApi;
+    containerApi: DockviewApi;
+    actionsPortalElement: HTMLElement;
+    tabPortalElement: WrappedTab;
+}
+
 export class ReactPanelContentPart implements IContentRenderer {
     private _element: HTMLElement;
     private part?: ReactPart<IDockviewPanelProps>;
@@ -97,7 +106,7 @@ export class ReactPanelContentPart implements IContentRenderer {
     private _actionsElement: HTMLElement;
     private actionsPart?: ReactPart<any>;
 
-    private parameters: GroupPanelPartInitParameters | undefined;
+    private parameters: GroupPanelContentPartInitParameters | undefined;
 
     // private hostedContainer: HostedContainer;
 
@@ -140,10 +149,10 @@ export class ReactPanelContentPart implements IContentRenderer {
         // this._element.focus();
     }
 
-    public init(parameters: GroupPanelPartInitParameters): void {
+    public init(parameters: GroupPanelContentPartInitParameters): void {
         this.parameters = parameters;
 
-        const api = parameters.api;
+        // const api = parameters.api;
 
         // api.onDidVisibilityChange((event) => {
         //     const { isVisible } = event;
@@ -155,6 +164,13 @@ export class ReactPanelContentPart implements IContentRenderer {
         //     }
         // });
 
+        const context: ReactContentPartContext = {
+            api: parameters.api,
+            containerApi: parameters.containerApi,
+            actionsPortalElement: this._actionsElement,
+            tabPortalElement: this.parameters.tab,
+        };
+
         this.part = new ReactPart(
             this.element,
             this.reactPortalStore,
@@ -163,43 +179,9 @@ export class ReactPanelContentPart implements IContentRenderer {
                 ...parameters.params,
                 api: parameters.api,
                 containerApi: parameters.containerApi,
-                setActionsbar: this.setActionsbar.bind(this),
-            }
-        );
-    }
-
-    private setActionsbar<P>(
-        component: React.FunctionComponent<IGroupPanelActionbarProps & P>,
-        props: P
-    ): ActionsbarReference<IGroupPanelActionbarProps & P> {
-        if (this.actionsPart) {
-            console.debug('removed existing panel-actions portal');
-            this.actionsPart.dispose();
-            this.actionsPart = undefined;
-        }
-
-        this.actionsPart = new ReactPart<IGroupPanelActionbarProps & P>(
-            this._actionsElement,
-            this.reactPortalStore,
-            component,
-            {
-                ...props,
-                api: this.parameters!.api,
-                containerApi: this.parameters!.containerApi,
-            }
-        );
-
-        this._group?.group.updateActions();
-
-        return {
-            update: (props: Partial<P>) => {
-                this.actionsPart?.update(props);
             },
-            dispose: () => {
-                this.actionsPart?.dispose();
-                this.actionsPart = undefined;
-            },
-        };
+            context
+        );
     }
 
     public toJSON() {

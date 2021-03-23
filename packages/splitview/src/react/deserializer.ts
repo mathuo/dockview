@@ -33,9 +33,9 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
                 ? createComponent(
                       viewData.tab.id,
                       viewData.tab.id,
-                      this.layout.options.components,
-                      this.layout.options.frameworkComponents,
-                      this.layout.options.frameworkComponentFactory?.content
+                      this.layout.options.tabComponents,
+                      this.layout.options.frameworkTabComponents,
+                      this.layout.options.frameworkComponentFactory?.tab
                   )
                 : new DefaultTab(),
         });

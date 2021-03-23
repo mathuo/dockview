@@ -11,6 +11,7 @@ import { IGroupPanelBaseProps } from './dockview';
 export class ReactPanelHeaderPart implements ITabRenderer {
     private _element: HTMLElement;
     private part?: ReactPart<IGroupPanelBaseProps>;
+    private params: GroupPanelPartInitParameters | undefined;
 
     get element() {
         return this._element;
@@ -29,6 +30,8 @@ export class ReactPanelHeaderPart implements ITabRenderer {
     }
 
     public init(parameters: GroupPanelPartInitParameters): void {
+        this.params = parameters;
+
         this.part = new ReactPart(
             this.element,
             this.reactPortalStore,
@@ -42,7 +45,9 @@ export class ReactPanelHeaderPart implements ITabRenderer {
     }
 
     public update(event: PanelUpdateEvent) {
-        //noop
+        if (this.params) {
+            this.params.params = { ...this.params?.params, ...event.params };
+        }
     }
 
     public toJSON() {

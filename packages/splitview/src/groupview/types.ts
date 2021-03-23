@@ -5,6 +5,7 @@ import { PanelInitParameters, IPanel } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
 import { GroupviewPanel } from './v2/groupviewPanel';
 import { Event } from '../events';
+import { WrappedTab } from '../dockview/components/tab/defaultTab';
 
 export interface HeaderPartInitParameters {
     title: string;
@@ -16,6 +17,11 @@ export interface GroupPanelPartInitParameters
         HeaderPartInitParameters {
     api: IDockviewPanelApi;
     containerApi: DockviewApi;
+}
+
+export interface GroupPanelContentPartInitParameters
+    extends GroupPanelPartInitParameters {
+    tab: WrappedTab;
 }
 
 export interface WatermarkPart extends IDisposable {
@@ -41,7 +47,7 @@ export interface IContentRenderer extends IPanel {
     readonly onDidFocus?: Event<void>;
     readonly onDidBlur?: Event<void>;
     updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void;
-    init(parameters: GroupPanelPartInitParameters): void;
+    init(parameters: GroupPanelContentPartInitParameters): void;
     close?(): Promise<boolean>;
 }
 

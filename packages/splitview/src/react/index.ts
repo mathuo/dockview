@@ -1,4 +1,5 @@
 export * from './dockview/dockview';
+export * from './dockview/components';
 export * from './splitview/splitview';
 export * from './gridview/gridview';
 export * from './dockview/reactContentPart';

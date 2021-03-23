@@ -8,6 +8,67 @@ import { toggleClass } from '../../../dom';
 import { PanelUpdateEvent } from '../../../panel/types';
 import { GroupviewPanel } from '../../../groupview/v2/groupviewPanel';
 
+export class WrappedTab implements ITabRenderer {
+    private readonly _element: HTMLElement;
+
+    constructor(private readonly renderer: ITabRenderer) {
+        this._element = document.createElement('element');
+        this.show();
+    }
+
+    get innerRenderer() {
+        return this.renderer;
+    }
+
+    get element() {
+        return this._element;
+    }
+
+    get id() {
+        return this.renderer.id;
+    }
+
+    show() {
+        if (!this.renderer.element.parentElement) {
+            this._element.appendChild(this.renderer.element);
+        }
+    }
+
+    hide() {
+        if (this.renderer.element.parentElement) {
+            this.renderer.element.remove();
+        }
+    }
+
+    layout(width: number, height: number): void {
+        this.renderer.layout(width, height);
+    }
+
+    update(event: PanelUpdateEvent): void {
+        this.renderer.update(event);
+    }
+
+    toJSON(): object {
+        return this.renderer.toJSON();
+    }
+
+    focus(): void {
+        this.renderer.focus();
+    }
+
+    init(parameters: GroupPanelPartInitParameters): void {
+        this.renderer.init(parameters);
+    }
+
+    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void {
+        this.renderer.updateParentGroup(group, isPanelVisible);
+    }
+
+    dispose() {
+        this.renderer.dispose();
+    }
+}
+
 export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     private _element: HTMLElement;
 

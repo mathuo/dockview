@@ -67,7 +67,10 @@ ReactComponentBridge.displayName = 'PanelWrapper';
  */
 const uniquePortalKeyGenerator = sequentialNumberGenerator();
 
-export class ReactPart<P extends object> implements IFrameworkPart {
+export const ReactPartContext = React.createContext<{}>({});
+
+export class ReactPart<P extends object, C extends object = {}>
+    implements IFrameworkPart {
     private componentInstance?: IPanelWrapperRef;
     private ref?: { portal: React.ReactPortal; disposable: IDisposable };
     private disposed = false;
@@ -76,7 +79,8 @@ export class ReactPart<P extends object> implements IFrameworkPart {
         private readonly parent: HTMLElement,
         private readonly portalStore: ReactPortalStore,
         private readonly component: React.FunctionComponent<P>,
-        private readonly parameters: P
+        private readonly parameters: P,
+        private readonly context?: C
     ) {
         this.createPortal();
     }
@@ -117,8 +121,17 @@ export class ReactPart<P extends object> implements IFrameworkPart {
                 },
             }
         );
+
+        const node = this.context
+            ? React.createElement(
+                  ReactPartContext.Provider,
+                  { value: this.context },
+                  bridgeComponent
+              )
+            : bridgeComponent;
+
         const portal = ReactDOM.createPortal(
-            bridgeComponent,
+            node,
             this.parent,
             uniquePortalKeyGenerator.next()
         );

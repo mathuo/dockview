@@ -1,4 +1,7 @@
-import { DefaultTab } from '../../../dockview/components/tab/defaultTab';
+import {
+    DefaultTab,
+    WrappedTab,
+} from '../../../dockview/components/tab/defaultTab';
 import {
     GroupPanelPartInitParameters,
     IActionsRenderer,
@@ -6,8 +9,7 @@ import {
     ITabRenderer,
 } from '../../../groupview/types';
 import { GroupviewPanel } from '../../../groupview/v2/groupviewPanel';
-import { CompositeDisposable, IDisposable } from '../../../lifecycle';
-import { Event, Emitter } from '../../../events';
+import { IDisposable } from '../../../lifecycle';
 import { PanelUpdateEvent } from '../../../panel/types';
 
 export interface IGroupPanelView extends IDisposable {
@@ -21,34 +23,9 @@ export interface IGroupPanelView extends IDisposable {
     toJSON(): {};
 }
 
-class Context implements IDisposable {
-    private emitters = new Map<string, Emitter<any>>();
-
-    fire<T>(key: string, object: T) {
-        if (!this.emitters.has(key)) {
-            this.emitters.set(key, new Emitter<T>());
-        }
-        const emitter = this.emitters.get(key)! as Emitter<T>;
-        emitter.fire(object);
-    }
-
-    toEvent<T>(key: string): Event<T> {
-        const emitter = this.emitters.get(key) as Emitter<T>;
-        return emitter.event;
-    }
-
-    dispose() {
-        this.emitters.forEach((value, key) => {
-            value.dispose();
-        });
-        this.emitters.clear();
-    }
-}
-
 export class DefaultGroupPanelView implements IGroupPanelView {
-    private readonly context = new Context();
     private readonly _content: IContentRenderer;
-    private readonly _tab: ITabRenderer;
+    private readonly _tab: WrappedTab;
     private readonly _actions: IActionsRenderer | undefined;
 
     get content() {
@@ -69,7 +46,7 @@ export class DefaultGroupPanelView implements IGroupPanelView {
         actions?: IActionsRenderer;
     }) {
         this._content = renderers.content;
-        this._tab = renderers.tab ?? new DefaultTab();
+        this._tab = new WrappedTab(renderers.tab ?? new DefaultTab());
         this._actions =
             renderers.actions ||
             (this.content.actions
@@ -83,7 +60,7 @@ export class DefaultGroupPanelView implements IGroupPanelView {
     }
 
     init(params: GroupPanelPartInitParameters): void {
-        this.content.init(params);
+        this.content.init({ ...params, tab: this.tab });
         this.tab.init(params);
     }
 
@@ -103,7 +80,10 @@ export class DefaultGroupPanelView implements IGroupPanelView {
     toJSON() {
         return {
             content: this.content.toJSON(),
-            tab: this.tab instanceof DefaultTab ? undefined : this.tab.toJSON(),
+            tab:
+                this.tab.innerRenderer instanceof DefaultTab
+                    ? undefined
+                    : this.tab.toJSON(),
         };
     }
 

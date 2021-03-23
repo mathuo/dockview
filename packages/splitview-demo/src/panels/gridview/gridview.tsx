@@ -26,9 +26,10 @@ const components: PanelCollection<IGridviewPanelProps> = {
             width: number;
             height: number;
         }>({ width: 0, height: 0 });
-        const [constraints, setConstraints] = React.useState<
-            GridConstraintChangeEvent
-        >({
+        const [
+            constraints,
+            setConstraints,
+        ] = React.useState<GridConstraintChangeEvent>({
             minimumHeight: undefined,
             maximumHeight: undefined,
             minimumWidth: undefined,

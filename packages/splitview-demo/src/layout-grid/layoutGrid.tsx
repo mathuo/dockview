@@ -12,6 +12,7 @@ import {
     IWatermarkPanelProps,
     IGroupPanel,
     PanelCollection,
+    DockviewComponents,
 } from 'dockview';
 import { CustomTab } from './customTab';
 import { Settings } from './settingsPanel';
@@ -22,7 +23,41 @@ import { WelcomePanel } from '../panels/welcome/welcome';
 import { SplitviewPanel } from '../panels/splitview/splitview';
 import { GridviewDemoPanel } from '../panels/gridview/gridview';
 
+const Test = (props: IDockviewPanelProps) => {
+    const [counter, setCounter] = React.useState<number>(0);
+
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            setCounter((_) => _ + 1);
+        }, 2000);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
+
+    return (
+        <DockviewComponents.Panel>
+            {counter % 4 === 0 && (
+                <DockviewComponents.Tab>
+                    <div>{`custom tab ${counter}`}</div>
+                </DockviewComponents.Tab>
+            )}
+            <DockviewComponents.Body>
+                <div>
+                    <div>{`custom body ${counter}`}</div>
+                    <button>Toggle</button>
+                </div>
+            </DockviewComponents.Body>
+            <DockviewComponents.Action>
+                <div>{`custom action ${counter}`}</div>
+            </DockviewComponents.Action>
+        </DockviewComponents.Panel>
+    );
+};
+
 const components: PanelCollection<IDockviewPanelProps> = {
+    test: Test,
     welcome: WelcomePanel,
     splitview: SplitviewPanel,
     gridview: GridviewDemoPanel,
@@ -112,40 +147,6 @@ const components: PanelCollection<IDockviewPanelProps> = {
         const input = React.useRef<HTMLInputElement>();
 
         React.useEffect(() => {
-            props.setActionsbar(
-                (_props) => {
-                    const onClick = () => {
-                        _props.api.close();
-                    };
-
-                    return (
-                        <div
-                            style={{
-                                height: '100%',
-                                display: 'flex',
-                                backgroundColor: 'rgba(255,255,255,0.1)',
-                                padding: '0px 4px',
-                            }}
-                        >
-                            <span
-                                onClick={onClick}
-                                style={{
-                                    height: '100%',
-                                    width: '25px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                }}
-                            >
-                                <a className="material-icons">menu</a>
-                            </span>
-                        </div>
-                    );
-                },
-                { qwerty: 'qwerty' }
-            );
-        }, []);
-
-        React.useEffect(() => {
             const disposable = new CompositeDisposable(
                 props.api.onDidActiveChange((event) => {
                     setPanelState((_) => ({
@@ -193,62 +194,92 @@ const components: PanelCollection<IDockviewPanelProps> = {
             props.api.setTitle('Did it change?');
         };
 
+        const onClose = () => {
+            props.api.close();
+        };
+
         return (
-            <div
-                style={{
-                    // backgroundColor,
-                    height: '100%',
-                }}
-            >
-                <div
-                    style={{
-                        padding: '5px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                    }}
-                >
-                    <div>This is a dockable panel</div>
-                    <div>
-                        <span>{'isGroupActive: '}</span>
+            <DockviewComponents.Panel>
+                <DockviewComponents.Action>
+                    <div
+                        style={{
+                            height: '100%',
+                            display: 'flex',
+                            backgroundColor: 'rgba(255,255,255,0.1)',
+                            padding: '0px 4px',
+                        }}
+                    >
                         <span
+                            onClick={onClose}
                             style={{
-                                color: panelState.isGroupActive
-                                    ? '#23d16f'
-                                    : '#cd312b',
+                                height: '100%',
+                                width: '25px',
+                                display: 'flex',
+                                alignItems: 'center',
                             }}
                         >
-                            {`${panelState.isGroupActive}`}
+                            <a className="material-icons">menu</a>
                         </span>
                     </div>
-                    <div>
-                        <span>{'isPanelVisible: '}</span>
-                        <span
+                </DockviewComponents.Action>
+                <DockviewComponents.Body>
+                    <div
+                        style={{
+                            // backgroundColor,
+                            height: '100%',
+                        }}
+                    >
+                        <div
                             style={{
-                                color: panelState.isPanelVisible
-                                    ? '#23d16f'
-                                    : '#cd312b',
+                                padding: '5px',
+                                display: 'flex',
+                                flexDirection: 'column',
                             }}
                         >
-                            {`${panelState.isPanelVisible}`}
-                        </span>
+                            <div>This is a dockable panel</div>
+                            <div>
+                                <span>{'isGroupActive: '}</span>
+                                <span
+                                    style={{
+                                        color: panelState.isGroupActive
+                                            ? '#23d16f'
+                                            : '#cd312b',
+                                    }}
+                                >
+                                    {`${panelState.isGroupActive}`}
+                                </span>
+                            </div>
+                            <div>
+                                <span>{'isPanelVisible: '}</span>
+                                <span
+                                    style={{
+                                        color: panelState.isPanelVisible
+                                            ? '#23d16f'
+                                            : '#cd312b',
+                                    }}
+                                >
+                                    {`${panelState.isPanelVisible}`}
+                                </span>
+                            </div>
+                            <button onClick={onClick}>set state</button>
+                            <button onClick={onRename}>rename</button>
+
+                            {/* {props.api.getState()["test_key"]} */}
+
+                            {/* <div>{props.text || '-'}</div> */}
+                            <input
+                                style={{ width: '175px' }}
+                                ref={input}
+                                placeholder="This is focused by the panel"
+                            />
+                            <input
+                                style={{ width: '175px' }}
+                                placeholder="This is also focusable"
+                            />
+                        </div>
                     </div>
-                    <button onClick={onClick}>set state</button>
-                    <button onClick={onRename}>rename</button>
-
-                    {/* {props.api.getState()["test_key"]} */}
-
-                    {/* <div>{props.text || '-'}</div> */}
-                    <input
-                        style={{ width: '175px' }}
-                        ref={input}
-                        placeholder="This is focused by the panel"
-                    />
-                    <input
-                        style={{ width: '175px' }}
-                        placeholder="This is also focusable"
-                    />
-                </div>
-            </div>
+                </DockviewComponents.Body>
+            </DockviewComponents.Panel>
         );
     },
     settings: Settings,
@@ -331,6 +362,12 @@ export const TestGrid = (props: IGridviewPanelProps) => {
                 suppressClosable: true,
             });
         }
+
+        // api.addPanel({
+        //     component: 'test',
+        //     id: 'test',
+        //     title: 'Test',
+        // });
     };
 
     React.useEffect(() => {
