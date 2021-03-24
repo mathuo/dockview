@@ -146,36 +146,28 @@ export class ContentContainer
 
         const disposable = new CompositeDisposable();
 
-        // if (panel.onDidFocus) {
-        //     disposable.addDisposables(
-        //         panel.onDidFocus(() => this._onDidFocus.fire())
-        //     );
-        // }
-
-        // if (panel.onDidBlur) {
-        //     disposable.addDisposables(
-        //         panel.onDidBlur(() => this._onDidBlur.fire())
-        //     );
-        // }
-
         if (this.panel.view) {
-            let _onDidFocus: Event<void> = this.panel.view.content.onDidFocus!;
-            let _onDidBlur: Event<void> = this.panel.view.content.onDidBlur!;
+            const _onDidFocus: Event<void> = this.panel.view.content
+                .onDidFocus!;
+            const _onDidBlur: Event<void> = this.panel.view.content.onDidBlur!;
 
-            if (!_onDidFocus || !_onDidBlur) {
-                const { onDidFocus, onDidBlur } = trackFocus(this._element);
-                if (!_onDidFocus) {
-                    _onDidFocus = onDidFocus;
-                }
-                if (!_onDidBlur) {
-                    _onDidBlur = onDidBlur;
-                }
-            }
+            const { onDidFocus, onDidBlur } = trackFocus(this._element);
 
             disposable.addDisposables(
-                _onDidFocus(() => this._onDidFocus.fire()),
-                _onDidBlur(() => this._onDidBlur.fire())
+                onDidFocus(() => this._onDidFocus.fire()),
+                onDidBlur(() => this._onDidBlur.fire())
             );
+
+            if (_onDidFocus) {
+                disposable.addDisposables(
+                    _onDidFocus(() => this._onDidFocus.fire())
+                );
+            }
+            if (_onDidBlur) {
+                disposable.addDisposables(
+                    _onDidBlur(() => this._onDidBlur.fire())
+                );
+            }
 
             this._element.appendChild(this.panel.view.content.element);
         }
