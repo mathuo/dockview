@@ -5,9 +5,9 @@ import {
     GroupPanelContentPartInitParameters,
 } from '../../groupview/types';
 import { ReactPart, ReactPortalStore } from '../react';
-import { ActionsbarReference, IDockviewPanelProps } from '../dockview/dockview';
+import { IDockviewPanelProps } from '../dockview/dockview';
 import { PanelUpdateEvent } from '../../panel/types';
-import { DockviewPanelApi, IDockviewPanelApi } from '../../api/groupPanelApi';
+import { IDockviewPanelApi } from '../../api/groupPanelApi';
 import { DockviewApi } from '../../api/component.api';
 import { HostedContainer } from '../../hostedContainer';
 import { GroupviewPanel } from '../../groupview/v2/groupviewPanel';

@@ -16,10 +16,6 @@ import { IDisposable } from '../../lifecycle';
 import { watchElementResize } from '../../dom';
 import { IContentRenderer, ITabRenderer } from '../../groupview/types';
 
-export interface ActionsbarReference<P> extends IDisposable {
-    update(params: Partial<P>): void;
-}
-
 export interface IGroupPanelBaseProps {
     api: IDockviewPanelApi;
     containerApi: DockviewApi;

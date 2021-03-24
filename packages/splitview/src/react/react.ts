@@ -58,7 +58,7 @@ const ReactComponentBridge: React.ForwardRefRenderFunction<
 
     return React.createElement(props.component, _props.current);
 };
-ReactComponentBridge.displayName = 'PanelWrapper';
+ReactComponentBridge.displayName = 'DockviewReactJsBridge';
 
 /**
  * Since we are storing the React.Portal references in a rendered array they
@@ -181,3 +181,10 @@ export const usePortalsLifecycle: PortalLifecycleHook = () => {
 
     return [portals, addPortal];
 };
+
+// it does the job...
+export function isReactElement(
+    element: any | React.ReactElement
+): element is React.ReactElement {
+    return !!(element as any)?.type;
+}

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { ReactPartContext } from '../react';
+import { isReactElement, ReactPartContext } from '../react';
 import { ReactContentPartContext } from './reactContentPart';
 
 interface WithChildren {
@@ -17,13 +17,6 @@ const Body: React.FunctionComponent<WithChildren> = (props: WithChildren) => {
 const Action: React.FunctionComponent<WithChildren> = (props: WithChildren) => {
     return <>{props.children}</>;
 };
-
-// it does the job...
-function isReactElement(
-    element: any | React.ReactElement
-): element is React.ReactElement {
-    return !!(element as any)?.type;
-}
 
 function isValidComponent(element: React.ReactElement) {
     return [Body, Action, Tab].find((comp) => element.type === comp);
