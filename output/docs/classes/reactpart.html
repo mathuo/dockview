@@ -56,7 +56,7 @@
 					<a href="reactpart.html">ReactPart</a>
 				</li>
 			</ul>
-			<h1>Class ReactPart&lt;P&gt;</h1>
+			<h1>Class ReactPart&lt;P, C&gt;</h1>
 		</div>
 	</div>
 </header>
@@ -68,6 +68,9 @@
 				<ul class="tsd-type-parameters">
 					<li>
 						<h4>P<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></h4>
+					</li>
+					<li>
+						<h4>C<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span> = <span class="tsd-signature-symbol">{}</span></h4>
 					</li>
 				</ul>
 			</section>
@@ -111,19 +114,22 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>React<wbr>Part&lt;P&gt;<span class="tsd-signature-symbol">(</span>parent<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">HTMLElement</span>, portalStore<span class="tsd-signature-symbol">: </span><a href="../interfaces/reactportalstore.html" class="tsd-signature-type" data-tsd-kind="Interface">ReactPortalStore</a>, component<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">FunctionComponent</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">&gt;</span>, parameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="reactpart.html" class="tsd-signature-type" data-tsd-kind="Class">ReactPart</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>React<wbr>Part&lt;P, C&gt;<span class="tsd-signature-symbol">(</span>parent<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">HTMLElement</span>, portalStore<span class="tsd-signature-symbol">: </span><a href="../interfaces/reactportalstore.html" class="tsd-signature-type" data-tsd-kind="Interface">ReactPortalStore</a>, component<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">FunctionComponent</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">&gt;</span>, parameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">P</span>, context<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">C</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="reactpart.html" class="tsd-signature-type" data-tsd-kind="Class">ReactPart</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">C</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/fa903f1/packages/splitview/src/react/react.ts#L73">react/react.ts:73</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/43de915/packages/splitview/src/react/react.ts#L76">react/react.ts:76</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
 									<h4>P<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></h4>
+								</li>
+								<li>
+									<h4>C<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span> = <span class="tsd-signature-symbol">{}</span></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -140,8 +146,11 @@
 								<li>
 									<h5>parameters: <span class="tsd-signature-type">P</span></h5>
 								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> context: <span class="tsd-signature-type">C</span></h5>
+								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="reactpart.html" class="tsd-signature-type" data-tsd-kind="Class">ReactPart</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="reactpart.html" class="tsd-signature-type" data-tsd-kind="Class">ReactPart</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">P</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">C</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -158,7 +167,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/fa903f1/packages/splitview/src/react/react.ts#L132">react/react.ts:132</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/43de915/packages/splitview/src/react/react.ts#L145">react/react.ts:145</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -175,7 +184,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/fa903f1/packages/splitview/src/react/react.ts#L84">react/react.ts:84</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/43de915/packages/splitview/src/react/react.ts#L88">react/react.ts:88</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>

@@ -655,7 +655,28 @@ __webpack_require__(/*! ./layoutGrid.scss */ "./src/layout-grid/layoutGrid.scss"
 var welcome_1 = __webpack_require__(/*! ../panels/welcome/welcome */ "./src/panels/welcome/welcome.tsx");
 var splitview_1 = __webpack_require__(/*! ../panels/splitview/splitview */ "./src/panels/splitview/splitview.tsx");
 var gridview_1 = __webpack_require__(/*! ../panels/gridview/gridview */ "./src/panels/gridview/gridview.tsx");
+var Test = function (props) {
+    var _a = __read(React.useState(0), 2), counter = _a[0], setCounter = _a[1];
+    React.useEffect(function () {
+        var interval = setInterval(function () {
+            setCounter(function (_) { return _ + 1; });
+        }, 2000);
+        return function () {
+            clearInterval(interval);
+        };
+    }, []);
+    return (React.createElement(dockview_1.DockviewComponents.Panel, null,
+        counter % 4 === 0 && (React.createElement(dockview_1.DockviewComponents.Tab, null,
+            React.createElement("div", null, "custom tab " + counter))),
+        React.createElement(dockview_1.DockviewComponents.Body, null,
+            React.createElement("div", null,
+                React.createElement("div", null, "custom body " + counter),
+                React.createElement("button", null, "Toggle"))),
+        React.createElement(dockview_1.DockviewComponents.Action, null,
+            React.createElement("div", null, "custom action " + counter))));
+};
 var components = {
+    test: Test,
     welcome: welcome_1.WelcomePanel,
     splitview: splitview_1.SplitviewPanel,
     gridview: gridview_1.GridviewDemoPanel,
@@ -723,26 +744,6 @@ var components = {
         }), 2), panelState = _a[0], setPanelState = _a[1];
         var input = React.useRef();
         React.useEffect(function () {
-            props.setActionsbar(function (_props) {
-                var onClick = function () {
-                    _props.api.close();
-                };
-                return (React.createElement("div", { style: {
-                        height: '100%',
-                        display: 'flex',
-                        backgroundColor: 'rgba(255,255,255,0.1)',
-                        padding: '0px 4px',
-                    } },
-                    React.createElement("span", { onClick: onClick, style: {
-                            height: '100%',
-                            width: '25px',
-                            display: 'flex',
-                            alignItems: 'center',
-                        } },
-                        React.createElement("a", { className: "material-icons" }, "menu"))));
-            }, { qwerty: 'qwerty' });
-        }, []);
-        React.useEffect(function () {
             var disposable = new dockview_1.CompositeDisposable(props.api.onDidActiveChange(function (event) {
                 setPanelState(function (_) { return (__assign(__assign({}, _), { isGroupActive: event.isActive })); });
             }), props.api.onDidVisibilityChange(function (x) {
@@ -770,34 +771,53 @@ var components = {
         var onRename = function () {
             props.api.setTitle('Did it change?');
         };
-        return (React.createElement("div", { style: {
-                // backgroundColor,
-                height: '100%',
-            } },
-            React.createElement("div", { style: {
-                    padding: '5px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                } },
-                React.createElement("div", null, "This is a dockable panel"),
-                React.createElement("div", null,
-                    React.createElement("span", null, 'isGroupActive: '),
-                    React.createElement("span", { style: {
-                            color: panelState.isGroupActive
-                                ? '#23d16f'
-                                : '#cd312b',
-                        } }, "" + panelState.isGroupActive)),
-                React.createElement("div", null,
-                    React.createElement("span", null, 'isPanelVisible: '),
-                    React.createElement("span", { style: {
-                            color: panelState.isPanelVisible
-                                ? '#23d16f'
-                                : '#cd312b',
-                        } }, "" + panelState.isPanelVisible)),
-                React.createElement("button", { onClick: onClick }, "set state"),
-                React.createElement("button", { onClick: onRename }, "rename"),
-                React.createElement("input", { style: { width: '175px' }, ref: input, placeholder: "This is focused by the panel" }),
-                React.createElement("input", { style: { width: '175px' }, placeholder: "This is also focusable" }))));
+        var onClose = function () {
+            props.api.close();
+        };
+        return (React.createElement(dockview_1.DockviewComponents.Panel, null,
+            React.createElement(dockview_1.DockviewComponents.Action, null,
+                React.createElement("div", { style: {
+                        height: '100%',
+                        display: 'flex',
+                        backgroundColor: 'rgba(255,255,255,0.1)',
+                        padding: '0px 4px',
+                    } },
+                    React.createElement("span", { onClick: onClose, style: {
+                            height: '100%',
+                            width: '25px',
+                            display: 'flex',
+                            alignItems: 'center',
+                        } },
+                        React.createElement("a", { className: "material-icons" }, "menu")))),
+            React.createElement(dockview_1.DockviewComponents.Body, null,
+                React.createElement("div", { style: {
+                        // backgroundColor,
+                        height: '100%',
+                    } },
+                    React.createElement("div", { style: {
+                            padding: '5px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                        } },
+                        React.createElement("div", null, "This is a dockable panel"),
+                        React.createElement("div", null,
+                            React.createElement("span", null, 'isGroupActive: '),
+                            React.createElement("span", { style: {
+                                    color: panelState.isGroupActive
+                                        ? '#23d16f'
+                                        : '#cd312b',
+                                } }, "" + panelState.isGroupActive)),
+                        React.createElement("div", null,
+                            React.createElement("span", null, 'isPanelVisible: '),
+                            React.createElement("span", { style: {
+                                    color: panelState.isPanelVisible
+                                        ? '#23d16f'
+                                        : '#cd312b',
+                                } }, "" + panelState.isPanelVisible)),
+                        React.createElement("button", { onClick: onClick }, "set state"),
+                        React.createElement("button", { onClick: onRename }, "rename"),
+                        React.createElement("input", { style: { width: '175px' }, ref: input, placeholder: "This is focused by the panel" }),
+                        React.createElement("input", { style: { width: '175px' }, placeholder: "This is also focusable" }))))));
     },
     settings: settingsPanel_1.Settings,
     split_panel: splitPanel_1.SplitPanel,
@@ -868,6 +888,11 @@ var TestGrid = function (props) {
                 suppressClosable: true,
             });
         }
+        // api.addPanel({
+        //     component: 'test',
+        //     id: 'test',
+        //     title: 'Test',
+        // });
     };
     React.useEffect(function () {
         props.api.setConstraints({
@@ -33934,6 +33959,7 @@ class Droptarget {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "WrappedTab": () => (/* binding */ WrappedTab),
 /* harmony export */   "DefaultTab": () => (/* binding */ DefaultTab)
 /* harmony export */ });
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../lifecycle */ "../splitview/dist/esm/lifecycle.js");
@@ -33942,6 +33968,53 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+class WrappedTab {
+    constructor(renderer) {
+        this.renderer = renderer;
+        this._element = document.createElement('element');
+        this.show();
+    }
+    get innerRenderer() {
+        return this.renderer;
+    }
+    get element() {
+        return this._element;
+    }
+    get id() {
+        return this.renderer.id;
+    }
+    show() {
+        if (!this.renderer.element.parentElement) {
+            this._element.appendChild(this.renderer.element);
+        }
+    }
+    hide() {
+        if (this.renderer.element.parentElement) {
+            this.renderer.element.remove();
+        }
+    }
+    layout(width, height) {
+        this.renderer.layout(width, height);
+    }
+    update(event) {
+        this.renderer.update(event);
+    }
+    toJSON() {
+        return this.renderer.toJSON();
+    }
+    focus() {
+        this.renderer.focus();
+    }
+    init(parameters) {
+        this.renderer.init(parameters);
+    }
+    updateParentGroup(group, isPanelVisible) {
+        this.renderer.updateParentGroup(group, isPanelVisible);
+    }
+    dispose() {
+        this.renderer.dispose();
+    }
+}
 class DefaultTab extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable {
     constructor() {
         super();
@@ -37871,6 +37944,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "SplitviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_13__.SplitviewApi),
 /* harmony export */   "DockviewComponent": () => (/* reexport safe */ _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_15__.DockviewComponent),
 /* harmony export */   "GridviewComponent": () => (/* reexport safe */ _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_17__.GridviewComponent),
+/* harmony export */   "DockviewComponents": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.DockviewComponents),
 /* harmony export */   "DockviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.DockviewReact),
 /* harmony export */   "GridviewPanel": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.GridviewPanel),
 /* harmony export */   "GridviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.GridviewReact),
@@ -37878,6 +37952,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "ReactPanelContentPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.ReactPanelContentPart),
 /* harmony export */   "ReactPanelHeaderPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.ReactPanelHeaderPart),
 /* harmony export */   "ReactPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.ReactPart),
+/* harmony export */   "ReactPartContext": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.ReactPartContext),
 /* harmony export */   "SplitviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.SplitviewReact),
 /* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.usePortalsLifecycle)
 /* harmony export */ });
@@ -38703,7 +38778,7 @@ class ReactPanelDeserialzier {
         const view = new _dockview_v2_defaultGroupPanelView__WEBPACK_IMPORTED_MODULE_4__.DefaultGroupPanelView({
             content: (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(viewData.content.id, viewData.content.id, this.layout.options.components, this.layout.options.frameworkComponents, (_a = this.layout.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.content),
             tab: ((_b = viewData.tab) === null || _b === void 0 ? void 0 : _b.id)
-                ? (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(viewData.tab.id, viewData.tab.id, this.layout.options.components, this.layout.options.frameworkComponents, (_c = this.layout.options.frameworkComponentFactory) === null || _c === void 0 ? void 0 : _c.content)
+                ? (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(viewData.tab.id, viewData.tab.id, this.layout.options.tabComponents, this.layout.options.frameworkTabComponents, (_c = this.layout.options.frameworkComponentFactory) === null || _c === void 0 ? void 0 : _c.tab)
                 : new _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_3__.DefaultTab(),
         });
         const panel = new _groupview_groupPanel__WEBPACK_IMPORTED_MODULE_0__.GroupPanel(panelId, new _api_component_api__WEBPACK_IMPORTED_MODULE_2__.DockviewApi(this.layout));
@@ -38717,6 +38792,78 @@ class ReactPanelDeserialzier {
         return panel;
     }
 }
+
+
+/***/ }),
+
+/***/ "../splitview/dist/esm/react/dockview/components.js":
+/*!**********************************************************!*\
+  !*** ../splitview/dist/esm/react/dockview/components.js ***!
+  \**********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DockviewComponents": () => (/* binding */ DockviewComponents)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../react */ "../splitview/dist/esm/react/react.js");
+
+
+
+const Tab = (props) => {
+    return react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, props.children);
+};
+const Body = (props) => {
+    return react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, props.children);
+};
+const Action = (props) => {
+    return react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, props.children);
+};
+// it does the job...
+function isReactElement(element) {
+    var _a;
+    return !!((_a = element) === null || _a === void 0 ? void 0 : _a.type);
+}
+function isValidComponent(element) {
+    return [Body, Action, Tab].find((comp) => element.type === comp);
+}
+const Panel = (props) => {
+    const context = react__WEBPACK_IMPORTED_MODULE_0__.useContext(_react__WEBPACK_IMPORTED_MODULE_2__.ReactPartContext);
+    const sections = react__WEBPACK_IMPORTED_MODULE_0__.useMemo(() => {
+        var _a;
+        const childs = ((_a = react__WEBPACK_IMPORTED_MODULE_0__.Children.map(props.children, (_) => _)) === null || _a === void 0 ? void 0 : _a.filter(isReactElement)) || [];
+        const isInvalid = !!childs.find((_) => !isValidComponent(_));
+        if (isInvalid) {
+            throw new Error('Children of DockviewComponents.Panel must be one of the following: DockviewComponents.Body, DockviewComponents.Action, DockviewComponents.Tab');
+        }
+        const body = childs.find((_) => _.type === Body);
+        const actions = childs.find((_) => _.type === Action);
+        const tab = childs.find((_) => _.type === Tab);
+        return { body, actions, tab };
+    }, [props.children]);
+    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
+        /**
+         * hide or show the default tab behavior based on whether we want to override
+         * with our own React tab.
+         */
+        if (sections.tab) {
+            context.tabPortalElement.hide();
+        }
+        else {
+            context.tabPortalElement.show();
+        }
+    }, [sections.tab]);
+    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null,
+        sections.actions &&
+            react_dom__WEBPACK_IMPORTED_MODULE_1__.createPortal(sections.actions, context.actionsPortalElement),
+        sections.tab &&
+            react_dom__WEBPACK_IMPORTED_MODULE_1__.createPortal(sections.tab, context.tabPortalElement.element),
+        sections.body || props.children));
+};
+const DockviewComponents = { Tab, Body, Action, Panel };
 
 
 /***/ }),
@@ -38936,7 +39083,7 @@ class ReactPanelContentPart {
     }
     init(parameters) {
         this.parameters = parameters;
-        const api = parameters.api;
+        // const api = parameters.api;
         // api.onDidVisibilityChange((event) => {
         //     const { isVisible } = event;
         //     if (isVisible) {
@@ -38945,28 +39092,13 @@ class ReactPanelContentPart {
         //         this.hostedContainer.hide();
         //     }
         // });
-        this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, Object.assign(Object.assign({}, parameters.params), { api: parameters.api, containerApi: parameters.containerApi, setActionsbar: this.setActionsbar.bind(this) }));
-    }
-    setActionsbar(component, props) {
-        var _a;
-        if (this.actionsPart) {
-            console.debug('removed existing panel-actions portal');
-            this.actionsPart.dispose();
-            this.actionsPart = undefined;
-        }
-        this.actionsPart = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this._actionsElement, this.reactPortalStore, component, Object.assign(Object.assign({}, props), { api: this.parameters.api, containerApi: this.parameters.containerApi }));
-        (_a = this._group) === null || _a === void 0 ? void 0 : _a.group.updateActions();
-        return {
-            update: (props) => {
-                var _a;
-                (_a = this.actionsPart) === null || _a === void 0 ? void 0 : _a.update(props);
-            },
-            dispose: () => {
-                var _a;
-                (_a = this.actionsPart) === null || _a === void 0 ? void 0 : _a.dispose();
-                this.actionsPart = undefined;
-            },
+        const context = {
+            api: parameters.api,
+            containerApi: parameters.containerApi,
+            actionsPortalElement: this._actionsElement,
+            tabPortalElement: this.parameters.tab,
         };
+        this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, Object.assign(Object.assign({}, parameters.params), { api: parameters.api, containerApi: parameters.containerApi }), context);
     }
     toJSON() {
         return {
@@ -39031,10 +39163,14 @@ class ReactPanelHeaderPart {
         //noop
     }
     init(parameters) {
+        this.params = parameters;
         this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, Object.assign(Object.assign({}, parameters.params), { api: parameters.api, containerApi: parameters.containerApi }));
     }
     update(event) {
-        //noop
+        var _a;
+        if (this.params) {
+            this.params.params = Object.assign(Object.assign({}, (_a = this.params) === null || _a === void 0 ? void 0 : _a.params), event.params);
+        }
     }
     toJSON() {
         return {
@@ -39124,37 +39260,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "DefaultGroupPanelView": () => (/* binding */ DefaultGroupPanelView)
 /* harmony export */ });
 /* harmony import */ var _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../dockview/components/tab/defaultTab */ "../splitview/dist/esm/dockview/components/tab/defaultTab.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../events */ "../splitview/dist/esm/events.js");
 
-
-class Context {
-    constructor() {
-        this.emitters = new Map();
-    }
-    fire(key, object) {
-        if (!this.emitters.has(key)) {
-            this.emitters.set(key, new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter());
-        }
-        const emitter = this.emitters.get(key);
-        emitter.fire(object);
-    }
-    toEvent(key) {
-        const emitter = this.emitters.get(key);
-        return emitter.event;
-    }
-    dispose() {
-        this.emitters.forEach((value, key) => {
-            value.dispose();
-        });
-        this.emitters.clear();
-    }
-}
 class DefaultGroupPanelView {
     constructor(renderers) {
         var _a;
-        this.context = new Context();
         this._content = renderers.content;
-        this._tab = (_a = renderers.tab) !== null && _a !== void 0 ? _a : new _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_0__.DefaultTab();
+        this._tab = new _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_0__.WrappedTab((_a = renderers.tab) !== null && _a !== void 0 ? _a : new _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_0__.DefaultTab());
         this._actions =
             renderers.actions ||
                 (this.content.actions
@@ -39176,7 +39287,7 @@ class DefaultGroupPanelView {
         return this._actions;
     }
     init(params) {
-        this.content.init(params);
+        this.content.init(Object.assign(Object.assign({}, params), { tab: this.tab }));
         this.tab.init(params);
     }
     updateParentGroup(group, isPanelVisible) {
@@ -39192,7 +39303,9 @@ class DefaultGroupPanelView {
     toJSON() {
         return {
             content: this.content.toJSON(),
-            tab: this.tab instanceof _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_0__.DefaultTab ? undefined : this.tab.toJSON(),
+            tab: this.tab.innerRenderer instanceof _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_0__.DefaultTab
+                ? undefined
+                : this.tab.toJSON(),
         };
     }
     dispose() {
@@ -39323,24 +39436,28 @@ class ReactGridPanelView extends _gridview_gridviewPanel__WEBPACK_IMPORTED_MODUL
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "DockviewReact": () => (/* reexport safe */ _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__.DockviewReact),
-/* harmony export */   "SplitviewReact": () => (/* reexport safe */ _splitview_splitview__WEBPACK_IMPORTED_MODULE_1__.SplitviewReact),
-/* harmony export */   "GridviewReact": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_2__.GridviewReact),
-/* harmony export */   "ReactPanelContentPart": () => (/* reexport safe */ _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_3__.ReactPanelContentPart),
-/* harmony export */   "ReactPanelHeaderPart": () => (/* reexport safe */ _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_4__.ReactPanelHeaderPart),
-/* harmony export */   "GridviewPanel": () => (/* reexport safe */ _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_5__.GridviewPanel),
-/* harmony export */   "PaneviewReact": () => (/* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__.PaneviewReact),
-/* harmony export */   "ReactPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_8__.ReactPart),
-/* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_8__.usePortalsLifecycle)
+/* harmony export */   "DockviewComponents": () => (/* reexport safe */ _dockview_components__WEBPACK_IMPORTED_MODULE_1__.DockviewComponents),
+/* harmony export */   "SplitviewReact": () => (/* reexport safe */ _splitview_splitview__WEBPACK_IMPORTED_MODULE_2__.SplitviewReact),
+/* harmony export */   "GridviewReact": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_3__.GridviewReact),
+/* harmony export */   "ReactPanelContentPart": () => (/* reexport safe */ _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_4__.ReactPanelContentPart),
+/* harmony export */   "ReactPanelHeaderPart": () => (/* reexport safe */ _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_5__.ReactPanelHeaderPart),
+/* harmony export */   "GridviewPanel": () => (/* reexport safe */ _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_6__.GridviewPanel),
+/* harmony export */   "PaneviewReact": () => (/* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_7__.PaneviewReact),
+/* harmony export */   "ReactPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_9__.ReactPart),
+/* harmony export */   "ReactPartContext": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_9__.ReactPartContext),
+/* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_9__.usePortalsLifecycle)
 /* harmony export */ });
 /* harmony import */ var _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dockview/dockview */ "../splitview/dist/esm/react/dockview/dockview.js");
-/* harmony import */ var _splitview_splitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitview/splitview */ "../splitview/dist/esm/react/splitview/splitview.js");
-/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./gridview/gridview */ "../splitview/dist/esm/react/gridview/gridview.js");
-/* harmony import */ var _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./dockview/reactContentPart */ "../splitview/dist/esm/react/dockview/reactContentPart.js");
-/* harmony import */ var _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./dockview/reactHeaderPart */ "../splitview/dist/esm/react/dockview/reactHeaderPart.js");
-/* harmony import */ var _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../gridview/gridviewPanel */ "../splitview/dist/esm/gridview/gridviewPanel.js");
-/* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./paneview/paneview */ "../splitview/dist/esm/react/paneview/paneview.js");
-/* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./types */ "../splitview/dist/esm/react/types.js");
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./react */ "../splitview/dist/esm/react/react.js");
+/* harmony import */ var _dockview_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./dockview/components */ "../splitview/dist/esm/react/dockview/components.js");
+/* harmony import */ var _splitview_splitview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./splitview/splitview */ "../splitview/dist/esm/react/splitview/splitview.js");
+/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./gridview/gridview */ "../splitview/dist/esm/react/gridview/gridview.js");
+/* harmony import */ var _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./dockview/reactContentPart */ "../splitview/dist/esm/react/dockview/reactContentPart.js");
+/* harmony import */ var _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./dockview/reactHeaderPart */ "../splitview/dist/esm/react/dockview/reactHeaderPart.js");
+/* harmony import */ var _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../gridview/gridviewPanel */ "../splitview/dist/esm/gridview/gridviewPanel.js");
+/* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./paneview/paneview */ "../splitview/dist/esm/react/paneview/paneview.js");
+/* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./types */ "../splitview/dist/esm/react/types.js");
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./react */ "../splitview/dist/esm/react/react.js");
+
 
 
 
@@ -39515,6 +39632,7 @@ class PanelHeader {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ReactPartContext": () => (/* binding */ ReactPartContext),
 /* harmony export */   "ReactPart": () => (/* binding */ ReactPart),
 /* harmony export */   "usePortalsLifecycle": () => (/* binding */ usePortalsLifecycle)
 /* harmony export */ });
@@ -39562,12 +39680,14 @@ ReactComponentBridge.displayName = 'PanelWrapper';
  * to prevent excessive re-rendering
  */
 const uniquePortalKeyGenerator = (0,_math__WEBPACK_IMPORTED_MODULE_2__.sequentialNumberGenerator)();
+const ReactPartContext = react__WEBPACK_IMPORTED_MODULE_0__.createContext({});
 class ReactPart {
-    constructor(parent, portalStore, component, parameters) {
+    constructor(parent, portalStore, component, parameters, context) {
         this.parent = parent;
         this.portalStore = portalStore;
         this.component = component;
         this.parameters = parameters;
+        this.context = context;
         this.disposed = false;
         this.createPortal();
     }
@@ -39599,7 +39719,10 @@ class ReactPart {
                 this.componentInstance = element;
             },
         });
-        const portal = react_dom__WEBPACK_IMPORTED_MODULE_1__.createPortal(bridgeComponent, this.parent, uniquePortalKeyGenerator.next());
+        const node = this.context
+            ? react__WEBPACK_IMPORTED_MODULE_0__.createElement(ReactPartContext.Provider, { value: this.context }, bridgeComponent)
+            : bridgeComponent;
+        const portal = react_dom__WEBPACK_IMPORTED_MODULE_1__.createPortal(node, this.parent, uniquePortalKeyGenerator.next());
         this.ref = {
             portal,
             disposable: this.portalStore.addPortal(portal),

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>SerializedSplitviewPanelData | dockview</title>
+	<title>ReactContentPartContext | dockview</title>
 	<meta name="description" content="Documentation for dockview">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -53,10 +53,10 @@
 					<a href="../modules.html">dockview</a>
 				</li>
 				<li>
-					<a href="serializedsplitviewpaneldata.html">SerializedSplitviewPanelData</a>
+					<a href="reactcontentpartcontext.html">ReactContentPartContext</a>
 				</li>
 			</ul>
-			<h1>Interface SerializedSplitviewPanelData</h1>
+			<h1>Interface ReactContentPartContext</h1>
 		</div>
 	</div>
 </header>
@@ -67,7 +67,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">SerializedSplitviewPanelData</span>
+						<span class="target">ReactContentPartContext</span>
 					</li>
 				</ul>
 			</section>
@@ -78,12 +78,10 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="serializedsplitviewpaneldata.html#component" class="tsd-kind-icon">component</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="serializedsplitviewpaneldata.html#id" class="tsd-kind-icon">id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="serializedsplitviewpaneldata.html#maximumsize" class="tsd-kind-icon">maximum<wbr>Size</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="serializedsplitviewpaneldata.html#minimumsize" class="tsd-kind-icon">minimum<wbr>Size</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="serializedsplitviewpaneldata.html#params" class="tsd-kind-icon">params</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="serializedsplitviewpaneldata.html#state" class="tsd-kind-icon">state</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="reactcontentpartcontext.html#actionsportalelement" class="tsd-kind-icon">actions<wbr>Portal<wbr>Element</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="reactcontentpartcontext.html#api" class="tsd-kind-icon">api</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="reactcontentpartcontext.html#containerapi" class="tsd-kind-icon">container<wbr>Api</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="reactcontentpartcontext.html#tabportalelement" class="tsd-kind-icon">tab<wbr>Portal<wbr>Element</a></li>
 							</ul>
 						</section>
 					</div>
@@ -92,80 +90,44 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="component" class="tsd-anchor"></a>
-					<h3>component</h3>
-					<div class="tsd-signature tsd-kind-icon">component<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="actionsportalelement" class="tsd-anchor"></a>
+					<h3>actions<wbr>Portal<wbr>Element</h3>
+					<div class="tsd-signature tsd-kind-icon">actions<wbr>Portal<wbr>Element<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">HTMLElement</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/43de915/packages/splitview/src/splitview/splitviewComponent.ts#L21">splitview/splitviewComponent.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/43de915/packages/splitview/src/react/dockview/reactContentPart.ts#L97">react/dockview/reactContentPart.ts:97</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="id" class="tsd-anchor"></a>
-					<h3>id</h3>
-					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="api" class="tsd-anchor"></a>
+					<h3>api</h3>
+					<div class="tsd-signature tsd-kind-icon">api<span class="tsd-signature-symbol">:</span> <a href="idockviewpanelapi.html" class="tsd-signature-type" data-tsd-kind="Interface">IDockviewPanelApi</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/43de915/packages/splitview/src/splitview/splitviewComponent.ts#L20">splitview/splitviewComponent.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/43de915/packages/splitview/src/react/dockview/reactContentPart.ts#L95">react/dockview/reactContentPart.ts:95</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="maximumsize" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> maximum<wbr>Size</h3>
-					<div class="tsd-signature tsd-kind-icon">maximum<wbr>Size<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="containerapi" class="tsd-anchor"></a>
+					<h3>container<wbr>Api</h3>
+					<div class="tsd-signature tsd-kind-icon">container<wbr>Api<span class="tsd-signature-symbol">:</span> <a href="../classes/dockviewapi.html" class="tsd-signature-type" data-tsd-kind="Class">DockviewApi</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/43de915/packages/splitview/src/splitview/splitviewComponent.ts#L23">splitview/splitviewComponent.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/43de915/packages/splitview/src/react/dockview/reactContentPart.ts#L96">react/dockview/reactContentPart.ts:96</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="minimumsize" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> minimum<wbr>Size</h3>
-					<div class="tsd-signature tsd-kind-icon">minimum<wbr>Size<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="tabportalelement" class="tsd-anchor"></a>
+					<h3>tab<wbr>Portal<wbr>Element</h3>
+					<div class="tsd-signature tsd-kind-icon">tab<wbr>Portal<wbr>Element<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">WrappedTab</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/43de915/packages/splitview/src/splitview/splitviewComponent.ts#L22">splitview/splitviewComponent.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/43de915/packages/splitview/src/react/dockview/reactContentPart.ts#L98">react/dockview/reactContentPart.ts:98</a></li>
 						</ul>
 					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="params" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> params</h3>
-					<div class="tsd-signature tsd-kind-icon">params<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{}</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/43de915/packages/splitview/src/splitview/splitviewComponent.ts#L24">splitview/splitviewComponent.ts:24</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter-index-signature">
-								<h5><span class="tsd-signature-symbol">[</span>index: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">any</span></h5>
-							</li>
-						</ul>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="state" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> state</h3>
-					<div class="tsd-signature tsd-kind-icon">state<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{}</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/43de915/packages/splitview/src/splitview/splitviewComponent.ts#L25">splitview/splitviewComponent.ts:25</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter-index-signature">
-								<h5><span class="tsd-signature-symbol">[</span>index: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">any</span></h5>
-							</li>
-						</ul>
-					</div>
 				</section>
 			</section>
 		</div>
@@ -182,25 +144,19 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="serializedsplitviewpaneldata.html" class="tsd-kind-icon">Serialized<wbr>Splitview<wbr>Panel<wbr>Data</a>
+						<a href="reactcontentpartcontext.html" class="tsd-kind-icon">React<wbr>Content<wbr>Part<wbr>Context</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="serializedsplitviewpaneldata.html#component" class="tsd-kind-icon">component</a>
+								<a href="reactcontentpartcontext.html#actionsportalelement" class="tsd-kind-icon">actions<wbr>Portal<wbr>Element</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="serializedsplitviewpaneldata.html#id" class="tsd-kind-icon">id</a>
+								<a href="reactcontentpartcontext.html#api" class="tsd-kind-icon">api</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="serializedsplitviewpaneldata.html#maximumsize" class="tsd-kind-icon">maximum<wbr>Size</a>
+								<a href="reactcontentpartcontext.html#containerapi" class="tsd-kind-icon">container<wbr>Api</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="serializedsplitviewpaneldata.html#minimumsize" class="tsd-kind-icon">minimum<wbr>Size</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="serializedsplitviewpaneldata.html#params" class="tsd-kind-icon">params</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="serializedsplitviewpaneldata.html#state" class="tsd-kind-icon">state</a>
+								<a href="reactcontentpartcontext.html#tabportalelement" class="tsd-kind-icon">tab<wbr>Portal<wbr>Element</a>
 							</li>
 						</ul>
 					</li>
