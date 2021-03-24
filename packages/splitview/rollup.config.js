@@ -5,25 +5,25 @@ import typescript from '@rollup/plugin-typescript';
 import { terser } from 'rollup-plugin-terser';
 import postcss from 'rollup-plugin-postcss';
 
-const packageName = require('./package.json').name;
+const { name, version, homepage, licence } = require('./package.json');
 const main = join(__dirname, './scripts/rollupEntryTarget.ts');
 const mainNoStyles = join(__dirname, './src/index.ts');
 const outputDir = join(__dirname, 'dist');
 
 function outputFile(format, isMinified, withStyles) {
-    let name = join(outputDir, packageName);
+    let filename = join(outputDir, name);
 
     if (format !== 'umd') {
-        name += `.${format}`;
+        filename += `.${format}`;
     }
     if (isMinified) {
-        name += '.min';
+        filename += '.min';
     }
     if (!withStyles) {
-        name += '.noStyle';
+        filename += '.noStyle';
     }
 
-    return `${name}.js`;
+    return `${filename}.js`;
 }
 
 function createBundle(format, options) {
@@ -37,6 +37,14 @@ function createBundle(format, options) {
         file,
         format,
         globals: {},
+        banner: [
+            `/**`,
+            ` * ${name}`,
+            ` * @version ${version}`,
+            ` * @link ${homepage}`,
+            ` * @licence ${licence}`,
+            ` */`,
+        ].join('\n'),
     };
 
     const plugins = [
@@ -57,7 +65,7 @@ function createBundle(format, options) {
     }
 
     if (format === 'umd') {
-        output['name'] = packageName;
+        output['name'] = name;
 
         // TODO: should be conditional on whether user wants the React wrappers
         output.globals['react'] = 'React';
