@@ -5,7 +5,7 @@ import typescript from '@rollup/plugin-typescript';
 import { terser } from 'rollup-plugin-terser';
 import postcss from 'rollup-plugin-postcss';
 
-const { name, version, homepage, licence } = require('./package.json');
+const { name, version, homepage, license } = require('./package.json');
 const main = join(__dirname, './scripts/rollupEntryTarget.ts');
 const mainNoStyles = join(__dirname, './src/index.ts');
 const outputDir = join(__dirname, 'dist');
@@ -42,7 +42,7 @@ function createBundle(format, options) {
             ` * ${name}`,
             ` * @version ${version}`,
             ` * @link ${homepage}`,
-            ` * @licence ${licence}`,
+            ` * @license ${license}`,
             ` */`,
         ].join('\n'),
     };
