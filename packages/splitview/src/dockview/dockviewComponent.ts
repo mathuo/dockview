@@ -195,7 +195,7 @@ export class DockviewComponent
                             GroupChangeKind.ADD_GROUP,
                             GroupChangeKind.REMOVE_GROUP,
                             GroupChangeKind.ADD_PANEL,
-                            GroupChangeKind.REMOVE_GROUP,
+                            GroupChangeKind.REMOVE_PANEL,
                             GroupChangeKind.GROUP_ACTIVE,
                             GroupChangeKind.PANEL_ACTIVE,
                             GroupChangeKind.LAYOUT,
