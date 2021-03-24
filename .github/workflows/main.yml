@@ -16,15 +16,15 @@ jobs:
 
             - uses: actions/cache@v2
               with:
-                path: ~/.npm
-                key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-                restore-keys: |
-                    ${{ runner.os }}-node-
-                    
+                  path: ~/.npm
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+
             - run: npm ci
             - run: npm run bootstrap
             - run: npm run build
-            - run: npm run test-cov
+            - run: npm run test:cov
             - run: npm run codecov-publish
               env:
                   CI: true

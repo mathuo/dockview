@@ -13,7 +13,7 @@
         "clean": "lerna run clean",
         "bootstrap": "lerna bootstrap --hoist",
         "bootstrap-no-hoist": "lerna bootstrap",
-        "test-cov": "jest --coverage",
+        "test:cov": "jest --coverage",
         "codecov-publish": "codecov",
         "version-beta-build": "lerna version prerelease --preid beta",
         "publish-app": "lerna publish"

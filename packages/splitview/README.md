@@ -22,6 +22,7 @@ A zero dependency layout manager based on the layering of split-view components 
 - Code examples [here](https://github.com/mathuo/dockview/tree/master/packages/splitview-demo/src/stories).
 - Generated TypeDocs can be found [here](https://mathuo.github.io/dockview/output/docs/index.html).
 
+Want to inspect the deployed package? Go to https://unpkg.com/browse/dockview@latest/
 ### Features
 - Simple splitviews, nested splitviews (i.e. gridviews) supporting full layout managment with
 dockable and tabular views
