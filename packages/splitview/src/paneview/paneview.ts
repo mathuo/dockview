@@ -120,8 +120,8 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         return this.splitview.getViewSize(index);
     }
 
-    public getPanes() {
-        return this.splitview.getViews() as PaneviewPanel[];
+    public getPanes(): PaneviewPanel[] {
+        return this.splitview.getViews();
     }
 
     public removePane(index: number) {

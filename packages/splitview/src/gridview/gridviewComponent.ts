@@ -1,6 +1,9 @@
-import { getRelativeLocation, SerializedGridObject } from './gridview';
+import {
+    getRelativeLocation,
+    SerializedGridObject,
+    getGridLocation,
+} from './gridview';
 import { Position } from '../dnd/droptarget';
-import { getGridLocation } from './gridview';
 import { tail, sequenceEquals } from '../array';
 import { CompositeDisposable } from '../lifecycle';
 import { IPanelDeserializer } from '../dockview/deserializer';
@@ -155,7 +158,7 @@ export class GridviewComponent
     }
 
     public fromJSON(data: SerializedGridview, deferComponentLayout?: boolean) {
-        const { grid, activePanel } = data as SerializedGridview;
+        const { grid, activePanel } = data;
 
         this.gridview.clear();
         this.groups.clear();

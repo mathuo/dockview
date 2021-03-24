@@ -272,7 +272,7 @@ export class PaneviewComponent
     }
 
     getPanels(): PaneviewPanel[] {
-        return this.paneview.getPanes() as PaneviewPanel[];
+        return this.paneview.getPanes();
     }
 
     removePanel(panel: PaneviewPanel) {

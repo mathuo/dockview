@@ -586,7 +586,7 @@ export class GroupComponent extends CompositeDisposable implements IGroupview {
 
         this.tabsContainer.openPanel(panel, index);
 
-        this.contentContainer.openPanel(panel!);
+        this.contentContainer.openPanel(panel);
 
         this.tabsContainer.show();
         this.contentContainer.show();

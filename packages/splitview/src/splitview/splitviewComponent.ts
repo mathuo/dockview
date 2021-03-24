@@ -171,7 +171,7 @@ export class SplitviewComponent
     }
 
     getPanels(): SplitviewPanel[] {
-        return this.splitview.getViews() as SplitviewPanel[];
+        return this.splitview.getViews();
     }
 
     removePanel(panel: SplitviewPanel, sizing?: Sizing) {

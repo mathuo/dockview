@@ -28,12 +28,10 @@ export class DefaultDeserializer implements IViewDeserializer {
             panels.push(panel);
         }
 
-        const group = this.layout.createGroup({
+        return this.layout.createGroup({
             panels,
             activePanel: panels.find((p) => p.id === active),
             id: node.data.id,
         });
-
-        return group;
     }
 }

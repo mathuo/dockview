@@ -12,7 +12,6 @@ import { usePortalsLifecycle } from '../react';
 import { DockviewApi } from '../../api/component.api';
 import { ReactWatermarkPart } from './reactWatermarkPart';
 import { PanelCollection } from '../types';
-import { IDisposable } from '../../lifecycle';
 import { watchElementResize } from '../../dom';
 import { IContentRenderer, ITabRenderer } from '../../groupview/types';
 

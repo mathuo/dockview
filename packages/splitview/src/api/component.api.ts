@@ -20,8 +20,8 @@ import { IGroupPanel } from '../groupview/groupPanel';
 import {
     AddPaneviewCompponentOptions,
     SerializedPaneview,
+    IPaneviewComponent,
 } from '../paneview/paneviewComponent';
-import { IPaneviewComponent } from '../paneview/paneviewComponent';
 import { IPaneviewPanel } from '../paneview/paneviewPanel';
 import {
     AddSplitviewComponentOptions,

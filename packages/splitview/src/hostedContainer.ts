@@ -1,5 +1,5 @@
 import { trackFocus } from './dom';
-import { addDisposableListener, Emitter, Event } from './events';
+import { Emitter, Event } from './events';
 import { IDisposable } from './lifecycle';
 
 export interface HostedContainerOptions {

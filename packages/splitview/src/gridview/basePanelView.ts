@@ -104,14 +104,17 @@ export abstract class BasePanelView<T extends PanelApi>
 
     toJSON(): BasePanelViewState {
         const state = this.api.getState();
+
+        const params = this.params?.params
+            ? Object.keys(this.params.params).length > 0
+                ? this.params.params
+                : undefined
+            : undefined;
+
         return {
             id: this.id,
             component: this.component,
-            params: this.params?.params
-                ? Object.keys(this.params.params).length > 0
-                    ? this.params.params
-                    : undefined
-                : undefined,
+            params,
             state: Object.keys(state).length === 0 ? undefined : state,
         };
     }

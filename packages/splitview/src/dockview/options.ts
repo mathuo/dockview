@@ -9,7 +9,6 @@ import {
     WatermarkPart,
 } from '../groupview/types';
 import { GroupviewPanel } from '../groupview/v2/groupviewPanel';
-import { IGroupPanelView } from '../react/dockview/v2/defaultGroupPanelView';
 import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
 

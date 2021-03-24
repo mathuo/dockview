@@ -1,9 +1,9 @@
 import {
     getRelativeLocation,
     SerializedGridObject,
+    getGridLocation,
 } from '../gridview/gridview';
 import { Position } from '../dnd/droptarget';
-import { getGridLocation } from '../gridview/gridview';
 import { tail, sequenceEquals } from '../array';
 import {
     GroupPanel,
@@ -744,7 +744,6 @@ export class DockviewComponent
             }
 
             referenceGroup.group.openPanel(groupItem, { index });
-            return;
         } else {
             const referenceLocation = getGridLocation(referenceGroup.element);
             const targetLocation = getRelativeLocation(
@@ -770,7 +769,7 @@ export class DockviewComponent
                     const targetGroup = this.doRemoveGroup(sourceGroup, {
                         skipActive: true,
                         skipDispose: true,
-                    }) as GroupviewPanel;
+                    });
 
                     // after deleting the group we need to re-evaulate the ref location
                     const updatedReferenceLocation = getGridLocation(

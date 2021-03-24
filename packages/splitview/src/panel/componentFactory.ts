@@ -1,4 +1,3 @@
-import { Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
 
 export function createComponent<T>(
@@ -50,5 +49,5 @@ export function createComponent<T>(
         );
     }
 
-    return new Component(id, componentName!) as T;
+    return new Component(id, componentName!);
 }

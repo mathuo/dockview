@@ -1,6 +1,6 @@
 import { addDisposableListener, Emitter, Event } from '../events';
 import { Droptarget, DroptargetEvent } from '../dnd/droptarget';
-import { CompositeDisposable, IDisposable } from '../lifecycle';
+import { CompositeDisposable } from '../lifecycle';
 import {
     DATA_KEY,
     DragType,

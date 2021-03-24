@@ -4,11 +4,8 @@ import {
     GridviewPanelApi,
     IGridviewPanelApi,
 } from '../../api/gridviewPanelApi';
-import { GroupComponent, GroupOptions, GroupPanelViewState } from './component';
-import {
-    GridPanelViewState,
-    GridviewPanel,
-} from '../../gridview/gridviewPanel';
+import { GroupComponent, GroupOptions } from './component';
+import { GridviewPanel } from '../../gridview/gridviewPanel';
 
 interface IGroupApi extends IGridviewPanelApi {}
 

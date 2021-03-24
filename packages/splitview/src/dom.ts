@@ -11,8 +11,8 @@ export function watchElementResize(
     cb: (entry: ResizeObserverEntry) => void
 ): IDisposable {
     const observer = new ResizeObserver((entires) => {
-        const element = entires[0];
-        cb(element);
+        const firstEntry = entires[0];
+        cb(firstEntry);
     });
 
     observer.observe(element);

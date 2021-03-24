@@ -5,18 +5,12 @@ import {
     CompositeDisposable,
     IDisposable,
 } from '../lifecycle';
-import {
-    HeaderPartInitParameters,
-    IContentRenderer,
-    ITabRenderer,
-} from './types';
+import { HeaderPartInitParameters } from './types';
 import { IPanel, PanelInitParameters, PanelUpdateEvent } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
-import { DefaultTab } from '../dockview/components/tab/defaultTab';
 import { GroupviewPanel } from './v2/groupviewPanel';
 import { GroupChangeKind } from './v2/component';
 import { IGroupPanelView } from '../react/dockview/v2/defaultGroupPanelView';
-import { IGridPanelView } from '../gridview/baseComponentGridview';
 
 export interface IGroupPanelInitParameters
     extends PanelInitParameters,

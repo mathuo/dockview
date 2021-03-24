@@ -6,7 +6,7 @@ import {
 } from '../../paneview/paneviewComponent';
 import { usePortalsLifecycle } from '../react';
 import { PaneviewApi } from '../../api/component.api';
-import { PanelBody, PanelHeader } from './view';
+import { PanePanelSection } from './view';
 import { PanelCollection } from '../types';
 import { watchElementResize } from '../../dom';
 
@@ -66,7 +66,9 @@ export const PaneviewReact: React.FunctionComponent<IPaneviewReactProps> = (
                         componentId,
                         component: any
                     ) => {
-                        return new PanelHeader(id, component, { addPortal });
+                        return new PanePanelSection(id, component, {
+                            addPortal,
+                        });
                     },
                 },
                 body: {
@@ -75,7 +77,9 @@ export const PaneviewReact: React.FunctionComponent<IPaneviewReactProps> = (
                         componentId,
                         component: any
                     ) => {
-                        return new PanelBody(id, component, { addPortal });
+                        return new PanePanelSection(id, component, {
+                            addPortal,
+                        });
                     },
                 },
             },

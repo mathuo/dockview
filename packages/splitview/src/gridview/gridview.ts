@@ -319,7 +319,7 @@ export class Gridview implements IDisposable {
     ): Node {
         let result: Node;
         if (node.type === 'branch') {
-            const serializedChildren = node.data as ISerializedNode[];
+            const serializedChildren = node.data;
             const children = serializedChildren.map((serializedChild) => {
                 return {
                     node: this._deserializeNode(

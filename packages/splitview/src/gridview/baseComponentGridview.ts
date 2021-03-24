@@ -3,9 +3,12 @@ import { getGridLocation, Gridview, IGridView } from './gridview';
 import { Position } from '../dnd/droptarget';
 import { CompositeDisposable, IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
-import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
+import {
+    ISplitviewStyles,
+    Orientation,
+    Sizing,
+} from '../splitview/core/splitview';
 import { IPanel } from '../panel/types';
-import { Sizing } from '../splitview/core/splitview';
 import { MovementOptions2 } from '../dockview/options';
 import { GroupChangeEvent, GroupChangeKind } from '../groupview/v2/component';
 
