@@ -2,8 +2,10 @@
     --dv-accent-color: dodgerblue;
     --dv-title-font-size: 13px;
     --dv-title-height: 35px;
-    --dv-tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');
-    --dv-tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');
+    // --dv-tab-close-icon: url('https://fonts.gstatic.com/s/i/materialicons/close/v8/24px.svg');
+    // --dv-tab-dirty-icon: url('https://fonts.gstatic.com/s/i/materialicons/lens/v6/24px.svg');
+    --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>');
+    --dv-tab-dirty-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>');
     --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);
     --dv-title-bar-scroll-bar-color: #888;
 }
