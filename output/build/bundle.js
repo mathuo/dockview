@@ -34200,12 +34200,11 @@ class DefaultDeserializer {
             const panel = this.panelDeserializer.createPanel(child);
             panels.push(panel);
         }
-        const group = this.layout.createGroup({
+        return this.layout.createGroup({
             panels,
             activePanel: panels.find((p) => p.id === active),
             id: node.data.id,
         });
-        return group;
     }
 }
 
@@ -34274,7 +34273,6 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-
 const nextGroupId = (0,_math__WEBPACK_IMPORTED_MODULE_9__.sequentialNumberGenerator)();
 class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_13__.BaseGrid {
     constructor(element, options) {
@@ -34310,7 +34308,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
                     _groupview_v2_component__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.ADD_GROUP,
                     _groupview_v2_component__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.REMOVE_GROUP,
                     _groupview_v2_component__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.ADD_PANEL,
-                    _groupview_v2_component__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.REMOVE_GROUP,
+                    _groupview_v2_component__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.REMOVE_PANEL,
                     _groupview_v2_component__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.GROUP_ACTIVE,
                     _groupview_v2_component__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.PANEL_ACTIVE,
                     _groupview_v2_component__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.LAYOUT,
@@ -34702,7 +34700,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
                 this.doRemoveGroup(sourceGroup);
             }
             referenceGroup.group.openPanel(groupItem, { index });
-            return;
         }
         else {
             const referenceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
@@ -34855,8 +34852,8 @@ __webpack_require__.r(__webpack_exports__);
 
 function watchElementResize(element, cb) {
     const observer = new ResizeObserver((entires) => {
-        const element = entires[0];
-        cb(element);
+        const firstEntry = entires[0];
+        cb(firstEntry);
     });
     observer.observe(element);
     return {
@@ -35105,16 +35102,19 @@ focusedElement.element = document.activeElement;
 
 "use strict";
 
-const DOCKVIEW_SUPPRESS_WATERMARK = 'DOCKVIEW_WATERMARK_SUPPRESSED';
-const isSuppressed = !!window[DOCKVIEW_SUPPRESS_WATERMARK];
-if (!isSuppressed) {
-    console.log([
-        'dockview: https://github.com/mathuo/dockview for examples and documentation',
-        'dockview: https://www.npmjs.com/package/dockview',
-        `dockview: To suppress this message set window.${DOCKVIEW_SUPPRESS_WATERMARK}=1 before importing the dockview package`,
-        '',
-    ].join('\n'));
+function runFootnote() {
+    const DOCKVIEW_SUPPRESS_WATERMARK = 'DOCKVIEW_WATERMARK_SUPPRESSED';
+    const isSuppressed = !!window[DOCKVIEW_SUPPRESS_WATERMARK];
+    if (!isSuppressed) {
+        console.log([
+            'dockview: https://github.com/mathuo/dockview for examples and documentation',
+            'dockview: https://www.npmjs.com/package/dockview',
+            `dockview: To suppress this message set window.${DOCKVIEW_SUPPRESS_WATERMARK}=1 before importing the dockview package`,
+            '',
+        ].join('\n'));
+    }
 }
+runFootnote();
 
 
 /***/ }),
@@ -35412,14 +35412,15 @@ class BasePanelView extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDis
     toJSON() {
         var _a;
         const state = this.api.getState();
+        const params = ((_a = this.params) === null || _a === void 0 ? void 0 : _a.params)
+            ? Object.keys(this.params.params).length > 0
+                ? this.params.params
+                : undefined
+            : undefined;
         return {
             id: this.id,
             component: this.component,
-            params: ((_a = this.params) === null || _a === void 0 ? void 0 : _a.params)
-                ? Object.keys(this.params.params).length > 0
-                    ? this.params.params
-                    : undefined
-                : undefined,
+            params,
             state: Object.keys(state).length === 0 ? undefined : state,
         };
     }
@@ -36104,7 +36105,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../api/component.api */ "../splitview/dist/esm/api/component.api.js");
 /* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../panel/componentFactory */ "../splitview/dist/esm/panel/componentFactory.js");
 /* harmony import */ var _groupview_v2_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../groupview/v2/component */ "../splitview/dist/esm/groupview/v2/component.js");
-
 
 
 
@@ -36875,29 +36875,18 @@ class ContentContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composite
         }
         this.panel = panel;
         const disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable();
-        // if (panel.onDidFocus) {
-        //     disposable.addDisposables(
-        //         panel.onDidFocus(() => this._onDidFocus.fire())
-        //     );
-        // }
-        // if (panel.onDidBlur) {
-        //     disposable.addDisposables(
-        //         panel.onDidBlur(() => this._onDidBlur.fire())
-        //     );
-        // }
         if (this.panel.view) {
-            let _onDidFocus = this.panel.view.content.onDidFocus;
-            let _onDidBlur = this.panel.view.content.onDidBlur;
-            if (!_onDidFocus || !_onDidBlur) {
-                const { onDidFocus, onDidBlur } = (0,_dom__WEBPACK_IMPORTED_MODULE_2__.trackFocus)(this._element);
-                if (!_onDidFocus) {
-                    _onDidFocus = onDidFocus;
-                }
-                if (!_onDidBlur) {
-                    _onDidBlur = onDidBlur;
-                }
+            const _onDidFocus = this.panel.view.content
+                .onDidFocus;
+            const _onDidBlur = this.panel.view.content.onDidBlur;
+            const { onDidFocus, onDidBlur } = (0,_dom__WEBPACK_IMPORTED_MODULE_2__.trackFocus)(this._element);
+            disposable.addDisposables(onDidFocus(() => this._onDidFocus.fire()), onDidBlur(() => this._onDidBlur.fire()));
+            if (_onDidFocus) {
+                disposable.addDisposables(_onDidFocus(() => this._onDidFocus.fire()));
             }
-            disposable.addDisposables(_onDidFocus(() => this._onDidFocus.fire()), _onDidBlur(() => this._onDidBlur.fire()));
+            if (_onDidBlur) {
+                disposable.addDisposables(_onDidBlur(() => this._onDidBlur.fire()));
+            }
             this._element.appendChild(this.panel.view.content.element);
         }
         this.disposable.value = disposable;
@@ -37954,6 +37943,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "ReactPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.ReactPart),
 /* harmony export */   "ReactPartContext": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.ReactPartContext),
 /* harmony export */   "SplitviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.SplitviewReact),
+/* harmony export */   "isReactElement": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.isReactElement),
 /* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.usePortalsLifecycle)
 /* harmony export */ });
 /* harmony import */ var _footnote__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./footnote */ "../splitview/dist/esm/footnote.js");
@@ -38822,11 +38812,6 @@ const Body = (props) => {
 const Action = (props) => {
     return react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, props.children);
 };
-// it does the job...
-function isReactElement(element) {
-    var _a;
-    return !!((_a = element) === null || _a === void 0 ? void 0 : _a.type);
-}
 function isValidComponent(element) {
     return [Body, Action, Tab].find((comp) => element.type === comp);
 }
@@ -38834,7 +38819,7 @@ const Panel = (props) => {
     const context = react__WEBPACK_IMPORTED_MODULE_0__.useContext(_react__WEBPACK_IMPORTED_MODULE_2__.ReactPartContext);
     const sections = react__WEBPACK_IMPORTED_MODULE_0__.useMemo(() => {
         var _a;
-        const childs = ((_a = react__WEBPACK_IMPORTED_MODULE_0__.Children.map(props.children, (_) => _)) === null || _a === void 0 ? void 0 : _a.filter(isReactElement)) || [];
+        const childs = ((_a = react__WEBPACK_IMPORTED_MODULE_0__.Children.map(props.children, (_) => _)) === null || _a === void 0 ? void 0 : _a.filter(_react__WEBPACK_IMPORTED_MODULE_2__.isReactElement)) || [];
         const isInvalid = !!childs.find((_) => !isValidComponent(_));
         if (isInvalid) {
             throw new Error('Children of DockviewComponents.Panel must be one of the following: DockviewComponents.Body, DockviewComponents.Action, DockviewComponents.Tab');
@@ -39445,6 +39430,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "PaneviewReact": () => (/* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_7__.PaneviewReact),
 /* harmony export */   "ReactPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_9__.ReactPart),
 /* harmony export */   "ReactPartContext": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_9__.ReactPartContext),
+/* harmony export */   "isReactElement": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_9__.isReactElement),
 /* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_9__.usePortalsLifecycle)
 /* harmony export */ });
 /* harmony import */ var _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dockview/dockview */ "../splitview/dist/esm/react/dockview/dockview.js");
@@ -39522,12 +39508,16 @@ const PaneviewReact = (props) => {
             frameworkWrapper: {
                 header: {
                     createComponent: (id, componentId, component) => {
-                        return new _view__WEBPACK_IMPORTED_MODULE_4__.PanelHeader(id, component, { addPortal });
+                        return new _view__WEBPACK_IMPORTED_MODULE_4__.PanePanelSection(id, component, {
+                            addPortal,
+                        });
                     },
                 },
                 body: {
                     createComponent: (id, componentId, component) => {
-                        return new _view__WEBPACK_IMPORTED_MODULE_4__.PanelBody(id, component, { addPortal });
+                        return new _view__WEBPACK_IMPORTED_MODULE_4__.PanePanelSection(id, component, {
+                            addPortal,
+                        });
                     },
                 },
             },
@@ -39556,41 +39546,11 @@ PaneviewReact.displayName = 'PaneviewComponent';
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PanelBody": () => (/* binding */ PanelBody),
-/* harmony export */   "PanelHeader": () => (/* binding */ PanelHeader)
+/* harmony export */   "PanePanelSection": () => (/* binding */ PanePanelSection)
 /* harmony export */ });
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../react */ "../splitview/dist/esm/react/react.js");
 
-class PanelBody {
-    constructor(id, component, reactPortalStore) {
-        this.id = id;
-        this.component = component;
-        this.reactPortalStore = reactPortalStore;
-        this._element = document.createElement('div');
-        this._element.style.height = '100%';
-        this._element.style.width = '100%';
-    }
-    get element() {
-        return this._element;
-    }
-    init(parameters) {
-        this.part = new _react__WEBPACK_IMPORTED_MODULE_0__.ReactPart(this.element, this.reactPortalStore, this.component, Object.assign(Object.assign({}, parameters.params), { api: parameters.api, title: parameters.title, containerApi: parameters.containerApi }));
-    }
-    toJSON() {
-        return {
-            id: this.id,
-        };
-    }
-    update(params) {
-        var _a;
-        (_a = this.part) === null || _a === void 0 ? void 0 : _a.update(params.params);
-    }
-    dispose() {
-        var _a;
-        (_a = this.part) === null || _a === void 0 ? void 0 : _a.dispose();
-    }
-}
-class PanelHeader {
+class PanePanelSection {
     constructor(id, component, reactPortalStore) {
         this.id = id;
         this.component = component;
@@ -39634,7 +39594,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "ReactPartContext": () => (/* binding */ ReactPartContext),
 /* harmony export */   "ReactPart": () => (/* binding */ ReactPart),
-/* harmony export */   "usePortalsLifecycle": () => (/* binding */ usePortalsLifecycle)
+/* harmony export */   "usePortalsLifecycle": () => (/* binding */ usePortalsLifecycle),
+/* harmony export */   "isReactElement": () => (/* binding */ isReactElement)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
@@ -39673,7 +39634,7 @@ const ReactComponentBridge = (props, ref) => {
     }, []);
     return react__WEBPACK_IMPORTED_MODULE_0__.createElement(props.component, _props.current);
 };
-ReactComponentBridge.displayName = 'PanelWrapper';
+ReactComponentBridge.displayName = 'DockviewReactJsBridge';
 /**
  * Since we are storing the React.Portal references in a rendered array they
  * require a key property like any other React element rendered in an array
@@ -39757,6 +39718,11 @@ const usePortalsLifecycle = () => {
     }, []);
     return [portals, addPortal];
 };
+// it does the job...
+function isReactElement(element) {
+    var _a;
+    return !!((_a = element) === null || _a === void 0 ? void 0 : _a.type);
+}
 
 
 /***/ }),
