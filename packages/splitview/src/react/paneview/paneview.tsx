@@ -29,81 +29,83 @@ export interface IPaneviewReactProps {
     disableAutoResizing?: boolean;
 }
 
-export const PaneviewReact: React.FunctionComponent<IPaneviewReactProps> = (
-    props: IPaneviewReactProps
-) => {
-    const domRef = React.useRef<HTMLDivElement>(null);
-    const paneviewRef = React.useRef<IPaneviewComponent>();
-    const [portals, addPortal] = usePortalsLifecycle();
+export const PaneviewReact = React.forwardRef(
+    (props: IPaneviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
+        const domRef = React.useRef<HTMLDivElement>(null);
+        const paneviewRef = React.useRef<IPaneviewComponent>();
+        const [portals, addPortal] = usePortalsLifecycle();
 
-    React.useEffect(() => {
-        if (props.disableAutoResizing) {
+        React.useImperativeHandle(ref, () => domRef.current!, []);
+
+        React.useEffect(() => {
+            if (props.disableAutoResizing) {
+                return () => {
+                    //
+                };
+            }
+
+            const watcher = watchElementResize(domRef.current!, (entry) => {
+                const { width, height } = entry.contentRect;
+                paneviewRef.current?.layout(width, height);
+            });
+
             return () => {
-                //
+                watcher.dispose();
             };
-        }
+        }, [props.disableAutoResizing]);
 
-        const watcher = watchElementResize(domRef.current!, (entry) => {
-            const { width, height } = entry.contentRect;
-            paneviewRef.current?.layout(width, height);
-        });
-
-        return () => {
-            watcher.dispose();
-        };
-    }, [props.disableAutoResizing]);
-
-    React.useEffect(() => {
-        const paneview = new PaneviewComponent(domRef.current!, {
-            frameworkComponents: props.components,
-            components: {},
-            headerComponents: {},
-            headerframeworkComponents: props.headerComponents,
-            frameworkWrapper: {
-                header: {
-                    createComponent: (
-                        id: string,
-                        componentId,
-                        component: any
-                    ) => {
-                        return new PanePanelSection(id, component, {
-                            addPortal,
-                        });
+        React.useEffect(() => {
+            const paneview = new PaneviewComponent(domRef.current!, {
+                frameworkComponents: props.components,
+                components: {},
+                headerComponents: {},
+                headerframeworkComponents: props.headerComponents,
+                frameworkWrapper: {
+                    header: {
+                        createComponent: (
+                            id: string,
+                            componentId,
+                            component: any
+                        ) => {
+                            return new PanePanelSection(id, component, {
+                                addPortal,
+                            });
+                        },
+                    },
+                    body: {
+                        createComponent: (
+                            id: string,
+                            componentId,
+                            component: any
+                        ) => {
+                            return new PanePanelSection(id, component, {
+                                addPortal,
+                            });
+                        },
                     },
                 },
-                body: {
-                    createComponent: (
-                        id: string,
-                        componentId,
-                        component: any
-                    ) => {
-                        return new PanePanelSection(id, component, {
-                            addPortal,
-                        });
-                    },
-                },
-            },
-        });
+            });
 
-        if (props.onReady) {
-            props.onReady({ api: new PaneviewApi(paneview) });
-        }
+            if (props.onReady) {
+                props.onReady({ api: new PaneviewApi(paneview) });
+            }
 
-        paneviewRef.current = paneview;
+            paneviewRef.current = paneview;
 
-        return () => {
-            paneview.dispose();
-        };
-    }, []);
+            return () => {
+                paneview.dispose();
+            };
+        }, []);
 
-    return (
-        <div
-            className={props.className}
-            style={{ height: '100%', width: '100%' }}
-            ref={domRef}
-        >
-            {portals}
-        </div>
-    );
-};
+        return (
+            <div
+                className={props.className}
+                style={{ height: '100%', width: '100%' }}
+                ref={domRef}
+            >
+                {portals}
+            </div>
+        );
+    }
+);
 PaneviewReact.displayName = 'PaneviewComponent';
