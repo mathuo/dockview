@@ -3,6 +3,7 @@ import {
     Orientation,
     PanelCollection,
     SerializedSplitview,
+    Splitview,
     SplitviewApi,
     SplitviewReact,
     SplitviewReadyEvent,
