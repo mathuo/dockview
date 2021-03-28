@@ -20,5 +20,5 @@ module.exports = {
     modulePathIgnorePatterns: [
         '<rootDir>/packages/dockview/src/__tests__/__mocks__',
     ],
-    coverageDirectory: 'coverage',
+    coverageDirectory: '<rootDir>/packages/dockview/coverage/',
 };
