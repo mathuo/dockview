@@ -9,3 +9,4 @@ typedocs/
 .build
 storybook-static/
 .rollup.cache/
+test-report.xml

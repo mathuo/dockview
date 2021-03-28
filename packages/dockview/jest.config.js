@@ -21,4 +21,5 @@ module.exports = {
         '<rootDir>/packages/dockview/src/__tests__/__mocks__',
     ],
     coverageDirectory: '<rootDir>/packages/dockview/coverage/',
+    testResultsProcessor: 'jest-sonar-reporter',
 };
