@@ -12,5 +12,6 @@ module.exports = {
         "/node_modules/",
         "<rootDir>packages/*/src/__tests__/",
     ],
-    coverageDirectory: "coverage"
+    coverageDirectory: "coverage",
+    testResultsProcessor: 'jest-sonar-reporter',
 };
