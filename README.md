@@ -19,7 +19,7 @@
 A zero dependency layout manager based on the layering of split-view components with ReactJS support.
 - View the live demo [here](https://mathuo.github.io/dockview/). 
 - Storybook demo [here](https://mathuo.github.io/dockview/output/storybook-static).
-- Code examples [here](https://github.com/mathuo/dockview/tree/master/packages/splitview-demo/src/stories).
+- Code examples [here](https://github.com/mathuo/dockview/tree/master/packages/dockview-demo/src/stories).
 - Generated TypeDocs can be found [here](https://mathuo.github.io/dockview/output/docs/index.html).
 
 Want to inspect the deployed package? Go to https://unpkg.com/browse/dockview@latest/
