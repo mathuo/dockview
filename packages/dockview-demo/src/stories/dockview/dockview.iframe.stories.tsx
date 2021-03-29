@@ -62,7 +62,6 @@ export const Iframe = (props: {
     const api = React.useRef<DockviewApi>();
 
     const onReady = (event: DockviewReadyEvent) => {
-        event.api.layout(window.innerWidth, window.innerHeight);
         api.current = event.api;
 
         event.api.onGridEvent((e) => props.onEvent(e.kind));
@@ -79,12 +78,6 @@ export const Iframe = (props: {
         });
     };
 
-    React.useEffect(() => {
-        window.addEventListener('resize', () => {
-            api.current?.layout(window.innerWidth, window.innerHeight);
-        });
-    }, []);
-
     return (
         <DockviewReact
             className={props.theme}
@@ -97,7 +90,7 @@ export const Iframe = (props: {
 };
 
 export default {
-    title: 'Dockview/Iframe',
+    title: 'Library/Dockview/Iframe',
     component: Iframe,
     decorators: [
         (Component) => {

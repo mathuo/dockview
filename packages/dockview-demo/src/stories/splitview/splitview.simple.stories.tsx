@@ -1,25 +1,31 @@
 import {
-    GridviewApi,
-    GridviewReact,
-    GridviewReadyEvent,
-    IGridviewPanelProps,
+    ISplitviewPanelProps,
     Orientation,
     PanelCollection,
+    SplitviewApi,
+    SplitviewReact,
+    SplitviewReadyEvent,
 } from 'dockview';
 import * as React from 'react';
-import { Story, Meta } from '@storybook/react';
+import { Meta } from '@storybook/react';
 
-const components: PanelCollection<IGridviewPanelProps> = {
+const components: PanelCollection<ISplitviewPanelProps> = {
     default: (props) => {
+        const resize = () => {
+            props.api.setSize({ size: 300 });
+        };
+
         return (
             <div
                 style={{
                     padding: '10px',
                     backgroundColor: props.color,
                     height: '100%',
+                    boxSizing: 'border-box',
                 }}
             >
-                hello world
+                <div>hello world</div>
+                <button onClick={resize}>Resize</button>
             </div>
         );
     },
@@ -31,62 +37,32 @@ export const Simple = (props: {
     proportionalLayout: boolean;
     disableAutoResizing: boolean;
 }) => {
-    const api = React.useRef<GridviewApi>();
+    const api = React.useRef<SplitviewApi>();
 
-    const onReady = (event: GridviewReadyEvent) => {
-        event.api.layout(window.innerWidth, window.innerHeight);
+    const onReady = (event: SplitviewReadyEvent) => {
         api.current = event.api;
-
         event.api.addPanel({
-            id: 'panel_1',
+            id: 'panel1',
             component: 'default',
             params: { color: 'red' },
-            minimumHeight: 50,
-            minimumWidth: 50,
-            location: [0],
+            minimumSize: 50,
         });
         event.api.addPanel({
-            id: 'panel_2',
+            id: 'panel2',
             component: 'default',
             params: { color: 'green' },
-            minimumHeight: 50,
-            minimumWidth: 50,
-            location: [0, 0],
+            minimumSize: 50,
         });
         event.api.addPanel({
-            id: 'panel_3',
+            id: 'panel3',
             component: 'default',
             params: { color: 'purple' },
-            minimumHeight: 50,
-            minimumWidth: 50,
-            location: [0, 0, 0],
-        });
-        event.api.addPanel({
-            id: 'panel_4',
-            component: 'default',
-            params: { color: 'yellow' },
-            minimumHeight: 50,
-            minimumWidth: 50,
-            location: [0, 0, 0, 0],
-        });
-        event.api.addPanel({
-            id: 'panel_5',
-            component: 'default',
-            params: { color: 'dodgerblue' },
-            minimumHeight: 50,
-            minimumWidth: 50,
-            location: [0, 0, 0, 0, 0],
+            minimumSize: 50,
         });
     };
 
-    React.useEffect(() => {
-        window.addEventListener('resize', () => {
-            api.current?.layout(window.innerWidth, window.innerHeight);
-        });
-    }, []);
-
     return (
-        <GridviewReact
+        <SplitviewReact
             onReady={onReady}
             orientation={props.orientation}
             components={components}
@@ -98,7 +74,7 @@ export const Simple = (props: {
 };
 
 export default {
-    title: 'Gridview/Simple',
+    title: 'Library/Splitview/Simple',
     component: Simple,
     decorators: [
         (Component) => {

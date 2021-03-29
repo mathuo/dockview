@@ -86,7 +86,6 @@ export const Simple = (props: {
     const api = React.useRef<PaneviewApi>();
 
     const onReady = (event: PaneviewReadyEvent) => {
-        event.api.layout(window.innerWidth, window.innerHeight);
         api.current = event.api;
 
         event.api.addPanel({
@@ -112,12 +111,6 @@ export const Simple = (props: {
         });
     };
 
-    React.useEffect(() => {
-        window.addEventListener('resize', () => {
-            api.current?.layout(window.innerWidth, window.innerHeight);
-        });
-    }, []);
-
     return (
         <PaneviewReact
             className={props.theme}
@@ -129,7 +122,7 @@ export const Simple = (props: {
 };
 
 export default {
-    title: 'Paneview/Simple',
+    title: 'Library/Paneview/Simple',
     component: Simple,
     decorators: [
         (Component) => {

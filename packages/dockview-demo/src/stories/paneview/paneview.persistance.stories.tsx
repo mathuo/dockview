@@ -79,14 +79,13 @@ const components: PanelCollection<IPaneviewPanelProps> = {
     },
 };
 
-export const Localstoragesave = (props: {
+export const Persistance = (props: {
     theme: string;
     disableAutoResizing: boolean;
 }) => {
     const api = React.useRef<PaneviewApi>();
 
     const onReady = (event: PaneviewReadyEvent) => {
-        event.api.layout(window.innerWidth, window.innerHeight);
         api.current = event.api;
 
         event.api.onDidLayoutChange(() => {
@@ -137,15 +136,8 @@ export const Localstoragesave = (props: {
             ],
         });
 
-        event.api.layout(window.innerWidth, window.innerHeight);
         event.api.getPanel('panel2')?.api.setSize({ size: 60 });
     };
-
-    React.useEffect(() => {
-        window.addEventListener('resize', () => {
-            api.current?.layout(window.innerWidth, window.innerHeight);
-        });
-    }, []);
 
     return (
         <PaneviewReact
@@ -158,8 +150,8 @@ export const Localstoragesave = (props: {
 };
 
 export default {
-    title: 'Paneview/Localstoragesave',
-    component: Localstoragesave,
+    title: 'Library/Paneview/Persistance',
+    component: Persistance,
     decorators: [
         (Component) => {
             document.body.style.padding = '0px';

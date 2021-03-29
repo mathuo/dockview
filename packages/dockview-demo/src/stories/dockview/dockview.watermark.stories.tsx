@@ -28,7 +28,7 @@ const components: PanelCollection<IDockviewPanelProps> = {
     },
 };
 
-const Watermark = (props: IWatermarkPanelProps) => {
+const WatermarkPanel = (props: IWatermarkPanelProps) => {
     const [size, setSize] = React.useState<number>(props.containerApi.size);
     const [panels, setPanels] = React.useState<number>(
         props.containerApi.totalPanels
@@ -95,7 +95,7 @@ const Watermark = (props: IWatermarkPanelProps) => {
     );
 };
 
-export const CustomWatermark = (props: {
+export const Watermark = (props: {
     onEvent: (name: string) => void;
     theme: string;
     hideBorders: boolean;
@@ -104,7 +104,6 @@ export const CustomWatermark = (props: {
     const api = React.useRef<DockviewApi>();
 
     const onReady = (event: DockviewReadyEvent) => {
-        event.api.layout(window.innerWidth, window.innerHeight);
         api.current = event.api;
 
         event.api.onGridEvent((e) => props.onEvent(e.kind));
@@ -112,27 +111,21 @@ export const CustomWatermark = (props: {
         event.api.addEmptyGroup();
     };
 
-    React.useEffect(() => {
-        window.addEventListener('resize', () => {
-            api.current?.layout(window.innerWidth, window.innerHeight);
-        });
-    }, []);
-
     return (
         <DockviewReact
             className={props.theme}
             onReady={onReady}
             components={components}
             hideBorders={props.hideBorders}
-            watermarkComponent={Watermark}
+            watermarkComponent={WatermarkPanel}
             disableAutoResizing={props.disableAutoResizing}
         />
     );
 };
 
 export default {
-    title: 'Dockview/CustomWatermark',
-    component: CustomWatermark,
+    title: 'Library/Dockview/Watermark',
+    component: Watermark,
     decorators: [
         (Component) => {
             document.body.style.padding = '0px';

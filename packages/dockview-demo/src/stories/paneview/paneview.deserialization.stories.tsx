@@ -86,7 +86,6 @@ export const Deserialization = (props: {
     const api = React.useRef<PaneviewApi>();
 
     const onReady = (event: PaneviewReadyEvent) => {
-        event.api.layout(window.innerWidth, window.innerHeight);
         api.current = event.api;
 
         event.api.fromJSON({
@@ -125,15 +124,8 @@ export const Deserialization = (props: {
             ],
         });
 
-        event.api.layout(window.innerWidth, window.innerHeight);
         event.api.getPanel('panel2')?.api.setSize({ size: 60 });
     };
-
-    React.useEffect(() => {
-        window.addEventListener('resize', () => {
-            api.current?.layout(window.innerWidth, window.innerHeight);
-        });
-    }, []);
 
     return (
         <PaneviewReact
@@ -146,7 +138,7 @@ export const Deserialization = (props: {
 };
 
 export default {
-    title: 'Paneview/Deserialization',
+    title: 'Library/Paneview/Deserialization',
     component: Deserialization,
     decorators: [
         (Component) => {

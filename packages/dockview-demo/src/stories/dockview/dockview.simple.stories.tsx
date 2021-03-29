@@ -37,7 +37,6 @@ export const Simple = (props: {
     const api = React.useRef<DockviewApi>();
 
     const onReady = (event: DockviewReadyEvent) => {
-        event.api.layout(window.innerWidth, window.innerHeight);
         api.current = event.api;
 
         event.api.onGridEvent((e) => props.onEvent(e.kind));
@@ -64,12 +63,6 @@ export const Simple = (props: {
         // event.api.getPanel('panel1').api;
     };
 
-    React.useEffect(() => {
-        window.addEventListener('resize', () => {
-            api.current?.layout(window.innerWidth, window.innerHeight);
-        });
-    }, []);
-
     return (
         <DockviewReact
             className={props.theme}
@@ -82,7 +75,7 @@ export const Simple = (props: {
 };
 
 export default {
-    title: 'Dockview/Simple',
+    title: 'Library/Dockview/Simple',
     component: Simple,
     decorators: [
         (Component) => {
