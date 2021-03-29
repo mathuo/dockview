@@ -46,6 +46,8 @@ export interface IGridPanelView extends IGridView, IPanel {
 export interface IBaseGrid<T extends IGridPanelView> {
     readonly element: HTMLElement;
     readonly id: string;
+    readonly width: number;
+    readonly height: number;
     readonly minimumHeight: number;
     readonly maximumHeight: number;
     readonly minimumWidth: number;

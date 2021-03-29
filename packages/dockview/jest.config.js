@@ -19,6 +19,7 @@ module.exports = {
     coveragePathIgnorePatterns: ['/node_modules/'],
     modulePathIgnorePatterns: [
         '<rootDir>/packages/dockview/src/__tests__/__mocks__',
+        '<rootDir>/packages/dockview/src/__tests__/__test_utils__',
     ],
     coverageDirectory: '<rootDir>/packages/dockview/coverage/',
     testResultsProcessor: 'jest-sonar-reporter',

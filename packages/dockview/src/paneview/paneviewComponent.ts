@@ -120,6 +120,8 @@ export interface AddPaneviewCompponentOptions {
 }
 
 export interface IPaneviewComponent extends IDisposable {
+    readonly width: number;
+    readonly height: number;
     readonly minimumSize: number;
     readonly maximumSize: number;
     addPanel(options: AddPaneviewCompponentOptions): IDisposable;

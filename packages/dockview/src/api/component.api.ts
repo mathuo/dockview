@@ -109,6 +109,14 @@ export class SplitviewApi {
 }
 
 export class PaneviewApi {
+    get width() {
+        return this.component.width;
+    }
+
+    get height() {
+        return this.component.height;
+    }
+
     get minimumSize() {
         return this.component.minimumSize;
     }
@@ -165,6 +173,14 @@ export class PaneviewApi {
 }
 
 export class GridviewApi {
+    get width() {
+        return this.component.width;
+    }
+
+    get height() {
+        return this.component.height;
+    }
+
     get minimumHeight() {
         return this.component.minimumHeight;
     }
@@ -252,6 +268,14 @@ export class GridviewApi {
 }
 
 export class DockviewApi {
+    get width() {
+        return this.component.width;
+    }
+
+    get height() {
+        return this.component.height;
+    }
+
     get minimumHeight() {
         return this.component.minimumHeight;
     }
