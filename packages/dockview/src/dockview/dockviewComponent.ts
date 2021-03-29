@@ -262,7 +262,7 @@ export class DockviewComponent
         },
         options: (() => PanelOptions) | PanelOptions
     ): IDisposable {
-        const disposables = new CompositeDisposable(
+        return new CompositeDisposable(
             addDisposableListener(target.element, 'dragstart', (event) => {
                 if (!event.dataTransfer) {
                     throw new Error('unsupported');
@@ -305,8 +305,6 @@ export class DockviewComponent
                 this.drag.dispose();
             })
         );
-
-        return disposables;
     }
 
     setActivePanel(panel: IGroupPanel): void {
@@ -514,7 +512,7 @@ export class DockviewComponent
 
     public async closeAllGroups(): Promise<boolean> {
         for (const entry of this.groups.entries()) {
-            const [key, group] = entry;
+            const [_, group] = entry;
 
             const didCloseAll = await group.value.group.closeAllPanels();
             if (!didCloseAll) {

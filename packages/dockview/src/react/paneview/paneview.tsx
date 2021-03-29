@@ -55,6 +55,15 @@ export const PaneviewReact = React.forwardRef(
         }, [props.disableAutoResizing]);
 
         React.useEffect(() => {
+            const createComponent = (
+                id: string,
+                componentId: string,
+                component: any
+            ) =>
+                new PanePanelSection(id, component, {
+                    addPortal,
+                });
+
             const paneview = new PaneviewComponent(domRef.current!, {
                 frameworkComponents: props.components,
                 components: {},
@@ -62,26 +71,10 @@ export const PaneviewReact = React.forwardRef(
                 headerframeworkComponents: props.headerComponents,
                 frameworkWrapper: {
                     header: {
-                        createComponent: (
-                            id: string,
-                            componentId,
-                            component: any
-                        ) => {
-                            return new PanePanelSection(id, component, {
-                                addPortal,
-                            });
-                        },
+                        createComponent,
                     },
                     body: {
-                        createComponent: (
-                            id: string,
-                            componentId,
-                            component: any
-                        ) => {
-                            return new PanePanelSection(id, component, {
-                                addPortal,
-                            });
-                        },
+                        createComponent,
                     },
                 },
             });

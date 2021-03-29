@@ -95,15 +95,17 @@ export class LeafNode implements IView {
         this._orthogonalSize = orthogonalSize;
         this._size = size;
 
-        this._disposable = this.view.onDidChange((event) =>
-            this._onDidChange.fire(
-                event
-                    ? this.orientation === Orientation.VERTICAL
+        this._disposable = this.view.onDidChange((event) => {
+            if (event) {
+                this._onDidChange.fire(
+                    this.orientation === Orientation.VERTICAL
                         ? event.width
                         : event.height
-                    : undefined
-            )
-        );
+                );
+            } else {
+                this._onDidChange.fire(undefined);
+            }
+        });
     }
 
     public setVisible(visible: boolean) {

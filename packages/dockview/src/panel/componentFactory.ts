@@ -32,12 +32,11 @@ export function createComponent<T>(
                 `Cannot create '${id}' for framework component '${componentName}'. you must register a frameworkPanelWrapper to use framework components`
             );
         }
-        const wrappedComponent = createFrameworkComponent.createComponent(
+        return createFrameworkComponent.createComponent(
             id,
             componentName!,
             FrameworkComponent
         );
-        return wrappedComponent;
     }
 
     if (!Component) {

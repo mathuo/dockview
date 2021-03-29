@@ -538,8 +538,6 @@ export class GroupComponent extends CompositeDisposable implements IGroupview {
     }
 
     private _removePanel(panel: IGroupPanel) {
-        const index = this._panels.indexOf(panel);
-
         const isActivePanel = this._activePanel === panel;
 
         this.doRemovePanel(panel);

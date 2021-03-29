@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {
     IContentRenderer,
-    GroupPanelPartInitParameters,
     GroupPanelContentPartInitParameters,
 } from '../../groupview/types';
 import { ReactPart, ReactPortalStore } from '../react';
@@ -9,7 +8,6 @@ import { IDockviewPanelProps } from '../dockview/dockview';
 import { PanelUpdateEvent } from '../../panel/types';
 import { IDockviewPanelApi } from '../../api/groupPanelApi';
 import { DockviewApi } from '../../api/component.api';
-import { HostedContainer } from '../../hostedContainer';
 import { GroupviewPanel } from '../../groupview/v2/groupviewPanel';
 import { Emitter, Event } from '../../events';
 import { WrappedTab } from '../../dockview/components/tab/defaultTab';
@@ -17,78 +15,6 @@ import { WrappedTab } from '../../dockview/components/tab/defaultTab';
 export interface IGroupPanelActionbarProps {
     api: IDockviewPanelApi;
     containerApi: DockviewApi;
-}
-
-class BasePanelContentPart implements IContentRenderer {
-    protected _element: HTMLElement;
-    protected _group: GroupviewPanel | undefined;
-    //
-    protected _actionsElement: HTMLElement;
-
-    protected parameters: GroupPanelPartInitParameters | undefined;
-
-    private readonly _onDidFocus = new Emitter<void>();
-    readonly onDidFocus: Event<void> = this._onDidFocus.event;
-
-    private readonly _onDidBlur = new Emitter<void>();
-    readonly onDidBlur: Event<void> = this._onDidBlur.event;
-
-    get element(): HTMLElement {
-        return this._element;
-    }
-
-    get actions(): HTMLElement {
-        return this._actionsElement;
-    }
-
-    constructor(public readonly id: string) {
-        this._element = document.createElement('div');
-        this._element.style.height = '100%';
-        this._element.style.width = '100%';
-
-        this._actionsElement = document.createElement('div');
-        this._actionsElement.style.height = '100%';
-        this._actionsElement.style.width = '100%';
-    }
-
-    focus() {
-        // this._element.focus();
-    }
-
-    public init(parameters: GroupPanelPartInitParameters): void {
-        this.parameters = parameters;
-    }
-
-    public toJSON() {
-        return {
-            id: this.id,
-        };
-    }
-
-    public update(params: PanelUpdateEvent) {
-        if (this.parameters) {
-            this.parameters.params = params.params;
-        }
-    }
-
-    public updateParentGroup(
-        group: GroupviewPanel,
-        isPanelVisible: boolean
-    ): void {
-        this._group = group;
-    }
-
-    public layout(width: number, height: number): void {
-        // noop
-    }
-
-    public close(): Promise<boolean> {
-        return Promise.resolve(true);
-    }
-
-    public dispose() {
-        //
-    }
 }
 
 export interface ReactContentPartContext {

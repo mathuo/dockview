@@ -124,7 +124,7 @@ export class GridviewComponent
      *
      * @returns A JSON respresentation of the layout
      */
-    public toJSON() {
+    public toJSON(): SerializedGridview {
         const data = this.gridview.serialize() as {
             height: number;
             width: number;
@@ -132,11 +132,10 @@ export class GridviewComponent
             root: SerializedGridObject<GridPanelViewState>;
         };
 
-        const serializedData: SerializedGridview = {
+        return {
             grid: data,
             activePanel: this.activeGroup?.id,
         };
-        return serializedData;
     }
 
     setVisible(panel: GridviewPanel, visible: boolean): void {
