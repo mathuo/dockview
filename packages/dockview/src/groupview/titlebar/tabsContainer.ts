@@ -151,7 +151,12 @@ export class TabsContainer
                 if (event.defaultPrevented) {
                     return;
                 }
-                this.accessor.doSetGroupActive(this.group);
+
+                const isLeftClick = event.button === 0;
+
+                if (isLeftClick) {
+                    this.accessor.doSetGroupActive(this.group);
+                }
             }),
             addDisposableListener(this.tabContainer, 'dragenter', (event) => {
                 if (
@@ -273,6 +278,14 @@ export class TabsContainer
                 const alreadyFocused =
                     panel.id === this.group.group.activePanel?.id &&
                     this.group.group.isAncestor(focusedElement.element!);
+                this.accessor.fireMouseEvent({ ...event, panel, tab: true });
+
+                const isLeftClick = event.event.button === 0;
+
+                if (!isLeftClick || event.event.defaultPrevented) {
+                    return;
+                }
+
                 switch (event.kind) {
                     case MouseEventKind.CLICK:
                         this.group.group.openPanel(panel, {
@@ -280,7 +293,6 @@ export class TabsContainer
                         });
                         break;
                 }
-                this.accessor.fireMouseEvent({ ...event, panel, tab: true });
             }),
             tab.onDropped((event) => {
                 this._onDropped.fire({
