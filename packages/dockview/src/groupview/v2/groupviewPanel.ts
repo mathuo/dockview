@@ -28,6 +28,22 @@ export class GroupviewPanel extends GridviewPanel {
         return this._group;
     }
 
+    get minimumHeight() {
+        return this._group.minimumHeight;
+    }
+
+    get maximumHeight() {
+        return this._group.maximumHeight;
+    }
+
+    get minimumWidth() {
+        return this._group.minimumWidth;
+    }
+
+    get maximumWidth() {
+        return this._group.maximumWidth;
+    }
+
     constructor(
         accessor: IDockviewComponent,
         id: string,
