@@ -16,6 +16,8 @@
         overflow-x: overlay;
         overflow-y: hidden;
 
+        scrollbar-width: thin; // firefox
+
         &::-webkit-scrollbar {
             height: 3px;
         }
