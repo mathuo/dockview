@@ -10,7 +10,7 @@
 ![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg)
 [![npm version](https://badge.fury.io/js/dockview.svg)](https://www.npmjs.com/package/dockview)
 [![CI Build](https://github.com/mathuo/dockview/workflows/CI/badge.svg)](https://github.com/mathuo/dockview/actions?query=workflow%3ACI)
-[![codecov](https://codecov.io/gh/mathuo/dockview/branch/master/graph/badge.svg?token=BF083TK64H)](https://codecov.io/gh/mathuo/dockview/branch/master)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=coverage)](https://sonarcloud.io/dashboard?id=mathuo_dockview)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=alert_status)](https://sonarcloud.io/dashboard?id=mathuo_dockview)
 [![Bundle Phobia](https://badgen.net/bundlephobia/minzip/dockview)](https://bundlephobia.com/result?p=dockview)
 

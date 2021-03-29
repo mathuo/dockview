@@ -8,7 +8,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-
+            # might be required for sonar to work correctly
+              with:
+                  fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
             - name: Use Node.js
               uses: actions/setup-node@v1
               with:
@@ -25,13 +27,6 @@ jobs:
             - run: npm run bootstrap
             - run: npm run build
             - run: npm run test:cov
-            - run: npm run codecov-publish
-              env:
-                  CI: true
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-            - uses: actions/checkout@v2
-              with:
-                  fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
             - name: SonarCloud Scan
               uses: SonarSource/sonarcloud-github-action@master
               env:
