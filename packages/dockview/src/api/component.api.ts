@@ -30,7 +30,7 @@ import {
 } from '../splitview/splitviewComponent';
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { ISplitviewPanel } from '../splitview/splitviewPanel';
-import { GroupviewPanel } from '../groupview/v2/groupviewPanel';
+import { GroupviewPanel } from '../groupview/groupviewPanel';
 
 export class SplitviewApi {
     get minimumSize() {

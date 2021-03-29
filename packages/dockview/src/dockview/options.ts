@@ -8,7 +8,7 @@ import {
     WatermarkConstructor,
     WatermarkPart,
 } from '../groupview/types';
-import { GroupviewPanel } from '../groupview/v2/groupviewPanel';
+import { GroupviewPanel } from '../groupview/groupviewPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
 

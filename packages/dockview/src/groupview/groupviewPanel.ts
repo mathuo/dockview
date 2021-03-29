@@ -1,18 +1,15 @@
-import { IFrameworkPart } from '../../panel/types';
-import { IDockviewComponent } from '../../dockview/dockviewComponent';
-import {
-    GridviewPanelApi,
-    IGridviewPanelApi,
-} from '../../api/gridviewPanelApi';
-import { GroupComponent, GroupOptions } from './component';
-import { GridviewPanel } from '../../gridview/gridviewPanel';
+import { IFrameworkPart } from '../panel/types';
+import { IDockviewComponent } from '../dockview/dockviewComponent';
+import { GridviewPanelApi, IGridviewPanelApi } from '../api/gridviewPanelApi';
+import { Groupview, GroupOptions } from './groupview';
+import { GridviewPanel } from '../gridview/gridviewPanel';
 
 interface IGroupApi extends IGridviewPanelApi {}
 
 class GroupApi extends GridviewPanelApi implements IGroupApi {
-    private _value?: GroupComponent;
+    private _value?: Groupview;
 
-    set group(value: GroupComponent) {
+    set group(value: Groupview) {
         this._value = value;
     }
 
@@ -22,9 +19,9 @@ class GroupApi extends GridviewPanelApi implements IGroupApi {
 }
 
 export class GroupviewPanel extends GridviewPanel {
-    private readonly _group: GroupComponent;
+    private readonly _group: Groupview;
 
-    get group(): GroupComponent {
+    get group(): Groupview {
         return this._group;
     }
 
@@ -51,13 +48,7 @@ export class GroupviewPanel extends GridviewPanel {
     ) {
         super(id, 'groupview_default', new GroupApi(id));
 
-        this._group = new GroupComponent(
-            this.element,
-            accessor,
-            id,
-            options,
-            this
-        );
+        this._group = new Groupview(this.element, accessor, id, options, this);
 
         (this.api as GroupApi).group = this._group;
         this.group.bootstrap();

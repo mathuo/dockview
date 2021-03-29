@@ -12,7 +12,7 @@ import { focusedElement } from '../../focusedElement';
 import { IGroupPanel } from '../groupPanel';
 import { IDockviewComponent } from '../../dockview/dockviewComponent';
 import { LocalSelectionTransfer } from '../../dnd/dataTransfer';
-import { GroupviewPanel } from '../v2/groupviewPanel';
+import { GroupviewPanel } from '../groupviewPanel';
 
 export interface TabDropEvent {
     readonly event: DroptargetEvent;

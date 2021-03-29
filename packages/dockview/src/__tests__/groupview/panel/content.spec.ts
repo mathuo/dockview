@@ -6,7 +6,7 @@ import {
     GroupPanelContentPartInitParameters,
     IContentRenderer,
 } from '../../../groupview/types';
-import { GroupviewPanel } from '../../../groupview/v2/groupviewPanel';
+import { GroupviewPanel } from '../../../groupview/groupviewPanel';
 import { CompositeDisposable } from '../../../lifecycle';
 import { PanelUpdateEvent } from '../../../panel/types';
 import { IGroupPanelView } from '../../../react/dockview/v2/defaultGroupPanelView';

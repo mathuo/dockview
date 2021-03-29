@@ -6,7 +6,7 @@ import {
 import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
 import { PanelUpdateEvent } from '../../../panel/types';
-import { GroupviewPanel } from '../../../groupview/v2/groupviewPanel';
+import { GroupviewPanel } from '../../../groupview/groupviewPanel';
 
 export class WrappedTab implements ITabRenderer {
     private readonly _element: HTMLElement;

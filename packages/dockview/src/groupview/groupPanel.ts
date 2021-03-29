@@ -8,8 +8,8 @@ import {
 import { HeaderPartInitParameters } from './types';
 import { IPanel, PanelInitParameters, PanelUpdateEvent } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
-import { GroupviewPanel } from './v2/groupviewPanel';
-import { GroupChangeKind } from './v2/component';
+import { GroupviewPanel } from './groupviewPanel';
+import { GroupChangeKind } from './groupview';
 import { IGroupPanelView } from '../react/dockview/v2/defaultGroupPanelView';
 
 export interface IGroupPanelInitParameters

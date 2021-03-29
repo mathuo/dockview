@@ -8,7 +8,7 @@ import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/core/splitview';
 import { ReactPanelDeserialzier } from '../../react/deserializer';
 import { Position } from '../../dnd/droptarget';
-import { GroupviewPanel } from '../../groupview/v2/groupviewPanel';
+import { GroupviewPanel } from '../../groupview/groupviewPanel';
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
 

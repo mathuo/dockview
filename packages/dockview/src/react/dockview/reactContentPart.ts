@@ -8,7 +8,7 @@ import { IDockviewPanelProps } from '../dockview/dockview';
 import { PanelUpdateEvent } from '../../panel/types';
 import { IDockviewPanelApi } from '../../api/groupPanelApi';
 import { DockviewApi } from '../../api/component.api';
-import { GroupviewPanel } from '../../groupview/v2/groupviewPanel';
+import { GroupviewPanel } from '../../groupview/groupviewPanel';
 import { Emitter, Event } from '../../events';
 import { WrappedTab } from '../../dockview/components/tab/defaultTab';
 

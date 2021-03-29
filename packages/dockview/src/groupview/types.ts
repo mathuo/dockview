@@ -3,7 +3,7 @@ import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { IDockviewPanelApi } from '../api/groupPanelApi';
 import { PanelInitParameters, IPanel } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
-import { GroupviewPanel } from './v2/groupviewPanel';
+import { GroupviewPanel } from './groupviewPanel';
 import { Event } from '../events';
 import { WrappedTab } from '../dockview/components/tab/defaultTab';
 

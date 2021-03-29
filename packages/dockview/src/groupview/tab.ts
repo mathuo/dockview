@@ -11,7 +11,7 @@ import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { ITabRenderer } from './types';
 import { focusedElement } from '../focusedElement';
 import { IGroupPanel } from './groupPanel';
-import { GroupviewPanel } from './v2/groupviewPanel';
+import { GroupviewPanel } from './groupviewPanel';
 
 export enum MouseEventKind {
     CLICK = 'CLICK',

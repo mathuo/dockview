@@ -1,7 +1,7 @@
 import { Emitter, Event } from '../events';
 import { GridviewPanelApi, IGridviewPanelApi } from './gridviewPanelApi';
 import { IGroupPanel } from '../groupview/groupPanel';
-import { GroupviewPanel } from '../groupview/v2/groupviewPanel';
+import { GroupviewPanel } from '../groupview/groupviewPanel';
 
 export interface TitleEvent {
     title: string;

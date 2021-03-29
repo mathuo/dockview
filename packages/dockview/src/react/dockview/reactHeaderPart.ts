@@ -3,7 +3,7 @@ import {
     ITabRenderer,
     GroupPanelPartInitParameters,
 } from '../../groupview/types';
-import { GroupviewPanel } from '../../groupview/v2/groupviewPanel';
+import { GroupviewPanel } from '../../groupview/groupviewPanel';
 import { PanelUpdateEvent } from '../../panel/types';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IGroupPanelBaseProps } from './dockview';

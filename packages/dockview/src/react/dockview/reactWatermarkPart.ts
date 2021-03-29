@@ -3,7 +3,7 @@ import {
     GroupPanelPartInitParameters,
     WatermarkPart,
 } from '../../groupview/types';
-import { GroupviewPanel } from '../../groupview/v2/groupviewPanel';
+import { GroupviewPanel } from '../../groupview/groupviewPanel';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IGroupPanelBaseProps } from './dockview';
 

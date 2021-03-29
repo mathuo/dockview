@@ -26,7 +26,7 @@ import { GridviewPanelApi } from '../api/gridviewPanelApi';
 import { GridviewApi } from '../api/component.api';
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { createComponent } from '../panel/componentFactory';
-import { GroupChangeKind } from '../groupview/v2/component';
+import { GroupChangeKind } from '../groupview/groupview';
 
 interface PanelReference {
     api: GridviewPanelApi;

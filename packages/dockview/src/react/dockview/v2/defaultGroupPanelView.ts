@@ -8,7 +8,7 @@ import {
     IContentRenderer,
     ITabRenderer,
 } from '../../../groupview/types';
-import { GroupviewPanel } from '../../../groupview/v2/groupviewPanel';
+import { GroupviewPanel } from '../../../groupview/groupviewPanel';
 import { IDisposable } from '../../../lifecycle';
 import { PanelUpdateEvent } from '../../../panel/types';
 

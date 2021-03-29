@@ -10,7 +10,7 @@ import {
 } from '../splitview/core/splitview';
 import { IPanel } from '../panel/types';
 import { MovementOptions2 } from '../dockview/options';
-import { GroupChangeEvent, GroupChangeKind } from '../groupview/v2/component';
+import { GroupChangeEvent, GroupChangeKind } from '../groupview/groupview';
 
 const nextLayoutId = sequentialNumberGenerator();
 

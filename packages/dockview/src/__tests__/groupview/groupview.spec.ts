@@ -15,12 +15,12 @@ import { PanelUpdateEvent } from '../../panel/types';
 import { fireEvent } from '@testing-library/dom';
 import { LocalSelectionTransfer } from '../../dnd/dataTransfer';
 import { Position } from '../../dnd/droptarget';
-import { GroupviewPanel } from '../../groupview/v2/groupviewPanel';
+import { GroupviewPanel } from '../../groupview/groupviewPanel';
 import {
     DefaultGroupPanelView,
     IGroupPanelView,
 } from '../../react/dockview/v2/defaultGroupPanelView';
-import { GroupOptions, GroupDropEvent } from '../../groupview/v2/component';
+import { GroupOptions, GroupDropEvent } from '../../groupview/groupview';
 import { IDockviewPanelApi } from '../../api/groupPanelApi';
 
 class Watermark implements WatermarkPart {

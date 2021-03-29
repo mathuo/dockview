@@ -2,7 +2,7 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
 } from '../../../groupview/types';
-import { GroupviewPanel } from '../../../groupview/v2/groupviewPanel';
+import { GroupviewPanel } from '../../../groupview/groupviewPanel';
 import { HostedContainer } from '../../../hostedContainer';
 import { PanelUpdateEvent } from '../../../panel/types';
 

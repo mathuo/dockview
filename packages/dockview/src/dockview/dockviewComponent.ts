@@ -56,8 +56,8 @@ import {
     GroupDropEvent,
     GroupOptions,
     GroupPanelViewState,
-} from '../groupview/v2/component';
-import { GroupviewPanel } from '../groupview/v2/groupviewPanel';
+} from '../groupview/groupview';
+import { GroupviewPanel } from '../groupview/groupviewPanel';
 import { DefaultGroupPanelView } from '../react/dockview/v2/defaultGroupPanelView';
 
 const nextGroupId = sequentialNumberGenerator();
