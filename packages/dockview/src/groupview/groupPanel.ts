@@ -15,14 +15,10 @@ import { IGroupPanelView } from '../react/dockview/v2/defaultGroupPanelView';
 export interface IGroupPanelInitParameters
     extends PanelInitParameters,
         HeaderPartInitParameters {
-    // headerPart: ITabRenderer;
-    // contentPart: IContentRenderer;
     view: IGroupPanelView;
 }
 
 export interface IGroupPanel extends IDisposable, IPanel {
-    // readonly header?: ITabRenderer;
-    // readonly content?: IContentRenderer;
     readonly view?: IGroupPanelView;
     readonly group?: GroupviewPanel;
     readonly api: IDockviewPanelApi;
@@ -52,21 +48,11 @@ export class GroupPanel extends CompositeDisposable implements IGroupPanel {
 
     readonly onDidStateChange: Event<void>;
 
-    // private headerPart?: ITabRenderer;
-    // private contentPart?: IContentRenderer;
     private _view?: IGroupPanelView;
 
     get group(): GroupviewPanel | undefined {
         return this._group;
     }
-
-    // get header() {
-    //     return this.headerPart;
-    // }
-
-    // get content() {
-    //     return this.contentPart;
-    // }
 
     get view() {
         return this._view;
@@ -115,11 +101,6 @@ export class GroupPanel extends CompositeDisposable implements IGroupPanel {
         return {
             id: this.id,
             view: this.view!.toJSON(),
-            // contentId: this.contentPart?.id as string,
-            // tabId:
-            //     this.headerPart instanceof DefaultTab
-            //         ? undefined
-            //         : this.headerPart?.id,
             params:
                 params && Object.keys(params).length > 0 ? params : undefined,
             title: this.params?.title as string,
@@ -134,15 +115,10 @@ export class GroupPanel extends CompositeDisposable implements IGroupPanel {
         }
 
         this.view?.update(params);
-
-        // this.contentPart?.update(params);
-        // this.headerPart?.update(params);
     }
 
     public init(params: IGroupPanelInitParameters): void {
         this.params = params;
-        // this.contentPart = params.contentPart;
-        // this.headerPart = params.headerPart;
         this._view = params.view;
 
         if (params.state) {
@@ -154,17 +130,6 @@ export class GroupPanel extends CompositeDisposable implements IGroupPanel {
             api: this.api,
             containerApi: this.containerApi,
         });
-
-        // this.content?.init({
-        //     ...params,
-        //     api: this.api,
-        //     containerApi: this.containerApi,
-        // });
-        // this.header?.init({
-        //     ...params,
-        //     api: this.api,
-        //     containerApi: this.containerApi,
-        // });
     }
 
     public updateParentGroup(group: GroupviewPanel, isGroupActive: boolean) {
@@ -174,27 +139,16 @@ export class GroupPanel extends CompositeDisposable implements IGroupPanel {
         this.mutableDisposable.value = this._group.group.onDidGroupChange(
             (ev) => {
                 if (ev.kind === GroupChangeKind.GROUP_ACTIVE) {
-                    const isPanelVisible = !!this._group?.group.isPanelActive(
-                        this
-                    );
+                    const isVisible = !!this._group?.group.isPanelActive(this);
                     this.api._onDidActiveChange.fire({
-                        isActive: isGroupActive && isPanelVisible,
+                        isActive: isGroupActive && isVisible,
                     });
                     this.api._onDidVisibilityChange.fire({
-                        isVisible: isPanelVisible,
+                        isVisible,
                     });
                 }
             }
         );
-
-        // this.api._onDidChangeFocus.fire({ isFocused: isGroupActive });
-        // this.api._onDidGroupPanelVisibleChange.fire({
-        //     isVisible: this._group.isPanelActive(this),
-        // });
-
-        // this.api._onDidGroupPanelVisibleChange.fire({
-        //     isVisible: this._group.isPanelActive(this),
-        // });
 
         const isPanelVisible = this._group.group.isPanelActive(this);
 
@@ -209,15 +163,6 @@ export class GroupPanel extends CompositeDisposable implements IGroupPanel {
             this._group,
             this._group.group.isPanelActive(this)
         );
-
-        // this.headerPart?.updateParentGroup(
-        //     this._group,
-        //     this._group.group.isPanelActive(this)
-        // );
-        // this.contentPart?.updateParentGroup(
-        //     this._group,
-        //     this._group.group.isPanelActive(this)
-        // );
     }
 
     public layout(width: number, height: number) {
@@ -227,7 +172,6 @@ export class GroupPanel extends CompositeDisposable implements IGroupPanel {
             height: height - (this.group?.group.tabHeight || 0),
         });
 
-        // this.contentPart?.layout(width, height);
         this.view?.layout(width, height);
     }
 
@@ -236,8 +180,5 @@ export class GroupPanel extends CompositeDisposable implements IGroupPanel {
         this.mutableDisposable.dispose();
 
         this.view?.dispose();
-
-        // this.headerPart?.dispose();
-        // this.contentPart?.dispose();
     }
 }

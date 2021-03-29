@@ -248,9 +248,9 @@ export class TabsContainer
     public delete(id: string) {
         const index = this.tabs.findIndex((tab) => tab.value.id === id);
 
-        const tab = this.tabs.splice(index, 1)[0];
+        const tabToRemove = this.tabs.splice(index, 1)[0];
 
-        const { value, disposable } = tab;
+        const { value, disposable } = tabToRemove;
 
         disposable.dispose();
         value.element.remove();
@@ -267,14 +267,14 @@ export class TabsContainer
         if (this.tabs.find((tab) => tab.value.id === panel.id)) {
             return;
         }
-        const tab = new Tab(panel.id, this.accessor, this.group);
+        const tabToAdd = new Tab(panel.id, this.accessor, this.group);
         if (!panel.view?.tab) {
             throw new Error('invalid header component');
         }
-        tab.setContent(panel.view.tab);
+        tabToAdd.setContent(panel.view.tab);
 
         const disposable = CompositeDisposable.from(
-            tab.onChanged((event) => {
+            tabToAdd.onChanged((event) => {
                 const alreadyFocused =
                     panel.id === this.group.group.activePanel?.id &&
                     this.group.group.isAncestor(focusedElement.element!);
@@ -294,15 +294,15 @@ export class TabsContainer
                         break;
                 }
             }),
-            tab.onDropped((event) => {
+            tabToAdd.onDropped((event) => {
                 this._onDropped.fire({
                     event,
-                    index: this.tabs.findIndex((x) => x.value === tab),
+                    index: this.tabs.findIndex((x) => x.value === tabToAdd),
                 });
             })
         );
 
-        const value: IValueDisposable<ITab> = { value: tab, disposable };
+        const value: IValueDisposable<ITab> = { value: tabToAdd, disposable };
 
         this.addTab(value, index);
         this.activePanel = panel;

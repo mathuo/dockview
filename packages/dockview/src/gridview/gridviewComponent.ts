@@ -65,7 +65,10 @@ export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
     removePanel(panel: IGridviewPanel, sizing?: Sizing): void;
     toggleVisibility(panel: IGridviewPanel): void;
     focus(): void;
-    fromJSON(data: SerializedGridview, deferComponentLayout?: boolean): void;
+    fromJSON(
+        serializedGridview: SerializedGridview,
+        deferComponentLayout?: boolean
+    ): void;
     toJSON(): SerializedGridview;
     movePanel(
         panel: IGridviewPanel,
@@ -156,8 +159,11 @@ export class GridviewComponent
         this.activeGroup?.focus();
     }
 
-    public fromJSON(data: SerializedGridview, deferComponentLayout?: boolean) {
-        const { grid, activePanel } = data;
+    public fromJSON(
+        serializedGridview: SerializedGridview,
+        deferComponentLayout?: boolean
+    ) {
+        const { grid, activePanel } = serializedGridview;
 
         this.gridview.clear();
         this.groups.clear();

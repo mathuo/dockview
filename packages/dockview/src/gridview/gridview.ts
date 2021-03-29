@@ -436,13 +436,15 @@ export class Gridview implements IDisposable {
             throw new Error('invalid location');
         }
 
-        const findLeaf = (node: Node, last: boolean): LeafNode => {
-            if (node instanceof LeafNode) {
-                return node;
+        const findLeaf = (candiateNode: Node, last: boolean): LeafNode => {
+            if (candiateNode instanceof LeafNode) {
+                return candiateNode;
             }
-            if (node instanceof BranchNode) {
+            if (candiateNode instanceof BranchNode) {
                 return findLeaf(
-                    node.children[last ? node.children.length - 1 : 0],
+                    candiateNode.children[
+                        last ? candiateNode.children.length - 1 : 0
+                    ],
                     last
                 );
             }
@@ -660,10 +662,10 @@ export class Gridview implements IDisposable {
                 orthogonal(sibling.orientation),
                 sibling.size
             );
-            const sizing = isSiblingVisible
+            const siblingSizing = isSiblingVisible
                 ? sibling.orthogonalSize
                 : Sizing.Invisible(sibling.orthogonalSize);
-            grandParent.addChild(newSibling, sizing, parentIndex);
+            grandParent.addChild(newSibling, siblingSizing, parentIndex);
         }
 
         for (let i = 0; i < sizes.length; i++) {

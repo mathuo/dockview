@@ -126,7 +126,10 @@ export interface IPaneviewComponent extends IDisposable {
     layout(width: number, height: number): void;
     onDidLayoutChange: Event<void>;
     toJSON(): SerializedPaneview;
-    fromJSON(data: SerializedPaneview, deferComponentLayout?: boolean): void;
+    fromJSON(
+        serializedPaneview: SerializedPaneview,
+        deferComponentLayout?: boolean
+    ): void;
     resizeToFit(): void;
     focus(): void;
     getPanels(): IPaneviewPanel[];
@@ -338,8 +341,11 @@ export class PaneviewComponent
         };
     }
 
-    fromJSON(data: SerializedPaneview, deferComponentLayout?: boolean): void {
-        const { views, size } = data;
+    fromJSON(
+        serializedPaneview: SerializedPaneview,
+        deferComponentLayout?: boolean
+    ): void {
+        const { views, size } = serializedPaneview;
 
         const queue: Function[] = [];
 

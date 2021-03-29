@@ -402,13 +402,13 @@ export class GroupComponent extends CompositeDisposable implements IGroupview {
                 ? groupItemOrId
                 : groupItemOrId.id;
 
-        const panel = this._panels.find((panel) => panel.id === id);
+        const panelToRemove = this._panels.find((panel) => panel.id === id);
 
-        if (!panel) {
+        if (!panelToRemove) {
             throw new Error('invalid operation');
         }
 
-        return this._removePanel(panel);
+        return this._removePanel(panelToRemove);
     }
 
     public async closeAllPanels() {

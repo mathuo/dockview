@@ -35,8 +35,8 @@ const ReactComponentBridge: React.ForwardRefRenderFunction<
     React.useImperativeHandle(
         ref,
         () => ({
-            update: (props: object) => {
-                _props.current = { ..._props.current, ...props };
+            update: (componentProps: object) => {
+                _props.current = { ..._props.current, ...componentProps };
                 /**
                  * setting a arbitrary piece of state within this component will
                  * trigger a re-render.
@@ -164,7 +164,7 @@ export const usePortalsLifecycle: PortalLifecycleHook = () => {
     React.useDebugValue(`Portal count: ${portals.length}`);
 
     const addPortal = React.useCallback((portal: React.ReactPortal) => {
-        setPortals((portals) => [...portals, portal]);
+        setPortals((existingPortals) => [...existingPortals, portal]);
         let disposed = false;
         return {
             dispose: () => {
@@ -174,7 +174,9 @@ export const usePortalsLifecycle: PortalLifecycleHook = () => {
                     );
                 }
                 disposed = true;
-                setPortals((portals) => portals.filter((p) => p !== portal));
+                setPortals((existingPortals) =>
+                    existingPortals.filter((p) => p !== portal)
+                );
             },
         };
     }, []);
@@ -186,5 +188,5 @@ export const usePortalsLifecycle: PortalLifecycleHook = () => {
 export function isReactElement(
     element: any | React.ReactElement
 ): element is React.ReactElement {
-    return !!(element as any)?.type;
+    return (element as any)?.type;
 }

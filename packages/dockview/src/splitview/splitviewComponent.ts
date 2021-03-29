@@ -56,7 +56,10 @@ export interface ISplitviewComponent extends IDisposable {
     layout(width: number, height: number): void;
     onDidLayoutChange: Event<void>;
     toJSON(): SerializedSplitview;
-    fromJSON(data: SerializedSplitview, deferComponentLayout?: boolean): void;
+    fromJSON(
+        serializedSplitview: SerializedSplitview,
+        deferComponentLayout?: boolean
+    ): void;
     resizeToFit(): void;
     focus(): void;
     getPanel(id: string): ISplitviewPanel | undefined;
@@ -286,8 +289,11 @@ export class SplitviewComponent
         };
     }
 
-    fromJSON(data: SerializedSplitview, deferComponentLayout = false): void {
-        const { views, orientation, size, activeView } = data;
+    fromJSON(
+        serializedSplitview: SerializedSplitview,
+        deferComponentLayout = false
+    ): void {
+        const { views, orientation, size, activeView } = serializedSplitview;
 
         this.splitview.dispose();
 

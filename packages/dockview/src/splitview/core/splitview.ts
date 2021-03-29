@@ -313,7 +313,7 @@ export class Splitview {
 
         item.size = size;
 
-        this.relayout([index], undefined);
+        this.relayout([index]);
     }
 
     public addView(
@@ -339,8 +339,8 @@ export class Splitview {
             viewSize = view.minimumSize;
         }
 
-        const disposable = view.onDidChange((size) =>
-            this.onDidChange(viewItem, size)
+        const disposable = view.onDidChange((newSize) =>
+            this.onDidChange(viewItem, newSize)
         );
 
         const dispose = () => {
@@ -385,7 +385,7 @@ export class Splitview {
                         ? event.clientX
                         : event.clientY;
 
-                const index = firstIndex(
+                const sashIndex = firstIndex(
                     this.sashes,
                     (s) => s.container === sash
                 );
@@ -396,8 +396,8 @@ export class Splitview {
                 //
                 let snapBefore: ISashDragSnapState | undefined;
                 let snapAfter: ISashDragSnapState | undefined;
-                const upIndexes = range(index, -1);
-                const downIndexes = range(index + 1, this.views.length);
+                const upIndexes = range(sashIndex, -1);
+                const downIndexes = range(sashIndex + 1, this.views.length);
                 const minDeltaUp = upIndexes.reduce(
                     (r, i) => r + (this.views[i].minimumSize - sizes[i]),
                     0
@@ -428,41 +428,45 @@ export class Splitview {
                 const snapBeforeIndex = this.findFirstSnapIndex(upIndexes);
                 const snapAfterIndex = this.findFirstSnapIndex(downIndexes);
                 if (typeof snapBeforeIndex === 'number') {
-                    const viewItem = this.views[snapBeforeIndex];
-                    const halfSize = Math.floor(viewItem.viewMinimumSize / 2);
+                    const snappedViewItem = this.views[snapBeforeIndex];
+                    const halfSize = Math.floor(
+                        snappedViewItem.viewMinimumSize / 2
+                    );
 
                     snapBefore = {
                         index: snapBeforeIndex,
-                        limitDelta: viewItem.visible
+                        limitDelta: snappedViewItem.visible
                             ? minDelta - halfSize
                             : minDelta + halfSize,
-                        size: viewItem.size,
+                        size: snappedViewItem.size,
                     };
                 }
 
                 if (typeof snapAfterIndex === 'number') {
-                    const viewItem = this.views[snapAfterIndex];
-                    const halfSize = Math.floor(viewItem.viewMinimumSize / 2);
+                    const snappedViewItem = this.views[snapAfterIndex];
+                    const halfSize = Math.floor(
+                        snappedViewItem.viewMinimumSize / 2
+                    );
 
                     snapAfter = {
                         index: snapAfterIndex,
-                        limitDelta: viewItem.visible
+                        limitDelta: snappedViewItem.visible
                             ? maxDelta + halfSize
                             : maxDelta - halfSize,
-                        size: viewItem.size,
+                        size: snappedViewItem.size,
                     };
                 }
                 //
 
-                const mousemove = (event: MouseEvent) => {
+                const mousemove = (mousemoveEvent: MouseEvent) => {
                     const current =
                         this._orientation === Orientation.HORIZONTAL
-                            ? event.clientX
-                            : event.clientY;
+                            ? mousemoveEvent.clientX
+                            : mousemoveEvent.clientY;
                     const delta = current - start;
 
                     this.resize(
-                        index,
+                        sashIndex,
                         delta,
                         sizes,
                         undefined,
@@ -501,12 +505,13 @@ export class Splitview {
 
             sash.addEventListener('mousedown', onStart);
 
-            const disposable = () => {
-                sash.removeEventListener('mousedown', onStart);
-                this.sashContainer.removeChild(sash);
+            const sashItem: ISashItem = {
+                container: sash,
+                disposable: () => {
+                    sash.removeEventListener('mousedown', onStart);
+                    this.sashContainer.removeChild(sash);
+                },
             };
-
-            const sashItem: ISashItem = { container: sash, disposable };
 
             this.sashContainer.appendChild(sash);
             this.sashes.push(sashItem);
@@ -875,16 +880,16 @@ export class Splitview {
         const downIndexes = range(index + 1, this.views.length);
         //
         if (highPriorityIndexes) {
-            for (const index of highPriorityIndexes) {
-                pushToStart(upIndexes, index);
-                pushToStart(downIndexes, index);
+            for (const i of highPriorityIndexes) {
+                pushToStart(upIndexes, i);
+                pushToStart(downIndexes, i);
             }
         }
 
         if (lowPriorityIndexes) {
-            for (const index of lowPriorityIndexes) {
-                pushToEnd(upIndexes, index);
-                pushToEnd(downIndexes, index);
+            for (const i of lowPriorityIndexes) {
+                pushToEnd(upIndexes, i);
+                pushToEnd(downIndexes, i);
             }
         }
         //
