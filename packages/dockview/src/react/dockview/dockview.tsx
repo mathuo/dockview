@@ -137,6 +137,9 @@ export const DockviewReact = React.forwardRef(
             domRef.current?.appendChild(dockview.element);
             dockview.deserializer = new ReactPanelDeserialzier(dockview);
 
+            const { clientWidth, clientHeight } = domRef.current!;
+            dockview.layout(clientWidth, clientHeight);
+
             if (props.onReady) {
                 props.onReady({ api: new DockviewApi(dockview) });
             }

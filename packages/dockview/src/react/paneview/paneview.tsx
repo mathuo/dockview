@@ -79,6 +79,9 @@ export const PaneviewReact = React.forwardRef(
                 },
             });
 
+            const { clientWidth, clientHeight } = domRef.current!;
+            paneview.layout(clientWidth, clientHeight);
+
             if (props.onReady) {
                 props.onReady({ api: new PaneviewApi(paneview) });
             }

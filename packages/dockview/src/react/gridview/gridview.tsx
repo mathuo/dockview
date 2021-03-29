@@ -82,6 +82,9 @@ export const GridviewReact = React.forwardRef(
 
             domRef.current?.appendChild(gridview.element);
 
+            const { clientWidth, clientHeight } = domRef.current!;
+            gridview.layout(clientWidth, clientHeight);
+
             if (props.onReady) {
                 props.onReady({ api: new GridviewApi(gridview) });
             }

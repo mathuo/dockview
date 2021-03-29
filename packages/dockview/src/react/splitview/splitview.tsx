@@ -77,6 +77,9 @@ export const SplitviewReact = React.forwardRef(
                     : undefined,
             });
 
+            const { clientWidth, clientHeight } = domRef.current!;
+            splitview.layout(clientWidth, clientHeight);
+
             if (props.onReady) {
                 props.onReady({ api: new SplitviewApi(splitview) });
             }
