@@ -343,7 +343,7 @@ describe('dockviewComponent', () => {
     });
 
     test('serialization', () => {
-        dockview.layout(100, 100);
+        dockview.layout(1000, 1000);
 
         dockview.deserializer = new ReactPanelDeserialzier(dockview);
         dockview.fromJSON({
@@ -358,7 +358,7 @@ describe('dockviewComponent', () => {
                                 views: ['panel1'],
                                 id: 'group-1',
                             },
-                            size: 50,
+                            size: 500,
                         },
                         {
                             type: 'branch',
@@ -369,26 +369,26 @@ describe('dockviewComponent', () => {
                                         views: ['panel2', 'panel3'],
                                         id: 'group-2',
                                     },
-                                    size: 50,
+                                    size: 500,
                                 },
                                 {
                                     type: 'leaf',
                                     data: { views: ['panel4'], id: 'group-3' },
-                                    size: 50,
+                                    size: 500,
                                 },
                             ],
-                            size: 25,
+                            size: 250,
                         },
                         {
                             type: 'leaf',
                             data: { views: ['panel5'], id: 'group-4' },
-                            size: 25,
+                            size: 250,
                         },
                     ],
-                    size: 100,
+                    size: 1000,
                 },
-                height: 100,
-                width: 100,
+                height: 1000,
+                width: 1000,
                 orientation: Orientation.VERTICAL,
             },
             panels: {
@@ -434,7 +434,7 @@ describe('dockviewComponent', () => {
                                 id: 'group-1',
                                 activeView: 'panel1',
                             },
-                            size: 50,
+                            size: 500,
                         },
                         {
                             type: 'branch',
@@ -446,7 +446,7 @@ describe('dockviewComponent', () => {
                                         id: 'group-2',
                                         activeView: 'panel2',
                                     },
-                                    size: 50,
+                                    size: 500,
                                 },
                                 {
                                     type: 'leaf',
@@ -455,10 +455,10 @@ describe('dockviewComponent', () => {
                                         id: 'group-3',
                                         activeView: 'panel4',
                                     },
-                                    size: 50,
+                                    size: 500,
                                 },
                             ],
-                            size: 25,
+                            size: 250,
                         },
                         {
                             type: 'leaf',
@@ -467,13 +467,13 @@ describe('dockviewComponent', () => {
                                 id: 'group-4',
                                 activeView: 'panel5',
                             },
-                            size: 25,
+                            size: 250,
                         },
                     ],
-                    size: 100,
+                    size: 1000,
                 },
-                height: 100,
-                width: 100,
+                height: 1000,
+                width: 1000,
                 orientation: Orientation.VERTICAL,
             },
             panels: {
