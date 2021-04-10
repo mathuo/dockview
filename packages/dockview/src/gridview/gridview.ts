@@ -228,10 +228,7 @@ const serializeBranchNode = <T extends IGridView>(
         data: node.children.map((c) =>
             serializeBranchNode(c, orthogonal(orientation))
         ),
-        size:
-            orientation === Orientation.HORIZONTAL
-                ? node.box.width
-                : node.box.height,
+        size,
     };
 };
 
@@ -258,56 +255,6 @@ export interface INodeDescriptor {
 export interface IViewDeserializer {
     fromJSON: (data: ISerializedLeafNode) => IGridView;
 }
-
-function getDimensions<T>(
-    node: SerializedGridObject<T>,
-    orientation: Orientation
-): { width?: number; height?: number } {
-    if (node.type === 'branch') {
-        const childrenDimensions = (node.data as SerializedGridObject<T>[]).map(
-            (c) => getDimensions(c, orthogonal(orientation))
-        );
-
-        if (orientation === Orientation.VERTICAL) {
-            const width =
-                node.size ||
-                (childrenDimensions.length === 0
-                    ? undefined
-                    : Math.max(...childrenDimensions.map((d) => d.width || 0)));
-            const height =
-                childrenDimensions.length === 0
-                    ? undefined
-                    : childrenDimensions.reduce(
-                          (r, d) => r + (d.height || 0),
-                          0
-                      );
-            return { width, height };
-        } else {
-            const width =
-                childrenDimensions.length === 0
-                    ? undefined
-                    : childrenDimensions.reduce(
-                          (r, d) => r + (d.width || 0),
-                          0
-                      );
-            const height =
-                node.size ||
-                (childrenDimensions.length === 0
-                    ? undefined
-                    : Math.max(
-                          ...childrenDimensions.map((d) => d.height || 0)
-                      ));
-            return { width, height };
-        }
-    } else {
-        const width =
-            orientation === Orientation.VERTICAL ? node.size : undefined;
-        const height =
-            orientation === Orientation.VERTICAL ? undefined : node.size;
-        return { width, height };
-    }
-}
-
 export class Gridview implements IDisposable {
     private _root: BranchNode | undefined;
     public readonly element: HTMLElement;
@@ -318,15 +265,6 @@ export class Gridview implements IDisposable {
 
     public serialize() {
         const root = serializeBranchNode(this.getView(), this.orientation);
-        const { width, height } = getDimensions(root, this.orientation);
-
-        console.log('test');
-        if (width !== this.width) {
-            console.log(`width ${width} !== this.width ${this.width}`);
-        }
-        if (height !== this.height) {
-            console.log(`height ${height} !== this.height ${this.height}`);
-        }
 
         return {
             root,
@@ -354,10 +292,7 @@ export class Gridview implements IDisposable {
 
     public deserialize(json: any, deserializer: IViewDeserializer) {
         const orientation = json.orientation;
-        const height =
-            orientation === Orientation.VERTICAL ? json.height : json.width;
-
-        // this.orientation = orientation;
+        const height = json.height;
         this._deserialize(
             json.root as ISerializedBranchNode,
             orientation,
@@ -374,7 +309,7 @@ export class Gridview implements IDisposable {
     ): void {
         this.root = this._deserializeNode(
             root,
-            orthogonal(orientation),
+            orientation,
             deserializer,
             orthogonalSize
         ) as BranchNode;
