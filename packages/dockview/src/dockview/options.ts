@@ -49,11 +49,6 @@ export interface ViewFactoryData {
 }
 
 export interface DockviewOptions extends DockviewRenderFunctions {
-    // viewFactory: (
-    //     id: string,
-    //     data: ViewFactoryData,
-    //     options: DockviewRenderFunctions
-    // ) => IGroupPanelView;
     watermarkComponent?: WatermarkConstructor;
     watermarkFrameworkComponent?: any;
     frameworkComponentFactory?: GroupPanelFrameworkComponentFactory;

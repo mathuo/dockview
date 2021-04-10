@@ -22,6 +22,7 @@ export interface IGroupPanel extends IDisposable, IPanel {
     readonly view?: IGroupPanelView;
     readonly group?: GroupviewPanel;
     readonly api: IDockviewPanelApi;
+    readonly params?: IGroupPanelInitParameters;
     updateParentGroup(group: GroupviewPanel, isGroupActive: boolean): void;
     setDirty(isDirty: boolean): void;
     close?(): Promise<boolean>;
@@ -44,11 +45,15 @@ export class GroupPanel extends CompositeDisposable implements IGroupPanel {
 
     readonly api: DockviewPanelApi;
     private _group: GroupviewPanel | undefined;
-    private params?: IGroupPanelInitParameters;
+    private _params?: IGroupPanelInitParameters;
 
     readonly onDidStateChange: Event<void>;
 
     private _view?: IGroupPanelView;
+
+    get params() {
+        return this._params;
+    }
 
     get group(): GroupviewPanel | undefined {
         return this._group;
@@ -63,7 +68,6 @@ export class GroupPanel extends CompositeDisposable implements IGroupPanel {
         private readonly containerApi: DockviewApi
     ) {
         super();
-
         this.api = new DockviewPanelApi(this, this._group);
         this.onDidStateChange = this.api.onDidStateChange;
 
@@ -95,7 +99,7 @@ export class GroupPanel extends CompositeDisposable implements IGroupPanel {
     }
 
     public toJSON(): GroupviewPanelState {
-        const params = this.params?.params;
+        const params = this._params?.params;
         const state = this.api.getState();
 
         return {
@@ -103,22 +107,44 @@ export class GroupPanel extends CompositeDisposable implements IGroupPanel {
             view: this.view!.toJSON(),
             params:
                 params && Object.keys(params).length > 0 ? params : undefined,
-            title: this.params?.title as string,
-            suppressClosable: this.params?.suppressClosable,
+            title: this._params?.title as string,
+            suppressClosable: this._params?.suppressClosable,
             state: state && Object.keys(state).length > 0 ? state : undefined,
         };
     }
 
-    public update(params: PanelUpdateEvent): void {
-        if (this.params) {
-            this.params.params = { ...(this.params?.params || {}), ...params };
+    public update(params: PanelUpdateEvent<IGroupPanelInitParameters>): void {
+        let didTitleChange = false;
+        let didSuppressChangableClose = false;
+
+        const innerParams = params.params as IGroupPanelInitParameters;
+
+        if (this._params) {
+            didTitleChange = this._params.title !== innerParams.title;
+            didSuppressChangableClose =
+                this._params.suppressClosable !== innerParams.suppressClosable;
+
+            this._params.params = {
+                ...(this._params?.params || {}),
+                ...params,
+            };
+        }
+
+        if (didTitleChange) {
+            this.api._titleChanged.fire({ title: innerParams.title });
+        }
+
+        if (didSuppressChangableClose) {
+            this.api._suppressClosableChanged.fire({
+                suppressClosable: !!innerParams.suppressClosable,
+            });
         }
 
         this.view?.update(params);
     }
 
     public init(params: IGroupPanelInitParameters): void {
-        this.params = params;
+        this._params = params;
         this._view = params.view;
 
         if (params.state) {

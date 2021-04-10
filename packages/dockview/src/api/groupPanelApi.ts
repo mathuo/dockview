@@ -7,6 +7,10 @@ export interface TitleEvent {
     title: string;
 }
 
+export interface SuppressClosableEvent {
+    suppressClosable: boolean;
+}
+
 /*
  * omit visibility modifiers since the visibility of a single group doesn't make sense
  * because it belongs to a groupview
@@ -15,9 +19,10 @@ export interface IDockviewPanelApi
     extends Omit<IGridviewPanelApi, 'setVisible' | 'visible'> {
     readonly group: GroupviewPanel | undefined;
     readonly isGroupActive: boolean;
+    readonly title: string;
+    readonly suppressClosable: boolean;
     onDidDirtyChange: Event<boolean>;
     close: () => Promise<boolean>;
-    tryClose: undefined | (() => Promise<boolean>);
     interceptOnCloseAction(interceptor: () => Promise<boolean>): void;
     setTitle(title: string): void;
 }
@@ -38,12 +43,26 @@ export class DockviewPanelApi
     readonly _onDidTitleChange = new Emitter<TitleEvent>();
     readonly onDidTitleChange = this._onDidTitleChange.event;
 
+    readonly _titleChanged = new Emitter<TitleEvent>();
+    readonly titleChanged = this._titleChanged.event;
+
+    readonly _suppressClosableChanged = new Emitter<SuppressClosableEvent>();
+    readonly suppressClosableChanged = this._suppressClosableChanged.event;
+
     // get isGroupVisible() {
     //     return this._isGroupVisible;
     // }
 
     get tryClose(): undefined | (() => Promise<boolean>) {
         return this._interceptor;
+    }
+
+    get title() {
+        return this.panel.params?.title || '';
+    }
+
+    get suppressClosable() {
+        return !!this.panel.params?.suppressClosable;
     }
 
     get isGroupActive() {

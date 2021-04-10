@@ -14,15 +14,15 @@ export interface PanelInitParameters {
     state?: State;
 }
 
-export interface PanelUpdateEvent {
-    params: Parameters;
+export interface PanelUpdateEvent<T extends Parameters = Parameters> {
+    params: Partial<T>;
 }
 
 export interface IPanel extends IDisposable {
     readonly id: string;
     init(params: PanelInitParameters): void;
     layout(width: number, height: number): void;
-    update(event: PanelUpdateEvent): void;
+    update(event: PanelUpdateEvent<Parameters>): void;
     toJSON(): object;
     focus(): void;
 }
