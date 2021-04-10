@@ -1,6 +1,12 @@
 function runFootnote() {
     const DOCKVIEW_SUPPRESS_WATERMARK = 'DOCKVIEW_WATERMARK_SUPPRESSED';
 
+    const isTest = (window as any).process?.env?.NODE_ENV === 'test';
+
+    if (isTest) {
+        return; // don't spam people tests
+    }
+
     const isSuppressed = !!(window as any)[DOCKVIEW_SUPPRESS_WATERMARK];
 
     if (!isSuppressed) {
