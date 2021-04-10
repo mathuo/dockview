@@ -489,4 +489,37 @@ describe('splitview', () => {
 
         splitview.dispose();
     });
+
+    test('from descriptor', () => {
+        const descriptor = {
+            size: 300,
+            views: [
+                {
+                    size: 80,
+                    view: new Testview(0, Number.POSITIVE_INFINITY),
+                },
+                {
+                    size: 100,
+                    view: new Testview(0, Number.POSITIVE_INFINITY),
+                },
+                {
+                    size: 120,
+                    view: new Testview(0, Number.POSITIVE_INFINITY),
+                },
+            ],
+        };
+
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: false,
+            descriptor,
+        });
+
+        expect([
+            descriptor.views[0].size,
+            descriptor.views[1].size,
+            descriptor.views[2].size,
+        ]).toEqual([80, 100, 120]);
+        expect(splitview.size).toBe(300);
+    });
 });
