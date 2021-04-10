@@ -1,3 +1,8 @@
+/*---------------------------------------------------------------------------------------------
+ * Accreditation: This file is largly based upon the MIT licenced VSCode sourcecode found at:
+ * https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/splitview
+ *--------------------------------------------------------------------------------------------*/
+
 import {
     removeClasses,
     addClasses,
