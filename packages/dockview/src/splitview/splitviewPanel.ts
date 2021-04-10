@@ -3,13 +3,13 @@ import {
     BasePanelView,
     BasePanelViewExported,
 } from '../gridview/basePanelView';
-import { SplitviewPanelApi } from '../api/splitviewPanelApi';
+import { SplitviewPanelApiImpl } from '../api/splitviewPanelApi';
 import { LayoutPriority, Orientation } from './core/splitview';
 import { FunctionOrValue } from '../types';
 import { Emitter, Event } from '../events';
 
 export interface ISplitviewPanel
-    extends BasePanelViewExported<SplitviewPanelApi> {
+    extends BasePanelViewExported<SplitviewPanelApiImpl> {
     readonly priority: LayoutPriority | undefined;
     readonly minimumSize: number;
     readonly maximumSize: number;
@@ -18,7 +18,7 @@ export interface ISplitviewPanel
 }
 
 export abstract class SplitviewPanel
-    extends BasePanelView<SplitviewPanelApi>
+    extends BasePanelView<SplitviewPanelApiImpl>
     implements ISerializableView, ISplitviewPanel {
     private _evaluatedMinimumSize = 0;
     private _evaluatedMaximumSize = Number.POSITIVE_INFINITY;
@@ -78,7 +78,7 @@ export abstract class SplitviewPanel
     }
 
     constructor(id: string, componentName: string) {
-        super(id, componentName, new SplitviewPanelApi(id));
+        super(id, componentName, new SplitviewPanelApiImpl(id));
 
         this.addDisposables(
             this.api.onVisibilityChange((event) => {

@@ -1,12 +1,15 @@
 import { IFrameworkPart } from '../panel/types';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
-import { GridviewPanelApi, IGridviewPanelApi } from '../api/gridviewPanelApi';
+import {
+    GridviewPanelApiImpl,
+    GridviewPanelApi,
+} from '../api/gridviewPanelApi';
 import { Groupview, GroupOptions } from './groupview';
 import { GridviewPanel } from '../gridview/gridviewPanel';
 
-interface IGroupApi extends IGridviewPanelApi {}
+interface IGroupApi extends GridviewPanelApi {}
 
-class GroupApi extends GridviewPanelApi implements IGroupApi {
+class GroupApi extends GridviewPanelApiImpl implements IGroupApi {
     private _value?: Groupview;
 
     set group(value: Groupview) {

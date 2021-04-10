@@ -7,7 +7,7 @@ import {
     GroupPanelFrameworkComponentFactory,
     TabContextMenuEvent,
 } from '../../dockview/options';
-import { IDockviewPanelApi } from '../../api/groupPanelApi';
+import { DockviewPanelApi } from '../../api/groupPanelApi';
 import { usePortalsLifecycle } from '../react';
 import { DockviewApi } from '../../api/component.api';
 import { ReactWatermarkPart } from './reactWatermarkPart';
@@ -16,7 +16,7 @@ import { watchElementResize } from '../../dom';
 import { IContentRenderer, ITabRenderer } from '../../groupview/types';
 
 export interface IGroupPanelBaseProps {
-    api: IDockviewPanelApi;
+    api: DockviewPanelApi;
     containerApi: DockviewApi;
     [key: string]: any;
 }

@@ -30,13 +30,16 @@ export {
 } from './api/panelApi';
 export {
     SizeEvent,
-    IGridviewPanelApi,
+    GridviewPanelApi as IGridviewPanelApi,
     GridConstraintChangeEvent,
 } from './api/gridviewPanelApi';
-export { TitleEvent, IDockviewPanelApi } from './api/groupPanelApi';
+export {
+    TitleEvent,
+    DockviewPanelApi as IDockviewPanelApi,
+} from './api/groupPanelApi';
 export {
     PanelSizeEvent,
     PanelConstraintChangeEvent,
-    ISplitviewPanelApi,
+    SplitviewPanelApi as ISplitviewPanelApi,
 } from './api/splitviewPanelApi';
 export { ExpansionEvent, IPaneviewPanelApi } from './api/paneviewPanelApi';

@@ -6,19 +6,19 @@ import {
 import { ReactPart, ReactPortalStore } from '../react';
 import { IDockviewPanelProps } from '../dockview/dockview';
 import { PanelUpdateEvent } from '../../panel/types';
-import { IDockviewPanelApi } from '../../api/groupPanelApi';
+import { DockviewPanelApi } from '../../api/groupPanelApi';
 import { DockviewApi } from '../../api/component.api';
 import { GroupviewPanel } from '../../groupview/groupviewPanel';
 import { Emitter, Event } from '../../events';
 import { WrappedTab } from '../../dockview/components/tab/defaultTab';
 
 export interface IGroupPanelActionbarProps {
-    api: IDockviewPanelApi;
+    api: DockviewPanelApi;
     containerApi: DockviewApi;
 }
 
 export interface ReactContentPartContext {
-    api: IDockviewPanelApi;
+    api: DockviewPanelApi;
     containerApi: DockviewApi;
     actionsPortalElement: HTMLElement;
     tabPortalElement: WrappedTab;

@@ -1,5 +1,5 @@
 import { Emitter, Event } from '../events';
-import { GridviewPanelApi, IGridviewPanelApi } from './gridviewPanelApi';
+import { GridviewPanelApiImpl, GridviewPanelApi } from './gridviewPanelApi';
 import { IGroupPanel } from '../groupview/groupPanel';
 import { GroupviewPanel } from '../groupview/groupviewPanel';
 
@@ -15,8 +15,8 @@ export interface SuppressClosableEvent {
  * omit visibility modifiers since the visibility of a single group doesn't make sense
  * because it belongs to a groupview
  */
-export interface IDockviewPanelApi
-    extends Omit<IGridviewPanelApi, 'setVisible' | 'visible'> {
+export interface DockviewPanelApi
+    extends Omit<GridviewPanelApi, 'setVisible' | 'visible'> {
     readonly group: GroupviewPanel | undefined;
     readonly isGroupActive: boolean;
     readonly title: string;
@@ -27,9 +27,9 @@ export interface IDockviewPanelApi
     setTitle(title: string): void;
 }
 
-export class DockviewPanelApi
-    extends GridviewPanelApi
-    implements IDockviewPanelApi {
+export class DockviewPanelApiImpl
+    extends GridviewPanelApiImpl
+    implements DockviewPanelApi {
     private _group: GroupviewPanel | undefined;
     private _interceptor: undefined | (() => Promise<boolean>);
 

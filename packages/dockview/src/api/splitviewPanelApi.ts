@@ -1,7 +1,7 @@
 import { Emitter, Event } from '../events';
 import { IDisposable } from '../lifecycle';
 import { FunctionOrValue } from '../types';
-import { PanelApi, IPanelApi } from './panelApi';
+import { PanelApiImpl, PanelApi } from './panelApi';
 
 interface PanelConstraintChangeEvent2 {
     minimumSize?: FunctionOrValue<number>;
@@ -17,15 +17,15 @@ export interface PanelSizeEvent {
     size: number;
 }
 
-export interface ISplitviewPanelApi extends IPanelApi {
+export interface SplitviewPanelApi extends PanelApi {
     onDidConstraintsChange: Event<PanelConstraintChangeEvent>;
     setConstraints(value: PanelConstraintChangeEvent2): void;
     setSize(event: PanelSizeEvent): void;
 }
 
-export class SplitviewPanelApi
-    extends PanelApi
-    implements ISplitviewPanelApi, IDisposable {
+export class SplitviewPanelApiImpl
+    extends PanelApiImpl
+    implements SplitviewPanelApi, IDisposable {
     readonly _onDidConstraintsChangeInternal = new Emitter<PanelConstraintChangeEvent2>();
     readonly onDidConstraintsChangeInternal: Event<PanelConstraintChangeEvent2> = this
         ._onDidConstraintsChangeInternal.event;

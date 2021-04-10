@@ -6,7 +6,7 @@ import {
     BasePanelViewExported,
     BasePanelViewState,
 } from './basePanelView';
-import { GridviewPanelApi } from '../api/gridviewPanelApi';
+import { GridviewPanelApiImpl } from '../api/gridviewPanelApi';
 import { LayoutPriority } from '../splitview/core/splitview';
 import { Emitter, Event } from '../events';
 import { IViewSize } from './gridview';
@@ -24,7 +24,7 @@ export interface GridviewInitParameters extends PanelInitParameters {
 }
 
 export interface IGridviewPanel
-    extends BasePanelViewExported<GridviewPanelApi> {
+    extends BasePanelViewExported<GridviewPanelApiImpl> {
     readonly minimumWidth: number;
     readonly maximumWidth: number;
     readonly minimumHeight: number;
@@ -34,7 +34,7 @@ export interface IGridviewPanel
 }
 
 export abstract class GridviewPanel
-    extends BasePanelView<GridviewPanelApi>
+    extends BasePanelView<GridviewPanelApiImpl>
     implements IGridPanelComponentView, IGridviewPanel {
     private _evaluatedMinimumWidth = 0;
     private _evaluatedMaximumWidth = Number.MAX_SAFE_INTEGER;
@@ -120,7 +120,11 @@ export abstract class GridviewPanel
         return this.api.isActive;
     }
 
-    constructor(id: string, component: string, api = new GridviewPanelApi(id)) {
+    constructor(
+        id: string,
+        component: string,
+        api = new GridviewPanelApiImpl(id)
+    ) {
         super(id, component, api);
 
         this.addDisposables(

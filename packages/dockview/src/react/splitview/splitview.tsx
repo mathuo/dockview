@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { SplitviewApi } from '../../api/component.api';
-import { ISplitviewPanelApi } from '../../api/splitviewPanelApi';
+import { SplitviewPanelApi } from '../../api/splitviewPanelApi';
 import {
     ISplitviewComponent,
     SplitviewComponent,
@@ -16,7 +16,7 @@ export interface SplitviewReadyEvent {
 }
 
 export interface ISplitviewPanelProps {
-    api: ISplitviewPanelApi;
+    api: SplitviewPanelApi;
     containerApi: SplitviewApi;
     [key: string]: any;
 }

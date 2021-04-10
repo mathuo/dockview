@@ -36,7 +36,7 @@ export interface ActiveEvent {
     isActive: boolean;
 }
 
-export interface IPanelApi {
+export interface PanelApi {
     // events
     onDidDimensionsChange: Event<PanelDimensionChangeEvent>;
     onDidStateChange: Event<void>;
@@ -81,7 +81,7 @@ export interface IPanelApi {
 /**
  * A core api implementation that should be used across all panel-like objects
  */
-export class PanelApi extends CompositeDisposable implements IPanelApi {
+export class PanelApiImpl extends CompositeDisposable implements PanelApi {
     private _state: State = {};
     private _isFocused = false;
     private _isActive = false;

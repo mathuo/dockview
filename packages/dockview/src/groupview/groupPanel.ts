@@ -1,4 +1,4 @@
-import { DockviewPanelApi, IDockviewPanelApi } from '../api/groupPanelApi';
+import { DockviewPanelApiImpl, DockviewPanelApi } from '../api/groupPanelApi';
 import { Event } from '../events';
 import {
     MutableDisposable,
@@ -21,7 +21,7 @@ export interface IGroupPanelInitParameters
 export interface IGroupPanel extends IDisposable, IPanel {
     readonly view?: IGroupPanelView;
     readonly group?: GroupviewPanel;
-    readonly api: IDockviewPanelApi;
+    readonly api: DockviewPanelApi;
     readonly params?: IGroupPanelInitParameters;
     updateParentGroup(group: GroupviewPanel, isGroupActive: boolean): void;
     setDirty(isDirty: boolean): void;
@@ -43,7 +43,7 @@ export interface GroupviewPanelState {
 export class GroupPanel extends CompositeDisposable implements IGroupPanel {
     private readonly mutableDisposable = new MutableDisposable();
 
-    readonly api: DockviewPanelApi;
+    readonly api: DockviewPanelApiImpl;
     private _group: GroupviewPanel | undefined;
     private _params?: IGroupPanelInitParameters;
 
@@ -68,7 +68,7 @@ export class GroupPanel extends CompositeDisposable implements IGroupPanel {
         private readonly containerApi: DockviewApi
     ) {
         super();
-        this.api = new DockviewPanelApi(this, this._group);
+        this.api = new DockviewPanelApiImpl(this, this._group);
         this.onDidStateChange = this.api.onDidStateChange;
 
         this.addDisposables(

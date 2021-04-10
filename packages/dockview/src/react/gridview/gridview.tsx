@@ -3,7 +3,7 @@ import {
     GridviewComponent,
     IGridviewComponent,
 } from '../../gridview/gridviewComponent';
-import { IGridviewPanelApi } from '../../api/gridviewPanelApi';
+import { GridviewPanelApi } from '../../api/gridviewPanelApi';
 import { Orientation } from '../../splitview/core/splitview';
 import { ReactGridPanelView } from './view';
 import { usePortalsLifecycle } from '../react';
@@ -16,7 +16,7 @@ export interface GridviewReadyEvent {
 }
 
 export interface IGridviewPanelProps {
-    api: IGridviewPanelApi;
+    api: GridviewPanelApi;
     containerApi: GridviewApi;
     [key: string]: any;
 }
