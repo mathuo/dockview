@@ -1,10 +1,10 @@
-import { PanelApi, StateObject } from '../../api/panelApi';
+import { PanelApiImpl, StateObject } from '../../api/panelApi';
 
 describe('api', () => {
-    let api: PanelApi;
+    let api: PanelApiImpl;
 
     beforeEach(() => {
-        api = new PanelApi('dummy_id');
+        api = new PanelApiImpl('dummy_id');
     });
 
     it('sets api state', () => {
