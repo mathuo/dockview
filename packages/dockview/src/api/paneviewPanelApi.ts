@@ -6,7 +6,7 @@ export interface ExpansionEvent {
     isExpanded: boolean;
 }
 
-export interface IPaneviewPanelApi extends SplitviewPanelApi {
+export interface PaneviewPanelApi extends SplitviewPanelApi {
     onDidExpansionChange: Event<ExpansionEvent>;
     readonly onMouseEnter: Event<MouseEvent>;
     readonly onMouseLeave: Event<MouseEvent>;
@@ -14,9 +14,9 @@ export interface IPaneviewPanelApi extends SplitviewPanelApi {
     readonly isExpanded: boolean;
 }
 
-export class PaneviewPanelApi
+export class PaneviewPanelApiImpl
     extends SplitviewPanelApiImpl
-    implements IPaneviewPanelApi {
+    implements PaneviewPanelApi {
     readonly _onDidExpansionChange = new Emitter<ExpansionEvent>({
         replay: true,
     });

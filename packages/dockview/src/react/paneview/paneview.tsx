@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IPaneviewPanelApi } from '../../api/paneviewPanelApi';
+import { PaneviewPanelApi } from '../../api/paneviewPanelApi';
 import {
     PaneviewComponent,
     IPaneviewComponent,
@@ -15,7 +15,7 @@ export interface PaneviewReadyEvent {
 }
 
 export interface IPaneviewPanelProps {
-    api: IPaneviewPanelApi;
+    api: PaneviewPanelApi;
     containerApi: PaneviewApi;
     title: string;
     [key: string]: any;
