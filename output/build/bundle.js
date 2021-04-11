@@ -33300,13 +33300,13 @@ class DockviewApi {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GridviewPanelApi": () => (/* binding */ GridviewPanelApi)
+/* harmony export */   "GridviewPanelApiImpl": () => (/* binding */ GridviewPanelApiImpl)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
 /* harmony import */ var _panelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./panelApi */ "../dockview/dist/esm/api/panelApi.js");
 
 
-class GridviewPanelApi extends _panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApi {
+class GridviewPanelApiImpl extends _panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApiImpl {
     //
     constructor(id) {
         super(id);
@@ -33343,13 +33343,13 @@ class GridviewPanelApi extends _panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApi {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DockviewPanelApi": () => (/* binding */ DockviewPanelApi)
+/* harmony export */   "DockviewPanelApiImpl": () => (/* binding */ DockviewPanelApiImpl)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
 /* harmony import */ var _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./gridviewPanelApi */ "../dockview/dist/esm/api/gridviewPanelApi.js");
 
 
-class DockviewPanelApi extends _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridviewPanelApi {
+class DockviewPanelApiImpl extends _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridviewPanelApiImpl {
     constructor(panel, group) {
         super(panel.id);
         this.panel = panel;
@@ -33362,6 +33362,10 @@ class DockviewPanelApi extends _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.Gr
         //     ._onDidGroupPanelVisibleChange.event;
         this._onDidTitleChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
         this.onDidTitleChange = this._onDidTitleChange.event;
+        this._titleChanged = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        this.titleChanged = this._titleChanged.event;
+        this._suppressClosableChanged = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        this.suppressClosableChanged = this._suppressClosableChanged.event;
         this._group = group;
         this.addDisposables(
         // this._onDidGroupPanelVisibleChange,
@@ -33376,6 +33380,14 @@ class DockviewPanelApi extends _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.Gr
     // }
     get tryClose() {
         return this._interceptor;
+    }
+    get title() {
+        var _a;
+        return ((_a = this.panel.params) === null || _a === void 0 ? void 0 : _a.title) || '';
+    }
+    get suppressClosable() {
+        var _a;
+        return !!((_a = this.panel.params) === null || _a === void 0 ? void 0 : _a.suppressClosable);
     }
     get isGroupActive() {
         var _a;
@@ -33416,7 +33428,7 @@ class DockviewPanelApi extends _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.Gr
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PanelApi": () => (/* binding */ PanelApi)
+/* harmony export */   "PanelApiImpl": () => (/* binding */ PanelApiImpl)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
@@ -33425,7 +33437,7 @@ __webpack_require__.r(__webpack_exports__);
 /**
  * A core api implementation that should be used across all panel-like objects
  */
-class PanelApi extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable {
+class PanelApiImpl extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable {
     constructor(id) {
         super();
         this.id = id;
@@ -33540,7 +33552,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _splitviewPanelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitviewPanelApi */ "../dockview/dist/esm/api/splitviewPanelApi.js");
 
 
-class PaneviewPanelApi extends _splitviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.SplitviewPanelApi {
+class PaneviewPanelApi extends _splitviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.SplitviewPanelApiImpl {
     constructor(id) {
         super(id);
         this._onDidExpansionChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
@@ -33578,13 +33590,13 @@ class PaneviewPanelApi extends _splitviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.S
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "SplitviewPanelApi": () => (/* binding */ SplitviewPanelApi)
+/* harmony export */   "SplitviewPanelApiImpl": () => (/* binding */ SplitviewPanelApiImpl)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
 /* harmony import */ var _panelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./panelApi */ "../dockview/dist/esm/api/panelApi.js");
 
 
-class SplitviewPanelApi extends _panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApi {
+class SplitviewPanelApiImpl extends _panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelApiImpl {
     //
     constructor(id) {
         super(id);
@@ -35120,7 +35132,12 @@ focusedElement.element = document.activeElement;
 "use strict";
 
 function runFootnote() {
+    var _a, _b;
     const DOCKVIEW_SUPPRESS_WATERMARK = 'DOCKVIEW_WATERMARK_SUPPRESSED';
+    const isTest = ((_b = (_a = window.process) === null || _a === void 0 ? void 0 : _a.env) === null || _b === void 0 ? void 0 : _b.NODE_ENV) === 'test';
+    if (isTest) {
+        return; // don't spam people tests
+    }
     const isSuppressed = !!window[DOCKVIEW_SUPPRESS_WATERMARK];
     if (!isSuppressed) {
         console.log([
@@ -35461,6 +35478,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
 /* harmony import */ var _leafNode__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./leafNode */ "../dockview/dist/esm/gridview/leafNode.js");
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
+/*---------------------------------------------------------------------------------------------
+ * Accreditation: This file is largly based upon the MIT licenced VSCode sourcecode found at:
+ * https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/grid
+ *--------------------------------------------------------------------------------------------*/
 
 
 
@@ -35704,6 +35725,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _branchNode__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./branchNode */ "../dockview/dist/esm/gridview/branchNode.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
+/*---------------------------------------------------------------------------------------------
+ * Accreditation: This file is largly based upon the MIT licenced VSCode sourcecode found at:
+ * https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/grid
+ *--------------------------------------------------------------------------------------------*/
 
 
 
@@ -35830,10 +35855,11 @@ class Gridview {
         this.root = new _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode(orientation, proportionalLayout, styles, 0, 0);
     }
     serialize() {
+        const root = serializeBranchNode(this.getView(), this.orientation);
         return {
-            root: serializeBranchNode(this.getView(), this.orientation),
-            height: this.height,
+            root,
             width: this.width,
+            height: this.height,
             orientation: this.orientation,
         };
     }
@@ -35848,7 +35874,6 @@ class Gridview {
     deserialize(json, deserializer) {
         const orientation = json.orientation;
         const height = json.height;
-        this.orientation = orientation;
         this._deserialize(json.root, orientation, deserializer, height);
     }
     _deserialize(root, orientation, deserializer, orthogonalSize) {
@@ -36372,7 +36397,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class GridviewPanel extends _basePanelView__WEBPACK_IMPORTED_MODULE_0__.BasePanelView {
-    constructor(id, component, api = new _api_gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridviewPanelApi(id)) {
+    constructor(id, component, api = new _api_gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridviewPanelApiImpl(id)) {
         super(id, component, api);
         this._evaluatedMinimumWidth = 0;
         this._evaluatedMaximumWidth = Number.MAX_SAFE_INTEGER;
@@ -36528,6 +36553,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../splitview/core/splitview */ "../dockview/dist/esm/splitview/core/splitview.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
+/*---------------------------------------------------------------------------------------------
+ * Accreditation: This file is largly based upon the MIT licenced VSCode sourcecode found at:
+ * https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/grid
+ *--------------------------------------------------------------------------------------------*/
 
 
 class LeafNode {
@@ -36648,7 +36677,7 @@ class GroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDispos
         this.id = id;
         this.containerApi = containerApi;
         this.mutableDisposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_1__.MutableDisposable();
-        this.api = new _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_0__.DockviewPanelApi(this, this._group);
+        this.api = new _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_0__.DockviewPanelApiImpl(this, this._group);
         this.onDidStateChange = this.api.onDidStateChange;
         this.addDisposables(this.api.onActiveChange(() => {
             this.containerApi.setActivePanel(this);
@@ -36656,6 +36685,9 @@ class GroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDispos
             const title = event.title;
             this.update({ params: { title } });
         }));
+    }
+    get params() {
+        return this._params;
     }
     get group() {
         return this._group;
@@ -36677,27 +36709,41 @@ class GroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDispos
     }
     toJSON() {
         var _a, _b, _c;
-        const params = (_a = this.params) === null || _a === void 0 ? void 0 : _a.params;
+        const params = (_a = this._params) === null || _a === void 0 ? void 0 : _a.params;
         const state = this.api.getState();
         return {
             id: this.id,
             view: this.view.toJSON(),
             params: params && Object.keys(params).length > 0 ? params : undefined,
-            title: (_b = this.params) === null || _b === void 0 ? void 0 : _b.title,
-            suppressClosable: (_c = this.params) === null || _c === void 0 ? void 0 : _c.suppressClosable,
+            title: (_b = this._params) === null || _b === void 0 ? void 0 : _b.title,
+            suppressClosable: (_c = this._params) === null || _c === void 0 ? void 0 : _c.suppressClosable,
             state: state && Object.keys(state).length > 0 ? state : undefined,
         };
     }
     update(params) {
         var _a, _b;
-        if (this.params) {
-            this.params.params = Object.assign(Object.assign({}, (((_a = this.params) === null || _a === void 0 ? void 0 : _a.params) || {})), params);
+        let didTitleChange = false;
+        let didSuppressChangableClose = false;
+        const innerParams = params.params;
+        if (this._params) {
+            didTitleChange = this._params.title !== innerParams.title;
+            didSuppressChangableClose =
+                this._params.suppressClosable !== innerParams.suppressClosable;
+            this._params.params = Object.assign(Object.assign({}, (((_a = this._params) === null || _a === void 0 ? void 0 : _a.params) || {})), params);
+        }
+        if (didTitleChange) {
+            this.api._titleChanged.fire({ title: innerParams.title });
+        }
+        if (didSuppressChangableClose) {
+            this.api._suppressClosableChanged.fire({
+                suppressClosable: !!innerParams.suppressClosable,
+            });
         }
         (_b = this.view) === null || _b === void 0 ? void 0 : _b.update(params);
     }
     init(params) {
         var _a;
-        this.params = params;
+        this._params = params;
         this._view = params.view;
         if (params.state) {
             this.api.setState(params.state);
@@ -37293,7 +37339,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-class GroupApi extends _api_gridviewPanelApi__WEBPACK_IMPORTED_MODULE_0__.GridviewPanelApi {
+class GroupApi extends _api_gridviewPanelApi__WEBPACK_IMPORTED_MODULE_0__.GridviewPanelApiImpl {
     constructor(id) {
         super(id);
     }
@@ -37918,7 +37964,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "Disposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_10__.Disposable),
 /* harmony export */   "MutableDisposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_10__.MutableDisposable),
 /* harmony export */   "GroupPanel": () => (/* reexport safe */ _groupview_groupPanel__WEBPACK_IMPORTED_MODULE_11__.GroupPanel),
-/* harmony export */   "DockviewPanelApi": () => (/* reexport safe */ _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_12__.DockviewPanelApi),
+/* harmony export */   "DockviewPanelApiImpl": () => (/* reexport safe */ _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_12__.DockviewPanelApiImpl),
 /* harmony export */   "DockviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_13__.DockviewApi),
 /* harmony export */   "GridviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_13__.GridviewApi),
 /* harmony export */   "PaneviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_13__.PaneviewApi),
@@ -39813,6 +39859,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../events */ "../dockview/dist/esm/events.js");
 /* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../array */ "../dockview/dist/esm/array.js");
 /* harmony import */ var _viewItem__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./viewItem */ "../dockview/dist/esm/splitview/core/viewItem.js");
+/*---------------------------------------------------------------------------------------------
+ * Accreditation: This file is largly based upon the MIT licenced VSCode sourcecode found at:
+ * https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/splitview
+ *--------------------------------------------------------------------------------------------*/
 
 
 
@@ -40856,7 +40906,7 @@ __webpack_require__.r(__webpack_exports__);
 
 class SplitviewPanel extends _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_0__.BasePanelView {
     constructor(id, componentName) {
-        super(id, componentName, new _api_splitviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.SplitviewPanelApi(id));
+        super(id, componentName, new _api_splitviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.SplitviewPanelApiImpl(id));
         this._evaluatedMinimumSize = 0;
         this._evaluatedMaximumSize = Number.POSITIVE_INFINITY;
         this._minimumSize = 0;
