@@ -1,7 +1,7 @@
 {
   "name": "splitview-demo",
   "private": true,
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Demo project for https://github.com/mathuo/dockview",
   "scripts": {
     "build": "npm run build-webpack && npm run build-storybook",
@@ -14,7 +14,7 @@
   "author": "https://github.com/mathuo",
   "license": "MIT",
   "dependencies": {
-    "dockview": "^0.0.16",
+    "dockview": "^0.0.17",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
   },
