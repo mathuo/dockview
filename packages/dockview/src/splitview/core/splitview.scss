@@ -102,6 +102,17 @@
             position: absolute;
             z-index: 99;
             outline: none;
+
+            &:active {
+                transition: background-color 0.1s ease-in-out;
+                background-color: var(--dv-active-sash-color, transparent);
+            }
+
+            &:hover {
+                background-color: var(--dv-active-sash-color, transparent);
+                transition: background-color 0.1s ease-in-out;
+                transition-delay: 0.5s;
+            }
         }
     }
 
