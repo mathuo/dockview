@@ -33,7 +33,19 @@ dockable and tabular views
 - Tabular views with Drag and Drop support
 - Documentation and examples
 
+I
 
+Largly inspired by code IDE editors such as VSCode. Parts of the core resizable panelling is based upon the following VSCode sources:
+
+
+The below files controlling some of the core panel sizing and layouting are largly inspired by code found in the VSCode source
+- https://github.com/mathuo/dockview/blob/master/packages/dockview/src/splitview/core/splitview.ts
+- https://github.com/mathuo/dockview/blob/master/packages/dockview/src/gridview/gridview.ts
+- https://github.com/mathuo/dockview/blob/master/packages/dockview/src/gridview/branchNode.ts
+- https://github.com/mathuo/dockview/blob/master/packages/dockview/src/gridview/leafNode.ts
+The repsective VSCode sources can be found at:
+- https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/splitview
+- https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/grid
 ## Installation
 You can install the project from [npm](https://www.npmjs.com/package/dockview). The project comes with TypeScript typings.
 
@@ -70,3 +82,19 @@ Yes but with some extra work. Dockview is written in plain-old JS so you can eit
 - [Splitview](https://codesandbox.io/s/simple-splitview-l53nn)
 - [Paneview](https://codesandbox.io/s/simple-paneview-v8qvb)
 
+
+
+
+## Splitview
+[Component Api](https://mathuo.github.io/dockview/output/docs/classes/splitviewapi.html)
+[Panel Api]()
+
+## Gridview
+[Component Api](https://mathuo.github.io/dockview/output/docs/classes/gridviewapi.html)
+[Panel Api]()
+## Dockview
+[Component Api](https://mathuo.github.io/dockview/output/docs/classes/dockviewapi.html)
+[Panel Api]()
+## Paneview
+[Component Api](https://mathuo.github.io/dockview/output/docs/classes/paneviewapi.html)
+[Panel Api]()
