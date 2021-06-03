@@ -11,28 +11,33 @@ import { DockviewPanelApi } from '../../api/groupPanelApi';
 import { usePortalsLifecycle } from '../react';
 import { DockviewApi } from '../../api/component.api';
 import { ReactWatermarkPart } from './reactWatermarkPart';
-import { PanelCollection } from '../types';
+import { PanelCollection, PanelParameters } from '../types';
 import { watchElementResize } from '../../dom';
 import { IContentRenderer, ITabRenderer } from '../../groupview/types';
 
-export interface IGroupPanelBaseProps {
-    api: DockviewPanelApi;
-    containerApi: DockviewApi;
-    [key: string]: any;
+export interface PanelCollection1<T extends IDockviewPanelProps> {
+    [name: string]: React.FunctionComponent<T>;
 }
 
-export interface IDockviewPanelProps extends IGroupPanelBaseProps {
-    [key: string]: any;
+export interface IGroupPanelBaseProps<T extends {} = Record<string, any>>
+    extends PanelParameters<T> {
+    api: DockviewPanelApi;
+    containerApi: DockviewApi;
+}
+
+export interface IDockviewPanelProps<T extends {} = Record<string, any>>
+    extends IGroupPanelBaseProps<T> {
+    // noop
 }
 
 export interface DockviewReadyEvent {
     api: DockviewApi;
 }
 
-export interface IWatermarkPanelProps {
+export interface IWatermarkPanelProps<T extends {} = Record<string, any>>
+    extends PanelParameters<T> {
     containerApi: DockviewApi;
     close(): void;
-    [key: string]: any;
 }
 
 export interface IDockviewReactProps {

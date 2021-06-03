@@ -38,7 +38,7 @@ export class ReactWatermarkPart implements WatermarkPart {
             this.reactPortalStore,
             this.component,
             {
-                ...parameters.params,
+                params: parameters.params,
                 api: parameters.api,
                 containerApi: parameters.containerApi,
                 close: () => {

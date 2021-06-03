@@ -102,7 +102,7 @@ export class ReactPanelContentPart implements IContentRenderer {
             this.reactPortalStore,
             this.component,
             {
-                ...parameters.params,
+                params: parameters.params,
                 api: parameters.api,
                 containerApi: parameters.containerApi,
             },

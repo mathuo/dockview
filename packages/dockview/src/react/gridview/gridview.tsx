@@ -8,17 +8,17 @@ import { Orientation } from '../../splitview/core/splitview';
 import { ReactGridPanelView } from './view';
 import { usePortalsLifecycle } from '../react';
 import { GridviewApi } from '../../api/component.api';
-import { PanelCollection } from '../types';
+import { PanelCollection, PanelParameters } from '../types';
 import { watchElementResize } from '../../dom';
 
 export interface GridviewReadyEvent {
     api: GridviewApi;
 }
 
-export interface IGridviewPanelProps {
+export interface IGridviewPanelProps<T extends {} = Record<string, any>>
+    extends PanelParameters<T> {
     api: GridviewPanelApi;
     containerApi: GridviewApi;
-    [key: string]: any;
 }
 
 export interface IGridviewReactProps {

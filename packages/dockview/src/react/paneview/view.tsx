@@ -31,7 +31,7 @@ export class PanePanelSection implements IPaneBodyPart {
             this.reactPortalStore,
             this.component,
             {
-                ...parameters.params,
+                params: parameters.params,
                 api: parameters.api,
                 title: parameters.title,
                 containerApi: parameters.containerApi,

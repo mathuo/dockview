@@ -19,7 +19,7 @@ export class ReactPanelView extends SplitviewPanel {
             this.reactPortalStore,
             this.reactComponent,
             {
-                ...(this.params?.params || {}),
+                params: this.params?.params || {},
                 api: this.api,
                 containerApi: (this.params as PanelViewInitParameters)
                     .containerApi,

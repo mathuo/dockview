@@ -7,7 +7,7 @@ import {
 } from '../../splitview/splitviewComponent';
 import { Orientation } from '../../splitview/core/splitview';
 import { usePortalsLifecycle } from '../react';
-import { PanelCollection } from '../types';
+import { PanelCollection, PanelParameters } from '../types';
 import { ReactPanelView } from './view';
 import { watchElementResize } from '../../dom';
 
@@ -15,10 +15,10 @@ export interface SplitviewReadyEvent {
     api: SplitviewApi;
 }
 
-export interface ISplitviewPanelProps {
+export interface ISplitviewPanelProps<T extends {} = Record<string, any>>
+    extends PanelParameters<T> {
     api: SplitviewPanelApi;
     containerApi: SplitviewApi;
-    [key: string]: any;
 }
 
 export interface ISplitviewReactProps {

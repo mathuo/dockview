@@ -37,7 +37,7 @@ export class ReactPanelHeaderPart implements ITabRenderer {
             this.reactPortalStore,
             this.component,
             {
-                ...parameters.params,
+                params: parameters.params,
                 api: parameters.api,
                 containerApi: parameters.containerApi,
             }

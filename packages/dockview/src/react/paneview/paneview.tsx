@@ -7,18 +7,18 @@ import {
 import { usePortalsLifecycle } from '../react';
 import { PaneviewApi } from '../../api/component.api';
 import { PanePanelSection } from './view';
-import { PanelCollection } from '../types';
+import { PanelCollection, PanelParameters } from '../types';
 import { watchElementResize } from '../../dom';
 
 export interface PaneviewReadyEvent {
     api: PaneviewApi;
 }
 
-export interface IPaneviewPanelProps {
+export interface IPaneviewPanelProps<T extends {} = Record<string, any>>
+    extends PanelParameters<T> {
     api: PaneviewPanelApi;
     containerApi: PaneviewApi;
     title: string;
-    [key: string]: any;
 }
 
 export interface IPaneviewReactProps {
