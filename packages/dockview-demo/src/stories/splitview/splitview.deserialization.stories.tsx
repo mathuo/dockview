@@ -9,8 +9,8 @@ import {
 import * as React from 'react';
 import { Meta } from '@storybook/react';
 
-const components: PanelCollection<ISplitviewPanelProps> = {
-    default: (props) => {
+const components: PanelCollection = {
+    default: (props: ISplitviewPanelProps<{ color: string }>) => {
         const resize = () => {
             props.api.setSize({ size: 300 });
         };
@@ -19,7 +19,7 @@ const components: PanelCollection<ISplitviewPanelProps> = {
             <div
                 style={{
                     padding: '10px',
-                    backgroundColor: props.color,
+                    backgroundColor: props.params.color,
                     height: '100%',
                     boxSizing: 'border-box',
                 }}

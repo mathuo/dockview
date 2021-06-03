@@ -9,13 +9,13 @@ import {
 import * as React from 'react';
 import { Meta } from '@storybook/react';
 
-const components: PanelCollection<IGridviewPanelProps> = {
-    default: (props) => {
+const components: PanelCollection<IGridviewPanelProps<any>> = {
+    default: (props: IGridviewPanelProps<{ color: string }>) => {
         return (
             <div
                 style={{
                     padding: '10px',
-                    backgroundColor: props.color,
+                    backgroundColor: props.params.color,
                     height: '100%',
                 }}
             >

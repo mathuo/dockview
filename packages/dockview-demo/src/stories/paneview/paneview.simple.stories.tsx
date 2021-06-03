@@ -15,8 +15,8 @@ import {
 import * as React from 'react';
 import { Story, Meta } from '@storybook/react';
 
-const components: PanelCollection<IPaneviewPanelProps> = {
-    default: (props) => {
+const components: PanelCollection<IPaneviewPanelProps<any>> = {
+    default: (props: IPaneviewPanelProps<{ color: string }>) => {
         const [
             constraints,
             setConstraints,
@@ -54,7 +54,7 @@ const components: PanelCollection<IPaneviewPanelProps> = {
             <div
                 style={{
                     padding: '10px',
-                    backgroundColor: props.color,
+                    backgroundColor: props.params.color,
                     boxSizing: 'border-box',
                     height: '100%',
                 }}
