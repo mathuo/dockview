@@ -22,7 +22,7 @@ import { timeoutAsPromise } from '../async';
 import {
     IContentRenderer,
     ITabRenderer,
-    WatermarkPart,
+    IWatermarkRenderer,
 } from '../groupview/types';
 import { debounce } from '../functions';
 import { sequentialNumberGenerator } from '../math';
@@ -101,7 +101,7 @@ export interface IDockviewComponent extends IBaseGrid<GroupviewPanel> {
     addPanel(options: AddPanelOptions): IGroupPanel;
     getGroupPanel: (id: string) => IGroupPanel | undefined;
     fireMouseEvent(event: LayoutMouseEvent): void;
-    createWatermarkComponent(): WatermarkPart;
+    createWatermarkComponent(): IWatermarkRenderer;
     setTabHeight(height: number | undefined): void;
     getTabHeight(): number | undefined;
     totalPanels: number;
@@ -607,7 +607,7 @@ export class DockviewComponent
         return panel;
     }
 
-    createWatermarkComponent(): WatermarkPart {
+    createWatermarkComponent(): IWatermarkRenderer {
         return createComponent(
             'watermark-id',
             'watermark-name',

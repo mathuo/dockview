@@ -1,22 +1,24 @@
 import * as React from 'react';
 import {
     GroupPanelPartInitParameters,
-    WatermarkPart,
+    IWatermarkRenderer,
 } from '../../groupview/types';
 import { GroupviewPanel } from '../../groupview/groupviewPanel';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IGroupPanelBaseProps } from './dockview';
+import { PanelUpdateEvent } from '../../panel/types';
 
 interface IWatermarkPanelProps extends IGroupPanelBaseProps {
     close: () => void;
 }
 
-export class ReactWatermarkPart implements WatermarkPart {
+export class ReactWatermarkPart implements IWatermarkRenderer {
     private _element: HTMLElement;
     private part?: ReactPart<IWatermarkPanelProps>;
     private _groupRef: { value: GroupviewPanel | undefined } = {
         value: undefined,
     };
+    private parameters: GroupPanelPartInitParameters | undefined;
 
     get element() {
         return this._element;
@@ -32,7 +34,9 @@ export class ReactWatermarkPart implements WatermarkPart {
         this._element.style.width = '100%';
     }
 
-    public init(parameters: GroupPanelPartInitParameters): void {
+    init(parameters: GroupPanelPartInitParameters): void {
+        this.parameters = parameters;
+
         this.part = new ReactPart(
             this.element,
             this.reactPortalStore,
@@ -52,25 +56,34 @@ export class ReactWatermarkPart implements WatermarkPart {
         );
     }
 
-    public toJSON() {
+    focus() {
+        // noop
+    }
+
+    update(params: PanelUpdateEvent) {
+        if (this.parameters) {
+            this.parameters.params = params.params;
+        }
+
+        this.part?.update({ params: this.parameters?.params || {} });
+    }
+
+    toJSON() {
         return {
             id: this.id,
         };
     }
 
-    public layout(width: number, height: number) {
+    layout(width: number, height: number) {
         // noop - retrieval from api
     }
 
-    public updateParentGroup(
-        group: GroupviewPanel,
-        isPanelVisible: boolean
-    ): void {
+    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void {
         // noop - retrieval from api
         this._groupRef.value = group;
     }
 
-    public dispose() {
+    dispose() {
         this.part?.dispose();
     }
 }

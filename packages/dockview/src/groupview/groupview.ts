@@ -20,7 +20,7 @@ import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
 import { IGroupPanel } from './groupPanel';
 import { ContentContainer, IContentContainer } from './panel/content';
 import { ITabsContainer, TabsContainer } from './titlebar/tabsContainer';
-import { WatermarkPart } from './types';
+import { IWatermarkRenderer } from './types';
 import { GroupviewPanel } from './groupviewPanel';
 
 export enum GroupChangeKind {
@@ -120,7 +120,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     private readonly contentContainer: IContentContainer;
     private readonly dropTarget: Droptarget;
     private _activePanel?: IGroupPanel;
-    private watermark?: WatermarkPart;
+    private watermark?: IWatermarkRenderer;
     private _isGroupActive = false;
 
     private mostRecentlyUsed: IGroupPanel[] = [];

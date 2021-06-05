@@ -24,11 +24,10 @@ export interface GroupPanelContentPartInitParameters
     tab: WrappedTab;
 }
 
-export interface WatermarkPart extends IDisposable {
-    readonly id: string;
+export interface IWatermarkRenderer extends IPanel {
+    readonly element: HTMLElement;
     init: (params: GroupPanelPartInitParameters) => void;
     updateParentGroup(group: GroupviewPanel, visible: boolean): void;
-    element: HTMLElement;
 }
 
 export interface ITabRenderer extends IPanel {
@@ -67,5 +66,5 @@ export interface PanelContentPartConstructor {
 }
 
 export interface WatermarkConstructor {
-    new (): WatermarkPart;
+    new (): IWatermarkRenderer;
 }

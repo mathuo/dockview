@@ -121,7 +121,7 @@ export class ReactPanelContentPart implements IContentRenderer {
             this.parameters.params = params.params;
         }
 
-        this.part?.update(params.params);
+        this.part?.update({ params: this.parameters?.params || {} });
     }
 
     public updateParentGroup(

@@ -6,7 +6,7 @@ import {
     IContentRenderer,
     ITabRenderer,
     WatermarkConstructor,
-    WatermarkPart,
+    IWatermarkRenderer,
 } from '../groupview/types';
 import { GroupviewPanel } from '../groupview/groupviewPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
@@ -15,7 +15,7 @@ import { FrameworkFactory } from '../types';
 export interface GroupPanelFrameworkComponentFactory {
     content: FrameworkFactory<IContentRenderer>;
     tab: FrameworkFactory<ITabRenderer>;
-    watermark: FrameworkFactory<WatermarkPart>;
+    watermark: FrameworkFactory<IWatermarkRenderer>;
 }
 
 export interface TabContextMenuEvent {

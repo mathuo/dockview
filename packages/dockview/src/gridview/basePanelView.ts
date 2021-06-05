@@ -98,7 +98,13 @@ export abstract class BasePanelView<T extends PanelApiImpl>
     }
 
     update(params: PanelUpdateEvent) {
-        this.params = { ...this.params, params: params.params };
+        this.params = {
+            ...this.params,
+            params: {
+                ...this.params?.params,
+                ...params.params,
+            },
+        };
         this.part?.update(this.params.params);
     }
 
