@@ -276,7 +276,7 @@ describe('groupview', () => {
 
     test('default', () => {
         let viewQuery = groupview.element.querySelectorAll(
-            '.groupview > .title-container'
+            '.groupview > .tabs-and-actions-container'
         );
         expect(viewQuery).toBeTruthy();
 
@@ -300,7 +300,7 @@ describe('groupview', () => {
         });
 
         const viewQuery = groupview.element.querySelectorAll(
-            '.groupview > .title-container > .tab-container > .tab'
+            '.groupview > .tabs-and-actions-container > .tabs-container > .tab'
         );
         expect(viewQuery.length).toBe(2);
 

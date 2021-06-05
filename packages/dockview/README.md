@@ -23,6 +23,7 @@ A zero dependency layout manager based on the layering of split-view components 
 - Generated TypeDocs can be found [here](https://mathuo.github.io/dockview/output/docs/index.html).
 
 Want to inspect the deployed package? Go to https://unpkg.com/browse/dockview@latest/
+
 ### Features
 - Simple splitviews, nested splitviews (i.e. gridviews) supporting full layout managment with
 dockable and tabular views
@@ -32,6 +33,7 @@ dockable and tabular views
 - Tabular views with Drag and Drop support
 - Documentation and examples
 
+Largly inspired by code IDE editors such as VSCode. Parts of the core resizable panelling is based upon an implementation found in the VSCode sources of a [splitview](https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/splitview) and [gridview](https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/grid).
 
 ## Installation
 You can install the project from [npm](https://www.npmjs.com/package/dockview). The project comes with TypeScript typings.
@@ -69,3 +71,51 @@ Yes but with some extra work. Dockview is written in plain-old JS so you can eit
 - [Splitview](https://codesandbox.io/s/simple-splitview-l53nn)
 - [Paneview](https://codesandbox.io/s/simple-paneview-v8qvb)
 
+# API Documentation
+### Splitview
+[Component Api](https://mathuo.github.io/dockview/output/docs/classes/splitviewapi.html)
+[Panel Api]()
+
+### Gridview
+[Component Api](https://mathuo.github.io/dockview/output/docs/classes/gridviewapi.html)
+[Panel Api]()
+### Dockview
+[Component Api](https://mathuo.github.io/dockview/output/docs/classes/dockviewapi.html)
+[Panel Api]()
+### Paneview
+[Component Api](https://mathuo.github.io/dockview/output/docs/classes/paneviewapi.html)
+[Panel Api]()
+
+## Theming
+
+The theme can be customized using the below set of CSS properties. You can find the built in themes [here](https://github.com/mathuo/dockview/blob/master/packages/dockview/src/theme.scss) which could be used as an example to extend upon or build your own theme. 
+
+
+| CSS Property | Description |
+| ------------ | ----------- |
+| **General** |
+| --dv-active-sash-color | The background color a dividing sash during an interaction |
+| --dv-separator-border | The color of the seperator between panels |
+| **Paneview** |
+| --dv-paneview-header-border-color | - |
+| --dv-paneview-active-outline-color | The primary accent color, used for example to highlight the active panel in Paneviews |
+| **Dockview -> Dragging** |
+| --dv-drag-over-background-color | The overlay color applied to a group when a moving tab is dragged over |
+| **Dockview -> Tabs container** |
+| --dv-tabs-and-actions-container-font-size | - |
+| --dv-tabs-and-actions-container-height | Default tab height |
+| --dv-tabs-and-actions-container-background-color | - |
+| --dv-tabs-container-scrollbar-color | - |
+| --dv-group-view-background-color | - |
+| **Dockview -> Tabs** (see [dockviewComponent.scss](https://github.com/mathuo/dockview/blob/master/packages/dockview/src/dockview/dockviewComponent.scss)) 
+| --dv-activegroup-visiblepanel-tab-background-color | The background color of the tab for the visible panel in the active group |
+| --dv-activegroup-hiddenpanel-tab-background-color | The background color of the tab for the hidden panel/s in the active group |
+| --dv-inactivegroup-visiblepanel-tab-background-color | The background color of the tab for the visible panel in groups other than the active group |
+| --dv-inactivegroup-hiddenpanel-tab-background-color | The background color of the tab for the hidden panel/s in groups other than the active group |
+| --dv-activegroup-visiblepanel-tab-color | The color of the tab for the visible panel in the active group |
+| --dv-activegroup-hiddenpanel-tab-color | The color of the tab for the hidden panel/s in the active group |
+| --dv-inactivegroup-visiblepanel-tab-color | The color of the tab for the visible panel in groups other than the active group |
+| --dv-inactivegroup-hiddenpanel-tab-color | The color of the tab for the hidden panel/s in groups other than the active group |
+| --dv-tab-divider-color | - |
+| --dv-tab-close-icon | Default tab close icon |
+| --dv-tab-dirty-icon | Default tab dirty icon |

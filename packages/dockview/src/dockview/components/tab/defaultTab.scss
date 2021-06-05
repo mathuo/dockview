@@ -1,5 +1,4 @@
 .tab {
-    // padding-left: 10px;
     flex-shrink: 0;
 
     &.dragged {
@@ -12,7 +11,7 @@
 
     &.dragging {
         .tab-action {
-            background-color: var(--dv-active-group-visible-panel-color);
+            background-color: var(--dv-activegroup-visiblepanel-tab-color);
         }
     }
 

@@ -1,16 +1,16 @@
-.title-container {
+.tabs-and-actions-container {
     display: flex;
-    background-color: var(--dv-title-bar-background-color);
+    background-color: var(--dv-tabs-and-actions-container-background-color);
     flex-shrink: 0;
     box-sizing: border-box;
-    height: var(--dv-title-height);
-    font-size: var(--dv-title-font-size);
+    height: var(--dv-tabs-and-actions-container-height);
+    font-size: var(--dv-tabs-and-actions-container-font-size);
 
     &.hidden {
         display: none;
     }
 
-    .tab-container {
+    .tabs-container {
         flex-grow: 1;
         display: flex;
         overflow-x: overlay;
@@ -29,7 +29,7 @@
 
         /* Handle */
         &::-webkit-scrollbar-thumb {
-            background: var(--dv-title-bar-scroll-bar-color);
+            background: var(--dv-tabs-container-scrollbar-color);
         }
 
         &.drag-over-target {

@@ -68,11 +68,16 @@ export class TabsContainer
         this._height = value;
         if (typeof value !== 'number') {
             // removeClasses(this.element, 'separator-border');
-            this.element.style.removeProperty('--dv-title-height');
+            this.element.style.removeProperty(
+                '--dv-tabs-and-actions-container-height'
+            );
         } else {
             // addClasses(this.element, 'separator-border');
             // if (styles?.separatorBorder) {
-            this.element.style.setProperty('--dv-title-height', `${value}px`);
+            this.element.style.setProperty(
+                '--dv-tabs-and-actions-container-height',
+                `${value}px`
+            );
             // }
         }
         // this._element.style.height = `${this.height}px`;
@@ -133,7 +138,7 @@ export class TabsContainer
         this.addDisposables(this._onDropped);
 
         this._element = document.createElement('div');
-        this._element.className = 'title-container';
+        this._element.className = 'tabs-and-actions-container';
 
         this.height = options.tabHeight;
 
@@ -141,7 +146,7 @@ export class TabsContainer
         this.actionContainer.className = 'action-container';
 
         this.tabContainer = document.createElement('div');
-        this.tabContainer.className = 'tab-container';
+        this.tabContainer.className = 'tabs-container';
 
         this._element.appendChild(this.tabContainer);
         this._element.appendChild(this.actionContainer);
