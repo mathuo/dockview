@@ -9,7 +9,7 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     ITabRenderer,
-    WatermarkPart,
+    IWatermarkRenderer,
 } from '../../groupview/types';
 import { PanelUpdateEvent } from '../../panel/types';
 import { fireEvent } from '@testing-library/dom';
@@ -23,7 +23,7 @@ import {
 import { GroupOptions, GroupDropEvent } from '../../groupview/groupview';
 import { DockviewPanelApi } from '../../api/groupPanelApi';
 
-class Watermark implements WatermarkPart {
+class Watermark implements IWatermarkRenderer {
     public readonly element = document.createElement('div');
 
     get id() {
@@ -32,6 +32,22 @@ class Watermark implements WatermarkPart {
 
     init(params: GroupPanelPartInitParameters) {
         //
+    }
+
+    layout(width: number, height: number) {
+        // noop
+    }
+
+    update(event: PanelUpdateEvent) {
+        // noop
+    }
+
+    focus() {
+        // noop
+    }
+
+    toJSON() {
+        return {};
     }
 
     updateParentGroup() {

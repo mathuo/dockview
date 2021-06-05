@@ -7,6 +7,7 @@ import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
 import { CompositeDisposable } from '../../../lifecycle';
 import { GroupviewPanel } from '../../../groupview/groupviewPanel';
+import { PanelUpdateEvent } from '../../../panel/types';
 
 export class Watermark
     extends CompositeDisposable
@@ -55,11 +56,23 @@ export class Watermark
         );
     }
 
+    update(event: PanelUpdateEvent) {
+        // noop
+    }
+
+    focus() {
+        // noop
+    }
+
+    toJSON() {
+        return {};
+    }
+
     layout(width: number, height: number) {
         // noop
     }
 
-    public init(params: GroupPanelPartInitParameters) {
+    init(params: GroupPanelPartInitParameters) {
         this.params = params;
 
         this.addDisposables(
@@ -71,7 +84,7 @@ export class Watermark
         this.render();
     }
 
-    public updateParentGroup(group: GroupviewPanel, visible: boolean): void {
+    updateParentGroup(group: GroupviewPanel, visible: boolean): void {
         this.group = group;
         this.render();
     }
@@ -87,7 +100,7 @@ export class Watermark
         toggleClass(this.element, 'has-actions', isOneGroup);
     }
 
-    public dispose() {
+    dispose() {
         super.dispose();
     }
 }
