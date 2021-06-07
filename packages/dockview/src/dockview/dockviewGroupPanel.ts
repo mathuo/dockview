@@ -104,17 +104,19 @@ export class DockviewGroupPanel
     public toJSON(): GroupviewPanelState {
         const state = this.api.getState();
 
-        return {
+        const objectState: GroupviewPanelState = {
             id: this.id,
             view: this.view!.toJSON(),
             params:
                 Object.keys(this._params || {}).length > 0
                     ? this._params
                     : undefined,
-            title: this._params?.title as string,
-            suppressClosable: this._params?.suppressClosable,
             state: state && Object.keys(state).length > 0 ? state : undefined,
+            suppressClosable: this.suppressClosable || undefined,
+            title: this.title,
         };
+
+        return objectState;
     }
 
     public update(event: GroupPanelUpdateEvent): void {

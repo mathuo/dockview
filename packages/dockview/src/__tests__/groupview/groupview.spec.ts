@@ -16,12 +16,12 @@ import { fireEvent } from '@testing-library/dom';
 import { LocalSelectionTransfer } from '../../dnd/dataTransfer';
 import { Position } from '../../dnd/droptarget';
 import { GroupviewPanel } from '../../groupview/groupviewPanel';
+import { GroupOptions, GroupDropEvent } from '../../groupview/groupview';
+import { DockviewPanelApi } from '../../api/groupPanelApi';
 import {
     DefaultGroupPanelView,
     IGroupPanelView,
-} from '../../react/dockview/v2/defaultGroupPanelView';
-import { GroupOptions, GroupDropEvent } from '../../groupview/groupview';
-import { DockviewPanelApi } from '../../api/groupPanelApi';
+} from '../../dockview/defaultGroupPanelView';
 
 class Watermark implements IWatermarkRenderer {
     public readonly element = document.createElement('div');
@@ -136,6 +136,14 @@ class TestPanel implements IGroupPanel {
     private _params: IGroupPanelInitParameters;
     private _onDidChangeState = new Emitter<void>();
     readonly onDidStateChange = this._onDidChangeState.event;
+
+    get title() {
+        return '';
+    }
+
+    get suppressClosable() {
+        return false;
+    }
 
     get group() {
         return this._group;

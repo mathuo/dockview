@@ -9,7 +9,7 @@ import {
 import { GroupviewPanel } from '../../../groupview/groupviewPanel';
 import { CompositeDisposable } from '../../../lifecycle';
 import { PanelUpdateEvent } from '../../../panel/types';
-import { IGroupPanelView } from '../../../react/dockview/v2/defaultGroupPanelView';
+import { IGroupPanelView } from '../../../dockview/defaultGroupPanelView';
 
 class TestContentRenderer
     extends CompositeDisposable
