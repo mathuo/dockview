@@ -9,7 +9,7 @@ import {
 import * as React from 'react';
 import { Meta } from '@storybook/react';
 
-const components: PanelCollection = {
+const components: PanelCollection<ISplitviewPanelProps> = {
     default: (props: ISplitviewPanelProps<{ color: string }>) => {
         const resize = () => {
             props.api.setSize({ size: 300 });

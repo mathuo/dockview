@@ -97,15 +97,15 @@ export abstract class BasePanelView<T extends PanelApiImpl>
         this.part = this.getComponent();
     }
 
-    update(params: PanelUpdateEvent) {
+    update(event: PanelUpdateEvent) {
         this.params = {
             ...this.params,
             params: {
                 ...this.params?.params,
-                ...params.params,
+                ...event.params,
             },
         };
-        this.part?.update(this.params.params);
+        this.part?.update({ params: this.params.params });
     }
 
     toJSON(): BasePanelViewState {

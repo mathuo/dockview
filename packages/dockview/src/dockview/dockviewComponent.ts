@@ -5,11 +5,8 @@ import {
 } from '../gridview/gridview';
 import { Position } from '../dnd/droptarget';
 import { tail, sequenceEquals } from '../array';
-import {
-    GroupPanel,
-    GroupviewPanelState,
-    IGroupPanel,
-} from '../groupview/groupPanel';
+import { GroupviewPanelState, IGroupPanel } from '../groupview/groupPanel';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import {
     CompositeDisposable,
     IDisposable,
@@ -58,7 +55,7 @@ import {
     GroupPanelViewState,
 } from '../groupview/groupview';
 import { GroupviewPanel } from '../groupview/groupviewPanel';
-import { DefaultGroupPanelView } from '../react/dockview/v2/defaultGroupPanelView';
+import { DefaultGroupPanelView } from './defaultGroupPanelView';
 
 const nextGroupId = sequentialNumberGenerator();
 
@@ -595,7 +592,10 @@ export class DockviewComponent
             tab: this.createTabComponent(options.id, options.tabComponent),
         });
 
-        const panel: IGroupPanel = new GroupPanel(options.id, this._api);
+        const panel: IGroupPanel = new DockviewGroupPanel(
+            options.id,
+            this._api
+        );
         panel.init({
             view,
             title: options.title || options.id,
@@ -704,15 +704,8 @@ export class DockviewComponent
     ): void {
         let group: GroupviewPanel;
 
-        // if (
-        //     this.groups.size === 1 &&
-        //     Array.from(this.groups.values())[0].value.size === 0
-        // ) {
-        //     group = Array.from(this.groups.values())[0].value;
-        // } else {
         group! = this.createGroup();
         this.doAddGroup(group, location);
-        // }
 
         group.group.openPanel(panel);
     }
@@ -815,7 +808,6 @@ export class DockviewComponent
                 `Duplicate group id ${options?.id}. reassigning group id to avoid errors`
             );
             id = undefined;
-            // throw new Error(`duplicate group ${options.id}`);
         }
 
         if (!id) {

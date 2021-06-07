@@ -58,11 +58,11 @@ export class DockviewPanelApiImpl
     }
 
     get title() {
-        return this.panel.params?.title || '';
+        return this.panel.title;
     }
 
     get suppressClosable() {
-        return !!this.panel.params?.suppressClosable;
+        return !!this.panel.suppressClosable;
     }
 
     get isGroupActive() {

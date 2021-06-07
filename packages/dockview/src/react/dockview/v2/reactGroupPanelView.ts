@@ -4,7 +4,7 @@ import {
     ViewFactoryData,
 } from '../../../dockview/options';
 import { ReactPortalStore } from '../../react';
-import { DefaultGroupPanelView } from './defaultGroupPanelView';
+import { DefaultGroupPanelView } from '../../../dockview/defaultGroupPanelView';
 import { ReactContentRenderer } from './reactContentRenderer';
 
 export class ReactGroupPanelView extends DefaultGroupPanelView {

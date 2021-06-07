@@ -27,12 +27,10 @@ export interface ReactContentPartContext {
 export class ReactPanelContentPart implements IContentRenderer {
     private _element: HTMLElement;
     private part?: ReactPart<IDockviewPanelProps>;
-    private _group: GroupviewPanel | undefined;
     //
     private _actionsElement: HTMLElement;
     private actionsPart?: ReactPart<any>;
-
-    private parameters: GroupPanelContentPartInitParameters | undefined;
+    private _group: GroupviewPanel | undefined;
 
     // private hostedContainer: HostedContainer;
 
@@ -72,29 +70,15 @@ export class ReactPanelContentPart implements IContentRenderer {
     }
 
     focus() {
-        // this._element.focus();
+        // TODO
     }
 
     public init(parameters: GroupPanelContentPartInitParameters): void {
-        this.parameters = parameters;
-
-        // const api = parameters.api;
-
-        // api.onDidVisibilityChange((event) => {
-        //     const { isVisible } = event;
-
-        //     if (isVisible) {
-        //         this.hostedContainer.show();
-        //     } else {
-        //         this.hostedContainer.hide();
-        //     }
-        // });
-
         const context: ReactContentPartContext = {
             api: parameters.api,
             containerApi: parameters.containerApi,
             actionsPortalElement: this._actionsElement,
-            tabPortalElement: this.parameters.tab,
+            tabPortalElement: parameters.tab,
         };
 
         this.part = new ReactPart(
@@ -116,12 +100,8 @@ export class ReactPanelContentPart implements IContentRenderer {
         };
     }
 
-    public update(params: PanelUpdateEvent) {
-        if (this.parameters) {
-            this.parameters.params = params.params;
-        }
-
-        this.part?.update({ params: this.parameters?.params || {} });
+    public update(event: PanelUpdateEvent) {
+        this.part?.update(event.params);
     }
 
     public updateParentGroup(

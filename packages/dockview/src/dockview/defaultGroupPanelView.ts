@@ -1,22 +1,19 @@
-import {
-    DefaultTab,
-    WrappedTab,
-} from '../../../dockview/components/tab/defaultTab';
+import { DefaultTab, WrappedTab } from './components/tab/defaultTab';
 import {
     GroupPanelPartInitParameters,
     IActionsRenderer,
     IContentRenderer,
     ITabRenderer,
-} from '../../../groupview/types';
-import { GroupviewPanel } from '../../../groupview/groupviewPanel';
-import { IDisposable } from '../../../lifecycle';
-import { PanelUpdateEvent } from '../../../panel/types';
+} from '../groupview/types';
+import { GroupviewPanel } from '../groupview/groupviewPanel';
+import { IDisposable } from '../lifecycle';
+import { GroupPanelUpdateEvent } from '../groupview/groupPanel';
 
 export interface IGroupPanelView extends IDisposable {
     readonly content: IContentRenderer;
     readonly tab?: ITabRenderer;
     readonly actions?: IActionsRenderer;
-    update(event: PanelUpdateEvent): void;
+    update(event: GroupPanelUpdateEvent): void;
     layout(width: number, height: number): void;
     init(params: GroupPanelPartInitParameters): void;
     updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void;
@@ -65,19 +62,19 @@ export class DefaultGroupPanelView implements IGroupPanelView {
     }
 
     updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void {
-        //
+        // TODO
     }
 
     layout(width: number, height: number): void {
         this.content.layout(width, height);
     }
 
-    update(event: PanelUpdateEvent): void {
+    update(event: GroupPanelUpdateEvent): void {
         this.content.update(event);
         this.tab.update(event);
     }
 
-    toJSON() {
+    toJSON(): {} {
         return {
             content: this.content.toJSON(),
             tab:

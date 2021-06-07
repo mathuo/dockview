@@ -83,7 +83,7 @@ export const Params = (props: {
         const interval = setInterval(() => {
             const panel1 = gridApi.getPanel('panel1');
 
-            panel1.update({ params: { ticker: Date.now() } });
+            panel1.update({ params: { params: { ticker: Date.now() } } });
         }, 1000);
         return () => {
             clearInterval(interval);
