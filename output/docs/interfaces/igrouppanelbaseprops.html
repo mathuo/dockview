@@ -56,29 +56,38 @@
 					<a href="igrouppanelbaseprops.html">IGroupPanelBaseProps</a>
 				</li>
 			</ul>
-			<h1>Interface IGroupPanelBaseProps</h1>
+			<h1>Interface IGroupPanelBaseProps&lt;T&gt;</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-type-parameters">
+				<h3>Type parameters</h3>
+				<ul class="tsd-type-parameters">
+					<li>
+						<h4>T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span> = <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
+					</li>
+				</ul>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">IGroupPanelBaseProps</span>
+						<a href="panelparameters.html" class="tsd-signature-type" data-tsd-kind="Interface">PanelParameters</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>
 						<ul class="tsd-hierarchy">
 							<li>
-								<a href="idockviewpanelprops.html" class="tsd-signature-type" data-tsd-kind="Interface">IDockviewPanelProps</a>
+								<span class="target">IGroupPanelBaseProps</span>
+								<ul class="tsd-hierarchy">
+									<li>
+										<a href="idockviewpanelprops.html" class="tsd-signature-type" data-tsd-kind="Interface">IDockviewPanelProps</a>
+									</li>
+								</ul>
 							</li>
 						</ul>
 					</li>
 				</ul>
-			</section>
-			<section class="tsd-panel tsd-kind-interface">
-				<h3 class="tsd-before-signature">Indexable</h3>
-				<div class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">[</span>key: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">any</span></div>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
@@ -89,6 +98,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="igrouppanelbaseprops.html#api" class="tsd-kind-icon">api</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="igrouppanelbaseprops.html#containerapi" class="tsd-kind-icon">container<wbr>Api</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="igrouppanelbaseprops.html#params" class="tsd-kind-icon">params</a></li>
 							</ul>
 						</section>
 					</div>
@@ -102,7 +112,7 @@
 					<div class="tsd-signature tsd-kind-icon">api<span class="tsd-signature-symbol">:</span> <a href="dockviewpanelapi.html" class="tsd-signature-type" data-tsd-kind="Interface">DockviewPanelApi</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/2c02bed/packages/dockview/src/react/dockview/dockview.tsx#L19">react/dockview/dockview.tsx:19</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/374d59f/packages/dockview/src/react/dockview/dockview.tsx#L24">react/dockview/dockview.tsx:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -112,7 +122,18 @@
 					<div class="tsd-signature tsd-kind-icon">container<wbr>Api<span class="tsd-signature-symbol">:</span> <a href="../classes/dockviewapi.html" class="tsd-signature-type" data-tsd-kind="Class">DockviewApi</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/2c02bed/packages/dockview/src/react/dockview/dockview.tsx#L20">react/dockview/dockview.tsx:20</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/374d59f/packages/dockview/src/react/dockview/dockview.tsx#L25">react/dockview/dockview.tsx:25</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+					<a name="params" class="tsd-anchor"></a>
+					<h3>params</h3>
+					<div class="tsd-signature tsd-kind-icon">params<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="panelparameters.html">PanelParameters</a>.<a href="panelparameters.html#params">params</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/374d59f/packages/dockview/src/react/types.ts#L8">react/types.ts:8</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -130,7 +151,7 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface">
+					<li class="current tsd-kind-interface tsd-has-type-parameter">
 						<a href="igrouppanelbaseprops.html" class="tsd-kind-icon">IGroup<wbr>Panel<wbr>Base<wbr>Props</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
@@ -138,6 +159,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="igrouppanelbaseprops.html#containerapi" class="tsd-kind-icon">container<wbr>Api</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+								<a href="igrouppanelbaseprops.html#params" class="tsd-kind-icon">params</a>
 							</li>
 						</ul>
 					</li>

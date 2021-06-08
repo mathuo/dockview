@@ -90,6 +90,7 @@
 					<li>Tabular views with Drag and Drop support</li>
 					<li>Documentation and examples</li>
 				</ul>
+				<p>Largly inspired by code IDE editors such as VSCode. Parts of the core resizable panelling is based upon an implementation found in the VSCode sources of a <a href="https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/splitview">splitview</a> and <a href="https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/grid">gridview</a>.</p>
 				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
 					<h2>Installation</h2>
 				</a>
@@ -127,6 +128,145 @@
 					<li><a href="https://codesandbox.io/s/simple-splitview-l53nn">Splitview</a></li>
 					<li><a href="https://codesandbox.io/s/simple-paneview-v8qvb">Paneview</a></li>
 				</ul>
+				<a href="#api-documentation" id="api-documentation" style="color: inherit; text-decoration: none;">
+					<h1>API Documentation</h1>
+				</a>
+				<a href="#splitview" id="splitview" style="color: inherit; text-decoration: none;">
+					<h3>Splitview</h3>
+				</a>
+				<p><a href="https://mathuo.github.io/dockview/output/docs/classes/splitviewapi.html">Component Api</a>
+				<a href="">Panel Api</a></p>
+				<a href="#gridview" id="gridview" style="color: inherit; text-decoration: none;">
+					<h3>Gridview</h3>
+				</a>
+				<p><a href="https://mathuo.github.io/dockview/output/docs/classes/gridviewapi.html">Component Api</a>
+				<a href="">Panel Api</a></p>
+				<a href="#dockview" id="dockview" style="color: inherit; text-decoration: none;">
+					<h3>Dockview</h3>
+				</a>
+				<p><a href="https://mathuo.github.io/dockview/output/docs/classes/dockviewapi.html">Component Api</a>
+				<a href="">Panel Api</a></p>
+				<a href="#paneview" id="paneview" style="color: inherit; text-decoration: none;">
+					<h3>Paneview</h3>
+				</a>
+				<p><a href="https://mathuo.github.io/dockview/output/docs/classes/paneviewapi.html">Component Api</a>
+				<a href="">Panel Api</a></p>
+				<a href="#theming" id="theming" style="color: inherit; text-decoration: none;">
+					<h2>Theming</h2>
+				</a>
+				<p>The theme can be customized using the below set of CSS properties. You can find the built in themes <a href="https://github.com/mathuo/dockview/blob/master/packages/dockview/src/theme.scss">here</a> which could be used as an example to extend upon or build your own theme. </p>
+				<table>
+					<thead>
+						<tr>
+							<th>CSS Property</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td><strong>General</strong></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>--dv-active-sash-color</td>
+							<td>The background color a dividing sash during an interaction</td>
+						</tr>
+						<tr>
+							<td>--dv-separator-border</td>
+							<td>The color of the seperator between panels</td>
+						</tr>
+						<tr>
+							<td><strong>Paneview</strong></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>--dv-paneview-header-border-color</td>
+							<td>-</td>
+						</tr>
+						<tr>
+							<td>--dv-paneview-active-outline-color</td>
+							<td>The primary accent color, used for example to highlight the active panel in Paneviews</td>
+						</tr>
+						<tr>
+							<td><strong>Dockview -&gt; Dragging</strong></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>--dv-drag-over-background-color</td>
+							<td>The overlay color applied to a group when a moving tab is dragged over</td>
+						</tr>
+						<tr>
+							<td><strong>Dockview -&gt; Tabs container</strong></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>--dv-tabs-and-actions-container-font-size</td>
+							<td>-</td>
+						</tr>
+						<tr>
+							<td>--dv-tabs-and-actions-container-height</td>
+							<td>Default tab height</td>
+						</tr>
+						<tr>
+							<td>--dv-tabs-and-actions-container-background-color</td>
+							<td>-</td>
+						</tr>
+						<tr>
+							<td>--dv-tabs-container-scrollbar-color</td>
+							<td>-</td>
+						</tr>
+						<tr>
+							<td>--dv-group-view-background-color</td>
+							<td>-</td>
+						</tr>
+						<tr>
+							<td><strong>Dockview -&gt; Tabs</strong> (see <a href="https://github.com/mathuo/dockview/blob/master/packages/dockview/src/dockview/dockviewComponent.scss">dockviewComponent.scss</a>)</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>--dv-activegroup-visiblepanel-tab-background-color</td>
+							<td>The background color of the tab for the visible panel in the active group</td>
+						</tr>
+						<tr>
+							<td>--dv-activegroup-hiddenpanel-tab-background-color</td>
+							<td>The background color of the tab for the hidden panel/s in the active group</td>
+						</tr>
+						<tr>
+							<td>--dv-inactivegroup-visiblepanel-tab-background-color</td>
+							<td>The background color of the tab for the visible panel in groups other than the active group</td>
+						</tr>
+						<tr>
+							<td>--dv-inactivegroup-hiddenpanel-tab-background-color</td>
+							<td>The background color of the tab for the hidden panel/s in groups other than the active group</td>
+						</tr>
+						<tr>
+							<td>--dv-activegroup-visiblepanel-tab-color</td>
+							<td>The color of the tab for the visible panel in the active group</td>
+						</tr>
+						<tr>
+							<td>--dv-activegroup-hiddenpanel-tab-color</td>
+							<td>The color of the tab for the hidden panel/s in the active group</td>
+						</tr>
+						<tr>
+							<td>--dv-inactivegroup-visiblepanel-tab-color</td>
+							<td>The color of the tab for the visible panel in groups other than the active group</td>
+						</tr>
+						<tr>
+							<td>--dv-inactivegroup-hiddenpanel-tab-color</td>
+							<td>The color of the tab for the hidden panel/s in groups other than the active group</td>
+						</tr>
+						<tr>
+							<td>--dv-tab-divider-color</td>
+							<td>-</td>
+						</tr>
+						<tr>
+							<td>--dv-tab-close-icon</td>
+							<td>Default tab close icon</td>
+						</tr>
+						<tr>
+							<td>--dv-tab-dirty-icon</td>
+							<td>Default tab dirty icon</td>
+						</tr>
+				</tbody></table>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -189,9 +329,6 @@
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/gridviewpanel.html" class="tsd-kind-icon">Gridview<wbr>Panel</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/grouppanel.html" class="tsd-kind-icon">Group<wbr>Panel</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/groupview.html" class="tsd-kind-icon">Groupview</a>
@@ -346,7 +483,7 @@
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/idockviewcomponent.html" class="tsd-kind-icon">IDockview<wbr>Component</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/idockviewpanelprops.html" class="tsd-kind-icon">IDockview<wbr>Panel<wbr>Props</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -364,7 +501,7 @@
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/igridviewpanel.html" class="tsd-kind-icon">IGridview<wbr>Panel</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/igridviewpanelprops.html" class="tsd-kind-icon">IGridview<wbr>Panel<wbr>Props</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -379,7 +516,7 @@
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/igrouppanelactionbarprops.html" class="tsd-kind-icon">IGroup<wbr>Panel<wbr>Actionbar<wbr>Props</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/igrouppanelbaseprops.html" class="tsd-kind-icon">IGroup<wbr>Panel<wbr>Base<wbr>Props</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -394,7 +531,7 @@
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/ipaneviewcomponent.html" class="tsd-kind-icon">IPaneview<wbr>Component</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/ipaneviewpanelprops.html" class="tsd-kind-icon">IPaneview<wbr>Panel<wbr>Props</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -415,7 +552,7 @@
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/isplitviewcomponent.html" class="tsd-kind-icon">ISplitview<wbr>Component</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/isplitviewpanelprops.html" class="tsd-kind-icon">ISplitview<wbr>Panel<wbr>Props</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -442,8 +579,11 @@
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/iviewsize.html" class="tsd-kind-icon">IView<wbr>Size</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/iwatermarkpanelprops.html" class="tsd-kind-icon">IWatermark<wbr>Panel<wbr>Props</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/iwatermarkrenderer.html" class="tsd-kind-icon">IWatermark<wbr>Renderer</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/layoutdropevent.html" class="tsd-kind-icon">Layout<wbr>Drop<wbr>Event</a>
@@ -460,6 +600,9 @@
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/panelcollection.html" class="tsd-kind-icon">Panel<wbr>Collection</a>
 					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/panelcollection1.html" class="tsd-kind-icon">Panel<wbr>Collection1</a>
+					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/panelconstraintchangeevent.html" class="tsd-kind-icon">Panel<wbr>Constraint<wbr>Change<wbr>Event</a>
 					</li>
@@ -474,6 +617,9 @@
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/paneloptions.html" class="tsd-kind-icon">Panel<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/panelparameters.html" class="tsd-kind-icon">Panel<wbr>Parameters</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/panelreference.html" class="tsd-kind-icon">Panel<wbr>Reference</a>
@@ -551,9 +697,6 @@
 						<a href="interfaces/watermarkconstructor.html" class="tsd-kind-icon">Watermark<wbr>Constructor</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/watermarkpart.html" class="tsd-kind-icon">Watermark<wbr>Part</a>
-					</li>
-					<li class=" tsd-kind-interface">
 						<a href="interfaces/watermarkpartinitparameters.html" class="tsd-kind-icon">Watermark<wbr>Part<wbr>Init<wbr>Parameters</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
@@ -561,6 +704,9 @@
 					</li>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
 						<a href="modules.html#gridnode" class="tsd-kind-icon">Grid<wbr>Node</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#grouppanelupdateevent" class="tsd-kind-icon">Group<wbr>Panel<wbr>Update<wbr>Event</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="modules.html#iserializednode" class="tsd-kind-icon">ISerialized<wbr>Node</a>
