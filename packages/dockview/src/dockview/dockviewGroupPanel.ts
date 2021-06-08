@@ -157,10 +157,10 @@ export class DockviewGroupPanel
         this._group = group;
         this.api.group = group;
 
-        this.mutableDisposable.value = this._group.group.onDidGroupChange(
+        this.mutableDisposable.value = this._group.model.onDidGroupChange(
             (ev) => {
                 if (ev.kind === GroupChangeKind.GROUP_ACTIVE) {
-                    const isVisible = !!this._group?.group.isPanelActive(this);
+                    const isVisible = !!this._group?.model.isPanelActive(this);
                     this.api._onDidActiveChange.fire({
                         isActive: isGroupActive && isVisible,
                     });
@@ -171,7 +171,7 @@ export class DockviewGroupPanel
             }
         );
 
-        const isPanelVisible = this._group.group.isPanelActive(this);
+        const isPanelVisible = this._group.model.isPanelActive(this);
 
         this.api._onDidActiveChange.fire({
             isActive: isGroupActive && isPanelVisible,
@@ -182,7 +182,7 @@ export class DockviewGroupPanel
 
         this.view?.updateParentGroup(
             this._group,
-            this._group.group.isPanelActive(this)
+            this._group.model.isPanelActive(this)
         );
     }
 
@@ -190,7 +190,7 @@ export class DockviewGroupPanel
         // the obtain the correct dimensions of the content panel we must deduct the tab height
         this.api._onDidPanelDimensionChange.fire({
             width,
-            height: height - (this.group?.group.tabHeight || 0),
+            height: height - (this.group?.model.tabHeight || 0),
         });
 
         this.view?.layout(width, height);

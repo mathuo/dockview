@@ -235,7 +235,7 @@ describe('groupview', () => {
             activePanel: panel2,
         });
 
-        expect(groupview2.group.activePanel).toBe(panel2);
+        expect(groupview2.model.activePanel).toBe(panel2);
 
         expect(
             groupview2.element.querySelector('.content-part-panel1')
@@ -253,33 +253,33 @@ describe('groupview', () => {
         const panel2 = new TestPanel('panel2', jest.fn() as any);
         const panel3 = new TestPanel('panel3', jest.fn() as any);
 
-        groupview.group.openPanel(panel1);
-        groupview.group.openPanel(panel2);
-        groupview.group.openPanel(panel3);
+        groupview.model.openPanel(panel1);
+        groupview.model.openPanel(panel2);
+        groupview.model.openPanel(panel3);
 
-        groupview.group.openPanel(panel2); // set active
+        groupview.model.openPanel(panel2); // set active
 
-        groupview.group.moveToPrevious();
-        expect(groupview.group.activePanel).toBe(panel1);
+        groupview.model.moveToPrevious();
+        expect(groupview.model.activePanel).toBe(panel1);
 
-        groupview.group.moveToPrevious({ suppressRoll: true });
-        expect(groupview.group.activePanel).toBe(panel1);
+        groupview.model.moveToPrevious({ suppressRoll: true });
+        expect(groupview.model.activePanel).toBe(panel1);
 
-        groupview.group.moveToPrevious();
-        expect(groupview.group.activePanel).toBe(panel3);
+        groupview.model.moveToPrevious();
+        expect(groupview.model.activePanel).toBe(panel3);
 
-        groupview.group.moveToNext({ suppressRoll: true });
-        expect(groupview.group.activePanel).toBe(panel3);
+        groupview.model.moveToNext({ suppressRoll: true });
+        expect(groupview.model.activePanel).toBe(panel3);
 
-        groupview.group.moveToNext({ suppressRoll: false });
-        expect(groupview.group.activePanel).toBe(panel1);
+        groupview.model.moveToNext({ suppressRoll: false });
+        expect(groupview.model.activePanel).toBe(panel1);
 
-        groupview.group.moveToPrevious({ suppressRoll: false });
-        expect(groupview.group.activePanel).toBe(panel3);
+        groupview.model.moveToPrevious({ suppressRoll: false });
+        expect(groupview.model.activePanel).toBe(panel3);
 
-        groupview.group.moveToNext();
-        groupview.group.moveToNext();
-        expect(groupview.group.activePanel).toBe(panel2);
+        groupview.model.moveToNext();
+        groupview.model.moveToNext();
+        expect(groupview.model.activePanel).toBe(panel2);
     });
 
     test('default', () => {
@@ -298,12 +298,12 @@ describe('groupview', () => {
         const panel1 = new TestPanel('panel1', jest.fn() as any);
         const panel2 = new TestPanel('panel2', jest.fn() as any);
 
-        groupview.group.openPanel(panel1);
-        groupview.group.openPanel(panel2);
+        groupview.model.openPanel(panel1);
+        groupview.model.openPanel(panel2);
 
         const events: GroupDropEvent[] = [];
 
-        groupview.group.onDrop((event) => {
+        groupview.model.onDrop((event) => {
             events.push(event);
         });
 

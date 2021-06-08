@@ -27,7 +27,8 @@ export interface BasePanelViewExported<T extends PanelApiImpl> {
 
 export abstract class BasePanelView<T extends PanelApiImpl>
     extends CompositeDisposable
-    implements IPanel, BasePanelViewExported<T> {
+    implements IPanel, BasePanelViewExported<T>
+{
     private _height = 0;
     private _width = 0;
     private _element: HTMLElement;
@@ -87,8 +88,10 @@ export abstract class BasePanelView<T extends PanelApiImpl>
         this._height = height;
         this.api._onDidPanelDimensionChange.fire({ width, height });
 
-        if (this.part && this.params) {
-            this.part.update(this.params.params);
+        if (this.part) {
+            if (this.params) {
+                this.part.update(this.params.params);
+            }
         }
     }
 

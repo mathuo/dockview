@@ -98,7 +98,7 @@ export class DockviewPanelApiImpl
         if (!this.group) {
             throw new Error(`panel ${this.id} has no group`);
         }
-        return this.group.group.closePanel(this.panel);
+        return this.group.model.closePanel(this.panel);
     }
 
     public interceptOnCloseAction(interceptor: () => Promise<boolean>) {

@@ -16,12 +16,18 @@ import { addDisposableListener, Emitter, Event } from '../events';
 import { IGridPanelView } from '../gridview/baseComponentGridview';
 import { IViewSize } from '../gridview/gridview';
 import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
-import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
+import {
+    IFrameworkPart,
+    PanelInitParameters,
+    PanelUpdateEvent,
+} from '../panel/types';
 import { IGroupPanel } from './groupPanel';
 import { ContentContainer, IContentContainer } from './panel/content';
 import { ITabsContainer, TabsContainer } from './titlebar/tabsContainer';
 import { IWatermarkRenderer } from './types';
 import { GroupviewPanel } from './groupviewPanel';
+import { focusedElement } from '../focusedElement';
+import { BasePanelView } from '../gridview/basePanelView';
 
 export enum GroupChangeKind {
     GROUP_ACTIVE = 'GROUP_ACTIVE',
@@ -80,7 +86,7 @@ export interface IGroupview extends IDisposable, IGridPanelView {
     readonly isActive: boolean;
     readonly size: number;
     readonly panels: IGroupPanel[];
-    tabHeight: number | undefined;
+    readonly tabHeight: number | undefined;
     // state
     isPanelActive: (panel: IGroupPanel) => boolean;
     activePanel: IGroupPanel | undefined;
@@ -105,7 +111,7 @@ export interface IGroupview extends IDisposable, IGridPanelView {
         panel?: IGroupPanel;
         suppressRoll?: boolean;
     }): void;
-    isAncestor(element: Element): boolean;
+    isContentFocused(): boolean;
     updateActions(): void;
 }
 
@@ -126,8 +132,8 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     private mostRecentlyUsed: IGroupPanel[] = [];
 
     private readonly _onDidChange = new Emitter<IViewSize | undefined>();
-    readonly onDidChange: Event<IViewSize | undefined> = this._onDidChange
-        .event;
+    readonly onDidChange: Event<IViewSize | undefined> =
+        this._onDidChange.event;
 
     private _width = 0;
     private _height = 0;
@@ -141,8 +147,8 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     readonly onDrop: Event<GroupDropEvent> = this._onDrop.event;
 
     private readonly _onDidGroupChange = new Emitter<GroupChangeEvent>();
-    readonly onDidGroupChange: Event<{ kind: GroupChangeKind }> = this
-        ._onDidGroupChange.event;
+    readonly onDidGroupChange: Event<{ kind: GroupChangeKind }> =
+        this._onDidGroupChange.event;
 
     get element(): HTMLElement {
         throw new Error('not supported');
@@ -193,10 +199,92 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         return Number.MAX_SAFE_INTEGER;
     }
 
-    isAncestor(element: Element): boolean {
-        return (
-            element === this.contentContainer.element ||
-            isAncestor(element, this.contentContainer.element)
+    constructor(
+        private readonly container: HTMLElement,
+        private accessor: IDockviewComponent,
+        public id: string,
+        private readonly options: GroupOptions,
+        private readonly parent: GroupviewPanel
+    ) {
+        super();
+
+        this.container.classList.add('groupview');
+
+        this.addDisposables(this._onMove, this._onDidGroupChange, this._onDrop);
+
+        this.tabsContainer = new TabsContainer(this.accessor, this.parent, {
+            tabHeight: options.tabHeight,
+        });
+        this.contentContainer = new ContentContainer();
+        this.dropTarget = new Droptarget(this.contentContainer.element, {
+            isDirectional: true,
+            id: this.accessor.id,
+            isDisabled: () => {
+                // disable the drop target if we only have one tab, and that is also the tab we are moving
+                return (
+                    this._panels.length === 1 &&
+                    this.tabsContainer.hasActiveDragEvent
+                );
+            },
+            enableExternalDragEvents:
+                this.accessor.options.enableExternalDragEvents,
+        });
+
+        container.append(
+            this.tabsContainer.element,
+            this.contentContainer.element
+        );
+
+        this.addDisposables(
+            this._onMove,
+            this._onDidGroupChange,
+            this.tabsContainer.onDropEvent((event) =>
+                this.handleDropEvent(event.event, event.index)
+            ),
+            this.contentContainer.onDidFocus(() => {
+                this.accessor.doSetGroupActive(this.parent, true);
+            }),
+            this.contentContainer.onDidBlur(() => {
+                // this._activePanel?.api._ondid
+            }),
+            this.dropTarget.onDidChange((event) => {
+                // if we've center dropped on ourself then ignore
+                if (
+                    event.position === Position.Center &&
+                    this.tabsContainer.hasActiveDragEvent
+                ) {
+                    return;
+                }
+
+                this.handleDropEvent(event);
+            })
+        );
+
+        if (this.options?.panels) {
+            this.options.panels.forEach((panel) => {
+                this.doAddPanel(panel);
+            });
+        }
+
+        if (this.options?.activePanel) {
+            this.openPanel(this.options.activePanel);
+        }
+    }
+
+    initialize() {
+        // must be run after the constructor otherwise this.parent may not be
+        // correctly initialized
+        this.setActive(this.isActive, true, true);
+        this.updateContainer();
+    }
+
+    isContentFocused() {
+        if (!focusedElement.element) {
+            return false;
+        }
+        return isAncestor(
+            focusedElement.element,
+            this.contentContainer.element
         );
     }
 
@@ -284,84 +372,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
     public containsPanel(panel: IGroupPanel) {
         return this.panels.includes(panel);
-    }
-
-    constructor(
-        private readonly container: HTMLElement,
-        private accessor: IDockviewComponent,
-        public id: string,
-        private readonly options: GroupOptions,
-        private readonly parent: GroupviewPanel
-    ) {
-        super();
-
-        this.container.classList.add('groupview');
-
-        this.addDisposables(this._onMove, this._onDidGroupChange, this._onDrop);
-
-        this.tabsContainer = new TabsContainer(this.accessor, this.parent, {
-            tabHeight: options.tabHeight,
-        });
-        this.contentContainer = new ContentContainer();
-        this.dropTarget = new Droptarget(this.contentContainer.element, {
-            isDirectional: true,
-            id: this.accessor.id,
-            isDisabled: () => {
-                // disable the drop target if we only have one tab, and that is also the tab we are moving
-                return (
-                    this._panels.length === 1 &&
-                    this.tabsContainer.hasActiveDragEvent
-                );
-            },
-            enableExternalDragEvents: this.accessor.options
-                .enableExternalDragEvents,
-        });
-
-        container.append(
-            this.tabsContainer.element,
-            this.contentContainer.element
-        );
-
-        this.addDisposables(
-            this._onMove,
-            this._onDidGroupChange,
-            this.tabsContainer.onDropEvent((event) =>
-                this.handleDropEvent(event.event, event.index)
-            ),
-            this.contentContainer.onDidFocus(() => {
-                this.accessor.doSetGroupActive(this.parent, true);
-            }),
-            this.contentContainer.onDidBlur(() => {
-                // this._activePanel?.api._ondid
-            }),
-            this.dropTarget.onDidChange((event) => {
-                // if we've center dropped on ourself then ignore
-                if (
-                    event.position === Position.Center &&
-                    this.tabsContainer.hasActiveDragEvent
-                ) {
-                    return;
-                }
-
-                this.handleDropEvent(event);
-            })
-        );
-    }
-
-    bootstrap() {
-        if (this.options?.panels) {
-            this.options.panels.forEach((panel) => {
-                this.doAddPanel(panel);
-            });
-        }
-
-        if (this.options?.activePanel) {
-            this.openPanel(this.options.activePanel);
-        }
-
-        this.setActive(this.isActive, true, true);
-
-        this.updateContainer();
     }
 
     init(params: PanelInitParameters) {

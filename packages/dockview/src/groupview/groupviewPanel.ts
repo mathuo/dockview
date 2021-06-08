@@ -1,47 +1,30 @@
 import { IFrameworkPart } from '../panel/types';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
-import {
-    GridviewPanelApiImpl,
-    GridviewPanelApi,
-} from '../api/gridviewPanelApi';
+import { GridviewPanelApiImpl } from '../api/gridviewPanelApi';
 import { Groupview, GroupOptions } from './groupview';
 import { GridviewPanel } from '../gridview/gridviewPanel';
 
-interface IGroupApi extends GridviewPanelApi {}
-
-class GroupApi extends GridviewPanelApiImpl implements IGroupApi {
-    private _value?: Groupview;
-
-    set group(value: Groupview) {
-        this._value = value;
-    }
-
-    constructor(id: string) {
-        super(id);
-    }
-}
-
 export class GroupviewPanel extends GridviewPanel {
-    private readonly _group: Groupview;
+    private readonly _model: Groupview;
 
-    get group(): Groupview {
-        return this._group;
+    get model(): Groupview {
+        return this._model;
     }
 
     get minimumHeight() {
-        return this._group.minimumHeight;
+        return this._model.minimumHeight;
     }
 
     get maximumHeight() {
-        return this._group.maximumHeight;
+        return this._model.maximumHeight;
     }
 
     get minimumWidth() {
-        return this._group.minimumWidth;
+        return this._model.minimumWidth;
     }
 
     get maximumWidth() {
-        return this._group.maximumWidth;
+        return this._model.maximumWidth;
     }
 
     constructor(
@@ -49,29 +32,27 @@ export class GroupviewPanel extends GridviewPanel {
         id: string,
         options: GroupOptions
     ) {
-        super(id, 'groupview_default', new GroupApi(id));
+        super(id, 'groupview_default', new GridviewPanelApiImpl(id));
 
-        this._group = new Groupview(this.element, accessor, id, options, this);
-
-        (this.api as GroupApi).group = this._group;
-        this.group.bootstrap();
+        this._model = new Groupview(this.element, accessor, id, options, this);
+        this.model.initialize();
     }
 
     setActive(isActive: boolean): void {
         super.setActive(isActive);
-        this.group.setActive(isActive);
+        this.model.setActive(isActive);
     }
 
     layout(width: number, height: number) {
         super.layout(width, height);
-        this.group.layout(width, height);
+        this.model.layout(width, height);
     }
 
     getComponent(): IFrameworkPart {
-        return this._group;
+        return this._model;
     }
 
     toJSON(): any {
-        return this.group.toJSON();
+        return this.model.toJSON();
     }
 }

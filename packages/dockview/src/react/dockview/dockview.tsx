@@ -15,10 +15,6 @@ import { PanelCollection, PanelParameters } from '../types';
 import { watchElementResize } from '../../dom';
 import { IContentRenderer, ITabRenderer } from '../../groupview/types';
 
-export interface PanelCollection1<T extends IDockviewPanelProps> {
-    [name: string]: React.FunctionComponent<T>;
-}
-
 export interface IGroupPanelBaseProps<T extends {} = Record<string, any>>
     extends PanelParameters<T> {
     api: DockviewPanelApi;

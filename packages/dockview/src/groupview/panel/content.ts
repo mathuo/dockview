@@ -7,13 +7,6 @@ import { Emitter, Event } from '../../events';
 import { trackFocus } from '../../dom';
 import { IGroupPanel } from '../groupPanel';
 
-export interface IRenderable {
-    id: string;
-    element: HTMLElement;
-    onDidFocus?: Event<void>;
-    onDidBlur?: Event<void>;
-}
-
 export interface IContentContainer extends IDisposable {
     onDidFocus: Event<void>;
     onDidBlur: Event<void>;
@@ -25,76 +18,10 @@ export interface IContentContainer extends IDisposable {
     hide(): void;
 }
 
-export interface HostedPanelOptions {
-    id: string;
-    parent?: HTMLElement;
-}
-
-export class HostedPanel implements IRenderable, IDisposable {
-    private readonly _element: HTMLElement;
-
-    get element() {
-        return this._element;
-    }
-
-    get id() {
-        return this.panel.id;
-    }
-
-    constructor(
-        private readonly panel: IGroupPanel,
-        private readonly options: HostedPanelOptions
-    ) {
-        if (!options.parent) {
-            options.parent = document.getElementById('app') as HTMLElement;
-            options.parent.style.position = 'relative';
-        }
-
-        this._element = document.createElement('div');
-        this._element.style.visibility = 'hidden';
-        this._element.style.overflow = 'hidden';
-        // this._element.style.pointerEvents = 'none';
-        this._element.id = `webivew-${options.id}`;
-
-        options.parent.appendChild(this._element);
-    }
-
-    hide() {
-        this._element.style.visibility = 'hidden';
-    }
-
-    show() {
-        this._element.style.visibility = 'visible';
-    }
-
-    layout(
-        element: HTMLElement,
-        dimension?: { width: number; height: number }
-    ) {
-        if (!this.element || !this.element.parentElement) {
-            return;
-        }
-        const frameRect = element.getBoundingClientRect();
-        const containerRect = this.element.parentElement.getBoundingClientRect();
-        this.element.style.position = 'absolute';
-        this.element.style.top = `${frameRect.top - containerRect.top}px`;
-        this.element.style.left = `${frameRect.left - containerRect.left}px`;
-        this.element.style.width = `${
-            dimension ? dimension.width : frameRect.width
-        }px`;
-        this.element.style.height = `${
-            dimension ? dimension.height : frameRect.height
-        }px`;
-    }
-
-    dispose() {
-        this._element.remove();
-    }
-}
-
 export class ContentContainer
     extends CompositeDisposable
-    implements IContentContainer {
+    implements IContentContainer
+{
     private _element: HTMLElement;
     private panel: IGroupPanel | undefined;
     private disposable = new MutableDisposable();
@@ -145,8 +72,8 @@ export class ContentContainer
         const disposable = new CompositeDisposable();
 
         if (this.panel.view) {
-            const _onDidFocus: Event<void> = this.panel.view.content
-                .onDidFocus!;
+            const _onDidFocus: Event<void> =
+                this.panel.view.content.onDidFocus!;
             const _onDidBlur: Event<void> = this.panel.view.content.onDidBlur!;
 
             const { onDidFocus, onDidBlur } = trackFocus(this._element);

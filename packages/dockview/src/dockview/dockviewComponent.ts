@@ -135,7 +135,8 @@ export interface LayoutDropEvent {
 
 export class DockviewComponent
     extends BaseGrid<GroupviewPanel>
-    implements IDockviewComponent {
+    implements IDockviewComponent
+{
     private readonly panels = new Map<string, IValueDisposable<IGroupPanel>>();
     private readonly dirtyPanels = new Set<IGroupPanel>();
     private readonly debouncedDeque = debounce(
@@ -144,11 +145,11 @@ export class DockviewComponent
     );
     // events
     private readonly _onTabInteractionEvent = new Emitter<LayoutMouseEvent>();
-    readonly onTabInteractionEvent: Event<LayoutMouseEvent> = this
-        ._onTabInteractionEvent.event;
+    readonly onTabInteractionEvent: Event<LayoutMouseEvent> =
+        this._onTabInteractionEvent.event;
     private readonly _onTabContextMenu = new Emitter<TabContextMenuEvent>();
-    readonly onTabContextMenu: Event<TabContextMenuEvent> = this
-        ._onTabContextMenu.event;
+    readonly onTabContextMenu: Event<TabContextMenuEvent> =
+        this._onTabContextMenu.event;
     // everything else
     private drag = new MutableDisposable();
     private _deserializer: IPanelDeserializer | undefined;
@@ -270,7 +271,7 @@ export class DockviewComponent
 
                 const panel = this.panels.get(panelOptions.id)?.value;
                 if (panel) {
-                    this.drag.value = panel.group!.group.startActiveDrag(panel);
+                    this.drag.value = panel.group!.model.startActiveDrag(panel);
                 }
 
                 const data = JSON.stringify({
@@ -309,7 +310,7 @@ export class DockviewComponent
             throw new Error(`Panel ${panel.id} has no associated group`);
         }
         this.doSetGroupActive(panel.group);
-        panel.group.group.openPanel(panel);
+        panel.group.model.openPanel(panel);
     }
 
     public moveToNext(options: MovementOptions = {}): void {
@@ -322,12 +323,12 @@ export class DockviewComponent
 
         if (options.includePanel && options.group) {
             if (
-                options.group.group.activePanel !==
-                options.group.group.panels[
-                    options.group.group.panels.length - 1
+                options.group.model.activePanel !==
+                options.group.model.panels[
+                    options.group.model.panels.length - 1
                 ]
             ) {
-                options.group.group.moveToNext({ suppressRoll: true });
+                options.group.model.moveToNext({ suppressRoll: true });
                 return;
             }
         }
@@ -347,10 +348,10 @@ export class DockviewComponent
 
         if (options.includePanel && options.group) {
             if (
-                options.group.group.activePanel !==
-                options.group.group.panels[0]
+                options.group.model.activePanel !==
+                options.group.model.panels[0]
             ) {
-                options.group.group.moveToPrevious({ suppressRoll: true });
+                options.group.model.moveToPrevious({ suppressRoll: true });
                 return;
             }
         }
@@ -511,7 +512,7 @@ export class DockviewComponent
         for (const entry of this.groups.entries()) {
             const [_, group] = entry;
 
-            const didCloseAll = await group.value.group.closeAllPanels();
+            const didCloseAll = await group.value.model.closeAllPanels();
             if (!didCloseAll) {
                 return false;
             }
@@ -523,7 +524,7 @@ export class DockviewComponent
     public setTabHeight(height: number | undefined): void {
         this.options.tabHeight = height;
         this.groups.forEach((value) => {
-            value.value.group.tabHeight = height;
+            value.value.model.tabHeight = height;
         });
     }
 
@@ -569,7 +570,7 @@ export class DockviewComponent
         if (referenceGroup) {
             const target = toTarget(options.position?.direction || 'within');
             if (target === Position.Center) {
-                referenceGroup.group.openPanel(panel);
+                referenceGroup.model.openPanel(panel);
             } else {
                 const location = getGridLocation(referenceGroup.element);
                 const relativeLocation = getRelativeLocation(
@@ -652,8 +653,9 @@ export class DockviewComponent
         const group = this.createGroup();
 
         if (options) {
-            const referencePanel = this.panels.get(options.referencePanel)
-                ?.value;
+            const referencePanel = this.panels.get(
+                options.referencePanel
+            )?.value;
 
             if (!referencePanel) {
                 throw new Error(
@@ -684,9 +686,9 @@ export class DockviewComponent
     }
 
     public removeGroup(group: GroupviewPanel): void {
-        const panels = [...group.group.panels]; // reassign since group panels will mutate
+        const panels = [...group.model.panels]; // reassign since group panels will mutate
         panels.forEach((panel) => {
-            group.group.removePanel(panel);
+            group.model.removePanel(panel);
             this.unregisterPanel(panel);
         });
 
@@ -707,7 +709,7 @@ export class DockviewComponent
         group! = this.createGroup();
         this.doAddGroup(group, location);
 
-        group.group.openPanel(panel);
+        group.model.openPanel(panel);
     }
 
     public moveGroupOrPanel(
@@ -723,18 +725,18 @@ export class DockviewComponent
 
         if (!target || target === Position.Center) {
             const groupItem: IGroupPanel | undefined =
-                sourceGroup?.group.removePanel(itemId) ||
+                sourceGroup?.model.removePanel(itemId) ||
                 this.panels.get(itemId)?.value;
 
             if (!groupItem) {
                 throw new Error(`No panel with id ${itemId}`);
             }
 
-            if (sourceGroup?.group.size === 0) {
+            if (sourceGroup?.model.size === 0) {
                 this.doRemoveGroup(sourceGroup);
             }
 
-            referenceGroup.group.openPanel(groupItem, { index });
+            referenceGroup.model.openPanel(groupItem, { index });
         } else {
             const referenceLocation = getGridLocation(referenceGroup.element);
             const targetLocation = getRelativeLocation(
@@ -743,7 +745,7 @@ export class DockviewComponent
                 target
             );
 
-            if (sourceGroup && sourceGroup.group.size < 2) {
+            if (sourceGroup && sourceGroup.model.size < 2) {
                 const [targetParentLocation, to] = tail(targetLocation);
                 const sourceLocation = getGridLocation(sourceGroup.element);
                 const [sourceParentLocation, from] = tail(sourceLocation);
@@ -775,7 +777,7 @@ export class DockviewComponent
                 }
             } else {
                 const groupItem: IGroupPanel | undefined =
-                    sourceGroup?.group.removePanel(itemId) ||
+                    sourceGroup?.model.removePanel(itemId) ||
                     this.panels.get(itemId)?.value;
 
                 if (!groupItem) {
@@ -820,19 +822,19 @@ export class DockviewComponent
         const view = new GroupviewPanel(this, id, options);
 
         if (typeof this.options.tabHeight === 'number') {
-            view.group.tabHeight = this.options.tabHeight;
+            view.model.tabHeight = this.options.tabHeight;
         }
 
         if (!this.groups.has(view.id)) {
             const disposable = new CompositeDisposable(
-                view.group.onMove((event) => {
+                view.model.onMove((event) => {
                     const { groupId, itemId, target, index } = event;
                     this.moveGroupOrPanel(view, groupId, itemId, target, index);
                 }),
-                view.group.onDidGroupChange((event) => {
+                view.model.onDidGroupChange((event) => {
                     this._onGridEvent.fire(event);
                 }),
-                view.group.onDrop((event) => {
+                view.model.onDrop((event) => {
                     const dragEvent = event.event;
                     const dataTransfer = dragEvent.dataTransfer;
 
@@ -883,7 +885,7 @@ export class DockviewComponent
 
     private findGroup(panel: IGroupPanel): GroupviewPanel | undefined {
         return Array.from(this.groups.values()).find((group) =>
-            group.value.group.containsPanel(panel)
+            group.value.model.containsPanel(panel)
         )?.value;
     }
 

@@ -8,7 +8,6 @@ import { ITab, MouseEventKind, Tab } from '../tab';
 import { removeClasses, addClasses } from '../../dom';
 import { DroptargetEvent, Position } from '../../dnd/droptarget';
 import { last } from '../../array';
-import { focusedElement } from '../../focusedElement';
 import { IGroupPanel } from '../groupPanel';
 import { IDockviewComponent } from '../../dockview/dockviewComponent';
 import { LocalSelectionTransfer } from '../../dnd/dataTransfer';
@@ -40,7 +39,8 @@ export interface ITabsContainer extends IDisposable {
 
 export class TabsContainer
     extends CompositeDisposable
-    implements ITabsContainer {
+    implements ITabsContainer
+{
     private readonly _element: HTMLElement;
     private readonly tabContainer: HTMLElement;
     private readonly actionContainer: HTMLElement;
@@ -281,8 +281,8 @@ export class TabsContainer
         const disposable = CompositeDisposable.from(
             tabToAdd.onChanged((event) => {
                 const alreadyFocused =
-                    panel.id === this.group.group.activePanel?.id &&
-                    this.group.group.isAncestor(focusedElement.element!);
+                    panel.id === this.group.model.activePanel?.id &&
+                    this.group.model.isContentFocused();
                 this.accessor.fireMouseEvent({ ...event, panel, tab: true });
 
                 const isLeftClick = event.event.button === 0;
@@ -293,7 +293,7 @@ export class TabsContainer
 
                 switch (event.kind) {
                     case MouseEventKind.CLICK:
-                        this.group.group.openPanel(panel, {
+                        this.group.model.openPanel(panel, {
                             skipFocus: alreadyFocused,
                         });
                         break;

@@ -35,7 +35,8 @@ export interface IGridviewPanel
 
 export abstract class GridviewPanel
     extends BasePanelView<GridviewPanelApiImpl>
-    implements IGridPanelComponentView, IGridviewPanel {
+    implements IGridPanelComponentView, IGridviewPanel
+{
     private _evaluatedMinimumWidth = 0;
     private _evaluatedMaximumWidth = Number.MAX_SAFE_INTEGER;
     private _evaluatedMinimumHeight = 0;
@@ -49,8 +50,8 @@ export abstract class GridviewPanel
     private _snap = false;
 
     private readonly _onDidChange = new Emitter<IViewSize | undefined>();
-    readonly onDidChange: Event<IViewSize | undefined> = this._onDidChange
-        .event;
+    readonly onDidChange: Event<IViewSize | undefined> =
+        this._onDidChange.event;
 
     get priority(): LayoutPriority | undefined {
         return this._priority;

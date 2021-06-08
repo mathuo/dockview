@@ -7,6 +7,13 @@ import { GroupviewPanel } from './groupviewPanel';
 import { Event } from '../events';
 import { WrappedTab } from '../dockview/components/tab/defaultTab';
 
+export interface IRenderable {
+    id: string;
+    element: HTMLElement;
+    onDidFocus?: Event<void>;
+    onDidBlur?: Event<void>;
+}
+
 export interface HeaderPartInitParameters {
     title: string;
     suppressClosable?: boolean;

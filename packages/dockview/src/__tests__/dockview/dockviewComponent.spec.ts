@@ -89,28 +89,28 @@ describe('dockviewComponent', () => {
         dockview.moveGroupOrPanel(group2, group1.id, 'panel3', Position.Center);
 
         expect(dockview.activeGroup).toBe(group2);
-        expect(dockview.activeGroup.group.activePanel).toBe(panel3);
-        expect(dockview.activeGroup.group.indexOf(panel3)).toBe(1);
+        expect(dockview.activeGroup.model.activePanel).toBe(panel3);
+        expect(dockview.activeGroup.model.indexOf(panel3)).toBe(1);
 
         dockview.moveToPrevious({ includePanel: true });
         expect(dockview.activeGroup).toBe(group2);
-        expect(dockview.activeGroup.group.activePanel).toBe(panel1);
+        expect(dockview.activeGroup.model.activePanel).toBe(panel1);
 
         dockview.moveToNext({ includePanel: true });
         expect(dockview.activeGroup).toBe(group2);
-        expect(dockview.activeGroup.group.activePanel).toBe(panel3);
+        expect(dockview.activeGroup.model.activePanel).toBe(panel3);
 
         dockview.moveToPrevious({ includePanel: false });
         expect(dockview.activeGroup).toBe(group1);
-        expect(dockview.activeGroup.group.activePanel).toBe(panel4);
+        expect(dockview.activeGroup.model.activePanel).toBe(panel4);
 
         dockview.moveToPrevious({ includePanel: true });
         expect(dockview.activeGroup).toBe(group1);
-        expect(dockview.activeGroup.group.activePanel).toBe(panel2);
+        expect(dockview.activeGroup.model.activePanel).toBe(panel2);
 
         dockview.moveToNext({ includePanel: false });
         expect(dockview.activeGroup).toBe(group2);
-        expect(dockview.activeGroup.group.activePanel).toBe(panel3);
+        expect(dockview.activeGroup.model.activePanel).toBe(panel3);
     });
 
     test('remove group', () => {
@@ -142,8 +142,8 @@ describe('dockviewComponent', () => {
 
         expect(dockview.size).toBe(2);
         expect(dockview.totalPanels).toBe(4);
-        expect(panel1.group.group.size).toBe(2);
-        expect(panel2.group.group.size).toBe(2);
+        expect(panel1.group.model.size).toBe(2);
+        expect(panel2.group.model.size).toBe(2);
 
         dockview.removeGroup(panel1.group);
 
@@ -263,13 +263,13 @@ describe('dockviewComponent', () => {
 
         const group = panel1.group;
 
-        expect(group.group.size).toBe(2);
-        expect(group.group.containsPanel(panel1)).toBeTruthy();
-        expect(group.group.containsPanel(panel2)).toBeTruthy();
-        expect(group.group.activePanel).toBe(panel2);
+        expect(group.model.size).toBe(2);
+        expect(group.model.containsPanel(panel1)).toBeTruthy();
+        expect(group.model.containsPanel(panel2)).toBeTruthy();
+        expect(group.model.activePanel).toBe(panel2);
 
-        expect(group.group.indexOf(panel1)).toBe(0);
-        expect(group.group.indexOf(panel2)).toBe(1);
+        expect(group.model.indexOf(panel1)).toBe(0);
+        expect(group.model.indexOf(panel2)).toBe(1);
 
         dockview.moveGroupOrPanel(group, group.id, 'panel1', Position.Right);
 
@@ -277,12 +277,12 @@ describe('dockviewComponent', () => {
         expect(dockview.totalPanels).toBe(2);
 
         expect(panel1.group).not.toBe(panel2.group);
-        expect(panel1.group.group.size).toBe(1);
-        expect(panel2.group.group.size).toBe(1);
-        expect(panel1.group.group.containsPanel(panel1)).toBeTruthy();
-        expect(panel2.group.group.containsPanel(panel2)).toBeTruthy();
-        expect(panel1.group.group.activePanel).toBe(panel1);
-        expect(panel2.group.group.activePanel).toBe(panel2);
+        expect(panel1.group.model.size).toBe(1);
+        expect(panel2.group.model.size).toBe(1);
+        expect(panel1.group.model.containsPanel(panel1)).toBeTruthy();
+        expect(panel2.group.model.containsPanel(panel2)).toBeTruthy();
+        expect(panel1.group.model.activePanel).toBe(panel1);
+        expect(panel2.group.model.activePanel).toBe(panel2);
 
         await panel1.api.close();
 
