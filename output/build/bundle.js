@@ -33206,7 +33206,7 @@ class DockviewPanelApiImpl extends _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1_
         if (!this.group) {
             throw new Error(`panel ${this.id} has no group`);
         }
-        return this.group.group.closePanel(this.panel);
+        return this.group.model.closePanel(this.panel);
     }
     interceptOnCloseAction(interceptor) {
         this._interceptor = interceptor;
@@ -34197,11 +34197,9 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         this.debouncedDeque = (0,_functions__WEBPACK_IMPORTED_MODULE_8__.debounce)(this.syncConfigs.bind(this), 5000);
         // events
         this._onTabInteractionEvent = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
-        this.onTabInteractionEvent = this
-            ._onTabInteractionEvent.event;
+        this.onTabInteractionEvent = this._onTabInteractionEvent.event;
         this._onTabContextMenu = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
-        this.onTabContextMenu = this
-            ._onTabContextMenu.event;
+        this.onTabContextMenu = this._onTabContextMenu.event;
         // everything else
         this.drag = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.MutableDisposable();
         this.panelState = {};
@@ -34280,7 +34278,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             const panelOptions = typeof options === 'function' ? options() : options;
             const panel = (_a = this.panels.get(panelOptions.id)) === null || _a === void 0 ? void 0 : _a.value;
             if (panel) {
-                this.drag.value = panel.group.group.startActiveDrag(panel);
+                this.drag.value = panel.group.model.startActiveDrag(panel);
             }
             const data = JSON.stringify(Object.assign({ type: _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_12__.DragType.EXTERNAL }, panelOptions));
             _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_12__.LocalSelectionTransfer.getInstance().setData([data], this.id);
@@ -34303,7 +34301,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             throw new Error(`Panel ${panel.id} has no associated group`);
         }
         this.doSetGroupActive(panel.group);
-        panel.group.group.openPanel(panel);
+        panel.group.model.openPanel(panel);
     }
     moveToNext(options = {}) {
         var _a;
@@ -34314,9 +34312,9 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             options.group = this.activeGroup;
         }
         if (options.includePanel && options.group) {
-            if (options.group.group.activePanel !==
-                options.group.group.panels[options.group.group.panels.length - 1]) {
-                options.group.group.moveToNext({ suppressRoll: true });
+            if (options.group.model.activePanel !==
+                options.group.model.panels[options.group.model.panels.length - 1]) {
+                options.group.model.moveToNext({ suppressRoll: true });
                 return;
             }
         }
@@ -34333,9 +34331,9 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             options.group = this.activeGroup;
         }
         if (options.includePanel && options.group) {
-            if (options.group.group.activePanel !==
-                options.group.group.panels[0]) {
-                options.group.group.moveToPrevious({ suppressRoll: true });
+            if (options.group.model.activePanel !==
+                options.group.model.panels[0]) {
+                options.group.model.moveToPrevious({ suppressRoll: true });
                 return;
             }
         }
@@ -34456,7 +34454,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         return __awaiter(this, void 0, void 0, function* () {
             for (const entry of this.groups.entries()) {
                 const [_, group] = entry;
-                const didCloseAll = yield group.value.group.closeAllPanels();
+                const didCloseAll = yield group.value.model.closeAllPanels();
                 if (!didCloseAll) {
                     return false;
                 }
@@ -34468,7 +34466,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
     setTabHeight(height) {
         this.options.tabHeight = height;
         this.groups.forEach((value) => {
-            value.value.group.tabHeight = height;
+            value.value.model.tabHeight = height;
         });
     }
     getTabHeight() {
@@ -34504,7 +34502,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         if (referenceGroup) {
             const target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_13__.toTarget)(((_b = options.position) === null || _b === void 0 ? void 0 : _b.direction) || 'within');
             if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
-                referenceGroup.group.openPanel(panel);
+                referenceGroup.model.openPanel(panel);
             }
             else {
                 const location = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
@@ -34570,9 +34568,9 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         }
     }
     removeGroup(group) {
-        const panels = [...group.group.panels]; // reassign since group panels will mutate
+        const panels = [...group.model.panels]; // reassign since group panels will mutate
         panels.forEach((panel) => {
-            group.group.removePanel(panel);
+            group.model.removePanel(panel);
             this.unregisterPanel(panel);
         });
         if (this.groups.size === 1) {
@@ -34585,7 +34583,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         let group;
         group = this.createGroup();
         this.doAddGroup(group, location);
-        group.group.openPanel(panel);
+        group.model.openPanel(panel);
     }
     moveGroupOrPanel(referenceGroup, groupId, itemId, target, index) {
         var _a, _b, _c;
@@ -34593,20 +34591,20 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             ? (_a = this.groups.get(groupId)) === null || _a === void 0 ? void 0 : _a.value
             : undefined;
         if (!target || target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
-            const groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.group.removePanel(itemId)) ||
+            const groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.model.removePanel(itemId)) ||
                 ((_b = this.panels.get(itemId)) === null || _b === void 0 ? void 0 : _b.value);
             if (!groupItem) {
                 throw new Error(`No panel with id ${itemId}`);
             }
-            if ((sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.group.size) === 0) {
+            if ((sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.model.size) === 0) {
                 this.doRemoveGroup(sourceGroup);
             }
-            referenceGroup.group.openPanel(groupItem, { index });
+            referenceGroup.model.openPanel(groupItem, { index });
         }
         else {
             const referenceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
             const targetLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
-            if (sourceGroup && sourceGroup.group.size < 2) {
+            if (sourceGroup && sourceGroup.model.size < 2) {
                 const [targetParentLocation, to] = (0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(targetLocation);
                 const sourceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(sourceGroup.element);
                 const [sourceParentLocation, from] = (0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(sourceLocation);
@@ -34629,7 +34627,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
                 }
             }
             else {
-                const groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.group.removePanel(itemId)) ||
+                const groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.model.removePanel(itemId)) ||
                     ((_c = this.panels.get(itemId)) === null || _c === void 0 ? void 0 : _c.value);
                 if (!groupItem) {
                     throw new Error(`No panel with id ${itemId}`);
@@ -34659,15 +34657,15 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         }
         const view = new _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_19__.GroupviewPanel(this, id, options);
         if (typeof this.options.tabHeight === 'number') {
-            view.group.tabHeight = this.options.tabHeight;
+            view.model.tabHeight = this.options.tabHeight;
         }
         if (!this.groups.has(view.id)) {
-            const disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.CompositeDisposable(view.group.onMove((event) => {
+            const disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.CompositeDisposable(view.model.onMove((event) => {
                 const { groupId, itemId, target, index } = event;
                 this.moveGroupOrPanel(view, groupId, itemId, target, index);
-            }), view.group.onDidGroupChange((event) => {
+            }), view.model.onDidGroupChange((event) => {
                 this._onGridEvent.fire(event);
-            }), view.group.onDrop((event) => {
+            }), view.model.onDrop((event) => {
                 var _a;
                 const dragEvent = event.event;
                 const dataTransfer = dragEvent.dataTransfer;
@@ -34698,7 +34696,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
     }
     findGroup(panel) {
         var _a;
-        return (_a = Array.from(this.groups.values()).find((group) => group.value.group.containsPanel(panel))) === null || _a === void 0 ? void 0 : _a.value;
+        return (_a = Array.from(this.groups.values()).find((group) => group.value.model.containsPanel(panel))) === null || _a === void 0 ? void 0 : _a.value;
     }
     addDirtyPanel(panel) {
         this.dirtyPanels.add(panel);
@@ -34826,10 +34824,10 @@ class DockviewGroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.Composi
         var _a;
         this._group = group;
         this.api.group = group;
-        this.mutableDisposable.value = this._group.group.onDidGroupChange((ev) => {
+        this.mutableDisposable.value = this._group.model.onDidGroupChange((ev) => {
             var _a;
             if (ev.kind === _groupview_groupview__WEBPACK_IMPORTED_MODULE_1__.GroupChangeKind.GROUP_ACTIVE) {
-                const isVisible = !!((_a = this._group) === null || _a === void 0 ? void 0 : _a.group.isPanelActive(this));
+                const isVisible = !!((_a = this._group) === null || _a === void 0 ? void 0 : _a.model.isPanelActive(this));
                 this.api._onDidActiveChange.fire({
                     isActive: isGroupActive && isVisible,
                 });
@@ -34838,21 +34836,21 @@ class DockviewGroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.Composi
                 });
             }
         });
-        const isPanelVisible = this._group.group.isPanelActive(this);
+        const isPanelVisible = this._group.model.isPanelActive(this);
         this.api._onDidActiveChange.fire({
             isActive: isGroupActive && isPanelVisible,
         });
         this.api._onDidVisibilityChange.fire({
             isVisible: isPanelVisible,
         });
-        (_a = this.view) === null || _a === void 0 ? void 0 : _a.updateParentGroup(this._group, this._group.group.isPanelActive(this));
+        (_a = this.view) === null || _a === void 0 ? void 0 : _a.updateParentGroup(this._group, this._group.model.isPanelActive(this));
     }
     layout(width, height) {
         var _a, _b;
         // the obtain the correct dimensions of the content panel we must deduct the tab height
         this.api._onDidPanelDimensionChange.fire({
             width,
-            height: height - (((_a = this.group) === null || _a === void 0 ? void 0 : _a.group.tabHeight) || 0),
+            height: height - (((_a = this.group) === null || _a === void 0 ? void 0 : _a.model.tabHeight) || 0),
         });
         (_b = this.view) === null || _b === void 0 ? void 0 : _b.layout(width, height);
     }
@@ -35454,8 +35452,10 @@ class BasePanelView extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDis
         this._width = width;
         this._height = height;
         this.api._onDidPanelDimensionChange.fire({ width, height });
-        if (this.part && this.params) {
-            this.part.update(this.params.params);
+        if (this.part) {
+            if (this.params) {
+                this.part.update(this.params.params);
+            }
         }
     }
     init(parameters) {
@@ -36433,8 +36433,7 @@ class GridviewPanel extends _basePanelView__WEBPACK_IMPORTED_MODULE_0__.BasePane
         this._maximumHeight = Number.MAX_SAFE_INTEGER;
         this._snap = false;
         this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
-        this.onDidChange = this._onDidChange
-            .event;
+        this.onDidChange = this._onDidChange.event;
         this.addDisposables(this.api.onVisibilityChange((event) => {
             const { isVisible } = event;
             const { containerApi } = this.params;
@@ -36712,6 +36711,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
 /* harmony import */ var _panel_content__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./panel/content */ "../dockview/dist/esm/groupview/panel/content.js");
 /* harmony import */ var _titlebar_tabsContainer__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./titlebar/tabsContainer */ "../dockview/dist/esm/groupview/titlebar/tabsContainer.js");
+/* harmony import */ var _focusedElement__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../focusedElement */ "../dockview/dist/esm/focusedElement.js");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36721,6 +36721,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+
 
 
 
@@ -36754,6 +36755,7 @@ var GroupChangeKind;
 })(GroupChangeKind || (GroupChangeKind = {}));
 class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposable {
     constructor(container, accessor, id, options, parent) {
+        var _a, _b;
         super();
         this.container = container;
         this.accessor = accessor;
@@ -36763,8 +36765,7 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
         this._isGroupActive = false;
         this.mostRecentlyUsed = [];
         this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
-        this.onDidChange = this._onDidChange
-            .event;
+        this.onDidChange = this._onDidChange.event;
         this._width = 0;
         this._height = 0;
         this._panels = [];
@@ -36773,8 +36774,7 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
         this._onDrop = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
         this.onDrop = this._onDrop.event;
         this._onDidGroupChange = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
-        this.onDidGroupChange = this
-            ._onDidGroupChange.event;
+        this.onDidGroupChange = this._onDidGroupChange.event;
         this.closePanel = (panel) => __awaiter(this, void 0, void 0, function* () {
             if (panel.close && !(yield panel.close())) {
                 return false;
@@ -36796,8 +36796,7 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
                 return (this._panels.length === 1 &&
                     this.tabsContainer.hasActiveDragEvent);
             },
-            enableExternalDragEvents: this.accessor.options
-                .enableExternalDragEvents,
+            enableExternalDragEvents: this.accessor.options.enableExternalDragEvents,
         });
         container.append(this.tabsContainer.element, this.contentContainer.element);
         this.addDisposables(this._onMove, this._onDidGroupChange, this.tabsContainer.onDropEvent((event) => this.handleDropEvent(event.event, event.index)), this.contentContainer.onDidFocus(() => {
@@ -36812,6 +36811,14 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
             }
             this.handleDropEvent(event);
         }));
+        if ((_a = this.options) === null || _a === void 0 ? void 0 : _a.panels) {
+            this.options.panels.forEach((panel) => {
+                this.doAddPanel(panel);
+            });
+        }
+        if ((_b = this.options) === null || _b === void 0 ? void 0 : _b.activePanel) {
+            this.openPanel(this.options.activePanel);
+        }
     }
     get element() {
         throw new Error('not supported');
@@ -36850,9 +36857,17 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
     get maximumWidth() {
         return Number.MAX_SAFE_INTEGER;
     }
-    isAncestor(element) {
-        return (element === this.contentContainer.element ||
-            (0,_dom__WEBPACK_IMPORTED_MODULE_4__.isAncestor)(element, this.contentContainer.element));
+    initialize() {
+        // must be run after the constructor otherwise this.parent may not be
+        // correctly initialized
+        this.setActive(this.isActive, true, true);
+        this.updateContainer();
+    }
+    isContentFocused() {
+        if (!_focusedElement__WEBPACK_IMPORTED_MODULE_9__.focusedElement.element) {
+            return false;
+        }
+        return (0,_dom__WEBPACK_IMPORTED_MODULE_4__.isAncestor)(_focusedElement__WEBPACK_IMPORTED_MODULE_9__.focusedElement.element, this.contentContainer.element);
     }
     indexOf(panel) {
         return this.tabsContainer.indexOf(panel.id);
@@ -36923,19 +36938,6 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
     }
     containsPanel(panel) {
         return this.panels.includes(panel);
-    }
-    bootstrap() {
-        var _a, _b;
-        if ((_a = this.options) === null || _a === void 0 ? void 0 : _a.panels) {
-            this.options.panels.forEach((panel) => {
-                this.doAddPanel(panel);
-            });
-        }
-        if ((_b = this.options) === null || _b === void 0 ? void 0 : _b.activePanel) {
-            this.openPanel(this.options.activePanel);
-        }
-        this.setActive(this.isActive, true, true);
-        this.updateContainer();
     }
     init(params) {
         //noop
@@ -37235,49 +37237,40 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-class GroupApi extends _api_gridviewPanelApi__WEBPACK_IMPORTED_MODULE_0__.GridviewPanelApiImpl {
-    constructor(id) {
-        super(id);
-    }
-    set group(value) {
-        this._value = value;
-    }
-}
 class GroupviewPanel extends _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_2__.GridviewPanel {
     constructor(accessor, id, options) {
-        super(id, 'groupview_default', new GroupApi(id));
-        this._group = new _groupview__WEBPACK_IMPORTED_MODULE_1__.Groupview(this.element, accessor, id, options, this);
-        this.api.group = this._group;
-        this.group.bootstrap();
+        super(id, 'groupview_default', new _api_gridviewPanelApi__WEBPACK_IMPORTED_MODULE_0__.GridviewPanelApiImpl(id));
+        this._model = new _groupview__WEBPACK_IMPORTED_MODULE_1__.Groupview(this.element, accessor, id, options, this);
+        this.model.initialize();
     }
-    get group() {
-        return this._group;
+    get model() {
+        return this._model;
     }
     get minimumHeight() {
-        return this._group.minimumHeight;
+        return this._model.minimumHeight;
     }
     get maximumHeight() {
-        return this._group.maximumHeight;
+        return this._model.maximumHeight;
     }
     get minimumWidth() {
-        return this._group.minimumWidth;
+        return this._model.minimumWidth;
     }
     get maximumWidth() {
-        return this._group.maximumWidth;
+        return this._model.maximumWidth;
     }
     setActive(isActive) {
         super.setActive(isActive);
-        this.group.setActive(isActive);
+        this.model.setActive(isActive);
     }
     layout(width, height) {
         super.layout(width, height);
-        this.group.layout(width, height);
+        this.model.layout(width, height);
     }
     getComponent() {
-        return this._group;
+        return this._model;
     }
     toJSON() {
-        return this.group.toJSON();
+        return this.model.toJSON();
     }
 }
 
@@ -37293,7 +37286,6 @@ class GroupviewPanel extends _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_2_
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "HostedPanel": () => (/* binding */ HostedPanel),
 /* harmony export */   "ContentContainer": () => (/* binding */ ContentContainer)
 /* harmony export */ });
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lifecycle */ "../dockview/dist/esm/lifecycle.js");
@@ -37302,49 +37294,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-class HostedPanel {
-    constructor(panel, options) {
-        this.panel = panel;
-        this.options = options;
-        if (!options.parent) {
-            options.parent = document.getElementById('app');
-            options.parent.style.position = 'relative';
-        }
-        this._element = document.createElement('div');
-        this._element.style.visibility = 'hidden';
-        this._element.style.overflow = 'hidden';
-        // this._element.style.pointerEvents = 'none';
-        this._element.id = `webivew-${options.id}`;
-        options.parent.appendChild(this._element);
-    }
-    get element() {
-        return this._element;
-    }
-    get id() {
-        return this.panel.id;
-    }
-    hide() {
-        this._element.style.visibility = 'hidden';
-    }
-    show() {
-        this._element.style.visibility = 'visible';
-    }
-    layout(element, dimension) {
-        if (!this.element || !this.element.parentElement) {
-            return;
-        }
-        const frameRect = element.getBoundingClientRect();
-        const containerRect = this.element.parentElement.getBoundingClientRect();
-        this.element.style.position = 'absolute';
-        this.element.style.top = `${frameRect.top - containerRect.top}px`;
-        this.element.style.left = `${frameRect.left - containerRect.left}px`;
-        this.element.style.width = `${dimension ? dimension.width : frameRect.width}px`;
-        this.element.style.height = `${dimension ? dimension.height : frameRect.height}px`;
-    }
-    dispose() {
-        this._element.remove();
-    }
-}
 class ContentContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable {
     constructor() {
         super();
@@ -37385,8 +37334,7 @@ class ContentContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composite
         this.panel = panel;
         const disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable();
         if (this.panel.view) {
-            const _onDidFocus = this.panel.view.content
-                .onDidFocus;
+            const _onDidFocus = this.panel.view.content.onDidFocus;
             const _onDidBlur = this.panel.view.content.onDidBlur;
             const { onDidFocus, onDidBlur } = (0,_dom__WEBPACK_IMPORTED_MODULE_2__.trackFocus)(this._element);
             disposable.addDisposables(onDidFocus(() => this._onDidFocus.fire()), onDidBlur(() => this._onDidBlur.fire()));
@@ -37594,9 +37542,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../dom */ "../dockview/dist/esm/dom.js");
 /* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../dnd/droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
 /* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../array */ "../dockview/dist/esm/array.js");
-/* harmony import */ var _focusedElement__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../focusedElement */ "../dockview/dist/esm/focusedElement.js");
-/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../dnd/dataTransfer */ "../dockview/dist/esm/dnd/dataTransfer.js");
-
+/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../dnd/dataTransfer */ "../dockview/dist/esm/dnd/dataTransfer.js");
 
 
 
@@ -37634,7 +37580,7 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
             }
         }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.tabContainer, 'dragenter', (event) => {
             var _a;
-            if (!_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_7__.LocalSelectionTransfer.getInstance().hasData(this.accessor.id)) {
+            if (!_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_6__.LocalSelectionTransfer.getInstance().hasData(this.accessor.id)) {
                 console.debug('[tabs] invalid drop event');
                 return;
             }
@@ -37646,7 +37592,7 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
         }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.tabContainer, 'dragleave', (event) => {
             (0,_dom__WEBPACK_IMPORTED_MODULE_3__.removeClasses)(this.tabContainer, 'drag-over-target');
         }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.tabContainer, 'drop', (event) => {
-            if (!_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_7__.LocalSelectionTransfer.getInstance().hasData(this.accessor.id)) {
+            if (!_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_6__.LocalSelectionTransfer.getInstance().hasData(this.accessor.id)) {
                 console.debug('[tabs] invalid drop event');
                 return;
             }
@@ -37768,8 +37714,8 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
         tabToAdd.setContent(panel.view.tab);
         const disposable = _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable.from(tabToAdd.onChanged((event) => {
             var _a;
-            const alreadyFocused = panel.id === ((_a = this.group.group.activePanel) === null || _a === void 0 ? void 0 : _a.id) &&
-                this.group.group.isAncestor(_focusedElement__WEBPACK_IMPORTED_MODULE_6__.focusedElement.element);
+            const alreadyFocused = panel.id === ((_a = this.group.model.activePanel) === null || _a === void 0 ? void 0 : _a.id) &&
+                this.group.model.isContentFocused();
             this.accessor.fireMouseEvent(Object.assign(Object.assign({}, event), { panel, tab: true }));
             const isLeftClick = event.event.button === 0;
             if (!isLeftClick || event.event.defaultPrevented) {
@@ -37777,7 +37723,7 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
             }
             switch (event.kind) {
                 case _tab__WEBPACK_IMPORTED_MODULE_2__.MouseEventKind.CLICK:
-                    this.group.group.openPanel(panel, {
+                    this.group.model.openPanel(panel, {
                         skipFocus: alreadyFocused,
                     });
                     break;
@@ -37849,7 +37795,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "GroupChangeKind": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_6__.GroupChangeKind),
 /* harmony export */   "Groupview": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_6__.Groupview),
 /* harmony export */   "ContentContainer": () => (/* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_7__.ContentContainer),
-/* harmony export */   "HostedPanel": () => (/* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_7__.HostedPanel),
 /* harmony export */   "MouseEventKind": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_8__.MouseEventKind),
 /* harmony export */   "Tab": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_8__.Tab),
 /* harmony export */   "Emitter": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_9__.Emitter),
