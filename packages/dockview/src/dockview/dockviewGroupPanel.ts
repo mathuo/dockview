@@ -15,7 +15,8 @@ import { IGroupPanelView } from './defaultGroupPanelView';
 
 export class DockviewGroupPanel
     extends CompositeDisposable
-    implements IGroupPanel {
+    implements IGroupPanel
+{
     private readonly mutableDisposable = new MutableDisposable();
 
     readonly api: DockviewPanelApiImpl;
@@ -71,8 +72,8 @@ export class DockviewGroupPanel
         this._params = params.params;
         this._view = params.view;
 
-        this._title = params.title;
-        this._suppressClosable = params.suppressClosable || false;
+        this.setTitle(params.title);
+        this.setSuppressClosable(params.suppressClosable || false);
 
         if (params.state) {
             this.api.setState(params.state);
@@ -119,29 +120,41 @@ export class DockviewGroupPanel
         return objectState;
     }
 
+    setTitle(title: string) {
+        const didTitleChange = title !== this._params?.title;
+
+        if (didTitleChange) {
+            this._title = title;
+            this.api._titleChanged.fire({ title: this.title });
+        }
+    }
+
+    setSuppressClosable(suppressClosable: boolean) {
+        const didSuppressChangableClose =
+            suppressClosable !== this._params?.suppressClosable;
+
+        if (didSuppressChangableClose) {
+            this._suppressClosable = suppressClosable;
+            this.api._suppressClosableChanged.fire({
+                suppressClosable: !!this.suppressClosable,
+            });
+        }
+    }
+
     public update(event: GroupPanelUpdateEvent): void {
         const params = event.params as IGroupPanelInitParameters;
-
-        const didTitleChange =
-            typeof params.title === 'string' &&
-            params.title !== this._params?.title;
-        const didSuppressChangableClose =
-            typeof params.suppressClosable === 'boolean' &&
-            params.suppressClosable !== this._params?.suppressClosable;
 
         this._params = {
             ...(this._params || {}),
             ...event.params.params,
         };
 
-        if (didTitleChange) {
-            this.api._titleChanged.fire({ title: params.title });
+        if (typeof params.title === 'string') {
+            this.setTitle(params.title);
         }
 
-        if (didSuppressChangableClose) {
-            this.api._suppressClosableChanged.fire({
-                suppressClosable: !!params.suppressClosable,
-            });
+        if (typeof params.suppressClosable === 'boolean') {
+            this.setSuppressClosable(params.suppressClosable);
         }
 
         this.view?.update({
