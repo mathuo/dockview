@@ -34763,8 +34763,8 @@ class DockviewGroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.Composi
         var _a;
         this._params = params.params;
         this._view = params.view;
-        this._title = params.title;
-        this._suppressClosable = params.suppressClosable || false;
+        this.setTitle(params.title);
+        this.setSuppressClosable(params.suppressClosable || false);
         if (params.state) {
             this.api.setState(params.state);
         }
@@ -34796,23 +34796,35 @@ class DockviewGroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.Composi
         };
         return objectState;
     }
-    update(event) {
-        var _a, _b, _c;
-        const params = event.params;
-        const didTitleChange = typeof params.title === 'string' &&
-            params.title !== ((_a = this._params) === null || _a === void 0 ? void 0 : _a.title);
-        const didSuppressChangableClose = typeof params.suppressClosable === 'boolean' &&
-            params.suppressClosable !== ((_b = this._params) === null || _b === void 0 ? void 0 : _b.suppressClosable);
-        this._params = Object.assign(Object.assign({}, (this._params || {})), event.params.params);
+    setTitle(title) {
+        var _a;
+        const didTitleChange = title !== ((_a = this._params) === null || _a === void 0 ? void 0 : _a.title);
         if (didTitleChange) {
-            this.api._titleChanged.fire({ title: params.title });
+            this._title = title;
+            this.api._titleChanged.fire({ title: this.title });
         }
+    }
+    setSuppressClosable(suppressClosable) {
+        var _a;
+        const didSuppressChangableClose = suppressClosable !== ((_a = this._params) === null || _a === void 0 ? void 0 : _a.suppressClosable);
         if (didSuppressChangableClose) {
+            this._suppressClosable = suppressClosable;
             this.api._suppressClosableChanged.fire({
-                suppressClosable: !!params.suppressClosable,
+                suppressClosable: !!this.suppressClosable,
             });
         }
-        (_c = this.view) === null || _c === void 0 ? void 0 : _c.update({
+    }
+    update(event) {
+        var _a;
+        const params = event.params;
+        this._params = Object.assign(Object.assign({}, (this._params || {})), event.params.params);
+        if (typeof params.title === 'string') {
+            this.setTitle(params.title);
+        }
+        if (typeof params.suppressClosable === 'boolean') {
+            this.setSuppressClosable(params.suppressClosable);
+        }
+        (_a = this.view) === null || _a === void 0 ? void 0 : _a.update({
             params: {
                 params: this._params,
                 title: this.title,
