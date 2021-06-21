@@ -7,7 +7,7 @@ import { Position } from '../dnd/droptarget';
 import { tail, sequenceEquals } from '../array';
 import { CompositeDisposable } from '../lifecycle';
 import { IPanelDeserializer } from '../dockview/deserializer';
-import { GridComponentOptions } from './options';
+import { GridviewComponentOptions } from './options';
 import {
     BaseGrid,
     Direction,
@@ -59,8 +59,14 @@ export interface IGridPanelComponentView extends IGridPanelView {
     init: (params: GridviewInitParameters) => void;
 }
 
+export type GridviewComponentUpdateOptions = Pick<
+    GridviewComponentOptions,
+    'orientation' | 'components' | 'frameworkComponents'
+>;
+
 export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
-    orientation: Orientation;
+    readonly orientation: Orientation;
+    updateOptions(options: GridviewComponentUpdateOptions): void;
     addPanel(options: AddComponentOptions): void;
     removePanel(panel: IGridviewPanel, sizing?: Sizing): void;
     toggleVisibility(panel: IGridviewPanel): void;
@@ -80,18 +86,39 @@ export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
 
 export class GridviewComponent
     extends BaseGrid<GridviewPanel>
-    implements IGridviewComponent {
+    implements IGridviewComponent
+{
+    private _options: GridviewComponentOptions;
     private _deserializer: IPanelDeserializer | undefined;
 
-    constructor(
-        element: HTMLElement,
-        private readonly options: GridComponentOptions
-    ) {
+    get orientation() {
+        return this.gridview.orientation;
+    }
+
+    set orientation(value: Orientation) {
+        this.gridview.orientation = value;
+    }
+
+    get options() {
+        return this._options;
+    }
+
+    get deserializer(): IPanelDeserializer | undefined {
+        return this._deserializer;
+    }
+
+    set deserializer(value: IPanelDeserializer | undefined) {
+        this._deserializer = value;
+    }
+
+    constructor(element: HTMLElement, options: GridviewComponentOptions) {
         super(element, {
             proportionalLayout: options.proportionalLayout,
             orientation: options.orientation,
             styles: options.styles,
         });
+
+        this._options = options;
 
         if (!this.options.components) {
             this.options.components = {};
@@ -101,21 +128,18 @@ export class GridviewComponent
         }
     }
 
-    get orientation() {
-        return this.gridview.orientation;
-    }
+    updateOptions(options: GridviewComponentUpdateOptions): void {
+        const hasOrientationChanged =
+            typeof options.orientation === 'string' &&
+            this.options.orientation !== options.orientation;
 
-    set orientation(value: Orientation) {
-        this.gridview.orientation = value;
+        this._options = { ...this.options, ...options };
+
+        if (hasOrientationChanged) {
+            this.gridview.orientation = options.orientation!;
+        }
+
         this.layout(this.gridview.width, this.gridview.height, true);
-    }
-
-    get deserializer(): IPanelDeserializer | undefined {
-        return this._deserializer;
-    }
-
-    set deserializer(value: IPanelDeserializer | undefined) {
-        this._deserializer = value;
     }
 
     removePanel(panel: GridviewPanel) {
@@ -180,8 +204,9 @@ export class GridviewComponent
                     this.options.frameworkComponents || {},
                     this.options.frameworkComponentFactory
                         ? {
-                              createComponent: this.options
-                                  .frameworkComponentFactory.createComponent,
+                              createComponent:
+                                  this.options.frameworkComponentFactory
+                                      .createComponent,
                           }
                         : undefined
                 );
@@ -261,8 +286,9 @@ export class GridviewComponent
         let relativeLocation: number[] = options.location || [0];
 
         if (options.position?.reference) {
-            const referenceGroup = this.groups.get(options.position.reference)
-                ?.value;
+            const referenceGroup = this.groups.get(
+                options.position.reference
+            )?.value;
 
             if (!referenceGroup) {
                 throw new Error(
@@ -290,8 +316,9 @@ export class GridviewComponent
             this.options.frameworkComponents || {},
             this.options.frameworkComponentFactory
                 ? {
-                      createComponent: this.options.frameworkComponentFactory
-                          .createComponent,
+                      createComponent:
+                          this.options.frameworkComponentFactory
+                              .createComponent,
                   }
                 : undefined
         );

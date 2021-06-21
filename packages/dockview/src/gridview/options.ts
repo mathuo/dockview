@@ -2,7 +2,7 @@ import { GridviewPanel } from './gridviewPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
 
-export interface GridComponentOptions {
+export interface GridviewComponentOptions {
     proportionalLayout: boolean;
     orientation: Orientation;
     components?: {

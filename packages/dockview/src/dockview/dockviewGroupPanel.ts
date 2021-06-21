@@ -105,7 +105,7 @@ export class DockviewGroupPanel
     public toJSON(): GroupviewPanelState {
         const state = this.api.getState();
 
-        const objectState: GroupviewPanelState = {
+        return <GroupviewPanelState>{
             id: this.id,
             view: this.view!.toJSON(),
             params:
@@ -116,8 +116,6 @@ export class DockviewGroupPanel
             suppressClosable: this.suppressClosable || undefined,
             title: this.title,
         };
-
-        return objectState;
     }
 
     setTitle(title: string) {

@@ -16,18 +16,13 @@ import { addDisposableListener, Emitter, Event } from '../events';
 import { IGridPanelView } from '../gridview/baseComponentGridview';
 import { IViewSize } from '../gridview/gridview';
 import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
-import {
-    IFrameworkPart,
-    PanelInitParameters,
-    PanelUpdateEvent,
-} from '../panel/types';
+import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
 import { IGroupPanel } from './groupPanel';
 import { ContentContainer, IContentContainer } from './panel/content';
 import { ITabsContainer, TabsContainer } from './titlebar/tabsContainer';
 import { IWatermarkRenderer } from './types';
 import { GroupviewPanel } from './groupviewPanel';
 import { focusedElement } from '../focusedElement';
-import { BasePanelView } from '../gridview/basePanelView';
 
 export enum GroupChangeKind {
     GROUP_ACTIVE = 'GROUP_ACTIVE',

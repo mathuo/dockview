@@ -1,6 +1,7 @@
 import {
     ISplitviewPanelProps,
     Orientation,
+    orthogonal,
     PanelCollection,
     SplitviewApi,
     SplitviewReact,
@@ -15,6 +16,12 @@ const components: PanelCollection<ISplitviewPanelProps<any>> = {
             props.api.setSize({ size: 300 });
         };
 
+        const transpose = () => {
+            props.containerApi.updateOptions({
+                orientation: orthogonal(props.containerApi.orientation),
+            });
+        };
+
         return (
             <div
                 style={{
@@ -26,6 +33,7 @@ const components: PanelCollection<ISplitviewPanelProps<any>> = {
             >
                 <div>hello world</div>
                 <button onClick={resize}>Resize</button>
+                <button onClick={transpose}>Transpose</button>
             </div>
         );
     },

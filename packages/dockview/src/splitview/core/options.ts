@@ -16,7 +16,7 @@ export interface ISerializableView extends IView, IPanel {
     init: (params: PanelViewInitParameters) => void;
 }
 
-export interface SplitPanelOptions extends SplitViewOptions {
+export interface SplitviewComponentOptions extends SplitViewOptions {
     components?: {
         [componentName: string]: {
             new (id: string, componentName: string): SplitviewPanel;

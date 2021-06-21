@@ -99,7 +99,7 @@ export class Splitview {
     private sashContainer: HTMLElement;
     private views: ViewItem[] = [];
     private sashes: ISashItem[] = [];
-    private readonly _orientation: Orientation;
+    private _orientation: Orientation;
     private _size = 0;
     private _orthogonalSize = 0;
     private contentSize = 0;
@@ -135,6 +135,21 @@ export class Splitview {
 
     get orientation() {
         return this._orientation;
+    }
+
+    set orientation(value: Orientation) {
+        this._orientation = value;
+
+        const tmp = this.size;
+        this.size = this.orthogonalSize;
+        this.orthogonalSize = tmp;
+
+        removeClasses(this.element, 'horizontal', 'vertical');
+        this.element.classList.add(
+            this.orientation == Orientation.HORIZONTAL
+                ? 'horizontal'
+                : 'vertical'
+        );
     }
 
     get minimumSize(): number {

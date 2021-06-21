@@ -4,6 +4,7 @@ import {
     GridviewReadyEvent,
     IGridviewPanelProps,
     Orientation,
+    orthogonal,
     PanelCollection,
 } from 'dockview';
 import * as React from 'react';
@@ -11,6 +12,20 @@ import { Meta } from '@storybook/react';
 
 const components: PanelCollection<IGridviewPanelProps<any>> = {
     default: (props: IGridviewPanelProps<{ color: string }>) => {
+        const transpose = () => {
+            props.containerApi.orientation = orthogonal(
+                props.containerApi.orientation
+            );
+        };
+
+        const resizeWidth = () => {
+            props.api.setSize({ width: 300 });
+        };
+
+        const resizeHeight = () => {
+            props.api.setSize({ height: 300 });
+        };
+
         return (
             <div
                 style={{
@@ -19,7 +34,10 @@ const components: PanelCollection<IGridviewPanelProps<any>> = {
                     height: '100%',
                 }}
             >
-                hello world
+                <div>{'hello world'}</div>
+                <button onClick={transpose}>Transpose</button>
+                <button onClick={resizeWidth}>Resize width</button>
+                <button onClick={resizeHeight}>Resize height</button>
             </div>
         );
     },

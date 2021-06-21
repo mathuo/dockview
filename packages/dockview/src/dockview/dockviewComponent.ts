@@ -29,7 +29,7 @@ import {
     AddGroupOptions,
     AddPanelOptions,
     PanelOptions,
-    DockviewOptions,
+    DockviewOptions as DockviewComponentOptions,
     MovementOptions,
     TabContextMenuEvent,
 } from './options';
@@ -76,15 +76,19 @@ export interface SerializedDockview {
     options: { tabHeight?: number };
 }
 
-/**
- *
- * component: 'default'
- * tab: 'default'
- *
- */
+export type DockviewComponentUpdateOptions = Pick<
+    DockviewComponentOptions,
+    | 'orientation'
+    | 'components'
+    | 'frameworkComponents'
+    | 'tabComponents'
+    | 'frameworkTabComponents'
+>;
 
 export interface IDockviewComponent extends IBaseGrid<GroupviewPanel> {
     readonly activeGroup: GroupviewPanel | undefined;
+    tabHeight: number | undefined;
+    updateOptions(options: DockviewComponentUpdateOptions): void;
     moveGroupOrPanel(
         referenceGroup: GroupviewPanel,
         groupId: string,
@@ -94,13 +98,11 @@ export interface IDockviewComponent extends IBaseGrid<GroupviewPanel> {
     ): void;
     doSetGroupActive: (group: GroupviewPanel, skipFocus?: boolean) => void;
     removeGroup: (group: GroupviewPanel) => void;
-    options: DockviewOptions;
+    options: DockviewComponentOptions;
     addPanel(options: AddPanelOptions): IGroupPanel;
     getGroupPanel: (id: string) => IGroupPanel | undefined;
     fireMouseEvent(event: LayoutMouseEvent): void;
     createWatermarkComponent(): IWatermarkRenderer;
-    setTabHeight(height: number | undefined): void;
-    getTabHeight(): number | undefined;
     totalPanels: number;
     // lifecycle
     addEmptyGroup(options?: AddGroupOptions): void;
@@ -159,26 +161,46 @@ export class DockviewComponent
         (event: LayoutDropEvent) => PanelOptions
     >();
     private _api: DockviewApi;
+    private _options: DockviewComponentOptions;
 
     private _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange = this._onDidLayoutChange.event;
 
-    addDndHandle(
-        type: string,
-        cb: (event: LayoutDropEvent) => PanelOptions
-    ): void {
-        this.registry.set(type, cb);
+    get totalPanels(): number {
+        return this.panels.size;
     }
 
-    constructor(
-        element: HTMLElement,
-        public readonly options: DockviewOptions
-    ) {
+    get deserializer(): IPanelDeserializer | undefined {
+        return this._deserializer;
+    }
+
+    set deserializer(value: IPanelDeserializer | undefined) {
+        this._deserializer = value;
+    }
+
+    get options() {
+        return this._options;
+    }
+
+    set tabHeight(height: number | undefined) {
+        this.options.tabHeight = height;
+        this.groups.forEach((value) => {
+            value.value.model.tabHeight = height;
+        });
+    }
+
+    get tabHeight(): number | undefined {
+        return this.options.tabHeight;
+    }
+
+    constructor(element: HTMLElement, options: DockviewComponentOptions) {
         super(element, {
             proportionalLayout: true,
             orientation: options.orientation || Orientation.HORIZONTAL,
             styles: options.styles,
         });
+
+        this._options = options;
 
         this.addDisposables(
             (() => {
@@ -233,27 +255,41 @@ export class DockviewComponent
         this._api = new DockviewApi(this);
     }
 
-    get totalPanels(): number {
-        return this.panels.size;
+    updateOptions(options: DockviewComponentUpdateOptions): void {
+        const hasOrientationChanged =
+            typeof options.orientation === 'string' &&
+            this.options.orientation !== options.orientation;
+
+        // TODO support style update
+        // const hasStylesChanged =
+        //     typeof options.styles === 'object' &&
+        //     this.options.styles !== options.styles;
+
+        this._options = { ...this.options, ...options };
+
+        if (hasOrientationChanged) {
+            this.gridview.orientation = options.orientation!;
+        }
+
+        this.layout(this.gridview.width, this.gridview.height, true);
     }
 
-    get deserializer(): IPanelDeserializer | undefined {
-        return this._deserializer;
-    }
-
-    set deserializer(value: IPanelDeserializer | undefined) {
-        this._deserializer = value;
+    addDndHandle(
+        type: string,
+        cb: (event: LayoutDropEvent) => PanelOptions
+    ): void {
+        this.registry.set(type, cb);
     }
 
     focus(): void {
         this.activeGroup?.focus();
     }
 
-    public getGroupPanel(id: string): IGroupPanel | undefined {
+    getGroupPanel(id: string): IGroupPanel | undefined {
         return this.panels.get(id)?.value;
     }
 
-    public createDragTarget(
+    createDragTarget(
         target: {
             element: HTMLElement;
             content: string;
@@ -313,7 +349,7 @@ export class DockviewComponent
         panel.group.model.openPanel(panel);
     }
 
-    public moveToNext(options: MovementOptions = {}): void {
+    moveToNext(options: MovementOptions = {}): void {
         if (!options.group) {
             if (!this.activeGroup) {
                 return;
@@ -338,7 +374,7 @@ export class DockviewComponent
         this.doSetGroupActive(next);
     }
 
-    public moveToPrevious(options: MovementOptions = {}): void {
+    moveToPrevious(options: MovementOptions = {}): void {
         if (!options.group) {
             if (!this.activeGroup) {
                 return;
@@ -363,7 +399,7 @@ export class DockviewComponent
         }
     }
 
-    public registerPanel(panel: IGroupPanel): void {
+    registerPanel(panel: IGroupPanel): void {
         if (this.panels.has(panel.id)) {
             throw new Error(`panel ${panel.id} already exists`);
         }
@@ -377,7 +413,7 @@ export class DockviewComponent
         this._onGridEvent.fire({ kind: GroupChangeKind.PANEL_CREATED });
     }
 
-    public unregisterPanel(panel: IGroupPanel): void {
+    unregisterPanel(panel: IGroupPanel): void {
         if (!this.panels.has(panel.id)) {
             throw new Error(`panel ${panel.id} doesn't exist`);
         }
@@ -398,7 +434,7 @@ export class DockviewComponent
      *
      * @returns A JSON respresentation of the layout
      */
-    public toJSON(): SerializedDockview {
+    toJSON(): SerializedDockview {
         this.syncConfigs();
 
         const data = this.gridview.serialize();
@@ -419,50 +455,11 @@ export class DockviewComponent
             grid: data,
             panels,
             activeGroup: this.activeGroup?.id,
-            options: { tabHeight: this.getTabHeight() },
+            options: { tabHeight: this.tabHeight },
         };
     }
 
-    /**
-     * Ensure the local copy of the layout state is up-to-date
-     */
-    private syncConfigs(): void {
-        const dirtyPanels = Array.from(this.dirtyPanels);
-
-        if (dirtyPanels.length === 0) {
-            // console.debug('[layout#syncConfigs] no dirty panels');
-        }
-
-        this.dirtyPanels.clear();
-
-        const partialPanelState = dirtyPanels
-            .map((panel) => this.panels.get(panel.id))
-            .filter((_) => !!_)
-            .reduce((collection, panel) => {
-                collection[panel!.value.id] = panel!.value.toJSON();
-                return collection;
-            }, {} as State);
-
-        this.panelState = {
-            ...this.panelState,
-            ...partialPanelState,
-        };
-
-        dirtyPanels
-            .filter((p) => this.panels.has(p.id))
-            .forEach((panel) => {
-                panel.setDirty(false);
-                this._onGridEvent.fire({
-                    kind: GroupChangeKind.PANEL_CLEAN,
-                });
-            });
-
-        this._onGridEvent.fire({
-            kind: GroupChangeKind.LAYOUT_CONFIG_UPDATED,
-        });
-    }
-
-    public fromJSON(data: SerializedDockview): void {
+    fromJSON(data: SerializedDockview): void {
         this.gridview.clear();
         this.panels.forEach((panel) => {
             panel.disposable.dispose();
@@ -477,7 +474,7 @@ export class DockviewComponent
         const { grid, panels, options, activeGroup } = data;
 
         if (typeof options?.tabHeight === 'number') {
-            this.setTabHeight(options.tabHeight);
+            this.tabHeight = options.tabHeight;
         }
 
         if (!this.deserializer) {
@@ -508,7 +505,7 @@ export class DockviewComponent
         this._onGridEvent.fire({ kind: GroupChangeKind.NEW_LAYOUT });
     }
 
-    public async closeAllGroups(): Promise<boolean> {
+    async closeAllGroups(): Promise<boolean> {
         for (const entry of this.groups.entries()) {
             const [_, group] = entry;
 
@@ -519,17 +516,6 @@ export class DockviewComponent
             await timeoutAsPromise(0);
         }
         return true;
-    }
-
-    public setTabHeight(height: number | undefined): void {
-        this.options.tabHeight = height;
-        this.groups.forEach((value) => {
-            value.value.model.tabHeight = height;
-        });
-    }
-
-    public getTabHeight(): number | undefined {
-        return this.options.tabHeight;
     }
 
     fireMouseEvent(event: LayoutMouseEvent): void {
@@ -546,7 +532,7 @@ export class DockviewComponent
         }
     }
 
-    public addPanel(options: AddPanelOptions): IGroupPanel {
+    addPanel(options: AddPanelOptions): IGroupPanel {
         const panel = this._addPanel(options);
 
         let referenceGroup: GroupviewPanel | undefined;
@@ -587,27 +573,6 @@ export class DockviewComponent
         return panel;
     }
 
-    public _addPanel(options: AddPanelOptions): IGroupPanel {
-        const view = new DefaultGroupPanelView({
-            content: this.createContentComponent(options.id, options.component),
-            tab: this.createTabComponent(options.id, options.tabComponent),
-        });
-
-        const panel: IGroupPanel = new DockviewGroupPanel(
-            options.id,
-            this._api
-        );
-        panel.init({
-            view,
-            title: options.title || options.id,
-            suppressClosable: options?.suppressClosable,
-            params: options?.params || {},
-        });
-
-        this.registerPanel(panel);
-        return panel;
-    }
-
     createWatermarkComponent(): IWatermarkRenderer {
         return createComponent(
             'watermark-id',
@@ -622,34 +587,7 @@ export class DockviewComponent
         );
     }
 
-    private createContentComponent(
-        id: string,
-        componentName: string
-    ): IContentRenderer {
-        return createComponent(
-            id,
-            componentName,
-            this.options.components || {},
-            this.options.frameworkComponents,
-            this.options.frameworkComponentFactory?.content
-        );
-    }
-
-    private createTabComponent(
-        id: string,
-        componentName?: string
-    ): ITabRenderer {
-        return createComponent(
-            id,
-            componentName,
-            this.options.tabComponents || {},
-            this.options.frameworkTabComponents,
-            this.options.frameworkComponentFactory?.tab,
-            () => new DefaultTab()
-        );
-    }
-
-    public addEmptyGroup(options: AddGroupOptions): void {
+    addEmptyGroup(options: AddGroupOptions): void {
         const group = this.createGroup();
 
         if (options) {
@@ -685,7 +623,7 @@ export class DockviewComponent
         }
     }
 
-    public removeGroup(group: GroupviewPanel): void {
+    removeGroup(group: GroupviewPanel): void {
         const panels = [...group.model.panels]; // reassign since group panels will mutate
         panels.forEach((panel) => {
             group.model.removePanel(panel);
@@ -700,19 +638,7 @@ export class DockviewComponent
         super.removeGroup(group);
     }
 
-    private addPanelToNewGroup(
-        panel: IGroupPanel,
-        location: number[] = [0]
-    ): void {
-        let group: GroupviewPanel;
-
-        group! = this.createGroup();
-        this.doAddGroup(group, location);
-
-        group.model.openPanel(panel);
-    }
-
-    public moveGroupOrPanel(
+    moveGroupOrPanel(
         referenceGroup: GroupviewPanel,
         groupId: string,
         itemId: string,
@@ -797,10 +723,10 @@ export class DockviewComponent
 
     createGroup(options?: GroupOptions): GroupviewPanel {
         if (!options) {
-            options = { tabHeight: this.getTabHeight() };
+            options = { tabHeight: this.tabHeight };
         }
         if (typeof options.tabHeight !== 'number') {
-            options.tabHeight = this.getTabHeight();
+            options.tabHeight = this.tabHeight;
         }
 
         let id = options?.id;
@@ -883,6 +809,109 @@ export class DockviewComponent
         return view;
     }
 
+    dispose(): void {
+        super.dispose();
+
+        this._onGridEvent.dispose();
+    }
+
+    /**
+     * Ensure the local copy of the layout state is up-to-date
+     */
+    private syncConfigs(): void {
+        const dirtyPanels = Array.from(this.dirtyPanels);
+
+        if (dirtyPanels.length === 0) {
+            // console.debug('[layout#syncConfigs] no dirty panels');
+        }
+
+        this.dirtyPanels.clear();
+
+        const partialPanelState = dirtyPanels
+            .map((panel) => this.panels.get(panel.id))
+            .filter((_) => !!_)
+            .reduce((collection, panel) => {
+                collection[panel!.value.id] = panel!.value.toJSON();
+                return collection;
+            }, {} as State);
+
+        this.panelState = {
+            ...this.panelState,
+            ...partialPanelState,
+        };
+
+        dirtyPanels
+            .filter((p) => this.panels.has(p.id))
+            .forEach((panel) => {
+                panel.setDirty(false);
+                this._onGridEvent.fire({
+                    kind: GroupChangeKind.PANEL_CLEAN,
+                });
+            });
+
+        this._onGridEvent.fire({
+            kind: GroupChangeKind.LAYOUT_CONFIG_UPDATED,
+        });
+    }
+
+    private _addPanel(options: AddPanelOptions): IGroupPanel {
+        const view = new DefaultGroupPanelView({
+            content: this.createContentComponent(options.id, options.component),
+            tab: this.createTabComponent(options.id, options.tabComponent),
+        });
+
+        const panel: IGroupPanel = new DockviewGroupPanel(
+            options.id,
+            this._api
+        );
+        panel.init({
+            view,
+            title: options.title || options.id,
+            suppressClosable: options?.suppressClosable,
+            params: options?.params || {},
+        });
+
+        this.registerPanel(panel);
+        return panel;
+    }
+
+    private createContentComponent(
+        id: string,
+        componentName: string
+    ): IContentRenderer {
+        return createComponent(
+            id,
+            componentName,
+            this.options.components || {},
+            this.options.frameworkComponents,
+            this.options.frameworkComponentFactory?.content
+        );
+    }
+
+    private createTabComponent(
+        id: string,
+        componentName?: string
+    ): ITabRenderer {
+        return createComponent(
+            id,
+            componentName,
+            this.options.tabComponents || {},
+            this.options.frameworkTabComponents,
+            this.options.frameworkComponentFactory?.tab,
+            () => new DefaultTab()
+        );
+    }
+
+    private addPanelToNewGroup(
+        panel: IGroupPanel,
+        location: number[] = [0]
+    ): void {
+        const group = this.createGroup();
+        this.doAddGroup(group, location);
+
+        group.model.openPanel(panel);
+    }
+
     private findGroup(panel: IGroupPanel): GroupviewPanel | undefined {
         return Array.from(this.groups.values()).find((group) =>
             group.value.model.containsPanel(panel)
@@ -894,11 +923,5 @@ export class DockviewComponent
         panel.setDirty(true);
         this._onGridEvent.fire({ kind: GroupChangeKind.PANEL_DIRTY });
         this.debouncedDeque();
-    }
-
-    public dispose(): void {
-        super.dispose();
-
-        this._onGridEvent.dispose();
     }
 }

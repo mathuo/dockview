@@ -27,6 +27,7 @@ import {
     AddSplitviewComponentOptions,
     ISplitviewComponent,
     SerializedSplitview,
+    SplitviewComponentUpdateOptions,
 } from '../splitview/splitviewComponent';
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { ISplitviewPanel } from '../splitview/splitviewPanel';
@@ -57,7 +58,15 @@ export class SplitviewApi {
         return this.component.onDidLayoutChange;
     }
 
+    get orientation(): Orientation {
+        return this.component.orientation;
+    }
+
     constructor(private readonly component: ISplitviewComponent) {}
+
+    updateOptions(options: SplitviewComponentUpdateOptions): void {
+        this.component.updateOptions(options);
+    }
 
     removePanel(panel: ISplitviewPanel, sizing?: Sizing) {
         this.component.removePanel(panel, sizing);
@@ -208,7 +217,7 @@ export class GridviewApi {
     }
 
     set orientation(value: Orientation) {
-        this.component.orientation = value;
+        this.component.updateOptions({ orientation: value });
     }
 
     focus() {
@@ -369,11 +378,11 @@ export class DockviewApi {
     }
 
     getTabHeight() {
-        return this.component.getTabHeight();
+        return this.component.tabHeight;
     }
 
     setTabHeight(height: number | undefined) {
-        this.component.setTabHeight(height);
+        this.component.tabHeight = height;
     }
 
     getGroup(id: string) {

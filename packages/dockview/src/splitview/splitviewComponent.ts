@@ -9,7 +9,7 @@ import {
     Sizing,
     Splitview,
 } from './core/splitview';
-import { SplitPanelOptions } from './core/options';
+import { SplitviewComponentOptions } from './core/options';
 import { BaseComponentOptions } from '../panel/types';
 import { Emitter, Event } from '../events';
 import { SplitviewApi } from '../api/component.api';
@@ -46,12 +46,19 @@ export interface AddSplitviewComponentOptions extends BaseComponentOptions {
     maximumSize?: number;
 }
 
+export type SplitviewComponentUpdateOptions = Pick<
+    SplitviewComponentOptions,
+    'orientation' | 'components' | 'frameworkComponents'
+>;
+
 export interface ISplitviewComponent extends IDisposable {
     readonly minimumSize: number;
     readonly maximumSize: number;
     readonly height: number;
     readonly width: number;
     readonly length: number;
+    readonly orientation: Orientation;
+    updateOptions(options: SplitviewComponentUpdateOptions): void;
     addPanel(options: AddSplitviewComponentOptions): void;
     layout(width: number, height: number): void;
     onDidLayoutChange: Event<void>;
@@ -75,11 +82,21 @@ export interface ISplitviewComponent extends IDisposable {
  */
 export class SplitviewComponent
     extends CompositeDisposable
-    implements ISplitviewComponent {
+    implements ISplitviewComponent
+{
     private _disposable = new MutableDisposable();
     private _splitview!: Splitview;
     private _activePanel: SplitviewPanel | undefined;
     private panels = new Map<string, IDisposable>();
+    private _options: SplitviewComponentOptions;
+
+    get options() {
+        return this._options;
+    }
+
+    get orientation() {
+        return this.splitview.orientation;
+    }
 
     get splitview() {
         return this._splitview;
@@ -124,9 +141,11 @@ export class SplitviewComponent
 
     constructor(
         private readonly element: HTMLElement,
-        private readonly options: SplitPanelOptions
+        options: SplitviewComponentOptions
     ) {
         super();
+
+        this._options = options;
 
         if (!options.components) {
             options.components = {};
@@ -138,6 +157,23 @@ export class SplitviewComponent
         this.splitview = new Splitview(this.element, options);
 
         this.addDisposables(this._disposable);
+    }
+
+    updateOptions(options: SplitviewComponentUpdateOptions): void {
+        const hasOrientationChanged =
+            typeof options.orientation === 'string' &&
+            this.options.orientation !== options.orientation;
+
+        this._options = { ...this.options, ...options };
+
+        if (hasOrientationChanged) {
+            this.splitview.orientation = options.orientation!;
+        }
+
+        this.splitview.layout(
+            this.splitview.size,
+            this.splitview.orthogonalSize
+        );
     }
 
     focus() {
@@ -207,8 +243,8 @@ export class SplitviewComponent
             this.options.frameworkComponents || {},
             this.options.frameworkWrapper
                 ? {
-                      createComponent: this.options.frameworkWrapper
-                          .createComponent,
+                      createComponent:
+                          this.options.frameworkWrapper.createComponent,
                   }
                 : undefined
         );
@@ -242,10 +278,8 @@ export class SplitviewComponent
         if (!this.element.parentElement) {
             return;
         }
-        const {
-            width,
-            height,
-        } = this.element.parentElement?.getBoundingClientRect();
+        const { width, height } =
+            this.element.parentElement?.getBoundingClientRect();
         this.layout(width, height);
     }
 
@@ -318,8 +352,9 @@ export class SplitviewComponent
                         this.options.frameworkComponents || {},
                         this.options.frameworkWrapper
                             ? {
-                                  createComponent: this.options.frameworkWrapper
-                                      .createComponent,
+                                  createComponent:
+                                      this.options.frameworkWrapper
+                                          .createComponent,
                               }
                             : undefined
                     );

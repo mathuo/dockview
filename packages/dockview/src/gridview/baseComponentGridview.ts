@@ -66,7 +66,8 @@ export interface IBaseGrid<T extends IGridPanelView> {
 
 export abstract class BaseGrid<T extends IGridPanelView>
     extends CompositeDisposable
-    implements IBaseGrid<T> {
+    implements IBaseGrid<T>
+{
     private readonly _id = nextLayoutId.next();
     protected readonly groups = new Map<string, IValueDisposable<T>>();
     protected readonly gridview: Gridview;
@@ -264,10 +265,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
         if (!this.element.parentElement) {
             return;
         }
-        const {
-            width,
-            height,
-        } = this.element.parentElement.getBoundingClientRect();
+        const { width, height } =
+            this.element.parentElement.getBoundingClientRect();
         this.layout(width, height);
     }
 

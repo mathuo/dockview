@@ -70,7 +70,8 @@ const uniquePortalKeyGenerator = sequentialNumberGenerator();
 export const ReactPartContext = React.createContext<{}>({});
 
 export class ReactPart<P extends object, C extends object = {}>
-    implements IFrameworkPart {
+    implements IFrameworkPart
+{
     private componentInstance?: IPanelWrapperRef;
     private ref?: { portal: React.ReactPortal; disposable: IDisposable };
     private disposed = false;
@@ -113,9 +114,9 @@ export class ReactPart<P extends object, C extends object = {}>
         const bridgeComponent = React.createElement(
             React.forwardRef(ReactComponentBridge),
             {
-                component: (this
-                    .component as unknown) as React.FunctionComponent<{}>,
-                componentProps: (this.parameters as unknown) as {},
+                component: this
+                    .component as unknown as React.FunctionComponent<{}>,
+                componentProps: this.parameters as unknown as {},
                 ref: (element: IPanelWrapperRef) => {
                     this.componentInstance = element;
                 },
@@ -188,5 +189,5 @@ export const usePortalsLifecycle: PortalLifecycleHook = () => {
 export function isReactElement(
     element: any | React.ReactElement
 ): element is React.ReactElement {
-    return (element as any)?.type;
+    return element?.type;
 }
