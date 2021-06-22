@@ -32842,6 +32842,12 @@ class SplitviewApi {
     get onDidLayoutChange() {
         return this.component.onDidLayoutChange;
     }
+    get orientation() {
+        return this.component.orientation;
+    }
+    updateOptions(options) {
+        this.component.updateOptions(options);
+    }
     removePanel(panel, sizing) {
         this.component.removePanel(panel, sizing);
     }
@@ -32958,7 +32964,7 @@ class GridviewApi {
         return this.component.orientation;
     }
     set orientation(value) {
-        this.component.orientation = value;
+        this.component.updateOptions({ orientation: value });
     }
     focus() {
         return this.component.focus();
@@ -33074,10 +33080,10 @@ class DockviewApi {
         return this.component.resizeToFit();
     }
     getTabHeight() {
-        return this.component.getTabHeight();
+        return this.component.tabHeight;
     }
     setTabHeight(height) {
-        this.component.setTabHeight(height);
+        this.component.tabHeight = height;
     }
     getGroup(id) {
         return this.component.getPanel(id);
@@ -34191,7 +34197,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             orientation: options.orientation || _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_16__.Orientation.HORIZONTAL,
             styles: options.styles,
         });
-        this.options = options;
         this.panels = new Map();
         this.dirtyPanels = new Set();
         this.debouncedDeque = (0,_functions__WEBPACK_IMPORTED_MODULE_8__.debounce)(this.syncConfigs.bind(this), 5000);
@@ -34206,6 +34211,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         this.registry = new Map();
         this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
         this.onDidLayoutChange = this._onDidLayoutChange.event;
+        this._options = options;
         this.addDisposables((() => {
             /**
              * TODO Fix this relatively ugly 'merge and delay'
@@ -34249,9 +34255,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         }
         this._api = new _api_component_api__WEBPACK_IMPORTED_MODULE_14__.DockviewApi(this);
     }
-    addDndHandle(type, cb) {
-        this.registry.set(type, cb);
-    }
     get totalPanels() {
         return this.panels.size;
     }
@@ -34260,6 +34263,34 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
     }
     set deserializer(value) {
         this._deserializer = value;
+    }
+    get options() {
+        return this._options;
+    }
+    set tabHeight(height) {
+        this.options.tabHeight = height;
+        this.groups.forEach((value) => {
+            value.value.model.tabHeight = height;
+        });
+    }
+    get tabHeight() {
+        return this.options.tabHeight;
+    }
+    updateOptions(options) {
+        const hasOrientationChanged = typeof options.orientation === 'string' &&
+            this.options.orientation !== options.orientation;
+        // TODO support style update
+        // const hasStylesChanged =
+        //     typeof options.styles === 'object' &&
+        //     this.options.styles !== options.styles;
+        this._options = Object.assign(Object.assign({}, this.options), options);
+        if (hasOrientationChanged) {
+            this.gridview.orientation = options.orientation;
+        }
+        this.layout(this.gridview.width, this.gridview.height, true);
+    }
+    addDndHandle(type, cb) {
+        this.registry.set(type, cb);
     }
     focus() {
         var _a;
@@ -34383,37 +34414,8 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             grid: data,
             panels,
             activeGroup: (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.id,
-            options: { tabHeight: this.getTabHeight() },
+            options: { tabHeight: this.tabHeight },
         };
-    }
-    /**
-     * Ensure the local copy of the layout state is up-to-date
-     */
-    syncConfigs() {
-        const dirtyPanels = Array.from(this.dirtyPanels);
-        if (dirtyPanels.length === 0) {
-            // console.debug('[layout#syncConfigs] no dirty panels');
-        }
-        this.dirtyPanels.clear();
-        const partialPanelState = dirtyPanels
-            .map((panel) => this.panels.get(panel.id))
-            .filter((_) => !!_)
-            .reduce((collection, panel) => {
-            collection[panel.value.id] = panel.value.toJSON();
-            return collection;
-        }, {});
-        this.panelState = Object.assign(Object.assign({}, this.panelState), partialPanelState);
-        dirtyPanels
-            .filter((p) => this.panels.has(p.id))
-            .forEach((panel) => {
-            panel.setDirty(false);
-            this._onGridEvent.fire({
-                kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.PANEL_CLEAN,
-            });
-        });
-        this._onGridEvent.fire({
-            kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.LAYOUT_CONFIG_UPDATED,
-        });
     }
     fromJSON(data) {
         this.gridview.clear();
@@ -34428,7 +34430,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         }
         const { grid, panels, options, activeGroup } = data;
         if (typeof (options === null || options === void 0 ? void 0 : options.tabHeight) === 'number') {
-            this.setTabHeight(options.tabHeight);
+            this.tabHeight = options.tabHeight;
         }
         if (!this.deserializer) {
             throw new Error('no deserializer provided');
@@ -34462,15 +34464,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             }
             return true;
         });
-    }
-    setTabHeight(height) {
-        this.options.tabHeight = height;
-        this.groups.forEach((value) => {
-            value.value.model.tabHeight = height;
-        });
-    }
-    getTabHeight() {
-        return this.options.tabHeight;
     }
     fireMouseEvent(event) {
         switch (event.kind) {
@@ -34515,21 +34508,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         }
         return panel;
     }
-    _addPanel(options) {
-        const view = new _defaultGroupPanelView__WEBPACK_IMPORTED_MODULE_20__.DefaultGroupPanelView({
-            content: this.createContentComponent(options.id, options.component),
-            tab: this.createTabComponent(options.id, options.tabComponent),
-        });
-        const panel = new _dockviewGroupPanel__WEBPACK_IMPORTED_MODULE_3__.DockviewGroupPanel(options.id, this._api);
-        panel.init({
-            view,
-            title: options.title || options.id,
-            suppressClosable: options === null || options === void 0 ? void 0 : options.suppressClosable,
-            params: (options === null || options === void 0 ? void 0 : options.params) || {},
-        });
-        this.registerPanel(panel);
-        return panel;
-    }
     createWatermarkComponent() {
         var _a;
         return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_11__.createComponent)('watermark-id', 'watermark-name', this.options.watermarkComponent
@@ -34537,14 +34515,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             : {}, this.options.watermarkFrameworkComponent
             ? { 'watermark-name': this.options.watermarkFrameworkComponent }
             : {}, (_a = this.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.watermark);
-    }
-    createContentComponent(id, componentName) {
-        var _a;
-        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_11__.createComponent)(id, componentName, this.options.components || {}, this.options.frameworkComponents, (_a = this.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.content);
-    }
-    createTabComponent(id, componentName) {
-        var _a;
-        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_11__.createComponent)(id, componentName, this.options.tabComponents || {}, this.options.frameworkTabComponents, (_a = this.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.tab, () => new _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_17__.DefaultTab());
     }
     addEmptyGroup(options) {
         var _a;
@@ -34578,12 +34548,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             return;
         }
         super.removeGroup(group);
-    }
-    addPanelToNewGroup(panel, location = [0]) {
-        let group;
-        group = this.createGroup();
-        this.doAddGroup(group, location);
-        group.model.openPanel(panel);
     }
     moveGroupOrPanel(referenceGroup, groupId, itemId, target, index) {
         var _a, _b, _c;
@@ -34639,10 +34603,10 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
     }
     createGroup(options) {
         if (!options) {
-            options = { tabHeight: this.getTabHeight() };
+            options = { tabHeight: this.tabHeight };
         }
         if (typeof options.tabHeight !== 'number') {
-            options.tabHeight = this.getTabHeight();
+            options.tabHeight = this.tabHeight;
         }
         let id = options === null || options === void 0 ? void 0 : options.id;
         if (id && this.groups.has(options.id)) {
@@ -34694,6 +34658,67 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         }
         return view;
     }
+    dispose() {
+        super.dispose();
+        this._onGridEvent.dispose();
+    }
+    /**
+     * Ensure the local copy of the layout state is up-to-date
+     */
+    syncConfigs() {
+        const dirtyPanels = Array.from(this.dirtyPanels);
+        if (dirtyPanels.length === 0) {
+            // console.debug('[layout#syncConfigs] no dirty panels');
+        }
+        this.dirtyPanels.clear();
+        const partialPanelState = dirtyPanels
+            .map((panel) => this.panels.get(panel.id))
+            .filter((_) => !!_)
+            .reduce((collection, panel) => {
+            collection[panel.value.id] = panel.value.toJSON();
+            return collection;
+        }, {});
+        this.panelState = Object.assign(Object.assign({}, this.panelState), partialPanelState);
+        dirtyPanels
+            .filter((p) => this.panels.has(p.id))
+            .forEach((panel) => {
+            panel.setDirty(false);
+            this._onGridEvent.fire({
+                kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.PANEL_CLEAN,
+            });
+        });
+        this._onGridEvent.fire({
+            kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.LAYOUT_CONFIG_UPDATED,
+        });
+    }
+    _addPanel(options) {
+        const view = new _defaultGroupPanelView__WEBPACK_IMPORTED_MODULE_20__.DefaultGroupPanelView({
+            content: this.createContentComponent(options.id, options.component),
+            tab: this.createTabComponent(options.id, options.tabComponent),
+        });
+        const panel = new _dockviewGroupPanel__WEBPACK_IMPORTED_MODULE_3__.DockviewGroupPanel(options.id, this._api);
+        panel.init({
+            view,
+            title: options.title || options.id,
+            suppressClosable: options === null || options === void 0 ? void 0 : options.suppressClosable,
+            params: (options === null || options === void 0 ? void 0 : options.params) || {},
+        });
+        this.registerPanel(panel);
+        return panel;
+    }
+    createContentComponent(id, componentName) {
+        var _a;
+        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_11__.createComponent)(id, componentName, this.options.components || {}, this.options.frameworkComponents, (_a = this.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.content);
+    }
+    createTabComponent(id, componentName) {
+        var _a;
+        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_11__.createComponent)(id, componentName, this.options.tabComponents || {}, this.options.frameworkTabComponents, (_a = this.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.tab, () => new _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_17__.DefaultTab());
+    }
+    addPanelToNewGroup(panel, location = [0]) {
+        const group = this.createGroup();
+        this.doAddGroup(group, location);
+        group.model.openPanel(panel);
+    }
     findGroup(panel) {
         var _a;
         return (_a = Array.from(this.groups.values()).find((group) => group.value.model.containsPanel(panel))) === null || _a === void 0 ? void 0 : _a.value;
@@ -34703,10 +34728,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         panel.setDirty(true);
         this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.PANEL_DIRTY });
         this.debouncedDeque();
-    }
-    dispose() {
-        super.dispose();
-        this._onGridEvent.dispose();
     }
 }
 
@@ -34784,7 +34805,7 @@ class DockviewGroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.Composi
     }
     toJSON() {
         const state = this.api.getState();
-        const objectState = {
+        return {
             id: this.id,
             view: this.view.toJSON(),
             params: Object.keys(this._params || {}).length > 0
@@ -34794,7 +34815,6 @@ class DockviewGroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.Composi
             suppressClosable: this.suppressClosable || undefined,
             title: this.title,
         };
-        return objectState;
     }
     setTitle(title) {
         var _a;
@@ -35399,7 +35419,7 @@ class BaseGrid extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposab
         if (!this.element.parentElement) {
             return;
         }
-        const { width, height, } = this.element.parentElement.getBoundingClientRect();
+        const { width, height } = this.element.parentElement.getBoundingClientRect();
         this.layout(width, height);
     }
     dispose() {
@@ -36194,7 +36214,7 @@ class GridviewComponent extends _baseComponentGridview__WEBPACK_IMPORTED_MODULE_
             orientation: options.orientation,
             styles: options.styles,
         });
-        this.options = options;
+        this._options = options;
         if (!this.options.components) {
             this.options.components = {};
         }
@@ -36207,13 +36227,24 @@ class GridviewComponent extends _baseComponentGridview__WEBPACK_IMPORTED_MODULE_
     }
     set orientation(value) {
         this.gridview.orientation = value;
-        this.layout(this.gridview.width, this.gridview.height, true);
+    }
+    get options() {
+        return this._options;
     }
     get deserializer() {
         return this._deserializer;
     }
     set deserializer(value) {
         this._deserializer = value;
+    }
+    updateOptions(options) {
+        const hasOrientationChanged = typeof options.orientation === 'string' &&
+            this.options.orientation !== options.orientation;
+        this._options = Object.assign(Object.assign({}, this.options), options);
+        if (hasOrientationChanged) {
+            this.gridview.orientation = options.orientation;
+        }
+        this.layout(this.gridview.width, this.gridview.height, true);
     }
     removePanel(panel) {
         this.removeGroup(panel);
@@ -36256,8 +36287,8 @@ class GridviewComponent extends _baseComponentGridview__WEBPACK_IMPORTED_MODULE_
                 const { data } = node;
                 const view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(data.id, data.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkComponentFactory
                     ? {
-                        createComponent: this.options
-                            .frameworkComponentFactory.createComponent,
+                        createComponent: this.options.frameworkComponentFactory
+                            .createComponent,
                     }
                     : undefined);
                 queue.push(() => view.init({
@@ -39507,8 +39538,7 @@ const usePortalsLifecycle = () => {
 };
 // it does the job...
 function isReactElement(element) {
-    var _a;
-    return (_a = element) === null || _a === void 0 ? void 0 : _a.type;
+    return element === null || element === void 0 ? void 0 : element.type;
 }
 
 
@@ -39843,6 +39873,16 @@ class Splitview {
     }
     get orientation() {
         return this._orientation;
+    }
+    set orientation(value) {
+        this._orientation = value;
+        const tmp = this.size;
+        this.size = this.orthogonalSize;
+        this.orthogonalSize = tmp;
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.removeClasses)(this.element, 'horizontal', 'vertical');
+        this.element.classList.add(this.orientation == Orientation.HORIZONTAL
+            ? 'horizontal'
+            : 'vertical');
     }
     get minimumSize() {
         return this.views.reduce((r, item) => r + item.minimumSize, 0);
@@ -40461,11 +40501,11 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
     constructor(element, options) {
         super();
         this.element = element;
-        this.options = options;
         this._disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_0__.MutableDisposable();
         this.panels = new Map();
         this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
         this.onDidLayoutChange = this._onDidLayoutChange.event;
+        this._options = options;
         if (!options.components) {
             options.components = {};
         }
@@ -40474,6 +40514,12 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
         }
         this.splitview = new _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Splitview(this.element, options);
         this.addDisposables(this._disposable);
+    }
+    get options() {
+        return this._options;
+    }
+    get orientation() {
+        return this.splitview.orientation;
     }
     get splitview() {
         return this._splitview;
@@ -40502,6 +40548,15 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
     }
     get length() {
         return this.panels.size;
+    }
+    updateOptions(options) {
+        const hasOrientationChanged = typeof options.orientation === 'string' &&
+            this.options.orientation !== options.orientation;
+        this._options = Object.assign(Object.assign({}, this.options), options);
+        if (hasOrientationChanged) {
+            this.splitview.orientation = options.orientation;
+        }
+        this.splitview.layout(this.splitview.size, this.splitview.orthogonalSize);
     }
     focus() {
         var _a;
@@ -40555,8 +40610,7 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
         }
         const view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__.createComponent)(options.id, options.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkWrapper
             ? {
-                createComponent: this.options.frameworkWrapper
-                    .createComponent,
+                createComponent: this.options.frameworkWrapper.createComponent,
             }
             : undefined);
         view.orientation = this.splitview.orientation;
@@ -40582,7 +40636,7 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
         if (!this.element.parentElement) {
             return;
         }
-        const { width, height, } = (_a = this.element.parentElement) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect();
+        const { width, height } = (_a = this.element.parentElement) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect();
         this.layout(width, height);
     }
     layout(width, height) {
