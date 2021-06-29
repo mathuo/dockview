@@ -1,17 +1,14 @@
 import { addDisposableListener, Emitter, Event } from '../events';
-import { Droptarget, DroptargetEvent } from '../dnd/droptarget';
 import { CompositeDisposable } from '../lifecycle';
-import {
-    DATA_KEY,
-    DragType,
-    LocalSelectionTransfer,
-} from '../dnd/dataTransfer';
+import { getPanelData, LocalSelectionTransfer } from '../dnd/dataTransfer';
 import { getElementsByTagName, toggleClass } from '../dom';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { ITabRenderer } from './types';
 import { focusedElement } from '../focusedElement';
 import { IGroupPanel } from './groupPanel';
 import { GroupviewPanel } from './groupviewPanel';
+import { DroptargetEvent, Droptarget, PanelTransfer } from '../dnd/droptarget';
+import { DockviewDropTargets } from './groupview';
 
 export enum MouseEventKind {
     CLICK = 'CLICK',
@@ -26,22 +23,16 @@ export interface LayoutMouseEvent {
 }
 
 export interface ITab {
-    id: string;
+    panelId: string;
     element: HTMLElement;
-    hasActiveDragEvent: boolean;
     setContent: (element: ITabRenderer) => void;
     onChanged: Event<LayoutMouseEvent>;
-    onDropped: Event<DroptargetEvent>;
+    onDrop: Event<DroptargetEvent>;
     setActive(isActive: boolean): void;
-    startDragEvent(): void;
-    stopDragEvent(): void;
 }
 
 export class Tab extends CompositeDisposable implements ITab {
     private _element: HTMLElement;
-    private dragInPlayDetails: { id?: string; isDragging: boolean } = {
-        isDragging: false,
-    };
     private droptarget: Droptarget;
     private content?: ITabRenderer;
 
@@ -49,28 +40,19 @@ export class Tab extends CompositeDisposable implements ITab {
     readonly onChanged: Event<LayoutMouseEvent> = this._onChanged.event;
 
     private readonly _onDropped = new Emitter<DroptargetEvent>();
-    readonly onDropped: Event<DroptargetEvent> = this._onDropped.event;
+    readonly onDrop: Event<DroptargetEvent> = this._onDropped.event;
+
+    private readonly panelTransfer =
+        LocalSelectionTransfer.getInstance<PanelTransfer>();
 
     public get element() {
         return this._element;
     }
 
-    public get hasActiveDragEvent() {
-        return this.dragInPlayDetails?.isDragging;
-    }
-
-    public startDragEvent() {
-        this.dragInPlayDetails = { isDragging: true, id: this.accessor.id };
-    }
-
-    public stopDragEvent() {
-        this.dragInPlayDetails = { isDragging: false, id: undefined };
-    }
-
     private iframes: HTMLElement[] = [];
 
     constructor(
-        public id: string,
+        public panelId: string,
         private readonly accessor: IDockviewComponent,
         private group: GroupviewPanel
     ) {
@@ -85,11 +67,6 @@ export class Tab extends CompositeDisposable implements ITab {
 
         this.addDisposables(
             addDisposableListener(this._element, 'dragstart', (event) => {
-                this.dragInPlayDetails = {
-                    isDragging: true,
-                    id: this.accessor.id,
-                };
-
                 this.iframes = [
                     ...getElementsByTagName('iframe'),
                     ...getElementsByTagName('webview'),
@@ -102,18 +79,18 @@ export class Tab extends CompositeDisposable implements ITab {
                 this.element.classList.add('dragged');
                 setTimeout(() => this.element.classList.remove('dragged'), 0);
 
-                const data = JSON.stringify({
-                    type: DragType.ITEM,
-                    itemId: this.id,
-                    groupId: this.group.id,
-                });
-                LocalSelectionTransfer.getInstance().setData(
-                    [data],
-                    this.dragInPlayDetails.id
+                this.panelTransfer.setData(
+                    [
+                        new PanelTransfer(
+                            this.accessor.id,
+                            this.group.id,
+                            this.panelId
+                        ),
+                    ],
+                    PanelTransfer.prototype
                 );
 
                 if (event.dataTransfer) {
-                    event.dataTransfer.setData(DATA_KEY, data);
                     event.dataTransfer.effectAllowed = 'move';
                 }
             }),
@@ -123,14 +100,7 @@ export class Tab extends CompositeDisposable implements ITab {
                 }
                 this.iframes = [];
 
-                // drop events fire before dragend so we can remove this safely
-                LocalSelectionTransfer.getInstance().clearData(
-                    this.dragInPlayDetails.id
-                );
-                this.dragInPlayDetails = {
-                    isDragging: false,
-                    id: undefined,
-                };
+                this.panelTransfer.clearData(PanelTransfer.prototype);
             }),
             addDisposableListener(this._element, 'mousedown', (event) => {
                 if (event.defaultPrevented) {
@@ -168,16 +138,22 @@ export class Tab extends CompositeDisposable implements ITab {
         );
 
         this.droptarget = new Droptarget(this._element, {
-            isDirectional: false,
-            isDisabled: () => this.dragInPlayDetails.isDragging,
-            id: this.accessor.id,
-            enableExternalDragEvents: this.accessor.options
-                .enableExternalDragEvents,
+            validOverlays: 'none',
+            canDisplayOverlay: (event) => {
+                const data = getPanelData();
+                if (data) {
+                    return this.panelId !== data.panelId;
+                }
+
+                return this.group.model.canDisplayOverlay(
+                    event,
+                    DockviewDropTargets.Tab
+                );
+            },
         });
 
         this.addDisposables(
-            this.droptarget.onDidChange((event) => {
-                event.event.preventDefault();
+            this.droptarget.onDrop((event) => {
                 this._onDropped.fire(event);
             })
         );

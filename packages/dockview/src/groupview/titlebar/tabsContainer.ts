@@ -5,28 +5,28 @@ import {
 } from '../../lifecycle';
 import { addDisposableListener, Emitter, Event } from '../../events';
 import { ITab, MouseEventKind, Tab } from '../tab';
-import { removeClasses, addClasses } from '../../dom';
-import { DroptargetEvent, Position } from '../../dnd/droptarget';
 import { last } from '../../array';
 import { IGroupPanel } from '../groupPanel';
 import { IDockviewComponent } from '../../dockview/dockviewComponent';
-import { LocalSelectionTransfer } from '../../dnd/dataTransfer';
+import { getPanelData } from '../../dnd/dataTransfer';
 import { GroupviewPanel } from '../groupviewPanel';
+import { Droptarget } from '../../dnd/droptarget';
+import { DockviewDropTargets } from '../groupview';
 
-export interface TabDropEvent {
-    readonly event: DroptargetEvent;
-    readonly index?: number;
+export interface TabDropIndexEvent {
+    event: DragEvent;
+    readonly index: number;
 }
 
 export interface ITabsContainer extends IDisposable {
     readonly element: HTMLElement;
     readonly panels: string[];
-    readonly hasActiveDragEvent: boolean;
+    readonly size: number;
     height: number | undefined;
     delete: (id: string) => void;
     indexOf: (id: string) => number;
     at: (index: number) => ITab;
-    onDropEvent: Event<TabDropEvent>;
+    onDrop: Event<TabDropIndexEvent>;
     setActive: (isGroupActive: boolean) => void;
     setActivePanel: (panel: IGroupPanel) => void;
     isActive: (tab: ITab) => boolean;
@@ -43,7 +43,10 @@ export class TabsContainer
 {
     private readonly _element: HTMLElement;
     private readonly tabContainer: HTMLElement;
+    private readonly voidContainer: HTMLElement;
     private readonly actionContainer: HTMLElement;
+
+    private readonly voidDropTarget: Droptarget;
 
     private tabs: IValueDisposable<ITab>[] = [];
     private selectedIndex = -1;
@@ -53,11 +56,15 @@ export class TabsContainer
 
     private _height: number | undefined;
 
-    private readonly _onDropped = new Emitter<TabDropEvent>();
-    readonly onDropEvent: Event<TabDropEvent> = this._onDropped.event;
+    private readonly _onDrop = new Emitter<TabDropIndexEvent>();
+    readonly onDrop: Event<TabDropIndexEvent> = this._onDrop.event;
 
     get panels() {
-        return this.tabs.map((_) => _.value.id);
+        return this.tabs.map((_) => _.value.panelId);
+    }
+
+    get size() {
+        return this.tabs.length;
     }
 
     get height(): number | undefined {
@@ -67,20 +74,15 @@ export class TabsContainer
     set height(value: number | undefined) {
         this._height = value;
         if (typeof value !== 'number') {
-            // removeClasses(this.element, 'separator-border');
             this.element.style.removeProperty(
                 '--dv-tabs-and-actions-container-height'
             );
         } else {
-            // addClasses(this.element, 'separator-border');
-            // if (styles?.separatorBorder) {
             this.element.style.setProperty(
                 '--dv-tabs-and-actions-container-height',
                 `${value}px`
             );
-            // }
         }
-        // this._element.style.height = `${this.height}px`;
     }
 
     show() {
@@ -116,16 +118,12 @@ export class TabsContainer
         );
     }
 
-    public get hasActiveDragEvent() {
-        return !!this.tabs.find((tab) => tab.value.hasActiveDragEvent);
-    }
-
     public at(index: number) {
         return this.tabs[index]?.value;
     }
 
     public indexOf(id: string): number {
-        return this.tabs.findIndex((tab) => tab.value.id === id);
+        return this.tabs.findIndex((tab) => tab.value.panelId === id);
     }
 
     constructor(
@@ -135,7 +133,7 @@ export class TabsContainer
     ) {
         super();
 
-        this.addDisposables(this._onDropped);
+        this.addDisposables(this._onDrop);
 
         this._element = document.createElement('div');
         this._element.className = 'tabs-and-actions-container';
@@ -148,10 +146,38 @@ export class TabsContainer
         this.tabContainer = document.createElement('div');
         this.tabContainer.className = 'tabs-container';
 
+        this.voidContainer = document.createElement('div');
+        this.voidContainer.className = 'void-container';
+
         this._element.appendChild(this.tabContainer);
+        this._element.appendChild(this.voidContainer);
         this._element.appendChild(this.actionContainer);
 
+        this.voidDropTarget = new Droptarget(this.voidContainer, {
+            validOverlays: 'none',
+            canDisplayOverlay: (event) => {
+                const data = getPanelData();
+
+                if (data) {
+                    // don't show the overlay if the tab being dragged is the last panel of this group
+                    return last(this.tabs)?.value.panelId !== data.panelId;
+                }
+
+                return group.model.canDisplayOverlay(
+                    event,
+                    DockviewDropTargets.Panel
+                );
+            },
+        });
+
         this.addDisposables(
+            this.voidDropTarget.onDrop((event) => {
+                this._onDrop.fire({
+                    event: event.event,
+                    index: this.tabs.length,
+                });
+            }),
+            this.voidDropTarget,
             addDisposableListener(this.tabContainer, 'mousedown', (event) => {
                 if (event.defaultPrevented) {
                     return;
@@ -162,62 +188,6 @@ export class TabsContainer
                 if (isLeftClick) {
                     this.accessor.doSetGroupActive(this.group);
                 }
-            }),
-            addDisposableListener(this.tabContainer, 'dragenter', (event) => {
-                if (
-                    !LocalSelectionTransfer.getInstance().hasData(
-                        this.accessor.id
-                    )
-                ) {
-                    console.debug('[tabs] invalid drop event');
-                    return;
-                }
-                if (!last(this.tabs)?.value.hasActiveDragEvent) {
-                    addClasses(this.tabContainer, 'drag-over-target');
-                }
-            }),
-            addDisposableListener(this.tabContainer, 'dragover', (event) => {
-                event.preventDefault();
-            }),
-            addDisposableListener(this.tabContainer, 'dragleave', (event) => {
-                removeClasses(this.tabContainer, 'drag-over-target');
-            }),
-            addDisposableListener(this.tabContainer, 'drop', (event) => {
-                if (
-                    !LocalSelectionTransfer.getInstance().hasData(
-                        this.accessor.id
-                    )
-                ) {
-                    console.debug('[tabs] invalid drop event');
-                    return;
-                }
-                if (event.defaultPrevented) {
-                    console.debug('[tab] drop event defaultprevented');
-                    return;
-                }
-
-                removeClasses(this.tabContainer, 'drag-over-target');
-
-                const activetab = this.tabs.find(
-                    (tab) => tab.value.hasActiveDragEvent
-                );
-
-                const ignore = !!(
-                    activetab &&
-                    event
-                        .composedPath()
-                        .find((x) => activetab.value.element === x)
-                );
-
-                if (ignore) {
-                    console.debug('[tabs] ignore event');
-                    return;
-                }
-
-                this._onDropped.fire({
-                    event: { event, position: Position.Center },
-                    index: this.tabs.length - (activetab ? 1 : 0),
-                });
             })
         );
     }
@@ -251,7 +221,7 @@ export class TabsContainer
     }
 
     public delete(id: string) {
-        const index = this.tabs.findIndex((tab) => tab.value.id === id);
+        const index = this.tabs.findIndex((tab) => tab.value.panelId === id);
 
         const tabToRemove = this.tabs.splice(index, 1)[0];
 
@@ -263,13 +233,13 @@ export class TabsContainer
 
     public setActivePanel(panel: IGroupPanel) {
         this.tabs.forEach((tab) => {
-            const isActivePanel = panel.id === tab.value.id;
+            const isActivePanel = panel.id === tab.value.panelId;
             tab.value.setActive(isActivePanel);
         });
     }
 
     public openPanel(panel: IGroupPanel, index: number = this.tabs.length) {
-        if (this.tabs.find((tab) => tab.value.id === panel.id)) {
+        if (this.tabs.find((tab) => tab.value.panelId === panel.id)) {
             return;
         }
         const tabToAdd = new Tab(panel.id, this.accessor, this.group);
@@ -299,9 +269,9 @@ export class TabsContainer
                         break;
                 }
             }),
-            tabToAdd.onDropped((event) => {
-                this._onDropped.fire({
-                    event,
+            tabToAdd.onDrop((event) => {
+                this._onDrop.fire({
+                    event: event.event,
                     index: this.tabs.findIndex((x) => x.value === tabToAdd),
                 });
             })

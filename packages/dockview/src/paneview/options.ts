@@ -22,4 +22,5 @@ export interface PaneviewComponentOptions {
         header: FrameworkFactory<IPaneHeaderPart>;
         body: FrameworkFactory<IPaneBodyPart>;
     };
+    disableDnd?: boolean;
 }

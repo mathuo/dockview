@@ -106,8 +106,12 @@ export class Splitview {
     private _proportions: number[] | undefined = undefined;
     private proportionalLayout: boolean;
 
-    private _onDidSashEnd = new Emitter<void>();
-    public onDidSashEnd = this._onDidSashEnd.event;
+    private readonly _onDidSashEnd = new Emitter<void>();
+    readonly onDidSashEnd = this._onDidSashEnd.event;
+    private readonly _onDidAddView = new Emitter<IView>();
+    readonly onDidAddView = this._onDidAddView.event;
+    private readonly _onDidRemoveView = new Emitter<IView>();
+    readonly onDidRemoveView = this._onDidAddView.event;
 
     get size() {
         return this._size;
@@ -548,6 +552,8 @@ export class Splitview {
         ) {
             this.distributeViewSizes();
         }
+
+        this._onDidAddView.fire(view);
     }
 
     distributeViewSizes(): void {
@@ -601,6 +607,8 @@ export class Splitview {
         if (sizing && sizing.type === 'distribute') {
             this.distributeViewSizes();
         }
+
+        this._onDidRemoveView.fire(viewItem.view);
 
         return viewItem.view;
     }
@@ -1033,6 +1041,10 @@ export class Splitview {
     }
 
     public dispose() {
+        this._onDidSashEnd.dispose();
+        this._onDidAddView.dispose();
+        this._onDidRemoveView.dispose();
+
         this.element.remove();
         for (let i = 0; i < this.element.children.length; i++) {
             if (this.element.children.item(i) === this.element) {

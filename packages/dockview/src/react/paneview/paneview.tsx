@@ -9,6 +9,7 @@ import { PaneviewApi } from '../../api/component.api';
 import { PanePanelSection } from './view';
 import { PanelCollection, PanelParameters } from '../types';
 import { watchElementResize } from '../../dom';
+import { DroptargetEvent } from '../../dnd/droptarget';
 
 export interface PaneviewReadyEvent {
     api: PaneviewApi;
@@ -21,12 +22,19 @@ export interface IPaneviewPanelProps<T extends {} = Record<string, any>>
     title: string;
 }
 
+export interface PaneviewDropEvent {
+    api: PaneviewApi;
+    event: DroptargetEvent;
+}
+
 export interface IPaneviewReactProps {
     onReady?: (event: PaneviewReadyEvent) => void;
     components?: PanelCollection<IPaneviewPanelProps>;
     headerComponents?: PanelCollection<IPaneviewPanelProps>;
     className?: string;
     disableAutoResizing?: boolean;
+    disableDnd?: boolean;
+    onDidDrop?(event: PaneviewDropEvent): void;
 }
 
 export const PaneviewReact = React.forwardRef(
@@ -68,6 +76,7 @@ export const PaneviewReact = React.forwardRef(
                 frameworkComponents: props.components,
                 components: {},
                 headerComponents: {},
+                disableDnd: props.disableDnd,
                 headerframeworkComponents: props.headerComponents,
                 frameworkWrapper: {
                     header: {
@@ -79,16 +88,25 @@ export const PaneviewReact = React.forwardRef(
                 },
             });
 
+            const api = new PaneviewApi(paneview);
+
+            const disposable = paneview.onDidDrop((event) => {
+                if (props.onDidDrop) {
+                    props.onDidDrop({ event, api });
+                }
+            });
+
             const { clientWidth, clientHeight } = domRef.current!;
             paneview.layout(clientWidth, clientHeight);
 
             if (props.onReady) {
-                props.onReady({ api: new PaneviewApi(paneview) });
+                props.onReady({ api });
             }
 
             paneviewRef.current = paneview;
 
             return () => {
+                disposable.dispose();
                 paneview.dispose();
             };
         }, []);

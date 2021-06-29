@@ -26,17 +26,16 @@ describe('droptarget', () => {
         let position: Position | undefined = undefined;
 
         droptarget = new Droptarget(element, {
-            isDisabled: () => false,
-            isDirectional: false,
-            id: 'test-dnd',
-            enableExternalDragEvents: true,
+            canDisplayOverlay: () => true,
+            validOverlays: 'none',
         });
 
-        droptarget.onDidChange((event) => {
+        droptarget.onDrop((event) => {
             position = event.position;
         });
 
         fireEvent.dragEnter(element);
+        fireEvent.dragOver(element);
 
         const target = element.querySelector(
             '.drop-target-dropzone'
@@ -49,17 +48,16 @@ describe('droptarget', () => {
         let position: Position | undefined = undefined;
 
         droptarget = new Droptarget(element, {
-            isDisabled: () => false,
-            isDirectional: true,
-            id: 'test-dnd',
-            enableExternalDragEvents: true,
+            canDisplayOverlay: () => true,
+            validOverlays: 'all',
         });
 
-        droptarget.onDidChange((event) => {
+        droptarget.onDrop((event) => {
             position = event.position;
         });
 
         fireEvent.dragEnter(element);
+        fireEvent.dragOver(element);
 
         const target = element.querySelector(
             '.drop-target-dropzone'
@@ -80,15 +78,14 @@ describe('droptarget', () => {
 
     test('default', () => {
         droptarget = new Droptarget(element, {
-            isDisabled: () => false,
-            isDirectional: true,
-            id: 'test-dnd',
-            enableExternalDragEvents: true,
+            canDisplayOverlay: () => true,
+            validOverlays: 'all',
         });
 
         expect(droptarget.state).toBeUndefined();
 
         fireEvent.dragEnter(element);
+        fireEvent.dragOver(element);
 
         let viewQuery = element.querySelectorAll(
             '.drop-target > .drop-target-dropzone > .drop-target-selection'

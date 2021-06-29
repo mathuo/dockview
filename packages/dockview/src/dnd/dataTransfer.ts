@@ -1,5 +1,6 @@
 import { PanelOptions } from '../dockview/options';
 import { tryParseJSON } from '../json';
+import { PanelTransfer, PaneTransfer } from './droptarget';
 
 export const DATA_KEY = 'splitview/transfer';
 
@@ -12,7 +13,7 @@ export const isPanelTransferEvent = (event: DragEvent) => {
 };
 
 export enum DragType {
-    ITEM = 'group_drag',
+    DOCKVIEW_TAB = 'dockview_tab',
     EXTERNAL = 'external_group_drag',
 }
 
@@ -30,7 +31,7 @@ export type DataObject = DragItem | ExternalDragItem;
  * dragging a tab component
  */
 export const isTabDragEvent = (data: any): data is DragItem => {
-    return data.type === DragType.ITEM;
+    return data.type === DragType.DOCKVIEW_TAB;
 };
 
 /**
@@ -101,4 +102,26 @@ export class LocalSelectionTransfer<T> {
             this.proto = proto;
         }
     }
+}
+
+export function getPanelData(): PanelTransfer | undefined {
+    const panelTransfer = LocalSelectionTransfer.getInstance<PanelTransfer>();
+    const isPanelEvent = panelTransfer.hasData(PanelTransfer.prototype);
+
+    if (!isPanelEvent) {
+        return undefined;
+    }
+
+    return panelTransfer.getData(PanelTransfer.prototype)![0];
+}
+
+export function getPaneData(): PaneTransfer | undefined {
+    const paneTransfer = LocalSelectionTransfer.getInstance<PaneTransfer>();
+    const isPanelEvent = paneTransfer.hasData(PaneTransfer.prototype);
+
+    if (!isPanelEvent) {
+        return undefined;
+    }
+
+    return paneTransfer.getData(PaneTransfer.prototype)![0];
 }

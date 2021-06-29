@@ -1,12 +1,8 @@
 import { DockviewApi } from '../api/component.api';
 import { timeoutAsPromise } from '../async';
-import {
-    extractData,
-    isCustomDragEvent,
-    isPanelTransferEvent,
-    isTabDragEvent,
-} from '../dnd/dataTransfer';
-import { Droptarget, DroptargetEvent, Position } from '../dnd/droptarget';
+import { getPanelData } from '../dnd/dataTransfer';
+import { Position } from '../dnd/droptarget';
+import { Droptarget } from '../dnd/droptarget';
 import {
     DockviewComponent,
     IDockviewComponent,
@@ -15,7 +11,7 @@ import { isAncestor, toggleClass } from '../dom';
 import { addDisposableListener, Emitter, Event } from '../events';
 import { IGridPanelView } from '../gridview/baseComponentGridview';
 import { IViewSize } from '../gridview/gridview';
-import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
 import { IGroupPanel } from './groupPanel';
 import { ContentContainer, IContentContainer } from './panel/content';
@@ -44,6 +40,20 @@ export enum GroupChangeKind {
     PANEL_CLEAN = 'PANEL_CLEAN',
     //
     LAYOUT_CONFIG_UPDATED = 'LAYOUT_CONFIG_UPDATED',
+}
+
+export interface DndService {
+    canDisplayOverlay(
+        group: IGroupview,
+        event: DragEvent,
+        target: DockviewDropTargets
+    ): boolean;
+    onDrop(
+        group: IGroupview,
+        event: DragEvent,
+        position: Position,
+        index?: number
+    ): void;
 }
 
 export interface IGroupItem {
@@ -77,6 +87,12 @@ export interface GroupPanelViewState {
     id: string;
 }
 
+export enum DockviewDropTargets {
+    Tab,
+    Panel,
+    TabContainer,
+}
+
 export interface IGroupview extends IDisposable, IGridPanelView {
     readonly isActive: boolean;
     readonly size: number;
@@ -99,7 +115,7 @@ export interface IGroupview extends IDisposable, IGridPanelView {
     onDidGroupChange: Event<{ kind: GroupChangeKind }>;
     onMove: Event<GroupMoveEvent>;
     //
-    startActiveDrag(panel: IGroupPanel): IDisposable;
+    // startActiveDrag(panel: IGroupPanel): IDisposable;
     //
     moveToNext(options?: { panel?: IGroupPanel; suppressRoll?: boolean }): void;
     moveToPrevious(options?: {
@@ -108,12 +124,7 @@ export interface IGroupview extends IDisposable, IGridPanelView {
     }): void;
     isContentFocused(): boolean;
     updateActions(): void;
-}
-
-export interface GroupDropEvent {
-    event: DragEvent;
-    target: Position;
-    index?: number;
+    canDisplayOverlay(event: DragEvent, target: DockviewDropTargets): boolean;
 }
 
 export class Groupview extends CompositeDisposable implements IGroupview {
@@ -137,9 +148,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
     private readonly _onMove = new Emitter<GroupMoveEvent>();
     readonly onMove: Event<GroupMoveEvent> = this._onMove.event;
-
-    private readonly _onDrop = new Emitter<GroupDropEvent>();
-    readonly onDrop: Event<GroupDropEvent> = this._onDrop.event;
 
     private readonly _onDidGroupChange = new Emitter<GroupChangeEvent>();
     readonly onDidGroupChange: Event<{ kind: GroupChangeKind }> =
@@ -205,24 +213,26 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         this.container.classList.add('groupview');
 
-        this.addDisposables(this._onMove, this._onDidGroupChange, this._onDrop);
+        this.addDisposables(this._onMove, this._onDidGroupChange);
 
         this.tabsContainer = new TabsContainer(this.accessor, this.parent, {
             tabHeight: options.tabHeight,
         });
         this.contentContainer = new ContentContainer();
         this.dropTarget = new Droptarget(this.contentContainer.element, {
-            isDirectional: true,
-            id: this.accessor.id,
-            isDisabled: () => {
-                // disable the drop target if we only have one tab, and that is also the tab we are moving
-                return (
-                    this._panels.length === 1 &&
-                    this.tabsContainer.hasActiveDragEvent
-                );
+            validOverlays: 'all',
+            canDisplayOverlay: (event) => {
+                const data = getPanelData();
+
+                if (data) {
+                    const groupHasOnePanelAndIsActiveDragElement =
+                        this._panels.length === 1 && data.groupId === this.id;
+
+                    return !groupHasOnePanelAndIsActiveDragElement;
+                }
+
+                return this.canDisplayOverlay(event, DockviewDropTargets.Panel);
             },
-            enableExternalDragEvents:
-                this.accessor.options.enableExternalDragEvents,
         });
 
         container.append(
@@ -233,28 +243,22 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.addDisposables(
             this._onMove,
             this._onDidGroupChange,
-            this.tabsContainer.onDropEvent((event) =>
-                this.handleDropEvent(event.event, event.index)
-            ),
+            this.tabsContainer.onDrop((event) => {
+                this.handleDropEvent(event.event, Position.Center, event.index);
+            }),
             this.contentContainer.onDidFocus(() => {
                 this.accessor.doSetGroupActive(this.parent, true);
             }),
             this.contentContainer.onDidBlur(() => {
                 // this._activePanel?.api._ondid
             }),
-            this.dropTarget.onDidChange((event) => {
-                // if we've center dropped on ourself then ignore
-                if (
-                    event.position === Position.Center &&
-                    this.tabsContainer.hasActiveDragEvent
-                ) {
-                    return;
-                }
-
-                this.handleDropEvent(event);
+            this.dropTarget.onDrop((event) => {
+                this.handleDropEvent(event.event, event.position);
             })
         );
+    }
 
+    initialize() {
         if (this.options?.panels) {
             this.options.panels.forEach((panel) => {
                 this.doAddPanel(panel);
@@ -264,9 +268,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         if (this.options?.activePanel) {
             this.openPanel(this.options.activePanel);
         }
-    }
 
-    initialize() {
         // must be run after the constructor otherwise this.parent may not be
         // correctly initialized
         this.setActive(this.isActive, true, true);
@@ -295,19 +297,19 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         };
     }
 
-    public startActiveDrag(panel: IGroupPanel): IDisposable {
-        const index = this.tabsContainer.indexOf(panel.id);
-        if (index > -1) {
-            const tab = this.tabsContainer.at(index);
-            tab.startDragEvent();
-            return {
-                dispose: () => {
-                    tab.stopDragEvent();
-                },
-            };
-        }
-        return Disposable.NONE;
-    }
+    // public startActiveDrag(panel: IGroupPanel): IDisposable {
+    //     const index = this.tabsContainer.indexOf(panel.id);
+    //     if (index > -1) {
+    //         const tab = this.tabsContainer.at(index);
+    //         tab.startDragEvent();
+    //         return {
+    //             dispose: () => {
+    //                 tab.stopDragEvent();
+    //             },
+    //         };
+    //     }
+    //     return Disposable.NONE;
+    // }
 
     public moveToNext(options?: {
         panel?: IGroupPanel;
@@ -385,7 +387,10 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         panel: IGroupPanel,
         options: { index?: number; skipFocus?: boolean } = {}
     ) {
-        if (typeof options.index !== 'number') {
+        if (
+            typeof options.index !== 'number' ||
+            options.index > this.panels.length
+        ) {
             options.index = this.panels.length;
         }
         if (this._activePanel === panel) {
@@ -668,33 +673,34 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
     }
 
-    private handleDropEvent(event: DroptargetEvent, index?: number) {
-        if (isPanelTransferEvent(event.event)) {
-            this.handlePanelDropEvent(event.event, event.position, index);
-            return;
-        }
-
-        this._onDrop.fire({
-            event: event.event,
-            target: event.position,
-            index,
-        });
-
-        console.debug('[customDropEvent]');
+    canDisplayOverlay(
+        dragOverEvent: DragEvent,
+        target: DockviewDropTargets
+    ): boolean {
+        // custom overlay handler
+        return false;
     }
 
-    private handlePanelDropEvent(
+    private handleDropEvent(
         event: DragEvent,
-        target: Position,
+        position: Position,
         index?: number
     ) {
-        const dataObject = extractData(event);
+        const data = getPanelData();
 
-        if (isTabDragEvent(dataObject)) {
-            const { groupId, itemId } = dataObject;
+        if (data) {
+            const fromSameGroup =
+                this.tabsContainer.indexOf(data.panelId) !== -1;
+
+            if (fromSameGroup && this.tabsContainer.size === 1) {
+                console.debug('[tabs] ignore event');
+                return;
+            }
+
+            const { groupId, panelId } = data;
             const isSameGroup = this.id === groupId;
-            if (isSameGroup && !target) {
-                const oldIndex = this.tabsContainer.indexOf(itemId);
+            if (isSameGroup && !position) {
+                const oldIndex = this.tabsContainer.indexOf(panelId);
                 if (oldIndex === index) {
                     console.debug(
                         '[tabs] drop indicates no change in position'
@@ -704,30 +710,13 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             }
 
             this._onMove.fire({
-                target,
-                groupId: dataObject.groupId,
-                itemId: dataObject.itemId,
+                target: position,
+                groupId: data.groupId,
+                itemId: data.panelId,
                 index,
             });
-        }
-
-        if (isCustomDragEvent(dataObject)) {
-            let panel = this.accessor.getGroupPanel(dataObject.id);
-
-            if (!panel) {
-                panel = this.accessor.addPanel(dataObject);
-            }
-
-            if (!panel.group) {
-                throw new Error(`panel ${panel.id} has no associated group`);
-            }
-
-            this._onMove.fire({
-                target,
-                groupId: panel.group.id,
-                itemId: panel.id,
-                index,
-            });
+        } else {
+            // custom drop handler
         }
     }
 

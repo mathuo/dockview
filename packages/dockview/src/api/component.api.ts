@@ -1,6 +1,5 @@
 import {
     IDockviewComponent,
-    LayoutDropEvent,
     SerializedDockview,
 } from '../dockview/dockviewComponent';
 import {
@@ -339,19 +338,19 @@ export class DockviewApi {
         return this.component.addPanel(options);
     }
 
-    addDndHandle(type: string, cb: (event: LayoutDropEvent) => PanelOptions) {
-        return this.component.addDndHandle(type, cb);
-    }
+    // addDndHandle(type: string, cb: (event: LayoutDropEvent) => PanelOptions) {
+    //     return this.component.addDndHandle(type, cb);
+    // }
 
-    createDragTarget(
-        target: {
-            element: HTMLElement;
-            content: string;
-        },
-        options: (() => PanelOptions) | PanelOptions
-    ) {
-        return this.component.createDragTarget(target, options);
-    }
+    // createDragTarget(
+    //     target: {
+    //         element: HTMLElement;
+    //         content: string;
+    //     },
+    //     options: (() => PanelOptions) | PanelOptions
+    // ) {
+    //     return this.component.createDragTarget(target, options);
+    // }
 
     addEmptyGroup(options?: AddGroupOptions) {
         return this.component.addEmptyGroup(options);

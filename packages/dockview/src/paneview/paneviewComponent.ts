@@ -22,6 +22,8 @@ import {
     PanePanelInitParameter,
     IPaneviewPanel,
 } from './paneviewPanel';
+import { DraggablePaneviewPanel } from './draggablePaneviewPanel';
+import { DroptargetEvent } from '../dnd/droptarget';
 
 export interface SerializedPaneviewPanel {
     snap?: boolean;
@@ -74,7 +76,7 @@ class DefaultHeader extends CompositeDisposable implements IPaneHeaderPart {
     }
 }
 
-export class PaneFramework extends PaneviewPanel {
+export class PaneFramework extends DraggablePaneviewPanel {
     constructor(
         private readonly options: {
             id: string;
@@ -84,6 +86,7 @@ export class PaneFramework extends PaneviewPanel {
             header: IPaneHeaderPart;
             orientation: Orientation;
             isExpanded: boolean;
+            disableDnd: boolean;
         }
     ) {
         super(
@@ -91,7 +94,8 @@ export class PaneFramework extends PaneviewPanel {
             options.component,
             options.headerComponent,
             options.orientation,
-            options.isExpanded
+            options.isExpanded,
+            options.disableDnd
         );
     }
 
@@ -142,12 +146,24 @@ export interface IPaneviewComponent extends IDisposable {
 
 export class PaneviewComponent
     extends CompositeDisposable
-    implements IPaneviewComponent {
+    implements IPaneviewComponent
+{
     private _disposable = new MutableDisposable();
     private _paneview!: Paneview;
 
     private readonly _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
+
+    private readonly _onDidDrop = new Emitter<DroptargetEvent>();
+    readonly onDidDrop: Event<DroptargetEvent> = this._onDidDrop.event;
+
+    get onDidAddView() {
+        return this._paneview.onDidAddView;
+    }
+
+    get onDidRemoveView() {
+        return this._paneview.onDidRemoveView;
+    }
 
     set paneview(value: Paneview) {
         this._paneview = value;
@@ -216,8 +232,8 @@ export class PaneviewComponent
             this.options.frameworkComponents || {},
             this.options.frameworkWrapper
                 ? {
-                      createComponent: this.options.frameworkWrapper.body
-                          .createComponent,
+                      createComponent:
+                          this.options.frameworkWrapper.body.createComponent,
                   }
                 : undefined
         );
@@ -232,8 +248,9 @@ export class PaneviewComponent
                 this.options.headerframeworkComponents,
                 this.options.frameworkWrapper
                     ? {
-                          createComponent: this.options.frameworkWrapper.header
-                              .createComponent,
+                          createComponent:
+                              this.options.frameworkWrapper.header
+                                  .createComponent,
                       }
                     : undefined
             );
@@ -249,6 +266,11 @@ export class PaneviewComponent
             body,
             orientation: Orientation.VERTICAL,
             isExpanded: !!options.isExpanded,
+            disableDnd: !!this.options.disableDnd,
+        });
+
+        view.onDidDrop((event) => {
+            this._onDidDrop.fire(event);
         });
 
         const size: Sizing | number =
@@ -309,10 +331,8 @@ export class PaneviewComponent
         if (!this.element.parentElement) {
             return;
         }
-        const {
-            width,
-            height,
-        } = this.element.parentElement.getBoundingClientRect();
+        const { width, height } =
+            this.element.parentElement.getBoundingClientRect();
         this.layout(width, height);
     }
 
@@ -367,8 +387,9 @@ export class PaneviewComponent
                         this.options.frameworkComponents || {},
                         this.options.frameworkWrapper
                             ? {
-                                  createComponent: this.options.frameworkWrapper
-                                      .body.createComponent,
+                                  createComponent:
+                                      this.options.frameworkWrapper.body
+                                          .createComponent,
                               }
                             : undefined
                     );
@@ -383,9 +404,9 @@ export class PaneviewComponent
                             this.options.headerframeworkComponents || {},
                             this.options.frameworkWrapper
                                 ? {
-                                      createComponent: this.options
-                                          .frameworkWrapper.header
-                                          .createComponent,
+                                      createComponent:
+                                          this.options.frameworkWrapper.header
+                                              .createComponent,
                                   }
                                 : undefined
                         );
@@ -401,6 +422,11 @@ export class PaneviewComponent
                         body,
                         orientation: Orientation.VERTICAL,
                         isExpanded: !!view.expanded,
+                        disableDnd: !!this.options.disableDnd,
+                    });
+
+                    panel.onDidDrop((event) => {
+                        this._onDidDrop.fire(event);
                     });
 
                     queue.push(() => {

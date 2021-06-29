@@ -24,6 +24,13 @@ export class Paneview extends CompositeDisposable implements IDisposable {
     private readonly _onDidChange = new Emitter<void>();
     readonly onDidChange: Event<void> = this._onDidChange.event;
 
+    get onDidAddView() {
+        return <Event<PaneviewPanel>>this.splitview.onDidAddView;
+    }
+    get onDidRemoveView() {
+        return <Event<PaneviewPanel>>this.splitview.onDidRemoveView;
+    }
+
     get minimumSize() {
         return this.splitview.minimumSize;
     }
@@ -66,10 +73,12 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         // if we've added views from the descriptor we need to
         // add the panes to our Pane array and setup animation
         this.getPanes().forEach((pane, index) => {
-            const disposable = pane.onDidChangeExpansionState(() => {
-                this.setupAnimation();
-                this._onDidChange.fire(undefined);
-            });
+            const disposable = new CompositeDisposable(
+                pane.onDidChangeExpansionState(() => {
+                    this.setupAnimation();
+                    this._onDidChange.fire(undefined);
+                })
+            );
 
             const paneItem: PaneItem = {
                 pane,
@@ -112,6 +121,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         };
 
         this.paneItems.splice(index, 0, paneItem);
+
         pane.orthogonalSize = this.splitview.orthogonalSize;
         this.splitview.addView(pane, size, index, skipLayout);
     }
@@ -131,9 +141,21 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         return paneItem;
     }
 
+    private skipAnimation = false;
+
     public moveView(from: number, to: number) {
+        if (from === to) {
+            return;
+        }
+
         const view = this.removePane(from);
-        this.addPane(view.pane, to);
+
+        this.skipAnimation = true;
+        try {
+            this.addPane(view.pane, view.pane.size, to, false);
+        } finally {
+            this.skipAnimation = false;
+        }
     }
 
     public layout(size: number, orthogonalSize: number): void {
@@ -145,6 +167,10 @@ export class Paneview extends CompositeDisposable implements IDisposable {
     }
 
     private setupAnimation() {
+        if (this.skipAnimation) {
+            return;
+        }
+
         if (this.animationTimer) {
             clearTimeout(this.animationTimer);
             this.animationTimer = undefined;
