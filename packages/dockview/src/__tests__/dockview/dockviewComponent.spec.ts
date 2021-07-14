@@ -9,6 +9,7 @@ import { Orientation } from '../../splitview/core/splitview';
 import { ReactPanelDeserialzier } from '../../react/deserializer';
 import { Position } from '../../dnd/droptarget';
 import { GroupviewPanel } from '../../groupview/groupviewPanel';
+import { IGroupPanel } from '../../groupview/groupPanel';
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
 
@@ -357,6 +358,7 @@ describe('dockviewComponent', () => {
                             data: {
                                 views: ['panel1'],
                                 id: 'group-1',
+                                activeView: 'panel1',
                             },
                             size: 500,
                         },

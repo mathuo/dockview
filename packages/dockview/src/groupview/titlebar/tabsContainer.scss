@@ -10,8 +10,12 @@
         display: none;
     }
 
-    .tabs-container {
+    .void-container {
+        display: flex;
         flex-grow: 1;
+    }
+
+    .tabs-container {
         display: flex;
         overflow-x: overlay;
         overflow-y: hidden;
@@ -30,10 +34,6 @@
         /* Handle */
         &::-webkit-scrollbar-thumb {
             background: var(--dv-tabs-container-scrollbar-color);
-        }
-
-        &.drag-over-target {
-            background-color: var(--dv-drag-over-background-color);
         }
 
         .tab {

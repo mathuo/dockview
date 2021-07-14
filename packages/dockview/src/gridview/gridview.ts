@@ -555,9 +555,8 @@ export class Gridview implements IDisposable {
 
             let newSiblingSize: number | Sizing = 0;
 
-            const newSiblingCachedVisibleSize = grandParent.getChildCachedVisibleSize(
-                parentIndex
-            );
+            const newSiblingCachedVisibleSize =
+                grandParent.getChildCachedVisibleSize(parentIndex);
             if (typeof newSiblingCachedVisibleSize === 'number') {
                 newSiblingSize = Sizing.Invisible(newSiblingCachedVisibleSize);
             }

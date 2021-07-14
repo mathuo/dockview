@@ -304,26 +304,26 @@ export const TestGrid = (props: IGridviewPanelProps) => {
         _api.current = event.api;
         registry.register('dockview', api);
 
-        api.addDndHandle('text/plain', (ev) => {
-            const { event } = ev;
+        // api.addDndHandle('text/plain', (ev) => {
+        //     const { event } = ev;
 
-            return {
-                id: 'yellow',
-                component: 'test_component',
-            };
-        });
+        //     return {
+        //         id: 'yellow',
+        //         component: 'test_component',
+        //     };
+        // });
 
-        api.addDndHandle('Files', (ev) => {
-            const { event } = ev;
+        // api.addDndHandle('Files', (ev) => {
+        //     const { event } = ev;
 
-            ev.event.event.preventDefault();
+        //     ev.event.event.preventDefault();
 
-            return {
-                id: Date.now().toString(),
-                title: event.event.dataTransfer.files[0].name,
-                component: 'test_component',
-            };
-        });
+        //     return {
+        //         id: Date.now().toString(),
+        //         title: event.event.dataTransfer.files[0].name,
+        //         component: 'test_component',
+        //     };
+        // });
 
         const state = localStorage.getItem('dockview');
         if (state) {

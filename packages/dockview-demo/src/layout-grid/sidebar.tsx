@@ -6,6 +6,7 @@ import {
     IPaneviewPanelProps,
     CompositeDisposable,
     PaneviewApi,
+    PaneviewDropEvent,
 } from 'dockview';
 import { ControlCenter } from './controlCenter';
 import { toggleClass } from '../dom';
@@ -183,6 +184,10 @@ export const Sidebar = (props: IGridviewPanelProps) => {
         };
     }, []);
 
+    const onDidDrop = React.useCallback((event: PaneviewDropEvent) => {
+        console.log('drop', event);
+    }, []);
+
     return (
         <div
             style={{
@@ -194,6 +199,7 @@ export const Sidebar = (props: IGridviewPanelProps) => {
                 headerComponents={headerComponents}
                 components={components}
                 onReady={onReady}
+                onDidDrop={onDidDrop}
             />
         </div>
     );

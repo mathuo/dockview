@@ -7,13 +7,8 @@ import { Position } from '../dnd/droptarget';
 import { tail, sequenceEquals } from '../array';
 import { GroupviewPanelState, IGroupPanel } from '../groupview/groupPanel';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
-import {
-    CompositeDisposable,
-    IDisposable,
-    IValueDisposable,
-    MutableDisposable,
-} from '../lifecycle';
-import { Event, Emitter, addDisposableListener } from '../events';
+import { CompositeDisposable, IValueDisposable } from '../lifecycle';
+import { Event, Emitter } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import { timeoutAsPromise } from '../async';
 import {
@@ -28,16 +23,10 @@ import { createComponent } from '../panel/componentFactory';
 import {
     AddGroupOptions,
     AddPanelOptions,
-    PanelOptions,
     DockviewOptions as DockviewComponentOptions,
     MovementOptions,
     TabContextMenuEvent,
 } from './options';
-import {
-    DATA_KEY,
-    DragType,
-    LocalSelectionTransfer,
-} from '../dnd/dataTransfer';
 import {
     BaseGrid,
     IBaseGrid,
@@ -50,7 +39,6 @@ import { Orientation } from '../splitview/core/splitview';
 import { DefaultTab } from './components/tab/defaultTab';
 import {
     GroupChangeKind,
-    GroupDropEvent,
     GroupOptions,
     GroupPanelViewState,
 } from '../groupview/groupview';
@@ -113,26 +101,22 @@ export interface IDockviewComponent extends IBaseGrid<GroupviewPanel> {
     onTabContextMenu: Event<TabContextMenuEvent>;
     moveToNext(options?: MovementOptions): void;
     moveToPrevious(options?: MovementOptions): void;
-    createDragTarget(
-        target: {
-            element: HTMLElement;
-            content: string;
-        },
-        options: (() => PanelOptions) | PanelOptions
-    ): IDisposable;
-    addDndHandle(
-        type: string,
-        cb: (event: LayoutDropEvent) => PanelOptions
-    ): void;
+    // createDragTarget(
+    //     target: {
+    //         element: HTMLElement;
+    //         content: string;
+    //     },
+    //     options: (() => PanelOptions) | PanelOptions
+    // ): IDisposable;
+    // addDndHandle(
+    //     type: string,
+    //     cb: (event: LayoutDropEvent) => PanelOptions
+    // ): void;
     setActivePanel(panel: IGroupPanel): void;
     focus(): void;
     toJSON(): SerializedDockview;
     fromJSON(data: SerializedDockview): void;
     onDidLayoutChange: Event<void>;
-}
-
-export interface LayoutDropEvent {
-    event: GroupDropEvent;
 }
 
 export class DockviewComponent
@@ -153,13 +137,13 @@ export class DockviewComponent
     readonly onTabContextMenu: Event<TabContextMenuEvent> =
         this._onTabContextMenu.event;
     // everything else
-    private drag = new MutableDisposable();
+    // private drag = new MutableDisposable();
     private _deserializer: IPanelDeserializer | undefined;
     private panelState: State = {};
-    private registry = new Map<
-        string,
-        (event: LayoutDropEvent) => PanelOptions
-    >();
+    // private registry = new Map<
+    //     string,
+    //     (event: LayoutDropEvent) => PanelOptions
+    // >();
     private _api: DockviewApi;
     private _options: DockviewComponentOptions;
 
@@ -274,12 +258,12 @@ export class DockviewComponent
         this.layout(this.gridview.width, this.gridview.height, true);
     }
 
-    addDndHandle(
-        type: string,
-        cb: (event: LayoutDropEvent) => PanelOptions
-    ): void {
-        this.registry.set(type, cb);
-    }
+    // addDndHandle(
+    //     type: string,
+    //     cb: (event: LayoutDropEvent) => PanelOptions
+    // ): void {
+    //     this.registry.set(type, cb);
+    // }
 
     focus(): void {
         this.activeGroup?.focus();
@@ -289,57 +273,57 @@ export class DockviewComponent
         return this.panels.get(id)?.value;
     }
 
-    createDragTarget(
-        target: {
-            element: HTMLElement;
-            content: string;
-        },
-        options: (() => PanelOptions) | PanelOptions
-    ): IDisposable {
-        return new CompositeDisposable(
-            addDisposableListener(target.element, 'dragstart', (event) => {
-                if (!event.dataTransfer) {
-                    throw new Error('unsupported');
-                }
+    // createDragTarget(
+    //     target: {
+    //         element: HTMLElement;
+    //         content: string;
+    //     },
+    //     options: (() => PanelOptions) | PanelOptions
+    // ): IDisposable {
+    //     return new CompositeDisposable(
+    //         addDisposableListener(target.element, 'dragstart', (event) => {
+    //             if (!event.dataTransfer) {
+    //                 throw new Error('unsupported');
+    //             }
 
-                const panelOptions =
-                    typeof options === 'function' ? options() : options;
+    //             const panelOptions =
+    //                 typeof options === 'function' ? options() : options;
 
-                const panel = this.panels.get(panelOptions.id)?.value;
-                if (panel) {
-                    this.drag.value = panel.group!.model.startActiveDrag(panel);
-                }
+    //             const panel = this.panels.get(panelOptions.id)?.value;
+    //             if (panel) {
+    //                 this.drag.value = panel.group!.model.startActiveDrag(panel);
+    //             }
 
-                const data = JSON.stringify({
-                    type: DragType.EXTERNAL,
-                    ...panelOptions,
-                });
+    //             const data = JSON.stringify({
+    //                 type: DragType.EXTERNAL,
+    //                 ...panelOptions,
+    //             });
 
-                LocalSelectionTransfer.getInstance().setData([data], this.id);
+    //             LocalSelectionTransfer.getInstance().setData([data], this.id);
 
-                event.dataTransfer.effectAllowed = 'move';
+    //             event.dataTransfer.effectAllowed = 'move';
 
-                const dragImage = document.createElement('div');
-                dragImage.textContent = target.content;
-                dragImage.classList.add('custom-dragging');
+    //             const dragImage = document.createElement('div');
+    //             dragImage.textContent = target.content;
+    //             dragImage.classList.add('custom-dragging');
 
-                document.body.appendChild(dragImage);
-                event.dataTransfer.setDragImage(
-                    dragImage,
-                    event.offsetX,
-                    event.offsetY
-                );
-                setTimeout(() => document.body.removeChild(dragImage), 0);
+    //             document.body.appendChild(dragImage);
+    //             event.dataTransfer.setDragImage(
+    //                 dragImage,
+    //                 event.offsetX,
+    //                 event.offsetY
+    //             );
+    //             setTimeout(() => document.body.removeChild(dragImage), 0);
 
-                event.dataTransfer.setData(DATA_KEY, data);
-            }),
-            addDisposableListener(this.element, 'dragend', (ev) => {
-                // drop events fire before dragend so we can remove this safely
-                LocalSelectionTransfer.getInstance().clearData(this.id);
-                this.drag.dispose();
-            })
-        );
-    }
+    //             event.dataTransfer.setData(DATA_KEY, data);
+    //         }),
+    //         addDisposableListener(this.element, 'dragend', (ev) => {
+    //             // drop events fire before dragend so we can remove this safely
+    //             LocalSelectionTransfer.getInstance().clearData(this.id);
+    //             this.drag.dispose();
+    //         })
+    //     );
+    // }
 
     setActivePanel(panel: IGroupPanel): void {
         if (!panel.group) {
@@ -759,47 +743,6 @@ export class DockviewComponent
                 }),
                 view.model.onDidGroupChange((event) => {
                     this._onGridEvent.fire(event);
-                }),
-                view.model.onDrop((event) => {
-                    const dragEvent = event.event;
-                    const dataTransfer = dragEvent.dataTransfer;
-
-                    if (!dataTransfer) {
-                        return;
-                    }
-
-                    if (dataTransfer.types.length === 0) {
-                        return;
-                    }
-                    const cb = this.registry.get(dataTransfer.types[0]);
-
-                    if (!cb) {
-                        return;
-                    }
-
-                    const panelOptions = cb({ event });
-
-                    let panel = this.getGroupPanel(panelOptions.id);
-
-                    if (!panel) {
-                        panel = this._addPanel(panelOptions);
-                    }
-
-                    const groupId = panel.group?.id;
-
-                    if (!groupId) {
-                        throw new Error(
-                            `Panel ${panel.id} has no associated group`
-                        );
-                    }
-
-                    this.moveGroupOrPanel(
-                        view,
-                        groupId,
-                        panel.id,
-                        event.target,
-                        event.index
-                    );
                 })
             );
 

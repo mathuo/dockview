@@ -1,6 +1,37 @@
 import { toggleClass } from '../dom';
 import { Emitter, Event } from '../events';
-import { LocalSelectionTransfer } from './dataTransfer';
+import { CompositeDisposable } from '../lifecycle';
+import { DragAndDropObserver } from './dnd';
+
+export interface DroptargetEvent {
+    position: Position;
+    event: DragEvent;
+}
+
+class TransferObject {
+    constructor() {
+        //
+    }
+}
+
+export class PanelTransfer extends TransferObject {
+    constructor(
+        public readonly viewId: string,
+        public readonly groupId: string,
+        public readonly panelId: string
+    ) {
+        super();
+    }
+}
+
+export class PaneTransfer extends TransferObject {
+    constructor(
+        public readonly viewId: string,
+        public readonly paneId: string
+    ) {
+        super();
+    }
+}
 
 export enum Position {
     Top = 'Top',
@@ -15,146 +46,176 @@ export interface DroptargetEvent {
     event: DragEvent;
 }
 
-export class Droptarget {
+export type DropTargetDirections = 'vertical' | 'horizontal' | 'all' | 'none';
+
+function isBooleanValue(
+    canDisplayOverlay: CanDisplayOverlay
+): canDisplayOverlay is boolean {
+    return typeof canDisplayOverlay === 'boolean';
+}
+
+export type CanDisplayOverlay = boolean | ((dragEvent: DragEvent) => boolean);
+
+export class Droptarget extends CompositeDisposable {
     private target: HTMLElement | undefined;
     private overlay: HTMLElement | undefined;
     private _state: Position | undefined;
 
-    private readonly _onDidChange = new Emitter<DroptargetEvent>();
-    readonly onDidChange: Event<DroptargetEvent> = this._onDidChange.event;
+    private readonly _onDrop = new Emitter<DroptargetEvent>();
+    readonly onDrop: Event<DroptargetEvent> = this._onDrop.event;
 
     get state() {
         return this._state;
     }
 
+    set validOverlays(value: DropTargetDirections) {
+        this.options.validOverlays = value;
+    }
+
+    set canDisplayOverlay(value: CanDisplayOverlay) {
+        this.options.canDisplayOverlay = value;
+    }
+
     constructor(
-        private element: HTMLElement,
-        private options: {
-            isDisabled: () => boolean;
-            isDirectional: boolean;
-            id: string;
-            enableExternalDragEvents?: boolean;
+        private readonly element: HTMLElement,
+        private readonly options: {
+            canDisplayOverlay: CanDisplayOverlay;
+            validOverlays: DropTargetDirections;
         }
     ) {
-        this.element.addEventListener('dragenter', this.onDragEnter);
+        super();
+
+        this.addDisposables(
+            new DragAndDropObserver(this.element, {
+                onDragEnter: (e) => undefined,
+                onDragOver: (e) => {
+                    if (isBooleanValue(this.options.canDisplayOverlay)) {
+                        if (!this.options.canDisplayOverlay) {
+                            return;
+                        }
+                    } else if (!this.options.canDisplayOverlay(e)) {
+                        return;
+                    }
+
+                    if (!this.target) {
+                        console.debug('[droptarget] created');
+                        this.target = document.createElement('div');
+                        this.target.className = 'drop-target-dropzone';
+                        this.overlay = document.createElement('div');
+                        this.overlay.className = 'drop-target-selection';
+                        this._state = Position.Center;
+                        this.target.appendChild(this.overlay);
+
+                        this.element.classList.add('drop-target');
+                        this.element.append(this.target);
+                    }
+
+                    if (this.options.validOverlays === 'none') {
+                        return;
+                    }
+
+                    if (!this.target || !this.overlay) {
+                        return;
+                    }
+
+                    const width = this.target.clientWidth;
+                    const height = this.target.clientHeight;
+
+                    if (width === 0 || height === 0) {
+                        return; // avoid div!0
+                    }
+
+                    const x = e.offsetX;
+                    const y = e.offsetY;
+                    const xp = (100 * x) / width;
+                    const yp = (100 * y) / height;
+
+                    let isRight = false;
+                    let isLeft = false;
+                    let isTop = false;
+                    let isBottom = false;
+
+                    switch (this.options.validOverlays) {
+                        case 'all':
+                            isRight = xp > 80;
+                            isLeft = xp < 20;
+                            isTop = !isRight && !isLeft && yp < 20;
+                            isBottom = !isRight && !isLeft && yp > 80;
+                            break;
+                        case 'vertical':
+                            isTop = yp < 50;
+                            isBottom = yp >= 50;
+                            break;
+                        case 'horizontal':
+                            isLeft = xp < 50;
+                            isRight = xp >= 50;
+                            break;
+                    }
+
+                    const isSmallX = width < 100;
+                    const isSmallY = height < 100;
+
+                    toggleClass(this.overlay, 'right', !isSmallX && isRight);
+                    toggleClass(this.overlay, 'left', !isSmallX && isLeft);
+                    toggleClass(this.overlay, 'top', !isSmallY && isTop);
+                    toggleClass(this.overlay, 'bottom', !isSmallY && isBottom);
+
+                    toggleClass(
+                        this.overlay,
+                        'small-right',
+                        isSmallX && isRight
+                    );
+                    toggleClass(this.overlay, 'small-left', isSmallX && isLeft);
+                    toggleClass(this.overlay, 'small-top', isSmallY && isTop);
+                    toggleClass(
+                        this.overlay,
+                        'small-bottom',
+                        isSmallY && isBottom
+                    );
+
+                    if (isRight) {
+                        this._state = Position.Right;
+                    } else if (isLeft) {
+                        this._state = Position.Left;
+                    } else if (isTop) {
+                        this._state = Position.Top;
+                    } else if (isBottom) {
+                        this._state = Position.Bottom;
+                    } else {
+                        this._state = Position.Center;
+                    }
+                },
+                onDragLeave: (e) => {
+                    this.removeDropTarget();
+                },
+                onDragEnd: (e) => {
+                    this.removeDropTarget();
+                },
+                onDrop: (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const state = this._state;
+
+                    console.debug('[dragtarget] drop');
+                    this.removeDropTarget();
+
+                    if (state) {
+                        this._onDrop.fire({ position: state, event: e });
+                    }
+                },
+            })
+        );
     }
 
     public dispose() {
-        this._onDidChange.dispose();
+        this._onDrop.dispose();
         this.removeDropTarget();
-        this.element.removeEventListener('dragenter', this.onDragEnter);
     }
-
-    private onDragEnter = (event: DragEvent) => {
-        if (
-            !this.options.enableExternalDragEvents &&
-            !LocalSelectionTransfer.getInstance().hasData(this.options.id)
-        ) {
-            console.debug('[droptarget] invalid event');
-            return;
-        }
-
-        if (this.options.isDisabled()) {
-            return;
-        }
-
-        event.preventDefault();
-        if (!this.target) {
-            console.debug('[droptarget] created');
-            this.target = document.createElement('div');
-            this.target.className = 'drop-target-dropzone';
-            this.overlay = document.createElement('div');
-            this.overlay.className = 'drop-target-selection';
-            //
-            this._state = Position.Center;
-            this.target.addEventListener('dragover', this.onDragOver);
-            this.target.addEventListener('dragleave', this.onDragLeave);
-            this.target.addEventListener('drop', this.onDrop);
-            this.target.appendChild(this.overlay);
-
-            this.element.classList.add('drop-target');
-            this.element.append(this.target);
-        }
-    };
-
-    private onDrop = (event: DragEvent) => {
-        if (
-            !this.options.enableExternalDragEvents &&
-            !LocalSelectionTransfer.getInstance().hasData(this.options.id)
-        ) {
-            console.debug('[dragtarget] invalid');
-            return;
-        }
-
-        const state = this._state;
-
-        console.debug('[dragtarget] drop');
-        this.removeDropTarget();
-
-        if (event.defaultPrevented) {
-            console.debug('[dragtarget] defaultPrevented');
-        } else if (state) {
-            this._onDidChange.fire({ position: state, event });
-        }
-    };
-
-    private onDragOver = (event: DragEvent) => {
-        event.preventDefault();
-
-        if (!this.options.isDirectional) {
-            return;
-        }
-
-        if (!this.target || !this.overlay) {
-            return;
-        }
-
-        const width = this.target.clientWidth;
-        const height = this.target.clientHeight;
-
-        if (width === 0 || height === 0) {
-            return; // avoid div!0
-        }
-
-        const x = event.offsetX;
-        const y = event.offsetY;
-        const xp = (100 * x) / width;
-        const yp = (100 * y) / height;
-
-        const isRight = xp > 80;
-        const isLeft = xp < 20;
-        const isTop = !isRight && !isLeft && yp < 20;
-        const isBottom = !isRight && !isLeft && yp > 80;
-
-        toggleClass(this.overlay, 'right', isRight);
-        toggleClass(this.overlay, 'left', isLeft);
-        toggleClass(this.overlay, 'top', isTop);
-        toggleClass(this.overlay, 'bottom', isBottom);
-
-        if (isRight) {
-            this._state = Position.Right;
-        } else if (isLeft) {
-            this._state = Position.Left;
-        } else if (isTop) {
-            this._state = Position.Top;
-        } else if (isBottom) {
-            this._state = Position.Bottom;
-        } else {
-            this._state = Position.Center;
-        }
-    };
-
-    private onDragLeave = (event: DragEvent) => {
-        console.debug('[droptarget] leave');
-        this.removeDropTarget();
-    };
 
     private removeDropTarget() {
         if (this.target) {
             this._state = undefined;
-            this.target.removeEventListener('dragover', this.onDragOver);
-            this.target.removeEventListener('dragleave', this.onDragLeave);
-            this.target.removeEventListener('drop', this.onDrop);
             this.element.removeChild(this.target);
             this.target = undefined;
             this.element.classList.remove('drop-target');

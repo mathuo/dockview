@@ -61,7 +61,8 @@ export interface IPaneviewPanel
 
 export abstract class PaneviewPanel
     extends BasePanelView<PaneviewPanelApiImpl>
-    implements IPaneview, IPaneviewPanel {
+    implements IPaneview, IPaneviewPanel
+{
     private _onDidChangeExpansionState: Emitter<boolean> = new Emitter<boolean>(
         { replay: true }
     );
@@ -71,6 +72,7 @@ export abstract class PaneviewPanel
 
     private headerSize = 22;
     private _orthogonalSize = 0;
+    private _size = 0;
     private _minimumBodySize = 0;
     private _maximumBodySize: number = Number.POSITIVE_INFINITY;
     private _isExpanded = false;
@@ -80,7 +82,6 @@ export abstract class PaneviewPanel
     private headerPart?: IPaneBodyPart;
     private expandedSize = 0;
     private animationTimer: any | undefined;
-
     private _orientation: Orientation;
 
     set orientation(value: Orientation) {
@@ -105,6 +106,10 @@ export abstract class PaneviewPanel
         const maximumBodySize = expanded ? this._maximumBodySize : 0;
 
         return headerSize + maximumBodySize;
+    }
+
+    get size() {
+        return this._size;
     }
 
     get orthogonalSize() {
@@ -176,7 +181,7 @@ export abstract class PaneviewPanel
             })
         );
 
-        this.render();
+        this.renderOnce();
     }
 
     setVisible(isVisible: boolean) {
@@ -216,6 +221,8 @@ export abstract class PaneviewPanel
     }
 
     layout(size: number, orthogonalSize: number) {
+        this._size = size;
+        this._orthogonalSize = orthogonalSize;
         const [width, height] =
             this.orientation === Orientation.HORIZONTAL
                 ? [size, orthogonalSize]
@@ -259,7 +266,7 @@ export abstract class PaneviewPanel
         };
     }
 
-    private render() {
+    private renderOnce() {
         this.header = document.createElement('div');
         this.header.tabIndex = -1;
 
