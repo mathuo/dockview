@@ -140,8 +140,9 @@ var Activitybar = function (props) {
         };
     }, []);
     return (React.createElement("div", { className: "activity-bar", onClick: onOpenSidebar },
-        React.createElement("div", { className: "activity-bar-item" },
-            React.createElement(ActivitybarImage, { url: 'https://fonts.gstatic.com/s/i/materialicons/search/v7/24px.svg' }))));
+        React.createElement(dockview_1.DockviewDropTarget, { validOverlays: 'vertical', canDisplayOverlay: true },
+            React.createElement("div", { className: "activity-bar-item" },
+                React.createElement(ActivitybarImage, { url: 'https://fonts.gstatic.com/s/i/materialicons/search/v7/24px.svg' })))));
 };
 exports.Activitybar = Activitybar;
 
@@ -342,16 +343,19 @@ __webpack_require__(/*! ./controlCenter.scss */ "./src/layout-grid/controlCenter
 var ControlCenter = function () {
     var registry = registry_1.useLayoutRegistry();
     var dragRef = React.useRef();
-    React.useEffect(function () {
-        var api = registry.get('dockview');
-        var target = api.createDragTarget({ element: dragRef.current, content: 'drag me' }, function () { return ({
-            id: 'yellow',
-            component: 'test_component',
-        }); });
-        return function () {
-            target.dispose();
-        };
-    }, []);
+    // React.useEffect(() => {
+    //     const api = registry.get<DockviewApi>('dockview');
+    //     const target = api.createDragTarget(
+    //         { element: dragRef.current, content: 'drag me' },
+    //         () => ({
+    //             id: 'yellow',
+    //             component: 'test_component',
+    //         })
+    //     );
+    //     return () => {
+    //         target.dispose();
+    //     };
+    // }, []);
     var onDragStart = function (event) {
         event.dataTransfer.setData('text/plain', 'Panel2');
     };
@@ -836,22 +840,22 @@ var TestGrid = function (props) {
         var api = event.api;
         _api.current = event.api;
         registry.register('dockview', api);
-        api.addDndHandle('text/plain', function (ev) {
-            var event = ev.event;
-            return {
-                id: 'yellow',
-                component: 'test_component',
-            };
-        });
-        api.addDndHandle('Files', function (ev) {
-            var event = ev.event;
-            ev.event.event.preventDefault();
-            return {
-                id: Date.now().toString(),
-                title: event.event.dataTransfer.files[0].name,
-                component: 'test_component',
-            };
-        });
+        // api.addDndHandle('text/plain', (ev) => {
+        //     const { event } = ev;
+        //     return {
+        //         id: 'yellow',
+        //         component: 'test_component',
+        //     };
+        // });
+        // api.addDndHandle('Files', (ev) => {
+        //     const { event } = ev;
+        //     ev.event.event.preventDefault();
+        //     return {
+        //         id: Date.now().toString(),
+        //         title: event.event.dataTransfer.files[0].name,
+        //         component: 'test_component',
+        //     };
+        // });
         var state = localStorage.getItem('dockview');
         if (state) {
             api.fromJSON(JSON.parse(state));
@@ -1384,11 +1388,14 @@ var Sidebar = function (props) {
             disposable.dispose();
         };
     }, []);
+    var onDidDrop = React.useCallback(function (event) {
+        console.log('drop', event);
+    }, []);
     return (React.createElement("div", { style: {
             backgroundColor: 'rgb(37,37,38)',
             height: '100%',
         } },
-        React.createElement(dockview_1.PaneviewReact, { headerComponents: headerComponents, components: components, onReady: onReady })));
+        React.createElement(dockview_1.PaneviewReact, { headerComponents: headerComponents, components: components, onReady: onReady, onDidDrop: onDidDrop })));
 };
 exports.Sidebar = Sidebar;
 
@@ -2318,7 +2325,7 @@ module.exports = exports;
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../dockview-demo/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ".dockview-theme-dark {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-tab-dirty-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n}\n\n.dockview-theme-light {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-tab-dirty-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: white;\n  --dv-tabs-and-actions-container-background-color: #f3f3f3;\n  --dv-activegroup-visiblepanel-tab-background-color: white;\n  --dv-activegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-inactivegroup-visiblepanel-tab-background-color: white;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-tab-divider-color: white;\n  --dv-activegroup-visiblepanel-tab-color: rgb(51, 51, 51);\n  --dv-activegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-visiblepanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.35);\n  --dv-separator-border: rgba(128, 128, 128, 0.35);\n  --dv-paneview-header-border-color: rgb(51, 51, 51);\n}\n\n.dockview-theme-vs {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-tab-dirty-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n  --dv-activegroup-visiblepanel-tab-background-color: dodgerblue;\n  --dv-tabs-and-actions-container-height: 18px;\n  --dv-tabs-and-actions-container-font-size: 11px;\n}\n.dockview-theme-vs .groupview.active-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-activegroup-visiblepanel-tab-background-color);\n}\n.dockview-theme-vs .groupview.inactive-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-inactivegroup-visiblepanel-tab-background-color);\n}\n.actions-bar {\n  text-align: right;\n  width: 28px;\n  display: flex;\n  align-items: center;\n  flex-shrink: 0;\n}\n.actions-bar .actions-container {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.actions-bar .actions-container a:active {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.actions-bar .actions-container .close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n  cursor: pointer;\n}\n.drop-target {\n  position: relative;\n}\n.drop-target > .drop-target-dropzone {\n  position: absolute;\n  left: 0px;\n  top: 0px;\n  height: 100%;\n  width: 100%;\n  z-index: 10000;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection {\n  position: relative;\n  pointer-events: none;\n  height: 100%;\n  width: 100%;\n  background-color: var(--dv-drag-over-background-color);\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.left, .drop-target > .drop-target-dropzone > .drop-target-selection.right {\n  width: 50%;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.right {\n  transform: translate(100%, 0%);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n  transform: translate(0%, 100%);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.top, .drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n  height: 50%;\n}\n.custom-dragging {\n  height: 24px;\n  line-height: 24px;\n  font-size: 11px;\n  width: 100px;\n  background-color: dodgerblue;\n  color: ghostwhite;\n  border-radius: 11px;\n  position: absolute;\n  padding-left: 10px;\n}\n\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-background-color);\n  color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n\n/**\n * when a tab is dragged we lose the above stylings because they are conditional on parent elements\n * therefore we also set some stylings for the dragging event\n **/\n.tab.dragging {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.grid-view,\n.branch-node {\n  height: 100%;\n  width: 100%;\n}\n.groupview {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  background-color: var(--dv-group-view-background-color);\n  overflow: hidden;\n}\n.groupview:focus {\n  outline: none;\n}\n.groupview.empty > .tabs-and-actions-container {\n  display: none;\n}\n.groupview > .content-container {\n  flex-grow: 1;\n  overflow: hidden;\n  outline: none;\n}\n.pane-container {\n  height: 100%;\n  width: 100%;\n}\n.pane-container.animated .view {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.pane-container .view {\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  padding: 0px !important;\n}\n.pane-container .view:not(:first-child)::before {\n  background-color: transparent !important;\n}\n.pane-container .view:not(:first-child) .pane > .pane-header {\n  border-top: 1px solid var(--dv-paneview-header-border-color);\n}\n.pane-container:first-of-type > .pane > .pane-header {\n  border-top: none !important;\n}\n.pane-container .pane {\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  height: 100%;\n}\n.pane-container .pane .pane-header {\n  box-sizing: border-box;\n  user-select: none;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-header:focus:before, .pane-container .pane .pane-header:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.pane-container .pane .pane-body {\n  overflow-y: auto;\n  overflow-x: hidden;\n  flex-grow: 1;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-body:focus:before, .pane-container .pane .pane-body:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.tabs-and-actions-container {\n  display: flex;\n  background-color: var(--dv-tabs-and-actions-container-background-color);\n  flex-shrink: 0;\n  box-sizing: border-box;\n  height: var(--dv-tabs-and-actions-container-height);\n  font-size: var(--dv-tabs-and-actions-container-font-size);\n}\n.tabs-and-actions-container.hidden {\n  display: none;\n}\n.tabs-and-actions-container .tabs-container {\n  flex-grow: 1;\n  display: flex;\n  overflow-x: overlay;\n  overflow-y: hidden;\n  scrollbar-width: thin;\n  /* Track */\n  /* Handle */\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar {\n  height: 3px;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-track {\n  background: transparent;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-thumb {\n  background: var(--dv-tabs-container-scrollbar-color);\n}\n.tabs-and-actions-container .tabs-container.drag-over-target {\n  background-color: var(--dv-drag-over-background-color);\n}\n.tabs-and-actions-container .tabs-container .tab {\n  -webkit-user-drag: element;\n  outline: none;\n  min-width: 75px;\n  cursor: pointer;\n  position: relative;\n  box-sizing: border-box;\n}\n.tabs-and-actions-container .tabs-container .tab:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-tab-divider-color);\n  width: 1px;\n  height: 100%;\n}\n.split-view-container {\n  position: relative;\n  overflow: hidden;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container.animation .view,\n.split-view-container.animation .sash {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.split-view-container.horizontal {\n  height: 100%;\n}\n.split-view-container.horizontal > .sash-container > .sash {\n  height: 100%;\n  width: 4px;\n}\n.split-view-container.horizontal > .sash-container > .sash.enabled {\n  cursor: ew-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.horizontal > .sash-container > .sash.maximum {\n  cursor: w-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.minimum {\n  cursor: e-resize;\n}\n.split-view-container.horizontal > .view-container > .view:not(:first-child)::before {\n  height: 100%;\n  width: 1px;\n}\n.split-view-container.vertical {\n  width: 100%;\n}\n.split-view-container.vertical > .sash-container > .sash {\n  width: 100%;\n  height: 4px;\n}\n.split-view-container.vertical > .sash-container > .sash.enabled {\n  cursor: ns-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.vertical > .sash-container > .sash.maximum {\n  cursor: n-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.minimum {\n  cursor: s-resize;\n}\n.split-view-container.vertical > .view-container > .view {\n  width: 100%;\n}\n.split-view-container.vertical > .view-container > .view:not(:first-child)::before {\n  height: 1px;\n  width: 100%;\n}\n.split-view-container .sash-container {\n  height: 100%;\n  width: 100%;\n  position: absolute;\n}\n.split-view-container .sash-container .sash {\n  position: absolute;\n  z-index: 99;\n  outline: none;\n}\n.split-view-container .sash-container .sash:active {\n  transition: background-color 0.1s ease-in-out;\n  background-color: var(--dv-active-sash-color, transparent);\n}\n.split-view-container .sash-container .sash:hover {\n  background-color: var(--dv-active-sash-color, transparent);\n  transition: background-color 0.1s ease-in-out;\n  transition-delay: 0.5s;\n}\n.split-view-container .view-container {\n  position: relative;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container .view-container .view {\n  height: 100%;\n  box-sizing: border-box;\n  overflow: auto;\n  position: absolute;\n}\n.split-view-container.separator-border .view:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-separator-border);\n}\n.tab {\n  flex-shrink: 0;\n}\n.tab.dragged {\n  transform: translate3d(0px, 0px, 0px);\n  /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */\n}\n.tab.dragging .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.tab.active-tab > .default-tab .tab-action {\n  visibility: visible;\n}\n.tab.inactive-tab > .default-tab .tab-action:not(.dirty) {\n  visibility: hidden;\n}\n.tab.inactive-tab > .default-tab:hover .tab-action {\n  visibility: visible;\n}\n.tab .default-tab {\n  position: relative;\n  height: 100%;\n  display: flex;\n  min-width: 80px;\n  align-items: center;\n  padding-left: 10px;\n  white-space: nowrap;\n  text-overflow: elipsis;\n}\n.tab .default-tab .tab-content {\n  flex-grow: 1;\n}\n.tab .default-tab .action-container {\n  text-align: right;\n  width: 28px;\n  display: flex;\n}\n.tab .default-tab .action-container .tab-list {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.tab .default-tab .action-container .tab-list a:active:hover {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.tab .default-tab .action-container .tab-list .tab-action {\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n}\n.tab .default-tab .action-container .tab-list .tab-action.disable-close {\n  display: none;\n}\n.tab .default-tab .action-container .tab-list .tab-action.dirty:not(:hover) {\n  display: block;\n  -webkit-mask: var(--dv-tab-dirty-icon) 50% 50%/60% 60% no-repeat;\n  mask: var(--dv-tab-dirty-icon) 50% 50%/60% 60% no-repeat;\n}\n.watermark {\n  display: flex;\n  width: 100%;\n}\n.watermark.has-actions .watermark-title .actions-bar {\n  display: none;\n}\n.watermark .watermark-title {\n  height: 35px;\n  width: 100%;\n  display: flex;\n}\n.watermark .watermark-content {\n  flex-grow: 1;\n}", ""]);
+exports.push([module.id, ".dockview-theme-dark {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-tab-dirty-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n}\n\n.dockview-theme-light {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-tab-dirty-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: white;\n  --dv-tabs-and-actions-container-background-color: #f3f3f3;\n  --dv-activegroup-visiblepanel-tab-background-color: white;\n  --dv-activegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-inactivegroup-visiblepanel-tab-background-color: white;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-tab-divider-color: white;\n  --dv-activegroup-visiblepanel-tab-color: rgb(51, 51, 51);\n  --dv-activegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-visiblepanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.35);\n  --dv-separator-border: rgba(128, 128, 128, 0.35);\n  --dv-paneview-header-border-color: rgb(51, 51, 51);\n}\n\n.dockview-theme-vs {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-tab-dirty-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n  --dv-activegroup-visiblepanel-tab-background-color: dodgerblue;\n  --dv-tabs-and-actions-container-height: 18px;\n  --dv-tabs-and-actions-container-font-size: 11px;\n}\n.dockview-theme-vs .groupview.active-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-activegroup-visiblepanel-tab-background-color);\n}\n.dockview-theme-vs .groupview.inactive-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-inactivegroup-visiblepanel-tab-background-color);\n}\n.actions-bar {\n  text-align: right;\n  width: 28px;\n  display: flex;\n  align-items: center;\n  flex-shrink: 0;\n}\n.actions-bar .actions-container {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.actions-bar .actions-container a:active {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.actions-bar .actions-container .close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n  cursor: pointer;\n}\n.drop-target {\n  position: relative;\n}\n.drop-target > .drop-target-dropzone {\n  position: absolute;\n  left: 0px;\n  top: 0px;\n  height: 100%;\n  width: 100%;\n  z-index: 10000;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection {\n  position: relative;\n  pointer-events: none;\n  box-sizing: border-box;\n  height: 100%;\n  width: 100%;\n  background-color: var(--dv-drag-over-background-color);\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.left, .drop-target > .drop-target-dropzone > .drop-target-selection.right {\n  width: 50%;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.right {\n  transform: translate(100%, 0%);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n  transform: translate(0%, 100%);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.top, .drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n  height: 50%;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-top {\n  border-top: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-bottom {\n  border-bottom: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-left {\n  border-left: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-right {\n  border-right: 1px solid var(--dv-drag-over-border-color);\n}\n.custom-dragging {\n  height: 24px;\n  line-height: 24px;\n  font-size: 11px;\n  width: 100px;\n  background-color: dodgerblue;\n  color: ghostwhite;\n  border-radius: 11px;\n  position: absolute;\n  padding-left: 10px;\n}\n\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-background-color);\n  color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n\n/**\n * when a tab is dragged we lose the above stylings because they are conditional on parent elements\n * therefore we also set some stylings for the dragging event\n **/\n.tab.dragging {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.grid-view,\n.branch-node {\n  height: 100%;\n  width: 100%;\n}\n.groupview {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  background-color: var(--dv-group-view-background-color);\n  overflow: hidden;\n}\n.groupview:focus {\n  outline: none;\n}\n.groupview.empty > .tabs-and-actions-container {\n  display: none;\n}\n.groupview > .content-container {\n  flex-grow: 1;\n  overflow: hidden;\n  outline: none;\n}\n.pane-container {\n  height: 100%;\n  width: 100%;\n}\n.pane-container.animated .view {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.pane-container .view {\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  padding: 0px !important;\n}\n.pane-container .view:not(:first-child)::before {\n  background-color: transparent !important;\n}\n.pane-container .view:not(:first-child) .pane > .pane-header {\n  border-top: 1px solid var(--dv-paneview-header-border-color);\n}\n.pane-container:first-of-type > .pane > .pane-header {\n  border-top: none !important;\n}\n.pane-container .pane {\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  height: 100%;\n}\n.pane-container .pane .pane-header {\n  box-sizing: border-box;\n  user-select: none;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-header:focus:before, .pane-container .pane .pane-header:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.pane-container .pane .pane-body {\n  overflow-y: auto;\n  overflow-x: hidden;\n  flex-grow: 1;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-body:focus:before, .pane-container .pane .pane-body:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.tabs-and-actions-container {\n  display: flex;\n  background-color: var(--dv-tabs-and-actions-container-background-color);\n  flex-shrink: 0;\n  box-sizing: border-box;\n  height: var(--dv-tabs-and-actions-container-height);\n  font-size: var(--dv-tabs-and-actions-container-font-size);\n}\n.tabs-and-actions-container.hidden {\n  display: none;\n}\n.tabs-and-actions-container .void-container {\n  display: flex;\n  flex-grow: 1;\n}\n.tabs-and-actions-container .tabs-container {\n  display: flex;\n  overflow-x: overlay;\n  overflow-y: hidden;\n  scrollbar-width: thin;\n  /* Track */\n  /* Handle */\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar {\n  height: 3px;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-track {\n  background: transparent;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-thumb {\n  background: var(--dv-tabs-container-scrollbar-color);\n}\n.tabs-and-actions-container .tabs-container .tab {\n  -webkit-user-drag: element;\n  outline: none;\n  min-width: 75px;\n  cursor: pointer;\n  position: relative;\n  box-sizing: border-box;\n}\n.tabs-and-actions-container .tabs-container .tab:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-tab-divider-color);\n  width: 1px;\n  height: 100%;\n}\n.split-view-container {\n  position: relative;\n  overflow: hidden;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container.animation .view,\n.split-view-container.animation .sash {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.split-view-container.horizontal {\n  height: 100%;\n}\n.split-view-container.horizontal > .sash-container > .sash {\n  height: 100%;\n  width: 4px;\n}\n.split-view-container.horizontal > .sash-container > .sash.enabled {\n  cursor: ew-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.horizontal > .sash-container > .sash.maximum {\n  cursor: w-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.minimum {\n  cursor: e-resize;\n}\n.split-view-container.horizontal > .view-container > .view:not(:first-child)::before {\n  height: 100%;\n  width: 1px;\n}\n.split-view-container.vertical {\n  width: 100%;\n}\n.split-view-container.vertical > .sash-container > .sash {\n  width: 100%;\n  height: 4px;\n}\n.split-view-container.vertical > .sash-container > .sash.enabled {\n  cursor: ns-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.vertical > .sash-container > .sash.maximum {\n  cursor: n-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.minimum {\n  cursor: s-resize;\n}\n.split-view-container.vertical > .view-container > .view {\n  width: 100%;\n}\n.split-view-container.vertical > .view-container > .view:not(:first-child)::before {\n  height: 1px;\n  width: 100%;\n}\n.split-view-container .sash-container {\n  height: 100%;\n  width: 100%;\n  position: absolute;\n}\n.split-view-container .sash-container .sash {\n  position: absolute;\n  z-index: 99;\n  outline: none;\n}\n.split-view-container .sash-container .sash:active {\n  transition: background-color 0.1s ease-in-out;\n  background-color: var(--dv-active-sash-color, transparent);\n}\n.split-view-container .sash-container .sash:hover {\n  background-color: var(--dv-active-sash-color, transparent);\n  transition: background-color 0.1s ease-in-out;\n  transition-delay: 0.5s;\n}\n.split-view-container .view-container {\n  position: relative;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container .view-container .view {\n  height: 100%;\n  box-sizing: border-box;\n  overflow: auto;\n  position: absolute;\n}\n.split-view-container.separator-border .view:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-separator-border);\n}\n.dragged {\n  transform: translate3d(0px, 0px, 0px);\n  /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */\n}\n\n.tab {\n  flex-shrink: 0;\n}\n.tab.dragging .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.tab.active-tab > .default-tab .tab-action {\n  visibility: visible;\n}\n.tab.inactive-tab > .default-tab .tab-action:not(.dirty) {\n  visibility: hidden;\n}\n.tab.inactive-tab > .default-tab:hover .tab-action {\n  visibility: visible;\n}\n.tab .default-tab {\n  position: relative;\n  height: 100%;\n  display: flex;\n  min-width: 80px;\n  align-items: center;\n  padding-left: 10px;\n  white-space: nowrap;\n  text-overflow: elipsis;\n}\n.tab .default-tab .tab-content {\n  flex-grow: 1;\n}\n.tab .default-tab .action-container {\n  text-align: right;\n  width: 28px;\n  display: flex;\n}\n.tab .default-tab .action-container .tab-list {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.tab .default-tab .action-container .tab-list a:active:hover {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.tab .default-tab .action-container .tab-list .tab-action {\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n}\n.tab .default-tab .action-container .tab-list .tab-action.disable-close {\n  display: none;\n}\n.tab .default-tab .action-container .tab-list .tab-action.dirty:not(:hover) {\n  display: block;\n  -webkit-mask: var(--dv-tab-dirty-icon) 50% 50%/60% 60% no-repeat;\n  mask: var(--dv-tab-dirty-icon) 50% 50%/60% 60% no-repeat;\n}\n.watermark {\n  display: flex;\n  width: 100%;\n}\n.watermark.has-actions .watermark-title .actions-bar {\n  display: none;\n}\n.watermark .watermark-title {\n  height: 35px;\n  width: 100%;\n  display: flex;\n}\n.watermark .watermark-content {\n  flex-grow: 1;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -33055,12 +33062,18 @@ class DockviewApi {
     addPanel(options) {
         return this.component.addPanel(options);
     }
-    addDndHandle(type, cb) {
-        return this.component.addDndHandle(type, cb);
-    }
-    createDragTarget(target, options) {
-        return this.component.createDragTarget(target, options);
-    }
+    // addDndHandle(type: string, cb: (event: LayoutDropEvent) => PanelOptions) {
+    //     return this.component.addDndHandle(type, cb);
+    // }
+    // createDragTarget(
+    //     target: {
+    //         element: HTMLElement;
+    //         content: string;
+    //     },
+    //     options: (() => PanelOptions) | PanelOptions
+    // ) {
+    //     return this.component.createDragTarget(target, options);
+    // }
     addEmptyGroup(options) {
         return this.component.addEmptyGroup(options);
     }
@@ -33546,6 +33559,100 @@ function timeoutAsPromise(timeout) {
 
 /***/ }),
 
+/***/ "../dockview/dist/esm/dnd/abstractDragHandler.js":
+/*!*******************************************************!*\
+  !*** ../dockview/dist/esm/dnd/abstractDragHandler.js ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DragHandler": () => (/* binding */ DragHandler)
+/* harmony export */ });
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dom */ "../dockview/dist/esm/dom.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
+/* harmony import */ var _focusedElement__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../focusedElement */ "../dockview/dist/esm/focusedElement.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
+
+
+
+
+class DragHandler extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable {
+    constructor(el) {
+        super();
+        this.el = el;
+        this.iframes = [];
+        this._onDragStart = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
+        this.onDragStart = this._onDragStart.event;
+        this.configure();
+    }
+    configure() {
+        this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.el, 'dragstart', (event) => {
+            var _a;
+            this.iframes = [
+                ...(0,_dom__WEBPACK_IMPORTED_MODULE_0__.getElementsByTagName)('iframe'),
+                ...(0,_dom__WEBPACK_IMPORTED_MODULE_0__.getElementsByTagName)('webview'),
+            ];
+            for (const iframe of this.iframes) {
+                iframe.style.pointerEvents = 'none';
+            }
+            this.el.classList.add('dragged');
+            setTimeout(() => this.el.classList.remove('dragged'), 0);
+            // this.activeDrag = this.getData();
+            (_a = this.disposable) === null || _a === void 0 ? void 0 : _a.dispose();
+            this.disposable = this.getData();
+            // if (event.dataTransfer) {
+            //     event.dataTransfer.setData(DATA_KEY, stringifiedData);
+            //     event.dataTransfer.effectAllowed = 'move';
+            // }
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.el, 'dragend', (ev) => {
+            var _a;
+            for (const iframe of this.iframes) {
+                iframe.style.pointerEvents = 'auto';
+            }
+            this.iframes = [];
+            (_a = this.disposable) === null || _a === void 0 ? void 0 : _a.dispose();
+            this.disposable = undefined;
+            // drop events fire before dragend so we can remove this safely
+            // LocalSelectionTransfer.getInstance().clearData(this.activeDrag);
+            // this.activeDrag = undefined;
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.el, 'mousedown', (event) => {
+            if (event.defaultPrevented) {
+                return;
+            }
+            /**
+             * TODO: alternative to stopPropagation
+             *
+             * I need to stop the event propagation here since otherwise it'll be intercepted by event handlers
+             * on the tabs-container. I cannot use event.preventDefault() since I need the on DragStart event to occur
+             */
+            event.stopPropagation();
+            /**
+             * //TODO mousedown focusing with draggable element (is there a better approach?)
+             *
+             * this mousedown event wants to focus the tab itself but if we call preventDefault()
+             * this would also prevent the dragStart event from firing. To get around this we propagate
+             * the onChanged event during the next tick of the event-loop, allowing the tab element to become
+             * focused on this tick and ensuring the dragstart event is not interrupted
+             */
+            const oldFocus = _focusedElement__WEBPACK_IMPORTED_MODULE_2__.focusedElement.element;
+            setTimeout(() => {
+                oldFocus.focus();
+                // this._onChanged.fire({ kind: MouseEventKind.CLICK, event });
+            }, 0);
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.el, 'contextmenu', (event) => {
+            // this._onChanged.fire({
+            //     kind: MouseEventKind.CONTEXT_MENU,
+            //     event,
+            // });
+        }));
+    }
+}
+
+
+/***/ }),
+
 /***/ "../dockview/dist/esm/dnd/dataTransfer.js":
 /*!************************************************!*\
   !*** ../dockview/dist/esm/dnd/dataTransfer.js ***!
@@ -33561,9 +33668,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "isTabDragEvent": () => (/* binding */ isTabDragEvent),
 /* harmony export */   "isCustomDragEvent": () => (/* binding */ isCustomDragEvent),
 /* harmony export */   "extractData": () => (/* binding */ extractData),
-/* harmony export */   "LocalSelectionTransfer": () => (/* binding */ LocalSelectionTransfer)
+/* harmony export */   "LocalSelectionTransfer": () => (/* binding */ LocalSelectionTransfer),
+/* harmony export */   "getPanelData": () => (/* binding */ getPanelData),
+/* harmony export */   "getPaneData": () => (/* binding */ getPaneData)
 /* harmony export */ });
 /* harmony import */ var _json__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../json */ "../dockview/dist/esm/json.js");
+/* harmony import */ var _droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
+
 
 const DATA_KEY = 'splitview/transfer';
 const isPanelTransferEvent = (event) => {
@@ -33574,7 +33685,7 @@ const isPanelTransferEvent = (event) => {
 };
 var DragType;
 (function (DragType) {
-    DragType["ITEM"] = "group_drag";
+    DragType["DOCKVIEW_TAB"] = "dockview_tab";
     DragType["EXTERNAL"] = "external_group_drag";
 })(DragType || (DragType = {}));
 /**
@@ -33582,7 +33693,7 @@ var DragType;
  * dragging a tab component
  */
 const isTabDragEvent = (data) => {
-    return data.type === DragType.ITEM;
+    return data.type === DragType.DOCKVIEW_TAB;
 };
 /**
  * Determine whether this data belong to that of an event that was started by
@@ -33637,6 +33748,150 @@ class LocalSelectionTransfer {
     }
 }
 LocalSelectionTransfer.INSTANCE = new LocalSelectionTransfer();
+function getPanelData() {
+    const panelTransfer = LocalSelectionTransfer.getInstance();
+    const isPanelEvent = panelTransfer.hasData(_droptarget__WEBPACK_IMPORTED_MODULE_1__.PanelTransfer.prototype);
+    if (!isPanelEvent) {
+        return undefined;
+    }
+    return panelTransfer.getData(_droptarget__WEBPACK_IMPORTED_MODULE_1__.PanelTransfer.prototype)[0];
+}
+function getPaneData() {
+    const paneTransfer = LocalSelectionTransfer.getInstance();
+    const isPanelEvent = paneTransfer.hasData(_droptarget__WEBPACK_IMPORTED_MODULE_1__.PaneTransfer.prototype);
+    if (!isPanelEvent) {
+        return undefined;
+    }
+    return paneTransfer.getData(_droptarget__WEBPACK_IMPORTED_MODULE_1__.PaneTransfer.prototype)[0];
+}
+
+
+/***/ }),
+
+/***/ "../dockview/dist/esm/dnd/dnd.js":
+/*!***************************************!*\
+  !*** ../dockview/dist/esm/dnd/dnd.js ***!
+  \***************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DragAndDropObserver": () => (/* binding */ DragAndDropObserver),
+/* harmony export */   "DragAndDrop": () => (/* binding */ DragAndDrop)
+/* harmony export */ });
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
+/* harmony import */ var _dataTransfer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./dataTransfer */ "../dockview/dist/esm/dnd/dataTransfer.js");
+
+
+
+class DragAndDropObserver extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable {
+    constructor(element, callbacks) {
+        super();
+        this.element = element;
+        this.callbacks = callbacks;
+        // A helper to fix issues with repeated DRAG_ENTER / DRAG_LEAVE
+        // calls see https://github.com/microsoft/vscode/issues/14470
+        // when the element has child elements where the events are fired
+        // repeadedly.
+        this.counter = 0;
+        this.registerListeners();
+    }
+    registerListeners() {
+        this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(this.element, 'dragenter', (e) => {
+            this.counter++;
+            this.callbacks.onDragEnter(e);
+        }));
+        this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(this.element, 'dragover', (e) => {
+            e.preventDefault(); // needed so that the drop event fires (https://stackoverflow.com/questions/21339924/drop-event-not-firing-in-chrome)
+            if (this.callbacks.onDragOver) {
+                this.callbacks.onDragOver(e);
+            }
+        }));
+        this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(this.element, 'dragleave', (e) => {
+            this.counter--;
+            if (this.counter === 0) {
+                this.callbacks.onDragLeave(e);
+            }
+        }));
+        this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(this.element, 'dragend', (e) => {
+            this.counter = 0;
+            this.callbacks.onDragEnd(e);
+        }));
+        this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(this.element, 'drop', (e) => {
+            this.counter = 0;
+            this.callbacks.onDrop(e);
+        }));
+    }
+}
+class DockviewIdentifier {
+    constructor(data) {
+        this.data = data;
+        //
+    }
+}
+class DragAndDrop extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable {
+    constructor() {
+        super();
+        this._onDragStart = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        this._onDragEnd = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        this.transferData = _dataTransfer__WEBPACK_IMPORTED_MODULE_2__.LocalSelectionTransfer.getInstance();
+        this.addDisposables(this._onDragStart, this._onDragEnd);
+    }
+    static get INSTANCE() {
+        if (!DragAndDrop._instance) {
+            DragAndDrop._instance = new DragAndDrop();
+        }
+        return DragAndDrop._instance;
+    }
+    registerTarget(element, callbacks) {
+        const disposables = new _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable();
+        disposables.addDisposables(new DragAndDropObserver(element, {
+            onDragEnd: (e) => {
+                // no-op
+            },
+            onDragEnter: (e) => {
+                e.preventDefault();
+            },
+            onDragLeave: (e) => {
+                //
+            },
+            onDrop: (e) => {
+                //
+            },
+            onDragOver: (e) => {
+                //
+            },
+        }));
+        return disposables;
+    }
+    registerDraggable(element, draggedItemProvider, callbacks) {
+        element.draggable = true;
+        const disposables = new _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable();
+        disposables.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(element, 'dragstart', (e) => {
+            this._onDragStart.fire({ event: e });
+        }));
+        disposables.addDisposables(new DragAndDropObserver(element, {
+            onDragEnd: (e) => {
+                // no-op
+            },
+            onDragEnter: (e) => {
+                //
+            },
+            onDragLeave: (e) => {
+                //
+            },
+            onDrop: (e) => {
+                //
+            },
+            onDragOver: (e) => {
+                //
+            },
+        }));
+        return disposables;
+    }
+}
 
 
 /***/ }),
@@ -33650,15 +33905,39 @@ LocalSelectionTransfer.INSTANCE = new LocalSelectionTransfer();
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "PanelTransfer": () => (/* binding */ PanelTransfer),
+/* harmony export */   "PaneTransfer": () => (/* binding */ PaneTransfer),
 /* harmony export */   "Position": () => (/* binding */ Position),
 /* harmony export */   "Droptarget": () => (/* binding */ Droptarget)
 /* harmony export */ });
 /* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dom */ "../dockview/dist/esm/dom.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
-/* harmony import */ var _dataTransfer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./dataTransfer */ "../dockview/dist/esm/dnd/dataTransfer.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
+/* harmony import */ var _dnd__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./dnd */ "../dockview/dist/esm/dnd/dnd.js");
 
 
 
+
+class TransferObject {
+    constructor() {
+        //
+    }
+}
+class PanelTransfer extends TransferObject {
+    constructor(viewId, groupId, panelId) {
+        super();
+        this.viewId = viewId;
+        this.groupId = groupId;
+        this.panelId = panelId;
+    }
+}
+class PaneTransfer extends TransferObject {
+    constructor(viewId, paneId) {
+        super();
+        this.viewId = viewId;
+        this.paneId = paneId;
+    }
+}
 var Position;
 (function (Position) {
     Position["Top"] = "Top";
@@ -33667,115 +33946,133 @@ var Position;
     Position["Right"] = "Right";
     Position["Center"] = "Center";
 })(Position || (Position = {}));
-class Droptarget {
+function isBooleanValue(canDisplayOverlay) {
+    return typeof canDisplayOverlay === 'boolean';
+}
+class Droptarget extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable {
     constructor(element, options) {
+        super();
         this.element = element;
         this.options = options;
-        this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
-        this.onDidChange = this._onDidChange.event;
-        this.onDragEnter = (event) => {
-            if (!this.options.enableExternalDragEvents &&
-                !_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.LocalSelectionTransfer.getInstance().hasData(this.options.id)) {
-                console.debug('[droptarget] invalid event');
-                return;
-            }
-            if (this.options.isDisabled()) {
-                return;
-            }
-            event.preventDefault();
-            if (!this.target) {
-                console.debug('[droptarget] created');
-                this.target = document.createElement('div');
-                this.target.className = 'drop-target-dropzone';
-                this.overlay = document.createElement('div');
-                this.overlay.className = 'drop-target-selection';
-                //
-                this._state = Position.Center;
-                this.target.addEventListener('dragover', this.onDragOver);
-                this.target.addEventListener('dragleave', this.onDragLeave);
-                this.target.addEventListener('drop', this.onDrop);
-                this.target.appendChild(this.overlay);
-                this.element.classList.add('drop-target');
-                this.element.append(this.target);
-            }
-        };
-        this.onDrop = (event) => {
-            if (!this.options.enableExternalDragEvents &&
-                !_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.LocalSelectionTransfer.getInstance().hasData(this.options.id)) {
-                console.debug('[dragtarget] invalid');
-                return;
-            }
-            const state = this._state;
-            console.debug('[dragtarget] drop');
-            this.removeDropTarget();
-            if (event.defaultPrevented) {
-                console.debug('[dragtarget] defaultPrevented');
-            }
-            else if (state) {
-                this._onDidChange.fire({ position: state, event });
-            }
-        };
-        this.onDragOver = (event) => {
-            event.preventDefault();
-            if (!this.options.isDirectional) {
-                return;
-            }
-            if (!this.target || !this.overlay) {
-                return;
-            }
-            const width = this.target.clientWidth;
-            const height = this.target.clientHeight;
-            if (width === 0 || height === 0) {
-                return; // avoid div!0
-            }
-            const x = event.offsetX;
-            const y = event.offsetY;
-            const xp = (100 * x) / width;
-            const yp = (100 * y) / height;
-            const isRight = xp > 80;
-            const isLeft = xp < 20;
-            const isTop = !isRight && !isLeft && yp < 20;
-            const isBottom = !isRight && !isLeft && yp > 80;
-            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'right', isRight);
-            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'left', isLeft);
-            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'top', isTop);
-            (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'bottom', isBottom);
-            if (isRight) {
-                this._state = Position.Right;
-            }
-            else if (isLeft) {
-                this._state = Position.Left;
-            }
-            else if (isTop) {
-                this._state = Position.Top;
-            }
-            else if (isBottom) {
-                this._state = Position.Bottom;
-            }
-            else {
-                this._state = Position.Center;
-            }
-        };
-        this.onDragLeave = (event) => {
-            console.debug('[droptarget] leave');
-            this.removeDropTarget();
-        };
-        this.element.addEventListener('dragenter', this.onDragEnter);
+        this._onDrop = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
+        this.onDrop = this._onDrop.event;
+        this.addDisposables(new _dnd__WEBPACK_IMPORTED_MODULE_3__.DragAndDropObserver(this.element, {
+            onDragEnter: (e) => undefined,
+            onDragOver: (e) => {
+                if (isBooleanValue(this.options.canDisplayOverlay)) {
+                    if (!this.options.canDisplayOverlay) {
+                        return;
+                    }
+                }
+                else if (!this.options.canDisplayOverlay(e)) {
+                    return;
+                }
+                if (!this.target) {
+                    console.debug('[droptarget] created');
+                    this.target = document.createElement('div');
+                    this.target.className = 'drop-target-dropzone';
+                    this.overlay = document.createElement('div');
+                    this.overlay.className = 'drop-target-selection';
+                    this._state = Position.Center;
+                    this.target.appendChild(this.overlay);
+                    this.element.classList.add('drop-target');
+                    this.element.append(this.target);
+                }
+                if (this.options.validOverlays === 'none') {
+                    return;
+                }
+                if (!this.target || !this.overlay) {
+                    return;
+                }
+                const width = this.target.clientWidth;
+                const height = this.target.clientHeight;
+                if (width === 0 || height === 0) {
+                    return; // avoid div!0
+                }
+                const x = e.offsetX;
+                const y = e.offsetY;
+                const xp = (100 * x) / width;
+                const yp = (100 * y) / height;
+                let isRight = false;
+                let isLeft = false;
+                let isTop = false;
+                let isBottom = false;
+                switch (this.options.validOverlays) {
+                    case 'all':
+                        isRight = xp > 80;
+                        isLeft = xp < 20;
+                        isTop = !isRight && !isLeft && yp < 20;
+                        isBottom = !isRight && !isLeft && yp > 80;
+                        break;
+                    case 'vertical':
+                        isTop = yp < 50;
+                        isBottom = yp >= 50;
+                        break;
+                    case 'horizontal':
+                        isLeft = xp < 50;
+                        isRight = xp >= 50;
+                        break;
+                }
+                const isSmallX = width < 100;
+                const isSmallY = height < 100;
+                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'right', !isSmallX && isRight);
+                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'left', !isSmallX && isLeft);
+                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'top', !isSmallY && isTop);
+                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'bottom', !isSmallY && isBottom);
+                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'small-right', isSmallX && isRight);
+                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'small-left', isSmallX && isLeft);
+                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'small-top', isSmallY && isTop);
+                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'small-bottom', isSmallY && isBottom);
+                if (isRight) {
+                    this._state = Position.Right;
+                }
+                else if (isLeft) {
+                    this._state = Position.Left;
+                }
+                else if (isTop) {
+                    this._state = Position.Top;
+                }
+                else if (isBottom) {
+                    this._state = Position.Bottom;
+                }
+                else {
+                    this._state = Position.Center;
+                }
+            },
+            onDragLeave: (e) => {
+                this.removeDropTarget();
+            },
+            onDragEnd: (e) => {
+                this.removeDropTarget();
+            },
+            onDrop: (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const state = this._state;
+                console.debug('[dragtarget] drop');
+                this.removeDropTarget();
+                if (state) {
+                    this._onDrop.fire({ position: state, event: e });
+                }
+            },
+        }));
     }
     get state() {
         return this._state;
     }
+    set validOverlays(value) {
+        this.options.validOverlays = value;
+    }
+    set canDisplayOverlay(value) {
+        this.options.canDisplayOverlay = value;
+    }
     dispose() {
-        this._onDidChange.dispose();
+        this._onDrop.dispose();
         this.removeDropTarget();
-        this.element.removeEventListener('dragenter', this.onDragEnter);
     }
     removeDropTarget() {
         if (this.target) {
             this._state = undefined;
-            this.target.removeEventListener('dragover', this.onDragOver);
-            this.target.removeEventListener('dragleave', this.onDragLeave);
-            this.target.removeEventListener('drop', this.onDrop);
             this.element.removeChild(this.target);
             this.target = undefined;
             this.element.classList.remove('drop-target');
@@ -34150,15 +34447,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../math */ "../dockview/dist/esm/math.js");
 /* harmony import */ var _deserializer__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./deserializer */ "../dockview/dist/esm/dockview/deserializer.js");
 /* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../panel/componentFactory */ "../dockview/dist/esm/panel/componentFactory.js");
-/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../dnd/dataTransfer */ "../dockview/dist/esm/dnd/dataTransfer.js");
-/* harmony import */ var _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../gridview/baseComponentGridview */ "../dockview/dist/esm/gridview/baseComponentGridview.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../api/component.api */ "../dockview/dist/esm/api/component.api.js");
-/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../groupview/tab */ "../dockview/dist/esm/groupview/tab.js");
-/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../splitview/core/splitview */ "../dockview/dist/esm/splitview/core/splitview.js");
-/* harmony import */ var _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./components/tab/defaultTab */ "../dockview/dist/esm/dockview/components/tab/defaultTab.js");
-/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../groupview/groupview */ "../dockview/dist/esm/groupview/groupview.js");
-/* harmony import */ var _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ../groupview/groupviewPanel */ "../dockview/dist/esm/groupview/groupviewPanel.js");
-/* harmony import */ var _defaultGroupPanelView__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./defaultGroupPanelView */ "../dockview/dist/esm/dockview/defaultGroupPanelView.js");
+/* harmony import */ var _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../gridview/baseComponentGridview */ "../dockview/dist/esm/gridview/baseComponentGridview.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../api/component.api */ "../dockview/dist/esm/api/component.api.js");
+/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../groupview/tab */ "../dockview/dist/esm/groupview/tab.js");
+/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../splitview/core/splitview */ "../dockview/dist/esm/splitview/core/splitview.js");
+/* harmony import */ var _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./components/tab/defaultTab */ "../dockview/dist/esm/dockview/components/tab/defaultTab.js");
+/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../groupview/groupview */ "../dockview/dist/esm/groupview/groupview.js");
+/* harmony import */ var _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../groupview/groupviewPanel */ "../dockview/dist/esm/groupview/groupviewPanel.js");
+/* harmony import */ var _defaultGroupPanelView__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./defaultGroupPanelView */ "../dockview/dist/esm/dockview/defaultGroupPanelView.js");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -34188,13 +34484,12 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-
 const nextGroupId = (0,_math__WEBPACK_IMPORTED_MODULE_9__.sequentialNumberGenerator)();
-class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_13__.BaseGrid {
+class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_12__.BaseGrid {
     constructor(element, options) {
         super(element, {
             proportionalLayout: true,
-            orientation: options.orientation || _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_16__.Orientation.HORIZONTAL,
+            orientation: options.orientation || _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_15__.Orientation.HORIZONTAL,
             styles: options.styles,
         });
         this.panels = new Map();
@@ -34205,10 +34500,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         this.onTabInteractionEvent = this._onTabInteractionEvent.event;
         this._onTabContextMenu = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
         this.onTabContextMenu = this._onTabContextMenu.event;
-        // everything else
-        this.drag = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.MutableDisposable();
         this.panelState = {};
-        this.registry = new Map();
         this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
         this.onDidLayoutChange = this._onDidLayoutChange.event;
         this._options = options;
@@ -34219,13 +34511,13 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             let timer;
             return this.onGridEvent((event) => {
                 if ([
-                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.ADD_GROUP,
-                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.REMOVE_GROUP,
-                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.ADD_PANEL,
-                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.REMOVE_PANEL,
-                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.GROUP_ACTIVE,
-                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.PANEL_ACTIVE,
-                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.LAYOUT,
+                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__.GroupChangeKind.ADD_GROUP,
+                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__.GroupChangeKind.REMOVE_GROUP,
+                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__.GroupChangeKind.ADD_PANEL,
+                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__.GroupChangeKind.REMOVE_PANEL,
+                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__.GroupChangeKind.GROUP_ACTIVE,
+                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__.GroupChangeKind.PANEL_ACTIVE,
+                    _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__.GroupChangeKind.LAYOUT,
                 ].includes(event.kind)) {
                     if (timer) {
                         clearTimeout(timer);
@@ -34253,7 +34545,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             !this.options.watermarkFrameworkComponent) {
             this.options.watermarkComponent = _components_watermark_watermark__WEBPACK_IMPORTED_MODULE_6__.Watermark;
         }
-        this._api = new _api_component_api__WEBPACK_IMPORTED_MODULE_14__.DockviewApi(this);
+        this._api = new _api_component_api__WEBPACK_IMPORTED_MODULE_13__.DockviewApi(this);
     }
     get totalPanels() {
         return this.panels.size;
@@ -34289,9 +34581,12 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         }
         this.layout(this.gridview.width, this.gridview.height, true);
     }
-    addDndHandle(type, cb) {
-        this.registry.set(type, cb);
-    }
+    // addDndHandle(
+    //     type: string,
+    //     cb: (event: LayoutDropEvent) => PanelOptions
+    // ): void {
+    //     this.registry.set(type, cb);
+    // }
     focus() {
         var _a;
         (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.focus();
@@ -34300,33 +34595,49 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         var _a;
         return (_a = this.panels.get(id)) === null || _a === void 0 ? void 0 : _a.value;
     }
-    createDragTarget(target, options) {
-        return new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.CompositeDisposable((0,_events__WEBPACK_IMPORTED_MODULE_5__.addDisposableListener)(target.element, 'dragstart', (event) => {
-            var _a;
-            if (!event.dataTransfer) {
-                throw new Error('unsupported');
-            }
-            const panelOptions = typeof options === 'function' ? options() : options;
-            const panel = (_a = this.panels.get(panelOptions.id)) === null || _a === void 0 ? void 0 : _a.value;
-            if (panel) {
-                this.drag.value = panel.group.model.startActiveDrag(panel);
-            }
-            const data = JSON.stringify(Object.assign({ type: _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_12__.DragType.EXTERNAL }, panelOptions));
-            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_12__.LocalSelectionTransfer.getInstance().setData([data], this.id);
-            event.dataTransfer.effectAllowed = 'move';
-            const dragImage = document.createElement('div');
-            dragImage.textContent = target.content;
-            dragImage.classList.add('custom-dragging');
-            document.body.appendChild(dragImage);
-            event.dataTransfer.setDragImage(dragImage, event.offsetX, event.offsetY);
-            setTimeout(() => document.body.removeChild(dragImage), 0);
-            event.dataTransfer.setData(_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_12__.DATA_KEY, data);
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_5__.addDisposableListener)(this.element, 'dragend', (ev) => {
-            // drop events fire before dragend so we can remove this safely
-            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_12__.LocalSelectionTransfer.getInstance().clearData(this.id);
-            this.drag.dispose();
-        }));
-    }
+    // createDragTarget(
+    //     target: {
+    //         element: HTMLElement;
+    //         content: string;
+    //     },
+    //     options: (() => PanelOptions) | PanelOptions
+    // ): IDisposable {
+    //     return new CompositeDisposable(
+    //         addDisposableListener(target.element, 'dragstart', (event) => {
+    //             if (!event.dataTransfer) {
+    //                 throw new Error('unsupported');
+    //             }
+    //             const panelOptions =
+    //                 typeof options === 'function' ? options() : options;
+    //             const panel = this.panels.get(panelOptions.id)?.value;
+    //             if (panel) {
+    //                 this.drag.value = panel.group!.model.startActiveDrag(panel);
+    //             }
+    //             const data = JSON.stringify({
+    //                 type: DragType.EXTERNAL,
+    //                 ...panelOptions,
+    //             });
+    //             LocalSelectionTransfer.getInstance().setData([data], this.id);
+    //             event.dataTransfer.effectAllowed = 'move';
+    //             const dragImage = document.createElement('div');
+    //             dragImage.textContent = target.content;
+    //             dragImage.classList.add('custom-dragging');
+    //             document.body.appendChild(dragImage);
+    //             event.dataTransfer.setDragImage(
+    //                 dragImage,
+    //                 event.offsetX,
+    //                 event.offsetY
+    //             );
+    //             setTimeout(() => document.body.removeChild(dragImage), 0);
+    //             event.dataTransfer.setData(DATA_KEY, data);
+    //         }),
+    //         addDisposableListener(this.element, 'dragend', (ev) => {
+    //             // drop events fire before dragend so we can remove this safely
+    //             LocalSelectionTransfer.getInstance().clearData(this.id);
+    //             this.drag.dispose();
+    //         })
+    //     );
+    // }
     setActivePanel(panel) {
         if (!panel.group) {
             throw new Error(`Panel ${panel.id} has no associated group`);
@@ -34380,7 +34691,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         }
         const disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.CompositeDisposable(panel.onDidStateChange(() => this.addDirtyPanel(panel)));
         this.panels.set(panel.id, { value: panel, disposable });
-        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.PANEL_CREATED });
+        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__.GroupChangeKind.PANEL_CREATED });
     }
     unregisterPanel(panel) {
         if (!this.panels.has(panel.id)) {
@@ -34392,7 +34703,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             item.value.dispose();
         }
         this.panels.delete(panel.id);
-        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.PANEL_DESTROYED });
+        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__.GroupChangeKind.PANEL_DESTROYED });
     }
     /**
      * Serialize the current state of the layout
@@ -34450,7 +34761,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             }
         }
         this.gridview.layout(this.width, this.height);
-        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.NEW_LAYOUT });
+        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__.GroupChangeKind.NEW_LAYOUT });
     }
     closeAllGroups() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -34467,7 +34778,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
     }
     fireMouseEvent(event) {
         switch (event.kind) {
-            case _groupview_tab__WEBPACK_IMPORTED_MODULE_15__.MouseEventKind.CONTEXT_MENU:
+            case _groupview_tab__WEBPACK_IMPORTED_MODULE_14__.MouseEventKind.CONTEXT_MENU:
                 if (event.tab && event.panel) {
                     this._onTabContextMenu.fire({
                         event: event.event,
@@ -34493,7 +34804,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             referenceGroup = this.activeGroup;
         }
         if (referenceGroup) {
-            const target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_13__.toTarget)(((_b = options.position) === null || _b === void 0 ? void 0 : _b.direction) || 'within');
+            const target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_12__.toTarget)(((_b = options.position) === null || _b === void 0 ? void 0 : _b.direction) || 'within');
             if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
                 referenceGroup.model.openPanel(panel);
             }
@@ -34528,7 +34839,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             if (!referenceGroup) {
                 throw new Error(`reference group for reference panel ${options.referencePanel} does not exist`);
             }
-            const target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_13__.toTarget)(options.direction || 'within');
+            const target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_12__.toTarget)(options.direction || 'within');
             const location = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
             const relativeLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location, target);
             this.doAddGroup(group, relativeLocation);
@@ -34619,7 +34930,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
                 id = nextGroupId.next();
             }
         }
-        const view = new _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_19__.GroupviewPanel(this, id, options);
+        const view = new _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_18__.GroupviewPanel(this, id, options);
         if (typeof this.options.tabHeight === 'number') {
             view.model.tabHeight = this.options.tabHeight;
         }
@@ -34629,30 +34940,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
                 this.moveGroupOrPanel(view, groupId, itemId, target, index);
             }), view.model.onDidGroupChange((event) => {
                 this._onGridEvent.fire(event);
-            }), view.model.onDrop((event) => {
-                var _a;
-                const dragEvent = event.event;
-                const dataTransfer = dragEvent.dataTransfer;
-                if (!dataTransfer) {
-                    return;
-                }
-                if (dataTransfer.types.length === 0) {
-                    return;
-                }
-                const cb = this.registry.get(dataTransfer.types[0]);
-                if (!cb) {
-                    return;
-                }
-                const panelOptions = cb({ event });
-                let panel = this.getGroupPanel(panelOptions.id);
-                if (!panel) {
-                    panel = this._addPanel(panelOptions);
-                }
-                const groupId = (_a = panel.group) === null || _a === void 0 ? void 0 : _a.id;
-                if (!groupId) {
-                    throw new Error(`Panel ${panel.id} has no associated group`);
-                }
-                this.moveGroupOrPanel(view, groupId, panel.id, event.target, event.index);
             }));
             this.groups.set(view.id, { value: view, disposable });
         }
@@ -34684,15 +34971,15 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             .forEach((panel) => {
             panel.setDirty(false);
             this._onGridEvent.fire({
-                kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.PANEL_CLEAN,
+                kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__.GroupChangeKind.PANEL_CLEAN,
             });
         });
         this._onGridEvent.fire({
-            kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.LAYOUT_CONFIG_UPDATED,
+            kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__.GroupChangeKind.LAYOUT_CONFIG_UPDATED,
         });
     }
     _addPanel(options) {
-        const view = new _defaultGroupPanelView__WEBPACK_IMPORTED_MODULE_20__.DefaultGroupPanelView({
+        const view = new _defaultGroupPanelView__WEBPACK_IMPORTED_MODULE_19__.DefaultGroupPanelView({
             content: this.createContentComponent(options.id, options.component),
             tab: this.createTabComponent(options.id, options.tabComponent),
         });
@@ -34712,7 +34999,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
     }
     createTabComponent(id, componentName) {
         var _a;
-        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_11__.createComponent)(id, componentName, this.options.tabComponents || {}, this.options.frameworkTabComponents, (_a = this.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.tab, () => new _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_17__.DefaultTab());
+        return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_11__.createComponent)(id, componentName, this.options.tabComponents || {}, this.options.frameworkTabComponents, (_a = this.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.tab, () => new _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_16__.DefaultTab());
     }
     addPanelToNewGroup(panel, location = [0]) {
         const group = this.createGroup();
@@ -34726,7 +35013,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
     addDirtyPanel(panel) {
         this.dirtyPanels.add(panel);
         panel.setDirty(true);
-        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_18__.GroupChangeKind.PANEL_DIRTY });
+        this._onGridEvent.fire({ kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__.GroupChangeKind.PANEL_DIRTY });
         this.debouncedDeque();
     }
 }
@@ -36743,6 +37030,7 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "GroupChangeKind": () => (/* binding */ GroupChangeKind),
+/* harmony export */   "DockviewDropTargets": () => (/* binding */ DockviewDropTargets),
 /* harmony export */   "Groupview": () => (/* binding */ Groupview)
 /* harmony export */ });
 /* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/component.api */ "../dockview/dist/esm/api/component.api.js");
@@ -36764,6 +37052,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+
 
 
 
@@ -36796,9 +37085,14 @@ var GroupChangeKind;
     //
     GroupChangeKind["LAYOUT_CONFIG_UPDATED"] = "LAYOUT_CONFIG_UPDATED";
 })(GroupChangeKind || (GroupChangeKind = {}));
+var DockviewDropTargets;
+(function (DockviewDropTargets) {
+    DockviewDropTargets[DockviewDropTargets["Tab"] = 0] = "Tab";
+    DockviewDropTargets[DockviewDropTargets["Panel"] = 1] = "Panel";
+    DockviewDropTargets[DockviewDropTargets["TabContainer"] = 2] = "TabContainer";
+})(DockviewDropTargets || (DockviewDropTargets = {}));
 class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposable {
     constructor(container, accessor, id, options, parent) {
-        var _a, _b;
         super();
         this.container = container;
         this.accessor = accessor;
@@ -36814,8 +37108,6 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
         this._panels = [];
         this._onMove = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
         this.onMove = this._onMove.event;
-        this._onDrop = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
-        this.onDrop = this._onDrop.event;
         this._onDidGroupChange = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
         this.onDidGroupChange = this._onDidGroupChange.event;
         this.closePanel = (panel) => __awaiter(this, void 0, void 0, function* () {
@@ -36826,42 +37118,32 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
             return true;
         });
         this.container.classList.add('groupview');
-        this.addDisposables(this._onMove, this._onDidGroupChange, this._onDrop);
+        this.addDisposables(this._onMove, this._onDidGroupChange);
         this.tabsContainer = new _titlebar_tabsContainer__WEBPACK_IMPORTED_MODULE_8__.TabsContainer(this.accessor, this.parent, {
             tabHeight: options.tabHeight,
         });
         this.contentContainer = new _panel_content__WEBPACK_IMPORTED_MODULE_7__.ContentContainer();
         this.dropTarget = new _dnd_droptarget__WEBPACK_IMPORTED_MODULE_3__.Droptarget(this.contentContainer.element, {
-            isDirectional: true,
-            id: this.accessor.id,
-            isDisabled: () => {
-                // disable the drop target if we only have one tab, and that is also the tab we are moving
-                return (this._panels.length === 1 &&
-                    this.tabsContainer.hasActiveDragEvent);
+            validOverlays: 'all',
+            canDisplayOverlay: (event) => {
+                const data = (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.getPanelData)();
+                if (data) {
+                    const groupHasOnePanelAndIsActiveDragElement = this._panels.length === 1 && data.groupId === this.id;
+                    return !groupHasOnePanelAndIsActiveDragElement;
+                }
+                return this.canDisplayOverlay(event, DockviewDropTargets.Panel);
             },
-            enableExternalDragEvents: this.accessor.options.enableExternalDragEvents,
         });
         container.append(this.tabsContainer.element, this.contentContainer.element);
-        this.addDisposables(this._onMove, this._onDidGroupChange, this.tabsContainer.onDropEvent((event) => this.handleDropEvent(event.event, event.index)), this.contentContainer.onDidFocus(() => {
+        this.addDisposables(this._onMove, this._onDidGroupChange, this.tabsContainer.onDrop((event) => {
+            this.handleDropEvent(event.event, _dnd_droptarget__WEBPACK_IMPORTED_MODULE_3__.Position.Center, event.index);
+        }), this.contentContainer.onDidFocus(() => {
             this.accessor.doSetGroupActive(this.parent, true);
         }), this.contentContainer.onDidBlur(() => {
             // this._activePanel?.api._ondid
-        }), this.dropTarget.onDidChange((event) => {
-            // if we've center dropped on ourself then ignore
-            if (event.position === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_3__.Position.Center &&
-                this.tabsContainer.hasActiveDragEvent) {
-                return;
-            }
-            this.handleDropEvent(event);
+        }), this.dropTarget.onDrop((event) => {
+            this.handleDropEvent(event.event, event.position);
         }));
-        if ((_a = this.options) === null || _a === void 0 ? void 0 : _a.panels) {
-            this.options.panels.forEach((panel) => {
-                this.doAddPanel(panel);
-            });
-        }
-        if ((_b = this.options) === null || _b === void 0 ? void 0 : _b.activePanel) {
-            this.openPanel(this.options.activePanel);
-        }
     }
     get element() {
         throw new Error('not supported');
@@ -36901,6 +37183,15 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
         return Number.MAX_SAFE_INTEGER;
     }
     initialize() {
+        var _a, _b;
+        if ((_a = this.options) === null || _a === void 0 ? void 0 : _a.panels) {
+            this.options.panels.forEach((panel) => {
+                this.doAddPanel(panel);
+            });
+        }
+        if ((_b = this.options) === null || _b === void 0 ? void 0 : _b.activePanel) {
+            this.openPanel(this.options.activePanel);
+        }
         // must be run after the constructor otherwise this.parent may not be
         // correctly initialized
         this.setActive(this.isActive, true, true);
@@ -36923,19 +37214,19 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
             id: this.id,
         };
     }
-    startActiveDrag(panel) {
-        const index = this.tabsContainer.indexOf(panel.id);
-        if (index > -1) {
-            const tab = this.tabsContainer.at(index);
-            tab.startDragEvent();
-            return {
-                dispose: () => {
-                    tab.stopDragEvent();
-                },
-            };
-        }
-        return _lifecycle__WEBPACK_IMPORTED_MODULE_6__.Disposable.NONE;
-    }
+    // public startActiveDrag(panel: IGroupPanel): IDisposable {
+    //     const index = this.tabsContainer.indexOf(panel.id);
+    //     if (index > -1) {
+    //         const tab = this.tabsContainer.at(index);
+    //         tab.startDragEvent();
+    //         return {
+    //             dispose: () => {
+    //                 tab.stopDragEvent();
+    //             },
+    //         };
+    //     }
+    //     return Disposable.NONE;
+    // }
     moveToNext(options) {
         if (!options) {
             options = {};
@@ -36993,7 +37284,8 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
         (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.focus();
     }
     openPanel(panel, options = {}) {
-        if (typeof options.index !== 'number') {
+        if (typeof options.index !== 'number' ||
+            options.index > this.panels.length) {
             options.index = this.panels.length;
         }
         if (this._activePanel === panel) {
@@ -37202,51 +37494,36 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
             this.tabsContainer.show();
         }
     }
-    handleDropEvent(event, index) {
-        if ((0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.isPanelTransferEvent)(event.event)) {
-            this.handlePanelDropEvent(event.event, event.position, index);
-            return;
-        }
-        this._onDrop.fire({
-            event: event.event,
-            target: event.position,
-            index,
-        });
-        console.debug('[customDropEvent]');
+    canDisplayOverlay(dragOverEvent, target) {
+        // custom overlay handler
+        return false;
     }
-    handlePanelDropEvent(event, target, index) {
-        const dataObject = (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.extractData)(event);
-        if ((0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.isTabDragEvent)(dataObject)) {
-            const { groupId, itemId } = dataObject;
+    handleDropEvent(event, position, index) {
+        const data = (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.getPanelData)();
+        if (data) {
+            const fromSameGroup = this.tabsContainer.indexOf(data.panelId) !== -1;
+            if (fromSameGroup && this.tabsContainer.size === 1) {
+                console.debug('[tabs] ignore event');
+                return;
+            }
+            const { groupId, panelId } = data;
             const isSameGroup = this.id === groupId;
-            if (isSameGroup && !target) {
-                const oldIndex = this.tabsContainer.indexOf(itemId);
+            if (isSameGroup && !position) {
+                const oldIndex = this.tabsContainer.indexOf(panelId);
                 if (oldIndex === index) {
                     console.debug('[tabs] drop indicates no change in position');
                     return;
                 }
             }
             this._onMove.fire({
-                target,
-                groupId: dataObject.groupId,
-                itemId: dataObject.itemId,
+                target: position,
+                groupId: data.groupId,
+                itemId: data.panelId,
                 index,
             });
         }
-        if ((0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.isCustomDragEvent)(dataObject)) {
-            let panel = this.accessor.getGroupPanel(dataObject.id);
-            if (!panel) {
-                panel = this.accessor.addPanel(dataObject);
-            }
-            if (!panel.group) {
-                throw new Error(`panel ${panel.id} has no associated group`);
-            }
-            this._onMove.fire({
-                target,
-                groupId: panel.group.id,
-                itemId: panel.id,
-                index,
-            });
+        else {
+            // custom drop handler
         }
     }
     dispose() {
@@ -37423,11 +37700,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "Tab": () => (/* binding */ Tab)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
-/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
-/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dnd/dataTransfer */ "../dockview/dist/esm/dnd/dataTransfer.js");
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../dom */ "../dockview/dist/esm/dom.js");
-/* harmony import */ var _focusedElement__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../focusedElement */ "../dockview/dist/esm/focusedElement.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
+/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../dnd/dataTransfer */ "../dockview/dist/esm/dnd/dataTransfer.js");
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dom */ "../dockview/dist/esm/dom.js");
+/* harmony import */ var _focusedElement__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../focusedElement */ "../dockview/dist/esm/focusedElement.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../dnd/droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
+/* harmony import */ var _groupview__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./groupview */ "../dockview/dist/esm/groupview/groupview.js");
+
 
 
 
@@ -37439,19 +37718,17 @@ var MouseEventKind;
     MouseEventKind["CLICK"] = "CLICK";
     MouseEventKind["CONTEXT_MENU"] = "CONTEXT_MENU";
 })(MouseEventKind || (MouseEventKind = {}));
-class Tab extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable {
-    constructor(id, accessor, group) {
+class Tab extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable {
+    constructor(panelId, accessor, group) {
         super();
-        this.id = id;
+        this.panelId = panelId;
         this.accessor = accessor;
         this.group = group;
-        this.dragInPlayDetails = {
-            isDragging: false,
-        };
         this._onChanged = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
         this.onChanged = this._onChanged.event;
         this._onDropped = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        this.onDropped = this._onDropped.event;
+        this.onDrop = this._onDropped.event;
+        this.panelTransfer = _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.LocalSelectionTransfer.getInstance();
         this.iframes = [];
         this.addDisposables(this._onChanged, this._onDropped);
         this._element = document.createElement('div');
@@ -37459,27 +37736,19 @@ class Tab extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable {
         this._element.tabIndex = 0;
         this._element.draggable = true;
         this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(this._element, 'dragstart', (event) => {
-            this.dragInPlayDetails = {
-                isDragging: true,
-                id: this.accessor.id,
-            };
             this.iframes = [
-                ...(0,_dom__WEBPACK_IMPORTED_MODULE_4__.getElementsByTagName)('iframe'),
-                ...(0,_dom__WEBPACK_IMPORTED_MODULE_4__.getElementsByTagName)('webview'),
+                ...(0,_dom__WEBPACK_IMPORTED_MODULE_3__.getElementsByTagName)('iframe'),
+                ...(0,_dom__WEBPACK_IMPORTED_MODULE_3__.getElementsByTagName)('webview'),
             ];
             for (const iframe of this.iframes) {
                 iframe.style.pointerEvents = 'none';
             }
             this.element.classList.add('dragged');
             setTimeout(() => this.element.classList.remove('dragged'), 0);
-            const data = JSON.stringify({
-                type: _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.DragType.ITEM,
-                itemId: this.id,
-                groupId: this.group.id,
-            });
-            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.LocalSelectionTransfer.getInstance().setData([data], this.dragInPlayDetails.id);
+            this.panelTransfer.setData([
+                new _dnd_droptarget__WEBPACK_IMPORTED_MODULE_5__.PanelTransfer(this.accessor.id, this.group.id, this.panelId),
+            ], _dnd_droptarget__WEBPACK_IMPORTED_MODULE_5__.PanelTransfer.prototype);
             if (event.dataTransfer) {
-                event.dataTransfer.setData(_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.DATA_KEY, data);
                 event.dataTransfer.effectAllowed = 'move';
             }
         }), (0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(this._element, 'dragend', (ev) => {
@@ -37487,12 +37756,7 @@ class Tab extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable {
                 iframe.style.pointerEvents = 'auto';
             }
             this.iframes = [];
-            // drop events fire before dragend so we can remove this safely
-            _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.LocalSelectionTransfer.getInstance().clearData(this.dragInPlayDetails.id);
-            this.dragInPlayDetails = {
-                isDragging: false,
-                id: undefined,
-            };
+            this.panelTransfer.clearData(_dnd_droptarget__WEBPACK_IMPORTED_MODULE_5__.PanelTransfer.prototype);
         }), (0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(this._element, 'mousedown', (event) => {
             if (event.defaultPrevented) {
                 return;
@@ -37512,7 +37776,7 @@ class Tab extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable {
              * the onChanged event during the next tick of the event-loop, allowing the tab element to become
              * focused on this tick and ensuring the dragstart event is not interrupted
              */
-            const oldFocus = _focusedElement__WEBPACK_IMPORTED_MODULE_5__.focusedElement.element;
+            const oldFocus = _focusedElement__WEBPACK_IMPORTED_MODULE_4__.focusedElement.element;
             setTimeout(() => {
                 oldFocus.focus();
                 this._onChanged.fire({ kind: MouseEventKind.CLICK, event });
@@ -37523,34 +37787,26 @@ class Tab extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable {
                 event,
             });
         }));
-        this.droptarget = new _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Droptarget(this._element, {
-            isDirectional: false,
-            isDisabled: () => this.dragInPlayDetails.isDragging,
-            id: this.accessor.id,
-            enableExternalDragEvents: this.accessor.options
-                .enableExternalDragEvents,
+        this.droptarget = new _dnd_droptarget__WEBPACK_IMPORTED_MODULE_5__.Droptarget(this._element, {
+            validOverlays: 'none',
+            canDisplayOverlay: (event) => {
+                const data = (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.getPanelData)();
+                if (data) {
+                    return this.panelId !== data.panelId;
+                }
+                return this.group.model.canDisplayOverlay(event, _groupview__WEBPACK_IMPORTED_MODULE_6__.DockviewDropTargets.Tab);
+            },
         });
-        this.addDisposables(this.droptarget.onDidChange((event) => {
-            event.event.preventDefault();
+        this.addDisposables(this.droptarget.onDrop((event) => {
             this._onDropped.fire(event);
         }));
     }
     get element() {
         return this._element;
     }
-    get hasActiveDragEvent() {
-        var _a;
-        return (_a = this.dragInPlayDetails) === null || _a === void 0 ? void 0 : _a.isDragging;
-    }
-    startDragEvent() {
-        this.dragInPlayDetails = { isDragging: true, id: this.accessor.id };
-    }
-    stopDragEvent() {
-        this.dragInPlayDetails = { isDragging: false, id: undefined };
-    }
     setActive(isActive) {
-        (0,_dom__WEBPACK_IMPORTED_MODULE_4__.toggleClass)(this.element, 'active-tab', isActive);
-        (0,_dom__WEBPACK_IMPORTED_MODULE_4__.toggleClass)(this.element, 'inactive-tab', !isActive);
+        (0,_dom__WEBPACK_IMPORTED_MODULE_3__.toggleClass)(this.element, 'active-tab', isActive);
+        (0,_dom__WEBPACK_IMPORTED_MODULE_3__.toggleClass)(this.element, 'inactive-tab', !isActive);
     }
     setContent(part) {
         if (this.content) {
@@ -37582,10 +37838,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lifecycle */ "../dockview/dist/esm/lifecycle.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../events */ "../dockview/dist/esm/events.js");
 /* harmony import */ var _tab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../tab */ "../dockview/dist/esm/groupview/tab.js");
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../dom */ "../dockview/dist/esm/dom.js");
-/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../dnd/droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
-/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../array */ "../dockview/dist/esm/array.js");
-/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../dnd/dataTransfer */ "../dockview/dist/esm/dnd/dataTransfer.js");
+/* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../array */ "../dockview/dist/esm/array.js");
+/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../dnd/dataTransfer */ "../dockview/dist/esm/dnd/dataTransfer.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../dnd/droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
+/* harmony import */ var _groupview__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../groupview */ "../dockview/dist/esm/groupview/groupview.js");
 
 
 
@@ -37601,9 +37857,9 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
         this.tabs = [];
         this.selectedIndex = -1;
         this.active = false;
-        this._onDropped = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
-        this.onDropEvent = this._onDropped.event;
-        this.addDisposables(this._onDropped);
+        this._onDrop = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
+        this.onDrop = this._onDrop.event;
+        this.addDisposables(this._onDrop);
         this._element = document.createElement('div');
         this._element.className = 'tabs-and-actions-container';
         this.height = options.tabHeight;
@@ -37611,9 +37867,29 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
         this.actionContainer.className = 'action-container';
         this.tabContainer = document.createElement('div');
         this.tabContainer.className = 'tabs-container';
+        this.voidContainer = document.createElement('div');
+        this.voidContainer.className = 'void-container';
         this._element.appendChild(this.tabContainer);
+        this._element.appendChild(this.voidContainer);
         this._element.appendChild(this.actionContainer);
-        this.addDisposables((0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.tabContainer, 'mousedown', (event) => {
+        this.voidDropTarget = new _dnd_droptarget__WEBPACK_IMPORTED_MODULE_5__.Droptarget(this.voidContainer, {
+            validOverlays: 'none',
+            canDisplayOverlay: (event) => {
+                var _a;
+                const data = (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_4__.getPanelData)();
+                if (data) {
+                    // don't show the overlay if the tab being dragged is the last panel of this group
+                    return ((_a = (0,_array__WEBPACK_IMPORTED_MODULE_3__.last)(this.tabs)) === null || _a === void 0 ? void 0 : _a.value.panelId) !== data.panelId;
+                }
+                return group.model.canDisplayOverlay(event, _groupview__WEBPACK_IMPORTED_MODULE_6__.DockviewDropTargets.Panel);
+            },
+        });
+        this.addDisposables(this.voidDropTarget.onDrop((event) => {
+            this._onDrop.fire({
+                event: event.event,
+                index: this.tabs.length,
+            });
+        }), this.voidDropTarget, (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.tabContainer, 'mousedown', (event) => {
             if (event.defaultPrevented) {
                 return;
             }
@@ -37621,46 +37897,13 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
             if (isLeftClick) {
                 this.accessor.doSetGroupActive(this.group);
             }
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.tabContainer, 'dragenter', (event) => {
-            var _a;
-            if (!_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_6__.LocalSelectionTransfer.getInstance().hasData(this.accessor.id)) {
-                console.debug('[tabs] invalid drop event');
-                return;
-            }
-            if (!((_a = (0,_array__WEBPACK_IMPORTED_MODULE_5__.last)(this.tabs)) === null || _a === void 0 ? void 0 : _a.value.hasActiveDragEvent)) {
-                (0,_dom__WEBPACK_IMPORTED_MODULE_3__.addClasses)(this.tabContainer, 'drag-over-target');
-            }
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.tabContainer, 'dragover', (event) => {
-            event.preventDefault();
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.tabContainer, 'dragleave', (event) => {
-            (0,_dom__WEBPACK_IMPORTED_MODULE_3__.removeClasses)(this.tabContainer, 'drag-over-target');
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.tabContainer, 'drop', (event) => {
-            if (!_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_6__.LocalSelectionTransfer.getInstance().hasData(this.accessor.id)) {
-                console.debug('[tabs] invalid drop event');
-                return;
-            }
-            if (event.defaultPrevented) {
-                console.debug('[tab] drop event defaultprevented');
-                return;
-            }
-            (0,_dom__WEBPACK_IMPORTED_MODULE_3__.removeClasses)(this.tabContainer, 'drag-over-target');
-            const activetab = this.tabs.find((tab) => tab.value.hasActiveDragEvent);
-            const ignore = !!(activetab &&
-                event
-                    .composedPath()
-                    .find((x) => activetab.value.element === x));
-            if (ignore) {
-                console.debug('[tabs] ignore event');
-                return;
-            }
-            this._onDropped.fire({
-                event: { event, position: _dnd_droptarget__WEBPACK_IMPORTED_MODULE_4__.Position.Center },
-                index: this.tabs.length - (activetab ? 1 : 0),
-            });
         }));
     }
     get panels() {
-        return this.tabs.map((_) => _.value.id);
+        return this.tabs.map((_) => _.value.panelId);
+    }
+    get size() {
+        return this.tabs.length;
     }
     get height() {
         return this._height;
@@ -37668,16 +37911,11 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
     set height(value) {
         this._height = value;
         if (typeof value !== 'number') {
-            // removeClasses(this.element, 'separator-border');
             this.element.style.removeProperty('--dv-tabs-and-actions-container-height');
         }
         else {
-            // addClasses(this.element, 'separator-border');
-            // if (styles?.separatorBorder) {
             this.element.style.setProperty('--dv-tabs-and-actions-container-height', `${value}px`);
-            // }
         }
-        // this._element.style.height = `${this.height}px`;
     }
     show() {
         this.element.style.display = '';
@@ -37705,15 +37943,12 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
         return (this.selectedIndex > -1 &&
             this.tabs[this.selectedIndex].value === tab);
     }
-    get hasActiveDragEvent() {
-        return !!this.tabs.find((tab) => tab.value.hasActiveDragEvent);
-    }
     at(index) {
         var _a;
         return (_a = this.tabs[index]) === null || _a === void 0 ? void 0 : _a.value;
     }
     indexOf(id) {
-        return this.tabs.findIndex((tab) => tab.value.id === id);
+        return this.tabs.findIndex((tab) => tab.value.panelId === id);
     }
     setActive(isGroupActive) {
         this.active = isGroupActive;
@@ -37733,7 +37968,7 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
         }
     }
     delete(id) {
-        const index = this.tabs.findIndex((tab) => tab.value.id === id);
+        const index = this.tabs.findIndex((tab) => tab.value.panelId === id);
         const tabToRemove = this.tabs.splice(index, 1)[0];
         const { value, disposable } = tabToRemove;
         disposable.dispose();
@@ -37741,13 +37976,13 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
     }
     setActivePanel(panel) {
         this.tabs.forEach((tab) => {
-            const isActivePanel = panel.id === tab.value.id;
+            const isActivePanel = panel.id === tab.value.panelId;
             tab.value.setActive(isActivePanel);
         });
     }
     openPanel(panel, index = this.tabs.length) {
         var _a;
-        if (this.tabs.find((tab) => tab.value.id === panel.id)) {
+        if (this.tabs.find((tab) => tab.value.panelId === panel.id)) {
             return;
         }
         const tabToAdd = new _tab__WEBPACK_IMPORTED_MODULE_2__.Tab(panel.id, this.accessor, this.group);
@@ -37771,9 +38006,9 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
                     });
                     break;
             }
-        }), tabToAdd.onDropped((event) => {
-            this._onDropped.fire({
-                event,
+        }), tabToAdd.onDrop((event) => {
+            this._onDrop.fire({
+                event: event.event,
                 index: this.tabs.findIndex((x) => x.value === tabToAdd),
             });
         }));
@@ -37835,6 +38070,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "indexInParent": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_5__.indexInParent),
 /* harmony export */   "isGridBranchNode": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_5__.isGridBranchNode),
 /* harmony export */   "orthogonal": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_5__.orthogonal),
+/* harmony export */   "DockviewDropTargets": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_6__.DockviewDropTargets),
 /* harmony export */   "GroupChangeKind": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_6__.GroupChangeKind),
 /* harmony export */   "Groupview": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_6__.Groupview),
 /* harmony export */   "ContentContainer": () => (/* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_7__.ContentContainer),
@@ -37854,6 +38090,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "DockviewComponent": () => (/* reexport safe */ _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_14__.DockviewComponent),
 /* harmony export */   "GridviewComponent": () => (/* reexport safe */ _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_16__.GridviewComponent),
 /* harmony export */   "DockviewComponents": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_17__.DockviewComponents),
+/* harmony export */   "DockviewDropTarget": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_17__.DockviewDropTarget),
 /* harmony export */   "DockviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_17__.DockviewReact),
 /* harmony export */   "GridviewPanel": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_17__.GridviewPanel),
 /* harmony export */   "GridviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_17__.GridviewReact),
@@ -38051,6 +38288,90 @@ function createComponent(id, componentName, components = {}, frameworkComponents
 
 /***/ }),
 
+/***/ "../dockview/dist/esm/paneview/draggablePaneviewPanel.js":
+/*!***************************************************************!*\
+  !*** ../dockview/dist/esm/paneview/draggablePaneviewPanel.js ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DraggablePaneviewPanel": () => (/* binding */ DraggablePaneviewPanel)
+/* harmony export */ });
+/* harmony import */ var _dnd_abstractDragHandler__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dnd/abstractDragHandler */ "../dockview/dist/esm/dnd/abstractDragHandler.js");
+/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/dataTransfer */ "../dockview/dist/esm/dnd/dataTransfer.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../dnd/droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
+/* harmony import */ var _paneviewPanel__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./paneviewPanel */ "../dockview/dist/esm/paneview/paneviewPanel.js");
+
+
+
+
+
+class DraggablePaneviewPanel extends _paneviewPanel__WEBPACK_IMPORTED_MODULE_4__.PaneviewPanel {
+    constructor(id, component, headerComponent, orientation, isExpanded, disableDnd) {
+        super(id, component, headerComponent, orientation, isExpanded);
+        this._onDidDrop = new _events__WEBPACK_IMPORTED_MODULE_3__.Emitter();
+        this.onDidDrop = this._onDidDrop.event;
+        if (!disableDnd) {
+            this.initDragFeatures();
+        }
+    }
+    initDragFeatures() {
+        const id = this.id;
+        this.header.draggable = true;
+        this.header.tabIndex = 0;
+        this.handler = new (class PaneDragHandler extends _dnd_abstractDragHandler__WEBPACK_IMPORTED_MODULE_0__.DragHandler {
+            getData() {
+                _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.LocalSelectionTransfer.getInstance().setData([new _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.PaneTransfer('paneview', id)], _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.PaneTransfer.prototype);
+                return {
+                    dispose: () => {
+                        _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.LocalSelectionTransfer.getInstance().clearData(_dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.PaneTransfer.prototype);
+                    },
+                };
+            }
+        })(this.header);
+        this.target = new _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Droptarget(this.element, {
+            validOverlays: 'vertical',
+            canDisplayOverlay: (event) => {
+                const data = (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.getPaneData)();
+                if (!data) {
+                    return true;
+                }
+                return data.paneId !== this.id;
+            },
+        });
+        this.addDisposables(this._onDidDrop, this.handler, this.target, this.target.onDrop((event) => {
+            const data = (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.getPaneData)();
+            if (!data) {
+                this._onDidDrop.fire(event);
+                return;
+            }
+            const containerApi = this.params
+                .containerApi;
+            const id = data.paneId;
+            const existingPanel = containerApi.getPanel(id);
+            if (!existingPanel) {
+                this._onDidDrop.fire(event);
+                return;
+            }
+            const fromIndex = containerApi
+                .getPanels()
+                .indexOf(existingPanel);
+            let toIndex = containerApi.getPanels().indexOf(this);
+            if (event.position === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Right ||
+                event.position === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Bottom) {
+                toIndex = Math.max(0, toIndex + 1);
+            }
+            containerApi.movePanel(fromIndex, toIndex);
+        }));
+    }
+}
+
+
+/***/ }),
+
 /***/ "../dockview/dist/esm/paneview/paneview.js":
 /*!*************************************************!*\
   !*** ../dockview/dist/esm/paneview/paneview.js ***!
@@ -38077,6 +38398,7 @@ class Paneview extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposab
         this.paneItems = [];
         this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
         this.onDidChange = this._onDidChange.event;
+        this.skipAnimation = false;
         this._orientation = (_a = options.orientation) !== null && _a !== void 0 ? _a : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.VERTICAL;
         this.element = document.createElement('div');
         this.element.className = 'pane-container';
@@ -38089,10 +38411,10 @@ class Paneview extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposab
         // if we've added views from the descriptor we need to
         // add the panes to our Pane array and setup animation
         this.getPanes().forEach((pane, index) => {
-            const disposable = pane.onDidChangeExpansionState(() => {
+            const disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable(pane.onDidChangeExpansionState(() => {
                 this.setupAnimation();
                 this._onDidChange.fire(undefined);
-            });
+            }));
             const paneItem = {
                 pane,
                 disposable: {
@@ -38107,6 +38429,12 @@ class Paneview extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposab
         this.addDisposables(this.splitview.onDidSashEnd(() => {
             this._onDidChange.fire(undefined);
         }));
+    }
+    get onDidAddView() {
+        return this.splitview.onDidAddView;
+    }
+    get onDidRemoveView() {
+        return this.splitview.onDidRemoveView;
     }
     get minimumSize() {
         return this.splitview.minimumSize;
@@ -38153,8 +38481,17 @@ class Paneview extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposab
         return paneItem;
     }
     moveView(from, to) {
+        if (from === to) {
+            return;
+        }
         const view = this.removePane(from);
-        this.addPane(view.pane, to);
+        this.skipAnimation = true;
+        try {
+            this.addPane(view.pane, view.pane.size, to, false);
+        }
+        finally {
+            this.skipAnimation = false;
+        }
     }
     layout(size, orthogonalSize) {
         // for (const paneItem of this.paneItems) {
@@ -38163,6 +38500,9 @@ class Paneview extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposab
         this.splitview.layout(size, orthogonalSize);
     }
     setupAnimation() {
+        if (this.skipAnimation) {
+            return;
+        }
         if (this.animationTimer) {
             clearTimeout(this.animationTimer);
             this.animationTimer = undefined;
@@ -38209,7 +38549,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
 /* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../splitview/core/splitview */ "../dockview/dist/esm/splitview/core/splitview.js");
 /* harmony import */ var _paneview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./paneview */ "../dockview/dist/esm/paneview/paneview.js");
-/* harmony import */ var _paneviewPanel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./paneviewPanel */ "../dockview/dist/esm/paneview/paneviewPanel.js");
+/* harmony import */ var _draggablePaneviewPanel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./draggablePaneviewPanel */ "../dockview/dist/esm/paneview/draggablePaneviewPanel.js");
 
 
 
@@ -38238,9 +38578,9 @@ class DefaultHeader extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDis
         //
     }
 }
-class PaneFramework extends _paneviewPanel__WEBPACK_IMPORTED_MODULE_6__.PaneviewPanel {
+class PaneFramework extends _draggablePaneviewPanel__WEBPACK_IMPORTED_MODULE_6__.DraggablePaneviewPanel {
     constructor(options) {
-        super(options.id, options.component, options.headerComponent, options.orientation, options.isExpanded);
+        super(options.id, options.component, options.headerComponent, options.orientation, options.isExpanded, options.disableDnd);
         this.options = options;
     }
     getBodyComponent() {
@@ -38258,6 +38598,8 @@ class PaneviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Composit
         this._disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_3__.MutableDisposable();
         this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
         this.onDidLayoutChange = this._onDidLayoutChange.event;
+        this._onDidDrop = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        this.onDidDrop = this._onDidDrop.event;
         if (!options.components) {
             options.components = {};
         }
@@ -38269,6 +38611,12 @@ class PaneviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Composit
             orientation: _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation.VERTICAL,
         });
         this.addDisposables(this._disposable);
+    }
+    get onDidAddView() {
+        return this._paneview.onDidAddView;
+    }
+    get onDidRemoveView() {
+        return this._paneview.onDidRemoveView;
     }
     set paneview(value) {
         this._paneview = value;
@@ -38301,8 +38649,7 @@ class PaneviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Composit
     addPanel(options) {
         const body = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(options.id, options.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkWrapper
             ? {
-                createComponent: this.options.frameworkWrapper.body
-                    .createComponent,
+                createComponent: this.options.frameworkWrapper.body.createComponent,
             }
             : undefined);
         let header;
@@ -38325,6 +38672,10 @@ class PaneviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Composit
             body,
             orientation: _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation.VERTICAL,
             isExpanded: !!options.isExpanded,
+            disableDnd: !!this.options.disableDnd,
+        });
+        view.onDidDrop((event) => {
+            this._onDidDrop.fire(event);
         });
         const size = typeof options.size === 'number' ? options.size : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Sizing.Distribute;
         const index = typeof options.index === 'number' ? options.index : undefined;
@@ -38371,7 +38722,7 @@ class PaneviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Composit
         if (!this.element.parentElement) {
             return;
         }
-        const { width, height, } = this.element.parentElement.getBoundingClientRect();
+        const { width, height } = this.element.parentElement.getBoundingClientRect();
         this.layout(width, height);
     }
     toJSON() {
@@ -38409,16 +38760,15 @@ class PaneviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Composit
                     const data = view.data;
                     const body = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(data.id, data.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkWrapper
                         ? {
-                            createComponent: this.options.frameworkWrapper
-                                .body.createComponent,
+                            createComponent: this.options.frameworkWrapper.body
+                                .createComponent,
                         }
                         : undefined);
                     let header;
                     if (data.headerComponent) {
                         header = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(data.id, data.headerComponent, this.options.headerComponents || {}, this.options.headerframeworkComponents || {}, this.options.frameworkWrapper
                             ? {
-                                createComponent: this.options
-                                    .frameworkWrapper.header
+                                createComponent: this.options.frameworkWrapper.header
                                     .createComponent,
                             }
                             : undefined);
@@ -38434,6 +38784,10 @@ class PaneviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Composit
                         body,
                         orientation: _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation.VERTICAL,
                         isExpanded: !!view.expanded,
+                        disableDnd: !!this.options.disableDnd,
+                    });
+                    panel.onDidDrop((event) => {
+                        this._onDidDrop.fire(event);
                     });
                     queue.push(() => {
                         panel.init({
@@ -38494,6 +38848,7 @@ class PaneviewPanel extends _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_2__
         this.onDidChange = this._onDidChange.event;
         this.headerSize = 22;
         this._orthogonalSize = 0;
+        this._size = 0;
         this._minimumBodySize = 0;
         this._maximumBodySize = Number.POSITIVE_INFINITY;
         this._isExpanded = false;
@@ -38513,7 +38868,7 @@ class PaneviewPanel extends _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_2__
         this.addDisposables(this._onDidChangeExpansionState, this.onDidChangeExpansionState((isExpanded) => {
             this.api._onDidExpansionChange.fire({ isExpanded });
         }));
-        this.render();
+        this.renderOnce();
     }
     set orientation(value) {
         this._orientation = value;
@@ -38532,6 +38887,9 @@ class PaneviewPanel extends _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_2__
         const expanded = this.isExpanded();
         const maximumBodySize = expanded ? this._maximumBodySize : 0;
         return headerSize + maximumBodySize;
+    }
+    get size() {
+        return this._size;
     }
     get orthogonalSize() {
         return this._orthogonalSize;
@@ -38584,6 +38942,8 @@ class PaneviewPanel extends _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_2__
         this._onDidChangeExpansionState.fire(expanded);
     }
     layout(size, orthogonalSize) {
+        this._size = size;
+        this._orthogonalSize = orthogonalSize;
         const [width, height] = this.orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_3__.Orientation.HORIZONTAL
             ? [size, orthogonalSize]
             : [orthogonalSize, size];
@@ -38615,7 +38975,7 @@ class PaneviewPanel extends _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_2__
         const params = this.params;
         return Object.assign(Object.assign({}, super.toJSON()), { headerComponent: this.headerComponent, title: params.title });
     }
-    render() {
+    renderOnce() {
         this.header = document.createElement('div');
         this.header.tabIndex = -1;
         this.header.className = 'pane-header';
@@ -39112,6 +39472,48 @@ class ReactWatermarkPart {
 
 /***/ }),
 
+/***/ "../dockview/dist/esm/react/dropTarget.js":
+/*!************************************************!*\
+  !*** ../dockview/dist/esm/react/dropTarget.js ***!
+  \************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DockviewDropTarget": () => (/* binding */ DockviewDropTarget)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
+
+
+const DockviewDropTarget = react__WEBPACK_IMPORTED_MODULE_0__.forwardRef((props, ref) => {
+    const domRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef(null);
+    const dropTargetRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
+    react__WEBPACK_IMPORTED_MODULE_0__.useImperativeHandle(ref, () => domRef.current, []);
+    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
+        dropTargetRef.current = new _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Droptarget(domRef.current, {
+            canDisplayOverlay: props.canDisplayOverlay,
+            validOverlays: props.validOverlays,
+        });
+        return () => {
+            var _a;
+            (_a = dropTargetRef.current) === null || _a === void 0 ? void 0 : _a.dispose();
+        };
+    }, []);
+    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
+        dropTargetRef.current.validOverlays = props.validOverlays;
+    }, [props.validOverlays]);
+    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
+        dropTargetRef.current.canDisplayOverlay = props.canDisplayOverlay;
+    }, [props.canDisplayOverlay]);
+    return react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { ref: domRef }, props.children);
+});
+DockviewDropTarget.displayName = 'DockviewDropTarget';
+
+
+/***/ }),
+
 /***/ "../dockview/dist/esm/react/gridview/gridview.js":
 /*!*******************************************************!*\
   !*** ../dockview/dist/esm/react/gridview/gridview.js ***!
@@ -39246,7 +39648,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "ReactPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_9__.ReactPart),
 /* harmony export */   "ReactPartContext": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_9__.ReactPartContext),
 /* harmony export */   "isReactElement": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_9__.isReactElement),
-/* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_9__.usePortalsLifecycle)
+/* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_9__.usePortalsLifecycle),
+/* harmony export */   "DockviewDropTarget": () => (/* reexport safe */ _dropTarget__WEBPACK_IMPORTED_MODULE_10__.DockviewDropTarget)
 /* harmony export */ });
 /* harmony import */ var _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dockview/dockview */ "../dockview/dist/esm/react/dockview/dockview.js");
 /* harmony import */ var _dockview_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./dockview/components */ "../dockview/dist/esm/react/dockview/components.js");
@@ -39258,6 +39661,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./paneview/paneview */ "../dockview/dist/esm/react/paneview/paneview.js");
 /* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./types */ "../dockview/dist/esm/react/types.js");
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./react */ "../dockview/dist/esm/react/react.js");
+/* harmony import */ var _dropTarget__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./dropTarget */ "../dockview/dist/esm/react/dropTarget.js");
+
 
 
 
@@ -39323,6 +39728,7 @@ const PaneviewReact = react__WEBPACK_IMPORTED_MODULE_0__.forwardRef((props, ref)
             frameworkComponents: props.components,
             components: {},
             headerComponents: {},
+            disableDnd: props.disableDnd,
             headerframeworkComponents: props.headerComponents,
             frameworkWrapper: {
                 header: {
@@ -39333,13 +39739,20 @@ const PaneviewReact = react__WEBPACK_IMPORTED_MODULE_0__.forwardRef((props, ref)
                 },
             },
         });
+        const api = new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.PaneviewApi(paneview);
+        const disposable = paneview.onDidDrop((event) => {
+            if (props.onDidDrop) {
+                props.onDidDrop({ event, api });
+            }
+        });
         const { clientWidth, clientHeight } = domRef.current;
         paneview.layout(clientWidth, clientHeight);
         if (props.onReady) {
-            props.onReady({ api: new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.PaneviewApi(paneview) });
+            props.onReady({ api });
         }
         paneviewRef.current = paneview;
         return () => {
+            disposable.dispose();
             paneview.dispose();
         };
     }, []);
@@ -39738,6 +40151,10 @@ class Splitview {
         this._proportions = undefined;
         this._onDidSashEnd = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
         this.onDidSashEnd = this._onDidSashEnd.event;
+        this._onDidAddView = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        this.onDidAddView = this._onDidAddView.event;
+        this._onDidRemoveView = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        this.onDidRemoveView = this._onDidAddView.event;
         this._startSnappingEnabled = true;
         this._endSnappingEnabled = true;
         this.resize = (index, delta, sizes = this.views.map((x) => x.size), lowPriorityIndexes, highPriorityIndexes, overloadMinDelta = Number.NEGATIVE_INFINITY, overloadMaxDelta = Number.POSITIVE_INFINITY, snapBefore, snapAfter) => {
@@ -40115,6 +40532,7 @@ class Splitview {
             size.type === 'distribute') {
             this.distributeViewSizes();
         }
+        this._onDidAddView.fire(view);
     }
     distributeViewSizes() {
         const flexibleViewItems = [];
@@ -40150,6 +40568,7 @@ class Splitview {
         if (sizing && sizing.type === 'distribute') {
             this.distributeViewSizes();
         }
+        this._onDidRemoveView.fire(viewItem.view);
         return viewItem.view;
     }
     getViewCachedVisibleSize(index) {
@@ -40365,6 +40784,9 @@ class Splitview {
         return element;
     }
     dispose() {
+        this._onDidSashEnd.dispose();
+        this._onDidAddView.dispose();
+        this._onDidRemoveView.dispose();
         this.element.remove();
         for (let i = 0; i < this.element.children.length; i++) {
             if (this.element.children.item(i) === this.element) {

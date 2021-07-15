@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>IGroupPanelBaseProps | dockview</title>
+	<title>DndService | dockview</title>
 	<meta name="description" content="Documentation for dockview">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -53,39 +53,21 @@
 					<a href="../modules.html">dockview</a>
 				</li>
 				<li>
-					<a href="igrouppanelbaseprops.html">IGroupPanelBaseProps</a>
+					<a href="dndservice.html">DndService</a>
 				</li>
 			</ul>
-			<h1>Interface IGroupPanelBaseProps&lt;T&gt;</h1>
+			<h1>Interface DndService</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-type-parameters">
-				<h3>Type parameters</h3>
-				<ul class="tsd-type-parameters">
-					<li>
-						<h4>T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span> = <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
-					</li>
-				</ul>
-			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<a href="panelparameters.html" class="tsd-signature-type" data-tsd-kind="Interface">PanelParameters</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>
-						<ul class="tsd-hierarchy">
-							<li>
-								<span class="target">IGroupPanelBaseProps</span>
-								<ul class="tsd-hierarchy">
-									<li>
-										<a href="idockviewpanelprops.html" class="tsd-signature-type" data-tsd-kind="Interface">IDockviewPanelProps</a>
-									</li>
-								</ul>
-							</li>
-						</ul>
+						<span class="target">DndService</span>
 					</li>
 				</ul>
 			</section>
@@ -94,48 +76,77 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Properties</h3>
+							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="igrouppanelbaseprops.html#api" class="tsd-kind-icon">api</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="igrouppanelbaseprops.html#containerapi" class="tsd-kind-icon">container<wbr>Api</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="igrouppanelbaseprops.html#params" class="tsd-kind-icon">params</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="dndservice.html#candisplayoverlay" class="tsd-kind-icon">can<wbr>Display<wbr>Overlay</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="dndservice.html#ondrop" class="tsd-kind-icon">on<wbr>Drop</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="api" class="tsd-anchor"></a>
-					<h3>api</h3>
-					<div class="tsd-signature tsd-kind-icon">api<span class="tsd-signature-symbol">:</span> <a href="dockviewpanelapi.html" class="tsd-signature-type" data-tsd-kind="Interface">DockviewPanelApi</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/react/dockview/dockview.tsx#L20">react/dockview/dockview.tsx:20</a></li>
-						</ul>
-					</aside>
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="candisplayoverlay" class="tsd-anchor"></a>
+					<h3>can<wbr>Display<wbr>Overlay</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">can<wbr>Display<wbr>Overlay<span class="tsd-signature-symbol">(</span>group<span class="tsd-signature-symbol">: </span><a href="igroupview.html" class="tsd-signature-type" data-tsd-kind="Interface">IGroupview</a>, event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DragEvent</span>, target<span class="tsd-signature-symbol">: </span><a href="../enums/dockviewdroptargets.html" class="tsd-signature-type" data-tsd-kind="Enumeration">DockviewDropTargets</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L46">groupview/groupview.ts:46</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>group: <a href="igroupview.html" class="tsd-signature-type" data-tsd-kind="Interface">IGroupview</a></h5>
+								</li>
+								<li>
+									<h5>event: <span class="tsd-signature-type">DragEvent</span></h5>
+								</li>
+								<li>
+									<h5>target: <a href="../enums/dockviewdroptargets.html" class="tsd-signature-type" data-tsd-kind="Enumeration">DockviewDropTargets</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="containerapi" class="tsd-anchor"></a>
-					<h3>container<wbr>Api</h3>
-					<div class="tsd-signature tsd-kind-icon">container<wbr>Api<span class="tsd-signature-symbol">:</span> <a href="../classes/dockviewapi.html" class="tsd-signature-type" data-tsd-kind="Class">DockviewApi</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/react/dockview/dockview.tsx#L21">react/dockview/dockview.tsx:21</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
-					<a name="params" class="tsd-anchor"></a>
-					<h3>params</h3>
-					<div class="tsd-signature tsd-kind-icon">params<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span></div>
-					<aside class="tsd-sources">
-						<p>Inherited from <a href="panelparameters.html">PanelParameters</a>.<a href="panelparameters.html#params">params</a></p>
-						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/react/types.ts#L8">react/types.ts:8</a></li>
-						</ul>
-					</aside>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="ondrop" class="tsd-anchor"></a>
+					<h3>on<wbr>Drop</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">on<wbr>Drop<span class="tsd-signature-symbol">(</span>group<span class="tsd-signature-symbol">: </span><a href="igroupview.html" class="tsd-signature-type" data-tsd-kind="Interface">IGroupview</a>, event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DragEvent</span>, position<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Position</span>, index<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L51">groupview/groupview.ts:51</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>group: <a href="igroupview.html" class="tsd-signature-type" data-tsd-kind="Interface">IGroupview</a></h5>
+								</li>
+								<li>
+									<h5>event: <span class="tsd-signature-type">DragEvent</span></h5>
+								</li>
+								<li>
+									<h5>position: <span class="tsd-signature-type">Position</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> index: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -151,17 +162,14 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-has-type-parameter">
-						<a href="igrouppanelbaseprops.html" class="tsd-kind-icon">IGroup<wbr>Panel<wbr>Base<wbr>Props</a>
+					<li class="current tsd-kind-interface">
+						<a href="dndservice.html" class="tsd-kind-icon">Dnd<wbr>Service</a>
 						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="igrouppanelbaseprops.html#api" class="tsd-kind-icon">api</a>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="dndservice.html#candisplayoverlay" class="tsd-kind-icon">can<wbr>Display<wbr>Overlay</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="igrouppanelbaseprops.html#containerapi" class="tsd-kind-icon">container<wbr>Api</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
-								<a href="igrouppanelbaseprops.html#params" class="tsd-kind-icon">params</a>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="dndservice.html#ondrop" class="tsd-kind-icon">on<wbr>Drop</a>
 							</li>
 						</ul>
 					</li>

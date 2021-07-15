@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>LayoutDropEvent | dockview</title>
+	<title>IDragTragetProps | dockview</title>
 	<meta name="description" content="Documentation for dockview">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -53,10 +53,10 @@
 					<a href="../modules.html">dockview</a>
 				</li>
 				<li>
-					<a href="layoutdropevent.html">LayoutDropEvent</a>
+					<a href="idragtragetprops.html">IDragTragetProps</a>
 				</li>
 			</ul>
-			<h1>Interface LayoutDropEvent</h1>
+			<h1>Interface IDragTragetProps</h1>
 		</div>
 	</div>
 </header>
@@ -67,7 +67,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">LayoutDropEvent</span>
+						<span class="target">IDragTragetProps</span>
 					</li>
 				</ul>
 			</section>
@@ -78,7 +78,9 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="layoutdropevent.html#event" class="tsd-kind-icon">event</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="idragtragetprops.html#candisplayoverlay" class="tsd-kind-icon">can<wbr>Display<wbr>Overlay</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="idragtragetprops.html#children" class="tsd-kind-icon">children</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="idragtragetprops.html#validoverlays" class="tsd-kind-icon">valid<wbr>Overlays</a></li>
 							</ul>
 						</section>
 					</div>
@@ -87,12 +89,32 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="event" class="tsd-anchor"></a>
-					<h3>event</h3>
-					<div class="tsd-signature tsd-kind-icon">event<span class="tsd-signature-symbol">:</span> <a href="groupdropevent.html" class="tsd-signature-type" data-tsd-kind="Interface">GroupDropEvent</a></div>
+					<a name="candisplayoverlay" class="tsd-anchor"></a>
+					<h3>can<wbr>Display<wbr>Overlay</h3>
+					<div class="tsd-signature tsd-kind-icon">can<wbr>Display<wbr>Overlay<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CanDisplayOverlay</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/dockview/dockviewComponent.ts#L135">dockview/dockviewComponent.ts:135</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/react/dropTarget.tsx#L9">react/dropTarget.tsx:9</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="children" class="tsd-anchor"></a>
+					<h3>children</h3>
+					<div class="tsd-signature tsd-kind-icon">children<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">ReactElement</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">JSXElementConstructor</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ReactText</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ReactFragment</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ReactPortal</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/react/dropTarget.tsx#L11">react/dropTarget.tsx:11</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="validoverlays" class="tsd-anchor"></a>
+					<h3>valid<wbr>Overlays</h3>
+					<div class="tsd-signature tsd-kind-icon">valid<wbr>Overlays<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">DropTargetDirections</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/react/dropTarget.tsx#L10">react/dropTarget.tsx:10</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -111,10 +133,16 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="layoutdropevent.html" class="tsd-kind-icon">Layout<wbr>Drop<wbr>Event</a>
+						<a href="idragtragetprops.html" class="tsd-kind-icon">IDrag<wbr>Traget<wbr>Props</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="layoutdropevent.html#event" class="tsd-kind-icon">event</a>
+								<a href="idragtragetprops.html#candisplayoverlay" class="tsd-kind-icon">can<wbr>Display<wbr>Overlay</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="idragtragetprops.html#children" class="tsd-kind-icon">children</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="idragtragetprops.html#validoverlays" class="tsd-kind-icon">valid<wbr>Overlays</a>
 							</li>
 						</ul>
 					</li>

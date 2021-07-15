@@ -95,16 +95,15 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="tab.html#id" class="tsd-kind-icon">id</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="tab.html#onchanged" class="tsd-kind-icon">on<wbr>Changed</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="tab.html#ondropped" class="tsd-kind-icon">on<wbr>Dropped</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="tab.html#ondrop" class="tsd-kind-icon">on<wbr>Drop</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="tab.html#panelid" class="tsd-kind-icon">panel<wbr>Id</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Accessors</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="tab.html#element" class="tsd-kind-icon">element</a></li>
-								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="tab.html#hasactivedragevent" class="tsd-kind-icon">has<wbr>Active<wbr>Drag<wbr>Event</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
@@ -114,8 +113,6 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="tab.html#dispose" class="tsd-kind-icon">dispose</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tab.html#setactive" class="tsd-kind-icon">set<wbr>Active</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tab.html#setcontent" class="tsd-kind-icon">set<wbr>Content</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tab.html#startdragevent" class="tsd-kind-icon">start<wbr>Drag<wbr>Event</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="tab.html#stopdragevent" class="tsd-kind-icon">stop<wbr>Drag<wbr>Event</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static"><a href="tab.html#from" class="tsd-kind-icon">from</a></li>
 							</ul>
 						</section>
@@ -128,20 +125,20 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Tab<span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, accessor<span class="tsd-signature-symbol">: </span><a href="../interfaces/idockviewcomponent.html" class="tsd-signature-type" data-tsd-kind="Interface">IDockviewComponent</a>, group<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GroupviewPanel</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tab.html" class="tsd-signature-type" data-tsd-kind="Class">Tab</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Tab<span class="tsd-signature-symbol">(</span>panelId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, accessor<span class="tsd-signature-symbol">: </span><a href="../interfaces/idockviewcomponent.html" class="tsd-signature-type" data-tsd-kind="Interface">IDockviewComponent</a>, group<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GroupviewPanel</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tab.html" class="tsd-signature-type" data-tsd-kind="Class">Tab</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="compositedisposable.html">CompositeDisposable</a>.<a href="compositedisposable.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/tab.ts#L70">groupview/tab.ts:70</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/tab.ts#L52">groupview/tab.ts:52</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>id: <span class="tsd-signature-type">string</span></h5>
+									<h5>panelId: <span class="tsd-signature-type">string</span></h5>
 								</li>
 								<li>
 									<h5>accessor: <a href="../interfaces/idockviewcomponent.html" class="tsd-signature-type" data-tsd-kind="Interface">IDockviewComponent</a></h5>
@@ -158,33 +155,33 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="id" class="tsd-anchor"></a>
-					<h3>id</h3>
-					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<p>Implementation of <a href="../interfaces/itab.html">ITab</a>.<a href="../interfaces/itab.html#id">id</a></p>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="onchanged" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> on<wbr>Changed</h3>
 					<div class="tsd-signature tsd-kind-icon">on<wbr>Changed<span class="tsd-signature-symbol">:</span> <a href="../interfaces/event.html" class="tsd-signature-type" data-tsd-kind="Interface">Event</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/layoutmouseevent.html" class="tsd-signature-type" data-tsd-kind="Interface">LayoutMouseEvent</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/itab.html">ITab</a>.<a href="../interfaces/itab.html#onchanged">onChanged</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/tab.ts#L49">groupview/tab.ts:49</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/tab.ts#L40">groupview/tab.ts:40</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="ondropped" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> on<wbr>Dropped</h3>
-					<div class="tsd-signature tsd-kind-icon">on<wbr>Dropped<span class="tsd-signature-symbol">:</span> <a href="../interfaces/event.html" class="tsd-signature-type" data-tsd-kind="Interface">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">DroptargetEvent</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<a name="ondrop" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> on<wbr>Drop</h3>
+					<div class="tsd-signature tsd-kind-icon">on<wbr>Drop<span class="tsd-signature-symbol">:</span> <a href="../interfaces/event.html" class="tsd-signature-type" data-tsd-kind="Interface">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">DroptargetEvent</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
-						<p>Implementation of <a href="../interfaces/itab.html">ITab</a>.<a href="../interfaces/itab.html#ondropped">onDropped</a></p>
+						<p>Implementation of <a href="../interfaces/itab.html">ITab</a>.<a href="../interfaces/itab.html#ondrop">onDrop</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/tab.ts#L52">groupview/tab.ts:52</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/tab.ts#L43">groupview/tab.ts:43</a></li>
 						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="panelid" class="tsd-anchor"></a>
+					<h3>panel<wbr>Id</h3>
+					<div class="tsd-signature tsd-kind-icon">panel<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<p>Implementation of <a href="../interfaces/itab.html">ITab</a>.<a href="../interfaces/itab.html#panelid">panelId</a></p>
 					</aside>
 				</section>
 			</section>
@@ -201,28 +198,10 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/itab.html">ITab</a>.<a href="../interfaces/itab.html#element">element</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/tab.ts#L54">groupview/tab.ts:54</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/tab.ts#L48">groupview/tab.ts:48</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">HTMLElement</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
-					<a name="hasactivedragevent" class="tsd-anchor"></a>
-					<h3>has<wbr>Active<wbr>Drag<wbr>Event</h3>
-					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> hasActiveDragEvent<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/itab.html">ITab</a>.<a href="../interfaces/itab.html#hasactivedragevent">hasActiveDragEvent</a></p>
-								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/tab.ts#L58">groupview/tab.ts:58</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -240,7 +219,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="compositedisposable.html">CompositeDisposable</a>.<a href="compositedisposable.html#adddisposables">addDisposables</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/lifecycle.ts#L29">lifecycle.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/lifecycle.ts#L29">lifecycle.ts:29</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -264,7 +243,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="compositedisposable.html">CompositeDisposable</a>.<a href="compositedisposable.html#dispose">dispose</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/tab.ts#L199">groupview/tab.ts:199</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/tab.ts#L175">groupview/tab.ts:175</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -282,7 +261,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/itab.html">ITab</a>.<a href="../interfaces/itab.html#setactive">setActive</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/tab.ts#L186">groupview/tab.ts:186</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/tab.ts#L162">groupview/tab.ts:162</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -305,7 +284,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/tab.ts#L191">groupview/tab.ts:191</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/tab.ts#L167">groupview/tab.ts:167</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -314,42 +293,6 @@
 									<h5>part: <a href="../interfaces/itabrenderer.html" class="tsd-signature-type" data-tsd-kind="Interface">ITabRenderer</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="startdragevent" class="tsd-anchor"></a>
-					<h3>start<wbr>Drag<wbr>Event</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">start<wbr>Drag<wbr>Event<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/itab.html">ITab</a>.<a href="../interfaces/itab.html#startdragevent">startDragEvent</a></p>
-								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/tab.ts#L62">groupview/tab.ts:62</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="stopdragevent" class="tsd-anchor"></a>
-					<h3>stop<wbr>Drag<wbr>Event</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">stop<wbr>Drag<wbr>Event<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/itab.html">ITab</a>.<a href="../interfaces/itab.html#stopdragevent">stopDragEvent</a></p>
-								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/tab.ts#L66">groupview/tab.ts:66</a></li>
-								</ul>
-							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
@@ -365,7 +308,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="compositedisposable.html">CompositeDisposable</a>.<a href="compositedisposable.html#from">from</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/lifecycle.ts#L21">lifecycle.ts:21</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/lifecycle.ts#L21">lifecycle.ts:21</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -399,19 +342,16 @@
 								<a href="tab.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="tab.html#id" class="tsd-kind-icon">id</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="tab.html#onchanged" class="tsd-kind-icon">on<wbr>Changed</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="tab.html#ondropped" class="tsd-kind-icon">on<wbr>Dropped</a>
+								<a href="tab.html#ondrop" class="tsd-kind-icon">on<wbr>Drop</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="tab.html#panelid" class="tsd-kind-icon">panel<wbr>Id</a>
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="tab.html#element" class="tsd-kind-icon">element</a>
-							</li>
-							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
-								<a href="tab.html#hasactivedragevent" class="tsd-kind-icon">has<wbr>Active<wbr>Drag<wbr>Event</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="tab.html#adddisposables" class="tsd-kind-icon">add<wbr>Disposables</a>
@@ -424,12 +364,6 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="tab.html#setcontent" class="tsd-kind-icon">set<wbr>Content</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="tab.html#startdragevent" class="tsd-kind-icon">start<wbr>Drag<wbr>Event</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="tab.html#stopdragevent" class="tsd-kind-icon">stop<wbr>Drag<wbr>Event</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static">
 								<a href="tab.html#from" class="tsd-kind-icon">from</a>

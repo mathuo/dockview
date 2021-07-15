@@ -98,7 +98,6 @@
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="groupview.html#id" class="tsd-kind-icon">id</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="groupview.html#ondidchange" class="tsd-kind-icon">on<wbr>Did<wbr>Change</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="groupview.html#ondidgroupchange" class="tsd-kind-icon">on<wbr>Did<wbr>Group<wbr>Change</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="groupview.html#ondrop" class="tsd-kind-icon">on<wbr>Drop</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="groupview.html#onmove" class="tsd-kind-icon">on<wbr>Move</a></li>
 							</ul>
 						</section>
@@ -122,6 +121,7 @@
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="groupview.html#adddisposables" class="tsd-kind-icon">add<wbr>Disposables</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="groupview.html#candisplayoverlay" class="tsd-kind-icon">can<wbr>Display<wbr>Overlay</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="groupview.html#closeallpanels" class="tsd-kind-icon">close<wbr>All<wbr>Panels</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="groupview.html#closepanel" class="tsd-kind-icon">close<wbr>Panel</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="groupview.html#containspanel" class="tsd-kind-icon">contains<wbr>Panel</a></li>
@@ -138,7 +138,6 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="groupview.html#openpanel" class="tsd-kind-icon">open<wbr>Panel</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="groupview.html#removepanel" class="tsd-kind-icon">remove<wbr>Panel</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="groupview.html#setactive" class="tsd-kind-icon">set<wbr>Active</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="groupview.html#startactivedrag" class="tsd-kind-icon">start<wbr>Active<wbr>Drag</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="groupview.html#tojson" class="tsd-kind-icon">toJSON</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="groupview.html#update" class="tsd-kind-icon">update</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="groupview.html#updateactions" class="tsd-kind-icon">update<wbr>Actions</a></li>
@@ -161,7 +160,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="compositedisposable.html">CompositeDisposable</a>.<a href="compositedisposable.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L195">groupview/groupview.ts:195</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L203">groupview/groupview.ts:203</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -204,7 +203,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#ondidchange">onDidChange</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L130">groupview/groupview.ts:130</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L141">groupview/groupview.ts:141</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -215,17 +214,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#ondidgroupchange">onDidGroupChange</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L145">groupview/groupview.ts:145</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="ondrop" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> on<wbr>Drop</h3>
-					<div class="tsd-signature tsd-kind-icon">on<wbr>Drop<span class="tsd-signature-symbol">:</span> <a href="../interfaces/event.html" class="tsd-signature-type" data-tsd-kind="Interface">Event</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/groupdropevent.html" class="tsd-signature-type" data-tsd-kind="Interface">GroupDropEvent</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L142">groupview/groupview.ts:142</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L153">groupview/groupview.ts:153</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -236,7 +225,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#onmove">onMove</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L139">groupview/groupview.ts:139</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L150">groupview/groupview.ts:150</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -254,7 +243,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#activepanel">activePanel</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L152">groupview/groupview.ts:152</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L160">groupview/groupview.ts:160</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/igrouppanel.html" class="tsd-signature-type" data-tsd-kind="Interface">IGroupPanel</a></h4>
@@ -272,7 +261,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#element">element</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L148">groupview/groupview.ts:148</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L156">groupview/groupview.ts:156</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">HTMLElement</span></h4>
@@ -290,7 +279,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#isactive">isActive</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L165">groupview/groupview.ts:165</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L173">groupview/groupview.ts:173</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -307,7 +296,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L177">groupview/groupview.ts:177</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L185">groupview/groupview.ts:185</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -325,7 +314,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#maximumheight">maximumHeight</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L185">groupview/groupview.ts:185</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L193">groupview/groupview.ts:193</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -343,7 +332,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#maximumwidth">maximumWidth</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L193">groupview/groupview.ts:193</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L201">groupview/groupview.ts:201</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -361,7 +350,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#minimumheight">minimumHeight</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L181">groupview/groupview.ts:181</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L189">groupview/groupview.ts:189</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -379,7 +368,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#minimumwidth">minimumWidth</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L189">groupview/groupview.ts:189</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L197">groupview/groupview.ts:197</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -397,7 +386,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#panels">panels</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L169">groupview/groupview.ts:169</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L177">groupview/groupview.ts:177</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="../interfaces/igrouppanel.html" class="tsd-signature-type" data-tsd-kind="Interface">IGroupPanel</a><span class="tsd-signature-symbol">[]</span></h4>
@@ -415,7 +404,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#size">size</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L173">groupview/groupview.ts:173</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L181">groupview/groupview.ts:181</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -434,7 +423,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#tabheight">tabHeight</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L156">groupview/groupview.ts:156</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L164">groupview/groupview.ts:164</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></h4>
@@ -443,7 +432,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#tabheight">tabHeight</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L160">groupview/groupview.ts:160</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L168">groupview/groupview.ts:168</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -470,7 +459,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="compositedisposable.html">CompositeDisposable</a>.<a href="compositedisposable.html#adddisposables">addDisposables</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/lifecycle.ts#L29">lifecycle.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/lifecycle.ts#L29">lifecycle.ts:29</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -480,6 +469,33 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="candisplayoverlay" class="tsd-anchor"></a>
+					<h3>can<wbr>Display<wbr>Overlay</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">can<wbr>Display<wbr>Overlay<span class="tsd-signature-symbol">(</span>dragOverEvent<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DragEvent</span>, target<span class="tsd-signature-symbol">: </span><a href="../enums/dockviewdroptargets.html" class="tsd-signature-type" data-tsd-kind="Enumeration">DockviewDropTargets</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#candisplayoverlay">canDisplayOverlay</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L676">groupview/groupview.ts:676</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>dragOverEvent: <span class="tsd-signature-type">DragEvent</span></h5>
+								</li>
+								<li>
+									<h5>target: <a href="../enums/dockviewdroptargets.html" class="tsd-signature-type" data-tsd-kind="Enumeration">DockviewDropTargets</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -494,7 +510,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#closeallpanels">closeAllPanels</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L419">groupview/groupview.ts:419</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L424">groupview/groupview.ts:424</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -512,7 +528,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#closepanel">closePanel</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L463">groupview/groupview.ts:463</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L468">groupview/groupview.ts:468</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -536,7 +552,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#containspanel">containsPanel</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L368">groupview/groupview.ts:368</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L370">groupview/groupview.ts:370</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -560,7 +576,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="compositedisposable.html">CompositeDisposable</a>.<a href="compositedisposable.html#dispose">dispose</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L734">groupview/groupview.ts:734</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L723">groupview/groupview.ts:723</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -578,7 +594,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#focus">focus</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L380">groupview/groupview.ts:380</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L382">groupview/groupview.ts:382</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -596,7 +612,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#indexof">indexOf</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L286">groupview/groupview.ts:286</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L288">groupview/groupview.ts:288</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -620,7 +636,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#init">init</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L372">groupview/groupview.ts:372</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L374">groupview/groupview.ts:374</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -643,7 +659,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L269">groupview/groupview.ts:269</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L261">groupview/groupview.ts:261</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -661,7 +677,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#iscontentfocused">isContentFocused</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L276">groupview/groupview.ts:276</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L278">groupview/groupview.ts:278</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -678,7 +694,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L481">groupview/groupview.ts:481</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L486">groupview/groupview.ts:486</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -702,7 +718,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#layout">layout</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L534">groupview/groupview.ts:534</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L539">groupview/groupview.ts:539</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -728,7 +744,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L312">groupview/groupview.ts:312</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L314">groupview/groupview.ts:314</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -759,7 +775,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L338">groupview/groupview.ts:338</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L340">groupview/groupview.ts:340</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -790,7 +806,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L384">groupview/groupview.ts:384</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L386">groupview/groupview.ts:386</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -824,7 +840,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L404">groupview/groupview.ts:404</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L409">groupview/groupview.ts:409</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -847,7 +863,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L495">groupview/groupview.ts:495</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L500">groupview/groupview.ts:500</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -867,30 +883,6 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="startactivedrag" class="tsd-anchor"></a>
-					<h3>start<wbr>Active<wbr>Drag</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">start<wbr>Active<wbr>Drag<span class="tsd-signature-symbol">(</span>panel<span class="tsd-signature-symbol">: </span><a href="../interfaces/igrouppanel.html" class="tsd-signature-type" data-tsd-kind="Interface">IGroupPanel</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/idisposable.html" class="tsd-signature-type" data-tsd-kind="Interface">IDisposable</a></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#startactivedrag">startActiveDrag</a></p>
-								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L298">groupview/groupview.ts:298</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>panel: <a href="../interfaces/igrouppanel.html" class="tsd-signature-type" data-tsd-kind="Interface">IGroupPanel</a></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="../interfaces/idisposable.html" class="tsd-signature-type" data-tsd-kind="Interface">IDisposable</a></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="tojson" class="tsd-anchor"></a>
 					<h3>toJSON</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -901,7 +893,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#tojson">toJSON</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L290">groupview/groupview.ts:290</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L292">groupview/groupview.ts:292</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="../interfaces/grouppanelviewstate.html" class="tsd-signature-type" data-tsd-kind="Interface">GroupPanelViewState</a></h4>
@@ -919,7 +911,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#update">update</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L376">groupview/groupview.ts:376</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L378">groupview/groupview.ts:378</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -943,7 +935,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/igroupview.html">IGroupview</a>.<a href="../interfaces/igroupview.html#updateactions">updateActions</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/groupview/groupview.ts#L485">groupview/groupview.ts:485</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/groupview/groupview.ts#L490">groupview/groupview.ts:490</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -961,7 +953,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="compositedisposable.html">CompositeDisposable</a>.<a href="compositedisposable.html#from">from</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/lifecycle.ts#L21">lifecycle.ts:21</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/lifecycle.ts#L21">lifecycle.ts:21</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1004,9 +996,6 @@
 								<a href="groupview.html#ondidgroupchange" class="tsd-kind-icon">on<wbr>Did<wbr>Group<wbr>Change</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="groupview.html#ondrop" class="tsd-kind-icon">on<wbr>Drop</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="groupview.html#onmove" class="tsd-kind-icon">on<wbr>Move</a>
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
@@ -1044,6 +1033,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="groupview.html#adddisposables" class="tsd-kind-icon">add<wbr>Disposables</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="groupview.html#candisplayoverlay" class="tsd-kind-icon">can<wbr>Display<wbr>Overlay</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="groupview.html#closeallpanels" class="tsd-kind-icon">close<wbr>All<wbr>Panels</a>
@@ -1092,9 +1084,6 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="groupview.html#setactive" class="tsd-kind-icon">set<wbr>Active</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="groupview.html#startactivedrag" class="tsd-kind-icon">start<wbr>Active<wbr>Drag</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="groupview.html#tojson" class="tsd-kind-icon">toJSON</a>

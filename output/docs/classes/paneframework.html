@@ -67,7 +67,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="tsd-signature-type">PaneviewPanel</span>
+						<span class="tsd-signature-type">DraggablePaneviewPanel</span>
 						<ul class="tsd-hierarchy">
 							<li>
 								<span class="target">PaneFramework</span>
@@ -96,6 +96,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="paneframework.html#id" class="tsd-kind-icon">id</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="paneframework.html#ondidchange" class="tsd-kind-icon">on<wbr>Did<wbr>Change</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="paneframework.html#ondidchangeexpansionstate" class="tsd-kind-icon">on<wbr>Did<wbr>Change<wbr>Expansion<wbr>State</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="paneframework.html#ondiddrop" class="tsd-kind-icon">on<wbr>Did<wbr>Drop</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="paneframework.html#params" class="tsd-kind-icon">params</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="paneframework.html#part" class="tsd-kind-icon">part</a></li>
 							</ul>
@@ -111,6 +112,7 @@
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="paneframework.html#minimumsize" class="tsd-kind-icon">minimum<wbr>Size</a></li>
 								<li class="tsd-kind-accessor tsd-parent-kind-class"><a href="paneframework.html#orientation" class="tsd-kind-icon">orientation</a></li>
 								<li class="tsd-kind-accessor tsd-parent-kind-class"><a href="paneframework.html#orthogonalsize" class="tsd-kind-icon">orthogonal<wbr>Size</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="paneframework.html#size" class="tsd-kind-icon">size</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="paneframework.html#width" class="tsd-kind-icon">width</a></li>
 							</ul>
 						</section>
@@ -143,25 +145,28 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Pane<wbr>Framework<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IPaneBodyPart</span><span class="tsd-signature-symbol">; </span>component<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>header<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IPaneHeaderPart</span><span class="tsd-signature-symbol">; </span>headerComponent<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>isExpanded<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>orientation<span class="tsd-signature-symbol">: </span><a href="../enums/orientation.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Orientation</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="paneframework.html" class="tsd-signature-type" data-tsd-kind="Class">PaneFramework</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Pane<wbr>Framework<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IPaneBodyPart</span><span class="tsd-signature-symbol">; </span>component<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>disableDnd<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>header<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IPaneHeaderPart</span><span class="tsd-signature-symbol">; </span>headerComponent<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>isExpanded<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>orientation<span class="tsd-signature-symbol">: </span><a href="../enums/orientation.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Orientation</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="paneframework.html" class="tsd-signature-type" data-tsd-kind="Class">PaneFramework</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewComponent.ts#L77">paneview/paneviewComponent.ts:77</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewComponent.ts#L79">paneview/paneviewComponent.ts:79</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>options: <span class="tsd-signature-symbol">{ </span>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IPaneBodyPart</span><span class="tsd-signature-symbol">; </span>component<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>header<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IPaneHeaderPart</span><span class="tsd-signature-symbol">; </span>headerComponent<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>isExpanded<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>orientation<span class="tsd-signature-symbol">: </span><a href="../enums/orientation.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Orientation</a><span class="tsd-signature-symbol"> }</span></h5>
+									<h5>options: <span class="tsd-signature-symbol">{ </span>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IPaneBodyPart</span><span class="tsd-signature-symbol">; </span>component<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>disableDnd<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>header<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IPaneHeaderPart</span><span class="tsd-signature-symbol">; </span>headerComponent<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>isExpanded<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>orientation<span class="tsd-signature-symbol">: </span><a href="../enums/orientation.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Orientation</a><span class="tsd-signature-symbol"> }</span></h5>
 									<ul class="tsd-parameters">
 										<li class="tsd-parameter">
 											<h5>body<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IPaneBodyPart</span></h5>
 										</li>
 										<li class="tsd-parameter">
 											<h5>component<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>disable<wbr>Dnd<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></h5>
 										</li>
 										<li class="tsd-parameter">
 											<h5>header<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IPaneHeaderPart</span></h5>
@@ -201,7 +206,7 @@
 					<div class="tsd-signature tsd-kind-icon">body<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">HTMLElement</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L78">paneview/paneviewPanel.ts:78</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L80">paneview/paneviewPanel.ts:80</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -218,7 +223,7 @@
 					<div class="tsd-signature tsd-kind-icon">header<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">HTMLElement</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L77">paneview/paneviewPanel.ts:77</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L79">paneview/paneviewPanel.ts:79</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -235,7 +240,7 @@
 					<div class="tsd-signature tsd-kind-icon">on<wbr>Did<wbr>Change<span class="tsd-signature-symbol">:</span> <a href="../interfaces/event.html" class="tsd-signature-type" data-tsd-kind="Interface">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L70">paneview/paneviewPanel.ts:70</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L71">paneview/paneviewPanel.ts:71</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -245,7 +250,17 @@
 					<div class="tsd-signature tsd-kind-icon">on<wbr>Did<wbr>Change<wbr>Expansion<wbr>State<span class="tsd-signature-symbol">:</span> <a href="../interfaces/event.html" class="tsd-signature-type" data-tsd-kind="Interface">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L68">paneview/paneviewPanel.ts:68</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L69">paneview/paneviewPanel.ts:69</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="ondiddrop" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> on<wbr>Did<wbr>Drop</h3>
+					<div class="tsd-signature tsd-kind-icon">on<wbr>Did<wbr>Drop<span class="tsd-signature-symbol">:</span> <a href="../interfaces/event.html" class="tsd-signature-type" data-tsd-kind="Interface">Event</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">DroptargetEvent</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/draggablePaneviewPanel.ts#L36">paneview/draggablePaneviewPanel.ts:36</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -255,7 +270,7 @@
 					<div class="tsd-signature tsd-kind-icon">params<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">PanelInitParameters</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/gridview/basePanelView.ts#L36">gridview/basePanelView.ts:36</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/gridview/basePanelView.ts#L36">gridview/basePanelView.ts:36</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -265,7 +280,7 @@
 					<div class="tsd-signature tsd-kind-icon">part<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">IFrameworkPart</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/gridview/basePanelView.ts#L35">gridview/basePanelView.ts:35</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/gridview/basePanelView.ts#L35">gridview/basePanelView.ts:35</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -282,7 +297,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/gridview/basePanelView.ts#L43">gridview/basePanelView.ts:43</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/gridview/basePanelView.ts#L43">gridview/basePanelView.ts:43</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">HTMLElement</span></h4>
@@ -299,7 +314,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/gridview/basePanelView.ts#L51">gridview/basePanelView.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/gridview/basePanelView.ts#L51">gridview/basePanelView.ts:51</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -317,7 +332,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L126">paneview/paneviewPanel.ts:126</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L131">paneview/paneviewPanel.ts:131</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -325,7 +340,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L130">paneview/paneviewPanel.ts:130</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L135">paneview/paneviewPanel.ts:135</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -348,7 +363,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L102">paneview/paneviewPanel.ts:102</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L103">paneview/paneviewPanel.ts:103</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -366,7 +381,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L118">paneview/paneviewPanel.ts:118</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L123">paneview/paneviewPanel.ts:123</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -374,7 +389,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L122">paneview/paneviewPanel.ts:122</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L127">paneview/paneviewPanel.ts:127</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -397,7 +412,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L94">paneview/paneviewPanel.ts:94</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L95">paneview/paneviewPanel.ts:95</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -415,7 +430,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L90">paneview/paneviewPanel.ts:90</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L91">paneview/paneviewPanel.ts:91</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="../enums/orientation.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Orientation</a></h4>
@@ -423,7 +438,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L86">paneview/paneviewPanel.ts:86</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L87">paneview/paneviewPanel.ts:87</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -447,7 +462,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L110">paneview/paneviewPanel.ts:110</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L115">paneview/paneviewPanel.ts:115</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -455,7 +470,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L114">paneview/paneviewPanel.ts:114</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L119">paneview/paneviewPanel.ts:119</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -469,6 +484,23 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="size" class="tsd-anchor"></a>
+					<h3>size</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> size<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L111">paneview/paneviewPanel.ts:111</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
 					<a name="width" class="tsd-anchor"></a>
 					<h3>width</h3>
 					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
@@ -478,7 +510,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/gridview/basePanelView.ts#L47">gridview/basePanelView.ts:47</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/gridview/basePanelView.ts#L47">gridview/basePanelView.ts:47</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -498,7 +530,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/lifecycle.ts#L29">lifecycle.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/lifecycle.ts#L29">lifecycle.ts:29</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -521,7 +553,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/gridview/basePanelView.ts#L127">gridview/basePanelView.ts:127</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/gridview/basePanelView.ts#L127">gridview/basePanelView.ts:127</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -538,7 +570,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/gridview/basePanelView.ts#L82">gridview/basePanelView.ts:82</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/gridview/basePanelView.ts#L82">gridview/basePanelView.ts:82</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -555,7 +587,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewComponent.ts#L98">paneview/paneviewComponent.ts:98</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewComponent.ts#L102">paneview/paneviewComponent.ts:102</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IPaneBodyPart</span></h4>
@@ -572,7 +604,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L283">paneview/paneviewPanel.ts:283</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L290">paneview/paneviewPanel.ts:290</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IFrameworkPart</span></h4>
@@ -589,7 +621,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewComponent.ts#L102">paneview/paneviewComponent.ts:102</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewComponent.ts#L106">paneview/paneviewComponent.ts:106</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IPaneHeaderPart</span></h4>
@@ -606,7 +638,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L229">paneview/paneviewPanel.ts:229</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L236">paneview/paneviewPanel.ts:236</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -629,7 +661,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L190">paneview/paneviewPanel.ts:190</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L195">paneview/paneviewPanel.ts:195</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -646,7 +678,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L218">paneview/paneviewPanel.ts:218</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L223">paneview/paneviewPanel.ts:223</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -672,7 +704,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L186">paneview/paneviewPanel.ts:186</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L191">paneview/paneviewPanel.ts:191</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -695,7 +727,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L194">paneview/paneviewPanel.ts:194</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L199">paneview/paneviewPanel.ts:199</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -718,7 +750,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L182">paneview/paneviewPanel.ts:182</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L187">paneview/paneviewPanel.ts:187</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -741,7 +773,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/paneview/paneviewPanel.ts#L253">paneview/paneviewPanel.ts:253</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/paneview/paneviewPanel.ts#L260">paneview/paneviewPanel.ts:260</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">PanePanelViewState</span></h4>
@@ -758,7 +790,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/gridview/basePanelView.ts#L103">gridview/basePanelView.ts:103</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/gridview/basePanelView.ts#L103">gridview/basePanelView.ts:103</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -781,7 +813,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/529bbed/packages/dockview/src/lifecycle.ts#L21">lifecycle.ts:21</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/7ec824e/packages/dockview/src/lifecycle.ts#L21">lifecycle.ts:21</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -835,6 +867,9 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="paneframework.html#ondidchangeexpansionstate" class="tsd-kind-icon">on<wbr>Did<wbr>Change<wbr>Expansion<wbr>State</a>
 							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="paneframework.html#ondiddrop" class="tsd-kind-icon">on<wbr>Did<wbr>Drop</a>
+							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
 								<a href="paneframework.html#params" class="tsd-kind-icon">params</a>
 							</li>
@@ -864,6 +899,9 @@
 							</li>
 							<li class=" tsd-kind-accessor tsd-parent-kind-class">
 								<a href="paneframework.html#orthogonalsize" class="tsd-kind-icon">orthogonal<wbr>Size</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="paneframework.html#size" class="tsd-kind-icon">size</a>
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="paneframework.html#width" class="tsd-kind-icon">width</a>
