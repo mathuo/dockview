@@ -128,9 +128,10 @@ export interface IPaneviewComponent extends IDisposable {
     readonly height: number;
     readonly minimumSize: number;
     readonly maximumSize: number;
+    readonly onDidDrop: Event<DroptargetEvent>;
+    readonly onDidLayoutChange: Event<void>;
     addPanel(options: AddPaneviewCompponentOptions): IDisposable;
     layout(width: number, height: number): void;
-    onDidLayoutChange: Event<void>;
     toJSON(): SerializedPaneview;
     fromJSON(
         serializedPaneview: SerializedPaneview,
@@ -142,6 +143,7 @@ export interface IPaneviewComponent extends IDisposable {
     removePanel(panel: IPaneviewPanel): void;
     getPanel(id: string): IPaneviewPanel | undefined;
     movePanel(from: number, to: number): void;
+    updateOptions(options: Partial<PaneviewComponentOptions>): void;
 }
 
 export class PaneviewComponent
@@ -199,11 +201,19 @@ export class PaneviewComponent
             : this.paneview.orthogonalSize;
     }
 
+    private _options: PaneviewComponentOptions;
+
+    get options() {
+        return this._options;
+    }
+
     constructor(
         private element: HTMLElement,
-        private readonly options: PaneviewComponentOptions
+        options: PaneviewComponentOptions
     ) {
         super();
+
+        this._options = options;
 
         if (!options.components) {
             options.components = {};
@@ -222,6 +232,10 @@ export class PaneviewComponent
 
     focus() {
         //
+    }
+
+    updateOptions(options: Partial<PaneviewComponentOptions>): void {
+        this._options = { ...this.options, ...options };
     }
 
     addPanel(options: AddPaneviewCompponentOptions): IDisposable {
@@ -269,16 +283,16 @@ export class PaneviewComponent
             disableDnd: !!this.options.disableDnd,
         });
 
-        view.onDidDrop((event) => {
-            this._onDidDrop.fire(event);
-        });
+        const disposable = new CompositeDisposable(
+            view.onDidDrop((event) => {
+                this._onDidDrop.fire(event);
+            })
+        );
 
         const size: Sizing | number =
             typeof options.size === 'number' ? options.size : Sizing.Distribute;
         const index =
             typeof options.index === 'number' ? options.index : undefined;
-
-        this.paneview.addPane(view, size, index);
 
         view.init({
             params: options.params || {},
@@ -289,13 +303,11 @@ export class PaneviewComponent
             containerApi: new PaneviewApi(this),
         });
 
+        this.paneview.addPane(view, size, index);
+
         view.orientation = this.paneview.orientation;
 
-        return {
-            dispose: () => {
-                //
-            },
-        };
+        return disposable;
     }
 
     getPanels(): PaneviewPanel[] {

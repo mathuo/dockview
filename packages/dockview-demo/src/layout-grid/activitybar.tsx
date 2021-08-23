@@ -49,18 +49,27 @@ export const Activitybar = (props: IGridviewPanelProps) => {
 
     return (
         <div className="activity-bar" onClick={onOpenSidebar}>
-            <DockviewDropTarget
-                validOverlays={'vertical'}
-                canDisplayOverlay={true}
-            >
-                <div className="activity-bar-item">
-                    <ActivitybarImage
-                        url={
-                            'https://fonts.gstatic.com/s/i/materialicons/search/v7/24px.svg'
-                        }
-                    />
-                </div>
-            </DockviewDropTarget>
+            <div className="activity-bar-item">
+                <ActivitybarImage
+                    url={
+                        'https://fonts.gstatic.com/s/i/materialicons/search/v7/24px.svg'
+                    }
+                />
+            </div>
+            <div className="activity-bar-item">
+                <ActivitybarImage
+                    url={
+                        'https://fonts.gstatic.com/s/i/materialicons/search/v7/24px.svg'
+                    }
+                />
+            </div>
+            <div className="activity-bar-item">
+                <ActivitybarImage
+                    url={
+                        'https://fonts.gstatic.com/s/i/materialicons/search/v7/24px.svg'
+                    }
+                />
+            </div>
         </div>
     );
 };
