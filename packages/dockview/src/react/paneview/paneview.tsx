@@ -63,6 +63,18 @@ export const PaneviewReact = React.forwardRef(
         }, [props.disableAutoResizing]);
 
         React.useEffect(() => {
+            paneviewRef.current?.updateOptions({
+                frameworkComponents: props.components,
+            });
+        }, [props.components]);
+
+        React.useEffect(() => {
+            paneviewRef.current?.updateOptions({
+                headerframeworkComponents: props.headerComponents,
+            });
+        }, [props.headerComponents]);
+
+        React.useEffect(() => {
             const createComponent = (
                 id: string,
                 componentId: string,
@@ -90,12 +102,6 @@ export const PaneviewReact = React.forwardRef(
 
             const api = new PaneviewApi(paneview);
 
-            const disposable = paneview.onDidDrop((event) => {
-                if (props.onDidDrop) {
-                    props.onDidDrop({ event, api });
-                }
-            });
-
             const { clientWidth, clientHeight } = domRef.current!;
             paneview.layout(clientWidth, clientHeight);
 
@@ -106,10 +112,27 @@ export const PaneviewReact = React.forwardRef(
             paneviewRef.current = paneview;
 
             return () => {
-                disposable.dispose();
                 paneview.dispose();
             };
         }, []);
+
+        React.useEffect(() => {
+            if (!paneviewRef.current) {
+                return;
+            }
+
+            const paneview = paneviewRef.current;
+
+            const disposable = paneview.onDidDrop((event) => {
+                if (props.onDidDrop) {
+                    props.onDidDrop({ event, api: new PaneviewApi(paneview) });
+                }
+            });
+
+            return () => {
+                disposable.dispose();
+            };
+        }, [props.onDidDrop]);
 
         return (
             <div
