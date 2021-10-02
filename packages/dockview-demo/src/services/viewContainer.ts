@@ -4,26 +4,31 @@ import {
     Event,
     SerializedPaneview,
 } from 'dockview';
-import { DefaultView, View } from './view';
+import { DefaultView, View, SerializedView } from './view';
+import { IViewRegistry } from './viewRegistry';
+
+export interface SerializedViewContainer {
+    readonly id: string;
+    readonly views: SerializedView[];
+}
 
 export interface ViewContainer<T = any> {
     readonly id: string;
-    readonly canDelete: boolean;
     readonly views: View[];
-    readonly schema: T | undefined;
+    readonly schema: T | any;
+    readonly icon: string;
     readonly onDidAddView: Event<View>;
     readonly onDidRemoveView: Event<View>;
     addView(view: View, location?: number): void;
     layout(schema: T): void;
     removeView(view: View): void;
     clear(): void;
-    toJSON(): object;
+    toJSON(): SerializedViewContainer;
 }
 
 export class PaneviewContainer implements ViewContainer<SerializedPaneview> {
     private readonly _id: string;
-    private readonly _canDelete: boolean;
-    private readonly _views: View[];
+    private readonly _views: View[] = [];
 
     private readonly _onDidAddView = new Emitter<View>();
     readonly onDidAddView = this._onDidAddView.event;
@@ -40,10 +45,6 @@ export class PaneviewContainer implements ViewContainer<SerializedPaneview> {
         return this._views;
     }
 
-    get canDelete() {
-        return this._canDelete;
-    }
-
     get schema(): SerializedPaneview | undefined {
         if (!this._schema) {
             this._schema = JSON.parse(
@@ -53,21 +54,35 @@ export class PaneviewContainer implements ViewContainer<SerializedPaneview> {
         return this._schema;
     }
 
-    constructor(id: string, canDelete: boolean) {
-        this._id = id;
-        this._canDelete = canDelete;
-
-        const schema = this.schema;
-
-        if (this.schema) {
-            this._views = this.schema.views.map((v) => {
-                return new DefaultView(v.data.id, v.data.title, v.expanded);
-            });
-        } else {
-            this._views = [];
+    get icon(): string {
+        const defaultIcon = 'search';
+        if (this.views.length > 0) {
+            return this.views.find((v) => !!v.icon)?.icon || defaultIcon;
         }
-        // super();
+        return defaultIcon;
+    }
 
+    constructor(
+        id: string,
+        viewRegistry: IViewRegistry,
+        views?: SerializedView[]
+    ) {
+        this._id = id;
+
+        if (views) {
+            for (const view of views) {
+                const registeredView = viewRegistry.getRegisteredView(view.id);
+                this.addView(
+                    new DefaultView({
+                        id: view.id,
+                        title: registeredView.title,
+                        isExpanded: view.isExpanded,
+                        isLocationEditable: registeredView.isLocationEditable,
+                        icon: registeredView.icon,
+                    })
+                );
+            }
+        }
         // this.addDisposables(this._onDidAddView, this._onDidRemoveView);
     }
 
@@ -106,7 +121,7 @@ export class PaneviewContainer implements ViewContainer<SerializedPaneview> {
         localStorage.removeItem(`viewcontainer_${this.id}`);
     }
 
-    toJSON() {
-        return { id: this.id, views: this.views.map((v) => ({ id: v.id })) };
+    toJSON(): SerializedViewContainer {
+        return { id: this.id, views: this.views.map((v) => v.toJSON()) };
     }
 }

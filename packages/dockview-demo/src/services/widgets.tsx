@@ -13,36 +13,88 @@ import {
 import * as React from 'react';
 import { useLayoutRegistry } from '../layout-grid/registry';
 import { PaneviewContainer, ViewContainer } from './viewContainer';
-import { ViewService } from './viewService';
+import { IViewService, ViewService } from './viewService';
 import { DefaultView } from './view';
+import { RegisteredView, VIEW_REGISTRY } from './viewRegistry';
 
-const viewService = new ViewService();
+class ViewServiceModel {
+    private readonly viewService: IViewService;
 
-const layout = localStorage.getItem('viewservice');
-if (layout) {
-    viewService.load(JSON.parse(layout));
-} else {
-    const container1 = new PaneviewContainer('c1', true);
-    if (!container1.schema) {
-        container1.addView(new DefaultView('panel1', 'Panel 1', true));
-        container1.addView(new DefaultView('panel2', 'Panel 2', true));
+    get model() {
+        return this.viewService;
     }
-    const container2 = new PaneviewContainer('c2', true);
-    if (!container2.schema) {
-        container2.addView(new DefaultView('panel3', 'Panel 3', true));
-        container2.addView(new DefaultView('panel4', 'Panel 4', true));
+
+    constructor() {
+        this.viewService = new ViewService(VIEW_REGISTRY);
+        this.init();
     }
-    viewService.addContainer(container1);
-    viewService.addContainer(container2);
+
+    init(): void {
+        const layout = localStorage.getItem('viewservice');
+        if (layout) {
+            this.viewService.load(JSON.parse(layout));
+        } else {
+            const container1 = new PaneviewContainer(
+                'default_container_1',
+                VIEW_REGISTRY
+            );
+            if (!container1.schema) {
+                this.addView(
+                    container1,
+                    VIEW_REGISTRY.getRegisteredView('search_widget')
+                );
+                this.addView(
+                    container1,
+                    VIEW_REGISTRY.getRegisteredView('home_widget')
+                );
+            }
+            const container2 = new PaneviewContainer(
+                'default_container_2',
+                VIEW_REGISTRY
+            );
+            if (!container2.schema) {
+                this.addView(
+                    container2,
+                    VIEW_REGISTRY.getRegisteredView('account_widget')
+                );
+                this.addView(
+                    container2,
+                    VIEW_REGISTRY.getRegisteredView('settings_widget')
+                );
+            }
+            this.viewService.addContainer(container1);
+            this.viewService.addContainer(container2);
+        }
+
+        const save = () => {
+            localStorage.setItem(
+                'viewservice',
+                JSON.stringify(this.viewService.toJSON())
+            );
+        };
+
+        this.viewService.onDidActiveContainerChange(save);
+        this.viewService.onDidRemoveContainer(save);
+        this.viewService.onDidAddContainer(save);
+    }
+
+    private addView(
+        container: ViewContainer,
+        registedView: RegisteredView
+    ): void {
+        container.addView(
+            new DefaultView({
+                id: registedView.id,
+                title: registedView.title,
+                isExpanded: true,
+                isLocationEditable: registedView.isLocationEditable,
+                icon: registedView.icon,
+            })
+        );
+    }
 }
 
-const save = () => {
-    localStorage.setItem('viewservice', JSON.stringify(viewService.toJSON()));
-};
-
-viewService.onDidActiveContainerChange(save);
-viewService.onDidRemoveContainer(save);
-viewService.onDidAddContainer(save);
+const viewService = new ViewServiceModel();
 
 const components: PanelCollection<IPaneviewPanelProps<any>> = {
     default: (props: IPaneviewPanelProps<{ viewId: string }>) => {
@@ -56,27 +108,27 @@ const components: PanelCollection<IPaneviewPanelProps<any>> = {
 
 export const Activitybar = (props: IGridviewPanelProps) => {
     const [activeContainerid, setActiveContainerId] = React.useState<string>(
-        viewService.activeContainer.id
+        viewService.model.activeContainer.id
     );
     const [containers, setContainers] = React.useState<ViewContainer[]>(
-        viewService.containers
+        viewService.model.containers
     );
 
     const registry = useLayoutRegistry();
 
     React.useEffect(() => {
         const disposable = new CompositeDisposable(
-            viewService.onDidActiveContainerChange(() => {
-                setActiveContainerId(viewService.activeContainer.id);
+            viewService.model.onDidActiveContainerChange(() => {
+                setActiveContainerId(viewService.model.activeContainer.id);
             }),
-            viewService.onDidAddContainer(() => {
-                setContainers(viewService.containers);
+            viewService.model.onDidAddContainer(() => {
+                setContainers(viewService.model.containers);
             }),
-            viewService.onDidRemoveContainer(() => {
-                setContainers(viewService.containers);
+            viewService.model.onDidRemoveContainer(() => {
+                setContainers(viewService.model.containers);
             }),
-            viewService.onDidContainersChange(() => {
-                setContainers(viewService.containers);
+            viewService.model.onDidContainersChange(() => {
+                setContainers(viewService.model.containers);
             })
         );
 
@@ -103,7 +155,7 @@ export const Activitybar = (props: IGridviewPanelProps) => {
             sidebarPanel.focus();
         }
 
-        viewService.setActiveViewContainer(container.id);
+        viewService.model.setActiveViewContainer(container.id);
     };
 
     const onDrop = (targetContainer: ViewContainer) => (
@@ -112,8 +164,13 @@ export const Activitybar = (props: IGridviewPanelProps) => {
         const data = event.dataTransfer.getData('application/json');
         if (data) {
             const { container } = JSON.parse(data);
-            const sourceContainer = viewService.getViewContainer(container);
-            viewService.insertContainerAfter(sourceContainer, targetContainer);
+            const sourceContainer = viewService.model.getViewContainer(
+                container
+            );
+            viewService.model.insertContainerAfter(
+                sourceContainer,
+                targetContainer
+            );
         }
     };
 
@@ -121,16 +178,16 @@ export const Activitybar = (props: IGridviewPanelProps) => {
         const data = getPaneData();
         if (data) {
             const { paneId } = data;
-            const view = viewService.getView(paneId);
-            const viewContainer = viewService.getViewContainer2(view);
-            viewService.removeViews([view], viewContainer);
+            const view = viewService.model.getView(paneId);
+            const viewContainer = viewService.model.getViewContainer2(view);
+            viewService.model.removeViews([view], viewContainer);
             // viewContainer.removeView(view);
             const newContainer = new PaneviewContainer(
                 `t_${Date.now().toString().substr(5)}`,
-                true
+                VIEW_REGISTRY
             );
             newContainer.addView(view);
-            viewService.addContainer(newContainer);
+            viewService.model.addContainer(newContainer);
         }
     };
 
@@ -157,6 +214,9 @@ export const Activitybar = (props: IGridviewPanelProps) => {
                         }}
                         onDrop={onDrop(container)}
                         style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
                             height: '48px',
                             boxSizing: 'border-box',
                             borderLeft: isActive
@@ -165,7 +225,13 @@ export const Activitybar = (props: IGridviewPanelProps) => {
                         }}
                         key={i}
                     >
-                        {container.id}
+                        {/* {container.id} */}
+                        <span
+                            style={{ fontSize: '30px' }}
+                            className="material-icons-outlined"
+                        >
+                            {container.icon}
+                        </span>
                     </div>
                 );
             })}
@@ -185,12 +251,12 @@ export const Activitybar = (props: IGridviewPanelProps) => {
 
 export const Sidebar = () => {
     const [sidebarId, setSidebarId] = React.useState<string>(
-        viewService.activeContainer.id
+        viewService.model.activeContainer.id
     );
 
     React.useEffect(() => {
-        const disposable = viewService.onDidActiveContainerChange(() => {
-            setSidebarId(viewService.activeContainer.id);
+        const disposable = viewService.model.onDidActiveContainerChange(() => {
+            setSidebarId(viewService.model.activeContainer.id);
         });
 
         return () => {
@@ -211,7 +277,7 @@ export const SidebarPart = (props: { id: string }) => {
             };
         }
 
-        const viewContainer = viewService.getViewContainer(props.id);
+        const viewContainer = viewService.model.getViewContainer(props.id);
 
         const disposables = new CompositeDisposable(
             api.onDidLayoutChange(() => {
@@ -271,10 +337,10 @@ export const SidebarPart = (props: { id: string }) => {
         }
 
         const viewId = data.paneId;
-        const viewContainer = viewService.getViewContainer(props.id);
-        const view = viewService.getView(viewId);
+        const viewContainer = viewService.model.getViewContainer(props.id);
+        const view = viewService.model.getView(viewId);
 
-        viewService.moveViewToLocation(view, viewContainer, 0);
+        viewService.model.moveViewToLocation(view, viewContainer, 0);
     };
 
     if (!props.id) {

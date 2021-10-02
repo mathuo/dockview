@@ -119,7 +119,7 @@ export const PaneviewReact = React.forwardRef(
         React.useEffect(() => {
             if (!paneviewRef.current) {
                 return () => {
-                    // noop
+                    //
                 };
             }
 

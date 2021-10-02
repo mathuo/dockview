@@ -1,12 +1,29 @@
-import { Emitter, Event } from 'dockview';
+import {
+    CompositeDisposable,
+    Emitter,
+    Event,
+    IDisposable,
+    IView,
+} from 'dockview';
 import { DefaultView, View } from './view';
-import { PaneviewContainer, ViewContainer } from './viewContainer';
+import {
+    PaneviewContainer,
+    ViewContainer,
+    SerializedViewContainer,
+} from './viewContainer';
+import { IViewRegistry } from './viewRegistry';
 
-export interface IViewService {
+export interface SerializedViewService {
+    containers: SerializedViewContainer[];
+    activeContainer?: string;
+}
+
+export interface IViewService extends IDisposable {
     readonly containers: ViewContainer[];
     readonly onDidActiveContainerChange: Event<void>;
     readonly onDidRemoveContainer: Event<void>;
     readonly onDidAddContainer: Event<void>;
+    readonly onDidContainersChange: Event<void>;
     readonly activeContainer: ViewContainer | undefined;
     addContainer(container: ViewContainer): void;
     setActiveViewContainer(id: string): void;
@@ -16,11 +33,13 @@ export interface IViewService {
         targetViewContainer: ViewContainer,
         targetLocation: number
     ): void;
+    insertContainerAfter(source: ViewContainer, target: ViewContainer): void;
     addViews(view: View, viewContainer: ViewContainer, location?: number): void;
     removeViews(removeViews: View[], viewContainer: ViewContainer): void;
     getViewContainer(id: string): ViewContainer | undefined;
-    toJSON(): object;
-    load(layout: any): void;
+    getViewContainer2(view: View): ViewContainer | undefined;
+    toJSON(): SerializedViewService;
+    load(layout: SerializedViewService): void;
 }
 
 export class ViewService implements IViewService {
@@ -46,21 +65,21 @@ export class ViewService implements IViewService {
         );
     }
 
-    constructor() {
+    constructor(private readonly viewRegistry: IViewRegistry) {
         //
     }
 
-    load(layout: any): void {
+    load(layout: SerializedViewService): void {
         const { containers, activeContainer } = layout;
 
         for (const container of containers) {
             const { id, views } = container;
-            const viewContainer = new PaneviewContainer(id, true);
-            for (const view of views) {
-                viewContainer.addView(
-                    new DefaultView(view.id, view.title, view.isExpanded)
-                );
-            }
+            const viewContainer = new PaneviewContainer(
+                id,
+                this.viewRegistry,
+                views
+            );
+
             this.addContainer(viewContainer);
         }
 
@@ -166,10 +185,16 @@ export class ViewService implements IViewService {
         return undefined;
     }
 
-    toJSON() {
+    toJSON(): SerializedViewService {
         return {
             containers: this.containers.map((c) => c.toJSON()),
             activeContainer: this.activeContainer.id,
         };
+    }
+
+    dispose(): void {
+        this._onDidActiveContainerChange.dispose();
+        this._onDidAddContainer.dispose();
+        this._onDidRemoveContainer.dispose();
     }
 }
