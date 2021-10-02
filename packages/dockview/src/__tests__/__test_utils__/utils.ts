@@ -10,5 +10,5 @@ export function setMockRefElement(node: Partial<HTMLElement>): void {
         },
     };
 
-    jest.spyOn(React, 'useRef').mockReturnValue(mockRef);
+    jest.spyOn(React, 'useRef').mockReturnValueOnce(mockRef);
 }
