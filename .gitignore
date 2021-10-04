@@ -10,3 +10,4 @@ typedocs/
 storybook-static/
 .rollup.cache/
 test-report.xml
+*.code-workspace
