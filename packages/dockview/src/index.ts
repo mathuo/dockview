@@ -17,6 +17,7 @@ export * from './dockview/dockviewComponent';
 export * from './dockview/options';
 export * from './gridview/gridviewComponent';
 export * from './dnd/dataTransfer';
+export { Position } from './dnd/droptarget';
 
 export * from './react'; // TODO: should be conditional on whether user wants the React wrappers
 

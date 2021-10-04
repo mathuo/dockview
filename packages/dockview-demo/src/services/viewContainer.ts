@@ -17,7 +17,7 @@ export interface ViewContainer<T = any> {
     readonly views: View[];
     readonly schema: T | any;
     readonly icon: string;
-    readonly onDidAddView: Event<View>;
+    readonly onDidAddView: Event<{ view: View; index?: number }>;
     readonly onDidRemoveView: Event<View>;
     addView(view: View, location?: number): void;
     layout(schema: T): void;
@@ -30,7 +30,10 @@ export class PaneviewContainer implements ViewContainer<SerializedPaneview> {
     private readonly _id: string;
     private readonly _views: View[] = [];
 
-    private readonly _onDidAddView = new Emitter<View>();
+    private readonly _onDidAddView = new Emitter<{
+        view: View;
+        index?: number;
+    }>();
     readonly onDidAddView = this._onDidAddView.event;
     private readonly _onDidRemoveView = new Emitter<View>();
     readonly onDidRemoveView = this._onDidRemoveView.event;
@@ -94,9 +97,9 @@ export class PaneviewContainer implements ViewContainer<SerializedPaneview> {
         );
     }
 
-    addView(view: View, location = 0): void {
-        this._views.splice(location, 0, view);
-        this._onDidAddView.fire(view);
+    addView(view: View, index?: number): void {
+        this._views.splice(index, 0, view);
+        this._onDidAddView.fire({ view, index });
     }
 
     removeView(view: View): void {

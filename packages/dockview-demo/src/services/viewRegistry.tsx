@@ -1,8 +1,11 @@
+import React from 'react';
+
 export interface RegisteredView {
     id: string;
     icon: string;
     title: string;
     isLocationEditable: boolean;
+    component: React.FunctionComponent;
 }
 
 export interface IViewRegistry {
@@ -28,22 +31,34 @@ VIEW_REGISTRY.register({
     title: 'search',
     icon: 'search',
     isLocationEditable: false,
+    component: () => {
+        return <div>This is a search bar component</div>;
+    },
 });
 VIEW_REGISTRY.register({
     id: 'home_widget',
     title: 'Home',
     icon: 'home',
     isLocationEditable: true,
+    component: () => {
+        return <div>Home</div>;
+    },
 });
 VIEW_REGISTRY.register({
     id: 'account_widget',
     title: 'Account',
     icon: 'account_circle',
     isLocationEditable: true,
+    component: () => {
+        return <div>account_circle</div>;
+    },
 });
 VIEW_REGISTRY.register({
     id: 'settings_widget',
     title: 'Settings',
     icon: 'settings',
     isLocationEditable: true,
+    component: () => {
+        return <div>settings</div>;
+    },
 });

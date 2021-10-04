@@ -1,5 +1,6 @@
 import {
     CompositeDisposable,
+    getPaneData,
     GridviewApi,
     IGridviewPanelProps,
     IPaneviewPanelProps,
@@ -8,7 +9,7 @@ import {
     PaneviewDropEvent,
     PaneviewReact,
     PaneviewReadyEvent,
-    getPaneData,
+    Position,
 } from 'dockview';
 import * as React from 'react';
 import { useLayoutRegistry } from '../layout-grid/registry';
@@ -16,6 +17,8 @@ import { PaneviewContainer, ViewContainer } from './viewContainer';
 import { IViewService, ViewService } from './viewService';
 import { DefaultView } from './view';
 import { RegisteredView, VIEW_REGISTRY } from './viewRegistry';
+import { toggleClass } from '../dom';
+import './widgets.scss';
 
 class ViewServiceModel {
     private readonly viewService: IViewService;
@@ -96,13 +99,23 @@ class ViewServiceModel {
 
 const viewService = new ViewServiceModel();
 
+const colors = {
+    home_widget: 'red',
+    account_widget: 'green',
+    settings_widget: 'yellow',
+    search_widget: 'orange',
+};
+
 const components: PanelCollection<IPaneviewPanelProps<any>> = {
     default: (props: IPaneviewPanelProps<{ viewId: string }>) => {
-        return (
-            <div style={{ backgroundColor: 'black', height: '100%' }}>
-                {props.params.viewId}
-            </div>
-        );
+        const Component = React.useMemo(() => {
+            const registeredView = VIEW_REGISTRY.getRegisteredView(
+                props.params.viewId
+            );
+            return registeredView?.component;
+        }, [props.params.viewId]);
+
+        return Component ? <Component /> : null;
     },
 };
 
@@ -158,7 +171,7 @@ export const Activitybar = (props: IGridviewPanelProps) => {
         viewService.model.setActiveViewContainer(container.id);
     };
 
-    const onDrop = (targetContainer: ViewContainer) => (
+    const onContainerDrop = (targetContainer: ViewContainer) => (
         event: React.DragEvent
     ) => {
         const data = event.dataTransfer.getData('application/json');
@@ -192,7 +205,7 @@ export const Activitybar = (props: IGridviewPanelProps) => {
     };
 
     return (
-        <div style={{ background: 'rgb(51,51,51)' }}>
+        <div style={{ background: 'rgb(51,51,51)', cursor: 'pointer' }}>
             {containers.map((container, i) => {
                 const isActive = activeContainerid === container.id;
                 return (
@@ -212,7 +225,7 @@ export const Activitybar = (props: IGridviewPanelProps) => {
                                 JSON.stringify({ container: container.id })
                             );
                         }}
-                        onDrop={onDrop(container)}
+                        onDrop={onContainerDrop(container)}
                         style={{
                             display: 'flex',
                             justifyContent: 'center',
@@ -235,17 +248,33 @@ export const Activitybar = (props: IGridviewPanelProps) => {
                     </div>
                 );
             })}
-            <div
-                onDragOver={(e) => {
-                    e.preventDefault();
-                }}
-                onDragEnter={(e) => {
-                    e.preventDefault();
-                }}
-                onDrop={onNewContainer}
-                style={{ height: '100%', backgroundColor: 'red' }}
-            ></div>
+            <ExtraSpace onNewContainer={onNewContainer} />
         </div>
+    );
+};
+
+const ExtraSpace = (props: {
+    onNewContainer: (event: React.DragEvent) => void;
+}) => {
+    const ref = React.useRef<HTMLDivElement>(null);
+
+    return (
+        <div
+            ref={ref}
+            className="activity-bar-space"
+            onDragOver={(e) => {
+                e.preventDefault();
+            }}
+            onDragEnter={(e) => {
+                toggleClass(ref.current, 'activity-bar-space-dragover', true);
+                e.preventDefault();
+            }}
+            onDragLeave={(e) => {
+                toggleClass(ref.current, 'activity-bar-space-dragover', false);
+            }}
+            onDrop={props.onNewContainer}
+            style={{ height: '100%', backgroundColor: 'red' }}
+        ></div>
     );
 };
 
@@ -283,7 +312,7 @@ export const SidebarPart = (props: { id: string }) => {
             api.onDidLayoutChange(() => {
                 viewContainer.layout(api.toJSON());
             }),
-            viewContainer.onDidAddView((view) => {
+            viewContainer.onDidAddView(({ view, index }) => {
                 api.addPanel({
                     id: view.id,
                     isExpanded: view.isExpanded,
@@ -292,6 +321,7 @@ export const SidebarPart = (props: { id: string }) => {
                     params: {
                         viewId: view.id,
                     },
+                    index,
                 });
             }),
             viewContainer.onDidRemoveView((view) => {
@@ -330,17 +360,34 @@ export const SidebarPart = (props: { id: string }) => {
     };
 
     const onDidDrop = (event: PaneviewDropEvent) => {
-        const data = getPaneData();
+        const data = event.event.getData();
 
         if (!data) {
             return;
+        }
+
+        const targetPanel = event.event.panel;
+        const allPanels = event.api.getPanels();
+        let toIndex = allPanels.indexOf(targetPanel);
+
+        // if (
+        //     event.event.position === Position.Left ||
+        //     event.event.position === Position.Top
+        // ) {
+        //     toIndex = Math.max(0, toIndex - 1);
+        // }
+        if (
+            event.event.position === Position.Right ||
+            event.event.position === Position.Bottom
+        ) {
+            toIndex = Math.min(allPanels.length, toIndex + 1);
         }
 
         const viewId = data.paneId;
         const viewContainer = viewService.model.getViewContainer(props.id);
         const view = viewService.model.getView(viewId);
 
-        viewService.model.moveViewToLocation(view, viewContainer, 0);
+        viewService.model.moveViewToLocation(view, viewContainer, toIndex);
     };
 
     if (!props.id) {
