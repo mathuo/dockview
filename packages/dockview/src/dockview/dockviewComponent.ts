@@ -75,7 +75,10 @@ export type DockviewComponentUpdateOptions = Pick<
 
 export interface IDockviewComponent extends IBaseGrid<GroupviewPanel> {
     readonly activeGroup: GroupviewPanel | undefined;
+    readonly totalPanels: number;
+    readonly panels: IGroupPanel[];
     tabHeight: number | undefined;
+    deserializer: IPanelDeserializer | undefined;
     updateOptions(options: DockviewComponentUpdateOptions): void;
     moveGroupOrPanel(
         referenceGroup: GroupviewPanel,
@@ -91,11 +94,10 @@ export interface IDockviewComponent extends IBaseGrid<GroupviewPanel> {
     getGroupPanel: (id: string) => IGroupPanel | undefined;
     fireMouseEvent(event: LayoutMouseEvent): void;
     createWatermarkComponent(): IWatermarkRenderer;
-    totalPanels: number;
+
     // lifecycle
     addEmptyGroup(options?: AddGroupOptions): void;
     closeAllGroups: () => Promise<boolean>;
-    deserializer: IPanelDeserializer | undefined;
     // events
     onTabInteractionEvent: Event<LayoutMouseEvent>;
     onTabContextMenu: Event<TabContextMenuEvent>;
@@ -123,7 +125,7 @@ export class DockviewComponent
     extends BaseGrid<GroupviewPanel>
     implements IDockviewComponent
 {
-    private readonly panels = new Map<string, IValueDisposable<IGroupPanel>>();
+    private readonly _panels = new Map<string, IValueDisposable<IGroupPanel>>();
     private readonly dirtyPanels = new Set<IGroupPanel>();
     private readonly debouncedDeque = debounce(
         this.syncConfigs.bind(this),
@@ -151,7 +153,11 @@ export class DockviewComponent
     readonly onDidLayoutChange = this._onDidLayoutChange.event;
 
     get totalPanels(): number {
-        return this.panels.size;
+        return this._panels.size;
+    }
+
+    get panels(): IGroupPanel[] {
+        return Array.from(this._panels.values()).map((_) => _.value);
     }
 
     get deserializer(): IPanelDeserializer | undefined {
@@ -168,7 +174,7 @@ export class DockviewComponent
 
     set tabHeight(height: number | undefined) {
         this.options.tabHeight = height;
-        this.groups.forEach((value) => {
+        this._groups.forEach((value) => {
             value.value.model.tabHeight = height;
         });
     }
@@ -270,7 +276,7 @@ export class DockviewComponent
     }
 
     getGroupPanel(id: string): IGroupPanel | undefined {
-        return this.panels.get(id)?.value;
+        return this._panels.get(id)?.value;
     }
 
     // createDragTarget(
@@ -384,7 +390,7 @@ export class DockviewComponent
     }
 
     registerPanel(panel: IGroupPanel): void {
-        if (this.panels.has(panel.id)) {
+        if (this._panels.has(panel.id)) {
             throw new Error(`panel ${panel.id} already exists`);
         }
 
@@ -392,23 +398,23 @@ export class DockviewComponent
             panel.onDidStateChange(() => this.addDirtyPanel(panel))
         );
 
-        this.panels.set(panel.id, { value: panel, disposable });
+        this._panels.set(panel.id, { value: panel, disposable });
 
         this._onGridEvent.fire({ kind: GroupChangeKind.PANEL_CREATED });
     }
 
     unregisterPanel(panel: IGroupPanel): void {
-        if (!this.panels.has(panel.id)) {
+        if (!this._panels.has(panel.id)) {
             throw new Error(`panel ${panel.id} doesn't exist`);
         }
-        const item = this.panels.get(panel.id);
+        const item = this._panels.get(panel.id);
 
         if (item) {
             item.disposable.dispose();
             item.value.dispose();
         }
 
-        this.panels.delete(panel.id);
+        this._panels.delete(panel.id);
 
         this._onGridEvent.fire({ kind: GroupChangeKind.PANEL_DESTROYED });
     }
@@ -425,7 +431,7 @@ export class DockviewComponent
 
         // const state = { ...this.panelState };
 
-        const panels = Array.from(this.panels.values()).reduce(
+        const panels = Array.from(this._panels.values()).reduce(
             (collection, panel) => {
                 if (!this.panelState[panel.value.id]) {
                     collection[panel.value.id] = panel.value.toJSON();
@@ -445,12 +451,12 @@ export class DockviewComponent
 
     fromJSON(data: SerializedDockview): void {
         this.gridview.clear();
-        this.panels.forEach((panel) => {
+        this._panels.forEach((panel) => {
             panel.disposable.dispose();
             panel.value.dispose();
         });
-        this.panels.clear();
-        this.groups.clear();
+        this._panels.clear();
+        this._groups.clear();
 
         if (!this.deserializer) {
             throw new Error('invalid deserializer');
@@ -490,7 +496,7 @@ export class DockviewComponent
     }
 
     async closeAllGroups(): Promise<boolean> {
-        for (const entry of this.groups.entries()) {
+        for (const entry of this._groups.entries()) {
             const [_, group] = entry;
 
             const didCloseAll = await group.value.model.closeAllPanels();
@@ -575,7 +581,7 @@ export class DockviewComponent
         const group = this.createGroup();
 
         if (options) {
-            const referencePanel = this.panels.get(
+            const referencePanel = this._panels.get(
                 options.referencePanel
             )?.value;
 
@@ -614,7 +620,7 @@ export class DockviewComponent
             this.unregisterPanel(panel);
         });
 
-        if (this.groups.size === 1) {
+        if (this._groups.size === 1) {
             this._activeGroup = group;
             return;
         }
@@ -630,13 +636,13 @@ export class DockviewComponent
         index?: number
     ): void {
         const sourceGroup = groupId
-            ? this.groups.get(groupId)?.value
+            ? this._groups.get(groupId)?.value
             : undefined;
 
         if (!target || target === Position.Center) {
             const groupItem: IGroupPanel | undefined =
                 sourceGroup?.model.removePanel(itemId) ||
-                this.panels.get(itemId)?.value;
+                this._panels.get(itemId)?.value;
 
             if (!groupItem) {
                 throw new Error(`No panel with id ${itemId}`);
@@ -688,7 +694,7 @@ export class DockviewComponent
             } else {
                 const groupItem: IGroupPanel | undefined =
                     sourceGroup?.model.removePanel(itemId) ||
-                    this.panels.get(itemId)?.value;
+                    this._panels.get(itemId)?.value;
 
                 if (!groupItem) {
                     throw new Error(`No panel with id ${itemId}`);
@@ -715,7 +721,7 @@ export class DockviewComponent
 
         let id = options?.id;
 
-        if (id && this.groups.has(options.id!)) {
+        if (id && this._groups.has(options.id!)) {
             console.warn(
                 `Duplicate group id ${options?.id}. reassigning group id to avoid errors`
             );
@@ -724,7 +730,7 @@ export class DockviewComponent
 
         if (!id) {
             id = nextGroupId.next();
-            while (this.groups.has(id)) {
+            while (this._groups.has(id)) {
                 id = nextGroupId.next();
             }
         }
@@ -735,7 +741,7 @@ export class DockviewComponent
             view.model.tabHeight = this.options.tabHeight;
         }
 
-        if (!this.groups.has(view.id)) {
+        if (!this._groups.has(view.id)) {
             const disposable = new CompositeDisposable(
                 view.model.onMove((event) => {
                     const { groupId, itemId, target, index } = event;
@@ -746,7 +752,7 @@ export class DockviewComponent
                 })
             );
 
-            this.groups.set(view.id, { value: view, disposable });
+            this._groups.set(view.id, { value: view, disposable });
         }
 
         return view;
@@ -771,7 +777,7 @@ export class DockviewComponent
         this.dirtyPanels.clear();
 
         const partialPanelState = dirtyPanels
-            .map((panel) => this.panels.get(panel.id))
+            .map((panel) => this._panels.get(panel.id))
             .filter((_) => !!_)
             .reduce((collection, panel) => {
                 collection[panel!.value.id] = panel!.value.toJSON();
@@ -784,7 +790,7 @@ export class DockviewComponent
         };
 
         dirtyPanels
-            .filter((p) => this.panels.has(p.id))
+            .filter((p) => this._panels.has(p.id))
             .forEach((panel) => {
                 panel.setDirty(false);
                 this._onGridEvent.fire({
@@ -856,7 +862,7 @@ export class DockviewComponent
     }
 
     private findGroup(panel: IGroupPanel): GroupviewPanel | undefined {
-        return Array.from(this.groups.values()).find((group) =>
+        return Array.from(this._groups.values()).find((group) =>
             group.value.model.containsPanel(panel)
         )?.value;
     }

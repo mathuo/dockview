@@ -54,6 +54,7 @@ export interface IBaseGrid<T extends IGridPanelView> {
     readonly maximumWidth: number;
     readonly activeGroup: T | undefined;
     readonly size: number;
+    readonly groups: T[];
     readonly onGridEvent: Event<GroupChangeEvent>;
     getPanel(id: string): T | undefined;
     toJSON(): object;
@@ -69,7 +70,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
     implements IBaseGrid<T>
 {
     private readonly _id = nextLayoutId.next();
-    protected readonly groups = new Map<string, IValueDisposable<T>>();
+    protected readonly _groups = new Map<string, IValueDisposable<T>>();
     protected readonly gridview: Gridview;
     //
     protected _activeGroup: T | undefined;
@@ -86,7 +87,11 @@ export abstract class BaseGrid<T extends IGridPanelView>
     }
 
     get size() {
-        return this.groups.size;
+        return this._groups.size;
+    }
+
+    get groups() {
+        return Array.from(this._groups.values()).map((_) => _.value);
     }
 
     get width() {
@@ -162,21 +167,21 @@ export abstract class BaseGrid<T extends IGridPanelView>
         group: T,
         options?: { skipActive?: boolean; skipDispose?: boolean }
     ) {
-        if (!this.groups.has(group.id)) {
+        if (!this._groups.has(group.id)) {
             throw new Error('invalid operation');
         }
 
-        const item = this.groups.get(group.id);
+        const item = this._groups.get(group.id);
 
         const view = this.gridview.remove(group, Sizing.Distribute);
 
         if (item && !options?.skipDispose) {
             item.disposable.dispose();
-            this.groups.delete(group.id);
+            this._groups.delete(group.id);
         }
 
-        if (!options?.skipActive && this.groups.size > 0) {
-            this.doSetGroupActive(Array.from(this.groups.values())[0].value);
+        if (!options?.skipActive && this._groups.size > 0) {
+            this.doSetGroupActive(Array.from(this._groups.values())[0].value);
         }
 
         this._onGridEvent.fire({ kind: GroupChangeKind.REMOVE_GROUP });
@@ -185,7 +190,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
     }
 
     public getPanel(id: string): T | undefined {
-        return this.groups.get(id)?.value;
+        return this._groups.get(id)?.value;
     }
 
     public doSetGroupActive(group: T, skipFocus?: boolean) {

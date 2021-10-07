@@ -170,7 +170,7 @@ export class GridviewComponent
     }
 
     setActive(panel: GridviewPanel): void {
-        this.groups.forEach((value, key) => {
+        this._groups.forEach((value, key) => {
             value.value.setActive(panel === value.value);
         });
     }
@@ -190,7 +190,7 @@ export class GridviewComponent
         const { grid, activePanel } = serializedGridview;
 
         this.gridview.clear();
-        this.groups.clear();
+        this._groups.clear();
 
         const queue: Function[] = [];
 
@@ -259,7 +259,7 @@ export class GridviewComponent
 
         const removedPanel = this.gridview.remove(panel) as GridviewPanel;
 
-        const referenceGroup = this.groups.get(options.reference)?.value;
+        const referenceGroup = this._groups.get(options.reference)?.value;
 
         if (!referenceGroup) {
             throw new Error(
@@ -286,7 +286,7 @@ export class GridviewComponent
         let relativeLocation: number[] = options.location || [0];
 
         if (options.position?.reference) {
-            const referenceGroup = this.groups.get(
+            const referenceGroup = this._groups.get(
                 options.position.reference
             )?.value;
 
@@ -348,7 +348,7 @@ export class GridviewComponent
                 if (!event.isFocused) {
                     return;
                 }
-                this.groups.forEach((groupItem) => {
+                this._groups.forEach((groupItem) => {
                     const group = groupItem.value;
                     if (group !== panel) {
                         group.setActive(false);
@@ -363,7 +363,7 @@ export class GridviewComponent
             })
         );
 
-        this.groups.set(panel.id, {
+        this._groups.set(panel.id, {
             value: panel,
             disposable,
         });
@@ -421,11 +421,11 @@ export class GridviewComponent
     removeGroup(group: GridviewPanel) {
         super.removeGroup(group);
 
-        const panel = this.groups.get(group.id);
+        const panel = this._groups.get(group.id);
 
         if (panel) {
             panel.disposable.dispose();
-            this.groups.delete(group.id);
+            this._groups.delete(group.id);
         }
     }
 

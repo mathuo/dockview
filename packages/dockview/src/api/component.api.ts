@@ -209,6 +209,10 @@ export class GridviewApi {
         return this.component.onGridEvent;
     }
 
+    get panels() {
+        return this.component.groups;
+    }
+
     constructor(private readonly component: IGridviewComponent) {}
 
     get orientation() {
@@ -314,6 +318,14 @@ export class DockviewApi {
 
     get onDidLayoutChange() {
         return this.component.onDidLayoutChange;
+    }
+
+    get panels() {
+        return this.component.panels;
+    }
+
+    get groups() {
+        return this.component.groups;
     }
 
     constructor(private readonly component: IDockviewComponent) {}
