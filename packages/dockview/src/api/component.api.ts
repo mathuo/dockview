@@ -6,7 +6,6 @@ import {
     AddGroupOptions,
     AddPanelOptions,
     MovementOptions,
-    PanelOptions,
 } from '../dockview/options';
 import { Direction } from '../gridview/baseComponentGridview';
 import {
@@ -31,8 +30,13 @@ import {
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { ISplitviewPanel } from '../splitview/splitviewPanel';
 import { GroupviewPanel } from '../groupview/groupviewPanel';
+import { Event } from '../events';
 
-export class SplitviewApi {
+export interface CommonApi {
+    readonly onDidLayoutChange: Event<void>;
+}
+
+export class SplitviewApi implements CommonApi {
     get minimumSize() {
         return this.component.minimumSize;
     }
@@ -116,7 +120,7 @@ export class SplitviewApi {
     }
 }
 
-export class PaneviewApi {
+export class PaneviewApi implements CommonApi {
     get width() {
         return this.component.width;
     }
@@ -180,7 +184,7 @@ export class PaneviewApi {
     }
 }
 
-export class GridviewApi {
+export class GridviewApi implements CommonApi {
     get width() {
         return this.component.width;
     }
@@ -207,6 +211,10 @@ export class GridviewApi {
 
     get onGridEvent() {
         return this.component.onGridEvent;
+    }
+
+    get onDidLayoutChange() {
+        return this.component.onDidLayoutChange;
     }
 
     get panels() {
@@ -279,7 +287,7 @@ export class GridviewApi {
     }
 }
 
-export class DockviewApi {
+export class DockviewApi implements CommonApi {
     get width() {
         return this.component.width;
     }

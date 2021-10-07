@@ -17,7 +17,7 @@
 ##
 
 A zero dependency layout manager based on the layering of split-view components with ReactJS support.
-- View the live demo [here](https://mathuo.github.io/dockview/). 
+- View the live demo [here](https://mathuo.github.io/dockview/).
 - Storybook demo [here](https://mathuo.github.io/dockview/output/storybook-static).
 - Code examples [here](https://github.com/mathuo/dockview/tree/master/packages/dockview-demo/src/stories).
 - Generated TypeDocs can be found [here](https://mathuo.github.io/dockview/output/docs/index.html).
@@ -86,9 +86,14 @@ Yes but with some extra work. Dockview is written in plain-old JS so you can eit
 [Component Api](https://mathuo.github.io/dockview/output/docs/classes/paneviewapi.html)
 [Panel Api]()
 
+## Serialization / De-serialization
+All view components support the methods `toJSON()`, `fromJSON(...)` and `onDidLayoutChange()`.
+
+See example [here](https://codesandbox.io/s/workspace-saving-example-euo5d).
+
 ## Theming
 
-The theme can be customized using the below set of CSS properties. You can find the built in themes [here](https://github.com/mathuo/dockview/blob/master/packages/dockview/src/theme.scss) which could be used as an example to extend upon or build your own theme. 
+The theme can be customized using the below set of CSS properties. You can find the built in themes [here](https://github.com/mathuo/dockview/blob/master/packages/dockview/src/theme.scss) which could be used as an example to extend upon or build your own theme.
 
 
 | CSS Property | Description |
@@ -107,7 +112,7 @@ The theme can be customized using the below set of CSS properties. You can find 
 | --dv-tabs-and-actions-container-background-color | - |
 | --dv-tabs-container-scrollbar-color | - |
 | --dv-group-view-background-color | - |
-| **Dockview -> Tabs** (see [dockviewComponent.scss](https://github.com/mathuo/dockview/blob/master/packages/dockview/src/dockview/dockviewComponent.scss)) 
+| **Dockview -> Tabs** (see [dockviewComponent.scss](https://github.com/mathuo/dockview/blob/master/packages/dockview/src/dockview/dockviewComponent.scss))
 | --dv-activegroup-visiblepanel-tab-background-color | The background color of the tab for the visible panel in the active group |
 | --dv-activegroup-hiddenpanel-tab-background-color | The background color of the tab for the hidden panel/s in the active group |
 | --dv-inactivegroup-visiblepanel-tab-background-color | The background color of the tab for the visible panel in groups other than the active group |
