@@ -22,8 +22,10 @@ import {
     PanePanelInitParameter,
     IPaneviewPanel,
 } from './paneviewPanel';
-import { DraggablePaneviewPanel } from './draggablePaneviewPanel';
-import { DroptargetEvent } from '../dnd/droptarget';
+import {
+    DraggablePaneviewPanel,
+    PaneviewDropEvent2,
+} from './draggablePaneviewPanel';
 
 export interface SerializedPaneviewPanel {
     snap?: boolean;
@@ -58,6 +60,7 @@ class DefaultHeader extends CompositeDisposable implements IPaneHeaderPart {
     constructor() {
         super();
         this._element = document.createElement('div');
+        this._element.className = 'default-header';
 
         this.addDisposables(
             addDisposableListener(this.element, 'click', () => {
@@ -128,9 +131,10 @@ export interface IPaneviewComponent extends IDisposable {
     readonly height: number;
     readonly minimumSize: number;
     readonly maximumSize: number;
+    readonly onDidDrop: Event<PaneviewDropEvent2>;
+    readonly onDidLayoutChange: Event<void>;
     addPanel(options: AddPaneviewCompponentOptions): IDisposable;
     layout(width: number, height: number): void;
-    onDidLayoutChange: Event<void>;
     toJSON(): SerializedPaneview;
     fromJSON(
         serializedPaneview: SerializedPaneview,
@@ -142,6 +146,7 @@ export interface IPaneviewComponent extends IDisposable {
     removePanel(panel: IPaneviewPanel): void;
     getPanel(id: string): IPaneviewPanel | undefined;
     movePanel(from: number, to: number): void;
+    updateOptions(options: Partial<PaneviewComponentOptions>): void;
 }
 
 export class PaneviewComponent
@@ -154,8 +159,8 @@ export class PaneviewComponent
     private readonly _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
 
-    private readonly _onDidDrop = new Emitter<DroptargetEvent>();
-    readonly onDidDrop: Event<DroptargetEvent> = this._onDidDrop.event;
+    private readonly _onDidDrop = new Emitter<PaneviewDropEvent2>();
+    readonly onDidDrop: Event<PaneviewDropEvent2> = this._onDidDrop.event;
 
     get onDidAddView() {
         return this._paneview.onDidAddView;
@@ -199,11 +204,19 @@ export class PaneviewComponent
             : this.paneview.orthogonalSize;
     }
 
+    private _options: PaneviewComponentOptions;
+
+    get options() {
+        return this._options;
+    }
+
     constructor(
         private element: HTMLElement,
-        private readonly options: PaneviewComponentOptions
+        options: PaneviewComponentOptions
     ) {
         super();
+
+        this._options = options;
 
         if (!options.components) {
             options.components = {};
@@ -222,6 +235,10 @@ export class PaneviewComponent
 
     focus() {
         //
+    }
+
+    updateOptions(options: Partial<PaneviewComponentOptions>): void {
+        this._options = { ...this.options, ...options };
     }
 
     addPanel(options: AddPaneviewCompponentOptions): IDisposable {
@@ -269,16 +286,16 @@ export class PaneviewComponent
             disableDnd: !!this.options.disableDnd,
         });
 
-        view.onDidDrop((event) => {
-            this._onDidDrop.fire(event);
-        });
+        const disposable = new CompositeDisposable(
+            view.onDidDrop((event) => {
+                this._onDidDrop.fire(event);
+            })
+        );
 
         const size: Sizing | number =
             typeof options.size === 'number' ? options.size : Sizing.Distribute;
         const index =
             typeof options.index === 'number' ? options.index : undefined;
-
-        this.paneview.addPane(view, size, index);
 
         view.init({
             params: options.params || {},
@@ -289,13 +306,11 @@ export class PaneviewComponent
             containerApi: new PaneviewApi(this),
         });
 
+        this.paneview.addPane(view, size, index);
+
         view.orientation = this.paneview.orientation;
 
-        return {
-            dispose: () => {
-                //
-            },
-        };
+        return disposable;
     }
 
     getPanels(): PaneviewPanel[] {

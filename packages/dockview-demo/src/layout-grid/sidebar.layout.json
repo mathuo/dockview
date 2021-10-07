@@ -5,7 +5,7 @@
             "data": {
                 "id": "1",
                 "component": "controlCenter",
-                "headerComponent": "default",
+          
                 "props": {},
                 "title": "Control Center",
                 "state": {}
@@ -17,7 +17,7 @@
             "data": {
                 "id": "2",
                 "component": "default",
-                "headerComponent": "default",
+   
                 "props": {},
                 "title": "Panel 1",
                 "state": {}
@@ -30,7 +30,7 @@
             "data": {
                 "id": "3",
                 "component": "default",
-                "headerComponent": "default",
+      
                 "props": {},
                 "title": "Panel 2",
                 "state": {}
@@ -43,7 +43,7 @@
             "data": {
                 "id": "4",
                 "component": "default",
-                "headerComponent": "default",
+    
                 "props": {},
                 "title": "Panel 3",
                 "state": {}

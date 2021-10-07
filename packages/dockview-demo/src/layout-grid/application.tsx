@@ -8,12 +8,12 @@ import {
     SerializedGridview,
     GridviewApi,
 } from 'dockview';
-import { Activitybar } from './activitybar';
+import { Activitybar } from '../services/widgets';
 import { Footer } from './footer';
 import { Panel } from './panel';
 import { TestGrid } from './layoutGrid';
 import { useLayoutRegistry } from './registry';
-import { Sidebar } from './sidebar';
+import { Sidebar } from '../services/widgets';
 
 const rootcomponents: {
     [index: string]: React.FunctionComponent<IGridviewPanelProps>;

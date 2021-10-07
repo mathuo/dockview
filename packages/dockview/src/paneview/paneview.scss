@@ -23,6 +23,11 @@
                 border-top: 1px solid var(--dv-paneview-header-border-color);
             }
         }
+
+        .default-header {
+            background-color: var(--dv-group-view-background-color);
+            color: var(--dv-activegroup-visiblepanel-tab-color);
+        }
     }
 
     &:first-of-type > .pane > .pane-header {

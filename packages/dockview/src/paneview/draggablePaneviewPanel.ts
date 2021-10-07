@@ -9,7 +9,11 @@ import {
 import { Emitter, Event } from '../events';
 import { IDisposable } from '../lifecycle';
 import { Orientation } from '../splitview/core/splitview';
-import { PanePanelInitParameter, PaneviewPanel } from './paneviewPanel';
+import {
+    IPaneviewPanel,
+    PanePanelInitParameter,
+    PaneviewPanel,
+} from './paneviewPanel';
 
 interface ViewContainer {
     readonly title: string;
@@ -28,11 +32,16 @@ interface IViewContainerService {
     getViewContainerModel(container: ViewContainer): ViewContainerModel;
 }
 
+export interface PaneviewDropEvent2 extends DroptargetEvent {
+    panel: IPaneviewPanel;
+    getData: () => PaneTransfer | undefined;
+}
+
 export abstract class DraggablePaneviewPanel extends PaneviewPanel {
     private handler: DragHandler | undefined;
     private target: Droptarget | undefined;
 
-    private readonly _onDidDrop = new Emitter<DroptargetEvent>();
+    private readonly _onDidDrop = new Emitter<PaneviewDropEvent2>();
     readonly onDidDrop = this._onDidDrop.event;
 
     constructor(
@@ -93,7 +102,11 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
                 const data = getPaneData();
 
                 if (!data) {
-                    this._onDidDrop.fire(event);
+                    this._onDidDrop.fire({
+                        ...event,
+                        panel: this,
+                        getData: () => getPaneData(),
+                    });
                     return;
                 }
 
@@ -103,20 +116,30 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
 
                 const existingPanel = containerApi.getPanel(id);
                 if (!existingPanel) {
-                    this._onDidDrop.fire(event);
+                    this._onDidDrop.fire({
+                        ...event,
+                        panel: this,
+                        getData: () => getPaneData(),
+                    });
                     return;
                 }
 
-                const fromIndex = containerApi
-                    .getPanels()
-                    .indexOf(existingPanel);
+                const allPanels = containerApi.getPanels();
+
+                const fromIndex = allPanels.indexOf(existingPanel);
                 let toIndex = containerApi.getPanels().indexOf(this);
 
+                if (
+                    event.position === Position.Left ||
+                    event.position === Position.Top
+                ) {
+                    toIndex = Math.max(0, toIndex - 1);
+                }
                 if (
                     event.position === Position.Right ||
                     event.position === Position.Bottom
                 ) {
-                    toIndex = Math.max(0, toIndex + 1);
+                    toIndex = Math.min(allPanels.length - 1, toIndex + 1);
                 }
 
                 containerApi.movePanel(fromIndex, toIndex);
