@@ -96,9 +96,9 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="dockviewcomponent.html#_activegroup" class="tsd-kind-icon">_active<wbr>Group</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="dockviewcomponent.html#_groups" class="tsd-kind-icon">_groups</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="dockviewcomponent.html#_ongridevent" class="tsd-kind-icon">_on<wbr>Grid<wbr>Event</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="dockviewcomponent.html#gridview" class="tsd-kind-icon">gridview</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="dockviewcomponent.html#groups" class="tsd-kind-icon">groups</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="dockviewcomponent.html#ondidlayoutchange" class="tsd-kind-icon">on<wbr>Did<wbr>Layout<wbr>Change</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="dockviewcomponent.html#ongridevent" class="tsd-kind-icon">on<wbr>Grid<wbr>Event</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="dockviewcomponent.html#ontabcontextmenu" class="tsd-kind-icon">on<wbr>Tab<wbr>Context<wbr>Menu</a></li>
@@ -111,6 +111,7 @@
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewcomponent.html#activegroup" class="tsd-kind-icon">active<wbr>Group</a></li>
 								<li class="tsd-kind-accessor tsd-parent-kind-class"><a href="dockviewcomponent.html#deserializer" class="tsd-kind-icon">deserializer</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewcomponent.html#element" class="tsd-kind-icon">element</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewcomponent.html#groups" class="tsd-kind-icon">groups</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewcomponent.html#height" class="tsd-kind-icon">height</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewcomponent.html#id" class="tsd-kind-icon">id</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewcomponent.html#maximumheight" class="tsd-kind-icon">maximum<wbr>Height</a></li>
@@ -118,6 +119,7 @@
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewcomponent.html#minimumheight" class="tsd-kind-icon">minimum<wbr>Height</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewcomponent.html#minimumwidth" class="tsd-kind-icon">minimum<wbr>Width</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewcomponent.html#options" class="tsd-kind-icon">options</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewcomponent.html#panels" class="tsd-kind-icon">panels</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewcomponent.html#size" class="tsd-kind-icon">size</a></li>
 								<li class="tsd-kind-accessor tsd-parent-kind-class"><a href="dockviewcomponent.html#tabheight" class="tsd-kind-icon">tab<wbr>Height</a></li>
 								<li class="tsd-kind-get-signature tsd-parent-kind-class"><a href="dockviewcomponent.html#totalpanels" class="tsd-kind-icon">total<wbr>Panels</a></li>
@@ -173,7 +175,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L178">dockview/dockviewComponent.ts:178</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L180">dockview/dockviewComponent.ts:180</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -198,7 +200,17 @@
 					<div class="tsd-signature tsd-kind-icon">_active<wbr>Group<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">GroupviewPanel</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L75">gridview/baseComponentGridview.ts:75</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L77">gridview/baseComponentGridview.ts:77</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="_groups" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> <span class="tsd-flag ts-flagReadonly">Readonly</span> _groups</h3>
+					<div class="tsd-signature tsd-kind-icon">_groups<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/ivaluedisposable.html" class="tsd-signature-type" data-tsd-kind="Interface">IValueDisposable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">GroupviewPanel</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L74">gridview/baseComponentGridview.ts:74</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -208,7 +220,7 @@
 					<div class="tsd-signature tsd-kind-icon">_on<wbr>Grid<wbr>Event<span class="tsd-signature-symbol">:</span> <a href="emitter.html" class="tsd-signature-type" data-tsd-kind="Class">Emitter</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/groupchangeevent.html" class="tsd-signature-type" data-tsd-kind="Interface">GroupChangeEvent</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L77">gridview/baseComponentGridview.ts:77</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L79">gridview/baseComponentGridview.ts:79</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -218,17 +230,7 @@
 					<div class="tsd-signature tsd-kind-icon">gridview<span class="tsd-signature-symbol">:</span> <a href="gridview.html" class="tsd-signature-type" data-tsd-kind="Class">Gridview</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L73">gridview/baseComponentGridview.ts:73</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
-					<a name="groups" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagProtected">Protected</span> <span class="tsd-flag ts-flagReadonly">Readonly</span> groups</h3>
-					<div class="tsd-signature tsd-kind-icon">groups<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/ivaluedisposable.html" class="tsd-signature-type" data-tsd-kind="Interface">IValueDisposable</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">GroupviewPanel</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L72">gridview/baseComponentGridview.ts:72</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L75">gridview/baseComponentGridview.ts:75</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -239,7 +241,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#ondidlayoutchange">onDidLayoutChange</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L151">dockview/dockviewComponent.ts:151</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L83">gridview/baseComponentGridview.ts:83</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -250,7 +252,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#ongridevent">onGridEvent</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L78">gridview/baseComponentGridview.ts:78</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L80">gridview/baseComponentGridview.ts:80</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -261,7 +263,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#ontabcontextmenu">onTabContextMenu</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L137">dockview/dockviewComponent.ts:137</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L138">dockview/dockviewComponent.ts:138</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -272,7 +274,7 @@
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#ontabinteractionevent">onTabInteractionEvent</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L134">dockview/dockviewComponent.ts:134</a></li>
+							<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L135">dockview/dockviewComponent.ts:135</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -290,7 +292,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#activegroup">activeGroup</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L113">gridview/baseComponentGridview.ts:113</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L122">gridview/baseComponentGridview.ts:122</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">T</span></h4>
@@ -309,7 +311,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#deserializer">deserializer</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L157">dockview/dockviewComponent.ts:157</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L159">dockview/dockviewComponent.ts:159</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">IPanelDeserializer</span></h4>
@@ -318,7 +320,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#deserializer">deserializer</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L161">dockview/dockviewComponent.ts:161</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L163">dockview/dockviewComponent.ts:163</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -342,10 +344,28 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#element">element</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L84">gridview/baseComponentGridview.ts:84</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L89">gridview/baseComponentGridview.ts:89</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">HTMLElement</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="groups" class="tsd-anchor"></a>
+					<h3>groups</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> groups<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#groups">groups</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L97">gridview/baseComponentGridview.ts:97</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">[]</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -360,7 +380,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#height">height</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L96">gridview/baseComponentGridview.ts:96</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L105">gridview/baseComponentGridview.ts:105</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -378,7 +398,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#id">id</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L80">gridview/baseComponentGridview.ts:80</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L85">gridview/baseComponentGridview.ts:85</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -396,7 +416,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#maximumheight">maximumHeight</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L103">gridview/baseComponentGridview.ts:103</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L112">gridview/baseComponentGridview.ts:112</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -414,7 +434,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#maximumwidth">maximumWidth</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L109">gridview/baseComponentGridview.ts:109</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L118">gridview/baseComponentGridview.ts:118</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -432,7 +452,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#minimumheight">minimumHeight</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L100">gridview/baseComponentGridview.ts:100</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L109">gridview/baseComponentGridview.ts:109</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -450,7 +470,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#minimumwidth">minimumWidth</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L106">gridview/baseComponentGridview.ts:106</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L115">gridview/baseComponentGridview.ts:115</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -468,10 +488,28 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#options">options</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L165">dockview/dockviewComponent.ts:165</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L167">dockview/dockviewComponent.ts:167</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="../interfaces/dockviewoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">DockviewOptions</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class">
+					<a name="panels" class="tsd-anchor"></a>
+					<h3>panels</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> panels<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/igrouppanel.html" class="tsd-signature-type" data-tsd-kind="Interface">IGroupPanel</a><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#panels">panels</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L155">dockview/dockviewComponent.ts:155</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/igrouppanel.html" class="tsd-signature-type" data-tsd-kind="Interface">IGroupPanel</a><span class="tsd-signature-symbol">[]</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -486,7 +524,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#size">size</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L88">gridview/baseComponentGridview.ts:88</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L93">gridview/baseComponentGridview.ts:93</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -505,7 +543,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#tabheight">tabHeight</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L176">dockview/dockviewComponent.ts:176</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L178">dockview/dockviewComponent.ts:178</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></h4>
@@ -514,7 +552,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#tabheight">tabHeight</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L169">dockview/dockviewComponent.ts:169</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L171">dockview/dockviewComponent.ts:171</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -538,7 +576,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#totalpanels">totalPanels</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L153">dockview/dockviewComponent.ts:153</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L151">dockview/dockviewComponent.ts:151</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -556,7 +594,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#width">width</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L92">gridview/baseComponentGridview.ts:92</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L101">gridview/baseComponentGridview.ts:101</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -576,7 +614,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/lifecycle.ts#L29">lifecycle.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/lifecycle.ts#L29">lifecycle.ts:29</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -600,7 +638,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#addemptygroup">addEmptyGroup</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L574">dockview/dockviewComponent.ts:574</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L545">dockview/dockviewComponent.ts:545</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -624,7 +662,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#addpanel">addPanel</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L519">dockview/dockviewComponent.ts:519</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L490">dockview/dockviewComponent.ts:490</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -647,7 +685,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L492">dockview/dockviewComponent.ts:492</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L463">dockview/dockviewComponent.ts:463</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -664,7 +702,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L708">dockview/dockviewComponent.ts:708</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L679">dockview/dockviewComponent.ts:679</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -688,7 +726,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#createwatermarkcomponent">createWatermarkComponent</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L560">dockview/dockviewComponent.ts:560</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L531">dockview/dockviewComponent.ts:531</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="../interfaces/iwatermarkrenderer.html" class="tsd-signature-type" data-tsd-kind="Interface">IWatermarkRenderer</a></h4>
@@ -705,7 +743,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L755">dockview/dockviewComponent.ts:755</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L726">dockview/dockviewComponent.ts:726</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -722,7 +760,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L153">gridview/baseComponentGridview.ts:153</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L193">gridview/baseComponentGridview.ts:193</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -751,7 +789,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L161">gridview/baseComponentGridview.ts:161</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L201">gridview/baseComponentGridview.ts:201</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -785,7 +823,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L191">gridview/baseComponentGridview.ts:191</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L231">gridview/baseComponentGridview.ts:231</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -812,7 +850,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#firemouseevent">fireMouseEvent</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L505">dockview/dockviewComponent.ts:505</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L476">dockview/dockviewComponent.ts:476</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -836,7 +874,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#focus">focus</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L268">dockview/dockviewComponent.ts:268</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L239">dockview/dockviewComponent.ts:239</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -854,7 +892,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#fromjson">fromJSON</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L446">dockview/dockviewComponent.ts:446</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L417">dockview/dockviewComponent.ts:417</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -877,7 +915,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L272">dockview/dockviewComponent.ts:272</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L243">dockview/dockviewComponent.ts:243</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -901,7 +939,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#getpanel">getPanel</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L187">gridview/baseComponentGridview.ts:187</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L227">gridview/baseComponentGridview.ts:227</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -925,7 +963,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#isvisible">isVisible</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L149">gridview/baseComponentGridview.ts:149</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L189">gridview/baseComponentGridview.ts:189</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -949,7 +987,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#layout">layout</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L247">gridview/baseComponentGridview.ts:247</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L287">gridview/baseComponentGridview.ts:287</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -972,14 +1010,14 @@
 					<a name="movegrouporpanel" class="tsd-anchor"></a>
 					<h3>move<wbr>Group<wbr>OrPanel</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">move<wbr>Group<wbr>OrPanel<span class="tsd-signature-symbol">(</span>referenceGroup<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GroupviewPanel</span>, groupId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, itemId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Position</span>, index<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">move<wbr>Group<wbr>OrPanel<span class="tsd-signature-symbol">(</span>referenceGroup<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GroupviewPanel</span>, groupId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, itemId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, target<span class="tsd-signature-symbol">: </span><a href="../enums/position.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Position</a>, index<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#movegrouporpanel">moveGroupOrPanel</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L625">dockview/dockviewComponent.ts:625</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L596">dockview/dockviewComponent.ts:596</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -994,7 +1032,7 @@
 									<h5>itemId: <span class="tsd-signature-type">string</span></h5>
 								</li>
 								<li>
-									<h5>target: <span class="tsd-signature-type">Position</span></h5>
+									<h5>target: <a href="../enums/position.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Position</a></h5>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> index: <span class="tsd-signature-type">number</span></h5>
@@ -1015,7 +1053,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#movetonext">moveToNext</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L336">dockview/dockviewComponent.ts:336</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L307">dockview/dockviewComponent.ts:307</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1039,7 +1077,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#movetoprevious">moveToPrevious</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L361">dockview/dockviewComponent.ts:361</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L332">dockview/dockviewComponent.ts:332</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1062,7 +1100,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L386">dockview/dockviewComponent.ts:386</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L357">dockview/dockviewComponent.ts:357</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1085,7 +1123,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L610">dockview/dockviewComponent.ts:610</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L581">dockview/dockviewComponent.ts:581</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1109,7 +1147,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#resizetofit">resizeToFit</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L264">gridview/baseComponentGridview.ts:264</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L304">gridview/baseComponentGridview.ts:304</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1132,7 +1170,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#setactivepanel">setActivePanel</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L328">dockview/dockviewComponent.ts:328</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L299">dockview/dockviewComponent.ts:299</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1156,7 +1194,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#setvisible">setVisible</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/gridview/baseComponentGridview.ts#L144">gridview/baseComponentGridview.ts:144</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/gridview/baseComponentGridview.ts#L184">gridview/baseComponentGridview.ts:184</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1183,7 +1221,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#tojson">toJSON</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L421">dockview/dockviewComponent.ts:421</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L392">dockview/dockviewComponent.ts:392</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1206,7 +1244,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L400">dockview/dockviewComponent.ts:400</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L371">dockview/dockviewComponent.ts:371</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1230,7 +1268,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/idockviewcomponent.html">IDockviewComponent</a>.<a href="../interfaces/idockviewcomponent.html#updateoptions">updateOptions</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/dockview/dockviewComponent.ts#L242">dockview/dockviewComponent.ts:242</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/dockview/dockviewComponent.ts#L213">dockview/dockviewComponent.ts:213</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1253,7 +1291,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/28685f6/packages/dockview/src/lifecycle.ts#L21">lifecycle.ts:21</a></li>
+									<li>Defined in <a href="https://github.com/mathuo/dockview/blob/b234599/packages/dockview/src/lifecycle.ts#L21">lifecycle.ts:21</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1290,13 +1328,13 @@
 								<a href="dockviewcomponent.html#_activegroup" class="tsd-kind-icon">_active<wbr>Group</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="dockviewcomponent.html#_groups" class="tsd-kind-icon">_groups</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
 								<a href="dockviewcomponent.html#_ongridevent" class="tsd-kind-icon">_on<wbr>Grid<wbr>Event</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
 								<a href="dockviewcomponent.html#gridview" class="tsd-kind-icon">gridview</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
-								<a href="dockviewcomponent.html#groups" class="tsd-kind-icon">groups</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="dockviewcomponent.html#ondidlayoutchange" class="tsd-kind-icon">on<wbr>Did<wbr>Layout<wbr>Change</a>
@@ -1320,6 +1358,9 @@
 								<a href="dockviewcomponent.html#element" class="tsd-kind-icon">element</a>
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="dockviewcomponent.html#groups" class="tsd-kind-icon">groups</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="dockviewcomponent.html#height" class="tsd-kind-icon">height</a>
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
@@ -1339,6 +1380,9 @@
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="dockviewcomponent.html#options" class="tsd-kind-icon">options</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
+								<a href="dockviewcomponent.html#panels" class="tsd-kind-icon">panels</a>
 							</li>
 							<li class=" tsd-kind-get-signature tsd-parent-kind-class">
 								<a href="dockviewcomponent.html#size" class="tsd-kind-icon">size</a>
