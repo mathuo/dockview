@@ -4,7 +4,6 @@
         "outDir": "dist/esm",
         "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.esm",
         "jsx": "react",
-        // "baseUrl": "."
         "rootDir": "src"
     },
     "include": ["src"],

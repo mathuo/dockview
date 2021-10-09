@@ -10,7 +10,7 @@
         "noImplicitReturns": true,
         "noImplicitAny": true,
         "allowUnreachableCode": false,
-        "forceConsistentCasingInFileNames": true, 
+        "forceConsistentCasingInFileNames": true,
         "strict": true,
         "lib": [
 			"ES2015",

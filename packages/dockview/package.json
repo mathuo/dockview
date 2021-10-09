@@ -15,9 +15,9 @@
 	"homepage": "https://github.com/mathuo/dockview",
 	"scripts": {
 		"build:ci": "npm run build:cjs && npm run build:esm && npm run build:css",
-		"build:cjs": "cross-env ../../node_modules/.bin/tsc --project tsconfig.json --extendedDiagnostics",
+		"build:cjs": "cross-env ../../node_modules/.bin/tsc --project ./tsconfig.json --extendedDiagnostics",
 		"build:css": "gulp sass",
-		"build:esm": "cross-env ../../node_modules/.bin/tsc --project tsconfig.esm.json --extendedDiagnostics",
+		"build:esm": "cross-env ../../node_modules/.bin/tsc --project ./tsconfig.esm.json --extendedDiagnostics",
 		"build:modulefiles": "rollup -c",
 		"build": "npm run build:ci && npm run build:modulefiles",
 		"clean": "rimraf dist/ .build/",
