@@ -15,24 +15,24 @@
   "license": "MIT",
   "dependencies": {
     "dockview": "^0.0.23",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.8",
-    "@storybook/addon-actions": "^6.3.10",
-    "@storybook/addon-controls": "^6.3.10",
-    "@storybook/addon-docs": "^6.3.10",
-    "@storybook/addon-essentials": "^6.3.10",
-    "@storybook/addon-links": "^6.3.10",
-    "@storybook/addon-storysource": "^6.3.10",
-    "@storybook/manager-webpack5": "^6.3.10",
-    "@storybook/react": "^6.3.10",
-    "@types/react": "^17.0.27",
-    "@types/react-dom": "^17.0.9",
+    "@babel/core": "^7.13.10",
+    "@storybook/addon-actions": "^6.2.9",
+    "@storybook/addon-controls": "^6.2.9",
+    "@storybook/addon-docs": "^6.2.9",
+    "@storybook/addon-essentials": "^6.2.9",
+    "@storybook/addon-links": "^6.2.9",
+    "@storybook/addon-storysource": "^6.2.9",
+    "@storybook/builder-webpack5": "^6.2.9",
+    "@storybook/react": "^6.2.9",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.1",
     "babel-loader": "^8.2.2",
     "cross-env": "^7.0.3",
     "rimraf": "^3.0.2",
-    "source-map-loader": "^3.0.0"
+    "source-map-loader": "^1.1.3"
   }
 }
