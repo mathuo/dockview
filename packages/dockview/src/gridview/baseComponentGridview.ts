@@ -56,6 +56,7 @@ export interface IBaseGrid<T extends IGridPanelView> {
     readonly size: number;
     readonly groups: T[];
     readonly onGridEvent: Event<GroupChangeEvent>;
+    readonly onDidLayoutChange: Event<void>;
     getPanel(id: string): T | undefined;
     toJSON(): object;
     fromJSON(data: any): void;
@@ -77,6 +78,9 @@ export abstract class BaseGrid<T extends IGridPanelView>
     //
     protected readonly _onGridEvent = new Emitter<GroupChangeEvent>();
     readonly onGridEvent: Event<GroupChangeEvent> = this._onGridEvent.event;
+
+    private _onDidLayoutChange = new Emitter<void>();
+    readonly onDidLayoutChange = this._onDidLayoutChange.event;
 
     get id() {
         return this._id;
@@ -140,6 +144,37 @@ export abstract class BaseGrid<T extends IGridPanelView>
             this.gridview.onDidChange(() => {
                 this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT });
             })
+        );
+
+        this.addDisposables(
+            (() => {
+                /**
+                 * TODO Fix this relatively ugly 'merge and delay'
+                 */
+                let timer: any;
+
+                return this.onGridEvent((event) => {
+                    if (
+                        [
+                            GroupChangeKind.ADD_GROUP,
+                            GroupChangeKind.REMOVE_GROUP,
+                            GroupChangeKind.ADD_PANEL,
+                            GroupChangeKind.REMOVE_PANEL,
+                            GroupChangeKind.GROUP_ACTIVE,
+                            GroupChangeKind.PANEL_ACTIVE,
+                            GroupChangeKind.LAYOUT,
+                        ].includes(event.kind)
+                    ) {
+                        if (timer) {
+                            clearTimeout(timer);
+                        }
+                        timer = setTimeout(() => {
+                            this._onDidLayoutChange.fire();
+                            clearTimeout(timer);
+                        });
+                    }
+                });
+            })()
         );
     }
 

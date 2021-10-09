@@ -118,7 +118,6 @@ export interface IDockviewComponent extends IBaseGrid<GroupviewPanel> {
     focus(): void;
     toJSON(): SerializedDockview;
     fromJSON(data: SerializedDockview): void;
-    onDidLayoutChange: Event<void>;
 }
 
 export class DockviewComponent
@@ -148,9 +147,6 @@ export class DockviewComponent
     // >();
     private _api: DockviewApi;
     private _options: DockviewComponentOptions;
-
-    private _onDidLayoutChange = new Emitter<void>();
-    readonly onDidLayoutChange = this._onDidLayoutChange.event;
 
     get totalPanels(): number {
         return this._panels.size;
@@ -191,37 +187,6 @@ export class DockviewComponent
         });
 
         this._options = options;
-
-        this.addDisposables(
-            (() => {
-                /**
-                 * TODO Fix this relatively ugly 'merge and delay'
-                 */
-                let timer: any;
-
-                return this.onGridEvent((event) => {
-                    if (
-                        [
-                            GroupChangeKind.ADD_GROUP,
-                            GroupChangeKind.REMOVE_GROUP,
-                            GroupChangeKind.ADD_PANEL,
-                            GroupChangeKind.REMOVE_PANEL,
-                            GroupChangeKind.GROUP_ACTIVE,
-                            GroupChangeKind.PANEL_ACTIVE,
-                            GroupChangeKind.LAYOUT,
-                        ].includes(event.kind)
-                    ) {
-                        if (timer) {
-                            clearTimeout(timer);
-                        }
-                        timer = setTimeout(() => {
-                            this._onDidLayoutChange.fire();
-                            clearTimeout(timer);
-                        });
-                    }
-                });
-            })()
-        );
 
         if (!this.options.components) {
             this.options.components = {};
