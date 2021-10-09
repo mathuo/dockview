@@ -6,6 +6,7 @@ module.exports = {
     output: {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'dist'),
+        publicPath: '/dist',
     },
     mode: 'development',
     resolve: {
@@ -13,13 +14,13 @@ module.exports = {
         alias: {
             react: path.resolve(__dirname, 'node_modules/react'),
             'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
-        }
+        },
     },
     module: {
         rules: [
             {
                 test: /\.tsx?$/,
-                loader: 'ts-loader'
+                loader: 'ts-loader',
             },
             {
                 test: /\.s[ac]ss$/i,
@@ -46,8 +47,8 @@ module.exports = {
     devServer: {
         port: 9000,
         compress: true,
-        contentBase: path.resolve(__dirname, 'public'),
-        publicPath: '/dist',
-        writeToDisk:false
+        static: {
+            directory: path.resolve(__dirname, 'public'),
+        },
     },
 };
