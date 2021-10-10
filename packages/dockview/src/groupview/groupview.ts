@@ -1,8 +1,7 @@
 import { DockviewApi } from '../api/component.api';
 import { timeoutAsPromise } from '../async';
 import { getPanelData } from '../dnd/dataTransfer';
-import { Position } from '../dnd/droptarget';
-import { Droptarget } from '../dnd/droptarget';
+import { Droptarget, Position } from '../dnd/droptarget';
 import {
     DockviewComponent,
     IDockviewComponent,

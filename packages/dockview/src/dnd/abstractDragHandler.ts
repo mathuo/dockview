@@ -2,7 +2,6 @@ import { getElementsByTagName } from '../dom';
 import { addDisposableListener, Emitter } from '../events';
 import { focusedElement } from '../focusedElement';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
-import { DATA_KEY, LocalSelectionTransfer } from './dataTransfer';
 
 export abstract class DragHandler extends CompositeDisposable {
     private iframes: HTMLElement[] = [];

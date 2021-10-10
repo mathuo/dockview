@@ -103,17 +103,6 @@ export interface IDockviewComponent extends IBaseGrid<GroupviewPanel> {
     onTabContextMenu: Event<TabContextMenuEvent>;
     moveToNext(options?: MovementOptions): void;
     moveToPrevious(options?: MovementOptions): void;
-    // createDragTarget(
-    //     target: {
-    //         element: HTMLElement;
-    //         content: string;
-    //     },
-    //     options: (() => PanelOptions) | PanelOptions
-    // ): IDisposable;
-    // addDndHandle(
-    //     type: string,
-    //     cb: (event: LayoutDropEvent) => PanelOptions
-    // ): void;
     setActivePanel(panel: IGroupPanel): void;
     focus(): void;
     toJSON(): SerializedDockview;
@@ -138,13 +127,8 @@ export class DockviewComponent
     readonly onTabContextMenu: Event<TabContextMenuEvent> =
         this._onTabContextMenu.event;
     // everything else
-    // private drag = new MutableDisposable();
     private _deserializer: IPanelDeserializer | undefined;
     private panelState: State = {};
-    // private registry = new Map<
-    //     string,
-    //     (event: LayoutDropEvent) => PanelOptions
-    // >();
     private _api: DockviewApi;
     private _options: DockviewComponentOptions;
 
@@ -229,13 +213,6 @@ export class DockviewComponent
         this.layout(this.gridview.width, this.gridview.height, true);
     }
 
-    // addDndHandle(
-    //     type: string,
-    //     cb: (event: LayoutDropEvent) => PanelOptions
-    // ): void {
-    //     this.registry.set(type, cb);
-    // }
-
     focus(): void {
         this.activeGroup?.focus();
     }
@@ -243,58 +220,6 @@ export class DockviewComponent
     getGroupPanel(id: string): IGroupPanel | undefined {
         return this._panels.get(id)?.value;
     }
-
-    // createDragTarget(
-    //     target: {
-    //         element: HTMLElement;
-    //         content: string;
-    //     },
-    //     options: (() => PanelOptions) | PanelOptions
-    // ): IDisposable {
-    //     return new CompositeDisposable(
-    //         addDisposableListener(target.element, 'dragstart', (event) => {
-    //             if (!event.dataTransfer) {
-    //                 throw new Error('unsupported');
-    //             }
-
-    //             const panelOptions =
-    //                 typeof options === 'function' ? options() : options;
-
-    //             const panel = this.panels.get(panelOptions.id)?.value;
-    //             if (panel) {
-    //                 this.drag.value = panel.group!.model.startActiveDrag(panel);
-    //             }
-
-    //             const data = JSON.stringify({
-    //                 type: DragType.EXTERNAL,
-    //                 ...panelOptions,
-    //             });
-
-    //             LocalSelectionTransfer.getInstance().setData([data], this.id);
-
-    //             event.dataTransfer.effectAllowed = 'move';
-
-    //             const dragImage = document.createElement('div');
-    //             dragImage.textContent = target.content;
-    //             dragImage.classList.add('custom-dragging');
-
-    //             document.body.appendChild(dragImage);
-    //             event.dataTransfer.setDragImage(
-    //                 dragImage,
-    //                 event.offsetX,
-    //                 event.offsetY
-    //             );
-    //             setTimeout(() => document.body.removeChild(dragImage), 0);
-
-    //             event.dataTransfer.setData(DATA_KEY, data);
-    //         }),
-    //         addDisposableListener(this.element, 'dragend', (ev) => {
-    //             // drop events fire before dragend so we can remove this safely
-    //             LocalSelectionTransfer.getInstance().clearData(this.id);
-    //             this.drag.dispose();
-    //         })
-    //     );
-    // }
 
     setActivePanel(panel: IGroupPanel): void {
         if (!panel.group) {
@@ -393,8 +318,6 @@ export class DockviewComponent
         this.syncConfigs();
 
         const data = this.gridview.serialize();
-
-        // const state = { ...this.panelState };
 
         const panels = Array.from(this._panels.values()).reduce(
             (collection, panel) => {
@@ -736,7 +659,7 @@ export class DockviewComponent
         const dirtyPanels = Array.from(this.dirtyPanels);
 
         if (dirtyPanels.length === 0) {
-            // console.debug('[layout#syncConfigs] no dirty panels');
+            //
         }
 
         this.dirtyPanels.clear();

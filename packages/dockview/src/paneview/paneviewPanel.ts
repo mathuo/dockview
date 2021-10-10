@@ -176,8 +176,10 @@ export abstract class PaneviewPanel
 
         this.addDisposables(
             this._onDidChangeExpansionState,
-            this.onDidChangeExpansionState((isExpanded) => {
-                this.api._onDidExpansionChange.fire({ isExpanded });
+            this.onDidChangeExpansionState((isPanelExpanded) => {
+                this.api._onDidExpansionChange.fire({
+                    isExpanded: isPanelExpanded,
+                });
             })
         );
 
