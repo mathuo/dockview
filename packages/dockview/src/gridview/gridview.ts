@@ -419,13 +419,13 @@ export class Gridview implements IDisposable {
 
         for (let i = 0; i < node.children.length; i++) {
             const child = node.children[i];
-            const cachedVisibleSize = node.getChildCachedVisibleSize(i);
+            const nodeCachedVisibleSize = node.getChildCachedVisibleSize(i);
 
             children.push(
                 this._getViews(
                     child,
                     orthogonal(orientation),
-                    cachedVisibleSize
+                    nodeCachedVisibleSize
                 )
             );
         }
@@ -643,7 +643,7 @@ export class Gridview implements IDisposable {
         const isSiblingVisible = parent.isChildVisible(0);
         parent.removeChild(0, sizing);
 
-        const sizes = grandParent.children.map((_, i) =>
+        const sizes = grandParent.children.map((size, i) =>
             grandParent.getChildSize(i)
         );
         grandParent.removeChild(parentIndex, sizing);

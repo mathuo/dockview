@@ -1,6 +1,6 @@
-import { ReactPart, ReactPortalStore } from '../../react/react';
+import { ReactPart } from '../../react/react';
 import * as React from 'react';
-import { render, fireEvent, waitFor, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 interface TestInterface {
     valueA: string;

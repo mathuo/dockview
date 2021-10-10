@@ -112,9 +112,9 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
 
                 const containerApi = (this.params! as PanePanelInitParameter)
                     .containerApi;
-                const id = data.paneId;
+                const panelId = data.paneId;
 
-                const existingPanel = containerApi.getPanel(id);
+                const existingPanel = containerApi.getPanel(panelId);
                 if (!existingPanel) {
                     this._onDidDrop.fire({
                         ...event,
