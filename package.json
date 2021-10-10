@@ -11,7 +11,7 @@
         "build-demo": "lerna run build --scope dockview-demo",
         "docs": "lerna run docs --scope dockview",
         "clean": "lerna run clean",
-        "bootstrap": "lerna bootstrap --hoist",
+        "bootstrap": "lerna bootstrap",
         "bootstrap-no-hoist": "lerna bootstrap",
         "test:cov": "jest --coverage",
         "codecov-publish": "codecov",
