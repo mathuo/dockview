@@ -49,13 +49,6 @@ const ReactComponentBridge: React.ForwardRefRenderFunction<
         []
     );
 
-    React.useEffect(() => {
-        // console.debug('[reactwrapper] component mounted ');
-        return () => {
-            // console.debug('[reactwrapper] component unmounted ');
-        };
-    }, []);
-
     return React.createElement(props.component, _props.current);
 };
 ReactComponentBridge.displayName = 'DockviewReactJsBridge';
