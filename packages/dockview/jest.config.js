@@ -23,4 +23,5 @@ module.exports = {
     ],
     coverageDirectory: '<rootDir>/packages/dockview/coverage/',
     testResultsProcessor: 'jest-sonar-reporter',
+    testEnvironment: 'jsdom',
 };
