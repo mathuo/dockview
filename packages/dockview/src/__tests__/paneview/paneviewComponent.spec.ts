@@ -222,6 +222,7 @@ describe('componentPaneview', () => {
                         title: 'Panel 1',
                     },
                     expanded: true,
+                    minimumSize: 100,
                 },
                 {
                     size: 22,
@@ -231,6 +232,7 @@ describe('componentPaneview', () => {
                         title: 'Panel 2',
                     },
                     expanded: false,
+                    minimumSize: 100,
                 },
                 {
                     size: 22,
@@ -240,6 +242,7 @@ describe('componentPaneview', () => {
                         title: 'Panel 3',
                     },
                     expanded: false,
+                    minimumSize: 100,
                 },
             ],
         });
