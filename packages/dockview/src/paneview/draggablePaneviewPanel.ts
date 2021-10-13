@@ -139,7 +139,10 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
                     event.position === Position.Right ||
                     event.position === Position.Bottom
                 ) {
-                    toIndex = Math.min(allPanels.length - 1, toIndex + 1);
+                    if (fromIndex > toIndex) {
+                        toIndex++;
+                    }
+                    toIndex = Math.min(allPanels.length - 1, toIndex);
                 }
 
                 containerApi.movePanel(fromIndex, toIndex);

@@ -32,7 +32,17 @@ VIEW_REGISTRY.register({
     icon: 'search',
     isLocationEditable: false,
     component: () => {
-        return <div>This is a search bar component</div>;
+        return (
+            <div
+                style={{
+                    backgroundColor: 'yellow',
+                    color: 'black',
+                    height: '100%',
+                }}
+            >
+                This is a search bar component
+            </div>
+        );
     },
 });
 VIEW_REGISTRY.register({
@@ -41,7 +51,17 @@ VIEW_REGISTRY.register({
     icon: 'home',
     isLocationEditable: true,
     component: () => {
-        return <div>Home</div>;
+        return (
+            <div
+                style={{
+                    backgroundColor: 'lightblue',
+                    color: 'black',
+                    height: '100%',
+                }}
+            >
+                Home
+            </div>
+        );
     },
 });
 VIEW_REGISTRY.register({
@@ -50,7 +70,17 @@ VIEW_REGISTRY.register({
     icon: 'account_circle',
     isLocationEditable: true,
     component: () => {
-        return <div>account_circle</div>;
+        return (
+            <div
+                style={{
+                    backgroundColor: 'green',
+                    color: 'black',
+                    height: '100%',
+                }}
+            >
+                account_circle
+            </div>
+        );
     },
 });
 VIEW_REGISTRY.register({
@@ -59,6 +89,16 @@ VIEW_REGISTRY.register({
     icon: 'settings',
     isLocationEditable: true,
     component: () => {
-        return <div>settings</div>;
+        return (
+            <div
+                style={{
+                    backgroundColor: 'orange',
+                    color: 'black',
+                    height: '100%',
+                }}
+            >
+                settings
+            </div>
+        );
     },
 });

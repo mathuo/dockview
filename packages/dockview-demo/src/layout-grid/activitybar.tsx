@@ -3,7 +3,6 @@ import {
     CompositeDisposable,
     GridviewApi,
     IGridviewPanelProps,
-    DockviewDropTarget,
 } from 'dockview';
 import './activitybar.scss';
 import { useLayoutRegistry } from './registry';
