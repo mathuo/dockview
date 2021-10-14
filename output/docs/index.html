@@ -1,873 +1,234 @@
-<!doctype html>
-<html class="default no-js">
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>dockview</title>
-	<meta name="description" content="Documentation for dockview">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="assets/css/main.css">
-	<script async src="assets/js/search.js" id="search-script"></script>
-</head>
-<body>
-<header>
-	<div class="tsd-page-toolbar">
-		<div class="container">
-			<div class="table-wrap">
-				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
-					<div class="field">
-						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
-						<input id="tsd-search-field" type="text" />
-					</div>
-					<ul class="results">
-						<li class="state loading">Preparing search index...</li>
-						<li class="state failure">The search index is not available</li>
-					</ul>
-					<a href="index.html" class="title">dockview</a>
-				</div>
-				<div class="table-cell" id="tsd-widgets">
-					<div id="tsd-filter">
-						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
-						<div class="tsd-filter-group">
-							<div class="tsd-select" id="tsd-filter-visibility">
-								<span class="tsd-select-label">All</span>
-								<ul class="tsd-select-list">
-									<li data-value="public">Public</li>
-									<li data-value="protected">Public/Protected</li>
-									<li data-value="private" class="selected">All</li>
-								</ul>
-							</div>
-							<input type="checkbox" id="tsd-filter-inherited" checked />
-							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
-						</div>
-					</div>
-					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="tsd-page-title">
-		<div class="container">
-			<h1>dockview</h1>
-		</div>
-	</div>
-</header>
-<div class="container container-main">
-	<div class="row">
-		<div class="col-8 col-content">
-			<div class="tsd-panel tsd-typography">
-				<div align="center">
-					<h1>dockview</h1>
-					<p>Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support</p>
-				</div>
-				<hr>
-				<p><img src="https://img.shields.io/badge/stability-experimental-orange.svg" alt="stability-experimental">
-					<a href="https://www.npmjs.com/package/dockview"><img src="https://badge.fury.io/js/dockview.svg" alt="npm version"></a>
-					<a href="https://github.com/mathuo/dockview/actions?query=workflow%3ACI"><img src="https://github.com/mathuo/dockview/workflows/CI/badge.svg" alt="CI Build"></a>
-					<a href="https://sonarcloud.io/dashboard?id=mathuo_dockview"><img src="https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=coverage" alt="Coverage"></a>
-					<a href="https://sonarcloud.io/dashboard?id=mathuo_dockview"><img src="https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=alert_status" alt="Quality Gate Status"></a>
-				<a href="https://bundlephobia.com/result?p=dockview"><img src="https://badgen.net/bundlephobia/minzip/dockview" alt="Bundle Phobia"></a></p>
-				<a href="#" id="" style="color: inherit; text-decoration: none;">
-					<h2></h2>
-				</a>
-				<p>A zero dependency layout manager based on the layering of split-view components with ReactJS support.</p>
-				<ul>
-					<li>View the live demo <a href="https://mathuo.github.io/dockview/">here</a>.</li>
-					<li>Storybook demo <a href="https://mathuo.github.io/dockview/output/storybook-static">here</a>.</li>
-					<li>Code examples <a href="https://github.com/mathuo/dockview/tree/master/packages/dockview-demo/src/stories">here</a>.</li>
-					<li>Generated TypeDocs can be found <a href="https://mathuo.github.io/dockview/output/docs/index.html">here</a>.</li>
-				</ul>
-				<p>Want to inspect the deployed package? Go to <a href="https://unpkg.com/browse/dockview@latest/">https://unpkg.com/browse/dockview@latest/</a></p>
-				<a href="#features" id="features" style="color: inherit; text-decoration: none;">
-					<h3>Features</h3>
-				</a>
-				<ul>
-					<li>Simple splitviews, nested splitviews (i.e. gridviews) supporting full layout managment with
-					dockable and tabular views</li>
-					<li>Extensive API support at the component level and at the indivdual view level</li>
-					<li>Themable and customizable</li>
-					<li>Serialization / deserialization</li>
-					<li>Tabular views with Drag and Drop support</li>
-					<li>Documentation and examples</li>
-				</ul>
-				<p>Largly inspired by code IDE editors such as VSCode. Parts of the core resizable panelling is based upon an implementation found in the VSCode sources of a <a href="https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/splitview">splitview</a> and <a href="https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/grid">gridview</a>.</p>
-				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
-					<h2>Installation</h2>
-				</a>
-				<p>You can install the project from <a href="https://www.npmjs.com/package/dockview">npm</a>. The project comes with TypeScript typings.</p>
-				<pre><code><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span><span style="color: #000000"> --</span><span style="color: #001080">save</span><span style="color: #000000"> </span><span style="color: #001080">dockview</span>
-</code></pre>
-				<a href="#setup" id="setup" style="color: inherit; text-decoration: none;">
-					<h2>Setup</h2>
-				</a>
-				<p>You must import or reference the stylesheet at <code>dockview/dist/styles/dockview.css</code>. For example:</p>
-				<pre><code class="language-css"><span style="color: #AF00DB">@import</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;~dockview/dist/styles/dockview.css&#039;</span><span style="color: #000000">;</span>
-</code></pre>
-				<p>You should also attach a dockview theme to an element containing your components. For example:</p>
-				<pre><code class="language-html"><span style="color: #800000">&lt;body</span><span style="color: #000000"> </span><span style="color: #FF0000">classname</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;dockview-theme-light&quot;</span><span style="color: #800000">&gt;</span>
-<span style="color: #800000">&lt;/body&gt;</span>
-</code></pre>
-				<p>dockview has a peer dependency on <code>react &gt;= 16.8.0</code> and <code>react-dom &gt;= 16.8.0</code> which is the version that introduced <a href="https://reactjs.org/docs/hooks-intro.html">React Hooks</a>.</p>
-				<a href="#faq" id="faq" style="color: inherit; text-decoration: none;">
-					<h2>FAQ</h2>
-				</a>
-				<a href="#can-i-use-this-library-without-react" id="can-i-use-this-library-without-react" style="color: inherit; text-decoration: none;">
-					<h3>Can I use this library without React?</h3>
-				</a>
-				<p>In theory, yes. The library is written in plain-old JS and the parts written in ReactJS are merely wrappers around the plain-old JS components. Currently everything is published as one package though so maybe that&#39;s something to change in the future.</p>
-				<a href="#can-i-use-this-library-with-angularjsvuejs-or-any-other-arbitrarily-named-javascript-libraryframework" id="can-i-use-this-library-with-angularjsvuejs-or-any-other-arbitrarily-named-javascript-libraryframework" style="color: inherit; text-decoration: none;">
-					<h3>Can I use this library with AngularJS/Vue.js or any other arbitrarily named JavaScript library/framework?</h3>
-				</a>
-				<p>Yes but with some extra work. Dockview is written in plain-old JS so you can either interact directly with the plain-old JS components or create a wrapper using your prefered library/framework. The React wrapper may give some ideas on how this wrapper implementation could be done for other libraries/frameworks. Maybe that&#39;s something to change in the future.</p>
-				<a href="#sandbox-examples" id="sandbox-examples" style="color: inherit; text-decoration: none;">
-					<h2>Sandbox examples</h2>
-				</a>
-				<ul>
-					<li><a href="https://codesandbox.io/s/simple-dockview-t6491">Dockview</a></li>
-					<li><a href="https://codesandbox.io/s/simple-gridview-jrp0n">Gridview</a></li>
-					<li><a href="https://codesandbox.io/s/simple-splitview-l53nn">Splitview</a></li>
-					<li><a href="https://codesandbox.io/s/simple-paneview-v8qvb">Paneview</a></li>
-				</ul>
-				<a href="#api-documentation" id="api-documentation" style="color: inherit; text-decoration: none;">
-					<h1>API Documentation</h1>
-				</a>
-				<a href="#splitview" id="splitview" style="color: inherit; text-decoration: none;">
-					<h3>Splitview</h3>
-				</a>
-				<p><a href="https://mathuo.github.io/dockview/output/docs/classes/splitviewapi.html">Component Api</a>
-				<a href="">Panel Api</a></p>
-				<a href="#gridview" id="gridview" style="color: inherit; text-decoration: none;">
-					<h3>Gridview</h3>
-				</a>
-				<p><a href="https://mathuo.github.io/dockview/output/docs/classes/gridviewapi.html">Component Api</a>
-				<a href="">Panel Api</a></p>
-				<a href="#dockview" id="dockview" style="color: inherit; text-decoration: none;">
-					<h3>Dockview</h3>
-				</a>
-				<p><a href="https://mathuo.github.io/dockview/output/docs/classes/dockviewapi.html">Component Api</a>
-				<a href="">Panel Api</a></p>
-				<a href="#paneview" id="paneview" style="color: inherit; text-decoration: none;">
-					<h3>Paneview</h3>
-				</a>
-				<p><a href="https://mathuo.github.io/dockview/output/docs/classes/paneviewapi.html">Component Api</a>
-				<a href="">Panel Api</a></p>
-				<a href="#serialization--de-serialization" id="serialization--de-serialization" style="color: inherit; text-decoration: none;">
-					<h2>Serialization / De-serialization</h2>
-				</a>
-				<p>All view components support the methods <code>toJSON()</code>, <code>fromJSON(...)</code> and <code>onDidLayoutChange()</code>.</p>
-				<p>See example <a href="https://codesandbox.io/s/workspace-saving-example-euo5d">here</a>.</p>
-				<a href="#theming" id="theming" style="color: inherit; text-decoration: none;">
-					<h2>Theming</h2>
-				</a>
-				<p>The theme can be customized using the below set of CSS properties. You can find the built in themes <a href="https://github.com/mathuo/dockview/blob/master/packages/dockview/src/theme.scss">here</a> which could be used as an example to extend upon or build your own theme.</p>
-				<table>
-					<thead>
-						<tr>
-							<th>CSS Property</th>
-							<th>Description</th>
-						</tr>
-					</thead>
-					<tbody><tr>
-							<td><strong>General</strong></td>
-							<td></td>
-						</tr>
-						<tr>
-							<td>--dv-active-sash-color</td>
-							<td>The background color a dividing sash during an interaction</td>
-						</tr>
-						<tr>
-							<td>--dv-separator-border</td>
-							<td>The color of the seperator between panels</td>
-						</tr>
-						<tr>
-							<td><strong>Paneview</strong></td>
-							<td></td>
-						</tr>
-						<tr>
-							<td>--dv-paneview-header-border-color</td>
-							<td>-</td>
-						</tr>
-						<tr>
-							<td>--dv-paneview-active-outline-color</td>
-							<td>The primary accent color, used for example to highlight the active panel in Paneviews</td>
-						</tr>
-						<tr>
-							<td><strong>Dockview -&gt; Dragging</strong></td>
-							<td></td>
-						</tr>
-						<tr>
-							<td>--dv-drag-over-background-color</td>
-							<td>The overlay color applied to a group when a moving tab is dragged over</td>
-						</tr>
-						<tr>
-							<td><strong>Dockview -&gt; Tabs container</strong></td>
-							<td></td>
-						</tr>
-						<tr>
-							<td>--dv-tabs-and-actions-container-font-size</td>
-							<td>-</td>
-						</tr>
-						<tr>
-							<td>--dv-tabs-and-actions-container-height</td>
-							<td>Default tab height</td>
-						</tr>
-						<tr>
-							<td>--dv-tabs-and-actions-container-background-color</td>
-							<td>-</td>
-						</tr>
-						<tr>
-							<td>--dv-tabs-container-scrollbar-color</td>
-							<td>-</td>
-						</tr>
-						<tr>
-							<td>--dv-group-view-background-color</td>
-							<td>-</td>
-						</tr>
-						<tr>
-							<td><strong>Dockview -&gt; Tabs</strong> (see <a href="https://github.com/mathuo/dockview/blob/master/packages/dockview/src/dockview/dockviewComponent.scss">dockviewComponent.scss</a>)</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td>--dv-activegroup-visiblepanel-tab-background-color</td>
-							<td>The background color of the tab for the visible panel in the active group</td>
-						</tr>
-						<tr>
-							<td>--dv-activegroup-hiddenpanel-tab-background-color</td>
-							<td>The background color of the tab for the hidden panel/s in the active group</td>
-						</tr>
-						<tr>
-							<td>--dv-inactivegroup-visiblepanel-tab-background-color</td>
-							<td>The background color of the tab for the visible panel in groups other than the active group</td>
-						</tr>
-						<tr>
-							<td>--dv-inactivegroup-hiddenpanel-tab-background-color</td>
-							<td>The background color of the tab for the hidden panel/s in groups other than the active group</td>
-						</tr>
-						<tr>
-							<td>--dv-activegroup-visiblepanel-tab-color</td>
-							<td>The color of the tab for the visible panel in the active group</td>
-						</tr>
-						<tr>
-							<td>--dv-activegroup-hiddenpanel-tab-color</td>
-							<td>The color of the tab for the hidden panel/s in the active group</td>
-						</tr>
-						<tr>
-							<td>--dv-inactivegroup-visiblepanel-tab-color</td>
-							<td>The color of the tab for the visible panel in groups other than the active group</td>
-						</tr>
-						<tr>
-							<td>--dv-inactivegroup-hiddenpanel-tab-color</td>
-							<td>The color of the tab for the hidden panel/s in groups other than the active group</td>
-						</tr>
-						<tr>
-							<td>--dv-tab-divider-color</td>
-							<td>-</td>
-						</tr>
-						<tr>
-							<td>--dv-tab-close-icon</td>
-							<td>Default tab close icon</td>
-						</tr>
-						<tr>
-							<td>--dv-tab-dirty-icon</td>
-							<td>Default tab dirty icon</td>
-						</tr>
-				</tbody></table>
-			</div>
-		</div>
-		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
-			<nav class="tsd-navigation primary">
-				<ul>
-					<li class=" ">
-						<a href="modules.html">Exports</a>
-					</li>
-					<li class=" tsd-kind-namespace">
-						<a href="modules/disposable.html">Disposable</a>
-					</li>
-					<li class=" tsd-kind-namespace">
-						<a href="modules/event.html">Event</a>
-					</li>
-					<li class=" tsd-kind-namespace">
-						<a href="modules/sizing.html">Sizing</a>
-					</li>
-				</ul>
-			</nav>
-			<nav class="tsd-navigation secondary menu-sticky">
-				<ul class="before-current">
-					<li class=" tsd-kind-enum">
-						<a href="enums/dockviewdroptargets.html" class="tsd-kind-icon">Dockview<wbr>Drop<wbr>Targets</a>
-					</li>
-					<li class=" tsd-kind-enum">
-						<a href="enums/dragtype.html" class="tsd-kind-icon">Drag<wbr>Type</a>
-					</li>
-					<li class=" tsd-kind-enum">
-						<a href="enums/groupchangekind.html" class="tsd-kind-icon">Group<wbr>Change<wbr>Kind</a>
-					</li>
-					<li class=" tsd-kind-enum">
-						<a href="enums/layoutpriority.html" class="tsd-kind-icon">Layout<wbr>Priority</a>
-					</li>
-					<li class=" tsd-kind-enum">
-						<a href="enums/mouseeventkind.html" class="tsd-kind-icon">Mouse<wbr>Event<wbr>Kind</a>
-					</li>
-					<li class=" tsd-kind-enum">
-						<a href="enums/orientation.html" class="tsd-kind-icon">Orientation</a>
-					</li>
-					<li class=" tsd-kind-enum">
-						<a href="enums/position.html" class="tsd-kind-icon">Position</a>
-					</li>
-					<li class=" tsd-kind-enum">
-						<a href="enums/sashstate.html" class="tsd-kind-icon">Sash<wbr>State</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/compositedisposable.html" class="tsd-kind-icon">Composite<wbr>Disposable</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/contentcontainer.html" class="tsd-kind-icon">Content<wbr>Container</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/dockviewapi.html" class="tsd-kind-icon">Dockview<wbr>Api</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/dockviewcomponent.html" class="tsd-kind-icon">Dockview<wbr>Component</a>
-					</li>
-					<li class=" tsd-kind-class tsd-has-type-parameter">
-						<a href="classes/emitter.html" class="tsd-kind-icon">Emitter</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/gridview.html" class="tsd-kind-icon">Gridview</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/gridviewapi.html" class="tsd-kind-icon">Gridview<wbr>Api</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/gridviewcomponent.html" class="tsd-kind-icon">Gridview<wbr>Component</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/gridviewpanel.html" class="tsd-kind-icon">Gridview<wbr>Panel</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/groupview.html" class="tsd-kind-icon">Groupview</a>
-					</li>
-					<li class=" tsd-kind-class tsd-has-type-parameter">
-						<a href="classes/localselectiontransfer.html" class="tsd-kind-icon">Local<wbr>Selection<wbr>Transfer</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/mutabledisposable.html" class="tsd-kind-icon">Mutable<wbr>Disposable</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/paneframework.html" class="tsd-kind-icon">Pane<wbr>Framework</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/paneview.html" class="tsd-kind-icon">Paneview</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/paneviewapi.html" class="tsd-kind-icon">Paneview<wbr>Api</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/paneviewcomponent.html" class="tsd-kind-icon">Paneview<wbr>Component</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/reactpanelcontentpart.html" class="tsd-kind-icon">React<wbr>Panel<wbr>Content<wbr>Part</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/reactpanelheaderpart.html" class="tsd-kind-icon">React<wbr>Panel<wbr>Header<wbr>Part</a>
-					</li>
-					<li class=" tsd-kind-class tsd-has-type-parameter">
-						<a href="classes/reactpart.html" class="tsd-kind-icon">React<wbr>Part</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/splitview.html" class="tsd-kind-icon">Splitview</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/splitviewapi.html" class="tsd-kind-icon">Splitview<wbr>Api</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/splitviewcomponent.html" class="tsd-kind-icon">Splitview<wbr>Component</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="classes/tab.html" class="tsd-kind-icon">Tab</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/activeevent.html" class="tsd-kind-icon">Active<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/addcomponentoptions.html" class="tsd-kind-icon">Add<wbr>Component<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/addgroupoptions.html" class="tsd-kind-icon">Add<wbr>Group<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/addpaneloptions.html" class="tsd-kind-icon">Add<wbr>Panel<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/addpaneviewcompponentoptions.html" class="tsd-kind-icon">Add<wbr>Paneview<wbr>Compponent<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/addsplitviewcomponentoptions.html" class="tsd-kind-icon">Add<wbr>Splitview<wbr>Component<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/commonapi.html" class="tsd-kind-icon">Common<wbr>Api</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/dndservice.html" class="tsd-kind-icon">Dnd<wbr>Service</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/dockviewoptions.html" class="tsd-kind-icon">Dockview<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/dockviewpanelapi.html" class="tsd-kind-icon">Dockview<wbr>Panel<wbr>Api</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/dockviewreadyevent.html" class="tsd-kind-icon">Dockview<wbr>Ready<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/dockviewrenderfunctions.html" class="tsd-kind-icon">Dockview<wbr>Render<wbr>Functions</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/dragitem.html" class="tsd-kind-icon">Drag<wbr>Item</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/emitteroptions.html" class="tsd-kind-icon">Emitter<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter">
-						<a href="interfaces/event.html" class="tsd-kind-icon">Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/expansionevent.html" class="tsd-kind-icon">Expansion<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/externaldragitem.html" class="tsd-kind-icon">External<wbr>Drag<wbr>Item</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/focusevent.html" class="tsd-kind-icon">Focus<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter">
-						<a href="interfaces/gridbranchnode.html" class="tsd-kind-icon">Grid<wbr>Branch<wbr>Node</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/gridconstraintchangeevent.html" class="tsd-kind-icon">Grid<wbr>Constraint<wbr>Change<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter">
-						<a href="interfaces/gridleafnode.html" class="tsd-kind-icon">Grid<wbr>Leaf<wbr>Node</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/gridpanelviewstate.html" class="tsd-kind-icon">Grid<wbr>Panel<wbr>View<wbr>State</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/gridviewinitparameters.html" class="tsd-kind-icon">Gridview<wbr>Init<wbr>Parameters</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/gridviewpanelapi.html" class="tsd-kind-icon">Gridview<wbr>Panel<wbr>Api</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/gridviewreadyevent.html" class="tsd-kind-icon">Gridview<wbr>Ready<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/groupchangeevent.html" class="tsd-kind-icon">Group<wbr>Change<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/groupoptions.html" class="tsd-kind-icon">Group<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/grouppanelcontentpartinitparameters.html" class="tsd-kind-icon">Group<wbr>Panel<wbr>Content<wbr>Part<wbr>Init<wbr>Parameters</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/grouppanelframeworkcomponentfactory.html" class="tsd-kind-icon">Group<wbr>Panel<wbr>Framework<wbr>Component<wbr>Factory</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/grouppanelpartinitparameters.html" class="tsd-kind-icon">Group<wbr>Panel<wbr>Part<wbr>Init<wbr>Parameters</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/grouppanelviewstate.html" class="tsd-kind-icon">Group<wbr>Panel<wbr>View<wbr>State</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/groupviewpanelstate.html" class="tsd-kind-icon">Groupview<wbr>Panel<wbr>State</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/headerpartinitparameters.html" class="tsd-kind-icon">Header<wbr>Part<wbr>Init<wbr>Parameters</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/iactionsrenderer.html" class="tsd-kind-icon">IActions<wbr>Renderer</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/ibaseview.html" class="tsd-kind-icon">IBase<wbr>View</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/icontentcontainer.html" class="tsd-kind-icon">IContent<wbr>Container</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/icontentrenderer.html" class="tsd-kind-icon">IContent<wbr>Renderer</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/idisposable.html" class="tsd-kind-icon">IDisposable</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/idockviewcomponent.html" class="tsd-kind-icon">IDockview<wbr>Component</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter">
-						<a href="interfaces/idockviewpanelprops.html" class="tsd-kind-icon">IDockview<wbr>Panel<wbr>Props</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/idockviewreactprops.html" class="tsd-kind-icon">IDockview<wbr>React<wbr>Props</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/idragtragetprops.html" class="tsd-kind-icon">IDrag<wbr>Traget<wbr>Props</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/igridpanelcomponentview.html" class="tsd-kind-icon">IGrid<wbr>Panel<wbr>Component<wbr>View</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/igridview.html" class="tsd-kind-icon">IGrid<wbr>View</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/igridviewcomponent.html" class="tsd-kind-icon">IGridview<wbr>Component</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/igridviewpanel.html" class="tsd-kind-icon">IGridview<wbr>Panel</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter">
-						<a href="interfaces/igridviewpanelprops.html" class="tsd-kind-icon">IGridview<wbr>Panel<wbr>Props</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/igridviewreactprops.html" class="tsd-kind-icon">IGridview<wbr>React<wbr>Props</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/igroupitem.html" class="tsd-kind-icon">IGroup<wbr>Item</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/igrouppanel.html" class="tsd-kind-icon">IGroup<wbr>Panel</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/igrouppanelactionbarprops.html" class="tsd-kind-icon">IGroup<wbr>Panel<wbr>Actionbar<wbr>Props</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter">
-						<a href="interfaces/igrouppanelbaseprops.html" class="tsd-kind-icon">IGroup<wbr>Panel<wbr>Base<wbr>Props</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/igrouppanelinitparameters.html" class="tsd-kind-icon">IGroup<wbr>Panel<wbr>Init<wbr>Parameters</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/igroupview.html" class="tsd-kind-icon">IGroupview</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/inodedescriptor.html" class="tsd-kind-icon">INode<wbr>Descriptor</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/ipaneviewcomponent.html" class="tsd-kind-icon">IPaneview<wbr>Component</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter">
-						<a href="interfaces/ipaneviewpanelprops.html" class="tsd-kind-icon">IPaneview<wbr>Panel<wbr>Props</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/ipaneviewreactprops.html" class="tsd-kind-icon">IPaneview<wbr>React<wbr>Props</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/irenderable.html" class="tsd-kind-icon">IRenderable</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/iserializedbranchnode.html" class="tsd-kind-icon">ISerialized<wbr>Branch<wbr>Node</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/iserializedleafnode.html" class="tsd-kind-icon">ISerialized<wbr>Leaf<wbr>Node</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/isplitviewdescriptor.html" class="tsd-kind-icon">ISplit<wbr>View<wbr>Descriptor</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/isplitviewcomponent.html" class="tsd-kind-icon">ISplitview<wbr>Component</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter">
-						<a href="interfaces/isplitviewpanelprops.html" class="tsd-kind-icon">ISplitview<wbr>Panel<wbr>Props</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/isplitviewreactprops.html" class="tsd-kind-icon">ISplitview<wbr>React<wbr>Props</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/isplitviewstyles.html" class="tsd-kind-icon">ISplitview<wbr>Styles</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/itab.html" class="tsd-kind-icon">ITab</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/itabrenderer.html" class="tsd-kind-icon">ITab<wbr>Renderer</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter">
-						<a href="interfaces/ivaluedisposable.html" class="tsd-kind-icon">IValue<wbr>Disposable</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/iview.html" class="tsd-kind-icon">IView</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/iviewdeserializer.html" class="tsd-kind-icon">IView<wbr>Deserializer</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/iviewsize.html" class="tsd-kind-icon">IView<wbr>Size</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter">
-						<a href="interfaces/iwatermarkpanelprops.html" class="tsd-kind-icon">IWatermark<wbr>Panel<wbr>Props</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/iwatermarkrenderer.html" class="tsd-kind-icon">IWatermark<wbr>Renderer</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/layoutmouseevent.html" class="tsd-kind-icon">Layout<wbr>Mouse<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/movementoptions.html" class="tsd-kind-icon">Movement<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/movementoptions2.html" class="tsd-kind-icon">Movement<wbr>Options2</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter">
-						<a href="interfaces/panelcollection.html" class="tsd-kind-icon">Panel<wbr>Collection</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/panelconstraintchangeevent.html" class="tsd-kind-icon">Panel<wbr>Constraint<wbr>Change<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/panelcontentpartconstructor.html" class="tsd-kind-icon">Panel<wbr>Content<wbr>Part<wbr>Constructor</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/paneldimensionchangeevent.html" class="tsd-kind-icon">Panel<wbr>Dimension<wbr>Change<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/panelheaderpartconstructor.html" class="tsd-kind-icon">Panel<wbr>Header<wbr>Part<wbr>Constructor</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/paneloptions.html" class="tsd-kind-icon">Panel<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter">
-						<a href="interfaces/panelparameters.html" class="tsd-kind-icon">Panel<wbr>Parameters</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/panelreference.html" class="tsd-kind-icon">Panel<wbr>Reference</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/panelsizeevent.html" class="tsd-kind-icon">Panel<wbr>Size<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/paneviewdropevent.html" class="tsd-kind-icon">Paneview<wbr>Drop<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/paneviewpanelapi.html" class="tsd-kind-icon">Paneview<wbr>Panel<wbr>Api</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/paneviewreadyevent.html" class="tsd-kind-icon">Paneview<wbr>Ready<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/reactcontentpartcontext.html" class="tsd-kind-icon">React<wbr>Content<wbr>Part<wbr>Context</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/reactportalstore.html" class="tsd-kind-icon">React<wbr>Portal<wbr>Store</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/serializeddockview.html" class="tsd-kind-icon">Serialized<wbr>Dockview</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter">
-						<a href="interfaces/serializedgridobject.html" class="tsd-kind-icon">Serialized<wbr>Grid<wbr>Object</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/serializedgridview.html" class="tsd-kind-icon">Serialized<wbr>Gridview</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/serializedpaneview.html" class="tsd-kind-icon">Serialized<wbr>Paneview</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/serializedpaneviewpanel.html" class="tsd-kind-icon">Serialized<wbr>Paneview<wbr>Panel</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/serializedsplitview.html" class="tsd-kind-icon">Serialized<wbr>Splitview</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/serializedsplitviewpanel.html" class="tsd-kind-icon">Serialized<wbr>Splitview<wbr>Panel</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/serializedsplitviewpaneldata.html" class="tsd-kind-icon">Serialized<wbr>Splitview<wbr>Panel<wbr>Data</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/sizeevent.html" class="tsd-kind-icon">Size<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/splitviewoptions.html" class="tsd-kind-icon">Split<wbr>View<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/splitviewpanelapi.html" class="tsd-kind-icon">Splitview<wbr>Panel<wbr>Api</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/splitviewreadyevent.html" class="tsd-kind-icon">Splitview<wbr>Ready<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/state.html" class="tsd-kind-icon">State</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/suppressclosableevent.html" class="tsd-kind-icon">Suppress<wbr>Closable<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/tabcontextmenuevent.html" class="tsd-kind-icon">Tab<wbr>Context<wbr>Menu<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/titleevent.html" class="tsd-kind-icon">Title<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/viewfactorydata.html" class="tsd-kind-icon">View<wbr>Factory<wbr>Data</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/visibilityevent.html" class="tsd-kind-icon">Visibility<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/watermarkconstructor.html" class="tsd-kind-icon">Watermark<wbr>Constructor</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/watermarkpartinitparameters.html" class="tsd-kind-icon">Watermark<wbr>Part<wbr>Init<wbr>Parameters</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#dataobject" class="tsd-kind-icon">Data<wbr>Object</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#distributesizing" class="tsd-kind-icon">Distribute<wbr>Sizing</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#dockviewcomponentupdateoptions" class="tsd-kind-icon">Dockview<wbr>Component<wbr>Update<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
-						<a href="modules.html#gridnode" class="tsd-kind-icon">Grid<wbr>Node</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#gridviewcomponentupdateoptions" class="tsd-kind-icon">Gridview<wbr>Component<wbr>Update<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#grouppanelupdateevent" class="tsd-kind-icon">Group<wbr>Panel<wbr>Update<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#iserializednode" class="tsd-kind-icon">ISerialized<wbr>Node</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#invisiblesizing" class="tsd-kind-icon">Invisible<wbr>Sizing</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#sizing" class="tsd-kind-icon">Sizing</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#splitsizing" class="tsd-kind-icon">Split<wbr>Sizing</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#splitviewcomponentupdateoptions" class="tsd-kind-icon">Splitview<wbr>Component<wbr>Update<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#stateobject" class="tsd-kind-icon">State<wbr>Object</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="modules.html#data_key" class="tsd-kind-icon">DATA_<wbr>KEY</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="modules.html#dockviewcomponents" class="tsd-kind-icon">Dockview<wbr>Components</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="modules.html#dockviewdroptarget" class="tsd-kind-icon">Dockview<wbr>Drop<wbr>Target</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="modules.html#dockviewreact" class="tsd-kind-icon">Dockview<wbr>React</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="modules.html#gridviewreact" class="tsd-kind-icon">Gridview<wbr>React</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="modules.html#paneviewreact" class="tsd-kind-icon">Paneview<wbr>React</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="modules.html#reactpartcontext" class="tsd-kind-icon">React<wbr>Part<wbr>Context</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="modules.html#splitviewreact" class="tsd-kind-icon">Splitview<wbr>React</a>
-					</li>
-					<li class=" tsd-kind-function tsd-has-type-parameter">
-						<a href="modules.html#adddisposablelistener" class="tsd-kind-icon">add<wbr>Disposable<wbr>Listener</a>
-					</li>
-					<li class=" tsd-kind-function tsd-has-type-parameter">
-						<a href="modules.html#adddisposablewindowlistener" class="tsd-kind-icon">add<wbr>Disposable<wbr>Window<wbr>Listener</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#extractdata" class="tsd-kind-icon">extract<wbr>Data</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#getdirectionorientation" class="tsd-kind-icon">get<wbr>Direction<wbr>Orientation</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#getgridlocation" class="tsd-kind-icon">get<wbr>Grid<wbr>Location</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#getlocationorientation" class="tsd-kind-icon">get<wbr>Location<wbr>Orientation</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#getpanedata" class="tsd-kind-icon">get<wbr>Pane<wbr>Data</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#getpaneldata" class="tsd-kind-icon">get<wbr>Panel<wbr>Data</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#getrelativelocation" class="tsd-kind-icon">get<wbr>Relative<wbr>Location</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#indexinparent" class="tsd-kind-icon">index<wbr>InParent</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#iscustomdragevent" class="tsd-kind-icon">is<wbr>Custom<wbr>Drag<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-function tsd-has-type-parameter">
-						<a href="modules.html#isgridbranchnode" class="tsd-kind-icon">is<wbr>Grid<wbr>Branch<wbr>Node</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#ispaneltransferevent" class="tsd-kind-icon">is<wbr>Panel<wbr>Transfer<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#isreactelement" class="tsd-kind-icon">is<wbr>React<wbr>Element</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#istabdragevent" class="tsd-kind-icon">is<wbr>Tab<wbr>Drag<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#orthogonal" class="tsd-kind-icon">orthogonal</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="modules.html#useportalslifecycle" class="tsd-kind-icon">use<wbr>Portals<wbr>Lifecycle</a>
-					</li>
-				</ul>
-			</nav>
-		</div>
-	</div>
+<!DOCTYPE html><html class="default no-js"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>dockview</title><meta name="description" content="Documentation for dockview"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script async src="assets/search.js" id="search-script"></script></head><body><header><div class="tsd-page-toolbar"><div class="container"><div class="table-wrap"><div class="table-cell" id="tsd-search" data-base="."><div class="field"><label for="tsd-search-field" class="tsd-widget search no-caption">Search</label><input type="text" id="tsd-search-field"/></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">dockview</a></div><div class="table-cell" id="tsd-widgets"><div id="tsd-filter"><a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a><div class="tsd-filter-group"><div class="tsd-select" id="tsd-filter-visibility"><span class="tsd-select-label">All</span><ul class="tsd-select-list"><li data-value="public">Public</li><li data-value="protected">Public/Protected</li><li data-value="private" class="selected">All</li></ul></div> <input type="checkbox" id="tsd-filter-inherited" checked/><label class="tsd-widget" for="tsd-filter-inherited">Inherited</label></div></div><a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a></div></div></div></div><div class="tsd-page-title"><div class="container"><h1>dockview</h1></div></div></header><div class="container container-main"><div class="row"><div class="col-8 col-content"><div class="tsd-panel tsd-typography"><div align="center">
+<h1>dockview</h1>
+
+<p>Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support</p>
+
 </div>
-<footer class="with-border-bottom">
-	<div class="container">
-		<h2>Legend</h2>
-		<div class="tsd-legend-group">
-			<ul class="tsd-legend">
-				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
-			</ul>
-		</div>
-	</div>
-</footer>
-<div class="container tsd-generator">
-	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
-</div>
-<div class="overlay"></div>
-<script src="assets/js/main.js"></script>
-</body>
-</html>
+
+<hr>
+<p><img src="https://img.shields.io/badge/stability-experimental-orange.svg" alt="stability-experimental">
+<a href="https://www.npmjs.com/package/dockview"><img src="https://badge.fury.io/js/dockview.svg" alt="npm version"></a>
+<a href="https://github.com/mathuo/dockview/actions?query=workflow%3ACI"><img src="https://github.com/mathuo/dockview/workflows/CI/badge.svg" alt="CI Build"></a>
+<a href="https://sonarcloud.io/dashboard?id=mathuo_dockview"><img src="https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=coverage" alt="Coverage"></a>
+<a href="https://sonarcloud.io/dashboard?id=mathuo_dockview"><img src="https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=alert_status" alt="Quality Gate Status"></a>
+<a href="https://bundlephobia.com/result?p=dockview"><img src="https://badgen.net/bundlephobia/minzip/dockview" alt="Bundle Phobia"></a></p>
+
+<a href="#" id="" style="color: inherit; text-decoration: none;">
+  <h2></h2>
+</a>
+<p>A zero dependency layout manager based on the layering of split-view components with ReactJS support.</p>
+<ul>
+<li>View the live demo <a href="https://mathuo.github.io/dockview/">here</a>.</li>
+<li>Storybook demo <a href="https://mathuo.github.io/dockview/output/storybook-static">here</a>.</li>
+<li>Code examples <a href="https://github.com/mathuo/dockview/tree/master/packages/dockview-demo/src/stories">here</a>.</li>
+<li>Generated TypeDocs can be found <a href="https://mathuo.github.io/dockview/output/docs/index.html">here</a>.</li>
+</ul>
+<p>Want to inspect the deployed package? Go to <a href="https://unpkg.com/browse/dockview@latest/">https://unpkg.com/browse/dockview@latest/</a></p>
+
+<a href="#features" id="features" style="color: inherit; text-decoration: none;">
+  <h3>Features</h3>
+</a>
+<ul>
+<li>Simple splitviews, nested splitviews (i.e. gridviews) supporting full layout managment with
+dockable and tabular views</li>
+<li>Extensive API support at the component level and at the indivdual view level</li>
+<li>Themable and customizable</li>
+<li>Serialization / deserialization</li>
+<li>Tabular views with Drag and Drop support</li>
+<li>Documentation and examples</li>
+</ul>
+<p>Largly inspired by code IDE editors such as VSCode. Parts of the core resizable panelling is based upon an implementation found in the VSCode sources of a <a href="https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/splitview">splitview</a> and <a href="https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/grid">gridview</a>.</p>
+
+<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+  <h2>Installation</h2>
+</a>
+<p>You can install the project from <a href="https://www.npmjs.com/package/dockview">npm</a>. The project comes with TypeScript typings.</p>
+<pre><code><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">install</span><span class="hl-1"> --</span><span class="hl-0">save</span><span class="hl-1"> </span><span class="hl-0">dockview</span>
+</code></pre>
+
+<a href="#setup" id="setup" style="color: inherit; text-decoration: none;">
+  <h2>Setup</h2>
+</a>
+<p>You must import or reference the stylesheet at <code>dockview/dist/styles/dockview.css</code>. For example:</p>
+<pre><code class="language-css"><span class="hl-2">@import</span><span class="hl-1"> </span><span class="hl-3">&#39;~dockview/dist/styles/dockview.css&#39;</span><span class="hl-1">;</span>
+</code></pre>
+<p>You should also attach a dockview theme to an element containing your components. For example:</p>
+<pre><code class="language-html"><span class="hl-4">&lt;</span><span class="hl-5">body</span><span class="hl-1"> </span><span class="hl-6">classname</span><span class="hl-1">=</span><span class="hl-7">&quot;dockview-theme-light&quot;</span><span class="hl-4">&gt;</span><br/><span class="hl-4">&lt;/</span><span class="hl-5">body</span><span class="hl-4">&gt;</span>
+</code></pre>
+<p>dockview has a peer dependency on <code>react &gt;= 16.8.0</code> and <code>react-dom &gt;= 16.8.0</code> which is the version that introduced <a href="https://reactjs.org/docs/hooks-intro.html">React Hooks</a>.</p>
+
+<a href="#faq" id="faq" style="color: inherit; text-decoration: none;">
+  <h2>FAQ</h2>
+</a>
+
+<a href="#can-i-use-this-library-without-react" id="can-i-use-this-library-without-react" style="color: inherit; text-decoration: none;">
+  <h3>Can I use this library without React?</h3>
+</a>
+<p>In theory, yes. The library is written in plain-old JS and the parts written in ReactJS are merely wrappers around the plain-old JS components. Currently everything is published as one package though so maybe that&#39;s something to change in the future.</p>
+
+<a href="#can-i-use-this-library-with-angularjsvuejs-or-any-other-arbitrarily-named-javascript-libraryframework" id="can-i-use-this-library-with-angularjsvuejs-or-any-other-arbitrarily-named-javascript-libraryframework" style="color: inherit; text-decoration: none;">
+  <h3>Can I use this library with AngularJS/Vue.js or any other arbitrarily named JavaScript library/framework?</h3>
+</a>
+<p>Yes but with some extra work. Dockview is written in plain-old JS so you can either interact directly with the plain-old JS components or create a wrapper using your prefered library/framework. The React wrapper may give some ideas on how this wrapper implementation could be done for other libraries/frameworks. Maybe that&#39;s something to change in the future.</p>
+
+<a href="#sandbox-examples" id="sandbox-examples" style="color: inherit; text-decoration: none;">
+  <h2>Sandbox examples</h2>
+</a>
+<ul>
+<li><a href="https://codesandbox.io/s/simple-dockview-t6491">Dockview</a></li>
+<li><a href="https://codesandbox.io/s/simple-gridview-jrp0n">Gridview</a></li>
+<li><a href="https://codesandbox.io/s/simple-splitview-l53nn">Splitview</a></li>
+<li><a href="https://codesandbox.io/s/simple-paneview-v8qvb">Paneview</a></li>
+</ul>
+
+<a href="#api-documentation" id="api-documentation" style="color: inherit; text-decoration: none;">
+  <h1>API Documentation</h1>
+</a>
+
+<a href="#splitview" id="splitview" style="color: inherit; text-decoration: none;">
+  <h3>Splitview</h3>
+</a>
+<p><a href="https://mathuo.github.io/dockview/output/docs/classes/splitviewapi.html">Component Api</a>
+<a href="">Panel Api</a></p>
+
+<a href="#gridview" id="gridview" style="color: inherit; text-decoration: none;">
+  <h3>Gridview</h3>
+</a>
+<p><a href="https://mathuo.github.io/dockview/output/docs/classes/gridviewapi.html">Component Api</a>
+<a href="">Panel Api</a></p>
+
+<a href="#dockview" id="dockview" style="color: inherit; text-decoration: none;">
+  <h3>Dockview</h3>
+</a>
+<p><a href="https://mathuo.github.io/dockview/output/docs/classes/dockviewapi.html">Component Api</a>
+<a href="">Panel Api</a></p>
+
+<a href="#paneview" id="paneview" style="color: inherit; text-decoration: none;">
+  <h3>Paneview</h3>
+</a>
+<p><a href="https://mathuo.github.io/dockview/output/docs/classes/paneviewapi.html">Component Api</a>
+<a href="">Panel Api</a></p>
+
+<a href="#serialization--de-serialization" id="serialization--de-serialization" style="color: inherit; text-decoration: none;">
+  <h2>Serialization / De-serialization</h2>
+</a>
+<p>All view components support the methods <code>toJSON()</code>, <code>fromJSON(...)</code> and <code>onDidLayoutChange()</code>.</p>
+<p>See example <a href="https://codesandbox.io/s/workspace-saving-example-euo5d">here</a>.</p>
+
+<a href="#theming" id="theming" style="color: inherit; text-decoration: none;">
+  <h2>Theming</h2>
+</a>
+<p>The theme can be customized using the below set of CSS properties. You can find the built in themes <a href="https://github.com/mathuo/dockview/blob/master/packages/dockview/src/theme.scss">here</a> which could be used as an example to extend upon or build your own theme.</p>
+<table>
+<thead>
+<tr>
+<th>CSS Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>General</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>--dv-active-sash-color</td>
+<td>The background color a dividing sash during an interaction</td>
+</tr>
+<tr>
+<td>--dv-separator-border</td>
+<td>The color of the seperator between panels</td>
+</tr>
+<tr>
+<td><strong>Paneview</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>--dv-paneview-header-border-color</td>
+<td>-</td>
+</tr>
+<tr>
+<td>--dv-paneview-active-outline-color</td>
+<td>The primary accent color, used for example to highlight the active panel in Paneviews</td>
+</tr>
+<tr>
+<td><strong>Dockview -&gt; Dragging</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>--dv-drag-over-background-color</td>
+<td>The overlay color applied to a group when a moving tab is dragged over</td>
+</tr>
+<tr>
+<td><strong>Dockview -&gt; Tabs container</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>--dv-tabs-and-actions-container-font-size</td>
+<td>-</td>
+</tr>
+<tr>
+<td>--dv-tabs-and-actions-container-height</td>
+<td>Default tab height</td>
+</tr>
+<tr>
+<td>--dv-tabs-and-actions-container-background-color</td>
+<td>-</td>
+</tr>
+<tr>
+<td>--dv-tabs-container-scrollbar-color</td>
+<td>-</td>
+</tr>
+<tr>
+<td>--dv-group-view-background-color</td>
+<td>-</td>
+</tr>
+<tr>
+<td><strong>Dockview -&gt; Tabs</strong> (see <a href="https://github.com/mathuo/dockview/blob/master/packages/dockview/src/dockview/dockviewComponent.scss">dockviewComponent.scss</a>)</td>
+<td></td>
+</tr>
+<tr>
+<td>--dv-activegroup-visiblepanel-tab-background-color</td>
+<td>The background color of the tab for the visible panel in the active group</td>
+</tr>
+<tr>
+<td>--dv-activegroup-hiddenpanel-tab-background-color</td>
+<td>The background color of the tab for the hidden panel/s in the active group</td>
+</tr>
+<tr>
+<td>--dv-inactivegroup-visiblepanel-tab-background-color</td>
+<td>The background color of the tab for the visible panel in groups other than the active group</td>
+</tr>
+<tr>
+<td>--dv-inactivegroup-hiddenpanel-tab-background-color</td>
+<td>The background color of the tab for the hidden panel/s in groups other than the active group</td>
+</tr>
+<tr>
+<td>--dv-activegroup-visiblepanel-tab-color</td>
+<td>The color of the tab for the visible panel in the active group</td>
+</tr>
+<tr>
+<td>--dv-activegroup-hiddenpanel-tab-color</td>
+<td>The color of the tab for the hidden panel/s in the active group</td>
+</tr>
+<tr>
+<td>--dv-inactivegroup-visiblepanel-tab-color</td>
+<td>The color of the tab for the visible panel in groups other than the active group</td>
+</tr>
+<tr>
+<td>--dv-inactivegroup-hiddenpanel-tab-color</td>
+<td>The color of the tab for the hidden panel/s in groups other than the active group</td>
+</tr>
+<tr>
+<td>--dv-tab-divider-color</td>
+<td>-</td>
+</tr>
+<tr>
+<td>--dv-tab-close-icon</td>
+<td>Default tab close icon</td>
+</tr>
+<tr>
+<td>--dv-tab-dirty-icon</td>
+<td>Default tab dirty icon</td>
+</tr>
+</tbody></table>
+</div></div><div class="col-4 col-menu menu-sticky-wrap menu-highlight"><nav class="tsd-navigation primary"><ul><li class="current"><a href="modules.html">Exports</a></li><li class=" tsd-kind-namespace"><a href="modules/Disposable.html">Disposable</a></li><li class=" tsd-kind-namespace"><a href="modules/Event.html">Event</a></li><li class=" tsd-kind-namespace"><a href="modules/Sizing.html">Sizing</a></li></ul></nav><nav class="tsd-navigation secondary menu-sticky"><ul><li class="tsd-kind-enum"><a href="enums/DockviewDropTargets.html" class="tsd-kind-icon">Dockview<wbr/>Drop<wbr/>Targets</a></li><li class="tsd-kind-enum"><a href="enums/DragType.html" class="tsd-kind-icon">Drag<wbr/>Type</a></li><li class="tsd-kind-enum"><a href="enums/GroupChangeKind.html" class="tsd-kind-icon">Group<wbr/>Change<wbr/>Kind</a></li><li class="tsd-kind-enum"><a href="enums/LayoutPriority.html" class="tsd-kind-icon">Layout<wbr/>Priority</a></li><li class="tsd-kind-enum"><a href="enums/MouseEventKind.html" class="tsd-kind-icon">Mouse<wbr/>Event<wbr/>Kind</a></li><li class="tsd-kind-enum"><a href="enums/Orientation.html" class="tsd-kind-icon">Orientation</a></li><li class="tsd-kind-enum"><a href="enums/SashState.html" class="tsd-kind-icon">Sash<wbr/>State</a></li><li class="tsd-kind-class"><a href="classes/CompositeDisposable.html" class="tsd-kind-icon">Composite<wbr/>Disposable</a></li><li class="tsd-kind-class"><a href="classes/ContentContainer.html" class="tsd-kind-icon">Content<wbr/>Container</a></li><li class="tsd-kind-class"><a href="classes/DockviewApi.html" class="tsd-kind-icon">Dockview<wbr/>Api</a></li><li class="tsd-kind-class"><a href="classes/DockviewComponent.html" class="tsd-kind-icon">Dockview<wbr/>Component</a></li><li class="tsd-kind-class tsd-has-type-parameter"><a href="classes/Emitter.html" class="tsd-kind-icon">Emitter</a></li><li class="tsd-kind-class"><a href="classes/Gridview.html" class="tsd-kind-icon">Gridview</a></li><li class="tsd-kind-class"><a href="classes/GridviewApi.html" class="tsd-kind-icon">Gridview<wbr/>Api</a></li><li class="tsd-kind-class"><a href="classes/GridviewComponent.html" class="tsd-kind-icon">Gridview<wbr/>Component</a></li><li class="tsd-kind-class"><a href="classes/GridviewPanel.html" class="tsd-kind-icon">Gridview<wbr/>Panel</a></li><li class="tsd-kind-class"><a href="classes/Groupview.html" class="tsd-kind-icon">Groupview</a></li><li class="tsd-kind-class tsd-has-type-parameter"><a href="classes/LocalSelectionTransfer.html" class="tsd-kind-icon">Local<wbr/>Selection<wbr/>Transfer</a></li><li class="tsd-kind-class"><a href="classes/MutableDisposable.html" class="tsd-kind-icon">Mutable<wbr/>Disposable</a></li><li class="tsd-kind-class"><a href="classes/PaneFramework.html" class="tsd-kind-icon">Pane<wbr/>Framework</a></li><li class="tsd-kind-class"><a href="classes/Paneview.html" class="tsd-kind-icon">Paneview</a></li><li class="tsd-kind-class"><a href="classes/PaneviewApi.html" class="tsd-kind-icon">Paneview<wbr/>Api</a></li><li class="tsd-kind-class"><a href="classes/PaneviewComponent.html" class="tsd-kind-icon">Paneview<wbr/>Component</a></li><li class="tsd-kind-class"><a href="classes/ReactPanelContentPart.html" class="tsd-kind-icon">React<wbr/>Panel<wbr/>Content<wbr/>Part</a></li><li class="tsd-kind-class"><a href="classes/ReactPanelHeaderPart.html" class="tsd-kind-icon">React<wbr/>Panel<wbr/>Header<wbr/>Part</a></li><li class="tsd-kind-class tsd-has-type-parameter"><a href="classes/ReactPart.html" class="tsd-kind-icon">React<wbr/>Part</a></li><li class="tsd-kind-class"><a href="classes/Splitview.html" class="tsd-kind-icon">Splitview</a></li><li class="tsd-kind-class"><a href="classes/SplitviewApi.html" class="tsd-kind-icon">Splitview<wbr/>Api</a></li><li class="tsd-kind-class"><a href="classes/SplitviewComponent.html" class="tsd-kind-icon">Splitview<wbr/>Component</a></li><li class="tsd-kind-class"><a href="classes/Tab.html" class="tsd-kind-icon">Tab</a></li><li class="tsd-kind-interface"><a href="interfaces/AddComponentOptions.html" class="tsd-kind-icon">Add<wbr/>Component<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/AddGroupOptions.html" class="tsd-kind-icon">Add<wbr/>Group<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/AddPanelOptions.html" class="tsd-kind-icon">Add<wbr/>Panel<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/AddPaneviewCompponentOptions.html" class="tsd-kind-icon">Add<wbr/>Paneview<wbr/>Compponent<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/AddSplitviewComponentOptions.html" class="tsd-kind-icon">Add<wbr/>Splitview<wbr/>Component<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/CommonApi.html" class="tsd-kind-icon">Common<wbr/>Api</a></li><li class="tsd-kind-interface"><a href="interfaces/DndService.html" class="tsd-kind-icon">Dnd<wbr/>Service</a></li><li class="tsd-kind-interface"><a href="interfaces/DockviewOptions.html" class="tsd-kind-icon">Dockview<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/DockviewReadyEvent.html" class="tsd-kind-icon">Dockview<wbr/>Ready<wbr/>Event</a></li><li class="tsd-kind-interface"><a href="interfaces/DockviewRenderFunctions.html" class="tsd-kind-icon">Dockview<wbr/>Render<wbr/>Functions</a></li><li class="tsd-kind-interface"><a href="interfaces/DragItem.html" class="tsd-kind-icon">Drag<wbr/>Item</a></li><li class="tsd-kind-interface"><a href="interfaces/EmitterOptions.html" class="tsd-kind-icon">Emitter<wbr/>Options</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/Event.html" class="tsd-kind-icon">Event</a></li><li class="tsd-kind-interface"><a href="interfaces/ExternalDragItem.html" class="tsd-kind-icon">External<wbr/>Drag<wbr/>Item</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/GridBranchNode.html" class="tsd-kind-icon">Grid<wbr/>Branch<wbr/>Node</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/GridLeafNode.html" class="tsd-kind-icon">Grid<wbr/>Leaf<wbr/>Node</a></li><li class="tsd-kind-interface"><a href="interfaces/GridPanelViewState.html" class="tsd-kind-icon">Grid<wbr/>Panel<wbr/>View<wbr/>State</a></li><li class="tsd-kind-interface"><a href="interfaces/GridviewInitParameters.html" class="tsd-kind-icon">Gridview<wbr/>Init<wbr/>Parameters</a></li><li class="tsd-kind-interface"><a href="interfaces/GridviewReadyEvent.html" class="tsd-kind-icon">Gridview<wbr/>Ready<wbr/>Event</a></li><li class="tsd-kind-interface"><a href="interfaces/GroupChangeEvent.html" class="tsd-kind-icon">Group<wbr/>Change<wbr/>Event</a></li><li class="tsd-kind-interface"><a href="interfaces/GroupOptions.html" class="tsd-kind-icon">Group<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/GroupPanelContentPartInitParameters.html" class="tsd-kind-icon">Group<wbr/>Panel<wbr/>Content<wbr/>Part<wbr/>Init<wbr/>Parameters</a></li><li class="tsd-kind-interface"><a href="interfaces/GroupPanelFrameworkComponentFactory.html" class="tsd-kind-icon">Group<wbr/>Panel<wbr/>Framework<wbr/>Component<wbr/>Factory</a></li><li class="tsd-kind-interface"><a href="interfaces/GroupPanelPartInitParameters.html" class="tsd-kind-icon">Group<wbr/>Panel<wbr/>Part<wbr/>Init<wbr/>Parameters</a></li><li class="tsd-kind-interface"><a href="interfaces/GroupPanelViewState.html" class="tsd-kind-icon">Group<wbr/>Panel<wbr/>View<wbr/>State</a></li><li class="tsd-kind-interface"><a href="interfaces/GroupviewPanelState.html" class="tsd-kind-icon">Groupview<wbr/>Panel<wbr/>State</a></li><li class="tsd-kind-interface"><a href="interfaces/HeaderPartInitParameters.html" class="tsd-kind-icon">Header<wbr/>Part<wbr/>Init<wbr/>Parameters</a></li><li class="tsd-kind-interface"><a href="interfaces/IActionsRenderer.html" class="tsd-kind-icon">IActions<wbr/>Renderer</a></li><li class="tsd-kind-interface"><a href="interfaces/IBaseView.html" class="tsd-kind-icon">IBase<wbr/>View</a></li><li class="tsd-kind-interface"><a href="interfaces/IContentContainer.html" class="tsd-kind-icon">IContent<wbr/>Container</a></li><li class="tsd-kind-interface"><a href="interfaces/IContentRenderer.html" class="tsd-kind-icon">IContent<wbr/>Renderer</a></li><li class="tsd-kind-interface"><a href="interfaces/IDisposable.html" class="tsd-kind-icon">IDisposable</a></li><li class="tsd-kind-interface"><a href="interfaces/IDockviewComponent.html" class="tsd-kind-icon">IDockview<wbr/>Component</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/IDockviewPanelProps.html" class="tsd-kind-icon">IDockview<wbr/>Panel<wbr/>Props</a></li><li class="tsd-kind-interface"><a href="interfaces/IDockviewReactProps.html" class="tsd-kind-icon">IDockview<wbr/>React<wbr/>Props</a></li><li class="tsd-kind-interface"><a href="interfaces/IDragTragetProps.html" class="tsd-kind-icon">IDrag<wbr/>Traget<wbr/>Props</a></li><li class="tsd-kind-interface"><a href="interfaces/IGridPanelComponentView.html" class="tsd-kind-icon">IGrid<wbr/>Panel<wbr/>Component<wbr/>View</a></li><li class="tsd-kind-interface"><a href="interfaces/IGridView.html" class="tsd-kind-icon">IGrid<wbr/>View</a></li><li class="tsd-kind-interface"><a href="interfaces/IGridviewComponent.html" class="tsd-kind-icon">IGridview<wbr/>Component</a></li><li class="tsd-kind-interface"><a href="interfaces/IGridviewPanel.html" class="tsd-kind-icon">IGridview<wbr/>Panel</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/IGridviewPanelProps.html" class="tsd-kind-icon">IGridview<wbr/>Panel<wbr/>Props</a></li><li class="tsd-kind-interface"><a href="interfaces/IGridviewReactProps.html" class="tsd-kind-icon">IGridview<wbr/>React<wbr/>Props</a></li><li class="tsd-kind-interface"><a href="interfaces/IGroupItem.html" class="tsd-kind-icon">IGroup<wbr/>Item</a></li><li class="tsd-kind-interface"><a href="interfaces/IGroupPanel.html" class="tsd-kind-icon">IGroup<wbr/>Panel</a></li><li class="tsd-kind-interface"><a href="interfaces/IGroupPanelActionbarProps.html" class="tsd-kind-icon">IGroup<wbr/>Panel<wbr/>Actionbar<wbr/>Props</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/IGroupPanelBaseProps.html" class="tsd-kind-icon">IGroup<wbr/>Panel<wbr/>Base<wbr/>Props</a></li><li class="tsd-kind-interface"><a href="interfaces/IGroupPanelInitParameters.html" class="tsd-kind-icon">IGroup<wbr/>Panel<wbr/>Init<wbr/>Parameters</a></li><li class="tsd-kind-interface"><a href="interfaces/IGroupview.html" class="tsd-kind-icon">IGroupview</a></li><li class="tsd-kind-interface"><a href="interfaces/INodeDescriptor.html" class="tsd-kind-icon">INode<wbr/>Descriptor</a></li><li class="tsd-kind-interface"><a href="interfaces/IPaneviewComponent.html" class="tsd-kind-icon">IPaneview<wbr/>Component</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/IPaneviewPanelProps.html" class="tsd-kind-icon">IPaneview<wbr/>Panel<wbr/>Props</a></li><li class="tsd-kind-interface"><a href="interfaces/IPaneviewReactProps.html" class="tsd-kind-icon">IPaneview<wbr/>React<wbr/>Props</a></li><li class="tsd-kind-interface"><a href="interfaces/IRenderable.html" class="tsd-kind-icon">IRenderable</a></li><li class="tsd-kind-interface"><a href="interfaces/ISerializedBranchNode.html" class="tsd-kind-icon">ISerialized<wbr/>Branch<wbr/>Node</a></li><li class="tsd-kind-interface"><a href="interfaces/ISerializedLeafNode.html" class="tsd-kind-icon">ISerialized<wbr/>Leaf<wbr/>Node</a></li><li class="tsd-kind-interface"><a href="interfaces/ISplitViewDescriptor.html" class="tsd-kind-icon">ISplit<wbr/>View<wbr/>Descriptor</a></li><li class="tsd-kind-interface"><a href="interfaces/ISplitviewComponent.html" class="tsd-kind-icon">ISplitview<wbr/>Component</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/ISplitviewPanelProps.html" class="tsd-kind-icon">ISplitview<wbr/>Panel<wbr/>Props</a></li><li class="tsd-kind-interface"><a href="interfaces/ISplitviewReactProps.html" class="tsd-kind-icon">ISplitview<wbr/>React<wbr/>Props</a></li><li class="tsd-kind-interface"><a href="interfaces/ISplitviewStyles.html" class="tsd-kind-icon">ISplitview<wbr/>Styles</a></li><li class="tsd-kind-interface"><a href="interfaces/ITab.html" class="tsd-kind-icon">ITab</a></li><li class="tsd-kind-interface"><a href="interfaces/ITabRenderer.html" class="tsd-kind-icon">ITab<wbr/>Renderer</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/IValueDisposable.html" class="tsd-kind-icon">IValue<wbr/>Disposable</a></li><li class="tsd-kind-interface"><a href="interfaces/IView.html" class="tsd-kind-icon">IView</a></li><li class="tsd-kind-interface"><a href="interfaces/IViewDeserializer.html" class="tsd-kind-icon">IView<wbr/>Deserializer</a></li><li class="tsd-kind-interface"><a href="interfaces/IViewSize.html" class="tsd-kind-icon">IView<wbr/>Size</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/IWatermarkPanelProps.html" class="tsd-kind-icon">IWatermark<wbr/>Panel<wbr/>Props</a></li><li class="tsd-kind-interface"><a href="interfaces/IWatermarkRenderer.html" class="tsd-kind-icon">IWatermark<wbr/>Renderer</a></li><li class="tsd-kind-interface"><a href="interfaces/LayoutMouseEvent.html" class="tsd-kind-icon">Layout<wbr/>Mouse<wbr/>Event</a></li><li class="tsd-kind-interface"><a href="interfaces/MovementOptions.html" class="tsd-kind-icon">Movement<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/MovementOptions2.html" class="tsd-kind-icon">Movement<wbr/>Options2</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/PanelCollection.html" class="tsd-kind-icon">Panel<wbr/>Collection</a></li><li class="tsd-kind-interface"><a href="interfaces/PanelContentPartConstructor.html" class="tsd-kind-icon">Panel<wbr/>Content<wbr/>Part<wbr/>Constructor</a></li><li class="tsd-kind-interface"><a href="interfaces/PanelHeaderPartConstructor.html" class="tsd-kind-icon">Panel<wbr/>Header<wbr/>Part<wbr/>Constructor</a></li><li class="tsd-kind-interface"><a href="interfaces/PanelOptions.html" class="tsd-kind-icon">Panel<wbr/>Options</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/PanelParameters.html" class="tsd-kind-icon">Panel<wbr/>Parameters</a></li><li class="tsd-kind-interface"><a href="interfaces/PanelReference.html" class="tsd-kind-icon">Panel<wbr/>Reference</a></li><li class="tsd-kind-interface"><a href="interfaces/PaneviewDropEvent.html" class="tsd-kind-icon">Paneview<wbr/>Drop<wbr/>Event</a></li><li class="tsd-kind-interface"><a href="interfaces/PaneviewReadyEvent.html" class="tsd-kind-icon">Paneview<wbr/>Ready<wbr/>Event</a></li><li class="tsd-kind-interface"><a href="interfaces/ReactContentPartContext.html" class="tsd-kind-icon">React<wbr/>Content<wbr/>Part<wbr/>Context</a></li><li class="tsd-kind-interface"><a href="interfaces/ReactPortalStore.html" class="tsd-kind-icon">React<wbr/>Portal<wbr/>Store</a></li><li class="tsd-kind-interface"><a href="interfaces/SerializedDockview.html" class="tsd-kind-icon">Serialized<wbr/>Dockview</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/SerializedGridObject.html" class="tsd-kind-icon">Serialized<wbr/>Grid<wbr/>Object</a></li><li class="tsd-kind-interface"><a href="interfaces/SerializedGridview.html" class="tsd-kind-icon">Serialized<wbr/>Gridview</a></li><li class="tsd-kind-interface"><a href="interfaces/SerializedPaneview.html" class="tsd-kind-icon">Serialized<wbr/>Paneview</a></li><li class="tsd-kind-interface"><a href="interfaces/SerializedPaneviewPanel.html" class="tsd-kind-icon">Serialized<wbr/>Paneview<wbr/>Panel</a></li><li class="tsd-kind-interface"><a href="interfaces/SerializedSplitview.html" class="tsd-kind-icon">Serialized<wbr/>Splitview</a></li><li class="tsd-kind-interface"><a href="interfaces/SerializedSplitviewPanel.html" class="tsd-kind-icon">Serialized<wbr/>Splitview<wbr/>Panel</a></li><li class="tsd-kind-interface"><a href="interfaces/SerializedSplitviewPanelData.html" class="tsd-kind-icon">Serialized<wbr/>Splitview<wbr/>Panel<wbr/>Data</a></li><li class="tsd-kind-interface"><a href="interfaces/SplitViewOptions.html" class="tsd-kind-icon">Split<wbr/>View<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/SplitviewReadyEvent.html" class="tsd-kind-icon">Splitview<wbr/>Ready<wbr/>Event</a></li><li class="tsd-kind-interface"><a href="interfaces/TabContextMenuEvent.html" class="tsd-kind-icon">Tab<wbr/>Context<wbr/>Menu<wbr/>Event</a></li><li class="tsd-kind-interface"><a href="interfaces/ViewFactoryData.html" class="tsd-kind-icon">View<wbr/>Factory<wbr/>Data</a></li><li class="tsd-kind-interface"><a href="interfaces/WatermarkConstructor.html" class="tsd-kind-icon">Watermark<wbr/>Constructor</a></li><li class="tsd-kind-interface"><a href="interfaces/WatermarkPartInitParameters.html" class="tsd-kind-icon">Watermark<wbr/>Part<wbr/>Init<wbr/>Parameters</a></li><li class="tsd-kind-type-alias"><a href="modules.html#DataObject" class="tsd-kind-icon">Data<wbr/>Object</a></li><li class="tsd-kind-type-alias"><a href="modules.html#DistributeSizing" class="tsd-kind-icon">Distribute<wbr/>Sizing</a></li><li class="tsd-kind-type-alias"><a href="modules.html#DockviewComponentUpdateOptions" class="tsd-kind-icon">Dockview<wbr/>Component<wbr/>Update<wbr/>Options</a></li><li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="modules.html#GridNode" class="tsd-kind-icon">Grid<wbr/>Node</a></li><li class="tsd-kind-type-alias"><a href="modules.html#GridviewComponentUpdateOptions" class="tsd-kind-icon">Gridview<wbr/>Component<wbr/>Update<wbr/>Options</a></li><li class="tsd-kind-type-alias"><a href="modules.html#GroupPanelUpdateEvent" class="tsd-kind-icon">Group<wbr/>Panel<wbr/>Update<wbr/>Event</a></li><li class="tsd-kind-type-alias"><a href="modules.html#ISerializedNode" class="tsd-kind-icon">ISerialized<wbr/>Node</a></li><li class="tsd-kind-type-alias"><a href="modules.html#InvisibleSizing" class="tsd-kind-icon">Invisible<wbr/>Sizing</a></li><li class="tsd-kind-type-alias"><a href="modules.html#Sizing" class="tsd-kind-icon">Sizing</a></li><li class="tsd-kind-type-alias"><a href="modules.html#SplitSizing" class="tsd-kind-icon">Split<wbr/>Sizing</a></li><li class="tsd-kind-type-alias"><a href="modules.html#SplitviewComponentUpdateOptions" class="tsd-kind-icon">Splitview<wbr/>Component<wbr/>Update<wbr/>Options</a></li><li class="tsd-kind-variable"><a href="modules.html#DATA_KEY" class="tsd-kind-icon">DATA_<wbr/>KEY</a></li><li class="tsd-kind-variable"><a href="modules.html#DockviewComponents" class="tsd-kind-icon">Dockview<wbr/>Components</a></li><li class="tsd-kind-variable"><a href="modules.html#DockviewDropTarget" class="tsd-kind-icon">Dockview<wbr/>Drop<wbr/>Target</a></li><li class="tsd-kind-variable"><a href="modules.html#DockviewReact" class="tsd-kind-icon">Dockview<wbr/>React</a></li><li class="tsd-kind-variable"><a href="modules.html#GridviewReact" class="tsd-kind-icon">Gridview<wbr/>React</a></li><li class="tsd-kind-variable"><a href="modules.html#PaneviewReact" class="tsd-kind-icon">Paneview<wbr/>React</a></li><li class="tsd-kind-variable"><a href="modules.html#ReactPartContext" class="tsd-kind-icon">React<wbr/>Part<wbr/>Context</a></li><li class="tsd-kind-variable"><a href="modules.html#SplitviewReact" class="tsd-kind-icon">Splitview<wbr/>React</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#addDisposableListener" class="tsd-kind-icon">add<wbr/>Disposable<wbr/>Listener</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#addDisposableWindowListener" class="tsd-kind-icon">add<wbr/>Disposable<wbr/>Window<wbr/>Listener</a></li><li class="tsd-kind-function"><a href="modules.html#extractData" class="tsd-kind-icon">extract<wbr/>Data</a></li><li class="tsd-kind-function"><a href="modules.html#getDirectionOrientation" class="tsd-kind-icon">get<wbr/>Direction<wbr/>Orientation</a></li><li class="tsd-kind-function"><a href="modules.html#getGridLocation" class="tsd-kind-icon">get<wbr/>Grid<wbr/>Location</a></li><li class="tsd-kind-function"><a href="modules.html#getLocationOrientation" class="tsd-kind-icon">get<wbr/>Location<wbr/>Orientation</a></li><li class="tsd-kind-function"><a href="modules.html#getPaneData" class="tsd-kind-icon">get<wbr/>Pane<wbr/>Data</a></li><li class="tsd-kind-function"><a href="modules.html#getPanelData" class="tsd-kind-icon">get<wbr/>Panel<wbr/>Data</a></li><li class="tsd-kind-function"><a href="modules.html#getRelativeLocation" class="tsd-kind-icon">get<wbr/>Relative<wbr/>Location</a></li><li class="tsd-kind-function"><a href="modules.html#indexInParent" class="tsd-kind-icon">index<wbr/>In<wbr/>Parent</a></li><li class="tsd-kind-function"><a href="modules.html#isCustomDragEvent" class="tsd-kind-icon">is<wbr/>Custom<wbr/>Drag<wbr/>Event</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#isGridBranchNode" class="tsd-kind-icon">is<wbr/>Grid<wbr/>Branch<wbr/>Node</a></li><li class="tsd-kind-function"><a href="modules.html#isPanelTransferEvent" class="tsd-kind-icon">is<wbr/>Panel<wbr/>Transfer<wbr/>Event</a></li><li class="tsd-kind-function"><a href="modules.html#isReactElement" class="tsd-kind-icon">is<wbr/>React<wbr/>Element</a></li><li class="tsd-kind-function"><a href="modules.html#isTabDragEvent" class="tsd-kind-icon">is<wbr/>Tab<wbr/>Drag<wbr/>Event</a></li><li class="tsd-kind-function"><a href="modules.html#orthogonal" class="tsd-kind-icon">orthogonal</a></li><li class="tsd-kind-function"><a href="modules.html#usePortalsLifecycle" class="tsd-kind-icon">use<wbr/>Portals<wbr/>Lifecycle</a></li></ul></nav></div></div></div><footer class="with-border-bottom"><div class="container"><h2>Legend</h2><div class="tsd-legend-group"><ul class="tsd-legend"><li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li><li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li><li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li><li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li><li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li><li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li><li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li></ul></div><h2>Settings</h2><p>Theme <select id="theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></p></div></footer><div class="container tsd-generator"><p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div><div class="overlay"></div><script src="assets/main.js"></script></body></html>
