@@ -2,7 +2,7 @@
     "packages": [
         "packages/*"
     ],
-    "version": "0.0.23",
+    "version": "0.0.24",
     "command": {
         "publish": {
             "message": "chore(release): publish %s"
