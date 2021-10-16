@@ -588,4 +588,34 @@ describe('dockviewComponent', () => {
         expect(panel3!.api.isGroupActive).toBeFalsy();
         expect(panel3!.api.group.isActive).toBeFalsy();
     });
+
+    test('toJSON shouldnt fire any layout events', () => {
+        dockview.layout(1000, 1000);
+
+        dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+        });
+        dockview.addPanel({
+            id: 'panel4',
+            component: 'default',
+        });
+
+        const disposable = dockview.onDidLayoutChange(() => {
+            fail('onDidLayoutChange shouldnt have been called');
+        });
+
+        const result = dockview.toJSON();
+        expect(result).toBeTruthy();
+
+        disposable.dispose();
+    });
 });

@@ -33,7 +33,12 @@ import { GroupviewPanel } from '../groupview/groupviewPanel';
 import { Event } from '../events';
 
 export interface CommonApi {
+    readonly height: number;
+    readonly width: number;
     readonly onDidLayoutChange: Event<void>;
+    focus(): void;
+    layout(width: number, height: number): void;
+    resizeToFit(): void;
 }
 
 export class SplitviewApi implements CommonApi {

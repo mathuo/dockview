@@ -328,4 +328,67 @@ describe('componentSplitview', () => {
             activeView: 'panel1',
         });
     });
+
+    test('toJSON shouldnt fire any layout events', () => {
+        const splitview = new SplitviewComponent(container, {
+            orientation: Orientation.HORIZONTAL,
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+
+        splitview.layout(1000, 1000);
+
+        splitview.addPanel({
+            id: 'panel1',
+            component: 'testPanel',
+        });
+        splitview.addPanel({
+            id: 'panel2',
+            component: 'testPanel',
+        });
+
+        const disposable = splitview.onDidLayoutChange(() => {
+            fail('onDidLayoutChange shouldnt have been called');
+        });
+
+        const result = splitview.toJSON();
+        expect(result).toBeTruthy();
+
+        disposable.dispose();
+    });
+
+    class EventListenerTracker {
+        private events = new Map<string, Set<any>>();
+
+        get size() {
+            return this.events.size;
+        }
+
+        constructor() {
+            const originalAddEventListener = document.addEventListener;
+            const originalRemoveEventListener = document.removeEventListener;
+
+            document.addEventListener = jest.fn((event, callback, options) => {
+                if (!this.events.has(event)) {
+                    this.events.set(event, new Set<any>());
+                }
+                this.events.get(event).add(callback);
+                originalAddEventListener(event, callback, options);
+            });
+
+            document.removeEventListener = jest.fn(
+                (event, callback, options) => {
+                    if (this.events.has(event)) {
+                        this.events.get(event).delete(callback);
+                        if (this.events.get(event).size === 0) {
+                            this.events.delete(event);
+                        }
+                    }
+
+                    originalRemoveEventListener(event, callback, options);
+                }
+            );
+        }
+    }
 });

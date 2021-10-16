@@ -246,4 +246,34 @@ describe('gridview', () => {
             activePanel: 'panel_1',
         });
     });
+
+    test('toJSON shouldnt fire any layout events', () => {
+        gridview.layout(1000, 1000);
+
+        gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        gridview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+        gridview.addPanel({
+            id: 'panel3',
+            component: 'default',
+        });
+        gridview.addPanel({
+            id: 'panel4',
+            component: 'default',
+        });
+
+        const disposable = gridview.onDidLayoutChange(() => {
+            fail('onDidLayoutChange shouldnt have been called');
+        });
+
+        const result = gridview.toJSON();
+        expect(result).toBeTruthy();
+
+        disposable.dispose();
+    });
 });

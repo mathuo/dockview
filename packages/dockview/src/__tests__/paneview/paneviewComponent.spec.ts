@@ -247,4 +247,33 @@ describe('componentPaneview', () => {
             ],
         });
     });
+
+    test('toJSON shouldnt fire any layout events', () => {
+        const paneview = new PaneviewComponent(container, {
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+        paneview.layout(1000, 1000);
+
+        paneview.addPanel({
+            id: 'panel1',
+            component: 'testPanel',
+            title: 'Panel 1',
+        });
+        paneview.addPanel({
+            id: 'panel2',
+            component: 'testPanel',
+            title: 'Panel 2',
+        });
+
+        const disposable = paneview.onDidLayoutChange(() => {
+            fail('onDidLayoutChange shouldnt have been called');
+        });
+
+        const result = paneview.toJSON();
+        expect(result).toBeTruthy();
+
+        disposable.dispose();
+    });
 });
