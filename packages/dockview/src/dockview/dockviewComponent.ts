@@ -681,14 +681,7 @@ export class DockviewComponent
             .filter((p) => this._panels.has(p.id))
             .forEach((panel) => {
                 panel.setDirty(false);
-                this._onGridEvent.fire({
-                    kind: GroupChangeKind.PANEL_CLEAN,
-                });
             });
-
-        this._onGridEvent.fire({
-            kind: GroupChangeKind.LAYOUT_CONFIG_UPDATED,
-        });
     }
 
     private _addPanel(options: AddPanelOptions): IGroupPanel {
