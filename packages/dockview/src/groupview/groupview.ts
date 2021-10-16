@@ -692,7 +692,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 this.tabsContainer.indexOf(data.panelId) !== -1;
 
             if (fromSameGroup && this.tabsContainer.size === 1) {
-                console.debug('[tabs] ignore event');
                 return;
             }
 
@@ -701,9 +700,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             if (isSameGroup && !position) {
                 const oldIndex = this.tabsContainer.indexOf(panelId);
                 if (oldIndex === index) {
-                    console.debug(
-                        '[tabs] drop indicates no change in position'
-                    );
                     return;
                 }
             }

@@ -105,7 +105,6 @@ export const PaneviewReact = React.forwardRef(
         }, []);
 
         React.useEffect(() => {
-            console.log(paneviewRef.current);
             paneviewRef.current?.updateOptions({
                 frameworkComponents: props.components,
             });

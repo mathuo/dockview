@@ -98,7 +98,6 @@ export class Droptarget extends CompositeDisposable {
                     }
 
                     if (!this.target) {
-                        console.debug('[droptarget] created');
                         this.target = document.createElement('div');
                         this.target.className = 'drop-target-dropzone';
                         this.overlay = document.createElement('div');
@@ -197,7 +196,6 @@ export class Droptarget extends CompositeDisposable {
 
                     const state = this._state;
 
-                    console.debug('[dragtarget] drop');
                     this.removeDropTarget();
 
                     if (state) {
