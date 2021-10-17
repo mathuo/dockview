@@ -18,6 +18,7 @@ import { ITabsContainer, TabsContainer } from './titlebar/tabsContainer';
 import { IWatermarkRenderer } from './types';
 import { GroupviewPanel } from './groupviewPanel';
 import { focusedElement } from '../focusedElement';
+import { DockviewDropTargets } from './dnd';
 
 export enum GroupChangeKind {
     GROUP_ACTIVE = 'GROUP_ACTIVE',
@@ -84,12 +85,6 @@ export interface GroupPanelViewState {
     views: string[];
     activeView?: string;
     id: string;
-}
-
-export enum DockviewDropTargets {
-    Tab,
-    Panel,
-    TabContainer,
 }
 
 export interface IGroupview extends IDisposable, IGridPanelView {

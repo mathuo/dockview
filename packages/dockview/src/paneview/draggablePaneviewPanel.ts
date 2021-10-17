@@ -1,11 +1,7 @@
 import { DragHandler } from '../dnd/abstractDragHandler';
 import { getPaneData, LocalSelectionTransfer } from '../dnd/dataTransfer';
-import {
-    Droptarget,
-    DroptargetEvent,
-    PaneTransfer,
-    Position,
-} from '../dnd/droptarget';
+import { Droptarget, DroptargetEvent, Position } from '../dnd/droptarget';
+import { PaneTransfer } from '../dnd/dataTransfer';
 import { Emitter, Event } from '../events';
 import { IDisposable } from '../lifecycle';
 import { Orientation } from '../splitview/core/splitview';
