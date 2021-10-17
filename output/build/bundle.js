@@ -34177,7 +34177,6 @@ class Droptarget extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDispos
                     return;
                 }
                 if (!this.target) {
-                    console.debug('[droptarget] created');
                     this.target = document.createElement('div');
                     this.target.className = 'drop-target-dropzone';
                     this.overlay = document.createElement('div');
@@ -34258,7 +34257,6 @@ class Droptarget extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDispos
                 e.preventDefault();
                 e.stopPropagation();
                 const state = this._state;
-                console.debug('[dragtarget] drop');
                 this.removeDropTarget();
                 if (state) {
                     this._onDrop.fire({ position: state, event: e });
@@ -35105,12 +35103,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             .filter((p) => this._panels.has(p.id))
             .forEach((panel) => {
             panel.setDirty(false);
-            this._onGridEvent.fire({
-                kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__.GroupChangeKind.PANEL_CLEAN,
-            });
-        });
-        this._onGridEvent.fire({
-            kind: _groupview_groupview__WEBPACK_IMPORTED_MODULE_17__.GroupChangeKind.LAYOUT_CONFIG_UPDATED,
         });
     }
     _addPanel(options) {
@@ -37667,7 +37659,6 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
         if (data) {
             const fromSameGroup = this.tabsContainer.indexOf(data.panelId) !== -1;
             if (fromSameGroup && this.tabsContainer.size === 1) {
-                console.debug('[tabs] ignore event');
                 return;
             }
             const { groupId, panelId } = data;
@@ -37675,7 +37666,6 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
             if (isSameGroup && !position) {
                 const oldIndex = this.tabsContainer.indexOf(panelId);
                 if (oldIndex === index) {
-                    console.debug('[tabs] drop indicates no change in position');
                     return;
                 }
             }
@@ -39945,7 +39935,6 @@ const PaneviewReact = react__WEBPACK_IMPORTED_MODULE_0__.forwardRef((props, ref)
     }, []);
     react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
         var _a;
-        console.log(paneviewRef.current);
         (_a = paneviewRef.current) === null || _a === void 0 ? void 0 : _a.updateOptions({
             frameworkComponents: props.components,
         });
