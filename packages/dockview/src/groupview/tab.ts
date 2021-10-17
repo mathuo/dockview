@@ -7,8 +7,9 @@ import { ITabRenderer } from './types';
 import { focusedElement } from '../focusedElement';
 import { IGroupPanel } from './groupPanel';
 import { GroupviewPanel } from './groupviewPanel';
-import { DroptargetEvent, Droptarget, PanelTransfer } from '../dnd/droptarget';
-import { DockviewDropTargets } from './groupview';
+import { DroptargetEvent, Droptarget } from '../dnd/droptarget';
+import { PanelTransfer } from '../dnd/dataTransfer';
+import { DockviewDropTargets } from './dnd';
 
 export enum MouseEventKind {
     CLICK = 'CLICK',

@@ -11,7 +11,7 @@ import { IDockviewComponent } from '../../dockview/dockviewComponent';
 import { getPanelData } from '../../dnd/dataTransfer';
 import { GroupviewPanel } from '../groupviewPanel';
 import { Droptarget } from '../../dnd/droptarget';
-import { DockviewDropTargets } from '../groupview';
+import { DockviewDropTargets } from '../dnd';
 
 export interface TabDropIndexEvent {
     event: DragEvent;

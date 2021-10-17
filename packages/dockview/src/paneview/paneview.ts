@@ -141,8 +141,8 @@ export class Paneview extends CompositeDisposable implements IDisposable {
     }
 
     public removePane(index: number) {
-        this.splitview.removeView(index);
         const paneItem = this.paneItems.splice(index, 1)[0];
+        this.splitview.removeView(index);
         paneItem.disposable.dispose();
         return paneItem;
     }

@@ -8,31 +8,6 @@ export interface DroptargetEvent {
     event: DragEvent;
 }
 
-class TransferObject {
-    constructor() {
-        //
-    }
-}
-
-export class PanelTransfer extends TransferObject {
-    constructor(
-        public readonly viewId: string,
-        public readonly groupId: string,
-        public readonly panelId: string
-    ) {
-        super();
-    }
-}
-
-export class PaneTransfer extends TransferObject {
-    constructor(
-        public readonly viewId: string,
-        public readonly paneId: string
-    ) {
-        super();
-    }
-}
-
 export enum Position {
     Top = 'Top',
     Left = 'Left',
