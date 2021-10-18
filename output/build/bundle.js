@@ -33871,6 +33871,8 @@ class DragHandler extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDispo
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "PanelTransfer": () => (/* binding */ PanelTransfer),
+/* harmony export */   "PaneTransfer": () => (/* binding */ PaneTransfer),
 /* harmony export */   "DATA_KEY": () => (/* binding */ DATA_KEY),
 /* harmony export */   "isPanelTransferEvent": () => (/* binding */ isPanelTransferEvent),
 /* harmony export */   "DragType": () => (/* binding */ DragType),
@@ -33882,9 +33884,27 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "getPaneData": () => (/* binding */ getPaneData)
 /* harmony export */ });
 /* harmony import */ var _json__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../json */ "../dockview/dist/esm/json.js");
-/* harmony import */ var _droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
 
-
+class TransferObject {
+    constructor() {
+        //
+    }
+}
+class PanelTransfer extends TransferObject {
+    constructor(viewId, groupId, panelId) {
+        super();
+        this.viewId = viewId;
+        this.groupId = groupId;
+        this.panelId = panelId;
+    }
+}
+class PaneTransfer extends TransferObject {
+    constructor(viewId, paneId) {
+        super();
+        this.viewId = viewId;
+        this.paneId = paneId;
+    }
+}
 const DATA_KEY = 'splitview/transfer';
 const isPanelTransferEvent = (event) => {
     if (!event.dataTransfer) {
@@ -33959,19 +33979,19 @@ class LocalSelectionTransfer {
 LocalSelectionTransfer.INSTANCE = new LocalSelectionTransfer();
 function getPanelData() {
     const panelTransfer = LocalSelectionTransfer.getInstance();
-    const isPanelEvent = panelTransfer.hasData(_droptarget__WEBPACK_IMPORTED_MODULE_1__.PanelTransfer.prototype);
+    const isPanelEvent = panelTransfer.hasData(PanelTransfer.prototype);
     if (!isPanelEvent) {
         return undefined;
     }
-    return panelTransfer.getData(_droptarget__WEBPACK_IMPORTED_MODULE_1__.PanelTransfer.prototype)[0];
+    return panelTransfer.getData(PanelTransfer.prototype)[0];
 }
 function getPaneData() {
     const paneTransfer = LocalSelectionTransfer.getInstance();
-    const isPanelEvent = paneTransfer.hasData(_droptarget__WEBPACK_IMPORTED_MODULE_1__.PaneTransfer.prototype);
+    const isPanelEvent = paneTransfer.hasData(PaneTransfer.prototype);
     if (!isPanelEvent) {
         return undefined;
     }
-    return paneTransfer.getData(_droptarget__WEBPACK_IMPORTED_MODULE_1__.PaneTransfer.prototype)[0];
+    return paneTransfer.getData(PaneTransfer.prototype)[0];
 }
 
 
@@ -34114,8 +34134,6 @@ class DragAndDrop extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDispo
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PanelTransfer": () => (/* binding */ PanelTransfer),
-/* harmony export */   "PaneTransfer": () => (/* binding */ PaneTransfer),
 /* harmony export */   "Position": () => (/* binding */ Position),
 /* harmony export */   "Droptarget": () => (/* binding */ Droptarget)
 /* harmony export */ });
@@ -34127,26 +34145,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-class TransferObject {
-    constructor() {
-        //
-    }
-}
-class PanelTransfer extends TransferObject {
-    constructor(viewId, groupId, panelId) {
-        super();
-        this.viewId = viewId;
-        this.groupId = groupId;
-        this.panelId = panelId;
-    }
-}
-class PaneTransfer extends TransferObject {
-    constructor(viewId, paneId) {
-        super();
-        this.viewId = viewId;
-        this.paneId = paneId;
-    }
-}
 var Position;
 (function (Position) {
     Position["Top"] = "Top";
@@ -37164,6 +37162,27 @@ class LeafNode {
 
 /***/ }),
 
+/***/ "../dockview/dist/esm/groupview/dnd.js":
+/*!*********************************************!*\
+  !*** ../dockview/dist/esm/groupview/dnd.js ***!
+  \*********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DockviewDropTargets": () => (/* binding */ DockviewDropTargets)
+/* harmony export */ });
+var DockviewDropTargets;
+(function (DockviewDropTargets) {
+    DockviewDropTargets[DockviewDropTargets["Tab"] = 0] = "Tab";
+    DockviewDropTargets[DockviewDropTargets["Panel"] = 1] = "Panel";
+    DockviewDropTargets[DockviewDropTargets["TabContainer"] = 2] = "TabContainer";
+})(DockviewDropTargets || (DockviewDropTargets = {}));
+
+
+/***/ }),
+
 /***/ "../dockview/dist/esm/groupview/groupPanel.js":
 /*!****************************************************!*\
   !*** ../dockview/dist/esm/groupview/groupPanel.js ***!
@@ -37187,7 +37206,6 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "GroupChangeKind": () => (/* binding */ GroupChangeKind),
-/* harmony export */   "DockviewDropTargets": () => (/* binding */ DockviewDropTargets),
 /* harmony export */   "Groupview": () => (/* binding */ Groupview)
 /* harmony export */ });
 /* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/component.api */ "../dockview/dist/esm/api/component.api.js");
@@ -37200,6 +37218,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _panel_content__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./panel/content */ "../dockview/dist/esm/groupview/panel/content.js");
 /* harmony import */ var _titlebar_tabsContainer__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./titlebar/tabsContainer */ "../dockview/dist/esm/groupview/titlebar/tabsContainer.js");
 /* harmony import */ var _focusedElement__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../focusedElement */ "../dockview/dist/esm/focusedElement.js");
+/* harmony import */ var _dnd__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./dnd */ "../dockview/dist/esm/groupview/dnd.js");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -37209,6 +37228,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+
 
 
 
@@ -37241,12 +37261,6 @@ var GroupChangeKind;
     //
     GroupChangeKind["LAYOUT_CONFIG_UPDATED"] = "LAYOUT_CONFIG_UPDATED";
 })(GroupChangeKind || (GroupChangeKind = {}));
-var DockviewDropTargets;
-(function (DockviewDropTargets) {
-    DockviewDropTargets[DockviewDropTargets["Tab"] = 0] = "Tab";
-    DockviewDropTargets[DockviewDropTargets["Panel"] = 1] = "Panel";
-    DockviewDropTargets[DockviewDropTargets["TabContainer"] = 2] = "TabContainer";
-})(DockviewDropTargets || (DockviewDropTargets = {}));
 class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposable {
     constructor(container, accessor, id, options, parent) {
         super();
@@ -37287,7 +37301,7 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
                     const groupHasOnePanelAndIsActiveDragElement = this._panels.length === 1 && data.groupId === this.id;
                     return !groupHasOnePanelAndIsActiveDragElement;
                 }
-                return this.canDisplayOverlay(event, DockviewDropTargets.Panel);
+                return this.canDisplayOverlay(event, _dnd__WEBPACK_IMPORTED_MODULE_10__.DockviewDropTargets.Panel);
             },
         });
         container.append(this.tabsContainer.element, this.contentContainer.element);
@@ -37859,7 +37873,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../dom */ "../dockview/dist/esm/dom.js");
 /* harmony import */ var _focusedElement__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../focusedElement */ "../dockview/dist/esm/focusedElement.js");
 /* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../dnd/droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
-/* harmony import */ var _groupview__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./groupview */ "../dockview/dist/esm/groupview/groupview.js");
+/* harmony import */ var _dnd__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./dnd */ "../dockview/dist/esm/groupview/dnd.js");
+
 
 
 
@@ -37900,8 +37915,8 @@ class Tab extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable {
             this.element.classList.add('dragged');
             setTimeout(() => this.element.classList.remove('dragged'), 0);
             this.panelTransfer.setData([
-                new _dnd_droptarget__WEBPACK_IMPORTED_MODULE_5__.PanelTransfer(this.accessor.id, this.group.id, this.panelId),
-            ], _dnd_droptarget__WEBPACK_IMPORTED_MODULE_5__.PanelTransfer.prototype);
+                new _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.PanelTransfer(this.accessor.id, this.group.id, this.panelId),
+            ], _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.PanelTransfer.prototype);
             if (event.dataTransfer) {
                 event.dataTransfer.effectAllowed = 'move';
             }
@@ -37910,7 +37925,7 @@ class Tab extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable {
                 iframe.style.pointerEvents = 'auto';
             }
             this.iframes = [];
-            this.panelTransfer.clearData(_dnd_droptarget__WEBPACK_IMPORTED_MODULE_5__.PanelTransfer.prototype);
+            this.panelTransfer.clearData(_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.PanelTransfer.prototype);
         }), (0,_events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener)(this._element, 'mousedown', (event) => {
             if (event.defaultPrevented) {
                 return;
@@ -37948,7 +37963,7 @@ class Tab extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable {
                 if (data) {
                     return this.panelId !== data.panelId;
                 }
-                return this.group.model.canDisplayOverlay(event, _groupview__WEBPACK_IMPORTED_MODULE_6__.DockviewDropTargets.Tab);
+                return this.group.model.canDisplayOverlay(event, _dnd__WEBPACK_IMPORTED_MODULE_6__.DockviewDropTargets.Tab);
             },
         });
         this.addDisposables(this.droptarget.onDrop((event) => {
@@ -37995,7 +38010,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../array */ "../dockview/dist/esm/array.js");
 /* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../dnd/dataTransfer */ "../dockview/dist/esm/dnd/dataTransfer.js");
 /* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../dnd/droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
-/* harmony import */ var _groupview__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../groupview */ "../dockview/dist/esm/groupview/groupview.js");
+/* harmony import */ var _dnd__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../dnd */ "../dockview/dist/esm/groupview/dnd.js");
 
 
 
@@ -38035,7 +38050,7 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
                     // don't show the overlay if the tab being dragged is the last panel of this group
                     return ((_a = (0,_array__WEBPACK_IMPORTED_MODULE_3__.last)(this.tabs)) === null || _a === void 0 ? void 0 : _a.value.panelId) !== data.panelId;
                 }
-                return group.model.canDisplayOverlay(event, _groupview__WEBPACK_IMPORTED_MODULE_6__.DockviewDropTargets.Panel);
+                return group.model.canDisplayOverlay(event, _dnd__WEBPACK_IMPORTED_MODULE_6__.DockviewDropTargets.Panel);
             },
         });
         this.addDisposables(this.voidDropTarget.onDrop((event) => {
@@ -38224,7 +38239,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "indexInParent": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_5__.indexInParent),
 /* harmony export */   "isGridBranchNode": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_5__.isGridBranchNode),
 /* harmony export */   "orthogonal": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_5__.orthogonal),
-/* harmony export */   "DockviewDropTargets": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_6__.DockviewDropTargets),
 /* harmony export */   "GroupChangeKind": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_6__.GroupChangeKind),
 /* harmony export */   "Groupview": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_6__.Groupview),
 /* harmony export */   "ContentContainer": () => (/* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_7__.ContentContainer),
@@ -38246,6 +38260,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "DATA_KEY": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_17__.DATA_KEY),
 /* harmony export */   "DragType": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_17__.DragType),
 /* harmony export */   "LocalSelectionTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_17__.LocalSelectionTransfer),
+/* harmony export */   "PaneTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_17__.PaneTransfer),
+/* harmony export */   "PanelTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_17__.PanelTransfer),
 /* harmony export */   "extractData": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_17__.extractData),
 /* harmony export */   "getPaneData": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_17__.getPaneData),
 /* harmony export */   "getPanelData": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_17__.getPanelData),
@@ -38477,6 +38493,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 class DraggablePaneviewPanel extends _paneviewPanel__WEBPACK_IMPORTED_MODULE_4__.PaneviewPanel {
     constructor(id, component, headerComponent, orientation, isExpanded, disableDnd) {
         super(id, component, headerComponent, orientation, isExpanded);
@@ -38492,10 +38509,10 @@ class DraggablePaneviewPanel extends _paneviewPanel__WEBPACK_IMPORTED_MODULE_4__
         this.header.tabIndex = 0;
         this.handler = new (class PaneDragHandler extends _dnd_abstractDragHandler__WEBPACK_IMPORTED_MODULE_0__.DragHandler {
             getData() {
-                _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.LocalSelectionTransfer.getInstance().setData([new _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.PaneTransfer('paneview', id)], _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.PaneTransfer.prototype);
+                _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.LocalSelectionTransfer.getInstance().setData([new _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.PaneTransfer('paneview', id)], _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.PaneTransfer.prototype);
                 return {
                     dispose: () => {
-                        _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.LocalSelectionTransfer.getInstance().clearData(_dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.PaneTransfer.prototype);
+                        _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.LocalSelectionTransfer.getInstance().clearData(_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.PaneTransfer.prototype);
                     },
                 };
             }
@@ -38653,8 +38670,8 @@ class Paneview extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposab
         return this.splitview.getViews();
     }
     removePane(index) {
-        this.splitview.removeView(index);
         const paneItem = this.paneItems.splice(index, 1)[0];
+        this.splitview.removeView(index);
         paneItem.disposable.dispose();
         return paneItem;
     }
