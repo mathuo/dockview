@@ -21,29 +21,29 @@ export interface State {
 }
 
 export interface FocusEvent {
-    isFocused: boolean;
+    readonly isFocused: boolean;
 }
 export interface PanelDimensionChangeEvent {
-    width: number;
-    height: number;
+    readonly width: number;
+    readonly height: number;
 }
 
 export interface VisibilityEvent {
-    isVisible: boolean;
+    readonly isVisible: boolean;
 }
 
 export interface ActiveEvent {
-    isActive: boolean;
+    readonly isActive: boolean;
 }
 
 export interface PanelApi {
     // events
-    onDidDimensionsChange: Event<PanelDimensionChangeEvent>;
-    onDidStateChange: Event<void>;
-    onDidFocusChange: Event<FocusEvent>;
-    onDidVisibilityChange: Event<VisibilityEvent>;
-    onDidActiveChange: Event<ActiveEvent>;
-    onFocusEvent: Event<void>;
+    readonly onDidDimensionsChange: Event<PanelDimensionChangeEvent>;
+    readonly onDidStateChange: Event<void>;
+    readonly onDidFocusChange: Event<FocusEvent>;
+    readonly onDidVisibilityChange: Event<VisibilityEvent>;
+    readonly onDidActiveChange: Event<ActiveEvent>;
+    readonly onFocusEvent: Event<void>;
     //
     setVisible(isVisible: boolean): void;
     setActive(): void;
@@ -92,11 +92,10 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
     readonly _onDidStateChange = new Emitter<void>();
     readonly onDidStateChange: Event<void> = this._onDidStateChange.event;
     //
-    readonly _onDidPanelDimensionChange = new Emitter<PanelDimensionChangeEvent>(
-        {
+    readonly _onDidPanelDimensionChange =
+        new Emitter<PanelDimensionChangeEvent>({
             replay: true,
-        }
-    );
+        });
     readonly onDidDimensionsChange = this._onDidPanelDimensionChange.event;
     //
     readonly _onDidChangeFocus = new Emitter<FocusEvent>({
@@ -110,19 +109,19 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
     readonly _onDidVisibilityChange = new Emitter<VisibilityEvent>({
         replay: true,
     });
-    readonly onDidVisibilityChange: Event<VisibilityEvent> = this
-        ._onDidVisibilityChange.event;
+    readonly onDidVisibilityChange: Event<VisibilityEvent> =
+        this._onDidVisibilityChange.event;
     //
 
     readonly _onVisibilityChange = new Emitter<VisibilityEvent>();
-    readonly onVisibilityChange: Event<VisibilityEvent> = this
-        ._onVisibilityChange.event;
+    readonly onVisibilityChange: Event<VisibilityEvent> =
+        this._onVisibilityChange.event;
     //
     readonly _onDidActiveChange = new Emitter<ActiveEvent>({
         replay: true,
     });
-    readonly onDidActiveChange: Event<ActiveEvent> = this._onDidActiveChange
-        .event;
+    readonly onDidActiveChange: Event<ActiveEvent> =
+        this._onDidActiveChange.event;
     //
     readonly _onActiveChange = new Emitter<void>();
     readonly onActiveChange: Event<void> = this._onActiveChange.event;

@@ -28,6 +28,7 @@ export {
     PanelDimensionChangeEvent,
     VisibilityEvent,
     ActiveEvent,
+    PanelApi,
 } from './api/panelApi';
 export {
     SizeEvent,

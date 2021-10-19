@@ -35,6 +35,9 @@ export class GroupviewPanel extends GridviewPanel {
         super(id, 'groupview_default', new GridviewPanelApiImpl(id));
 
         this._model = new Groupview(this.element, accessor, id, options, this);
+    }
+
+    initialize() {
         this.model.initialize();
     }
 
