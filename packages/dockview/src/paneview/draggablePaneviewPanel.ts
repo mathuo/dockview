@@ -58,7 +58,6 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
     private initDragFeatures() {
         const id = this.id;
         this.header!.draggable = true;
-        this.header!.tabIndex = 0;
 
         this.handler = new (class PaneDragHandler extends DragHandler {
             getData(): IDisposable {

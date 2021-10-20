@@ -193,9 +193,9 @@ export abstract class BaseGrid<T extends IGridPanelView>
     protected doAddGroup(group: T, location: number[] = [0], size?: number) {
         this.gridview.addView(group, size ?? Sizing.Distribute, location);
 
-        this.doSetGroupActive(group);
-
         this._onGridEvent.fire({ kind: GroupChangeKind.ADD_GROUP });
+
+        this.doSetGroupActive(group);
     }
 
     protected doRemoveGroup(
@@ -215,11 +215,15 @@ export abstract class BaseGrid<T extends IGridPanelView>
             this._groups.delete(group.id);
         }
 
-        if (!options?.skipActive && this._groups.size > 0) {
-            this.doSetGroupActive(Array.from(this._groups.values())[0].value);
-        }
-
         this._onGridEvent.fire({ kind: GroupChangeKind.REMOVE_GROUP });
+
+        if (!options?.skipActive && this._activeGroup === group) {
+            const groups = Array.from(this._groups.values());
+
+            this.doSetGroupActive(
+                groups.length > 0 ? groups[0].value : undefined
+            );
+        }
 
         return view as T;
     }
@@ -228,7 +232,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         return this._groups.get(id)?.value;
     }
 
-    public doSetGroupActive(group: T, skipFocus?: boolean) {
+    public doSetGroupActive(group: T | undefined, skipFocus?: boolean) {
         if (this._activeGroup === group) {
             return;
         }
@@ -238,17 +242,20 @@ export abstract class BaseGrid<T extends IGridPanelView>
                 this._activeGroup.focus();
             }
         }
-        group.setActive(true);
-        if (!skipFocus) {
-            group.focus();
+
+        if (group) {
+            group.setActive(true);
+            if (!skipFocus) {
+                group.focus();
+            }
         }
+
         this._activeGroup = group;
+
+        this._onGridEvent.fire({ kind: GroupChangeKind.GROUP_ACTIVE });
     }
 
     public removeGroup(group: T) {
-        if (group === this._activeGroup) {
-            this._activeGroup = undefined;
-        }
         this.doRemoveGroup(group);
     }
 

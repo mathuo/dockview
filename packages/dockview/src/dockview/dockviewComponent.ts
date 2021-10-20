@@ -380,7 +380,7 @@ export class DockviewComponent
 
         this.gridview.layout(this.width, this.height);
 
-        this._onGridEvent.fire({ kind: GroupChangeKind.NEW_LAYOUT });
+        this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT_FROM_JSON });
     }
 
     async closeAllGroups(): Promise<boolean> {
