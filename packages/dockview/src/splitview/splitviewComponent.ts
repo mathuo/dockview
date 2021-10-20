@@ -279,7 +279,7 @@ export class SplitviewComponent
             return;
         }
         const { width, height } =
-            this.element.parentElement?.getBoundingClientRect();
+            this.element.parentElement.getBoundingClientRect();
         this.layout(width, height);
     }
 
