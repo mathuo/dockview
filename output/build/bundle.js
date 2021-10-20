@@ -33341,14 +33341,12 @@ class GridviewPanelApiImpl extends _panelApi__WEBPACK_IMPORTED_MODULE_1__.PanelA
     constructor(id) {
         super(id);
         this._onDidConstraintsChangeInternal = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        this.onDidConstraintsChangeInternal = this
-            ._onDidConstraintsChangeInternal.event;
+        this.onDidConstraintsChangeInternal = this._onDidConstraintsChangeInternal.event;
         //
         this._onDidConstraintsChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
             replay: true,
         });
-        this.onDidConstraintsChange = this
-            ._onDidConstraintsChange.event;
+        this.onDidConstraintsChange = this._onDidConstraintsChange.event;
         //
         this._onDidSizeChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
         this.onDidSizeChange = this._onDidSizeChange.event;
@@ -33385,11 +33383,6 @@ class DockviewPanelApiImpl extends _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1_
         this.panel = panel;
         this._onDidDirtyChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
         this.onDidDirtyChange = this._onDidDirtyChange.event;
-        // readonly _onDidGroupPanelVisibleChange = new Emitter<VisibilityEvent>({
-        //     replay: true,
-        // });
-        // readonly onDidGroupPanelVisibleChange: Event<VisibilityEvent> = this
-        //     ._onDidGroupPanelVisibleChange.event;
         this._onDidTitleChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
         this.onDidTitleChange = this._onDidTitleChange.event;
         this._titleChanged = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
@@ -33397,17 +33390,8 @@ class DockviewPanelApiImpl extends _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1_
         this._suppressClosableChanged = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
         this.suppressClosableChanged = this._suppressClosableChanged.event;
         this._group = group;
-        this.addDisposables(
-        // this._onDidGroupPanelVisibleChange,
-        this._onDidDirtyChange
-        // this.onDidGroupPanelVisibleChange((event) => {
-        //     this._isGroupVisible = event.isVisible;
-        // })
-        );
+        this.addDisposables(this._onDidDirtyChange);
     }
-    // get isGroupVisible() {
-    //     return this._isGroupVisible;
-    // }
     get tryClose() {
         return this._interceptor;
     }
@@ -33494,18 +33478,15 @@ class PanelApiImpl extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisp
         this._onDidVisibilityChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
             replay: true,
         });
-        this.onDidVisibilityChange = this
-            ._onDidVisibilityChange.event;
+        this.onDidVisibilityChange = this._onDidVisibilityChange.event;
         //
         this._onVisibilityChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        this.onVisibilityChange = this
-            ._onVisibilityChange.event;
+        this.onVisibilityChange = this._onVisibilityChange.event;
         //
         this._onDidActiveChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
             replay: true,
         });
-        this.onDidActiveChange = this._onDidActiveChange
-            .event;
+        this.onDidActiveChange = this._onDidActiveChange.event;
         //
         this._onActiveChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
         this.onActiveChange = this._onActiveChange.event;
@@ -33586,8 +33567,7 @@ class PaneviewPanelApiImpl extends _splitviewPanelApi__WEBPACK_IMPORTED_MODULE_1
         this._onDidExpansionChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
             replay: true,
         });
-        this.onDidExpansionChange = this
-            ._onDidExpansionChange.event;
+        this.onDidExpansionChange = this._onDidExpansionChange.event;
         this._onMouseEnter = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({});
         this.onMouseEnter = this._onMouseEnter.event;
         this._onMouseLeave = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({});
@@ -33629,18 +33609,15 @@ class SplitviewPanelApiImpl extends _panelApi__WEBPACK_IMPORTED_MODULE_1__.Panel
     constructor(id) {
         super(id);
         this._onDidConstraintsChangeInternal = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        this.onDidConstraintsChangeInternal = this
-            ._onDidConstraintsChangeInternal.event;
+        this.onDidConstraintsChangeInternal = this._onDidConstraintsChangeInternal.event;
         //
         this._onDidConstraintsChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
             replay: true,
         });
-        this.onDidConstraintsChange = this
-            ._onDidConstraintsChange.event;
+        this.onDidConstraintsChange = this._onDidConstraintsChange.event;
         //
         this._onDidSizeChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
-        this.onDidSizeChange = this._onDidSizeChange
-            .event;
+        this.onDidSizeChange = this._onDidSizeChange.event;
     }
     setConstraints(value) {
         this._onDidConstraintsChangeInternal.fire(value);
@@ -35062,9 +35039,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             }
         }
         const view = new _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_18__.GroupviewPanel(this, id, options);
-        if (typeof this.options.tabHeight === 'number') {
-            view.model.tabHeight = this.options.tabHeight;
-        }
         if (!this._groups.has(view.id)) {
             const disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.CompositeDisposable(view.model.onMove((event) => {
                 const { groupId, itemId, target, index } = event;
@@ -35073,6 +35047,12 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
                 this._onGridEvent.fire(event);
             }));
             this._groups.set(view.id, { value: view, disposable });
+        }
+        // TODO: must be called after the above listeners have been setup,
+        // not an ideal pattern
+        view.initialize();
+        if (typeof this.options.tabHeight === 'number') {
+            view.model.tabHeight = this.options.tabHeight;
         }
         return view;
     }
@@ -37583,7 +37563,7 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
             this.openPanel(nextPanel);
         }
         if (this._activePanel && this.panels.length === 0) {
-            this._activePanel = undefined;
+            this.doSetActivePanel(undefined);
         }
         this.updateContainer();
         return panel;
@@ -37616,15 +37596,19 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_6__.CompositeDisposa
         }
         this.updateMru(panel);
         this.panels.splice(index, 0, panel);
-        this._onDidGroupChange.fire({ kind: GroupChangeKind.ADD_PANEL });
+        this._onDidGroupChange.fire({ kind: GroupChangeKind.ADD_PANEL, panel });
     }
     doSetActivePanel(panel) {
         this._activePanel = panel;
-        this.tabsContainer.setActivePanel(panel);
-        // this.contentContainer.openPanel(panel.content);
-        panel.layout(this._width, this._height);
-        this.updateMru(panel);
-        this._onDidGroupChange.fire({ kind: GroupChangeKind.PANEL_ACTIVE });
+        if (panel) {
+            this.tabsContainer.setActivePanel(panel);
+            panel.layout(this._width, this._height);
+            this.updateMru(panel);
+        }
+        this._onDidGroupChange.fire({
+            kind: GroupChangeKind.PANEL_ACTIVE,
+            panel,
+        });
     }
     updateMru(panel) {
         if (this.mostRecentlyUsed.includes(panel)) {
@@ -37729,7 +37713,6 @@ class GroupviewPanel extends _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_2_
     constructor(accessor, id, options) {
         super(id, 'groupview_default', new _api_gridviewPanelApi__WEBPACK_IMPORTED_MODULE_0__.GridviewPanelApiImpl(id));
         this._model = new _groupview__WEBPACK_IMPORTED_MODULE_1__.Groupview(this.element, accessor, id, options, this);
-        this.model.initialize();
     }
     get model() {
         return this._model;
@@ -37745,6 +37728,9 @@ class GroupviewPanel extends _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_2_
     }
     get maximumWidth() {
         return this._model.maximumWidth;
+    }
+    initialize() {
+        this.model.initialize();
     }
     setActive(isActive) {
         super.setActive(isActive);
