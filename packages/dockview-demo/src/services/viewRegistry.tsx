@@ -1,4 +1,5 @@
 import React from 'react';
+import { ControlCenter } from '../layout-grid/controlCenter';
 
 export interface RegisteredView {
     id: string;
@@ -50,19 +51,7 @@ VIEW_REGISTRY.register({
     title: 'Home',
     icon: 'home',
     isLocationEditable: true,
-    component: () => {
-        return (
-            <div
-                style={{
-                    backgroundColor: 'lightblue',
-                    color: 'black',
-                    height: '100%',
-                }}
-            >
-                Home
-            </div>
-        );
-    },
+    component: ControlCenter,
 });
 VIEW_REGISTRY.register({
     id: 'account_widget',
