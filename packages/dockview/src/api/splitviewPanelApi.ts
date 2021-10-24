@@ -4,43 +4,45 @@ import { FunctionOrValue } from '../types';
 import { PanelApiImpl, PanelApi } from './panelApi';
 
 interface PanelConstraintChangeEvent2 {
-    minimumSize?: FunctionOrValue<number>;
-    maximumSize?: FunctionOrValue<number>;
+    readonly minimumSize?: FunctionOrValue<number>;
+    readonly maximumSize?: FunctionOrValue<number>;
 }
 
 export interface PanelConstraintChangeEvent {
-    minimumSize?: number;
-    maximumSize?: number;
+    readonly minimumSize?: number;
+    readonly maximumSize?: number;
 }
 
 export interface PanelSizeEvent {
-    size: number;
+    readonly size: number;
 }
 
 export interface SplitviewPanelApi extends PanelApi {
-    onDidConstraintsChange: Event<PanelConstraintChangeEvent>;
+    readonly onDidConstraintsChange: Event<PanelConstraintChangeEvent>;
     setConstraints(value: PanelConstraintChangeEvent2): void;
     setSize(event: PanelSizeEvent): void;
 }
 
 export class SplitviewPanelApiImpl
     extends PanelApiImpl
-    implements SplitviewPanelApi, IDisposable {
-    readonly _onDidConstraintsChangeInternal = new Emitter<PanelConstraintChangeEvent2>();
-    readonly onDidConstraintsChangeInternal: Event<PanelConstraintChangeEvent2> = this
-        ._onDidConstraintsChangeInternal.event;
+    implements SplitviewPanelApi, IDisposable
+{
+    readonly _onDidConstraintsChangeInternal =
+        new Emitter<PanelConstraintChangeEvent2>();
+    readonly onDidConstraintsChangeInternal: Event<PanelConstraintChangeEvent2> =
+        this._onDidConstraintsChangeInternal.event;
     //
 
     readonly _onDidConstraintsChange = new Emitter<PanelConstraintChangeEvent>({
         replay: true,
     });
-    readonly onDidConstraintsChange: Event<PanelConstraintChangeEvent> = this
-        ._onDidConstraintsChange.event;
+    readonly onDidConstraintsChange: Event<PanelConstraintChangeEvent> =
+        this._onDidConstraintsChange.event;
     //
 
     readonly _onDidSizeChange = new Emitter<PanelSizeEvent>();
-    readonly onDidSizeChange: Event<PanelSizeEvent> = this._onDidSizeChange
-        .event;
+    readonly onDidSizeChange: Event<PanelSizeEvent> =
+        this._onDidSizeChange.event;
     //
 
     constructor(id: string) {

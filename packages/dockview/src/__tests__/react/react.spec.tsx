@@ -1,6 +1,6 @@
 import { ReactPart } from '../../react/react';
 import * as React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 
 interface TestInterface {
     valueA: string;
@@ -23,12 +23,16 @@ describe('react', () => {
             expect(screen.getByTestId('valueA').textContent).toBe('stringA');
             expect(screen.getByTestId('valueB').textContent).toBe('42');
 
-            api.update({ valueB: '32' });
+            act(() => {
+                api.update({ valueB: '32' });
+            });
 
             expect(screen.getByTestId('valueA').textContent).toBe('stringA');
             expect(screen.getByTestId('valueB').textContent).toBe('32');
 
-            api.update({ valueA: 'anotherStringA', valueB: '22' });
+            act(() => {
+                api.update({ valueA: 'anotherStringA', valueB: '22' });
+            });
 
             expect(screen.getByTestId('valueA').textContent).toBe(
                 'anotherStringA'

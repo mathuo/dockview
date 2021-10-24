@@ -20,5 +20,7 @@ describe('lifecycle', () => {
 
         mutableDisposable.dispose();
         expect(disposed).toBe(2);
+
+        mutableDisposable.dispose();
     });
 });

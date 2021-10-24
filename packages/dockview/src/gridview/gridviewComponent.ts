@@ -248,7 +248,7 @@ export class GridviewComponent
             }
         }
 
-        this._onGridEvent.fire({ kind: GroupChangeKind.NEW_LAYOUT });
+        this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT_FROM_JSON });
     }
 
     movePanel(

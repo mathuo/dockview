@@ -275,6 +275,7 @@ export class Gridview implements IDisposable {
     }
 
     public dispose() {
+        this.disposable.dispose();
         this._onDidChange.dispose();
         this.root.dispose();
     }

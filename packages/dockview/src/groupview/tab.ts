@@ -115,20 +115,7 @@ export class Tab extends CompositeDisposable implements ITab {
                  */
                 event.stopPropagation();
 
-                /**
-                 * //TODO mousedown focusing with draggable element (is there a better approach?)
-                 *
-                 * this mousedown event wants to focus the tab itself but if we call preventDefault()
-                 * this would also prevent the dragStart event from firing. To get around this we propagate
-                 * the onChanged event during the next tick of the event-loop, allowing the tab element to become
-                 * focused on this tick and ensuring the dragstart event is not interrupted
-                 */
-
-                const oldFocus = focusedElement.element as HTMLElement;
-                setTimeout(() => {
-                    oldFocus.focus();
-                    this._onChanged.fire({ kind: MouseEventKind.CLICK, event });
-                }, 0);
+                this._onChanged.fire({ kind: MouseEventKind.CLICK, event });
             }),
             addDisposableListener(this._element, 'contextmenu', (event) => {
                 this._onChanged.fire({

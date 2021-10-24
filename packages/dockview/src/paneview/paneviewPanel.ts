@@ -1,5 +1,6 @@
 import { PaneviewApi } from '../api/component.api';
 import { PaneviewPanelApiImpl } from '../api/paneviewPanelApi';
+import { addClasses, removeClasses } from '../dom';
 import { addDisposableListener, Emitter, Event } from '../events';
 import {
     BasePanelView,
@@ -180,6 +181,16 @@ export abstract class PaneviewPanel
                 this.api._onDidExpansionChange.fire({
                     isExpanded: isPanelExpanded,
                 });
+            }),
+            this.api.onDidFocusChange((e) => {
+                if (!this.header) {
+                    return;
+                }
+                if (e.isFocused) {
+                    addClasses(this.header, 'focused');
+                } else {
+                    removeClasses(this.header, 'focused');
+                }
             })
         );
 
@@ -270,7 +281,7 @@ export abstract class PaneviewPanel
 
     private renderOnce() {
         this.header = document.createElement('div');
-        this.header.tabIndex = -1;
+        this.header.tabIndex = 0;
 
         this.header.className = 'pane-header';
         this.header.style.height = `${this.headerSize}px`;
@@ -281,7 +292,6 @@ export abstract class PaneviewPanel
         this.element.appendChild(this.header);
 
         this.body = document.createElement('div');
-        this.body.tabIndex = -1;
 
         this.body.className = 'pane-body';
 

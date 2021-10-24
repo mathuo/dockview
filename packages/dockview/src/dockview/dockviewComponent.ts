@@ -380,7 +380,7 @@ export class DockviewComponent
 
         this.gridview.layout(this.width, this.height);
 
-        this._onGridEvent.fire({ kind: GroupChangeKind.NEW_LAYOUT });
+        this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT_FROM_JSON });
     }
 
     async closeAllGroups(): Promise<boolean> {
@@ -625,10 +625,6 @@ export class DockviewComponent
 
         const view = new GroupviewPanel(this, id, options);
 
-        if (typeof this.options.tabHeight === 'number') {
-            view.model.tabHeight = this.options.tabHeight;
-        }
-
         if (!this._groups.has(view.id)) {
             const disposable = new CompositeDisposable(
                 view.model.onMove((event) => {
@@ -641,6 +637,14 @@ export class DockviewComponent
             );
 
             this._groups.set(view.id, { value: view, disposable });
+        }
+
+        // TODO: must be called after the above listeners have been setup,
+        // not an ideal pattern
+        view.initialize();
+
+        if (typeof this.options.tabHeight === 'number') {
+            view.model.tabHeight = this.options.tabHeight;
         }
 
         return view;

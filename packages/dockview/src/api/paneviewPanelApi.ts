@@ -3,25 +3,26 @@ import { PaneviewPanel } from '../paneview/paneviewPanel';
 import { SplitviewPanelApi, SplitviewPanelApiImpl } from './splitviewPanelApi';
 
 export interface ExpansionEvent {
-    isExpanded: boolean;
+    readonly isExpanded: boolean;
 }
 
 export interface PaneviewPanelApi extends SplitviewPanelApi {
-    onDidExpansionChange: Event<ExpansionEvent>;
+    readonly isExpanded: boolean;
+    readonly onDidExpansionChange: Event<ExpansionEvent>;
     readonly onMouseEnter: Event<MouseEvent>;
     readonly onMouseLeave: Event<MouseEvent>;
     setExpanded(isExpanded: boolean): void;
-    readonly isExpanded: boolean;
 }
 
 export class PaneviewPanelApiImpl
     extends SplitviewPanelApiImpl
-    implements PaneviewPanelApi {
+    implements PaneviewPanelApi
+{
     readonly _onDidExpansionChange = new Emitter<ExpansionEvent>({
         replay: true,
     });
-    readonly onDidExpansionChange: Event<ExpansionEvent> = this
-        ._onDidExpansionChange.event;
+    readonly onDidExpansionChange: Event<ExpansionEvent> =
+        this._onDidExpansionChange.event;
 
     readonly _onMouseEnter = new Emitter<MouseEvent>({});
     readonly onMouseEnter: Event<MouseEvent> = this._onMouseEnter.event;

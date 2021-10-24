@@ -12,11 +12,8 @@ import {
     IWatermarkRenderer,
 } from '../../groupview/types';
 import { PanelUpdateEvent } from '../../panel/types';
-import { fireEvent } from '@testing-library/dom';
-import { LocalSelectionTransfer } from '../../dnd/dataTransfer';
-import { Position } from '../../dnd/droptarget';
 import { GroupviewPanel } from '../../groupview/groupviewPanel';
-import { GroupOptions } from '../../groupview/groupview';
+import { GroupChangeKind, GroupOptions } from '../../groupview/groupview';
 import { DockviewPanelApi } from '../../api/groupPanelApi';
 import {
     DefaultGroupPanelView,
@@ -222,6 +219,7 @@ describe('groupview', () => {
             tabHeight: 30,
         };
         groupview = new GroupviewPanel(dockview, 'groupview-1', options);
+        groupview.initialize();
     });
 
     test('serialized layout shows active panel', () => {
@@ -234,6 +232,7 @@ describe('groupview', () => {
             panels: [panel1, panel2, panel3],
             activePanel: panel2,
         });
+        groupview2.initialize();
 
         expect(groupview2.model.activePanel).toBe(panel2);
 
@@ -246,6 +245,138 @@ describe('groupview', () => {
         expect(
             groupview2.element.querySelector('.content-part-panel3')
         ).toBeFalsy();
+    });
+
+    test('panel events are captured during de-serialization', () => {
+        const panel1 = new TestPanel('panel1', jest.fn() as any);
+        const panel2 = new TestPanel('panel2', jest.fn() as any);
+        const panel3 = new TestPanel('panel3', jest.fn() as any);
+
+        const groupview2 = new GroupviewPanel(dockview, 'groupview-2', {
+            tabHeight: 25,
+            panels: [panel1, panel2, panel3],
+            activePanel: panel2,
+        });
+
+        const events: Array<{
+            kind: GroupChangeKind;
+        }> = [];
+        const disposable = groupview2.model.onDidGroupChange((e) => {
+            events.push(e);
+        });
+
+        groupview2.initialize();
+
+        expect(events).toEqual([
+            {
+                kind: GroupChangeKind.ADD_PANEL,
+                panel: panel1,
+            },
+            {
+                kind: GroupChangeKind.ADD_PANEL,
+                panel: panel2,
+            },
+            {
+                kind: GroupChangeKind.ADD_PANEL,
+                panel: panel3,
+            },
+            {
+                kind: GroupChangeKind.PANEL_ACTIVE,
+                panel: panel2,
+            },
+        ]);
+
+        disposable.dispose();
+    });
+
+    test('panel events flow', () => {
+        let events: Array<{
+            kind: GroupChangeKind;
+        }> = [];
+        const disposable = groupview.model.onDidGroupChange((e) => {
+            events.push(e);
+        });
+
+        const panel1 = new TestPanel('panel1', jest.fn() as any);
+        const panel2 = new TestPanel('panel2', jest.fn() as any);
+        const panel3 = new TestPanel('panel3', jest.fn() as any);
+
+        expect(events.length).toBe(0);
+
+        groupview.model.openPanel(panel1);
+        expect(events).toEqual([
+            {
+                kind: GroupChangeKind.ADD_PANEL,
+                panel: panel1,
+            },
+            {
+                kind: GroupChangeKind.PANEL_ACTIVE,
+                panel: panel1,
+            },
+        ]);
+        events = [];
+
+        groupview.model.openPanel(panel2);
+        expect(events).toEqual([
+            {
+                kind: GroupChangeKind.ADD_PANEL,
+                panel: panel2,
+            },
+            {
+                kind: GroupChangeKind.PANEL_ACTIVE,
+                panel: panel2,
+            },
+        ]);
+        events = [];
+
+        groupview.model.openPanel(panel3);
+        expect(events).toEqual([
+            {
+                kind: GroupChangeKind.ADD_PANEL,
+                panel: panel3,
+            },
+            {
+                kind: GroupChangeKind.PANEL_ACTIVE,
+                panel: panel3,
+            },
+        ]);
+        events = [];
+
+        groupview.model.removePanel(panel3);
+        expect(events).toEqual([
+            {
+                kind: GroupChangeKind.REMOVE_PANEL,
+                panel: panel3,
+            },
+            {
+                kind: GroupChangeKind.PANEL_ACTIVE,
+                panel: panel2,
+            },
+        ]);
+        events = [];
+
+        groupview.model.removePanel(panel1);
+        expect(events).toEqual([
+            {
+                kind: GroupChangeKind.REMOVE_PANEL,
+                panel: panel1,
+            },
+        ]);
+        events = [];
+
+        groupview.model.removePanel(panel2);
+        expect(events).toEqual([
+            {
+                kind: GroupChangeKind.REMOVE_PANEL,
+                panel: panel2,
+            },
+            {
+                kind: GroupChangeKind.PANEL_ACTIVE,
+            },
+        ]);
+        events = [];
+
+        disposable.dispose();
     });
 
     test('moveToPrevious and moveToNext', () => {
@@ -293,45 +424,4 @@ describe('groupview', () => {
         );
         expect(viewQuery).toBeTruthy();
     });
-
-    // test('dnd', () => {
-    //     const panel1 = new TestPanel('panel1', jest.fn() as any);
-    //     const panel2 = new TestPanel('panel2', jest.fn() as any);
-
-    //     groupview.model.openPanel(panel1);
-    //     groupview.model.openPanel(panel2);
-
-    //     const events: GroupDropEvent[] = [];
-
-    //     groupview.model.onDrop((event) => {
-    //         events.push(event);
-    //     });
-
-    //     const viewQuery = groupview.element.querySelectorAll(
-    //         '.groupview > .tabs-and-actions-container > .tabs-container > .tab'
-    //     );
-    //     expect(viewQuery.length).toBe(2);
-
-    //     LocalSelectionTransfer.getInstance().setData([], 'dockview-1');
-
-    //     fireEvent.dragEnter(viewQuery[0]);
-
-    //     let dropTarget = viewQuery[0].querySelector('.drop-target-dropzone');
-    //     fireEvent.dragOver(dropTarget);
-    //     fireEvent.drop(dropTarget);
-
-    //     expect(events.length).toBe(1);
-    //     expect(events[0].target).toBe(Position.Center);
-    //     expect(events[0].index).toBe(0);
-
-    //     fireEvent.dragEnter(viewQuery[1]);
-
-    //     dropTarget = viewQuery[1].querySelector('.drop-target-dropzone');
-    //     fireEvent.dragOver(dropTarget);
-    //     fireEvent.drop(dropTarget);
-
-    //     expect(events.length).toBe(2);
-    //     expect(events[1].target).toBe(Position.Center);
-    //     expect(events[1].index).toBe(1);
-    // });
 });

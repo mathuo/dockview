@@ -1,13 +1,11 @@
 import { PaneviewApi } from '../api/component.api';
-import { PaneviewPanelApiImpl } from '../api/paneviewPanelApi';
 import { createComponent } from '../panel/componentFactory';
-import { addDisposableListener, Emitter, Event } from '../events';
+import { Emitter, Event } from '../events';
 import {
     CompositeDisposable,
     IDisposable,
     MutableDisposable,
 } from '../lifecycle';
-import { PanelUpdateEvent } from '../panel/types';
 import {
     LayoutPriority,
     Orientation,
@@ -19,13 +17,13 @@ import {
     IPaneBodyPart,
     IPaneHeaderPart,
     PaneviewPanel,
-    PanePanelInitParameter,
     IPaneviewPanel,
 } from './paneviewPanel';
 import {
     DraggablePaneviewPanel,
     PaneviewDropEvent2,
 } from './draggablePaneviewPanel';
+import { DefaultHeader } from './defaultPaneviewHeader';
 
 export interface SerializedPaneviewPanel {
     snap?: boolean;
@@ -47,36 +45,6 @@ export interface SerializedPaneviewPanel {
 export interface SerializedPaneview {
     size: number;
     views: SerializedPaneviewPanel[];
-}
-
-class DefaultHeader extends CompositeDisposable implements IPaneHeaderPart {
-    private _element: HTMLElement;
-    private apiRef: { api: PaneviewPanelApiImpl | null } = { api: null };
-
-    get element() {
-        return this._element;
-    }
-
-    constructor() {
-        super();
-        this._element = document.createElement('div');
-        this._element.className = 'default-header';
-
-        this.addDisposables(
-            addDisposableListener(this.element, 'click', () => {
-                this.apiRef.api?.setExpanded(!this.apiRef.api.isExpanded);
-            })
-        );
-    }
-
-    init(params: PanePanelInitParameter & { api: PaneviewPanelApiImpl }) {
-        this.apiRef.api = params.api;
-        this._element.textContent = params.title;
-    }
-
-    update(params: PanelUpdateEvent) {
-        //
-    }
 }
 
 export class PaneFramework extends DraggablePaneviewPanel {

@@ -94,6 +94,8 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     constructor() {
         super();
 
+        this.addDisposables(this.isDirtyDisposable);
+
         this._element = document.createElement('div');
         this._element.className = 'default-tab';
         //

@@ -1,5 +1,6 @@
 import { GridviewComponent } from '../../gridview/gridviewComponent';
 import { GridviewPanel } from '../../gridview/gridviewPanel';
+import { GroupChangeEvent, GroupChangeKind } from '../../groupview/groupview';
 import { IFrameworkPart } from '../../panel/types';
 import { Orientation } from '../../splitview/core/splitview';
 
@@ -273,6 +274,96 @@ describe('gridview', () => {
 
         const result = gridview.toJSON();
         expect(result).toBeTruthy();
+
+        disposable.dispose();
+    });
+
+    test('gridview events', () => {
+        gridview.layout(800, 400);
+
+        let events: GroupChangeEvent[] = [];
+        const disposable = gridview.onGridEvent((e) => events.push(e));
+
+        gridview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        expect(events).toEqual([
+            {
+                kind: GroupChangeKind.ADD_GROUP,
+            },
+            {
+                kind: GroupChangeKind.GROUP_ACTIVE,
+            },
+        ]);
+        events = [];
+
+        gridview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+        });
+
+        expect(events).toEqual([
+            {
+                kind: GroupChangeKind.ADD_GROUP,
+            },
+            {
+                kind: GroupChangeKind.GROUP_ACTIVE,
+            },
+        ]);
+        events = [];
+
+        gridview.addPanel({
+            id: 'panel_3',
+            component: 'default',
+        });
+
+        expect(events).toEqual([
+            {
+                kind: GroupChangeKind.ADD_GROUP,
+            },
+            {
+                kind: GroupChangeKind.GROUP_ACTIVE,
+            },
+        ]);
+        events = [];
+
+        const panel1 = gridview.getPanel('panel_1');
+        const panel2 = gridview.getPanel('panel_2');
+        const panel3 = gridview.getPanel('panel_3');
+
+        gridview.removePanel(panel2);
+
+        expect(events).toEqual([
+            {
+                kind: GroupChangeKind.REMOVE_GROUP,
+            },
+        ]);
+        events = [];
+
+        gridview.removePanel(panel3);
+        expect(events).toEqual([
+            {
+                kind: GroupChangeKind.REMOVE_GROUP,
+            },
+            {
+                kind: GroupChangeKind.GROUP_ACTIVE,
+            },
+        ]);
+        events = [];
+
+        gridview.removePanel(panel1);
+
+        expect(events).toEqual([
+            {
+                kind: GroupChangeKind.REMOVE_GROUP,
+            },
+            {
+                kind: GroupChangeKind.GROUP_ACTIVE,
+            },
+        ]);
+        events = [];
 
         disposable.dispose();
     });

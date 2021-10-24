@@ -9,7 +9,6 @@ import {
     PaneviewDropEvent,
 } from 'dockview';
 import { ControlCenter } from './controlCenter';
-import { toggleClass } from '../dom';
 import './sidebar.scss';
 
 const components = {
@@ -33,7 +32,7 @@ export const Sidebar = (props: IGridviewPanelProps) => {
 
         event.api.addPanel({
             id: '1',
-            component: 'default',
+            component: 'controlCenter',
             title: 'Control Center',
         });
         event.api.addPanel({

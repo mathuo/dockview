@@ -27,6 +27,12 @@
         .default-header {
             background-color: var(--dv-group-view-background-color);
             color: var(--dv-activegroup-visiblepanel-tab-color);
+            display: flex;
+            padding: 0px 8px;
+
+            > span {
+                flex-grow: 1;
+            }
         }
     }
 

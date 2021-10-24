@@ -27,11 +27,9 @@ export enum GroupChangeKind {
     //
     ADD_PANEL = 'ADD_PANEL',
     REMOVE_PANEL = 'REMOVE_PANEL',
-    PANEL_OPEN = 'PANEL_OPEN',
-    PANEL_CLOSE = 'PANEL_CLOSE',
     PANEL_ACTIVE = 'PANEL_ACTIVE',
     //
-    NEW_LAYOUT = 'NEW_LAYOUT',
+    LAYOUT_FROM_JSON = 'LAYOUT_FROM_JSON',
     LAYOUT = 'LAYOUT',
     //
     PANEL_CREATED = 'PANEL_CREATED',
@@ -552,7 +550,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
 
         if (this._activePanel && this.panels.length === 0) {
-            this._activePanel = undefined;
+            this.doSetActivePanel(undefined);
         }
 
         this.updateContainer();
@@ -601,20 +599,24 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.updateMru(panel);
         this.panels.splice(index, 0, panel);
 
-        this._onDidGroupChange.fire({ kind: GroupChangeKind.ADD_PANEL });
+        this._onDidGroupChange.fire({ kind: GroupChangeKind.ADD_PANEL, panel });
     }
 
-    private doSetActivePanel(panel: IGroupPanel) {
+    private doSetActivePanel(panel: IGroupPanel | undefined) {
         this._activePanel = panel;
-        this.tabsContainer.setActivePanel(panel);
 
-        // this.contentContainer.openPanel(panel.content);
+        if (panel) {
+            this.tabsContainer.setActivePanel(panel);
 
-        panel.layout(this._width, this._height);
+            panel.layout(this._width, this._height);
 
-        this.updateMru(panel);
+            this.updateMru(panel);
+        }
 
-        this._onDidGroupChange.fire({ kind: GroupChangeKind.PANEL_ACTIVE });
+        this._onDidGroupChange.fire({
+            kind: GroupChangeKind.PANEL_ACTIVE,
+            panel,
+        });
     }
 
     private updateMru(panel: IGroupPanel) {

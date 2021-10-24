@@ -4,11 +4,11 @@ import { IGroupPanel } from '../groupview/groupPanel';
 import { GroupviewPanel } from '../groupview/groupviewPanel';
 
 export interface TitleEvent {
-    title: string;
+    readonly title: string;
 }
 
 export interface SuppressClosableEvent {
-    suppressClosable: boolean;
+    readonly suppressClosable: boolean;
 }
 
 /*
@@ -21,7 +21,7 @@ export interface DockviewPanelApi
     readonly isGroupActive: boolean;
     readonly title: string;
     readonly suppressClosable: boolean;
-    onDidDirtyChange: Event<boolean>;
+    readonly onDidDirtyChange: Event<boolean>;
     close: () => Promise<boolean>;
     interceptOnCloseAction(interceptor: () => Promise<boolean>): void;
     setTitle(title: string): void;
@@ -29,17 +29,14 @@ export interface DockviewPanelApi
 
 export class DockviewPanelApiImpl
     extends GridviewPanelApiImpl
-    implements DockviewPanelApi {
+    implements DockviewPanelApi
+{
     private _group: GroupviewPanel | undefined;
     private _interceptor: undefined | (() => Promise<boolean>);
 
     readonly _onDidDirtyChange = new Emitter<boolean>();
     readonly onDidDirtyChange = this._onDidDirtyChange.event;
-    // readonly _onDidGroupPanelVisibleChange = new Emitter<VisibilityEvent>({
-    //     replay: true,
-    // });
-    // readonly onDidGroupPanelVisibleChange: Event<VisibilityEvent> = this
-    //     ._onDidGroupPanelVisibleChange.event;
+
     readonly _onDidTitleChange = new Emitter<TitleEvent>();
     readonly onDidTitleChange = this._onDidTitleChange.event;
 
@@ -48,10 +45,6 @@ export class DockviewPanelApiImpl
 
     readonly _suppressClosableChanged = new Emitter<SuppressClosableEvent>();
     readonly suppressClosableChanged = this._suppressClosableChanged.event;
-
-    // get isGroupVisible() {
-    //     return this._isGroupVisible;
-    // }
 
     get tryClose(): undefined | (() => Promise<boolean>) {
         return this._interceptor;
@@ -81,13 +74,7 @@ export class DockviewPanelApiImpl
         super(panel.id);
         this._group = group;
 
-        this.addDisposables(
-            // this._onDidGroupPanelVisibleChange,
-            this._onDidDirtyChange
-            // this.onDidGroupPanelVisibleChange((event) => {
-            //     this._isGroupVisible = event.isVisible;
-            // })
-        );
+        this.addDisposables(this._onDidDirtyChange);
     }
 
     public setTitle(title: string) {
