@@ -1,6 +1,5 @@
 import { getElementsByTagName } from '../dom';
 import { addDisposableListener, Emitter } from '../events';
-import { focusedElement } from '../focusedElement';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 
 export abstract class DragHandler extends CompositeDisposable {

@@ -17,7 +17,6 @@ import { ContentContainer, IContentContainer } from './panel/content';
 import { ITabsContainer, TabsContainer } from './titlebar/tabsContainer';
 import { IWatermarkRenderer } from './types';
 import { GroupviewPanel } from './groupviewPanel';
-import { focusedElement } from '../focusedElement';
 import { DockviewDropTargets } from './dnd';
 
 export enum GroupChangeKind {
@@ -268,11 +267,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
 
     isContentFocused() {
-        if (!focusedElement.element) {
+        if (!document.activeElement) {
             return false;
         }
         return isAncestor(
-            focusedElement.element,
+            document.activeElement,
             this.contentContainer.element
         );
     }
