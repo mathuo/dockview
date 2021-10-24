@@ -10,6 +10,7 @@ import {
     PanePanelInitParameter,
     PaneviewPanel,
 } from './paneviewPanel';
+import { addClasses } from '../dom';
 
 interface ViewContainer {
     readonly title: string;
@@ -56,9 +57,15 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
     }
 
     private initDragFeatures() {
+        if (!this.header) {
+            return;
+        }
+
         const id = this.id;
-        this.header!.draggable = true;
-        this.header!.tabIndex = 0;
+        this.header.draggable = true;
+        this.header.tabIndex = 0;
+
+        addClasses(this.header, 'pane-draggable');
 
         this.handler = new (class PaneDragHandler extends DragHandler {
             getData(): IDisposable {
@@ -75,7 +82,7 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
                     },
                 };
             }
-        })(this.header!);
+        })(this.header);
 
         this.target = new Droptarget(this.element, {
             validOverlays: 'vertical',

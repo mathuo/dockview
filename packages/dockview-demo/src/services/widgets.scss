@@ -3,3 +3,12 @@
         background-color: green !important;
     }
 }
+
+.container-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+    box-sizing: border-box;
+    position: relative;
+}
