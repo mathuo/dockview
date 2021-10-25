@@ -35,16 +35,24 @@ dockable and tabular views
 
 Largly inspired by code IDE editors such as VSCode. Parts of the core resizable panelling is based upon an implementation found in the VSCode sources of a [splitview](https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/splitview) and [gridview](https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/grid).
 
-## Installation
-You can install the project from [npm](https://www.npmjs.com/package/dockview). The project comes with TypeScript typings.
+## Table of contents
+
+- [Table of contents](#table-of-contents)
+- [Quick start](#quick-start)
+- [Sandbox examples](#sandbox-examples)
+- [Serializated layouts](#serializated-layouts)
+- [Theming](#theming)
+- [Performance](#performance)
+- [FAQ](#faq)
+
+## Quick start
+You can install the project from [npm](https://www.npmjs.com/package/dockview).
 
 ```
 npm install --save dockview
 ```
 
-## Setup
-
-You must import or reference the stylesheet at `dockview/dist/styles/dockview.css`. For example:
+Within your project you must import or reference the stylesheet at `dockview/dist/styles/dockview.css`. For example:
 
 ```css
 @import '~dockview/dist/styles/dockview.css';
@@ -59,34 +67,16 @@ You should also attach a dockview theme to an element containing your components
 
 dockview has a peer dependency on `react >= 16.8.0` and `react-dom >= 16.8.0` which is the version that introduced [React Hooks](https://reactjs.org/docs/hooks-intro.html).
 
-## FAQ
-### Can I use this library without React?
-In theory, yes. The library is written in plain-old JS and the parts written in ReactJS are merely wrappers around the plain-old JS components. Currently everything is published as one package though so maybe that's something to change in the future.
 
-### Can I use this library with AngularJS/Vue.js or any other arbitrarily named JavaScript library/framework?
-Yes but with some extra work. Dockview is written in plain-old JS so you can either interact directly with the plain-old JS components or create a wrapper using your prefered library/framework. The React wrapper may give some ideas on how this wrapper implementation could be done for other libraries/frameworks. Maybe that's something to change in the future.
 ## Sandbox examples
 - [Dockview](https://codesandbox.io/s/simple-dockview-t6491)
 - [Gridview](https://codesandbox.io/s/simple-gridview-jrp0n)
 - [Splitview](https://codesandbox.io/s/simple-splitview-l53nn)
 - [Paneview](https://codesandbox.io/s/simple-paneview-v8qvb)
 
-# API Documentation
-### Splitview
-[Component Api](https://mathuo.github.io/dockview/output/docs/classes/splitviewapi.html)
-[Panel Api]()
 
-### Gridview
-[Component Api](https://mathuo.github.io/dockview/output/docs/classes/gridviewapi.html)
-[Panel Api]()
-### Dockview
-[Component Api](https://mathuo.github.io/dockview/output/docs/classes/dockviewapi.html)
-[Panel Api]()
-### Paneview
-[Component Api](https://mathuo.github.io/dockview/output/docs/classes/paneviewapi.html)
-[Panel Api]()
 
-## Serialization / De-serialization
+## Serializated layouts
 All view components support the methods `toJSON()`, `fromJSON(...)` and `onDidLayoutChange()`.
 
 See example [here](https://codesandbox.io/s/workspace-saving-example-euo5d).
@@ -124,3 +114,15 @@ The theme can be customized using the below set of CSS properties. You can find 
 | --dv-tab-divider-color | - |
 | --dv-tab-close-icon | Default tab close icon |
 | --dv-tab-dirty-icon | Default tab dirty icon |
+
+## Performance
+Consider using React.lazy(...) to defer the importing of your panels until they are required. This has the potential to reduce the initial import cost when your application starts.
+
+## FAQ
+**Q: Can I use this library without React?**
+
+**A:** In theory, yes. The library is written in plain-old JS and the parts written in ReactJS are merely wrappers around the plain-old JS components. Currently everything is published as one package though so maybe that's something to change in the future.
+
+**Q: Can I use this library with AngularJS/Vue.js or any other arbitrarily named JavaScript library/framework?**
+
+**A:** Yes but with some extra work. Dockview is written in plain-old JS so you can either interact directly with the plain-old JS components or create a wrapper using your prefered library/framework. The React wrapper may give some ideas on how this wrapper implementation could be done for other libraries/frameworks. Maybe that's something to change in the future.

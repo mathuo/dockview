@@ -14,7 +14,6 @@
         "bootstrap": "lerna bootstrap",
         "bootstrap-no-hoist": "lerna bootstrap",
         "test:cov": "jest --coverage",
-        "codecov-publish": "codecov",
         "version-beta-build": "lerna version prerelease --preid beta",
         "publish-app": "lerna publish"
     },
