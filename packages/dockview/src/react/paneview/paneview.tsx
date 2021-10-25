@@ -22,9 +22,8 @@ export interface IPaneviewPanelProps<T extends {} = Record<string, any>>
     title: string;
 }
 
-export interface PaneviewDropEvent {
+export interface PaneviewDropEvent extends PaneviewDropEvent2 {
     api: PaneviewApi;
-    event: PaneviewDropEvent2;
 }
 
 export interface IPaneviewReactProps {
@@ -128,7 +127,7 @@ export const PaneviewReact = React.forwardRef(
             const disposable = paneview.onDidDrop((event) => {
                 if (props.onDidDrop) {
                     props.onDidDrop({
-                        event,
+                        ...event,
                         api: new PaneviewApi(paneview),
                     });
                 }

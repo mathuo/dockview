@@ -18,6 +18,7 @@ import { IViewService, ViewService } from './viewService';
 import { DefaultView } from './view';
 import { RegisteredView, VIEW_REGISTRY } from './viewRegistry';
 import { toggleClass } from '../dom';
+import { Container } from './sidebarItem';
 import './widgets.scss';
 
 class ViewServiceModel {
@@ -172,7 +173,8 @@ export const Activitybar = (props: IGridviewPanelProps) => {
     };
 
     const onContainerDrop = (targetContainer: ViewContainer) => (
-        event: React.DragEvent
+        event: React.DragEvent,
+        direction: 'top' | 'bottom'
     ) => {
         const data = event.dataTransfer.getData('application/json');
         if (data) {
@@ -180,10 +182,21 @@ export const Activitybar = (props: IGridviewPanelProps) => {
             const sourceContainer = viewService.model.getViewContainer(
                 container
             );
-            viewService.model.insertContainerAfter(
-                sourceContainer,
-                targetContainer
-            );
+
+            switch (direction) {
+                case 'bottom':
+                    viewService.model.insertContainerAfter(
+                        sourceContainer,
+                        targetContainer
+                    );
+                    break;
+                case 'top':
+                    viewService.model.insertContainerBefore(
+                        sourceContainer,
+                        targetContainer
+                    );
+                    break;
+            }
         }
     };
 
@@ -204,48 +217,31 @@ export const Activitybar = (props: IGridviewPanelProps) => {
         }
     };
 
+    const onDragOver = (container: ViewContainer) => (e: React.DragEvent) => {
+        const api = registry.get<GridviewApi>('gridview');
+
+        const sidebarPanel = api.getPanel('sidebar');
+        if (!sidebarPanel.api.isVisible) {
+            api.setVisible(sidebarPanel, true);
+            sidebarPanel.focus();
+        }
+
+        viewService.model.setActiveViewContainer(container.id);
+    };
+
     return (
         <div style={{ background: 'rgb(51,51,51)', cursor: 'pointer' }}>
             {containers.map((container, i) => {
                 const isActive = activeContainerid === container.id;
                 return (
-                    <div
-                        onClick={onClick(container)}
-                        onDragOver={(e) => {
-                            e.preventDefault();
-                            onClick(container, true)(e);
-                        }}
-                        onDragEnter={(e) => {
-                            e.preventDefault();
-                        }}
-                        draggable={true}
-                        onDragStart={(e) => {
-                            e.dataTransfer.setData(
-                                'application/json',
-                                JSON.stringify({ container: container.id })
-                            );
-                        }}
-                        onDrop={onContainerDrop(container)}
-                        style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            height: '48px',
-                            boxSizing: 'border-box',
-                            borderLeft: isActive
-                                ? '1px solid white'
-                                : '1px solid transparent',
-                        }}
+                    <Container
                         key={i}
-                    >
-                        {/* {container.id} */}
-                        <span
-                            style={{ fontSize: '30px' }}
-                            className="material-icons-outlined"
-                        >
-                            {container.icon}
-                        </span>
-                    </div>
+                        container={container}
+                        isActive={isActive}
+                        onDragOver={onDragOver(container)}
+                        onClick={onClick(container)}
+                        onDrop={onContainerDrop(container)}
+                    />
                 );
             })}
             <ExtraSpace onNewContainer={onNewContainer} />
@@ -360,25 +356,40 @@ export const SidebarPart = (props: { id: string }) => {
     };
 
     const onDidDrop = (event: PaneviewDropEvent) => {
-        const data = event.event.getData();
+        const data = event.getData();
+
+        const containerData = event.event.dataTransfer.getData(
+            'application/json'
+        );
+
+        if (containerData) {
+            const { container } = JSON.parse(containerData);
+
+            const sourceContainer = viewService.model.getViewContainer(
+                container
+            );
+            const targetContainer = viewService.model.getViewContainer(
+                props.id
+            );
+
+            sourceContainer.views.forEach((v) => {
+                viewService.model.moveViewToLocation(v, targetContainer, 0);
+            });
+
+            return;
+        }
 
         if (!data) {
             return;
         }
 
-        const targetPanel = event.event.panel;
+        const targetPanel = event.panel;
         const allPanels = event.api.getPanels();
         let toIndex = allPanels.indexOf(targetPanel);
 
-        // if (
-        //     event.event.position === Position.Left ||
-        //     event.event.position === Position.Top
-        // ) {
-        //     toIndex = Math.max(0, toIndex - 1);
-        // }
         if (
-            event.event.position === Position.Right ||
-            event.event.position === Position.Bottom
+            event.position === Position.Right ||
+            event.position === Position.Bottom
         ) {
             toIndex = Math.min(allPanels.length, toIndex + 1);
         }

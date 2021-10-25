@@ -34,6 +34,7 @@ export interface IViewService extends IDisposable {
         targetLocation: number
     ): void;
     insertContainerAfter(source: ViewContainer, target: ViewContainer): void;
+    insertContainerBefore(source: ViewContainer, target: ViewContainer): void;
     addViews(view: View, viewContainer: ViewContainer, location?: number): void;
     removeViews(removeViews: View[], viewContainer: ViewContainer): void;
     getViewContainer(id: string): ViewContainer | undefined;
@@ -98,6 +99,23 @@ export class ViewService implements IViewService {
         );
 
         this._viewContainers.splice(targetIndex + 1, 0, view);
+        this._viewContainers = [...this._viewContainers];
+
+        this._onDidContainersChange.fire();
+    }
+
+    insertContainerBefore(source: ViewContainer, target: ViewContainer): void {
+        const sourceIndex = this._viewContainers.findIndex(
+            (c) => c.id === source.id
+        );
+
+        const view = this._viewContainers.splice(sourceIndex, 1)[0];
+
+        const targetIndex = this._viewContainers.findIndex(
+            (c) => c.id === target.id
+        );
+
+        this._viewContainers.splice(Math.max(targetIndex, 0), 0, view);
         this._viewContainers = [...this._viewContainers];
 
         this._onDidContainersChange.fire();

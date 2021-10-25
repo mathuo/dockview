@@ -52,6 +52,10 @@
             position: relative;
             outline: none;
 
+            &.pane-draggable {
+                cursor: pointer;
+            }
+
             &:focus,
             &:focus-within {
                 &:before {

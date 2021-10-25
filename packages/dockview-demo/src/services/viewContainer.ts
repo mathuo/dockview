@@ -45,7 +45,7 @@ export class PaneviewContainer implements ViewContainer<SerializedPaneview> {
     }
 
     get views() {
-        return this._views;
+        return [...this._views];
     }
 
     get schema(): SerializedPaneview | undefined {

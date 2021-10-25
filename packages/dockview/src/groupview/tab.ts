@@ -4,7 +4,6 @@ import { getPanelData, LocalSelectionTransfer } from '../dnd/dataTransfer';
 import { getElementsByTagName, toggleClass } from '../dom';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { ITabRenderer } from './types';
-import { focusedElement } from '../focusedElement';
 import { IGroupPanel } from './groupPanel';
 import { GroupviewPanel } from './groupviewPanel';
 import { DroptargetEvent, Droptarget } from '../dnd/droptarget';
