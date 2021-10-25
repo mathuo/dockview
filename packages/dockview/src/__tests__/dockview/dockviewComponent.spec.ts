@@ -1,5 +1,4 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
-
 import {
     GroupPanelPartInitParameters,
     IContentRenderer,
@@ -9,7 +8,10 @@ import { Orientation } from '../../splitview/core/splitview';
 import { ReactPanelDeserialzier } from '../../react/deserializer';
 import { Position } from '../../dnd/droptarget';
 import { GroupviewPanel } from '../../groupview/groupviewPanel';
-import { IGroupPanel } from '../../groupview/groupPanel';
+import {
+    GroupChangeEvent,
+    GroupChangeKind,
+} from '../../gridview/baseComponentGridview';
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
 
@@ -615,6 +617,113 @@ describe('dockviewComponent', () => {
 
         const result = dockview.toJSON();
         expect(result).toBeTruthy();
+
+        disposable.dispose();
+    });
+
+    test('events flow', () => {
+        dockview.layout(1000, 1000);
+
+        let events: GroupChangeEvent[] = [];
+        const disposable = dockview.onGridEvent((e) => events.push(e));
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        expect(events).toEqual([
+            { kind: GroupChangeKind.ADD_GROUP },
+            { kind: GroupChangeKind.GROUP_ACTIVE },
+            { kind: GroupChangeKind.ADD_PANEL, panel: panel1 },
+            { kind: GroupChangeKind.PANEL_ACTIVE, panel: panel1 },
+        ]);
+
+        events = [];
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+        expect(events).toEqual([
+            { kind: GroupChangeKind.ADD_PANEL, panel: panel2 },
+            { kind: GroupChangeKind.PANEL_ACTIVE, panel: panel2 },
+        ]);
+
+        events = [];
+        const panel3 = dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+        });
+        expect(events).toEqual([
+            { kind: GroupChangeKind.ADD_PANEL, panel: panel3 },
+            { kind: GroupChangeKind.PANEL_ACTIVE, panel: panel3 },
+        ]);
+
+        events = [];
+        dockview.removePanel(panel1);
+        expect(events).toEqual([
+            { kind: GroupChangeKind.REMOVE_PANEL, panel: panel1 },
+        ]);
+
+        events = [];
+        dockview.removePanel(panel3);
+        expect(events).toEqual([
+            { kind: GroupChangeKind.REMOVE_PANEL, panel: panel3 },
+            { kind: GroupChangeKind.PANEL_ACTIVE, panel: panel2 },
+        ]);
+
+        events = [];
+        const panel4 = dockview.addPanel({
+            id: 'panel4',
+            component: 'default',
+            position: { referencePanel: panel2.id, direction: 'right' },
+        });
+        expect(events).toEqual([
+            { kind: GroupChangeKind.ADD_GROUP },
+            { kind: GroupChangeKind.GROUP_ACTIVE },
+            { kind: GroupChangeKind.ADD_PANEL, panel: panel4 },
+            { kind: GroupChangeKind.PANEL_ACTIVE, panel: panel4 },
+        ]);
+
+        events = [];
+        const panel5 = dockview.addPanel({
+            id: 'panel5',
+            component: 'default',
+            position: { referencePanel: panel4.id, direction: 'within' },
+        });
+        expect(events).toEqual([
+            { kind: GroupChangeKind.ADD_PANEL, panel: panel5 },
+            { kind: GroupChangeKind.PANEL_ACTIVE, panel: panel5 },
+        ]);
+
+        events = [];
+        dockview.moveGroupOrPanel(
+            panel2.group!,
+            panel5.group!.id,
+            panel5.id,
+            Position.Center
+        );
+        expect(events).toEqual([
+            { kind: GroupChangeKind.REMOVE_PANEL, panel: panel5 },
+            { kind: GroupChangeKind.PANEL_ACTIVE, panel: panel4 },
+            { kind: GroupChangeKind.ADD_PANEL, panel: panel5 },
+            { kind: GroupChangeKind.PANEL_ACTIVE, panel: panel5 },
+            { kind: GroupChangeKind.GROUP_ACTIVE },
+            { kind: GroupChangeKind.PANEL_ACTIVE, panel: panel5 },
+        ]);
+
+        events = [];
+        dockview.moveGroupOrPanel(
+            panel2.group!,
+            panel4.group!.id,
+            panel4.id,
+            Position.Center
+        );
+        expect(events).toEqual([
+            { kind: GroupChangeKind.REMOVE_PANEL, panel: panel4 },
+            { kind: GroupChangeKind.REMOVE_GROUP },
+            { kind: GroupChangeKind.ADD_PANEL, panel: panel4 },
+            { kind: GroupChangeKind.PANEL_ACTIVE, panel: panel4 },
+        ]);
 
         disposable.dispose();
     });

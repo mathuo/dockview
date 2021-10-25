@@ -11,6 +11,7 @@ import { GridviewComponentOptions } from './options';
 import {
     BaseGrid,
     Direction,
+    GroupChangeKind,
     IBaseGrid,
     IGridPanelView,
     toTarget,
@@ -26,7 +27,6 @@ import { GridviewPanelApiImpl } from '../api/gridviewPanelApi';
 import { GridviewApi } from '../api/component.api';
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { createComponent } from '../panel/componentFactory';
-import { GroupChangeKind } from '../groupview/groupview';
 
 interface PanelReference {
     api: GridviewPanelApiImpl;

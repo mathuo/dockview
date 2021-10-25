@@ -1,6 +1,9 @@
+import {
+    GroupChangeEvent,
+    GroupChangeKind,
+} from '../../gridview/baseComponentGridview';
 import { GridviewComponent } from '../../gridview/gridviewComponent';
 import { GridviewPanel } from '../../gridview/gridviewPanel';
-import { GroupChangeEvent, GroupChangeKind } from '../../groupview/groupview';
 import { IFrameworkPart } from '../../panel/types';
 import { Orientation } from '../../splitview/core/splitview';
 

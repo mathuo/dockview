@@ -5,6 +5,7 @@ export * from './splitview/splitviewComponent';
 export * from './paneview/paneview';
 export * from './paneview/paneviewComponent';
 export * from './gridview/gridview';
+export * from './gridview/baseComponentGridview';
 export * from './groupview/groupview';
 export * from './groupview/panel/content';
 export * from './groupview/tab';

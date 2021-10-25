@@ -50,13 +50,19 @@ export const Application = () => {
 
         // event.api.fromJSON(require('./application.layout.json'));
 
+        let success = false;
         const state = localStorage.getItem('dockview-layout');
 
         if (state) {
-            console.log('loading from save');
-            const jsonstate = JSON.parse(state) as SerializedGridview;
-            event.api.fromJSON(jsonstate);
-        } else {
+            try {
+                event.api.fromJSON(JSON.parse(state));
+                success = true;
+            } catch (err) {
+                console.error('failed to load layout', err);
+            }
+        }
+
+        if (!success) {
             event.api.addPanel({
                 id: 'i',
                 component: 'activitybar',
@@ -110,7 +116,6 @@ export const Application = () => {
 
     return (
         <GridviewReact
-            // className={'visual-studio-theme'}
             components={rootcomponents}
             onReady={onReady}
             orientation={Orientation.VERTICAL}

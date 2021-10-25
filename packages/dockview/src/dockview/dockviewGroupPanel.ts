@@ -1,3 +1,4 @@
+import { GroupChangeKind2 } from '..';
 import { DockviewApi } from '../api/component.api';
 import { DockviewPanelApiImpl } from '../api/groupPanelApi';
 import { Event } from '../events';
@@ -7,7 +8,6 @@ import {
     IGroupPanel,
     IGroupPanelInitParameters,
 } from '../groupview/groupPanel';
-import { GroupChangeKind } from '../groupview/groupview';
 import { GroupviewPanel } from '../groupview/groupviewPanel';
 import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { Parameters } from '../panel/types';
@@ -170,7 +170,7 @@ export class DockviewGroupPanel
 
         this.mutableDisposable.value = this._group.model.onDidGroupChange(
             (ev) => {
-                if (ev.kind === GroupChangeKind.GROUP_ACTIVE) {
+                if (ev.kind === GroupChangeKind2.GROUP_ACTIVE) {
                     const isVisible = !!this._group?.model.isPanelActive(this);
                     this.api._onDidActiveChange.fire({
                         isActive: isGroupActive && isVisible,

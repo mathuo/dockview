@@ -10,7 +10,24 @@ import {
 } from '../splitview/core/splitview';
 import { IPanel } from '../panel/types';
 import { MovementOptions2 } from '../dockview/options';
-import { GroupChangeEvent, GroupChangeKind } from '../groupview/groupview';
+import { IGroupPanel } from '../groupview/groupPanel';
+
+export enum GroupChangeKind {
+    ADD_PANEL = 'ADD_PANEL',
+    REMOVE_PANEL = 'REMOVE_PANEL',
+    PANEL_ACTIVE = 'PANEL_ACTIVE',
+    //
+    GROUP_ACTIVE = 'GROUP_ACTIVE',
+    ADD_GROUP = 'ADD_GROUP',
+    REMOVE_GROUP = 'REMOVE_GROUP',
+    //
+    LAYOUT_FROM_JSON = 'LAYOUT_FROM_JSON',
+    LAYOUT = 'LAYOUT',
+}
+export interface GroupChangeEvent {
+    readonly kind: GroupChangeKind;
+    readonly panel?: IGroupPanel;
+}
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -252,7 +269,9 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
         this._activeGroup = group;
 
-        this._onGridEvent.fire({ kind: GroupChangeKind.GROUP_ACTIVE });
+        this._onGridEvent.fire({
+            kind: GroupChangeKind.GROUP_ACTIVE,
+        });
     }
 
     public removeGroup(group: T) {

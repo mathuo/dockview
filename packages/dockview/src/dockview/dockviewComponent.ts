@@ -29,6 +29,7 @@ import {
 } from './options';
 import {
     BaseGrid,
+    GroupChangeKind,
     IBaseGrid,
     toTarget,
 } from '../gridview/baseComponentGridview';
@@ -38,7 +39,7 @@ import { LayoutMouseEvent, MouseEventKind } from '../groupview/tab';
 import { Orientation } from '../splitview/core/splitview';
 import { DefaultTab } from './components/tab/defaultTab';
 import {
-    GroupChangeKind,
+    GroupChangeKind2,
     GroupOptions,
     GroupPanelViewState,
 } from '../groupview/groupview';
@@ -74,7 +75,7 @@ export type DockviewComponentUpdateOptions = Pick<
 >;
 
 export interface IDockviewComponent extends IBaseGrid<GroupviewPanel> {
-    readonly activeGroup: GroupviewPanel | undefined;
+    readonly activePanel: IGroupPanel | undefined;
     readonly totalPanels: number;
     readonly panels: IGroupPanel[];
     tabHeight: number | undefined;
@@ -91,6 +92,7 @@ export interface IDockviewComponent extends IBaseGrid<GroupviewPanel> {
     removeGroup: (group: GroupviewPanel) => void;
     options: DockviewComponentOptions;
     addPanel(options: AddPanelOptions): IGroupPanel;
+    removePanel(panel: IGroupPanel): void;
     getGroupPanel: (id: string) => IGroupPanel | undefined;
     fireMouseEvent(event: LayoutMouseEvent): void;
     createWatermarkComponent(): IWatermarkRenderer;
@@ -148,8 +150,18 @@ export class DockviewComponent
         this._deserializer = value;
     }
 
-    get options() {
+    get options(): DockviewComponentOptions {
         return this._options;
+    }
+
+    get activePanel(): IGroupPanel | undefined {
+        const activeGroup = this.activeGroup;
+
+        if (!activeGroup) {
+            return undefined;
+        }
+
+        return activeGroup.model.activePanel;
     }
 
     set tabHeight(height: number | undefined) {
@@ -289,8 +301,6 @@ export class DockviewComponent
         );
 
         this._panels.set(panel.id, { value: panel, disposable });
-
-        this._onGridEvent.fire({ kind: GroupChangeKind.PANEL_CREATED });
     }
 
     unregisterPanel(panel: IGroupPanel): void {
@@ -305,8 +315,6 @@ export class DockviewComponent
         }
 
         this._panels.delete(panel.id);
-
-        this._onGridEvent.fire({ kind: GroupChangeKind.PANEL_DESTROYED });
     }
 
     /**
@@ -449,6 +457,10 @@ export class DockviewComponent
         }
 
         return panel;
+    }
+
+    removePanel(panel: IGroupPanel): void {
+        panel.group?.model.removePanel(panel);
     }
 
     createWatermarkComponent(): IWatermarkRenderer {
@@ -599,6 +611,21 @@ export class DockviewComponent
         }
     }
 
+    override doSetGroupActive(
+        group: GroupviewPanel | undefined,
+        skipFocus?: boolean
+    ) {
+        const isGroupAlreadyFocused = this._activeGroup === group;
+        super.doSetGroupActive(group, skipFocus);
+
+        if (!isGroupAlreadyFocused && this._activeGroup?.model.activePanel) {
+            this._onGridEvent.fire({
+                kind: GroupChangeKind.PANEL_ACTIVE,
+                panel: this._activeGroup?.model.activePanel,
+            });
+        }
+    }
+
     createGroup(options?: GroupOptions): GroupviewPanel {
         if (!options) {
             options = { tabHeight: this.tabHeight };
@@ -632,7 +659,32 @@ export class DockviewComponent
                     this.moveGroupOrPanel(view, groupId, itemId, target, index);
                 }),
                 view.model.onDidGroupChange((event) => {
-                    this._onGridEvent.fire(event);
+                    switch (event.kind) {
+                        case GroupChangeKind2.ADD_PANEL:
+                            this._onGridEvent.fire({
+                                kind: GroupChangeKind.ADD_PANEL,
+                                panel: event.panel,
+                            });
+                            break;
+                        case GroupChangeKind2.GROUP_ACTIVE:
+                            this._onGridEvent.fire({
+                                kind: GroupChangeKind.GROUP_ACTIVE,
+                                panel: event.panel,
+                            });
+                            break;
+                        case GroupChangeKind2.REMOVE_PANEL:
+                            this._onGridEvent.fire({
+                                kind: GroupChangeKind.REMOVE_PANEL,
+                                panel: event.panel,
+                            });
+                            break;
+                        case GroupChangeKind2.PANEL_ACTIVE:
+                            this._onGridEvent.fire({
+                                kind: GroupChangeKind.PANEL_ACTIVE,
+                                panel: event.panel,
+                            });
+                            break;
+                    }
                 })
             );
 
@@ -755,7 +807,6 @@ export class DockviewComponent
     private addDirtyPanel(panel: IGroupPanel): void {
         this.dirtyPanels.add(panel);
         panel.setDirty(true);
-        this._onGridEvent.fire({ kind: GroupChangeKind.PANEL_DIRTY });
         this.debouncedDeque();
     }
 }

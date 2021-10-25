@@ -8,21 +8,6 @@ export const ControlCenter = () => {
 
     const dragRef = React.useRef<HTMLDivElement>();
 
-    // React.useEffect(() => {
-    //     const api = registry.get<DockviewApi>('dockview');
-    //     const target = api.createDragTarget(
-    //         { element: dragRef.current, content: 'drag me' },
-    //         () => ({
-    //             id: 'yellow',
-    //             component: 'test_component',
-    //         })
-    //     );
-
-    //     return () => {
-    //         target.dispose();
-    //     };
-    // }, []);
-
     const onDragStart = (event: React.DragEvent) => {
         event.dataTransfer.setData('text/plain', 'Panel2');
     };

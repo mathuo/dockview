@@ -13,7 +13,7 @@ import {
 } from '../../groupview/types';
 import { PanelUpdateEvent } from '../../panel/types';
 import { GroupviewPanel } from '../../groupview/groupviewPanel';
-import { GroupChangeKind, GroupOptions } from '../../groupview/groupview';
+import { GroupChangeKind2, GroupOptions } from '../../groupview/groupview';
 import { DockviewPanelApi } from '../../api/groupPanelApi';
 import {
     DefaultGroupPanelView,
@@ -259,7 +259,7 @@ describe('groupview', () => {
         });
 
         const events: Array<{
-            kind: GroupChangeKind;
+            kind: GroupChangeKind2;
         }> = [];
         const disposable = groupview2.model.onDidGroupChange((e) => {
             events.push(e);
@@ -269,19 +269,19 @@ describe('groupview', () => {
 
         expect(events).toEqual([
             {
-                kind: GroupChangeKind.ADD_PANEL,
+                kind: GroupChangeKind2.ADD_PANEL,
                 panel: panel1,
             },
             {
-                kind: GroupChangeKind.ADD_PANEL,
+                kind: GroupChangeKind2.ADD_PANEL,
                 panel: panel2,
             },
             {
-                kind: GroupChangeKind.ADD_PANEL,
+                kind: GroupChangeKind2.ADD_PANEL,
                 panel: panel3,
             },
             {
-                kind: GroupChangeKind.PANEL_ACTIVE,
+                kind: GroupChangeKind2.PANEL_ACTIVE,
                 panel: panel2,
             },
         ]);
@@ -291,7 +291,7 @@ describe('groupview', () => {
 
     test('panel events flow', () => {
         let events: Array<{
-            kind: GroupChangeKind;
+            kind: GroupChangeKind2;
         }> = [];
         const disposable = groupview.model.onDidGroupChange((e) => {
             events.push(e);
@@ -306,11 +306,11 @@ describe('groupview', () => {
         groupview.model.openPanel(panel1);
         expect(events).toEqual([
             {
-                kind: GroupChangeKind.ADD_PANEL,
+                kind: GroupChangeKind2.ADD_PANEL,
                 panel: panel1,
             },
             {
-                kind: GroupChangeKind.PANEL_ACTIVE,
+                kind: GroupChangeKind2.PANEL_ACTIVE,
                 panel: panel1,
             },
         ]);
@@ -319,11 +319,11 @@ describe('groupview', () => {
         groupview.model.openPanel(panel2);
         expect(events).toEqual([
             {
-                kind: GroupChangeKind.ADD_PANEL,
+                kind: GroupChangeKind2.ADD_PANEL,
                 panel: panel2,
             },
             {
-                kind: GroupChangeKind.PANEL_ACTIVE,
+                kind: GroupChangeKind2.PANEL_ACTIVE,
                 panel: panel2,
             },
         ]);
@@ -332,11 +332,11 @@ describe('groupview', () => {
         groupview.model.openPanel(panel3);
         expect(events).toEqual([
             {
-                kind: GroupChangeKind.ADD_PANEL,
+                kind: GroupChangeKind2.ADD_PANEL,
                 panel: panel3,
             },
             {
-                kind: GroupChangeKind.PANEL_ACTIVE,
+                kind: GroupChangeKind2.PANEL_ACTIVE,
                 panel: panel3,
             },
         ]);
@@ -345,11 +345,11 @@ describe('groupview', () => {
         groupview.model.removePanel(panel3);
         expect(events).toEqual([
             {
-                kind: GroupChangeKind.REMOVE_PANEL,
+                kind: GroupChangeKind2.REMOVE_PANEL,
                 panel: panel3,
             },
             {
-                kind: GroupChangeKind.PANEL_ACTIVE,
+                kind: GroupChangeKind2.PANEL_ACTIVE,
                 panel: panel2,
             },
         ]);
@@ -358,7 +358,7 @@ describe('groupview', () => {
         groupview.model.removePanel(panel1);
         expect(events).toEqual([
             {
-                kind: GroupChangeKind.REMOVE_PANEL,
+                kind: GroupChangeKind2.REMOVE_PANEL,
                 panel: panel1,
             },
         ]);
@@ -367,11 +367,8 @@ describe('groupview', () => {
         groupview.model.removePanel(panel2);
         expect(events).toEqual([
             {
-                kind: GroupChangeKind.REMOVE_PANEL,
+                kind: GroupChangeKind2.REMOVE_PANEL,
                 panel: panel2,
-            },
-            {
-                kind: GroupChangeKind.PANEL_ACTIVE,
             },
         ]);
         events = [];

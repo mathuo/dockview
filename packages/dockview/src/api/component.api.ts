@@ -7,7 +7,7 @@ import {
     AddPanelOptions,
     MovementOptions,
 } from '../dockview/options';
-import { Direction } from '../gridview/baseComponentGridview';
+import { Direction, GroupChangeEvent } from '../gridview/baseComponentGridview';
 import {
     AddComponentOptions,
     IGridviewComponent,
@@ -31,6 +31,8 @@ import { Orientation, Sizing } from '../splitview/core/splitview';
 import { ISplitviewPanel } from '../splitview/splitviewPanel';
 import { GroupviewPanel } from '../groupview/groupviewPanel';
 import { Event } from '../events';
+import { GridviewPanel } from '../gridview/gridviewPanel';
+import { IDisposable } from '../lifecycle';
 
 export interface CommonApi {
     readonly height: number;
@@ -42,27 +44,27 @@ export interface CommonApi {
 }
 
 export class SplitviewApi implements CommonApi {
-    get minimumSize() {
+    get minimumSize(): number {
         return this.component.minimumSize;
     }
 
-    get maximumSize() {
+    get maximumSize(): number {
         return this.component.maximumSize;
     }
 
-    get height() {
+    get height(): number {
         return this.component.height;
     }
 
-    get width() {
+    get width(): number {
         return this.component.width;
     }
 
-    get length() {
+    get length(): number {
         return this.component.length;
     }
 
-    get onDidLayoutChange() {
+    get onDidLayoutChange(): Event<void> {
         return this.component.onDidLayoutChange;
     }
 
@@ -76,73 +78,73 @@ export class SplitviewApi implements CommonApi {
         this.component.updateOptions(options);
     }
 
-    removePanel(panel: ISplitviewPanel, sizing?: Sizing) {
+    removePanel(panel: ISplitviewPanel, sizing?: Sizing): void {
         this.component.removePanel(panel, sizing);
     }
 
-    setVisible(panel: ISplitviewPanel, isVisible: boolean) {
-        return this.component.setVisible(panel, isVisible);
+    setVisible(panel: ISplitviewPanel, isVisible: boolean): void {
+        this.component.setVisible(panel, isVisible);
     }
 
     getPanels(): ISplitviewPanel[] {
         return this.component.getPanels();
     }
 
-    focus() {
-        return this.component.focus();
+    focus(): void {
+        this.component.focus();
     }
 
-    getPanel(id: string) {
+    getPanel(id: string): ISplitviewPanel | undefined {
         return this.component.getPanel(id);
     }
 
-    setActive(panel: ISplitviewPanel) {
-        return this.component.setActive(panel);
+    setActive(panel: ISplitviewPanel): void {
+        this.component.setActive(panel);
     }
 
-    layout(width: number, height: number) {
+    layout(width: number, height: number): void {
         return this.component.layout(width, height);
     }
 
-    addPanel(options: AddSplitviewComponentOptions) {
-        return this.component.addPanel(options);
+    addPanel(options: AddSplitviewComponentOptions): void {
+        this.component.addPanel(options);
     }
 
-    resizeToFit() {
-        return this.component.resizeToFit();
+    resizeToFit(): void {
+        this.component.resizeToFit();
     }
 
-    movePanel(from: number, to: number) {
+    movePanel(from: number, to: number): void {
         this.component.movePanel(from, to);
     }
 
-    fromJSON(data: SerializedSplitview, deferComponentLayout?: boolean) {
-        return this.component.fromJSON(data, deferComponentLayout);
+    fromJSON(data: SerializedSplitview, deferComponentLayout?: boolean): void {
+        this.component.fromJSON(data, deferComponentLayout);
     }
 
-    toJSON() {
+    toJSON(): SerializedSplitview {
         return this.component.toJSON();
     }
 }
 
 export class PaneviewApi implements CommonApi {
-    get width() {
+    get width(): number {
         return this.component.width;
     }
 
-    get height() {
+    get height(): number {
         return this.component.height;
     }
 
-    get minimumSize() {
+    get minimumSize(): number {
         return this.component.minimumSize;
     }
 
-    get maximumSize() {
+    get maximumSize(): number {
         return this.component.maximumSize;
     }
 
-    get onDidLayoutChange() {
+    get onDidLayoutChange(): Event<void> {
         return this.component.onDidLayoutChange;
     }
 
@@ -160,75 +162,73 @@ export class PaneviewApi implements CommonApi {
         return this.component.getPanel(id);
     }
 
-    movePanel(from: number, to: number) {
+    movePanel(from: number, to: number): void {
         this.component.movePanel(from, to);
     }
 
-    focus() {
-        return this.component.focus();
+    focus(): void {
+        this.component.focus();
     }
 
-    layout(width: number, height: number) {
-        return this.component.layout(width, height);
+    layout(width: number, height: number): void {
+        this.component.layout(width, height);
     }
 
-    addPanel(options: AddPaneviewCompponentOptions) {
+    addPanel(options: AddPaneviewCompponentOptions): IDisposable {
         return this.component.addPanel(options);
     }
 
-    resizeToFit() {
-        return this.component.resizeToFit();
+    resizeToFit(): void {
+        this.component.resizeToFit();
     }
 
-    fromJSON(data: SerializedPaneview, deferComponentLayout?: boolean) {
-        return this.component.fromJSON(data, deferComponentLayout);
+    fromJSON(data: SerializedPaneview, deferComponentLayout?: boolean): void {
+        this.component.fromJSON(data, deferComponentLayout);
     }
 
-    toJSON() {
+    toJSON(): SerializedPaneview {
         return this.component.toJSON();
     }
 }
 
 export class GridviewApi implements CommonApi {
-    get width() {
+    get width(): number {
         return this.component.width;
     }
 
-    get height() {
+    get height(): number {
         return this.component.height;
     }
 
-    get minimumHeight() {
+    get minimumHeight(): number {
         return this.component.minimumHeight;
     }
 
-    get maximumHeight() {
+    get maximumHeight(): number {
         return this.component.maximumHeight;
     }
 
-    get minimumWidth() {
+    get minimumWidth(): number {
         return this.component.minimumWidth;
     }
 
-    get maximumWidth() {
+    get maximumWidth(): number {
         return this.component.maximumWidth;
     }
 
-    get onGridEvent() {
+    get onGridEvent(): Event<GroupChangeEvent> {
         return this.component.onGridEvent;
     }
 
-    get onDidLayoutChange() {
+    get onDidLayoutChange(): Event<void> {
         return this.component.onDidLayoutChange;
     }
 
-    get panels() {
+    get panels(): GridviewPanel[] {
         return this.component.groups;
     }
 
-    constructor(private readonly component: IGridviewComponent) {}
-
-    get orientation() {
+    get orientation(): Orientation {
         return this.component.orientation;
     }
 
@@ -236,16 +236,18 @@ export class GridviewApi implements CommonApi {
         this.component.updateOptions({ orientation: value });
     }
 
-    focus() {
-        return this.component.focus();
+    constructor(private readonly component: IGridviewComponent) {}
+
+    focus(): void {
+        this.component.focus();
     }
 
-    layout(width: number, height: number, force = false) {
-        return this.component.layout(width, height, force);
+    layout(width: number, height: number, force = false): void {
+        this.component.layout(width, height, force);
     }
 
-    addPanel(options: AddComponentOptions) {
-        return this.component.addPanel(options);
+    addPanel(options: AddComponentOptions): void {
+        this.component.addPanel(options);
     }
 
     removePanel(panel: IGridviewPanel, sizing?: Sizing): void {
@@ -255,169 +257,163 @@ export class GridviewApi implements CommonApi {
     movePanel(
         panel: IGridviewPanel,
         options: { direction: Direction; reference: string; size?: number }
-    ) {
+    ): void {
         this.component.movePanel(panel, options);
     }
 
-    resizeToFit() {
-        return this.component.resizeToFit();
+    resizeToFit(): void {
+        this.component.resizeToFit();
     }
 
-    getPanel(id: string) {
+    getPanel(id: string): GridviewPanel | undefined {
         return this.component.getPanel(id);
     }
 
-    toggleVisibility(panel: IGridviewPanel) {
-        return this.component.toggleVisibility(panel);
+    toggleVisibility(panel: IGridviewPanel): void {
+        this.component.toggleVisibility(panel);
     }
 
-    // isVisible(panel: IGridviewPanel) {
-    //     return this.component.isVisible(panel);
-    // }
-
-    setVisible(panel: IGridviewPanel, visible: boolean) {
-        return this.component.setVisible(panel, visible);
+    setVisible(panel: IGridviewPanel, visible: boolean): void {
+        this.component.setVisible(panel, visible);
     }
 
     setActive(panel: IGridviewPanel): void {
         this.component.setActive(panel);
     }
 
-    fromJSON(data: SerializedGridview, deferComponentLayout?: boolean) {
+    fromJSON(data: SerializedGridview, deferComponentLayout?: boolean): void {
         return this.component.fromJSON(data, deferComponentLayout);
     }
 
-    toJSON() {
+    toJSON(): SerializedGridview {
         return this.component.toJSON();
     }
 }
 
 export class DockviewApi implements CommonApi {
-    get width() {
+    get width(): number {
         return this.component.width;
     }
 
-    get height() {
+    get height(): number {
         return this.component.height;
     }
 
-    get minimumHeight() {
+    get minimumHeight(): number {
         return this.component.minimumHeight;
     }
 
-    get maximumHeight() {
+    get maximumHeight(): number {
         return this.component.maximumHeight;
     }
 
-    get minimumWidth() {
+    get minimumWidth(): number {
         return this.component.minimumWidth;
     }
 
-    get maximumWidth() {
+    get maximumWidth(): number {
         return this.component.maximumWidth;
     }
 
-    get size() {
+    get size(): number {
         return this.component.size;
     }
 
-    get totalPanels() {
+    get totalPanels(): number {
         return this.component.totalPanels;
     }
 
-    get onGridEvent() {
+    get onGridEvent(): Event<GroupChangeEvent> {
         return this.component.onGridEvent;
     }
 
-    get onDidLayoutChange() {
+    get onDidLayoutChange(): Event<void> {
         return this.component.onDidLayoutChange;
     }
 
-    get panels() {
+    get panels(): IGroupPanel[] {
         return this.component.panels;
     }
 
-    get groups() {
+    get groups(): GroupviewPanel[] {
         return this.component.groups;
+    }
+
+    get activePanel(): IGroupPanel | undefined {
+        return this.component.activePanel;
+    }
+
+    get activeGroup(): GroupviewPanel | undefined {
+        return this.component.activeGroup;
     }
 
     constructor(private readonly component: IDockviewComponent) {}
 
-    focus() {
-        return this.component.focus();
+    getTabHeight(): number | undefined {
+        return this.component.tabHeight;
+    }
+
+    setTabHeight(height: number | undefined): void {
+        this.component.tabHeight = height;
+    }
+
+    focus(): void {
+        this.component.focus();
     }
 
     getPanel(id: string): IGroupPanel | undefined {
         return this.component.getGroupPanel(id);
     }
 
-    setActivePanel(panel: IGroupPanel) {
-        return this.component.setActivePanel(panel);
+    setActivePanel(panel: IGroupPanel): void {
+        this.component.setActivePanel(panel);
     }
 
-    layout(width: number, height: number, force = false) {
-        return this.component.layout(width, height, force);
+    layout(width: number, height: number, force = false): void {
+        this.component.layout(width, height, force);
     }
 
-    addPanel(options: AddPanelOptions) {
+    addPanel(options: AddPanelOptions): IGroupPanel {
         return this.component.addPanel(options);
     }
 
-    // addDndHandle(type: string, cb: (event: LayoutDropEvent) => PanelOptions) {
-    //     return this.component.addDndHandle(type, cb);
-    // }
-
-    // createDragTarget(
-    //     target: {
-    //         element: HTMLElement;
-    //         content: string;
-    //     },
-    //     options: (() => PanelOptions) | PanelOptions
-    // ) {
-    //     return this.component.createDragTarget(target, options);
-    // }
-
-    addEmptyGroup(options?: AddGroupOptions) {
-        return this.component.addEmptyGroup(options);
+    removePanel(panel: IGroupPanel): void {
+        this.component.removePanel(panel);
     }
 
-    moveToNext(options?: MovementOptions) {
-        return this.component.moveToNext(options);
+    addEmptyGroup(options?: AddGroupOptions): void {
+        this.component.addEmptyGroup(options);
     }
 
-    moveToPrevious(options?: MovementOptions) {
-        return this.component.moveToPrevious(options);
+    moveToNext(options?: MovementOptions): void {
+        this.component.moveToNext(options);
     }
 
-    closeAllGroups() {
+    moveToPrevious(options?: MovementOptions): void {
+        this.component.moveToPrevious(options);
+    }
+
+    closeAllGroups(): Promise<boolean> {
         return this.component.closeAllGroups();
     }
 
-    removeGroup(group: GroupviewPanel) {
-        return this.component.removeGroup(group);
+    removeGroup(group: GroupviewPanel): void {
+        this.component.removeGroup(group);
     }
 
-    resizeToFit() {
+    resizeToFit(): void {
         return this.component.resizeToFit();
     }
 
-    getTabHeight() {
-        return this.component.tabHeight;
-    }
-
-    setTabHeight(height: number | undefined) {
-        this.component.tabHeight = height;
-    }
-
-    getGroup(id: string) {
+    getGroup(id: string): GroupviewPanel | undefined {
         return this.component.getPanel(id);
     }
 
-    fromJSON(data: SerializedDockview) {
-        return this.component.fromJSON(data);
+    fromJSON(data: SerializedDockview): void {
+        this.component.fromJSON(data);
     }
 
-    toJSON() {
+    toJSON(): SerializedDockview {
         return this.component.toJSON();
     }
 }

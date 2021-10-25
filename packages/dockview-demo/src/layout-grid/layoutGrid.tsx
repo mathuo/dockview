@@ -22,6 +22,8 @@ import './layoutGrid.scss';
 import { WelcomePanel } from '../panels/welcome/welcome';
 import { SplitviewPanel } from '../panels/splitview/splitview';
 import { GridviewDemoPanel } from '../panels/gridview/gridview';
+import { useRecoilCallback } from 'recoil';
+import { selectedPanelAtom } from './footer';
 
 const Test = (props: IDockviewPanelProps) => {
     const [counter, setCounter] = React.useState<number>(0);
@@ -101,23 +103,6 @@ const components: PanelCollection<IDockviewPanelProps> = {
                 });
             }
         };
-
-        React.useEffect(() => {
-            const compDis = new CompositeDisposable(
-                props.api.onDidDimensionsChange((event) => {
-                    // _api.current?.layout(event.width, event.height);
-                }),
-                _api.current.onGridEvent((event) => {
-                    if (event.kind === GroupChangeKind.LAYOUT_CONFIG_UPDATED) {
-                        props.api.setState('layout', _api.current.toJSON());
-                    }
-                })
-            );
-
-            return () => {
-                compDis.dispose();
-            };
-        }, []);
 
         return (
             <div
@@ -296,101 +281,66 @@ export const nextGuid = (() => {
 })();
 
 export const TestGrid = (props: IGridviewPanelProps) => {
-    const _api = React.useRef<DockviewApi>();
+    const [api, setApi] = React.useState<DockviewApi>();
     const registry = useLayoutRegistry();
 
     const onReady = (event: DockviewReadyEvent) => {
         const api = event.api;
-        _api.current = event.api;
+        setApi(api);
         registry.register('dockview', api);
+    };
 
-        // api.addDndHandle('text/plain', (ev) => {
-        //     const { event } = ev;
+    const setSelectedPanel = useRecoilCallback(
+        ({ set }) => (value: string) => set(selectedPanelAtom, value),
+        []
+    );
 
-        //     return {
-        //         id: 'yellow',
-        //         component: 'test_component',
-        //     };
-        // });
+    React.useEffect(() => {
+        if (!api) {
+            return () => {
+                //
+            };
+        }
+        props.api.setConstraints({
+            minimumWidth: () => api.minimumWidth,
+            minimumHeight: () => api.minimumHeight,
+        });
 
-        // api.addDndHandle('Files', (ev) => {
-        //     const { event } = ev;
-
-        //     ev.event.event.preventDefault();
-
-        //     return {
-        //         id: Date.now().toString(),
-        //         title: event.event.dataTransfer.files[0].name,
-        //         component: 'test_component',
-        //     };
-        // });
+        const disposable = new CompositeDisposable(
+            api.onDidLayoutChange(() => {
+                const state = api.toJSON();
+                localStorage.setItem('dockview', JSON.stringify(state));
+            }),
+            api.onGridEvent((e) => {
+                console.log(e);
+                if (e.kind === GroupChangeKind.PANEL_ACTIVE) {
+                    setSelectedPanel(e.panel?.id || '');
+                }
+            })
+        );
 
         const state = localStorage.getItem('dockview');
+        let success = false;
         if (state) {
-            api.fromJSON(JSON.parse(state));
-        } else {
+            try {
+                api.fromJSON(JSON.parse(state));
+                success = true;
+            } catch (err) {
+                console.error('failed to load layout', err);
+            }
+        }
+        if (!success) {
             api.addPanel({
                 component: 'welcome',
                 id: 'welcome',
                 title: 'Welcome',
             });
-
-            // event.api.deserialize(require('./layoutGrid.layout.json'));
-            return;
-
-            api.addPanel({
-                component: 'test_component',
-                id: nextGuid(),
-                title: 'Item 1',
-                params: { text: 'how low?' },
-            });
-            api.addPanel({
-                component: 'test_component',
-                id: 'item2',
-                title: 'Item 2',
-            });
-            api.addPanel({
-                component: 'split_panel',
-                id: nextGuid(),
-                title: 'Item 3 with a long title',
-            });
-            api.addPanel({
-                component: 'test_component',
-                id: nextGuid(),
-                title: 'Item 3',
-                position: { direction: 'below', referencePanel: 'item2' },
-                suppressClosable: true,
-            });
         }
-
-        // api.addPanel({
-        //     component: 'test',
-        //     id: 'test',
-        //     title: 'Test',
-        // });
-    };
-
-    React.useEffect(() => {
-        props.api.setConstraints({
-            minimumWidth: () => _api.current.minimumWidth,
-            minimumHeight: () => _api.current.minimumHeight,
-        });
-
-        const disposable = new CompositeDisposable(
-            _api.current.onDidLayoutChange(() => {
-                const state = _api.current.toJSON();
-                localStorage.setItem('dockview', JSON.stringify(state));
-            }),
-            props.api.onDidDimensionsChange((event) => {
-                const { width, height } = event;
-                // _api.current.layout(width, height);
-            })
-        );
 
         return () => {
             disposable.dispose();
         };
-    }, []);
+    }, [api]);
 
     const [coord, setCoord] = React.useState<{
         x: number;

@@ -20,24 +20,11 @@ import { GroupviewPanel } from './groupviewPanel';
 import { focusedElement } from '../focusedElement';
 import { DockviewDropTargets } from './dnd';
 
-export enum GroupChangeKind {
-    GROUP_ACTIVE = 'GROUP_ACTIVE',
-    ADD_GROUP = 'ADD_GROUP',
-    REMOVE_GROUP = 'REMOVE_GROUP',
-    //
+export enum GroupChangeKind2 {
     ADD_PANEL = 'ADD_PANEL',
     REMOVE_PANEL = 'REMOVE_PANEL',
     PANEL_ACTIVE = 'PANEL_ACTIVE',
-    //
-    LAYOUT_FROM_JSON = 'LAYOUT_FROM_JSON',
-    LAYOUT = 'LAYOUT',
-    //
-    PANEL_CREATED = 'PANEL_CREATED',
-    PANEL_DESTROYED = 'PANEL_DESTROYED',
-    PANEL_DIRTY = 'PANEL_DIRTY',
-    PANEL_CLEAN = 'PANEL_CLEAN',
-    //
-    LAYOUT_CONFIG_UPDATED = 'LAYOUT_CONFIG_UPDATED',
+    GROUP_ACTIVE = 'GROUP_ACTIVE',
 }
 
 export interface DndService {
@@ -74,8 +61,8 @@ export interface GroupOptions {
     tabHeight?: number;
 }
 
-export interface GroupChangeEvent {
-    readonly kind: GroupChangeKind;
+export interface GroupviewChangeEvent {
+    readonly kind: GroupChangeKind2;
     readonly panel?: IGroupPanel;
 }
 
@@ -104,11 +91,8 @@ export interface IGroupview extends IDisposable, IGridPanelView {
     containsPanel(panel: IGroupPanel): boolean;
     removePanel: (panelOrId: IGroupPanel | string) => IGroupPanel;
     // events
-    onDidGroupChange: Event<{ kind: GroupChangeKind }>;
+    onDidGroupChange: Event<GroupviewChangeEvent>;
     onMove: Event<GroupMoveEvent>;
-    //
-    // startActiveDrag(panel: IGroupPanel): IDisposable;
-    //
     moveToNext(options?: { panel?: IGroupPanel; suppressRoll?: boolean }): void;
     moveToPrevious(options?: {
         panel?: IGroupPanel;
@@ -141,8 +125,8 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     private readonly _onMove = new Emitter<GroupMoveEvent>();
     readonly onMove: Event<GroupMoveEvent> = this._onMove.event;
 
-    private readonly _onDidGroupChange = new Emitter<GroupChangeEvent>();
-    readonly onDidGroupChange: Event<{ kind: GroupChangeKind }> =
+    private readonly _onDidGroupChange = new Emitter<GroupviewChangeEvent>();
+    readonly onDidGroupChange: Event<GroupviewChangeEvent> =
         this._onDidGroupChange.event;
 
     get element(): HTMLElement {
@@ -288,20 +272,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             id: this.id,
         };
     }
-
-    // public startActiveDrag(panel: IGroupPanel): IDisposable {
-    //     const index = this.tabsContainer.indexOf(panel.id);
-    //     if (index > -1) {
-    //         const tab = this.tabsContainer.at(index);
-    //         tab.startDragEvent();
-    //         return {
-    //             dispose: () => {
-    //                 tab.stopDragEvent();
-    //             },
-    //         };
-    //     }
-    //     return Disposable.NONE;
-    // }
 
     public moveToNext(options?: {
         panel?: IGroupPanel;
@@ -504,27 +474,16 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         this.tabsContainer.setActive(this.isActive);
 
-        // this.updateActions();
-
         if (!this._activePanel && this.panels.length > 0) {
             this.doSetActivePanel(this.panels[0]);
         }
 
         this.updateContainer();
 
-        // this.panels.forEach((panel) =>
-        //     panel.updateParentGroup(this, this.isActive)
-        // );
-
-        // if (this.watermark?.updateParentGroup) {
-        //     this.watermark.updateParentGroup(this, this.isActive);
-        // }
-
         if (isGroupActive) {
             if (!skipFocus) {
                 this._activePanel?.focus();
             }
-            this._onDidGroupChange.fire({ kind: GroupChangeKind.GROUP_ACTIVE });
         }
     }
 
@@ -575,7 +534,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
 
         this._onDidGroupChange.fire({
-            kind: GroupChangeKind.REMOVE_PANEL,
+            kind: GroupChangeKind2.REMOVE_PANEL,
             panel,
         });
     }
@@ -599,7 +558,10 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.updateMru(panel);
         this.panels.splice(index, 0, panel);
 
-        this._onDidGroupChange.fire({ kind: GroupChangeKind.ADD_PANEL, panel });
+        this._onDidGroupChange.fire({
+            kind: GroupChangeKind2.ADD_PANEL,
+            panel,
+        });
     }
 
     private doSetActivePanel(panel: IGroupPanel | undefined) {
@@ -611,12 +573,12 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             panel.layout(this._width, this._height);
 
             this.updateMru(panel);
-        }
 
-        this._onDidGroupChange.fire({
-            kind: GroupChangeKind.PANEL_ACTIVE,
-            panel,
-        });
+            this._onDidGroupChange.fire({
+                kind: GroupChangeKind2.PANEL_ACTIVE,
+                panel,
+            });
+        }
     }
 
     private updateMru(panel: IGroupPanel) {
