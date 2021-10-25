@@ -1,4 +1,4 @@
-import { GroupChangeKind2 } from '..';
+import { GroupChangeKind2 } from '../groupview/groupview';
 import { DockviewApi } from '../api/component.api';
 import { DockviewPanelApiImpl } from '../api/groupPanelApi';
 import { Event } from '../events';
