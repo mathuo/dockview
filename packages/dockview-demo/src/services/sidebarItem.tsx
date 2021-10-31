@@ -1,6 +1,5 @@
 import { ViewContainer } from './viewContainer';
 import * as React from 'react';
-import { toggleClass } from '../dom';
 
 export const Container = (props: {
     container: ViewContainer;
@@ -17,7 +16,15 @@ export const Container = (props: {
 
     const [dragEntered, setDragEntered] = React.useState<boolean>(false);
 
+    const timer = React.useRef<any>(null);
+
     const onDragOver = (e: React.DragEvent) => {
+        if (!timer.current) {
+            timer.current = setTimeout(() => {
+                props.onDragOver(e);
+            }, 1000);
+        }
+
         if (isDragging.current) {
             return;
         }
@@ -44,11 +51,14 @@ export const Container = (props: {
         const isBottom = yp >= 50;
 
         setSelection(isTop ? 'top' : 'bottom');
-
-        props.onDragOver(e);
     };
 
     const onDragLeave = (e: React.DragEvent) => {
+        if (timer.current) {
+            clearTimeout(timer.current);
+            timer.current = null;
+        }
+
         if (isDragging.current) {
             return;
         }
@@ -59,6 +69,10 @@ export const Container = (props: {
     };
 
     const onDrop = (e: React.DragEvent) => {
+        if (timer.current) {
+            clearTimeout(timer.current);
+            timer.current = null;
+        }
         if (isDragging.current) {
             return;
         }
@@ -102,10 +116,10 @@ export const Container = (props: {
             onDrop={onDrop}
             style={{
                 borderLeft: props.isActive
-                    ? '1px solid white'
-                    : '1px solid transparent',
+                    ? '2px solid white'
+                    : '2px solid transparent',
             }}
-            className="container-item"
+            className={`activity-bar-item${props.isActive ? ' active' : ''}`}
         >
             {dragEntered && (
                 <div
@@ -124,12 +138,7 @@ export const Container = (props: {
                     }}
                 />
             )}
-            <span
-                style={{ fontSize: '30px' }}
-                className="material-icons-outlined"
-            >
-                {props.container.icon}
-            </span>
+            <a className="material-icons-outlined">{props.container.icon}</a>
         </div>
     );
 };

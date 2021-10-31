@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 2px;
+    padding: 4px 8px;
     box-sizing: border-box;
 
     .control-center-row {
@@ -10,7 +10,7 @@
         box-sizing: border-box;
 
         button {
-            width: 125px;
+            width: 175px;
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;

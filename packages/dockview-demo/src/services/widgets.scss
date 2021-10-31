@@ -1,14 +1,32 @@
-.activity-bar-space {
-    &.activity-bar-space-dragover {
-        background-color: green !important;
-    }
+.sidebar-part {
+    background-color: #252526;
 }
 
-.container-item {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 48px;
-    box-sizing: border-box;
-    position: relative;
+.activity-bar-part {
+    background-color: #333333;
+
+    .activity-bar-item {
+        display: flex;
+        cursor: pointer;
+        justify-content: center;
+        align-items: center;
+        height: 48px;
+        box-sizing: border-box;
+        position: relative;
+        color: grey;
+        font-size: 24px;
+
+        &:hover,
+        &.active {
+            color: white;
+        }
+    }
+
+    .activity-bar-space {
+        height: 100%;
+
+        &.activity-bar-space-dragover {
+            border-top: 2px solid white;
+        }
+    }
 }

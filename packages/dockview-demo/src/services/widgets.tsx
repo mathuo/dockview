@@ -197,6 +197,8 @@ export const Activitybar = (props: IGridviewPanelProps) => {
                     );
                     break;
             }
+
+            viewService.model.setActiveViewContainer(sourceContainer.id);
         }
     };
 
@@ -205,9 +207,21 @@ export const Activitybar = (props: IGridviewPanelProps) => {
         if (data) {
             const { paneId } = data;
             const view = viewService.model.getView(paneId);
+
+            if (!view) {
+                console.log(`view ${paneId} doesn't exist`);
+                return;
+            }
+
             const viewContainer = viewService.model.getViewContainer2(view);
+
+            if (!viewContainer) {
+                console.log(`viewContainer for view ${view.id} doesn't exist`);
+                return;
+            }
+
             viewService.model.removeViews([view], viewContainer);
-            // viewContainer.removeView(view);
+
             const newContainer = new PaneviewContainer(
                 `t_${Date.now().toString().substr(5)}`,
                 VIEW_REGISTRY
@@ -230,7 +244,7 @@ export const Activitybar = (props: IGridviewPanelProps) => {
     };
 
     return (
-        <div style={{ background: 'rgb(51,51,51)', cursor: 'pointer' }}>
+        <div className="activity-bar-part">
             {containers.map((container, i) => {
                 const isActive = activeContainerid === container.id;
                 return (
@@ -254,6 +268,11 @@ const ExtraSpace = (props: {
 }) => {
     const ref = React.useRef<HTMLDivElement>(null);
 
+    const onDrop = (event: React.DragEvent) => {
+        toggleClass(ref.current, 'activity-bar-space-dragover', false);
+        props.onNewContainer(event);
+    };
+
     return (
         <div
             ref={ref}
@@ -268,8 +287,7 @@ const ExtraSpace = (props: {
             onDragLeave={(e) => {
                 toggleClass(ref.current, 'activity-bar-space-dragover', false);
             }}
-            onDrop={props.onNewContainer}
-            style={{ height: '100%', backgroundColor: 'red' }}
+            onDrop={onDrop}
         ></div>
     );
 };
@@ -290,6 +308,28 @@ export const Sidebar = () => {
     }, []);
 
     return <SidebarPart id={sidebarId} />;
+};
+
+const headerComponents: PanelCollection<IPaneviewPanelProps> = {
+    default: (props) => {
+        const onClick = () => props.api.setExpanded(!props.api.isExpanded);
+        return (
+            <div
+                onClick={onClick}
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '0px 8px',
+                    cursor: 'pointer',
+                }}
+            >
+                <a className="material-icons-outlined">
+                    {props.api.isExpanded ? 'expand_more' : 'chevron_right'}
+                </a>
+                <span>{props.title}</span>
+            </div>
+        );
+    },
 };
 
 export const SidebarPart = (props: { id: string }) => {
@@ -314,6 +354,7 @@ export const SidebarPart = (props: { id: string }) => {
                     isExpanded: view.isExpanded,
                     title: view.title,
                     component: 'default',
+                    headerComponent: 'default',
                     params: {
                         viewId: view.id,
                     },
@@ -339,6 +380,7 @@ export const SidebarPart = (props: { id: string }) => {
                     isExpanded: view.isExpanded,
                     title: view.title,
                     component: 'default',
+                    headerComponent: 'default',
                     params: {
                         viewId: view.id,
                     },
@@ -365,12 +407,25 @@ export const SidebarPart = (props: { id: string }) => {
         if (containerData) {
             const { container } = JSON.parse(containerData);
 
+            if (container === props.id) {
+                return;
+            }
+
             const sourceContainer = viewService.model.getViewContainer(
                 container
             );
             const targetContainer = viewService.model.getViewContainer(
                 props.id
             );
+
+            if (!sourceContainer) {
+                console.log(`sourceContainer ${props.id} doesn't exist`);
+                return;
+            }
+            if (!targetContainer) {
+                console.log(`targetContainer ${props.id} doesn't exist`);
+                return;
+            }
 
             sourceContainer.views.forEach((v) => {
                 viewService.model.moveViewToLocation(v, targetContainer, 0);
@@ -396,6 +451,12 @@ export const SidebarPart = (props: { id: string }) => {
 
         const viewId = data.paneId;
         const viewContainer = viewService.model.getViewContainer(props.id);
+
+        if (!viewContainer) {
+            console.log(`viewContainer ${props.id} doesn't exist`);
+            return;
+        }
+
         const view = viewService.model.getView(viewId);
 
         viewService.model.moveViewToLocation(view, viewContainer, toIndex);
@@ -407,8 +468,10 @@ export const SidebarPart = (props: { id: string }) => {
 
     return (
         <PaneviewReact
+            className="sidebar-part"
             onDidDrop={onDidDrop}
             components={components}
+            headerComponents={headerComponents}
             onReady={onReady}
         />
     );
