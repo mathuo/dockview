@@ -1924,7 +1924,13 @@ var Container = function (props) {
     var _a = __read(React.useState(undefined), 2), selection = _a[0], setSelection = _a[1];
     var isDragging = React.useRef(false);
     var _b = __read(React.useState(false), 2), dragEntered = _b[0], setDragEntered = _b[1];
+    var timer = React.useRef(null);
     var onDragOver = function (e) {
+        if (!timer.current) {
+            timer.current = setTimeout(function () {
+                props.onDragOver(e);
+            }, 1000);
+        }
         if (isDragging.current) {
             return;
         }
@@ -1943,9 +1949,12 @@ var Container = function (props) {
         var isTop = yp < 50;
         var isBottom = yp >= 50;
         setSelection(isTop ? 'top' : 'bottom');
-        props.onDragOver(e);
     };
     var onDragLeave = function (e) {
+        if (timer.current) {
+            clearTimeout(timer.current);
+            timer.current = null;
+        }
         if (isDragging.current) {
             return;
         }
@@ -1953,6 +1962,10 @@ var Container = function (props) {
         setSelection(undefined);
     };
     var onDrop = function (e) {
+        if (timer.current) {
+            clearTimeout(timer.current);
+            timer.current = null;
+        }
         if (isDragging.current) {
             return;
         }
@@ -1973,9 +1986,9 @@ var Container = function (props) {
     };
     return (React.createElement("div", { ref: ref, draggable: true, onClick: props.onClick, onDragOver: onDragOver, onDragEnter: onDragEnter, onDragStart: onDragStart, onDragLeave: onDragLeave, onDragEnd: onDragEnd, onDrop: onDrop, style: {
             borderLeft: props.isActive
-                ? '1px solid white'
-                : '1px solid transparent',
-        }, className: "container-item" },
+                ? '2px solid white'
+                : '2px solid transparent',
+        }, className: "activity-bar-item" + (props.isActive ? ' active' : '') },
         dragEntered && (React.createElement("div", { style: {
                 position: 'absolute',
                 top: '0px',
@@ -1988,7 +2001,7 @@ var Container = function (props) {
                 borderBottom: selection === 'bottom' ? '2px solid white' : '',
                 pointerEvents: 'none',
             } })),
-        React.createElement("span", { style: { fontSize: '30px' }, className: "material-icons-outlined" }, props.container.icon)));
+        React.createElement("a", { className: "material-icons-outlined" }, props.container.icon)));
 };
 exports.Container = Container;
 
@@ -2698,6 +2711,7 @@ var Activitybar = function (props) {
                     viewService.model.insertContainerBefore(sourceContainer, targetContainer);
                     break;
             }
+            viewService.model.setActiveViewContainer(sourceContainer.id);
         }
     }; };
     var onNewContainer = function (event) {
@@ -2705,9 +2719,16 @@ var Activitybar = function (props) {
         if (data) {
             var paneId = data.paneId;
             var view = viewService.model.getView(paneId);
+            if (!view) {
+                console.log("view " + paneId + " doesn't exist");
+                return;
+            }
             var viewContainer = viewService.model.getViewContainer2(view);
+            if (!viewContainer) {
+                console.log("viewContainer for view " + view.id + " doesn't exist");
+                return;
+            }
             viewService.model.removeViews([view], viewContainer);
-            // viewContainer.removeView(view);
             var newContainer = new viewContainer_1.PaneviewContainer("t_" + Date.now().toString().substr(5), viewRegistry_1.VIEW_REGISTRY);
             newContainer.addView(view);
             viewService.model.addContainer(newContainer);
@@ -2722,7 +2743,7 @@ var Activitybar = function (props) {
         }
         viewService.model.setActiveViewContainer(container.id);
     }; };
-    return (React.createElement("div", { style: { background: 'rgb(51,51,51)', cursor: 'pointer' } },
+    return (React.createElement("div", { className: "activity-bar-part" },
         containers.map(function (container, i) {
             var isActive = activeContainerid === container.id;
             return (React.createElement(sidebarItem_1.Container, { key: i, container: container, isActive: isActive, onDragOver: onDragOver(container), onClick: onClick(container), onDrop: onContainerDrop(container) }));
@@ -2732,6 +2753,10 @@ var Activitybar = function (props) {
 exports.Activitybar = Activitybar;
 var ExtraSpace = function (props) {
     var ref = React.useRef(null);
+    var onDrop = function (event) {
+        (0, dom_1.toggleClass)(ref.current, 'activity-bar-space-dragover', false);
+        props.onNewContainer(event);
+    };
     return (React.createElement("div", { ref: ref, className: "activity-bar-space", onDragOver: function (e) {
             e.preventDefault();
         }, onDragEnter: function (e) {
@@ -2739,7 +2764,7 @@ var ExtraSpace = function (props) {
             e.preventDefault();
         }, onDragLeave: function (e) {
             (0, dom_1.toggleClass)(ref.current, 'activity-bar-space-dragover', false);
-        }, onDrop: props.onNewContainer, style: { height: '100%', backgroundColor: 'red' } }));
+        }, onDrop: onDrop }));
 };
 var Sidebar = function () {
     var _a = __read(React.useState(viewService.model.activeContainer.id), 2), sidebarId = _a[0], setSidebarId = _a[1];
@@ -2754,6 +2779,19 @@ var Sidebar = function () {
     return React.createElement(exports.SidebarPart, { id: sidebarId });
 };
 exports.Sidebar = Sidebar;
+var headerComponents = {
+    default: function (props) {
+        var onClick = function () { return props.api.setExpanded(!props.api.isExpanded); };
+        return (React.createElement("div", { onClick: onClick, style: {
+                display: 'flex',
+                alignItems: 'center',
+                padding: '0px 8px',
+                cursor: 'pointer',
+            } },
+            React.createElement("a", { className: "material-icons-outlined" }, props.api.isExpanded ? 'expand_more' : 'chevron_right'),
+            React.createElement("span", null, props.title)));
+    },
+};
 var SidebarPart = function (props) {
     var _a = __read(React.useState(), 2), api = _a[0], setApi = _a[1];
     React.useEffect(function () {
@@ -2772,6 +2810,7 @@ var SidebarPart = function (props) {
                 isExpanded: view.isExpanded,
                 title: view.title,
                 component: 'default',
+                headerComponent: 'default',
                 params: {
                     viewId: view.id,
                 },
@@ -2795,6 +2834,7 @@ var SidebarPart = function (props) {
                     isExpanded: view.isExpanded,
                     title: view.title,
                     component: 'default',
+                    headerComponent: 'default',
                     params: {
                         viewId: view.id,
                     },
@@ -2813,8 +2853,19 @@ var SidebarPart = function (props) {
         var containerData = event.event.dataTransfer.getData('application/json');
         if (containerData) {
             var container = JSON.parse(containerData).container;
+            if (container === props.id) {
+                return;
+            }
             var sourceContainer = viewService.model.getViewContainer(container);
             var targetContainer_1 = viewService.model.getViewContainer(props.id);
+            if (!sourceContainer) {
+                console.log("sourceContainer " + props.id + " doesn't exist");
+                return;
+            }
+            if (!targetContainer_1) {
+                console.log("targetContainer " + props.id + " doesn't exist");
+                return;
+            }
             sourceContainer.views.forEach(function (v) {
                 viewService.model.moveViewToLocation(v, targetContainer_1, 0);
             });
@@ -2832,13 +2883,17 @@ var SidebarPart = function (props) {
         }
         var viewId = data.paneId;
         var viewContainer = viewService.model.getViewContainer(props.id);
+        if (!viewContainer) {
+            console.log("viewContainer " + props.id + " doesn't exist");
+            return;
+        }
         var view = viewService.model.getView(viewId);
         viewService.model.moveViewToLocation(view, viewContainer, toIndex);
     };
     if (!props.id) {
         return null;
     }
-    return (React.createElement(dockview_1.PaneviewReact, { onDidDrop: onDidDrop, components: components, onReady: onReady }));
+    return (React.createElement(dockview_1.PaneviewReact, { className: "sidebar-part", onDidDrop: onDidDrop, components: components, headerComponents: headerComponents, onReady: onReady }));
 };
 exports.SidebarPart = SidebarPart;
 
@@ -2857,7 +2912,7 @@ var ___CSS_LOADER_AT_RULE_IMPORT_0___ = __webpack_require__(/*! -!../node_module
 exports = ___CSS_LOADER_API_IMPORT___(false);
 exports.i(___CSS_LOADER_AT_RULE_IMPORT_0___);
 // Module
-exports.push([module.id, "body {\n  margin: 0;\n  font-family: Arial, \"Helvetica Neue\", Helvetica, sans-serif;\n  overflow: hidden;\n  color: white;\n  font-size: 13px;\n}\n\n::-webkit-scrollbar {\n  height: 8px;\n  width: 8px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n  background: transparent;\n}\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n  background: var(--dv-tabs-container-scrollbar-color);\n}\n\n.close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n  cursor: pointer;\n}\n.close-action:active {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n\nbutton {\n  max-width: 125px;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  white-space: nowrap;\n  border: none;\n  background-color: #0e639c;\n  color: white;\n  font-family: inherit;\n  outline: none;\n  padding: 2px 14px;\n  margin: 2px 0px;\n}\nbutton:hover {\n  background-color: #1177bb;\n  cursor: pointer;\n}", ""]);
+exports.push([module.id, "body {\n  margin: 0;\n  font-family: Arial, \"Helvetica Neue\", Helvetica, sans-serif;\n  overflow: hidden;\n  color: white;\n  font-size: 13px;\n}\n\n::-webkit-scrollbar {\n  height: 8px;\n  width: 8px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n  background: transparent;\n}\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n  background: var(--dv-tabs-container-scrollbar-color);\n}\n\n.close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n  cursor: pointer;\n}\n.close-action:active {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n\nbutton {\n  text-overflow: ellipsis;\n  overflow: hidden;\n  white-space: nowrap;\n  border: none;\n  background-color: #0e639c;\n  color: white;\n  font-family: inherit;\n  outline: none;\n  padding: 2px 14px;\n  margin: 2px 0px;\n}\nbutton:hover {\n  background-color: #1177bb;\n  cursor: pointer;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -2874,7 +2929,7 @@ module.exports = exports;
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ".control-center {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  padding: 2px;\n  box-sizing: border-box;\n}\n.control-center .control-center-row {\n  height: 25px;\n  box-sizing: border-box;\n}\n.control-center .control-center-row button {\n  width: 125px;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  white-space: nowrap;\n  border: none;\n  background-color: #0e639c;\n  color: white;\n  font-family: inherit;\n  outline: none;\n  padding: 2px 14px;\n  margin: 2px 0px;\n}\n.control-center .control-center-row button:hover {\n  background-color: #1177bb;\n}", ""]);
+exports.push([module.id, ".control-center {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  padding: 4px 8px;\n  box-sizing: border-box;\n}\n.control-center .control-center-row {\n  height: 25px;\n  box-sizing: border-box;\n}\n.control-center .control-center-row button {\n  width: 175px;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  white-space: nowrap;\n  border: none;\n  background-color: #0e639c;\n  color: white;\n  font-family: inherit;\n  outline: none;\n  padding: 2px 14px;\n  margin: 2px 0px;\n}\n.control-center .control-center-row button:hover {\n  background-color: #1177bb;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -2959,7 +3014,7 @@ module.exports = exports;
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ".activity-bar-space.activity-bar-space-dragover {\n  background-color: green !important;\n}\n\n.container-item {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 48px;\n  box-sizing: border-box;\n  position: relative;\n}", ""]);
+exports.push([module.id, ".sidebar-part {\n  background-color: #252526;\n}\n\n.activity-bar-part {\n  background-color: #333333;\n}\n.activity-bar-part .activity-bar-item {\n  display: flex;\n  cursor: pointer;\n  justify-content: center;\n  align-items: center;\n  height: 48px;\n  box-sizing: border-box;\n  position: relative;\n  color: grey;\n  font-size: 24px;\n}\n.activity-bar-part .activity-bar-item:hover, .activity-bar-part .activity-bar-item.active {\n  color: white;\n}\n.activity-bar-part .activity-bar-space {\n  height: 100%;\n}\n.activity-bar-part .activity-bar-space.activity-bar-space-dragover {\n  border-top: 2px solid white;\n}", ""]);
 // Exports
 module.exports = exports;
 
