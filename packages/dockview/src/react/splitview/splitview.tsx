@@ -15,7 +15,7 @@ export interface SplitviewReadyEvent {
     api: SplitviewApi;
 }
 
-export interface ISplitviewPanelProps<T extends {} = any>
+export interface ISplitviewPanelProps<T extends { [index: string]: any } = any>
     extends PanelParameters<T> {
     api: SplitviewPanelApi;
     containerApi: SplitviewApi;

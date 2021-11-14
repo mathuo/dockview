@@ -15,7 +15,7 @@ export interface GridviewReadyEvent {
     api: GridviewApi;
 }
 
-export interface IGridviewPanelProps<T extends {} = Record<string, any>>
+export interface IGridviewPanelProps<T extends { [index: string]: any } = any>
     extends PanelParameters<T> {
     api: GridviewPanelApi;
     containerApi: GridviewApi;

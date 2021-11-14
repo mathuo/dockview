@@ -15,7 +15,7 @@ export interface PaneviewReadyEvent {
     api: PaneviewApi;
 }
 
-export interface IPaneviewPanelProps<T extends {} = Record<string, any>>
+export interface IPaneviewPanelProps<T extends { [index: string]: any } = any>
     extends PanelParameters<T> {
     api: PaneviewPanelApi;
     containerApi: PaneviewApi;
