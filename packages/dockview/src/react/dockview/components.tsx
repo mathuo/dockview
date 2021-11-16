@@ -41,7 +41,7 @@ const Panel: React.FunctionComponent<WithChildren> = (props: WithChildren) => {
 
         if (isInvalid) {
             throw new Error(
-                'Children of DockviewComponents.Panel must be one of the following: DockviewComponents.Contents, DockviewComponents.Actions, DockviewComponents.Tab'
+                'Children of DockviewComponents.Panel must be one of the following: DockviewComponents.Content, DockviewComponents.Actions, DockviewComponents.Tab'
             );
         }
 
