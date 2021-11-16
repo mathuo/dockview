@@ -352,12 +352,8 @@ export class GridviewComponent
                     const group = groupItem.value;
                     if (group !== panel) {
                         group.setActive(false);
-                        // group.api._onDidActiveChange.fire({ isActive: false });
-                        // group.api.setActive(false);
                     } else {
                         group.setActive(true);
-                        // group.api._onDidActiveChange.fire({ isActive: true });
-                        // group.setActive(true);
                     }
                 });
             })

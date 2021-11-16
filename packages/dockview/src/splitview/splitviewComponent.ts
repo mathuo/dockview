@@ -195,18 +195,15 @@ export class SplitviewComponent
         this.getPanels()
             .filter((v) => v !== view)
             .forEach((v) => {
-                // v.api._;
                 v.api._onDidActiveChange.fire({ isActive: false });
                 if (!skipFocus) {
                     v.focus();
                 }
-                // v.setActive(false, skipFocus);
             });
         view.api._onDidActiveChange.fire({ isActive: true });
         if (!skipFocus) {
             view.focus();
         }
-        // view.setActive(true, skipFocus);
     }
 
     getPanels(): SplitviewPanel[] {

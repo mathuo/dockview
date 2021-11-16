@@ -608,7 +608,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             this.tabsContainer.hide();
             this.container.appendChild(this.watermark.element);
 
-            // this.contentContainer.openPanel(this.watermark);
             this.watermark.updateParentGroup(this.parent, true);
         }
         if (!this.isEmpty && this.watermark) {

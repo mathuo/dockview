@@ -856,27 +856,20 @@ export class Splitview {
                     (position > 0 || this.startSnappingEnabled)
                 ) {
                     this.updateSash(sash, SashState.MINIMUM);
-                    // sash.state = SashState.Minimum;
                 } else if (
                     snappedAfter &&
                     collapsesDown[index] &&
                     (position < this.contentSize || this.endSnappingEnabled)
                 ) {
-                    // sash.state = SashState.Maximum;
                     this.updateSash(sash, SashState.MAXIMUM);
                 } else {
-                    // sash.state = SashState.Disabled;
                     this.updateSash(sash, SashState.DISABLED);
                 }
             } else if (min && !max) {
-                // sash.state = SashState.Minimum;
                 this.updateSash(sash, SashState.MINIMUM);
             } else if (!min && max) {
-                // sash.state = SashState.Maximum;
-
                 this.updateSash(sash, SashState.MAXIMUM);
             } else {
-                // sash.state = SashState.Enabled;
                 this.updateSash(sash, SashState.ENABLED);
             }
         }

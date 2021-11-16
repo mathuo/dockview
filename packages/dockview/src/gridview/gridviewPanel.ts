@@ -132,7 +132,6 @@ export abstract class GridviewPanel
             this.api.onVisibilityChange((event) => {
                 const { isVisible } = event;
                 const { containerApi } = this.params as GridviewInitParameters;
-                // this.api.setVisible(isVisible);
                 containerApi.setVisible(this, isVisible);
             }),
             this.api.onActiveChange(() => {

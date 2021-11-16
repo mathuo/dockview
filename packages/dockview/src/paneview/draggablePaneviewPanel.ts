@@ -1,7 +1,10 @@
 import { DragHandler } from '../dnd/abstractDragHandler';
-import { getPaneData, LocalSelectionTransfer } from '../dnd/dataTransfer';
+import {
+    getPaneData,
+    LocalSelectionTransfer,
+    PaneTransfer,
+} from '../dnd/dataTransfer';
 import { Droptarget, DroptargetEvent, Position } from '../dnd/droptarget';
-import { PaneTransfer } from '../dnd/dataTransfer';
 import { Emitter, Event } from '../events';
 import { IDisposable } from '../lifecycle';
 import { Orientation } from '../splitview/core/splitview';
@@ -10,7 +13,6 @@ import {
     PanePanelInitParameter,
     PaneviewPanel,
 } from './paneviewPanel';
-import { addClasses } from '../dom';
 
 interface ViewContainer {
     readonly title: string;
