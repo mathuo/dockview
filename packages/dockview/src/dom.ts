@@ -25,31 +25,6 @@ export function watchElementResize(
     };
 }
 
-export function isHTMLElement(o: any): o is HTMLElement {
-    if (typeof HTMLElement === 'object') {
-        return o instanceof HTMLElement;
-    }
-    return (
-        o &&
-        typeof o === 'object' &&
-        o.nodeType === 1 &&
-        typeof o.nodeName === 'string'
-    );
-}
-
-export const isInTree = (element: HTMLElement, className: string) => {
-    let _element: HTMLElement | null = element;
-
-    while (_element) {
-        if (_element.classList.contains(className)) {
-            return true;
-        }
-        _element = _element.parentElement;
-    }
-
-    return false;
-};
-
 export const removeClasses = (element: HTMLElement, ...classes: string[]) => {
     for (const classname of classes) {
         if (element.classList.contains(classname)) {

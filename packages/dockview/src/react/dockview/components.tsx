@@ -11,15 +11,19 @@ const Tab: React.FunctionComponent<WithChildren> = (props: WithChildren) => {
     return <>{props.children}</>;
 };
 
-const Body: React.FunctionComponent<WithChildren> = (props: WithChildren) => {
+const Content: React.FunctionComponent<WithChildren> = (
+    props: WithChildren
+) => {
     return <>{props.children}</>;
 };
-const Action: React.FunctionComponent<WithChildren> = (props: WithChildren) => {
+const Actions: React.FunctionComponent<WithChildren> = (
+    props: WithChildren
+) => {
     return <>{props.children}</>;
 };
 
 function isValidComponent(element: React.ReactElement) {
-    return [Body, Action, Tab].find((comp) => element.type === comp);
+    return [Content, Actions, Tab].find((comp) => element.type === comp);
 }
 
 const Panel: React.FunctionComponent<WithChildren> = (props: WithChildren) => {
@@ -37,12 +41,12 @@ const Panel: React.FunctionComponent<WithChildren> = (props: WithChildren) => {
 
         if (isInvalid) {
             throw new Error(
-                'Children of DockviewComponents.Panel must be one of the following: DockviewComponents.Body, DockviewComponents.Action, DockviewComponents.Tab'
+                'Children of DockviewComponents.Panel must be one of the following: DockviewComponents.Contents, DockviewComponents.Actions, DockviewComponents.Tab'
             );
         }
 
-        const body = childs.find((_) => _.type === Body);
-        const actions = childs.find((_) => _.type === Action);
+        const body = childs.find((_) => _.type === Content);
+        const actions = childs.find((_) => _.type === Actions);
         const tab = childs.find((_) => _.type === Tab);
 
         return { body, actions, tab };
@@ -77,4 +81,9 @@ const Panel: React.FunctionComponent<WithChildren> = (props: WithChildren) => {
     );
 };
 
-export const DockviewComponents = { Tab, Body, Action, Panel };
+export const DockviewComponents = {
+    Tab,
+    Content,
+    Actions,
+    Panel,
+};

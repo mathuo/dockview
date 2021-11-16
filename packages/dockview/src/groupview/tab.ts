@@ -1,13 +1,16 @@
 import { addDisposableListener, Emitter, Event } from '../events';
 import { CompositeDisposable } from '../lifecycle';
-import { getPanelData, LocalSelectionTransfer } from '../dnd/dataTransfer';
+import {
+    getPanelData,
+    LocalSelectionTransfer,
+    PanelTransfer,
+} from '../dnd/dataTransfer';
 import { getElementsByTagName, toggleClass } from '../dom';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { ITabRenderer } from './types';
 import { IGroupPanel } from './groupPanel';
 import { GroupviewPanel } from './groupviewPanel';
 import { DroptargetEvent, Droptarget } from '../dnd/droptarget';
-import { PanelTransfer } from '../dnd/dataTransfer';
 import { DockviewDropTargets } from './dnd';
 
 export enum MouseEventKind {

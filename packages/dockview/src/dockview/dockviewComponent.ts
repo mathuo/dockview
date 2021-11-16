@@ -10,7 +10,6 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { CompositeDisposable, IValueDisposable } from '../lifecycle';
 import { Event, Emitter } from '../events';
 import { Watermark } from './components/watermark/watermark';
-import { timeoutAsPromise } from '../async';
 import {
     IContentRenderer,
     ITabRenderer,
@@ -399,7 +398,6 @@ export class DockviewComponent
             if (!didCloseAll) {
                 return false;
             }
-            await timeoutAsPromise(0);
         }
         return true;
     }

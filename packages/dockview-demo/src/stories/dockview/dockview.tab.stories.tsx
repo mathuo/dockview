@@ -39,11 +39,11 @@ const components: PanelCollection<IDockviewPanelProps> = {
                         )}
                     </div>
                 </DockviewComponents.Tab>
-                <DockviewComponents.Body>
+                <DockviewComponents.Content>
                     <div style={{ padding: '10px', height: '100%' }}>
                         hello world
                     </div>
-                </DockviewComponents.Body>
+                </DockviewComponents.Content>
             </DockviewComponents.Panel>
         );
     },

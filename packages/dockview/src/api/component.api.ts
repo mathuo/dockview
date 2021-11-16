@@ -13,7 +13,7 @@ import {
     IGridviewComponent,
     SerializedGridview,
 } from '../gridview/gridviewComponent';
-import { IGridviewPanel } from '../gridview/gridviewPanel';
+import { GridviewPanel, IGridviewPanel } from '../gridview/gridviewPanel';
 import { IGroupPanel } from '../groupview/groupPanel';
 import {
     AddPaneviewCompponentOptions,
@@ -31,7 +31,6 @@ import { Orientation, Sizing } from '../splitview/core/splitview';
 import { ISplitviewPanel } from '../splitview/splitviewPanel';
 import { GroupviewPanel } from '../groupview/groupviewPanel';
 import { Event } from '../events';
-import { GridviewPanel } from '../gridview/gridviewPanel';
 import { IDisposable } from '../lifecycle';
 
 export interface CommonApi {

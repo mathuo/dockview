@@ -44,11 +44,11 @@ const components: PanelCollection<IDockviewPanelProps<any>> = {
                         )}
                     </div>
                 </DockviewComponents.Tab>
-                <DockviewComponents.Body>
+                <DockviewComponents.Content>
                     <div style={{ padding: '10px', height: '100%' }}>
                         {`The current ticker value is ${props.params.ticker}`}
                     </div>
-                </DockviewComponents.Body>
+                </DockviewComponents.Content>
             </DockviewComponents.Panel>
         );
     },

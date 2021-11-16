@@ -45,15 +45,15 @@ const Test = (props: IDockviewPanelProps) => {
                     <div>{`custom tab ${counter}`}</div>
                 </DockviewComponents.Tab>
             )}
-            <DockviewComponents.Body>
+            <DockviewComponents.Content>
                 <div>
                     <div>{`custom body ${counter}`}</div>
                     <button>Toggle</button>
                 </div>
-            </DockviewComponents.Body>
-            <DockviewComponents.Action>
+            </DockviewComponents.Content>
+            <DockviewComponents.Actions>
                 <div>{`custom action ${counter}`}</div>
-            </DockviewComponents.Action>
+            </DockviewComponents.Actions>
         </DockviewComponents.Panel>
     );
 };
@@ -185,7 +185,7 @@ const components: PanelCollection<IDockviewPanelProps> = {
 
         return (
             <DockviewComponents.Panel>
-                <DockviewComponents.Action>
+                <DockviewComponents.Actions>
                     <div
                         style={{
                             height: '100%',
@@ -206,8 +206,8 @@ const components: PanelCollection<IDockviewPanelProps> = {
                             <a className="material-icons">menu</a>
                         </span>
                     </div>
-                </DockviewComponents.Action>
-                <DockviewComponents.Body>
+                </DockviewComponents.Actions>
+                <DockviewComponents.Content>
                     <div
                         style={{
                             // backgroundColor,
@@ -263,7 +263,7 @@ const components: PanelCollection<IDockviewPanelProps> = {
                             />
                         </div>
                     </div>
-                </DockviewComponents.Body>
+                </DockviewComponents.Content>
             </DockviewComponents.Panel>
         );
     },

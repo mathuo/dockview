@@ -1,11 +1,7 @@
 import { DockviewApi } from '../api/component.api';
-import { timeoutAsPromise } from '../async';
 import { getPanelData } from '../dnd/dataTransfer';
 import { Droptarget, Position } from '../dnd/droptarget';
-import {
-    DockviewComponent,
-    IDockviewComponent,
-} from '../dockview/dockviewComponent';
+import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { isAncestor, toggleClass } from '../dom';
 import { addDisposableListener, Emitter, Event } from '../events';
 import { IGridPanelView } from '../gridview/baseComponentGridview';
@@ -407,7 +403,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             this.openPanel(panel);
 
             if (panel.close) {
-                await timeoutAsPromise(0);
                 const canClose = await panel.close();
                 if (!canClose) {
                     return false;

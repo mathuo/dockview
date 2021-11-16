@@ -9,14 +9,6 @@
 .tab {
     flex-shrink: 0;
 
-    // &.dragged {
-    //     transform: translate3d(
-    //         0px,
-    //         0px,
-    //         0px
-    //     ); /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */
-    // }
-
     &.dragging {
         .tab-action {
             background-color: var(--dv-activegroup-visiblepanel-tab-color);

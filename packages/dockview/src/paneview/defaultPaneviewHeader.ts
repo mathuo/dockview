@@ -1,9 +1,8 @@
 import { addDisposableListener } from '../events';
 import { PaneviewPanelApiImpl } from '../api/paneviewPanelApi';
-import { CompositeDisposable } from '../lifecycle';
+import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { PanelUpdateEvent } from '../panel/types';
 import { IPaneHeaderPart, PanePanelInitParameter } from './paneviewPanel';
-import { MutableDisposable } from '../lifecycle';
 
 export class DefaultHeader
     extends CompositeDisposable
