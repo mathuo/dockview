@@ -621,6 +621,90 @@ describe('dockviewComponent', () => {
         disposable.dispose();
     });
 
+    test('totalPanels is updated before panel event fires', () => {
+        dockview.layout(1000, 1000);
+
+        let counter = 0;
+
+        const disposable = dockview.onGridEvent((e) => {
+            switch (e.kind) {
+                case GroupChangeKind.ADD_PANEL:
+                    counter++;
+                    expect(counter).toBe(dockview.totalPanels);
+                    break;
+                case GroupChangeKind.REMOVE_PANEL:
+                    counter--;
+                    expect(counter).toBe(dockview.totalPanels);
+                    break;
+            }
+        });
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            position: { referencePanel: 'panel1', direction: 'within' },
+        });
+
+        const panel3 = dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: { referencePanel: 'panel1', direction: 'right' },
+        });
+
+        dockview.removePanel(panel1);
+        dockview.removePanel(panel3);
+        dockview.removePanel(panel2);
+
+        disposable.dispose();
+    });
+
+    test('size is updated before group event fires', () => {
+        dockview.layout(1000, 1000);
+
+        let counter = 0;
+
+        const disposable = dockview.onGridEvent((e) => {
+            switch (e.kind) {
+                case GroupChangeKind.ADD_GROUP:
+                    counter++;
+                    expect(counter).toBe(dockview.size);
+                    break;
+                case GroupChangeKind.REMOVE_GROUP:
+                    counter--;
+                    expect(counter).toBe(dockview.size);
+                    break;
+            }
+        });
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            position: { referencePanel: 'panel1', direction: 'within' },
+        });
+
+        const panel3 = dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: { referencePanel: 'panel1', direction: 'right' },
+        });
+
+        dockview.removePanel(panel1);
+        dockview.removePanel(panel3);
+        dockview.removePanel(panel2);
+
+        disposable.dispose();
+    });
+
     test('events flow', () => {
         dockview.layout(1000, 1000);
 

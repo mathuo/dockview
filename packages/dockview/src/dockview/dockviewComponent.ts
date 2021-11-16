@@ -291,7 +291,7 @@ export class DockviewComponent
         }
     }
 
-    registerPanel(panel: IGroupPanel): void {
+    private registerPanel(panel: IGroupPanel): void {
         if (this._panels.has(panel.id)) {
             throw new Error(`panel ${panel.id} already exists`);
         }
@@ -303,7 +303,7 @@ export class DockviewComponent
         this._panels.set(panel.id, { value: panel, disposable });
     }
 
-    unregisterPanel(panel: IGroupPanel): void {
+    private unregisterPanel(panel: IGroupPanel): void {
         if (!this._panels.has(panel.id)) {
             throw new Error(`panel ${panel.id} doesn't exist`);
         }
@@ -460,7 +460,20 @@ export class DockviewComponent
     }
 
     removePanel(panel: IGroupPanel): void {
-        panel.group?.model.removePanel(panel);
+        this.unregisterPanel(panel);
+        const group = panel.group;
+
+        if (!group) {
+            throw new Error(
+                `cannot remove panel ${panel.id}. it's missing a group.`
+            );
+        }
+
+        group.model.removePanel(panel);
+
+        if (group.model.size === 0) {
+            this.removeGroup(group);
+        }
     }
 
     createWatermarkComponent(): IWatermarkRenderer {
@@ -516,8 +529,7 @@ export class DockviewComponent
     removeGroup(group: GroupviewPanel): void {
         const panels = [...group.model.panels]; // reassign since group panels will mutate
         panels.forEach((panel) => {
-            group.model.removePanel(panel);
-            this.unregisterPanel(panel);
+            this.removePanel(panel);
         });
 
         if (this._groups.size === 1) {
