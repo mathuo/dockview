@@ -436,12 +436,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     };
 
     private doClose(panel: IGroupPanel) {
-        this.removePanel(panel);
-        this._removePanel(panel);
-
-        if (this.panels.length === 0) {
-            this.accessor.removeGroup(this.parent);
-        }
+        this.accessor.removePanel(panel);
     }
 
     public isPanelActive(panel: IGroupPanel) {
