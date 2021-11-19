@@ -1,7 +1,7 @@
 {
   "name": "dockview-demo",
   "private": true,
-  "version": "0.0.27",
+  "version": "0.0.28",
   "description": "Demo project for https://github.com/mathuo/dockview",
   "scripts": {
     "build": "npm run build-webpack && npm run build-storybook",
@@ -14,7 +14,7 @@
   "author": "https://github.com/mathuo",
   "license": "MIT",
   "dependencies": {
-    "dockview": "^0.0.27",
+    "dockview": "^0.0.28",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "recoil": "^0.4.1"
