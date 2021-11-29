@@ -65,6 +65,66 @@ You should also attach a dockview theme to an element containing your components
 <body classname="dockview-theme-dark"></body>
 ```
 
+Demonstrated below is a high level example of a `DockviewReact` component. You can follow a similar pattern for `GridviewReact`, `SplitviewReact` and `PaneviewReact` components too, see examples for more.
+
+```tsx
+import { DockviewReact, DockviewReadyEvent, PanelCollection.IDockviewPanelProps } from 'dockview';
+
+const components: PanelCollection<IDockviewPanelProps> = {
+  default: (props: IDockviewPanelProps<{someProps: string}>) => {
+    return <div>{props.params.someProps}</div>
+  }
+};
+
+const Component = () => {
+    const onReady = (event: DockviewReadyEvent) => {
+        event.api.addPanel({
+            id: 'panel1',
+            component: 'default',
+            params: {
+                someProps: 'Hello',
+            },
+        });
+        event.api.addPanel({
+            id: 'panel2',
+            component: 'default',
+            params: {
+                someProps: 'World',
+            },
+            position: { referencePanel: 'panel1', direction: 'below' },
+        });
+    };
+
+    return <DockviewReact components={components} onReady={onReady} />;
+};
+```
+
+Specifically for `DockviewReact` there exists higher-order components to encapsulate both the tab and contents into one logical component for the user making state sharing between the two simple, which is an optional feature.
+
+```tsx
+const components: PanelCollection<IDockviewPanelProps> = {
+    default: (props: IDockviewPanelProps<{ someProps: string }>) => {
+        return <div>{props.params.someProps}</div>;
+    },
+    fancy: (props: IDockviewPanelProps) => {
+        const close = () => props.api.close();
+        return (
+            <DockviewComponents.Panel>
+                <DockviewComponents.Tab>
+                    <div>
+                        <span>{props.api.title}</span>
+                        <span onClick={close}>{'Close'}</span>
+                    </div>
+                </DockviewComponents.Tab>
+                <DockviewComponents.Content>
+                    <div>{'Hello world'}</div>
+                </DockviewComponents.Content>
+            </DockviewComponents.Panel>
+        );
+    },
+};
+```
+
 ## Sandbox examples
 
 -   [Dockview](https://codesandbox.io/s/simple-dockview-t6491)
