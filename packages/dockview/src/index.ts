@@ -1,5 +1,3 @@
-import './footnote';
-
 export * from './events';
 export * from './lifecycle';
 export * from './dnd/dataTransfer';
