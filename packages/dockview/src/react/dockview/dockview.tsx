@@ -153,6 +153,24 @@ export const DockviewReact = React.forwardRef(
         }, []);
 
         React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+            dockviewRef.current.updateOptions({
+                frameworkComponents: props.components,
+            });
+        }, [props.components]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+            dockviewRef.current.updateOptions({
+                frameworkTabComponents: props.tabComponents,
+            });
+        }, [props.tabComponents]);
+
+        React.useEffect(() => {
             if (!props.onTabContextMenu || !dockviewRef.current) {
                 return () => {
                     //noop

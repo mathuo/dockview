@@ -91,6 +91,15 @@ export const SplitviewReact = React.forwardRef(
             };
         }, []);
 
+        React.useEffect(() => {
+            if (!splitviewRef.current) {
+                return;
+            }
+            splitviewRef.current.updateOptions({
+                frameworkComponents: props.components,
+            });
+        }, [props.components]);
+
         return (
             <div
                 className={props.className}

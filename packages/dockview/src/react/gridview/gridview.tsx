@@ -96,6 +96,15 @@ export const GridviewReact = React.forwardRef(
             };
         }, []);
 
+        React.useEffect(() => {
+            if (!gridviewRef.current) {
+                return;
+            }
+            gridviewRef.current.updateOptions({
+                frameworkComponents: props.components,
+            });
+        }, [props.components]);
+
         return (
             <div
                 className={props.className}

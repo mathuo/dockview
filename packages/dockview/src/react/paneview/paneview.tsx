@@ -104,13 +104,19 @@ export const PaneviewReact = React.forwardRef(
         }, []);
 
         React.useEffect(() => {
-            paneviewRef.current?.updateOptions({
+            if (!paneviewRef.current) {
+                return;
+            }
+            paneviewRef.current.updateOptions({
                 frameworkComponents: props.components,
             });
         }, [props.components]);
 
         React.useEffect(() => {
-            paneviewRef.current?.updateOptions({
+            if (!paneviewRef.current) {
+                return;
+            }
+            paneviewRef.current.updateOptions({
                 headerframeworkComponents: props.headerComponents,
             });
         }, [props.headerComponents]);
