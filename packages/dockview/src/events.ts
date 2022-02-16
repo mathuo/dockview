@@ -101,3 +101,24 @@ export function addDisposableListener<K extends keyof HTMLElementEventMap>(
         },
     };
 }
+
+export class TickDelayedEvent implements IDisposable {
+    private timer: any;
+
+    private readonly _onFired = new Emitter<void>();
+    readonly onEvent = this._onFired.event;
+
+    fire(): void {
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
+        this.timer = setTimeout(() => {
+            this._onFired.fire();
+            clearTimeout(this.timer);
+        });
+    }
+
+    dispose(): void {
+        this._onFired.dispose();
+    }
+}

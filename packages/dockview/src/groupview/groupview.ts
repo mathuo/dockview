@@ -221,7 +221,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 this.accessor.doSetGroupActive(this.parent, true);
             }),
             this.contentContainer.onDidBlur(() => {
-                // this._activePanel?.api._ondid
+                // noop
             }),
             this.dropTarget.onDrop((event) => {
                 this.handleDropEvent(event.event, event.position);

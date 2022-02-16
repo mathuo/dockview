@@ -60,7 +60,7 @@ function flipNode<T extends Node>(
         return result as T;
     } else {
         return new LeafNode(
-            (node as LeafNode).view,
+            node.view,
             orthogonal(node.orientation),
             orthogonalSize
         ) as T;
@@ -161,11 +161,7 @@ export interface IGridView {
     readonly minimumHeight: number;
     readonly maximumHeight: number;
     priority?: LayoutPriority;
-    layout(
-        width: number,
-        height: number
-        // top: number, left: number
-    ): void;
+    layout(width: number, height: number): void;
     toJSON(): object;
     fromJSON?(json: object): void;
     snap?: boolean;
@@ -615,7 +611,6 @@ export class Gridview implements IDisposable {
         parent.removeChild(index, sizing);
 
         if (parent.children.length === 0) {
-            // throw new Error('Invalid grid state');
             return node.view;
         }
 

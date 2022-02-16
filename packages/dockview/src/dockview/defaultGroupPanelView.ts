@@ -62,7 +62,8 @@ export class DefaultGroupPanelView implements IGroupPanelView {
     }
 
     updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void {
-        // TODO
+        this._content.updateParentGroup(group, isPanelVisible);
+        this._tab?.updateParentGroup(group, isPanelVisible);
     }
 
     layout(width: number, height: number): void {

@@ -1,4 +1,4 @@
-import { Emitter, Event } from '../events';
+import { Emitter, Event, TickDelayedEvent } from '../events';
 import { getGridLocation, Gridview, IGridView } from './gridview';
 import { Position } from '../dnd/droptarget';
 import { CompositeDisposable, IValueDisposable } from '../lifecycle';
@@ -165,37 +165,35 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
         this.addDisposables(
             (() => {
-                /**
-                 * TODO Fix this relatively ugly 'merge and delay'
-                 */
-                let timer: any;
+                const tickDelayedEvent = new TickDelayedEvent();
 
-                return this.onGridEvent((event) => {
-                    if (
-                        [
-                            GroupChangeKind.ADD_GROUP,
-                            GroupChangeKind.REMOVE_GROUP,
-                            GroupChangeKind.ADD_PANEL,
-                            GroupChangeKind.REMOVE_PANEL,
-                            GroupChangeKind.GROUP_ACTIVE,
-                            GroupChangeKind.PANEL_ACTIVE,
-                            GroupChangeKind.LAYOUT,
-                        ].includes(event.kind)
-                    ) {
-                        if (timer) {
-                            clearTimeout(timer);
+                return new CompositeDisposable(
+                    this.onGridEvent((event) => {
+                        if (
+                            [
+                                GroupChangeKind.ADD_GROUP,
+                                GroupChangeKind.REMOVE_GROUP,
+                                GroupChangeKind.ADD_PANEL,
+                                GroupChangeKind.REMOVE_PANEL,
+                                GroupChangeKind.GROUP_ACTIVE,
+                                GroupChangeKind.PANEL_ACTIVE,
+                                GroupChangeKind.LAYOUT,
+                            ].includes(event.kind)
+                        ) {
+                            tickDelayedEvent.fire();
                         }
-                        timer = setTimeout(() => {
-                            this._onDidLayoutChange.fire();
-                            clearTimeout(timer);
-                        });
-                    }
-                });
+                    }),
+                    tickDelayedEvent.onEvent(() => {
+                        this._onDidLayoutChange.fire();
+                    }),
+                    tickDelayedEvent
+                );
             })()
         );
     }
 
     public abstract toJSON(): object;
+
     public abstract fromJSON(data: any): void;
 
     public setVisible(panel: T, visible: boolean) {
