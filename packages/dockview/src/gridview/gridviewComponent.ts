@@ -66,7 +66,7 @@ export type GridviewComponentUpdateOptions = Pick<
 
 export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
     readonly orientation: Orientation;
-    updateOptions(options: GridviewComponentUpdateOptions): void;
+    updateOptions(options: Partial<GridviewComponentUpdateOptions>): void;
     addPanel(options: AddComponentOptions): void;
     removePanel(panel: IGridviewPanel, sizing?: Sizing): void;
     toggleVisibility(panel: IGridviewPanel): void;
@@ -128,7 +128,7 @@ export class GridviewComponent
         }
     }
 
-    updateOptions(options: GridviewComponentUpdateOptions): void {
+    updateOptions(options: Partial<GridviewComponentUpdateOptions>): void {
         const hasOrientationChanged =
             typeof options.orientation === 'string' &&
             this.options.orientation !== options.orientation;

@@ -58,7 +58,7 @@ export interface ISplitviewComponent extends IDisposable {
     readonly width: number;
     readonly length: number;
     readonly orientation: Orientation;
-    updateOptions(options: SplitviewComponentUpdateOptions): void;
+    updateOptions(options: Partial<SplitviewComponentUpdateOptions>): void;
     addPanel(options: AddSplitviewComponentOptions): void;
     layout(width: number, height: number): void;
     onDidLayoutChange: Event<void>;
@@ -159,7 +159,7 @@ export class SplitviewComponent
         this.addDisposables(this._disposable);
     }
 
-    updateOptions(options: SplitviewComponentUpdateOptions): void {
+    updateOptions(options: Partial<SplitviewComponentUpdateOptions>): void {
         const hasOrientationChanged =
             typeof options.orientation === 'string' &&
             this.options.orientation !== options.orientation;
