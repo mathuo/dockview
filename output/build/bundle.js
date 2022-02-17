@@ -42963,7 +42963,9 @@ class DefaultGroupPanelView {
         this.tab.init(params);
     }
     updateParentGroup(group, isPanelVisible) {
-        // TODO
+        var _a;
+        this._content.updateParentGroup(group, isPanelVisible);
+        (_a = this._tab) === null || _a === void 0 ? void 0 : _a.updateParentGroup(group, isPanelVisible);
     }
     layout(width, height) {
         this.content.layout(width, height);
@@ -43917,7 +43919,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "Event": () => (/* binding */ Event),
 /* harmony export */   "Emitter": () => (/* binding */ Emitter),
 /* harmony export */   "addDisposableWindowListener": () => (/* binding */ addDisposableWindowListener),
-/* harmony export */   "addDisposableListener": () => (/* binding */ addDisposableListener)
+/* harmony export */   "addDisposableListener": () => (/* binding */ addDisposableListener),
+/* harmony export */   "TickDelayedEvent": () => (/* binding */ TickDelayedEvent)
 /* harmony export */ });
 var Event;
 (function (Event) {
@@ -43990,36 +43993,24 @@ function addDisposableListener(element, type, listener, options) {
         },
     };
 }
-
-
-/***/ }),
-
-/***/ "../dockview/dist/esm/footnote.js":
-/*!****************************************!*\
-  !*** ../dockview/dist/esm/footnote.js ***!
-  \****************************************/
-/***/ (() => {
-
-"use strict";
-
-function runFootnote() {
-    var _a, _b;
-    const DOCKVIEW_SUPPRESS_WATERMARK = 'DOCKVIEW_WATERMARK_SUPPRESSED';
-    const isTest = ((_b = (_a = window.process) === null || _a === void 0 ? void 0 : _a.env) === null || _b === void 0 ? void 0 : _b.NODE_ENV) === 'test';
-    if (isTest) {
-        return; // don't spam people tests
+class TickDelayedEvent {
+    constructor() {
+        this._onFired = new Emitter();
+        this.onEvent = this._onFired.event;
     }
-    const isSuppressed = !!window[DOCKVIEW_SUPPRESS_WATERMARK];
-    if (!isSuppressed) {
-        console.log([
-            'dockview: https://github.com/mathuo/dockview for examples and documentation',
-            'dockview: https://www.npmjs.com/package/dockview',
-            `dockview: To suppress this message set window.${DOCKVIEW_SUPPRESS_WATERMARK}=1 before importing the dockview package`,
-            '',
-        ].join('\n'));
+    fire() {
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
+        this.timer = setTimeout(() => {
+            this._onFired.fire();
+            clearTimeout(this.timer);
+        });
+    }
+    dispose() {
+        this._onFired.dispose();
     }
 }
-runFootnote();
 
 
 /***/ }),
@@ -44120,11 +44111,8 @@ class BaseGrid extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposab
             this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT });
         }));
         this.addDisposables((() => {
-            /**
-             * TODO Fix this relatively ugly 'merge and delay'
-             */
-            let timer;
-            return this.onGridEvent((event) => {
+            const tickDelayedEvent = new _events__WEBPACK_IMPORTED_MODULE_0__.TickDelayedEvent();
+            return new _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable(this.onGridEvent((event) => {
                 if ([
                     GroupChangeKind.ADD_GROUP,
                     GroupChangeKind.REMOVE_GROUP,
@@ -44134,15 +44122,11 @@ class BaseGrid extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposab
                     GroupChangeKind.PANEL_ACTIVE,
                     GroupChangeKind.LAYOUT,
                 ].includes(event.kind)) {
-                    if (timer) {
-                        clearTimeout(timer);
-                    }
-                    timer = setTimeout(() => {
-                        this._onDidLayoutChange.fire();
-                        clearTimeout(timer);
-                    });
+                    tickDelayedEvent.fire();
                 }
-            });
+            }), tickDelayedEvent.onEvent(() => {
+                this._onDidLayoutChange.fire();
+            }), tickDelayedEvent);
         })());
     }
     get id() {
@@ -44974,7 +44958,6 @@ class Gridview {
         }
         parent.removeChild(index, sizing);
         if (parent.children.length === 0) {
-            // throw new Error('Invalid grid state');
             return node.view;
         }
         if (parent.children.length > 1) {
@@ -45705,7 +45688,7 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
         }), this.contentContainer.onDidFocus(() => {
             this.accessor.doSetGroupActive(this.parent, true);
         }), this.contentContainer.onDidBlur(() => {
-            // this._activePanel?.api._ondid
+            // noop
         }), this.dropTarget.onDrop((event) => {
             this.handleDropEvent(event.event, event.position);
         }));
@@ -46584,97 +46567,95 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Emitter": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_1__.Emitter),
-/* harmony export */   "Event": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_1__.Event),
-/* harmony export */   "addDisposableListener": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener),
-/* harmony export */   "addDisposableWindowListener": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_1__.addDisposableWindowListener),
-/* harmony export */   "CompositeDisposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable),
-/* harmony export */   "Disposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_2__.Disposable),
-/* harmony export */   "MutableDisposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_2__.MutableDisposable),
-/* harmony export */   "DATA_KEY": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.DATA_KEY),
-/* harmony export */   "DragType": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.DragType),
-/* harmony export */   "LocalSelectionTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.LocalSelectionTransfer),
-/* harmony export */   "PaneTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.PaneTransfer),
-/* harmony export */   "PanelTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.PanelTransfer),
-/* harmony export */   "extractData": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.extractData),
-/* harmony export */   "getPaneData": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.getPaneData),
-/* harmony export */   "getPanelData": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.getPanelData),
-/* harmony export */   "isCustomDragEvent": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.isCustomDragEvent),
-/* harmony export */   "isPanelTransferEvent": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.isPanelTransferEvent),
-/* harmony export */   "isTabDragEvent": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__.isTabDragEvent),
-/* harmony export */   "DockviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_4__.DockviewApi),
-/* harmony export */   "GridviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_4__.GridviewApi),
-/* harmony export */   "PaneviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_4__.PaneviewApi),
-/* harmony export */   "SplitviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_4__.SplitviewApi),
-/* harmony export */   "LayoutPriority": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__.LayoutPriority),
-/* harmony export */   "Orientation": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__.Orientation),
-/* harmony export */   "SashState": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__.SashState),
-/* harmony export */   "Sizing": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__.Sizing),
-/* harmony export */   "Splitview": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__.Splitview),
-/* harmony export */   "Paneview": () => (/* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__.Paneview),
-/* harmony export */   "Gridview": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_7__.Gridview),
-/* harmony export */   "getDirectionOrientation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_7__.getDirectionOrientation),
-/* harmony export */   "getGridLocation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_7__.getGridLocation),
-/* harmony export */   "getLocationOrientation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_7__.getLocationOrientation),
-/* harmony export */   "getRelativeLocation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_7__.getRelativeLocation),
-/* harmony export */   "indexInParent": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_7__.indexInParent),
-/* harmony export */   "isGridBranchNode": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_7__.isGridBranchNode),
-/* harmony export */   "orthogonal": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_7__.orthogonal),
-/* harmony export */   "GroupChangeKind2": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_8__.GroupChangeKind2),
-/* harmony export */   "Groupview": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_8__.Groupview),
-/* harmony export */   "BaseGrid": () => (/* reexport safe */ _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_9__.BaseGrid),
-/* harmony export */   "GroupChangeKind": () => (/* reexport safe */ _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_9__.GroupChangeKind),
-/* harmony export */   "toTarget": () => (/* reexport safe */ _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_9__.toTarget),
-/* harmony export */   "ContentContainer": () => (/* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_10__.ContentContainer),
-/* harmony export */   "MouseEventKind": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_11__.MouseEventKind),
-/* harmony export */   "Tab": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_11__.Tab),
-/* harmony export */   "DockviewComponent": () => (/* reexport safe */ _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_14__.DockviewComponent),
-/* harmony export */   "GridviewComponent": () => (/* reexport safe */ _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_15__.GridviewComponent),
-/* harmony export */   "SplitviewComponent": () => (/* reexport safe */ _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_16__.SplitviewComponent),
-/* harmony export */   "PaneFramework": () => (/* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_17__.PaneFramework),
-/* harmony export */   "PaneviewComponent": () => (/* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_17__.PaneviewComponent),
-/* harmony export */   "GridviewPanel": () => (/* reexport safe */ _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_18__.GridviewPanel),
-/* harmony export */   "SplitviewPanel": () => (/* reexport safe */ _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_19__.SplitviewPanel),
-/* harmony export */   "PaneviewPanel": () => (/* reexport safe */ _paneview_paneviewPanel__WEBPACK_IMPORTED_MODULE_20__.PaneviewPanel),
-/* harmony export */   "DockviewComponents": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_22__.DockviewComponents),
-/* harmony export */   "DockviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_22__.DockviewReact),
-/* harmony export */   "GridviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_22__.GridviewReact),
-/* harmony export */   "PaneviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_22__.PaneviewReact),
-/* harmony export */   "ReactPanelContentPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_22__.ReactPanelContentPart),
-/* harmony export */   "ReactPanelHeaderPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_22__.ReactPanelHeaderPart),
-/* harmony export */   "ReactPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_22__.ReactPart),
-/* harmony export */   "ReactPartContext": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_22__.ReactPartContext),
-/* harmony export */   "SplitviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_22__.SplitviewReact),
-/* harmony export */   "isReactElement": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_22__.isReactElement),
-/* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_22__.usePortalsLifecycle),
-/* harmony export */   "Position": () => (/* reexport safe */ _dnd_droptarget__WEBPACK_IMPORTED_MODULE_23__.Position)
+/* harmony export */   "Emitter": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_0__.Emitter),
+/* harmony export */   "Event": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_0__.Event),
+/* harmony export */   "TickDelayedEvent": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_0__.TickDelayedEvent),
+/* harmony export */   "addDisposableListener": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener),
+/* harmony export */   "addDisposableWindowListener": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_0__.addDisposableWindowListener),
+/* harmony export */   "CompositeDisposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable),
+/* harmony export */   "Disposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_1__.Disposable),
+/* harmony export */   "MutableDisposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_1__.MutableDisposable),
+/* harmony export */   "DATA_KEY": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.DATA_KEY),
+/* harmony export */   "DragType": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.DragType),
+/* harmony export */   "LocalSelectionTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.LocalSelectionTransfer),
+/* harmony export */   "PaneTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.PaneTransfer),
+/* harmony export */   "PanelTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.PanelTransfer),
+/* harmony export */   "extractData": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.extractData),
+/* harmony export */   "getPaneData": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.getPaneData),
+/* harmony export */   "getPanelData": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.getPanelData),
+/* harmony export */   "isCustomDragEvent": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.isCustomDragEvent),
+/* harmony export */   "isPanelTransferEvent": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.isPanelTransferEvent),
+/* harmony export */   "isTabDragEvent": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.isTabDragEvent),
+/* harmony export */   "DockviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_3__.DockviewApi),
+/* harmony export */   "GridviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_3__.GridviewApi),
+/* harmony export */   "PaneviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_3__.PaneviewApi),
+/* harmony export */   "SplitviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_3__.SplitviewApi),
+/* harmony export */   "LayoutPriority": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.LayoutPriority),
+/* harmony export */   "Orientation": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation),
+/* harmony export */   "SashState": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.SashState),
+/* harmony export */   "Sizing": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Sizing),
+/* harmony export */   "Splitview": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Splitview),
+/* harmony export */   "Paneview": () => (/* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_5__.Paneview),
+/* harmony export */   "Gridview": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.Gridview),
+/* harmony export */   "getDirectionOrientation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.getDirectionOrientation),
+/* harmony export */   "getGridLocation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.getGridLocation),
+/* harmony export */   "getLocationOrientation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.getLocationOrientation),
+/* harmony export */   "getRelativeLocation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.getRelativeLocation),
+/* harmony export */   "indexInParent": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.indexInParent),
+/* harmony export */   "isGridBranchNode": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.isGridBranchNode),
+/* harmony export */   "orthogonal": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.orthogonal),
+/* harmony export */   "GroupChangeKind2": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_7__.GroupChangeKind2),
+/* harmony export */   "Groupview": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_7__.Groupview),
+/* harmony export */   "BaseGrid": () => (/* reexport safe */ _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_8__.BaseGrid),
+/* harmony export */   "GroupChangeKind": () => (/* reexport safe */ _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_8__.GroupChangeKind),
+/* harmony export */   "toTarget": () => (/* reexport safe */ _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_8__.toTarget),
+/* harmony export */   "ContentContainer": () => (/* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_9__.ContentContainer),
+/* harmony export */   "MouseEventKind": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_10__.MouseEventKind),
+/* harmony export */   "Tab": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_10__.Tab),
+/* harmony export */   "DockviewComponent": () => (/* reexport safe */ _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_13__.DockviewComponent),
+/* harmony export */   "GridviewComponent": () => (/* reexport safe */ _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_14__.GridviewComponent),
+/* harmony export */   "SplitviewComponent": () => (/* reexport safe */ _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_15__.SplitviewComponent),
+/* harmony export */   "PaneFramework": () => (/* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_16__.PaneFramework),
+/* harmony export */   "PaneviewComponent": () => (/* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_16__.PaneviewComponent),
+/* harmony export */   "GridviewPanel": () => (/* reexport safe */ _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_17__.GridviewPanel),
+/* harmony export */   "SplitviewPanel": () => (/* reexport safe */ _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_18__.SplitviewPanel),
+/* harmony export */   "PaneviewPanel": () => (/* reexport safe */ _paneview_paneviewPanel__WEBPACK_IMPORTED_MODULE_19__.PaneviewPanel),
+/* harmony export */   "DockviewComponents": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.DockviewComponents),
+/* harmony export */   "DockviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.DockviewReact),
+/* harmony export */   "GridviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.GridviewReact),
+/* harmony export */   "PaneviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.PaneviewReact),
+/* harmony export */   "ReactPanelContentPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.ReactPanelContentPart),
+/* harmony export */   "ReactPanelHeaderPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.ReactPanelHeaderPart),
+/* harmony export */   "ReactPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.ReactPart),
+/* harmony export */   "ReactPartContext": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.ReactPartContext),
+/* harmony export */   "SplitviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.SplitviewReact),
+/* harmony export */   "isReactElement": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.isReactElement),
+/* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.usePortalsLifecycle),
+/* harmony export */   "Position": () => (/* reexport safe */ _dnd_droptarget__WEBPACK_IMPORTED_MODULE_22__.Position)
 /* harmony export */ });
-/* harmony import */ var _footnote__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./footnote */ "../dockview/dist/esm/footnote.js");
-/* harmony import */ var _footnote__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_footnote__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./events */ "../dockview/dist/esm/events.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./lifecycle */ "../dockview/dist/esm/lifecycle.js");
-/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./dnd/dataTransfer */ "../dockview/dist/esm/dnd/dataTransfer.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./api/component.api */ "../dockview/dist/esm/api/component.api.js");
-/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./splitview/core/splitview */ "../dockview/dist/esm/splitview/core/splitview.js");
-/* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./paneview/paneview */ "../dockview/dist/esm/paneview/paneview.js");
-/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./gridview/gridview */ "../dockview/dist/esm/gridview/gridview.js");
-/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./groupview/groupview */ "../dockview/dist/esm/groupview/groupview.js");
-/* harmony import */ var _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./gridview/baseComponentGridview */ "../dockview/dist/esm/gridview/baseComponentGridview.js");
-/* harmony import */ var _groupview_panel_content__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./groupview/panel/content */ "../dockview/dist/esm/groupview/panel/content.js");
-/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./groupview/tab */ "../dockview/dist/esm/groupview/tab.js");
-/* harmony import */ var _groupview_types__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./groupview/types */ "../dockview/dist/esm/groupview/types.js");
-/* harmony import */ var _dockview_options__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./dockview/options */ "../dockview/dist/esm/dockview/options.js");
-/* harmony import */ var _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./dockview/dockviewComponent */ "../dockview/dist/esm/dockview/dockviewComponent.js");
-/* harmony import */ var _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./gridview/gridviewComponent */ "../dockview/dist/esm/gridview/gridviewComponent.js");
-/* harmony import */ var _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./splitview/splitviewComponent */ "../dockview/dist/esm/splitview/splitviewComponent.js");
-/* harmony import */ var _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./paneview/paneviewComponent */ "../dockview/dist/esm/paneview/paneviewComponent.js");
-/* harmony import */ var _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./gridview/gridviewPanel */ "../dockview/dist/esm/gridview/gridviewPanel.js");
-/* harmony import */ var _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./splitview/splitviewPanel */ "../dockview/dist/esm/splitview/splitviewPanel.js");
-/* harmony import */ var _paneview_paneviewPanel__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./paneview/paneviewPanel */ "../dockview/dist/esm/paneview/paneviewPanel.js");
-/* harmony import */ var _groupview_groupPanel__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./groupview/groupPanel */ "../dockview/dist/esm/groupview/groupPanel.js");
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./react */ "../dockview/dist/esm/react/index.js");
-/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./dnd/droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
-
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./events */ "../dockview/dist/esm/events.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lifecycle */ "../dockview/dist/esm/lifecycle.js");
+/* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./dnd/dataTransfer */ "../dockview/dist/esm/dnd/dataTransfer.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./api/component.api */ "../dockview/dist/esm/api/component.api.js");
+/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./splitview/core/splitview */ "../dockview/dist/esm/splitview/core/splitview.js");
+/* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./paneview/paneview */ "../dockview/dist/esm/paneview/paneview.js");
+/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./gridview/gridview */ "../dockview/dist/esm/gridview/gridview.js");
+/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./groupview/groupview */ "../dockview/dist/esm/groupview/groupview.js");
+/* harmony import */ var _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./gridview/baseComponentGridview */ "../dockview/dist/esm/gridview/baseComponentGridview.js");
+/* harmony import */ var _groupview_panel_content__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./groupview/panel/content */ "../dockview/dist/esm/groupview/panel/content.js");
+/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./groupview/tab */ "../dockview/dist/esm/groupview/tab.js");
+/* harmony import */ var _groupview_types__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./groupview/types */ "../dockview/dist/esm/groupview/types.js");
+/* harmony import */ var _dockview_options__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./dockview/options */ "../dockview/dist/esm/dockview/options.js");
+/* harmony import */ var _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./dockview/dockviewComponent */ "../dockview/dist/esm/dockview/dockviewComponent.js");
+/* harmony import */ var _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./gridview/gridviewComponent */ "../dockview/dist/esm/gridview/gridviewComponent.js");
+/* harmony import */ var _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./splitview/splitviewComponent */ "../dockview/dist/esm/splitview/splitviewComponent.js");
+/* harmony import */ var _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./paneview/paneviewComponent */ "../dockview/dist/esm/paneview/paneviewComponent.js");
+/* harmony import */ var _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./gridview/gridviewPanel */ "../dockview/dist/esm/gridview/gridviewPanel.js");
+/* harmony import */ var _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./splitview/splitviewPanel */ "../dockview/dist/esm/splitview/splitviewPanel.js");
+/* harmony import */ var _paneview_paneviewPanel__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./paneview/paneviewPanel */ "../dockview/dist/esm/paneview/paneviewPanel.js");
+/* harmony import */ var _groupview_groupPanel__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./groupview/groupPanel */ "../dockview/dist/esm/groupview/groupPanel.js");
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./react */ "../dockview/dist/esm/react/index.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./dnd/droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
 
 
 
@@ -47118,9 +47099,6 @@ class Paneview extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposab
         }
     }
     layout(size, orthogonalSize) {
-        // for (const paneItem of this.paneItems) {
-        //     paneItem.pane.orthogonalSize = orthogonalSize;
-        // }
         this.splitview.layout(size, orthogonalSize);
     }
     setupAnimation() {
@@ -47855,6 +47833,22 @@ const DockviewReact = react__WEBPACK_IMPORTED_MODULE_0__.forwardRef((props, ref)
         };
     }, []);
     react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
+        if (!dockviewRef.current) {
+            return;
+        }
+        dockviewRef.current.updateOptions({
+            frameworkComponents: props.components,
+        });
+    }, [props.components]);
+    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
+        if (!dockviewRef.current) {
+            return;
+        }
+        dockviewRef.current.updateOptions({
+            frameworkTabComponents: props.tabComponents,
+        });
+    }, [props.tabComponents]);
+    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
         if (!props.onTabContextMenu || !dockviewRef.current) {
             return () => {
                 //noop
@@ -48169,6 +48163,14 @@ const GridviewReact = react__WEBPACK_IMPORTED_MODULE_0__.forwardRef((props, ref)
             gridview.dispose();
         };
     }, []);
+    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
+        if (!gridviewRef.current) {
+            return;
+        }
+        gridviewRef.current.updateOptions({
+            frameworkComponents: props.components,
+        });
+    }, [props.components]);
     return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: props.className, style: { height: '100%', width: '100%' }, ref: domRef }, portals));
 });
 GridviewReact.displayName = 'GridviewComponent';
@@ -48328,14 +48330,18 @@ const PaneviewReact = react__WEBPACK_IMPORTED_MODULE_0__.forwardRef((props, ref)
         };
     }, []);
     react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
-        var _a;
-        (_a = paneviewRef.current) === null || _a === void 0 ? void 0 : _a.updateOptions({
+        if (!paneviewRef.current) {
+            return;
+        }
+        paneviewRef.current.updateOptions({
             frameworkComponents: props.components,
         });
     }, [props.components]);
     react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
-        var _a;
-        (_a = paneviewRef.current) === null || _a === void 0 ? void 0 : _a.updateOptions({
+        if (!paneviewRef.current) {
+            return;
+        }
+        paneviewRef.current.updateOptions({
             headerframeworkComponents: props.headerComponents,
         });
     }, [props.headerComponents]);
@@ -48619,6 +48625,14 @@ const SplitviewReact = react__WEBPACK_IMPORTED_MODULE_0__.forwardRef((props, ref
             splitview.dispose();
         };
     }, []);
+    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
+        if (!splitviewRef.current) {
+            return;
+        }
+        splitviewRef.current.updateOptions({
+            frameworkComponents: props.components,
+        });
+    }, [props.components]);
     return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: props.className, style: { height: '100%', width: '100%' }, ref: domRef }, portals));
 });
 SplitviewReact.displayName = 'SplitviewComponent';
@@ -49907,18 +49921,6 @@ module.exports = JSON.parse('{"views":[{"size":200,"data":{"id":"1","component":
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
