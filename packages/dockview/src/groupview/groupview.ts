@@ -673,7 +673,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 index,
             });
         } else {
-            // TODO: custom drop handler
             this._onDidDrop.fire({ nativeEvent: event, position, index });
         }
     }
