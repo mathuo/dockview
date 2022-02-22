@@ -400,7 +400,7 @@ export const SidebarPart = (props: { id: string }) => {
     const onDidDrop = (event: PaneviewDropEvent) => {
         const data = event.getData();
 
-        const containerData = event.event.dataTransfer.getData(
+        const containerData = event.nativeEvent.dataTransfer.getData(
             'application/json'
         );
 
