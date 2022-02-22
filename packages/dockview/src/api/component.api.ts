@@ -20,7 +20,7 @@ import {
     SerializedPaneview,
     IPaneviewComponent,
 } from '../paneview/paneviewComponent';
-import { IPaneviewPanel } from '../paneview/paneviewPanel';
+import { IPaneviewPanel, PaneviewPanel } from '../paneview/paneviewPanel';
 import {
     AddSplitviewComponentOptions,
     ISplitviewComponent,
@@ -30,8 +30,9 @@ import {
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { ISplitviewPanel } from '../splitview/splitviewPanel';
 import { GroupviewPanel } from '../groupview/groupviewPanel';
-import { Event } from '../events';
+import { Emitter, Event } from '../events';
 import { IDisposable } from '../lifecycle';
+import { PaneviewDropEvent } from '../react';
 
 export interface CommonApi {
     readonly height: number;
@@ -145,6 +146,29 @@ export class PaneviewApi implements CommonApi {
 
     get onDidLayoutChange(): Event<void> {
         return this.component.onDidLayoutChange;
+    }
+
+    get onDidAddView(): Event<PaneviewPanel> {
+        return this.component.onDidAddView;
+    }
+
+    get onDidRemoveView(): Event<PaneviewPanel> {
+        return this.component.onDidRemoveView;
+    }
+
+    get onDidDrop(): Event<PaneviewDropEvent> {
+        const emitter = new Emitter<PaneviewDropEvent>();
+
+        const disposable = this.component.onDidDrop((e) => {
+            emitter.fire({ ...e, api: this });
+        });
+
+        emitter.dispose = () => {
+            disposable.dispose();
+            emitter.dispose();
+        };
+
+        return emitter.event;
     }
 
     constructor(private readonly component: IPaneviewComponent) {}

@@ -20,6 +20,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
     private paneItems: PaneItem[] = [];
     private _orientation: Orientation;
     private animationTimer: any | undefined;
+    private skipAnimation = false;
 
     private readonly _onDidChange = new Emitter<void>();
     readonly onDidChange: Event<void> = this._onDidChange.event;
@@ -146,8 +147,6 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         paneItem.disposable.dispose();
         return paneItem;
     }
-
-    private skipAnimation = false;
 
     public moveView(from: number, to: number) {
         if (from === to) {

@@ -99,6 +99,8 @@ export interface IPaneviewComponent extends IDisposable {
     readonly height: number;
     readonly minimumSize: number;
     readonly maximumSize: number;
+    readonly onDidAddView: Event<PaneviewPanel>;
+    readonly onDidRemoveView: Event<PaneviewPanel>;
     readonly onDidDrop: Event<PaneviewDropEvent2>;
     readonly onDidLayoutChange: Event<void>;
     addPanel(options: AddPaneviewCompponentOptions): IDisposable;
