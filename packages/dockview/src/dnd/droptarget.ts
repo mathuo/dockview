@@ -3,11 +3,6 @@ import { Emitter, Event } from '../events';
 import { CompositeDisposable } from '../lifecycle';
 import { DragAndDropObserver } from './dnd';
 
-export interface DroptargetEvent {
-    position: Position;
-    event: DragEvent;
-}
-
 export enum Position {
     Top = 'Top',
     Left = 'Left',
@@ -18,7 +13,7 @@ export enum Position {
 
 export interface DroptargetEvent {
     position: Position;
-    event: DragEvent;
+    nativeEvent: DragEvent;
 }
 
 export type DropTargetDirections = 'vertical' | 'horizontal' | 'all' | 'none';
@@ -174,7 +169,7 @@ export class Droptarget extends CompositeDisposable {
                     this.removeDropTarget();
 
                     if (state) {
-                        this._onDrop.fire({ position: state, event: e });
+                        this._onDrop.fire({ position: state, nativeEvent: e });
                     }
                 },
             })

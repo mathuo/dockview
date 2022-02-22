@@ -173,7 +173,7 @@ export class TabsContainer
         this.addDisposables(
             this.voidDropTarget.onDrop((event) => {
                 this._onDrop.fire({
-                    event: event.event,
+                    event: event.nativeEvent,
                     index: this.tabs.length,
                 });
             }),
@@ -271,7 +271,7 @@ export class TabsContainer
             }),
             tabToAdd.onDrop((event) => {
                 this._onDrop.fire({
-                    event: event.event,
+                    event: event.nativeEvent,
                     index: this.tabs.findIndex((x) => x.value === tabToAdd),
                 });
             })

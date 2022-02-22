@@ -224,7 +224,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 // noop
             }),
             this.dropTarget.onDrop((event) => {
-                this.handleDropEvent(event.event, event.position);
+                this.handleDropEvent(event.nativeEvent, event.position);
             })
         );
     }
