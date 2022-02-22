@@ -163,7 +163,7 @@ if (panelData) {
     const { viewId, groupId, panelId } = panelData; // deconstructed object
 }
 
-const paneData: PaneTransfer | undefined = getPanelData();
+const paneData: PaneTransfer | undefined = getPaneData();
 
 if (paneData) {
     // PaneviewReact: data transfer metadata associated with the active drag and drop event
