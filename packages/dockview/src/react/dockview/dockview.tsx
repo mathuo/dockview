@@ -1,5 +1,8 @@
 import * as React from 'react';
-import { DockviewComponent } from '../../dockview/dockviewComponent';
+import {
+    DockviewComponent,
+    DockviewDropEvent,
+} from '../../dockview/dockviewComponent';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
 import { ReactPanelDeserialzier } from '../deserializer';
@@ -14,6 +17,7 @@ import { ReactWatermarkPart } from './reactWatermarkPart';
 import { PanelCollection, PanelParameters } from '../types';
 import { watchElementResize } from '../../dom';
 import { IContentRenderer, ITabRenderer } from '../../groupview/types';
+import { DockviewDropTargets } from '../../groupview/dnd';
 
 export interface IGroupPanelBaseProps<T extends {} = Record<string, any>>
     extends PanelParameters<T> {
@@ -43,8 +47,9 @@ export interface IDockviewReactProps {
     onReady?: (event: DockviewReadyEvent) => void;
     debug?: boolean;
     tabHeight?: number;
-    enableExternalDragEvents?: boolean;
     onTabContextMenu?: (event: TabContextMenuEvent) => void;
+    onDidDrop?: (event: DockviewDropEvent) => void;
+    showDndOverlay?: (event: DragEvent, target: DockviewDropTargets) => boolean;
     hideBorders?: boolean;
     className?: string;
     disableAutoResizing?: boolean;
@@ -128,11 +133,16 @@ export const DockviewReact = React.forwardRef(
                 frameworkTabComponents: props.tabComponents,
                 tabHeight: props.tabHeight,
                 debug: props.debug,
-                enableExternalDragEvents: props.enableExternalDragEvents,
                 watermarkFrameworkComponent: props.watermarkComponent,
                 styles: props.hideBorders
                     ? { separatorBorder: 'transparent' }
                     : undefined,
+            });
+
+            const disposable = dockview.onDidDrop((event) => {
+                if (props.onDidDrop) {
+                    props.onDidDrop(event);
+                }
             });
 
             domRef.current?.appendChild(dockview.element);
@@ -148,6 +158,7 @@ export const DockviewReact = React.forwardRef(
             dockviewRef.current = dockview;
 
             return () => {
+                disposable.dispose();
                 dockview.dispose();
             };
         }, []);
@@ -160,6 +171,15 @@ export const DockviewReact = React.forwardRef(
                 frameworkComponents: props.components,
             });
         }, [props.components]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+            dockviewRef.current.updateOptions({
+                showDndOverlay: props.showDndOverlay,
+            });
+        }, [props.showDndOverlay]);
 
         React.useEffect(() => {
             if (!dockviewRef.current) {

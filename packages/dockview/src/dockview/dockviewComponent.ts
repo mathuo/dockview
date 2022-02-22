@@ -41,6 +41,7 @@ import {
     GroupChangeKind2,
     GroupOptions,
     GroupPanelViewState,
+    GroupviewDropEvent,
 } from '../groupview/groupview';
 import { GroupviewPanel } from '../groupview/groupviewPanel';
 import { DefaultGroupPanelView } from './defaultGroupPanelView';
@@ -71,12 +72,18 @@ export type DockviewComponentUpdateOptions = Pick<
     | 'frameworkComponents'
     | 'tabComponents'
     | 'frameworkTabComponents'
+    | 'showDndOverlay'
 >;
+
+export interface DockviewDropEvent extends GroupviewDropEvent {
+    api: DockviewApi;
+}
 
 export interface IDockviewComponent extends IBaseGrid<GroupviewPanel> {
     readonly activePanel: IGroupPanel | undefined;
     readonly totalPanels: number;
     readonly panels: IGroupPanel[];
+    readonly onDidDrop: Event<DockviewDropEvent>;
     tabHeight: number | undefined;
     deserializer: IPanelDeserializer | undefined;
     updateOptions(options: DockviewComponentUpdateOptions): void;
@@ -124,9 +131,14 @@ export class DockviewComponent
     private readonly _onTabInteractionEvent = new Emitter<LayoutMouseEvent>();
     readonly onTabInteractionEvent: Event<LayoutMouseEvent> =
         this._onTabInteractionEvent.event;
+
     private readonly _onTabContextMenu = new Emitter<TabContextMenuEvent>();
     readonly onTabContextMenu: Event<TabContextMenuEvent> =
         this._onTabContextMenu.event;
+
+    private readonly _onDidDrop = new Emitter<DockviewDropEvent>();
+    readonly onDidDrop: Event<DockviewDropEvent> = this._onDidDrop.event;
+
     // everything else
     private _deserializer: IPanelDeserializer | undefined;
     private panelState: State = {};
@@ -668,6 +680,9 @@ export class DockviewComponent
                     const { groupId, itemId, target, index } = event;
                     this.moveGroupOrPanel(view, groupId, itemId, target, index);
                 }),
+                view.model.onDidDrop((event) => {
+                    this._onDidDrop.fire({ ...event, api: this._api });
+                }),
                 view.model.onDidGroupChange((event) => {
                     switch (event.kind) {
                         case GroupChangeKind2.ADD_PANEL:
@@ -716,6 +731,9 @@ export class DockviewComponent
         super.dispose();
 
         this._onGridEvent.dispose();
+        this._onDidDrop.dispose();
+        this._onTabContextMenu.dispose();
+        this._onTabInteractionEvent.dispose();
     }
 
     /**

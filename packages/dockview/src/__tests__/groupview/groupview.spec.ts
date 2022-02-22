@@ -207,9 +207,7 @@ describe('groupview', () => {
 
     beforeEach(() => {
         dockview = <IDockviewComponent>(<any>{
-            options: {
-                enableExternalDragEvents: false,
-            },
+            options: {},
             createWatermarkComponent: () => new Watermark(),
             doSetGroupActive: jest.fn(),
             id: 'dockview-1',
