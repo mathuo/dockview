@@ -51,7 +51,7 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
         isExpanded: boolean,
         disableDnd: boolean
     ) {
-        super(id, component, headerComponent, orientation, isExpanded);
+        super(id, component, headerComponent, orientation, isExpanded, true);
 
         if (!disableDnd) {
             this.initDragFeatures();

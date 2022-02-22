@@ -132,21 +132,21 @@ export class PaneviewComponent
     private readonly _onDidDrop = new Emitter<PaneviewDropEvent2>();
     readonly onDidDrop: Event<PaneviewDropEvent2> = this._onDidDrop.event;
 
-    get onDidAddView() {
-        return this._paneview.onDidAddView;
-    }
+    private readonly _onDidAddView = new Emitter<PaneviewPanel>();
+    readonly onDidAddView = this._onDidAddView.event;
 
-    get onDidRemoveView() {
-        return this._paneview.onDidRemoveView;
-    }
+    private readonly _onDidRemoveView = new Emitter<PaneviewPanel>();
+    readonly onDidRemoveView = this._onDidRemoveView.event;
 
     set paneview(value: Paneview) {
         this._paneview = value;
 
         this._disposable.value = new CompositeDisposable(
-            this.paneview.onDidChange(() => {
+            this._paneview.onDidChange(() => {
                 this._onDidLayoutChange.fire(undefined);
-            })
+            }),
+            this._paneview.onDidAddView((e) => this._onDidAddView.fire(e)),
+            this._paneview.onDidRemoveView((e) => this._onDidRemoveView.fire(e))
         );
     }
 
@@ -425,6 +425,11 @@ export class PaneviewComponent
                         });
                         panel.orientation = this.paneview.orientation;
                     });
+
+                    setTimeout(() => {
+                        // the original onDidAddView events are missed since they are fired before we can subcribe to them
+                        this._onDidAddView.fire(panel);
+                    }, 0);
 
                     return { size: view.size, view: panel };
                 }),

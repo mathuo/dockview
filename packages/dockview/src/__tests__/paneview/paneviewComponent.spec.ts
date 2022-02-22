@@ -12,7 +12,7 @@ import { Orientation } from '../../splitview/core/splitview';
 
 class TestPanel extends PaneviewPanel {
     constructor(id: string, component: string) {
-        super(id, component, 'header', Orientation.VERTICAL, false);
+        super(id, component, 'header', Orientation.VERTICAL, false, true);
     }
 
     getHeaderComponent() {

@@ -58,6 +58,7 @@ export interface IPaneviewPanel
     readonly maximumBodySize: number;
     isExpanded(): boolean;
     setExpanded(isExpanded: boolean): void;
+    headerVisible: boolean;
 }
 
 export abstract class PaneviewPanel
@@ -84,6 +85,8 @@ export abstract class PaneviewPanel
     private expandedSize = 0;
     private animationTimer: any | undefined;
     private _orientation: Orientation;
+
+    private _headerVisible: boolean;
 
     set orientation(value: Orientation) {
         this._orientation = value;
@@ -138,16 +141,27 @@ export abstract class PaneviewPanel
             typeof value === 'number' ? value : Number.POSITIVE_INFINITY;
     }
 
+    get headerVisible(): boolean {
+        return this._headerVisible;
+    }
+
+    set headerVisible(value: boolean) {
+        this._headerVisible = value;
+        this.header!.style.display = value ? '' : 'none';
+    }
+
     constructor(
         id: string,
         component: string,
         private readonly headerComponent: string | undefined,
         orientation: Orientation,
-        isExpanded: boolean
+        isExpanded: boolean,
+        isHeaderVisible: boolean
     ) {
         super(id, component, new PaneviewPanelApiImpl(id));
         this.api.pane = this; // TODO cannot use 'this' before 'super'
         this._isExpanded = isExpanded;
+        this._headerVisible = isHeaderVisible;
 
         this._onDidChangeExpansionState.fire(this.isExpanded()); // initialize value
 

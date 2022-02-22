@@ -27,7 +27,7 @@ import {
     SerializedSplitview,
     SplitviewComponentUpdateOptions,
 } from '../splitview/splitviewComponent';
-import { Orientation, Sizing } from '../splitview/core/splitview';
+import { IView, Orientation, Sizing } from '../splitview/core/splitview';
 import { ISplitviewPanel } from '../splitview/splitviewPanel';
 import { GroupviewPanel } from '../groupview/groupviewPanel';
 import { Emitter, Event } from '../events';
@@ -66,6 +66,14 @@ export class SplitviewApi implements CommonApi {
 
     get onDidLayoutChange(): Event<void> {
         return this.component.onDidLayoutChange;
+    }
+
+    get onDidAddView(): Event<IView> {
+        return this.component.onDidAddView;
+    }
+
+    get onDidRemoveView(): Event<IView> {
+        return this.component.onDidRemoveView;
     }
 
     get orientation(): Orientation {

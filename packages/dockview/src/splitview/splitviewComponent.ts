@@ -4,6 +4,7 @@ import {
     MutableDisposable,
 } from '../lifecycle';
 import {
+    IView,
     LayoutPriority,
     Orientation,
     Sizing,
@@ -58,6 +59,8 @@ export interface ISplitviewComponent extends IDisposable {
     readonly width: number;
     readonly length: number;
     readonly orientation: Orientation;
+    readonly onDidAddView: Event<IView>;
+    readonly onDidRemoveView: Event<IView>;
     updateOptions(options: Partial<SplitviewComponentUpdateOptions>): void;
     addPanel(options: AddSplitviewComponentOptions): void;
     layout(width: number, height: number): void;
@@ -90,6 +93,15 @@ export class SplitviewComponent
     private panels = new Map<string, IDisposable>();
     private _options: SplitviewComponentOptions;
 
+    private readonly _onDidAddView = new Emitter<IView>();
+    readonly onDidAddView = this._onDidAddView.event;
+
+    private readonly _onDidRemoveView = new Emitter<IView>();
+    readonly onDidRemoveView = this._onDidRemoveView.event;
+
+    private readonly _onDidLayoutChange = new Emitter<void>();
+    readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
+
     get options() {
         return this._options;
     }
@@ -108,12 +120,13 @@ export class SplitviewComponent
         this._disposable.value = new CompositeDisposable(
             this._splitview.onDidSashEnd(() => {
                 this._onDidLayoutChange.fire(undefined);
-            })
+            }),
+            this._splitview.onDidAddView((e) => this._onDidAddView.fire(e)),
+            this._splitview.onDidRemoveView((e) =>
+                this._onDidRemoveView.fire(e)
+            )
         );
     }
-
-    private readonly _onDidLayoutChange = new Emitter<void>();
-    readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
 
     get minimumSize() {
         return this.splitview.minimumSize;
@@ -370,6 +383,10 @@ export class SplitviewComponent
                     panel.orientation = orientation;
 
                     this.doAddView(panel);
+                    setTimeout(() => {
+                        // the original onDidAddView events are missed since they are fired before we can subcribe to them
+                        this._onDidAddView.fire(panel);
+                    }, 0);
 
                     return { size: view.size, view: panel };
                 }),

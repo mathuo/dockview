@@ -111,7 +111,7 @@ export class Splitview {
     private readonly _onDidAddView = new Emitter<IView>();
     readonly onDidAddView = this._onDidAddView.event;
     private readonly _onDidRemoveView = new Emitter<IView>();
-    readonly onDidRemoveView = this._onDidAddView.event;
+    readonly onDidRemoveView = this._onDidRemoveView.event;
 
     get size() {
         return this._size;

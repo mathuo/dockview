@@ -1,5 +1,6 @@
 import { last } from '../../../array';
 import { Emitter } from '../../../events';
+import { CompositeDisposable } from '../../../lifecycle';
 import {
     IView,
     LayoutPriority,
@@ -521,5 +522,48 @@ describe('splitview', () => {
             descriptor.views[2].size,
         ]).toEqual([80, 100, 120]);
         expect(splitview.size).toBe(300);
+    });
+
+    test('onDidAddView and onDidRemoveView events', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: false,
+        });
+
+        const added: IView[] = [];
+        const removed: IView[] = [];
+
+        const disposable = new CompositeDisposable(
+            splitview.onDidAddView((view) => added.push(view)),
+            splitview.onDidRemoveView((view) => removed.push(view))
+        );
+
+        const view1 = new Testview(0, 100);
+        const view2 = new Testview(0, 100);
+
+        expect(added.length).toBe(0);
+        expect(removed.length).toBe(0);
+
+        splitview.addView(view1);
+        expect(added.length).toBe(1);
+        expect(removed.length).toBe(0);
+        expect(added[0]).toBe(view1);
+
+        splitview.addView(view2);
+        expect(added.length).toBe(2);
+        expect(removed.length).toBe(0);
+        expect(added[1]).toBe(view2);
+
+        splitview.removeView(0);
+        expect(added.length).toBe(2);
+        expect(removed.length).toBe(1);
+        expect(removed[0]).toBe(view1);
+
+        splitview.removeView(0);
+        expect(added.length).toBe(2);
+        expect(removed.length).toBe(2);
+        expect(removed[1]).toBe(view2);
+
+        disposable.dispose();
     });
 });
