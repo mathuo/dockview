@@ -2850,7 +2850,7 @@ var SidebarPart = function (props) {
     };
     var onDidDrop = function (event) {
         var data = event.getData();
-        var containerData = event.event.dataTransfer.getData('application/json');
+        var containerData = event.nativeEvent.dataTransfer.getData('application/json');
         if (containerData) {
             var container = JSON.parse(containerData).container;
             if (container === props.id) {
@@ -41510,6 +41510,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "GridviewApi": () => (/* binding */ GridviewApi),
 /* harmony export */   "DockviewApi": () => (/* binding */ DockviewApi)
 /* harmony export */ });
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
+
 class SplitviewApi {
     constructor(component) {
         this.component = component;
@@ -41531,6 +41533,12 @@ class SplitviewApi {
     }
     get onDidLayoutChange() {
         return this.component.onDidLayoutChange;
+    }
+    get onDidAddView() {
+        return this.component.onDidAddView;
+    }
+    get onDidRemoveView() {
+        return this.component.onDidRemoveView;
     }
     get orientation() {
         return this.component.orientation;
@@ -41593,6 +41601,23 @@ class PaneviewApi {
     }
     get onDidLayoutChange() {
         return this.component.onDidLayoutChange;
+    }
+    get onDidAddView() {
+        return this.component.onDidAddView;
+    }
+    get onDidRemoveView() {
+        return this.component.onDidRemoveView;
+    }
+    get onDidDrop() {
+        const emitter = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        const disposable = this.component.onDidDrop((e) => {
+            emitter.fire(Object.assign(Object.assign({}, e), { api: this }));
+        });
+        emitter.dispose = () => {
+            disposable.dispose();
+            emitter.dispose();
+        };
+        return emitter.event;
     }
     getPanels() {
         return this.component.getPanels();
@@ -42653,7 +42678,7 @@ class Droptarget extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDispos
                 const state = this._state;
                 this.removeDropTarget();
                 if (state) {
-                    this._onDrop.fire({ position: state, event: e });
+                    this._onDrop.fire({ position: state, nativeEvent: e });
                 }
             },
         }));
@@ -45690,7 +45715,7 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
         }), this.contentContainer.onDidBlur(() => {
             // noop
         }), this.dropTarget.onDrop((event) => {
-            this.handleDropEvent(event.event, event.position);
+            this.handleDropEvent(event.nativeEvent, event.position);
         }));
     }
     get element() {
@@ -46400,7 +46425,7 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
         });
         this.addDisposables(this.voidDropTarget.onDrop((event) => {
             this._onDrop.fire({
-                event: event.event,
+                event: event.nativeEvent,
                 index: this.tabs.length,
             });
         }), this.voidDropTarget, (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.tabContainer, 'mousedown', (event) => {
@@ -46522,7 +46547,7 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
             }
         }), tabToAdd.onDrop((event) => {
             this._onDrop.fire({
-                event: event.event,
+                event: event.nativeEvent,
                 index: this.tabs.findIndex((x) => x.value === tabToAdd),
             });
         }));
@@ -46904,7 +46929,7 @@ __webpack_require__.r(__webpack_exports__);
 
 class DraggablePaneviewPanel extends _paneviewPanel__WEBPACK_IMPORTED_MODULE_4__.PaneviewPanel {
     constructor(id, component, headerComponent, orientation, isExpanded, disableDnd) {
-        super(id, component, headerComponent, orientation, isExpanded);
+        super(id, component, headerComponent, orientation, isExpanded, true);
         this._onDidDrop = new _events__WEBPACK_IMPORTED_MODULE_3__.Emitter();
         this.onDidDrop = this._onDidDrop.event;
         if (!disableDnd) {
@@ -46997,9 +47022,9 @@ class Paneview extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposab
         var _a;
         super();
         this.paneItems = [];
+        this.skipAnimation = false;
         this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
         this.onDidChange = this._onDidChange.event;
-        this.skipAnimation = false;
         this._orientation = (_a = options.orientation) !== null && _a !== void 0 ? _a : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.VERTICAL;
         this.element = document.createElement('div');
         this.element.className = 'pane-container';
@@ -47182,6 +47207,10 @@ class PaneviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Composit
         this.onDidLayoutChange = this._onDidLayoutChange.event;
         this._onDidDrop = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
         this.onDidDrop = this._onDidDrop.event;
+        this._onDidAddView = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        this.onDidAddView = this._onDidAddView.event;
+        this._onDidRemoveView = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        this.onDidRemoveView = this._onDidRemoveView.event;
         this._options = options;
         if (!options.components) {
             options.components = {};
@@ -47195,17 +47224,11 @@ class PaneviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Composit
         });
         this.addDisposables(this._disposable);
     }
-    get onDidAddView() {
-        return this._paneview.onDidAddView;
-    }
-    get onDidRemoveView() {
-        return this._paneview.onDidRemoveView;
-    }
     set paneview(value) {
         this._paneview = value;
-        this._disposable.value = new _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable(this.paneview.onDidChange(() => {
+        this._disposable.value = new _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable(this._paneview.onDidChange(() => {
             this._onDidLayoutChange.fire(undefined);
-        }));
+        }), this._paneview.onDidAddView((e) => this._onDidAddView.fire(e)), this._paneview.onDidRemoveView((e) => this._onDidRemoveView.fire(e)));
     }
     get paneview() {
         return this._paneview;
@@ -47385,6 +47408,10 @@ class PaneviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Composit
                         });
                         panel.orientation = this.paneview.orientation;
                     });
+                    setTimeout(() => {
+                        // the original onDidAddView events are missed since they are fired before we can subcribe to them
+                        this._onDidAddView.fire(panel);
+                    }, 0);
                     return { size: view.size, view: panel };
                 }),
             },
@@ -47426,7 +47453,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class PaneviewPanel extends _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_3__.BasePanelView {
-    constructor(id, component, headerComponent, orientation, isExpanded) {
+    constructor(id, component, headerComponent, orientation, isExpanded, isHeaderVisible) {
         super(id, component, new _api_paneviewPanelApi__WEBPACK_IMPORTED_MODULE_0__.PaneviewPanelApiImpl(id));
         this.headerComponent = headerComponent;
         this._onDidChangeExpansionState = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter({ replay: true });
@@ -47442,6 +47469,7 @@ class PaneviewPanel extends _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_3__
         this.expandedSize = 0;
         this.api.pane = this; // TODO cannot use 'this' before 'super'
         this._isExpanded = isExpanded;
+        this._headerVisible = isHeaderVisible;
         this._onDidChangeExpansionState.fire(this.isExpanded()); // initialize value
         this._orientation = orientation;
         this.element.classList.add('pane');
@@ -47508,6 +47536,13 @@ class PaneviewPanel extends _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_3__
     set maximumBodySize(value) {
         this._maximumBodySize =
             typeof value === 'number' ? value : Number.POSITIVE_INFINITY;
+    }
+    get headerVisible() {
+        return this._headerVisible;
+    }
+    set headerVisible(value) {
+        this._headerVisible = value;
+        this.header.style.display = value ? '' : 'none';
     }
     setVisible(isVisible) {
         this.api._onDidVisibilityChange.fire({ isVisible });
@@ -48761,7 +48796,7 @@ class Splitview {
         this._onDidAddView = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
         this.onDidAddView = this._onDidAddView.event;
         this._onDidRemoveView = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
-        this.onDidRemoveView = this._onDidAddView.event;
+        this.onDidRemoveView = this._onDidRemoveView.event;
         this._startSnappingEnabled = true;
         this._endSnappingEnabled = true;
         this.resize = (index, delta, sizes = this.views.map((x) => x.size), lowPriorityIndexes, highPriorityIndexes, overloadMinDelta = Number.NEGATIVE_INFINITY, overloadMaxDelta = Number.POSITIVE_INFINITY, snapBefore, snapAfter) => {
@@ -49526,6 +49561,10 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
         this.element = element;
         this._disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_0__.MutableDisposable();
         this.panels = new Map();
+        this._onDidAddView = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        this.onDidAddView = this._onDidAddView.event;
+        this._onDidRemoveView = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        this.onDidRemoveView = this._onDidRemoveView.event;
         this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
         this.onDidLayoutChange = this._onDidLayoutChange.event;
         this._options = options;
@@ -49551,7 +49590,7 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
         this._splitview = value;
         this._disposable.value = new _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable(this._splitview.onDidSashEnd(() => {
             this._onDidLayoutChange.fire(undefined);
-        }));
+        }), this._splitview.onDidAddView((e) => this._onDidAddView.fire(e)), this._splitview.onDidRemoveView((e) => this._onDidRemoveView.fire(e)));
     }
     get minimumSize() {
         return this.splitview.minimumSize;
@@ -49725,6 +49764,10 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
                     });
                     panel.orientation = orientation;
                     this.doAddView(panel);
+                    setTimeout(() => {
+                        // the original onDidAddView events are missed since they are fired before we can subcribe to them
+                        this._onDidAddView.fire(panel);
+                    }, 0);
                     return { size: view.size, view: panel };
                 }),
             },
