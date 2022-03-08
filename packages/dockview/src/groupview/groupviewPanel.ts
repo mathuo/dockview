@@ -2,9 +2,13 @@ import { IFrameworkPart } from '../panel/types';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { GridviewPanelApiImpl } from '../api/gridviewPanelApi';
 import { Groupview, GroupOptions } from './groupview';
-import { GridviewPanel } from '../gridview/gridviewPanel';
+import { GridviewPanel, IGridviewPanel } from '../gridview/gridviewPanel';
 
-export class GroupviewPanel extends GridviewPanel {
+export interface IGroupviewPanel extends IGridviewPanel {
+    model: Groupview;
+}
+
+export class GroupviewPanel extends GridviewPanel implements IGroupviewPanel {
     private readonly _model: Groupview;
 
     get model(): Groupview {

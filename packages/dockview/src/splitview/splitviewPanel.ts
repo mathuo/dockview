@@ -19,7 +19,8 @@ export interface ISplitviewPanel
 
 export abstract class SplitviewPanel
     extends BasePanelView<SplitviewPanelApiImpl>
-    implements ISerializableView, ISplitviewPanel {
+    implements ISerializableView, ISplitviewPanel
+{
     private _evaluatedMinimumSize = 0;
     private _evaluatedMaximumSize = Number.POSITIVE_INFINITY;
 
@@ -83,11 +84,13 @@ export abstract class SplitviewPanel
         this.addDisposables(
             this.api.onVisibilityChange((event) => {
                 const { isVisible } = event;
-                const { containerApi } = this.params as PanelViewInitParameters;
+                const { containerApi } = this
+                    ._params as PanelViewInitParameters;
                 containerApi.setVisible(this, isVisible);
             }),
             this.api.onActiveChange(() => {
-                const { containerApi } = this.params as PanelViewInitParameters;
+                const { containerApi } = this
+                    ._params as PanelViewInitParameters;
                 containerApi.setActive(this);
             }),
             this.api.onDidConstraintsChangeInternal((event) => {

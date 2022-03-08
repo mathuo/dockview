@@ -13,14 +13,14 @@ import {
     IGridviewComponent,
     SerializedGridview,
 } from '../gridview/gridviewComponent';
-import { GridviewPanel, IGridviewPanel } from '../gridview/gridviewPanel';
+import { IGridviewPanel } from '../gridview/gridviewPanel';
 import { IGroupPanel } from '../groupview/groupPanel';
 import {
     AddPaneviewCompponentOptions,
     SerializedPaneview,
     IPaneviewComponent,
 } from '../paneview/paneviewComponent';
-import { IPaneviewPanel, PaneviewPanel } from '../paneview/paneviewPanel';
+import { IPaneviewPanel } from '../paneview/paneviewPanel';
 import {
     AddSplitviewComponentOptions,
     ISplitviewComponent,
@@ -29,7 +29,7 @@ import {
 } from '../splitview/splitviewComponent';
 import { IView, Orientation, Sizing } from '../splitview/core/splitview';
 import { ISplitviewPanel } from '../splitview/splitviewPanel';
-import { GroupviewPanel } from '../groupview/groupviewPanel';
+import { GroupviewPanel, IGroupviewPanel } from '../groupview/groupviewPanel';
 import { Emitter, Event } from '../events';
 import { IDisposable } from '../lifecycle';
 import { PaneviewDropEvent } from '../react';
@@ -156,11 +156,11 @@ export class PaneviewApi implements CommonApi {
         return this.component.onDidLayoutChange;
     }
 
-    get onDidAddView(): Event<PaneviewPanel> {
+    get onDidAddView(): Event<IPaneviewPanel> {
         return this.component.onDidAddView;
     }
 
-    get onDidRemoveView(): Event<PaneviewPanel> {
+    get onDidRemoveView(): Event<IPaneviewPanel> {
         return this.component.onDidRemoveView;
     }
 
@@ -255,7 +255,7 @@ export class GridviewApi implements CommonApi {
         return this.component.onDidLayoutChange;
     }
 
-    get panels(): GridviewPanel[] {
+    get panels(): IGridviewPanel[] {
         return this.component.groups;
     }
 
@@ -296,7 +296,7 @@ export class GridviewApi implements CommonApi {
         this.component.resizeToFit();
     }
 
-    getPanel(id: string): GridviewPanel | undefined {
+    getPanel(id: string): IGridviewPanel | undefined {
         return this.component.getPanel(id);
     }
 
@@ -366,7 +366,7 @@ export class DockviewApi implements CommonApi {
         return this.component.panels;
     }
 
-    get groups(): GroupviewPanel[] {
+    get groups(): IGroupviewPanel[] {
         return this.component.groups;
     }
 
@@ -374,7 +374,7 @@ export class DockviewApi implements CommonApi {
         return this.component.activePanel;
     }
 
-    get activeGroup(): GroupviewPanel | undefined {
+    get activeGroup(): IGroupviewPanel | undefined {
         return this.component.activeGroup;
     }
 
@@ -428,15 +428,15 @@ export class DockviewApi implements CommonApi {
         return this.component.closeAllGroups();
     }
 
-    removeGroup(group: GroupviewPanel): void {
-        this.component.removeGroup(group);
+    removeGroup(group: IGroupviewPanel): void {
+        this.component.removeGroup(<GroupviewPanel>group);
     }
 
     resizeToFit(): void {
         return this.component.resizeToFit();
     }
 
-    getGroup(id: string): GroupviewPanel | undefined {
+    getGroup(id: string): IGroupviewPanel | undefined {
         return this.component.getPanel(id);
     }
 

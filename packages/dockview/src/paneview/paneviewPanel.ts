@@ -285,7 +285,7 @@ export abstract class PaneviewPanel
     }
 
     toJSON(): PanePanelViewState {
-        const params = this.params as PanePanelInitParameter;
+        const params = this._params as PanePanelInitParameter;
         return {
             ...super.toJSON(),
             headerComponent: this.headerComponent,
