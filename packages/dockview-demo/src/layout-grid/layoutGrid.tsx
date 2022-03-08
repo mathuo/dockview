@@ -410,9 +410,14 @@ export const TestGrid = (props: IGridviewPanelProps) => {
                 components={components}
                 tabComponents={tabComponents}
                 debug={false}
-                enableExternalDragEvents={true}
                 onTabContextMenu={onTabContextMenu}
                 watermarkComponent={Watermark}
+                showDndOverlay={(ev, target) => {
+                    return true;
+                }}
+                onDidDrop={(ev) => {
+                    console.log('onDidDrop', ev);
+                }}
             />
         </>
     );

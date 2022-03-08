@@ -39,6 +39,7 @@ Want to inspect the latest deployment? Go to https://unpkg.com/browse/dockview@l
 -   [Quick start](#quick-start)
 -   [Sandbox examples](#sandbox-examples)
 -   [Serializated layouts](#serializated-layouts)
+-   [Drag and drop](#drag-and-drop)
 -   [Theming](#theming)
 -   [Performance](#performance)
 -   [FAQ](#faq)
@@ -137,6 +138,40 @@ const components: PanelCollection<IDockviewPanelProps> = {
 All view components support the methods `toJSON()`, `fromJSON(...)` and `onDidLayoutChange()`.
 
 See example [here](https://codesandbox.io/s/workspace-saving-example-euo5d).
+
+## Drag and drop
+
+Both `DockviewReact` and `PaneviewReact` support drag and drop functionality out of the box.
+
+-   `DockviewReact` allows tabs to be repositioned using drag and drop.
+-   `PaneviewReact` allows the repositioning of views using drag and drop on the header section.
+
+You can use the utility methods `getPaneData` and `getPanelData` to manually extract the data transfer metadata associated with an active drag and drop event for either of the above components.
+
+```tsx
+import {
+    getPaneData,
+    getPanelData,
+    PanelTransfer,
+    PaneTransfer,
+} from 'dockview';
+
+const panelData: PanelTransfer | undefined = getPanelData();
+
+if (panelData) {
+    // DockviewReact: data transfer metadata associated with the active drag and drop event
+    const { viewId, groupId, panelId } = panelData; // deconstructed object
+}
+
+const paneData: PaneTransfer | undefined = getPaneData();
+
+if (paneData) {
+    // PaneviewReact: data transfer metadata associated with the active drag and drop event
+    const { viewId, paneId } = paneData; // deconstructed object
+}
+```
+
+You can also intercept custom drag and drop events allowing dockview components to interact with and react to external drag events. `PaneviewReact` supports the method `onDidDrop` and `DockviewReact` supports the methods `onDidDrop` and `showDndOverlay`.
 
 ## Theming
 

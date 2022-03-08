@@ -11,6 +11,7 @@ import {
 import { GroupviewPanel } from '../groupview/groupviewPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
+import { DockviewDropTargets } from '../groupview/dnd';
 
 export interface GroupPanelFrameworkComponentFactory {
     content: FrameworkFactory<IContentRenderer>;
@@ -54,9 +55,9 @@ export interface DockviewOptions extends DockviewRenderFunctions {
     frameworkComponentFactory?: GroupPanelFrameworkComponentFactory;
     tabHeight?: number;
     debug?: boolean;
-    enableExternalDragEvents?: boolean;
     orientation?: Orientation;
     styles?: ISplitviewStyles;
+    showDndOverlay?: (event: DragEvent, target: DockviewDropTargets) => boolean;
 }
 
 export interface PanelOptions {

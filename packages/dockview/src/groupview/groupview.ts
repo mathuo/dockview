@@ -67,14 +67,21 @@ export interface GroupPanelViewState {
     id: string;
 }
 
+export interface GroupviewDropEvent {
+    nativeEvent: DragEvent;
+    position: Position;
+    index?: number;
+}
+
 export interface IGroupview extends IDisposable, IGridPanelView {
     readonly isActive: boolean;
     readonly size: number;
     readonly panels: IGroupPanel[];
     readonly tabHeight: number | undefined;
+    readonly activePanel: IGroupPanel | undefined;
+    readonly onDidDrop: Event<GroupviewDropEvent>;
     // state
     isPanelActive: (panel: IGroupPanel) => boolean;
-    activePanel: IGroupPanel | undefined;
     indexOf(panel: IGroupPanel): number;
     // panel lifecycle
     openPanel(
@@ -123,6 +130,9 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     private readonly _onDidGroupChange = new Emitter<GroupviewChangeEvent>();
     readonly onDidGroupChange: Event<GroupviewChangeEvent> =
         this._onDidGroupChange.event;
+
+    private readonly _onDidDrop = new Emitter<GroupviewDropEvent>();
+    readonly onDidDrop: Event<GroupviewDropEvent> = this._onDidDrop.event;
 
     get element(): HTMLElement {
         throw new Error('not supported');
@@ -184,7 +194,12 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         this.container.classList.add('groupview');
 
-        this.addDisposables(this._onMove, this._onDidGroupChange);
+        this.addDisposables(
+            this._onMove,
+            this._onDidGroupChange,
+            this._onDidChange,
+            this._onDidDrop
+        );
 
         this.tabsContainer = new TabsContainer(this.accessor, this.parent, {
             tabHeight: options.tabHeight,
@@ -619,11 +634,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
     }
 
-    canDisplayOverlay(
-        dragOverEvent: DragEvent,
-        target: DockviewDropTargets
-    ): boolean {
+    canDisplayOverlay(event: DragEvent, target: DockviewDropTargets): boolean {
         // custom overlay handler
+        if (this.accessor.options.showDndOverlay) {
+            return this.accessor.options.showDndOverlay(event, target);
+        }
         return false;
     }
 
@@ -658,7 +673,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 index,
             });
         } else {
-            // custom drop handler
+            this._onDidDrop.fire({ nativeEvent: event, position, index });
         }
     }
 
