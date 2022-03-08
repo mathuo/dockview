@@ -11,8 +11,8 @@ import { PanelApiImpl } from '../api/panelApi';
 export interface BasePanelViewState {
     id: string;
     component: string;
-    params?: { [key: string]: any };
-    state?: { [key: string]: any };
+    params?: Record<string, any>;
+    state?: Record<string, any>;
 }
 
 export interface BasePanelViewExported<T extends PanelApiImpl> {
@@ -20,9 +20,9 @@ export interface BasePanelViewExported<T extends PanelApiImpl> {
     readonly api: T;
     readonly width: number;
     readonly height: number;
+    readonly params: Record<string, any> | undefined;
     focus(): void;
     toJSON(): object;
-    update(params: PanelUpdateEvent): void;
 }
 
 export abstract class BasePanelView<T extends PanelApiImpl>
@@ -33,7 +33,7 @@ export abstract class BasePanelView<T extends PanelApiImpl>
     private _width = 0;
     private _element: HTMLElement;
     protected part?: IFrameworkPart;
-    protected params?: PanelInitParameters;
+    protected _params?: PanelInitParameters;
 
     /**
      * Provide an IFrameworkPart that will determine the rendered UI of this view piece.
@@ -50,6 +50,10 @@ export abstract class BasePanelView<T extends PanelApiImpl>
 
     get height() {
         return this._height;
+    }
+
+    get params(): Record<string, any> | undefined {
+        return this._params?.params;
     }
 
     constructor(
@@ -89,32 +93,32 @@ export abstract class BasePanelView<T extends PanelApiImpl>
         this.api._onDidPanelDimensionChange.fire({ width, height });
 
         if (this.part) {
-            if (this.params) {
-                this.part.update(this.params.params);
+            if (this._params) {
+                this.part.update(this._params.params);
             }
         }
     }
 
     init(parameters: PanelInitParameters): void {
-        this.params = parameters;
+        this._params = parameters;
         this.part = this.getComponent();
     }
 
     update(event: PanelUpdateEvent) {
-        this.params = {
-            ...this.params,
+        this._params = {
+            ...this._params,
             params: {
-                ...this.params?.params,
+                ...this._params?.params,
                 ...event.params,
             },
         };
-        this.part?.update({ params: this.params.params });
+        this.part?.update({ params: this._params.params });
     }
 
     toJSON(): BasePanelViewState {
         const state = this.api.getState();
 
-        const params = this.params?.params ?? {};
+        const params = this._params?.params ?? {};
 
         return {
             id: this.id,

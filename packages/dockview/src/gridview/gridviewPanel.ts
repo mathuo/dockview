@@ -131,11 +131,11 @@ export abstract class GridviewPanel
         this.addDisposables(
             this.api.onVisibilityChange((event) => {
                 const { isVisible } = event;
-                const { containerApi } = this.params as GridviewInitParameters;
+                const { containerApi } = this._params as GridviewInitParameters;
                 containerApi.setVisible(this, isVisible);
             }),
             this.api.onActiveChange(() => {
-                const { containerApi } = this.params as GridviewInitParameters;
+                const { containerApi } = this._params as GridviewInitParameters;
                 containerApi.setActive(this);
             }),
             this.api.onDidConstraintsChangeInternal((event) => {

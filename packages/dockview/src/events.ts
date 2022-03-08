@@ -61,9 +61,9 @@ export class Emitter<T> implements IDisposable {
 
     public fire(e: T) {
         this._last = e;
-        this._listeners.forEach((listener) => {
+        for (const listener of this._listeners) {
             listener(e);
-        });
+        }
     }
 
     public dispose() {
