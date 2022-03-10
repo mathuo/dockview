@@ -14,7 +14,6 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
         const panelId = panelData.id;
         const params = panelData.params;
         const title = panelData.title;
-        const state = panelData.state;
         const suppressClosable = panelData.suppressClosable;
         const viewData = panelData.view;
 
@@ -47,7 +46,6 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
             title,
             suppressClosable,
             params: params || {},
-            state: state || {},
         });
 
         return panel;

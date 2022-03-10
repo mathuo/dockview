@@ -22,7 +22,7 @@
     }
 
     &.inactive-tab > .default-tab {
-        .tab-action:not(.dirty) {
+        .tab-action {
             visibility: hidden;
         }
         &:hover {
@@ -73,14 +73,6 @@
 
                     &.disable-close {
                         display: none;
-                    }
-
-                    &.dirty:not(:hover) {
-                        display: block;
-                        -webkit-mask: var(--dv-tab-dirty-icon) 50% 50% / 60% 60%
-                            no-repeat;
-                        mask: var(--dv-tab-dirty-icon) 50% 50% / 60% 60%
-                            no-repeat;
                     }
                 }
             }

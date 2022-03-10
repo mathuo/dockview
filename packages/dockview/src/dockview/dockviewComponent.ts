@@ -15,7 +15,6 @@ import {
     ITabRenderer,
     IWatermarkRenderer,
 } from '../groupview/types';
-import { debounce } from '../functions';
 import { sequentialNumberGenerator } from '../math';
 import { DefaultDeserializer, IPanelDeserializer } from './deserializer';
 import { createComponent } from '../panel/componentFactory';
@@ -33,7 +32,6 @@ import {
     toTarget,
 } from '../gridview/baseComponentGridview';
 import { DockviewApi } from '../api/component.api';
-import { State } from '../api/panelApi';
 import { LayoutMouseEvent, MouseEventKind } from '../groupview/tab';
 import { Orientation } from '../splitview/core/splitview';
 import { DefaultTab } from './components/tab/defaultTab';
@@ -122,11 +120,7 @@ export class DockviewComponent
     implements IDockviewComponent
 {
     private readonly _panels = new Map<string, IValueDisposable<IGroupPanel>>();
-    private readonly dirtyPanels = new Set<IGroupPanel>();
-    private readonly debouncedDeque = debounce(
-        this.syncConfigs.bind(this),
-        5000
-    );
+
     // events
     private readonly _onTabInteractionEvent = new Emitter<LayoutMouseEvent>();
     readonly onTabInteractionEvent: Event<LayoutMouseEvent> =
@@ -141,7 +135,6 @@ export class DockviewComponent
 
     // everything else
     private _deserializer: IPanelDeserializer | undefined;
-    private panelState: State = {};
     private _api: DockviewApi;
     private _options: DockviewComponentOptions;
 
@@ -307,11 +300,14 @@ export class DockviewComponent
             throw new Error(`panel ${panel.id} already exists`);
         }
 
-        const disposable = new CompositeDisposable(
-            panel.onDidStateChange(() => this.addDirtyPanel(panel))
-        );
-
-        this._panels.set(panel.id, { value: panel, disposable });
+        this._panels.set(panel.id, {
+            value: panel,
+            disposable: {
+                dispose: () => {
+                    /** noop */
+                },
+            },
+        });
     }
 
     private unregisterPanel(panel: IGroupPanel): void {
@@ -334,15 +330,11 @@ export class DockviewComponent
      * @returns A JSON respresentation of the layout
      */
     toJSON(): SerializedDockview {
-        this.syncConfigs();
-
         const data = this.gridview.serialize();
 
         const panels = Array.from(this._panels.values()).reduce(
             (collection, panel) => {
-                if (!this.panelState[panel.value.id]) {
-                    collection[panel.value.id] = panel.value.toJSON();
-                }
+                collection[panel.value.id] = panel.value.toJSON();
                 return collection;
             },
             {} as { [key: string]: GroupviewPanelState }
@@ -736,38 +728,6 @@ export class DockviewComponent
         this._onTabInteractionEvent.dispose();
     }
 
-    /**
-     * Ensure the local copy of the layout state is up-to-date
-     */
-    private syncConfigs(): void {
-        const dirtyPanels = Array.from(this.dirtyPanels);
-
-        if (dirtyPanels.length === 0) {
-            //
-        }
-
-        this.dirtyPanels.clear();
-
-        const partialPanelState = dirtyPanels
-            .map((panel) => this._panels.get(panel.id))
-            .filter((_) => !!_)
-            .reduce((collection, panel) => {
-                collection[panel!.value.id] = panel!.value.toJSON();
-                return collection;
-            }, {} as State);
-
-        this.panelState = {
-            ...this.panelState,
-            ...partialPanelState,
-        };
-
-        dirtyPanels
-            .filter((p) => this._panels.has(p.id))
-            .forEach((panel) => {
-                panel.setDirty(false);
-            });
-    }
-
     private _addPanel(options: AddPanelOptions): IGroupPanel {
         const view = new DefaultGroupPanelView({
             content: this.createContentComponent(options.id, options.component),
@@ -830,11 +790,5 @@ export class DockviewComponent
         return Array.from(this._groups.values()).find((group) =>
             group.value.model.containsPanel(panel)
         )?.value;
-    }
-
-    private addDirtyPanel(panel: IGroupPanel): void {
-        this.dirtyPanels.add(panel);
-        panel.setDirty(true);
-        this.debouncedDeque();
     }
 }

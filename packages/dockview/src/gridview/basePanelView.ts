@@ -12,7 +12,6 @@ export interface BasePanelViewState {
     id: string;
     component: string;
     params?: Record<string, any>;
-    state?: Record<string, any>;
 }
 
 export interface BasePanelViewExported<T extends PanelApiImpl> {
@@ -116,15 +115,12 @@ export abstract class BasePanelView<T extends PanelApiImpl>
     }
 
     toJSON(): BasePanelViewState {
-        const state = this.api.getState();
-
         const params = this._params?.params ?? {};
 
         return {
             id: this.id,
             component: this.component,
             params: Object.keys(params).length > 0 ? params : undefined,
-            state: Object.keys(state).length === 0 ? undefined : state,
         };
     }
 

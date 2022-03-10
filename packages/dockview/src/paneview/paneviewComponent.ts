@@ -36,7 +36,6 @@ export interface SerializedPaneviewPanel {
         title: string;
         headerComponent?: string;
         params?: { [index: string]: any };
-        state?: { [index: string]: any };
     };
     size: number;
     expanded?: boolean;
