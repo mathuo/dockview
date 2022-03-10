@@ -69,6 +69,12 @@ export class DockviewPanelApiImpl
     constructor(private panel: IGroupPanel, group: GroupviewPanel | undefined) {
         super(panel.id);
         this._group = group;
+
+        this.addDisposables(
+            this._onDidTitleChange,
+            this._titleChanged,
+            this._suppressClosableChanged
+        );
     }
 
     public setTitle(title: string) {
@@ -84,9 +90,5 @@ export class DockviewPanelApiImpl
 
     public interceptOnCloseAction(interceptor: () => Promise<boolean>) {
         this._interceptor = interceptor;
-    }
-
-    public dispose() {
-        super.dispose();
     }
 }

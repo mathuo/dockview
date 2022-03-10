@@ -20,6 +20,7 @@ export abstract class DragHandler extends CompositeDisposable {
 
     private configure() {
         this.addDisposables(
+            this._onDragStart,
             addDisposableListener(this.el, 'dragstart', (event) => {
                 this.iframes = [
                     ...getElementsByTagName('iframe'),

@@ -47,6 +47,12 @@ export class SplitviewPanelApiImpl
 
     constructor(id: string) {
         super(id);
+
+        this.addDisposables(
+            this._onDidConstraintsChangeInternal,
+            this._onDidConstraintsChange,
+            this._onDidSizeChange
+        );
     }
 
     setConstraints(value: PanelConstraintChangeEvent2) {
@@ -55,11 +61,5 @@ export class SplitviewPanelApiImpl
 
     setSize(event: PanelSizeEvent) {
         this._onDidSizeChange.fire(event);
-    }
-
-    dispose() {
-        super.dispose();
-        this._onDidConstraintsChange.dispose();
-        this._onDidSizeChange.dispose();
     }
 }
