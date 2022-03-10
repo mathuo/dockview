@@ -129,6 +129,7 @@ export abstract class GridviewPanel
         super(id, component, api);
 
         this.addDisposables(
+            this._onDidChange,
             this.api.onVisibilityChange((event) => {
                 const { isVisible } = event;
                 const { containerApi } = this._params as GridviewInitParameters;
@@ -229,10 +230,6 @@ export abstract class GridviewPanel
             snap: this.snap,
             priority: this.priority,
         };
-    }
-
-    dispose() {
-        super.dispose();
     }
 }
 

@@ -185,6 +185,13 @@ export class PaneviewComponent
     ) {
         super();
 
+        this.addDisposables(
+            this._onDidLayoutChange,
+            this._onDidDrop,
+            this._onDidAddView,
+            this._onDidRemoveView
+        );
+
         this._options = options;
 
         if (!options.components) {

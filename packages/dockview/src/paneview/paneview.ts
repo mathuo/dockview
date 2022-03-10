@@ -95,6 +95,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         });
 
         this.addDisposables(
+            this._onDidChange,
             this.splitview.onDidSashEnd(() => {
                 this._onDidChange.fire(undefined);
             }),

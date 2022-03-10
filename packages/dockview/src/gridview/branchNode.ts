@@ -155,6 +155,7 @@ export class BranchNode extends CompositeDisposable implements IView {
         }
 
         this.addDisposables(
+            this._onDidChange,
             this.splitview.onDidSashEnd(() => {
                 this._onDidChange.fire(undefined);
             })

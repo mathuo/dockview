@@ -56,6 +56,7 @@ export class Droptarget extends CompositeDisposable {
         super();
 
         this.addDisposables(
+            this._onDrop,
             new DragAndDropObserver(this.element, {
                 onDragEnter: (e) => undefined,
                 onDragOver: (e) => {
@@ -177,7 +178,6 @@ export class Droptarget extends CompositeDisposable {
     }
 
     public dispose() {
-        this._onDrop.dispose();
         this.removeDropTarget();
     }
 

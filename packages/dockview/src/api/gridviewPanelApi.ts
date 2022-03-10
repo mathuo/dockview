@@ -50,6 +50,12 @@ export class GridviewPanelApiImpl
 
     constructor(id: string) {
         super(id);
+
+        this.addDisposables(
+            this._onDidConstraintsChangeInternal,
+            this._onDidConstraintsChange,
+            this._onDidSizeChange
+        );
     }
 
     public setConstraints(value: GridConstraintChangeEvent) {

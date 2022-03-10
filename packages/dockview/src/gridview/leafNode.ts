@@ -128,6 +128,7 @@ export class LeafNode implements IView {
     }
 
     public dispose() {
+        this._onDidChange.dispose();
         this._disposable.dispose();
     }
 }
