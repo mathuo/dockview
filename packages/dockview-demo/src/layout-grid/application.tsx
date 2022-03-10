@@ -120,6 +120,7 @@ export const Application = () => {
             onReady={onReady}
             orientation={Orientation.VERTICAL}
             hideBorders={true}
+            proportionalLayout={true}
         />
     );
 };

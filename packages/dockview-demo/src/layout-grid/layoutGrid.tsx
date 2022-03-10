@@ -69,39 +69,34 @@ const components: PanelCollection<IDockviewPanelProps> = {
         const onReady = (event: DockviewReadyEvent) => {
             _api.current = event.api;
 
-            const layout = props.api.getStateKey<any>('layout');
-            if (layout) {
-                event.api.fromJSON(layout);
-            } else {
-                event.api.addPanel({
-                    component: 'test_component',
-                    id: 'inner-1',
-                    title: 'inner-1',
-                });
-                event.api.addPanel({
-                    component: 'test_component',
-                    id: 'inner-2',
-                    title: 'inner-2',
-                });
-                event.api.addPanel({
-                    component: 'test_component',
-                    id: nextGuid(),
-                    title: 'inner-3',
-                    position: {
-                        direction: 'within',
-                        referencePanel: 'inner-1',
-                    },
-                });
-                event.api.addPanel({
-                    component: 'test_component',
-                    id: nextGuid(),
-                    title: 'inner-4',
-                    position: {
-                        direction: 'within',
-                        referencePanel: 'inner-2',
-                    },
-                });
-            }
+            event.api.addPanel({
+                component: 'test_component',
+                id: 'inner-1',
+                title: 'inner-1',
+            });
+            event.api.addPanel({
+                component: 'test_component',
+                id: 'inner-2',
+                title: 'inner-2',
+            });
+            event.api.addPanel({
+                component: 'test_component',
+                id: nextGuid(),
+                title: 'inner-3',
+                position: {
+                    direction: 'within',
+                    referencePanel: 'inner-1',
+                },
+            });
+            event.api.addPanel({
+                component: 'test_component',
+                id: nextGuid(),
+                title: 'inner-4',
+                position: {
+                    direction: 'within',
+                    referencePanel: 'inner-2',
+                },
+            });
         };
 
         return (
@@ -249,9 +244,6 @@ const components: PanelCollection<IDockviewPanelProps> = {
                             <button onClick={onClick}>set state</button>
                             <button onClick={onRename}>rename</button>
 
-                            {/* {props.api.getState()["test_key"]} */}
-
-                            {/* <div>{props.text || '-'}</div> */}
                             <input
                                 style={{ width: '175px' }}
                                 ref={input}

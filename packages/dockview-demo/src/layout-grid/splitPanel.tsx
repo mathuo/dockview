@@ -85,8 +85,6 @@ export const SplitPanel = (props: IDockviewPanelProps) => {
 
         registry.register('splitview', event.api);
 
-        const existingLayout = props.api.getStateKey(SPLIT_PANEL_STATE_KEY);
-
         event.api.fromJSON(require('./splitpanel.layout.json'));
         return;
         event.api.addPanel({
