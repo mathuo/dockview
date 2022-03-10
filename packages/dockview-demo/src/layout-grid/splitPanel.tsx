@@ -56,8 +56,6 @@ const components = {
     },
 };
 
-const SPLIT_PANEL_STATE_KEY = 'splitview_panel_state';
-
 export const SplitPanel = (props: IDockviewPanelProps) => {
     const api = React.useRef<SplitviewApi>();
     const registry = useLayoutRegistry();
@@ -66,9 +64,6 @@ export const SplitPanel = (props: IDockviewPanelProps) => {
         const disposable = new CompositeDisposable(
             props.api.onDidDimensionsChange((event) => {
                 api.current?.layout(event.width, event.height - 25);
-            }),
-            api.current.onDidLayoutChange(() => {
-                props.api.setState(SPLIT_PANEL_STATE_KEY, api.current.toJSON());
             }),
             props.api.onFocusEvent(() => {
                 api.current.focus();
@@ -96,11 +91,6 @@ export const SplitPanel = (props: IDockviewPanelProps) => {
             },
         });
         event.api.addPanel({ id: '2', component: 'default1' });
-    };
-
-    const onSave = () => {
-        props.api.setState(SPLIT_PANEL_STATE_KEY, api.current.toJSON());
-        console.log(JSON.stringify(api.current.toJSON(), null, 4));
     };
 
     const onUpdateProps = () => {
