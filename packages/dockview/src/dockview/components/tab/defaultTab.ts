@@ -1,10 +1,9 @@
-import { CompositeDisposable, MutableDisposable } from '../../../lifecycle';
+import { CompositeDisposable } from '../../../lifecycle';
 import {
     ITabRenderer,
     GroupPanelPartInitParameters,
 } from '../../../groupview/types';
 import { addDisposableListener } from '../../../events';
-import { toggleClass } from '../../../dom';
 import { PanelUpdateEvent } from '../../../panel/types';
 import { GroupviewPanel } from '../../../groupview/groupviewPanel';
 
@@ -80,8 +79,6 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     private action: HTMLElement;
     //
     private params: GroupPanelPartInitParameters = {} as any;
-    //
-    private isDirtyDisposable = new MutableDisposable();
 
     get element() {
         return this._element;
@@ -93,8 +90,6 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
 
     constructor() {
         super();
-
-        this.addDisposables(this.isDirtyDisposable);
 
         this._element = document.createElement('div');
         this._element.className = 'default-tab';
@@ -141,13 +136,6 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     public init(params: GroupPanelPartInitParameters) {
         this.params = params;
         this._content.textContent = params.title;
-
-        this.isDirtyDisposable.value = this.params.api.onDidDirtyChange(
-            (event) => {
-                const isDirty = event;
-                toggleClass(this.action, 'dirty', isDirty);
-            }
-        );
 
         if (!this.params.suppressClosable) {
             addDisposableListener(this.action, 'click', (ev) => {

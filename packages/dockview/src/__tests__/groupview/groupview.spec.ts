@@ -1,5 +1,4 @@
 import { IDockviewComponent } from '../../dockview/dockviewComponent';
-import { Emitter } from '../../events';
 import {
     GroupviewPanelState,
     IGroupPanel,
@@ -131,8 +130,6 @@ class TestPanel implements IGroupPanel {
     private _view: IGroupPanelView | undefined;
     private _group: GroupviewPanel | undefined;
     private _params: IGroupPanelInitParameters;
-    private _onDidChangeState = new Emitter<void>();
-    readonly onDidStateChange = this._onDidChangeState.event;
 
     get title() {
         return '';
@@ -165,10 +162,6 @@ class TestPanel implements IGroupPanel {
         this._view = params.view;
 
         this._params = params;
-    }
-
-    setDirty(isDirty: boolean) {
-        //noop
     }
 
     updateParentGroup(group: GroupviewPanel, isGroupActive: boolean) {

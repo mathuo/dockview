@@ -1,25 +1,6 @@
 import { Emitter, Event } from '../events';
 import { CompositeDisposable } from '../lifecycle';
 
-/**
- * A valid JSON type
- */
-export type StateObject =
-    | number
-    | string
-    | boolean
-    | null
-    | object
-    | StateObject[]
-    | { [key: string]: StateObject };
-
-/**
- * A JSON-serializable object
- */
-export interface State {
-    [key: string]: StateObject;
-}
-
 export interface FocusEvent {
     readonly isFocused: boolean;
 }
@@ -39,7 +20,6 @@ export interface ActiveEvent {
 export interface PanelApi {
     // events
     readonly onDidDimensionsChange: Event<PanelDimensionChangeEvent>;
-    readonly onDidStateChange: Event<void>;
     readonly onDidFocusChange: Event<FocusEvent>;
     readonly onDidVisibilityChange: Event<VisibilityEvent>;
     readonly onDidActiveChange: Event<ActiveEvent>;
@@ -47,11 +27,6 @@ export interface PanelApi {
     //
     setVisible(isVisible: boolean): void;
     setActive(): void;
-    // state
-    setState(key: string, value: StateObject): void;
-    setState(state: State): void;
-    getState: () => State;
-    getStateKey: <T extends StateObject>(key: string) => T;
     /**
      * The id of the panel that would have been assigned when the panel was created
      */
@@ -82,16 +57,12 @@ export interface PanelApi {
  * A core api implementation that should be used across all panel-like objects
  */
 export class PanelApiImpl extends CompositeDisposable implements PanelApi {
-    private _state: State = {};
     private _isFocused = false;
     private _isActive = false;
     private _isVisible = true;
     private _width = 0;
     private _height = 0;
 
-    readonly _onDidStateChange = new Emitter<void>();
-    readonly onDidStateChange: Event<void> = this._onDidStateChange.event;
-    //
     readonly _onDidPanelDimensionChange =
         new Emitter<PanelDimensionChangeEvent>({
             replay: true,
@@ -150,7 +121,6 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
         super();
 
         this.addDisposables(
-            this._onDidStateChange,
             this._onDidPanelDimensionChange,
             this._onDidChangeFocus,
             this._onDidVisibilityChange,
@@ -178,26 +148,6 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
 
     setActive(): void {
         this._onActiveChange.fire();
-    }
-
-    setState(
-        key: string | { [key: string]: StateObject },
-        value?: StateObject
-    ): void {
-        if (typeof key === 'object') {
-            this._state = key;
-        } else if (typeof value !== undefined) {
-            this._state[key] = value!;
-        }
-        this._onDidStateChange.fire(undefined);
-    }
-
-    getState(): State {
-        return this._state;
-    }
-
-    getStateKey<T extends StateObject>(key: string): T {
-        return this._state[key] as T;
     }
 
     dispose() {

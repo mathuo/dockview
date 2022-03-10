@@ -1,7 +1,6 @@
 import { GroupChangeKind2 } from '../groupview/groupview';
 import { DockviewApi } from '../api/component.api';
 import { DockviewPanelApiImpl } from '../api/groupPanelApi';
-import { Event } from '../events';
 import {
     GroupPanelUpdateEvent,
     GroupviewPanelState,
@@ -22,8 +21,6 @@ export class DockviewGroupPanel
     readonly api: DockviewPanelApiImpl;
     private _group: GroupviewPanel | undefined;
     private _params?: Parameters;
-
-    readonly onDidStateChange: Event<void>;
 
     private _view?: IGroupPanelView;
 
@@ -55,7 +52,6 @@ export class DockviewGroupPanel
         this._title = '';
 
         this.api = new DockviewPanelApiImpl(this, this._group);
-        this.onDidStateChange = this.api.onDidStateChange;
 
         this.addDisposables(
             this.api.onActiveChange(() => {
@@ -75,10 +71,6 @@ export class DockviewGroupPanel
         this.setTitle(params.title);
         this.setSuppressClosable(params.suppressClosable || false);
 
-        if (params.state) {
-            this.api.setState(params.state);
-        }
-
         this.view?.init({
             ...params,
             api: this.api,
@@ -90,10 +82,6 @@ export class DockviewGroupPanel
         this.api._onFocusEvent.fire();
     }
 
-    public setDirty(isDirty: boolean) {
-        this.api._onDidDirtyChange.fire(isDirty);
-    }
-
     public close(): Promise<boolean> {
         if (this.api.tryClose) {
             return this.api.tryClose();
@@ -103,8 +91,6 @@ export class DockviewGroupPanel
     }
 
     public toJSON(): GroupviewPanelState {
-        const state = this.api.getState();
-
         return <GroupviewPanelState>{
             id: this.id,
             view: this.view!.toJSON(),
@@ -112,7 +98,6 @@ export class DockviewGroupPanel
                 Object.keys(this._params || {}).length > 0
                     ? this._params
                     : undefined,
-            state: state && Object.keys(state).length > 0 ? state : undefined,
             suppressClosable: this.suppressClosable || undefined,
             title: this.title,
         };

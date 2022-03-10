@@ -1,4 +1,4 @@
-import { Emitter, Event } from '../events';
+import { Emitter } from '../events';
 import { GridviewPanelApiImpl, GridviewPanelApi } from './gridviewPanelApi';
 import { IGroupPanel } from '../groupview/groupPanel';
 import { GroupviewPanel } from '../groupview/groupviewPanel';
@@ -21,7 +21,6 @@ export interface DockviewPanelApi
     readonly isGroupActive: boolean;
     readonly title: string;
     readonly suppressClosable: boolean;
-    readonly onDidDirtyChange: Event<boolean>;
     close: () => Promise<boolean>;
     interceptOnCloseAction(interceptor: () => Promise<boolean>): void;
     setTitle(title: string): void;
@@ -33,9 +32,6 @@ export class DockviewPanelApiImpl
 {
     private _group: GroupviewPanel | undefined;
     private _interceptor: undefined | (() => Promise<boolean>);
-
-    readonly _onDidDirtyChange = new Emitter<boolean>();
-    readonly onDidDirtyChange = this._onDidDirtyChange.event;
 
     readonly _onDidTitleChange = new Emitter<TitleEvent>();
     readonly onDidTitleChange = this._onDidTitleChange.event;
@@ -73,8 +69,6 @@ export class DockviewPanelApiImpl
     constructor(private panel: IGroupPanel, group: GroupviewPanel | undefined) {
         super(panel.id);
         this._group = group;
-
-        this.addDisposables(this._onDidDirtyChange);
     }
 
     public setTitle(title: string) {

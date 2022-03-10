@@ -204,7 +204,6 @@ The theme can be customized using the below set of CSS properties. You can find 
 | --dv-inactivegroup-hiddenpanel-tab-color             | The color of the tab for the hidden panel/s in groups other than the active group                                                    |
 | --dv-tab-divider-color                               | -                                                                                                                                    |
 | --dv-tab-close-icon                                  | Default tab close icon                                                                                                               |
-| --dv-tab-dirty-icon                                  | Default tab dirty icon                                                                                                               |
 
 ## Performance
 

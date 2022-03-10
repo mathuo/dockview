@@ -1,4 +1,3 @@
-import { State } from '../api/panelApi';
 import { IDisposable } from '../lifecycle';
 import { LayoutPriority } from '../splitview/core/splitview';
 
@@ -11,7 +10,6 @@ export interface Parameters {
 
 export interface PanelInitParameters {
     params: Parameters;
-    state?: State;
 }
 
 export interface PanelUpdateEvent<T extends Parameters = Parameters> {

@@ -1,4 +1,4 @@
-import { PanelApiImpl, StateObject } from '../../api/panelApi';
+import { PanelApiImpl } from '../../api/panelApi';
 
 describe('api', () => {
     let api: PanelApiImpl;
@@ -7,36 +7,7 @@ describe('api', () => {
         api = new PanelApiImpl('dummy_id');
     });
 
-    it('sets api state', () => {
-        let state: StateObject;
-
-        const stream = api.onDidStateChange(() => {
-            state = api.getState();
-        });
-
-        expect(state).toBeUndefined();
-        expect(api.getState()).toEqual({});
-
-        api.setState('key1', 'value1');
-        expect(state).toEqual({ key1: 'value1' });
-        expect(api.getStateKey('key1')).toBe('value1');
-
-        api.setState('key2', 'value2');
-        expect(state).toEqual({ key1: 'value1', key2: 'value2' });
-        expect(api.getStateKey('key2')).toBe('value2');
-
-        api.setState('key1', 'value1_1');
-        expect(state).toEqual({ key2: 'value2', key1: 'value1_1' });
-        expect(api.getStateKey('key1')).toBe('value1_1');
-
-        api.setState({ key3: 'value3' });
-        expect(state).toEqual({ key3: 'value3' });
-
-        stream.dispose();
-        api.dispose();
-    });
-
-    it('shpuld update isFcoused getter', () => {
+    it('should update isFcoused getter', () => {
         expect(api.isFocused).toBeFalsy();
 
         api._onDidChangeFocus.fire({ isFocused: true });

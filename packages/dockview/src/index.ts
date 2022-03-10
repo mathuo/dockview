@@ -28,8 +28,6 @@ export * from './react'; // TODO: should be conditional on whether user wants th
 
 export { Position } from './dnd/droptarget';
 export {
-    StateObject,
-    State,
     FocusEvent,
     PanelDimensionChangeEvent,
     VisibilityEvent,
