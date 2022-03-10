@@ -157,10 +157,6 @@ const components: PanelCollection<IDockviewPanelProps> = {
             };
         }, []);
 
-        const onClick = () => {
-            props.api.setState('test_key', 'hello');
-        };
-
         const backgroundColor = React.useMemo(
             () =>
                 // "#1e1e1e",
@@ -241,7 +237,6 @@ const components: PanelCollection<IDockviewPanelProps> = {
                                     {`${panelState.isPanelVisible}`}
                                 </span>
                             </div>
-                            <button onClick={onClick}>set state</button>
                             <button onClick={onRename}>rename</button>
 
                             <input

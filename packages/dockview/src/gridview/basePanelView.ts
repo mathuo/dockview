@@ -22,6 +22,7 @@ export interface BasePanelViewExported<T extends PanelApiImpl> {
     readonly params: Record<string, any> | undefined;
     focus(): void;
     toJSON(): object;
+    update(event: PanelUpdateEvent): void;
 }
 
 export abstract class BasePanelView<T extends PanelApiImpl>
