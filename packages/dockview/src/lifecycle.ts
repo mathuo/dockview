@@ -27,7 +27,7 @@ export class CompositeDisposable {
     }
 
     public addDisposables(...args: IDisposable[]) {
-        args?.forEach((arg) => this.disposables.push(arg));
+        args.forEach((arg) => this.disposables.push(arg));
     }
 
     public dispose() {

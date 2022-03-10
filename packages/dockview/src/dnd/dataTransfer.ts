@@ -1,10 +1,7 @@
-import { PanelOptions } from '../dockview/options';
-import { tryParseJSON } from '../json';
-
 class TransferObject {
-  constructor() {
-      //
-  }
+    constructor() {
+        //
+    }
 }
 
 export class PanelTransfer extends TransferObject {
@@ -25,65 +22,6 @@ export class PaneTransfer extends TransferObject {
         super();
     }
 }
-
-
-export const DATA_KEY = 'splitview/transfer';
-
-export const isPanelTransferEvent = (event: DragEvent) => {
-    if (!event.dataTransfer) {
-        return false;
-    }
-
-    return event.dataTransfer.types.includes(DATA_KEY);
-};
-
-export enum DragType {
-    DOCKVIEW_TAB = 'dockview_tab',
-    EXTERNAL = 'external_group_drag',
-}
-
-export interface DragItem {
-    itemId: string;
-    groupId: string;
-}
-
-export interface ExternalDragItem extends PanelOptions {}
-
-export type DataObject = DragItem | ExternalDragItem;
-
-/**
- * Determine whether this data belong to that of an event that was started by
- * dragging a tab component
- */
-export const isTabDragEvent = (data: any): data is DragItem => {
-    return data.type === DragType.DOCKVIEW_TAB;
-};
-
-/**
- * Determine whether this data belong to that of an event that was started by
- * a custom drag-enable component
- */
-export const isCustomDragEvent = (data: any): data is ExternalDragItem => {
-    return data.type === DragType.EXTERNAL;
-};
-
-export const extractData = (event: DragEvent): DataObject | null => {
-    if (!event.dataTransfer) {
-        return null;
-    }
-
-    const data = tryParseJSON(event.dataTransfer.getData(DATA_KEY));
-
-    if (!data) {
-        console.warn(`[dragEvent] ${DATA_KEY} data is missing`);
-    }
-
-    if (typeof data.type !== 'string') {
-        console.warn(`[dragEvent] invalid type ${data.type}`);
-    }
-
-    return data;
-};
 
 /**
  * A singleton to store transfer data during drag & drop operations that are only valid within the application.
