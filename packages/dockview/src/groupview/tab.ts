@@ -1,17 +1,18 @@
 import { addDisposableListener, Emitter, Event } from '../events';
-import { CompositeDisposable } from '../lifecycle';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
 import {
     getPanelData,
     LocalSelectionTransfer,
     PanelTransfer,
 } from '../dnd/dataTransfer';
-import { getElementsByTagName, toggleClass } from '../dom';
+import { toggleClass } from '../dom';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { ITabRenderer } from './types';
 import { IGroupPanel } from './groupPanel';
 import { GroupviewPanel } from './groupviewPanel';
 import { DroptargetEvent, Droptarget } from '../dnd/droptarget';
 import { DockviewDropTargets } from './dnd';
+import { DragHandler } from '../dnd/abstractDragHandler';
 
 export enum MouseEventKind {
     CLICK = 'CLICK',
@@ -19,15 +20,15 @@ export enum MouseEventKind {
 }
 
 export interface LayoutMouseEvent {
-    kind: MouseEventKind;
-    event: MouseEvent;
-    panel?: IGroupPanel;
-    tab?: boolean;
+    readonly kind: MouseEventKind;
+    readonly event: MouseEvent;
+    readonly panel?: IGroupPanel;
+    readonly tab?: boolean;
 }
 
 export interface ITab {
-    panelId: string;
-    element: HTMLElement;
+    readonly panelId: string;
+    readonly element: HTMLElement;
     setContent: (element: ITabRenderer) => void;
     onChanged: Event<LayoutMouseEvent>;
     onDrop: Event<DroptargetEvent>;
@@ -35,8 +36,8 @@ export interface ITab {
 }
 
 export class Tab extends CompositeDisposable implements ITab {
-    private _element: HTMLElement;
-    private droptarget: Droptarget;
+    private readonly _element: HTMLElement;
+    private readonly droptarget: Droptarget;
     private content?: ITabRenderer;
 
     private readonly _onChanged = new Emitter<LayoutMouseEvent>();
@@ -45,19 +46,14 @@ export class Tab extends CompositeDisposable implements ITab {
     private readonly _onDropped = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDropped.event;
 
-    private readonly panelTransfer =
-        LocalSelectionTransfer.getInstance<PanelTransfer>();
-
     public get element() {
         return this._element;
     }
 
-    private iframes: HTMLElement[] = [];
-
     constructor(
-        public panelId: string,
-        private readonly accessor: IDockviewComponent,
-        private group: GroupviewPanel
+        public readonly panelId: string,
+        accessor: IDockviewComponent,
+        private readonly group: GroupviewPanel
     ) {
         super();
 
@@ -69,42 +65,32 @@ export class Tab extends CompositeDisposable implements ITab {
         this._element.draggable = true;
 
         this.addDisposables(
-            addDisposableListener(this._element, 'dragstart', (event) => {
-                this.iframes = [
-                    ...getElementsByTagName('iframe'),
-                    ...getElementsByTagName('webview'),
-                ];
+            new (class Handler extends DragHandler {
+                private readonly panelTransfer =
+                    LocalSelectionTransfer.getInstance<PanelTransfer>();
 
-                for (const iframe of this.iframes) {
-                    iframe.style.pointerEvents = 'none';
+                getData(): IDisposable {
+                    this.panelTransfer.setData(
+                        [new PanelTransfer(accessor.id, group.id, panelId)],
+                        PanelTransfer.prototype
+                    );
+
+                    return {
+                        dispose: () => {
+                            this.panelTransfer.clearData(
+                                PanelTransfer.prototype
+                            );
+                        },
+                    };
                 }
 
-                this.element.classList.add('dragged');
-                setTimeout(() => this.element.classList.remove('dragged'), 0);
-
-                this.panelTransfer.setData(
-                    [
-                        new PanelTransfer(
-                            this.accessor.id,
-                            this.group.id,
-                            this.panelId
-                        ),
-                    ],
-                    PanelTransfer.prototype
-                );
-
-                if (event.dataTransfer) {
-                    event.dataTransfer.effectAllowed = 'move';
+                public dispose(): void {
+                    //
                 }
-            }),
-            addDisposableListener(this._element, 'dragend', (ev) => {
-                for (const iframe of this.iframes) {
-                    iframe.style.pointerEvents = 'auto';
-                }
-                this.iframes = [];
+            })(this._element)
+        );
 
-                this.panelTransfer.clearData(PanelTransfer.prototype);
-            }),
+        this.addDisposables(
             addDisposableListener(this._element, 'mousedown', (event) => {
                 if (event.defaultPrevented) {
                     return;

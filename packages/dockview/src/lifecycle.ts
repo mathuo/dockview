@@ -48,6 +48,7 @@ export class MutableDisposable implements IDisposable {
     public dispose() {
         if (this._disposable) {
             this._disposable.dispose();
+            this._disposable = Disposable.NONE;
         }
     }
 }

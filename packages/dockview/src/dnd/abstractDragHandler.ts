@@ -1,14 +1,15 @@
+import { MutableDisposable } from '..';
 import { getElementsByTagName } from '../dom';
 import { addDisposableListener, Emitter } from '../events';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 
 export abstract class DragHandler extends CompositeDisposable {
-    private iframes: HTMLElement[] = [];
+    private readonly disposable = new MutableDisposable();
 
     private readonly _onDragStart = new Emitter<void>();
     readonly onDragStart = this._onDragStart.event;
 
-    private disposable: IDisposable | undefined;
+    private iframes: HTMLElement[] = [];
 
     constructor(private readonly el: HTMLElement) {
         super();
@@ -32,8 +33,11 @@ export abstract class DragHandler extends CompositeDisposable {
                 this.el.classList.add('dragged');
                 setTimeout(() => this.el.classList.remove('dragged'), 0);
 
-                this.disposable?.dispose();
-                this.disposable = this.getData();
+                this.disposable.value = this.getData();
+
+                if (event.dataTransfer) {
+                    event.dataTransfer.effectAllowed = 'move';
+                }
             }),
             addDisposableListener(this.el, 'dragend', (ev) => {
                 for (const iframe of this.iframes) {
@@ -41,8 +45,7 @@ export abstract class DragHandler extends CompositeDisposable {
                 }
                 this.iframes = [];
 
-                this.disposable?.dispose();
-                this.disposable = undefined;
+                this.disposable.dispose();
             })
         );
     }
