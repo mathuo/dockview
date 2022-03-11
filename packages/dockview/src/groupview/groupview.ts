@@ -88,8 +88,8 @@ export interface IGroupview extends IDisposable, IGridPanelView {
         panel: IGroupPanel,
         options?: { index?: number; skipFocus?: boolean }
     ): void;
-    closePanel(panel: IGroupPanel): Promise<boolean>;
-    closeAllPanels(): Promise<boolean>;
+    closePanel(panel: IGroupPanel): void;
+    closeAllPanels(): void;
     containsPanel(panel: IGroupPanel): boolean;
     removePanel: (panelOrId: IGroupPanel | string) => IGroupPanel;
     // events
@@ -393,57 +393,21 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         return this._removePanel(panelToRemove);
     }
 
-    public async closeAllPanels() {
-        const index = this._activePanel
-            ? this.panels.indexOf(this._activePanel)
-            : -1;
-
-        if (this._activePanel && index > -1) {
-            if (this.panels.indexOf(this._activePanel) < 0) {
-                console.warn('active panel not tracked');
-            }
-
-            const canClose =
-                !this._activePanel?.close || (await this._activePanel.close());
-            if (!canClose) {
-                return false;
-            }
-        }
-
-        for (let i = 0; i < this.panels.length; i++) {
-            if (i === index) {
-                continue;
-            }
-            const panel = this.panels[i];
-            this.openPanel(panel);
-
-            if (panel.close) {
-                const canClose = await panel.close();
-                if (!canClose) {
-                    return false;
-                }
-            }
-        }
-
+    public closeAllPanels() {
         if (this.panels.length > 0) {
             // take a copy since we will be edting the array as we iterate through
             const arrPanelCpy = [...this.panels];
-            await Promise.all(arrPanelCpy.map((p) => this.doClose(p)));
+            for (const panel of arrPanelCpy) {
+                this.doClose(panel);
+            }
         } else {
             this.accessor.removeGroup(this.parent);
         }
-
-        return true;
     }
 
-    public closePanel = async (panel: IGroupPanel) => {
-        if (panel.close && !(await panel.close())) {
-            return false;
-        }
-
+    public closePanel(panel: IGroupPanel): void {
         this.doClose(panel);
-        return true;
-    };
+    }
 
     private doClose(panel: IGroupPanel) {
         this.accessor.removePanel(panel);

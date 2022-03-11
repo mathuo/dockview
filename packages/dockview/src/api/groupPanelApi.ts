@@ -21,8 +21,7 @@ export interface DockviewPanelApi
     readonly isGroupActive: boolean;
     readonly title: string;
     readonly suppressClosable: boolean;
-    close: () => Promise<boolean>;
-    interceptOnCloseAction(interceptor: () => Promise<boolean>): void;
+    close(): void;
     setTitle(title: string): void;
 }
 
@@ -31,7 +30,6 @@ export class DockviewPanelApiImpl
     implements DockviewPanelApi
 {
     private _group: GroupviewPanel | undefined;
-    private _interceptor: undefined | (() => Promise<boolean>);
 
     readonly _onDidTitleChange = new Emitter<TitleEvent>();
     readonly onDidTitleChange = this._onDidTitleChange.event;
@@ -41,10 +39,6 @@ export class DockviewPanelApiImpl
 
     readonly _suppressClosableChanged = new Emitter<SuppressClosableEvent>();
     readonly suppressClosableChanged = this._suppressClosableChanged.event;
-
-    get tryClose(): undefined | (() => Promise<boolean>) {
-        return this._interceptor;
-    }
 
     get title() {
         return this.panel.title;
@@ -81,14 +75,10 @@ export class DockviewPanelApiImpl
         this._onDidTitleChange.fire({ title });
     }
 
-    public close(): Promise<boolean> {
+    public close(): void {
         if (!this.group) {
             throw new Error(`panel ${this.id} has no group`);
         }
         return this.group.model.closePanel(this.panel);
-    }
-
-    public interceptOnCloseAction(interceptor: () => Promise<boolean>) {
-        this._interceptor = interceptor;
     }
 }

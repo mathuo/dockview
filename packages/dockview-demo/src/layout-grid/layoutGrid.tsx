@@ -145,13 +145,6 @@ const components: PanelCollection<IDockviewPanelProps> = {
                 })
             );
 
-            props.api.interceptOnCloseAction(() => {
-                if (confirm('close?')) {
-                    return Promise.resolve(true);
-                }
-                return Promise.resolve(false);
-            });
-
             return () => {
                 disposable.dispose();
             };

@@ -1,3 +1,4 @@
+import { DockviewComponent } from '../..';
 import { DockviewApi } from '../../api/component.api';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
@@ -6,8 +7,12 @@ describe('dockviewGroupPanel', () => {
         const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
             return {} as any;
         });
+        const accessorMock = jest.fn<DockviewComponent, []>(() => {
+            return {} as any;
+        });
         const api = new dockviewApiMock();
-        const cut = new DockviewGroupPanel('fake-id', api);
+        const accessor = new accessorMock();
+        const cut = new DockviewGroupPanel('fake-id', accessor, api);
 
         let latestTitle: string | undefined = undefined;
 
@@ -32,8 +37,13 @@ describe('dockviewGroupPanel', () => {
         const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
             return {} as any;
         });
+        const accessorMock = jest.fn<DockviewComponent, []>(() => {
+            return {} as any;
+        });
         const api = new dockviewApiMock();
-        const cut = new DockviewGroupPanel('fake-id', api);
+        const accessor = new accessorMock();
+
+        const cut = new DockviewGroupPanel('fake-id', accessor, api);
 
         let latestSuppressClosable: boolean | undefined = undefined;
 
