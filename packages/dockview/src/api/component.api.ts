@@ -64,6 +64,10 @@ export class SplitviewApi implements CommonApi {
         return this.component.length;
     }
 
+    get orientation(): Orientation {
+        return this.component.orientation;
+    }
+
     get onDidLayoutChange(): Event<void> {
         return this.component.onDidLayoutChange;
     }
@@ -74,10 +78,6 @@ export class SplitviewApi implements CommonApi {
 
     get onDidRemoveView(): Event<IView> {
         return this.component.onDidRemoveView;
-    }
-
-    get orientation(): Orientation {
-        return this.component.orientation;
     }
 
     constructor(private readonly component: ISplitviewComponent) {}
@@ -136,20 +136,20 @@ export class SplitviewApi implements CommonApi {
 }
 
 export class PaneviewApi implements CommonApi {
-    get width(): number {
-        return this.component.width;
-    }
-
-    get height(): number {
-        return this.component.height;
-    }
-
     get minimumSize(): number {
         return this.component.minimumSize;
     }
 
     get maximumSize(): number {
         return this.component.maximumSize;
+    }
+
+    get height(): number {
+        return this.component.height;
+    }
+
+    get width(): number {
+        return this.component.width;
     }
 
     get onDidLayoutChange(): Event<void> {
@@ -223,14 +223,6 @@ export class PaneviewApi implements CommonApi {
 }
 
 export class GridviewApi implements CommonApi {
-    get width(): number {
-        return this.component.width;
-    }
-
-    get height(): number {
-        return this.component.height;
-    }
-
     get minimumHeight(): number {
         return this.component.minimumHeight;
     }
@@ -245,6 +237,14 @@ export class GridviewApi implements CommonApi {
 
     get maximumWidth(): number {
         return this.component.maximumWidth;
+    }
+
+    get width(): number {
+        return this.component.width;
+    }
+
+    get height(): number {
+        return this.component.height;
     }
 
     get onGridEvent(): Event<GroupChangeEvent> {
