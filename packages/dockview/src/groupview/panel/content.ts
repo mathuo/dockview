@@ -42,6 +42,8 @@ export class ContentContainer
         this._element.className = 'content-container';
         this._element.tabIndex = -1;
 
+        this.addDisposables(this._onDidFocus, this._onDidBlur);
+
         // for hosted containers
         // 1) register a drop target on the host
         // 2) register window dragStart events to disable pointer events

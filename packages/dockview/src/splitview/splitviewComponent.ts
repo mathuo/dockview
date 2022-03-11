@@ -168,7 +168,12 @@ export class SplitviewComponent
 
         this.splitview = new Splitview(this.element, options);
 
-        this.addDisposables(this._disposable);
+        this.addDisposables(
+            this._disposable,
+            this._onDidAddView,
+            this._onDidRemoveView,
+            this._onDidLayoutChange
+        );
     }
 
     updateOptions(options: Partial<SplitviewComponentUpdateOptions>): void {

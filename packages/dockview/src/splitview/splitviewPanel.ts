@@ -82,6 +82,7 @@ export abstract class SplitviewPanel
         super(id, componentName, new SplitviewPanelApiImpl(id));
 
         this.addDisposables(
+            this._onDidChange,
             this.api.onVisibilityChange((event) => {
                 const { isVisible } = event;
                 const { containerApi } = this

@@ -37,6 +37,12 @@ export class PaneviewPanelApiImpl
 
     constructor(id: string) {
         super(id);
+
+        this.addDisposables(
+            this._onDidExpansionChange,
+            this._onMouseEnter,
+            this._onMouseLeave
+        );
     }
 
     setExpanded(isExpanded: boolean): void {

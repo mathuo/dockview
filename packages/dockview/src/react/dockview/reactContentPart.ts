@@ -124,6 +124,8 @@ export class ReactPanelContentPart implements IContentRenderer {
     }
 
     public dispose() {
+        this._onDidFocus.dispose();
+        this._onDidBlur.dispose();
         this.part?.dispose();
         // this.hostedContainer?.dispose();
         this.actionsPart?.dispose();

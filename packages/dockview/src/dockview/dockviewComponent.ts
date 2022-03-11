@@ -186,6 +186,12 @@ export class DockviewComponent
             styles: options.styles,
         });
 
+        this.addDisposables(
+            this._onTabInteractionEvent,
+            this._onTabContextMenu,
+            this._onDidDrop
+        );
+
         this._options = options;
 
         if (!this.options.components) {
@@ -713,15 +719,6 @@ export class DockviewComponent
         }
 
         return view;
-    }
-
-    dispose(): void {
-        super.dispose();
-
-        this._onGridEvent.dispose();
-        this._onDidDrop.dispose();
-        this._onTabContextMenu.dispose();
-        this._onTabInteractionEvent.dispose();
     }
 
     private _addPanel(options: AddPanelOptions): IGroupPanel {

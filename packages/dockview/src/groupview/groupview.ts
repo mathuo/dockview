@@ -397,7 +397,9 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         if (this.panels.length > 0) {
             // take a copy since we will be edting the array as we iterate through
             const arrPanelCpy = [...this.panels];
-            arrPanelCpy.map((p) => this.doClose(p));
+            for (const panel of arrPanelCpy) {
+                this.doClose(panel);
+            }
         } else {
             this.accessor.removeGroup(this.parent);
         }

@@ -63,6 +63,12 @@ export class DockviewPanelApiImpl
     constructor(private panel: IGroupPanel, group: GroupviewPanel | undefined) {
         super(panel.id);
         this._group = group;
+
+        this.addDisposables(
+            this._onDidTitleChange,
+            this._titleChanged,
+            this._suppressClosableChanged
+        );
     }
 
     public setTitle(title: string) {
@@ -74,9 +80,5 @@ export class DockviewPanelApiImpl
             throw new Error(`panel ${this.id} has no group`);
         }
         return this.group.model.closePanel(this.panel);
-    }
-
-    public dispose() {
-        super.dispose();
     }
 }

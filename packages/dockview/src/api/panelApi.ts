@@ -126,6 +126,8 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
             this._onDidVisibilityChange,
             this._onDidActiveChange,
             this._onFocusEvent,
+            this._onActiveChange,
+            this._onVisibilityChange,
             this.onDidFocusChange((event) => {
                 this._isFocused = event.isFocused;
             }),
