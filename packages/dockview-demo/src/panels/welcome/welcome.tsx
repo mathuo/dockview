@@ -6,7 +6,7 @@ export const WelcomePanel = (props: IDockviewPanelProps) => {
     const onAddSplitview = (event: React.MouseEvent<HTMLDivElement>) => {
         const splitviewPanel = props.containerApi.getPanel('splitview');
         if (splitviewPanel) {
-            props.containerApi.setActivePanel(splitviewPanel);
+            splitviewPanel.api.setActive();
             return;
         }
 
@@ -20,7 +20,7 @@ export const WelcomePanel = (props: IDockviewPanelProps) => {
     const onAddGridview = (event: React.MouseEvent<HTMLDivElement>) => {
         const splitviewPanel = props.containerApi.getPanel('gridview');
         if (splitviewPanel) {
-            props.containerApi.setActivePanel(splitviewPanel);
+            splitviewPanel.api.setActive();
             return;
         }
 

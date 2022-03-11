@@ -103,7 +103,7 @@ export interface IDockviewComponent extends IBaseGrid<GroupviewPanel> {
 
     // lifecycle
     addEmptyGroup(options?: AddGroupOptions): void;
-    closeAllGroups: () => Promise<boolean>;
+    closeAllGroups(): void;
     // events
     onTabInteractionEvent: Event<LayoutMouseEvent>;
     onTabContextMenu: Event<TabContextMenuEvent>;
@@ -394,16 +394,12 @@ export class DockviewComponent
         this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT_FROM_JSON });
     }
 
-    async closeAllGroups(): Promise<boolean> {
+    closeAllGroups(): void {
         for (const entry of this._groups.entries()) {
             const [_, group] = entry;
 
-            const didCloseAll = await group.value.model.closeAllPanels();
-            if (!didCloseAll) {
-                return false;
-            }
+            group.value.model.closeAllPanels();
         }
-        return true;
     }
 
     fireMouseEvent(event: LayoutMouseEvent): void {
@@ -736,6 +732,7 @@ export class DockviewComponent
 
         const panel: IGroupPanel = new DockviewGroupPanel(
             options.id,
+            this,
             this._api
         );
         panel.init({

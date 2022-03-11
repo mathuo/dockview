@@ -396,20 +396,12 @@ export class DockviewApi implements CommonApi {
         return this.component.getGroupPanel(id);
     }
 
-    setActivePanel(panel: IGroupPanel): void {
-        this.component.setActivePanel(panel);
-    }
-
     layout(width: number, height: number, force = false): void {
         this.component.layout(width, height, force);
     }
 
     addPanel(options: AddPanelOptions): IGroupPanel {
         return this.component.addPanel(options);
-    }
-
-    removePanel(panel: IGroupPanel): void {
-        this.component.removePanel(panel);
     }
 
     addEmptyGroup(options?: AddGroupOptions): void {
@@ -424,7 +416,7 @@ export class DockviewApi implements CommonApi {
         this.component.moveToPrevious(options);
     }
 
-    closeAllGroups(): Promise<boolean> {
+    closeAllGroups(): void {
         return this.component.closeAllGroups();
     }
 

@@ -29,7 +29,6 @@ export interface IGroupPanel extends IDisposable, IPanel {
     readonly title: string;
     readonly suppressClosable: boolean;
     updateParentGroup(group: GroupviewPanel, isGroupActive: boolean): void;
-    close?(): Promise<boolean>;
     init(params: IGroupPanelInitParameters): void;
     toJSON(): GroupviewPanelState;
     update(event: GroupPanelUpdateEvent): void;

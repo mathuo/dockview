@@ -30,7 +30,7 @@ export const ControlCenter = () => {
 
         const panel = api.getPanel(id);
         if (panel) {
-            api.setActivePanel(panel);
+            panel.api.setActive();
             return;
         }
         api.addPanel({
@@ -76,10 +76,8 @@ export const ControlCenter = () => {
 
     const onLoad = async () => {
         const api = registry.get<DockviewApi>('dockview');
-        const didClose = await api.closeAllGroups();
-        if (!didClose) {
-            return;
-        }
+        api.closeAllGroups();
+
         const data = localStorage.getItem('layout');
         if (data) {
             const jsonData = JSON.parse(data);
@@ -102,7 +100,7 @@ export const ControlCenter = () => {
 
         const settingsPanel = api.getPanel('settings');
         if (settingsPanel) {
-            api.setActivePanel(settingsPanel);
+            settingsPanel.api.setActive();
             return;
         }
 
@@ -124,7 +122,7 @@ export const ControlCenter = () => {
     const onFocusPanel = () => {
         const api = registry.get<DockviewApi>('dockview');
         const panel = api.getPanel('split_panel');
-        api.setActivePanel(panel);
+        panel.api.setActive();
     };
 
     return (

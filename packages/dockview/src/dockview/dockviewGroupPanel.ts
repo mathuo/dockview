@@ -11,6 +11,7 @@ import { GroupviewPanel } from '../groupview/groupviewPanel';
 import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { Parameters } from '../panel/types';
 import { IGroupPanelView } from './defaultGroupPanelView';
+import { DockviewComponent } from './dockviewComponent';
 
 export class DockviewGroupPanel
     extends CompositeDisposable
@@ -45,6 +46,7 @@ export class DockviewGroupPanel
 
     constructor(
         public readonly id: string,
+        accessor: DockviewComponent,
         private readonly containerApi: DockviewApi
     ) {
         super();
@@ -55,7 +57,7 @@ export class DockviewGroupPanel
 
         this.addDisposables(
             this.api.onActiveChange(() => {
-                this.containerApi.setActivePanel(this);
+                accessor.setActivePanel(this);
             }),
             this.api.onDidTitleChange((event) => {
                 const title = event.title;
@@ -80,14 +82,6 @@ export class DockviewGroupPanel
 
     focus() {
         this.api._onFocusEvent.fire();
-    }
-
-    public close(): Promise<boolean> {
-        if (this.api.tryClose) {
-            return this.api.tryClose();
-        }
-
-        return Promise.resolve(true);
     }
 
     public toJSON(): GroupviewPanelState {
