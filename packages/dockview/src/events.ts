@@ -42,8 +42,6 @@ export class Emitter<T> implements IDisposable {
                     listener(this._last);
                 }
 
-                const firstListener = this._listeners.length === 0;
-
                 this._listeners.push(listener);
 
                 return {

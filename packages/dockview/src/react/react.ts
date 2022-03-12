@@ -92,7 +92,6 @@ export class ReactPart<P extends object, C extends object = {}>
             throw new Error('invalid operation: resource is already disposed');
         }
 
-        // TODO use a better check for isReactFunctionalComponent
         if (typeof this.component !== 'function') {
             /**
              * we know this isn't a React.FunctionComponent so throw an error here.
@@ -100,7 +99,7 @@ export class ReactPart<P extends object, C extends object = {}>
              * for the same reason, at least at this point we will emit a sensible stacktrace.
              */
             throw new Error(
-                'invalid operation: only functional components are supported'
+                'Invalid Operation. dockview only supports React Functional Components.'
             );
         }
 
