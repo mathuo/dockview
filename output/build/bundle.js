@@ -278,7 +278,7 @@ var ControlCenter = function () {
         var id = "duplicate_panel";
         var panel = api.getPanel(id);
         if (panel) {
-            api.setActivePanel(panel);
+            panel.api.setActive();
             return;
         }
         api.addPanel({
@@ -319,24 +319,16 @@ var ControlCenter = function () {
         localStorage.setItem('layout', stringData);
     };
     var onLoad = function () { return __awaiter(void 0, void 0, void 0, function () {
-        var api, didClose, data, jsonData;
+        var api, data, jsonData;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    api = registry.get('dockview');
-                    return [4 /*yield*/, api.closeAllGroups()];
-                case 1:
-                    didClose = _a.sent();
-                    if (!didClose) {
-                        return [2 /*return*/];
-                    }
-                    data = localStorage.getItem('layout');
-                    if (data) {
-                        jsonData = JSON.parse(data);
-                        api.fromJSON(jsonData);
-                    }
-                    return [2 /*return*/];
+            api = registry.get('dockview');
+            api.closeAllGroups();
+            data = localStorage.getItem('layout');
+            if (data) {
+                jsonData = JSON.parse(data);
+                api.fromJSON(jsonData);
             }
+            return [2 /*return*/];
         });
     }); };
     var onClear = function () {
@@ -351,7 +343,7 @@ var ControlCenter = function () {
         var api = registry.get('dockview');
         var settingsPanel = api.getPanel('settings');
         if (settingsPanel) {
-            api.setActivePanel(settingsPanel);
+            settingsPanel.api.setActive();
             return;
         }
         api.addPanel({
@@ -368,7 +360,7 @@ var ControlCenter = function () {
     var onFocusPanel = function () {
         var api = registry.get('dockview');
         var panel = api.getPanel('split_panel');
-        api.setActivePanel(panel);
+        panel.api.setActive();
     };
     return (React.createElement("div", { className: "control-center" },
         React.createElement("div", { className: "control-center-row" },
@@ -654,12 +646,6 @@ var components = {
             }), props.api.onFocusEvent(function () {
                 input.current.focus();
             }));
-            props.api.interceptOnCloseAction(function () {
-                if (confirm('close?')) {
-                    return Promise.resolve(true);
-                }
-                return Promise.resolve(false);
-            });
             return function () {
                 disposable.dispose();
             };
@@ -1822,7 +1808,7 @@ var WelcomePanel = function (props) {
     var onAddSplitview = function (event) {
         var splitviewPanel = props.containerApi.getPanel('splitview');
         if (splitviewPanel) {
-            props.containerApi.setActivePanel(splitviewPanel);
+            splitviewPanel.api.setActive();
             return;
         }
         props.containerApi.addPanel({
@@ -1834,7 +1820,7 @@ var WelcomePanel = function (props) {
     var onAddGridview = function (event) {
         var splitviewPanel = props.containerApi.getPanel('gridview');
         if (splitviewPanel) {
-            props.containerApi.setActivePanel(splitviewPanel);
+            splitviewPanel.api.setActive();
             return;
         }
         props.containerApi.addPanel({
@@ -41517,6 +41503,9 @@ class SplitviewApi {
     get length() {
         return this.component.length;
     }
+    get orientation() {
+        return this.component.orientation;
+    }
     get onDidLayoutChange() {
         return this.component.onDidLayoutChange;
     }
@@ -41525,9 +41514,6 @@ class SplitviewApi {
     }
     get onDidRemoveView() {
         return this.component.onDidRemoveView;
-    }
-    get orientation() {
-        return this.component.orientation;
     }
     updateOptions(options) {
         this.component.updateOptions(options);
@@ -41573,17 +41559,17 @@ class PaneviewApi {
     constructor(component) {
         this.component = component;
     }
-    get width() {
-        return this.component.width;
-    }
-    get height() {
-        return this.component.height;
-    }
     get minimumSize() {
         return this.component.minimumSize;
     }
     get maximumSize() {
         return this.component.maximumSize;
+    }
+    get height() {
+        return this.component.height;
+    }
+    get width() {
+        return this.component.width;
     }
     get onDidLayoutChange() {
         return this.component.onDidLayoutChange;
@@ -41640,12 +41626,6 @@ class GridviewApi {
     constructor(component) {
         this.component = component;
     }
-    get width() {
-        return this.component.width;
-    }
-    get height() {
-        return this.component.height;
-    }
     get minimumHeight() {
         return this.component.minimumHeight;
     }
@@ -41657,6 +41637,12 @@ class GridviewApi {
     }
     get maximumWidth() {
         return this.component.maximumWidth;
+    }
+    get width() {
+        return this.component.width;
+    }
+    get height() {
+        return this.component.height;
     }
     get onGridEvent() {
         return this.component.onGridEvent;
@@ -41768,17 +41754,11 @@ class DockviewApi {
     getPanel(id) {
         return this.component.getGroupPanel(id);
     }
-    setActivePanel(panel) {
-        this.component.setActivePanel(panel);
-    }
     layout(width, height, force = false) {
         this.component.layout(width, height, force);
     }
     addPanel(options) {
         return this.component.addPanel(options);
-    }
-    removePanel(panel) {
-        this.component.removePanel(panel);
     }
     addEmptyGroup(options) {
         this.component.addEmptyGroup(options);
@@ -41882,9 +41862,6 @@ class DockviewPanelApiImpl extends _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1_
         this._group = group;
         this.addDisposables(this._onDidTitleChange, this._titleChanged, this._suppressClosableChanged);
     }
-    get tryClose() {
-        return this._interceptor;
-    }
     get title() {
         return this.panel.title;
     }
@@ -41909,9 +41886,6 @@ class DockviewPanelApiImpl extends _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1_
             throw new Error(`panel ${this.id} has no group`);
         }
         return this.group.model.closePanel(this.panel);
-    }
-    interceptOnCloseAction(interceptor) {
-        this._interceptor = interceptor;
     }
 }
 
@@ -42917,15 +42891,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../groupview/groupview */ "../dockview/dist/esm/groupview/groupview.js");
 /* harmony import */ var _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../groupview/groupviewPanel */ "../dockview/dist/esm/groupview/groupviewPanel.js");
 /* harmony import */ var _defaultGroupPanelView__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./defaultGroupPanelView */ "../dockview/dist/esm/dockview/defaultGroupPanelView.js");
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 
 
 
@@ -43158,16 +43123,10 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         this._onGridEvent.fire({ kind: _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_10__.GroupChangeKind.LAYOUT_FROM_JSON });
     }
     closeAllGroups() {
-        return __awaiter(this, void 0, void 0, function* () {
-            for (const entry of this._groups.entries()) {
-                const [_, group] = entry;
-                const didCloseAll = yield group.value.model.closeAllPanels();
-                if (!didCloseAll) {
-                    return false;
-                }
-            }
-            return true;
-        });
+        for (const entry of this._groups.entries()) {
+            const [_, group] = entry;
+            group.value.model.closeAllPanels();
+        }
     }
     fireMouseEvent(event) {
         switch (event.kind) {
@@ -43394,7 +43353,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             content: this.createContentComponent(options.id, options.component),
             tab: this.createTabComponent(options.id, options.tabComponent),
         });
-        const panel = new _dockviewGroupPanel__WEBPACK_IMPORTED_MODULE_3__.DockviewGroupPanel(options.id, this._api);
+        const panel = new _dockviewGroupPanel__WEBPACK_IMPORTED_MODULE_3__.DockviewGroupPanel(options.id, this, this._api);
         panel.init({
             view,
             title: options.title || options.id,
@@ -43444,7 +43403,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class DockviewGroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable {
-    constructor(id, containerApi) {
+    constructor(id, accessor, containerApi) {
         super();
         this.id = id;
         this.containerApi = containerApi;
@@ -43453,7 +43412,7 @@ class DockviewGroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.Composi
         this._title = '';
         this.api = new _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_1__.DockviewPanelApiImpl(this, this._group);
         this.addDisposables(this.api.onActiveChange(() => {
-            this.containerApi.setActivePanel(this);
+            accessor.setActivePanel(this);
         }), this.api.onDidTitleChange((event) => {
             const title = event.title;
             this.update({ params: { title } });
@@ -43481,12 +43440,6 @@ class DockviewGroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.Composi
     }
     focus() {
         this.api._onFocusEvent.fire();
-    }
-    close() {
-        if (this.api.tryClose) {
-            return this.api.tryClose();
-        }
-        return Promise.resolve(true);
     }
     toJSON() {
         return {
@@ -45413,15 +45366,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _panel_content__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./panel/content */ "../dockview/dist/esm/groupview/panel/content.js");
 /* harmony import */ var _titlebar_tabsContainer__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./titlebar/tabsContainer */ "../dockview/dist/esm/groupview/titlebar/tabsContainer.js");
 /* harmony import */ var _dnd__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./dnd */ "../dockview/dist/esm/groupview/dnd.js");
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 
 
 
@@ -45459,13 +45403,6 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
         this.onDidGroupChange = this._onDidGroupChange.event;
         this._onDidDrop = new _events__WEBPACK_IMPORTED_MODULE_4__.Emitter();
         this.onDidDrop = this._onDidDrop.event;
-        this.closePanel = (panel) => __awaiter(this, void 0, void 0, function* () {
-            if (panel.close && !(yield panel.close())) {
-                return false;
-            }
-            this.doClose(panel);
-            return true;
-        });
         this.container.classList.add('groupview');
         this.addDisposables(this._onMove, this._onDidGroupChange, this._onDidChange, this._onDidDrop);
         this.tabsContainer = new _titlebar_tabsContainer__WEBPACK_IMPORTED_MODULE_7__.TabsContainer(this.accessor, this.parent, {
@@ -45644,43 +45581,19 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
         return this._removePanel(panelToRemove);
     }
     closeAllPanels() {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            const index = this._activePanel
-                ? this.panels.indexOf(this._activePanel)
-                : -1;
-            if (this._activePanel && index > -1) {
-                if (this.panels.indexOf(this._activePanel) < 0) {
-                    console.warn('active panel not tracked');
-                }
-                const canClose = !((_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.close) || (yield this._activePanel.close());
-                if (!canClose) {
-                    return false;
-                }
+        if (this.panels.length > 0) {
+            // take a copy since we will be edting the array as we iterate through
+            const arrPanelCpy = [...this.panels];
+            for (const panel of arrPanelCpy) {
+                this.doClose(panel);
             }
-            for (let i = 0; i < this.panels.length; i++) {
-                if (i === index) {
-                    continue;
-                }
-                const panel = this.panels[i];
-                this.openPanel(panel);
-                if (panel.close) {
-                    const canClose = yield panel.close();
-                    if (!canClose) {
-                        return false;
-                    }
-                }
-            }
-            if (this.panels.length > 0) {
-                // take a copy since we will be edting the array as we iterate through
-                const arrPanelCpy = [...this.panels];
-                yield Promise.all(arrPanelCpy.map((p) => this.doClose(p)));
-            }
-            else {
-                this.accessor.removeGroup(this.parent);
-            }
-            return true;
-        });
+        }
+        else {
+            this.accessor.removeGroup(this.parent);
+        }
+    }
+    closePanel(panel) {
+        this.doClose(panel);
     }
     doClose(panel) {
         this.accessor.removePanel(panel);
@@ -47426,7 +47339,7 @@ class ReactPanelDeserialzier {
                 ? (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(viewData.tab.id, viewData.tab.id, this.layout.options.tabComponents, this.layout.options.frameworkTabComponents, (_c = this.layout.options.frameworkComponentFactory) === null || _c === void 0 ? void 0 : _c.tab)
                 : new _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_3__.DefaultTab(),
         });
-        const panel = new _dockview_dockviewGroupPanel__WEBPACK_IMPORTED_MODULE_0__.DockviewGroupPanel(panelId, new _api_component_api__WEBPACK_IMPORTED_MODULE_2__.DockviewApi(this.layout));
+        const panel = new _dockview_dockviewGroupPanel__WEBPACK_IMPORTED_MODULE_0__.DockviewGroupPanel(panelId, this.layout, new _api_component_api__WEBPACK_IMPORTED_MODULE_2__.DockviewApi(this.layout));
         panel.init({
             view,
             title,
