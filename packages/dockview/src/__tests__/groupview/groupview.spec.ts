@@ -1,4 +1,7 @@
-import { IDockviewComponent } from '../../dockview/dockviewComponent';
+import {
+    IDockviewComponent,
+    DockviewComponent,
+} from '../../dockview/dockviewComponent';
 import {
     GroupviewPanelState,
     IGroupPanel,
@@ -198,13 +201,21 @@ describe('groupview', () => {
     let dockview: IDockviewComponent;
     let options: GroupOptions;
 
+    let removePanelMock: jest.Mock;
+    let removeGroupMock: jest.Mock;
+
     beforeEach(() => {
-        dockview = <IDockviewComponent>(<any>{
+        removePanelMock = jest.fn();
+        removeGroupMock = jest.fn();
+
+        dockview = (<Partial<DockviewComponent>>{
             options: {},
             createWatermarkComponent: () => new Watermark(),
             doSetGroupActive: jest.fn(),
             id: 'dockview-1',
-        });
+            removePanel: removePanelMock,
+            removeGroup: removeGroupMock,
+        }) as DockviewComponent;
 
         options = {
             tabHeight: 30,
@@ -411,5 +422,26 @@ describe('groupview', () => {
             '.groupview > .content-container'
         );
         expect(viewQuery).toBeTruthy();
+    });
+
+    test('closeAllPanels with panels', () => {
+        const panel1 = new TestPanel('panel1', jest.fn() as any);
+        const panel2 = new TestPanel('panel2', jest.fn() as any);
+        const panel3 = new TestPanel('panel3', jest.fn() as any);
+
+        groupview.model.openPanel(panel1);
+        groupview.model.openPanel(panel2);
+        groupview.model.openPanel(panel3);
+
+        groupview.model.closeAllPanels();
+
+        expect(removePanelMock).toBeCalledWith(panel1);
+        expect(removePanelMock).toBeCalledWith(panel2);
+        expect(removePanelMock).toBeCalledWith(panel3);
+    });
+
+    test('closeAllPanels with no panels', () => {
+        groupview.model.closeAllPanels();
+        expect(removeGroupMock).toBeCalledWith(groupview);
     });
 });
