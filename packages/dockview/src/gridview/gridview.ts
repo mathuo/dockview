@@ -618,9 +618,10 @@ export class Gridview implements IDisposable {
             return node.view;
         }
 
+        const sibling = parent.children[0];
+
         if (pathToParent.length === 0) {
             // parent is root
-            const sibling = parent.children[0];
 
             if (sibling instanceof LeafNode) {
                 return node.view;
@@ -635,7 +636,6 @@ export class Gridview implements IDisposable {
         const [grandParent, ..._] = [...pathToParent].reverse();
         const [parentIndex, ...__] = [...rest].reverse();
 
-        const sibling = parent.children[0];
         const isSiblingVisible = parent.isChildVisible(0);
         parent.removeChild(0, sizing);
 

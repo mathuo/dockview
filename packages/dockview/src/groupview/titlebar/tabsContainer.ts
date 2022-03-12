@@ -261,12 +261,10 @@ export class TabsContainer
                     return;
                 }
 
-                switch (event.kind) {
-                    case MouseEventKind.CLICK:
-                        this.group.model.openPanel(panel, {
-                            skipFocus: alreadyFocused,
-                        });
-                        break;
+                if (event.kind === MouseEventKind.CLICK) {
+                    this.group.model.openPanel(panel, {
+                        skipFocus: alreadyFocused,
+                    });
                 }
             }),
             tabToAdd.onDrop((event) => {

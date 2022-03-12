@@ -221,11 +221,6 @@ export class DockviewComponent
             typeof options.orientation === 'string' &&
             this.options.orientation !== options.orientation;
 
-        // TODO support style update
-        // const hasStylesChanged =
-        //     typeof options.styles === 'object' &&
-        //     this.options.styles !== options.styles;
-
         this._options = { ...this.options, ...options };
 
         if (hasOrientationChanged) {
@@ -409,16 +404,14 @@ export class DockviewComponent
     }
 
     fireMouseEvent(event: LayoutMouseEvent): void {
-        switch (event.kind) {
-            case MouseEventKind.CONTEXT_MENU:
-                if (event.tab && event.panel) {
-                    this._onTabContextMenu.fire({
-                        event: event.event,
-                        api: this._api,
-                        panel: event.panel,
-                    });
-                }
-                break;
+        if (event.kind === MouseEventKind.CONTEXT_MENU) {
+            if (event.tab && event.panel) {
+                this._onTabContextMenu.fire({
+                    event: event.event,
+                    api: this._api,
+                    panel: event.panel,
+                });
+            }
         }
     }
 
