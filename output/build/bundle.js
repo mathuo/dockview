@@ -42979,10 +42979,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
     updateOptions(options) {
         const hasOrientationChanged = typeof options.orientation === 'string' &&
             this.options.orientation !== options.orientation;
-        // TODO support style update
-        // const hasStylesChanged =
-        //     typeof options.styles === 'object' &&
-        //     this.options.styles !== options.styles;
         this._options = Object.assign(Object.assign({}, this.options), options);
         if (hasOrientationChanged) {
             this.gridview.orientation = options.orientation;
@@ -43129,16 +43125,14 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         }
     }
     fireMouseEvent(event) {
-        switch (event.kind) {
-            case _groupview_tab__WEBPACK_IMPORTED_MODULE_12__.MouseEventKind.CONTEXT_MENU:
-                if (event.tab && event.panel) {
-                    this._onTabContextMenu.fire({
-                        event: event.event,
-                        api: this._api,
-                        panel: event.panel,
-                    });
-                }
-                break;
+        if (event.kind === _groupview_tab__WEBPACK_IMPORTED_MODULE_12__.MouseEventKind.CONTEXT_MENU) {
+            if (event.tab && event.panel) {
+                this._onTabContextMenu.fire({
+                    event: event.event,
+                    api: this._api,
+                    panel: event.panel,
+                });
+            }
         }
     }
     addPanel(options) {
@@ -43727,7 +43721,6 @@ class Emitter {
                 if (((_a = this.options) === null || _a === void 0 ? void 0 : _a.replay) && this._last !== undefined) {
                     listener(this._last);
                 }
-                const firstListener = this._listeners.length === 0;
                 this._listeners.push(listener);
                 return {
                     dispose: () => {
@@ -44717,9 +44710,9 @@ class Gridview {
         if (parent.children.length > 1) {
             return node.view;
         }
+        const sibling = parent.children[0];
         if (pathToParent.length === 0) {
             // parent is root
-            const sibling = parent.children[0];
             if (sibling instanceof _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode) {
                 return node.view;
             }
@@ -44730,7 +44723,6 @@ class Gridview {
         }
         const [grandParent, ..._] = [...pathToParent].reverse();
         const [parentIndex, ...__] = [...rest].reverse();
-        const sibling = parent.children[0];
         const isSiblingVisible = parent.isChildVisible(0);
         parent.removeChild(0, sizing);
         const sizes = grandParent.children.map((size, i) => grandParent.getChildSize(i));
@@ -46225,12 +46217,10 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
             if (!isLeftClick || event.event.defaultPrevented) {
                 return;
             }
-            switch (event.kind) {
-                case _tab__WEBPACK_IMPORTED_MODULE_2__.MouseEventKind.CLICK:
-                    this.group.model.openPanel(panel, {
-                        skipFocus: alreadyFocused,
-                    });
-                    break;
+            if (event.kind === _tab__WEBPACK_IMPORTED_MODULE_2__.MouseEventKind.CLICK) {
+                this.group.model.openPanel(panel, {
+                    skipFocus: alreadyFocused,
+                });
             }
         }), tabToAdd.onDrop((event) => {
             this._onDrop.fire({
@@ -48200,14 +48190,13 @@ class ReactPart {
         if (this.disposed) {
             throw new Error('invalid operation: resource is already disposed');
         }
-        // TODO use a better check for isReactFunctionalComponent
         if (typeof this.component !== 'function') {
             /**
              * we know this isn't a React.FunctionComponent so throw an error here.
              * if we do not intercept this the React library will throw a very obsure error
              * for the same reason, at least at this point we will emit a sensible stacktrace.
              */
-            throw new Error('invalid operation: only functional components are supported');
+            throw new Error('Invalid Operation. dockview only supports React Functional Components.');
         }
         const bridgeComponent = react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(ReactComponentBridge), {
             component: this
