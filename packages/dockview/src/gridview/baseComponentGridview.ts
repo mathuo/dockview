@@ -154,8 +154,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
         this.element.appendChild(this.gridview.element);
 
-        // TODO for some reason this is required before anything will layout correctly
-        this.layout(0, 0, true);
+        this.layout(0, 0, true); // set some elements height/widths
 
         this.addDisposables(
             this.gridview.onDidChange(() => {
