@@ -54,8 +54,7 @@ export class ReactPanelContentPart implements IContentRenderer {
         private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');
-        this._element.style.height = '100%';
-        this._element.style.width = '100%';
+        this._element.className = 'dockview-react-part';
 
         // this.hostedContainer = new HostedContainer({
         //     id,
@@ -65,8 +64,7 @@ export class ReactPanelContentPart implements IContentRenderer {
         // this.hostedContainer.onDidBlur(() => this._onDidBlur.fire());
 
         this._actionsElement = document.createElement('div');
-        this._actionsElement.style.height = '100%';
-        this._actionsElement.style.width = '100%';
+        this._actionsElement.className = 'dockview-react-part';
     }
 
     focus() {

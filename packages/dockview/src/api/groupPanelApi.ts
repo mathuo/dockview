@@ -2,6 +2,7 @@ import { Emitter } from '../events';
 import { GridviewPanelApiImpl, GridviewPanelApi } from './gridviewPanelApi';
 import { IGroupPanel } from '../groupview/groupPanel';
 import { GroupviewPanel } from '../groupview/groupviewPanel';
+import { MutableDisposable } from '../lifecycle';
 
 export interface TitleEvent {
     readonly title: string;
@@ -40,6 +41,14 @@ export class DockviewPanelApiImpl
     readonly _suppressClosableChanged = new Emitter<SuppressClosableEvent>();
     readonly suppressClosableChanged = this._suppressClosableChanged.event;
 
+    private readonly _onDidActiveGroupChange = new Emitter<void>();
+    readonly onDidActiveGroupChange = this._onDidActiveGroupChange.event;
+
+    private readonly _onDidGroupChange = new Emitter<void>();
+    readonly onDidGroupChange = this._onDidGroupChange.event;
+
+    private disposable = new MutableDisposable();
+
     get title() {
         return this.panel.title;
     }
@@ -53,7 +62,21 @@ export class DockviewPanelApiImpl
     }
 
     set group(value: GroupviewPanel | undefined) {
+        const isOldGroupActive = this.isGroupActive;
+
         this._group = value;
+
+        this._onDidGroupChange.fire();
+
+        if (this._group) {
+            this.disposable.value = this._group.api.onDidActiveChange(() => {
+                this._onDidActiveGroupChange.fire();
+            });
+
+            if (this.isGroupActive !== isOldGroupActive) {
+                this._onDidActiveGroupChange.fire();
+            }
+        }
     }
 
     get group(): GroupviewPanel | undefined {
@@ -62,12 +85,15 @@ export class DockviewPanelApiImpl
 
     constructor(private panel: IGroupPanel, group: GroupviewPanel | undefined) {
         super(panel.id);
-        this._group = group;
+        this.group = group;
 
         this.addDisposables(
+            this.disposable,
             this._onDidTitleChange,
             this._titleChanged,
-            this._suppressClosableChanged
+            this._suppressClosableChanged,
+            this._onDidGroupChange,
+            this._onDidActiveGroupChange
         );
     }
 
