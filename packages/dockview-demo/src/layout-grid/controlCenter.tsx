@@ -6,12 +6,6 @@ import './controlCenter.scss';
 export const ControlCenter = () => {
     const registry = useLayoutRegistry();
 
-    const dragRef = React.useRef<HTMLDivElement>();
-
-    const onDragStart = (event: React.DragEvent) => {
-        event.dataTransfer.setData('text/plain', 'Panel2');
-    };
-
     const onAdd = () => {
         const api = registry.get<DockviewApi>('dockview');
         const _id = Date.now();
@@ -111,30 +105,8 @@ export const ControlCenter = () => {
         });
     };
 
-    const onFocusSplitview = () => {
-        const api = registry.get<SplitviewApi>('splitview');
-
-        const panel = api.getPanel('1');
-
-        api.setActive(panel);
-    };
-
-    const onFocusPanel = () => {
-        const api = registry.get<DockviewApi>('dockview');
-        const panel = api.getPanel('split_panel');
-        panel.api.setActive();
-    };
-
     return (
         <div className="control-center">
-            <div className="control-center-row">
-                <button onMouseDown={onFocusSplitview}>Split view focus</button>
-            </div>
-            <div className="control-center-row">
-                <button onMouseDown={onFocusPanel}>
-                    Split view panel focus
-                </button>
-            </div>
             <div className="control-center-row">
                 <button onMouseDown={onAdd}>Add new</button>
             </div>
@@ -172,30 +144,6 @@ export const ControlCenter = () => {
                 <button onClick={saveApplicationLayout}>
                     Save application layout
                 </button>
-            </div>
-            <div
-                draggable={true}
-                style={{
-                    backgroundColor: 'dodgerblue',
-                    width: '150px',
-                    padding: '2px 14px',
-                    margin: '2px 0px',
-                }}
-                ref={dragRef}
-            >
-                Drag me
-            </div>
-            <div
-                onDragStart={onDragStart}
-                draggable={true}
-                style={{
-                    backgroundColor: 'orange',
-                    width: '150px',
-                    padding: '2px 14px',
-                    margin: '2px 0px',
-                }}
-            >
-                Drag me too
             </div>
         </div>
     );

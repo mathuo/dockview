@@ -24,6 +24,7 @@ import { SplitviewPanel } from '../panels/splitview/splitview';
 import { GridviewDemoPanel } from '../panels/gridview/gridview';
 import { useRecoilCallback } from 'recoil';
 import { selectedPanelAtom } from './footer';
+import { ExampleFunctions } from './panels/exampleFunctions';
 
 const Test = (props: IDockviewPanelProps) => {
     const [counter, setCounter] = React.useState<number>(0);
@@ -115,138 +116,7 @@ const components: PanelCollection<IDockviewPanelProps> = {
             </div>
         );
     },
-    test_component: (props: IDockviewPanelProps & { [key: string]: any }) => {
-        const [panelState, setPanelState] = React.useState<{
-            isGroupActive: boolean;
-            isPanelVisible: boolean;
-        }>({
-            isGroupActive: false,
-            isPanelVisible: false,
-        });
-
-        const input = React.useRef<HTMLInputElement>();
-
-        React.useEffect(() => {
-            const disposable = new CompositeDisposable(
-                props.api.onDidActiveChange((event) => {
-                    setPanelState((_) => ({
-                        ..._,
-                        isGroupActive: event.isActive,
-                    }));
-                }),
-                props.api.onDidVisibilityChange((x) => {
-                    setPanelState((_) => ({
-                        ..._,
-                        isPanelVisible: x.isVisible,
-                    }));
-                }),
-                props.api.onFocusEvent(() => {
-                    input.current.focus();
-                })
-            );
-
-            return () => {
-                disposable.dispose();
-            };
-        }, []);
-
-        const backgroundColor = React.useMemo(
-            () =>
-                // "#1e1e1e",
-                `rgb(${Math.floor(Math.random() * 256)},${Math.floor(
-                    Math.random() * 256
-                )},${Math.floor(Math.random() * 256)})`,
-            []
-        );
-
-        const onRename = () => {
-            props.api.setTitle('Did it change?');
-        };
-
-        const onClose = () => {
-            props.api.close();
-        };
-
-        return (
-            <DockviewComponents.Panel>
-                <DockviewComponents.Actions>
-                    <div
-                        style={{
-                            height: '100%',
-                            display: 'flex',
-                            backgroundColor: 'rgba(255,255,255,0.1)',
-                            padding: '0px 4px',
-                        }}
-                    >
-                        <span
-                            onClick={onClose}
-                            style={{
-                                height: '100%',
-                                width: '25px',
-                                display: 'flex',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <a className="material-icons">menu</a>
-                        </span>
-                    </div>
-                </DockviewComponents.Actions>
-                <DockviewComponents.Content>
-                    <div
-                        style={{
-                            // backgroundColor,
-                            height: '100%',
-                        }}
-                    >
-                        <div
-                            style={{
-                                padding: '5px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                            }}
-                        >
-                            <div>This is a dockable panel</div>
-                            <div>
-                                <span>{'isGroupActive: '}</span>
-                                <span
-                                    style={{
-                                        color: panelState.isGroupActive
-                                            ? '#23d16f'
-                                            : '#cd312b',
-                                    }}
-                                >
-                                    {`${panelState.isGroupActive}`}
-                                </span>
-                            </div>
-                            <div>
-                                <span>{'isPanelVisible: '}</span>
-                                <span
-                                    style={{
-                                        color: panelState.isPanelVisible
-                                            ? '#23d16f'
-                                            : '#cd312b',
-                                    }}
-                                >
-                                    {`${panelState.isPanelVisible}`}
-                                </span>
-                            </div>
-                            <button onClick={onRename}>rename</button>
-
-                            <input
-                                style={{ width: '175px' }}
-                                ref={input}
-                                placeholder="This is focused by the panel"
-                            />
-                            <input
-                                style={{ width: '175px' }}
-                                placeholder="This is also focusable"
-                            />
-                        </div>
-                    </div>
-                </DockviewComponents.Content>
-            </DockviewComponents.Panel>
-        );
-    },
+    test_component: ExampleFunctions,
     settings: Settings,
     split_panel: SplitPanel,
 };
@@ -309,11 +179,15 @@ export const TestGrid = (props: IGridviewPanelProps) => {
                 console.error('failed to load layout', err);
             }
         }
-        if (!success) {
+
+        const welcomePanel = api.getPanel('welcome');
+
+        if (!welcomePanel) {
             api.addPanel({
                 component: 'welcome',
                 id: 'welcome',
                 title: 'Welcome',
+                suppressClosable: true,
             });
         }
 

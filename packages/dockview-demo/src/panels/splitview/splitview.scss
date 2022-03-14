@@ -32,7 +32,7 @@
         }
 
         .splitview-demo-view {
-            height: 150px;
+            height: 180px;
             width: 500px;
 
             .api-parameter {
@@ -45,7 +45,7 @@
 .api-parameter {
     display: grid;
     grid-template-columns: 70px 50px;
-    grid-auto-rows: 15px;
+    grid-auto-rows: 18px;
 
     span {
         &:nth-child(2n) {
@@ -54,6 +54,7 @@
     }
 
     .visibility-toggle {
+        height: 16px;
         outline: 1px solid dodgerblue;
         outline-offset: -1px;
         padding: 0px 4px;

@@ -75,6 +75,8 @@ const components = {
                 className="splitview-demo-panel"
             >
                 <div className="api-parameter">
+                    <span>Id</span>
+                    <span>{props.api.id}</span>
                     <span>Width</span>
                     <span>{dimension.width}</span>
                     <span>Height</span>
@@ -105,8 +107,8 @@ export const SplitviewPanel = (props: IDockviewPanelProps) => {
                 boxSizing: 'border-box',
             }}
         >
-            <div style={{ padding: '0px 20px' }}>
-                <h1>Splitview</h1>
+            <div style={{ padding: '0px 20px', fontSize: '36px' }}>
+                Splitview
             </div>
             <ul style={{ padding: '0px 20px 0px 40px' }}>
                 <li>
@@ -254,14 +256,22 @@ export const Common = (
         <div
             className={`splitview-demo-container ${props.orientation.toLowerCase()}`}
         >
-            <h2>{text}</h2>
+            <h3>{text}</h3>
             <div className="splitview-demo-content">
-                <div className="splitview-demo-view">
-                    <SplitviewReact
-                        orientation={props.orientation}
-                        onReady={onReady}
-                        components={components}
-                    />
+                <div
+                    style={{
+                        backgroundColor: 'rgb(60,60,60)',
+                        padding: '10px',
+                        overflow: 'auto',
+                    }}
+                >
+                    <div className="splitview-demo-view">
+                        <SplitviewReact
+                            orientation={props.orientation}
+                            onReady={onReady}
+                            components={components}
+                        />
+                    </div>
                 </div>
                 <div className="api-parameter">
                     <span>Height</span>

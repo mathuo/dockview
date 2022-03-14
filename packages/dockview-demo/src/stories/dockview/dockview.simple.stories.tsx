@@ -1,9 +1,7 @@
 import {
-    CompositeDisposable,
     DockviewApi,
     DockviewReact,
     DockviewReadyEvent,
-    GroupChangeKind,
     IDockviewPanelProps,
     IWatermarkPanelProps,
     PanelCollection,

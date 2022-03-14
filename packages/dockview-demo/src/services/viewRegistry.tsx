@@ -53,6 +53,7 @@ VIEW_REGISTRY.register({
     isLocationEditable: true,
     component: ControlCenter,
 });
+
 VIEW_REGISTRY.register({
     id: 'account_widget',
     title: 'Account',
