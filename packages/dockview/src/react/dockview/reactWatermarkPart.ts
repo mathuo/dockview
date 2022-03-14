@@ -8,7 +8,7 @@ import { ReactPart, ReactPortalStore } from '../react';
 import { IGroupPanelBaseProps } from './dockview';
 import { PanelUpdateEvent } from '../../panel/types';
 
-interface IWatermarkPanelProps extends IGroupPanelBaseProps {
+export interface IWatermarkPanelProps extends IGroupPanelBaseProps {
     close: () => void;
 }
 
@@ -30,8 +30,7 @@ export class ReactWatermarkPart implements IWatermarkRenderer {
         private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');
-        this._element.style.height = '100%';
-        this._element.style.width = '100%';
+        this._element.className = 'dockview-react-part';
     }
 
     init(parameters: GroupPanelPartInitParameters): void {

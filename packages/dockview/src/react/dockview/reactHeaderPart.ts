@@ -22,6 +22,7 @@ export class ReactPanelHeaderPart implements ITabRenderer {
         private readonly reactPortalStore: ReactPortalStore
     ) {
         this._element = document.createElement('div');
+        this._element.className = 'dockview-react-part';
     }
 
     focus() {
