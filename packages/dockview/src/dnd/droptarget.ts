@@ -11,6 +11,8 @@ export enum Position {
     Center = 'Center',
 }
 
+type Quadrant = 'top' | 'bottom' | 'left' | 'right';
+
 export interface DroptargetEvent {
     position: Position;
     nativeEvent: DragEvent;
@@ -100,60 +102,18 @@ export class Droptarget extends CompositeDisposable {
                     const xp = (100 * x) / width;
                     const yp = (100 * y) / height;
 
-                    let isRight = false;
-                    let isLeft = false;
-                    let isTop = false;
-                    let isBottom = false;
-
-                    switch (this.options.validOverlays) {
-                        case 'all':
-                            isRight = xp > 80;
-                            isLeft = xp < 20;
-                            isTop = !isRight && !isLeft && yp < 20;
-                            isBottom = !isRight && !isLeft && yp > 80;
-                            break;
-                        case 'vertical':
-                            isTop = yp < 50;
-                            isBottom = yp >= 50;
-                            break;
-                        case 'horizontal':
-                            isLeft = xp < 50;
-                            isRight = xp >= 50;
-                            break;
-                    }
+                    const quadrant = this.calculateQuadrant(
+                        this.options.validOverlays,
+                        xp,
+                        yp
+                    );
 
                     const isSmallX = width < 100;
                     const isSmallY = height < 100;
 
-                    toggleClass(this.overlay, 'right', !isSmallX && isRight);
-                    toggleClass(this.overlay, 'left', !isSmallX && isLeft);
-                    toggleClass(this.overlay, 'top', !isSmallY && isTop);
-                    toggleClass(this.overlay, 'bottom', !isSmallY && isBottom);
+                    this.toggleClasses(quadrant, isSmallX, isSmallY);
 
-                    toggleClass(
-                        this.overlay,
-                        'small-right',
-                        isSmallX && isRight
-                    );
-                    toggleClass(this.overlay, 'small-left', isSmallX && isLeft);
-                    toggleClass(this.overlay, 'small-top', isSmallY && isTop);
-                    toggleClass(
-                        this.overlay,
-                        'small-bottom',
-                        isSmallY && isBottom
-                    );
-
-                    if (isRight) {
-                        this._state = Position.Right;
-                    } else if (isLeft) {
-                        this._state = Position.Left;
-                    } else if (isTop) {
-                        this._state = Position.Top;
-                    } else if (isBottom) {
-                        this._state = Position.Bottom;
-                    } else {
-                        this._state = Position.Center;
-                    }
+                    this.setState(quadrant);
                 },
                 onDragLeave: (e) => {
                     this.removeDropTarget();
@@ -179,6 +139,87 @@ export class Droptarget extends CompositeDisposable {
 
     public dispose() {
         this.removeDropTarget();
+    }
+
+    private toggleClasses(
+        quadrant: Quadrant | null,
+        isSmallX: boolean,
+        isSmallY: boolean
+    ) {
+        if (!this.overlay) {
+            return;
+        }
+
+        const isLeft = quadrant === 'left';
+        const isRight = quadrant === 'right';
+        const isTop = quadrant === 'top';
+        const isBottom = quadrant === 'bottom';
+
+        toggleClass(this.overlay, 'right', !isSmallX && isRight);
+        toggleClass(this.overlay, 'left', !isSmallX && isLeft);
+        toggleClass(this.overlay, 'top', !isSmallY && isTop);
+        toggleClass(this.overlay, 'bottom', !isSmallY && isBottom);
+
+        toggleClass(this.overlay, 'small-right', isSmallX && isRight);
+        toggleClass(this.overlay, 'small-left', isSmallX && isLeft);
+        toggleClass(this.overlay, 'small-top', isSmallY && isTop);
+        toggleClass(this.overlay, 'small-bottom', isSmallY && isBottom);
+    }
+
+    private setState(quadrant: Quadrant | null) {
+        switch (quadrant) {
+            case 'top':
+                this._state = Position.Top;
+                break;
+            case 'left':
+                this._state = Position.Left;
+                break;
+            case 'bottom':
+                this._state = Position.Bottom;
+                break;
+            case 'right':
+                this._state = Position.Right;
+                break;
+            default:
+                this._state = Position.Center;
+                break;
+        }
+    }
+
+    private calculateQuadrant(
+        overlayType: DropTargetDirections,
+        xp: number,
+        yp: number
+    ): Quadrant | null {
+        switch (overlayType) {
+            case 'all':
+                if (xp < 20) {
+                    return 'left';
+                }
+                if (xp > 80) {
+                    return 'right';
+                }
+                if (yp < 20) {
+                    return 'top';
+                }
+                if (yp > 80) {
+                    return 'bottom';
+                }
+                break;
+            case 'vertical':
+                if (yp < 50) {
+                    return 'top';
+                }
+                return 'bottom';
+
+            case 'horizontal':
+                if (xp < 50) {
+                    return 'left';
+                }
+                return 'right';
+        }
+
+        return null;
     }
 
     private removeDropTarget() {

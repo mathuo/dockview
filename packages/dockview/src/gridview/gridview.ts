@@ -17,6 +17,19 @@ import { Node } from './types';
 import { Emitter, Event } from '../events';
 import { IDisposable, MutableDisposable } from '../lifecycle';
 
+function findLeaf(candiateNode: Node, last: boolean): LeafNode {
+    if (candiateNode instanceof LeafNode) {
+        return candiateNode;
+    }
+    if (candiateNode instanceof BranchNode) {
+        return findLeaf(
+            candiateNode.children[last ? candiateNode.children.length - 1 : 0],
+            last
+        );
+    }
+    throw new Error('invalid node');
+}
+
 function flipNode<T extends Node>(
     node: T,
     size: number,
@@ -441,21 +454,6 @@ export class Gridview implements IDisposable {
         if (!(node instanceof LeafNode)) {
             throw new Error('invalid location');
         }
-
-        const findLeaf = (candiateNode: Node, last: boolean): LeafNode => {
-            if (candiateNode instanceof LeafNode) {
-                return candiateNode;
-            }
-            if (candiateNode instanceof BranchNode) {
-                return findLeaf(
-                    candiateNode.children[
-                        last ? candiateNode.children.length - 1 : 0
-                    ],
-                    last
-                );
-            }
-            throw new Error('invalid node');
-        };
 
         for (let i = path.length - 1; i > -1; i--) {
             const n = path[i];
