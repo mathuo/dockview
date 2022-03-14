@@ -22,6 +22,10 @@ describe('component.api', () => {
                 'onDidLayoutChange',
                 'onDidAddView',
                 'onDidRemoveView',
+                'getPanels',
+                'focus',
+                'resizeToFit',
+                'toJSON',
             ];
 
             for (const _ of list) {
@@ -33,7 +37,7 @@ describe('component.api', () => {
 
                 const cut = new SplitviewApi(<SplitviewComponent>component);
 
-                expect((cut as any)[_]).toBeFalsy();
+                (cut as any)[_];
 
                 expect(f).toBeCalledTimes(1);
             }
@@ -50,6 +54,10 @@ describe('component.api', () => {
                 'onDidLayoutChange',
                 'onDidAddView',
                 'onDidRemoveView',
+                'getPanels',
+                'focus',
+                'resizeToFit',
+                'toJSON',
             ];
 
             for (const _ of list) {
@@ -61,7 +69,7 @@ describe('component.api', () => {
 
                 const cut = new PaneviewApi(<PaneviewComponent>component);
 
-                expect((cut as any)[_]).toBeFalsy();
+                (cut as any)[_];
 
                 expect(f).toBeCalledTimes(1);
             }
@@ -80,6 +88,9 @@ describe('component.api', () => {
                 'onGridEvent',
                 'onDidLayoutChange',
                 'orientation',
+                'focus',
+                'resizeToFit',
+                'toJSON',
             ];
 
             for (const _ of list) {
@@ -91,7 +102,7 @@ describe('component.api', () => {
 
                 const cut = new GridviewApi(<GridviewComponent>component);
 
-                expect((cut as any)[_]).toBeFalsy();
+                (cut as any)[_];
 
                 expect(f).toBeCalledTimes(1);
             }
@@ -115,6 +126,10 @@ describe('component.api', () => {
                 'groups',
                 'activeGroup',
                 'activePanel',
+                'focus',
+                'closeAllGroups',
+                'resizeToFit',
+                'toJSON',
             ];
 
             for (const _ of list) {
@@ -126,7 +141,7 @@ describe('component.api', () => {
 
                 const cut = new DockviewApi(<DockviewComponent>component);
 
-                expect((cut as any)[_]).toBeFalsy();
+                (cut as any)[_];
 
                 expect(f).toBeCalledTimes(1);
             }
