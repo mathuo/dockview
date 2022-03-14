@@ -289,7 +289,8 @@ export class Gridview implements IDisposable {
 
     public deserialize(json: any, deserializer: IViewDeserializer) {
         const orientation = json.orientation;
-        const height = json.height;
+        const height =
+            orientation === Orientation.VERTICAL ? json.height : json.width;
         this._deserialize(
             json.root as ISerializedBranchNode,
             orientation,
@@ -308,7 +309,8 @@ export class Gridview implements IDisposable {
             root,
             orientation,
             deserializer,
-            orthogonalSize
+            orthogonalSize,
+            true
         ) as BranchNode;
     }
 
@@ -316,7 +318,8 @@ export class Gridview implements IDisposable {
         node: ISerializedNode,
         orientation: Orientation,
         deserializer: IViewDeserializer,
-        orthogonalSize: number
+        orthogonalSize: number,
+        isRoot = false
     ): Node {
         let result: Node;
         if (node.type === 'branch') {
@@ -333,12 +336,14 @@ export class Gridview implements IDisposable {
                 } as INodeDescriptor;
             });
 
+            // HORIZONTAL => height=orthogonalsize width=size
+            // VERTICAL => height=size width=orthogonalsize
             result = new BranchNode(
                 orientation,
                 this.proportionalLayout,
                 this.styles,
-                node.size,
-                orthogonalSize,
+                isRoot ? orthogonalSize : node.size,
+                isRoot ? node.size : orthogonalSize,
                 children
             );
         } else {
