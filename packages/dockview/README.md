@@ -69,16 +69,22 @@ You should also attach a dockview theme to an element containing your components
 Demonstrated below is a high level example of a `DockviewReact` component. You can follow a similar pattern for `GridviewReact`, `SplitviewReact` and `PaneviewReact` components too, see examples for more.
 
 ```tsx
-import { DockviewReact, DockviewReadyEvent, PanelCollection.IDockviewPanelProps } from 'dockview';
+import {
+    DockviewReact,
+    DockviewReadyEvent,
+    PanelCollection,
+    IDockviewPanelProps,
+    IDockviewPanelHeaderProps,
+} from 'dockview';
 
 const components: PanelCollection<IDockviewPanelProps> = {
-  default: (props: IDockviewPanelProps<{someProps: string}>) => {
-    return <div>{props.params.someProps}</div>
-  }
+    default: (props: IDockviewPanelProps<{ someProps: string }>) => {
+        return <div>{props.params.someProps}</div>;
+    },
 };
 
 const headers: PanelCollection<IDockviewPanelHeaderProps> = {
-    customHeader: (props) => {
+    customTab: (props: IDockviewPanelHeaderProps) => {
         return (
             <div>
                 <span>{props.api.title}</span>
@@ -100,7 +106,6 @@ const Component = () => {
         event.api.addPanel({
             id: 'panel2',
             component: 'default',
-            tabComponent: 'customHeader', // optional custom header
             params: {
                 someProps: 'World',
             },
@@ -108,7 +113,13 @@ const Component = () => {
         });
     };
 
-    return <DockviewReact components={components} tabComponents={headers} onReady={onReady} />;
+    return (
+        <DockviewReact
+            components={components}
+            tabComponents={headers}
+            onReady={onReady}
+        />
+    );
 };
 ```
 
