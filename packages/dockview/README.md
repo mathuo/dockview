@@ -77,6 +77,17 @@ const components: PanelCollection<IDockviewPanelProps> = {
   }
 };
 
+const headers: PanelCollection<IDockviewPanelHeaderProps> = {
+    customHeader: (props) => {
+        return (
+            <div>
+                <span>{props.api.title}</span>
+                <span onClick={() => props.api.close()}>{'[x]'}</span>
+            </div>
+        );
+    },
+};
+
 const Component = () => {
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
@@ -89,6 +100,7 @@ const Component = () => {
         event.api.addPanel({
             id: 'panel2',
             component: 'default',
+            tabComponent: 'customHeader', // optional custom header
             params: {
                 someProps: 'World',
             },
@@ -96,7 +108,7 @@ const Component = () => {
         });
     };
 
-    return <DockviewReact components={components} onReady={onReady} />;
+    return <DockviewReact components={components} tabComponents={headers} onReady={onReady} />;
 };
 ```
 
