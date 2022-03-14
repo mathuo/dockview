@@ -13,7 +13,7 @@ import {
 import { DockviewPanelApi } from '../../api/groupPanelApi';
 import { usePortalsLifecycle } from '../react';
 import { DockviewApi } from '../../api/component.api';
-import { ReactWatermarkPart } from './reactWatermarkPart';
+import { IWatermarkPanelProps, ReactWatermarkPart } from './reactWatermarkPart';
 import { PanelCollection, PanelParameters } from '../types';
 import { watchElementResize } from '../../dom';
 import { IContentRenderer, ITabRenderer } from '../../groupview/types';
@@ -25,24 +25,19 @@ export interface IGroupPanelBaseProps<T extends {} = Record<string, any>>
     containerApi: DockviewApi;
 }
 
-export interface IDockviewPanelProps<T extends { [index: string]: any } = any>
-    extends IGroupPanelBaseProps<T> {
-    // noop
-}
+export type IDockviewPanelHeaderProps<T extends {} = Record<string, any>> =
+    IGroupPanelBaseProps<T>;
+
+export type IDockviewPanelProps<T extends { [index: string]: any } = any> =
+    IGroupPanelBaseProps<T>;
 
 export interface DockviewReadyEvent {
     api: DockviewApi;
 }
 
-export interface IWatermarkPanelProps<T extends {} = Record<string, any>>
-    extends PanelParameters<T> {
-    containerApi: DockviewApi;
-    close(): void;
-}
-
 export interface IDockviewReactProps {
     components?: PanelCollection<IDockviewPanelProps>;
-    tabComponents?: PanelCollection<IGroupPanelBaseProps>;
+    tabComponents?: PanelCollection<IDockviewPanelHeaderProps>;
     watermarkComponent?: React.FunctionComponent<IWatermarkPanelProps>;
     onReady?: (event: DockviewReadyEvent) => void;
     debug?: boolean;
@@ -86,7 +81,7 @@ export const DockviewReact = React.forwardRef(
                     createComponent: (
                         id: string,
                         componentId: string,
-                        component: React.FunctionComponent<IGroupPanelBaseProps>
+                        component: React.FunctionComponent<IDockviewPanelProps>
                     ): IContentRenderer => {
                         return new ReactPanelContentPart(
                             componentId,
@@ -101,7 +96,7 @@ export const DockviewReact = React.forwardRef(
                     createComponent: (
                         id: string,
                         componentId: string,
-                        component: React.FunctionComponent<IGroupPanelBaseProps>
+                        component: React.FunctionComponent<IDockviewPanelHeaderProps>
                     ): ITabRenderer => {
                         return new ReactPanelHeaderPart(
                             componentId,
