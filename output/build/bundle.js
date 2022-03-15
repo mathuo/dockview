@@ -112,22 +112,9 @@ var rootcomponents = {
 var Application = function () {
     var api = React.useRef();
     var registry = (0, registry_1.useLayoutRegistry)();
-    React.useEffect(function () {
-        var onresize = function (ev) {
-            var width = window.innerWidth, height = window.innerHeight;
-            // api.current?.layout(width, height); // // fill the entire screen
-        };
-        window.addEventListener('resize', onresize);
-        onresize(undefined); // initial render
-        // api.current.getPanel('sidebar').api.setSize({ width: 300 });
-        return function () {
-            window.removeEventListener('resize', onresize);
-        };
-    }, []);
     var onReady = function (event) {
         api.current = event.api;
         registry.register('gridview', event.api);
-        // event.api.fromJSON(require('./application.layout.json'));
         var success = false;
         var state = localStorage.getItem('dockview-layout');
         if (state) {
@@ -179,7 +166,6 @@ var Application = function () {
         }
         event.api.onGridEvent(function () {
             localStorage.setItem('dockview-layout', JSON.stringify(event.api.toJSON()));
-            console.log('SAVED', event.api.toJSON());
         });
     };
     return (React.createElement(dockview_1.GridviewReact, { components: rootcomponents, onReady: onReady, orientation: dockview_1.Orientation.VERTICAL, hideBorders: true, proportionalLayout: true }));
@@ -259,10 +245,6 @@ var registry_1 = __webpack_require__(/*! ./registry */ "./src/layout-grid/regist
 __webpack_require__(/*! ./controlCenter.scss */ "./src/layout-grid/controlCenter.scss");
 var ControlCenter = function () {
     var registry = (0, registry_1.useLayoutRegistry)();
-    var dragRef = React.useRef();
-    var onDragStart = function (event) {
-        event.dataTransfer.setData('text/plain', 'Panel2');
-    };
     var onAdd = function () {
         var api = registry.get('dockview');
         var _id = Date.now();
@@ -352,21 +334,7 @@ var ControlCenter = function () {
             title: 'Settings',
         });
     };
-    var onFocusSplitview = function () {
-        var api = registry.get('splitview');
-        var panel = api.getPanel('1');
-        api.setActive(panel);
-    };
-    var onFocusPanel = function () {
-        var api = registry.get('dockview');
-        var panel = api.getPanel('split_panel');
-        panel.api.setActive();
-    };
     return (React.createElement("div", { className: "control-center" },
-        React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onMouseDown: onFocusSplitview }, "Split view focus")),
-        React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onMouseDown: onFocusPanel }, "Split view panel focus")),
         React.createElement("div", { className: "control-center-row" },
             React.createElement("button", { onMouseDown: onAdd }, "Add new")),
         React.createElement("div", { className: "control-center-row" },
@@ -390,19 +358,7 @@ var ControlCenter = function () {
         React.createElement("div", { className: "control-center-row" },
             React.createElement("button", { onClick: onClear }, "Clear")),
         React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onClick: saveApplicationLayout }, "Save application layout")),
-        React.createElement("div", { draggable: true, style: {
-                backgroundColor: 'dodgerblue',
-                width: '150px',
-                padding: '2px 14px',
-                margin: '2px 0px',
-            }, ref: dragRef }, "Drag me"),
-        React.createElement("div", { onDragStart: onDragStart, draggable: true, style: {
-                backgroundColor: 'orange',
-                width: '150px',
-                padding: '2px 14px',
-                margin: '2px 0px',
-            } }, "Drag me too")));
+            React.createElement("button", { onClick: saveApplicationLayout }, "Save application layout"))));
 };
 exports.ControlCenter = ControlCenter;
 
@@ -507,17 +463,6 @@ exports.Footer = Footer;
 
 "use strict";
 
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -568,6 +513,7 @@ var splitview_1 = __webpack_require__(/*! ../panels/splitview/splitview */ "./sr
 var gridview_1 = __webpack_require__(/*! ../panels/gridview/gridview */ "./src/panels/gridview/gridview.tsx");
 var recoil_1 = __webpack_require__(/*! recoil */ "./node_modules/recoil/es/recoil.js");
 var footer_1 = __webpack_require__(/*! ./footer */ "./src/layout-grid/footer.tsx");
+var exampleFunctions_1 = __webpack_require__(/*! ./panels/exampleFunctions */ "./src/layout-grid/panels/exampleFunctions.tsx");
 var Test = function (props) {
     var _a = __read(React.useState(0), 2), counter = _a[0], setCounter = _a[1];
     React.useEffect(function () {
@@ -632,78 +578,7 @@ var components = {
             } },
             React.createElement(dockview_1.DockviewReact, { onReady: onReady, components: components, tabHeight: 20, debug: true })));
     },
-    test_component: function (props) {
-        var _a = __read(React.useState({
-            isGroupActive: false,
-            isPanelVisible: false,
-        }), 2), panelState = _a[0], setPanelState = _a[1];
-        var input = React.useRef();
-        React.useEffect(function () {
-            var disposable = new dockview_1.CompositeDisposable(props.api.onDidActiveChange(function (event) {
-                setPanelState(function (_) { return (__assign(__assign({}, _), { isGroupActive: event.isActive })); });
-            }), props.api.onDidVisibilityChange(function (x) {
-                setPanelState(function (_) { return (__assign(__assign({}, _), { isPanelVisible: x.isVisible })); });
-            }), props.api.onFocusEvent(function () {
-                input.current.focus();
-            }));
-            return function () {
-                disposable.dispose();
-            };
-        }, []);
-        var backgroundColor = React.useMemo(function () {
-            // "#1e1e1e",
-            return "rgb(".concat(Math.floor(Math.random() * 256), ",").concat(Math.floor(Math.random() * 256), ",").concat(Math.floor(Math.random() * 256), ")");
-        }, []);
-        var onRename = function () {
-            props.api.setTitle('Did it change?');
-        };
-        var onClose = function () {
-            props.api.close();
-        };
-        return (React.createElement(dockview_1.DockviewComponents.Panel, null,
-            React.createElement(dockview_1.DockviewComponents.Actions, null,
-                React.createElement("div", { style: {
-                        height: '100%',
-                        display: 'flex',
-                        backgroundColor: 'rgba(255,255,255,0.1)',
-                        padding: '0px 4px',
-                    } },
-                    React.createElement("span", { onClick: onClose, style: {
-                            height: '100%',
-                            width: '25px',
-                            display: 'flex',
-                            alignItems: 'center',
-                        } },
-                        React.createElement("a", { className: "material-icons" }, "menu")))),
-            React.createElement(dockview_1.DockviewComponents.Content, null,
-                React.createElement("div", { style: {
-                        // backgroundColor,
-                        height: '100%',
-                    } },
-                    React.createElement("div", { style: {
-                            padding: '5px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                        } },
-                        React.createElement("div", null, "This is a dockable panel"),
-                        React.createElement("div", null,
-                            React.createElement("span", null, 'isGroupActive: '),
-                            React.createElement("span", { style: {
-                                    color: panelState.isGroupActive
-                                        ? '#23d16f'
-                                        : '#cd312b',
-                                } }, "".concat(panelState.isGroupActive))),
-                        React.createElement("div", null,
-                            React.createElement("span", null, 'isPanelVisible: '),
-                            React.createElement("span", { style: {
-                                    color: panelState.isPanelVisible
-                                        ? '#23d16f'
-                                        : '#cd312b',
-                                } }, "".concat(panelState.isPanelVisible))),
-                        React.createElement("button", { onClick: onRename }, "rename"),
-                        React.createElement("input", { style: { width: '175px' }, ref: input, placeholder: "This is focused by the panel" }),
-                        React.createElement("input", { style: { width: '175px' }, placeholder: "This is also focusable" }))))));
-    },
+    test_component: exampleFunctions_1.ExampleFunctions,
     settings: settingsPanel_1.Settings,
     split_panel: splitPanel_1.SplitPanel,
 };
@@ -757,11 +632,13 @@ var TestGrid = function (props) {
                 console.error('failed to load layout', err);
             }
         }
-        if (!success) {
+        var welcomePanel = api.getPanel('welcome');
+        if (!welcomePanel) {
             api.addPanel({
                 component: 'welcome',
                 id: 'welcome',
                 title: 'Welcome',
+                suppressClosable: true,
             });
         }
         return function () {
@@ -950,6 +827,135 @@ var Panel = function (props) {
             React.createElement("div", null, "isPanelActive: ".concat(active, " isPanelFocused: ").concat(focused)))));
 };
 exports.Panel = Panel;
+
+
+/***/ }),
+
+/***/ "./src/layout-grid/panels/exampleFunctions.tsx":
+/*!*****************************************************!*\
+  !*** ./src/layout-grid/panels/exampleFunctions.tsx ***!
+  \*****************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ExampleFunctions = void 0;
+var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
+var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+__webpack_require__(/*! ./exampleFunctions.scss */ "./src/layout-grid/panels/exampleFunctions.scss");
+var ExampleFunctions = function (props) {
+    var _a = __read(React.useState({
+        isGroupActive: props.api.isActive,
+        isPanelVisible: props.api.isVisible,
+    }), 2), panelState = _a[0], setPanelState = _a[1];
+    var _b = __read(React.useState(), 2), panelName = _b[0], setPanelName = _b[1];
+    var input = React.useRef();
+    React.useEffect(function () {
+        var disposable = new dockview_1.CompositeDisposable(props.api.onDidActiveChange(function (event) {
+            setPanelState(function (_) { return (__assign(__assign({}, _), { isGroupActive: event.isActive })); });
+        }), props.api.onDidVisibilityChange(function (x) {
+            setPanelState(function (_) { return (__assign(__assign({}, _), { isPanelVisible: x.isVisible })); });
+        }), props.api.onFocusEvent(function () {
+            input.current.focus();
+        }));
+        return function () {
+            disposable.dispose();
+        };
+    }, []);
+    var onRename = function () {
+        props.api.setTitle(panelName);
+    };
+    var onClose = function () {
+        props.api.close();
+    };
+    return (React.createElement(dockview_1.DockviewComponents.Panel, null,
+        React.createElement(dockview_1.DockviewComponents.Actions, null,
+            React.createElement("div", { style: {
+                    height: '100%',
+                    display: 'flex',
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    padding: '0px 4px',
+                } },
+                React.createElement("span", { onClick: onClose, style: {
+                        height: '100%',
+                        width: '25px',
+                        display: 'flex',
+                        alignItems: 'center',
+                    } },
+                    React.createElement("a", { className: "material-icons" }, "menu")))),
+        React.createElement(dockview_1.DockviewComponents.Content, null,
+            React.createElement("div", { className: "example-functions-panel" },
+                React.createElement("div", { className: "example-functions-panel-header-bar" },
+                    React.createElement("span", { style: { padding: '0px 8px' } },
+                        React.createElement("span", null, 'isGroupActive: '),
+                        React.createElement("span", { style: {
+                                color: panelState.isGroupActive
+                                    ? '#23d16f'
+                                    : '#cd312b',
+                            } }, "".concat(panelState.isGroupActive))),
+                    React.createElement("span", { style: { padding: '0px 8px' } },
+                        React.createElement("span", null, 'isPanelVisible: '),
+                        React.createElement("span", { style: {
+                                color: panelState.isPanelVisible
+                                    ? '#23d16f'
+                                    : '#cd312b',
+                            } }, "".concat(panelState.isPanelVisible)))),
+                React.createElement("div", { className: "example-functions-panel-section" },
+                    React.createElement("input", { value: panelName, placeholder: "New Panel Name", type: "text", onChange: function (event) {
+                            return setPanelName(event.target.value);
+                        } }),
+                    React.createElement("button", { onClick: onRename }, "Rename")),
+                React.createElement("input", { style: { width: '175px' }, ref: input, placeholder: "This is focused by the panel" }),
+                React.createElement("input", { style: { width: '175px' }, placeholder: "This is also focusable" })))));
+};
+exports.ExampleFunctions = ExampleFunctions;
 
 
 /***/ }),
@@ -1618,6 +1624,8 @@ var components = {
                 color: '#cccccc',
             }, className: "splitview-demo-panel" },
             React.createElement("div", { className: "api-parameter" },
+                React.createElement("span", null, "Id"),
+                React.createElement("span", null, props.api.id),
                 React.createElement("span", null, "Width"),
                 React.createElement("span", null, dimension.width),
                 React.createElement("span", null, "Height"),
@@ -1641,8 +1649,7 @@ var SplitviewPanel = function (props) {
             padding: '10px 0px',
             boxSizing: 'border-box',
         } },
-        React.createElement("div", { style: { padding: '0px 20px' } },
-            React.createElement("h1", null, "Splitview")),
+        React.createElement("div", { style: { padding: '0px 20px', fontSize: '36px' } }, "Splitview"),
         React.createElement("ul", { style: { padding: '0px 20px 0px 40px' } },
             React.createElement("li", null, "The splitview component exposes an API object, a selection of avaliable values are shown in the summary sections below"),
             React.createElement("li", null, "Each panel exposes it's own API, and has access to the common API. A selector of panel API values are shown in each panel of the splitview.")),
@@ -1746,10 +1753,15 @@ var Common = function (props) {
         }
     }, [props.orientation]);
     return (React.createElement("div", { className: "splitview-demo-container ".concat(props.orientation.toLowerCase()) },
-        React.createElement("h2", null, text),
+        React.createElement("h3", null, text),
         React.createElement("div", { className: "splitview-demo-content" },
-            React.createElement("div", { className: "splitview-demo-view" },
-                React.createElement(dockview_1.SplitviewReact, { orientation: props.orientation, onReady: onReady, components: components })),
+            React.createElement("div", { style: {
+                    backgroundColor: 'rgb(60,60,60)',
+                    padding: '10px',
+                    overflow: 'auto',
+                } },
+                React.createElement("div", { className: "splitview-demo-view" },
+                    React.createElement(dockview_1.SplitviewReact, { orientation: props.orientation, onReady: onReady, components: components }))),
             React.createElement("div", { className: "api-parameter" },
                 React.createElement("span", null, "Height"),
                 React.createElement("span", null, dimensions.height),
@@ -2884,7 +2896,7 @@ var ___CSS_LOADER_AT_RULE_IMPORT_0___ = __webpack_require__(/*! -!../node_module
 exports = ___CSS_LOADER_API_IMPORT___(false);
 exports.i(___CSS_LOADER_AT_RULE_IMPORT_0___);
 // Module
-exports.push([module.id, "body {\n  margin: 0;\n  font-family: Arial, \"Helvetica Neue\", Helvetica, sans-serif;\n  overflow: hidden;\n  color: white;\n  font-size: 13px;\n}\n\n::-webkit-scrollbar {\n  height: 8px;\n  width: 8px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n  background: transparent;\n}\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n  background: var(--dv-tabs-container-scrollbar-color);\n}\n\n.close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n  cursor: pointer;\n}\n.close-action:active {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n\nbutton {\n  text-overflow: ellipsis;\n  overflow: hidden;\n  white-space: nowrap;\n  border: none;\n  background-color: #0e639c;\n  color: white;\n  font-family: inherit;\n  outline: none;\n  padding: 2px 14px;\n  margin: 2px 0px;\n}\nbutton:hover {\n  background-color: #1177bb;\n  cursor: pointer;\n}", ""]);
+exports.push([module.id, "body {\n  margin: 0;\n  font-family: \"Roboto\", sans-serif;\n  overflow: hidden;\n  color: #cccccc;\n  font-size: 13px;\n}\n\n::-webkit-scrollbar {\n  height: 8px;\n  width: 8px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n  background: transparent;\n}\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n  background: var(--dv-tabs-container-scrollbar-color);\n}\n\n.close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n  cursor: pointer;\n}\n.close-action:active {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n\nbutton {\n  text-overflow: ellipsis;\n  overflow: hidden;\n  white-space: nowrap;\n  border: none;\n  background-color: #0e639c;\n  color: white;\n  font-family: inherit;\n  outline: none;\n  padding: 2px 14px;\n  margin: 2px 0px;\n}\nbutton:hover {\n  background-color: #1177bb;\n  cursor: pointer;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -2925,6 +2937,23 @@ module.exports = exports;
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/panels/exampleFunctions.scss":
+/*!***************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/panels/exampleFunctions.scss ***!
+  \***************************************************************************************************************************************/
+/***/ ((module, exports, __webpack_require__) => {
+
+// Imports
+var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+exports = ___CSS_LOADER_API_IMPORT___(false);
+// Module
+exports.push([module.id, ".example-functions-panel {\n  padding: 5px;\n  display: flex;\n  flex-direction: column;\n}\n.example-functions-panel .example-functions-panel-header-bar {\n  display: flex;\n  justify-content: flex-end;\n}\n.example-functions-panel .example-functions-panel-section {\n  padding: 8px 0px;\n}", ""]);
+// Exports
+module.exports = exports;
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/splitPanel.scss":
 /*!**************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/splitPanel.scss ***!
@@ -2952,7 +2981,7 @@ module.exports = exports;
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ".splitview-demo-container {\n  width: 100%;\n  padding: 0px 20px;\n  box-sizing: border-box;\n}\n.splitview-demo-container .splitview-demo-content {\n  display: flex;\n  --dv-separator-border: white;\n}\n.splitview-demo-container.vertical .api-parameter {\n  padding-left: 10px;\n}\n.splitview-demo-container.vertical .splitview-demo-view {\n  height: 500px;\n  width: 150px;\n}\n.splitview-demo-container.vertical .splitview-demo-view .api-parameter {\n  padding-left: 0px;\n}\n.splitview-demo-container.horizontal .splitview-demo-content {\n  flex-direction: column;\n}\n.splitview-demo-container.horizontal .api-parameter {\n  padding-top: 10px;\n}\n.splitview-demo-container.horizontal .splitview-demo-view {\n  height: 150px;\n  width: 500px;\n}\n.splitview-demo-container.horizontal .splitview-demo-view .api-parameter {\n  padding-top: 0px;\n}\n\n.api-parameter {\n  display: grid;\n  grid-template-columns: 70px 50px;\n  grid-auto-rows: 15px;\n}\n.api-parameter span:nth-child(2n) {\n  text-align: right;\n}\n.api-parameter .visibility-toggle {\n  outline: 1px solid dodgerblue;\n  outline-offset: -1px;\n  padding: 0px 4px;\n  display: flex;\n  cursor: pointer;\n}\n.api-parameter .visibility-toggle:not(:first-child) {\n  margin-left: 4px;\n}\n\n.splitview-demo-panel {\n  background-color: #2d2d2d;\n  height: 100%;\n  padding: 10px;\n  box-sizing: border-box;\n  overflow: hidden;\n}", ""]);
+exports.push([module.id, ".splitview-demo-container {\n  width: 100%;\n  padding: 0px 20px;\n  box-sizing: border-box;\n}\n.splitview-demo-container .splitview-demo-content {\n  display: flex;\n  --dv-separator-border: white;\n}\n.splitview-demo-container.vertical .api-parameter {\n  padding-left: 10px;\n}\n.splitview-demo-container.vertical .splitview-demo-view {\n  height: 500px;\n  width: 150px;\n}\n.splitview-demo-container.vertical .splitview-demo-view .api-parameter {\n  padding-left: 0px;\n}\n.splitview-demo-container.horizontal .splitview-demo-content {\n  flex-direction: column;\n}\n.splitview-demo-container.horizontal .api-parameter {\n  padding-top: 10px;\n}\n.splitview-demo-container.horizontal .splitview-demo-view {\n  height: 180px;\n  width: 500px;\n}\n.splitview-demo-container.horizontal .splitview-demo-view .api-parameter {\n  padding-top: 0px;\n}\n\n.api-parameter {\n  display: grid;\n  grid-template-columns: 70px 50px;\n  grid-auto-rows: 18px;\n}\n.api-parameter span:nth-child(2n) {\n  text-align: right;\n}\n.api-parameter .visibility-toggle {\n  height: 16px;\n  outline: 1px solid dodgerblue;\n  outline-offset: -1px;\n  padding: 0px 4px;\n  display: flex;\n  cursor: pointer;\n}\n.api-parameter .visibility-toggle:not(:first-child) {\n  margin-left: 4px;\n}\n\n.splitview-demo-panel {\n  background-color: #2d2d2d;\n  height: 100%;\n  padding: 10px;\n  box-sizing: border-box;\n  overflow: hidden;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -3003,7 +3032,7 @@ module.exports = exports;
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../dockview-demo/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ".dockview-theme-dark {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n}\n\n.dockview-theme-light {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: white;\n  --dv-tabs-and-actions-container-background-color: #f3f3f3;\n  --dv-activegroup-visiblepanel-tab-background-color: white;\n  --dv-activegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-inactivegroup-visiblepanel-tab-background-color: white;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-tab-divider-color: white;\n  --dv-activegroup-visiblepanel-tab-color: rgb(51, 51, 51);\n  --dv-activegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-visiblepanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.35);\n  --dv-separator-border: rgba(128, 128, 128, 0.35);\n  --dv-paneview-header-border-color: rgb(51, 51, 51);\n}\n\n.dockview-theme-vs {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n  --dv-activegroup-visiblepanel-tab-background-color: dodgerblue;\n  --dv-tabs-and-actions-container-height: 18px;\n  --dv-tabs-and-actions-container-font-size: 11px;\n}\n.dockview-theme-vs .groupview.active-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-activegroup-visiblepanel-tab-background-color);\n}\n.dockview-theme-vs .groupview.inactive-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-inactivegroup-visiblepanel-tab-background-color);\n}\n.actions-bar {\n  text-align: right;\n  width: 28px;\n  display: flex;\n  align-items: center;\n  flex-shrink: 0;\n}\n.actions-bar .actions-container {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.actions-bar .actions-container a:active {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.actions-bar .actions-container .close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n  cursor: pointer;\n}\n.drop-target {\n  position: relative;\n}\n.drop-target > .drop-target-dropzone {\n  position: absolute;\n  left: 0px;\n  top: 0px;\n  height: 100%;\n  width: 100%;\n  z-index: 10000;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection {\n  position: relative;\n  pointer-events: none;\n  box-sizing: border-box;\n  height: 100%;\n  width: 100%;\n  background-color: var(--dv-drag-over-background-color);\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.left, .drop-target > .drop-target-dropzone > .drop-target-selection.right {\n  width: 50%;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.right {\n  transform: translate(100%, 0%);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n  transform: translate(0%, 100%);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.top, .drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n  height: 50%;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-top {\n  border-top: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-bottom {\n  border-bottom: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-left {\n  border-left: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-right {\n  border-right: 1px solid var(--dv-drag-over-border-color);\n}\n.custom-dragging {\n  height: 24px;\n  line-height: 24px;\n  font-size: 11px;\n  width: 100px;\n  background-color: dodgerblue;\n  color: ghostwhite;\n  border-radius: 11px;\n  position: absolute;\n  padding-left: 10px;\n}\n\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-background-color);\n  color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n\n/**\n * when a tab is dragged we lose the above stylings because they are conditional on parent elements\n * therefore we also set some stylings for the dragging event\n **/\n.tab.dragging {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.grid-view,\n.branch-node {\n  height: 100%;\n  width: 100%;\n}\n.groupview {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  background-color: var(--dv-group-view-background-color);\n  overflow: hidden;\n}\n.groupview:focus {\n  outline: none;\n}\n.groupview.empty > .tabs-and-actions-container {\n  display: none;\n}\n.groupview > .content-container {\n  flex-grow: 1;\n  overflow: hidden;\n  outline: none;\n}\n.pane-container {\n  height: 100%;\n  width: 100%;\n}\n.pane-container.animated .view {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.pane-container .view {\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  padding: 0px !important;\n}\n.pane-container .view:not(:first-child)::before {\n  background-color: transparent !important;\n}\n.pane-container .view:not(:first-child) .pane > .pane-header {\n  border-top: 1px solid var(--dv-paneview-header-border-color);\n}\n.pane-container .view .default-header {\n  background-color: var(--dv-group-view-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n  display: flex;\n  padding: 0px 8px;\n}\n.pane-container .view .default-header > span {\n  flex-grow: 1;\n}\n.pane-container:first-of-type > .pane > .pane-header {\n  border-top: none !important;\n}\n.pane-container .pane {\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  height: 100%;\n}\n.pane-container .pane .pane-header {\n  box-sizing: border-box;\n  user-select: none;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-header.pane-draggable {\n  cursor: pointer;\n}\n.pane-container .pane .pane-header:focus:before, .pane-container .pane .pane-header:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.pane-container .pane .pane-body {\n  overflow-y: auto;\n  overflow-x: hidden;\n  flex-grow: 1;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-body:focus:before, .pane-container .pane .pane-body:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.tabs-and-actions-container {\n  display: flex;\n  background-color: var(--dv-tabs-and-actions-container-background-color);\n  flex-shrink: 0;\n  box-sizing: border-box;\n  height: var(--dv-tabs-and-actions-container-height);\n  font-size: var(--dv-tabs-and-actions-container-font-size);\n}\n.tabs-and-actions-container.hidden {\n  display: none;\n}\n.tabs-and-actions-container .void-container {\n  display: flex;\n  flex-grow: 1;\n}\n.tabs-and-actions-container .tabs-container {\n  display: flex;\n  overflow-x: overlay;\n  overflow-y: hidden;\n  scrollbar-width: thin;\n  /* Track */\n  /* Handle */\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar {\n  height: 3px;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-track {\n  background: transparent;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-thumb {\n  background: var(--dv-tabs-container-scrollbar-color);\n}\n.tabs-and-actions-container .tabs-container .tab {\n  -webkit-user-drag: element;\n  outline: none;\n  min-width: 75px;\n  cursor: pointer;\n  position: relative;\n  box-sizing: border-box;\n}\n.tabs-and-actions-container .tabs-container .tab:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-tab-divider-color);\n  width: 1px;\n  height: 100%;\n}\n.split-view-container {\n  position: relative;\n  overflow: hidden;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container.animation .view,\n.split-view-container.animation .sash {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.split-view-container.horizontal {\n  height: 100%;\n}\n.split-view-container.horizontal > .sash-container > .sash {\n  height: 100%;\n  width: 4px;\n}\n.split-view-container.horizontal > .sash-container > .sash.enabled {\n  cursor: ew-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.horizontal > .sash-container > .sash.maximum {\n  cursor: w-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.minimum {\n  cursor: e-resize;\n}\n.split-view-container.horizontal > .view-container > .view:not(:first-child)::before {\n  height: 100%;\n  width: 1px;\n}\n.split-view-container.vertical {\n  width: 100%;\n}\n.split-view-container.vertical > .sash-container > .sash {\n  width: 100%;\n  height: 4px;\n}\n.split-view-container.vertical > .sash-container > .sash.enabled {\n  cursor: ns-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.vertical > .sash-container > .sash.maximum {\n  cursor: n-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.minimum {\n  cursor: s-resize;\n}\n.split-view-container.vertical > .view-container > .view {\n  width: 100%;\n}\n.split-view-container.vertical > .view-container > .view:not(:first-child)::before {\n  height: 1px;\n  width: 100%;\n}\n.split-view-container .sash-container {\n  height: 100%;\n  width: 100%;\n  position: absolute;\n}\n.split-view-container .sash-container .sash {\n  position: absolute;\n  z-index: 99;\n  outline: none;\n}\n.split-view-container .sash-container .sash:active {\n  transition: background-color 0.1s ease-in-out;\n  background-color: var(--dv-active-sash-color, transparent);\n}\n.split-view-container .sash-container .sash:hover {\n  background-color: var(--dv-active-sash-color, transparent);\n  transition: background-color 0.1s ease-in-out;\n  transition-delay: 0.5s;\n}\n.split-view-container .view-container {\n  position: relative;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container .view-container .view {\n  height: 100%;\n  box-sizing: border-box;\n  overflow: auto;\n  position: absolute;\n}\n.split-view-container.separator-border .view:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-separator-border);\n}\n.dragged {\n  transform: translate3d(0px, 0px, 0px);\n  /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */\n}\n\n.tab {\n  flex-shrink: 0;\n}\n.tab.dragging .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.tab.active-tab > .default-tab .tab-action {\n  visibility: visible;\n}\n.tab.inactive-tab > .default-tab .tab-action {\n  visibility: hidden;\n}\n.tab.inactive-tab > .default-tab:hover .tab-action {\n  visibility: visible;\n}\n.tab .default-tab {\n  position: relative;\n  height: 100%;\n  display: flex;\n  min-width: 80px;\n  align-items: center;\n  padding-left: 10px;\n  white-space: nowrap;\n  text-overflow: elipsis;\n}\n.tab .default-tab .tab-content {\n  flex-grow: 1;\n}\n.tab .default-tab .action-container {\n  text-align: right;\n  width: 28px;\n  display: flex;\n}\n.tab .default-tab .action-container .tab-list {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.tab .default-tab .action-container .tab-list a:active:hover {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.tab .default-tab .action-container .tab-list .tab-action {\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n}\n.tab .default-tab .action-container .tab-list .tab-action.disable-close {\n  display: none;\n}\n.watermark {\n  display: flex;\n  width: 100%;\n}\n.watermark.has-actions .watermark-title .actions-bar {\n  display: none;\n}\n.watermark .watermark-title {\n  height: 35px;\n  width: 100%;\n  display: flex;\n}\n.watermark .watermark-content {\n  flex-grow: 1;\n}", ""]);
+exports.push([module.id, ".dockview-theme-dark {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n}\n\n.dockview-theme-light {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: white;\n  --dv-tabs-and-actions-container-background-color: #f3f3f3;\n  --dv-activegroup-visiblepanel-tab-background-color: white;\n  --dv-activegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-inactivegroup-visiblepanel-tab-background-color: white;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-tab-divider-color: white;\n  --dv-activegroup-visiblepanel-tab-color: rgb(51, 51, 51);\n  --dv-activegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-visiblepanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.35);\n  --dv-separator-border: rgba(128, 128, 128, 0.35);\n  --dv-paneview-header-border-color: rgb(51, 51, 51);\n}\n\n.dockview-theme-vs {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n  --dv-activegroup-visiblepanel-tab-background-color: dodgerblue;\n  --dv-tabs-and-actions-container-height: 18px;\n  --dv-tabs-and-actions-container-font-size: 11px;\n}\n.dockview-theme-vs .groupview.active-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-activegroup-visiblepanel-tab-background-color);\n}\n.dockview-theme-vs .groupview.inactive-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-inactivegroup-visiblepanel-tab-background-color);\n}\n.actions-bar {\n  text-align: right;\n  width: 28px;\n  display: flex;\n  align-items: center;\n  flex-shrink: 0;\n}\n.actions-bar .actions-container {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.actions-bar .actions-container a:active {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.actions-bar .actions-container .close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n  cursor: pointer;\n}\n.drop-target {\n  position: relative;\n}\n.drop-target > .drop-target-dropzone {\n  position: absolute;\n  left: 0px;\n  top: 0px;\n  height: 100%;\n  width: 100%;\n  z-index: 10000;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection {\n  position: relative;\n  pointer-events: none;\n  box-sizing: border-box;\n  height: 100%;\n  width: 100%;\n  background-color: var(--dv-drag-over-background-color);\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.left, .drop-target > .drop-target-dropzone > .drop-target-selection.right {\n  width: 50%;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.right {\n  transform: translate(100%, 0%);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n  transform: translate(0%, 100%);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.top, .drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n  height: 50%;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-top {\n  border-top: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-bottom {\n  border-bottom: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-left {\n  border-left: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-right {\n  border-right: 1px solid var(--dv-drag-over-border-color);\n}\n.custom-dragging {\n  height: 24px;\n  line-height: 24px;\n  font-size: 11px;\n  width: 100px;\n  background-color: dodgerblue;\n  color: ghostwhite;\n  border-radius: 11px;\n  position: absolute;\n  padding-left: 10px;\n}\n\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-background-color);\n  color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n\n/**\n * when a tab is dragged we lose the above stylings because they are conditional on parent elements\n * therefore we also set some stylings for the dragging event\n **/\n.tab.dragging {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.grid-view,\n.branch-node {\n  height: 100%;\n  width: 100%;\n}\n.groupview {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  background-color: var(--dv-group-view-background-color);\n  overflow: hidden;\n}\n.groupview:focus {\n  outline: none;\n}\n.groupview.empty > .tabs-and-actions-container {\n  display: none;\n}\n.groupview > .content-container {\n  flex-grow: 1;\n  overflow: hidden;\n  outline: none;\n}\n.pane-container {\n  height: 100%;\n  width: 100%;\n}\n.pane-container.animated .view {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.pane-container .view {\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  padding: 0px !important;\n}\n.pane-container .view:not(:first-child)::before {\n  background-color: transparent !important;\n}\n.pane-container .view:not(:first-child) .pane > .pane-header {\n  border-top: 1px solid var(--dv-paneview-header-border-color);\n}\n.pane-container .view .default-header {\n  background-color: var(--dv-group-view-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n  display: flex;\n  padding: 0px 8px;\n}\n.pane-container .view .default-header > span {\n  flex-grow: 1;\n}\n.pane-container:first-of-type > .pane > .pane-header {\n  border-top: none !important;\n}\n.pane-container .pane {\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  height: 100%;\n}\n.pane-container .pane .pane-header {\n  box-sizing: border-box;\n  user-select: none;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-header.pane-draggable {\n  cursor: pointer;\n}\n.pane-container .pane .pane-header:focus:before, .pane-container .pane .pane-header:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.pane-container .pane .pane-body {\n  overflow-y: auto;\n  overflow-x: hidden;\n  flex-grow: 1;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-body:focus:before, .pane-container .pane .pane-body:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.tabs-and-actions-container {\n  display: flex;\n  background-color: var(--dv-tabs-and-actions-container-background-color);\n  flex-shrink: 0;\n  box-sizing: border-box;\n  height: var(--dv-tabs-and-actions-container-height);\n  font-size: var(--dv-tabs-and-actions-container-font-size);\n}\n.tabs-and-actions-container.hidden {\n  display: none;\n}\n.tabs-and-actions-container .void-container {\n  display: flex;\n  flex-grow: 1;\n}\n.tabs-and-actions-container .tabs-container {\n  display: flex;\n  overflow-x: overlay;\n  overflow-y: hidden;\n  scrollbar-width: thin;\n  /* Track */\n  /* Handle */\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar {\n  height: 3px;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-track {\n  background: transparent;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-thumb {\n  background: var(--dv-tabs-container-scrollbar-color);\n}\n.tabs-and-actions-container .tabs-container .tab {\n  -webkit-user-drag: element;\n  outline: none;\n  min-width: 75px;\n  cursor: pointer;\n  position: relative;\n  box-sizing: border-box;\n}\n.tabs-and-actions-container .tabs-container .tab:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-tab-divider-color);\n  width: 1px;\n  height: 100%;\n}\n.dockview-react-part {\n  height: 100%;\n  width: 100%;\n}\n.split-view-container {\n  position: relative;\n  overflow: hidden;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container.animation .view,\n.split-view-container.animation .sash {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.split-view-container.horizontal {\n  height: 100%;\n}\n.split-view-container.horizontal > .sash-container > .sash {\n  height: 100%;\n  width: 4px;\n}\n.split-view-container.horizontal > .sash-container > .sash.enabled {\n  cursor: ew-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.horizontal > .sash-container > .sash.maximum {\n  cursor: w-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.minimum {\n  cursor: e-resize;\n}\n.split-view-container.horizontal > .view-container > .view:not(:first-child)::before {\n  height: 100%;\n  width: 1px;\n}\n.split-view-container.vertical {\n  width: 100%;\n}\n.split-view-container.vertical > .sash-container > .sash {\n  width: 100%;\n  height: 4px;\n}\n.split-view-container.vertical > .sash-container > .sash.enabled {\n  cursor: ns-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.vertical > .sash-container > .sash.maximum {\n  cursor: n-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.minimum {\n  cursor: s-resize;\n}\n.split-view-container.vertical > .view-container > .view {\n  width: 100%;\n}\n.split-view-container.vertical > .view-container > .view:not(:first-child)::before {\n  height: 1px;\n  width: 100%;\n}\n.split-view-container .sash-container {\n  height: 100%;\n  width: 100%;\n  position: absolute;\n}\n.split-view-container .sash-container .sash {\n  position: absolute;\n  z-index: 99;\n  outline: none;\n}\n.split-view-container .sash-container .sash:active {\n  transition: background-color 0.1s ease-in-out;\n  background-color: var(--dv-active-sash-color, transparent);\n}\n.split-view-container .sash-container .sash:hover {\n  background-color: var(--dv-active-sash-color, transparent);\n  transition: background-color 0.1s ease-in-out;\n  transition-delay: 0.5s;\n}\n.split-view-container .view-container {\n  position: relative;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container .view-container .view {\n  height: 100%;\n  box-sizing: border-box;\n  overflow: auto;\n  position: absolute;\n}\n.split-view-container.separator-border .view:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-separator-border);\n}\n.dragged {\n  transform: translate3d(0px, 0px, 0px);\n  /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */\n}\n\n.tab {\n  flex-shrink: 0;\n}\n.tab.dragging .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.tab.active-tab > .default-tab .tab-action {\n  visibility: visible;\n}\n.tab.inactive-tab > .default-tab .tab-action {\n  visibility: hidden;\n}\n.tab.inactive-tab > .default-tab:hover .tab-action {\n  visibility: visible;\n}\n.tab .default-tab {\n  position: relative;\n  height: 100%;\n  display: flex;\n  min-width: 80px;\n  align-items: center;\n  padding-left: 10px;\n  white-space: nowrap;\n  text-overflow: elipsis;\n}\n.tab .default-tab .tab-content {\n  flex-grow: 1;\n}\n.tab .default-tab .action-container {\n  text-align: right;\n  width: 28px;\n  display: flex;\n}\n.tab .default-tab .action-container .tab-list {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.tab .default-tab .action-container .tab-list a:active:hover {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.tab .default-tab .action-container .tab-list .tab-action {\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n}\n.tab .default-tab .action-container .tab-list .tab-action.disable-close {\n  display: none;\n}\n.watermark {\n  display: flex;\n  width: 100%;\n}\n.watermark.has-actions .watermark-title .actions-bar {\n  display: none;\n}\n.watermark .watermark-title {\n  height: 35px;\n  width: 100%;\n  display: flex;\n}\n.watermark .watermark-content {\n  flex-grow: 1;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -41045,6 +41074,34 @@ module.exports = content.locals || {};
 
 /***/ }),
 
+/***/ "./src/layout-grid/panels/exampleFunctions.scss":
+/*!******************************************************!*\
+  !*** ./src/layout-grid/panels/exampleFunctions.scss ***!
+  \******************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var api = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+            var content = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js!../../../../../node_modules/sass-loader/dist/cjs.js!./exampleFunctions.scss */ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/panels/exampleFunctions.scss");
+
+            content = content.__esModule ? content.default : content;
+
+            if (typeof content === 'string') {
+              content = [[module.id, content, '']];
+            }
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = api(content, options);
+
+
+
+module.exports = content.locals || {};
+
+/***/ }),
+
 /***/ "./src/layout-grid/splitPanel.scss":
 /*!*****************************************!*\
   !*** ./src/layout-grid/splitPanel.scss ***!
@@ -41847,6 +41904,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
 /* harmony import */ var _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./gridviewPanelApi */ "../dockview/dist/esm/api/gridviewPanelApi.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
+
 
 
 class DockviewPanelApiImpl extends _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1__.GridviewPanelApiImpl {
@@ -41859,8 +41918,13 @@ class DockviewPanelApiImpl extends _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1_
         this.titleChanged = this._titleChanged.event;
         this._suppressClosableChanged = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
         this.suppressClosableChanged = this._suppressClosableChanged.event;
-        this._group = group;
-        this.addDisposables(this._onDidTitleChange, this._titleChanged, this._suppressClosableChanged);
+        this._onDidActiveGroupChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        this.onDidActiveGroupChange = this._onDidActiveGroupChange.event;
+        this._onDidGroupChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        this.onDidGroupChange = this._onDidGroupChange.event;
+        this.disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_2__.MutableDisposable();
+        this.group = group;
+        this.addDisposables(this.disposable, this._onDidTitleChange, this._titleChanged, this._suppressClosableChanged, this._onDidGroupChange, this._onDidActiveGroupChange);
     }
     get title() {
         return this.panel.title;
@@ -41873,7 +41937,17 @@ class DockviewPanelApiImpl extends _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1_
         return !!((_a = this.group) === null || _a === void 0 ? void 0 : _a.isActive);
     }
     set group(value) {
+        const isOldGroupActive = this.isGroupActive;
         this._group = value;
+        this._onDidGroupChange.fire();
+        if (this._group) {
+            this.disposable.value = this._group.api.onDidActiveChange(() => {
+                this._onDidActiveGroupChange.fire();
+            });
+            if (this.isGroupActive !== isOldGroupActive) {
+                this._onDidActiveGroupChange.fire();
+            }
+        }
     }
     get group() {
         return this._group;
@@ -42439,51 +42513,11 @@ class Droptarget extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDispos
                 const y = e.offsetY;
                 const xp = (100 * x) / width;
                 const yp = (100 * y) / height;
-                let isRight = false;
-                let isLeft = false;
-                let isTop = false;
-                let isBottom = false;
-                switch (this.options.validOverlays) {
-                    case 'all':
-                        isRight = xp > 80;
-                        isLeft = xp < 20;
-                        isTop = !isRight && !isLeft && yp < 20;
-                        isBottom = !isRight && !isLeft && yp > 80;
-                        break;
-                    case 'vertical':
-                        isTop = yp < 50;
-                        isBottom = yp >= 50;
-                        break;
-                    case 'horizontal':
-                        isLeft = xp < 50;
-                        isRight = xp >= 50;
-                        break;
-                }
+                const quadrant = this.calculateQuadrant(this.options.validOverlays, xp, yp);
                 const isSmallX = width < 100;
                 const isSmallY = height < 100;
-                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'right', !isSmallX && isRight);
-                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'left', !isSmallX && isLeft);
-                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'top', !isSmallY && isTop);
-                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'bottom', !isSmallY && isBottom);
-                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'small-right', isSmallX && isRight);
-                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'small-left', isSmallX && isLeft);
-                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'small-top', isSmallY && isTop);
-                (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'small-bottom', isSmallY && isBottom);
-                if (isRight) {
-                    this._state = Position.Right;
-                }
-                else if (isLeft) {
-                    this._state = Position.Left;
-                }
-                else if (isTop) {
-                    this._state = Position.Top;
-                }
-                else if (isBottom) {
-                    this._state = Position.Bottom;
-                }
-                else {
-                    this._state = Position.Center;
-                }
+                this.toggleClasses(quadrant, isSmallX, isSmallY);
+                this.setState(quadrant);
             },
             onDragLeave: (e) => {
                 this.removeDropTarget();
@@ -42513,6 +42547,71 @@ class Droptarget extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDispos
     }
     dispose() {
         this.removeDropTarget();
+    }
+    toggleClasses(quadrant, isSmallX, isSmallY) {
+        if (!this.overlay) {
+            return;
+        }
+        const isLeft = quadrant === 'left';
+        const isRight = quadrant === 'right';
+        const isTop = quadrant === 'top';
+        const isBottom = quadrant === 'bottom';
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'right', !isSmallX && isRight);
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'left', !isSmallX && isLeft);
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'top', !isSmallY && isTop);
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'bottom', !isSmallY && isBottom);
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'small-right', isSmallX && isRight);
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'small-left', isSmallX && isLeft);
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'small-top', isSmallY && isTop);
+        (0,_dom__WEBPACK_IMPORTED_MODULE_0__.toggleClass)(this.overlay, 'small-bottom', isSmallY && isBottom);
+    }
+    setState(quadrant) {
+        switch (quadrant) {
+            case 'top':
+                this._state = Position.Top;
+                break;
+            case 'left':
+                this._state = Position.Left;
+                break;
+            case 'bottom':
+                this._state = Position.Bottom;
+                break;
+            case 'right':
+                this._state = Position.Right;
+                break;
+            default:
+                this._state = Position.Center;
+                break;
+        }
+    }
+    calculateQuadrant(overlayType, xp, yp) {
+        switch (overlayType) {
+            case 'all':
+                if (xp < 20) {
+                    return 'left';
+                }
+                if (xp > 80) {
+                    return 'right';
+                }
+                if (yp < 20) {
+                    return 'top';
+                }
+                if (yp > 80) {
+                    return 'bottom';
+                }
+                break;
+            case 'vertical':
+                if (yp < 50) {
+                    return 'top';
+                }
+                return 'bottom';
+            case 'horizontal':
+                if (xp < 50) {
+                    return 'left';
+                }
+                return 'right';
+        }
+        return null;
     }
     removeDropTarget() {
         if (this.target) {
@@ -43850,8 +43949,7 @@ class BaseGrid extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposab
         this.onDidLayoutChange = this._onDidLayoutChange.event;
         this.gridview = new _gridview__WEBPACK_IMPORTED_MODULE_1__.Gridview(!!options.proportionalLayout, options.styles, options.orientation);
         this.element.appendChild(this.gridview.element);
-        // TODO for some reason this is required before anything will layout correctly
-        this.layout(0, 0, true);
+        this.layout(0, 0, true); // set some elements height/widths
         this.addDisposables(this.gridview.onDidChange(() => {
             this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT });
         }));
@@ -44385,6 +44483,15 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+function findLeaf(candiateNode, last) {
+    if (candiateNode instanceof _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode) {
+        return candiateNode;
+    }
+    if (candiateNode instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode) {
+        return findLeaf(candiateNode.children[last ? candiateNode.children.length - 1 : 0], last);
+    }
+    throw new Error('invalid node');
+}
 function flipNode(node, size, orthogonalSize) {
     if (node instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode) {
         const result = new _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode(orthogonal(node.orientation), node.proportionalLayout, node.styles, size, orthogonalSize);
@@ -44523,13 +44630,13 @@ class Gridview {
     }
     deserialize(json, deserializer) {
         const orientation = json.orientation;
-        const height = json.height;
+        const height = orientation === _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__.Orientation.VERTICAL ? json.height : json.width;
         this._deserialize(json.root, orientation, deserializer, height);
     }
     _deserialize(root, orientation, deserializer, orthogonalSize) {
-        this.root = this._deserializeNode(root, orientation, deserializer, orthogonalSize);
+        this.root = this._deserializeNode(root, orientation, deserializer, orthogonalSize, true);
     }
-    _deserializeNode(node, orientation, deserializer, orthogonalSize) {
+    _deserializeNode(node, orientation, deserializer, orthogonalSize, isRoot = false) {
         let result;
         if (node.type === 'branch') {
             const serializedChildren = node.data;
@@ -44539,7 +44646,9 @@ class Gridview {
                     visible: serializedChild.visible,
                 };
             });
-            result = new _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode(orientation, this.proportionalLayout, this.styles, node.size, orthogonalSize, children);
+            // HORIZONTAL => height=orthogonalsize width=size
+            // VERTICAL => height=size width=orthogonalsize
+            result = new _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode(orientation, this.proportionalLayout, this.styles, isRoot ? orthogonalSize : node.size, isRoot ? node.size : orthogonalSize, children);
         }
         else {
             result = new _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode(deserializer.fromJSON(node), orientation, orthogonalSize, node.size);
@@ -44600,15 +44709,6 @@ class Gridview {
         if (!(node instanceof _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode)) {
             throw new Error('invalid location');
         }
-        const findLeaf = (candiateNode, last) => {
-            if (candiateNode instanceof _leafNode__WEBPACK_IMPORTED_MODULE_3__.LeafNode) {
-                return candiateNode;
-            }
-            if (candiateNode instanceof _branchNode__WEBPACK_IMPORTED_MODULE_4__.BranchNode) {
-                return findLeaf(candiateNode.children[last ? candiateNode.children.length - 1 : 0], last);
-            }
-            throw new Error('invalid node');
-        };
         for (let i = path.length - 1; i > -1; i--) {
             const n = path[i];
             const l = location[i] || 0;
@@ -46611,35 +46711,38 @@ class DraggablePaneviewPanel extends _paneviewPanel__WEBPACK_IMPORTED_MODULE_4__
             },
         });
         this.addDisposables(this._onDidDrop, this.handler, this.target, this.target.onDrop((event) => {
-            const data = (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.getPaneData)();
-            if (!data) {
-                this._onDidDrop.fire(Object.assign(Object.assign({}, event), { panel: this, getData: () => (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.getPaneData)() }));
-                return;
-            }
-            const containerApi = this._params
-                .containerApi;
-            const panelId = data.paneId;
-            const existingPanel = containerApi.getPanel(panelId);
-            if (!existingPanel) {
-                this._onDidDrop.fire(Object.assign(Object.assign({}, event), { panel: this, getData: () => (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.getPaneData)() }));
-                return;
-            }
-            const allPanels = containerApi.getPanels();
-            const fromIndex = allPanels.indexOf(existingPanel);
-            let toIndex = containerApi.getPanels().indexOf(this);
-            if (event.position === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Left ||
-                event.position === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Top) {
-                toIndex = Math.max(0, toIndex - 1);
-            }
-            if (event.position === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Right ||
-                event.position === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Bottom) {
-                if (fromIndex > toIndex) {
-                    toIndex++;
-                }
-                toIndex = Math.min(allPanels.length - 1, toIndex);
-            }
-            containerApi.movePanel(fromIndex, toIndex);
+            this.onDrop(event);
         }));
+    }
+    onDrop(event) {
+        const data = (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.getPaneData)();
+        if (!data) {
+            this._onDidDrop.fire(Object.assign(Object.assign({}, event), { panel: this, getData: () => (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.getPaneData)() }));
+            return;
+        }
+        const containerApi = this._params
+            .containerApi;
+        const panelId = data.paneId;
+        const existingPanel = containerApi.getPanel(panelId);
+        if (!existingPanel) {
+            this._onDidDrop.fire(Object.assign(Object.assign({}, event), { panel: this, getData: () => (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.getPaneData)() }));
+            return;
+        }
+        const allPanels = containerApi.getPanels();
+        const fromIndex = allPanels.indexOf(existingPanel);
+        let toIndex = containerApi.getPanels().indexOf(this);
+        if (event.position === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Left ||
+            event.position === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Top) {
+            toIndex = Math.max(0, toIndex - 1);
+        }
+        if (event.position === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Right ||
+            event.position === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Bottom) {
+            if (fromIndex > toIndex) {
+                toIndex++;
+            }
+            toIndex = Math.min(allPanels.length - 1, toIndex);
+        }
+        containerApi.movePanel(fromIndex, toIndex);
     }
 }
 
@@ -47591,16 +47694,14 @@ class ReactPanelContentPart {
         this._onDidBlur = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
         this.onDidBlur = this._onDidBlur.event;
         this._element = document.createElement('div');
-        this._element.style.height = '100%';
-        this._element.style.width = '100%';
+        this._element.className = 'dockview-react-part';
         // this.hostedContainer = new HostedContainer({
         //     id,
         // });
         // this.hostedContainer.onDidFocus(() => this._onDidFocus.fire());
         // this.hostedContainer.onDidBlur(() => this._onDidBlur.fire());
         this._actionsElement = document.createElement('div');
-        this._actionsElement.style.height = '100%';
-        this._actionsElement.style.width = '100%';
+        this._actionsElement.className = 'dockview-react-part';
     }
     get element() {
         return this._element;
@@ -47678,6 +47779,7 @@ class ReactPanelHeaderPart {
         this.component = component;
         this.reactPortalStore = reactPortalStore;
         this._element = document.createElement('div');
+        this._element.className = 'dockview-react-part';
     }
     get element() {
         return this._element;
@@ -47738,8 +47840,7 @@ class ReactWatermarkPart {
             value: undefined,
         };
         this._element = document.createElement('div');
-        this._element.style.height = '100%';
-        this._element.style.width = '100%';
+        this._element.className = 'dockview-react-part';
     }
     get element() {
         return this._element;
