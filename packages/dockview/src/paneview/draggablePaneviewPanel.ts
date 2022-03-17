@@ -5,7 +5,7 @@ import {
     PaneTransfer,
 } from '../dnd/dataTransfer';
 import { Droptarget, DroptargetEvent, Position } from '../dnd/droptarget';
-import { Emitter, Event } from '../events';
+import { Emitter } from '../events';
 import { IDisposable } from '../lifecycle';
 import { Orientation } from '../splitview/core/splitview';
 import {
@@ -13,23 +13,6 @@ import {
     PanePanelInitParameter,
     PaneviewPanel,
 } from './paneviewPanel';
-
-interface ViewContainer {
-    readonly title: string;
-    readonly icon: string;
-}
-
-interface ViewContainerModel {
-    readonly title: string;
-    readonly icon: string;
-    readonly onDidAdd: Event<void>;
-    readonly onDidRemove: Event<void>;
-}
-
-interface IViewContainerService {
-    getViewContainerById(id: string): ViewContainer;
-    getViewContainerModel(container: ViewContainer): ViewContainerModel;
-}
 
 export interface PaneviewDropEvent2 extends DroptargetEvent {
     panel: IPaneviewPanel;
@@ -101,54 +84,58 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
             this.handler,
             this.target,
             this.target.onDrop((event) => {
-                const data = getPaneData();
-
-                if (!data) {
-                    this._onDidDrop.fire({
-                        ...event,
-                        panel: this,
-                        getData: () => getPaneData(),
-                    });
-                    return;
-                }
-
-                const containerApi = (this._params! as PanePanelInitParameter)
-                    .containerApi;
-                const panelId = data.paneId;
-
-                const existingPanel = containerApi.getPanel(panelId);
-                if (!existingPanel) {
-                    this._onDidDrop.fire({
-                        ...event,
-                        panel: this,
-                        getData: () => getPaneData(),
-                    });
-                    return;
-                }
-
-                const allPanels = containerApi.getPanels();
-
-                const fromIndex = allPanels.indexOf(existingPanel);
-                let toIndex = containerApi.getPanels().indexOf(this);
-
-                if (
-                    event.position === Position.Left ||
-                    event.position === Position.Top
-                ) {
-                    toIndex = Math.max(0, toIndex - 1);
-                }
-                if (
-                    event.position === Position.Right ||
-                    event.position === Position.Bottom
-                ) {
-                    if (fromIndex > toIndex) {
-                        toIndex++;
-                    }
-                    toIndex = Math.min(allPanels.length - 1, toIndex);
-                }
-
-                containerApi.movePanel(fromIndex, toIndex);
+                this.onDrop(event);
             })
         );
+    }
+
+    private onDrop(event: DroptargetEvent) {
+        const data = getPaneData();
+
+        if (!data) {
+            this._onDidDrop.fire({
+                ...event,
+                panel: this,
+                getData: () => getPaneData(),
+            });
+            return;
+        }
+
+        const containerApi = (this._params! as PanePanelInitParameter)
+            .containerApi;
+        const panelId = data.paneId;
+
+        const existingPanel = containerApi.getPanel(panelId);
+        if (!existingPanel) {
+            this._onDidDrop.fire({
+                ...event,
+                panel: this,
+                getData: () => getPaneData(),
+            });
+            return;
+        }
+
+        const allPanels = containerApi.getPanels();
+
+        const fromIndex = allPanels.indexOf(existingPanel);
+        let toIndex = containerApi.getPanels().indexOf(this);
+
+        if (
+            event.position === Position.Left ||
+            event.position === Position.Top
+        ) {
+            toIndex = Math.max(0, toIndex - 1);
+        }
+        if (
+            event.position === Position.Right ||
+            event.position === Position.Bottom
+        ) {
+            if (fromIndex > toIndex) {
+                toIndex++;
+            }
+            toIndex = Math.min(allPanels.length - 1, toIndex);
+        }
+
+        containerApi.movePanel(fromIndex, toIndex);
     }
 }

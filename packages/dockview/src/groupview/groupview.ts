@@ -19,7 +19,6 @@ export enum GroupChangeKind2 {
     ADD_PANEL = 'ADD_PANEL',
     REMOVE_PANEL = 'REMOVE_PANEL',
     PANEL_ACTIVE = 'PANEL_ACTIVE',
-    GROUP_ACTIVE = 'GROUP_ACTIVE',
 }
 
 export interface DndService {
@@ -365,6 +364,10 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         ) {
             options.index = this.panels.length;
         }
+
+        // ensure the group is updated before we fire any events
+        panel.updateParentGroup(this.parent, true);
+
         if (this._activePanel === panel) {
             this.accessor.doSetGroupActive(this.parent);
             return;

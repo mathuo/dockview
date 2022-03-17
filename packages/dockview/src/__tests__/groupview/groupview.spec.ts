@@ -444,4 +444,19 @@ describe('groupview', () => {
         groupview.model.closeAllPanels();
         expect(removeGroupMock).toBeCalledWith(groupview);
     });
+
+    test('that group is set on panel during onDidAddPanel event', () => {
+        const cut = new DockviewComponent(document.createElement('div'), {
+            components: {
+                component: TestContentPart,
+            },
+        });
+
+        const disposable = cut.onDidAddPanel((panel) => {
+            expect(panel.group).toBeTruthy();
+        });
+
+        const panel = cut.addPanel({ id: 'id', component: 'component' });
+        disposable.dispose();
+    });
 });
