@@ -115,6 +115,7 @@ export interface IDockviewComponent extends IBaseGrid<GroupviewPanel> {
     //
     readonly onDidRemovePanel: Event<IGroupPanel>;
     readonly onDidAddPanel: Event<IGroupPanel>;
+    readonly onDidLayoutfromJSON: Event<void>;
     readonly onDidActivePanelChange: Event<IGroupPanel | undefined>;
 }
 
@@ -122,7 +123,9 @@ export class DockviewComponent
     extends BaseGrid<GroupviewPanel>
     implements IDockviewComponent
 {
-    // private readonly _panels = new Map<string, IValueDisposable<IGroupPanel>>();
+    private _deserializer: IPanelDeserializer | undefined;
+    private _api: DockviewApi;
+    private _options: DockviewComponentOptions;
 
     // events
     private readonly _onTabInteractionEvent = new Emitter<LayoutMouseEvent>();
@@ -143,16 +146,14 @@ export class DockviewComponent
     private readonly _onDidAddPanel = new Emitter<IGroupPanel>();
     readonly onDidAddPanel: Event<IGroupPanel> = this._onDidAddPanel.event;
 
+    private readonly _onDidLayoutfromJSON = new Emitter<void>();
+    readonly onDidLayoutfromJSON: Event<void> = this._onDidLayoutfromJSON.event;
+
     private readonly _onDidActivePanelChange = new Emitter<
         IGroupPanel | undefined
     >();
     readonly onDidActivePanelChange: Event<IGroupPanel | undefined> =
         this._onDidActivePanelChange.event;
-
-    // everything else
-    private _deserializer: IPanelDeserializer | undefined;
-    private _api: DockviewApi;
-    private _options: DockviewComponentOptions;
 
     get totalPanels(): number {
         return this.panels.length;
@@ -373,6 +374,7 @@ export class DockviewComponent
         this.gridview.layout(this.width, this.height);
 
         this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT_FROM_JSON });
+        this._onDidLayoutfromJSON.fire();
     }
 
     closeAllGroups(): void {
@@ -602,7 +604,7 @@ export class DockviewComponent
     override doSetGroupActive(
         group: GroupviewPanel | undefined,
         skipFocus?: boolean
-    ) {
+    ): void {
         const isGroupAlreadyFocused = this._activeGroup === group;
         super.doSetGroupActive(group, skipFocus);
 
@@ -767,5 +769,6 @@ export class DockviewComponent
         this._onDidActivePanelChange.dispose();
         this._onDidAddPanel.dispose();
         this._onDidRemovePanel.dispose();
+        this._onDidLayoutfromJSON.dispose();
     }
 }
