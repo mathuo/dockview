@@ -255,6 +255,22 @@ export class GridviewApi implements CommonApi {
         return this.component.onDidLayoutChange;
     }
 
+    get onDidAddGroup(): Event<IGridviewPanel> {
+        return this.component.onDidAddGroup;
+    }
+
+    get onDidRemoveGroup(): Event<IGridviewPanel> {
+        return this.component.onDidRemoveGroup;
+    }
+
+    get onDidActiveGroupChange(): Event<IGridviewPanel | undefined> {
+        return this.component.onDidActiveGroupChange;
+    }
+
+    get onDidLayoutFromJSON(): Event<void> {
+        return this.component.onDidLayoutFromJSON;
+    }
+
     get panels(): IGridviewPanel[] {
         return this.component.groups;
     }
@@ -356,6 +372,34 @@ export class DockviewApi implements CommonApi {
 
     get onGridEvent(): Event<GroupChangeEvent> {
         return this.component.onGridEvent;
+    }
+
+    get onDidActiveGroupChange(): Event<IGroupviewPanel | undefined> {
+        return this.component.onDidActiveGroupChange;
+    }
+
+    get onDidAddGroup(): Event<IGroupviewPanel> {
+        return this.component.onDidAddGroup;
+    }
+
+    get onDidRemoveGroup(): Event<IGroupviewPanel> {
+        return this.component.onDidRemoveGroup;
+    }
+
+    get onDidActivePanelChange(): Event<IGroupPanel | undefined> {
+        return this.component.onDidActivePanelChange;
+    }
+
+    get onDidAddPanel(): Event<IGroupPanel> {
+        return this.component.onDidAddPanel;
+    }
+
+    get onDidRemovePanel(): Event<IGroupPanel> {
+        return this.component.onDidRemovePanel;
+    }
+
+    get onDidLayoutfromJSON(): Event<void> {
+        return this.component.onDidLayoutfromJSON;
     }
 
     get onDidLayoutChange(): Event<void> {

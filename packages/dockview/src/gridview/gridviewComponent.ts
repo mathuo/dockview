@@ -27,6 +27,7 @@ import { GridviewPanelApiImpl } from '../api/gridviewPanelApi';
 import { GridviewApi } from '../api/component.api';
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { createComponent } from '../panel/componentFactory';
+import { Emitter, Event } from '../events';
 
 interface PanelReference {
     api: GridviewPanelApiImpl;
@@ -66,6 +67,7 @@ export type GridviewComponentUpdateOptions = Pick<
 
 export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
     readonly orientation: Orientation;
+    readonly onDidLayoutFromJSON: Event<void>;
     updateOptions(options: Partial<GridviewComponentUpdateOptions>): void;
     addPanel(options: AddComponentOptions): void;
     removePanel(panel: IGridviewPanel, sizing?: Sizing): void;
@@ -90,6 +92,9 @@ export class GridviewComponent
 {
     private _options: GridviewComponentOptions;
     private _deserializer: IPanelDeserializer | undefined;
+
+    private readonly _onDidLayoutfromJSON = new Emitter<void>();
+    readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutfromJSON.event;
 
     get orientation() {
         return this.gridview.orientation;
@@ -249,6 +254,7 @@ export class GridviewComponent
         }
 
         this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT_FROM_JSON });
+        this._onDidLayoutfromJSON.fire();
     }
 
     movePanel(
@@ -427,5 +433,7 @@ export class GridviewComponent
 
     public dispose() {
         super.dispose();
+
+        this._onDidLayoutfromJSON.dispose();
     }
 }

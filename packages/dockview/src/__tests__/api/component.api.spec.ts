@@ -91,6 +91,10 @@ describe('component.api', () => {
                 'focus',
                 'resizeToFit',
                 'toJSON',
+                'onDidActiveGroupChange',
+                'onDidAddGroup',
+                'onDidRemoveGroup',
+                'onDidLayoutFromJSON',
             ];
 
             for (const _ of list) {
@@ -130,6 +134,13 @@ describe('component.api', () => {
                 'closeAllGroups',
                 'resizeToFit',
                 'toJSON',
+                'onDidActiveGroupChange',
+                'onDidAddGroup',
+                'onDidRemoveGroup',
+                'onDidActivePanelChange',
+                'onDidAddPanel',
+                'onDidRemovePanel',
+                'onDidLayoutfromJSON',
             ];
 
             for (const _ of list) {
