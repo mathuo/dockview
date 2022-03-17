@@ -74,6 +74,9 @@ export interface IBaseGrid<T extends IGridPanelView> {
     readonly groups: T[];
     readonly onGridEvent: Event<GroupChangeEvent>;
     readonly onDidLayoutChange: Event<void>;
+    readonly onDidRemoveGroup: Event<T>;
+    readonly onDidAddGroup: Event<T>;
+    readonly onDidActiveGroupChange: Event<T | undefined>;
     getPanel(id: string): T | undefined;
     toJSON(): object;
     fromJSON(data: any): void;
@@ -98,6 +101,16 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     private _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange = this._onDidLayoutChange.event;
+
+    private readonly _onDidRemoveGroup = new Emitter<T>();
+    readonly onDidRemoveGroup: Event<T> = this._onDidRemoveGroup.event;
+
+    private readonly _onDidAddGroup = new Emitter<T>();
+    readonly onDidAddGroup: Event<T> = this._onDidAddGroup.event;
+
+    private readonly _onDidActiveGroupChange = new Emitter<T | undefined>();
+    readonly onDidActiveGroupChange: Event<T | undefined> =
+        this._onDidActiveGroupChange.event;
 
     get id() {
         return this._id;
@@ -208,6 +221,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.gridview.addView(group, size ?? Sizing.Distribute, location);
 
         this._onGridEvent.fire({ kind: GroupChangeKind.ADD_GROUP });
+        this._onDidAddGroup.fire(group);
 
         this.doSetGroupActive(group);
     }
@@ -230,6 +244,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         }
 
         this._onGridEvent.fire({ kind: GroupChangeKind.REMOVE_GROUP });
+        this._onDidRemoveGroup.fire(group);
 
         if (!options?.skipActive && this._activeGroup === group) {
             const groups = Array.from(this._groups.values());
@@ -269,6 +284,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this._onGridEvent.fire({
             kind: GroupChangeKind.GROUP_ACTIVE,
         });
+        this._onDidActiveGroupChange.fire(group);
     }
 
     public removeGroup(group: T) {
@@ -337,6 +353,11 @@ export abstract class BaseGrid<T extends IGridPanelView>
         super.dispose();
 
         this._onGridEvent.dispose();
+        this._onDidActiveGroupChange.dispose();
+        this._onDidAddGroup.dispose();
+        this._onDidRemoveGroup.dispose();
+        this._onDidLayoutChange.dispose();
+
         this.gridview.dispose();
     }
 }

@@ -1,4 +1,3 @@
-import { GroupChangeKind2 } from '../groupview/groupview';
 import { DockviewApi } from '../api/component.api';
 import { DockviewPanelApiImpl } from '../api/groupPanelApi';
 import {
@@ -146,20 +145,6 @@ export class DockviewGroupPanel
     public updateParentGroup(group: GroupviewPanel, isGroupActive: boolean) {
         this._group = group;
         this.api.group = group;
-
-        this.mutableDisposable.value = this._group.model.onDidGroupChange(
-            (ev) => {
-                if (ev.kind === GroupChangeKind2.GROUP_ACTIVE) {
-                    const isVisible = !!this._group?.model.isPanelActive(this);
-                    this.api._onDidActiveChange.fire({
-                        isActive: isGroupActive && isVisible,
-                    });
-                    this.api._onDidVisibilityChange.fire({
-                        isVisible,
-                    });
-                }
-            }
-        );
 
         const isPanelVisible = this._group.model.isPanelActive(this);
 

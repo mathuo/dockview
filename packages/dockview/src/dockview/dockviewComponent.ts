@@ -113,6 +113,10 @@ export interface IDockviewComponent extends IBaseGrid<GroupviewPanel> {
     focus(): void;
     toJSON(): SerializedDockview;
     fromJSON(data: SerializedDockview): void;
+    //
+    readonly onDidRemovePanel: Event<IGroupPanel>;
+    readonly onDidAddPanel: Event<IGroupPanel>;
+    readonly onDidActivePanelChange: Event<IGroupPanel | undefined>;
 }
 
 export class DockviewComponent
@@ -132,6 +136,19 @@ export class DockviewComponent
 
     private readonly _onDidDrop = new Emitter<DockviewDropEvent>();
     readonly onDidDrop: Event<DockviewDropEvent> = this._onDidDrop.event;
+
+    private readonly _onDidRemovePanel = new Emitter<IGroupPanel>();
+    readonly onDidRemovePanel: Event<IGroupPanel> =
+        this._onDidRemovePanel.event;
+
+    private readonly _onDidAddPanel = new Emitter<IGroupPanel>();
+    readonly onDidAddPanel: Event<IGroupPanel> = this._onDidAddPanel.event;
+
+    private readonly _onDidActivePanelChange = new Emitter<
+        IGroupPanel | undefined
+    >();
+    readonly onDidActivePanelChange: Event<IGroupPanel | undefined> =
+        this._onDidActivePanelChange.event;
 
     // everything else
     private _deserializer: IPanelDeserializer | undefined;
@@ -632,6 +649,9 @@ export class DockviewComponent
                 kind: GroupChangeKind.PANEL_ACTIVE,
                 panel: this._activeGroup?.model.activePanel,
             });
+            this._onDidActivePanelChange.fire(
+                this._activeGroup?.model.activePanel
+            );
         }
     }
 
@@ -677,24 +697,25 @@ export class DockviewComponent
                                 kind: GroupChangeKind.ADD_PANEL,
                                 panel: event.panel,
                             });
-                            break;
-                        case GroupChangeKind2.GROUP_ACTIVE:
-                            this._onGridEvent.fire({
-                                kind: GroupChangeKind.GROUP_ACTIVE,
-                                panel: event.panel,
-                            });
+                            if (event.panel) {
+                                this._onDidAddPanel.fire(event.panel);
+                            }
                             break;
                         case GroupChangeKind2.REMOVE_PANEL:
                             this._onGridEvent.fire({
                                 kind: GroupChangeKind.REMOVE_PANEL,
                                 panel: event.panel,
                             });
+                            if (event.panel) {
+                                this._onDidRemovePanel.fire(event.panel);
+                            }
                             break;
                         case GroupChangeKind2.PANEL_ACTIVE:
                             this._onGridEvent.fire({
                                 kind: GroupChangeKind.PANEL_ACTIVE,
                                 panel: event.panel,
                             });
+                            this._onDidActivePanelChange.fire(event.panel);
                             break;
                     }
                 })
@@ -777,5 +798,13 @@ export class DockviewComponent
         return Array.from(this._groups.values()).find((group) =>
             group.value.model.containsPanel(panel)
         )?.value;
+    }
+
+    public dispose(): void {
+        super.dispose();
+
+        this._onDidActivePanelChange.dispose();
+        this._onDidAddPanel.dispose();
+        this._onDidRemovePanel.dispose();
     }
 }
