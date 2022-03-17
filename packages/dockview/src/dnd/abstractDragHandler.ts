@@ -1,7 +1,10 @@
-import { MutableDisposable } from '..';
 import { getElementsByTagName } from '../dom';
 import { addDisposableListener, Emitter } from '../events';
-import { CompositeDisposable, IDisposable } from '../lifecycle';
+import {
+    CompositeDisposable,
+    IDisposable,
+    MutableDisposable,
+} from '../lifecycle';
 
 export abstract class DragHandler extends CompositeDisposable {
     private readonly disposable = new MutableDisposable();
