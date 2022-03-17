@@ -13,11 +13,12 @@
         "forceConsistentCasingInFileNames": true,
         "strict": true,
         "lib": [
-			"ES2015",
-			"ES2016.Array.Include",
-			"ES2017.String",
-			"ES2018.Promise",
-			"DOM",
-		]
+          "ES2015",
+          "ES2016.Array.Include",
+          "ES2017.String",
+          "ES2018.Promise",
+          "ES2019",
+          "DOM",
+		  ]
     }
 }
