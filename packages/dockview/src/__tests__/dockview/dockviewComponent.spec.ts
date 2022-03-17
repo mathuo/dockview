@@ -811,4 +811,31 @@ describe('dockviewComponent', () => {
 
         disposable.dispose();
     });
+
+    test('that removing a panel from a group reflects in the dockviewcomponent when searching for a panel', () => {
+        dockview.layout(500, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        expect(dockview.getGroupPanel('panel1')).toEqual(panel1);
+        expect(dockview.getGroupPanel('panel2')).toEqual(panel2);
+
+        panel1.group.model.removePanel(panel1);
+
+        expect(dockview.getGroupPanel('panel1')).toBeUndefined();
+        expect(dockview.getGroupPanel('panel2')).toEqual(panel2);
+
+        dockview.removePanel(panel2);
+
+        expect(dockview.getGroupPanel('panel1')).toBeUndefined();
+        expect(dockview.getGroupPanel('panel2')).toBeUndefined();
+    });
 });
