@@ -341,8 +341,7 @@ export class DockviewComponent
             new DefaultDeserializer(this, {
                 createPanel: (id) => {
                     const panelData = panels[id];
-                    const panel = this.deserializer!.fromJSON(panelData);
-                    return panel;
+                    return this.deserializer!.fromJSON(panelData);
                 },
             })
         );
