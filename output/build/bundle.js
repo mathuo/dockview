@@ -35,7 +35,11 @@ exports.toggleClass = toggleClass;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -75,7 +79,11 @@ ReactDOM.render(React.createElement(recoil_1.RecoilRoot, null,
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -185,7 +193,11 @@ exports.Application = Application;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -375,7 +387,11 @@ exports.ControlCenter = ControlCenter;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -413,7 +429,11 @@ exports.CustomTab = CustomTab;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -465,7 +485,11 @@ exports.Footer = Footer;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -745,7 +769,11 @@ var Watermark = function (props) {
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -852,7 +880,11 @@ var __assign = (this && this.__assign) || function () {
 };
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -970,7 +1002,11 @@ exports.ExampleFunctions = ExampleFunctions;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -1022,7 +1058,11 @@ exports.useLayoutRegistry = useLayoutRegistry;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -1094,7 +1134,11 @@ exports.Settings = Settings;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -1252,7 +1296,11 @@ var __assign = (this && this.__assign) || function () {
 };
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -1553,7 +1601,11 @@ var __assign = (this && this.__assign) || function () {
 };
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -1795,7 +1847,11 @@ exports.Common = Common;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -1867,7 +1923,11 @@ exports.WelcomePanel = WelcomePanel;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -2534,7 +2594,11 @@ exports.ViewService = ViewService;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -31925,47 +31989,82 @@ if (false) {} else {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   "DefaultValue": () => (/* binding */ Recoil_index_1),
-/* harmony export */   "RecoilRoot": () => (/* binding */ Recoil_index_2),
-/* harmony export */   "atom": () => (/* binding */ Recoil_index_4),
-/* harmony export */   "atomFamily": () => (/* binding */ Recoil_index_7),
-/* harmony export */   "batchUpdates": () => (/* binding */ Recoil_index_33),
-/* harmony export */   "constSelector": () => (/* binding */ Recoil_index_9),
-/* harmony export */   "errorSelector": () => (/* binding */ Recoil_index_10),
-/* harmony export */   "isRecoilValue": () => (/* binding */ Recoil_index_32),
-/* harmony export */   "noWait": () => (/* binding */ Recoil_index_27),
-/* harmony export */   "readOnlySelector": () => (/* binding */ Recoil_index_11),
-/* harmony export */   "retentionZone": () => (/* binding */ Recoil_index_6),
-/* harmony export */   "selector": () => (/* binding */ Recoil_index_5),
-/* harmony export */   "selectorFamily": () => (/* binding */ Recoil_index_8),
-/* harmony export */   "setBatcher": () => (/* binding */ Recoil_index_34),
+/* harmony export */   "RecoilLoadable": () => (/* binding */ Recoil_index_3),
+/* harmony export */   "RecoilRoot": () => (/* binding */ Recoil_index_4),
+/* harmony export */   "atom": () => (/* binding */ Recoil_index_7),
+/* harmony export */   "atomFamily": () => (/* binding */ Recoil_index_9),
+/* harmony export */   "constSelector": () => (/* binding */ Recoil_index_11),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   "errorSelector": () => (/* binding */ Recoil_index_12),
+/* harmony export */   "isRecoilValue": () => (/* binding */ Recoil_index_2),
+/* harmony export */   "noWait": () => (/* binding */ Recoil_index_14),
+/* harmony export */   "readOnlySelector": () => (/* binding */ Recoil_index_13),
+/* harmony export */   "retentionZone": () => (/* binding */ Recoil_index_37),
+/* harmony export */   "selector": () => (/* binding */ Recoil_index_8),
+/* harmony export */   "selectorFamily": () => (/* binding */ Recoil_index_10),
 /* harmony export */   "snapshot_UNSTABLE": () => (/* binding */ Recoil_index_35),
-/* harmony export */   "useGetRecoilValueInfo_UNSTABLE": () => (/* binding */ Recoil_index_18),
-/* harmony export */   "useGotoRecoilSnapshot": () => (/* binding */ Recoil_index_22),
-/* harmony export */   "useRecoilBridgeAcrossReactRoots_UNSTABLE": () => (/* binding */ Recoil_index_3),
-/* harmony export */   "useRecoilCallback": () => (/* binding */ Recoil_index_20),
-/* harmony export */   "useRecoilSnapshot": () => (/* binding */ Recoil_index_23),
-/* harmony export */   "useRecoilState": () => (/* binding */ Recoil_index_14),
-/* harmony export */   "useRecoilStateLoadable": () => (/* binding */ Recoil_index_15),
-/* harmony export */   "useRecoilTransactionObserver_UNSTABLE": () => (/* binding */ Recoil_index_24),
-/* harmony export */   "useRecoilTransaction_UNSTABLE": () => (/* binding */ Recoil_index_21),
-/* harmony export */   "useRecoilValue": () => (/* binding */ Recoil_index_12),
-/* harmony export */   "useRecoilValueLoadable": () => (/* binding */ Recoil_index_13),
-/* harmony export */   "useResetRecoilState": () => (/* binding */ Recoil_index_17),
-/* harmony export */   "useRetain": () => (/* binding */ Recoil_index_19),
-/* harmony export */   "useSetRecoilState": () => (/* binding */ Recoil_index_16),
-/* harmony export */   "useSetUnvalidatedAtomValues_UNSTABLE": () => (/* binding */ Recoil_index_26),
-/* harmony export */   "useTransactionObservation_UNSTABLE": () => (/* binding */ Recoil_index_25),
-/* harmony export */   "waitForAll": () => (/* binding */ Recoil_index_30),
-/* harmony export */   "waitForAllSettled": () => (/* binding */ Recoil_index_31),
-/* harmony export */   "waitForAny": () => (/* binding */ Recoil_index_29),
-/* harmony export */   "waitForNone": () => (/* binding */ Recoil_index_28)
+/* harmony export */   "useGetRecoilValueInfo_UNSTABLE": () => (/* binding */ Recoil_index_25),
+/* harmony export */   "useGotoRecoilSnapshot": () => (/* binding */ Recoil_index_32),
+/* harmony export */   "useRecoilBridgeAcrossReactRoots_UNSTABLE": () => (/* binding */ Recoil_index_6),
+/* harmony export */   "useRecoilCallback": () => (/* binding */ Recoil_index_30),
+/* harmony export */   "useRecoilRefresher_UNSTABLE": () => (/* binding */ Recoil_index_26),
+/* harmony export */   "useRecoilSnapshot": () => (/* binding */ Recoil_index_33),
+/* harmony export */   "useRecoilState": () => (/* binding */ Recoil_index_21),
+/* harmony export */   "useRecoilStateLoadable": () => (/* binding */ Recoil_index_22),
+/* harmony export */   "useRecoilState_TRANSITION_SUPPORT_UNSTABLE": () => (/* binding */ Recoil_index_29),
+/* harmony export */   "useRecoilStoreID": () => (/* binding */ Recoil_index_5),
+/* harmony export */   "useRecoilTransactionObserver_UNSTABLE": () => (/* binding */ Recoil_index_34),
+/* harmony export */   "useRecoilTransaction_UNSTABLE": () => (/* binding */ Recoil_index_31),
+/* harmony export */   "useRecoilValue": () => (/* binding */ Recoil_index_19),
+/* harmony export */   "useRecoilValueLoadable": () => (/* binding */ Recoil_index_20),
+/* harmony export */   "useRecoilValueLoadable_TRANSITION_SUPPORT_UNSTABLE": () => (/* binding */ Recoil_index_27),
+/* harmony export */   "useRecoilValue_TRANSITION_SUPPORT_UNSTABLE": () => (/* binding */ Recoil_index_28),
+/* harmony export */   "useResetRecoilState": () => (/* binding */ Recoil_index_24),
+/* harmony export */   "useRetain": () => (/* binding */ Recoil_index_36),
+/* harmony export */   "useSetRecoilState": () => (/* binding */ Recoil_index_23),
+/* harmony export */   "waitForAll": () => (/* binding */ Recoil_index_17),
+/* harmony export */   "waitForAllSettled": () => (/* binding */ Recoil_index_18),
+/* harmony export */   "waitForAny": () => (/* binding */ Recoil_index_16),
+/* harmony export */   "waitForNone": () => (/* binding */ Recoil_index_15)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 
 
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+
+function err(message) {
+  const error = new Error(message); // In V8, Error objects keep the closure scope chain alive until the
+  // err.stack property is accessed.
+
+  if (error.stack === undefined) {
+    // IE sets the stack only if error is thrown
+    try {
+      throw error;
+    } catch (_) {} // eslint-disable-line fb-www/no-unused-catch-bindings, no-empty
+
+  }
+
+  return error;
+}
+
+var err_1 = err;
+
+// @oss-only
+
+
+var Recoil_err = err_1;
 
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -31988,443 +32087,15 @@ function isPromise(p) {
 
 var Recoil_isPromise = isPromise;
 
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails oncall+recoil
- * 
- * @format
- */
-
 function nullthrows(x, message) {
   if (x != null) {
     return x;
   }
 
-  throw new Error(message !== null && message !== void 0 ? message : 'Got unexpected null or undefined');
+  throw Recoil_err(message !== null && message !== void 0 ? message : 'Got unexpected null or undefined');
 }
 
 var Recoil_nullthrows = nullthrows;
-
-// TODO Convert Loadable to a Class to allow for runtime type detection.
-// Containing static factories of withValue(), withError(), withPromise(), and all()
-
-
-class Canceled {}
-
-const CANCELED = new Canceled();
-const loadableAccessors = {
-  valueMaybe() {
-    return undefined;
-  },
-
-  valueOrThrow() {
-    const error = new Error( // $FlowFixMe[object-this-reference]
-    `Loadable expected value, but in "${this.state}" state`); // V8 keeps closures alive until stack is accessed, this prevents a memory leak
-    throw error;
-  },
-
-  errorMaybe() {
-    return undefined;
-  },
-
-  errorOrThrow() {
-    const error = new Error( // $FlowFixMe[object-this-reference]
-    `Loadable expected error, but in "${this.state}" state`); // V8 keeps closures alive until stack is accessed, this prevents a memory leak
-    throw error;
-  },
-
-  promiseMaybe() {
-    return undefined;
-  },
-
-  promiseOrThrow() {
-    const error = new Error( // $FlowFixMe[object-this-reference]
-    `Loadable expected promise, but in "${this.state}" state`); // V8 keeps closures alive until stack is accessed, this prevents a memory leak
-    throw error;
-  },
-
-  is(other) {
-    // $FlowFixMe[object-this-reference]
-    return other.state === this.state && other.contents === this.contents;
-  },
-
-  // TODO Convert Loadable to a Class to better support chaining
-  //      by returning a Loadable from a map function
-  map(map) {
-    // $FlowFixMe[object-this-reference]
-    if (this.state === 'hasError') {
-      // $FlowFixMe[object-this-reference]
-      return this;
-    } // $FlowFixMe[object-this-reference]
-
-
-    if (this.state === 'hasValue') {
-      try {
-        // $FlowFixMe[object-this-reference]
-        const next = map(this.contents); // TODO if next instanceof Loadable, then return next
-
-        return Recoil_isPromise(next) ? loadableWithPromise(next.then(value => ({
-          __value: value
-        }))) : loadableWithValue(next);
-      } catch (e) {
-        return Recoil_isPromise(e) ? // If we "suspended", then try again.
-        // errors and subsequent retries will be handled in 'loading' case
-        // $FlowFixMe[object-this-reference]
-        loadableWithPromise(e.next(() => map(this.contents))) : loadableWithError(e);
-      }
-    } // $FlowFixMe[object-this-reference]
-
-
-    if (this.state === 'loading') {
-      return loadableWithPromise( // $FlowFixMe[object-this-reference]
-      this.contents // TODO if map returns a loadable, then return the value or promise or throw the error
-      .then(value => ({
-        __value: map(value.__value)
-      })).catch(e => {
-        if (Recoil_isPromise(e)) {
-          // we were "suspended," try again
-          // $FlowFixMe[object-this-reference]
-          return e.then(() => map(this.contents));
-        }
-
-        throw e;
-      }));
-    }
-
-    const error = new Error('Invalid Loadable state'); // V8 keeps closures alive until stack is accessed, this prevents a memory leak
-    throw error;
-  }
-
-};
-
-function loadableWithValue(value) {
-  // Build objects this way since Flow doesn't support disjoint unions for class properties
-  return Object.freeze({
-    state: 'hasValue',
-    contents: value,
-    ...loadableAccessors,
-
-    getValue() {
-      return this.contents;
-    },
-
-    toPromise() {
-      return Promise.resolve(this.contents);
-    },
-
-    valueMaybe() {
-      return this.contents;
-    },
-
-    valueOrThrow() {
-      return this.contents;
-    }
-
-  });
-}
-
-function loadableWithError(error) {
-  return Object.freeze({
-    state: 'hasError',
-    contents: error,
-    ...loadableAccessors,
-
-    getValue() {
-      throw this.contents;
-    },
-
-    toPromise() {
-      return Promise.reject(this.contents);
-    },
-
-    errorMaybe() {
-      return this.contents;
-    },
-
-    errorOrThrow() {
-      return this.contents;
-    }
-
-  });
-} // TODO Probably need to clean-up this API to accept `Promise<T>`
-// with an alternative params or mechanism for internal key proxy.
-
-
-function loadableWithPromise(promise) {
-  return Object.freeze({
-    state: 'loading',
-    contents: promise,
-    ...loadableAccessors,
-
-    getValue() {
-      throw this.contents.then(({
-        __value
-      }) => __value);
-    },
-
-    toPromise() {
-      return this.contents.then(({
-        __value
-      }) => __value);
-    },
-
-    promiseMaybe() {
-      return this.contents.then(({
-        __value
-      }) => __value);
-    },
-
-    promiseOrThrow() {
-      return this.contents.then(({
-        __value
-      }) => __value);
-    }
-
-  });
-}
-
-function loadableLoading() {
-  return loadableWithPromise(new Promise(() => {}));
-}
-
-function loadableAll(inputs) {
-  return inputs.every(i => i.state === 'hasValue') ? loadableWithValue(inputs.map(i => i.contents)) : inputs.some(i => i.state === 'hasError') ? loadableWithError(Recoil_nullthrows(inputs.find(i => i.state === 'hasError'), 'Invalid loadable passed to loadableAll').contents) : loadableWithPromise(Promise.all(inputs.map(i => i.contents)).then(value => ({
-    __value: value
-  })));
-}
-
-var Recoil_Loadable = {
-  loadableWithValue,
-  loadableWithError,
-  loadableWithPromise,
-  loadableLoading,
-  loadableAll,
-  Canceled,
-  CANCELED
-};
-
-var _useMutableSource;
-
- // FIXME T2710559282599660
-
-
-const useMutableSource = // flowlint-line unclear-type:off
-(_useMutableSource = react__WEBPACK_IMPORTED_MODULE_0__.useMutableSource) !== null && _useMutableSource !== void 0 ? _useMutableSource : react__WEBPACK_IMPORTED_MODULE_0__.unstable_useMutableSource; // flowlint-line unclear-type:off
-
-function mutableSourceExists() {
-  return useMutableSource && !(typeof window !== 'undefined' && window.$disableRecoilValueMutableSource_TEMP_HACK_DO_NOT_USE);
-}
-
-var Recoil_mutableSource = {
-  mutableSourceExists,
-  useMutableSource
-};
-
-const {
-  mutableSourceExists: mutableSourceExists$1
-} = Recoil_mutableSource;
-
-const gks = new Map().set('recoil_hamt_2020', true).set('recoil_memory_managament_2020', true).set('recoil_suppress_rerender_in_callback', true);
-
-function Recoil_gkx(gk) {
-  var _gks$get;
-
-  if (gk === 'recoil_early_rendering_2021' && !mutableSourceExists$1()) {
-    return false;
-  }
-
-  return (_gks$get = gks.get(gk)) !== null && _gks$get !== void 0 ? _gks$get : false;
-}
-
-Recoil_gkx.setPass = gk => {
-  gks.set(gk, true);
-};
-
-Recoil_gkx.setFail = gk => {
-  gks.set(gk, false);
-};
-
-var Recoil_gkx_1 = Recoil_gkx; // @oss-only
-
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails oncall+recoil
- * 
- * @format
- */
-
-function recoverableViolation(message, projectName, {
-  error
-} = {}) {
-  if (true) {
-    console.error(message, error);
-  }
-
-  return null;
-}
-
-var recoverableViolation_1 = recoverableViolation;
-
-// @oss-only
-
-
-var Recoil_recoverableViolation = recoverableViolation_1;
-
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * Utilities for working with built-in Maps and Sets without mutating them.
- *
- * @emails oncall+recoil
- * 
- * @format
- */
-
-function setByAddingToSet(set, v) {
-  const next = new Set(set);
-  next.add(v);
-  return next;
-}
-
-function setByDeletingFromSet(set, v) {
-  const next = new Set(set);
-  next.delete(v);
-  return next;
-}
-
-function mapBySettingInMap(map, k, v) {
-  const next = new Map(map);
-  next.set(k, v);
-  return next;
-}
-
-function mapByUpdatingInMap(map, k, updater) {
-  const next = new Map(map);
-  next.set(k, updater(next.get(k)));
-  return next;
-}
-
-function mapByDeletingFromMap(map, k) {
-  const next = new Map(map);
-  next.delete(k);
-  return next;
-}
-
-function mapByDeletingMultipleFromMap(map, ks) {
-  const next = new Map(map);
-  ks.forEach(k => next.delete(k));
-  return next;
-}
-
-var Recoil_CopyOnWrite = {
-  setByAddingToSet,
-  setByDeletingFromSet,
-  mapBySettingInMap,
-  mapByUpdatingInMap,
-  mapByDeletingFromMap,
-  mapByDeletingMultipleFromMap
-};
-
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails oncall+recoil
- * 
- * @format
- */
-/**
- * Creates a new iterable whose output is generated by passing the input
- * iterable's values through the filter function.
- */
-
-function* filterIterable(iterable, predicate) {
-  // Use generator to create iterable/iterator
-  let index = 0;
-
-  for (const value of iterable) {
-    if (predicate(value, index++)) {
-      yield value;
-    }
-  }
-}
-
-var Recoil_filterIterable = filterIterable;
-
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails oncall+recoil
- * 
- * @format
- */
-/**
- * Creates a new iterable whose output is generated by passing the input
- * iterable's values through the mapper function.
- */
-
-function mapIterable(iterable, callback) {
-  // Use generator to create iterable/iterator
-  return function* () {
-    let index = 0;
-
-    for (const value of iterable) {
-      yield callback(value, index++);
-    }
-  }();
-}
-
-var Recoil_mapIterable = mapIterable;
-
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails oncall+recoil
- * 
- * @format
- */
-
-function sprintf(format, ...args) {
-  let index = 0;
-  return format.replace(/%s/g, () => String(args[index++]));
-}
-
-var sprintf_1 = sprintf;
-
-function expectationViolation(format, ...args) {
-  if (true) {
-    const message = sprintf_1.call(null, format, ...args);
-    const error = new Error(message);
-    error.name = 'Expectation Violation';
-    console.error(error);
-  }
-}
-
-var expectationViolation_1 = expectationViolation;
-
-// @oss-only
-
-
-var Recoil_expectationViolation = expectationViolation_1;
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -32440,6 +32111,283 @@ function _defineProperty(obj, key, value) {
 
   return obj;
 }
+
+class BaseLoadable {
+  getValue() {
+    throw Recoil_err('BaseLoadable');
+  }
+
+  toPromise() {
+    throw Recoil_err('BaseLoadable');
+  }
+
+  valueMaybe() {
+    throw Recoil_err('BaseLoadable');
+  }
+
+  valueOrThrow() {
+    // $FlowFixMe[prop-missing]
+    throw Recoil_err(`Loadable expected value, but in "${this.state}" state`);
+  }
+
+  promiseMaybe() {
+    throw Recoil_err('BaseLoadable');
+  }
+
+  promiseOrThrow() {
+    // $FlowFixMe[prop-missing]
+    throw Recoil_err(`Loadable expected promise, but in "${this.state}" state`);
+  }
+
+  errorMaybe() {
+    throw Recoil_err('BaseLoadable');
+  }
+
+  errorOrThrow() {
+    // $FlowFixMe[prop-missing]
+    throw Recoil_err(`Loadable expected error, but in "${this.state}" state`);
+  }
+
+  is(other) {
+    // $FlowFixMe[prop-missing]
+    return other.state === this.state && other.contents === this.contents;
+  }
+
+  map(_map) {
+    throw Recoil_err('BaseLoadable');
+  }
+
+}
+
+class ValueLoadable extends BaseLoadable {
+  constructor(value) {
+    super();
+
+    _defineProperty(this, "state", 'hasValue');
+
+    _defineProperty(this, "contents", void 0);
+
+    this.contents = value;
+  }
+
+  getValue() {
+    return this.contents;
+  }
+
+  toPromise() {
+    return Promise.resolve(this.contents);
+  }
+
+  valueMaybe() {
+    return this.contents;
+  }
+
+  valueOrThrow() {
+    return this.contents;
+  }
+
+  promiseMaybe() {
+    return undefined;
+  }
+
+  errorMaybe() {
+    return undefined;
+  }
+
+  map(map) {
+    try {
+      const next = map(this.contents);
+      return Recoil_isPromise(next) ? loadableWithPromise(next) : isLoadable(next) ? next : loadableWithValue(next);
+    } catch (e) {
+      return Recoil_isPromise(e) ? // If we "suspended", then try again.
+      // errors and subsequent retries will be handled in 'loading' case
+      loadableWithPromise(e.next(() => this.map(map))) : loadableWithError(e);
+    }
+  }
+
+}
+
+class ErrorLoadable extends BaseLoadable {
+  constructor(error) {
+    super();
+
+    _defineProperty(this, "state", 'hasError');
+
+    _defineProperty(this, "contents", void 0);
+
+    this.contents = error;
+  }
+
+  getValue() {
+    throw this.contents;
+  }
+
+  toPromise() {
+    return Promise.reject(this.contents);
+  }
+
+  valueMaybe() {
+    return undefined;
+  }
+
+  promiseMaybe() {
+    return undefined;
+  }
+
+  errorMaybe() {
+    return this.contents;
+  }
+
+  errorOrThrow() {
+    return this.contents;
+  }
+
+  map(_map) {
+    // $FlowIssue[incompatible-return]
+    return this;
+  }
+
+}
+
+class LoadingLoadable extends BaseLoadable {
+  constructor(promise) {
+    super();
+
+    _defineProperty(this, "state", 'loading');
+
+    _defineProperty(this, "contents", void 0);
+
+    this.contents = promise;
+  }
+
+  getValue() {
+    throw this.contents;
+  }
+
+  toPromise() {
+    return this.contents;
+  }
+
+  valueMaybe() {
+    return undefined;
+  }
+
+  promiseMaybe() {
+    return this.contents;
+  }
+
+  promiseOrThrow() {
+    return this.contents;
+  }
+
+  errorMaybe() {
+    return undefined;
+  }
+
+  map(map) {
+    return loadableWithPromise(this.contents.then(value => {
+      const next = map(value);
+
+      if (isLoadable(next)) {
+        const nextLoadable = next;
+
+        switch (nextLoadable.state) {
+          case 'hasValue':
+            return nextLoadable.contents;
+
+          case 'hasError':
+            throw nextLoadable.contents;
+
+          case 'loading':
+            return nextLoadable.contents;
+        }
+      } // $FlowIssue[incompatible-return]
+
+
+      return next;
+    }).catch(e => {
+      if (Recoil_isPromise(e)) {
+        // we were "suspended," try again
+        return e.then(() => this.map(map).contents);
+      }
+
+      throw e;
+    }));
+  }
+
+}
+
+function loadableWithValue(value) {
+  return Object.freeze(new ValueLoadable(value));
+}
+
+function loadableWithError(error) {
+  return Object.freeze(new ErrorLoadable(error));
+}
+
+function loadableWithPromise(promise) {
+  return Object.freeze(new LoadingLoadable(promise));
+}
+
+function loadableLoading() {
+  return Object.freeze(new LoadingLoadable(new Promise(() => {})));
+}
+
+function loadableAllArray(inputs) {
+  return inputs.every(i => i.state === 'hasValue') ? loadableWithValue(inputs.map(i => i.contents)) : inputs.some(i => i.state === 'hasError') ? loadableWithError(Recoil_nullthrows(inputs.find(i => i.state === 'hasError'), 'Invalid loadable passed to loadableAll').contents) : loadableWithPromise(Promise.all(inputs.map(i => i.contents)));
+}
+
+function loadableAll(inputs) {
+  const unwrapedInputs = Array.isArray(inputs) ? inputs : Object.getOwnPropertyNames(inputs).map(key => inputs[key]);
+  const normalizedInputs = unwrapedInputs.map(x => isLoadable(x) ? x : Recoil_isPromise(x) ? loadableWithPromise(x) : loadableWithValue(x));
+  const output = loadableAllArray(normalizedInputs);
+  return Array.isArray(inputs) ? // $FlowIssue[incompatible-return]
+  output : // Object.getOwnPropertyNames() has consistent key ordering with ES6
+  // $FlowIssue[incompatible-call]
+  output.map(outputs => Object.getOwnPropertyNames(inputs).reduce((out, key, idx) => ({ ...out,
+    [key]: outputs[idx]
+  }), {}));
+}
+
+function isLoadable(x) {
+  return x instanceof BaseLoadable;
+}
+
+const LoadableStaticInterface = {
+  of: value => Recoil_isPromise(value) ? loadableWithPromise(value) : isLoadable(value) ? value : loadableWithValue(value),
+  error: error => loadableWithError(error),
+  // $FlowIssue[unclear-type]
+  all: loadableAll,
+  isLoadable
+};
+var Recoil_Loadable = {
+  loadableWithValue,
+  loadableWithError,
+  loadableWithPromise,
+  loadableLoading,
+  loadableAll,
+  isLoadable,
+  RecoilLoadable: LoadableStaticInterface
+};
+
+var Recoil_Loadable_1 = Recoil_Loadable.loadableWithValue;
+var Recoil_Loadable_2 = Recoil_Loadable.loadableWithError;
+var Recoil_Loadable_3 = Recoil_Loadable.loadableWithPromise;
+var Recoil_Loadable_4 = Recoil_Loadable.loadableLoading;
+var Recoil_Loadable_5 = Recoil_Loadable.loadableAll;
+var Recoil_Loadable_6 = Recoil_Loadable.isLoadable;
+var Recoil_Loadable_7 = Recoil_Loadable.RecoilLoadable;
+
+var Recoil_Loadable$1 = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  loadableWithValue: Recoil_Loadable_1,
+  loadableWithError: Recoil_Loadable_2,
+  loadableWithPromise: Recoil_Loadable_3,
+  loadableLoading: Recoil_Loadable_4,
+  loadableAll: Recoil_Loadable_5,
+  isLoadable: Recoil_Loadable_6,
+  RecoilLoadable: Recoil_Loadable_7
+});
 
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -32489,6 +32437,129 @@ var Recoil_RecoilValue$1 = /*#__PURE__*/Object.freeze({
   RecoilValueReadOnly: Recoil_RecoilValue_3,
   isRecoilValue: Recoil_RecoilValue_4
 });
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+
+function sprintf(format, ...args) {
+  let index = 0;
+  return format.replace(/%s/g, () => String(args[index++]));
+}
+
+var sprintf_1 = sprintf;
+
+function expectationViolation(format, ...args) {
+  if (true) {
+    const message = sprintf_1.call(null, format, ...args);
+    const error = new Error(message);
+    error.name = 'Expectation Violation';
+    console.error(error);
+  }
+}
+
+var expectationViolation_1 = expectationViolation;
+
+// @oss-only
+
+
+var Recoil_expectationViolation = expectationViolation_1;
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+
+const gks = new Map().set('recoil_hamt_2020', true).set('recoil_sync_external_store', true).set('recoil_suppress_rerender_in_callback', true).set('recoil_memory_managament_2020', true);
+
+function Recoil_gkx_OSS(gk) {
+  var _gks$get;
+
+  return (_gks$get = gks.get(gk)) !== null && _gks$get !== void 0 ? _gks$get : false;
+}
+
+Recoil_gkx_OSS.setPass = gk => {
+  gks.set(gk, true);
+};
+
+Recoil_gkx_OSS.setFail = gk => {
+  gks.set(gk, false);
+};
+
+Recoil_gkx_OSS.clear = () => {
+  gks.clear();
+};
+
+var Recoil_gkx = Recoil_gkx_OSS; // @oss-only
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+/**
+ * Creates a new iterable whose output is generated by passing the input
+ * iterable's values through the mapper function.
+ */
+
+function mapIterable(iterable, callback) {
+  // Use generator to create iterable/iterator
+  return function* () {
+    let index = 0;
+
+    for (const value of iterable) {
+      yield callback(value, index++);
+    }
+  }();
+}
+
+var Recoil_mapIterable = mapIterable;
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+
+function recoverableViolation(message, projectName, {
+  error
+} = {}) {
+  if (true) {
+    console.error(message, error);
+  }
+
+  return null;
+}
+
+var recoverableViolation_1 = recoverableViolation;
+
+// @oss-only
+
+
+var Recoil_recoverableViolation = recoverableViolation_1;
 
 class DefaultValue {}
 
@@ -32562,13 +32633,13 @@ const configDeletionHandlers = new Map();
 function deleteNodeConfigIfPossible(key) {
   var _node$shouldDeleteCon;
 
-  if (!Recoil_gkx_1('recoil_memory_managament_2020')) {
+  if (!Recoil_gkx('recoil_memory_managament_2020')) {
     return;
   }
 
   const node = nodes.get(key);
 
-  if (node === null || node === void 0 ? void 0 : (_node$shouldDeleteCon = node.shouldDeleteConfigOnRelease) === null || _node$shouldDeleteCon === void 0 ? void 0 : _node$shouldDeleteCon.call(node)) {
+  if (node !== null && node !== void 0 && (_node$shouldDeleteCon = node.shouldDeleteConfigOnRelease) !== null && _node$shouldDeleteCon !== void 0 && _node$shouldDeleteCon.call(node)) {
     var _getConfigDeletionHan;
 
     nodes.delete(key);
@@ -32578,7 +32649,7 @@ function deleteNodeConfigIfPossible(key) {
 }
 
 function setConfigDeletionHandler(key, fn) {
-  if (!Recoil_gkx_1('recoil_memory_managament_2020')) {
+  if (!Recoil_gkx('recoil_memory_managament_2020')) {
     return;
   }
 
@@ -32620,843 +32691,12 @@ var Recoil_Node = {
  * @format
  */
 
-class RetentionZone {}
-
-function retentionZone() {
-  return new RetentionZone();
-}
-
-var Recoil_RetentionZone = {
-  RetentionZone,
-  retentionZone
-};
-
-const {
-  setByAddingToSet: setByAddingToSet$1
-} = Recoil_CopyOnWrite;
-
-
-
-
-
-
-
-const {
-  getNode: getNode$1,
-  getNodeMaybe: getNodeMaybe$1,
-  recoilValuesForKeys: recoilValuesForKeys$1
-} = Recoil_Node;
-
-const {
-  RetentionZone: RetentionZone$1
-} = Recoil_RetentionZone; // flowlint-next-line unclear-type:off
-
-
-const emptySet = Object.freeze(new Set());
-
-class ReadOnlyRecoilValueError extends Error {}
-
-function initializeRetentionForNode(store, nodeKey, retainedBy) {
-  if (!Recoil_gkx_1('recoil_memory_managament_2020')) {
-    return () => undefined;
-  }
-
-  const {
-    nodesRetainedByZone
-  } = store.getState().retention;
-
-  function addToZone(zone) {
-    let set = nodesRetainedByZone.get(zone);
-
-    if (!set) {
-      nodesRetainedByZone.set(zone, set = new Set());
-    }
-
-    set.add(nodeKey);
-  }
-
-  if (retainedBy instanceof RetentionZone$1) {
-    addToZone(retainedBy);
-  } else if (Array.isArray(retainedBy)) {
-    for (const zone of retainedBy) {
-      addToZone(zone);
-    }
-  }
-
-  return () => {
-    if (!Recoil_gkx_1('recoil_memory_managament_2020')) {
-      return;
-    }
-
-    const nodesRetainedByZone = store.getState().retention.nodesRetainedByZone;
-
-    function deleteFromZone(zone) {
-      const set = nodesRetainedByZone.get(zone);
-
-      if (set) {
-        set.delete(nodeKey);
-      }
-
-      if (set && set.size === 0) {
-        nodesRetainedByZone.delete(zone);
-      }
-    }
-
-    if (retainedBy instanceof RetentionZone$1) {
-      deleteFromZone(retainedBy);
-    } else if (Array.isArray(retainedBy)) {
-      for (const zone of retainedBy) {
-        deleteFromZone(zone);
-      }
-    }
-  };
-}
-
-function initializeNodeIfNewToStore(store, treeState, key, trigger) {
-  const storeState = store.getState();
-
-  if (storeState.nodeCleanupFunctions.has(key)) {
-    return;
-  }
-
-  const config = getNode$1(key);
-  const retentionCleanup = initializeRetentionForNode(store, key, config.retainedBy);
-  const nodeCleanup = config.init(store, treeState, trigger);
-  storeState.nodeCleanupFunctions.set(key, () => {
-    nodeCleanup();
-    retentionCleanup();
-  });
-}
-
-function cleanUpNode(store, key) {
-  var _state$nodeCleanupFun;
-
-  const state = store.getState();
-  (_state$nodeCleanupFun = state.nodeCleanupFunctions.get(key)) === null || _state$nodeCleanupFun === void 0 ? void 0 : _state$nodeCleanupFun();
-  state.nodeCleanupFunctions.delete(key);
-} // Get the current value loadable of a node and update the state.
-// Update dependencies and subscriptions for selectors.
-// Update saved value validation for atoms.
-
-
-function getNodeLoadable(store, state, key) {
-  initializeNodeIfNewToStore(store, state, key, 'get');
-  return getNode$1(key).get(store, state);
-} // Peek at the current value loadable for a node without any evaluation or state change
-
-
-function peekNodeLoadable(store, state, key) {
-  return getNode$1(key).peek(store, state);
-} // Write value directly to state bypassing the Node interface as the node
-// definitions may not have been loaded yet when processing the initial snapshot.
-
-
-function setUnvalidatedAtomValue_DEPRECATED(state, key, newValue) {
-  var _node$invalidate;
-
-  const node = getNodeMaybe$1(key);
-  node === null || node === void 0 ? void 0 : (_node$invalidate = node.invalidate) === null || _node$invalidate === void 0 ? void 0 : _node$invalidate.call(node, state);
-  return { ...state,
-    atomValues: state.atomValues.clone().delete(key),
-    nonvalidatedAtoms: state.nonvalidatedAtoms.clone().set(key, newValue),
-    dirtyAtoms: setByAddingToSet$1(state.dirtyAtoms, key)
-  };
-} // Return the discovered dependencies and values to be written by setting
-// a node value. (Multiple values may be written due to selectors getting to
-// set upstreams; deps may be discovered because of reads in updater functions.)
-
-
-function setNodeValue(store, state, key, newValue) {
-  const node = getNode$1(key);
-
-  if (node.set == null) {
-    throw new ReadOnlyRecoilValueError(`Attempt to set read-only RecoilValue: ${key}`);
-  }
-
-  const set = node.set; // so flow doesn't lose the above refinement.
-
-  initializeNodeIfNewToStore(store, state, key, 'set');
-  return set(store, state, newValue);
-}
-
-function peekNodeInfo(store, state, key) {
-  var _graph$nodeDeps$get, _storeState$nodeToCom, _storeState$nodeToCom2;
-
-  const storeState = store.getState();
-  const graph = store.getGraph(state.version);
-  const type = storeState.knownAtoms.has(key) ? 'atom' : storeState.knownSelectors.has(key) ? 'selector' : undefined;
-  const downstreamNodes = Recoil_filterIterable(getDownstreamNodes(store, state, new Set([key])), nodeKey => nodeKey !== key);
-  return {
-    loadable: peekNodeLoadable(store, state, key),
-    isActive: storeState.knownAtoms.has(key) || storeState.knownSelectors.has(key),
-    isSet: type === 'selector' ? false : state.atomValues.has(key),
-    isModified: state.dirtyAtoms.has(key),
-    type,
-    // Report current dependencies.  If the node hasn't been evaluated, then
-    // dependencies may be missing based on the current state.
-    deps: recoilValuesForKeys$1((_graph$nodeDeps$get = graph.nodeDeps.get(key)) !== null && _graph$nodeDeps$get !== void 0 ? _graph$nodeDeps$get : []),
-    // Reportsall "current" subscribers.  Evaluating other nodes or
-    // previous in-progress async evaluations may introduce new subscribers.
-    subscribers: {
-      nodes: recoilValuesForKeys$1(downstreamNodes),
-      components: Recoil_mapIterable((_storeState$nodeToCom = (_storeState$nodeToCom2 = storeState.nodeToComponentSubscriptions.get(key)) === null || _storeState$nodeToCom2 === void 0 ? void 0 : _storeState$nodeToCom2.values()) !== null && _storeState$nodeToCom !== void 0 ? _storeState$nodeToCom : [], ([name]) => ({
-        name
-      }))
-    }
-  };
-} // Find all of the recursively dependent nodes
-
-
-function getDownstreamNodes(store, state, keys) {
-  const visitedNodes = new Set();
-  const visitingNodes = Array.from(keys);
-  const graph = store.getGraph(state.version);
-
-  for (let key = visitingNodes.pop(); key; key = visitingNodes.pop()) {
-    var _graph$nodeToNodeSubs;
-
-    visitedNodes.add(key);
-    const subscribedNodes = (_graph$nodeToNodeSubs = graph.nodeToNodeSubscriptions.get(key)) !== null && _graph$nodeToNodeSubs !== void 0 ? _graph$nodeToNodeSubs : emptySet;
-
-    for (const downstreamNode of subscribedNodes) {
-      if (!visitedNodes.has(downstreamNode)) {
-        visitingNodes.push(downstreamNode);
-      }
-    }
-  }
-
-  return visitedNodes;
-}
-
-var Recoil_FunctionalCore = {
-  getNodeLoadable,
-  peekNodeLoadable,
-  setNodeValue,
-  cleanUpNode,
-  setUnvalidatedAtomValue_DEPRECATED,
-  peekNodeInfo,
-  getDownstreamNodes,
-  initializeNodeIfNewToStore
-};
-
-const {
-  CANCELED: CANCELED$1
-} = Recoil_Loadable;
-
-
-
-
-
-
-
-const {
-  getDownstreamNodes: getDownstreamNodes$1,
-  getNodeLoadable: getNodeLoadable$1,
-  setNodeValue: setNodeValue$1
-} = Recoil_FunctionalCore;
-
-const {
-  getNodeMaybe: getNodeMaybe$2
-} = Recoil_Node;
-
-const {
-  DefaultValue: DefaultValue$1,
-  RecoilValueNotReady: RecoilValueNotReady$1
-} = Recoil_Node;
-
-const {
-  AbstractRecoilValue: AbstractRecoilValue$1,
-  RecoilState: RecoilState$1,
-  RecoilValueReadOnly: RecoilValueReadOnly$1,
-  isRecoilValue: isRecoilValue$1
-} = Recoil_RecoilValue$1;
-
-function getRecoilValueAsLoadable(store, {
-  key
-}, treeState = store.getState().currentTree) {
-  var _storeState$nextTree, _storeState$previousT;
-
-  // Reading from an older tree can cause bugs because the dependencies that we
-  // discover during the read are lost.
-  const storeState = store.getState();
-
-  if (!(treeState.version === storeState.currentTree.version || treeState.version === ((_storeState$nextTree = storeState.nextTree) === null || _storeState$nextTree === void 0 ? void 0 : _storeState$nextTree.version) || treeState.version === ((_storeState$previousT = storeState.previousTree) === null || _storeState$previousT === void 0 ? void 0 : _storeState$previousT.version))) {
-    Recoil_recoverableViolation('Tried to read from a discarded tree');
-  }
-
-  const loadable = getNodeLoadable$1(store, treeState, key);
-
-  if (loadable.state === 'loading') {
-    loadable.contents.catch(() => {
-      /**
-       * HACK: intercept thrown error here to prevent an uncaught promise exception. Ideally this would happen closer to selector
-       * execution (perhaps introducing a new ERROR class to be resolved by async selectors that are in an error state)
-       */
-      return CANCELED$1;
-    });
-  }
-
-  return loadable;
-}
-
-function applyAtomValueWrites(atomValues, writes) {
-  const result = atomValues.clone();
-  writes.forEach((v, k) => {
-    if (v.state === 'hasValue' && v.contents instanceof DefaultValue$1) {
-      result.delete(k);
-    } else {
-      result.set(k, v);
-    }
-  });
-  return result;
-}
-
-function valueFromValueOrUpdater(store, state, {
-  key
-}, valueOrUpdater) {
-  if (typeof valueOrUpdater === 'function') {
-    // Updater form: pass in the current value. Throw if the current value
-    // is unavailable (namely when updating an async selector that's
-    // pending or errored):
-    const current = getNodeLoadable$1(store, state, key);
-
-    if (current.state === 'loading') {
-      throw new RecoilValueNotReady$1(key);
-    } else if (current.state === 'hasError') {
-      throw current.contents;
-    } // T itself may be a function, so our refinement is not sufficient:
-
-
-    return valueOrUpdater(current.contents); // flowlint-line unclear-type:off
-  } else {
-    return valueOrUpdater;
-  }
-}
-
-function applyAction(store, state, action) {
-  if (action.type === 'set') {
-    const {
-      recoilValue,
-      valueOrUpdater
-    } = action;
-    const newValue = valueFromValueOrUpdater(store, state, recoilValue, valueOrUpdater);
-    const writes = setNodeValue$1(store, state, recoilValue.key, newValue);
-
-    for (const [key, loadable] of writes.entries()) {
-      writeLoadableToTreeState(state, key, loadable);
-    }
-  } else if (action.type === 'setLoadable') {
-    const {
-      recoilValue: {
-        key
-      },
-      loadable
-    } = action;
-    writeLoadableToTreeState(state, key, loadable);
-  } else if (action.type === 'markModified') {
-    const {
-      recoilValue: {
-        key
-      }
-    } = action;
-    state.dirtyAtoms.add(key);
-  } else if (action.type === 'setUnvalidated') {
-    var _node$invalidate;
-
-    // Write value directly to state bypassing the Node interface as the node
-    // definitions may not have been loaded yet when processing the initial snapshot.
-    const {
-      recoilValue: {
-        key
-      },
-      unvalidatedValue
-    } = action;
-    const node = getNodeMaybe$2(key);
-    node === null || node === void 0 ? void 0 : (_node$invalidate = node.invalidate) === null || _node$invalidate === void 0 ? void 0 : _node$invalidate.call(node, state);
-    state.atomValues.delete(key);
-    state.nonvalidatedAtoms.set(key, unvalidatedValue);
-    state.dirtyAtoms.add(key);
-  } else {
-    Recoil_recoverableViolation(`Unknown action ${action.type}`);
-  }
-}
-
-function writeLoadableToTreeState(state, key, loadable) {
-  if (loadable.state === 'hasValue' && loadable.contents instanceof DefaultValue$1) {
-    state.atomValues.delete(key);
-  } else {
-    state.atomValues.set(key, loadable);
-  }
-
-  state.dirtyAtoms.add(key);
-  state.nonvalidatedAtoms.delete(key);
-}
-
-function applyActionsToStore(store, actions) {
-  store.replaceState(state => {
-    const newState = copyTreeState(state);
-
-    for (const action of actions) {
-      applyAction(store, newState, action);
-    }
-
-    invalidateDownstreams(store, newState);
-    return newState;
-  });
-}
-
-function queueOrPerformStateUpdate(store, action) {
-  if (batchStack.length) {
-    const actionsByStore = batchStack[batchStack.length - 1];
-    let actions = actionsByStore.get(store);
-
-    if (!actions) {
-      actionsByStore.set(store, actions = []);
-    }
-
-    actions.push(action);
-  } else {
-    applyActionsToStore(store, [action]);
-  }
-}
-
-const batchStack = [];
-
-function batchStart() {
-  const actionsByStore = new Map();
-  batchStack.push(actionsByStore);
-  return () => {
-    for (const [store, actions] of actionsByStore) {
-      applyActionsToStore(store, actions);
-    }
-
-    const popped = batchStack.pop();
-
-    if (popped !== actionsByStore) {
-      Recoil_recoverableViolation('Incorrect order of batch popping');
-    }
-  };
-}
-
-function copyTreeState(state) {
-  return { ...state,
-    atomValues: state.atomValues.clone(),
-    nonvalidatedAtoms: state.nonvalidatedAtoms.clone(),
-    dirtyAtoms: new Set(state.dirtyAtoms)
-  };
-}
-
-function invalidateDownstreams(store, state) {
-  // Inform any nodes that were changed or downstream of changes so that they
-  // can clear out any caches as needed due to the update:
-  const downstreams = getDownstreamNodes$1(store, state, state.dirtyAtoms);
-
-  for (const key of downstreams) {
-    var _getNodeMaybe, _getNodeMaybe$invalid;
-
-    (_getNodeMaybe = getNodeMaybe$2(key)) === null || _getNodeMaybe === void 0 ? void 0 : (_getNodeMaybe$invalid = _getNodeMaybe.invalidate) === null || _getNodeMaybe$invalid === void 0 ? void 0 : _getNodeMaybe$invalid.call(_getNodeMaybe, state);
-  }
-}
-
-function setRecoilValue(store, recoilValue, valueOrUpdater) {
-  queueOrPerformStateUpdate(store, {
-    type: 'set',
-    recoilValue,
-    valueOrUpdater
-  });
-}
-
-function setRecoilValueLoadable(store, recoilValue, loadable) {
-  if (loadable instanceof DefaultValue$1) {
-    return setRecoilValue(store, recoilValue, loadable);
-  }
-
-  queueOrPerformStateUpdate(store, {
-    type: 'setLoadable',
-    recoilValue,
-    loadable
-  });
-}
-
-function markRecoilValueModified(store, recoilValue) {
-  queueOrPerformStateUpdate(store, {
-    type: 'markModified',
-    recoilValue
-  });
-}
-
-function setUnvalidatedRecoilValue(store, recoilValue, unvalidatedValue) {
-  queueOrPerformStateUpdate(store, {
-    type: 'setUnvalidated',
-    recoilValue,
-    unvalidatedValue
-  });
-}
-
-let subscriptionID = 0;
-
-function subscribeToRecoilValue(store, {
-  key
-}, callback, componentDebugName = null) {
-  const subID = subscriptionID++;
-  const storeState = store.getState();
-
-  if (!storeState.nodeToComponentSubscriptions.has(key)) {
-    storeState.nodeToComponentSubscriptions.set(key, new Map());
-  }
-
-  Recoil_nullthrows(storeState.nodeToComponentSubscriptions.get(key)).set(subID, [componentDebugName !== null && componentDebugName !== void 0 ? componentDebugName : '<not captured>', callback]); // Handle the case that, during the same tick that we are subscribing, an atom
-  // has been updated by some effect handler. Otherwise we will miss the update.
-
-  if (Recoil_gkx_1('recoil_early_rendering_2021')) {
-    const nextTree = store.getState().nextTree;
-
-    if (nextTree && nextTree.dirtyAtoms.has(key)) {
-      callback(nextTree);
-    }
-  }
-
-  return {
-    release: () => {
-      const storeState = store.getState();
-      const subs = storeState.nodeToComponentSubscriptions.get(key);
-
-      if (subs === undefined || !subs.has(subID)) {
-        Recoil_recoverableViolation(`Subscription missing at release time for atom ${key}. This is a bug in Recoil.`);
-        return;
-      }
-
-      subs.delete(subID);
-
-      if (subs.size === 0) {
-        storeState.nodeToComponentSubscriptions.delete(key);
-      }
-    }
-  };
-}
-
-var Recoil_RecoilValueInterface = {
-  RecoilValueReadOnly: RecoilValueReadOnly$1,
-  AbstractRecoilValue: AbstractRecoilValue$1,
-  RecoilState: RecoilState$1,
-  getRecoilValueAsLoadable,
-  setRecoilValue,
-  setRecoilValueLoadable,
-  markRecoilValueModified,
-  setUnvalidatedRecoilValue,
-  subscribeToRecoilValue,
-  isRecoilValue: isRecoilValue$1,
-  applyAtomValueWrites,
-  // TODO Remove export when deprecating initialStoreState_DEPRECATED in RecoilRoot
-  batchStart,
-  writeLoadableToTreeState,
-  invalidateDownstreams,
-  copyTreeState,
-  invalidateDownstreams_FOR_TESTING: invalidateDownstreams
-};
-
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails oncall+recoil
- * 
- * @format
- *
- * This is to export esstiential functions from react-dom
- * for our web build
- */
-const {
-  unstable_batchedUpdates
-} = react_dom__WEBPACK_IMPORTED_MODULE_1__;
-
-var ReactBatchedUpdates = {
-  unstable_batchedUpdates
-};
-
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails oncall+recoil
- * 
- * @format
- *
- * This is to export esstiential functions from react-dom
- * for our web build
- */
-// @fb-only: const {unstable_batchedUpdates} = require('ReactDOMComet');
-const {
-  unstable_batchedUpdates: unstable_batchedUpdates$1
-} = ReactBatchedUpdates; // @oss-only
-
-
-var Recoil_ReactBatchedUpdates = {
-  unstable_batchedUpdates: unstable_batchedUpdates$1
-};
-
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails oncall+recoil
- * 
- * @format
- */
-const {
-  batchStart: batchStart$1
-} = Recoil_RecoilValueInterface;
-
-const {
-  unstable_batchedUpdates: unstable_batchedUpdates$2
-} = Recoil_ReactBatchedUpdates;
-
-let batcher = unstable_batchedUpdates$2; // flowlint-next-line unclear-type:off
-
-/**
- * Sets the provided batcher function as the batcher function used by Recoil.
- *
- * Set the batcher to a custom batcher for your renderer,
- * if you use a renderer other than React DOM or React Native.
- */
-const setBatcher = newBatcher => {
-  batcher = newBatcher;
-};
-/**
- * Returns the current batcher function.
- */
-
-
-const getBatcher = () => batcher;
-/**
- * Calls the current batcher function and passes the
- * provided callback function.
- */
-
-
-const batchUpdates = callback => {
-  batcher(() => {
-    let batchEnd = () => undefined;
-
-    try {
-      batchEnd = batchStart$1();
-      callback();
-    } finally {
-      batchEnd();
-    }
-  });
-};
-
-var Recoil_Batching = {
-  getBatcher,
-  setBatcher,
-  batchUpdates
-};
-
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails oncall+recoil
- * 
- * @format
- */
-
 function enqueueExecution(s, f) {
   f();
 }
 
 var Recoil_Queue = {
   enqueueExecution
-};
-
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails oncall+recoil
- * 
- * @format
- */
-/**
- * Returns a set containing all of the values from the first set that are not
- * present in any of the subsequent sets.
- *
- * Note: this is written procedurally (i.e., without filterSet) for performant
- * use in tight loops.
- */
-
-function differenceSets(set, ...setsWithValuesToRemove) {
-  const ret = new Set();
-
-  FIRST: for (const value of set) {
-    for (const otherSet of setsWithValuesToRemove) {
-      if (otherSet.has(value)) {
-        continue FIRST;
-      }
-    }
-
-    ret.add(value);
-  }
-
-  return ret;
-}
-
-var Recoil_differenceSets = differenceSets;
-
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails oncall+recoil
- * 
- * @format
- */
-/**
- * Returns a new Map object with the same keys as the original, but with the
- * values replaced with the output of the given callback function.
- */
-
-function mapMap(map, callback) {
-  const result = new Map();
-  map.forEach((value, key) => {
-    result.set(key, callback(value, key));
-  });
-  return result;
-}
-
-var Recoil_mapMap = mapMap;
-
-function graph() {
-  return {
-    nodeDeps: new Map(),
-    nodeToNodeSubscriptions: new Map()
-  };
-}
-
-function cloneGraph(graph) {
-  return {
-    nodeDeps: Recoil_mapMap(graph.nodeDeps, s => new Set(s)),
-    nodeToNodeSubscriptions: Recoil_mapMap(graph.nodeToNodeSubscriptions, s => new Set(s))
-  };
-} // Note that this overwrites the deps of existing nodes, rather than unioning
-// the new deps with the old deps.
-
-
-function mergeDependencyMapIntoGraph(deps, graph, // If olderGraph is given then we will not overwrite changes made to the given
-// graph compared with olderGraph:
-olderGraph) {
-  const {
-    nodeDeps,
-    nodeToNodeSubscriptions
-  } = graph;
-  deps.forEach((upstreams, downstream) => {
-    const existingUpstreams = nodeDeps.get(downstream);
-
-    if (existingUpstreams && olderGraph && existingUpstreams !== olderGraph.nodeDeps.get(downstream)) {
-      return;
-    } // Update nodeDeps:
-
-
-    nodeDeps.set(downstream, new Set(upstreams)); // Add new deps to nodeToNodeSubscriptions:
-
-    const addedUpstreams = existingUpstreams == null ? upstreams : Recoil_differenceSets(upstreams, existingUpstreams);
-    addedUpstreams.forEach(upstream => {
-      if (!nodeToNodeSubscriptions.has(upstream)) {
-        nodeToNodeSubscriptions.set(upstream, new Set());
-      }
-
-      const existing = Recoil_nullthrows(nodeToNodeSubscriptions.get(upstream));
-      existing.add(downstream);
-    }); // Remove removed deps from nodeToNodeSubscriptions:
-
-    if (existingUpstreams) {
-      const removedUpstreams = Recoil_differenceSets(existingUpstreams, upstreams);
-      removedUpstreams.forEach(upstream => {
-        if (!nodeToNodeSubscriptions.has(upstream)) {
-          return;
-        }
-
-        const existing = Recoil_nullthrows(nodeToNodeSubscriptions.get(upstream));
-        existing.delete(downstream);
-
-        if (existing.size === 0) {
-          nodeToNodeSubscriptions.delete(upstream);
-        }
-      });
-    }
-  });
-}
-
-function saveDependencyMapToStore(dependencyMap, store, version) {
-  var _storeState$nextTree, _storeState$previousT, _storeState$previousT2, _storeState$previousT3;
-
-  const storeState = store.getState();
-
-  if (!(version === storeState.currentTree.version || version === ((_storeState$nextTree = storeState.nextTree) === null || _storeState$nextTree === void 0 ? void 0 : _storeState$nextTree.version) || version === ((_storeState$previousT = storeState.previousTree) === null || _storeState$previousT === void 0 ? void 0 : _storeState$previousT.version))) {
-    Recoil_recoverableViolation('Tried to save dependencies to a discarded tree');
-  } // Merge the dependencies discovered into the store's dependency map
-  // for the version that was read:
-
-
-  const graph = store.getGraph(version);
-  mergeDependencyMapIntoGraph(dependencyMap, graph); // If this version is not the latest version, also write these dependencies
-  // into later versions if they don't already have their own:
-
-  if (version === ((_storeState$previousT2 = storeState.previousTree) === null || _storeState$previousT2 === void 0 ? void 0 : _storeState$previousT2.version)) {
-    const currentGraph = store.getGraph(storeState.currentTree.version);
-    mergeDependencyMapIntoGraph(dependencyMap, currentGraph, graph);
-  }
-
-  if (version === ((_storeState$previousT3 = storeState.previousTree) === null || _storeState$previousT3 === void 0 ? void 0 : _storeState$previousT3.version) || version === storeState.currentTree.version) {
-    var _storeState$nextTree2;
-
-    const nextVersion = (_storeState$nextTree2 = storeState.nextTree) === null || _storeState$nextTree2 === void 0 ? void 0 : _storeState$nextTree2.version;
-
-    if (nextVersion !== undefined) {
-      const nextGraph = store.getGraph(nextVersion);
-      mergeDependencyMapIntoGraph(dependencyMap, nextGraph, graph);
-    }
-  }
-}
-
-function mergeDepsIntoDependencyMap(from, into) {
-  from.forEach((upstreamDeps, downstreamNode) => {
-    if (!into.has(downstreamNode)) {
-      into.set(downstreamNode, new Set());
-    }
-
-    const deps = Recoil_nullthrows(into.get(downstreamNode));
-    upstreamDeps.forEach(dep => deps.add(dep));
-  });
-}
-
-function addToDependencyMap(downstream, upstream, dependencyMap) {
-  if (!dependencyMap.has(downstream)) {
-    dependencyMap.set(downstream, new Set());
-  }
-
-  Recoil_nullthrows(dependencyMap.get(downstream)).add(upstream);
-}
-
-var Recoil_Graph = {
-  addToDependencyMap,
-  cloneGraph,
-  graph,
-  mergeDepsIntoDependencyMap,
-  saveDependencyMapToStore
 };
 
 function createCommonjsModule(fn, module) {
@@ -34597,7 +33837,7 @@ class BuiltInMap {
 class HashArrayMappedTrieMap {
   // Because hamt.empty is not a function there is no way to introduce type
   // parameters on it, so empty is typed as HAMTPlusMap<string, mixed>.
-  // flowlint-next-line unclear-type:off
+  // $FlowIssue
   constructor(existing) {
     _defineProperty(this, "_hamt", hamt_1.empty.beginMutation());
 
@@ -34652,7 +33892,7 @@ class HashArrayMappedTrieMap {
 }
 
 function persistentMap(existing) {
-  if (Recoil_gkx_1('recoil_hamt_2020')) {
+  if (Recoil_gkx('recoil_hamt_2020')) {
     return new HashArrayMappedTrieMap(existing);
   } else {
     return new BuiltInMap(existing);
@@ -34670,21 +33910,230 @@ var Recoil_PersistentMap$1 = /*#__PURE__*/Object.freeze({
   persistentMap: Recoil_PersistentMap_1
 });
 
-const {
-  graph: graph$1
-} = Recoil_Graph;
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+/**
+ * Returns a set containing all of the values from the first set that are not
+ * present in any of the subsequent sets.
+ *
+ * Note: this is written procedurally (i.e., without filterSet) for performant
+ * use in tight loops.
+ */
 
-const {
-  persistentMap: persistentMap$1
-} = Recoil_PersistentMap$1; // flowlint-next-line unclear-type:off
+function differenceSets(set, ...setsWithValuesToRemove) {
+  const ret = new Set();
 
+  FIRST: for (const value of set) {
+    for (const otherSet of setsWithValuesToRemove) {
+      if (otherSet.has(value)) {
+        continue FIRST;
+      }
+    }
+
+    ret.add(value);
+  }
+
+  return ret;
+}
+
+var Recoil_differenceSets = differenceSets;
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+/**
+ * Returns a new Map object with the same keys as the original, but with the
+ * values replaced with the output of the given callback function.
+ */
+
+function mapMap(map, callback) {
+  const result = new Map();
+  map.forEach((value, key) => {
+    result.set(key, callback(value, key));
+  });
+  return result;
+}
+
+var Recoil_mapMap = mapMap;
+
+function makeGraph() {
+  return {
+    nodeDeps: new Map(),
+    nodeToNodeSubscriptions: new Map()
+  };
+}
+
+function cloneGraph(graph) {
+  return {
+    nodeDeps: Recoil_mapMap(graph.nodeDeps, s => new Set(s)),
+    nodeToNodeSubscriptions: Recoil_mapMap(graph.nodeToNodeSubscriptions, s => new Set(s))
+  };
+} // Note that this overwrites the deps of existing nodes, rather than unioning
+// the new deps with the old deps.
+
+
+function mergeDependencyMapIntoGraph(deps, graph, // If olderGraph is given then we will not overwrite changes made to the given
+// graph compared with olderGraph:
+olderGraph) {
+  const {
+    nodeDeps,
+    nodeToNodeSubscriptions
+  } = graph;
+  deps.forEach((upstreams, downstream) => {
+    const existingUpstreams = nodeDeps.get(downstream);
+
+    if (existingUpstreams && olderGraph && existingUpstreams !== olderGraph.nodeDeps.get(downstream)) {
+      return;
+    } // Update nodeDeps:
+
+
+    nodeDeps.set(downstream, new Set(upstreams)); // Add new deps to nodeToNodeSubscriptions:
+
+    const addedUpstreams = existingUpstreams == null ? upstreams : Recoil_differenceSets(upstreams, existingUpstreams);
+    addedUpstreams.forEach(upstream => {
+      if (!nodeToNodeSubscriptions.has(upstream)) {
+        nodeToNodeSubscriptions.set(upstream, new Set());
+      }
+
+      const existing = Recoil_nullthrows(nodeToNodeSubscriptions.get(upstream));
+      existing.add(downstream);
+    }); // Remove removed deps from nodeToNodeSubscriptions:
+
+    if (existingUpstreams) {
+      const removedUpstreams = Recoil_differenceSets(existingUpstreams, upstreams);
+      removedUpstreams.forEach(upstream => {
+        if (!nodeToNodeSubscriptions.has(upstream)) {
+          return;
+        }
+
+        const existing = Recoil_nullthrows(nodeToNodeSubscriptions.get(upstream));
+        existing.delete(downstream);
+
+        if (existing.size === 0) {
+          nodeToNodeSubscriptions.delete(upstream);
+        }
+      });
+    }
+  });
+}
+
+function saveDependencyMapToStore(dependencyMap, store, version) {
+  var _storeState$nextTree, _storeState$previousT, _storeState$previousT2, _storeState$previousT3;
+
+  const storeState = store.getState();
+
+  if (!(version === storeState.currentTree.version || version === ((_storeState$nextTree = storeState.nextTree) === null || _storeState$nextTree === void 0 ? void 0 : _storeState$nextTree.version) || version === ((_storeState$previousT = storeState.previousTree) === null || _storeState$previousT === void 0 ? void 0 : _storeState$previousT.version))) {
+    Recoil_recoverableViolation('Tried to save dependencies to a discarded tree');
+  } // Merge the dependencies discovered into the store's dependency map
+  // for the version that was read:
+
+
+  const graph = store.getGraph(version);
+  mergeDependencyMapIntoGraph(dependencyMap, graph); // If this version is not the latest version, also write these dependencies
+  // into later versions if they don't already have their own:
+
+  if (version === ((_storeState$previousT2 = storeState.previousTree) === null || _storeState$previousT2 === void 0 ? void 0 : _storeState$previousT2.version)) {
+    const currentGraph = store.getGraph(storeState.currentTree.version);
+    mergeDependencyMapIntoGraph(dependencyMap, currentGraph, graph);
+  }
+
+  if (version === ((_storeState$previousT3 = storeState.previousTree) === null || _storeState$previousT3 === void 0 ? void 0 : _storeState$previousT3.version) || version === storeState.currentTree.version) {
+    var _storeState$nextTree2;
+
+    const nextVersion = (_storeState$nextTree2 = storeState.nextTree) === null || _storeState$nextTree2 === void 0 ? void 0 : _storeState$nextTree2.version;
+
+    if (nextVersion !== undefined) {
+      const nextGraph = store.getGraph(nextVersion);
+      mergeDependencyMapIntoGraph(dependencyMap, nextGraph, graph);
+    }
+  }
+}
+
+function mergeDepsIntoDependencyMap(from, into) {
+  from.forEach((upstreamDeps, downstreamNode) => {
+    if (!into.has(downstreamNode)) {
+      into.set(downstreamNode, new Set());
+    }
+
+    const deps = Recoil_nullthrows(into.get(downstreamNode));
+    upstreamDeps.forEach(dep => deps.add(dep));
+  });
+}
+
+function addToDependencyMap(downstream, upstream, dependencyMap) {
+  if (!dependencyMap.has(downstream)) {
+    dependencyMap.set(downstream, new Set());
+  }
+
+  Recoil_nullthrows(dependencyMap.get(downstream)).add(upstream);
+}
+
+var Recoil_Graph = {
+  addToDependencyMap,
+  cloneGraph,
+  graph: makeGraph,
+  mergeDepsIntoDependencyMap,
+  saveDependencyMapToStore
+};
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
 
 let nextTreeStateVersion = 0;
 
 const getNextTreeStateVersion = () => nextTreeStateVersion++;
 
+let nextStoreID = 0;
+
+const getNextStoreID = () => nextStoreID++;
+
+let nextComponentID = 0;
+
+const getNextComponentID = () => nextComponentID++;
+
+var Recoil_Keys = {
+  getNextTreeStateVersion,
+  getNextStoreID,
+  getNextComponentID
+};
+
+const {
+  persistentMap: persistentMap$1
+} = Recoil_PersistentMap$1;
+
+const {
+  graph
+} = Recoil_Graph;
+
+const {
+  getNextTreeStateVersion: getNextTreeStateVersion$1
+} = Recoil_Keys;
+
 function makeEmptyTreeState() {
-  const version = getNextTreeStateVersion();
+  const version = getNextTreeStateVersion$1();
   return {
     version,
     stateID: version,
@@ -34709,8 +34158,7 @@ function makeEmptyStoreState() {
     nodeToComponentSubscriptions: new Map(),
     queuedComponentCallbacks_DEPRECATED: [],
     suspendedComponentResolvers: new Set(),
-    graphsByVersion: new Map().set(currentTree.version, graph$1()),
-    versionsUsedByComponent: new Map(),
+    graphsByVersion: new Map().set(currentTree.version, graph()),
     retention: {
       referenceCounts: new Map(),
       nodesRetainedByZone: new Map(),
@@ -34723,7 +34171,7 @@ function makeEmptyStoreState() {
 var Recoil_State = {
   makeEmptyTreeState,
   makeEmptyStoreState,
-  getNextTreeStateVersion
+  getNextTreeStateVersion: getNextTreeStateVersion$1
 };
 
 /**
@@ -34737,19 +34185,766 @@ var Recoil_State = {
  * @format
  */
 
-function unionSets(...sets) {
-  const result = new Set();
+class RetentionZone {}
 
-  for (const set of sets) {
-    for (const value of set) {
-      result.add(value);
+function retentionZone() {
+  return new RetentionZone();
+}
+
+var Recoil_RetentionZone = {
+  RetentionZone,
+  retentionZone
+};
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * Utilities for working with built-in Maps and Sets without mutating them.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+
+function setByAddingToSet(set, v) {
+  const next = new Set(set);
+  next.add(v);
+  return next;
+}
+
+function setByDeletingFromSet(set, v) {
+  const next = new Set(set);
+  next.delete(v);
+  return next;
+}
+
+function mapBySettingInMap(map, k, v) {
+  const next = new Map(map);
+  next.set(k, v);
+  return next;
+}
+
+function mapByUpdatingInMap(map, k, updater) {
+  const next = new Map(map);
+  next.set(k, updater(next.get(k)));
+  return next;
+}
+
+function mapByDeletingFromMap(map, k) {
+  const next = new Map(map);
+  next.delete(k);
+  return next;
+}
+
+function mapByDeletingMultipleFromMap(map, ks) {
+  const next = new Map(map);
+  ks.forEach(k => next.delete(k));
+  return next;
+}
+
+var Recoil_CopyOnWrite = {
+  setByAddingToSet,
+  setByDeletingFromSet,
+  mapBySettingInMap,
+  mapByUpdatingInMap,
+  mapByDeletingFromMap,
+  mapByDeletingMultipleFromMap
+};
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+/**
+ * Creates a new iterable whose output is generated by passing the input
+ * iterable's values through the filter function.
+ */
+
+function* filterIterable(iterable, predicate) {
+  // Use generator to create iterable/iterator
+  let index = 0;
+
+  for (const value of iterable) {
+    if (predicate(value, index++)) {
+      yield value;
+    }
+  }
+}
+
+var Recoil_filterIterable = filterIterable;
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+/**
+ * Return a proxy object based on the provided base and factories objects.
+ * The proxy will include all properties of the base object as-is.
+ * The factories object contains callbacks to obtain the values of the properies
+ * for its keys.
+ *
+ * This is useful for providing users an object where some properties may be
+ * lazily computed only on first access.
+ */
+// $FlowIssue[unclear-type]
+
+function lazyProxy(base, factories) {
+  const proxy = new Proxy(base, {
+    // Compute and cache lazy property if not already done.
+    get: (target, prop) => {
+      if (!(prop in target) && prop in factories) {
+        target[prop] = factories[prop]();
+      }
+
+      return target[prop];
+    },
+    // This method allows user to iterate keys as normal
+    ownKeys: target => {
+
+      return Object.keys(target);
+    }
+  }); // $FlowIssue[incompatible-return]
+
+  return proxy;
+}
+
+var Recoil_lazyProxy = lazyProxy;
+
+const {
+  getNode: getNode$1,
+  getNodeMaybe: getNodeMaybe$1,
+  recoilValuesForKeys: recoilValuesForKeys$1
+} = Recoil_Node;
+
+const {
+  RetentionZone: RetentionZone$1
+} = Recoil_RetentionZone;
+
+const {
+  setByAddingToSet: setByAddingToSet$1
+} = Recoil_CopyOnWrite;
+
+
+
+
+
+
+
+ // flowlint-next-line unclear-type:off
+
+
+const emptySet = Object.freeze(new Set());
+
+class ReadOnlyRecoilValueError extends Error {}
+
+function initializeRetentionForNode(store, nodeKey, retainedBy) {
+  if (!Recoil_gkx('recoil_memory_managament_2020')) {
+    return () => undefined;
+  }
+
+  const {
+    nodesRetainedByZone
+  } = store.getState().retention;
+
+  function addToZone(zone) {
+    let set = nodesRetainedByZone.get(zone);
+
+    if (!set) {
+      nodesRetainedByZone.set(zone, set = new Set());
+    }
+
+    set.add(nodeKey);
+  }
+
+  if (retainedBy instanceof RetentionZone$1) {
+    addToZone(retainedBy);
+  } else if (Array.isArray(retainedBy)) {
+    for (const zone of retainedBy) {
+      addToZone(zone);
     }
   }
 
+  return () => {
+    if (!Recoil_gkx('recoil_memory_managament_2020')) {
+      return;
+    }
+
+    const {
+      retention
+    } = store.getState();
+
+    function deleteFromZone(zone) {
+      const set = retention.nodesRetainedByZone.get(zone);
+      set === null || set === void 0 ? void 0 : set.delete(nodeKey);
+
+      if (set && set.size === 0) {
+        retention.nodesRetainedByZone.delete(zone);
+      }
+    }
+
+    if (retainedBy instanceof RetentionZone$1) {
+      deleteFromZone(retainedBy);
+    } else if (Array.isArray(retainedBy)) {
+      for (const zone of retainedBy) {
+        deleteFromZone(zone);
+      }
+    }
+  };
+}
+
+function initializeNodeIfNewToStore(store, treeState, key, trigger) {
+  const storeState = store.getState();
+
+  if (storeState.nodeCleanupFunctions.has(key)) {
+    return;
+  }
+
+  const node = getNode$1(key);
+  const retentionCleanup = initializeRetentionForNode(store, key, node.retainedBy);
+  const nodeCleanup = node.init(store, treeState, trigger);
+  storeState.nodeCleanupFunctions.set(key, () => {
+    nodeCleanup();
+    retentionCleanup();
+  });
+}
+
+function initializeNode(store, key, trigger) {
+  initializeNodeIfNewToStore(store, store.getState().currentTree, key, trigger);
+}
+
+function cleanUpNode(store, key) {
+  var _state$nodeCleanupFun;
+
+  const state = store.getState();
+  (_state$nodeCleanupFun = state.nodeCleanupFunctions.get(key)) === null || _state$nodeCleanupFun === void 0 ? void 0 : _state$nodeCleanupFun();
+  state.nodeCleanupFunctions.delete(key);
+} // Get the current value loadable of a node and update the state.
+// Update dependencies and subscriptions for selectors.
+// Update saved value validation for atoms.
+
+
+function getNodeLoadable(store, state, key) {
+  initializeNodeIfNewToStore(store, state, key, 'get');
+  return getNode$1(key).get(store, state);
+} // Peek at the current value loadable for a node without any evaluation or state change
+
+
+function peekNodeLoadable(store, state, key) {
+  return getNode$1(key).peek(store, state);
+} // Write value directly to state bypassing the Node interface as the node
+// definitions may not have been loaded yet when processing the initial snapshot.
+
+
+function setUnvalidatedAtomValue_DEPRECATED(state, key, newValue) {
+  var _node$invalidate;
+
+  const node = getNodeMaybe$1(key);
+  node === null || node === void 0 ? void 0 : (_node$invalidate = node.invalidate) === null || _node$invalidate === void 0 ? void 0 : _node$invalidate.call(node, state);
+  return { ...state,
+    atomValues: state.atomValues.clone().delete(key),
+    nonvalidatedAtoms: state.nonvalidatedAtoms.clone().set(key, newValue),
+    dirtyAtoms: setByAddingToSet$1(state.dirtyAtoms, key)
+  };
+} // Return the discovered dependencies and values to be written by setting
+// a node value. (Multiple values may be written due to selectors getting to
+// set upstreams; deps may be discovered because of reads in updater functions.)
+
+
+function setNodeValue(store, state, key, newValue) {
+  const node = getNode$1(key);
+
+  if (node.set == null) {
+    throw new ReadOnlyRecoilValueError(`Attempt to set read-only RecoilValue: ${key}`);
+  }
+
+  const set = node.set; // so flow doesn't lose the above refinement.
+
+  initializeNodeIfNewToStore(store, state, key, 'set');
+  return set(store, state, newValue);
+}
+
+function peekNodeInfo(store, state, key) {
+  const storeState = store.getState();
+  const graph = store.getGraph(state.version);
+  const type = getNode$1(key).nodeType;
+  return Recoil_lazyProxy({
+    type
+  }, {
+    loadable: () => peekNodeLoadable(store, state, key),
+    isActive: () => storeState.knownAtoms.has(key) || storeState.knownSelectors.has(key),
+    isSet: () => type === 'selector' ? false : state.atomValues.has(key),
+    isModified: () => state.dirtyAtoms.has(key),
+    // Report current dependencies.  If the node hasn't been evaluated, then
+    // dependencies may be missing based on the current state.
+    deps: () => {
+      var _graph$nodeDeps$get;
+
+      return recoilValuesForKeys$1((_graph$nodeDeps$get = graph.nodeDeps.get(key)) !== null && _graph$nodeDeps$get !== void 0 ? _graph$nodeDeps$get : []);
+    },
+    // Reports all "current" subscribers.  Evaluating other nodes or
+    // previous in-progress async evaluations may introduce new subscribers.
+    subscribers: () => {
+      var _storeState$nodeToCom, _storeState$nodeToCom2;
+
+      return {
+        nodes: recoilValuesForKeys$1(Recoil_filterIterable(getDownstreamNodes(store, state, new Set([key])), nodeKey => nodeKey !== key)),
+        components: Recoil_mapIterable((_storeState$nodeToCom = (_storeState$nodeToCom2 = storeState.nodeToComponentSubscriptions.get(key)) === null || _storeState$nodeToCom2 === void 0 ? void 0 : _storeState$nodeToCom2.values()) !== null && _storeState$nodeToCom !== void 0 ? _storeState$nodeToCom : [], ([name]) => ({
+          name
+        }))
+      };
+    }
+  });
+} // Find all of the recursively dependent nodes
+
+
+function getDownstreamNodes(store, state, keys) {
+  const visitedNodes = new Set();
+  const visitingNodes = Array.from(keys);
+  const graph = store.getGraph(state.version);
+
+  for (let key = visitingNodes.pop(); key; key = visitingNodes.pop()) {
+    var _graph$nodeToNodeSubs;
+
+    visitedNodes.add(key);
+    const subscribedNodes = (_graph$nodeToNodeSubs = graph.nodeToNodeSubscriptions.get(key)) !== null && _graph$nodeToNodeSubs !== void 0 ? _graph$nodeToNodeSubs : emptySet;
+
+    for (const downstreamNode of subscribedNodes) {
+      if (!visitedNodes.has(downstreamNode)) {
+        visitingNodes.push(downstreamNode);
+      }
+    }
+  }
+
+  return visitedNodes;
+}
+
+var Recoil_FunctionalCore = {
+  getNodeLoadable,
+  peekNodeLoadable,
+  setNodeValue,
+  initializeNode,
+  cleanUpNode,
+  setUnvalidatedAtomValue_DEPRECATED,
+  peekNodeInfo,
+  getDownstreamNodes
+};
+
+var _createMutableSource, _useMutableSource, _useSyncExternalStore;
+
+
+
+
+
+const createMutableSource = // flowlint-next-line unclear-type:off
+(_createMutableSource = react__WEBPACK_IMPORTED_MODULE_0__.createMutableSource) !== null && _createMutableSource !== void 0 ? _createMutableSource : react__WEBPACK_IMPORTED_MODULE_0__.unstable_createMutableSource;
+const useMutableSource = // flowlint-next-line unclear-type:off
+(_useMutableSource = react__WEBPACK_IMPORTED_MODULE_0__.useMutableSource) !== null && _useMutableSource !== void 0 ? _useMutableSource : react__WEBPACK_IMPORTED_MODULE_0__.unstable_useMutableSource; // https://github.com/reactwg/react-18/discussions/86
+
+const useSyncExternalStore = // flowlint-next-line unclear-type:off
+(_useSyncExternalStore = react__WEBPACK_IMPORTED_MODULE_0__.useSyncExternalStore) !== null && _useSyncExternalStore !== void 0 ? _useSyncExternalStore : // flowlint-next-line unclear-type:off
+react__WEBPACK_IMPORTED_MODULE_0__.unstable_useSyncExternalStore;
+
+/**
+ * mode: The React API and approach to use for syncing state with React
+ * early: Re-renders from Recoil updates occur:
+ *    1) earlier
+ *    2) in sync with React updates in the same batch
+ *    3) before transaction observers instead of after.
+ * concurrent: Is the current mode compatible with Concurrent Mode and useTransition()
+ */
+function reactMode() {
+  // NOTE: This mode is currently broken with some Suspense cases
+  // see Recoil_selector-test.js
+  if (Recoil_gkx('recoil_transition_support')) {
+    return {
+      mode: 'TRANSITION_SUPPORT',
+      early: true,
+      concurrent: true
+    };
+  }
+
+  if (Recoil_gkx('recoil_sync_external_store') && useSyncExternalStore != null) {
+    return {
+      mode: 'SYNC_EXTERNAL_STORE',
+      early: true,
+      concurrent: false
+    };
+  }
+
+  if (Recoil_gkx('recoil_mutable_source') && useMutableSource != null && typeof window !== 'undefined' && !window.$disableRecoilValueMutableSource_TEMP_HACK_DO_NOT_USE) {
+    return Recoil_gkx('recoil_suppress_rerender_in_callback') ? {
+      mode: 'MUTABLE_SOURCE',
+      early: true,
+      concurrent: true
+    } : {
+      mode: 'MUTABLE_SOURCE',
+      early: false,
+      concurrent: false
+    };
+  }
+
+  return Recoil_gkx('recoil_suppress_rerender_in_callback') ? {
+    mode: 'LEGACY',
+    early: true,
+    concurrent: false
+  } : {
+    mode: 'LEGACY',
+    early: false,
+    concurrent: false
+  };
+}
+
+var Recoil_ReactMode = {
+  createMutableSource,
+  useMutableSource,
+  useSyncExternalStore,
+  reactMode
+};
+
+const {
+  getDownstreamNodes: getDownstreamNodes$1,
+  getNodeLoadable: getNodeLoadable$1,
+  setNodeValue: setNodeValue$1
+} = Recoil_FunctionalCore;
+
+const {
+  getNextComponentID: getNextComponentID$1
+} = Recoil_Keys;
+
+const {
+  getNode: getNode$2,
+  getNodeMaybe: getNodeMaybe$2
+} = Recoil_Node;
+
+const {
+  DefaultValue: DefaultValue$1,
+  RecoilValueNotReady: RecoilValueNotReady$1
+} = Recoil_Node;
+
+const {
+  reactMode: reactMode$1
+} = Recoil_ReactMode;
+
+const {
+  AbstractRecoilValue: AbstractRecoilValue$1,
+  RecoilState: RecoilState$1,
+  RecoilValueReadOnly: RecoilValueReadOnly$1,
+  isRecoilValue: isRecoilValue$1
+} = Recoil_RecoilValue$1;
+
+
+
+
+
+function getRecoilValueAsLoadable(store, {
+  key
+}, treeState = store.getState().currentTree) {
+  var _storeState$nextTree, _storeState$previousT;
+
+  // Reading from an older tree can cause bugs because the dependencies that we
+  // discover during the read are lost.
+  const storeState = store.getState();
+
+  if (!(treeState.version === storeState.currentTree.version || treeState.version === ((_storeState$nextTree = storeState.nextTree) === null || _storeState$nextTree === void 0 ? void 0 : _storeState$nextTree.version) || treeState.version === ((_storeState$previousT = storeState.previousTree) === null || _storeState$previousT === void 0 ? void 0 : _storeState$previousT.version))) {
+    Recoil_recoverableViolation('Tried to read from a discarded tree');
+  }
+
+  const loadable = getNodeLoadable$1(store, treeState, key);
+
+  if (loadable.state === 'loading') {
+    loadable.contents.catch(() => {
+      /**
+       * HACK: intercept thrown error here to prevent an uncaught promise exception. Ideally this would happen closer to selector
+       * execution (perhaps introducing a new ERROR class to be resolved by async selectors that are in an error state)
+       */
+      return;
+    });
+  }
+
+  return loadable;
+}
+
+function applyAtomValueWrites(atomValues, writes) {
+  const result = atomValues.clone();
+  writes.forEach((v, k) => {
+    if (v.state === 'hasValue' && v.contents instanceof DefaultValue$1) {
+      result.delete(k);
+    } else {
+      result.set(k, v);
+    }
+  });
   return result;
 }
 
-var Recoil_unionSets = unionSets;
+function valueFromValueOrUpdater(store, state, {
+  key
+}, valueOrUpdater) {
+  if (typeof valueOrUpdater === 'function') {
+    // Updater form: pass in the current value. Throw if the current value
+    // is unavailable (namely when updating an async selector that's
+    // pending or errored):
+    const current = getNodeLoadable$1(store, state, key);
+
+    if (current.state === 'loading') {
+      throw new RecoilValueNotReady$1(key);
+    } else if (current.state === 'hasError') {
+      throw current.contents;
+    } // T itself may be a function, so our refinement is not sufficient:
+
+
+    return valueOrUpdater(current.contents); // flowlint-line unclear-type:off
+  } else {
+    return valueOrUpdater;
+  }
+}
+
+function applyAction(store, state, action) {
+  if (action.type === 'set') {
+    const {
+      recoilValue,
+      valueOrUpdater
+    } = action;
+    const newValue = valueFromValueOrUpdater(store, state, recoilValue, valueOrUpdater);
+    const writes = setNodeValue$1(store, state, recoilValue.key, newValue);
+
+    for (const [key, loadable] of writes.entries()) {
+      writeLoadableToTreeState(state, key, loadable);
+    }
+  } else if (action.type === 'setLoadable') {
+    const {
+      recoilValue: {
+        key
+      },
+      loadable
+    } = action;
+    writeLoadableToTreeState(state, key, loadable);
+  } else if (action.type === 'markModified') {
+    const {
+      recoilValue: {
+        key
+      }
+    } = action;
+    state.dirtyAtoms.add(key);
+  } else if (action.type === 'setUnvalidated') {
+    var _node$invalidate;
+
+    // Write value directly to state bypassing the Node interface as the node
+    // definitions may not have been loaded yet when processing the initial snapshot.
+    const {
+      recoilValue: {
+        key
+      },
+      unvalidatedValue
+    } = action;
+    const node = getNodeMaybe$2(key);
+    node === null || node === void 0 ? void 0 : (_node$invalidate = node.invalidate) === null || _node$invalidate === void 0 ? void 0 : _node$invalidate.call(node, state);
+    state.atomValues.delete(key);
+    state.nonvalidatedAtoms.set(key, unvalidatedValue);
+    state.dirtyAtoms.add(key);
+  } else {
+    Recoil_recoverableViolation(`Unknown action ${action.type}`);
+  }
+}
+
+function writeLoadableToTreeState(state, key, loadable) {
+  if (loadable.state === 'hasValue' && loadable.contents instanceof DefaultValue$1) {
+    state.atomValues.delete(key);
+  } else {
+    state.atomValues.set(key, loadable);
+  }
+
+  state.dirtyAtoms.add(key);
+  state.nonvalidatedAtoms.delete(key);
+}
+
+function applyActionsToStore(store, actions) {
+  store.replaceState(state => {
+    const newState = copyTreeState(state);
+
+    for (const action of actions) {
+      applyAction(store, newState, action);
+    }
+
+    invalidateDownstreams(store, newState);
+    return newState;
+  });
+}
+
+function queueOrPerformStateUpdate(store, action) {
+  if (batchStack.length) {
+    const actionsByStore = batchStack[batchStack.length - 1];
+    let actions = actionsByStore.get(store);
+
+    if (!actions) {
+      actionsByStore.set(store, actions = []);
+    }
+
+    actions.push(action);
+  } else {
+    applyActionsToStore(store, [action]);
+  }
+}
+
+const batchStack = [];
+
+function batchStart() {
+  const actionsByStore = new Map();
+  batchStack.push(actionsByStore);
+  return () => {
+    for (const [store, actions] of actionsByStore) {
+      applyActionsToStore(store, actions);
+    }
+
+    const popped = batchStack.pop();
+
+    if (popped !== actionsByStore) {
+      Recoil_recoverableViolation('Incorrect order of batch popping');
+    }
+  };
+}
+
+function copyTreeState(state) {
+  return { ...state,
+    atomValues: state.atomValues.clone(),
+    nonvalidatedAtoms: state.nonvalidatedAtoms.clone(),
+    dirtyAtoms: new Set(state.dirtyAtoms)
+  };
+}
+
+function invalidateDownstreams(store, state) {
+  // Inform any nodes that were changed or downstream of changes so that they
+  // can clear out any caches as needed due to the update:
+  const downstreams = getDownstreamNodes$1(store, state, state.dirtyAtoms);
+
+  for (const key of downstreams) {
+    var _getNodeMaybe, _getNodeMaybe$invalid;
+
+    (_getNodeMaybe = getNodeMaybe$2(key)) === null || _getNodeMaybe === void 0 ? void 0 : (_getNodeMaybe$invalid = _getNodeMaybe.invalidate) === null || _getNodeMaybe$invalid === void 0 ? void 0 : _getNodeMaybe$invalid.call(_getNodeMaybe, state);
+  }
+}
+
+function setRecoilValue(store, recoilValue, valueOrUpdater) {
+  queueOrPerformStateUpdate(store, {
+    type: 'set',
+    recoilValue,
+    valueOrUpdater
+  });
+}
+
+function setRecoilValueLoadable(store, recoilValue, loadable) {
+  if (loadable instanceof DefaultValue$1) {
+    return setRecoilValue(store, recoilValue, loadable);
+  }
+
+  queueOrPerformStateUpdate(store, {
+    type: 'setLoadable',
+    recoilValue,
+    loadable: loadable
+  });
+}
+
+function markRecoilValueModified(store, recoilValue) {
+  queueOrPerformStateUpdate(store, {
+    type: 'markModified',
+    recoilValue
+  });
+}
+
+function setUnvalidatedRecoilValue(store, recoilValue, unvalidatedValue) {
+  queueOrPerformStateUpdate(store, {
+    type: 'setUnvalidated',
+    recoilValue,
+    unvalidatedValue
+  });
+}
+
+function subscribeToRecoilValue(store, {
+  key
+}, callback, componentDebugName = null) {
+  const subID = getNextComponentID$1();
+  const storeState = store.getState();
+
+  if (!storeState.nodeToComponentSubscriptions.has(key)) {
+    storeState.nodeToComponentSubscriptions.set(key, new Map());
+  }
+
+  Recoil_nullthrows(storeState.nodeToComponentSubscriptions.get(key)).set(subID, [componentDebugName !== null && componentDebugName !== void 0 ? componentDebugName : '<not captured>', callback]); // Handle the case that, during the same tick that we are subscribing, an atom
+  // has been updated by some effect handler. Otherwise we will miss the update.
+
+  const mode = reactMode$1();
+
+  if (mode.early && (mode.mode === 'LEGACY' || mode.mode === 'MUTABLE_SOURCE')) {
+    const nextTree = store.getState().nextTree;
+
+    if (nextTree && nextTree.dirtyAtoms.has(key)) {
+      callback(nextTree);
+    }
+  }
+
+  return {
+    release: () => {
+      const releaseStoreState = store.getState();
+      const subs = releaseStoreState.nodeToComponentSubscriptions.get(key);
+
+      if (subs === undefined || !subs.has(subID)) {
+        Recoil_recoverableViolation(`Subscription missing at release time for atom ${key}. This is a bug in Recoil.`);
+        return;
+      }
+
+      subs.delete(subID);
+
+      if (subs.size === 0) {
+        releaseStoreState.nodeToComponentSubscriptions.delete(key);
+      }
+    }
+  };
+}
+
+function refreshRecoilValue(store, recoilValue) {
+  var _node$clearCache;
+
+  const {
+    currentTree
+  } = store.getState();
+  const node = getNode$2(recoilValue.key);
+  (_node$clearCache = node.clearCache) === null || _node$clearCache === void 0 ? void 0 : _node$clearCache.call(node, store, currentTree);
+}
+
+var Recoil_RecoilValueInterface = {
+  RecoilValueReadOnly: RecoilValueReadOnly$1,
+  AbstractRecoilValue: AbstractRecoilValue$1,
+  RecoilState: RecoilState$1,
+  getRecoilValueAsLoadable,
+  setRecoilValue,
+  setRecoilValueLoadable,
+  markRecoilValueModified,
+  setUnvalidatedRecoilValue,
+  subscribeToRecoilValue,
+  isRecoilValue: isRecoilValue$1,
+  applyAtomValueWrites,
+  // TODO Remove export when deprecating initialStoreState_DEPRECATED in RecoilRoot
+  batchStart,
+  writeLoadableToTreeState,
+  invalidateDownstreams,
+  copyTreeState,
+  refreshRecoilValue,
+  invalidateDownstreams_FOR_TESTING: invalidateDownstreams
+};
 
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -34791,13 +34986,24 @@ const {
 
 const {
   deleteNodeConfigIfPossible: deleteNodeConfigIfPossible$1,
-  getNode: getNode$2
+  getNode: getNode$3
 } = Recoil_Node;
 
 const {
   RetentionZone: RetentionZone$2
 } = Recoil_RetentionZone;
 
+
+
+
+
+
+
+ // Components that aren't mounted after suspending for this long will be assumed
+// to be discarded and their resources released.
+
+
+const SUSPENSE_TIMEOUT_MS = 120000;
 const emptySet$1 = new Set();
 
 function releaseRetainablesNowOnCurrentTree(store, retainables) {
@@ -34848,7 +35054,7 @@ function findReleasableNodes(store, searchFromNodes) {
       var _storeState$retention;
 
       // Not releasable if configured to be retained forever:
-      if (getNode$2(node).retainedBy === 'recoilRoot') {
+      if (getNode$3(node).retainedBy === 'recoilRoot') {
         nonReleasableNodes.add(node);
         continue;
       } // Not releasable if retained directly by a component:
@@ -34936,7 +35142,7 @@ doNotDescendInto1, doNotDescendInto2) {
 }
 
 function releaseNode(store, treeState, node) {
-  if (!Recoil_gkx_1('recoil_memory_managament_2020')) {
+  if (!Recoil_gkx('recoil_memory_managament_2020')) {
     return;
   } // Atom effects, in-closure caches, etc.:
 
@@ -34995,7 +35201,7 @@ function nodesRetainedByZone(storeState, zone) {
 }
 
 function zonesThatCouldRetainNode(node) {
-  const retainedBy = getNode$2(node).retainedBy;
+  const retainedBy = getNode$3(node).retainedBy;
 
   if (retainedBy === undefined || retainedBy === 'components' || retainedBy === 'recoilRoot') {
     return [];
@@ -35019,7 +35225,7 @@ function scheduleOrPerformPossibleReleaseOfRetainable(store, retainable) {
 function updateRetainCount(store, retainable, delta) {
   var _map$get;
 
-  if (!Recoil_gkx_1('recoil_memory_managament_2020')) {
+  if (!Recoil_gkx('recoil_memory_managament_2020')) {
     return;
   }
 
@@ -35034,7 +35240,7 @@ function updateRetainCount(store, retainable, delta) {
 }
 
 function updateRetainCountToZero(store, retainable) {
-  if (!Recoil_gkx_1('recoil_memory_managament_2020')) {
+  if (!Recoil_gkx('recoil_memory_managament_2020')) {
     return;
   }
 
@@ -35044,7 +35250,7 @@ function updateRetainCountToZero(store, retainable) {
 }
 
 function releaseScheduledRetainablesNow(store) {
-  if (!Recoil_gkx_1('recoil_memory_managament_2020')) {
+  if (!Recoil_gkx('recoil_memory_managament_2020')) {
     return;
   }
 
@@ -35059,10 +35265,116 @@ function retainedByOptionWithDefault(r) {
 }
 
 var Recoil_Retention = {
+  SUSPENSE_TIMEOUT_MS,
   updateRetainCount,
   updateRetainCountToZero,
   releaseScheduledRetainablesNow,
   retainedByOptionWithDefault
+};
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ *
+ * This is to export esstiential functions from react-dom
+ * for our web build
+ */
+const {
+  unstable_batchedUpdates
+} = react_dom__WEBPACK_IMPORTED_MODULE_1__;
+
+var ReactBatchedUpdates = {
+  unstable_batchedUpdates
+};
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ *
+ * This is to export esstiential functions from react-dom
+ * for our web build
+ */
+// @fb-only: const {unstable_batchedUpdates} = require('ReactDOMComet');
+// prettier-ignore
+const {
+  unstable_batchedUpdates: unstable_batchedUpdates$1
+} = ReactBatchedUpdates; // @oss-only
+
+
+var Recoil_ReactBatchedUpdates = {
+  unstable_batchedUpdates: unstable_batchedUpdates$1
+};
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+const {
+  batchStart: batchStart$1
+} = Recoil_RecoilValueInterface;
+
+const {
+  unstable_batchedUpdates: unstable_batchedUpdates$2
+} = Recoil_ReactBatchedUpdates;
+
+let batcher = unstable_batchedUpdates$2; // flowlint-next-line unclear-type:off
+
+/**
+ * Sets the provided batcher function as the batcher function used by Recoil.
+ *
+ * Set the batcher to a custom batcher for your renderer,
+ * if you use a renderer other than React DOM or React Native.
+ */
+const setBatcher = newBatcher => {
+  batcher = newBatcher;
+};
+/**
+ * Returns the current batcher function.
+ */
+
+
+const getBatcher = () => batcher;
+/**
+ * Calls the current batcher function and passes the
+ * provided callback function.
+ */
+
+
+const batchUpdates = callback => {
+  batcher(() => {
+    let batchEnd = () => undefined;
+
+    try {
+      batchEnd = batchStart$1();
+      callback();
+    } finally {
+      batchEnd();
+    }
+  });
+};
+
+var Recoil_Batching = {
+  getBatcher,
+  setBatcher,
+  batchUpdates
 };
 
 /**
@@ -35116,30 +35428,117 @@ var Recoil_Environment = {
   isReactNative
 };
 
-const {
-  isSSR: isSSR$1
-} = Recoil_Environment;
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+/**
+ * Caches a function's results based on the key returned by the passed
+ * hashFunction.
+ */
+
+function memoizeWithArgsHash(fn, hashFunction) {
+  let cache;
+
+  const memoizedFn = (...args) => {
+    if (!cache) {
+      cache = {};
+    }
+
+    const key = hashFunction(...args);
+
+    if (!Object.hasOwnProperty.call(cache, key)) {
+      cache[key] = fn.apply(this, args);
+    }
+
+    return cache[key];
+  };
+
+  return memoizedFn;
+}
+/**
+ * Caches a function's results based on a comparison of the arguments.
+ * Only caches the last return of the function.
+ * Defaults to reference equality
+ */
 
 
+function memoizeOneWithArgsHash(fn, hashFunction) {
+  let lastKey;
+  let lastResult; // breaking cache when arguments change
+
+  const memoizedFn = (...args) => {
+    const key = hashFunction(...args);
+
+    if (lastKey === key) {
+      return lastResult;
+    }
+
+    lastKey = key;
+    lastResult = fn.apply(this, args);
+    return lastResult;
+  };
+
+  return memoizedFn;
+}
+/**
+ * Caches a function's results based on a comparison of the arguments.
+ * Only caches the last return of the function.
+ * Defaults to reference equality
+ */
 
 
+function memoizeOneWithArgsHashAndInvalidation(fn, hashFunction) {
+  let lastKey;
+  let lastResult; // breaking cache when arguments change
 
+  const memoizedFn = (...args) => {
+    const key = hashFunction(...args);
 
+    if (lastKey === key) {
+      return lastResult;
+    }
 
+    lastKey = key;
+    lastResult = fn.apply(this, args);
+    return lastResult;
+  };
 
+  const invalidate = () => {
+    lastKey = null;
+  };
+
+  return [memoizedFn, invalidate];
+}
+
+var Recoil_Memoize = {
+  memoizeWithArgsHash,
+  memoizeOneWithArgsHash,
+  memoizeOneWithArgsHashAndInvalidation
+};
 
 const {
   batchUpdates: batchUpdates$1
 } = Recoil_Batching;
 
 const {
-  initializeNodeIfNewToStore: initializeNodeIfNewToStore$1,
+  initializeNode: initializeNode$1,
   peekNodeInfo: peekNodeInfo$1
 } = Recoil_FunctionalCore;
 
 const {
-  graph: graph$2
+  graph: graph$1
 } = Recoil_Graph;
+
+const {
+  getNextStoreID: getNextStoreID$1
+} = Recoil_Keys;
 
 const {
   DEFAULT_VALUE: DEFAULT_VALUE$1,
@@ -35159,9 +35558,31 @@ const {
 } = Recoil_Retention;
 
 const {
-  getNextTreeStateVersion: getNextTreeStateVersion$1,
+  getNextTreeStateVersion: getNextTreeStateVersion$2,
   makeEmptyStoreState: makeEmptyStoreState$1
-} = Recoil_State; // Opaque at this surface because it's part of the public API from here.
+} = Recoil_State;
+
+
+
+const {
+  isSSR: isSSR$1
+} = Recoil_Environment;
+
+
+
+
+
+
+
+
+
+const {
+  memoizeOneWithArgsHashAndInvalidation: memoizeOneWithArgsHashAndInvalidation$1
+} = Recoil_Memoize;
+
+
+
+ // Opaque at this surface because it's part of the public API from here.
 
 
 const retainWarning = `
@@ -35169,7 +35590,7 @@ Recoil Snapshots only last for the duration of the callback they are provided to
 
   const release = snapshot.retain();
   try {
-    await useTheSnapshotAsynchronously(snapshot);
+    await doSomethingWithSnapshot(snapshot);
   } finally {
     release();
   }
@@ -35180,10 +35601,11 @@ This is currently a DEV-only warning but will become a thrown exception in the n
 // evaluation functions are executed and async selectors resolve.
 
 class Snapshot {
+  // eslint-disable-next-line fb-www/no-uninitialized-properties
   constructor(storeState) {
     _defineProperty(this, "_store", void 0);
 
-    _defineProperty(this, "_refCount", 0);
+    _defineProperty(this, "_refCount", 1);
 
     _defineProperty(this, "getLoadable", recoilValue => {
       this.checkRefCount_INTERNAL();
@@ -35220,7 +35642,8 @@ class Snapshot {
     _defineProperty(this, "getInfo_UNSTABLE", ({
       key
     }) => {
-      this.checkRefCount_INTERNAL();
+      this.checkRefCount_INTERNAL(); // $FlowFixMe[escaped-generic]
+
       return peekNodeInfo$1(this._store, this._store.getState().currentTree, key);
     });
 
@@ -35229,17 +35652,23 @@ class Snapshot {
       const mutableSnapshot = new MutableSnapshot(this, batchUpdates$1);
       mapper(mutableSnapshot); // if removing batchUpdates from `set` add it here
 
-      return cloneSnapshot(mutableSnapshot.getStore_INTERNAL());
+      return mutableSnapshot;
     });
 
     _defineProperty(this, "asyncMap", async mapper => {
       this.checkRefCount_INTERNAL();
       const mutableSnapshot = new MutableSnapshot(this, batchUpdates$1);
-      await mapper(mutableSnapshot);
-      return cloneSnapshot(mutableSnapshot.getStore_INTERNAL());
+      mutableSnapshot.retain(); // Retain new snapshot during async mapper
+
+      await mapper(mutableSnapshot); // Continue to retain the new snapshot for the user, but auto-release it
+      // after the next tick, the same as a new synchronous snapshot.
+
+      mutableSnapshot.autoRelease_INTERNAL();
+      return mutableSnapshot;
     });
 
     this._store = {
+      storeID: getNextStoreID$1(),
       getState: () => storeState,
       replaceState: replacer => {
         storeState.currentTree = replacer(storeState.currentTree); // no batching so nextTree is never active
@@ -35251,7 +35680,7 @@ class Snapshot {
           return Recoil_nullthrows(graphs.get(version));
         }
 
-        const newGraph = graph$2();
+        const newGraph = graph$1();
         graphs.set(version, newGraph);
         return newGraph;
       },
@@ -35259,23 +35688,25 @@ class Snapshot {
         release: () => {}
       }),
       addTransactionMetadata: () => {
-        throw new Error('Cannot subscribe to Snapshots');
+        throw Recoil_err('Cannot subscribe to Snapshots');
       }
-    }; // Initialize any nodes that are live in the parent store (primarily so that this
-    // snapshot gets counted towards the node's live stores count).
+    }; // Initialize any nodes that are live in the parent store (primarily so that
+    // this snapshot gets counted towards the node's live stores count).
+    // TODO Optimize this when cloning snapshots for callbacks
 
-    for (const nodeKey of this._store.getState().nodeCleanupFunctions.keys()) {
-      initializeNodeIfNewToStore$1(this._store, storeState.currentTree, nodeKey, 'get');
+    for (const nodeKey of this._store.getState().knownAtoms) {
+      initializeNode$1(this._store, nodeKey, 'get');
       updateRetainCount$1(this._store, nodeKey, 1);
     }
 
-    this.retain();
-    this.autorelease_INTERNAL();
+    this.autoRelease_INTERNAL();
   }
 
   retain() {
-    if (!Recoil_gkx_1('recoil_memory_managament_2020')) {
-      return () => undefined;
+    if (this._refCount <= 0) {
+      if (true) {
+        throw Recoil_err('Snapshot has already been released.');
+      } else {}
     }
 
     this._refCount++;
@@ -35283,37 +35714,56 @@ class Snapshot {
     return () => {
       if (!released) {
         released = true;
-        this.release_INTERNAL();
+
+        this._release();
       }
     };
   }
+  /**
+   * Release the snapshot on the next tick.  This means the snapshot is retained
+   * during the execution of the current function using it.
+   */
 
-  autorelease_INTERNAL() {
-    if (!Recoil_gkx_1('recoil_memory_managament_2020')) {
-      return;
-    }
 
+  autoRelease_INTERNAL() {
     if (!isSSR$1) {
-      window.setTimeout(() => this.release_INTERNAL(), 0);
+      window.setTimeout(() => this._release(), 0);
     }
   }
 
-  release_INTERNAL() {
-    if (!Recoil_gkx_1('recoil_memory_managament_2020')) {
-      return;
-    }
-
+  _release() {
     this._refCount--;
 
-    if (this._refCount === 0) ;
+    if (this._refCount === 0) {
+      this._store.getState().nodeCleanupFunctions.forEach(cleanup => cleanup());
+
+      this._store.getState().nodeCleanupFunctions.clear();
+
+      if (!Recoil_gkx('recoil_memory_managament_2020')) {
+        return;
+      } // Temporarily nerfing this to allow us to find broken call sites without
+      // actually breaking anybody yet.
+      // for (const k of this._store.getState().knownAtoms) {
+      //   updateRetainCountToZero(this._store, k);
+      // }
+
+    } else if (this._refCount < 0) {
+      if (true) {
+        Recoil_recoverableViolation('Snapshot released an extra time.');
+      }
+    }
+  }
+
+  isRetained() {
+    return this._refCount > 0;
   }
 
   checkRefCount_INTERNAL() {
-    if (Recoil_gkx_1('recoil_memory_managament_2020') && this._refCount <= 0) {
+    if (Recoil_gkx('recoil_memory_managament_2020') && this._refCount <= 0) {
       if (true) {
         Recoil_recoverableViolation(retainWarning);
       } // What we will ship later:
-      // throw new Error(retainWarning);
+      // throw err(retainWarning);
 
     }
   }
@@ -35325,11 +35775,6 @@ class Snapshot {
 
   getID() {
     this.checkRefCount_INTERNAL();
-    return this.getID_INTERNAL();
-  }
-
-  getID_INTERNAL() {
-    this.checkRefCount_INTERNAL();
     return this._store.getState().currentTree.stateID;
   } // We want to allow the methods to be destructured and used as accessors
   // eslint-disable-next-line fb-www/extra-arrow-initializer
@@ -35339,7 +35784,7 @@ class Snapshot {
 
 function cloneStoreState(store, treeState, bumpVersion = false) {
   const storeState = store.getState();
-  const version = bumpVersion ? getNextTreeStateVersion$1() : treeState.version;
+  const version = bumpVersion ? getNextTreeStateVersion$2() : treeState.version;
   return {
     currentTree: bumpVersion ? {
       // TODO snapshots shouldn't really have versions because a new version number
@@ -35365,13 +35810,15 @@ function cloneStoreState(store, treeState, bumpVersion = false) {
     queuedComponentCallbacks_DEPRECATED: [],
     suspendedComponentResolvers: new Set(),
     graphsByVersion: new Map().set(version, store.getGraph(treeState.version)),
-    versionsUsedByComponent: new Map(),
     retention: {
       referenceCounts: new Map(),
       nodesRetainedByZone: new Map(),
       retainablesToCheckForRelease: new Set()
     },
-    nodeCleanupFunctions: new Map()
+    // FIXME here's a copy
+    // Create blank cleanup handlers for atoms so snapshots don't re-run
+    // atom effects.
+    nodeCleanupFunctions: new Map(Recoil_mapIterable(storeState.nodeCleanupFunctions.entries(), ([key]) => [key, () => {}]))
   };
 } // Factory to build a fresh snapshot
 
@@ -35382,10 +35829,25 @@ function freshSnapshot(initializeState) {
 } // Factory to clone a snapahot state
 
 
-function cloneSnapshot(store, version = 'current') {
+const [memoizedCloneSnapshot, invalidateMemoizedSnapshot] = memoizeOneWithArgsHashAndInvalidation$1((store, version) => {
   const storeState = store.getState();
   const treeState = version === 'current' ? storeState.currentTree : Recoil_nullthrows(storeState.previousTree);
   return new Snapshot(cloneStoreState(store, treeState));
+}, (store, version) => {
+  var _store$getState$previ;
+
+  return String(version) + String(store.storeID) + String(store.getState().currentTree.version) + String((_store$getState$previ = store.getState().previousTree) === null || _store$getState$previ === void 0 ? void 0 : _store$getState$previ.version);
+});
+
+function cloneSnapshot(store, version = 'current') {
+  const snapshot = memoizedCloneSnapshot(store, version);
+
+  if (!snapshot.isRetained()) {
+    invalidateMemoizedSnapshot();
+    return memoizedCloneSnapshot(store, version);
+  }
+
+  return snapshot;
 }
 
 class MutableSnapshot extends Snapshot {
@@ -35456,40 +35918,92 @@ var Recoil_Snapshot$1 = /*#__PURE__*/Object.freeze({
   cloneSnapshot: Recoil_Snapshot_4
 });
 
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+
+function unionSets(...sets) {
+  const result = new Set();
+
+  for (const set of sets) {
+    for (const value of set) {
+      result.add(value);
+    }
+  }
+
+  return result;
+}
+
+var Recoil_unionSets = unionSets;
+
+const {
+  useRef
+} = react__WEBPACK_IMPORTED_MODULE_0__;
+/**
+ * The same as `useRef()` except that if a function is specified then it will
+ * call that function to get the value to initialize the reference with.
+ * This is similar to how `useState()` behaves when given a function.  It allows
+ * the user to avoid generating the initial value for subsequent renders.
+ * The tradeoff is that to set the reference to a function itself you need to
+ * nest it: useRefInitOnce(() => () => {...});
+ */
+
+
+function useRefInitOnce(initialValue) {
+  // $FlowExpectedError[incompatible-call]
+  const ref = useRef(initialValue);
+
+  if (ref.current === initialValue && typeof initialValue === 'function') {
+    // $FlowExpectedError[incompatible-use]
+    ref.current = initialValue();
+  }
+
+  return ref;
+}
+
+var Recoil_useRefInitOnce = useRefInitOnce;
+
 // @fb-only: const RecoilusagelogEvent = require('RecoilusagelogEvent');
 // @fb-only: const RecoilUsageLogFalcoEvent = require('RecoilUsageLogFalcoEvent');
 // @fb-only: const URI = require('URI');
 
 
 const {
-  getNextTreeStateVersion: getNextTreeStateVersion$2,
+  getNextTreeStateVersion: getNextTreeStateVersion$3,
   makeEmptyStoreState: makeEmptyStoreState$2
 } = Recoil_State;
-
-
-
-
-
-
-
-
-
-
 
 const {
   cleanUpNode: cleanUpNode$2,
   getDownstreamNodes: getDownstreamNodes$2,
+  initializeNode: initializeNode$2,
   setNodeValue: setNodeValue$2,
   setUnvalidatedAtomValue_DEPRECATED: setUnvalidatedAtomValue_DEPRECATED$1
 } = Recoil_FunctionalCore;
 
 const {
-  graph: graph$3
+  graph: graph$2
 } = Recoil_Graph;
 
 const {
   cloneGraph: cloneGraph$1
 } = Recoil_Graph;
+
+const {
+  getNextStoreID: getNextStoreID$2
+} = Recoil_Keys;
+
+const {
+  createMutableSource: createMutableSource$1,
+  reactMode: reactMode$2
+} = Recoil_ReactMode;
 
 const {
   applyAtomValueWrites: applyAtomValueWrites$1
@@ -35510,15 +36024,30 @@ const {
   useContext,
   useEffect,
   useMemo,
-  useRef,
+  useRef: useRef$1,
   useState
 } = react__WEBPACK_IMPORTED_MODULE_0__;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function notInAContext() {
-  throw new Error('This component must be used inside a <RecoilRoot> component.');
+  throw Recoil_err('This component must be used inside a <RecoilRoot> component.');
 }
 
 const defaultStore = Object.freeze({
+  storeID: getNextStoreID$2(),
   getState: notInAContext,
   replaceState: notInAContext,
   getGraph: notInAContext,
@@ -35529,13 +36058,13 @@ let stateReplacerIsBeingExecuted = false;
 
 function startNextTreeIfNeeded(store) {
   if (stateReplacerIsBeingExecuted) {
-    throw new Error('An atom update was triggered within the execution of a state updater function. State updater functions provided to Recoil must be pure functions.');
+    throw Recoil_err('An atom update was triggered within the execution of a state updater function. State updater functions provided to Recoil must be pure functions.');
   }
 
   const storeState = store.getState();
 
   if (storeState.nextTree === null) {
-    if (Recoil_gkx_1('recoil_memory_managament_2020') && Recoil_gkx_1('recoil_release_on_cascading_update_killswitch_2021')) {
+    if (Recoil_gkx('recoil_memory_managament_2020') && Recoil_gkx('recoil_release_on_cascading_update_killswitch_2021')) {
       // If this is a cascading update (that is, rendering due to one state change
       // invokes a second state change), we won't have cleaned up retainables yet
       // because this normally happens after notifying components. Do it before
@@ -35546,7 +36075,7 @@ function startNextTreeIfNeeded(store) {
     }
 
     const version = storeState.currentTree.version;
-    const nextVersion = getNextTreeStateVersion$2();
+    const nextVersion = getNextTreeStateVersion$3();
     storeState.nextTree = { ...storeState.currentTree,
       version: nextVersion,
       stateID: nextVersion,
@@ -35561,9 +36090,10 @@ const AppContext = react__WEBPACK_IMPORTED_MODULE_0__.createContext({
   current: defaultStore
 });
 
-const useStoreRef = () => useContext(AppContext);
+const useStoreRef = () => useContext(AppContext); // $FlowExpectedError[incompatible-call]
 
-const MutableSourceContext = react__WEBPACK_IMPORTED_MODULE_0__.createContext(null); // TODO T2710559282599660
+
+const MutableSourceContext = react__WEBPACK_IMPORTED_MODULE_0__.createContext(null);
 
 function useRecoilMutableSource() {
   const mutableSource = useContext(MutableSourceContext);
@@ -35609,7 +36139,7 @@ function sendEndOfBatchNotifications(store) {
       subscription(store);
     }
 
-    if (!Recoil_gkx_1('recoil_early_rendering_2021') || storeState.suspendedComponentResolvers.size) {
+    if (!reactMode$2().early || storeState.suspendedComponentResolvers.size > 0) {
       // Notifying components is needed to wake from suspense, even when using
       // early rendering.
       notifyComponents(store, storeState, treeState); // Wake all suspended components so the right one(s) can try to re-render.
@@ -35630,8 +36160,8 @@ function sendEndOfBatchNotifications(store) {
   storeState.queuedComponentCallbacks_DEPRECATED.splice(0, storeState.queuedComponentCallbacks_DEPRECATED.length);
 }
 
-function endBatch(storeRef) {
-  const storeState = storeRef.current.getState();
+function endBatch(store) {
+  const storeState = store.getState();
   storeState.commitDepth++;
 
   try {
@@ -35649,7 +36179,7 @@ function endBatch(storeRef) {
     storeState.previousTree = storeState.currentTree;
     storeState.currentTree = nextTree;
     storeState.nextTree = null;
-    sendEndOfBatchNotifications(storeRef.current);
+    sendEndOfBatchNotifications(store);
 
     if (storeState.previousTree != null) {
       storeState.graphsByVersion.delete(storeState.previousTree.version);
@@ -35659,8 +36189,8 @@ function endBatch(storeRef) {
 
     storeState.previousTree = null;
 
-    if (Recoil_gkx_1('recoil_memory_managament_2020')) {
-      releaseScheduledRetainablesNow$1(storeRef.current);
+    if (Recoil_gkx('recoil_memory_managament_2020')) {
+      releaseScheduledRetainablesNow$1(store);
     }
   } finally {
     storeState.commitDepth--;
@@ -35678,25 +36208,26 @@ function Batcher({
   setNotifyBatcherOfChange
 }) {
   const storeRef = useStoreRef();
-  const [_, setState] = useState([]);
+  const [, setState] = useState([]);
   setNotifyBatcherOfChange(() => setState({}));
+  useEffect(() => {
+    setNotifyBatcherOfChange(() => setState({})); // If an asynchronous selector resolves after the Batcher is unmounted,
+    // notifyBatcherOfChange will still be called. An error gets thrown whenever
+    // setState is called after a component is already unmounted, so this sets
+    // notifyBatcherOfChange to be a no-op.
+
+    return () => {
+      setNotifyBatcherOfChange(() => {});
+    };
+  }, [setNotifyBatcherOfChange]);
   useEffect(() => {
     // enqueueExecution runs this function immediately; it is only used to
     // manipulate the order of useEffects during tests, since React seems to
     // call useEffect in an unpredictable order sometimes.
     Recoil_Queue.enqueueExecution('Batcher', () => {
-      endBatch(storeRef);
+      endBatch(storeRef.current);
     });
-  }); // If an asynchronous selector resolves after the Batcher is unmounted,
-  // notifyBatcherOfChange will still be called. An error gets thrown whenever
-  // setState is called after a component is already unmounted, so this sets
-  // notifyBatcherOfChange to be a no-op.
-
-  useEffect(() => {
-    return () => {
-      setNotifyBatcherOfChange(() => {});
-    };
-  }, [setNotifyBatcherOfChange]);
+  });
   return null;
 }
 
@@ -35737,11 +36268,27 @@ function initialStoreState_DEPRECATED(store, initializeState) {
     }
   });
   return initial;
-}
+} // Initialize state snapshot for <RecoilRoot> for the initializeState prop.
+// Atom effect initialization takes precedence over this prop.
+// Any atom effects will be run before initialization, but then cleaned up,
+// they are then re-run when used as part of rendering.  These semantics are
+// compatible with React StrictMode where effects may be re-run multiple times
+// but state initialization only happens once the first time.
+
 
 function initialStoreState(initializeState) {
+  // Initialize a snapshot and get its store
   const snapshot = freshSnapshot$1().map(initializeState);
-  return snapshot.getStore_INTERNAL().getState();
+  const storeState = snapshot.getStore_INTERNAL().getState(); // Counteract the snapshot auto-release
+
+  snapshot.retain(); // Cleanup any effects run during initialization and clear the handlers so
+  // they will re-initialize if used during rendering.  This allows atom effect
+  // initialization to take precedence over initializeState and be compatible
+  // with StrictMode semantics.
+
+  storeState.nodeCleanupFunctions.forEach(cleanup => cleanup());
+  storeState.nodeCleanupFunctions.clear();
+  return storeState;
 }
 
 let nextID = 0;
@@ -35753,8 +36300,6 @@ function RecoilRoot_INTERNAL({
   // For use with React "context bridging"
   children
 }) {
-  var _createMutableSource;
-
   // prettier-ignore
   // @fb-only: useEffect(() => {
   // @fb-only: if (gkx('recoil_usage_logging')) {
@@ -35771,16 +36316,16 @@ function RecoilRoot_INTERNAL({
   // @fb-only: }
   // @fb-only: }
   // @fb-only: }, []);
-  let storeState; // eslint-disable-line prefer-const
+  let storeStateRef; // eslint-disable-line prefer-const
 
   const getGraph = version => {
-    const graphs = storeState.current.graphsByVersion;
+    const graphs = storeStateRef.current.graphsByVersion;
 
     if (graphs.has(version)) {
       return Recoil_nullthrows(graphs.get(version));
     }
 
-    const newGraph = graph$3();
+    const newGraph = graph$2();
     graphs.set(version, newGraph);
     return newGraph;
   };
@@ -35835,10 +36380,9 @@ function RecoilRoot_INTERNAL({
   };
 
   const replaceState = replacer => {
-    const storeState = storeRef.current.getState();
     startNextTreeIfNeeded(storeRef.current); // Use replacer to get the next state:
 
-    const nextTree = Recoil_nullthrows(storeState.nextTree);
+    const nextTree = Recoil_nullthrows(storeStateRef.current.nextTree);
     let replaced;
 
     try {
@@ -35859,39 +36403,52 @@ function RecoilRoot_INTERNAL({
     } // Save changes to nextTree and schedule a React update:
 
 
-    storeState.nextTree = replaced;
+    storeStateRef.current.nextTree = replaced;
 
-    if (Recoil_gkx_1('recoil_early_rendering_2021')) {
-      notifyComponents(store, storeState, replaced);
+    if (reactMode$2().early) {
+      notifyComponents(storeRef.current, storeStateRef.current, replaced);
     }
 
     Recoil_nullthrows(notifyBatcherOfChange.current)();
   };
 
-  const notifyBatcherOfChange = useRef(null);
+  const notifyBatcherOfChange = useRef$1(null);
   const setNotifyBatcherOfChange = useCallback(x => {
     notifyBatcherOfChange.current = x;
-  }, [notifyBatcherOfChange]); // FIXME T2710559282599660
-
-  const createMutableSource = (_createMutableSource = react__WEBPACK_IMPORTED_MODULE_0__.createMutableSource) !== null && _createMutableSource !== void 0 ? _createMutableSource : // flowlint-line unclear-type:off
-  react__WEBPACK_IMPORTED_MODULE_0__.unstable_createMutableSource; // flowlint-line unclear-type:off
-
-  const store = storeProp !== null && storeProp !== void 0 ? storeProp : {
-    getState: () => storeState.current,
+  }, [notifyBatcherOfChange]);
+  const storeRef = Recoil_useRefInitOnce(() => storeProp !== null && storeProp !== void 0 ? storeProp : {
+    storeID: getNextStoreID$2(),
+    getState: () => storeStateRef.current,
     replaceState,
     getGraph,
     subscribeToTransactions,
     addTransactionMetadata
-  };
-  const storeRef = useRef(store);
-  storeState = useRef(initializeState_DEPRECATED != null ? initialStoreState_DEPRECATED(store, initializeState_DEPRECATED) : initializeState != null ? initialStoreState(initializeState) : makeEmptyStoreState$2());
-  const mutableSource = useMemo(() => createMutableSource ? createMutableSource(storeState, () => storeState.current.currentTree.version) : null, [createMutableSource, storeState]); // Cleanup when the <RecoilRoot> is unmounted
+  });
 
-  useEffect(() => () => {
-    for (const atomKey of storeRef.current.getState().knownAtoms) {
-      cleanUpNode$2(storeRef.current, atomKey);
+  if (storeProp != null) {
+    storeRef.current = storeProp;
+  }
+
+  storeStateRef = Recoil_useRefInitOnce(() => initializeState_DEPRECATED != null ? initialStoreState_DEPRECATED(storeRef.current, initializeState_DEPRECATED) : initializeState != null ? initialStoreState(initializeState) : makeEmptyStoreState$2());
+  const mutableSource = useMemo(() => createMutableSource$1 === null || createMutableSource$1 === void 0 ? void 0 : createMutableSource$1(storeStateRef, () => storeStateRef.current.currentTree.version), [storeStateRef]); // Cleanup when the <RecoilRoot> is unmounted
+
+  useEffect(() => {
+    // React is free to call effect cleanup handlers and effects at will, the
+    // deps array is only an optimization.  For example, React strict mode
+    // will execute each effect twice for testing.  Therefore, we need symmetry
+    // to re-initialize all known atoms after they were cleaned up.
+    const store = storeRef.current;
+
+    for (const atomKey of new Set(store.getState().knownAtoms)) {
+      initializeNode$2(store, atomKey, 'get');
     }
-  }, []);
+
+    return () => {
+      for (const atomKey of store.getState().knownAtoms) {
+        cleanUpNode$2(store, atomKey);
+      }
+    };
+  }, [storeRef]);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(AppContext.Provider, {
     value: storeRef
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(MutableSourceContext.Provider, {
@@ -35917,241 +36474,18 @@ function RecoilRoot(props) {
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(RecoilRoot_INTERNAL, propsExceptOverride);
 }
 
-var Recoil_RecoilRoot_react = {
+function useRecoilStoreID() {
+  return useStoreRef().current.storeID;
+}
+
+var Recoil_RecoilRoot = {
+  RecoilRoot,
   useStoreRef,
   useRecoilMutableSource,
-  RecoilRoot,
+  useRecoilStoreID,
   notifyComponents_FOR_TESTING: notifyComponents,
   sendEndOfBatchNotifications_FOR_TESTING: sendEndOfBatchNotifications
 };
-
-const {
-  loadableWithValue: loadableWithValue$1
-} = Recoil_Loadable;
-
-const {
-  DEFAULT_VALUE: DEFAULT_VALUE$2,
-  getNode: getNode$3
-} = Recoil_Node;
-
-const {
-  copyTreeState: copyTreeState$1,
-  getRecoilValueAsLoadable: getRecoilValueAsLoadable$2,
-  invalidateDownstreams: invalidateDownstreams$1,
-  writeLoadableToTreeState: writeLoadableToTreeState$1
-} = Recoil_RecoilValueInterface;
-
-function isAtom(recoilValue) {
-  return getNode$3(recoilValue.key).nodeType === 'atom';
-}
-
-class TransactionInterfaceImpl {
-  constructor(store, treeState) {
-    _defineProperty(this, "_store", void 0);
-
-    _defineProperty(this, "_treeState", void 0);
-
-    _defineProperty(this, "_changes", void 0);
-
-    _defineProperty(this, "get", recoilValue => {
-      if (this._changes.has(recoilValue.key)) {
-        // $FlowFixMe[incompatible-return]
-        return this._changes.get(recoilValue.key);
-      }
-
-      if (!isAtom(recoilValue)) {
-        throw new Error('Reading selectors within atomicUpdate is not supported');
-      }
-
-      const loadable = getRecoilValueAsLoadable$2(this._store, recoilValue, this._treeState);
-
-      if (loadable.state === 'hasValue') {
-        return loadable.contents;
-      } else if (loadable.state === 'hasError') {
-        throw loadable.contents;
-      } else {
-        throw new Error(`Expected Recoil atom ${recoilValue.key} to have a value, but it is in a loading state.`);
-      }
-    });
-
-    _defineProperty(this, "set", (recoilState, valueOrUpdater) => {
-      if (!isAtom(recoilState)) {
-        throw new Error('Setting selectors within atomicUpdate is not supported');
-      }
-
-      if (typeof valueOrUpdater === 'function') {
-        const current = this.get(recoilState);
-
-        this._changes.set(recoilState.key, valueOrUpdater(current)); // flowlint-line unclear-type:off
-
-      } else {
-        this._changes.set(recoilState.key, valueOrUpdater);
-      }
-    });
-
-    _defineProperty(this, "reset", recoilState => {
-      this.set(recoilState, DEFAULT_VALUE$2);
-    });
-
-    this._store = store;
-    this._treeState = treeState;
-    this._changes = new Map();
-  } // Allow destructing
-  // eslint-disable-next-line fb-www/extra-arrow-initializer
-
-
-  newTreeState_INTERNAL() {
-    if (this._changes.size === 0) {
-      return this._treeState;
-    }
-
-    const newState = copyTreeState$1(this._treeState);
-
-    for (const [k, v] of this._changes) {
-      writeLoadableToTreeState$1(newState, k, loadableWithValue$1(v));
-    }
-
-    invalidateDownstreams$1(this._store, newState);
-    return newState;
-  }
-
-}
-
-function atomicUpdater(store) {
-  return fn => {
-    store.replaceState(treeState => {
-      const changeset = new TransactionInterfaceImpl(store, treeState);
-      fn(changeset);
-      return changeset.newTreeState_INTERNAL();
-    });
-  };
-}
-
-var Recoil_AtomicUpdates = {
-  atomicUpdater
-};
-
-var Recoil_AtomicUpdates_1 = Recoil_AtomicUpdates.atomicUpdater;
-
-var Recoil_AtomicUpdates$1 = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  atomicUpdater: Recoil_AtomicUpdates_1
-});
-
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails oncall+recoil
- * 
- * @format
- */
-/**
- * Returns a map containing all of the keys + values from the original map where
- * the given callback returned true.
- */
-
-function filterMap(map, callback) {
-  const result = new Map();
-
-  for (const [key, value] of map) {
-    if (callback(value, key)) {
-      result.set(key, value);
-    }
-  }
-
-  return result;
-}
-
-var Recoil_filterMap = filterMap;
-
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails oncall+recoil
- * 
- * @format
- */
-/**
- * Returns a set containing all of the values from the original set where
- * the given callback returned true.
- */
-
-function filterSet(set, callback) {
-  const result = new Set();
-
-  for (const value of set) {
-    if (callback(value)) {
-      result.add(value);
-    }
-  }
-
-  return result;
-}
-
-var Recoil_filterSet = filterSet;
-
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails oncall+recoil
- * 
- * @format
- */
-
-function invariant(condition, message) {
-  if (!condition) {
-    throw new Error(message);
-  }
-}
-
-var invariant_1 = invariant;
-
-// @oss-only
-
-
-var Recoil_invariant = invariant_1;
-
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @emails oncall+recoil
- * 
- * @format
- */
-
-function mergeMaps(...maps) {
-  const result = new Map();
-
-  for (let i = 0; i < maps.length; i++) {
-    const iterator = maps[i].keys();
-    let nextKey;
-
-    while (!(nextKey = iterator.next()).done) {
-      // $FlowFixMe[incompatible-call] - map/iterator knows nothing about flow types
-      result.set(nextKey.value, maps[i].get(nextKey.value));
-    }
-  }
-  /* $FlowFixMe[incompatible-return] (>=0.66.0 site=www,mobile) This comment
-   * suppresses an error found when Flow v0.66 was deployed. To see the error
-   * delete this comment and run Flow. */
-
-
-  return result;
-}
-
-var Recoil_mergeMaps = mergeMaps;
 
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -36183,6 +36517,129 @@ function shallowArrayEqual(a, b) {
 }
 
 var Recoil_shallowArrayEqual = shallowArrayEqual;
+
+const {
+  useEffect: useEffect$1,
+  useRef: useRef$2
+} = react__WEBPACK_IMPORTED_MODULE_0__;
+
+function usePrevious(value) {
+  const ref = useRef$2();
+  useEffect$1(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
+
+var Recoil_usePrevious = usePrevious;
+
+const {
+  useStoreRef: useStoreRef$1
+} = Recoil_RecoilRoot;
+
+const {
+  SUSPENSE_TIMEOUT_MS: SUSPENSE_TIMEOUT_MS$1
+} = Recoil_Retention;
+
+const {
+  updateRetainCount: updateRetainCount$2
+} = Recoil_Retention;
+
+const {
+  RetentionZone: RetentionZone$3
+} = Recoil_RetentionZone;
+
+const {
+  useEffect: useEffect$2,
+  useRef: useRef$3
+} = react__WEBPACK_IMPORTED_MODULE_0__;
+
+const {
+  isSSR: isSSR$2
+} = Recoil_Environment;
+
+
+
+
+
+ // I don't see a way to avoid the any type here because we want to accept readable
+// and writable values with any type parameter, but normally with writable ones
+// RecoilState<SomeT> is not a subtype of RecoilState<mixed>.
+
+
+// flowlint-line unclear-type:off
+function useRetain(toRetain) {
+  if (!Recoil_gkx('recoil_memory_managament_2020')) {
+    return;
+  } // eslint-disable-next-line fb-www/react-hooks
+
+
+  return useRetain_ACTUAL(toRetain);
+}
+
+function useRetain_ACTUAL(toRetain) {
+  const array = Array.isArray(toRetain) ? toRetain : [toRetain];
+  const retainables = array.map(a => a instanceof RetentionZone$3 ? a : a.key);
+  const storeRef = useStoreRef$1();
+  useEffect$2(() => {
+    if (!Recoil_gkx('recoil_memory_managament_2020')) {
+      return;
+    }
+
+    const store = storeRef.current;
+
+    if (timeoutID.current && !isSSR$2) {
+      // Already performed a temporary retain on render, simply cancel the release
+      // of that temporary retain.
+      window.clearTimeout(timeoutID.current);
+      timeoutID.current = null;
+    } else {
+      for (const r of retainables) {
+        updateRetainCount$2(store, r, 1);
+      }
+    }
+
+    return () => {
+      for (const r of retainables) {
+        updateRetainCount$2(store, r, -1);
+      }
+    }; // eslint-disable-next-line fb-www/react-hooks-deps
+  }, [storeRef, ...retainables]); // We want to retain if the component suspends. This is terrible but the Suspense
+  // API affords us no better option. If we suspend and never commit after some
+  // seconds, then release. The 'actual' retain/release in the effect above
+  // cancels this.
+
+  const timeoutID = useRef$3();
+  const previousRetainables = Recoil_usePrevious(retainables);
+
+  if (!isSSR$2 && (previousRetainables === undefined || !Recoil_shallowArrayEqual(previousRetainables, retainables))) {
+    const store = storeRef.current;
+
+    for (const r of retainables) {
+      updateRetainCount$2(store, r, 1);
+    }
+
+    if (previousRetainables) {
+      for (const r of previousRetainables) {
+        updateRetainCount$2(store, r, -1);
+      }
+    }
+
+    if (timeoutID.current) {
+      window.clearTimeout(timeoutID.current);
+    }
+
+    timeoutID.current = window.setTimeout(() => {
+      timeoutID.current = null;
+
+      for (const r of retainables) {
+        updateRetainCount$2(store, r, -1);
+      }
+    }, SUSPENSE_TIMEOUT_MS$1);
+  }
+}
+
+var Recoil_useRetain = useRetain;
 
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -36353,14 +36810,18 @@ function parseNode(line) {
 var Recoil_stackTraceParser = stackTraceParser;
 
 const {
-  useRef: useRef$1
+  useRef: useRef$4
 } = react__WEBPACK_IMPORTED_MODULE_0__;
 
+
+
+
+
 function useComponentName() {
-  const nameRef = useRef$1();
+  const nameRef = useRef$4();
 
   if (true) {
-    if (Recoil_gkx_1('recoil_infer_component_names')) {
+    if (Recoil_gkx('recoil_infer_component_names')) {
       var _nameRef$current;
 
       if (nameRef.current === undefined) {
@@ -36371,6 +36832,7 @@ function useComponentName() {
         // to look down the stack and find the first function which doesn't start
         // with 'use'. We are only enabling this in dev for now, since once the
         // codebase is minified, the naming assumptions no longer hold true.
+        // eslint-disable-next-line fb-www/no-new-error
         const frames = Recoil_stackTraceParser(new Error().stack);
 
         for (const {
@@ -36397,23 +36859,23 @@ function useComponentName() {
 var Recoil_useComponentName = useComponentName;
 
 const {
-  atomicUpdater: atomicUpdater$1
-} = Recoil_AtomicUpdates$1;
-
-const {
   batchUpdates: batchUpdates$2
 } = Recoil_Batching;
 
 const {
-  DEFAULT_VALUE: DEFAULT_VALUE$3,
-  getNode: getNode$4,
-  nodes: nodes$1
+  DEFAULT_VALUE: DEFAULT_VALUE$2
 } = Recoil_Node;
 
 const {
+  reactMode: reactMode$3,
+  useMutableSource: useMutableSource$1,
+  useSyncExternalStore: useSyncExternalStore$1
+} = Recoil_ReactMode;
+
+const {
   useRecoilMutableSource: useRecoilMutableSource$1,
-  useStoreRef: useStoreRef$1
-} = Recoil_RecoilRoot_react;
+  useStoreRef: useStoreRef$2
+} = Recoil_RecoilRoot;
 
 const {
   isRecoilValue: isRecoilValue$2
@@ -36421,25 +36883,21 @@ const {
 
 const {
   AbstractRecoilValue: AbstractRecoilValue$3,
-  getRecoilValueAsLoadable: getRecoilValueAsLoadable$3,
+  getRecoilValueAsLoadable: getRecoilValueAsLoadable$2,
   setRecoilValue: setRecoilValue$2,
-  setRecoilValueLoadable: setRecoilValueLoadable$1,
   setUnvalidatedRecoilValue: setUnvalidatedRecoilValue$2,
   subscribeToRecoilValue: subscribeToRecoilValue$1
 } = Recoil_RecoilValueInterface;
 
-const {
-  updateRetainCount: updateRetainCount$2
-} = Recoil_Retention;
+
 
 const {
-  RetentionZone: RetentionZone$3
-} = Recoil_RetentionZone;
-
-const {
-  Snapshot: Snapshot$1,
-  cloneSnapshot: cloneSnapshot$1
-} = Recoil_Snapshot$1;
+  useCallback: useCallback$1,
+  useEffect: useEffect$3,
+  useMemo: useMemo$1,
+  useRef: useRef$5,
+  useState: useState$1
+} = react__WEBPACK_IMPORTED_MODULE_0__;
 
 const {
   setByAddingToSet: setByAddingToSet$2
@@ -36447,9 +36905,6 @@ const {
 
 
 
-const {
-  isSSR: isSSR$2
-} = Recoil_Environment;
 
 
 
@@ -36459,36 +36914,6 @@ const {
 
 
 
-
-
-
-
-
-
-const {
-  mutableSourceExists: mutableSourceExists$2,
-  useMutableSource: useMutableSource$1
-} = Recoil_mutableSource;
-
-
-
-
-
-
-
-
-
-const {
-  useCallback: useCallback$1,
-  useEffect: useEffect$1,
-  useMemo: useMemo$1,
-  useRef: useRef$2,
-  useState: useState$1
-} = react__WEBPACK_IMPORTED_MODULE_0__; // Components that aren't mounted after suspending for this long will be assumed
-// to be discarded and their resources released.
-
-
-const SUSPENSE_TIMEOUT_MS = 120000;
 
 function handleLoadable(loadable, recoilValue, storeRef) {
   // We can't just throw the promise we are waiting on to Suspense.  If the
@@ -36506,30 +36931,29 @@ function handleLoadable(loadable, recoilValue, storeRef) {
   } else if (loadable.state === 'hasError') {
     throw loadable.contents;
   } else {
-    const err = new Error(`Invalid value of loadable atom "${recoilValue.key}"`);
-
-    throw err;
+    throw Recoil_err(`Invalid value of loadable atom "${recoilValue.key}"`);
   }
 }
 
 function validateRecoilValue(recoilValue, hookName) {
   if (!isRecoilValue$2(recoilValue)) {
-    throw new Error(`Invalid argument to ${hookName}: expected an atom or selector but got ${String(recoilValue)}`);
+    throw Recoil_err(`Invalid argument to ${hookName}: expected an atom or selector but got ${String(recoilValue)}`);
   }
 }
 
 /**
- * Various things are broken with useRecoilInterface, particularly concurrent mode
- * and memory management. They will not be fixed.
+ * Various things are broken with useRecoilInterface, particularly concurrent
+ * mode, React strict mode, and memory management. They will not be fixed.
  * */
 function useRecoilInterface_DEPRECATED() {
-  const storeRef = useStoreRef$1();
-  const [_, forceUpdate] = useState$1([]);
-  const recoilValuesUsed = useRef$2(new Set());
+  const componentName = Recoil_useComponentName();
+  const storeRef = useStoreRef$2();
+  const [, forceUpdate] = useState$1([]);
+  const recoilValuesUsed = useRef$5(new Set());
   recoilValuesUsed.current = new Set(); // Track the RecoilValues used just during this render
 
-  const previousSubscriptions = useRef$2(new Set());
-  const subscriptions = useRef$2(new Map());
+  const previousSubscriptions = useRef$5(new Set());
+  const subscriptions = useRef$5(new Map());
   const unsubscribeFrom = useCallback$1(key => {
     const sub = subscriptions.current.get(key);
 
@@ -36538,27 +36962,21 @@ function useRecoilInterface_DEPRECATED() {
       subscriptions.current.delete(key);
     }
   }, [subscriptions]);
-  const componentName = Recoil_useComponentName();
-  useEffect$1(() => {
-    const store = storeRef.current;
-
-    function updateState(_state, key) {
-      if (!subscriptions.current.has(key)) {
-        return;
-      }
-
+  const updateState = useCallback$1((_state, key) => {
+    if (subscriptions.current.has(key)) {
       forceUpdate([]);
     }
+  }, []); // Effect to add/remove subscriptions as nodes are used
 
+  useEffect$3(() => {
+    const store = storeRef.current;
     Recoil_differenceSets(recoilValuesUsed.current, previousSubscriptions.current).forEach(key => {
       if (subscriptions.current.has(key)) {
         Recoil_expectationViolation(`Double subscription to RecoilValue "${key}"`);
         return;
       }
 
-      const sub = subscribeToRecoilValue$1(store, new AbstractRecoilValue$3(key), state => {
-        updateState(state, key);
-      }, componentName);
+      const sub = subscribeToRecoilValue$1(store, new AbstractRecoilValue$3(key), state => updateState(state, key), componentName);
       subscriptions.current.set(key, sub);
       /**
        * Since we're subscribing in an effect we need to update to the latest
@@ -36592,37 +37010,43 @@ function useRecoilInterface_DEPRECATED() {
       unsubscribeFrom(key);
     });
     previousSubscriptions.current = recoilValuesUsed.current;
-  });
-  useEffect$1(() => {
-    const subs = subscriptions.current;
-    return () => subs.forEach((_, key) => unsubscribeFrom(key));
-  }, [unsubscribeFrom]);
+  }); // Effect to unsubscribe from all when unmounting
+
+  useEffect$3(() => {
+    const currentSubscriptions = subscriptions.current; // Restore subscriptions that were cleared due to StrictMode running this effect twice
+
+    Recoil_differenceSets(recoilValuesUsed.current, new Set(currentSubscriptions.keys())).forEach(key => {
+      const sub = subscribeToRecoilValue$1(storeRef.current, new AbstractRecoilValue$3(key), state => updateState(state, key), componentName);
+      currentSubscriptions.set(key, sub);
+    });
+    return () => currentSubscriptions.forEach((_, key) => unsubscribeFrom(key));
+  }, [componentName, storeRef, unsubscribeFrom, updateState]);
   return useMemo$1(() => {
+    // eslint-disable-next-line no-shadow
     function useSetRecoilState(recoilState) {
       if (true) {
-        // $FlowFixMe[escaped-generic]
         validateRecoilValue(recoilState, 'useSetRecoilState');
       }
 
       return newValueOrUpdater => {
         setRecoilValue$2(storeRef.current, recoilState, newValueOrUpdater);
       };
-    }
+    } // eslint-disable-next-line no-shadow
+
 
     function useResetRecoilState(recoilState) {
       if (true) {
-        // $FlowFixMe[escaped-generic]
         validateRecoilValue(recoilState, 'useResetRecoilState');
       }
 
-      return () => setRecoilValue$2(storeRef.current, recoilState, DEFAULT_VALUE$3);
-    }
+      return () => setRecoilValue$2(storeRef.current, recoilState, DEFAULT_VALUE$2);
+    } // eslint-disable-next-line no-shadow
+
 
     function useRecoilValueLoadable(recoilValue) {
       var _storeState$nextTree;
 
       if (true) {
-        // $FlowFixMe[escaped-generic]
         validateRecoilValue(recoilValue, 'useRecoilValueLoadable');
       }
 
@@ -36632,31 +37056,31 @@ function useRecoilInterface_DEPRECATED() {
 
 
       const storeState = storeRef.current.getState();
-      return getRecoilValueAsLoadable$3(storeRef.current, recoilValue, Recoil_gkx_1('recoil_early_rendering_2021') ? (_storeState$nextTree = storeState.nextTree) !== null && _storeState$nextTree !== void 0 ? _storeState$nextTree : storeState.currentTree : storeState.currentTree);
-    }
+      return getRecoilValueAsLoadable$2(storeRef.current, recoilValue, reactMode$3().early ? (_storeState$nextTree = storeState.nextTree) !== null && _storeState$nextTree !== void 0 ? _storeState$nextTree : storeState.currentTree : storeState.currentTree);
+    } // eslint-disable-next-line no-shadow
+
 
     function useRecoilValue(recoilValue) {
       if (true) {
-        // $FlowFixMe[escaped-generic]
         validateRecoilValue(recoilValue, 'useRecoilValue');
       }
 
       const loadable = useRecoilValueLoadable(recoilValue);
       return handleLoadable(loadable, recoilValue, storeRef);
-    }
+    } // eslint-disable-next-line no-shadow
+
 
     function useRecoilState(recoilState) {
       if (true) {
-        // $FlowFixMe[escaped-generic]
         validateRecoilValue(recoilState, 'useRecoilState');
       }
 
       return [useRecoilValue(recoilState), useSetRecoilState(recoilState)];
-    }
+    } // eslint-disable-next-line no-shadow
+
 
     function useRecoilStateLoadable(recoilState) {
       if (true) {
-        // $FlowFixMe[escaped-generic]
         validateRecoilValue(recoilState, 'useRecoilStateLoadable');
       }
 
@@ -36678,20 +37102,61 @@ const recoilComponentGetRecoilValueCount_FOR_TESTING = {
   current: 0
 };
 
-function useRecoilValueLoadable_MUTABLESOURCE(recoilValue) {
-  if (true) {
-    // $FlowFixMe[escaped-generic]
-    validateRecoilValue(recoilValue, 'useRecoilValueLoadable');
-  }
-
-  const storeRef = useStoreRef$1();
-  const getLoadable = useCallback$1(() => {
+function useRecoilValueLoadable_SYNC_EXTERNAL_STORE(recoilValue) {
+  const storeRef = useStoreRef$2();
+  const componentName = Recoil_useComponentName();
+  const getSnapshot = useCallback$1(() => {
     var _storeState$nextTree2;
+
+    if (true) {
+      recoilComponentGetRecoilValueCount_FOR_TESTING.current++;
+    }
 
     const store = storeRef.current;
     const storeState = store.getState();
-    const treeState = Recoil_gkx_1('recoil_early_rendering_2021') ? (_storeState$nextTree2 = storeState.nextTree) !== null && _storeState$nextTree2 !== void 0 ? _storeState$nextTree2 : storeState.currentTree : storeState.currentTree;
-    return getRecoilValueAsLoadable$3(store, recoilValue, treeState);
+    const treeState = reactMode$3().early ? (_storeState$nextTree2 = storeState.nextTree) !== null && _storeState$nextTree2 !== void 0 ? _storeState$nextTree2 : storeState.currentTree : storeState.currentTree;
+    const loadable = getRecoilValueAsLoadable$2(store, recoilValue, treeState);
+    return {
+      loadable,
+      key: recoilValue.key
+    };
+  }, [storeRef, recoilValue]); // Memoize the state to avoid unnecessary rerenders
+
+  const memoizePreviousSnapshot = useCallback$1(getState => {
+    let prevState;
+    return () => {
+      var _prevState, _prevState2;
+
+      const nextState = getState();
+
+      if ((_prevState = prevState) !== null && _prevState !== void 0 && _prevState.loadable.is(nextState.loadable) && ((_prevState2 = prevState) === null || _prevState2 === void 0 ? void 0 : _prevState2.key) === nextState.key) {
+        return prevState;
+      }
+
+      prevState = nextState;
+      return nextState;
+    };
+  }, []);
+  const getMemoizedSnapshot = useMemo$1(() => memoizePreviousSnapshot(getSnapshot), [getSnapshot, memoizePreviousSnapshot]);
+  const subscribe = useCallback$1(notify => {
+    const store = storeRef.current;
+    const subscription = subscribeToRecoilValue$1(store, recoilValue, notify, componentName);
+    return subscription.release;
+  }, [storeRef, recoilValue, componentName]);
+  return useSyncExternalStore$1(subscribe, getMemoizedSnapshot, // getSnapshot()
+  getMemoizedSnapshot // getServerSnapshot() for SSR support
+  ).loadable;
+}
+
+function useRecoilValueLoadable_MUTABLE_SOURCE(recoilValue) {
+  const storeRef = useStoreRef$2();
+  const getLoadable = useCallback$1(() => {
+    var _storeState$nextTree3;
+
+    const store = storeRef.current;
+    const storeState = store.getState();
+    const treeState = reactMode$3().early ? (_storeState$nextTree3 = storeState.nextTree) !== null && _storeState$nextTree3 !== void 0 ? _storeState$nextTree3 : storeState.currentTree : storeState.currentTree;
+    return getRecoilValueAsLoadable$2(store, recoilValue, treeState);
   }, [storeRef, recoilValue]);
   const getLoadableWithTesting = useCallback$1(() => {
     if (true) {
@@ -36701,11 +37166,11 @@ function useRecoilValueLoadable_MUTABLESOURCE(recoilValue) {
     return getLoadable();
   }, [getLoadable]);
   const componentName = Recoil_useComponentName();
-  const subscribe = useCallback$1((_storeState, callback) => {
+  const subscribe = useCallback$1((_storeState, notify) => {
     const store = storeRef.current;
     const subscription = subscribeToRecoilValue$1(store, recoilValue, () => {
-      if (!Recoil_gkx_1('recoil_suppress_rerender_in_callback')) {
-        return callback();
+      if (!Recoil_gkx('recoil_suppress_rerender_in_callback')) {
+        return notify();
       } // Only re-render if the value has changed.
       // This will evaluate the atom/selector now as well as when the
       // component renders, but that may help with prefetching.
@@ -36714,7 +37179,7 @@ function useRecoilValueLoadable_MUTABLESOURCE(recoilValue) {
       const newLoadable = getLoadable();
 
       if (!prevLoadableRef.current.is(newLoadable)) {
-        callback();
+        notify();
       } // If the component is suspended then the effect setting prevLoadableRef
       // will not run.  So, set the previous value here when its subscription
       // is fired to wake it up.  We can't just rely on this, though, because
@@ -36727,36 +37192,96 @@ function useRecoilValueLoadable_MUTABLESOURCE(recoilValue) {
     return subscription.release;
   }, [storeRef, recoilValue, componentName, getLoadable]);
   const source = useRecoilMutableSource$1();
+
+  if (source == null) {
+    throw Recoil_err('Recoil hooks must be used in components contained within a <RecoilRoot> component.');
+  }
+
   const loadable = useMutableSource$1(source, getLoadableWithTesting, subscribe);
-  const prevLoadableRef = useRef$2(loadable);
-  useEffect$1(() => {
+  const prevLoadableRef = useRef$5(loadable);
+  useEffect$3(() => {
     prevLoadableRef.current = loadable;
   });
   return loadable;
 }
 
-function useRecoilValueLoadable_LEGACY(recoilValue) {
-  if (true) {
-    // $FlowFixMe[escaped-generic]
-    validateRecoilValue(recoilValue, 'useRecoilValueLoadable');
-  }
+function useRecoilValueLoadable_TRANSITION_SUPPORT(recoilValue) {
+  const storeRef = useStoreRef$2();
+  const componentName = Recoil_useComponentName(); // Accessors to get the current state
 
-  const storeRef = useStoreRef$1();
-  const [_, forceUpdate] = useState$1([]);
+  const getLoadable = useCallback$1(() => {
+    var _storeState$nextTree4;
+
+    if (true) {
+      recoilComponentGetRecoilValueCount_FOR_TESTING.current++;
+    }
+
+    const store = storeRef.current;
+    const storeState = store.getState();
+    const treeState = reactMode$3().early ? (_storeState$nextTree4 = storeState.nextTree) !== null && _storeState$nextTree4 !== void 0 ? _storeState$nextTree4 : storeState.currentTree : storeState.currentTree;
+    return getRecoilValueAsLoadable$2(store, recoilValue, treeState);
+  }, [storeRef, recoilValue]);
+  const getState = useCallback$1(() => ({
+    loadable: getLoadable(),
+    key: recoilValue.key
+  }), [getLoadable, recoilValue.key]); // Memoize state snapshots
+
+  const updateState = useCallback$1(prevState => {
+    const nextState = getState();
+    return prevState.loadable.is(nextState.loadable) && prevState.key === nextState.key ? prevState : nextState;
+  }, [getState]); // Subscribe to Recoil state changes
+
+  useEffect$3(() => {
+    const subscription = subscribeToRecoilValue$1(storeRef.current, recoilValue, _state => {
+      setState(updateState);
+    }, componentName); // Update state in case we are using a different key
+
+    setState(updateState);
+    return subscription.release;
+  }, [componentName, recoilValue, storeRef, updateState]); // Get the current state
+
+  const [state, setState] = useState$1(getState); // If we changed keys, then return the state for the new key.
+  // This is important in case the old key would cause the component to suspend.
+  // We don't have to set the new state here since the subscribing effect above
+  // will do that.
+
+  return state.key !== recoilValue.key ? getState().loadable : state.loadable;
+}
+
+function useRecoilValueLoadable_LEGACY(recoilValue) {
+  const storeRef = useStoreRef$2();
+  const [, forceUpdate] = useState$1([]);
   const componentName = Recoil_useComponentName();
-  useEffect$1(() => {
+  const getLoadable = useCallback$1(() => {
+    var _storeState$nextTree5;
+
+    if (true) {
+      recoilComponentGetRecoilValueCount_FOR_TESTING.current++;
+    }
+
+    const store = storeRef.current;
+    const storeState = store.getState();
+    const treeState = reactMode$3().early ? (_storeState$nextTree5 = storeState.nextTree) !== null && _storeState$nextTree5 !== void 0 ? _storeState$nextTree5 : storeState.currentTree : storeState.currentTree;
+    return getRecoilValueAsLoadable$2(store, recoilValue, treeState);
+  }, [storeRef, recoilValue]);
+  const loadable = getLoadable();
+  const prevLoadableRef = useRef$5(loadable);
+  useEffect$3(() => {
+    prevLoadableRef.current = loadable;
+  });
+  useEffect$3(() => {
     const store = storeRef.current;
     const storeState = store.getState();
     const subscription = subscribeToRecoilValue$1(store, recoilValue, _state => {
       var _prevLoadableRef$curr;
 
-      if (!Recoil_gkx_1('recoil_suppress_rerender_in_callback')) {
+      if (!Recoil_gkx('recoil_suppress_rerender_in_callback')) {
         return forceUpdate([]);
       }
 
-      const newLoadable = getRecoilValueAsLoadable$3(store, recoilValue, store.getState().currentTree);
+      const newLoadable = getLoadable();
 
-      if (!((_prevLoadableRef$curr = prevLoadableRef.current) === null || _prevLoadableRef$curr === void 0 ? void 0 : _prevLoadableRef$curr.is(newLoadable))) {
+      if (!((_prevLoadableRef$curr = prevLoadableRef.current) !== null && _prevLoadableRef$curr !== void 0 && _prevLoadableRef$curr.is(newLoadable))) {
         forceUpdate(newLoadable);
       }
 
@@ -36787,13 +37312,13 @@ function useRecoilValueLoadable_LEGACY(recoilValue) {
     } else {
       var _prevLoadableRef$curr2;
 
-      if (!Recoil_gkx_1('recoil_suppress_rerender_in_callback')) {
+      if (!Recoil_gkx('recoil_suppress_rerender_in_callback')) {
         return forceUpdate([]);
       }
 
-      const newLoadable = getRecoilValueAsLoadable$3(store, recoilValue, store.getState().currentTree);
+      const newLoadable = getLoadable();
 
-      if (!((_prevLoadableRef$curr2 = prevLoadableRef.current) === null || _prevLoadableRef$curr2 === void 0 ? void 0 : _prevLoadableRef$curr2.is(newLoadable))) {
+      if (!((_prevLoadableRef$curr2 = prevLoadableRef.current) !== null && _prevLoadableRef$curr2 !== void 0 && _prevLoadableRef$curr2.is(newLoadable))) {
         forceUpdate(newLoadable);
       }
 
@@ -36801,12 +37326,7 @@ function useRecoilValueLoadable_LEGACY(recoilValue) {
     }
 
     return subscription.release;
-  }, [componentName, recoilValue, storeRef]);
-  const loadable = getRecoilValueAsLoadable$3(storeRef.current, recoilValue);
-  const prevLoadableRef = useRef$2(loadable);
-  useEffect$1(() => {
-    prevLoadableRef.current = loadable;
-  });
+  }, [componentName, getLoadable, recoilValue, storeRef]);
   return loadable;
 }
 /**
@@ -36816,18 +37336,21 @@ function useRecoilValueLoadable_LEGACY(recoilValue) {
 
 
 function useRecoilValueLoadable(recoilValue) {
-  if (Recoil_gkx_1('recoil_memory_managament_2020')) {
-    // eslint-disable-next-line fb-www/react-hooks
-    useRetain(recoilValue);
+  if (true) {
+    validateRecoilValue(recoilValue, 'useRecoilValueLoadable');
   }
 
-  if (mutableSourceExists$2()) {
+  if (Recoil_gkx('recoil_memory_managament_2020')) {
     // eslint-disable-next-line fb-www/react-hooks
-    return useRecoilValueLoadable_MUTABLESOURCE(recoilValue);
-  } else {
-    // eslint-disable-next-line fb-www/react-hooks
-    return useRecoilValueLoadable_LEGACY(recoilValue);
+    Recoil_useRetain(recoilValue);
   }
+
+  return {
+    TRANSITION_SUPPORT: useRecoilValueLoadable_TRANSITION_SUPPORT,
+    SYNC_EXTERNAL_STORE: useRecoilValueLoadable_SYNC_EXTERNAL_STORE,
+    MUTABLE_SOURCE: useRecoilValueLoadable_MUTABLE_SOURCE,
+    LEGACY: useRecoilValueLoadable_LEGACY
+  }[reactMode$3().mode](recoilValue);
 }
 /**
   Returns the value represented by the RecoilValue.
@@ -36839,11 +37362,10 @@ function useRecoilValueLoadable(recoilValue) {
 
 function useRecoilValue(recoilValue) {
   if (true) {
-    // $FlowFixMe[escaped-generic]
     validateRecoilValue(recoilValue, 'useRecoilValue');
   }
 
-  const storeRef = useStoreRef$1();
+  const storeRef = useStoreRef$2();
   const loadable = useRecoilValueLoadable(recoilValue);
   return handleLoadable(loadable, recoilValue, storeRef);
 }
@@ -36855,11 +37377,10 @@ function useRecoilValue(recoilValue) {
 
 function useSetRecoilState(recoilState) {
   if (true) {
-    // $FlowFixMe[escaped-generic]
     validateRecoilValue(recoilState, 'useSetRecoilState');
   }
 
-  const storeRef = useStoreRef$1();
+  const storeRef = useStoreRef$2();
   return useCallback$1(newValueOrUpdater => {
     setRecoilValue$2(storeRef.current, recoilState, newValueOrUpdater);
   }, [storeRef, recoilState]);
@@ -36871,13 +37392,12 @@ function useSetRecoilState(recoilState) {
 
 function useResetRecoilState(recoilState) {
   if (true) {
-    // $FlowFixMe[escaped-generic]
     validateRecoilValue(recoilState, 'useResetRecoilState');
   }
 
-  const storeRef = useStoreRef$1();
+  const storeRef = useStoreRef$2();
   return useCallback$1(() => {
-    setRecoilValue$2(storeRef.current, recoilState, DEFAULT_VALUE$3);
+    setRecoilValue$2(storeRef.current, recoilState, DEFAULT_VALUE$2);
   }, [storeRef, recoilState]);
 }
 /**
@@ -36891,7 +37411,6 @@ function useResetRecoilState(recoilState) {
 
 function useRecoilState(recoilState) {
   if (true) {
-    // $FlowFixMe[escaped-generic]
     validateRecoilValue(recoilState, 'useRecoilState');
   }
 
@@ -36906,16 +37425,222 @@ function useRecoilState(recoilState) {
 
 function useRecoilStateLoadable(recoilState) {
   if (true) {
-    // $FlowFixMe[escaped-generic]
     validateRecoilValue(recoilState, 'useRecoilStateLoadable');
   }
 
   return [useRecoilValueLoadable(recoilState), useSetRecoilState(recoilState)];
 }
 
+function useSetUnvalidatedAtomValues() {
+  const storeRef = useStoreRef$2();
+  return (values, transactionMetadata = {}) => {
+    batchUpdates$2(() => {
+      storeRef.current.addTransactionMetadata(transactionMetadata);
+      values.forEach((value, key) => setUnvalidatedRecoilValue$2(storeRef.current, new AbstractRecoilValue$3(key), value));
+    });
+  };
+}
+/**
+ * Experimental variants of hooks with support for useTransition()
+ */
+
+
+function useRecoilValueLoadable_TRANSITION_SUPPORT_UNSTABLE(recoilValue) {
+  if (true) {
+    validateRecoilValue(recoilValue, 'useRecoilValueLoadable_TRANSITION_SUPPORT_UNSTABLE');
+
+    if (!reactMode$3().early) {
+      Recoil_recoverableViolation('Attepmt to use a hook with UNSTABLE_TRANSITION_SUPPORT in a rendering mode incompatible with concurrent rendering.  Try enabling the recoil_sync_external_store or recoil_transition_support GKs.');
+    }
+  }
+
+  if (Recoil_gkx('recoil_memory_managament_2020')) {
+    // eslint-disable-next-line fb-www/react-hooks
+    Recoil_useRetain(recoilValue);
+  }
+
+  return useRecoilValueLoadable_TRANSITION_SUPPORT(recoilValue);
+}
+
+function useRecoilValue_TRANSITION_SUPPORT_UNSTABLE(recoilValue) {
+  if (true) {
+    validateRecoilValue(recoilValue, 'useRecoilValue_TRANSITION_SUPPORT_UNSTABLE');
+  }
+
+  const storeRef = useStoreRef$2();
+  const loadable = useRecoilValueLoadable_TRANSITION_SUPPORT_UNSTABLE(recoilValue);
+  return handleLoadable(loadable, recoilValue, storeRef);
+}
+
+function useRecoilState_TRANSITION_SUPPORT_UNSTABLE(recoilState) {
+  if (true) {
+    validateRecoilValue(recoilState, 'useRecoilState_TRANSITION_SUPPORT_UNSTABLE');
+  }
+
+  return [useRecoilValue_TRANSITION_SUPPORT_UNSTABLE(recoilState), useSetRecoilState(recoilState)];
+}
+
+var Recoil_Hooks = {
+  recoilComponentGetRecoilValueCount_FOR_TESTING,
+  useRecoilInterface: useRecoilInterface_DEPRECATED,
+  useRecoilState,
+  useRecoilStateLoadable,
+  useRecoilValue,
+  useRecoilValueLoadable,
+  useResetRecoilState,
+  useSetRecoilState,
+  useSetUnvalidatedAtomValues,
+  useRecoilValueLoadable_TRANSITION_SUPPORT_UNSTABLE,
+  useRecoilValue_TRANSITION_SUPPORT_UNSTABLE,
+  useRecoilState_TRANSITION_SUPPORT_UNSTABLE
+};
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+/**
+ * Returns a map containing all of the keys + values from the original map where
+ * the given callback returned true.
+ */
+
+function filterMap(map, callback) {
+  const result = new Map();
+
+  for (const [key, value] of map) {
+    if (callback(value, key)) {
+      result.set(key, value);
+    }
+  }
+
+  return result;
+}
+
+var Recoil_filterMap = filterMap;
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+/**
+ * Returns a set containing all of the values from the original set where
+ * the given callback returned true.
+ */
+
+function filterSet(set, callback) {
+  const result = new Set();
+
+  for (const value of set) {
+    if (callback(value)) {
+      result.add(value);
+    }
+  }
+
+  return result;
+}
+
+var Recoil_filterSet = filterSet;
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+
+function mergeMaps(...maps) {
+  const result = new Map();
+
+  for (let i = 0; i < maps.length; i++) {
+    const iterator = maps[i].keys();
+    let nextKey;
+
+    while (!(nextKey = iterator.next()).done) {
+      // $FlowFixMe[incompatible-call] - map/iterator knows nothing about flow types
+      result.set(nextKey.value, maps[i].get(nextKey.value));
+    }
+  }
+  /* $FlowFixMe[incompatible-return] (>=0.66.0 site=www,mobile) This comment
+   * suppresses an error found when Flow v0.66 was deployed. To see the error
+   * delete this comment and run Flow. */
+
+
+  return result;
+}
+
+var Recoil_mergeMaps = mergeMaps;
+
+const {
+  batchUpdates: batchUpdates$3
+} = Recoil_Batching;
+
+const {
+  DEFAULT_VALUE: DEFAULT_VALUE$3,
+  getNode: getNode$4,
+  nodes: nodes$1
+} = Recoil_Node;
+
+const {
+  useStoreRef: useStoreRef$3
+} = Recoil_RecoilRoot;
+
+const {
+  AbstractRecoilValue: AbstractRecoilValue$4,
+  setRecoilValueLoadable: setRecoilValueLoadable$1
+} = Recoil_RecoilValueInterface;
+
+const {
+  SUSPENSE_TIMEOUT_MS: SUSPENSE_TIMEOUT_MS$2
+} = Recoil_Retention;
+
+const {
+  cloneSnapshot: cloneSnapshot$1
+} = Recoil_Snapshot$1;
+
+const {
+  useCallback: useCallback$2,
+  useEffect: useEffect$4,
+  useRef: useRef$6,
+  useState: useState$2
+} = react__WEBPACK_IMPORTED_MODULE_0__;
+
+const {
+  isSSR: isSSR$3
+} = Recoil_Environment;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function useTransactionSubscription(callback) {
-  const storeRef = useStoreRef$1();
-  useEffect$1(() => {
+  const storeRef = useStoreRef$3();
+  useEffect$4(() => {
     const sub = storeRef.current.subscribeToTransactions(callback);
     return sub.release;
   }, [callback, storeRef]);
@@ -36958,7 +37683,7 @@ function externallyVisibleAtomValuesInState(state) {
           transaction, to avoid loops.
 */
 function useTransactionObservation_DEPRECATED(callback) {
-  useTransactionSubscription(useCallback$1(store => {
+  useTransactionSubscription(useCallback$2(store => {
     let previousTree = store.getState().previousTree;
     const currentTree = store.getState().currentTree;
 
@@ -36994,7 +37719,7 @@ function useTransactionObservation_DEPRECATED(callback) {
 }
 
 function useRecoilTransactionObserver(callback) {
-  useTransactionSubscription(useCallback$1(store => {
+  useTransactionSubscription(useCallback$2(store => {
     const snapshot = cloneSnapshot$1(store, 'current');
     const previousSnapshot = cloneSnapshot$1(store, 'previous');
     callback({
@@ -37002,241 +37727,95 @@ function useRecoilTransactionObserver(callback) {
       previousSnapshot
     });
   }, [callback]));
-}
-
-function usePrevious(value) {
-  const ref = useRef$2();
-  useEffect$1(() => {
-    ref.current = value;
-  });
-  return ref.current;
 } // Return a snapshot of the current state and subscribe to all state changes
 
 
 function useRecoilSnapshot() {
-  const storeRef = useStoreRef$1();
-  const [snapshot, setSnapshot] = useState$1(() => cloneSnapshot$1(storeRef.current));
-  const previousSnapshot = usePrevious(snapshot);
-  const timeoutID = useRef$2();
-  useEffect$1(() => {
-    if (timeoutID.current && !isSSR$2) {
+  const storeRef = useStoreRef$3();
+  const [snapshot, setSnapshot] = useState$2(() => cloneSnapshot$1(storeRef.current));
+  const previousSnapshot = Recoil_usePrevious(snapshot);
+  const timeoutID = useRef$6();
+  const releaseRef = useRef$6();
+  useTransactionSubscription(useCallback$2(store => setSnapshot(cloneSnapshot$1(store)), [])); // Retain snapshot for duration component is mounted
+
+  useEffect$4(() => {
+    const release = snapshot.retain(); // Release the retain from the rendering call
+
+    if (timeoutID.current && !isSSR$3) {
+      var _releaseRef$current;
+
       window.clearTimeout(timeoutID.current);
-    }
-
-    return snapshot.retain();
-  }, [snapshot]);
-  useTransactionSubscription(useCallback$1(store => setSnapshot(cloneSnapshot$1(store)), []));
-
-  if (previousSnapshot !== snapshot && !isSSR$2) {
-    if (timeoutID.current) {
-      previousSnapshot === null || previousSnapshot === void 0 ? void 0 : previousSnapshot.release_INTERNAL();
-      window.clearTimeout(timeoutID.current);
-    }
-
-    snapshot.retain();
-    timeoutID.current = window.setTimeout(() => {
-      snapshot.release_INTERNAL();
       timeoutID.current = null;
-    }, SUSPENSE_TIMEOUT_MS);
+      (_releaseRef$current = releaseRef.current) === null || _releaseRef$current === void 0 ? void 0 : _releaseRef$current.call(releaseRef);
+      releaseRef.current = null;
+    }
+
+    return release;
+  }, [snapshot]); // Retain snapshot until above effect is run.
+  // Release after a threshold in case component is suspended.
+
+  if (previousSnapshot !== snapshot && !isSSR$3) {
+    // Release the previous snapshot
+    if (timeoutID.current) {
+      var _releaseRef$current2;
+
+      window.clearTimeout(timeoutID.current);
+      timeoutID.current = null;
+      (_releaseRef$current2 = releaseRef.current) === null || _releaseRef$current2 === void 0 ? void 0 : _releaseRef$current2.call(releaseRef);
+      releaseRef.current = null;
+    }
+
+    releaseRef.current = snapshot.retain();
+    timeoutID.current = window.setTimeout(() => {
+      var _releaseRef$current3;
+
+      timeoutID.current = null;
+      (_releaseRef$current3 = releaseRef.current) === null || _releaseRef$current3 === void 0 ? void 0 : _releaseRef$current3.call(releaseRef);
+      releaseRef.current = null;
+    }, SUSPENSE_TIMEOUT_MS$2);
   }
 
   return snapshot;
 }
 
-function useGotoRecoilSnapshot() {
-  const storeRef = useStoreRef$1();
-  return useCallback$1(snapshot => {
-    var _storeState$nextTree3;
+function gotoSnapshot(store, snapshot) {
+  var _storeState$nextTree;
 
-    const storeState = storeRef.current.getState();
-    const prev = (_storeState$nextTree3 = storeState.nextTree) !== null && _storeState$nextTree3 !== void 0 ? _storeState$nextTree3 : storeState.currentTree;
-    const next = snapshot.getStore_INTERNAL().getState().currentTree;
-    batchUpdates$2(() => {
-      const keysToUpdate = new Set();
+  const storeState = store.getState();
+  const prev = (_storeState$nextTree = storeState.nextTree) !== null && _storeState$nextTree !== void 0 ? _storeState$nextTree : storeState.currentTree;
+  const next = snapshot.getStore_INTERNAL().getState().currentTree;
+  batchUpdates$3(() => {
+    const keysToUpdate = new Set();
 
-      for (const keys of [prev.atomValues.keys(), next.atomValues.keys()]) {
-        for (const key of keys) {
-          var _prev$atomValues$get, _next$atomValues$get;
+    for (const keys of [prev.atomValues.keys(), next.atomValues.keys()]) {
+      for (const key of keys) {
+        var _prev$atomValues$get, _next$atomValues$get;
 
-          if (((_prev$atomValues$get = prev.atomValues.get(key)) === null || _prev$atomValues$get === void 0 ? void 0 : _prev$atomValues$get.contents) !== ((_next$atomValues$get = next.atomValues.get(key)) === null || _next$atomValues$get === void 0 ? void 0 : _next$atomValues$get.contents) && getNode$4(key).shouldRestoreFromSnapshots) {
-            keysToUpdate.add(key);
-          }
+        if (((_prev$atomValues$get = prev.atomValues.get(key)) === null || _prev$atomValues$get === void 0 ? void 0 : _prev$atomValues$get.contents) !== ((_next$atomValues$get = next.atomValues.get(key)) === null || _next$atomValues$get === void 0 ? void 0 : _next$atomValues$get.contents) && getNode$4(key).shouldRestoreFromSnapshots) {
+          keysToUpdate.add(key);
         }
       }
+    }
 
-      keysToUpdate.forEach(key => {
-        setRecoilValueLoadable$1(storeRef.current, new AbstractRecoilValue$3(key), next.atomValues.has(key) ? Recoil_nullthrows(next.atomValues.get(key)) : DEFAULT_VALUE$3);
-      });
-      storeRef.current.replaceState(state => {
-        return { ...state,
-          stateID: snapshot.getID_INTERNAL()
-        };
-      });
+    keysToUpdate.forEach(key => {
+      setRecoilValueLoadable$1(store, new AbstractRecoilValue$4(key), next.atomValues.has(key) ? Recoil_nullthrows(next.atomValues.get(key)) : DEFAULT_VALUE$3);
     });
-  }, [storeRef]);
+    store.replaceState(state => ({ ...state,
+      stateID: snapshot.getID()
+    }));
+  });
 }
 
-function useSetUnvalidatedAtomValues() {
-  const storeRef = useStoreRef$1();
-  return (values, transactionMetadata = {}) => {
-    batchUpdates$2(() => {
-      storeRef.current.addTransactionMetadata(transactionMetadata);
-      values.forEach((value, key) => setUnvalidatedRecoilValue$2(storeRef.current, new AbstractRecoilValue$3(key), value));
-    });
-  };
+function useGotoRecoilSnapshot() {
+  const storeRef = useStoreRef$3();
+  return useCallback$2(snapshot => gotoSnapshot(storeRef.current, snapshot), [storeRef]);
 }
 
-class Sentinel {}
-
-const SENTINEL = new Sentinel();
-
-function useRecoilCallback(fn, deps) {
-  const storeRef = useStoreRef$1();
-  const gotoSnapshot = useGotoRecoilSnapshot();
-  return useCallback$1((...args) => {
-    function set(recoilState, newValueOrUpdater) {
-      setRecoilValue$2(storeRef.current, recoilState, newValueOrUpdater);
-    }
-
-    function reset(recoilState) {
-      setRecoilValue$2(storeRef.current, recoilState, DEFAULT_VALUE$3);
-    } // Use currentTree for the snapshot to show the currently committed state
-
-
-    const snapshot = cloneSnapshot$1(storeRef.current); // FIXME massive gains from doing this lazily
-
-    const atomicUpdate = atomicUpdater$1(storeRef.current);
-    let ret = SENTINEL;
-    batchUpdates$2(() => {
-      const errMsg = 'useRecoilCallback expects a function that returns a function: ' + 'it accepts a function of the type (RecoilInterface) => T = R ' + 'and returns a callback function T => R, where RecoilInterface is an ' + 'object {snapshot, set, ...} and T and R are the argument and return ' + 'types of the callback you want to create.  Please see the docs ' + 'at recoiljs.org for details.';
-
-      if (typeof fn !== 'function') {
-        throw new Error(errMsg);
-      } // flowlint-next-line unclear-type:off
-
-
-      const cb = fn({
-        set,
-        reset,
-        snapshot,
-        gotoSnapshot,
-        transact_UNSTABLE: atomicUpdate
-      });
-
-      if (typeof cb !== 'function') {
-        throw new Error(errMsg);
-      }
-
-      ret = cb(...args);
-    });
-    !!(ret instanceof Sentinel) ?  true ? Recoil_invariant(false, 'batchUpdates should return immediately') : 0 : void 0;
-    return ret;
-  }, deps != null ? [...deps, storeRef] : undefined // eslint-disable-line fb-www/react-hooks-deps
-  );
-} // I don't see a way to avoid the any type here because we want to accept readable
-// and writable values with any type parameter, but normally with writable ones
-// RecoilState<SomeT> is not a subtype of RecoilState<mixed>.
-
-
-// flowlint-line unclear-type:off
-function useRetain(toRetain) {
-  if (!Recoil_gkx_1('recoil_memory_managament_2020')) {
-    return;
-  } // eslint-disable-next-line fb-www/react-hooks
-
-
-  return useRetain_ACTUAL(toRetain);
-}
-
-function useRetain_ACTUAL(toRetain) {
-  const array = Array.isArray(toRetain) ? toRetain : [toRetain];
-  const retainables = array.map(a => a instanceof RetentionZone$3 ? a : a.key);
-  const storeRef = useStoreRef$1();
-  useEffect$1(() => {
-    if (!Recoil_gkx_1('recoil_memory_managament_2020')) {
-      return;
-    }
-
-    const store = storeRef.current;
-
-    if (timeoutID.current && !isSSR$2) {
-      // Already performed a temporary retain on render, simply cancel the release
-      // of that temporary retain.
-      window.clearTimeout(timeoutID.current);
-      timeoutID.current = null;
-    } else {
-      for (const r of retainables) {
-        updateRetainCount$2(store, r, 1);
-      }
-    }
-
-    return () => {
-      for (const r of retainables) {
-        updateRetainCount$2(store, r, -1);
-      }
-    }; // eslint-disable-next-line fb-www/react-hooks-deps
-  }, [storeRef, ...retainables]); // We want to retain if the component suspends. This is terrible but the Suspense
-  // API affords us no better option. If we suspend and never commit after some
-  // seconds, then release. The 'actual' retain/release in the effect above
-  // cancels this.
-
-  const timeoutID = useRef$2();
-  const previousRetainables = usePrevious(retainables);
-
-  if (!isSSR$2 && (previousRetainables === undefined || !Recoil_shallowArrayEqual(previousRetainables, retainables))) {
-    const store = storeRef.current;
-
-    for (const r of retainables) {
-      updateRetainCount$2(store, r, 1);
-    }
-
-    if (previousRetainables) {
-      for (const r of previousRetainables) {
-        updateRetainCount$2(store, r, -1);
-      }
-    }
-
-    if (timeoutID.current) {
-      window.clearTimeout(timeoutID.current);
-    }
-
-    timeoutID.current = window.setTimeout(() => {
-      timeoutID.current = null;
-
-      for (const r of retainables) {
-        updateRetainCount$2(store, r, -1);
-      }
-    }, SUSPENSE_TIMEOUT_MS);
-  }
-}
-
-function useRecoilTransaction(fn, deps) {
-  const storeRef = useStoreRef$1();
-  return useMemo$1(() => (...args) => {
-    const atomicUpdate = atomicUpdater$1(storeRef.current);
-    atomicUpdate(transactionInterface => {
-      fn(transactionInterface)(...args);
-    });
-  }, deps != null ? [...deps, storeRef] : undefined // eslint-disable-line fb-www/react-hooks-deps
-  );
-}
-
-var Recoil_Hooks = {
-  recoilComponentGetRecoilValueCount_FOR_TESTING,
-  useGotoRecoilSnapshot,
-  useRecoilCallback,
-  useRecoilInterface: useRecoilInterface_DEPRECATED,
+var Recoil_SnapshotHooks = {
   useRecoilSnapshot,
-  useRecoilState,
-  useRecoilStateLoadable,
-  useRecoilTransaction,
+  gotoSnapshot,
+  useGotoRecoilSnapshot,
   useRecoilTransactionObserver,
-  useRecoilValue,
-  useRecoilValueLoadable,
-  useRetain,
-  useResetRecoilState,
-  useSetRecoilState,
-  useSetUnvalidatedAtomValues,
   useTransactionObservation_DEPRECATED,
   useTransactionSubscription_DEPRECATED: useTransactionSubscription
 };
@@ -37246,11 +37825,11 @@ const {
 } = Recoil_FunctionalCore;
 
 const {
-  useStoreRef: useStoreRef$2
-} = Recoil_RecoilRoot_react;
+  useStoreRef: useStoreRef$4
+} = Recoil_RecoilRoot;
 
 function useGetRecoilValueInfo() {
-  const storeRef = useStoreRef$2();
+  const storeRef = useStoreRef$4();
   return ({
     key
   }) => peekNodeInfo$2(storeRef.current, storeRef.current.getState().currentTree, key);
@@ -37259,9 +37838,13 @@ function useGetRecoilValueInfo() {
 var Recoil_useGetRecoilValueInfo = useGetRecoilValueInfo;
 
 const {
+  reactMode: reactMode$4
+} = Recoil_ReactMode;
+
+const {
   RecoilRoot: RecoilRoot$1,
-  useStoreRef: useStoreRef$3
-} = Recoil_RecoilRoot_react;
+  useStoreRef: useStoreRef$5
+} = Recoil_RecoilRoot;
 
 
 
@@ -37270,8 +37853,16 @@ const {
 } = react__WEBPACK_IMPORTED_MODULE_0__;
 
 function useRecoilBridgeAcrossReactRoots() {
-  const store = useStoreRef$3().current;
+  // The test fails when using useMutableSource(), but only if act() is used
+  // for the nested root.  So, this may only be a testing environment issue.
+  if (reactMode$4().mode === 'MUTABLE_SOURCE') {
+    // eslint-disable-next-line fb-www/no-console
+    console.warn('Warning: There are known issues using useRecoilBridgeAcrossReactRoots() in recoil_mutable_source rendering mode.  Please consider upgrading to recoil_sync_external_store mode.');
+  }
+
+  const store = useStoreRef$5().current;
   return useMemo$2(() => {
+    // eslint-disable-next-line no-shadow
     function RecoilBridge({
       children
     }) {
@@ -37286,6 +37877,128 @@ function useRecoilBridgeAcrossReactRoots() {
 
 var Recoil_useRecoilBridgeAcrossReactRoots = useRecoilBridgeAcrossReactRoots;
 
+const {
+  loadableWithValue: loadableWithValue$1
+} = Recoil_Loadable$1;
+
+const {
+  initializeNode: initializeNode$3
+} = Recoil_FunctionalCore;
+
+const {
+  DEFAULT_VALUE: DEFAULT_VALUE$4,
+  getNode: getNode$5
+} = Recoil_Node;
+
+const {
+  copyTreeState: copyTreeState$1,
+  getRecoilValueAsLoadable: getRecoilValueAsLoadable$3,
+  invalidateDownstreams: invalidateDownstreams$1,
+  writeLoadableToTreeState: writeLoadableToTreeState$1
+} = Recoil_RecoilValueInterface;
+
+
+
+function isAtom(recoilValue) {
+  return getNode$5(recoilValue.key).nodeType === 'atom';
+}
+
+class TransactionInterfaceImpl {
+  constructor(store, treeState) {
+    _defineProperty(this, "_store", void 0);
+
+    _defineProperty(this, "_treeState", void 0);
+
+    _defineProperty(this, "_changes", void 0);
+
+    _defineProperty(this, "get", recoilValue => {
+      if (this._changes.has(recoilValue.key)) {
+        // $FlowFixMe[incompatible-return]
+        return this._changes.get(recoilValue.key);
+      }
+
+      if (!isAtom(recoilValue)) {
+        throw Recoil_err('Reading selectors within atomicUpdate is not supported');
+      }
+
+      const loadable = getRecoilValueAsLoadable$3(this._store, recoilValue, this._treeState);
+
+      if (loadable.state === 'hasValue') {
+        return loadable.contents;
+      } else if (loadable.state === 'hasError') {
+        throw loadable.contents;
+      } else {
+        throw Recoil_err(`Expected Recoil atom ${recoilValue.key} to have a value, but it is in a loading state.`);
+      }
+    });
+
+    _defineProperty(this, "set", (recoilState, valueOrUpdater) => {
+      if (!isAtom(recoilState)) {
+        throw Recoil_err('Setting selectors within atomicUpdate is not supported');
+      }
+
+      if (typeof valueOrUpdater === 'function') {
+        const current = this.get(recoilState);
+
+        this._changes.set(recoilState.key, valueOrUpdater(current)); // flowlint-line unclear-type:off
+
+      } else {
+        // Initialize atom and run effects if not initialized yet
+        initializeNode$3(this._store, recoilState.key, 'set');
+
+        this._changes.set(recoilState.key, valueOrUpdater);
+      }
+    });
+
+    _defineProperty(this, "reset", recoilState => {
+      this.set(recoilState, DEFAULT_VALUE$4);
+    });
+
+    this._store = store;
+    this._treeState = treeState;
+    this._changes = new Map();
+  } // Allow destructing
+  // eslint-disable-next-line fb-www/extra-arrow-initializer
+
+
+  newTreeState_INTERNAL() {
+    if (this._changes.size === 0) {
+      return this._treeState;
+    }
+
+    const newState = copyTreeState$1(this._treeState);
+
+    for (const [k, v] of this._changes) {
+      writeLoadableToTreeState$1(newState, k, loadableWithValue$1(v));
+    }
+
+    invalidateDownstreams$1(this._store, newState);
+    return newState;
+  }
+
+}
+
+function atomicUpdater(store) {
+  return fn => {
+    store.replaceState(treeState => {
+      const changeset = new TransactionInterfaceImpl(store, treeState);
+      fn(changeset);
+      return changeset.newTreeState_INTERNAL();
+    });
+  };
+}
+
+var Recoil_AtomicUpdates = {
+  atomicUpdater
+};
+
+var Recoil_AtomicUpdates_1 = Recoil_AtomicUpdates.atomicUpdater;
+
+var Recoil_AtomicUpdates$1 = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  atomicUpdater: Recoil_AtomicUpdates_1
+});
+
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -37297,231 +38010,157 @@ var Recoil_useRecoilBridgeAcrossReactRoots = useRecoilBridgeAcrossReactRoots;
  * @format
  */
 
-function isNode(object) {
-  var _ownerDocument, _doc$defaultView;
-
-  if (typeof window === 'undefined') {
-    return false;
+function invariant(condition, message) {
+  if (!condition) {
+    throw new Error(message);
   }
-
-  const doc = object != null ? (_ownerDocument = object.ownerDocument) !== null && _ownerDocument !== void 0 ? _ownerDocument : object : document;
-  const defaultView = (_doc$defaultView = doc.defaultView) !== null && _doc$defaultView !== void 0 ? _doc$defaultView : window;
-  return !!(object != null && (typeof defaultView.Node === 'function' ? object instanceof defaultView.Node : typeof object === 'object' && typeof object.nodeType === 'number' && typeof object.nodeName === 'string'));
 }
 
-var Recoil_isNode = isNode;
+var invariant_1 = invariant;
+
+// @oss-only
+
+
+var Recoil_invariant = invariant_1;
 
 const {
-  isReactNative: isReactNative$1,
-  isSSR: isSSR$3
-} = Recoil_Environment;
+  atomicUpdater: atomicUpdater$1
+} = Recoil_AtomicUpdates$1;
+
+const {
+  batchUpdates: batchUpdates$4
+} = Recoil_Batching;
+
+const {
+  DEFAULT_VALUE: DEFAULT_VALUE$5
+} = Recoil_Node;
+
+const {
+  useStoreRef: useStoreRef$6
+} = Recoil_RecoilRoot;
+
+const {
+  refreshRecoilValue: refreshRecoilValue$1,
+  setRecoilValue: setRecoilValue$3
+} = Recoil_RecoilValueInterface;
+
+const {
+  Snapshot: Snapshot$1,
+  cloneSnapshot: cloneSnapshot$2
+} = Recoil_Snapshot$1;
+
+const {
+  gotoSnapshot: gotoSnapshot$1
+} = Recoil_SnapshotHooks;
+
+const {
+  useCallback: useCallback$3
+} = react__WEBPACK_IMPORTED_MODULE_0__;
 
 
 
 
 
-function shouldNotBeFrozen(value) {
-  // Primitives and functions:
-  if (value === null || typeof value !== 'object') {
-    return true;
-  } // React elements:
 
 
-  switch (typeof value.$$typeof) {
-    case 'symbol':
-      return true;
+class Sentinel {}
 
-    case 'number':
-      return true;
-  } // Immutable structures:
+const SENTINEL = new Sentinel();
 
+function recoilCallback(store, fn, args, extraInterface) {
+  let ret = SENTINEL;
+  batchUpdates$4(() => {
+    const errMsg = 'useRecoilCallback() expects a function that returns a function: ' + 'it accepts a function of the type (RecoilInterface) => (Args) => ReturnType ' + 'and returns a callback function (Args) => ReturnType, where RecoilInterface is ' + 'an object {snapshot, set, ...} and Args and ReturnType are the argument and return ' + 'types of the callback you want to create.  Please see the docs ' + 'at recoiljs.org for details.';
 
-  if (value['@@__IMMUTABLE_ITERABLE__@@'] != null || value['@@__IMMUTABLE_KEYED__@@'] != null || value['@@__IMMUTABLE_INDEXED__@@'] != null || value['@@__IMMUTABLE_ORDERED__@@'] != null || value['@@__IMMUTABLE_RECORD__@@'] != null) {
-    return true;
-  } // DOM nodes:
-
-
-  if (Recoil_isNode(value)) {
-    return true;
-  }
-
-  if (Recoil_isPromise(value)) {
-    return true;
-  }
-
-  if (value instanceof Error) {
-    return true;
-  }
-
-  if (ArrayBuffer.isView(value)) {
-    return true;
-  } // Some environments, just as Jest, don't work with the instanceof check
+    if (typeof fn !== 'function') {
+      throw Recoil_err(errMsg);
+    } // Clone the snapshot lazily to avoid overhead if the callback does not use it.
+    // Note that this means the snapshot may represent later state from when
+    // the callback was called if it first accesses the snapshot asynchronously.
 
 
-  if (!isSSR$3 && !isReactNative$1 && ( // $FlowFixMe(site=recoil) Window does not have a FlowType definition https://github.com/facebook/flow/issues/6709
-  value === window || value instanceof Window)) {
-    return true;
-  }
+    const callbackInterface = Recoil_lazyProxy({ ...(extraInterface !== null && extraInterface !== void 0 ? extraInterface : {}),
+      // flowlint-line unclear-type:off
+      set: (node, newValue) => setRecoilValue$3(store, node, newValue),
+      reset: node => setRecoilValue$3(store, node, DEFAULT_VALUE$5),
+      refresh: node => refreshRecoilValue$1(store, node),
+      gotoSnapshot: snapshot => gotoSnapshot$1(store, snapshot),
+      transact_UNSTABLE: transaction => atomicUpdater$1(store)(transaction)
+    }, {
+      snapshot: () => cloneSnapshot$2(store)
+    });
+    const callback = fn(callbackInterface);
 
-  return false;
-} // Recursively freeze a value to enforce it is read-only.
-// This may also have minimal performance improvements for enumerating
-// objects (based on browser implementations, of course)
-
-
-function deepFreezeValue(value) {
-  if (typeof value !== 'object' || shouldNotBeFrozen(value)) {
-    return;
-  }
-
-  Object.freeze(value); // Make all properties read-only
-
-  for (const key in value) {
-    // $FlowFixMe[method-unbinding] added when improving typing for this parameters
-    if (Object.prototype.hasOwnProperty.call(value, key)) {
-      const prop = value[key]; // Prevent infinite recurssion for circular references.
-
-      if (typeof prop === 'object' && prop != null && !Object.isFrozen(prop)) {
-        deepFreezeValue(prop);
-      }
+    if (typeof callback !== 'function') {
+      throw Recoil_err(errMsg);
     }
-  }
 
-  Object.seal(value); // This also makes existing properties non-configurable.
+    ret = callback(...args);
+  });
+  !!(ret instanceof Sentinel) ?  true ? Recoil_invariant(false, 'batchUpdates should return immediately') : 0 : void 0;
+  return ret;
 }
 
-var Recoil_deepFreezeValue = deepFreezeValue;
-
-const TIME_WARNING_THRESHOLD_MS = 15;
-
-function stringify(x, opt, key) {
-  // A optimization to avoid the more expensive JSON.stringify() for simple strings
-  // This may lose protection for u2028 and u2029, though.
-  if (typeof x === 'string' && !x.includes('"') && !x.includes('\\')) {
-    return `"${x}"`;
-  } // Handle primitive types
-
-
-  switch (typeof x) {
-    case 'undefined':
-      return '';
-    // JSON.stringify(undefined) returns undefined, but we always want to return a string
-
-    case 'boolean':
-      return x ? 'true' : 'false';
-
-    case 'number':
-    case 'symbol':
-      // case 'bigint': // BigInt is not supported in www
-      return String(x);
-
-    case 'string':
-      // Add surrounding quotes and escape internal quotes
-      return JSON.stringify(x);
-
-    case 'function':
-      if ((opt === null || opt === void 0 ? void 0 : opt.allowFunctions) !== true) {
-        throw new Error('Attempt to serialize function in a Recoil cache key');
-      }
-
-      return `__FUNCTION(${x.name})__`;
-  }
-
-  if (x === null) {
-    return 'null';
-  } // Fallback case for unknown types
-
-
-  if (typeof x !== 'object') {
-    var _JSON$stringify;
-
-    return (_JSON$stringify = JSON.stringify(x)) !== null && _JSON$stringify !== void 0 ? _JSON$stringify : '';
-  } // Deal with all promises as equivalent for now.
-
-
-  if (Recoil_isPromise(x)) {
-    return '__PROMISE__';
-  } // Arrays handle recursive stringification
-
-
-  if (Array.isArray(x)) {
-    return `[${x.map((v, i) => stringify(v, opt, i.toString()))}]`;
-  } // If an object defines a toJSON() method, then use that to override the
-  // serialization.  This matches the behavior of JSON.stringify().
-  // Pass the key for compatibility.
-  // Immutable.js collections define this method to allow us to serialize them.
-
-
-  if (typeof x.toJSON === 'function') {
-    // flowlint-next-line unclear-type: off
-    return stringify(x.toJSON(key), opt, key);
-  } // For built-in Maps, sort the keys in a stable order instead of the
-  // default insertion order.  Support non-string keys.
-
-
-  if (x instanceof Map) {
-    const obj = {};
-
-    for (const [k, v] of x) {
-      // Stringify will escape any nested quotes
-      obj[typeof k === 'string' ? k : stringify(k, opt)] = v;
-    }
-
-    return stringify(obj, opt, key);
-  } // For built-in Sets, sort the keys in a stable order instead of the
-  // default insertion order.
-
-
-  if (x instanceof Set) {
-    return stringify(Array.from(x).sort((a, b) => stringify(a, opt).localeCompare(stringify(b, opt))), opt, key);
-  } // Anything else that is iterable serialize as an Array.
-
-
-  if (Symbol !== undefined && x[Symbol.iterator] != null && typeof x[Symbol.iterator] === 'function') {
-    // flowlint-next-line unclear-type: off
-    return stringify(Array.from(x), opt, key);
-  } // For all other Objects, sort the keys in a stable order.
-
-
-  return `{${Object.keys(x).filter(key => x[key] !== undefined).sort() // stringify the key to add quotes and escape any nested slashes or quotes.
-  .map(key => `${stringify(key, opt)}:${stringify(x[key], opt, key)}`).join(',')}}`;
-} // Utility similar to JSON.stringify() except:
-// * Serialize built-in Sets as an Array
-// * Serialize built-in Maps as an Object.  Supports non-string keys.
-// * Serialize other iterables as arrays
-// * Sort the keys of Objects and Maps to have a stable order based on string conversion.
-//    This overrides their default insertion order.
-// * Still uses toJSON() of any object to override serialization
-// * Support Symbols (though don't guarantee uniqueness)
-// * We could support BigInt, but Flow doesn't seem to like it.
-// See Recoil_stableStringify-test.js for examples
-
-
-function stableStringify(x, opt = {
-  allowFunctions: false
-}) {
-  if (true) {
-    if (typeof window !== 'undefined') {
-      const startTime = window.performance ? window.performance.now() : 0;
-      const str = stringify(x, opt);
-      const endTime = window.performance ? window.performance.now() : 0;
-
-      if (endTime - startTime > TIME_WARNING_THRESHOLD_MS) {
-        /* eslint-disable fb-www/no-console */
-        console.groupCollapsed(`Recoil: Spent ${endTime - startTime}ms computing a cache key`);
-        console.warn(x, str);
-        console.groupEnd();
-        /* eslint-enable fb-www/no-console */
-      }
-
-      return str;
-    }
-  }
-
-  return stringify(x, opt);
+function useRecoilCallback(fn, deps) {
+  const storeRef = useStoreRef$6();
+  return useCallback$3( // $FlowIssue[incompatible-call]
+  (...args) => {
+    return recoilCallback(storeRef.current, fn, args);
+  }, deps != null ? [...deps, storeRef] : undefined // eslint-disable-line fb-www/react-hooks-deps
+  );
 }
 
-var Recoil_stableStringify = stableStringify;
+var Recoil_useRecoilCallback = {
+  recoilCallback,
+  useRecoilCallback
+};
+
+const {
+  useStoreRef: useStoreRef$7
+} = Recoil_RecoilRoot;
+
+const {
+  refreshRecoilValue: refreshRecoilValue$2
+} = Recoil_RecoilValueInterface;
+
+const {
+  useCallback: useCallback$4
+} = react__WEBPACK_IMPORTED_MODULE_0__;
+
+function useRecoilRefresher(recoilValue) {
+  const storeRef = useStoreRef$7();
+  return useCallback$4(() => {
+    const store = storeRef.current;
+    refreshRecoilValue$2(store, recoilValue);
+  }, [recoilValue, storeRef]);
+}
+
+var Recoil_useRecoilRefresher = useRecoilRefresher;
+
+const {
+  atomicUpdater: atomicUpdater$2
+} = Recoil_AtomicUpdates$1;
+
+const {
+  useStoreRef: useStoreRef$8
+} = Recoil_RecoilRoot;
+
+const {
+  useMemo: useMemo$3
+} = react__WEBPACK_IMPORTED_MODULE_0__;
+
+function useRecoilTransaction(fn, deps) {
+  const storeRef = useStoreRef$8();
+  return useMemo$3(() => (...args) => {
+    const atomicUpdate = atomicUpdater$2(storeRef.current);
+    atomicUpdate(transactionInterface => {
+      fn(transactionInterface)(...args);
+    });
+  }, deps != null ? [...deps, storeRef] : undefined // eslint-disable-line fb-www/react-hooks-deps
+  );
+}
+
+var Recoil_useRecoilTransaction = useRecoilTransaction;
 
 class TreeCache {
   constructor(options) {
@@ -37573,15 +38212,24 @@ class TreeCache {
 
   set(route, value, handlers) {
     let leafNode;
-    const newRoot = addLeaf(this.root(), route.map(([nodeKey, nodeValue]) => [nodeKey, this._mapNodeValue(nodeValue)]), null, value, null, {
-      onNodeVisit: node => {
-        handlers === null || handlers === void 0 ? void 0 : handlers.onNodeVisit(node);
+    let newRoot = null;
 
-        if (node.type === 'leaf') {
-          leafNode = node;
+    const setRetryablePart = () => {
+      newRoot = addLeaf(this.root(), route.map(([nodeKey, nodeValue]) => [nodeKey, this._mapNodeValue(nodeValue)]), null, value, null, {
+        onNodeVisit: node => {
+          handlers === null || handlers === void 0 ? void 0 : handlers.onNodeVisit(node);
+
+          if (node.type === 'leaf') {
+            leafNode = node;
+          }
         }
-      }
-    });
+      }, () => {
+        this.clear();
+        setRetryablePart();
+      });
+    };
+
+    setRetryablePart();
 
     if (!this.root()) {
       this._root = newRoot;
@@ -37638,7 +38286,7 @@ const findLeaf = (root, getNodeValue, handlers) => {
   return findLeaf(root.branches.get(nodeValue), getNodeValue, handlers);
 };
 
-const addLeaf = (root, route, parent, value, branchKey, handlers) => {
+const addLeaf = (root, route, parent, value, branchKey, handlers, onAbort) => {
   var _handlers$onNodeVisit2;
 
   let node;
@@ -37661,7 +38309,7 @@ const addLeaf = (root, route, parent, value, branchKey, handlers) => {
         branches: new Map(),
         branchKey
       };
-      node.branches.set(nodeValue, addLeaf(null, rest, node, value, nodeValue, handlers));
+      node.branches.set(nodeValue, addLeaf(null, rest, node, value, nodeValue, handlers, onAbort));
     }
   } else {
     node = root;
@@ -37669,8 +38317,14 @@ const addLeaf = (root, route, parent, value, branchKey, handlers) => {
     if (route.length) {
       const [path, ...rest] = route;
       const [nodeKey, nodeValue] = path;
-      !(root.type === 'branch' && root.nodeKey === nodeKey) ?  true ? Recoil_invariant(false, 'Existing cache must have a branch midway through the route with matching node key') : 0 : void 0;
-      root.branches.set(nodeValue, addLeaf(root.branches.get(nodeValue), rest, root, value, nodeValue, handlers));
+
+      if (root.type !== 'branch' || root.nodeKey !== nodeKey) {
+        Recoil_recoverableViolation('Existing cache must have a branch midway through the ' + 'route with matching node key. Resetting cache.');
+        onAbort();
+        return node; // ignored
+      }
+
+      root.branches.set(nodeValue, addLeaf(root.branches.get(nodeValue), rest, root, value, nodeValue, handlers, onAbort));
     }
   }
 
@@ -37898,9 +38552,146 @@ function treeCacheLRU(maxSize, mapNodeValue = v => v) {
 
 var Recoil_treeCacheLRU = treeCacheLRU;
 
+const TIME_WARNING_THRESHOLD_MS = 15;
+
+function stringify(x, opt, key) {
+  // A optimization to avoid the more expensive JSON.stringify() for simple strings
+  // This may lose protection for u2028 and u2029, though.
+  if (typeof x === 'string' && !x.includes('"') && !x.includes('\\')) {
+    return `"${x}"`;
+  } // Handle primitive types
+
+
+  switch (typeof x) {
+    case 'undefined':
+      return '';
+    // JSON.stringify(undefined) returns undefined, but we always want to return a string
+
+    case 'boolean':
+      return x ? 'true' : 'false';
+
+    case 'number':
+    case 'symbol':
+      // case 'bigint': // BigInt is not supported in www
+      return String(x);
+
+    case 'string':
+      // Add surrounding quotes and escape internal quotes
+      return JSON.stringify(x);
+
+    case 'function':
+      if ((opt === null || opt === void 0 ? void 0 : opt.allowFunctions) !== true) {
+        throw Recoil_err('Attempt to serialize function in a Recoil cache key');
+      }
+
+      return `__FUNCTION(${x.name})__`;
+  }
+
+  if (x === null) {
+    return 'null';
+  } // Fallback case for unknown types
+
+
+  if (typeof x !== 'object') {
+    var _JSON$stringify;
+
+    return (_JSON$stringify = JSON.stringify(x)) !== null && _JSON$stringify !== void 0 ? _JSON$stringify : '';
+  } // Deal with all promises as equivalent for now.
+
+
+  if (Recoil_isPromise(x)) {
+    return '__PROMISE__';
+  } // Arrays handle recursive stringification
+
+
+  if (Array.isArray(x)) {
+    return `[${x.map((v, i) => stringify(v, opt, i.toString()))}]`;
+  } // If an object defines a toJSON() method, then use that to override the
+  // serialization.  This matches the behavior of JSON.stringify().
+  // Pass the key for compatibility.
+  // Immutable.js collections define this method to allow us to serialize them.
+
+
+  if (typeof x.toJSON === 'function') {
+    // flowlint-next-line unclear-type: off
+    return stringify(x.toJSON(key), opt, key);
+  } // For built-in Maps, sort the keys in a stable order instead of the
+  // default insertion order.  Support non-string keys.
+
+
+  if (x instanceof Map) {
+    const obj = {};
+
+    for (const [k, v] of x) {
+      // Stringify will escape any nested quotes
+      obj[typeof k === 'string' ? k : stringify(k, opt)] = v;
+    }
+
+    return stringify(obj, opt, key);
+  } // For built-in Sets, sort the keys in a stable order instead of the
+  // default insertion order.
+
+
+  if (x instanceof Set) {
+    return stringify(Array.from(x).sort((a, b) => stringify(a, opt).localeCompare(stringify(b, opt))), opt, key);
+  } // Anything else that is iterable serialize as an Array.
+
+
+  if (Symbol !== undefined && x[Symbol.iterator] != null && typeof x[Symbol.iterator] === 'function') {
+    // flowlint-next-line unclear-type: off
+    return stringify(Array.from(x), opt, key);
+  } // For all other Objects, sort the keys in a stable order.
+
+
+  return `{${Object.keys(x).filter(k => x[k] !== undefined).sort() // stringify the key to add quotes and escape any nested slashes or quotes.
+  .map(k => `${stringify(k, opt)}:${stringify(x[k], opt, k)}`).join(',')}}`;
+} // Utility similar to JSON.stringify() except:
+// * Serialize built-in Sets as an Array
+// * Serialize built-in Maps as an Object.  Supports non-string keys.
+// * Serialize other iterables as arrays
+// * Sort the keys of Objects and Maps to have a stable order based on string conversion.
+//    This overrides their default insertion order.
+// * Still uses toJSON() of any object to override serialization
+// * Support Symbols (though don't guarantee uniqueness)
+// * We could support BigInt, but Flow doesn't seem to like it.
+// See Recoil_stableStringify-test.js for examples
+
+
+function stableStringify(x, opt = {
+  allowFunctions: false
+}) {
+  if (true) {
+    if (typeof window !== 'undefined') {
+      const startTime = window.performance ? window.performance.now() : 0;
+      const str = stringify(x, opt);
+      const endTime = window.performance ? window.performance.now() : 0;
+
+      if (endTime - startTime > TIME_WARNING_THRESHOLD_MS) {
+        /* eslint-disable fb-www/no-console */
+        console.groupCollapsed(`Recoil: Spent ${endTime - startTime}ms computing a cache key`);
+        console.warn(x, str);
+        console.groupEnd();
+        /* eslint-enable fb-www/no-console */
+      }
+
+      return str;
+    }
+  }
+
+  return stringify(x, opt);
+}
+
+var Recoil_stableStringify = stableStringify;
+
 const {
   TreeCache: TreeCache$2
 } = Recoil_TreeCache$1;
+
+
+
+
+
+
 
 
 
@@ -37929,7 +38720,7 @@ function getValueMapper(equality) {
       return val => Recoil_stableStringify(val);
   }
 
-  throw new Error(`Unrecognized equality policy ${equality}`);
+  throw Recoil_err(`Unrecognized equality policy ${equality}`);
 }
 
 function getTreeCache(eviction, maxSize, mapNodeValue) {
@@ -37947,10 +38738,116 @@ function getTreeCache(eviction, maxSize, mapNodeValue) {
       return Recoil_treeCacheLRU(1, mapNodeValue);
   }
 
-  throw new Error(`Unrecognized eviction policy ${eviction}`);
+  throw Recoil_err(`Unrecognized eviction policy ${eviction}`);
 }
 
 var Recoil_treeCacheFromPolicy = treeCacheFromPolicy;
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @emails oncall+recoil
+ * 
+ * @format
+ */
+
+function isNode(object) {
+  var _ownerDocument, _doc$defaultView;
+
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const doc = object != null ? (_ownerDocument = object.ownerDocument) !== null && _ownerDocument !== void 0 ? _ownerDocument : object : document;
+  const defaultView = (_doc$defaultView = doc.defaultView) !== null && _doc$defaultView !== void 0 ? _doc$defaultView : window;
+  return !!(object != null && (typeof defaultView.Node === 'function' ? object instanceof defaultView.Node : typeof object === 'object' && typeof object.nodeType === 'number' && typeof object.nodeName === 'string'));
+}
+
+var Recoil_isNode = isNode;
+
+const {
+  isReactNative: isReactNative$1,
+  isSSR: isSSR$4
+} = Recoil_Environment;
+
+
+
+
+
+function shouldNotBeFrozen(value) {
+  // Primitives and functions:
+  if (value === null || typeof value !== 'object') {
+    return true;
+  } // React elements:
+
+
+  switch (typeof value.$$typeof) {
+    case 'symbol':
+      return true;
+
+    case 'number':
+      return true;
+  } // Immutable structures:
+
+
+  if (value['@@__IMMUTABLE_ITERABLE__@@'] != null || value['@@__IMMUTABLE_KEYED__@@'] != null || value['@@__IMMUTABLE_INDEXED__@@'] != null || value['@@__IMMUTABLE_ORDERED__@@'] != null || value['@@__IMMUTABLE_RECORD__@@'] != null) {
+    return true;
+  } // DOM nodes:
+
+
+  if (Recoil_isNode(value)) {
+    return true;
+  }
+
+  if (Recoil_isPromise(value)) {
+    return true;
+  }
+
+  if (value instanceof Error) {
+    return true;
+  }
+
+  if (ArrayBuffer.isView(value)) {
+    return true;
+  } // Some environments, just as Jest, don't work with the instanceof check
+
+
+  if (!isSSR$4 && !isReactNative$1 && ( // $FlowFixMe(site=recoil) Window does not have a FlowType definition https://github.com/facebook/flow/issues/6709
+  value === window || value instanceof Window)) {
+    return true;
+  }
+
+  return false;
+} // Recursively freeze a value to enforce it is read-only.
+// This may also have minimal performance improvements for enumerating
+// objects (based on browser implementations, of course)
+
+
+function deepFreezeValue(value) {
+  if (typeof value !== 'object' || shouldNotBeFrozen(value)) {
+    return;
+  }
+
+  Object.freeze(value); // Make all properties read-only
+
+  for (const key in value) {
+    // $FlowFixMe[method-unbinding] added when improving typing for this parameters
+    if (Object.prototype.hasOwnProperty.call(value, key)) {
+      const prop = value[key]; // Prevent infinite recurssion for circular references.
+
+      if (typeof prop === 'object' && prop != null && !Object.isFrozen(prop)) {
+        deepFreezeValue(prop);
+      }
+    }
+  }
+
+  Object.seal(value); // This also makes existing properties non-configurable.
+}
+
+var Recoil_deepFreezeValue = deepFreezeValue;
 
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -37973,12 +38870,10 @@ var Recoil_PerformanceTimings = {
 };
 
 const {
-  CANCELED: CANCELED$2,
-  Canceled: Canceled$1,
   loadableWithError: loadableWithError$1,
   loadableWithPromise: loadableWithPromise$1,
   loadableWithValue: loadableWithValue$2
-} = Recoil_Loadable;
+} = Recoil_Loadable$1;
 
 
 
@@ -37993,9 +38888,10 @@ const {
 } = Recoil_Graph;
 
 const {
-  DEFAULT_VALUE: DEFAULT_VALUE$4,
+  DEFAULT_VALUE: DEFAULT_VALUE$6,
   RecoilValueNotReady: RecoilValueNotReady$2,
   getConfigDeletionHandler: getConfigDeletionHandler$1,
+  getNode: getNode$6,
   registerNode: registerNode$1
 } = Recoil_Node;
 
@@ -38004,11 +38900,7 @@ const {
 } = Recoil_RecoilValue$1;
 
 const {
-  AbstractRecoilValue: AbstractRecoilValue$4
-} = Recoil_RecoilValue$1;
-
-const {
-  setRecoilValueLoadable: setRecoilValueLoadable$2
+  markRecoilValueModified: markRecoilValueModified$1
 } = Recoil_RecoilValueInterface;
 
 const {
@@ -38016,8 +38908,10 @@ const {
 } = Recoil_Retention;
 
 const {
-  cloneSnapshot: cloneSnapshot$2
-} = Recoil_Snapshot$1;
+  recoilCallback: recoilCallback$1
+} = Recoil_useRecoilCallback;
+
+
 
 
 
@@ -38033,28 +38927,31 @@ const {
   startPerfBlock: startPerfBlock$1
 } = Recoil_PerformanceTimings;
 
+class Canceled {}
 
+const CANCELED = new Canceled();
+/**
+ * An ExecutionId is an arbitrary ID that lets us distinguish executions from
+ * each other. This is necessary as we need a way of solving this problem:
+ * "given 3 async executions, only update state for the 'latest' execution when
+ * it finishes running regardless of when the other 2 finish". ExecutionIds
+ * provide a convenient way of identifying executions so that we can track and
+ * manage them over time.
+ */
 
 const dependencyStack = []; // for detecting circular dependencies.
 
 const waitingStores = new Map();
-/* eslint-disable no-redeclare */
 
 const getNewExecutionId = (() => {
   let executionId = 0;
   return () => executionId++;
 })();
+/* eslint-disable no-redeclare */
 
-function getInitialExecutionInfo() {
-  return {
-    depValuesDiscoveredSoFarDuringAsyncWork: null,
-    latestLoadable: null,
-    latestExecutionId: null,
-    stateVersion: null
-  };
-}
 
 function selector(options) {
+  let recoilValue = null;
   const {
     key,
     get,
@@ -38062,6 +38959,18 @@ function selector(options) {
   } = options;
   const set = options.set != null ? options.set : undefined; // flow
 
+  if (true) {
+    if (typeof key !== 'string') {
+      throw Recoil_err('A key option with a unique string value must be provided when creating a selector.');
+    }
+
+    if (typeof get !== 'function') {
+      throw Recoil_err('Selectors must specify a get callback option to get the selector value.');
+    }
+  } // This is every discovered dependency across all executions
+
+
+  const discoveredDependencyNodeKeys = new Set();
   const cache = Recoil_treeCacheFromPolicy(cachePolicy !== null && cachePolicy !== void 0 ? cachePolicy : {
     equality: 'reference',
     eviction: 'keep-all'
@@ -38071,25 +38980,14 @@ function selector(options) {
   let liveStoresCount = 0;
 
   function selectorIsLive() {
-    return !Recoil_gkx_1('recoil_memory_managament_2020') || liveStoresCount > 0;
-  }
-
-  function getExecutionInfo(store) {
-    if (!executionInfoMap.has(store)) {
-      executionInfoMap.set(store, getInitialExecutionInfo());
-    }
-
-    return Recoil_nullthrows(executionInfoMap.get(store));
+    return !Recoil_gkx('recoil_memory_managament_2020') || liveStoresCount > 0;
   }
 
   function selectorInit(store) {
+    store.getState().knownSelectors.add(key);
     liveStoresCount++;
-    store.getState().knownSelectors.add(key); // FIXME remove knownSelectors?
-
     return () => {
       liveStoresCount--;
-      store.getState().knownSelectors.delete(key);
-      executionInfoMap.delete(store);
     };
   }
 
@@ -38097,45 +38995,53 @@ function selector(options) {
     return getConfigDeletionHandler$1(key) !== undefined && !selectorIsLive();
   }
 
-  function notifyStoreWhenAsyncSettles(store, loadable, executionId) {
-    if (loadable.state === 'loading') {
-      let stores = waitingStores.get(executionId);
-
-      if (stores == null) {
-        waitingStores.set(executionId, stores = new Set());
-      }
-
-      stores.add(store);
-    }
+  function resolveAsync(store, state, executionId, loadable, depValues) {
+    setCache(state, loadable, depValues);
+    setDepsInStore(store, state, new Set(depValues.keys()), executionId);
+    notifyStoresOfResolvedAsync(store, executionId);
   }
 
-  function notifyStoresOfSettledAsync(newLoadable, executionId) {
+  function notifyStoresOfResolvedAsync(store, executionId) {
+    if (isLatestExecution(store, executionId)) {
+      clearExecutionInfo(store);
+    }
+
     const stores = waitingStores.get(executionId);
 
     if (stores !== undefined) {
-      for (const store of stores) {
-        setRecoilValueLoadable$2(store, new AbstractRecoilValue$4(key), newLoadable);
+      for (const waitingStore of stores) {
+        markRecoilValueModified$1(waitingStore, Recoil_nullthrows(recoilValue));
       }
 
       waitingStores.delete(executionId);
     }
   }
 
-  function getCachedNodeLoadable(store, state, key) {
-    const isKeyPointingToSelector = store.getState().knownSelectors.has(key);
+  function markStoreWaitingForResolvedAsync(store, executionId) {
+    let stores = waitingStores.get(executionId);
+
+    if (stores == null) {
+      waitingStores.set(executionId, stores = new Set());
+    }
+
+    stores.add(store);
+  }
+
+  function getCachedNodeLoadable(store, state, nodeKey) {
+    const isKeyPointingToSelector = store.getState().knownSelectors.has(nodeKey);
     /**
      * It's important that we don't bypass calling getNodeLoadable for atoms
      * as getNodeLoadable has side effects in state
      */
 
-    if (isKeyPointingToSelector && state.atomValues.has(key)) {
-      return Recoil_nullthrows(state.atomValues.get(key));
+    if (isKeyPointingToSelector && state.atomValues.has(nodeKey)) {
+      return Recoil_nullthrows(state.atomValues.get(nodeKey));
     }
 
-    const loadable = getNodeLoadable$2(store, state, key);
+    const loadable = getNodeLoadable$2(store, state, nodeKey);
 
     if (loadable.state !== 'loading' && isKeyPointingToSelector) {
-      state.atomValues.set(key, loadable);
+      state.atomValues.set(nodeKey, loadable);
     }
 
     return loadable;
@@ -38171,43 +39077,32 @@ function selector(options) {
    */
 
 
-  function wrapPendingPromise(store, promise, state, depValues, executionId) {
+  function wrapPendingPromise(store, promise, state, depValues, executionId, loadingDepsState) {
     return promise.then(value => {
       if (!selectorIsLive()) {
         // The selector was released since the request began; ignore the response.
-        clearExecutionInfo(store, executionId);
-        return CANCELED$2;
+        clearExecutionInfo(store);
+        throw CANCELED;
       }
 
       const loadable = loadableWithValue$2(value);
-      maybeFreezeValue(value);
-      setCache(state, depValuesToDepRoute(depValues), loadable);
-      setDepsInStore(store, state, new Set(depValues.keys()), executionId);
-      setLoadableInStoreToNotifyDeps(store, loadable, executionId);
-      return {
-        __value: value,
-        __key: key
-      };
+      resolveAsync(store, state, executionId, loadable, depValues);
+      return value;
     }).catch(errorOrPromise => {
       if (!selectorIsLive()) {
         // The selector was released since the request began; ignore the response.
-        clearExecutionInfo(store, executionId);
-        return CANCELED$2;
+        clearExecutionInfo(store);
+        throw CANCELED;
       }
 
-      if (isLatestExecution(store, executionId)) {
-        updateExecutionInfoDepValues(depValues, store, executionId);
-      }
+      updateExecutionInfoDepValues(store, executionId, depValues);
 
       if (Recoil_isPromise(errorOrPromise)) {
-        return wrapPendingDependencyPromise(store, errorOrPromise, state, depValues, executionId);
+        return wrapPendingDependencyPromise(store, errorOrPromise, state, depValues, executionId, loadingDepsState);
       }
 
       const loadable = loadableWithError$1(errorOrPromise);
-      maybeFreezeValue(errorOrPromise);
-      setCache(state, depValuesToDepRoute(depValues), loadable);
-      setDepsInStore(store, state, new Set(depValues.keys()), executionId);
-      setLoadableInStoreToNotifyDeps(store, loadable, executionId);
+      resolveAsync(store, state, executionId, loadable, depValues);
       throw errorOrPromise;
     });
   }
@@ -38243,32 +39138,21 @@ function selector(options) {
    */
 
 
-  function wrapPendingDependencyPromise(store, promise, state, existingDeps, executionId) {
+  function wrapPendingDependencyPromise(store, promise, state, existingDeps, executionId, loadingDepsState) {
     return promise.then(resolvedDep => {
       if (!selectorIsLive()) {
         // The selector was released since the request began; ignore the response.
-        clearExecutionInfo(store, executionId);
-        return CANCELED$2;
-      }
+        clearExecutionInfo(store);
+        throw CANCELED;
+      } // Check if we are handling a pending Recoil dependency or if the user
+      // threw their own Promise to "suspend" a selector evaluation.  We need
+      // to check that the loadingDepPromise actually matches the promise that
+      // we caught in case the selector happened to catch the promise we threw
+      // for a pending Recoil dependency from `getRecoilValue()` and threw
+      // their own promise instead.
 
-      if (resolvedDep instanceof Canceled$1) {
-        Recoil_recoverableViolation('Selector was released while it had dependencies');
-        return CANCELED$2;
-      }
 
-      const {
-        __key: resolvedDepKey,
-        __value: depValue
-      } = resolvedDep !== null && resolvedDep !== void 0 ? resolvedDep : {};
-      /**
-       * We need to bypass the selector dep cache if the resolved dep was a
-       * user-thrown promise because the selector dep cache will contain the
-       * stale values of dependencies, causing an infinite evaluation loop.
-       */
-
-      let bypassSelectorDepCacheOnReevaluation = true;
-
-      if (resolvedDepKey != null) {
+      if (loadingDepsState.loadingDepKey != null && loadingDepsState.loadingDepPromise === promise) {
         /**
          * Note for async atoms, this means we are changing the atom's value
          * in the store for the given version. This should be alright because
@@ -38276,13 +39160,34 @@ function selector(options) {
          * already been triggered by the atom being resolved (see this logic
          * in Recoil_atom.js)
          */
-        state.atomValues.set(resolvedDepKey, loadableWithValue$2(depValue));
+        state.atomValues.set(loadingDepsState.loadingDepKey, loadableWithValue$2(resolvedDep));
+      } else {
         /**
-         * We've added the resolved dependency to the selector dep cache, so
-         * there's no need to bypass the cache
+         * If resolvedDepKey is not defined, the promise was a user-thrown
+         * promise. User-thrown promises are an advanced feature and they
+         * should be avoided in almost all cases. Using `loadable.map()` inside
+         * of selectors for loading loadables and then throwing that mapped
+         * loadable's promise is an example of a user-thrown promise.
+         *
+         * When we hit a user-thrown promise, we have to bail out of an optimization
+         * where we bypass calculating selector cache keys for selectors that
+         * have been previously seen for a given state (these selectors are saved in
+         * state.atomValues) to avoid stale state as we have no way of knowing
+         * what state changes happened (if any) in result to the promise resolving.
+         *
+         * Ideally we would only bail out selectors that are in the chain of
+         * dependencies for this selector, but there's currently no way to get
+         * a full list of a selector's downstream nodes because the state that
+         * is executing may be a discarded tree (so store.getGraph(state.version)
+         * will be empty), and the full dep tree may not be in the selector
+         * caches in the case where the selector's cache was cleared. To solve
+         * for this we would have to keep track of all running selector
+         * executions and their downstream deps. Because this only covers edge
+         * cases, that complexity might not be justifyable.
          */
-
-        bypassSelectorDepCacheOnReevaluation = false;
+        store.getState().knownSelectors.forEach(nodeKey => {
+          state.atomValues.delete(nodeKey);
+        });
       }
       /**
        * Optimization: Now that the dependency has resolved, let's try hitting
@@ -38298,19 +39203,41 @@ function selector(options) {
        * The ideal case is more difficult to implement as it would require that
        * we capture and wait for the the async dependency right after checking
        * the cache. The current approach takes advantage of the fact that running
-       * the selector already has a code path that lets use exit early when
+       * the selector already has a code path that lets us exit early when
        * an async dep resolves.
        */
 
 
       const cachedLoadable = getValFromCacheAndUpdatedDownstreamDeps(store, state);
 
-      if (cachedLoadable && cachedLoadable.state === 'hasValue') {
-        setExecutionInfo(cachedLoadable, store);
-        return {
-          __value: cachedLoadable.contents,
-          __key: key
-        };
+      if (cachedLoadable && cachedLoadable.state !== 'loading') {
+        /**
+         * This has to notify stores of a resolved async, even if there is no
+         * current pending execution for the following case:
+         * 1) A component renders with this pending loadable.
+         * 2) The upstream dependency resolves.
+         * 3) While processing some other selector it reads this one, such as
+         *    while traversing its dependencies.  At this point it gets the
+         *    new resolved value synchronously and clears the current
+         *    execution ID.  The component wasn't getting the value itself,
+         *    though, so it still has the pending loadable.
+         * 4) When this code executes the current execution id was cleared
+         *    and it wouldn't notify the component of the new value.
+         *
+         * I think this is only an issue with "early" rendering since the
+         * components got their value using the in-progress execution.
+         * We don't have a unit test for this case yet.  I'm not sure it is
+         * necessary with recoil_concurrent_support mode.
+         */
+        if (isLatestExecution(store, executionId) || getExecutionInfo(store) == null) {
+          notifyStoresOfResolvedAsync(store, executionId);
+        }
+
+        if (cachedLoadable.state === 'hasValue') {
+          return cachedLoadable.contents;
+        } else {
+          throw cachedLoadable.contents;
+        }
       }
       /**
        * If this execution is stale, let's check to see if there is some in
@@ -38339,72 +39266,45 @@ function selector(options) {
 
 
       if (!isLatestExecution(store, executionId)) {
-        var _executionInfo$latest;
-
         const executionInfo = getExecutionInfoOfInProgressExecution(state);
 
-        if ((executionInfo === null || executionInfo === void 0 ? void 0 : (_executionInfo$latest = executionInfo.latestLoadable) === null || _executionInfo$latest === void 0 ? void 0 : _executionInfo$latest.state) === 'loading') {
+        if ((executionInfo === null || executionInfo === void 0 ? void 0 : executionInfo.latestLoadable.state) === 'loading') {
           /**
            * Returning promise here without wrapping as the wrapper logic was
            * already done upstream when this promise was generated.
            */
           return executionInfo.latestLoadable.contents;
         }
-      }
+      } // Retry the selector evaluation now that the dependency has resolved
 
-      const [loadable, depValues] = evaluateSelectorGetter(store, state, executionId, bypassSelectorDepCacheOnReevaluation);
 
-      if (isLatestExecution(store, executionId)) {
-        updateExecutionInfoDepValues(depValues, store, executionId);
-      }
-
-      maybeFreezeLoadableContents(loadable);
+      const [loadable, depValues] = evaluateSelectorGetter(store, state, executionId);
+      updateExecutionInfoDepValues(store, executionId, depValues);
 
       if (loadable.state !== 'loading') {
-        setCache(state, depValuesToDepRoute(depValues), loadable);
-        setDepsInStore(store, state, new Set(depValues.keys()), executionId);
-        setLoadableInStoreToNotifyDeps(store, loadable, executionId);
+        resolveAsync(store, state, executionId, loadable, depValues);
       }
 
       if (loadable.state === 'hasError') {
         throw loadable.contents;
       }
 
-      if (loadable.state === 'hasValue') {
-        return {
-          __value: loadable.contents,
-          __key: key
-        };
-      }
-      /**
-       * Returning promise here without wrapping as the wrapepr logic was
-       * already done when we called evaluateSelectorGetter() to get this
-       * loadable
-       */
-
-
       return loadable.contents;
     }).catch(error => {
+      // The selector was released since the request began; ignore the response.
+      if (error instanceof Canceled) {
+        throw CANCELED;
+      }
+
       if (!selectorIsLive()) {
-        // The selector was released since the request began; ignore the response.
-        clearExecutionInfo(store, executionId);
-        return CANCELED$2;
+        clearExecutionInfo(store);
+        throw CANCELED;
       }
 
       const loadable = loadableWithError$1(error);
-      maybeFreezeValue(error);
-      setCache(state, depValuesToDepRoute(existingDeps), loadableWithError$1(error));
-      setDepsInStore(store, state, new Set(existingDeps.keys()), executionId);
-      setLoadableInStoreToNotifyDeps(store, loadable, executionId);
+      resolveAsync(store, state, executionId, loadable, existingDeps);
       throw error;
     });
-  }
-
-  function setLoadableInStoreToNotifyDeps(store, loadable, executionId) {
-    if (isLatestExecution(store, executionId)) {
-      setExecutionInfo(loadable, store);
-      notifyStoresOfSettledAsync(loadable, executionId);
-    }
   }
 
   function setDepsInStore(store, state, deps, executionId) {
@@ -38414,6 +39314,7 @@ function selector(options) {
       var _store$getState$nextT, _store$getState3, _store$getState3$next;
 
       saveDependencyMapToStore$1(new Map([[key, deps]]), store, (_store$getState$nextT = (_store$getState3 = store.getState()) === null || _store$getState3 === void 0 ? void 0 : (_store$getState3$next = _store$getState3.nextTree) === null || _store$getState3$next === void 0 ? void 0 : _store$getState3$next.version) !== null && _store$getState$nextT !== void 0 ? _store$getState$nextT : store.getState().currentTree.version);
+      deps.forEach(nodeKey => discoveredDependencyNodeKeys.add(nodeKey));
     }
   }
 
@@ -38422,12 +39323,23 @@ function selector(options) {
     setDepsInStore(store, state, deps, executionId);
   }
 
-  function evaluateSelectorGetter(store, state, executionId, bypassSelectorDepCache = false) {
+  function evaluateSelectorGetter(store, state, executionId) {
     const endPerfBlock = startPerfBlock$1(key); // TODO T63965866: use execution ID here
+
+    let gateCallback = true;
+
+    const finishEvaluation = () => {
+      endPerfBlock();
+      gateCallback = false;
+    };
 
     let result;
     let resultIsError = false;
     let loadable;
+    const loadingDepsState = {
+      loadingDepKey: null,
+      loadingDepPromise: null
+    };
     const depValues = new Map();
     /**
      * Starting a fresh set of deps that we'll be using to update state. We're
@@ -38443,40 +39355,41 @@ function selector(options) {
     const deps = new Set();
     setDepsInStore(store, state, deps, executionId);
 
-    function getRecoilValue(recoilValue) {
+    function getRecoilValue(dep) {
       const {
         key: depKey
-      } = recoilValue;
+      } = dep;
       setNewDepInStore(store, state, deps, depKey, executionId);
-      const depLoadable = bypassSelectorDepCache ? getNodeLoadable$2(store, state, depKey) : getCachedNodeLoadable(store, state, depKey);
-      maybeFreezeLoadableContents(depLoadable);
+      const depLoadable = getCachedNodeLoadable(store, state, depKey);
       depValues.set(depKey, depLoadable);
 
-      if (depLoadable.state === 'hasValue') {
-        return depLoadable.contents;
+      switch (depLoadable.state) {
+        case 'hasValue':
+          return depLoadable.contents;
+
+        case 'hasError':
+          throw depLoadable.contents;
+
+        case 'loading':
+          loadingDepsState.loadingDepKey = depKey;
+          loadingDepsState.loadingDepPromise = depLoadable.contents;
+          throw depLoadable.contents;
       }
 
-      throw depLoadable.contents;
+      throw Recoil_err('Invalid Loadable state');
     }
-
-    let gateCallback = false;
 
     const getCallback = fn => {
       return (...args) => {
-        if (!gateCallback) {
-          throw new Error('getCallback() should only be called asynchronously after the selector is evalutated.  It can be used for selectors to return objects with callbacks that can obtain the current Recoil state without a subscription.');
+        if (gateCallback) {
+          throw Recoil_err('Callbacks from getCallback() should only be called asynchronously after the selector is evalutated.  It can be used for selectors to return objects with callbacks that can work with Recoil state without a subscription.');
         }
 
-        const snapshot = cloneSnapshot$2(store);
-        const cb = fn({
-          snapshot
-        });
-
-        if (typeof cb !== 'function') {
-          throw new Error('getCallback() expects a function that returns a function.');
-        }
-
-        return cb(...args);
+        !(recoilValue != null) ?  true ? Recoil_invariant(false, 'Recoil Value can never be null') : 0 : void 0;
+        return recoilCallback$1(store, fn, args, {
+          node: recoilValue
+        } // flowlint-line unclear-type:off
+        );
       };
     };
 
@@ -38486,21 +39399,20 @@ function selector(options) {
         getCallback
       });
       result = isRecoilValue$3(result) ? getRecoilValue(result) : result;
-      gateCallback = true;
 
       if (Recoil_isPromise(result)) {
-        result = wrapPendingPromise(store, result, state, depValues, executionId).finally(endPerfBlock);
+        result = wrapPendingPromise(store, result, state, depValues, executionId, loadingDepsState).finally(finishEvaluation);
       } else {
-        endPerfBlock();
+        finishEvaluation();
       }
     } catch (errorOrDepPromise) {
       result = errorOrDepPromise;
 
       if (Recoil_isPromise(result)) {
-        result = wrapPendingDependencyPromise(store, result, state, depValues, executionId).finally(endPerfBlock);
+        result = wrapPendingDependencyPromise(store, result, state, depValues, executionId, loadingDepsState).finally(finishEvaluation);
       } else {
         resultIsError = true;
-        endPerfBlock();
+        finishEvaluation();
       }
     }
 
@@ -38512,24 +39424,29 @@ function selector(options) {
       loadable = loadableWithValue$2(result);
     }
 
-    maybeFreezeLoadableContents(loadable);
     return [loadable, depValues];
   }
 
   function getValFromCacheAndUpdatedDownstreamDeps(store, state) {
     const depsAfterCacheDone = new Set();
     const executionInfo = getExecutionInfo(store);
-    const cachedVal = cache.get(nodeKey => {
-      !(typeof nodeKey === 'string') ?  true ? Recoil_invariant(false, 'Cache nodeKey is type string') : 0 : void 0;
-      const loadable = getCachedNodeLoadable(store, state, nodeKey);
-      return loadable.contents;
-    }, {
-      onNodeVisit: node => {
-        if (node.type === 'branch' && node.nodeKey !== key && typeof node.nodeKey === 'string') {
-          depsAfterCacheDone.add(node.nodeKey);
+    let cachedVal;
+
+    try {
+      cachedVal = cache.get(nodeKey => {
+        !(typeof nodeKey === 'string') ?  true ? Recoil_invariant(false, 'Cache nodeKey is type string') : 0 : void 0;
+        const loadable = getCachedNodeLoadable(store, state, nodeKey);
+        return loadable.contents;
+      }, {
+        onNodeVisit: node => {
+          if (node.type === 'branch' && node.nodeKey !== key) {
+            depsAfterCacheDone.add(node.nodeKey);
+          }
         }
-      }
-    });
+      });
+    } catch (error) {
+      throw Recoil_err(`Problem with cache lookup for selector "${key}": ${error.message}`);
+    }
     /**
      * Ensure store contains correct dependencies if we hit the cache so that
      * the store deps and cache are in sync for a given state. This is important
@@ -38539,8 +39456,9 @@ function selector(options) {
      * or stale.
      */
 
+
     if (cachedVal) {
-      setDepsInStore(store, state, depsAfterCacheDone, executionInfo.latestExecutionId);
+      setDepsInStore(store, state, depsAfterCacheDone, executionInfo === null || executionInfo === void 0 ? void 0 : executionInfo.latestExecutionId);
     }
 
     return cachedVal;
@@ -38559,15 +39477,32 @@ function selector(options) {
 
 
   function depValuesToDepRoute(depValues) {
-    return Array.from(depValues.entries()).map(([key, valLoadable]) => [key, valLoadable.contents]);
+    return Array.from(depValues.entries()).map(([depKey, valLoadable]) => [depKey, valLoadable.contents]);
   }
 
   function getValFromRunningNewExecutionAndUpdatedDeps(store, state) {
     const newExecutionId = getNewExecutionId();
     const [loadable, newDepValues] = evaluateSelectorGetter(store, state, newExecutionId);
-    setExecutionInfo(loadable, store, newDepValues, newExecutionId, state);
-    maybeSetCacheWithLoadable(state, depValuesToDepRoute(newDepValues), loadable);
-    notifyStoreWhenAsyncSettles(store, loadable, newExecutionId);
+    /**
+     * Conditionally updates the cache with a given loadable.
+     *
+     * We only cache loadables that are not loading because our cache keys are
+     * based on dep values, which are in an unfinished state for loadables that
+     * have a 'loading' state (new deps may be discovered while the selector
+     * runs its async code). We never want to cache partial dependencies b/c it
+     * could lead to errors, such as prematurely returning the result based on a
+     * partial list of deps-- we need the full list of deps to ensure that we
+     * are returning the correct result from cache.
+     */
+
+    if (loadable.state === 'loading') {
+      setExecutionInfo(store, newExecutionId, loadable, newDepValues, state);
+      markStoreWaitingForResolvedAsync(store, newExecutionId);
+    } else {
+      clearExecutionInfo(store);
+      setCache(state, loadable, newDepValues);
+    }
+
     return loadable;
   }
   /**
@@ -38595,17 +39530,21 @@ function selector(options) {
     const cachedVal = getValFromCacheAndUpdatedDownstreamDeps(store, state);
 
     if (cachedVal != null) {
-      setExecutionInfo(cachedVal, store);
+      clearExecutionInfo(store);
       return cachedVal;
     }
 
     const inProgressExecutionInfo = getExecutionInfoOfInProgressExecution(state); // FIXME: this won't work with custom caching b/c it uses separate cache
 
-    if (inProgressExecutionInfo) {
-      const executionInfo = inProgressExecutionInfo;
-      notifyStoreWhenAsyncSettles(store, Recoil_nullthrows(executionInfo.latestLoadable), Recoil_nullthrows(executionInfo.latestExecutionId)); // FIXME: check after the fact to see if we made the right choice by waiting
+    if (inProgressExecutionInfo != null) {
+      var _inProgressExecutionI;
 
-      return Recoil_nullthrows(executionInfo.latestLoadable);
+      if (((_inProgressExecutionI = inProgressExecutionInfo.latestLoadable) === null || _inProgressExecutionI === void 0 ? void 0 : _inProgressExecutionI.state) === 'loading') {
+        markStoreWaitingForResolvedAsync(store, Recoil_nullthrows(inProgressExecutionInfo.latestExecutionId));
+      } // FIXME: check after the fact to see if we made the right choice by waiting
+
+
+      return Recoil_nullthrows(inProgressExecutionInfo.latestLoadable);
     }
 
     return getValFromRunningNewExecutionAndUpdatedDeps(store, state);
@@ -38619,8 +39558,8 @@ function selector(options) {
   function getExecutionInfoOfInProgressExecution(state) {
     var _Array$from$find;
 
-    const [, executionInfo] = (_Array$from$find = Array.from(executionInfoMap.entries()).find(([store, executionInfo]) => {
-      return executionInfo.latestLoadable != null && executionInfo.latestExecutionId != null && !haveAsyncDepsChanged(store, state);
+    const [, executionInfo] = (_Array$from$find = Array.from(executionInfoMap.entries()).find(([store, execInfo]) => {
+      return execInfo.latestLoadable != null && execInfo.latestExecutionId != null && !haveAsyncDepsChanged(store, state);
     })) !== null && _Array$from$find !== void 0 ? _Array$from$find : [];
     return executionInfo;
   }
@@ -38631,13 +39570,13 @@ function selector(options) {
     var _executionInfo$depVal, _mapOfCheckedVersions;
 
     const executionInfo = getExecutionInfo(store);
-    const oldDepValues = (_executionInfo$depVal = executionInfo.depValuesDiscoveredSoFarDuringAsyncWork) !== null && _executionInfo$depVal !== void 0 ? _executionInfo$depVal : new Map();
+    const oldDepValues = (_executionInfo$depVal = executionInfo === null || executionInfo === void 0 ? void 0 : executionInfo.depValuesDiscoveredSoFarDuringAsyncWork) !== null && _executionInfo$depVal !== void 0 ? _executionInfo$depVal : new Map();
     const cachedDepValuesCheckedForThisVersion = Array(((_mapOfCheckedVersions = mapOfCheckedVersions.get(state.version)) !== null && _mapOfCheckedVersions !== void 0 ? _mapOfCheckedVersions : new Map()).entries());
     const isCachedVersionSame = mapOfCheckedVersions.has(state.version) && cachedDepValuesCheckedForThisVersion.length === oldDepValues.size && cachedDepValuesCheckedForThisVersion.every(([nodeKey, nodeVal]) => {
       return oldDepValues.get(nodeKey) === nodeVal;
     });
 
-    if (oldDepValues == null || state.version === executionInfo.stateVersion || isCachedVersionSame) {
+    if (oldDepValues == null || state.version === (executionInfo === null || executionInfo === void 0 ? void 0 : executionInfo.stateVersion) || isCachedVersionSame) {
       return false;
     }
 
@@ -38646,6 +39585,10 @@ function selector(options) {
       const loadable = getCachedNodeLoadable(store, state, nodeKey);
       return loadable.contents !== oldVal.contents;
     });
+  }
+
+  function getExecutionInfo(store) {
+    return executionInfoMap.get(store);
   }
   /**
    * This function will update the selector's execution info when the selector
@@ -38656,82 +39599,55 @@ function selector(options) {
    */
 
 
-  function setExecutionInfo(loadable, store, depValues, newExecutionId, state) {
-    const executionInfo = getExecutionInfo(store);
-
-    if (loadable.state === 'loading') {
-      executionInfo.depValuesDiscoveredSoFarDuringAsyncWork = depValues;
-      executionInfo.latestExecutionId = newExecutionId;
-      executionInfo.latestLoadable = loadable;
-      executionInfo.stateVersion = state === null || state === void 0 ? void 0 : state.version;
-    } else {
-      executionInfo.depValuesDiscoveredSoFarDuringAsyncWork = null;
-      executionInfo.latestExecutionId = null;
-      executionInfo.latestLoadable = null;
-      executionInfo.stateVersion = null;
-    }
-  }
-  /**
-   * Conditionally updates the cache with a given loadable.
-   *
-   * We only cache loadables that are not loading because our cache keys are
-   * based on dep values, which are in an unfinished state for loadables that
-   * have a 'loading' state (new deps may be discovered while the selector
-   * runs its async code). We never want to cache partial dependencies b/c it
-   * could lead to errors, such as prematurely returning the result based on a
-   * partial list of deps-- we need the full list of deps to ensure that we
-   * are returning the correct result from cache.
-   */
-
-
-  function maybeSetCacheWithLoadable(state, depRoute, loadable) {
-    if (loadable.state !== 'loading') {
-      setCache(state, depRoute, loadable);
-    }
+  function setExecutionInfo(store, newExecutionId, loadable, depValues, state) {
+    executionInfoMap.set(store, {
+      depValuesDiscoveredSoFarDuringAsyncWork: depValues,
+      latestExecutionId: newExecutionId,
+      latestLoadable: loadable,
+      stateVersion: state.version
+    });
   }
 
-  function updateExecutionInfoDepValues(depValues, store, executionId) {
-    const executionInfo = getExecutionInfo(store);
-
+  function updateExecutionInfoDepValues(store, executionId, depValues) {
     if (isLatestExecution(store, executionId)) {
-      executionInfo.depValuesDiscoveredSoFarDuringAsyncWork = depValues;
-    }
-  }
+      const executionInfo = getExecutionInfo(store);
 
-  function clearExecutionInfo(store, executionId) {
-    if (isLatestExecution(store, executionId)) {
-      executionInfoMap.delete(store);
-    }
-  }
-
-  function isLatestExecution(store, executionId) {
-    const executionInfo = getExecutionInfo(store);
-    return executionId === executionInfo.latestExecutionId;
-  }
-
-  function maybeFreezeLoadableContents(loadable) {
-    if (loadable.state !== 'loading') {
-      maybeFreezeValue(loadable.contents);
-    }
-  }
-
-  function maybeFreezeValue(val) {
-    if (true) {
-      if (Boolean(options.dangerouslyAllowMutability) === false) {
-        Recoil_deepFreezeValue(val);
+      if (executionInfo != null) {
+        executionInfo.depValuesDiscoveredSoFarDuringAsyncWork = depValues;
       }
     }
   }
 
-  function setCache(state, cacheRoute, loadable) {
+  function clearExecutionInfo(store) {
+    executionInfoMap.delete(store);
+  }
+
+  function isLatestExecution(store, executionId) {
+    var _getExecutionInfo;
+
+    return executionId === ((_getExecutionInfo = getExecutionInfo(store)) === null || _getExecutionInfo === void 0 ? void 0 : _getExecutionInfo.latestExecutionId);
+  }
+
+  function setCache(state, loadable, depValues) {
+    if (true) {
+      if (loadable.state !== 'loading' && Boolean(options.dangerouslyAllowMutability) === false) {
+        Recoil_deepFreezeValue(loadable.contents);
+      }
+    }
+
     state.atomValues.set(key, loadable);
-    cache.set(cacheRoute, loadable);
+
+    try {
+      cache.set(depValuesToDepRoute(depValues), loadable);
+    } catch (error) {
+      throw Recoil_err(`Problem with setting cache for selector "${key}": ${error.message}`);
+    }
   }
 
   function detectCircularDependencies(fn) {
     if (dependencyStack.includes(key)) {
       const message = `Recoil selector has circular dependencies: ${dependencyStack.slice(dependencyStack.indexOf(key)).join(' \u2192 ')}`;
-      return loadableWithError$1(new Error(message));
+      return loadableWithError$1(Recoil_err(message));
     }
 
     dependencyStack.push(key);
@@ -38744,12 +39660,12 @@ function selector(options) {
   }
 
   function selectorPeek(store, state) {
-    const cacheVal = cache.get(nodeKey => {
+    return cache.get(nodeKey => {
+      var _peekNodeLoadable;
+
       !(typeof nodeKey === 'string') ?  true ? Recoil_invariant(false, 'Cache nodeKey is type string') : 0 : void 0;
-      const peek = peekNodeLoadable$1(store, state, nodeKey);
-      return peek === null || peek === void 0 ? void 0 : peek.contents;
+      return (_peekNodeLoadable = peekNodeLoadable$1(store, state, nodeKey)) === null || _peekNodeLoadable === void 0 ? void 0 : _peekNodeLoadable.contents;
     });
-    return cacheVal;
   }
 
   function selectorGet(store, state) {
@@ -38758,6 +39674,22 @@ function selector(options) {
 
   function invalidateSelector(state) {
     state.atomValues.delete(key);
+  }
+
+  function clearSelectorCache(store, treeState) {
+    !(recoilValue != null) ?  true ? Recoil_invariant(false, 'Recoil Value can never be null') : 0 : void 0;
+
+    for (const nodeKey of discoveredDependencyNodeKeys) {
+      var _node$clearCache;
+
+      const node = getNode$6(nodeKey);
+      (_node$clearCache = node.clearCache) === null || _node$clearCache === void 0 ? void 0 : _node$clearCache.call(node, store, treeState);
+    }
+
+    discoveredDependencyNodeKeys.clear();
+    invalidateSelector(treeState);
+    cache.clear();
+    markRecoilValueModified$1(store, recoilValue);
   }
 
   if (set != null) {
@@ -38770,19 +39702,18 @@ function selector(options) {
       const writes = new Map();
 
       function getRecoilValue({
-        key
+        key: depKey
       }) {
         if (syncSelectorSetFinished) {
-          throw new Error('Recoil: Async selector sets are not currently supported.');
+          throw Recoil_err('Recoil: Async selector sets are not currently supported.');
         }
 
-        const loadable = getCachedNodeLoadable(store, state, key);
-        maybeFreezeLoadableContents(loadable);
+        const loadable = getCachedNodeLoadable(store, state, depKey);
 
         if (loadable.state === 'hasValue') {
           return loadable.contents;
         } else if (loadable.state === 'loading') {
-          throw new RecoilValueNotReady$2(key);
+          throw new RecoilValueNotReady$2(depKey);
         } else {
           throw loadable.contents;
         }
@@ -38790,21 +39721,22 @@ function selector(options) {
 
       function setRecoilState(recoilState, valueOrUpdater) {
         if (syncSelectorSetFinished) {
-          throw new Error('Recoil: Async selector sets are not currently supported.');
+          throw Recoil_err('Recoil: Async selector sets are not currently supported.');
         }
 
-        const newValue = typeof valueOrUpdater === 'function' ? // cast to any because we can't restrict type S from being a function itself without losing support for opaque types
+        const setValue = typeof valueOrUpdater === 'function' ? // cast to any because we can't restrict type S from being a function itself without losing support for opaque types
         // flowlint-next-line unclear-type:off
         valueOrUpdater(getRecoilValue(recoilState)) : valueOrUpdater;
-        const upstreamWrites = setNodeValue$3(store, state, recoilState.key, newValue);
+        const upstreamWrites = setNodeValue$3(store, state, recoilState.key, setValue);
         upstreamWrites.forEach((v, k) => writes.set(k, v));
       }
 
       function resetRecoilState(recoilState) {
-        setRecoilState(recoilState, DEFAULT_VALUE$4);
+        setRecoilState(recoilState, DEFAULT_VALUE$6);
       }
 
-      const ret = set({
+      const ret = set( // $FlowFixMe[incompatible-call]
+      {
         set: setRecoilState,
         get: getRecoilValue,
         reset: resetRecoilState
@@ -38812,14 +39744,14 @@ function selector(options) {
       // will return a Promise, which we don't currently support.
 
       if (ret !== undefined) {
-        throw Recoil_isPromise(ret) ? new Error('Recoil: Async selector sets are not currently supported.') : new Error('Recoil: selector set should be a void function.');
+        throw Recoil_isPromise(ret) ? Recoil_err('Recoil: Async selector sets are not currently supported.') : Recoil_err('Recoil: selector set should be a void function.');
       }
 
       syncSelectorSetFinished = true;
       return writes;
     };
 
-    return registerNode$1({
+    return recoilValue = registerNode$1({
       key,
       nodeType: 'selector',
       peek: selectorPeek,
@@ -38827,19 +39759,21 @@ function selector(options) {
       set: selectorSet,
       init: selectorInit,
       invalidate: invalidateSelector,
+      clearCache: clearSelectorCache,
       shouldDeleteConfigOnRelease: selectorShouldDeleteConfigOnRelease,
       dangerouslyAllowMutability: options.dangerouslyAllowMutability,
       shouldRestoreFromSnapshots: false,
       retainedBy
     });
   } else {
-    return registerNode$1({
+    return recoilValue = registerNode$1({
       key,
       nodeType: 'selector',
       peek: selectorPeek,
       get: selectorGet,
       init: selectorInit,
       invalidate: invalidateSelector,
+      clearCache: clearSelectorCache,
       shouldDeleteConfigOnRelease: selectorShouldDeleteConfigOnRelease,
       dangerouslyAllowMutability: options.dangerouslyAllowMutability,
       shouldRestoreFromSnapshots: false,
@@ -38852,15 +39786,20 @@ function selector(options) {
 
 var Recoil_selector = selector;
 
+// @fb-only: import type {ScopeRules} from 'Recoil_ScopedAtom';
 // @fb-only: const {scopedAtom} = require('Recoil_ScopedAtom');
 const {
   loadableWithError: loadableWithError$2,
   loadableWithPromise: loadableWithPromise$2,
   loadableWithValue: loadableWithValue$3
-} = Recoil_Loadable;
+} = Recoil_Loadable$1;
 
 const {
-  DEFAULT_VALUE: DEFAULT_VALUE$5,
+  peekNodeInfo: peekNodeInfo$3
+} = Recoil_FunctionalCore;
+
+const {
+  DEFAULT_VALUE: DEFAULT_VALUE$7,
   DefaultValue: DefaultValue$2,
   getConfigDeletionHandler: getConfigDeletionHandler$2,
   registerNode: registerNode$2,
@@ -38872,14 +39811,17 @@ const {
 } = Recoil_RecoilValue$1;
 
 const {
-  markRecoilValueModified: markRecoilValueModified$1,
-  setRecoilValue: setRecoilValue$3,
-  setRecoilValueLoadable: setRecoilValueLoadable$3
+  getRecoilValueAsLoadable: getRecoilValueAsLoadable$4,
+  markRecoilValueModified: markRecoilValueModified$2,
+  setRecoilValue: setRecoilValue$4,
+  setRecoilValueLoadable: setRecoilValueLoadable$2
 } = Recoil_RecoilValueInterface;
 
 const {
   retainedByOptionWithDefault: retainedByOptionWithDefault$2
 } = Recoil_Retention;
+
+
 
 
 
@@ -38901,21 +39843,35 @@ function baseAtom(options) {
   const retainedBy = retainedByOptionWithDefault$2(options.retainedBy_UNSTABLE);
   let liveStoresCount = 0;
   let defaultLoadable = Recoil_isPromise(options.default) ? loadableWithPromise$2(options.default.then(value => {
-    defaultLoadable = loadableWithValue$3(value); // TODO Temporary disable Flow due to pending selector_NEW refactor
-
-    const promiseInfo = {
-      __key: key,
-      __value: value
-    };
-    return promiseInfo;
+    defaultLoadable = loadableWithValue$3(value);
+    return value;
   }).catch(error => {
     defaultLoadable = loadableWithError$2(error);
     throw error;
   })) : loadableWithValue$3(options.default);
+  maybeFreezeValueOrPromise(options.default);
   let cachedAnswerForUnvalidatedValue = undefined; // Cleanup handlers for this atom
   // Rely on stable reference equality of the store to use it as a key per <RecoilRoot>
 
   const cleanupEffectsByStore = new Map();
+
+  function maybeFreezeValueOrPromise(valueOrPromise) {
+    if (true) {
+      if (options.dangerouslyAllowMutability !== true) {
+        if (Recoil_isPromise(valueOrPromise)) {
+          return valueOrPromise.then(value => {
+            Recoil_deepFreezeValue(value);
+            return value;
+          });
+        } else {
+          Recoil_deepFreezeValue(valueOrPromise);
+          return valueOrPromise;
+        }
+      }
+    }
+
+    return valueOrPromise;
+  }
 
   function wrapPendingPromise(store, promise) {
     const wrappedPromise = promise.then(value => {
@@ -38924,20 +39880,17 @@ function baseAtom(options) {
       const state = (_store$getState$nextT = store.getState().nextTree) !== null && _store$getState$nextT !== void 0 ? _store$getState$nextT : store.getState().currentTree;
 
       if (((_state$atomValues$get = state.atomValues.get(key)) === null || _state$atomValues$get === void 0 ? void 0 : _state$atomValues$get.contents) === wrappedPromise) {
-        setRecoilValue$3(store, node, value);
+        setRecoilValue$4(store, node, value);
       }
 
-      return {
-        __key: key,
-        __value: value
-      };
+      return value;
     }).catch(error => {
       var _store$getState$nextT2, _state$atomValues$get2;
 
       const state = (_store$getState$nextT2 = store.getState().nextTree) !== null && _store$getState$nextT2 !== void 0 ? _store$getState$nextT2 : store.getState().currentTree;
 
       if (((_state$atomValues$get2 = state.atomValues.get(key)) === null || _state$atomValues$get2 === void 0 ? void 0 : _state$atomValues$get2.contents) === wrappedPromise) {
-        setRecoilValueLoadable$3(store, node, loadableWithError$2(error));
+        setRecoilValueLoadable$2(store, node, loadableWithError$2(error));
       }
 
       throw error;
@@ -38946,8 +39899,18 @@ function baseAtom(options) {
   }
 
   function initAtom(store, initState, trigger) {
+    var _options$effects;
+
     liveStoresCount++;
-    const alreadyKnown = store.getState().knownAtoms.has(key);
+
+    const cleanupAtom = () => {
+      var _cleanupEffectsByStor;
+
+      liveStoresCount--;
+      (_cleanupEffectsByStor = cleanupEffectsByStore.get(store)) === null || _cleanupEffectsByStor === void 0 ? void 0 : _cleanupEffectsByStor.forEach(cleanup => cleanup());
+      cleanupEffectsByStore.delete(store);
+    };
+
     store.getState().knownAtoms.add(key); // Setup async defaults to notify subscribers when they resolve
 
     if (defaultLoadable.state === 'loading') {
@@ -38957,30 +39920,67 @@ function baseAtom(options) {
         const state = (_store$getState$nextT3 = store.getState().nextTree) !== null && _store$getState$nextT3 !== void 0 ? _store$getState$nextT3 : store.getState().currentTree;
 
         if (!state.atomValues.has(key)) {
-          markRecoilValueModified$1(store, node);
+          markRecoilValueModified$2(store, node);
         }
       };
 
-      defaultLoadable.contents.then(notifyDefaultSubscribers).catch(notifyDefaultSubscribers);
-    } // Run Atom Effects
-    // This state is scoped by Store, since this is in the initAtom() closure
+      defaultLoadable.contents.finally(notifyDefaultSubscribers);
+    } ///////////////////
+    // Run Atom Effects
+    ///////////////////
 
 
-    let initValue = DEFAULT_VALUE$5;
-    let pendingSetSelf = null;
+    const effects = (_options$effects = options.effects) !== null && _options$effects !== void 0 ? _options$effects : options.effects_UNSTABLE;
 
-    if (options.effects_UNSTABLE != null && !alreadyKnown) {
+    if (effects != null) {
+      // This state is scoped by Store, since this is in the initAtom() closure
       let duringInit = true;
+      let initValue = DEFAULT_VALUE$7;
+      let isInitError = false;
+      let pendingSetSelf = null;
+
+      function getLoadable(recoilValue) {
+        // Normally we can just get the current value of another atom.
+        // But for our own value we need to check if there is a pending
+        // initialized value or get the fallback default value.
+        if (duringInit && recoilValue.key === key) {
+          // Cast T to S
+          const retValue = initValue; // flowlint-line unclear-type:off
+
+          return retValue instanceof DefaultValue$2 ? peekAtom(store, initState) // flowlint-line unclear-type:off
+          : Recoil_isPromise(retValue) ? loadableWithPromise$2(retValue.then(v => v instanceof DefaultValue$2 ? // Cast T to S
+          defaultLoadable.toPromise() // flowlint-line unclear-type:off
+          : v)) : loadableWithValue$3(retValue);
+        }
+
+        return getRecoilValueAsLoadable$4(store, recoilValue);
+      }
+
+      function getPromise(recoilValue) {
+        return getLoadable(recoilValue).toPromise();
+      }
+
+      function getInfo_UNSTABLE(recoilValue) {
+        var _store$getState$nextT4;
+
+        const info = peekNodeInfo$3(store, (_store$getState$nextT4 = store.getState().nextTree) !== null && _store$getState$nextT4 !== void 0 ? _store$getState$nextT4 : store.getState().currentTree, recoilValue.key);
+        return duringInit && recoilValue.key === key && !(initValue instanceof DefaultValue$2) ? { ...info,
+          isSet: true,
+          loadable: getLoadable(recoilValue)
+        } : info;
+      }
 
       const setSelf = effect => valueOrUpdater => {
         if (duringInit) {
-          const currentValue = initValue instanceof DefaultValue$2 || Recoil_isPromise(initValue) ? defaultLoadable.state === 'hasValue' ? defaultLoadable.contents : DEFAULT_VALUE$5 : initValue;
+          const currentLoadable = getLoadable(node);
+          const currentValue = currentLoadable.state === 'hasValue' ? currentLoadable.contents : DEFAULT_VALUE$7;
           initValue = typeof valueOrUpdater === 'function' ? // cast to any because we can't restrict T from being a function without losing support for opaque types
           valueOrUpdater(currentValue) // flowlint-line unclear-type:off
-          : valueOrUpdater; // Avoid calling onSet() when setSelf() initializes with a Promise
+          : valueOrUpdater;
 
           if (Recoil_isPromise(initValue)) {
             initValue = initValue.then(value => {
+              // Avoid calling onSet() when setSelf() initializes with a Promise
               pendingSetSelf = {
                 effect,
                 value
@@ -38990,7 +39990,7 @@ function baseAtom(options) {
           }
         } else {
           if (Recoil_isPromise(valueOrUpdater)) {
-            throw new Error('Setting atoms to async values is not implemented.');
+            throw Recoil_err('Setting atoms to async values is not implemented.');
           }
 
           if (typeof valueOrUpdater !== 'function') {
@@ -39000,7 +40000,7 @@ function baseAtom(options) {
             };
           }
 
-          setRecoilValue$3(store, node, typeof valueOrUpdater === 'function' ? currentValue => {
+          setRecoilValue$4(store, node, typeof valueOrUpdater === 'function' ? currentValue => {
             const newValue = // cast to any because we can't restrict T from being a function without losing support for opaque types
             valueOrUpdater(currentValue); // flowlint-line unclear-type:off
 
@@ -39013,10 +40013,14 @@ function baseAtom(options) {
         }
       };
 
-      const resetSelf = effect => () => setSelf(effect)(DEFAULT_VALUE$5);
+      const resetSelf = effect => () => setSelf(effect)(DEFAULT_VALUE$7);
 
       const onSet = effect => handler => {
-        store.subscribeToTransactions(currentStore => {
+        var _cleanupEffectsByStor2;
+
+        const {
+          release
+        } = store.subscribeToTransactions(currentStore => {
           var _currentTree$atomValu;
 
           // eslint-disable-next-line prefer-const
@@ -39037,7 +40041,7 @@ function baseAtom(options) {
 
             const newValue = newLoadable.contents;
             const oldLoadable = (_previousTree$atomVal = previousTree.atomValues.get(key)) !== null && _previousTree$atomVal !== void 0 ? _previousTree$atomVal : defaultLoadable;
-            const oldValue = oldLoadable.state === 'hasValue' ? oldLoadable.contents : DEFAULT_VALUE$5; // TODO This isn't actually valid, use as a placeholder for now.
+            const oldValue = oldLoadable.state === 'hasValue' ? oldLoadable.contents : DEFAULT_VALUE$7; // TODO This isn't actually valid, use as a placeholder for now.
             // Ignore atom value changes that were set via setSelf() in the same effect.
             // We will still properly call the handler if there was a subsequent
             // set from something other than an atom effect which was batched
@@ -39047,62 +40051,63 @@ function baseAtom(options) {
             // case, it was kind of a noop, so the semantics are debatable..
 
             if (((_pendingSetSelf = pendingSetSelf) === null || _pendingSetSelf === void 0 ? void 0 : _pendingSetSelf.effect) !== effect || ((_pendingSetSelf2 = pendingSetSelf) === null || _pendingSetSelf2 === void 0 ? void 0 : _pendingSetSelf2.value) !== newValue) {
-              handler(newValue, oldValue);
+              handler(newValue, oldValue, !currentTree.atomValues.has(key));
             } else if (((_pendingSetSelf3 = pendingSetSelf) === null || _pendingSetSelf3 === void 0 ? void 0 : _pendingSetSelf3.effect) === effect) {
               pendingSetSelf = null;
             }
           }
         }, key);
+        cleanupEffectsByStore.set(store, [...((_cleanupEffectsByStor2 = cleanupEffectsByStore.get(store)) !== null && _cleanupEffectsByStor2 !== void 0 ? _cleanupEffectsByStor2 : []), release]);
       };
 
-      for (const effect of (_options$effects_UNST = options.effects_UNSTABLE) !== null && _options$effects_UNST !== void 0 ? _options$effects_UNST : []) {
-        var _options$effects_UNST;
+      for (const effect of effects) {
+        try {
+          const cleanup = effect({
+            node,
+            storeID: store.storeID,
+            trigger,
+            setSelf: setSelf(effect),
+            resetSelf: resetSelf(effect),
+            onSet: onSet(effect),
+            getPromise,
+            getLoadable,
+            getInfo_UNSTABLE
+          });
 
-        const cleanup = effect({
-          node,
-          trigger,
-          setSelf: setSelf(effect),
-          resetSelf: resetSelf(effect),
-          onSet: onSet(effect)
-        });
+          if (cleanup != null) {
+            var _cleanupEffectsByStor3;
 
-        if (cleanup != null) {
-          var _cleanupEffectsByStor;
-
-          cleanupEffectsByStore.set(store, [...((_cleanupEffectsByStor = cleanupEffectsByStore.get(store)) !== null && _cleanupEffectsByStor !== void 0 ? _cleanupEffectsByStor : []), cleanup]);
+            cleanupEffectsByStore.set(store, [...((_cleanupEffectsByStor3 = cleanupEffectsByStore.get(store)) !== null && _cleanupEffectsByStor3 !== void 0 ? _cleanupEffectsByStor3 : []), cleanup]);
+          }
+        } catch (error) {
+          initValue = error;
+          isInitError = true;
         }
       }
 
-      duringInit = false;
-    } // Mutate initial state in place since we know there are no other subscribers
-    // since we are the ones initializing on first use.
+      duringInit = false; // Mutate initial state in place since we know there are no other subscribers
+      // since we are the ones initializing on first use.
 
+      if (!(initValue instanceof DefaultValue$2)) {
+        var _store$getState$nextT5;
 
-    if (!(initValue instanceof DefaultValue$2)) {
-      var _store$getState$nextT4;
+        const frozenInitValue = maybeFreezeValueOrPromise(initValue);
+        const initLoadable = isInitError ? loadableWithError$2(initValue) : Recoil_isPromise(frozenInitValue) ? loadableWithPromise$2(wrapPendingPromise(store, frozenInitValue)) : loadableWithValue$3(frozenInitValue);
+        initState.atomValues.set(key, initLoadable); // If there is a pending transaction, then also mutate the next state tree.
+        // This could happen if the atom was first initialized in an action that
+        // also updated some other atom's state.
 
-      const initLoadable = Recoil_isPromise(initValue) ? loadableWithPromise$2(wrapPendingPromise(store, initValue)) : loadableWithValue$3(initValue);
-      initState.atomValues.set(key, initLoadable); // If there is a pending transaction, then also mutate the next state tree.
-      // This could happen if the atom was first initialized in an action that
-      // also updated some other atom's state.
-
-      (_store$getState$nextT4 = store.getState().nextTree) === null || _store$getState$nextT4 === void 0 ? void 0 : _store$getState$nextT4.atomValues.set(key, initLoadable);
+        (_store$getState$nextT5 = store.getState().nextTree) === null || _store$getState$nextT5 === void 0 ? void 0 : _store$getState$nextT5.atomValues.set(key, initLoadable);
+      }
     }
 
-    return () => {
-      var _cleanupEffectsByStor2;
-
-      liveStoresCount--;
-      (_cleanupEffectsByStor2 = cleanupEffectsByStore.get(store)) === null || _cleanupEffectsByStor2 === void 0 ? void 0 : _cleanupEffectsByStor2.forEach(cleanup => cleanup());
-      cleanupEffectsByStore.delete(store);
-      store.getState().knownAtoms.delete(key); // FIXME remove knownAtoms?
-    };
+    return cleanupAtom;
   }
 
   function peekAtom(_store, state) {
-    var _ref, _state$atomValues$get3, _cachedAnswerForUnval;
+    var _ref, _state$atomValues$get3;
 
-    return (_ref = (_state$atomValues$get3 = state.atomValues.get(key)) !== null && _state$atomValues$get3 !== void 0 ? _state$atomValues$get3 : (_cachedAnswerForUnval = cachedAnswerForUnvalidatedValue) === null || _cachedAnswerForUnval === void 0 ? void 0 : _cachedAnswerForUnval[1]) !== null && _ref !== void 0 ? _ref : defaultLoadable;
+    return (_ref = (_state$atomValues$get3 = state.atomValues.get(key)) !== null && _state$atomValues$get3 !== void 0 ? _state$atomValues$get3 : cachedAnswerForUnvalidatedValue) !== null && _ref !== void 0 ? _ref : defaultLoadable;
   }
 
   function getAtom(_store, state) {
@@ -39122,7 +40127,7 @@ function baseAtom(options) {
       }
 
       const nonvalidatedValue = state.nonvalidatedAtoms.get(key);
-      const validatorResult = persistence.validator(nonvalidatedValue, DEFAULT_VALUE$5);
+      const validatorResult = persistence.validator(nonvalidatedValue, DEFAULT_VALUE$7);
       const validatedValueLoadable = validatorResult instanceof DefaultValue$2 ? defaultLoadable : loadableWithValue$3(validatorResult);
       cachedAnswerForUnvalidatedValue = validatedValueLoadable;
       return cachedAnswerForUnvalidatedValue;
@@ -39148,12 +40153,7 @@ function baseAtom(options) {
       return new Map();
     }
 
-    if (true) {
-      if (options.dangerouslyAllowMutability !== true) {
-        Recoil_deepFreezeValue(newValue);
-      }
-    }
-
+    maybeFreezeValueOrPromise(newValue);
     cachedAnswerForUnvalidatedValue = undefined; // can be released now if it was previously in use
 
     return new Map().set(key, loadableWithValue$3(newValue));
@@ -39185,6 +40185,16 @@ function baseAtom(options) {
 
 
 function atom(options) {
+  if (true) {
+    if (typeof options.key !== 'string') {
+      throw Recoil_err('A key option with a unique string value must be provided when creating an atom.');
+    }
+
+    if (!('default' in options)) {
+      throw Recoil_err('A default value must be specified when creating an atom.');
+    }
+  }
+
   const {
     default: optionsDefault,
     // @fb-only: scopeRules_APPEND_ONLY_READ_THE_DOCS,
@@ -39195,16 +40205,16 @@ function atom(options) {
   // for now, since scoped atoms don't support async defaults
   // @fb-only: || (isPromise(optionsDefault) && scopeRules_APPEND_ONLY_READ_THE_DOCS)
   ) {
-      return atomWithFallback({ ...restOptions,
-        default: optionsDefault // @fb-only: scopeRules_APPEND_ONLY_READ_THE_DOCS,
+    return atomWithFallback({ ...restOptions,
+      default: optionsDefault // @fb-only: scopeRules_APPEND_ONLY_READ_THE_DOCS,
 
-      }); // @fb-only: } else if (scopeRules_APPEND_ONLY_READ_THE_DOCS && !isPromise(optionsDefault)) {
-      // @fb-only: return scopedAtom<T>({
-      // @fb-only: ...restOptions,
-      // @fb-only: default: optionsDefault,
-      // @fb-only: scopeRules_APPEND_ONLY_READ_THE_DOCS,
-      // @fb-only: });
-    } else {
+    }); // @fb-only: } else if (scopeRules_APPEND_ONLY_READ_THE_DOCS && !isPromise(optionsDefault)) {
+    // @fb-only: return scopedAtom<T>({
+    // @fb-only: ...restOptions,
+    // @fb-only: default: optionsDefault,
+    // @fb-only: scopeRules_APPEND_ONLY_READ_THE_DOCS,
+    // @fb-only: });
+  } else {
     return baseAtom({ ...restOptions,
       default: optionsDefault
     });
@@ -39213,13 +40223,15 @@ function atom(options) {
 
 function atomWithFallback(options) {
   const base = atom({ ...options,
-    default: DEFAULT_VALUE$5,
+    default: DEFAULT_VALUE$7,
     persistence_UNSTABLE: options.persistence_UNSTABLE === undefined ? undefined : { ...options.persistence_UNSTABLE,
-      validator: storedValue => storedValue instanceof DefaultValue$2 ? storedValue : Recoil_nullthrows(options.persistence_UNSTABLE).validator(storedValue, DEFAULT_VALUE$5)
+      validator: storedValue => storedValue instanceof DefaultValue$2 ? storedValue : Recoil_nullthrows(options.persistence_UNSTABLE).validator(storedValue, DEFAULT_VALUE$7)
     },
     // TODO Hack for now.
-    // flowlint-next-line unclear-type: off
-    effects_UNSTABLE: options.effects_UNSTABLE
+    effects: options.effects,
+    // flowlint-line unclear-type: off
+    effects_UNSTABLE: options.effects_UNSTABLE // flowlint-line unclear-type: off
+
   });
   const sel = Recoil_selector({
     key: `${options.key}__withFallback`,
@@ -39241,7 +40253,10 @@ function atomWithFallback(options) {
 var Recoil_atom = atom;
 
 /**
- * (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * @emails oncall+recoil
  * 
@@ -39305,6 +40320,12 @@ const {
   MapCache: MapCache$1
 } = Recoil_MapCache$1;
 
+
+
+
+
+
+
 const defaultPolicy$1 = {
   equality: 'reference',
   eviction: 'none',
@@ -39330,7 +40351,7 @@ function getValueMapper$1(equality) {
       return val => Recoil_stableStringify(val);
   }
 
-  throw new Error(`Unrecognized equality policy ${equality}`);
+  throw Recoil_err(`Unrecognized equality policy ${equality}`);
 }
 
 function getCache(eviction, maxSize, mapKey) {
@@ -39356,7 +40377,7 @@ function getCache(eviction, maxSize, mapKey) {
       });
   }
 
-  throw new Error(`Unrecognized eviction policy ${eviction}`);
+  throw Recoil_err(`Unrecognized eviction policy ${eviction}`);
 }
 
 var Recoil_cacheFromPolicy = cacheFromPolicy;
@@ -39364,6 +40385,24 @@ var Recoil_cacheFromPolicy = cacheFromPolicy;
 const {
   setConfigDeletionHandler: setConfigDeletionHandler$2
 } = Recoil_Node;
+
+
+
+
+
+// Process scopeRules to handle any entries which are functions taking parameters
+// prettier-ignore
+// @fb-only: function mapScopeRules<P>(
+// @fb-only: scopeRules?: ParameterizedScopeRules<P>,
+// @fb-only: param: P,
+// @fb-only: ): ScopeRules | void {
+// @fb-only: return scopeRules?.map(rule =>
+// @fb-only: Array.isArray(rule)
+// @fb-only: ? rule.map(entry => (typeof entry === 'function' ? entry(param) : entry))
+// @fb-only: : rule,
+// @fb-only: );
+// @fb-only: }
+
 /*
 A function which returns an atom based on the input parameter.
 
@@ -39379,8 +40418,6 @@ parameter for a family of atoms; in this way, each component will have
 its own atom not shared by other instances.  These state keys may be composed
 into children's state keys as well.
 */
-
-
 function atomFamily(options) {
   var _options$cachePolicyF, _options$cachePolicyF2;
 
@@ -39391,7 +40428,7 @@ function atomFamily(options) {
   // on the parameter value equality.
 
   return params => {
-    var _stableStringify;
+    var _stableStringify, _options$effects;
 
     const cachedAtom = atomCache.get(params);
 
@@ -39411,7 +40448,7 @@ function atomFamily(options) {
       : // Default may be a static value, promise, or RecoilValue
       options.default,
       retainedBy_UNSTABLE: typeof options.retainedBy_UNSTABLE === 'function' ? options.retainedBy_UNSTABLE(params) : options.retainedBy_UNSTABLE,
-      effects_UNSTABLE: typeof options.effects_UNSTABLE === 'function' ? options.effects_UNSTABLE(params) : options.effects_UNSTABLE // prettier-ignore
+      effects: typeof options.effects === 'function' ? options.effects(params) : typeof options.effects_UNSTABLE === 'function' ? options.effects_UNSTABLE(params) : (_options$effects = options.effects) !== null && _options$effects !== void 0 ? _options$effects : options.effects_UNSTABLE // prettier-ignore
       // @fb-only: scopeRules_APPEND_ONLY_READ_THE_DOCS: mapScopeRules(
       // @fb-only: options.scopeRules_APPEND_ONLY_READ_THE_DOCS,
       // @fb-only: params,
@@ -39544,8 +40581,9 @@ var Recoil_constSelector = constSelector;
 const throwingSelector = Recoil_selectorFamily({
   key: '__error',
   get: message => () => {
-    throw new Error(message);
+    throw Recoil_err(message);
   },
+  // TODO Why?
   cachePolicyForParams_UNSTABLE: {
     equality: 'reference'
   }
@@ -39582,7 +40620,7 @@ const {
   loadableWithError: loadableWithError$3,
   loadableWithPromise: loadableWithPromise$3,
   loadableWithValue: loadableWithValue$4
-} = Recoil_Loadable;
+} = Recoil_Loadable$1;
 
 
 
@@ -39623,14 +40661,6 @@ function isError(exp) {
 
 function unwrapDependencies(dependencies) {
   return Array.isArray(dependencies) ? dependencies : Object.getOwnPropertyNames(dependencies).map(key => dependencies[key]);
-}
-
-function getValueFromLoadablePromiseResult(result) {
-  if (result != null && typeof result === 'object' && result.hasOwnProperty('__value')) {
-    return result.__value;
-  }
-
-  return result;
 }
 
 function wrapResults(dependencies, results) {
@@ -39696,7 +40726,7 @@ const waitForAny = Recoil_selectorFamily({
       for (const [i, exp] of exceptions.entries()) {
         if (Recoil_isPromise(exp)) {
           exp.then(result => {
-            results[i] = getValueFromLoadablePromiseResult(result);
+            results[i] = result;
             exceptions[i] = undefined;
             resolve(wrapLoadables(dependencies, results, exceptions));
           }).catch(error => {
@@ -39733,7 +40763,7 @@ const waitForAll = Recoil_selectorFamily({
     } // Otherwise, return a promise that will resolve when all results are available
 
 
-    return Promise.all(exceptions).then(exceptionResults => wrapResults(dependencies, combineAsyncResultsWithSyncResults(results, exceptionResults).map(getValueFromLoadablePromiseResult)));
+    return Promise.all(exceptions).then(exceptionResults => wrapResults(dependencies, combineAsyncResultsWithSyncResults(results, exceptionResults)));
   },
   dangerouslyAllowMutability: true
 });
@@ -39753,7 +40783,7 @@ const waitForAllSettled = Recoil_selectorFamily({
 
 
     return Promise.all(exceptions.map((exp, i) => Recoil_isPromise(exp) ? exp.then(result => {
-      results[i] = getValueFromLoadablePromiseResult(result);
+      results[i] = result;
       exceptions[i] = undefined;
     }).catch(error => {
       results[i] = undefined;
@@ -39785,17 +40815,17 @@ var Recoil_WaitFor = {
 };
 
 const {
-  batchUpdates: batchUpdates$3,
-  setBatcher: setBatcher$1
-} = Recoil_Batching;
+  RecoilLoadable
+} = Recoil_Loadable$1;
 
 const {
   DefaultValue: DefaultValue$3
 } = Recoil_Node;
 
 const {
-  RecoilRoot: RecoilRoot$2
-} = Recoil_RecoilRoot_react;
+  RecoilRoot: RecoilRoot$2,
+  useRecoilStoreID: useRecoilStoreID$1
+} = Recoil_RecoilRoot;
 
 const {
   isRecoilValue: isRecoilValue$5
@@ -39810,21 +40840,32 @@ const {
 } = Recoil_Snapshot$1;
 
 const {
-  useGotoRecoilSnapshot: useGotoRecoilSnapshot$1,
-  useRecoilCallback: useRecoilCallback$1,
-  useRecoilSnapshot: useRecoilSnapshot$1,
   useRecoilState: useRecoilState$1,
+  useRecoilState_TRANSITION_SUPPORT_UNSTABLE: useRecoilState_TRANSITION_SUPPORT_UNSTABLE$1,
   useRecoilStateLoadable: useRecoilStateLoadable$1,
-  useRecoilTransaction: useRecoilTransaction$1,
-  useRecoilTransactionObserver: useRecoilTransactionObserver$1,
   useRecoilValue: useRecoilValue$1,
+  useRecoilValue_TRANSITION_SUPPORT_UNSTABLE: useRecoilValue_TRANSITION_SUPPORT_UNSTABLE$1,
   useRecoilValueLoadable: useRecoilValueLoadable$1,
+  useRecoilValueLoadable_TRANSITION_SUPPORT_UNSTABLE: useRecoilValueLoadable_TRANSITION_SUPPORT_UNSTABLE$1,
   useResetRecoilState: useResetRecoilState$1,
-  useRetain: useRetain$1,
-  useSetRecoilState: useSetRecoilState$1,
-  useSetUnvalidatedAtomValues: useSetUnvalidatedAtomValues$1,
-  useTransactionObservation_DEPRECATED: useTransactionObservation_DEPRECATED$1
+  useSetRecoilState: useSetRecoilState$1
 } = Recoil_Hooks;
+
+const {
+  useGotoRecoilSnapshot: useGotoRecoilSnapshot$1,
+  useRecoilSnapshot: useRecoilSnapshot$1,
+  useRecoilTransactionObserver: useRecoilTransactionObserver$1
+} = Recoil_SnapshotHooks;
+
+
+
+
+
+const {
+  useRecoilCallback: useRecoilCallback$1
+} = Recoil_useRecoilCallback;
+
+
 
 
 
@@ -39855,21 +40896,28 @@ const {
 var Recoil_index = {
   // Types
   DefaultValue: DefaultValue$3,
-  // Components
+  isRecoilValue: isRecoilValue$5,
+  RecoilLoadable,
+  // Recoil Root
   RecoilRoot: RecoilRoot$2,
+  useRecoilStoreID: useRecoilStoreID$1,
   useRecoilBridgeAcrossReactRoots_UNSTABLE: Recoil_useRecoilBridgeAcrossReactRoots,
-  // RecoilValues
+  // Atoms/Selectors
   atom: Recoil_atom,
   selector: Recoil_selector,
-  // Other factories
-  retentionZone: retentionZone$1,
-  // Convenience RecoilValues
+  // Convenience Atoms/Selectors
   atomFamily: Recoil_atomFamily,
   selectorFamily: Recoil_selectorFamily,
   constSelector: Recoil_constSelector,
   errorSelector: Recoil_errorSelector,
   readOnlySelector: Recoil_readOnlySelector,
-  // Hooks that accept RecoilValues
+  // Concurrency Helpers for Atoms/Selectors
+  noWait: noWait$1,
+  waitForNone: waitForNone$1,
+  waitForAny: waitForAny$1,
+  waitForAll: waitForAll$1,
+  waitForAllSettled: waitForAllSettled$1,
+  // Hooks for Atoms/Selectors
   useRecoilValue: useRecoilValue$1,
   useRecoilValueLoadable: useRecoilValueLoadable$1,
   useRecoilState: useRecoilState$1,
@@ -39877,65 +40925,59 @@ var Recoil_index = {
   useSetRecoilState: useSetRecoilState$1,
   useResetRecoilState: useResetRecoilState$1,
   useGetRecoilValueInfo_UNSTABLE: Recoil_useGetRecoilValueInfo,
-  useRetain: useRetain$1,
-  // Hooks for complex operations with RecoilValues
+  useRecoilRefresher_UNSTABLE: Recoil_useRecoilRefresher,
+  useRecoilValueLoadable_TRANSITION_SUPPORT_UNSTABLE: useRecoilValueLoadable_TRANSITION_SUPPORT_UNSTABLE$1,
+  useRecoilValue_TRANSITION_SUPPORT_UNSTABLE: useRecoilValue_TRANSITION_SUPPORT_UNSTABLE$1,
+  useRecoilState_TRANSITION_SUPPORT_UNSTABLE: useRecoilState_TRANSITION_SUPPORT_UNSTABLE$1,
+  // Hooks for complex operations
   useRecoilCallback: useRecoilCallback$1,
-  useRecoilTransaction_UNSTABLE: useRecoilTransaction$1,
-  // Hooks for Snapshots
+  useRecoilTransaction_UNSTABLE: Recoil_useRecoilTransaction,
+  // Snapshots
   useGotoRecoilSnapshot: useGotoRecoilSnapshot$1,
   useRecoilSnapshot: useRecoilSnapshot$1,
   useRecoilTransactionObserver_UNSTABLE: useRecoilTransactionObserver$1,
-  useTransactionObservation_UNSTABLE: useTransactionObservation_DEPRECATED$1,
-  useSetUnvalidatedAtomValues_UNSTABLE: useSetUnvalidatedAtomValues$1,
-  // Concurrency Helpers
-  noWait: noWait$1,
-  waitForNone: waitForNone$1,
-  waitForAny: waitForAny$1,
-  waitForAll: waitForAll$1,
-  waitForAllSettled: waitForAllSettled$1,
-  // Other functions
-  isRecoilValue: isRecoilValue$5,
-  // Batching
-  batchUpdates: batchUpdates$3,
-  setBatcher: setBatcher$1,
-  // Snapshot Utils
-  snapshot_UNSTABLE: freshSnapshot$2
+  snapshot_UNSTABLE: freshSnapshot$2,
+  // Memory Management
+  useRetain: Recoil_useRetain,
+  retentionZone: retentionZone$1
 };
 var Recoil_index_1 = Recoil_index.DefaultValue;
-var Recoil_index_2 = Recoil_index.RecoilRoot;
-var Recoil_index_3 = Recoil_index.useRecoilBridgeAcrossReactRoots_UNSTABLE;
-var Recoil_index_4 = Recoil_index.atom;
-var Recoil_index_5 = Recoil_index.selector;
-var Recoil_index_6 = Recoil_index.retentionZone;
-var Recoil_index_7 = Recoil_index.atomFamily;
-var Recoil_index_8 = Recoil_index.selectorFamily;
-var Recoil_index_9 = Recoil_index.constSelector;
-var Recoil_index_10 = Recoil_index.errorSelector;
-var Recoil_index_11 = Recoil_index.readOnlySelector;
-var Recoil_index_12 = Recoil_index.useRecoilValue;
-var Recoil_index_13 = Recoil_index.useRecoilValueLoadable;
-var Recoil_index_14 = Recoil_index.useRecoilState;
-var Recoil_index_15 = Recoil_index.useRecoilStateLoadable;
-var Recoil_index_16 = Recoil_index.useSetRecoilState;
-var Recoil_index_17 = Recoil_index.useResetRecoilState;
-var Recoil_index_18 = Recoil_index.useGetRecoilValueInfo_UNSTABLE;
-var Recoil_index_19 = Recoil_index.useRetain;
-var Recoil_index_20 = Recoil_index.useRecoilCallback;
-var Recoil_index_21 = Recoil_index.useRecoilTransaction_UNSTABLE;
-var Recoil_index_22 = Recoil_index.useGotoRecoilSnapshot;
-var Recoil_index_23 = Recoil_index.useRecoilSnapshot;
-var Recoil_index_24 = Recoil_index.useRecoilTransactionObserver_UNSTABLE;
-var Recoil_index_25 = Recoil_index.useTransactionObservation_UNSTABLE;
-var Recoil_index_26 = Recoil_index.useSetUnvalidatedAtomValues_UNSTABLE;
-var Recoil_index_27 = Recoil_index.noWait;
-var Recoil_index_28 = Recoil_index.waitForNone;
-var Recoil_index_29 = Recoil_index.waitForAny;
-var Recoil_index_30 = Recoil_index.waitForAll;
-var Recoil_index_31 = Recoil_index.waitForAllSettled;
-var Recoil_index_32 = Recoil_index.isRecoilValue;
-var Recoil_index_33 = Recoil_index.batchUpdates;
-var Recoil_index_34 = Recoil_index.setBatcher;
+var Recoil_index_2 = Recoil_index.isRecoilValue;
+var Recoil_index_3 = Recoil_index.RecoilLoadable;
+var Recoil_index_4 = Recoil_index.RecoilRoot;
+var Recoil_index_5 = Recoil_index.useRecoilStoreID;
+var Recoil_index_6 = Recoil_index.useRecoilBridgeAcrossReactRoots_UNSTABLE;
+var Recoil_index_7 = Recoil_index.atom;
+var Recoil_index_8 = Recoil_index.selector;
+var Recoil_index_9 = Recoil_index.atomFamily;
+var Recoil_index_10 = Recoil_index.selectorFamily;
+var Recoil_index_11 = Recoil_index.constSelector;
+var Recoil_index_12 = Recoil_index.errorSelector;
+var Recoil_index_13 = Recoil_index.readOnlySelector;
+var Recoil_index_14 = Recoil_index.noWait;
+var Recoil_index_15 = Recoil_index.waitForNone;
+var Recoil_index_16 = Recoil_index.waitForAny;
+var Recoil_index_17 = Recoil_index.waitForAll;
+var Recoil_index_18 = Recoil_index.waitForAllSettled;
+var Recoil_index_19 = Recoil_index.useRecoilValue;
+var Recoil_index_20 = Recoil_index.useRecoilValueLoadable;
+var Recoil_index_21 = Recoil_index.useRecoilState;
+var Recoil_index_22 = Recoil_index.useRecoilStateLoadable;
+var Recoil_index_23 = Recoil_index.useSetRecoilState;
+var Recoil_index_24 = Recoil_index.useResetRecoilState;
+var Recoil_index_25 = Recoil_index.useGetRecoilValueInfo_UNSTABLE;
+var Recoil_index_26 = Recoil_index.useRecoilRefresher_UNSTABLE;
+var Recoil_index_27 = Recoil_index.useRecoilValueLoadable_TRANSITION_SUPPORT_UNSTABLE;
+var Recoil_index_28 = Recoil_index.useRecoilValue_TRANSITION_SUPPORT_UNSTABLE;
+var Recoil_index_29 = Recoil_index.useRecoilState_TRANSITION_SUPPORT_UNSTABLE;
+var Recoil_index_30 = Recoil_index.useRecoilCallback;
+var Recoil_index_31 = Recoil_index.useRecoilTransaction_UNSTABLE;
+var Recoil_index_32 = Recoil_index.useGotoRecoilSnapshot;
+var Recoil_index_33 = Recoil_index.useRecoilSnapshot;
+var Recoil_index_34 = Recoil_index.useRecoilTransactionObserver_UNSTABLE;
 var Recoil_index_35 = Recoil_index.snapshot_UNSTABLE;
+var Recoil_index_36 = Recoil_index.useRetain;
+var Recoil_index_37 = Recoil_index.retentionZone;
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Recoil_index);
 
@@ -41534,10 +42576,10 @@ class ActionContainer {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "SplitviewApi": () => (/* binding */ SplitviewApi),
-/* harmony export */   "PaneviewApi": () => (/* binding */ PaneviewApi),
+/* harmony export */   "DockviewApi": () => (/* binding */ DockviewApi),
 /* harmony export */   "GridviewApi": () => (/* binding */ GridviewApi),
-/* harmony export */   "DockviewApi": () => (/* binding */ DockviewApi)
+/* harmony export */   "PaneviewApi": () => (/* binding */ PaneviewApi),
+/* harmony export */   "SplitviewApi": () => (/* binding */ SplitviewApi)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
 
@@ -41707,6 +42749,18 @@ class GridviewApi {
     get onDidLayoutChange() {
         return this.component.onDidLayoutChange;
     }
+    get onDidAddGroup() {
+        return this.component.onDidAddGroup;
+    }
+    get onDidRemoveGroup() {
+        return this.component.onDidRemoveGroup;
+    }
+    get onDidActiveGroupChange() {
+        return this.component.onDidActiveGroupChange;
+    }
+    get onDidLayoutFromJSON() {
+        return this.component.onDidLayoutFromJSON;
+    }
     get panels() {
         return this.component.groups;
     }
@@ -41783,6 +42837,27 @@ class DockviewApi {
     }
     get onGridEvent() {
         return this.component.onGridEvent;
+    }
+    get onDidActiveGroupChange() {
+        return this.component.onDidActiveGroupChange;
+    }
+    get onDidAddGroup() {
+        return this.component.onDidAddGroup;
+    }
+    get onDidRemoveGroup() {
+        return this.component.onDidRemoveGroup;
+    }
+    get onDidActivePanelChange() {
+        return this.component.onDidActivePanelChange;
+    }
+    get onDidAddPanel() {
+        return this.component.onDidAddPanel;
+    }
+    get onDidRemovePanel() {
+        return this.component.onDidRemovePanel;
+    }
+    get onDidLayoutfromJSON() {
+        return this.component.onDidLayoutfromJSON;
     }
     get onDidLayoutChange() {
         return this.component.onDidLayoutChange;
@@ -42157,13 +43232,13 @@ class SplitviewPanelApiImpl extends _panelApi__WEBPACK_IMPORTED_MODULE_1__.Panel
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "tail": () => (/* binding */ tail),
+/* harmony export */   "firstIndex": () => (/* binding */ firstIndex),
 /* harmony export */   "last": () => (/* binding */ last),
-/* harmony export */   "sequenceEquals": () => (/* binding */ sequenceEquals),
-/* harmony export */   "pushToStart": () => (/* binding */ pushToStart),
 /* harmony export */   "pushToEnd": () => (/* binding */ pushToEnd),
+/* harmony export */   "pushToStart": () => (/* binding */ pushToStart),
 /* harmony export */   "range": () => (/* binding */ range),
-/* harmony export */   "firstIndex": () => (/* binding */ firstIndex)
+/* harmony export */   "sequenceEquals": () => (/* binding */ sequenceEquals),
+/* harmony export */   "tail": () => (/* binding */ tail)
 /* harmony export */ });
 function tail(arr) {
     if (arr.length === 0) {
@@ -42247,29 +43322,27 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "DragHandler": () => (/* binding */ DragHandler)
 /* harmony export */ });
-/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! .. */ "../dockview/dist/esm/index.js");
-/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dom */ "../dockview/dist/esm/dom.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
+/* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dom */ "../dockview/dist/esm/dom.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
 
 
 
-
-class DragHandler extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposable {
+class DragHandler extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable {
     constructor(el) {
         super();
         this.el = el;
-        this.disposable = new ___WEBPACK_IMPORTED_MODULE_0__.MutableDisposable();
-        this._onDragStart = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        this.disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_2__.MutableDisposable();
+        this._onDragStart = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
         this.onDragStart = this._onDragStart.event;
         this.iframes = [];
         this.configure();
     }
     configure() {
-        this.addDisposables(this._onDragStart, (0,_events__WEBPACK_IMPORTED_MODULE_2__.addDisposableListener)(this.el, 'dragstart', (event) => {
+        this.addDisposables(this._onDragStart, (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.el, 'dragstart', (event) => {
             this.iframes = [
-                ...(0,_dom__WEBPACK_IMPORTED_MODULE_1__.getElementsByTagName)('iframe'),
-                ...(0,_dom__WEBPACK_IMPORTED_MODULE_1__.getElementsByTagName)('webview'),
+                ...(0,_dom__WEBPACK_IMPORTED_MODULE_0__.getElementsByTagName)('iframe'),
+                ...(0,_dom__WEBPACK_IMPORTED_MODULE_0__.getElementsByTagName)('webview'),
             ];
             for (const iframe of this.iframes) {
                 iframe.style.pointerEvents = 'none';
@@ -42280,7 +43353,7 @@ class DragHandler extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDispo
             if (event.dataTransfer) {
                 event.dataTransfer.effectAllowed = 'move';
             }
-        }), (0,_events__WEBPACK_IMPORTED_MODULE_2__.addDisposableListener)(this.el, 'dragend', (ev) => {
+        }), (0,_events__WEBPACK_IMPORTED_MODULE_1__.addDisposableListener)(this.el, 'dragend', (ev) => {
             for (const iframe of this.iframes) {
                 iframe.style.pointerEvents = 'auto';
             }
@@ -42302,11 +43375,11 @@ class DragHandler extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDispo
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PanelTransfer": () => (/* binding */ PanelTransfer),
-/* harmony export */   "PaneTransfer": () => (/* binding */ PaneTransfer),
 /* harmony export */   "LocalSelectionTransfer": () => (/* binding */ LocalSelectionTransfer),
-/* harmony export */   "getPanelData": () => (/* binding */ getPanelData),
-/* harmony export */   "getPaneData": () => (/* binding */ getPaneData)
+/* harmony export */   "PaneTransfer": () => (/* binding */ PaneTransfer),
+/* harmony export */   "PanelTransfer": () => (/* binding */ PanelTransfer),
+/* harmony export */   "getPaneData": () => (/* binding */ getPaneData),
+/* harmony export */   "getPanelData": () => (/* binding */ getPanelData)
 /* harmony export */ });
 class TransferObject {
     constructor() {
@@ -42448,8 +43521,8 @@ class DragAndDropObserver extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.Compos
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Position": () => (/* binding */ Position),
-/* harmony export */   "Droptarget": () => (/* binding */ Droptarget)
+/* harmony export */   "Droptarget": () => (/* binding */ Droptarget),
+/* harmony export */   "Position": () => (/* binding */ Position)
 /* harmony export */ });
 /* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dom */ "../dockview/dist/esm/dom.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
@@ -42635,8 +43708,8 @@ class Droptarget extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDispos
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "WrappedTab": () => (/* binding */ WrappedTab),
-/* harmony export */   "DefaultTab": () => (/* binding */ DefaultTab)
+/* harmony export */   "DefaultTab": () => (/* binding */ DefaultTab),
+/* harmony export */   "WrappedTab": () => (/* binding */ WrappedTab)
 /* harmony export */ });
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../lifecycle */ "../dockview/dist/esm/lifecycle.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../events */ "../dockview/dist/esm/events.js");
@@ -43016,7 +44089,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             orientation: options.orientation || _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_13__.Orientation.HORIZONTAL,
             styles: options.styles,
         });
-        this._panels = new Map();
         // events
         this._onTabInteractionEvent = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
         this.onTabInteractionEvent = this._onTabInteractionEvent.event;
@@ -43024,6 +44096,14 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         this.onTabContextMenu = this._onTabContextMenu.event;
         this._onDidDrop = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
         this.onDidDrop = this._onDidDrop.event;
+        this._onDidRemovePanel = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
+        this.onDidRemovePanel = this._onDidRemovePanel.event;
+        this._onDidAddPanel = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
+        this.onDidAddPanel = this._onDidAddPanel.event;
+        this._onDidLayoutfromJSON = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
+        this.onDidLayoutfromJSON = this._onDidLayoutfromJSON.event;
+        this._onDidActivePanelChange = new _events__WEBPACK_IMPORTED_MODULE_5__.Emitter();
+        this.onDidActivePanelChange = this._onDidActivePanelChange.event;
         this.addDisposables(this._onTabInteractionEvent, this._onTabContextMenu, this._onDidDrop);
         this._options = options;
         if (!this.options.components) {
@@ -43045,10 +44125,10 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         this._api = new _api_component_api__WEBPACK_IMPORTED_MODULE_11__.DockviewApi(this);
     }
     get totalPanels() {
-        return this._panels.size;
+        return this.panels.length;
     }
     get panels() {
-        return Array.from(this._panels.values()).map((_) => _.value);
+        return this.groups.flatMap((group) => group.model.panels);
     }
     get deserializer() {
         return this._deserializer;
@@ -43089,8 +44169,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.focus();
     }
     getGroupPanel(id) {
-        var _a;
-        return (_a = this._panels.get(id)) === null || _a === void 0 ? void 0 : _a.value;
+        return this.panels.find((panel) => panel.id === id);
     }
     setActivePanel(panel) {
         if (!panel.group) {
@@ -43139,30 +44218,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             this.doSetGroupActive(next);
         }
     }
-    registerPanel(panel) {
-        if (this._panels.has(panel.id)) {
-            throw new Error(`panel ${panel.id} already exists`);
-        }
-        this._panels.set(panel.id, {
-            value: panel,
-            disposable: {
-                dispose: () => {
-                    /** noop */
-                },
-            },
-        });
-    }
-    unregisterPanel(panel) {
-        if (!this._panels.has(panel.id)) {
-            throw new Error(`panel ${panel.id} doesn't exist`);
-        }
-        const item = this._panels.get(panel.id);
-        if (item) {
-            item.disposable.dispose();
-            item.value.dispose();
-        }
-        this._panels.delete(panel.id);
-    }
     /**
      * Serialize the current state of the layout
      *
@@ -43171,8 +44226,8 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
     toJSON() {
         var _a;
         const data = this.gridview.serialize();
-        const panels = Array.from(this._panels.values()).reduce((collection, panel) => {
-            collection[panel.value.id] = panel.value.toJSON();
+        const panels = this.panels.reduce((collection, panel) => {
+            collection[panel.id] = panel.toJSON();
             return collection;
         }, {});
         return {
@@ -43184,11 +44239,9 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
     }
     fromJSON(data) {
         this.gridview.clear();
-        this._panels.forEach((panel) => {
-            panel.disposable.dispose();
-            panel.value.dispose();
+        this.panels.forEach((panel) => {
+            panel.dispose();
         });
-        this._panels.clear();
         this._groups.clear();
         if (!this.deserializer) {
             throw new Error('invalid deserializer');
@@ -43203,9 +44256,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         this.gridview.deserialize(grid, new _deserializer__WEBPACK_IMPORTED_MODULE_8__.DefaultDeserializer(this, {
             createPanel: (id) => {
                 const panelData = panels[id];
-                const panel = this.deserializer.fromJSON(panelData);
-                this.registerPanel(panel);
-                return panel;
+                return this.deserializer.fromJSON(panelData);
             },
         }));
         if (typeof activeGroup === 'string') {
@@ -43216,6 +44267,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         }
         this.gridview.layout(this.width, this.height);
         this._onGridEvent.fire({ kind: _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_10__.GroupChangeKind.LAYOUT_FROM_JSON });
+        this._onDidLayoutfromJSON.fire();
     }
     closeAllGroups() {
         for (const entry of this._groups.entries()) {
@@ -43265,7 +44317,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         return panel;
     }
     removePanel(panel) {
-        this.unregisterPanel(panel);
         const group = panel.group;
         if (!group) {
             throw new Error(`cannot remove panel ${panel.id}. it's missing a group.`);
@@ -43284,10 +44335,9 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             : {}, (_a = this.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.watermark);
     }
     addEmptyGroup(options) {
-        var _a;
         const group = this.createGroup();
         if (options) {
-            const referencePanel = (_a = this._panels.get(options.referencePanel)) === null || _a === void 0 ? void 0 : _a.value;
+            const referencePanel = this.panels.find((panel) => panel.id === options.referencePanel);
             if (!referencePanel) {
                 throw new Error(`reference panel ${options.referencePanel} does not exist`);
             }
@@ -43316,13 +44366,13 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         super.removeGroup(group);
     }
     moveGroupOrPanel(referenceGroup, groupId, itemId, target, index) {
-        var _a, _b, _c;
+        var _a;
         const sourceGroup = groupId
             ? (_a = this._groups.get(groupId)) === null || _a === void 0 ? void 0 : _a.value
             : undefined;
         if (!target || target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
             const groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.model.removePanel(itemId)) ||
-                ((_b = this._panels.get(itemId)) === null || _b === void 0 ? void 0 : _b.value);
+                this.panels.find((panel) => panel.id === itemId);
             if (!groupItem) {
                 throw new Error(`No panel with id ${itemId}`);
             }
@@ -43358,7 +44408,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             }
             else {
                 const groupItem = (sourceGroup === null || sourceGroup === void 0 ? void 0 : sourceGroup.model.removePanel(itemId)) ||
-                    ((_c = this._panels.get(itemId)) === null || _c === void 0 ? void 0 : _c.value);
+                    this.panels.find((panel) => panel.id === itemId);
                 if (!groupItem) {
                     throw new Error(`No panel with id ${itemId}`);
                 }
@@ -43368,7 +44418,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         }
     }
     doSetGroupActive(group, skipFocus) {
-        var _a, _b;
+        var _a, _b, _c;
         const isGroupAlreadyFocused = this._activeGroup === group;
         super.doSetGroupActive(group, skipFocus);
         if (!isGroupAlreadyFocused && ((_a = this._activeGroup) === null || _a === void 0 ? void 0 : _a.model.activePanel)) {
@@ -43376,6 +44426,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
                 kind: _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_10__.GroupChangeKind.PANEL_ACTIVE,
                 panel: (_b = this._activeGroup) === null || _b === void 0 ? void 0 : _b.model.activePanel,
             });
+            this._onDidActivePanelChange.fire((_c = this._activeGroup) === null || _c === void 0 ? void 0 : _c.model.activePanel);
         }
     }
     createGroup(options) {
@@ -43410,24 +44461,25 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
                             kind: _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_10__.GroupChangeKind.ADD_PANEL,
                             panel: event.panel,
                         });
-                        break;
-                    case _groupview_groupview__WEBPACK_IMPORTED_MODULE_15__.GroupChangeKind2.GROUP_ACTIVE:
-                        this._onGridEvent.fire({
-                            kind: _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_10__.GroupChangeKind.GROUP_ACTIVE,
-                            panel: event.panel,
-                        });
+                        if (event.panel) {
+                            this._onDidAddPanel.fire(event.panel);
+                        }
                         break;
                     case _groupview_groupview__WEBPACK_IMPORTED_MODULE_15__.GroupChangeKind2.REMOVE_PANEL:
                         this._onGridEvent.fire({
                             kind: _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_10__.GroupChangeKind.REMOVE_PANEL,
                             panel: event.panel,
                         });
+                        if (event.panel) {
+                            this._onDidRemovePanel.fire(event.panel);
+                        }
                         break;
                     case _groupview_groupview__WEBPACK_IMPORTED_MODULE_15__.GroupChangeKind2.PANEL_ACTIVE:
                         this._onGridEvent.fire({
                             kind: _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_10__.GroupChangeKind.PANEL_ACTIVE,
                             panel: event.panel,
                         });
+                        this._onDidActivePanelChange.fire(event.panel);
                         break;
                 }
             }));
@@ -43453,7 +44505,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             suppressClosable: options === null || options === void 0 ? void 0 : options.suppressClosable,
             params: (options === null || options === void 0 ? void 0 : options.params) || {},
         });
-        this.registerPanel(panel);
         return panel;
     }
     createContentComponent(id, componentName) {
@@ -43473,6 +44524,13 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         var _a;
         return (_a = Array.from(this._groups.values()).find((group) => group.value.model.containsPanel(panel))) === null || _a === void 0 ? void 0 : _a.value;
     }
+    dispose() {
+        super.dispose();
+        this._onDidActivePanelChange.dispose();
+        this._onDidAddPanel.dispose();
+        this._onDidRemovePanel.dispose();
+        this._onDidLayoutfromJSON.dispose();
+    }
 }
 
 
@@ -43489,21 +44547,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "DockviewGroupPanel": () => (/* binding */ DockviewGroupPanel)
 /* harmony export */ });
-/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../groupview/groupview */ "../dockview/dist/esm/groupview/groupview.js");
-/* harmony import */ var _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../api/groupPanelApi */ "../dockview/dist/esm/api/groupPanelApi.js");
-/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
+/* harmony import */ var _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/groupPanelApi */ "../dockview/dist/esm/api/groupPanelApi.js");
+/* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
 
 
-
-class DockviewGroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDisposable {
+class DockviewGroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable {
     constructor(id, accessor, containerApi) {
         super();
         this.id = id;
         this.containerApi = containerApi;
-        this.mutableDisposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_2__.MutableDisposable();
+        this.mutableDisposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_1__.MutableDisposable();
         this._suppressClosable = false;
         this._title = '';
-        this.api = new _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_1__.DockviewPanelApiImpl(this, this._group);
+        this.api = new _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_0__.DockviewPanelApiImpl(this, this._group);
         this.addDisposables(this.api.onActiveChange(() => {
             accessor.setActivePanel(this);
         }), this.api.onDidTitleChange((event) => {
@@ -43585,18 +44641,6 @@ class DockviewGroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.Composi
         var _a;
         this._group = group;
         this.api.group = group;
-        this.mutableDisposable.value = this._group.model.onDidGroupChange((ev) => {
-            var _a;
-            if (ev.kind === _groupview_groupview__WEBPACK_IMPORTED_MODULE_0__.GroupChangeKind2.GROUP_ACTIVE) {
-                const isVisible = !!((_a = this._group) === null || _a === void 0 ? void 0 : _a.model.isPanelActive(this));
-                this.api._onDidActiveChange.fire({
-                    isActive: isGroupActive && isVisible,
-                });
-                this.api._onDidVisibilityChange.fire({
-                    isVisible,
-                });
-            }
-        });
         const isPanelVisible = this._group.model.isPanelActive(this);
         this.api._onDidActiveChange.fire({
             isActive: isGroupActive && isPanelVisible,
@@ -43648,13 +44692,13 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "watchElementResize": () => (/* binding */ watchElementResize),
-/* harmony export */   "removeClasses": () => (/* binding */ removeClasses),
 /* harmony export */   "addClasses": () => (/* binding */ addClasses),
-/* harmony export */   "toggleClass": () => (/* binding */ toggleClass),
-/* harmony export */   "isAncestor": () => (/* binding */ isAncestor),
 /* harmony export */   "getElementsByTagName": () => (/* binding */ getElementsByTagName),
-/* harmony export */   "trackFocus": () => (/* binding */ trackFocus)
+/* harmony export */   "isAncestor": () => (/* binding */ isAncestor),
+/* harmony export */   "removeClasses": () => (/* binding */ removeClasses),
+/* harmony export */   "toggleClass": () => (/* binding */ toggleClass),
+/* harmony export */   "trackFocus": () => (/* binding */ trackFocus),
+/* harmony export */   "watchElementResize": () => (/* binding */ watchElementResize)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./events */ "../dockview/dist/esm/events.js");
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lifecycle */ "../dockview/dist/esm/lifecycle.js");
@@ -43784,11 +44828,11 @@ class FocusTracker extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisp
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Event": () => (/* binding */ Event),
 /* harmony export */   "Emitter": () => (/* binding */ Emitter),
-/* harmony export */   "addDisposableWindowListener": () => (/* binding */ addDisposableWindowListener),
+/* harmony export */   "Event": () => (/* binding */ Event),
+/* harmony export */   "TickDelayedEvent": () => (/* binding */ TickDelayedEvent),
 /* harmony export */   "addDisposableListener": () => (/* binding */ addDisposableListener),
-/* harmony export */   "TickDelayedEvent": () => (/* binding */ TickDelayedEvent)
+/* harmony export */   "addDisposableWindowListener": () => (/* binding */ addDisposableWindowListener)
 /* harmony export */ });
 var Event;
 (function (Event) {
@@ -43891,9 +44935,9 @@ class TickDelayedEvent {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "BaseGrid": () => (/* binding */ BaseGrid),
 /* harmony export */   "GroupChangeKind": () => (/* binding */ GroupChangeKind),
-/* harmony export */   "toTarget": () => (/* binding */ toTarget),
-/* harmony export */   "BaseGrid": () => (/* binding */ BaseGrid)
+/* harmony export */   "toTarget": () => (/* binding */ toTarget)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
 /* harmony import */ var _gridview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./gridview */ "../dockview/dist/esm/gridview/gridview.js");
@@ -43947,6 +44991,12 @@ class BaseGrid extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposab
         this.onGridEvent = this._onGridEvent.event;
         this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
         this.onDidLayoutChange = this._onDidLayoutChange.event;
+        this._onDidRemoveGroup = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        this.onDidRemoveGroup = this._onDidRemoveGroup.event;
+        this._onDidAddGroup = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        this.onDidAddGroup = this._onDidAddGroup.event;
+        this._onDidActiveGroupChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
+        this.onDidActiveGroupChange = this._onDidActiveGroupChange.event;
         this.gridview = new _gridview__WEBPACK_IMPORTED_MODULE_1__.Gridview(!!options.proportionalLayout, options.styles, options.orientation);
         this.element.appendChild(this.gridview.element);
         this.layout(0, 0, true); // set some elements height/widths
@@ -44015,6 +45065,7 @@ class BaseGrid extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposab
     doAddGroup(group, location = [0], size) {
         this.gridview.addView(group, size !== null && size !== void 0 ? size : _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_5__.Sizing.Distribute, location);
         this._onGridEvent.fire({ kind: GroupChangeKind.ADD_GROUP });
+        this._onDidAddGroup.fire(group);
         this.doSetGroupActive(group);
     }
     doRemoveGroup(group, options) {
@@ -44028,6 +45079,7 @@ class BaseGrid extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposab
             this._groups.delete(group.id);
         }
         this._onGridEvent.fire({ kind: GroupChangeKind.REMOVE_GROUP });
+        this._onDidRemoveGroup.fire(group);
         if (!(options === null || options === void 0 ? void 0 : options.skipActive) && this._activeGroup === group) {
             const groups = Array.from(this._groups.values());
             this.doSetGroupActive(groups.length > 0 ? groups[0].value : undefined);
@@ -44058,6 +45110,7 @@ class BaseGrid extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposab
         this._onGridEvent.fire({
             kind: GroupChangeKind.GROUP_ACTIVE,
         });
+        this._onDidActiveGroupChange.fire(group);
     }
     removeGroup(group) {
         this.doRemoveGroup(group);
@@ -44114,6 +45167,10 @@ class BaseGrid extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDisposab
     dispose() {
         super.dispose();
         this._onGridEvent.dispose();
+        this._onDidActiveGroupChange.dispose();
+        this._onDidAddGroup.dispose();
+        this._onDidRemoveGroup.dispose();
+        this._onDidLayoutChange.dispose();
         this.gridview.dispose();
     }
 }
@@ -44456,14 +45513,14 @@ class BranchNode extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.CompositeDispos
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "indexInParent": () => (/* binding */ indexInParent),
-/* harmony export */   "getGridLocation": () => (/* binding */ getGridLocation),
-/* harmony export */   "getRelativeLocation": () => (/* binding */ getRelativeLocation),
+/* harmony export */   "Gridview": () => (/* binding */ Gridview),
 /* harmony export */   "getDirectionOrientation": () => (/* binding */ getDirectionOrientation),
+/* harmony export */   "getGridLocation": () => (/* binding */ getGridLocation),
 /* harmony export */   "getLocationOrientation": () => (/* binding */ getLocationOrientation),
-/* harmony export */   "orthogonal": () => (/* binding */ orthogonal),
+/* harmony export */   "getRelativeLocation": () => (/* binding */ getRelativeLocation),
+/* harmony export */   "indexInParent": () => (/* binding */ indexInParent),
 /* harmony export */   "isGridBranchNode": () => (/* binding */ isGridBranchNode),
-/* harmony export */   "Gridview": () => (/* binding */ Gridview)
+/* harmony export */   "orthogonal": () => (/* binding */ orthogonal)
 /* harmony export */ });
 /* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../splitview/core/splitview */ "../dockview/dist/esm/splitview/core/splitview.js");
 /* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dnd/droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
@@ -44890,6 +45947,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _baseComponentGridview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./baseComponentGridview */ "../dockview/dist/esm/gridview/baseComponentGridview.js");
 /* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../api/component.api */ "../dockview/dist/esm/api/component.api.js");
 /* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../panel/componentFactory */ "../dockview/dist/esm/panel/componentFactory.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
+
 
 
 
@@ -44904,6 +45963,8 @@ class GridviewComponent extends _baseComponentGridview__WEBPACK_IMPORTED_MODULE_
             orientation: options.orientation,
             styles: options.styles,
         });
+        this._onDidLayoutfromJSON = new _events__WEBPACK_IMPORTED_MODULE_7__.Emitter();
+        this.onDidLayoutFromJSON = this._onDidLayoutfromJSON.event;
         this._options = options;
         if (!this.options.components) {
             this.options.components = {};
@@ -45012,6 +46073,7 @@ class GridviewComponent extends _baseComponentGridview__WEBPACK_IMPORTED_MODULE_
             }
         }
         this._onGridEvent.fire({ kind: _baseComponentGridview__WEBPACK_IMPORTED_MODULE_4__.GroupChangeKind.LAYOUT_FROM_JSON });
+        this._onDidLayoutfromJSON.fire();
     }
     movePanel(panel, options) {
         var _a;
@@ -45126,6 +46188,7 @@ class GridviewComponent extends _baseComponentGridview__WEBPACK_IMPORTED_MODULE_
     }
     dispose() {
         super.dispose();
+        this._onDidLayoutfromJSON.dispose();
     }
 }
 
@@ -45472,7 +46535,6 @@ var GroupChangeKind2;
     GroupChangeKind2["ADD_PANEL"] = "ADD_PANEL";
     GroupChangeKind2["REMOVE_PANEL"] = "REMOVE_PANEL";
     GroupChangeKind2["PANEL_ACTIVE"] = "PANEL_ACTIVE";
-    GroupChangeKind2["GROUP_ACTIVE"] = "GROUP_ACTIVE";
 })(GroupChangeKind2 || (GroupChangeKind2 = {}));
 class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposable {
     constructor(container, accessor, id, options, parent) {
@@ -45653,6 +46715,8 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
             options.index > this.panels.length) {
             options.index = this.panels.length;
         }
+        // ensure the group is updated before we fire any events
+        panel.updateParentGroup(this.parent, true);
         if (this._activePanel === panel) {
             this.accessor.doSetGroupActive(this.parent);
             return;
@@ -46369,65 +47433,65 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Emitter": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_0__.Emitter),
-/* harmony export */   "Event": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_0__.Event),
-/* harmony export */   "TickDelayedEvent": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_0__.TickDelayedEvent),
-/* harmony export */   "addDisposableListener": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener),
-/* harmony export */   "addDisposableWindowListener": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_0__.addDisposableWindowListener),
-/* harmony export */   "CompositeDisposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable),
-/* harmony export */   "Disposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_1__.Disposable),
-/* harmony export */   "MutableDisposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_1__.MutableDisposable),
-/* harmony export */   "LocalSelectionTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.LocalSelectionTransfer),
-/* harmony export */   "PaneTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.PaneTransfer),
-/* harmony export */   "PanelTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.PanelTransfer),
-/* harmony export */   "getPaneData": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.getPaneData),
-/* harmony export */   "getPanelData": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.getPanelData),
-/* harmony export */   "DockviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_3__.DockviewApi),
-/* harmony export */   "GridviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_3__.GridviewApi),
-/* harmony export */   "PaneviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_3__.PaneviewApi),
-/* harmony export */   "SplitviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_3__.SplitviewApi),
-/* harmony export */   "LayoutPriority": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.LayoutPriority),
-/* harmony export */   "Orientation": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation),
-/* harmony export */   "SashState": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.SashState),
-/* harmony export */   "Sizing": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Sizing),
-/* harmony export */   "Splitview": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Splitview),
-/* harmony export */   "Paneview": () => (/* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_5__.Paneview),
-/* harmony export */   "Gridview": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.Gridview),
-/* harmony export */   "getDirectionOrientation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.getDirectionOrientation),
-/* harmony export */   "getGridLocation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.getGridLocation),
-/* harmony export */   "getLocationOrientation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.getLocationOrientation),
-/* harmony export */   "getRelativeLocation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.getRelativeLocation),
-/* harmony export */   "indexInParent": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.indexInParent),
-/* harmony export */   "isGridBranchNode": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.isGridBranchNode),
-/* harmony export */   "orthogonal": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.orthogonal),
-/* harmony export */   "GroupChangeKind2": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_7__.GroupChangeKind2),
-/* harmony export */   "Groupview": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_7__.Groupview),
 /* harmony export */   "BaseGrid": () => (/* reexport safe */ _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_8__.BaseGrid),
-/* harmony export */   "GroupChangeKind": () => (/* reexport safe */ _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_8__.GroupChangeKind),
-/* harmony export */   "toTarget": () => (/* reexport safe */ _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_8__.toTarget),
+/* harmony export */   "CompositeDisposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable),
 /* harmony export */   "ContentContainer": () => (/* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_9__.ContentContainer),
-/* harmony export */   "MouseEventKind": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_10__.MouseEventKind),
-/* harmony export */   "Tab": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_10__.Tab),
+/* harmony export */   "Disposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_1__.Disposable),
+/* harmony export */   "DockviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_3__.DockviewApi),
 /* harmony export */   "DockviewComponent": () => (/* reexport safe */ _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_13__.DockviewComponent),
-/* harmony export */   "GridviewComponent": () => (/* reexport safe */ _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_14__.GridviewComponent),
-/* harmony export */   "SplitviewComponent": () => (/* reexport safe */ _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_15__.SplitviewComponent),
-/* harmony export */   "PaneFramework": () => (/* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_16__.PaneFramework),
-/* harmony export */   "PaneviewComponent": () => (/* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_16__.PaneviewComponent),
-/* harmony export */   "GridviewPanel": () => (/* reexport safe */ _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_17__.GridviewPanel),
-/* harmony export */   "SplitviewPanel": () => (/* reexport safe */ _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_18__.SplitviewPanel),
-/* harmony export */   "PaneviewPanel": () => (/* reexport safe */ _paneview_paneviewPanel__WEBPACK_IMPORTED_MODULE_19__.PaneviewPanel),
 /* harmony export */   "DockviewComponents": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.DockviewComponents),
 /* harmony export */   "DockviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.DockviewReact),
+/* harmony export */   "Emitter": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_0__.Emitter),
+/* harmony export */   "Event": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_0__.Event),
+/* harmony export */   "Gridview": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.Gridview),
+/* harmony export */   "GridviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_3__.GridviewApi),
+/* harmony export */   "GridviewComponent": () => (/* reexport safe */ _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_14__.GridviewComponent),
+/* harmony export */   "GridviewPanel": () => (/* reexport safe */ _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_17__.GridviewPanel),
 /* harmony export */   "GridviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.GridviewReact),
+/* harmony export */   "GroupChangeKind": () => (/* reexport safe */ _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_8__.GroupChangeKind),
+/* harmony export */   "GroupChangeKind2": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_7__.GroupChangeKind2),
+/* harmony export */   "Groupview": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_7__.Groupview),
+/* harmony export */   "LayoutPriority": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.LayoutPriority),
+/* harmony export */   "LocalSelectionTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.LocalSelectionTransfer),
+/* harmony export */   "MouseEventKind": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_10__.MouseEventKind),
+/* harmony export */   "MutableDisposable": () => (/* reexport safe */ _lifecycle__WEBPACK_IMPORTED_MODULE_1__.MutableDisposable),
+/* harmony export */   "Orientation": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Orientation),
+/* harmony export */   "PaneFramework": () => (/* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_16__.PaneFramework),
+/* harmony export */   "PaneTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.PaneTransfer),
+/* harmony export */   "PanelTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.PanelTransfer),
+/* harmony export */   "Paneview": () => (/* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_5__.Paneview),
+/* harmony export */   "PaneviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_3__.PaneviewApi),
+/* harmony export */   "PaneviewComponent": () => (/* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_16__.PaneviewComponent),
+/* harmony export */   "PaneviewPanel": () => (/* reexport safe */ _paneview_paneviewPanel__WEBPACK_IMPORTED_MODULE_19__.PaneviewPanel),
 /* harmony export */   "PaneviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.PaneviewReact),
+/* harmony export */   "Position": () => (/* reexport safe */ _dnd_droptarget__WEBPACK_IMPORTED_MODULE_22__.Position),
 /* harmony export */   "ReactPanelContentPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.ReactPanelContentPart),
 /* harmony export */   "ReactPanelHeaderPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.ReactPanelHeaderPart),
 /* harmony export */   "ReactPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.ReactPart),
 /* harmony export */   "ReactPartContext": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.ReactPartContext),
+/* harmony export */   "SashState": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.SashState),
+/* harmony export */   "Sizing": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Sizing),
+/* harmony export */   "Splitview": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_4__.Splitview),
+/* harmony export */   "SplitviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_3__.SplitviewApi),
+/* harmony export */   "SplitviewComponent": () => (/* reexport safe */ _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_15__.SplitviewComponent),
+/* harmony export */   "SplitviewPanel": () => (/* reexport safe */ _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_18__.SplitviewPanel),
 /* harmony export */   "SplitviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.SplitviewReact),
+/* harmony export */   "Tab": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_10__.Tab),
+/* harmony export */   "TickDelayedEvent": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_0__.TickDelayedEvent),
+/* harmony export */   "addDisposableListener": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_0__.addDisposableListener),
+/* harmony export */   "addDisposableWindowListener": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_0__.addDisposableWindowListener),
+/* harmony export */   "getDirectionOrientation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.getDirectionOrientation),
+/* harmony export */   "getGridLocation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.getGridLocation),
+/* harmony export */   "getLocationOrientation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.getLocationOrientation),
+/* harmony export */   "getPaneData": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.getPaneData),
+/* harmony export */   "getPanelData": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_2__.getPanelData),
+/* harmony export */   "getRelativeLocation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.getRelativeLocation),
+/* harmony export */   "indexInParent": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.indexInParent),
+/* harmony export */   "isGridBranchNode": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.isGridBranchNode),
 /* harmony export */   "isReactElement": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.isReactElement),
-/* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.usePortalsLifecycle),
-/* harmony export */   "Position": () => (/* reexport safe */ _dnd_droptarget__WEBPACK_IMPORTED_MODULE_22__.Position)
+/* harmony export */   "orthogonal": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_6__.orthogonal),
+/* harmony export */   "toTarget": () => (/* reexport safe */ _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_8__.toTarget),
+/* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_21__.usePortalsLifecycle)
 /* harmony export */ });
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./events */ "../dockview/dist/esm/events.js");
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lifecycle */ "../dockview/dist/esm/lifecycle.js");
@@ -46488,8 +47552,8 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Disposable": () => (/* binding */ Disposable),
 /* harmony export */   "CompositeDisposable": () => (/* binding */ CompositeDisposable),
+/* harmony export */   "Disposable": () => (/* binding */ Disposable),
 /* harmony export */   "MutableDisposable": () => (/* binding */ MutableDisposable)
 /* harmony export */ });
 var Disposable;
@@ -48020,15 +49084,15 @@ class ReactGridPanelView extends _gridview_gridviewPanel__WEBPACK_IMPORTED_MODUL
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DockviewReact": () => (/* reexport safe */ _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__.DockviewReact),
 /* harmony export */   "DockviewComponents": () => (/* reexport safe */ _dockview_components__WEBPACK_IMPORTED_MODULE_1__.DockviewComponents),
-/* harmony export */   "SplitviewReact": () => (/* reexport safe */ _splitview_splitview__WEBPACK_IMPORTED_MODULE_2__.SplitviewReact),
+/* harmony export */   "DockviewReact": () => (/* reexport safe */ _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__.DockviewReact),
 /* harmony export */   "GridviewReact": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_3__.GridviewReact),
+/* harmony export */   "PaneviewReact": () => (/* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__.PaneviewReact),
 /* harmony export */   "ReactPanelContentPart": () => (/* reexport safe */ _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_4__.ReactPanelContentPart),
 /* harmony export */   "ReactPanelHeaderPart": () => (/* reexport safe */ _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_5__.ReactPanelHeaderPart),
-/* harmony export */   "PaneviewReact": () => (/* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__.PaneviewReact),
 /* harmony export */   "ReactPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_8__.ReactPart),
 /* harmony export */   "ReactPartContext": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_8__.ReactPartContext),
+/* harmony export */   "SplitviewReact": () => (/* reexport safe */ _splitview_splitview__WEBPACK_IMPORTED_MODULE_2__.SplitviewReact),
 /* harmony export */   "isReactElement": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_8__.isReactElement),
 /* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_8__.usePortalsLifecycle)
 /* harmony export */ });
@@ -48226,10 +49290,10 @@ class PanePanelSection {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ReactPartContext": () => (/* binding */ ReactPartContext),
 /* harmony export */   "ReactPart": () => (/* binding */ ReactPart),
-/* harmony export */   "usePortalsLifecycle": () => (/* binding */ usePortalsLifecycle),
-/* harmony export */   "isReactElement": () => (/* binding */ isReactElement)
+/* harmony export */   "ReactPartContext": () => (/* binding */ ReactPartContext),
+/* harmony export */   "isReactElement": () => (/* binding */ isReactElement),
+/* harmony export */   "usePortalsLifecycle": () => (/* binding */ usePortalsLifecycle)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
@@ -48494,9 +49558,9 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "LayoutPriority": () => (/* binding */ LayoutPriority),
 /* harmony export */   "Orientation": () => (/* binding */ Orientation),
 /* harmony export */   "SashState": () => (/* binding */ SashState),
-/* harmony export */   "LayoutPriority": () => (/* binding */ LayoutPriority),
 /* harmony export */   "Sizing": () => (/* binding */ Sizing),
 /* harmony export */   "Splitview": () => (/* binding */ Splitview)
 /* harmony export */ });
