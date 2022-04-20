@@ -71,7 +71,10 @@ export const SplitviewReact = React.forwardRef(
                         });
                     },
                 },
-                proportionalLayout: props.proportionalLayout,
+                proportionalLayout:
+                    typeof props.proportionalLayout === 'boolean'
+                        ? props.proportionalLayout
+                        : true,
                 styles: props.hideBorders
                     ? { separatorBorder: 'transparent' }
                     : undefined,

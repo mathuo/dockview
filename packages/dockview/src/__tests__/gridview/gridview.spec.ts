@@ -779,6 +779,99 @@ describe('gridview', () => {
         });
     });
 
+    test('#5/VERTICAL/proportional/false', () => {
+        const gridview = new GridviewComponent(container, {
+            proportionalLayout: false,
+            orientation: Orientation.VERTICAL,
+            components: { default: TestGridview },
+        });
+
+        gridview.fromJSON({
+            grid: {
+                height: 400,
+                width: 800,
+                orientation: Orientation.VERTICAL,
+                root: {
+                    type: 'branch',
+                    size: 800,
+                    data: [
+                        {
+                            type: 'leaf',
+                            size: 100,
+                            data: {
+                                id: 'panel_1',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                        {
+                            type: 'leaf',
+                            size: 200,
+                            data: {
+                                id: 'panel_1',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                        {
+                            type: 'leaf',
+                            size: 100,
+                            data: {
+                                id: 'panel_1',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                    ],
+                },
+            },
+            activePanel: 'panel_1',
+        });
+        gridview.layout(800, 400, true);
+
+        expect(JSON.parse(JSON.stringify(gridview.toJSON()))).toEqual({
+            grid: {
+                height: 400,
+                width: 800,
+                orientation: Orientation.VERTICAL,
+                root: {
+                    type: 'branch',
+                    size: 800,
+                    data: [
+                        {
+                            type: 'leaf',
+                            size: 100,
+                            data: {
+                                id: 'panel_1',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                        {
+                            type: 'leaf',
+                            size: 200,
+                            data: {
+                                id: 'panel_1',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                        {
+                            type: 'leaf',
+                            size: 100,
+                            data: {
+                                id: 'panel_1',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                    ],
+                },
+            },
+            activePanel: 'panel_1',
+        });
+    });
+
     test('#6/VERTICAL', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
@@ -1153,6 +1246,128 @@ describe('gridview', () => {
     test('#9/HORIZONTAL', () => {
         const gridview = new GridviewComponent(container, {
             proportionalLayout: true,
+            orientation: Orientation.HORIZONTAL,
+            components: { default: TestGridview },
+        });
+
+        gridview.fromJSON({
+            grid: {
+                height: 400,
+                width: 800,
+                orientation: Orientation.HORIZONTAL,
+                root: {
+                    type: 'branch',
+                    size: 400,
+                    data: [
+                        {
+                            type: 'leaf',
+                            size: 200,
+                            data: {
+                                id: 'panel_1',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                        {
+                            type: 'branch',
+                            size: 400,
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    size: 250,
+                                    data: {
+                                        id: 'panel_1',
+                                        component: 'default',
+                                        snap: false,
+                                    },
+                                },
+                                {
+                                    type: 'leaf',
+                                    size: 150,
+                                    data: {
+                                        id: 'panel_1',
+                                        component: 'default',
+                                        snap: false,
+                                    },
+                                },
+                            ],
+                        },
+                        {
+                            type: 'leaf',
+                            size: 200,
+                            data: {
+                                id: 'panel_1',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                    ],
+                },
+            },
+            activePanel: 'panel_1',
+        });
+
+        expect(JSON.parse(JSON.stringify(gridview.toJSON()))).toEqual({
+            grid: {
+                height: 400,
+                width: 800,
+                orientation: Orientation.HORIZONTAL,
+                root: {
+                    type: 'branch',
+                    size: 400,
+                    data: [
+                        {
+                            type: 'leaf',
+                            size: 200,
+                            data: {
+                                id: 'panel_1',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                        {
+                            type: 'branch',
+                            size: 400,
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    size: 250,
+                                    data: {
+                                        id: 'panel_1',
+                                        component: 'default',
+                                        snap: false,
+                                    },
+                                },
+                                {
+                                    type: 'leaf',
+                                    size: 150,
+                                    data: {
+                                        id: 'panel_1',
+                                        component: 'default',
+                                        snap: false,
+                                    },
+                                },
+                            ],
+                        },
+                        {
+                            type: 'leaf',
+                            size: 200,
+                            data: {
+                                id: 'panel_1',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                    ],
+                },
+            },
+            activePanel: 'panel_1',
+        });
+    });
+
+    test('#9/HORIZONTAL/proportional/false', () => {
+        const gridview = new GridviewComponent(container, {
+            proportionalLayout: false,
             orientation: Orientation.HORIZONTAL,
             components: { default: TestGridview },
         });

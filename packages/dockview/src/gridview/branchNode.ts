@@ -143,7 +143,7 @@ export class BranchNode extends CompositeDisposable implements IView {
                                 : true,
                     };
                 }),
-                size: this.orthogonalSize,
+                size: this.size,
             };
 
             this.children = childDescriptors.map((c) => c.node);

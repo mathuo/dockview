@@ -1,4 +1,3 @@
-import { last } from '../../../array';
 import { Emitter } from '../../../events';
 import { CompositeDisposable } from '../../../lifecycle';
 import {
@@ -388,7 +387,7 @@ describe('splitview', () => {
         splitview.dispose();
     });
 
-    test('disable proportional layout', () => {
+    test('proportional layout', () => {
         const splitview = new Splitview(container, {
             orientation: Orientation.HORIZONTAL,
         });
