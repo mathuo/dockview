@@ -1,5 +1,3 @@
-export * from './events';
-export * from './lifecycle';
 export * from './dnd/dataTransfer';
 export * from './api/component.api';
 
@@ -26,6 +24,8 @@ export * from './groupview/groupPanel';
 
 export * from './react'; // TODO: should be conditional on whether user wants the React wrappers
 
+export { Event } from './events';
+export { IDisposable } from './lifecycle';
 export { Position } from './dnd/droptarget';
 export {
     FocusEvent,
