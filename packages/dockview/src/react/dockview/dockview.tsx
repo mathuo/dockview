@@ -172,6 +172,15 @@ export const DockviewReact = React.forwardRef(
                 return;
             }
             dockviewRef.current.updateOptions({
+                watermarkFrameworkComponent: props.watermarkComponent,
+            });
+        }, [props.watermarkComponent]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+            dockviewRef.current.updateOptions({
                 showDndOverlay: props.showDndOverlay,
             });
         }, [props.showDndOverlay]);

@@ -71,6 +71,7 @@ export type DockviewComponentUpdateOptions = Pick<
     | 'tabComponents'
     | 'frameworkTabComponents'
     | 'showDndOverlay'
+    | 'watermarkFrameworkComponent'
 >;
 
 export interface DockviewDropEvent extends GroupviewDropEvent {
@@ -335,11 +336,14 @@ export class DockviewComponent
     }
 
     fromJSON(data: SerializedDockview): void {
+        const groups = Array.from(this._groups.values()).map((_) => _.value);
+
+        for (const group of groups) {
+            // remove the group will automatically remove the panels
+            this.removeGroup(group, true);
+        }
+
         this.gridview.clear();
-        this.panels.forEach((panel) => {
-            panel.dispose();
-        });
-        this._groups.clear();
 
         if (!this.deserializer) {
             throw new Error('invalid deserializer');
@@ -438,7 +442,10 @@ export class DockviewComponent
         return panel;
     }
 
-    removePanel(panel: IGroupPanel): void {
+    removePanel(
+        panel: IGroupPanel,
+        options: { removeEmptyGroup: boolean } = { removeEmptyGroup: true }
+    ): void {
         const group = panel.group;
 
         if (!group) {
@@ -449,7 +456,7 @@ export class DockviewComponent
 
         group.model.removePanel(panel);
 
-        if (group.model.size === 0) {
+        if (group.model.size === 0 && options.removeEmptyGroup) {
             this.removeGroup(group);
         }
     }
@@ -504,18 +511,14 @@ export class DockviewComponent
         }
     }
 
-    removeGroup(group: GroupviewPanel): void {
+    removeGroup(group: GroupviewPanel, skipActive = false): void {
         const panels = [...group.model.panels]; // reassign since group panels will mutate
-        panels.forEach((panel) => {
-            this.removePanel(panel);
-        });
 
-        if (this._groups.size === 1) {
-            this._activeGroup = group;
-            return;
+        for (const panel of panels) {
+            this.removePanel(panel, { removeEmptyGroup: false });
         }
 
-        super.removeGroup(group);
+        super.doRemoveGroup(group, { skipActive });
     }
 
     moveGroupOrPanel(
