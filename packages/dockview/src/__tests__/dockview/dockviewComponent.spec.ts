@@ -1,7 +1,11 @@
-import { DockviewComponent } from '../../dockview/dockviewComponent';
+import {
+    DockviewComponent,
+    IDockviewComponent,
+} from '../../dockview/dockviewComponent';
 import {
     GroupPanelPartInitParameters,
     IContentRenderer,
+    ITabRenderer,
 } from '../../groupview/types';
 import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/core/splitview';
@@ -12,6 +16,20 @@ import {
     GroupChangeEvent,
     GroupChangeKind,
 } from '../../gridview/baseComponentGridview';
+import { CompositeDisposable } from '../../lifecycle';
+import {
+    GroupPanelUpdateEvent,
+    GroupviewPanelState,
+    IGroupPanel,
+    IGroupPanelInitParameters,
+} from '../../groupview/groupPanel';
+import { IGroupPanelView } from '../../dockview/defaultGroupPanelView';
+import {
+    DockviewPanelApi,
+    DockviewPanelApiImpl,
+} from '../../api/groupPanelApi';
+import { DefaultTab } from '../../dockview/components/tab/defaultTab';
+
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
 
@@ -48,12 +66,106 @@ class PanelContentPartTest implements IContentRenderer {
     }
 }
 
+class TestGroupPanelView implements IGroupPanelView {
+    readonly tab: ITabRenderer = new DefaultTab();
+
+    constructor(public readonly content: IContentRenderer) {
+        //
+    }
+
+    update(event: GroupPanelUpdateEvent): void {
+        //
+    }
+
+    layout(width: number, height: number): void {
+        //
+    }
+
+    init(params: GroupPanelPartInitParameters): void {
+        //
+    }
+
+    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void {
+        //
+    }
+
+    toJSON(): {} {
+        return {};
+    }
+
+    dispose(): void {
+        //
+    }
+}
+
+class TestGroupPanel implements IGroupPanel {
+    private _group: GroupviewPanel | undefined;
+
+    readonly view: IGroupPanelView;
+    readonly suppressClosable: boolean = false;
+    readonly api: DockviewPanelApi;
+
+    constructor(
+        public readonly id: string,
+        public readonly title: string,
+        accessor: IDockviewComponent
+    ) {
+        this.api = new DockviewPanelApiImpl(this, this._group);
+        this._group = new GroupviewPanel(accessor, id, {});
+        this.view = new TestGroupPanelView(
+            new PanelContentPartTest(id, 'component')
+        );
+    }
+
+    get group(): GroupviewPanel | undefined {
+        return this._group;
+    }
+
+    updateParentGroup(group: GroupviewPanel, isGroupActive: boolean): void {
+        this._group = group;
+    }
+
+    init(params: IGroupPanelInitParameters): void {
+        //
+    }
+
+    layout(width: number, height: number): void {
+        //
+    }
+
+    focus(): void {
+        //
+    }
+
+    toJSON(): GroupviewPanelState {
+        return {
+            id: this.id,
+            title: this.title,
+        };
+    }
+
+    update(event: GroupPanelUpdateEvent): void {
+        //
+    }
+
+    dispose(): void {
+        //
+    }
+}
+
 describe('dockviewComponent', () => {
+    let root: HTMLElement;
     let container: HTMLElement;
     let dockview: DockviewComponent;
 
     beforeEach(() => {
+        root = document.createElement('div'); // dockview container must have parent element
         container = document.createElement('div');
+
+        root.appendChild(container);
+        root.className = 'root';
+        container.className = 'container';
+
         dockview = new DockviewComponent(container, {
             components: {
                 default: PanelContentPartTest,
@@ -155,7 +267,7 @@ describe('dockviewComponent', () => {
 
         dockview.removeGroup(panel2.group);
 
-        expect(dockview.size).toBe(1);
+        expect(dockview.size).toBe(0);
         expect(dockview.totalPanels).toBe(0);
     });
 
@@ -294,7 +406,7 @@ describe('dockviewComponent', () => {
 
         await panel2.api.close();
 
-        expect(dockview.size).toBe(1);
+        expect(dockview.size).toBe(0);
         expect(dockview.totalPanels).toBe(0);
     });
 
@@ -837,5 +949,93 @@ describe('dockviewComponent', () => {
 
         expect(dockview.getGroupPanel('panel1')).toBeUndefined();
         expect(dockview.getGroupPanel('panel2')).toBeUndefined();
+    });
+
+    test('#1', () => {
+        dockview.layout(500, 500);
+        dockview.deserializer = {
+            fromJSON: (panelData: GroupviewPanelState): IGroupPanel => {
+                return new TestGroupPanel(
+                    panelData.id,
+                    panelData.title,
+                    dockview
+                );
+            },
+        };
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        const panel3 = dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: { referencePanel: 'panel2', direction: 'below' },
+        });
+
+        const removedGroups: GroupviewPanel[] = [];
+        const removedPanels: IGroupPanel[] = [];
+
+        const disposable = new CompositeDisposable(
+            dockview.onDidRemoveGroup((group) => {
+                removedGroups.push(group);
+            }),
+            dockview.onDidRemovePanel((panel) => {
+                removedPanels.push(panel);
+            })
+        );
+
+        dockview.fromJSON({
+            grid: {
+                height: 500,
+                width: 500,
+                orientation: Orientation.HORIZONTAL,
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['view_1', 'view_2'],
+                                id: 'group_1',
+                            },
+                        },
+                        {
+                            type: 'leaf',
+                            data: { views: ['view_3'], id: 'group_2' },
+                        },
+                    ],
+                },
+            },
+            panels: {
+                view_1: {
+                    id: 'view_1',
+                    title: 'view_1_title',
+                    view: {},
+                },
+                view_2: {
+                    id: 'view_2',
+                    title: 'view_2_title',
+                    view: {},
+                },
+                view_3: {
+                    id: 'view_3',
+                    title: 'view_3_title',
+                    view: {},
+                },
+            },
+            options: {},
+        });
+
+        expect(removedGroups.length).toBe(2);
+        expect(removedPanels.length).toBe(3);
+
+        disposable.dispose();
     });
 });
