@@ -11,7 +11,6 @@
 
         > .drop-target-selection {
             position: relative;
-            pointer-events: none;
             box-sizing: border-box;
             height: 100%;
             width: 100%;
@@ -19,31 +18,37 @@
 
             transition-duration: 0.15s;
             transition-timing-function: ease-out;
+            will-change: transform;
+            pointer-events: none;
 
-            &.left,
+            &.left {
+              transform: translateX(-25%) scaleX(50%)
+            }
+
             &.right {
-                width: 50%;
+              transform: translateX(25%) scaleX(50%)
             }
-            &.right {
-                transform: translate(100%, 0%);
+
+            &.top {
+              transform: translateY(-25%) scaleY(50%);
             }
+
             &.bottom {
-                transform: translate(0%, 100%);
-            }
-            &.top,
-            &.bottom {
-                height: 50%;
+              transform: translateY(25%) scaleY(50%);
             }
 
             &.small-top {
                 border-top: 1px solid var(--dv-drag-over-border-color);
             }
+
             &.small-bottom {
                 border-bottom: 1px solid var(--dv-drag-over-border-color);
             }
+
             &.small-left {
                 border-left: 1px solid var(--dv-drag-over-border-color);
             }
+
             &.small-right {
                 border-right: 1px solid var(--dv-drag-over-border-color);
             }
