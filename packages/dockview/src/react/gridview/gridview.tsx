@@ -60,7 +60,10 @@ export const GridviewReact = React.forwardRef(
             const element = document.createElement('div');
 
             const gridview = new GridviewComponent(element, {
-                proportionalLayout: !!props.proportionalLayout,
+                proportionalLayout:
+                    typeof props.proportionalLayout === 'boolean'
+                        ? props.proportionalLayout
+                        : true,
                 orientation: props.orientation,
                 frameworkComponents: props.components,
                 frameworkComponentFactory: {
