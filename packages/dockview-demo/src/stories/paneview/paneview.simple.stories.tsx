@@ -4,14 +4,13 @@ import {
     PaneviewApi,
     PaneviewReadyEvent,
     IPaneviewPanelProps,
-    SerializedPaneview,
     PanelConstraintChangeEvent,
-    CompositeDisposable,
     PanelDimensionChangeEvent,
     ExpansionEvent,
     FocusEvent,
     ActiveEvent,
 } from 'dockview';
+import { CompositeDisposable } from '../../lifecycle';
 import * as React from 'react';
 import { Story, Meta } from '@storybook/react';
 
