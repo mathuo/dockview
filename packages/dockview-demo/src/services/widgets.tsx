@@ -1,5 +1,4 @@
 import {
-    CompositeDisposable,
     getPaneData,
     GridviewApi,
     IGridviewPanelProps,
@@ -20,6 +19,7 @@ import { RegisteredView, VIEW_REGISTRY } from './viewRegistry';
 import { toggleClass } from '../dom';
 import { Container } from './sidebarItem';
 import './widgets.scss';
+import { CompositeDisposable } from '../lifecycle';
 
 class ViewServiceModel {
     private readonly viewService: IViewService;

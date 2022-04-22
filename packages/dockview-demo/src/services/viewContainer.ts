@@ -1,9 +1,5 @@
-import {
-    CompositeDisposable,
-    Emitter,
-    Event,
-    SerializedPaneview,
-} from 'dockview';
+import { SerializedPaneview } from 'dockview';
+import { Emitter, Event } from '../events';
 import { DefaultView, View, SerializedView } from './view';
 import { IViewRegistry } from './viewRegistry';
 

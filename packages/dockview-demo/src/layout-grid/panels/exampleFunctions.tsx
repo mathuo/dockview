@@ -1,11 +1,6 @@
-import {
-    CompositeDisposable,
-    DockviewComponents,
-    IDockviewPanelHeaderProps,
-    IDockviewPanelProps,
-    PanelCollection,
-} from 'dockview';
+import { DockviewComponents, IDockviewPanelProps } from 'dockview';
 import * as React from 'react';
+import { CompositeDisposable } from '../../lifecycle';
 import './exampleFunctions.scss';
 
 export const ExampleFunctions = (

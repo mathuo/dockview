@@ -1,11 +1,6 @@
-import {
-    CompositeDisposable,
-    Emitter,
-    Event,
-    IDisposable,
-    IView,
-} from 'dockview';
-import { DefaultView, View } from './view';
+import { Emitter, Event } from '../events';
+import { IDisposable } from '../lifecycle';
+import { View } from './view';
 import {
     PaneviewContainer,
     ViewContainer,

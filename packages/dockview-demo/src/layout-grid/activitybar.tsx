@@ -1,11 +1,8 @@
 import * as React from 'react';
-import {
-    CompositeDisposable,
-    GridviewApi,
-    IGridviewPanelProps,
-} from 'dockview';
+import { GridviewApi, IGridviewPanelProps } from 'dockview';
 import './activitybar.scss';
 import { useLayoutRegistry } from './registry';
+import { CompositeDisposable } from '../lifecycle';
 
 const ActivitybarImage = (props: { url: string }) => (
     <a

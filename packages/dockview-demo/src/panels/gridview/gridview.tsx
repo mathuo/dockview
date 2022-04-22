@@ -1,6 +1,5 @@
 import {
     ActiveEvent,
-    CompositeDisposable,
     FocusEvent,
     GridConstraintChangeEvent,
     GridviewApi,
@@ -16,6 +15,7 @@ import {
     VisibilityEvent,
 } from 'dockview';
 import * as React from 'react';
+import { CompositeDisposable } from '../../lifecycle';
 
 const components: PanelCollection<IGridviewPanelProps> = {
     default: (props) => {

@@ -4,12 +4,12 @@ import {
     PaneviewReact,
     PaneviewReadyEvent,
     IPaneviewPanelProps,
-    CompositeDisposable,
     PaneviewApi,
     PaneviewDropEvent,
 } from 'dockview';
 import { ControlCenter } from './controlCenter';
 import './sidebar.scss';
+import { CompositeDisposable } from '../lifecycle';
 
 const components = {
     default: (props: IPaneviewPanelProps) => {

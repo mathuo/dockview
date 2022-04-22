@@ -5,14 +5,14 @@ import {
     PaneviewReadyEvent,
     IPaneviewPanelProps,
     PanelConstraintChangeEvent,
-    CompositeDisposable,
     PanelDimensionChangeEvent,
     ExpansionEvent,
     FocusEvent,
     ActiveEvent,
 } from 'dockview';
 import * as React from 'react';
-import { Story, Meta } from '@storybook/react';
+import { Meta } from '@storybook/react';
+import { CompositeDisposable } from '../../lifecycle';
 
 const components: PanelCollection<IPaneviewPanelProps<any>> = {
     default: (props: IPaneviewPanelProps<{ color: string }>) => {
