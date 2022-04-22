@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {
-    CompositeDisposable,
     ISplitviewPanelProps,
     Orientation,
     SplitviewReadyEvent,
@@ -10,6 +9,7 @@ import {
 } from 'dockview';
 import { useLayoutRegistry } from './registry';
 import './splitPanel.scss';
+import { CompositeDisposable } from '../lifecycle';
 
 const components = {
     default1: (props: ISplitviewPanelProps) => {

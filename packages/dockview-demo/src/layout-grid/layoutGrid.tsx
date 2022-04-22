@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {
     IDockviewPanelProps,
-    CompositeDisposable,
     GroupChangeKind,
     IGridviewPanelProps,
     TabContextMenuEvent,
@@ -25,6 +24,7 @@ import { GridviewDemoPanel } from '../panels/gridview/gridview';
 import { useRecoilCallback } from 'recoil';
 import { selectedPanelAtom } from './footer';
 import { ExampleFunctions } from './panels/exampleFunctions';
+import { CompositeDisposable } from '../lifecycle';
 
 const Test = (props: IDockviewPanelProps) => {
     const [counter, setCounter] = React.useState<number>(0);

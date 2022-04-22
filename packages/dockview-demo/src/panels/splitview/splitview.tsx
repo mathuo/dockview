@@ -1,5 +1,4 @@
 import {
-    CompositeDisposable,
     ISplitviewPanelProps,
     Orientation,
     SplitviewApi,
@@ -10,10 +9,10 @@ import {
     FocusEvent,
     VisibilityEvent,
     PanelConstraintChangeEvent,
-    IGroupPanel,
     IDockviewPanelProps,
 } from 'dockview';
 import * as React from 'react';
+import { CompositeDisposable } from '../../lifecycle';
 import './splitview.scss';
 
 const components = {
