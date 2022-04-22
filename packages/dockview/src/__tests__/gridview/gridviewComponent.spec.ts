@@ -1,9 +1,6 @@
-import {
-    GroupChangeEvent,
-    GroupChangeKind,
-} from '../../gridview/baseComponentGridview';
 import { GridviewComponent } from '../../gridview/gridviewComponent';
 import { GridviewPanel } from '../../gridview/gridviewPanel';
+import { CompositeDisposable } from '../../lifecycle';
 import { IFrameworkPart } from '../../panel/types';
 import { Orientation } from '../../splitview/core/splitview';
 
@@ -314,20 +311,35 @@ describe('gridview', () => {
 
         gridview.layout(800, 400);
 
-        let events: GroupChangeEvent[] = [];
-        const disposable = gridview.onGridEvent((e) => events.push(e));
+        let events: { group: GridviewPanel | undefined; type: string }[] = [];
+
+        const disposable = new CompositeDisposable(
+            gridview.onDidAddGroup((group) => {
+                events.push({ type: 'ADD', group });
+            }),
+            gridview.onDidActiveGroupChange((group) => {
+                events.push({ type: 'ACTIVE', group });
+            }),
+            gridview.onDidRemoveGroup((group) => {
+                events.push({ type: 'REMOVE', group });
+            })
+        );
 
         gridview.addPanel({
             id: 'panel_1',
             component: 'default',
         });
 
+        const panel1 = gridview.getPanel('panel_1');
+
         expect(events).toEqual([
             {
-                kind: GroupChangeKind.ADD_GROUP,
+                type: 'ADD',
+                group: panel1,
             },
             {
-                kind: GroupChangeKind.GROUP_ACTIVE,
+                type: 'ACTIVE',
+                group: panel1,
             },
         ]);
         events = [];
@@ -337,12 +349,16 @@ describe('gridview', () => {
             component: 'default',
         });
 
+        const panel2 = gridview.getPanel('panel_2');
+
         expect(events).toEqual([
             {
-                kind: GroupChangeKind.ADD_GROUP,
+                type: 'ADD',
+                group: panel2,
             },
             {
-                kind: GroupChangeKind.GROUP_ACTIVE,
+                type: 'ACTIVE',
+                group: panel2,
             },
         ]);
         events = [];
@@ -352,36 +368,40 @@ describe('gridview', () => {
             component: 'default',
         });
 
+        const panel3 = gridview.getPanel('panel_3');
+
         expect(events).toEqual([
             {
-                kind: GroupChangeKind.ADD_GROUP,
+                type: 'ADD',
+                group: panel3,
             },
             {
-                kind: GroupChangeKind.GROUP_ACTIVE,
+                type: 'ACTIVE',
+                group: panel3,
             },
         ]);
         events = [];
-
-        const panel1 = gridview.getPanel('panel_1');
-        const panel2 = gridview.getPanel('panel_2');
-        const panel3 = gridview.getPanel('panel_3');
 
         gridview.removePanel(panel2);
 
         expect(events).toEqual([
             {
-                kind: GroupChangeKind.REMOVE_GROUP,
+                type: 'REMOVE',
+                group: panel2,
             },
         ]);
         events = [];
 
         gridview.removePanel(panel3);
+
         expect(events).toEqual([
             {
-                kind: GroupChangeKind.REMOVE_GROUP,
+                type: 'REMOVE',
+                group: panel3,
             },
             {
-                kind: GroupChangeKind.GROUP_ACTIVE,
+                type: 'ACTIVE',
+                group: panel1,
             },
         ]);
         events = [];
@@ -390,10 +410,12 @@ describe('gridview', () => {
 
         expect(events).toEqual([
             {
-                kind: GroupChangeKind.REMOVE_GROUP,
+                type: 'REMOVE',
+                group: panel1,
             },
             {
-                kind: GroupChangeKind.GROUP_ACTIVE,
+                type: 'ACTIVE',
+                group: undefined,
             },
         ]);
         events = [];

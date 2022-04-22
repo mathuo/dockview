@@ -7,7 +7,7 @@ import {
     AddPanelOptions,
     MovementOptions,
 } from '../dockview/options';
-import { Direction, GroupChangeEvent } from '../gridview/baseComponentGridview';
+import { Direction } from '../gridview/baseComponentGridview';
 import {
     AddComponentOptions,
     IGridviewComponent,
@@ -247,10 +247,6 @@ export class GridviewApi implements CommonApi {
         return this.component.height;
     }
 
-    get onGridEvent(): Event<GroupChangeEvent> {
-        return this.component.onGridEvent;
-    }
-
     get onDidLayoutChange(): Event<void> {
         return this.component.onDidLayoutChange;
     }
@@ -368,10 +364,6 @@ export class DockviewApi implements CommonApi {
 
     get totalPanels(): number {
         return this.component.totalPanels;
-    }
-
-    get onGridEvent(): Event<GroupChangeEvent> {
-        return this.component.onGridEvent;
     }
 
     get onDidActiveGroupChange(): Event<IGroupviewPanel | undefined> {

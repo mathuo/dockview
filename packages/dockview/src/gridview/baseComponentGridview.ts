@@ -10,24 +10,6 @@ import {
 } from '../splitview/core/splitview';
 import { IPanel } from '../panel/types';
 import { MovementOptions2 } from '../dockview/options';
-import { IGroupPanel } from '../groupview/groupPanel';
-
-export enum GroupChangeKind {
-    ADD_PANEL = 'ADD_PANEL',
-    REMOVE_PANEL = 'REMOVE_PANEL',
-    PANEL_ACTIVE = 'PANEL_ACTIVE',
-    //
-    GROUP_ACTIVE = 'GROUP_ACTIVE',
-    ADD_GROUP = 'ADD_GROUP',
-    REMOVE_GROUP = 'REMOVE_GROUP',
-    //
-    LAYOUT_FROM_JSON = 'LAYOUT_FROM_JSON',
-    LAYOUT = 'LAYOUT',
-}
-export interface GroupChangeEvent {
-    readonly kind: GroupChangeKind;
-    readonly panel?: IGroupPanel;
-}
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -72,7 +54,6 @@ export interface IBaseGrid<T extends IGridPanelView> {
     readonly activeGroup: T | undefined;
     readonly size: number;
     readonly groups: T[];
-    readonly onGridEvent: Event<GroupChangeEvent>;
     readonly onDidLayoutChange: Event<void>;
     readonly onDidRemoveGroup: Event<T>;
     readonly onDidAddGroup: Event<T>;
@@ -95,9 +76,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
     protected readonly gridview: Gridview;
     //
     protected _activeGroup: T | undefined;
-    //
-    protected readonly _onGridEvent = new Emitter<GroupChangeEvent>();
-    readonly onGridEvent: Event<GroupChangeEvent> = this._onGridEvent.event;
 
     private _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange = this._onDidLayoutChange.event;
@@ -111,6 +89,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
     private readonly _onDidActiveGroupChange = new Emitter<T | undefined>();
     readonly onDidActiveGroupChange: Event<T | undefined> =
         this._onDidActiveGroupChange.event;
+
+    protected readonly _bufferOnDidLayoutChange = new TickDelayedEvent();
 
     get id() {
         return this._id;
@@ -171,36 +151,22 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
         this.addDisposables(
             this.gridview.onDidChange(() => {
-                this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT });
+                this._onDidLayoutChange.fire();
             })
         );
 
         this.addDisposables(
-            (() => {
-                const tickDelayedEvent = new TickDelayedEvent();
-
-                return new CompositeDisposable(
-                    this.onGridEvent((event) => {
-                        if (
-                            [
-                                GroupChangeKind.ADD_GROUP,
-                                GroupChangeKind.REMOVE_GROUP,
-                                GroupChangeKind.ADD_PANEL,
-                                GroupChangeKind.REMOVE_PANEL,
-                                GroupChangeKind.GROUP_ACTIVE,
-                                GroupChangeKind.PANEL_ACTIVE,
-                                GroupChangeKind.LAYOUT,
-                            ].includes(event.kind)
-                        ) {
-                            tickDelayedEvent.fire();
-                        }
-                    }),
-                    tickDelayedEvent.onEvent(() => {
-                        this._onDidLayoutChange.fire();
-                    }),
-                    tickDelayedEvent
-                );
-            })()
+            Event.any(
+                this.onDidAddGroup,
+                this.onDidRemoveGroup,
+                this.onDidActiveGroupChange
+            )(() => {
+                this._bufferOnDidLayoutChange.fire();
+            }),
+            this._bufferOnDidLayoutChange.onEvent(() => {
+                this._onDidLayoutChange.fire();
+            }),
+            this._bufferOnDidLayoutChange
         );
     }
 
@@ -210,7 +176,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     public setVisible(panel: T, visible: boolean) {
         this.gridview.setViewVisible(getGridLocation(panel.element), visible);
-        this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT });
+        this._onDidLayoutChange.fire();
     }
 
     public isVisible(panel: T) {
@@ -220,7 +186,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
     protected doAddGroup(group: T, location: number[] = [0], size?: number) {
         this.gridview.addView(group, size ?? Sizing.Distribute, location);
 
-        this._onGridEvent.fire({ kind: GroupChangeKind.ADD_GROUP });
         this._onDidAddGroup.fire(group);
 
         this.doSetGroupActive(group);
@@ -243,7 +208,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
             this._groups.delete(group.id);
         }
 
-        this._onGridEvent.fire({ kind: GroupChangeKind.REMOVE_GROUP });
         this._onDidRemoveGroup.fire(group);
 
         if (!options?.skipActive && this._activeGroup === group) {
@@ -281,9 +245,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
         this._activeGroup = group;
 
-        this._onGridEvent.fire({
-            kind: GroupChangeKind.GROUP_ACTIVE,
-        });
         this._onDidActiveGroupChange.fire(group);
     }
 
@@ -352,7 +313,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
     public dispose(): void {
         super.dispose();
 
-        this._onGridEvent.dispose();
         this._onDidActiveGroupChange.dispose();
         this._onDidAddGroup.dispose();
         this._onDidRemoveGroup.dispose();
