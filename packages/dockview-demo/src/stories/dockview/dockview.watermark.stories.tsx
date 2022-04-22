@@ -1,5 +1,4 @@
 import {
-    CompositeDisposable,
     DockviewApi,
     DockviewReact,
     DockviewReadyEvent,
@@ -8,6 +7,7 @@ import {
     IWatermarkPanelProps,
     PanelCollection,
 } from 'dockview';
+import { CompositeDisposable } from '../../lifecycle';
 import * as React from 'react';
 import { Meta } from '@storybook/react';
 

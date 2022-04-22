@@ -1,12 +1,9 @@
 import {
-    CompositeDisposable,
     DockviewApi,
     DockviewComponents,
     DockviewReact,
     DockviewReadyEvent,
-    GroupChangeKind,
     IDockviewPanelProps,
-    IWatermarkPanelProps,
     PanelCollection,
 } from 'dockview';
 import * as React from 'react';

@@ -4,7 +4,6 @@ import {
     PaneviewApi,
     PaneviewReadyEvent,
     IPaneviewPanelProps,
-    SerializedPaneview,
     PanelConstraintChangeEvent,
     CompositeDisposable,
     PanelDimensionChangeEvent,

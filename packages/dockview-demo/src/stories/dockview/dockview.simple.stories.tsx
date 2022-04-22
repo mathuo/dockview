@@ -3,7 +3,6 @@ import {
     DockviewReact,
     DockviewReadyEvent,
     IDockviewPanelProps,
-    IWatermarkPanelProps,
     PanelCollection,
 } from 'dockview';
 import * as React from 'react';

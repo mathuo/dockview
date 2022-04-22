@@ -1,7 +1,9 @@
 import {
     CompositeDisposable,
     DockviewComponents,
+    IDockviewPanelHeaderProps,
     IDockviewPanelProps,
+    PanelCollection,
 } from 'dockview';
 import * as React from 'react';
 import './exampleFunctions.scss';
