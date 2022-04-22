@@ -96,6 +96,7 @@ export const GridviewReact = React.forwardRef(
 
             return () => {
                 gridview.dispose();
+                element.remove();
             };
         }, []);
 

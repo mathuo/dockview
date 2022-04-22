@@ -154,17 +154,11 @@ class TestGroupPanel implements IGroupPanel {
 }
 
 describe('dockviewComponent', () => {
-    let root: HTMLElement;
     let container: HTMLElement;
     let dockview: DockviewComponent;
 
     beforeEach(() => {
-        root = document.createElement('div'); // dockview container must have parent element
         container = document.createElement('div');
-
-        root.appendChild(container);
-        root.className = 'root';
-        container.className = 'container';
 
         dockview = new DockviewComponent(container, {
             components: {
@@ -1037,5 +1031,32 @@ describe('dockviewComponent', () => {
         expect(removedPanels.length).toBe(3);
 
         disposable.dispose();
+    });
+
+    test('dispose of dockviewComponent', () => {
+        dockview.layout(500, 1000);
+
+        dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+        });
+        dockview.addPanel({
+            id: 'panel4',
+            component: 'default',
+        });
+
+        expect(container.childNodes.length).toBe(1);
+
+        dockview.dispose();
+
+        expect(container.childNodes.length).toBe(0);
     });
 });

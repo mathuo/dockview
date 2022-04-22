@@ -155,6 +155,7 @@ export const DockviewReact = React.forwardRef(
             return () => {
                 disposable.dispose();
                 dockview.dispose();
+                element.remove();
             };
         }, []);
 

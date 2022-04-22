@@ -287,6 +287,8 @@ export class Gridview implements IDisposable {
         this.disposable.dispose();
         this._onDidChange.dispose();
         this.root.dispose();
+
+        this.element.remove();
     }
 
     public clear() {

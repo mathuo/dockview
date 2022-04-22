@@ -102,4 +102,38 @@ describe('paneview', () => {
 
         disposable.dispose();
     });
+
+    test('dispose of paneview', () => {
+        expect(container.childNodes.length).toBe(0);
+
+        const paneview = new Paneview(container, {
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        const view1 = new TestPanel(
+            'id',
+            'component',
+            'headerComponent',
+            Orientation.VERTICAL,
+            true,
+            true
+        );
+        const view2 = new TestPanel(
+            'id2',
+            'component',
+            'headerComponent',
+            Orientation.VERTICAL,
+            true,
+            true
+        );
+
+        paneview.addPane(view1);
+        paneview.addPane(view2);
+
+        expect(container.childNodes.length).toBeGreaterThan(0);
+
+        paneview.dispose();
+
+        expect(container.childNodes.length).toBe(0);
+    });
 });

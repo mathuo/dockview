@@ -452,4 +452,10 @@ export class PaneviewComponent
             queue.forEach((f) => f());
         }
     }
+
+    public dispose(): void {
+        super.dispose();
+
+        this.paneview.dispose();
+    }
 }

@@ -276,4 +276,33 @@ describe('componentPaneview', () => {
 
         disposable.dispose();
     });
+
+    test('dispose of paneviewComponent', () => {
+        expect(container.childNodes.length).toBe(0);
+
+        const paneview = new PaneviewComponent(container, {
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+
+        paneview.layout(1000, 1000);
+
+        paneview.addPanel({
+            id: 'panel1',
+            component: 'testPanel',
+            title: 'Panel 1',
+        });
+        paneview.addPanel({
+            id: 'panel2',
+            component: 'testPanel',
+            title: 'Panel 2',
+        });
+
+        expect(container.childNodes.length).toBeGreaterThan(0);
+
+        paneview.dispose();
+
+        expect(container.childNodes.length).toBe(0);
+    });
 });
