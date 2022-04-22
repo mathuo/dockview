@@ -1038,12 +1038,13 @@ export class Splitview {
         this._onDidAddView.dispose();
         this._onDidRemoveView.dispose();
 
-        this.element.remove();
         for (let i = 0; i < this.element.children.length; i++) {
             if (this.element.children.item(i) === this.element) {
                 this.element.removeChild(this.element);
                 break;
             }
         }
+
+        this.element.remove();
     }
 }

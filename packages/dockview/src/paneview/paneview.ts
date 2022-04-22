@@ -189,8 +189,6 @@ export class Paneview extends CompositeDisposable implements IDisposable {
     public dispose() {
         super.dispose();
 
-        this.splitview.dispose();
-
         if (this.animationTimer) {
             clearTimeout(this.animationTimer);
             this.animationTimer = undefined;
@@ -201,6 +199,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         });
         this.paneItems = [];
 
+        this.splitview.dispose();
         this.element.remove();
     }
 }

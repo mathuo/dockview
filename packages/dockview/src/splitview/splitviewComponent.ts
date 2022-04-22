@@ -421,6 +421,8 @@ export class SplitviewComponent
         });
         this.panels.clear();
 
+        this.splitview.dispose();
+
         super.dispose();
     }
 }

@@ -565,4 +565,25 @@ describe('splitview', () => {
 
         disposable.dispose();
     });
+
+    test('dispose of splitview', () => {
+        expect(container.childNodes.length).toBe(0);
+
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: false,
+        });
+
+        const view1 = new Testview(0, 100);
+        const view2 = new Testview(0, 100);
+
+        splitview.addView(view1);
+        splitview.addView(view2);
+
+        expect(container.childNodes.length).toBeGreaterThan(0);
+
+        splitview.dispose();
+
+        expect(container.childNodes.length).toBe(0);
+    });
 });

@@ -358,37 +358,31 @@ describe('componentSplitview', () => {
         disposable.dispose();
     });
 
-    class EventListenerTracker {
-        private events = new Map<string, Set<any>>();
+    test('dispose of splitviewComponent', () => {
+        expect(container.childNodes.length).toBe(0);
 
-        get size() {
-            return this.events.size;
-        }
+        const splitview = new SplitviewComponent(container, {
+            orientation: Orientation.HORIZONTAL,
+            components: {
+                testPanel: TestPanel,
+            },
+        });
 
-        constructor() {
-            const originalAddEventListener = document.addEventListener;
-            const originalRemoveEventListener = document.removeEventListener;
+        splitview.layout(1000, 1000);
 
-            document.addEventListener = jest.fn((event, callback, options) => {
-                if (!this.events.has(event)) {
-                    this.events.set(event, new Set<any>());
-                }
-                this.events.get(event).add(callback);
-                originalAddEventListener(event, callback, options);
-            });
+        splitview.addPanel({
+            id: 'panel1',
+            component: 'testPanel',
+        });
+        splitview.addPanel({
+            id: 'panel2',
+            component: 'testPanel',
+        });
 
-            document.removeEventListener = jest.fn(
-                (event, callback, options) => {
-                    if (this.events.has(event)) {
-                        this.events.get(event).delete(callback);
-                        if (this.events.get(event).size === 0) {
-                            this.events.delete(event);
-                        }
-                    }
+        expect(container.childNodes.length).toBeGreaterThan(0);
 
-                    originalRemoveEventListener(event, callback, options);
-                }
-            );
-        }
-    }
+        splitview.dispose();
+
+        expect(container.childNodes.length).toBe(0);
+    });
 });
