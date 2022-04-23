@@ -2,7 +2,6 @@ import {
     DockviewApi,
     DockviewReact,
     DockviewReadyEvent,
-    GroupChangeKind,
     IDockviewPanelProps,
     IWatermarkPanelProps,
     PanelCollection,
@@ -36,16 +35,17 @@ const WatermarkPanel = (props: IWatermarkPanelProps) => {
 
     React.useEffect(() => {
         const disposables = new CompositeDisposable(
-            props.containerApi.onGridEvent((event) => {
-                switch (event.kind) {
-                    case GroupChangeKind.ADD_GROUP:
-                    case GroupChangeKind.REMOVE_GROUP:
-                    case GroupChangeKind.ADD_PANEL:
-                    case GroupChangeKind.REMOVE_PANEL:
-                        setSize(props.containerApi.size);
-                        setPanels(props.containerApi.totalPanels);
-                        break;
-                }
+            props.containerApi.onDidAddGroup((event) => {
+                setSize(props.containerApi.size);
+            }),
+            props.containerApi.onDidRemoveGroup((event) => {
+                setSize(props.containerApi.size);
+            }),
+            props.containerApi.onDidAddPanel((event) => {
+                setPanels(props.containerApi.totalPanels);
+            }),
+            props.containerApi.onDidRemovePanel((event) => {
+                setPanels(props.containerApi.totalPanels);
             })
         );
 
@@ -96,7 +96,6 @@ const WatermarkPanel = (props: IWatermarkPanelProps) => {
 };
 
 export const Watermark = (props: {
-    onEvent: (name: string) => void;
     theme: string;
     hideBorders: boolean;
     disableAutoResizing: boolean;
@@ -105,8 +104,6 @@ export const Watermark = (props: {
 
     const onReady = (event: DockviewReadyEvent) => {
         api.current = event.api;
-
-        event.api.onGridEvent((e) => props.onEvent(e.kind));
 
         event.api.addEmptyGroup();
     };
@@ -144,6 +141,5 @@ export default {
                 options: ['dockview-theme-dark', 'dockview-theme-light'],
             },
         },
-        onEvent: { action: 'onEvent' },
     },
 } as Meta;

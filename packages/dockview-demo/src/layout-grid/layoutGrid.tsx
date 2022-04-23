@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {
     IDockviewPanelProps,
-    GroupChangeKind,
     IGridviewPanelProps,
     TabContextMenuEvent,
     DockviewReadyEvent,
@@ -161,11 +160,8 @@ export const TestGrid = (props: IGridviewPanelProps) => {
                 const state = api.toJSON();
                 localStorage.setItem('dockview', JSON.stringify(state));
             }),
-            api.onGridEvent((e) => {
-                console.log(e);
-                if (e.kind === GroupChangeKind.PANEL_ACTIVE) {
-                    setSelectedPanel(e.panel?.id || '');
-                }
+            api.onDidActivePanelChange((e) => {
+                setSelectedPanel(e?.id || '');
             })
         );
 

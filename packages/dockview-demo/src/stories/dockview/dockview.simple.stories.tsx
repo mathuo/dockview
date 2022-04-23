@@ -26,7 +26,6 @@ const components: PanelCollection<IDockviewPanelProps> = {
 };
 
 export const Simple = (props: {
-    onEvent: (name: string) => void;
     theme: string;
     hideBorders: boolean;
     disableAutoResizing: boolean;
@@ -35,8 +34,6 @@ export const Simple = (props: {
 
     const onReady = (event: DockviewReadyEvent) => {
         api.current = event.api;
-
-        event.api.onGridEvent((e) => props.onEvent(e.kind));
 
         event.api.addPanel({
             id: 'panel1',
@@ -92,6 +89,5 @@ export default {
                 options: ['dockview-theme-dark', 'dockview-theme-light'],
             },
         },
-        onEvent: { action: 'onEvent' },
     },
 } as Meta;
