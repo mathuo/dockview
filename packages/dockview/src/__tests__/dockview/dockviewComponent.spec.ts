@@ -25,9 +25,15 @@ import {
     DockviewPanelApiImpl,
 } from '../../api/groupPanelApi';
 import { DefaultTab } from '../../dockview/components/tab/defaultTab';
+import { Emitter } from '../../events';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
+
+    readonly _onDidDispose = new Emitter<void>();
+    readonly onDidDispose = this._onDidDispose.event;
+
+    isDisposed: boolean = false;
 
     constructor(public readonly id: string, component: string) {
         this.element.classList.add(`testpanel-${id}`);
@@ -58,7 +64,50 @@ class PanelContentPartTest implements IContentRenderer {
     }
 
     dispose(): void {
+        this.isDisposed = true;
+        this._onDidDispose.fire();
+    }
+}
+
+class PanelTabPartTest implements ITabRenderer {
+    element: HTMLElement = document.createElement('div');
+
+    readonly _onDidDispose = new Emitter<void>();
+    readonly onDidDispose = this._onDidDispose.event;
+
+    isDisposed: boolean = false;
+
+    constructor(public readonly id: string, component: string) {
+        this.element.classList.add(`testpanel-${id}`);
+    }
+
+    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void {
         //noop
+    }
+
+    init(parameters: GroupPanelPartInitParameters): void {
+        //noop
+    }
+
+    layout(width: number, height: number): void {
+        //noop
+    }
+
+    update(event: PanelUpdateEvent): void {
+        //noop
+    }
+
+    toJSON(): object {
+        return { id: this.id };
+    }
+
+    focus(): void {
+        //noop
+    }
+
+    dispose(): void {
+        this.isDisposed = true;
+        this._onDidDispose.fire();
     }
 }
 
@@ -1104,4 +1153,291 @@ describe('dockviewComponent', () => {
 
         expect(container.childNodes.length).toBe(0);
     });
+
+    test('panel is disposed of when closed', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: { default: PanelContentPartTest },
+        });
+
+        dockview.layout(500, 1000);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+
+        expect(panel1Spy).not.toHaveBeenCalled();
+
+        panel1.api.close();
+
+        expect(panel1Spy).toBeCalledTimes(1);
+    });
+
+    test('panel is disposed of when removed', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: { default: PanelContentPartTest },
+        });
+
+        dockview.layout(500, 1000);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+
+        expect(panel1Spy).not.toHaveBeenCalled();
+
+        dockview.removePanel(panel1);
+
+        expect(panel1Spy).toBeCalledTimes(1);
+    });
+
+    test('panel is not disposed of when moved to a new group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+        });
+
+        dockview.layout(500, 1000);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            tabComponent: 'default',
+            position: {
+                referencePanel: 'panel1',
+                direction: 'right',
+            },
+        });
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+        const panel2Spy = jest.spyOn(panel2, 'dispose');
+
+        dockview.moveGroupOrPanel(
+            panel1.group,
+            panel2.group.id,
+            'panel2',
+            Position.Left
+        );
+
+        expect(panel1Spy).not.toHaveBeenCalled();
+        expect(panel2Spy).not.toHaveBeenCalled();
+    });
+
+    test('panel is not disposed of when moved within another group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+        });
+
+        dockview.layout(500, 1000);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            tabComponent: 'default',
+            position: {
+                referencePanel: 'panel1',
+                direction: 'right',
+            },
+        });
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+        const panel2Spy = jest.spyOn(panel2, 'dispose');
+
+        dockview.moveGroupOrPanel(
+            panel1.group,
+            panel2.group.id,
+            'panel2',
+            Position.Center
+        );
+
+        expect(panel1Spy).not.toHaveBeenCalled();
+        expect(panel2Spy).not.toHaveBeenCalled();
+    });
+
+    test('panel is not disposed of when moved within another group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+        });
+
+        dockview.layout(500, 1000);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        expect(panel1.group).toEqual(panel2.group);
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+        const panel2Spy = jest.spyOn(panel2, 'dispose');
+
+        dockview.moveGroupOrPanel(
+            panel1.group,
+            panel1.group.id,
+            'panel1',
+            Position.Center,
+            0
+        );
+
+        expect(panel1Spy).not.toHaveBeenCalled();
+        expect(panel2Spy).not.toHaveBeenCalled();
+    });
+
+    test('panel is disposed of when group is disposed', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+        });
+
+        dockview.layout(500, 1000);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        expect(panel1.group).toEqual(panel2.group);
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+        const panel2Spy = jest.spyOn(panel2, 'dispose');
+
+        dockview.removeGroup(panel1.group);
+
+        expect(panel1Spy).toBeCalledTimes(1);
+        expect(panel2Spy).toBeCalledTimes(1);
+    });
+
+    test('panel is disposed of when component is disposed', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+        });
+
+        dockview.layout(500, 1000);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        expect(panel1.group).toEqual(panel2.group);
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+        const panel2Spy = jest.spyOn(panel2, 'dispose');
+
+        dockview.dispose();
+
+        expect(panel1Spy).toBeCalledTimes(1);
+        expect(panel2Spy).toBeCalledTimes(1);
+    });
+
+    test('panel is disposed of when from JSON is called', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+
+        dockview.layout(500, 1000);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        expect(panel1.group).toEqual(panel2.group);
+
+        const groupSpy = jest.spyOn(panel1.group, 'dispose');
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+        const panel2Spy = jest.spyOn(panel2, 'dispose');
+
+        dockview.fromJSON({
+            grid: {
+                height: 0,
+                width: 0,
+                root: { type: 'branch', data: [] },
+                orientation: Orientation.HORIZONTAL,
+            },
+            panels: {},
+        });
+
+        expect(groupSpy).toBeCalledTimes(1);
+        expect(panel1Spy).toBeCalledTimes(1);
+        expect(panel2Spy).toBeCalledTimes(1);
+    });
+
+    // group is disposed of when dockview is disposed
+    // watermark is disposed of when removed
+    // watermark is disposed of when dockview is disposed
 });

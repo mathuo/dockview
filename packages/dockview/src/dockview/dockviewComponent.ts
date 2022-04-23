@@ -59,7 +59,7 @@ export interface SerializedDockview {
     };
     panels: { [key: string]: GroupviewPanelState };
     activeGroup?: string;
-    options: { tabHeight?: number };
+    options?: { tabHeight?: number };
 }
 
 export type DockviewComponentUpdateOptions = Pick<
@@ -453,7 +453,10 @@ export class DockviewComponent
 
     removePanel(
         panel: IGroupPanel,
-        options: { removeEmptyGroup: boolean } = { removeEmptyGroup: true }
+        options: { removeEmptyGroup: boolean; skipDispose: boolean } = {
+            removeEmptyGroup: true,
+            skipDispose: false,
+        }
     ): void {
         const group = panel.group;
 
@@ -464,6 +467,8 @@ export class DockviewComponent
         }
 
         group.model.removePanel(panel);
+
+        panel.dispose();
 
         if (group.model.size === 0 && options.removeEmptyGroup) {
             this.removeGroup(group);
@@ -526,6 +531,7 @@ export class DockviewComponent
         for (const panel of panels) {
             this.removePanel(panel, {
                 removeEmptyGroup: false,
+                skipDispose: false,
             });
         }
 
@@ -654,6 +660,7 @@ export class DockviewComponent
         }
 
         const view = new GroupviewPanel(this, id, options);
+        view.init({ params: {}, containerApi: <any>null }); // required to initialized .part and allow for correct disposal of group
 
         if (!this._groups.has(view.id)) {
             const disposable = new CompositeDisposable(

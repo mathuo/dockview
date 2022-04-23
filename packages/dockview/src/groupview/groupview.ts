@@ -645,11 +645,13 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
 
     public dispose() {
+        super.dispose();
+
+        this.watermark?.dispose();
+
         for (const panel of this.panels) {
             panel.dispose();
         }
-
-        super.dispose();
 
         this.dropTarget.dispose();
         this.tabsContainer.dispose();

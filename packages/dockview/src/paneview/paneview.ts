@@ -142,10 +142,18 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         return this.splitview.getViews();
     }
 
-    public removePane(index: number) {
+    public removePane(
+        index: number,
+        options: { skipDispose: boolean } = { skipDispose: false }
+    ) {
         const paneItem = this.paneItems.splice(index, 1)[0];
         this.splitview.removeView(index);
-        paneItem.disposable.dispose();
+
+        if (!options.skipDispose) {
+            paneItem.disposable.dispose();
+            paneItem.pane.dispose();
+        }
+
         return paneItem;
     }
 
@@ -154,7 +162,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
             return;
         }
 
-        const view = this.removePane(from);
+        const view = this.removePane(from, { skipDispose: true });
 
         this.skipAnimation = true;
         try {
@@ -196,6 +204,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
 
         this.paneItems.forEach((paneItem) => {
             paneItem.disposable.dispose();
+            paneItem.pane.dispose();
         });
         this.paneItems = [];
 

@@ -1,6 +1,7 @@
 import {
     CompositeDisposable,
     IDisposable,
+    IValueDisposable,
     MutableDisposable,
 } from '../lifecycle';
 import {
@@ -89,7 +90,7 @@ export class SplitviewComponent
     private _disposable = new MutableDisposable();
     private _splitview!: Splitview;
     private _activePanel: SplitviewPanel | undefined;
-    private panels = new Map<string, IDisposable>();
+    private panels = new Map<string, IValueDisposable<SplitviewPanel>>();
     private _options: SplitviewComponentOptions;
 
     private readonly _onDidAddView = new Emitter<IView>();
@@ -229,7 +230,14 @@ export class SplitviewComponent
 
     removePanel(panel: SplitviewPanel, sizing?: Sizing) {
         const disposable = this.panels.get(panel.id);
-        disposable?.dispose();
+
+        if (!disposable) {
+            throw new Error(`unknown splitview panel ${panel.id}`);
+        }
+
+        disposable.disposable.dispose();
+        disposable.value.dispose();
+
         this.panels.delete(panel.id);
 
         const index = this.getPanels().findIndex((_) => _ === panel);
@@ -313,7 +321,7 @@ export class SplitviewComponent
             this.setActive(view, true);
         });
 
-        this.panels.set(view.id, disposable);
+        this.panels.set(view.id, { disposable, value: view });
     }
 
     toJSON(): SerializedSplitview {
@@ -343,6 +351,11 @@ export class SplitviewComponent
     ): void {
         const { views, orientation, size, activeView } = serializedSplitview;
 
+        for (const [_, value] of this.panels.entries()) {
+            value.disposable.dispose();
+            value.value.dispose();
+        }
+        this.panels.clear();
         this.splitview.dispose();
 
         const queue: Function[] = [];
@@ -416,9 +429,10 @@ export class SplitviewComponent
     }
 
     dispose() {
-        Array.from(this.panels.values()).forEach((value) => {
-            value.dispose();
-        });
+        for (const [_, value] of this.panels.entries()) {
+            value.disposable.dispose();
+            value.value.dispose();
+        }
         this.panels.clear();
 
         this.splitview.dispose();

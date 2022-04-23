@@ -385,4 +385,101 @@ describe('componentSplitview', () => {
 
         expect(container.childNodes.length).toBe(0);
     });
+
+    test('panel is disposed of when component is disposed', () => {
+        const splitview = new SplitviewComponent(container, {
+            orientation: Orientation.HORIZONTAL,
+            components: {
+                default: TestPanel,
+            },
+        });
+
+        splitview.layout(1000, 1000);
+
+        splitview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        splitview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        const panel1 = splitview.getPanel('panel1');
+        const panel2 = splitview.getPanel('panel2');
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+        const panel2Spy = jest.spyOn(panel2, 'dispose');
+
+        splitview.dispose();
+
+        expect(panel1Spy).toHaveBeenCalledTimes(1);
+        expect(panel2Spy).toHaveBeenCalledTimes(1);
+    });
+
+    test('panel is disposed of when removed', () => {
+        const splitview = new SplitviewComponent(container, {
+            orientation: Orientation.HORIZONTAL,
+            components: {
+                default: TestPanel,
+            },
+        });
+
+        splitview.layout(1000, 1000);
+
+        splitview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        splitview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        const panel1 = splitview.getPanel('panel1');
+        const panel2 = splitview.getPanel('panel2');
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+        const panel2Spy = jest.spyOn(panel2, 'dispose');
+
+        splitview.removePanel(panel2);
+
+        expect(panel1Spy).not.toHaveBeenCalled();
+        expect(panel2Spy).toHaveBeenCalledTimes(1);
+    });
+
+    test('panel is disposed of when fromJSON is called', () => {
+        const splitview = new SplitviewComponent(container, {
+            orientation: Orientation.HORIZONTAL,
+            components: {
+                default: TestPanel,
+            },
+        });
+
+        splitview.layout(1000, 1000);
+
+        splitview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        splitview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        const panel1 = splitview.getPanel('panel1');
+        const panel2 = splitview.getPanel('panel2');
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+        const panel2Spy = jest.spyOn(panel2, 'dispose');
+
+        splitview.fromJSON({
+            orientation: Orientation.HORIZONTAL,
+            size: 0,
+            views: [],
+        });
+
+        expect(panel1Spy).toHaveBeenCalledTimes(1);
+        expect(panel2Spy).toHaveBeenCalledTimes(1);
+    });
 });

@@ -22,15 +22,10 @@ import {
     IGridviewPanel,
 } from './gridviewPanel';
 import { BaseComponentOptions } from '../panel/types';
-import { GridviewPanelApiImpl } from '../api/gridviewPanelApi';
 import { GridviewApi } from '../api/component.api';
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { createComponent } from '../panel/componentFactory';
 import { Emitter, Event } from '../events';
-
-interface PanelReference {
-    api: GridviewPanelApiImpl;
-}
 
 export interface SerializedGridview {
     grid: {
@@ -193,8 +188,13 @@ export class GridviewComponent
     ) {
         const { grid, activePanel } = serializedGridview;
 
+        const groups = Array.from(this._groups.values()); // reassign since group panels will mutate
+        for (const group of groups) {
+            group.disposable.dispose();
+            this.doRemoveGroup(group.value, { skipActive: true });
+        }
+
         this.gridview.clear();
-        this._groups.clear();
 
         const queue: Function[] = [];
 
@@ -286,7 +286,7 @@ export class GridviewComponent
         this.doAddGroup(removedPanel, relativeLocation, options.size);
     }
 
-    public addPanel(options: AddComponentOptions): PanelReference {
+    public addPanel(options: AddComponentOptions): void {
         let relativeLocation: number[] = options.location || [0];
 
         if (options.position?.reference) {
@@ -342,8 +342,6 @@ export class GridviewComponent
         this.registerPanel(view);
 
         this.doAddGroup(view, relativeLocation, options.size);
-
-        return { api: view.api };
     }
 
     private registerPanel(panel: GridviewPanel) {
@@ -420,13 +418,6 @@ export class GridviewComponent
 
     removeGroup(group: GridviewPanel) {
         super.removeGroup(group);
-
-        const panel = this._groups.get(group.id);
-
-        if (panel) {
-            panel.disposable.dispose();
-            this._groups.delete(group.id);
-        }
     }
 
     public dispose() {

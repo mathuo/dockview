@@ -305,4 +305,100 @@ describe('componentPaneview', () => {
 
         expect(container.childNodes.length).toBe(0);
     });
+
+    test('panel is disposed of when component is disposed', () => {
+        const paneview = new PaneviewComponent(container, {
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+
+        paneview.layout(1000, 1000);
+
+        paneview.addPanel({
+            id: 'panel1',
+            component: 'testPanel',
+            title: 'Panel 1',
+        });
+        paneview.addPanel({
+            id: 'panel2',
+            component: 'testPanel',
+            title: 'Panel 2',
+        });
+
+        const panel1 = paneview.getPanel('panel1');
+        const panel2 = paneview.getPanel('panel2');
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+        const panel2Spy = jest.spyOn(panel2, 'dispose');
+
+        paneview.dispose();
+
+        expect(panel1Spy).toHaveBeenCalledTimes(1);
+        expect(panel2Spy).toHaveBeenCalledTimes(1);
+    });
+
+    test('panel is disposed of when removed', () => {
+        const paneview = new PaneviewComponent(container, {
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+
+        paneview.layout(1000, 1000);
+
+        paneview.addPanel({
+            id: 'panel1',
+            component: 'testPanel',
+            title: 'Panel 1',
+        });
+        paneview.addPanel({
+            id: 'panel2',
+            component: 'testPanel',
+            title: 'Panel 2',
+        });
+
+        const panel1 = paneview.getPanel('panel1');
+        const panel2 = paneview.getPanel('panel2');
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+        const panel2Spy = jest.spyOn(panel2, 'dispose');
+
+        paneview.removePanel(panel2);
+
+        expect(panel1Spy).not.toHaveBeenCalled();
+        expect(panel2Spy).toHaveBeenCalledTimes(1);
+    });
+
+    test('panel is disposed of when fromJSON is called', () => {
+        const paneview = new PaneviewComponent(container, {
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+
+        paneview.layout(1000, 1000);
+
+        paneview.addPanel({
+            id: 'panel1',
+            component: 'testPanel',
+            title: 'Panel 1',
+        });
+        paneview.addPanel({
+            id: 'panel2',
+            component: 'testPanel',
+            title: 'Panel 2',
+        });
+
+        const panel1 = paneview.getPanel('panel1');
+        const panel2 = paneview.getPanel('panel2');
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+        const panel2Spy = jest.spyOn(panel2, 'dispose');
+
+        paneview.fromJSON({ views: [], size: 0 });
+
+        expect(panel1Spy).toHaveBeenCalledTimes(1);
+        expect(panel2Spy).toHaveBeenCalledTimes(1);
+    });
 });
