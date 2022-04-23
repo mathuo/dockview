@@ -11,7 +11,6 @@ import { GridviewComponentOptions } from './options';
 import {
     BaseGrid,
     Direction,
-    GroupChangeKind,
     IBaseGrid,
     IGridPanelView,
     toTarget,
@@ -253,7 +252,6 @@ export class GridviewComponent
             }
         }
 
-        this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT_FROM_JSON });
         this._onDidLayoutfromJSON.fire();
     }
 

@@ -13,7 +13,9 @@ export interface IPanelDeserializer {
 export class DefaultDeserializer implements IViewDeserializer {
     constructor(
         private readonly layout: DockviewComponent,
-        private panelDeserializer: { createPanel: (id: string) => IGroupPanel }
+        private panelDeserializer: {
+            createPanel: (id: string) => IGroupPanel;
+        }
     ) {}
 
     public fromJSON(node: ISerializedLeafNode): IGridView {

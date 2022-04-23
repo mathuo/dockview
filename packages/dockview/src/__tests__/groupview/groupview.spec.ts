@@ -150,6 +150,10 @@ class TestPanel implements IGroupPanel {
         return this._view;
     }
 
+    get params(): Record<string, any> {
+        return {};
+    }
+
     constructor(public readonly id: string, public api: DockviewPanelApi) {
         this.init({
             view: new DefaultGroupPanelView({

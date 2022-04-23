@@ -27,7 +27,6 @@ import {
 } from './options';
 import {
     BaseGrid,
-    GroupChangeKind,
     IBaseGrid,
     toTarget,
 } from '../gridview/baseComponentGridview';
@@ -207,7 +206,14 @@ export class DockviewComponent
         this.addDisposables(
             this._onTabInteractionEvent,
             this._onTabContextMenu,
-            this._onDidDrop
+            this._onDidDrop,
+            Event.any(
+                this.onDidAddPanel,
+                this.onDidRemovePanel,
+                this.onDidActivePanelChange
+            )(() => {
+                this._bufferOnDidLayoutChange.fire();
+            })
         );
 
         this._options = options;
@@ -377,7 +383,6 @@ export class DockviewComponent
 
         this.gridview.layout(this.width, this.height);
 
-        this._onGridEvent.fire({ kind: GroupChangeKind.LAYOUT_FROM_JSON });
         this._onDidLayoutfromJSON.fire();
     }
 
@@ -515,7 +520,9 @@ export class DockviewComponent
         const panels = [...group.model.panels]; // reassign since group panels will mutate
 
         for (const panel of panels) {
-            this.removePanel(panel, { removeEmptyGroup: false });
+            this.removePanel(panel, {
+                removeEmptyGroup: false,
+            });
         }
 
         super.doRemoveGroup(group, { skipActive });
@@ -612,10 +619,6 @@ export class DockviewComponent
         super.doSetGroupActive(group, skipFocus);
 
         if (!isGroupAlreadyFocused && this._activeGroup?.model.activePanel) {
-            this._onGridEvent.fire({
-                kind: GroupChangeKind.PANEL_ACTIVE,
-                panel: this._activeGroup?.model.activePanel,
-            });
             this._onDidActivePanelChange.fire(
                 this._activeGroup?.model.activePanel
             );
@@ -660,28 +663,16 @@ export class DockviewComponent
                 view.model.onDidGroupChange((event) => {
                     switch (event.kind) {
                         case GroupChangeKind2.ADD_PANEL:
-                            this._onGridEvent.fire({
-                                kind: GroupChangeKind.ADD_PANEL,
-                                panel: event.panel,
-                            });
                             if (event.panel) {
                                 this._onDidAddPanel.fire(event.panel);
                             }
                             break;
                         case GroupChangeKind2.REMOVE_PANEL:
-                            this._onGridEvent.fire({
-                                kind: GroupChangeKind.REMOVE_PANEL,
-                                panel: event.panel,
-                            });
                             if (event.panel) {
                                 this._onDidRemovePanel.fire(event.panel);
                             }
                             break;
                         case GroupChangeKind2.PANEL_ACTIVE:
-                            this._onGridEvent.fire({
-                                kind: GroupChangeKind.PANEL_ACTIVE,
-                                panel: event.panel,
-                            });
                             this._onDidActivePanelChange.fire(event.panel);
                             break;
                     }
@@ -708,11 +699,7 @@ export class DockviewComponent
             tab: this.createTabComponent(options.id, options.tabComponent),
         });
 
-        const panel: IGroupPanel = new DockviewGroupPanel(
-            options.id,
-            this,
-            this._api
-        );
+        const panel = new DockviewGroupPanel(options.id, this, this._api);
         panel.init({
             view,
             title: options.title || options.id,
