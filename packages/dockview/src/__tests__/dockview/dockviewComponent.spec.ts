@@ -167,6 +167,22 @@ describe('dockviewComponent', () => {
         });
     });
 
+    test('duplicate panel', () => {
+        dockview.layout(500, 1000);
+
+        dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        expect(() => {
+            dockview.addPanel({
+                id: 'panel1',
+                component: 'default',
+            });
+        }).toThrowError('panel with id panel1 already exists');
+    });
+
     test('set active panel', () => {
         dockview.layout(500, 1000);
 
