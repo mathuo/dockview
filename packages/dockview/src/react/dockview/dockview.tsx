@@ -53,13 +53,13 @@ export interface IDockviewReactProps {
 export const DockviewReact = React.forwardRef(
     (props: IDockviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
         const domRef = React.useRef<HTMLDivElement>(null);
-        const [dockview, setDockview] = React.useState<DockviewComponent>();
+        const dockviewRef = React.useRef<DockviewComponent>();
         const [portals, addPortal] = usePortalsLifecycle();
 
         React.useImperativeHandle(ref, () => domRef.current!, []);
 
         React.useEffect(() => {
-            if (props.disableAutoResizing || !dockview) {
+            if (props.disableAutoResizing) {
                 return () => {
                     //
                 };
@@ -67,13 +67,13 @@ export const DockviewReact = React.forwardRef(
 
             const watcher = watchElementResize(domRef.current!, (entry) => {
                 const { width, height } = entry.contentRect;
-                dockview.layout(width, height);
+                dockviewRef.current?.layout(width, height);
             });
 
             return () => {
                 watcher.dispose();
             };
-        }, [dockview, props.disableAutoResizing]);
+        }, [props.disableAutoResizing]);
 
         React.useEffect(() => {
             const factory: GroupPanelFrameworkComponentFactory = {
@@ -122,7 +122,7 @@ export const DockviewReact = React.forwardRef(
 
             const element = document.createElement('div');
 
-            const component = new DockviewComponent(element, {
+            const dockview = new DockviewComponent(element, {
                 frameworkComponentFactory: factory,
                 frameworkComponents: props.components,
                 frameworkTabComponents: props.tabComponents,
@@ -134,68 +134,75 @@ export const DockviewReact = React.forwardRef(
                     : undefined,
             });
 
-            domRef.current!.appendChild(component.element);
-            component.deserializer = new ReactPanelDeserialzier(component);
+            const disposable = dockview.onDidDrop((event) => {
+                if (props.onDidDrop) {
+                    props.onDidDrop(event);
+                }
+            });
+
+            domRef.current?.appendChild(dockview.element);
+            dockview.deserializer = new ReactPanelDeserialzier(dockview);
 
             const { clientWidth, clientHeight } = domRef.current!;
-            component.layout(clientWidth, clientHeight);
+            dockview.layout(clientWidth, clientHeight);
 
             if (props.onReady) {
-                props.onReady({ api: new DockviewApi(component) });
+                props.onReady({ api: new DockviewApi(dockview) });
             }
 
-            setDockview(component);
+            dockviewRef.current = dockview;
 
             return () => {
-                component.dispose();
+                disposable.dispose();
+                dockview.dispose();
                 element.remove();
             };
         }, []);
 
         React.useEffect(() => {
-            if (!dockview) {
+            if (!dockviewRef.current) {
                 return;
             }
-            dockview.updateOptions({
+            dockviewRef.current.updateOptions({
                 frameworkComponents: props.components,
             });
-        }, [dockview, props.components]);
+        }, [props.components]);
 
         React.useEffect(() => {
-            if (!dockview) {
+            if (!dockviewRef.current) {
                 return;
             }
-            dockview.updateOptions({
+            dockviewRef.current.updateOptions({
                 watermarkFrameworkComponent: props.watermarkComponent,
             });
-        }, [dockview, props.watermarkComponent]);
+        }, [props.watermarkComponent]);
 
         React.useEffect(() => {
-            if (!dockview) {
+            if (!dockviewRef.current) {
                 return;
             }
-            dockview.updateOptions({
+            dockviewRef.current.updateOptions({
                 showDndOverlay: props.showDndOverlay,
             });
-        }, [dockview, props.showDndOverlay]);
+        }, [props.showDndOverlay]);
 
         React.useEffect(() => {
-            if (!dockview) {
+            if (!dockviewRef.current) {
                 return;
             }
-            dockview.updateOptions({
+            dockviewRef.current.updateOptions({
                 frameworkTabComponents: props.tabComponents,
             });
-        }, [dockview, props.tabComponents]);
+        }, [props.tabComponents]);
 
         React.useEffect(() => {
-            if (!props.onTabContextMenu || !dockview) {
+            if (!props.onTabContextMenu || !dockviewRef.current) {
                 return () => {
                     //noop
                 };
             }
 
-            const disposable = dockview.onTabContextMenu((event) => {
+            const disposable = dockviewRef.current.onTabContextMenu((event) => {
                 if (props.onTabContextMenu) {
                     props.onTabContextMenu(event);
                 }
@@ -204,25 +211,7 @@ export const DockviewReact = React.forwardRef(
             return () => {
                 disposable.dispose();
             };
-        }, [dockview, props.onTabContextMenu]);
-
-        React.useEffect(() => {
-            if (!dockview) {
-                return () => {
-                    //
-                };
-            }
-
-            const disposable = dockview.onDidDrop((event) => {
-                if (props.onDidDrop) {
-                    props.onDidDrop(event);
-                }
-            });
-
-            return () => {
-                disposable.dispose();
-            };
-        }, [dockview, props.onDidDrop]);
+        }, [props.onTabContextMenu]);
 
         return (
             <div
