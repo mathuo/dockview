@@ -34,13 +34,13 @@ export interface ISplitviewReactProps {
 export const SplitviewReact = React.forwardRef(
     (props: ISplitviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
         const domRef = React.useRef<HTMLDivElement>(null);
-        const splitviewRef = React.useRef<ISplitviewComponent>();
+        const [splitview, setSplitview] = React.useState<ISplitviewComponent>();
         const [portals, addPortal] = usePortalsLifecycle();
 
         React.useImperativeHandle(ref, () => domRef.current!, []);
 
         React.useEffect(() => {
-            if (props.disableAutoResizing) {
+            if (props.disableAutoResizing || !splitview) {
                 return () => {
                     //
                 };
@@ -48,16 +48,16 @@ export const SplitviewReact = React.forwardRef(
 
             const watcher = watchElementResize(domRef.current!, (entry) => {
                 const { width, height } = entry.contentRect;
-                splitviewRef.current?.layout(width, height);
+                splitview.layout(width, height);
             });
 
             return () => {
                 watcher.dispose();
             };
-        }, [props.disableAutoResizing]);
+        }, [splitview, props.disableAutoResizing]);
 
         React.useEffect(() => {
-            const splitview = new SplitviewComponent(domRef.current!, {
+            const component = new SplitviewComponent(domRef.current!, {
                 orientation: props.orientation,
                 frameworkComponents: props.components,
                 frameworkWrapper: {
@@ -81,27 +81,27 @@ export const SplitviewReact = React.forwardRef(
             });
 
             const { clientWidth, clientHeight } = domRef.current!;
-            splitview.layout(clientWidth, clientHeight);
+            component.layout(clientWidth, clientHeight);
 
             if (props.onReady) {
-                props.onReady({ api: new SplitviewApi(splitview) });
+                props.onReady({ api: new SplitviewApi(component) });
             }
 
-            splitviewRef.current = splitview;
+            setSplitview(component);
 
             return () => {
-                splitview.dispose();
+                component.dispose();
             };
         }, []);
 
         React.useEffect(() => {
-            if (!splitviewRef.current) {
+            if (!splitview) {
                 return;
             }
-            splitviewRef.current.updateOptions({
+            splitview.updateOptions({
                 frameworkComponents: props.components,
             });
-        }, [props.components]);
+        }, [splitview, props.components]);
 
         return (
             <div
