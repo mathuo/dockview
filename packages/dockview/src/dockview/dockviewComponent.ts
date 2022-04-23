@@ -407,7 +407,11 @@ export class DockviewComponent
     }
 
     addPanel(options: AddPanelOptions): IGroupPanel {
-        const panel = this._addPanel(options);
+        if (this.panels.find((_) => _.id === options.id)) {
+            throw new Error(`panel with id ${options.id} already exists`);
+        }
+
+        const panel = this.createPanel(options);
 
         let referenceGroup: GroupviewPanel | undefined;
 
@@ -693,7 +697,7 @@ export class DockviewComponent
         return view;
     }
 
-    private _addPanel(options: AddPanelOptions): IGroupPanel {
+    private createPanel(options: AddPanelOptions): IGroupPanel {
         const view = new DefaultGroupPanelView({
             content: this.createContentComponent(options.id, options.component),
             tab: this.createTabComponent(options.id, options.tabComponent),
