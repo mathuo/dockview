@@ -88,7 +88,7 @@ export const Application = () => {
             });
         }
 
-        event.api.onGridEvent(() => {
+        event.api.onDidLayoutChange(() => {
             localStorage.setItem(
                 'dockview-layout',
                 JSON.stringify(event.api.toJSON())

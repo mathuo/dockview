@@ -25,7 +25,6 @@ const components: PanelCollection<ISplitviewPanelProps<any>> = {
 };
 
 export const Params = (props: {
-    onEvent: (name: string) => void;
     theme: string;
     hideBorders: boolean;
     disableAutoResizing: boolean;
@@ -104,6 +103,5 @@ export default {
                 options: ['dockview-theme-dark', 'dockview-theme-light'],
             },
         },
-        onEvent: { action: 'onEvent' },
     },
 } as Meta;
