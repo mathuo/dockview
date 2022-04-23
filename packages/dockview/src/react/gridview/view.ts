@@ -2,6 +2,7 @@ import {
     GridviewPanel,
     GridviewInitParameters,
 } from '../../gridview/gridviewPanel';
+import { IFrameworkPart } from '../../panel/types';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IGridviewPanelProps } from './gridview';
 
@@ -15,7 +16,7 @@ export class ReactGridPanelView extends GridviewPanel {
         super(id, component);
     }
 
-    getComponent() {
+    getComponent(): IFrameworkPart {
         return new ReactPart(
             this.element,
             this.reactPortalStore,

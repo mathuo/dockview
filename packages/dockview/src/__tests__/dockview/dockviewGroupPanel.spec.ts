@@ -1,5 +1,6 @@
 import { DockviewComponent } from '../..';
 import { DockviewApi } from '../../api/component.api';
+import { IGroupPanelView } from '../../dockview/defaultGroupPanelView';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
 describe('dockviewGroupPanel', () => {
@@ -67,5 +68,32 @@ describe('dockviewGroupPanel', () => {
         expect(cut.suppressClosable).toBeFalsy();
 
         disposable.dispose();
+    });
+
+    test('dispose cleanup', () => {
+        const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
+            return {} as any;
+        });
+        const accessorMock = jest.fn<DockviewComponent, []>(() => {
+            return {} as any;
+        });
+        const api = new dockviewApiMock();
+        const accessor = new accessorMock();
+
+        const cut = new DockviewGroupPanel('fake-id', accessor, api);
+
+        const viewMock = jest.fn<IGroupPanelView, []>(() => {
+            return {
+                init: jest.fn(),
+                dispose: jest.fn(),
+            } as any;
+        });
+        const view = new viewMock();
+
+        cut.init({ params: {}, view, title: 'title' });
+
+        cut.dispose();
+
+        expect(view.dispose).toHaveBeenCalled();
     });
 });

@@ -16,7 +16,7 @@ import {
 import { IGridviewPanel } from '../gridview/gridviewPanel';
 import { IGroupPanel } from '../groupview/groupPanel';
 import {
-    AddPaneviewCompponentOptions,
+    AddPaneviewComponentOptions,
     SerializedPaneview,
     IPaneviewComponent,
 } from '../paneview/paneviewComponent';
@@ -31,7 +31,6 @@ import { IView, Orientation, Sizing } from '../splitview/core/splitview';
 import { ISplitviewPanel } from '../splitview/splitviewPanel';
 import { GroupviewPanel, IGroupviewPanel } from '../groupview/groupviewPanel';
 import { Emitter, Event } from '../events';
-import { IDisposable } from '../lifecycle';
 import { PaneviewDropEvent } from '../react';
 
 export interface CommonApi {
@@ -205,8 +204,8 @@ export class PaneviewApi implements CommonApi {
         this.component.layout(width, height);
     }
 
-    addPanel(options: AddPaneviewCompponentOptions): IDisposable {
-        return this.component.addPanel(options);
+    addPanel(options: AddPaneviewComponentOptions): void {
+        this.component.addPanel(options);
     }
 
     resizeToFit(): void {

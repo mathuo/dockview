@@ -1666,4 +1666,99 @@ describe('gridview', () => {
             activePanel: 'panel_1',
         });
     });
+
+    test('panel is disposed of when component is disposed', () => {
+        const gridview = new GridviewComponent(container, {
+            proportionalLayout: false,
+            orientation: Orientation.VERTICAL,
+            components: { default: TestGridview },
+        });
+
+        gridview.layout(1000, 1000);
+
+        gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        gridview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        const panel1 = gridview.getPanel('panel1');
+        const panel2 = gridview.getPanel('panel2');
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+        const panel2Spy = jest.spyOn(panel2, 'dispose');
+
+        gridview.dispose();
+
+        expect(panel1Spy).toHaveBeenCalledTimes(1);
+        expect(panel2Spy).toHaveBeenCalledTimes(1);
+    });
+
+    test('panel is disposed of when removed', () => {
+        const gridview = new GridviewComponent(container, {
+            proportionalLayout: false,
+            orientation: Orientation.VERTICAL,
+            components: { default: TestGridview },
+        });
+        gridview.layout(1000, 1000);
+
+        gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        gridview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        const panel1 = gridview.getPanel('panel1');
+        const panel2 = gridview.getPanel('panel2');
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+        const panel2Spy = jest.spyOn(panel2, 'dispose');
+
+        gridview.removePanel(panel2);
+
+        expect(panel1Spy).not.toHaveBeenCalled();
+        expect(panel2Spy).toHaveBeenCalledTimes(1);
+    });
+
+    test('panel is disposed of when fromJSON is called', () => {
+        const gridview = new GridviewComponent(container, {
+            proportionalLayout: false,
+            orientation: Orientation.VERTICAL,
+            components: { default: TestGridview },
+        });
+        gridview.layout(1000, 1000);
+
+        gridview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        gridview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        const panel1 = gridview.getPanel('panel1');
+        const panel2 = gridview.getPanel('panel2');
+
+        const panel1Spy = jest.spyOn(panel1, 'dispose');
+        const panel2Spy = jest.spyOn(panel2, 'dispose');
+
+        gridview.fromJSON({
+            grid: {
+                height: 0,
+                width: 0,
+                root: { type: 'branch', data: [] },
+                orientation: Orientation.HORIZONTAL,
+            },
+        });
+
+        expect(panel1Spy).toHaveBeenCalledTimes(1);
+        expect(panel2Spy).toHaveBeenCalledTimes(1);
+    });
 });

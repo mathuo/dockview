@@ -205,6 +205,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
         if (item && !options?.skipDispose) {
             item.disposable.dispose();
+            item.value.dispose();
             this._groups.delete(group.id);
         }
 
@@ -317,6 +318,10 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this._onDidAddGroup.dispose();
         this._onDidRemoveGroup.dispose();
         this._onDidLayoutChange.dispose();
+
+        for (const group of this.groups) {
+            group.dispose();
+        }
 
         this.gridview.dispose();
     }

@@ -127,6 +127,8 @@ export abstract class BasePanelView<T extends PanelApiImpl>
 
     dispose() {
         super.dispose();
+
         this.api.dispose();
+        this.part?.dispose();
     }
 }
