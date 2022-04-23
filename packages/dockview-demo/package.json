@@ -15,6 +15,8 @@
   "license": "MIT",
   "dependencies": {
     "dockview": "^1.1.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "recoil": "^0.7.2"
   },
   "devDependencies": {
@@ -28,6 +30,8 @@
     "@storybook/builder-webpack5": "^6.4.22",
     "@storybook/manager-webpack5": "^6.4.22",
     "@storybook/react": "^6.4.22",
+    "@types/react": "^17.0.40",
+    "@types/react-dom": "^17.0.13",
     "babel-loader": "^8.2.4",
     "cross-env": "^7.0.3",
     "rimraf": "^3.0.2",
