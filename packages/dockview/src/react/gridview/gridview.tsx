@@ -34,13 +34,13 @@ export interface IGridviewReactProps {
 export const GridviewReact = React.forwardRef(
     (props: IGridviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
         const domRef = React.useRef<HTMLDivElement>(null);
-        const gridviewRef = React.useRef<IGridviewComponent>();
+        const [gridview, setGridview] = React.useState<IGridviewComponent>();
         const [portals, addPortal] = usePortalsLifecycle();
 
         React.useImperativeHandle(ref, () => domRef.current!, []);
 
         React.useEffect(() => {
-            if (props.disableAutoResizing) {
+            if (props.disableAutoResizing || !gridview) {
                 return () => {
                     //
                 };
@@ -48,18 +48,18 @@ export const GridviewReact = React.forwardRef(
 
             const watcher = watchElementResize(domRef.current!, (entry) => {
                 const { width, height } = entry.contentRect;
-                gridviewRef.current?.layout(width, height);
+                gridview.layout(width, height);
             });
 
             return () => {
                 watcher.dispose();
             };
-        }, [props.disableAutoResizing]);
+        }, [gridview, props.disableAutoResizing]);
 
         React.useEffect(() => {
             const element = document.createElement('div');
 
-            const gridview = new GridviewComponent(element, {
+            const component = new GridviewComponent(element, {
                 proportionalLayout:
                     typeof props.proportionalLayout === 'boolean'
                         ? props.proportionalLayout
@@ -83,31 +83,31 @@ export const GridviewReact = React.forwardRef(
                     : undefined,
             });
 
-            domRef.current?.appendChild(gridview.element);
+            domRef.current!.appendChild(component.element);
 
             const { clientWidth, clientHeight } = domRef.current!;
-            gridview.layout(clientWidth, clientHeight);
+            component.layout(clientWidth, clientHeight);
 
             if (props.onReady) {
-                props.onReady({ api: new GridviewApi(gridview) });
+                props.onReady({ api: new GridviewApi(component) });
             }
 
-            gridviewRef.current = gridview;
+            setGridview(component);
 
             return () => {
-                gridview.dispose();
+                component.dispose();
                 element.remove();
             };
         }, []);
 
         React.useEffect(() => {
-            if (!gridviewRef.current) {
+            if (!gridview) {
                 return;
             }
-            gridviewRef.current.updateOptions({
+            gridview.updateOptions({
                 frameworkComponents: props.components,
             });
-        }, [props.components]);
+        }, [gridview, props.components]);
 
         return (
             <div
