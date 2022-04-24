@@ -342,11 +342,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         return this.panels.includes(panel);
     }
 
-    init(params: PanelInitParameters) {
+    init(_params: PanelInitParameters) {
         //noop
     }
 
-    update(params: PanelUpdateEvent) {
+    update(_params: PanelUpdateEvent) {
         //noop
     }
 

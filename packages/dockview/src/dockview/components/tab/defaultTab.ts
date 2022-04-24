@@ -154,7 +154,7 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         this.render();
     }
 
-    public layout(width: number, height: number) {
+    public layout(_width: number, _height: number) {
         // noop
     }
 

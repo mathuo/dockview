@@ -64,7 +64,7 @@ export const PaneviewReact = React.forwardRef(
         React.useEffect(() => {
             const createComponent = (
                 id: string,
-                componentId: string,
+                _componentId: string,
                 component: any
             ) =>
                 new PanePanelSection(id, component, {

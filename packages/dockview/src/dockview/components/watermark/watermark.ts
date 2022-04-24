@@ -11,7 +11,8 @@ import { PanelUpdateEvent } from '../../../panel/types';
 
 export class Watermark
     extends CompositeDisposable
-    implements IWatermarkRenderer {
+    implements IWatermarkRenderer
+{
     private _element: HTMLElement;
     private group: GroupviewPanel | undefined;
     private params: GroupPanelPartInitParameters | undefined;
@@ -56,7 +57,7 @@ export class Watermark
         );
     }
 
-    update(event: PanelUpdateEvent) {
+    update(_event: PanelUpdateEvent) {
         // noop
     }
 
@@ -68,7 +69,7 @@ export class Watermark
         return {};
     }
 
-    layout(width: number, height: number) {
+    layout(_width: number, _height: number) {
         // noop
     }
 
@@ -76,7 +77,7 @@ export class Watermark
         this.params = params;
 
         this.addDisposables(
-            this.params.containerApi.onDidLayoutChange((event) => {
+            this.params.containerApi.onDidLayoutChange(() => {
                 this.render();
             })
         );
@@ -84,7 +85,7 @@ export class Watermark
         this.render();
     }
 
-    updateParentGroup(group: GroupviewPanel, visible: boolean): void {
+    updateParentGroup(group: GroupviewPanel, _visible: boolean): void {
         this.group = group;
         this.render();
     }

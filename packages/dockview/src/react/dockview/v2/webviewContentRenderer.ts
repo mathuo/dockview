@@ -43,13 +43,13 @@ export class WebviewContentRenderer implements IContentRenderer {
     }
 
     public updateParentGroup(
-        group: GroupviewPanel,
-        isPanelVisible: boolean
+        _group: GroupviewPanel,
+        _isPanelVisible: boolean
     ): void {
         //
     }
 
-    public layout(width: number, height: number): void {
+    public layout(_width: number, _height: number): void {
         this._hostedContainer.layout(this._element);
     }
 

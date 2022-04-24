@@ -79,7 +79,7 @@ export const DockviewReact = React.forwardRef(
             const factory: GroupPanelFrameworkComponentFactory = {
                 content: {
                     createComponent: (
-                        id: string,
+                        _id: string,
                         componentId: string,
                         component: React.FunctionComponent<IDockviewPanelProps>
                     ): IContentRenderer => {
@@ -94,7 +94,7 @@ export const DockviewReact = React.forwardRef(
                 },
                 tab: {
                     createComponent: (
-                        id: string,
+                        _id: string,
                         componentId: string,
                         component: React.FunctionComponent<IDockviewPanelHeaderProps>
                     ): ITabRenderer => {
@@ -109,7 +109,7 @@ export const DockviewReact = React.forwardRef(
                 },
                 watermark: {
                     createComponent: (
-                        id: string,
+                        _id: string,
                         componentId: string,
                         component: React.FunctionComponent<{}>
                     ) => {

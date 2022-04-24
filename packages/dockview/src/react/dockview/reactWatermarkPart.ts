@@ -73,11 +73,11 @@ export class ReactWatermarkPart implements IWatermarkRenderer {
         };
     }
 
-    layout(width: number, height: number) {
+    layout(_width: number, _height: number) {
         // noop - retrieval from api
     }
 
-    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void {
+    updateParentGroup(group: GroupviewPanel, _isPanelVisible: boolean): void {
         // noop - retrieval from api
         this._groupRef.value = group;
     }

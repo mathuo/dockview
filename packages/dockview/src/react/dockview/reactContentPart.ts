@@ -32,8 +32,6 @@ export class ReactPanelContentPart implements IContentRenderer {
     private actionsPart?: ReactPart<any>;
     private _group: GroupviewPanel | undefined;
 
-    // private hostedContainer: HostedContainer;
-
     private readonly _onDidFocus = new Emitter<void>();
     readonly onDidFocus: Event<void> = this._onDidFocus.event;
 
@@ -55,13 +53,6 @@ export class ReactPanelContentPart implements IContentRenderer {
     ) {
         this._element = document.createElement('div');
         this._element.className = 'dockview-react-part';
-
-        // this.hostedContainer = new HostedContainer({
-        //     id,
-        // });
-
-        // this.hostedContainer.onDidFocus(() => this._onDidFocus.fire());
-        // this.hostedContainer.onDidBlur(() => this._onDidBlur.fire());
 
         this._actionsElement = document.createElement('div');
         this._actionsElement.className = 'dockview-react-part';
@@ -104,17 +95,13 @@ export class ReactPanelContentPart implements IContentRenderer {
 
     public updateParentGroup(
         group: GroupviewPanel,
-        isPanelVisible: boolean
+        _isPanelVisible: boolean
     ): void {
         this._group = group;
     }
 
-    public layout(width: number, height: number): void {
+    public layout(_width: number, _height: number): void {
         // noop
-        // this.hostedContainer.layout(
-        //     this.element
-        //     // { width, height }
-        // );
     }
 
     public close(): Promise<boolean> {
@@ -125,7 +112,6 @@ export class ReactPanelContentPart implements IContentRenderer {
         this._onDidFocus.dispose();
         this._onDidBlur.dispose();
         this.part?.dispose();
-        // this.hostedContainer?.dispose();
         this.actionsPart?.dispose();
     }
 }
