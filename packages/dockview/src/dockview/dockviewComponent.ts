@@ -470,7 +470,13 @@ export class DockviewComponent
 
         panel.dispose();
 
-        if (group.model.size === 0 && options.removeEmptyGroup) {
+        const retainGroupForWatermark = this.size === 1;
+
+        if (
+            !retainGroupForWatermark &&
+            group.model.size === 0 &&
+            options.removeEmptyGroup
+        ) {
             this.removeGroup(group);
         }
     }

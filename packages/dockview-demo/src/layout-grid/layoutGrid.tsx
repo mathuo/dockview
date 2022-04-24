@@ -25,6 +25,14 @@ import { selectedPanelAtom } from './footer';
 import { ExampleFunctions } from './panels/exampleFunctions';
 import { CompositeDisposable } from '../lifecycle';
 
+const WatermarkComponent = () => {
+    return (
+        <div style={{ backgroundColor: 'black', color: 'white' }}>
+            Watermark component
+        </div>
+    );
+};
+
 const Test = (props: IDockviewPanelProps) => {
     const [counter, setCounter] = React.useState<number>(0);
 
@@ -109,6 +117,7 @@ const components: PanelCollection<IDockviewPanelProps> = {
                 <DockviewReact
                     onReady={onReady}
                     components={components}
+                    watermarkComponent={WatermarkComponent}
                     tabHeight={20}
                     debug={true}
                 />
@@ -140,7 +149,9 @@ export const TestGrid = (props: IGridviewPanelProps) => {
     };
 
     const setSelectedPanel = useRecoilCallback(
-        ({ set }) => (value: string) => set(selectedPanelAtom, value),
+        ({ set }) =>
+            (value: string) =>
+                set(selectedPanelAtom, value),
         []
     );
 
@@ -192,11 +203,12 @@ export const TestGrid = (props: IGridviewPanelProps) => {
         };
     }, [api]);
 
-    const [coord, setCoord] = React.useState<{
-        x: number;
-        y: number;
-        panel: IGroupPanel;
-    }>(undefined);
+    const [coord, setCoord] =
+        React.useState<{
+            x: number;
+            y: number;
+            panel: IGroupPanel;
+        }>(undefined);
 
     const onTabContextMenu = React.useMemo(
         () => (event: TabContextMenuEvent) => {
@@ -276,7 +288,6 @@ export const TestGrid = (props: IGridviewPanelProps) => {
 const Watermark = (props: IWatermarkPanelProps) => {
     const [groups, setGroups] = React.useState<number>(props.containerApi.size);
     React.useEffect(() => {
-        console.log('mount');
         const disposable = new CompositeDisposable(
             props.containerApi.onDidLayoutChange(() => {
                 console.log(`groups2 ${props.containerApi.size}`);
@@ -285,7 +296,6 @@ const Watermark = (props: IWatermarkPanelProps) => {
         );
 
         return () => {
-            console.log('unmount');
             disposable.dispose();
         };
     }, []);
@@ -332,30 +342,7 @@ const Watermark = (props: IWatermarkPanelProps) => {
                     justifyContent: 'center',
                 }}
             >
-                {/* <svg
-                    width="300"
-                    height="300"
-                    viewBox="0 0 300 300"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <rect
-                        x="12.5"
-                        y="12.5"
-                        width="175"
-                        height="275"
-                        stroke="black"
-                        stroke-width="25"
-                    />
-                    <rect
-                        x="112.5"
-                        y="62.5"
-                        width="175"
-                        height="175"
-                        stroke="black"
-                        stroke-width="25"
-                    />
-                </svg> */}
+                <span>Watermark component</span>
             </div>
         </div>
     );
