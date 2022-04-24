@@ -150,36 +150,42 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.layout(this._width, this._height);
     }
 
-    get isActive() {
+    get isActive(): boolean {
         return this._isGroupActive;
     }
 
-    get panels() {
+    get panels(): IGroupPanel[] {
         return this._panels;
     }
 
-    get size() {
+    get size(): number {
         return this._panels.length;
     }
 
-    get isEmpty() {
+    get isEmpty(): boolean {
         return this._panels.length === 0;
     }
 
-    get minimumHeight() {
+    get minimumHeight(): number {
         return 100;
     }
 
-    get maximumHeight() {
+    get maximumHeight(): number {
         return Number.MAX_SAFE_INTEGER;
     }
 
-    get minimumWidth() {
+    get minimumWidth(): number {
         return 100;
     }
 
-    get maximumWidth() {
+    get maximumWidth(): number {
         return Number.MAX_SAFE_INTEGER;
+    }
+
+    get hasWatermark(): boolean {
+        return !!(
+            this.watermark && this.container.contains(this.watermark.element)
+        );
     }
 
     constructor(
