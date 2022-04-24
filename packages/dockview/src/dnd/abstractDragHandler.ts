@@ -43,7 +43,7 @@ export abstract class DragHandler extends CompositeDisposable {
                     event.dataTransfer.effectAllowed = 'move';
                 }
             }),
-            addDisposableListener(this.el, 'dragend', (ev) => {
+            addDisposableListener(this.el, 'dragend', () => {
                 for (const iframe of this.iframes) {
                     iframe.style.pointerEvents = 'auto';
                 }

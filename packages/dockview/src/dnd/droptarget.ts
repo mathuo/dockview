@@ -60,7 +60,7 @@ export class Droptarget extends CompositeDisposable {
         this.addDisposables(
             this._onDrop,
             new DragAndDropObserver(this.element, {
-                onDragEnter: (e) => undefined,
+                onDragEnter: () => undefined,
                 onDragOver: (e) => {
                     if (isBooleanValue(this.options.canDisplayOverlay)) {
                         if (!this.options.canDisplayOverlay) {
@@ -115,10 +115,10 @@ export class Droptarget extends CompositeDisposable {
 
                     this.setState(quadrant);
                 },
-                onDragLeave: (e) => {
+                onDragLeave: () => {
                     this.removeDropTarget();
                 },
-                onDragEnd: (e) => {
+                onDragEnd: () => {
                     this.removeDropTarget();
                 },
                 onDrop: (e) => {

@@ -102,7 +102,7 @@ export class ContentContainer
         this.disposable.value = disposable;
     }
 
-    public layout(width: number, height: number): void {
+    public layout(_width: number, _height: number): void {
         // noop
     }
 

@@ -169,7 +169,7 @@ export class GridviewComponent
     }
 
     setActive(panel: GridviewPanel): void {
-        this._groups.forEach((value, key) => {
+        this._groups.forEach((value, _key) => {
             value.value.setActive(panel === value.value);
         });
     }

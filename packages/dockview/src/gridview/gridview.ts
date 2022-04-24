@@ -644,7 +644,7 @@ export class Gridview implements IDisposable {
         const isSiblingVisible = parent.isChildVisible(0);
         parent.removeChild(0, sizing);
 
-        const sizes = grandParent.children.map((size, i) =>
+        const sizes = grandParent.children.map((_size, i) =>
             grandParent.getChildSize(i)
         );
         grandParent.removeChild(parentIndex, sizing);
