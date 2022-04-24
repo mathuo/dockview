@@ -134,12 +134,6 @@ export const DockviewReact = React.forwardRef(
                     : undefined,
             });
 
-            const disposable = dockview.onDidDrop((event) => {
-                if (props.onDidDrop) {
-                    props.onDidDrop(event);
-                }
-            });
-
             domRef.current?.appendChild(dockview.element);
             dockview.deserializer = new ReactPanelDeserialzier(dockview);
 
@@ -153,11 +147,28 @@ export const DockviewReact = React.forwardRef(
             dockviewRef.current = dockview;
 
             return () => {
-                disposable.dispose();
                 dockview.dispose();
                 element.remove();
             };
         }, []);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return () => {
+                    // noop
+                };
+            }
+
+            const disposable = dockviewRef.current.onDidDrop((event) => {
+                if (props.onDidDrop) {
+                    props.onDidDrop(event);
+                }
+            });
+
+            return () => {
+                disposable.dispose();
+            };
+        }, [props.onDidDrop]);
 
         React.useEffect(() => {
             if (!dockviewRef.current) {
