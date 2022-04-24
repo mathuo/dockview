@@ -73,7 +73,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
 
         // if we've added views from the descriptor we need to
         // add the panes to our Pane array and setup animation
-        this.getPanes().forEach((pane, index) => {
+        this.getPanes().forEach((pane) => {
             const disposable = new CompositeDisposable(
                 pane.onDidChangeExpansionState(() => {
                     this.setupAnimation();

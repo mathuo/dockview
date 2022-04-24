@@ -47,7 +47,7 @@ export class DefaultHeader
         });
     }
 
-    update(params: PanelUpdateEvent) {
+    update(_params: PanelUpdateEvent) {
         //
     }
 

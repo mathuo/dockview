@@ -42,10 +42,10 @@ export class HostedContainer implements IDisposable {
          * When dragging somebody
          */
 
-        window.addEventListener('dragstart', (ev) => {
+        window.addEventListener('dragstart', () => {
             this.element.style.pointerEvents = 'none';
         });
-        window.addEventListener('dragend', (ev) => {
+        window.addEventListener('dragend', () => {
             this.element.style.pointerEvents = '';
         });
         window.addEventListener('mousemove', (ev) => {
@@ -73,7 +73,8 @@ export class HostedContainer implements IDisposable {
             return;
         }
         const frameRect = element.getBoundingClientRect();
-        const containerRect = this.element.parentElement.getBoundingClientRect();
+        const containerRect =
+            this.element.parentElement.getBoundingClientRect();
         this.element.style.position = 'absolute';
         this.element.style.top = `${frameRect.top - containerRect.top}px`;
         this.element.style.left = `${frameRect.left - containerRect.left}px`;

@@ -90,12 +90,12 @@ export class ReactContentRenderer implements IContentRenderer {
 
     public updateParentGroup(
         group: GroupviewPanel,
-        isPanelVisible: boolean
+        _isPanelVisible: boolean
     ): void {
         this._group = group;
     }
 
-    public layout(width: number, height: number): void {
+    public layout(_width: number, _height: number): void {
         this._hostedContainer.layout(this.element);
     }
 
