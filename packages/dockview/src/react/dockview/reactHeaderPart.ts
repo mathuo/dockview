@@ -52,13 +52,13 @@ export class ReactPanelHeaderPart implements ITabRenderer {
         };
     }
 
-    public layout(width: number, height: number) {
+    public layout(_width: number, _height: number) {
         // noop - retrieval from api
     }
 
     public updateParentGroup(
-        group: GroupviewPanel,
-        isPanelVisible: boolean
+        _group: GroupviewPanel,
+        _isPanelVisible: boolean
     ): void {
         // noop - retrieval from api
     }
