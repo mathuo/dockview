@@ -465,7 +465,7 @@ describe('dockviewComponent', () => {
 
         await panel2.api.close();
 
-        expect(dockview.size).toBe(0);
+        expect(dockview.size).toBe(1); // watermark
         expect(dockview.totalPanels).toBe(0);
     });
 
@@ -1176,6 +1176,89 @@ describe('dockviewComponent', () => {
         panel1.api.close();
 
         expect(panel1Spy).toBeCalledTimes(1);
+    });
+
+    test('can add panel of same id if already removed', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: { default: PanelContentPartTest },
+        });
+
+        dockview.layout(500, 1000);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        expect(dockview.totalPanels).toBe(1);
+
+        panel1.api.close();
+
+        expect(dockview.totalPanels).toBe(0);
+
+        const panel1Again = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        expect(dockview.totalPanels).toBe(1);
+
+        panel1Again.api.close();
+
+        expect(dockview.totalPanels).toBe(0);
+    });
+
+    test('last group is retained for watermark', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: { default: PanelContentPartTest },
+        });
+
+        dockview.layout(500, 1000);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        expect(dockview.size).toBe(1);
+        expect(dockview.totalPanels).toBe(1);
+
+        const group = panel1.group;
+
+        dockview.removePanel(panel1);
+
+        expect(group.model.hasWatermark).toBeTruthy();
+        expect(dockview.size).toBe(1);
+        expect(dockview.totalPanels).toBe(0);
+
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        expect(group.model.hasWatermark).toBeFalsy();
+
+        const panel3 = dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            tabComponent: 'default',
+        });
+
+        expect(dockview.size).toBe(1);
+        expect(dockview.totalPanels).toBe(2);
+
+        panel2.api.close();
+        expect(group.model.hasWatermark).toBeFalsy();
+        panel3.api.close();
+        expect(group.model.hasWatermark).toBeTruthy();
     });
 
     test('panel is disposed of when removed', () => {
