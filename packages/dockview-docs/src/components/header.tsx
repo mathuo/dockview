@@ -31,7 +31,7 @@ export const Header = (props: {}) => {
     return (
         <div
             style={{
-                height: '1000px',
+                height: '0px',
                 backgroundColor: '#0070f3',
                 padding: '5vw',
             }}

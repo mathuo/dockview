@@ -2,6 +2,9 @@
   "name": "dockview-monorepo-root",
   "private": true,
   "description": "Monorepo for https://github.com/mathuo/dockview",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "test": "jest",
     "lint": "eslint packages/**/src/** --ext .ts,.tsx,.js,.jsx",
