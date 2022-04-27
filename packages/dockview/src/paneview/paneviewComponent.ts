@@ -102,13 +102,11 @@ export interface IPaneviewComponent extends IDisposable {
     readonly onDidRemoveView: Event<PaneviewPanel>;
     readonly onDidDrop: Event<PaneviewDropEvent2>;
     readonly onDidLayoutChange: Event<void>;
+    readonly onDidLayoutFromJSON: Event<void>;
     addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel;
     layout(width: number, height: number): void;
     toJSON(): SerializedPaneview;
-    fromJSON(
-        serializedPaneview: SerializedPaneview,
-        deferComponentLayout?: boolean
-    ): void;
+    fromJSON(serializedPaneview: SerializedPaneview): void;
     resizeToFit(): void;
     focus(): void;
     getPanels(): IPaneviewPanel[];
@@ -125,6 +123,9 @@ export class PaneviewComponent
     private _disposable = new MutableDisposable();
     private _viewDisposables = new Map<string, IDisposable>();
     private _paneview!: Paneview;
+
+    private readonly _onDidLayoutfromJSON = new Emitter<void>();
+    readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutfromJSON.event;
 
     private readonly _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
@@ -188,6 +189,7 @@ export class PaneviewComponent
 
         this.addDisposables(
             this._onDidLayoutChange,
+            this._onDidLayoutfromJSON,
             this._onDidDrop,
             this._onDidAddView,
             this._onDidRemoveView
@@ -353,10 +355,7 @@ export class PaneviewComponent
         };
     }
 
-    fromJSON(
-        serializedPaneview: SerializedPaneview,
-        deferComponentLayout?: boolean
-    ): void {
+    fromJSON(serializedPaneview: SerializedPaneview): void {
         const { views, size } = serializedPaneview;
 
         const queue: Function[] = [];
@@ -446,13 +445,9 @@ export class PaneviewComponent
 
         this.layout(this.width, this.height);
 
-        if (deferComponentLayout) {
-            setTimeout(() => {
-                queue.forEach((f) => f());
-            }, 0);
-        } else {
-            queue.forEach((f) => f());
-        }
+        queue.forEach((f) => f());
+
+        this._onDidLayoutfromJSON.fire();
     }
 
     private doAddPanel(panel: PaneFramework) {

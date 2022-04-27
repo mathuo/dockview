@@ -33,16 +33,20 @@ import { GroupviewPanel, IGroupviewPanel } from '../groupview/groupviewPanel';
 import { Emitter, Event } from '../events';
 import { PaneviewDropEvent } from '../react';
 
-export interface CommonApi {
+export interface CommonApi<T = any> {
     readonly height: number;
     readonly width: number;
     readonly onDidLayoutChange: Event<void>;
+    readonly onDidLayoutFromJSON: Event<void>;
     focus(): void;
     layout(width: number, height: number): void;
     resizeToFit(): void;
+    fromJSON(data: T): void;
+
+    toJSON(): T;
 }
 
-export class SplitviewApi implements CommonApi {
+export class SplitviewApi implements CommonApi<SerializedSplitview> {
     get minimumSize(): number {
         return this.component.minimumSize;
     }
@@ -65,6 +69,10 @@ export class SplitviewApi implements CommonApi {
 
     get orientation(): Orientation {
         return this.component.orientation;
+    }
+
+    get onDidLayoutFromJSON(): Event<void> {
+        return this.component.onDidLayoutFromJSON;
     }
 
     get onDidLayoutChange(): Event<void> {
@@ -125,8 +133,8 @@ export class SplitviewApi implements CommonApi {
         this.component.movePanel(from, to);
     }
 
-    fromJSON(data: SerializedSplitview, deferComponentLayout?: boolean): void {
-        this.component.fromJSON(data, deferComponentLayout);
+    fromJSON(data: SerializedSplitview): void {
+        this.component.fromJSON(data);
     }
 
     toJSON(): SerializedSplitview {
@@ -134,7 +142,7 @@ export class SplitviewApi implements CommonApi {
     }
 }
 
-export class PaneviewApi implements CommonApi {
+export class PaneviewApi implements CommonApi<SerializedPaneview> {
     get minimumSize(): number {
         return this.component.minimumSize;
     }
@@ -153,6 +161,10 @@ export class PaneviewApi implements CommonApi {
 
     get onDidLayoutChange(): Event<void> {
         return this.component.onDidLayoutChange;
+    }
+
+    get onDidLayoutFromJSON(): Event<void> {
+        return this.component.onDidLayoutFromJSON;
     }
 
     get onDidAddView(): Event<IPaneviewPanel> {
@@ -212,8 +224,8 @@ export class PaneviewApi implements CommonApi {
         this.component.resizeToFit();
     }
 
-    fromJSON(data: SerializedPaneview, deferComponentLayout?: boolean): void {
-        this.component.fromJSON(data, deferComponentLayout);
+    fromJSON(data: SerializedPaneview): void {
+        this.component.fromJSON(data);
     }
 
     toJSON(): SerializedPaneview {
@@ -221,7 +233,7 @@ export class PaneviewApi implements CommonApi {
     }
 }
 
-export class GridviewApi implements CommonApi {
+export class GridviewApi implements CommonApi<SerializedGridview> {
     get minimumHeight(): number {
         return this.component.minimumHeight;
     }
@@ -323,8 +335,8 @@ export class GridviewApi implements CommonApi {
         this.component.setActive(panel);
     }
 
-    fromJSON(data: SerializedGridview, deferComponentLayout?: boolean): void {
-        return this.component.fromJSON(data, deferComponentLayout);
+    fromJSON(data: SerializedGridview): void {
+        return this.component.fromJSON(data);
     }
 
     toJSON(): SerializedGridview {
@@ -332,7 +344,7 @@ export class GridviewApi implements CommonApi {
     }
 }
 
-export class DockviewApi implements CommonApi {
+export class DockviewApi implements CommonApi<SerializedDockview> {
     get width(): number {
         return this.component.width;
     }
@@ -389,7 +401,7 @@ export class DockviewApi implements CommonApi {
         return this.component.onDidRemovePanel;
     }
 
-    get onDidLayoutfromJSON(): Event<void> {
+    get onDidLayoutFromJSON(): Event<void> {
         return this.component.onDidLayoutfromJSON;
     }
 

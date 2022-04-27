@@ -38,7 +38,6 @@ export interface SerializedGridview {
 }
 
 export interface AddComponentOptions extends BaseComponentOptions {
-    size?: number;
     minimumWidth?: number;
     maximumWidth?: number;
     minimumHeight?: number;
@@ -67,10 +66,7 @@ export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
     removePanel(panel: IGridviewPanel, sizing?: Sizing): void;
     toggleVisibility(panel: IGridviewPanel): void;
     focus(): void;
-    fromJSON(
-        serializedGridview: SerializedGridview,
-        deferComponentLayout?: boolean
-    ): void;
+    fromJSON(serializedGridview: SerializedGridview): void;
     toJSON(): SerializedGridview;
     movePanel(
         panel: IGridviewPanel,
@@ -182,10 +178,7 @@ export class GridviewComponent
         this.activeGroup?.focus();
     }
 
-    public fromJSON(
-        serializedGridview: SerializedGridview,
-        deferComponentLayout?: boolean
-    ) {
+    public fromJSON(serializedGridview: SerializedGridview) {
         const { grid, activePanel } = serializedGridview;
 
         const groups = Array.from(this._groups.values()); // reassign since group panels will mutate
@@ -237,13 +230,7 @@ export class GridviewComponent
 
         this.layout(this.width, this.height, true);
 
-        if (deferComponentLayout) {
-            setTimeout(() => {
-                queue.forEach((f) => f());
-            }, 0);
-        } else {
-            queue.forEach((f) => f());
-        }
+        queue.forEach((f) => f());
 
         if (typeof activePanel === 'string') {
             const panel = this.getPanel(activePanel);

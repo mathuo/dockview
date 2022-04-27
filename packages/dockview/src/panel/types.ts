@@ -35,4 +35,5 @@ export interface BaseComponentOptions {
     params?: Parameters;
     snap?: boolean;
     priority?: LayoutPriority;
+    size?: number;
 }
