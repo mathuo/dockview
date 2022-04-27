@@ -416,15 +416,15 @@ export class DockviewComponent
         let referenceGroup: GroupviewPanel | undefined;
 
         if (options.position?.referencePanel) {
-            const referencePanel = this.getGroupPanel(
-                options.position.referencePanel
-            );
+          const referencePanel = this.getGroupPanel(
+              options.position.referencePanel
+          );
 
-            if (!referencePanel) {
-                throw new Error(
-                    `referencePanel ${options.position.referencePanel} does not exist`
-                );
-            }
+          if (!referencePanel) {
+              throw new Error(
+                  `referencePanel ${options.position.referencePanel} does not exist`
+              );
+          }
 
             referenceGroup = this.findGroup(referencePanel);
         } else {

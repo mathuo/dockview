@@ -41,7 +41,6 @@ export interface SerializedSplitview {
 }
 
 export interface AddSplitviewComponentOptions extends BaseComponentOptions {
-    size?: number;
     index?: number;
     minimumSize?: number;
     maximumSize?: number;
@@ -61,15 +60,13 @@ export interface ISplitviewComponent extends IDisposable {
     readonly orientation: Orientation;
     readonly onDidAddView: Event<IView>;
     readonly onDidRemoveView: Event<IView>;
+    readonly onDidLayoutFromJSON: Event<void>;
     updateOptions(options: Partial<SplitviewComponentUpdateOptions>): void;
     addPanel(options: AddSplitviewComponentOptions): void;
     layout(width: number, height: number): void;
     onDidLayoutChange: Event<void>;
     toJSON(): SerializedSplitview;
-    fromJSON(
-        serializedSplitview: SerializedSplitview,
-        deferComponentLayout?: boolean
-    ): void;
+    fromJSON(serializedSplitview: SerializedSplitview): void;
     resizeToFit(): void;
     focus(): void;
     getPanel(id: string): ISplitviewPanel | undefined;
@@ -92,6 +89,9 @@ export class SplitviewComponent
     private _activePanel: SplitviewPanel | undefined;
     private panels = new Map<string, IValueDisposable<SplitviewPanel>>();
     private _options: SplitviewComponentOptions;
+
+    private readonly _onDidLayoutfromJSON = new Emitter<void>();
+    readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutfromJSON.event;
 
     private readonly _onDidAddView = new Emitter<IView>();
     readonly onDidAddView = this._onDidAddView.event;
@@ -172,6 +172,7 @@ export class SplitviewComponent
         this.addDisposables(
             this._disposable,
             this._onDidAddView,
+            this._onDidLayoutfromJSON,
             this._onDidRemoveView,
             this._onDidLayoutChange
         );
@@ -345,10 +346,7 @@ export class SplitviewComponent
         };
     }
 
-    fromJSON(
-        serializedSplitview: SerializedSplitview,
-        deferComponentLayout = false
-    ): void {
+    fromJSON(serializedSplitview: SerializedSplitview): void {
         const { views, orientation, size, activeView } = serializedSplitview;
 
         for (const [_, value] of this.panels.entries()) {
@@ -412,13 +410,7 @@ export class SplitviewComponent
 
         this.layout(this.width, this.height);
 
-        if (deferComponentLayout) {
-            setTimeout(() => {
-                queue.forEach((f) => f());
-            }, 0);
-        } else {
-            queue.forEach((f) => f());
-        }
+        queue.forEach((f) => f());
 
         if (typeof activeView === 'string') {
             const panel = this.getPanel(activeView);
@@ -426,6 +418,8 @@ export class SplitviewComponent
                 this.setActive(panel);
             }
         }
+
+        this._onDidLayoutfromJSON.fire();
     }
 
     dispose() {
