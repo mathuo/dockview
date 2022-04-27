@@ -169,7 +169,7 @@ export class DockviewGroupPanel
         // the obtain the correct dimensions of the content panel we must deduct the tab height
         this.api._onDidPanelDimensionChange.fire({
             width,
-            height: height - (this.group?.model.tabHeight || 0),
+            height: height - (this.group?.model.header.height || 0),
         });
 
         this.view?.layout(width, height);

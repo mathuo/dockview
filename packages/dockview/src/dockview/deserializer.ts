@@ -4,6 +4,7 @@ import {
     IViewDeserializer,
 } from '../gridview/gridview';
 import { GroupviewPanelState, IGroupPanel } from '../groupview/groupPanel';
+import { GroupPanelViewState } from '../groupview/groupview';
 import { DockviewComponent } from './dockviewComponent';
 
 export interface IPanelDeserializer {
@@ -18,9 +19,10 @@ export class DefaultDeserializer implements IViewDeserializer {
         }
     ) {}
 
-    public fromJSON(node: ISerializedLeafNode): IGridView {
-        const children = node.data.views;
-        const active = node.data.activeView;
+    public fromJSON(node: ISerializedLeafNode<GroupPanelViewState>): IGridView {
+        const data = node.data;
+        const children = data.views;
+        const active = data.activeView;
 
         const panels: IGroupPanel[] = [];
 
@@ -33,7 +35,18 @@ export class DefaultDeserializer implements IViewDeserializer {
         return this.layout.createGroup({
             panels,
             activePanel: panels.find((p) => p.id === active),
-            id: node.data.id,
+            id: data.id,
+            locked: !!data.locked,
+            headerHidden: !!data.headerHidden,
         });
     }
 }
+
+/**
+ * isGroup
+ *
+ *
+ * panel.group.locked = true
+ * panel.group.header.hiddden = true
+ *
+ */

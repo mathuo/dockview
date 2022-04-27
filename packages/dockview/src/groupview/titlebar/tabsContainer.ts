@@ -33,6 +33,7 @@ export interface ITabsContainer extends IDisposable {
     closePanel: (panel: IGroupPanel) => void;
     openPanel: (panel: IGroupPanel, index?: number) => void;
     setActionElement(element: HTMLElement | undefined): void;
+    hidden: boolean;
     show(): void;
     hide(): void;
 }
@@ -55,6 +56,7 @@ export class TabsContainer
     private actions: HTMLElement | undefined;
 
     private _height: number | undefined;
+    private _hidden = false;
 
     private readonly _onDrop = new Emitter<TabDropIndexEvent>();
     readonly onDrop: Event<TabDropIndexEvent> = this._onDrop.event;
@@ -85,12 +87,23 @@ export class TabsContainer
         }
     }
 
-    show() {
-        this.element.style.display = '';
+    get hidden(): boolean {
+        return this._hidden;
     }
 
-    hide() {
-        this.element.style.display = 'none';
+    set hidden(value: boolean) {
+        this._hidden = value;
+        this.element.style.display = value ? 'none' : '';
+    }
+
+    show(): void {
+        if (!this.hidden) {
+            this.element.style.display = '';
+        }
+    }
+
+    hide(): void {
+        this._element.style.display = 'none';
     }
 
     setActionElement(element: HTMLElement | undefined): void {

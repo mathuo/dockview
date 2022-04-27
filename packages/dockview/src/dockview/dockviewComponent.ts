@@ -188,7 +188,7 @@ export class DockviewComponent
     set tabHeight(height: number | undefined) {
         this.options.tabHeight = height;
         this._groups.forEach((value) => {
-            value.value.model.tabHeight = height;
+            value.value.model.header.height = height;
         });
     }
 
@@ -704,7 +704,7 @@ export class DockviewComponent
         view.initialize();
 
         if (typeof this.options.tabHeight === 'number') {
-            view.model.tabHeight = this.options.tabHeight;
+            view.model.header.height = this.options.tabHeight;
         }
 
         return view;

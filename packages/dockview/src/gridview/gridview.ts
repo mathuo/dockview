@@ -241,9 +241,9 @@ const serializeBranchNode = <T extends IGridView>(
     };
 };
 
-export interface ISerializedLeafNode {
+export interface ISerializedLeafNode<T = any> {
     type: 'leaf';
-    data: any;
+    data: T;
     size: number;
     visible?: boolean;
 }

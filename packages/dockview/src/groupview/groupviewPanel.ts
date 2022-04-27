@@ -1,17 +1,17 @@
 import { IFrameworkPart } from '../panel/types';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { GridviewPanelApiImpl } from '../api/gridviewPanelApi';
-import { Groupview, GroupOptions } from './groupview';
+import { Groupview, GroupOptions, IGroupview } from './groupview';
 import { GridviewPanel, IGridviewPanel } from '../gridview/gridviewPanel';
 
 export interface IGroupviewPanel extends IGridviewPanel {
-    model: Groupview;
+    model: IGroupview;
 }
 
 export class GroupviewPanel extends GridviewPanel implements IGroupviewPanel {
     private readonly _model: Groupview;
 
-    get model(): Groupview {
+    get model(): IGroupview {
         return this._model;
     }
 
@@ -42,7 +42,7 @@ export class GroupviewPanel extends GridviewPanel implements IGroupviewPanel {
     }
 
     initialize() {
-        this.model.initialize();
+        this._model.initialize();
     }
 
     setActive(isActive: boolean): void {
