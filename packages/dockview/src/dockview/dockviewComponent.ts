@@ -21,7 +21,7 @@ import { createComponent } from '../panel/componentFactory';
 import {
     AddGroupOptions,
     AddPanelOptions,
-    DockviewOptions as DockviewComponentOptions,
+    DockviewComponentOptions,
     MovementOptions,
     TabContextMenuEvent,
 } from './options';
@@ -63,7 +63,7 @@ export interface SerializedDockview {
 }
 
 export type DockviewComponentUpdateOptions = Pick<
-    DockviewComponentOptions,
+DockviewComponentOptions,
     | 'orientation'
     | 'components'
     | 'frameworkComponents'
@@ -160,7 +160,7 @@ export class DockviewComponent
     }
 
     get panels(): IGroupPanel[] {
-        return this.groups.flatMap((group) => group.model.panels);
+        return this.groups.flatMap((group) => group.panels);
     }
 
     get deserializer(): IPanelDeserializer | undefined {
@@ -182,7 +182,7 @@ export class DockviewComponent
             return undefined;
         }
 
-        return activeGroup.model.activePanel;
+        return activeGroup.activePanel;
     }
 
     set tabHeight(height: number | undefined) {
@@ -280,9 +280,9 @@ export class DockviewComponent
 
         if (options.includePanel && options.group) {
             if (
-                options.group.model.activePanel !==
-                options.group.model.panels[
-                    options.group.model.panels.length - 1
+                options.group.activePanel !==
+                options.group.panels[
+                    options.group.panels.length - 1
                 ]
             ) {
                 options.group.model.moveToNext({ suppressRoll: true });
@@ -291,7 +291,7 @@ export class DockviewComponent
         }
 
         const location = getGridLocation(options.group.element);
-        const next = this.gridview.next(location)?.view as GroupviewPanel;
+        const next = <GroupviewPanel>this.gridview.next(location)?.view
         this.doSetGroupActive(next);
     }
 
@@ -305,8 +305,8 @@ export class DockviewComponent
 
         if (options.includePanel && options.group) {
             if (
-                options.group.model.activePanel !==
-                options.group.model.panels[0]
+                options.group.activePanel !==
+                options.group.panels[0]
             ) {
                 options.group.model.moveToPrevious({ suppressRoll: true });
                 return;
@@ -474,7 +474,7 @@ export class DockviewComponent
 
         if (
             !retainGroupForWatermark &&
-            group.model.size === 0 &&
+            group.size === 0 &&
             options.removeEmptyGroup
         ) {
             this.removeGroup(group);
@@ -532,7 +532,7 @@ export class DockviewComponent
     }
 
     removeGroup(group: GroupviewPanel, skipActive = false): void {
-        const panels = [...group.model.panels]; // reassign since group panels will mutate
+        const panels = [...group.panels]; // reassign since group panels will mutate
 
         for (const panel of panels) {
             this.removePanel(panel, {
@@ -577,7 +577,7 @@ export class DockviewComponent
                 target
             );
 
-            if (sourceGroup && sourceGroup.model.size < 2) {
+            if (sourceGroup && sourceGroup.size < 2) {
                 const [targetParentLocation, to] = tail(targetLocation);
                 const sourceLocation = getGridLocation(sourceGroup.element);
                 const [sourceParentLocation, from] = tail(sourceLocation);
@@ -634,9 +634,9 @@ export class DockviewComponent
         const isGroupAlreadyFocused = this._activeGroup === group;
         super.doSetGroupActive(group, skipFocus);
 
-        if (!isGroupAlreadyFocused && this._activeGroup?.model.activePanel) {
+        if (!isGroupAlreadyFocused && this._activeGroup?.activePanel) {
             this._onDidActivePanelChange.fire(
-                this._activeGroup?.model.activePanel
+                this._activeGroup?.activePanel
             );
         }
     }

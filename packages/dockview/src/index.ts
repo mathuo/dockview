@@ -1,5 +1,4 @@
 export * from './dnd/dataTransfer';
-export * from './api/component.api';
 
 export * from './splitview/core/splitview';
 export * from './paneview/paneview';
@@ -50,3 +49,10 @@ export {
     SplitviewPanelApi,
 } from './api/splitviewPanelApi';
 export { ExpansionEvent, PaneviewPanelApi } from './api/paneviewPanelApi';
+export {
+    CommonApi,
+    SplitviewApi,
+    PaneviewApi,
+    GridviewApi,
+    DockviewApi,
+} from './api/component.api';

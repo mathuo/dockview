@@ -20,6 +20,11 @@ describe('droptarget', () => {
 
     beforeEach(() => {
         element = document.createElement('div');
+
+        jest.spyOn(element, 'clientHeight', 'get').mockImplementation(
+            () => 100
+        );
+        jest.spyOn(element, 'clientWidth', 'get').mockImplementation(() => 200);
     });
 
     test('non-directional', () => {

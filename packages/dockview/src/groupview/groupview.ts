@@ -1,5 +1,5 @@
 import { DockviewApi } from '../api/component.api';
-import { getPanelData } from '../dnd/dataTransfer';
+import { getPanelData, PanelTransfer } from '../dnd/dataTransfer';
 import { Droptarget, Position } from '../dnd/droptarget';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { isAncestor, toggleClass } from '../dom';
@@ -74,6 +74,7 @@ export interface GroupviewChangeEvent {
 export interface GroupviewDropEvent {
     nativeEvent: DragEvent;
     position: Position;
+    getData(): PanelTransfer | undefined;
     index?: number;
 }
 
@@ -87,9 +88,12 @@ export interface IGroupview extends IDisposable, IGridPanelView {
     readonly size: number;
     readonly panels: IGroupPanel[];
     readonly activePanel: IGroupPanel | undefined;
-    locked: boolean;
     readonly header: IHeader;
+    readonly isContentFocused: boolean;
     readonly onDidDrop: Event<GroupviewDropEvent>;
+    readonly onDidGroupChange: Event<GroupviewChangeEvent>;
+    readonly onMove: Event<GroupMoveEvent>;
+    locked: boolean;
     // state
     isPanelActive: (panel: IGroupPanel) => boolean;
     indexOf(panel: IGroupPanel): number;
@@ -102,16 +106,11 @@ export interface IGroupview extends IDisposable, IGridPanelView {
     closeAllPanels(): void;
     containsPanel(panel: IGroupPanel): boolean;
     removePanel: (panelOrId: IGroupPanel | string) => IGroupPanel;
-    // events
-    onDidGroupChange: Event<GroupviewChangeEvent>;
-    onMove: Event<GroupMoveEvent>;
     moveToNext(options?: { panel?: IGroupPanel; suppressRoll?: boolean }): void;
     moveToPrevious(options?: {
         panel?: IGroupPanel;
         suppressRoll?: boolean;
     }): void;
-    isContentFocused(): boolean;
-    updateActions(): void;
     canDisplayOverlay(event: DragEvent, target: DockviewDropTargets): boolean;
 }
 
@@ -203,6 +202,16 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         return this.tabsContainer;
     }
 
+    get isContentFocused(): boolean {
+        if (!document.activeElement) {
+            return false;
+        }
+        return isAncestor(
+            document.activeElement,
+            this.contentContainer.element
+        );
+    }
+
     constructor(
         private readonly container: HTMLElement,
         private accessor: IDockviewComponent,
@@ -287,16 +296,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         // correctly initialized
         this.setActive(this.isActive, true, true);
         this.updateContainer();
-    }
-
-    isContentFocused() {
-        if (!document.activeElement) {
-            return false;
-        }
-        return isAncestor(
-            document.activeElement,
-            this.contentContainer.element
-        );
     }
 
     public indexOf(panel: IGroupPanel) {
@@ -679,7 +678,12 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 index,
             });
         } else {
-            this._onDidDrop.fire({ nativeEvent: event, position, index });
+            this._onDidDrop.fire({
+                nativeEvent: event,
+                position,
+                index,
+                getData: () => getPanelData(),
+            });
         }
     }
 

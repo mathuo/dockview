@@ -49,7 +49,7 @@ export interface ViewFactoryData {
     tab?: string;
 }
 
-export interface DockviewOptions extends DockviewRenderFunctions {
+export interface DockviewComponentOptions extends DockviewRenderFunctions {
     watermarkComponent?: WatermarkConstructor;
     watermarkFrameworkComponent?: any;
     frameworkComponentFactory?: GroupPanelFrameworkComponentFactory;

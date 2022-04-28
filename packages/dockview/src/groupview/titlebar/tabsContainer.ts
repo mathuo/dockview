@@ -265,7 +265,7 @@ export class TabsContainer
             tabToAdd.onChanged((event) => {
                 const alreadyFocused =
                     panel.id === this.group.model.activePanel?.id &&
-                    this.group.model.isContentFocused();
+                    this.group.model.isContentFocused;
                 this.accessor.fireMouseEvent({ ...event, panel, tab: true });
 
                 const isLeftClick = event.event.button === 0;
