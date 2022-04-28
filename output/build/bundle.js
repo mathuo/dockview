@@ -46282,6 +46282,9 @@ class SplitviewApi {
     get orientation() {
         return this.component.orientation;
     }
+    get onDidLayoutFromJSON() {
+        return this.component.onDidLayoutFromJSON;
+    }
     get onDidLayoutChange() {
         return this.component.onDidLayoutChange;
     }
@@ -46324,8 +46327,8 @@ class SplitviewApi {
     movePanel(from, to) {
         this.component.movePanel(from, to);
     }
-    fromJSON(data, deferComponentLayout) {
-        this.component.fromJSON(data, deferComponentLayout);
+    fromJSON(data) {
+        this.component.fromJSON(data);
     }
     toJSON() {
         return this.component.toJSON();
@@ -46349,6 +46352,9 @@ class PaneviewApi {
     }
     get onDidLayoutChange() {
         return this.component.onDidLayoutChange;
+    }
+    get onDidLayoutFromJSON() {
+        return this.component.onDidLayoutFromJSON;
     }
     get onDidAddView() {
         return this.component.onDidAddView;
@@ -46391,8 +46397,8 @@ class PaneviewApi {
     resizeToFit() {
         this.component.resizeToFit();
     }
-    fromJSON(data, deferComponentLayout) {
-        this.component.fromJSON(data, deferComponentLayout);
+    fromJSON(data) {
+        this.component.fromJSON(data);
     }
     toJSON() {
         return this.component.toJSON();
@@ -46474,8 +46480,8 @@ class GridviewApi {
     setActive(panel) {
         this.component.setActive(panel);
     }
-    fromJSON(data, deferComponentLayout) {
-        return this.component.fromJSON(data, deferComponentLayout);
+    fromJSON(data) {
+        return this.component.fromJSON(data);
     }
     toJSON() {
         return this.component.toJSON();
@@ -46527,7 +46533,7 @@ class DockviewApi {
     get onDidRemovePanel() {
         return this.component.onDidRemovePanel;
     }
-    get onDidLayoutfromJSON() {
+    get onDidLayoutFromJSON() {
         return this.component.onDidLayoutfromJSON;
     }
     get onDidLayoutChange() {
@@ -49647,7 +49653,7 @@ class GridviewComponent extends _baseComponentGridview__WEBPACK_IMPORTED_MODULE_
         var _a;
         (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.focus();
     }
-    fromJSON(serializedGridview, deferComponentLayout) {
+    fromJSON(serializedGridview) {
         const { grid, activePanel } = serializedGridview;
         const groups = Array.from(this._groups.values()); // reassign since group panels will mutate
         for (const group of groups) {
@@ -49681,14 +49687,7 @@ class GridviewComponent extends _baseComponentGridview__WEBPACK_IMPORTED_MODULE_
             },
         });
         this.layout(this.width, this.height, true);
-        if (deferComponentLayout) {
-            setTimeout(() => {
-                queue.forEach((f) => f());
-            }, 0);
-        }
-        else {
-            queue.forEach((f) => f());
-        }
+        queue.forEach((f) => f());
         if (typeof activePanel === 'string') {
             const panel = this.getPanel(activePanel);
             if (panel) {
@@ -51616,6 +51615,8 @@ class PaneviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Composit
         this.element = element;
         this._disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_3__.MutableDisposable();
         this._viewDisposables = new Map();
+        this._onDidLayoutfromJSON = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        this.onDidLayoutFromJSON = this._onDidLayoutfromJSON.event;
         this._onDidLayoutChange = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
         this.onDidLayoutChange = this._onDidLayoutChange.event;
         this._onDidDrop = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
@@ -51624,7 +51625,7 @@ class PaneviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Composit
         this.onDidAddView = this._onDidAddView.event;
         this._onDidRemoveView = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
         this.onDidRemoveView = this._onDidRemoveView.event;
-        this.addDisposables(this._onDidLayoutChange, this._onDidDrop, this._onDidAddView, this._onDidRemoveView);
+        this.addDisposables(this._onDidLayoutChange, this._onDidLayoutfromJSON, this._onDidDrop, this._onDidAddView, this._onDidRemoveView);
         this._options = options;
         if (!options.components) {
             options.components = {};
@@ -51769,7 +51770,7 @@ class PaneviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Composit
             size: this.paneview.size,
         };
     }
-    fromJSON(serializedPaneview, deferComponentLayout) {
+    fromJSON(serializedPaneview) {
         const { views, size } = serializedPaneview;
         const queue = [];
         for (const [_, value] of this._viewDisposables.entries()) {
@@ -51832,14 +51833,8 @@ class PaneviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_3__.Composit
             },
         });
         this.layout(this.width, this.height);
-        if (deferComponentLayout) {
-            setTimeout(() => {
-                queue.forEach((f) => f());
-            }, 0);
-        }
-        else {
-            queue.forEach((f) => f());
-        }
+        queue.forEach((f) => f());
+        this._onDidLayoutfromJSON.fire();
     }
     doAddPanel(panel) {
         const disposable = panel.onDidDrop((event) => {
@@ -54006,6 +54001,8 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
         this.element = element;
         this._disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_0__.MutableDisposable();
         this.panels = new Map();
+        this._onDidLayoutfromJSON = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
+        this.onDidLayoutFromJSON = this._onDidLayoutfromJSON.event;
         this._onDidAddView = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
         this.onDidAddView = this._onDidAddView.event;
         this._onDidRemoveView = new _events__WEBPACK_IMPORTED_MODULE_2__.Emitter();
@@ -54020,7 +54017,7 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
             options.frameworkComponents = {};
         }
         this.splitview = new _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Splitview(this.element, options);
-        this.addDisposables(this._disposable, this._onDidAddView, this._onDidRemoveView, this._onDidLayoutChange);
+        this.addDisposables(this._disposable, this._onDidAddView, this._onDidLayoutfromJSON, this._onDidRemoveView, this._onDidLayoutChange);
     }
     get options() {
         return this._options;
@@ -54181,7 +54178,7 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
             orientation: this.splitview.orientation,
         };
     }
-    fromJSON(serializedSplitview, deferComponentLayout = false) {
+    fromJSON(serializedSplitview) {
         const { views, orientation, size, activeView } = serializedSplitview;
         for (const [_, value] of this.panels.entries()) {
             value.disposable.dispose();
@@ -54227,20 +54224,14 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
             },
         });
         this.layout(this.width, this.height);
-        if (deferComponentLayout) {
-            setTimeout(() => {
-                queue.forEach((f) => f());
-            }, 0);
-        }
-        else {
-            queue.forEach((f) => f());
-        }
+        queue.forEach((f) => f());
         if (typeof activeView === 'string') {
             const panel = this.getPanel(activeView);
             if (panel) {
                 this.setActive(panel);
             }
         }
+        this._onDidLayoutfromJSON.fire();
     }
     dispose() {
         for (const [_, value] of this.panels.entries()) {
