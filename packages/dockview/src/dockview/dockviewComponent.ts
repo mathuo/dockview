@@ -21,7 +21,7 @@ import { createComponent } from '../panel/componentFactory';
 import {
     AddGroupOptions,
     AddPanelOptions,
-    DockviewOptions as DockviewComponentOptions,
+    DockviewComponentOptions,
     MovementOptions,
     TabContextMenuEvent,
 } from './options';

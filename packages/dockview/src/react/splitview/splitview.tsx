@@ -22,8 +22,8 @@ export interface ISplitviewPanelProps<T extends { [index: string]: any } = any>
 }
 
 export interface ISplitviewReactProps {
-    orientation: Orientation;
-    onReady?: (event: SplitviewReadyEvent) => void;
+    orientation?: Orientation;
+    onReady: (event: SplitviewReadyEvent) => void;
     components: PanelCollection<ISplitviewPanelProps>;
     proportionalLayout?: boolean;
     hideBorders?: boolean;
@@ -58,7 +58,7 @@ export const SplitviewReact = React.forwardRef(
 
         React.useEffect(() => {
             const splitview = new SplitviewComponent(domRef.current!, {
-                orientation: props.orientation,
+                orientation: props.orientation || Orientation.HORIZONTAL,
                 frameworkComponents: props.components,
                 frameworkWrapper: {
                     createComponent: (
