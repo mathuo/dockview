@@ -110,10 +110,6 @@ export class SplitviewComponent
         return this._options;
     }
 
-    get panels(): SplitviewPanel[] {
-        return this.splitview.getViews();
-    }
-
     get length(): number {
         return this._panels.size;
     }
@@ -158,10 +154,6 @@ export class SplitviewComponent
         return this.splitview.orientation === Orientation.HORIZONTAL
             ? this.splitview.size
             : this.splitview.orthogonalSize;
-    }
-
-    get length() {
-        return this._panels.size;
     }
 
     constructor(

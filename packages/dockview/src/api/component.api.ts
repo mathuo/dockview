@@ -197,10 +197,6 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
 
     constructor(private readonly component: IPaneviewComponent) {}
 
-    addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel {
-        return this.component.addPanel(options);
-    }
-
     removePanel(panel: IPaneviewPanel): void {
         this.component.removePanel(panel);
     }
