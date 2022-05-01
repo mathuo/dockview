@@ -73,7 +73,6 @@ export interface ISplitviewComponent extends IDisposable {
     getPanel(id: string): ISplitviewPanel | undefined;
     setActive(view: ISplitviewPanel, skipFocus?: boolean): void;
     removePanel(panel: ISplitviewPanel, sizing?: Sizing): void;
-
     setVisible(panel: ISplitviewPanel, visible: boolean): void;
     movePanel(from: number, to: number): void;
 }
@@ -103,12 +102,12 @@ export class SplitviewComponent
     private readonly _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
 
-    get options(): SplitviewComponentOptions {
-        return this._options;
-    }
-
     get panels(): SplitviewPanel[] {
         return this.splitview.getViews();
+    }
+
+    get options() {
+        return this._options;
     }
 
     get length(): number {
@@ -208,7 +207,7 @@ export class SplitviewComponent
         this.splitview.moveView(from, to);
     }
 
-    setVisible(panel: SplitviewPanel, visible: boolean): void {
+    setVisible(panel: SplitviewPanel, visible: boolean) {
         const index = this.panels.indexOf(panel);
         this.splitview.setViewVisible(index, visible);
     }
@@ -230,7 +229,7 @@ export class SplitviewComponent
         }
     }
 
-    removePanel(panel: SplitviewPanel, sizing?: Sizing): void {
+    removePanel(panel: SplitviewPanel, sizing?: Sizing) {
         const disposable = this._panels.get(panel.id);
 
         if (!disposable) {
@@ -425,7 +424,7 @@ export class SplitviewComponent
         this._onDidLayoutfromJSON.fire();
     }
 
-    dispose(): void {
+    dispose() {
         for (const [_, value] of this._panels.entries()) {
             value.disposable.dispose();
             value.value.dispose();

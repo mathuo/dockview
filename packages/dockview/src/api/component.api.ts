@@ -1,4 +1,5 @@
 import {
+    DockviewDropEvent,
     IDockviewComponent,
     SerializedDockview,
 } from '../dockview/dockviewComponent';
@@ -71,6 +72,10 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
         return this.component.orientation;
     }
 
+    get panels(): ISplitviewPanel[] {
+        return this.component.panels;
+    }
+
     get onDidLayoutFromJSON(): Event<void> {
         return this.component.onDidLayoutFromJSON;
     }
@@ -99,10 +104,6 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
 
     setVisible(panel: ISplitviewPanel, isVisible: boolean): void {
         this.component.setVisible(panel, isVisible);
-    }
-
-    getPanels(): ISplitviewPanel[] {
-        return this.component.panels;
     }
 
     focus(): void {
@@ -159,6 +160,10 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
         return this.component.width;
     }
 
+    get panels(): IPaneviewPanel[] {
+        return this.component.panels;
+    }
+
     get onDidLayoutChange(): Event<void> {
         return this.component.onDidLayoutChange;
     }
@@ -192,8 +197,8 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
 
     constructor(private readonly component: IPaneviewComponent) {}
 
-    getPanels(): IPaneviewPanel[] {
-        return this.component.getPanels();
+    addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel {
+        return this.component.addPanel(options);
     }
 
     removePanel(panel: IPaneviewPanel): void {
@@ -214,10 +219,6 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
 
     layout(width: number, height: number): void {
         this.component.layout(width, height);
-    }
-
-    addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel {
-        return this.component.addPanel(options);
     }
 
     resizeToFit(): void {
@@ -407,6 +408,10 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     get onDidLayoutChange(): Event<void> {
         return this.component.onDidLayoutChange;
+    }
+
+    get onDidDrop(): Event<DockviewDropEvent> {
+        return this.component.onDidDrop;
     }
 
     get panels(): IGroupPanel[] {
