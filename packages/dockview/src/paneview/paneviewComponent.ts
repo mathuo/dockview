@@ -98,6 +98,7 @@ export interface IPaneviewComponent extends IDisposable {
     readonly height: number;
     readonly minimumSize: number;
     readonly maximumSize: number;
+    readonly panels: IPaneviewPanel[];
     readonly onDidAddView: Event<PaneviewPanel>;
     readonly onDidRemoveView: Event<PaneviewPanel>;
     readonly onDidDrop: Event<PaneviewDropEvent2>;
@@ -109,7 +110,6 @@ export interface IPaneviewComponent extends IDisposable {
     fromJSON(serializedPaneview: SerializedPaneview): void;
     resizeToFit(): void;
     focus(): void;
-    getPanels(): IPaneviewPanel[];
     removePanel(panel: IPaneviewPanel): void;
     getPanel(id: string): IPaneviewPanel | undefined;
     movePanel(from: number, to: number): void;
@@ -138,6 +138,10 @@ export class PaneviewComponent
 
     private readonly _onDidRemoveView = new Emitter<PaneviewPanel>();
     readonly onDidRemoveView = this._onDidRemoveView.event;
+
+    get panels(): PaneviewPanel[] {
+        return this.paneview.getPanes();
+    }
 
     set paneview(value: Paneview) {
         this._paneview = value;
@@ -288,12 +292,8 @@ export class PaneviewComponent
         return view;
     }
 
-    getPanels(): PaneviewPanel[] {
-        return this.paneview.getPanes();
-    }
-
     removePanel(panel: PaneviewPanel) {
-        const views = this.getPanels();
+        const views = this.panels;
         const index = views.findIndex((_) => _ === panel);
         this.paneview.removePane(index);
 
@@ -305,7 +305,7 @@ export class PaneviewComponent
     }
 
     getPanel(id: string): PaneviewPanel | undefined {
-        return this.getPanels().find((view) => view.id === id);
+        return this.panels.find((view) => view.id === id);
     }
 
     layout(width: number, height: number): void {
