@@ -7,3 +7,79 @@
 | hideBorders         | boolean                              | Yes      | false                  |             |
 | className           | string                               | Yes      | ''                     |             |
 | disableAutoResizing | boolean                              | Yes      | false                  |             |
+
+## Gridview API
+
+```tsx
+const MyComponent = (props: IGridviewPanelProps<{ title: string }>) => {
+    // props.containerApi...
+
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+```tsx
+const onReady = (event: GridviewReadyEvent) => {
+    // event.api...
+};
+```
+
+| Property               | Type                                                                                              | Description          |
+| ---------------------- | ------------------------------------------------------------------------------------------------- | -------------------- |
+| height                 | `number`                                                                                          |                      |
+| width                  | `number`                                                                                          |                      |
+| minimumHeight          | `number`                                                                                          |                      |
+| maximumHeight          | `number`                                                                                          |                      |
+| maximumWidth           | `number`                                                                                          |                      |
+| maximumWidth           | `number`                                                                                          |                      |
+| length                 | `number`                                                                                          | Number of panels     |
+| panels                 | `ISplitviewPanel[]`                                                                               |                      |
+| orientation            | `Orientation`                                                                                     |                      |
+| onDidLayoutChange      | `Event<void>`                                                                                     |                      |
+| onDidLayoutFromJSON    | `Event<void>`                                                                                     |                      |
+| onDidAddGroup          | `Event<IGridviewPanel>`                                                                           |                      |
+| onDidRemoveGroup       | `Event<IGridviewPanel>`                                                                           |                      |
+| onDidActiveGroupChange | `Event<IGridviewPanel \| undefined>`                                                              |                      |
+| addPanel               | `addPanel(options: AddComponentOptions): IGridviewPanel`                                          |                      |
+| removePanel            | `(panel: IGridviewPanel, sizing?: Sizing): void`                                                  |                      |
+| movePanel              | `(panel: IGridviewPanel, options: {direction: Direction, refernece:string, size?: number}): void` |                      |
+| getPanel               | `(id: string) \| IGridviewPanel \| undefined`                                                     |                      |
+| updateOptions          | `(options:SplitviewComponentUpdateOptions): void`                                                 |                      |
+| setVisible             | `(panel: IGridviewPanel, isVisible: boolean): void`                                               |                      |
+| focus                  | `(): void`                                                                                        |                      |
+| setActive              | `(panel: IGridviewPanel): void`                                                                   |                      |
+| toggleVisiblity        | `(panel: IGridviewPanel): void`                                                                   |                      |
+| layout                 | `(width: number, height:number): void`                                                            |                      |
+| resizeToFit            | `(): void`                                                                                        |                      |
+| fromJSON               | `(data: SerializedGridview): void`                                                                | Deserialize a layout |
+| toJSON                 | `(): SerializedGridview`                                                                          | Serialized a layout  |
+
+## Gridview Panel API
+
+```tsx
+const MyComponent = (props: IGridviewPanelProps<{ title: string }>) => {
+    // props.api...
+
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+| Property               | Type                                                        | Description      |
+| ---------------------- | ----------------------------------------------------------- | ---------------- |
+| id                     | `string`                                                    | Panel id         |
+| isFocused              | `boolean`                                                   | Is panel focsed  |
+| isActive               | `boolean`                                                   | Is panel active  |
+| isVisible              | `boolean`                                                   | Is panel visible |
+| width                  | `number`                                                    | Panel width      |
+| height                 | `number`                                                    | Panel height     |
+| onDidDimensionsChange  | `Event<PanelDimensionChangeEvent>`                          |                  |
+| onDidFocusChange       | `Event<FocusEvent>`                                         |                  |
+| onDidVisibilityChange  | `Event<VisibilityEvent>`                                    |                  |
+| onDidActiveChange      | `Event<ActiveEvent>`                                        |                  |
+| onFocusEvent           | `Event<void>`                                               |                  |
+| setVisible             | `(isVisible: boolean): void`                                |                  |
+| setActive              | `(): void`                                                  |                  |
+|                        |                                                             |                  |
+| onDidConstraintsChange | `onDidConstraintsChange: Event<PanelConstraintChangeEvent>` |                  |
+| setConstraints         | `(value: PanelConstraintChangeEvent2): void;`               |                  |
+| setSize                | `(event: SizeEvent): void`                                  |                  |

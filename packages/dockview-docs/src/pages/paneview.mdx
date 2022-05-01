@@ -7,3 +7,75 @@
 | disableAutoResizing | boolean                              | Yes      | false   |             |
 | disableDnd          | boolean                              | Yes      | false   |             |
 | onDidDrop           | Event                                | Yes      |         |             |
+
+## Gridview API
+
+```tsx
+const MyComponent = (props: IGridviewPanelProps<{ title: string }>) => {
+    // props.containerApi...
+
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+```tsx
+const onReady = (event: GridviewReadyEvent) => {
+    // event.api...
+};
+```
+
+| Property            | Type                                                             | Description          |
+| ------------------- | ---------------------------------------------------------------- | -------------------- |
+| height              | `number`                                                         |                      |
+| width               | `number`                                                         |                      |
+| minimumSize         | `number`                                                         |                      |
+| maximumSize         | `number`                                                         |                      |
+| length              | `number`                                                         | Number of panels     |
+| panels              | `IPaneviewPanel[]`                                               |                      |
+|                     |                                                                  |                      |
+| onDidLayoutChange   | `Event<void>`                                                    |                      |
+| onDidLayoutFromJSON | `Event<void>`                                                    |                      |
+| onDidAddView        | `Event<IPaneviewPanel>`                                          |                      |
+| onDidRemoveView     | `Event<IPaneviewPanel>`                                          |                      |
+| onDidDrop           | `Event<PaneviewDropEvent`                                        |                      |
+|                     |                                                                  |                      |
+| addPanel            | `addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel` |                      |
+| removePanel         | `(panel: IPaneviewPanel): void`                                  |                      |
+| movePanel           | `(from: number, to: number): void`                               |                      |
+| getPanel            | `(id:string): IPaneviewPanel \| undefined`                       |                      |
+|                     |                                                                  |                      |
+| focus               | `(): void`                                                       |                      |
+| layout              | `(width: number, height:number): void`                           |                      |
+| resizeToFit         | `(): void`                                                       |                      |
+| fromJSON            | `(data: SerializedPaneview): void`                               | Deserialize a layout |
+| toJSON              | `(): SerializedPaneview`                                         | Serialized a layout  |
+
+## Gridview Panel API
+
+```tsx
+const MyComponent = (props: IGridviewPanelProps<{ title: string }>) => {
+    // props.api...
+
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+| Property               | Type                                                        | Description      |
+| ---------------------- | ----------------------------------------------------------- | ---------------- |
+| id                     | `string`                                                    | Panel id         |
+| isFocused              | `boolean`                                                   | Is panel focsed  |
+| isActive               | `boolean`                                                   | Is panel active  |
+| isVisible              | `boolean`                                                   | Is panel visible |
+| width                  | `number`                                                    | Panel width      |
+| height                 | `number`                                                    | Panel height     |
+| onDidDimensionsChange  | `Event<PanelDimensionChangeEvent>`                          |                  |
+| onDidFocusChange       | `Event<FocusEvent>`                                         |                  |
+| onDidVisibilityChange  | `Event<VisibilityEvent>`                                    |                  |
+| onDidActiveChange      | `Event<ActiveEvent>`                                        |                  |
+| onFocusEvent           | `Event<void>`                                               |                  |
+| setVisible             | `(isVisible: boolean): void`                                |                  |
+| setActive              | `(): void`                                                  |                  |
+|                        |                                                             |                  |
+| onDidConstraintsChange | `onDidConstraintsChange: Event<PanelConstraintChangeEvent>` |                  |
+| setConstraints         | `(value: PanelConstraintChangeEvent2): void;`               |                  |
+| setSize                | `(event: SizeEvent): void`                                  |                  |
