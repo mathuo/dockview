@@ -67,6 +67,10 @@ export const SimpleSplitview = () => {
 
 ## Component Props
 
+```tsx
+import { ReactSplitview } from 'dockview';
+```
+
 The `onReady` prop you will you access to the component `api`.
 
 | Property            | Type                                   | Optional | Default                  | Description                                             |
@@ -95,30 +99,33 @@ const onReady = (event: SplitviewReadyEvent) => {
 };
 ```
 
-| Property            | Type                                                               | Description          |
-| ------------------- | ------------------------------------------------------------------ | -------------------- |
-| height              | `number`                                                           |                      |
-| width               | `number`                                                           |                      |
-| minimumSize         | `number`                                                           |                      |
-| maximumSize         | `number`                                                           |                      |
-| length              | `number`                                                           | Number of panels     |
-| panels              | `ISplitviewPanel[]`                                                |                      |
-| onDidLayoutChange   | `Event<void>`                                                      |                      |
-| onDidLayoutFromJSON | `Event<void>`                                                      |                      |
-| onDidAddView        | `Event<IView>`                                                     |                      |
-| onDidRemoveView     | `Event<IView>`                                                     |                      |
-| addPanel            | `addPanel(options: AddSplitviewComponentOptions): ISplitviewPanel` |                      |
-| removePanel         | `(panel: ISplitviewPanel, sizing?: Sizing): void`                  |                      |
-| updateOptions       | `(options:SplitviewComponentUpdateOptions): void`                  |                      |
-| movePanel           | `(from: number, to: number): void`                                 |                      |
-| setVisible          | `(panel: ISplitviewPanel, isVisible: boolean): void`               |                      |
-| focus               | `(): void`                                                         |                      |
-| getPanel            | `(id:string): ISplitviewPanel \| undefined`                        |                      |
-| setActive           | `(panel: ISplitviewPanel): void`                                   |                      |
-| layout              | `(width: number, height:number): void`                             |                      |
-| resizeToFit         | `(): void`                                                         |                      |
-| fromJSON            | `(data: SerializedSplitview): void`                                | Deserialize a layout |
-| toJSON              | `(): SerializedSplitview`                                          | Serialized a layout  |
+| Property            | Type                                                               | Description                                 |
+| ------------------- | ------------------------------------------------------------------ | ------------------------------------------- |
+| height              | `number`                                                           | Component pixel height                      |
+| width               | `number`                                                           | Component pixel width                       |
+| minimumSize         | `number`                                                           |                                             |
+| maximumSize         | `number`                                                           |                                             |
+| length              | `number`                                                           | Number of panels                            |
+| panels              | `ISplitviewPanel[]`                                                |                                             |
+|                     |                                                                    |                                             |
+| onDidLayoutChange   | `Event<void>`                                                      |                                             |
+| onDidLayoutFromJSON | `Event<void>`                                                      |                                             |
+| onDidAddView        | `Event<IView>`                                                     |                                             |
+| onDidRemoveView     | `Event<IView>`                                                     |                                             |
+|                     |                                                                    |                                             |
+| addPanel            | `addPanel(options: AddSplitviewComponentOptions): ISplitviewPanel` |                                             |
+| removePanel         | `(panel: ISplitviewPanel, sizing?: Sizing): void`                  |                                             |
+| getPanel            | `(id:string): ISplitviewPanel \| undefined`                        |                                             |
+| movePanel           | `(from: number, to: number): void`                                 |                                             |
+|                     |                                                                    |
+| setVisible          | `(panel: ISplitviewPanel, isVisible: boolean): void`               |                                             |
+| setActive           | `(panel: ISplitviewPanel): void`                                   |                                             |
+| updateOptions       | `(options:SplitviewComponentUpdateOptions): void`                  |                                             |
+| focus               | `(): void`                                                         |                                             |
+| layout              | `(width: number, height:number): void`                             | See [Auto resizing](/basics/#auto-resizing) |
+| resizeToFit         | `(): void`                                                         | See [Auto resizing](/basics/#auto-resizing) |
+| fromJSON            | `(data: SerializedSplitview): void`                                | See [Serialization](/basics/#serialization) |
+| toJSON              | `(): SerializedSplitview`                                          | See [Serialization](/basics/#serialization) |
 
 ## Splitview Panel API
 
@@ -138,14 +145,16 @@ const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
 | isVisible              | `boolean`                                                   | Is panel visible |
 | width                  | `number`                                                    | Panel width      |
 | height                 | `number`                                                    | Panel height     |
+|                        |                                                             |
 | onDidDimensionsChange  | `Event<PanelDimensionChangeEvent>`                          |                  |
 | onDidFocusChange       | `Event<FocusEvent>`                                         |                  |
 | onDidVisibilityChange  | `Event<VisibilityEvent>`                                    |                  |
 | onDidActiveChange      | `Event<ActiveEvent>`                                        |                  |
 | onFocusEvent           | `Event<void>`                                               |                  |
+| onDidConstraintsChange | `onDidConstraintsChange: Event<PanelConstraintChangeEvent>` |                  |
+|                        |                                                             |                  |
 | setVisible             | `(isVisible: boolean): void`                                |                  |
 | setActive              | `(): void`                                                  |                  |
 |                        |                                                             |                  |
-| onDidConstraintsChange | `onDidConstraintsChange: Event<PanelConstraintChangeEvent>` |                  |
 | setConstraints         | `(value: PanelConstraintChangeEvent2): void;`               |                  |
 | setSize                | `(event: PanelSizeEvent): void`                             |                  |

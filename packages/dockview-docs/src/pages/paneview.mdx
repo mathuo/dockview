@@ -1,12 +1,18 @@
-| Property            | Type                                 | Optional | Default | Description |
-| ------------------- | ------------------------------------ | -------- | ------- | ----------- |
-| onReady             | (event: SplitviewReadyEvent) => void | No       |         |             |
-| components          | object                               | No       |         |             |
-| headerComponents    | object                               | Yes      |         |             |
-| className           | string                               | Yes      | ''      |             |
-| disableAutoResizing | boolean                              | Yes      | false   |             |
-| disableDnd          | boolean                              | Yes      | false   |             |
-| onDidDrop           | Event                                | Yes      |         |             |
+## Component Props
+
+```tsx
+import { ReactPaneview } from 'dockview';
+```
+
+| Property            | Type                                 | Optional | Default | Description                                 |
+| ------------------- | ------------------------------------ | -------- | ------- | ------------------------------------------- |
+| onReady             | (event: SplitviewReadyEvent) => void | No       |         |                                             |
+| components          | object                               | No       |         |                                             |
+| headerComponents    | object                               | Yes      |         |                                             |
+| className           | string                               | Yes      | ''      |                                             |
+| disableAutoResizing | boolean                              | Yes      | false   | See [Auto resizing](/basics/#auto-resizing) |
+| disableDnd          | boolean                              | Yes      | false   |                                             |
+| onDidDrop           | Event                                | Yes      |         |                                             |
 
 ## Gridview API
 
@@ -24,31 +30,31 @@ const onReady = (event: GridviewReadyEvent) => {
 };
 ```
 
-| Property            | Type                                                             | Description          |
-| ------------------- | ---------------------------------------------------------------- | -------------------- |
-| height              | `number`                                                         |                      |
-| width               | `number`                                                         |                      |
-| minimumSize         | `number`                                                         |                      |
-| maximumSize         | `number`                                                         |                      |
-| length              | `number`                                                         | Number of panels     |
-| panels              | `IPaneviewPanel[]`                                               |                      |
-|                     |                                                                  |                      |
-| onDidLayoutChange   | `Event<void>`                                                    |                      |
-| onDidLayoutFromJSON | `Event<void>`                                                    |                      |
-| onDidAddView        | `Event<IPaneviewPanel>`                                          |                      |
-| onDidRemoveView     | `Event<IPaneviewPanel>`                                          |                      |
-| onDidDrop           | `Event<PaneviewDropEvent`                                        |                      |
-|                     |                                                                  |                      |
-| addPanel            | `addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel` |                      |
-| removePanel         | `(panel: IPaneviewPanel): void`                                  |                      |
-| movePanel           | `(from: number, to: number): void`                               |                      |
-| getPanel            | `(id:string): IPaneviewPanel \| undefined`                       |                      |
-|                     |                                                                  |                      |
-| focus               | `(): void`                                                       |                      |
-| layout              | `(width: number, height:number): void`                           |                      |
-| resizeToFit         | `(): void`                                                       |                      |
-| fromJSON            | `(data: SerializedPaneview): void`                               | Deserialize a layout |
-| toJSON              | `(): SerializedPaneview`                                         | Serialized a layout  |
+| Property            | Type                                                             | Description                                 |
+| ------------------- | ---------------------------------------------------------------- | ------------------------------------------- |
+| height              | `number`                                                         | Component pixel height                      |
+| width               | `number`                                                         | Component pixel width                       |
+| minimumSize         | `number`                                                         |                                             |
+| maximumSize         | `number`                                                         |                                             |
+| length              | `number`                                                         | Number of panels                            |
+| panels              | `IPaneviewPanel[]`                                               |                                             |
+|                     |                                                                  |                                             |
+| onDidLayoutChange   | `Event<void>`                                                    |                                             |
+| onDidLayoutFromJSON | `Event<void>`                                                    |                                             |
+| onDidAddView        | `Event<IPaneviewPanel>`                                          |                                             |
+| onDidRemoveView     | `Event<IPaneviewPanel>`                                          |                                             |
+| onDidDrop           | `Event<PaneviewDropEvent`                                        |                                             |
+|                     |                                                                  |                                             |
+| addPanel            | `addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel` |                                             |
+| removePanel         | `(panel: IPaneviewPanel): void`                                  |                                             |
+| movePanel           | `(from: number, to: number): void`                               |                                             |
+| getPanel            | `(id:string): IPaneviewPanel \| undefined`                       |                                             |
+|                     |                                                                  |                                             |
+| focus               | `(): void`                                                       |                                             |
+| layout              | `(width: number, height:number): void`                           | See [Auto resizing](/basics/#auto-resizing) |
+| resizeToFit         | `(): void`                                                       | See [Auto resizing](/basics/#auto-resizing) |
+| fromJSON            | `(data: SerializedPaneview): void`                               | See [Serialization](/basics/#serialization) |
+| toJSON              | `(): SerializedPaneview`                                         | See [Serialization](/basics/#serialization) |
 
 ## Gridview Panel API
 
@@ -68,14 +74,15 @@ const MyComponent = (props: IGridviewPanelProps<{ title: string }>) => {
 | isVisible              | `boolean`                                                   | Is panel visible |
 | width                  | `number`                                                    | Panel width      |
 | height                 | `number`                                                    | Panel height     |
+|                        |                                                             |
 | onDidDimensionsChange  | `Event<PanelDimensionChangeEvent>`                          |                  |
 | onDidFocusChange       | `Event<FocusEvent>`                                         |                  |
 | onDidVisibilityChange  | `Event<VisibilityEvent>`                                    |                  |
 | onDidActiveChange      | `Event<ActiveEvent>`                                        |                  |
 | onFocusEvent           | `Event<void>`                                               |                  |
+| onDidConstraintsChange | `onDidConstraintsChange: Event<PanelConstraintChangeEvent>` |                  |
+|                        |                                                             |
 | setVisible             | `(isVisible: boolean): void`                                |                  |
 | setActive              | `(): void`                                                  |                  |
-|                        |                                                             |                  |
-| onDidConstraintsChange | `onDidConstraintsChange: Event<PanelConstraintChangeEvent>` |                  |
 | setConstraints         | `(value: PanelConstraintChangeEvent2): void;`               |                  |
 | setSize                | `(event: SizeEvent): void`                                  |                  |

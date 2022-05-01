@@ -56,7 +56,7 @@ export const SimpleDockview = () => {
             params: {
                 title: 'Panel 4',
             },
-            position: { referencePanelId: 'panel_1', direction: 'right' },
+            position: { referencePanel: 'panel_1', direction: 'right' },
         });
 
         const panel5 = event.api.addPanel({
@@ -65,7 +65,7 @@ export const SimpleDockview = () => {
             params: {
                 title: 'Panel 5',
             },
-            position: { referencePanelId: 'panel_3', direction: 'right' },
+            position: { referencePanel: 'panel_3', direction: 'right' },
         });
 
         // panel5.group!.model.header.hidden = true;
@@ -77,7 +77,7 @@ export const SimpleDockview = () => {
             params: {
                 title: 'Panel 6',
             },
-            position: { referencePanelId: 'panel_5', direction: 'below' },
+            position: { referencePanel: 'panel_5', direction: 'below' },
         });
 
         event.api.addPanel({
@@ -86,7 +86,7 @@ export const SimpleDockview = () => {
             params: {
                 title: 'Panel 7',
             },
-            position: { referencePanelId: 'panel_6', direction: 'right' },
+            position: { referencePanel: 'panel_6', direction: 'right' },
         });
     };
 

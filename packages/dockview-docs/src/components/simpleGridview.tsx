@@ -43,7 +43,7 @@ export const SimpleGridview = () => {
             params: {
                 title: 'Panel 4',
             },
-            position: { reference: 'panel_1', direction: 'right' },
+            position: { referencePanel: 'panel_1', direction: 'right' },
         });
 
         event.api.addPanel({
@@ -52,7 +52,7 @@ export const SimpleGridview = () => {
             params: {
                 title: 'Panel 5',
             },
-            position: { reference: 'panel_3', direction: 'right' },
+            position: { referencePanel: 'panel_3', direction: 'right' },
         });
 
         event.api.addPanel({
@@ -61,7 +61,7 @@ export const SimpleGridview = () => {
             params: {
                 title: 'Panel 6',
             },
-            position: { reference: 'panel_5', direction: 'below' },
+            position: { referencePanel: 'panel_5', direction: 'below' },
         });
 
         event.api.addPanel({
@@ -70,7 +70,7 @@ export const SimpleGridview = () => {
             params: {
                 title: 'Panel 7',
             },
-            position: { reference: 'panel_6', direction: 'right' },
+            position: { referencePanel: 'panel_6', direction: 'right' },
         });
     };
 

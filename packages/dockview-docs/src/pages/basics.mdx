@@ -6,6 +6,11 @@ import { SimpleSplitview } from '../components/simpleSplitview';
 Internally this is achieved using a [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver).
 You can disable this by settings the `disableAutoResizing` prop to be `true`.
 
+You can manually resize a component using the API method `layout(width: number, height: number): void`.
+
+You can force a component to resize without providing any measurements using the API method `resizeToFit(): void`.
+This method will evaluate the width and height of the parent `HTMLElement` container and use these values to relayout.
+
 ## Proportional layout
 
 <div
@@ -89,3 +94,7 @@ const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
     );
 };
 ```
+
+### Serialization
+
+All components support `toJSON(): T` which returns a Typed object representation of the components state. This same Typed object can be used to deserialize a view using `fromJSON(object: T): void`.
