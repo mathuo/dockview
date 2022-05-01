@@ -49,12 +49,11 @@ export interface ViewFactoryData {
     tab?: string;
 }
 
-export interface DockviewOptions extends DockviewRenderFunctions {
+export interface DockviewComponentOptions extends DockviewRenderFunctions {
     watermarkComponent?: WatermarkConstructor;
     watermarkFrameworkComponent?: any;
     frameworkComponentFactory?: GroupPanelFrameworkComponentFactory;
     tabHeight?: number;
-    debug?: boolean;
     orientation?: Orientation;
     styles?: ISplitviewStyles;
     showDndOverlay?: (event: DragEvent, target: DockviewDropTargets) => boolean;
