@@ -27,8 +27,8 @@ export interface PaneviewDropEvent extends PaneviewDropEvent2 {
 }
 
 export interface IPaneviewReactProps {
-    onReady?: (event: PaneviewReadyEvent) => void;
-    components?: PanelCollection<IPaneviewPanelProps>;
+    onReady: (event: PaneviewReadyEvent) => void;
+    components: PanelCollection<IPaneviewPanelProps>;
     headerComponents?: PanelCollection<IPaneviewPanelProps>;
     className?: string;
     disableAutoResizing?: boolean;

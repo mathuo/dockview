@@ -102,7 +102,7 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
     }
 
     getPanels(): ISplitviewPanel[] {
-        return this.component.getPanels();
+        return this.component.panels;
     }
 
     focus(): void {
@@ -121,8 +121,8 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
         return this.component.layout(width, height);
     }
 
-    addPanel(options: AddSplitviewComponentOptions): void {
-        this.component.addPanel(options);
+    addPanel(options: AddSplitviewComponentOptions): ISplitviewPanel {
+        return this.component.addPanel(options);
     }
 
     resizeToFit(): void {
@@ -216,8 +216,8 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
         this.component.layout(width, height);
     }
 
-    addPanel(options: AddPaneviewComponentOptions): void {
-        this.component.addPanel(options);
+    addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel {
+        return this.component.addPanel(options);
     }
 
     resizeToFit(): void {
@@ -300,8 +300,8 @@ export class GridviewApi implements CommonApi<SerializedGridview> {
         this.component.layout(width, height, force);
     }
 
-    addPanel(options: AddComponentOptions): void {
-        this.component.addPanel(options);
+    addPanel(options: AddComponentOptions): IGridviewPanel {
+        return this.component.addPanel(options);
     }
 
     removePanel(panel: IGridviewPanel, sizing?: Sizing): void {

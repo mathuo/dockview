@@ -22,8 +22,8 @@ export interface IGridviewPanelProps<T extends { [index: string]: any } = any>
 }
 
 export interface IGridviewReactProps {
-    orientation: Orientation;
-    onReady?: (event: GridviewReadyEvent) => void;
+    orientation?: Orientation;
+    onReady: (event: GridviewReadyEvent) => void;
     components: PanelCollection<IGridviewPanelProps>;
     hideBorders?: boolean;
     className?: string;
@@ -64,7 +64,7 @@ export const GridviewReact = React.forwardRef(
                     typeof props.proportionalLayout === 'boolean'
                         ? props.proportionalLayout
                         : true,
-                orientation: props.orientation,
+                orientation: props.orientation || Orientation.HORIZONTAL,
                 frameworkComponents: props.components,
                 frameworkComponentFactory: {
                     createComponent: (id: string, componentId, component) => {

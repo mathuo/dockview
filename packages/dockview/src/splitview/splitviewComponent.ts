@@ -61,8 +61,9 @@ export interface ISplitviewComponent extends IDisposable {
     readonly onDidAddView: Event<IView>;
     readonly onDidRemoveView: Event<IView>;
     readonly onDidLayoutFromJSON: Event<void>;
+    readonly panels: SplitviewPanel[];
     updateOptions(options: Partial<SplitviewComponentUpdateOptions>): void;
-    addPanel(options: AddSplitviewComponentOptions): void;
+    addPanel(options: AddSplitviewComponentOptions): ISplitviewPanel;
     layout(width: number, height: number): void;
     onDidLayoutChange: Event<void>;
     toJSON(): SerializedSplitview;
@@ -72,7 +73,7 @@ export interface ISplitviewComponent extends IDisposable {
     getPanel(id: string): ISplitviewPanel | undefined;
     setActive(view: ISplitviewPanel, skipFocus?: boolean): void;
     removePanel(panel: ISplitviewPanel, sizing?: Sizing): void;
-    getPanels(): SplitviewPanel[];
+
     setVisible(panel: ISplitviewPanel, visible: boolean): void;
     movePanel(from: number, to: number): void;
 }
@@ -87,7 +88,7 @@ export class SplitviewComponent
     private _disposable = new MutableDisposable();
     private _splitview!: Splitview;
     private _activePanel: SplitviewPanel | undefined;
-    private panels = new Map<string, IValueDisposable<SplitviewPanel>>();
+    private _panels = new Map<string, IValueDisposable<SplitviewPanel>>();
     private _options: SplitviewComponentOptions;
 
     private readonly _onDidLayoutfromJSON = new Emitter<void>();
@@ -102,15 +103,23 @@ export class SplitviewComponent
     private readonly _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
 
-    get options() {
+    get options(): SplitviewComponentOptions {
         return this._options;
     }
 
-    get orientation() {
+    get panels(): SplitviewPanel[] {
+        return this.splitview.getViews();
+    }
+
+    get length(): number {
+        return this._panels.size;
+    }
+
+    get orientation(): Orientation {
         return this.splitview.orientation;
     }
 
-    get splitview() {
+    get splitview(): Splitview {
         return this._splitview;
     }
 
@@ -128,28 +137,24 @@ export class SplitviewComponent
         );
     }
 
-    get minimumSize() {
+    get minimumSize(): number {
         return this.splitview.minimumSize;
     }
 
-    get maximumSize() {
+    get maximumSize(): number {
         return this.splitview.maximumSize;
     }
 
-    get height() {
+    get height(): number {
         return this.splitview.orientation === Orientation.HORIZONTAL
             ? this.splitview.orthogonalSize
             : this.splitview.size;
     }
 
-    get width() {
+    get width(): number {
         return this.splitview.orientation === Orientation.HORIZONTAL
             ? this.splitview.size
             : this.splitview.orthogonalSize;
-    }
-
-    get length() {
-        return this.panels.size;
     }
 
     constructor(
@@ -195,23 +200,23 @@ export class SplitviewComponent
         );
     }
 
-    focus() {
+    focus(): void {
         this._activePanel?.focus();
     }
 
-    movePanel(from: number, to: number) {
+    movePanel(from: number, to: number): void {
         this.splitview.moveView(from, to);
     }
 
-    setVisible(panel: SplitviewPanel, visible: boolean) {
-        const index = this.getPanels().indexOf(panel);
+    setVisible(panel: SplitviewPanel, visible: boolean): void {
+        const index = this.panels.indexOf(panel);
         this.splitview.setViewVisible(index, visible);
     }
 
-    setActive(view: SplitviewPanel, skipFocus?: boolean) {
+    setActive(view: SplitviewPanel, skipFocus?: boolean): void {
         this._activePanel = view;
 
-        this.getPanels()
+        this.panels
             .filter((v) => v !== view)
             .forEach((v) => {
                 v.api._onDidActiveChange.fire({ isActive: false });
@@ -225,12 +230,8 @@ export class SplitviewComponent
         }
     }
 
-    getPanels(): SplitviewPanel[] {
-        return this.splitview.getViews();
-    }
-
-    removePanel(panel: SplitviewPanel, sizing?: Sizing) {
-        const disposable = this.panels.get(panel.id);
+    removePanel(panel: SplitviewPanel, sizing?: Sizing): void {
+        const disposable = this._panels.get(panel.id);
 
         if (!disposable) {
             throw new Error(`unknown splitview panel ${panel.id}`);
@@ -239,23 +240,23 @@ export class SplitviewComponent
         disposable.disposable.dispose();
         disposable.value.dispose();
 
-        this.panels.delete(panel.id);
+        this._panels.delete(panel.id);
 
-        const index = this.getPanels().findIndex((_) => _ === panel);
+        const index = this.panels.findIndex((_) => _ === panel);
         this.splitview.removeView(index, sizing);
 
-        const panels = this.getPanels();
+        const panels = this.panels;
         if (panels.length > 0) {
             this.setActive(panels[panels.length - 1]);
         }
     }
 
     getPanel(id: string): SplitviewPanel | undefined {
-        return this.getPanels().find((view) => view.id === id);
+        return this.panels.find((view) => view.id === id);
     }
 
-    addPanel(options: AddSplitviewComponentOptions): void {
-        if (this.panels.has(options.id)) {
+    addPanel(options: AddSplitviewComponentOptions): ISplitviewPanel {
+        if (this._panels.has(options.id)) {
             throw new Error(`panel ${options.id} already exists`);
         }
 
@@ -292,6 +293,8 @@ export class SplitviewComponent
 
         this.doAddView(view);
         this.setActive(view);
+
+        return view;
     }
 
     /**
@@ -314,7 +317,7 @@ export class SplitviewComponent
         this.splitview.layout(size, orthogonalSize);
     }
 
-    private doAddView(view: SplitviewPanel) {
+    private doAddView(view: SplitviewPanel): void {
         const disposable = view.api.onDidFocusChange((event) => {
             if (!event.isFocused) {
                 return;
@@ -322,7 +325,7 @@ export class SplitviewComponent
             this.setActive(view, true);
         });
 
-        this.panels.set(view.id, { disposable, value: view });
+        this._panels.set(view.id, { disposable, value: view });
     }
 
     toJSON(): SerializedSplitview {
@@ -349,11 +352,11 @@ export class SplitviewComponent
     fromJSON(serializedSplitview: SerializedSplitview): void {
         const { views, orientation, size, activeView } = serializedSplitview;
 
-        for (const [_, value] of this.panels.entries()) {
+        for (const [_, value] of this._panels.entries()) {
             value.disposable.dispose();
             value.value.dispose();
         }
-        this.panels.clear();
+        this._panels.clear();
         this.splitview.dispose();
 
         const queue: Function[] = [];
@@ -366,7 +369,7 @@ export class SplitviewComponent
                 views: views.map((view) => {
                     const data = view.data;
 
-                    if (this.panels.has(data.id)) {
+                    if (this._panels.has(data.id)) {
                         throw new Error(`panel ${data.id} already exists`);
                     }
 
@@ -422,12 +425,12 @@ export class SplitviewComponent
         this._onDidLayoutfromJSON.fire();
     }
 
-    dispose() {
-        for (const [_, value] of this.panels.entries()) {
+    dispose(): void {
+        for (const [_, value] of this._panels.entries()) {
             value.disposable.dispose();
             value.value.dispose();
         }
-        this.panels.clear();
+        this._panels.clear();
 
         this.splitview.dispose();
 
