@@ -4,7 +4,7 @@ import {
     GridviewPanelApi,
     GridviewPanelApiImpl,
 } from '../api/gridviewPanelApi';
-import { Groupview, GroupOptions, IGroupview } from './groupview';
+import { Groupview, GroupOptions, IHeader } from './groupview';
 import { GridviewPanel, IGridviewPanel } from '../gridview/gridviewPanel';
 import { IGroupPanel } from './groupPanel';
 
@@ -63,6 +63,10 @@ export class GroupviewPanel extends GridviewPanel implements IGroupviewPanel {
 
     set locked(value: boolean) {
         this._model.locked = value;
+    }
+
+    get header(): IHeader {
+        return this._model.header;
     }
 
     constructor(

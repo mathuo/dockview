@@ -394,7 +394,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
     public openPanel(
         panel: IGroupPanel,
-        options: { index?: number; skipFocus?: boolean } = {}
+        options: {
+            index?: number;
+            skipFocus?: boolean;
+            skipSetActive?: boolean;
+        } = {}
     ) {
         if (
             typeof options.index !== 'number' ||
@@ -403,18 +407,22 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             options.index = this.panels.length;
         }
 
+        const skipSetActive = !!options.skipSetActive;
+
         // ensure the group is updated before we fire any events
         panel.updateParentGroup(this.parent, true);
 
-        if (this._activePanel === panel) {
+        if (!skipSetActive && this._activePanel === panel) {
             this.accessor.doSetGroupActive(this.parent);
             return;
         }
 
         this.doAddPanel(panel, options.index);
 
-        this.doSetActivePanel(panel);
-        this.accessor.doSetGroupActive(this.parent, !!options.skipFocus);
+        if (!skipSetActive) {
+            this.doSetActivePanel(panel);
+            this.accessor.doSetGroupActive(this.parent, !!options.skipFocus);
+        }
 
         this.updateContainer();
     }

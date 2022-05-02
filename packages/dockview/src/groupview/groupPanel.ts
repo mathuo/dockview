@@ -24,7 +24,7 @@ export type GroupPanelUpdateEvent = PanelUpdateEvent<{
 
 export interface IGroupPanel extends IDisposable, IPanel {
     readonly view?: IGroupPanelView;
-    readonly group?: GroupviewPanel;
+    readonly group: GroupviewPanel;
     readonly api: DockviewPanelApi;
     readonly title: string;
     readonly suppressClosable: boolean;

@@ -6,11 +6,15 @@ import { createComponent } from '../panel/componentFactory';
 import { DockviewApi } from '../api/component.api';
 import { DefaultTab } from '../dockview/components/tab/defaultTab';
 import { DefaultGroupPanelView } from '../dockview/defaultGroupPanelView';
+import { GroupviewPanel } from '../groupview/groupviewPanel';
 
 export class ReactPanelDeserialzier implements IPanelDeserializer {
     constructor(private readonly layout: DockviewComponent) {}
 
-    public fromJSON(panelData: GroupviewPanelState): IGroupPanel {
+    public fromJSON(
+        panelData: GroupviewPanelState,
+        group: GroupviewPanel
+    ): IGroupPanel {
         const panelId = panelData.id;
         const params = panelData.params;
         const title = panelData.title;
@@ -39,7 +43,8 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
         const panel = new DockviewGroupPanel(
             panelId,
             this.layout,
-            new DockviewApi(this.layout)
+            new DockviewApi(this.layout),
+            group
         );
 
         panel.init({
