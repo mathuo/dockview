@@ -68,12 +68,10 @@ export interface ISplitviewComponent extends IDisposable {
     onDidLayoutChange: Event<void>;
     toJSON(): SerializedSplitview;
     fromJSON(serializedSplitview: SerializedSplitview): void;
-    resizeToFit(): void;
     focus(): void;
     getPanel(id: string): ISplitviewPanel | undefined;
     setActive(view: ISplitviewPanel, skipFocus?: boolean): void;
     removePanel(panel: ISplitviewPanel, sizing?: Sizing): void;
-
     setVisible(panel: ISplitviewPanel, visible: boolean): void;
     movePanel(from: number, to: number): void;
 }
@@ -103,12 +101,12 @@ export class SplitviewComponent
     private readonly _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange: Event<void> = this._onDidLayoutChange.event;
 
-    get options(): SplitviewComponentOptions {
-        return this._options;
-    }
-
     get panels(): SplitviewPanel[] {
         return this.splitview.getViews();
+    }
+
+    get options(): SplitviewComponentOptions {
+        return this._options;
     }
 
     get length(): number {
@@ -295,18 +293,6 @@ export class SplitviewComponent
         this.setActive(view);
 
         return view;
-    }
-
-    /**
-     * Resize the layout to fit the parent container
-     */
-    resizeToFit(): void {
-        if (!this.element.parentElement) {
-            return;
-        }
-        const { width, height } =
-            this.element.parentElement.getBoundingClientRect();
-        this.layout(width, height);
     }
 
     layout(width: number, height: number): void {
