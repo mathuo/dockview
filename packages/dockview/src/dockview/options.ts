@@ -54,7 +54,6 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     watermarkFrameworkComponent?: any;
     frameworkComponentFactory?: GroupPanelFrameworkComponentFactory;
     tabHeight?: number;
-    debug?: boolean;
     orientation?: Orientation;
     styles?: ISplitviewStyles;
     showDndOverlay?: (event: DragEvent, target: DockviewDropTargets) => boolean;

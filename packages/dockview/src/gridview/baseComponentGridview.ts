@@ -62,7 +62,6 @@ export interface IBaseGrid<T extends IGridPanelView> {
     toJSON(): object;
     fromJSON(data: any): void;
     layout(width: number, height: number, force?: boolean): void;
-    resizeToFit(): void;
     setVisible(panel: T, visible: boolean): void;
     isVisible(panel: T): boolean;
 }
@@ -297,18 +296,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.element.style.width = `${width}px`;
 
         this.gridview.layout(width, height);
-    }
-
-    /**
-     * Resize the layout to fit the parent container
-     */
-    public resizeToFit(): void {
-        if (!this.element.parentElement) {
-            return;
-        }
-        const { width, height } =
-            this.element.parentElement.getBoundingClientRect();
-        this.layout(width, height);
     }
 
     public dispose(): void {

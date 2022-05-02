@@ -115,10 +115,10 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
             return;
         }
 
-        const allPanels = containerApi.getPanels();
+        const allPanels = containerApi.panels;
 
         const fromIndex = allPanels.indexOf(existingPanel);
-        let toIndex = containerApi.getPanels().indexOf(this);
+        let toIndex = containerApi.panels.indexOf(this);
 
         if (
             event.position === Position.Left ||

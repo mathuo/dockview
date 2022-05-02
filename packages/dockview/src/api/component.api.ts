@@ -1,4 +1,5 @@
 import {
+    DockviewDropEvent,
     IDockviewComponent,
     SerializedDockview,
 } from '../dockview/dockviewComponent';
@@ -40,9 +41,7 @@ export interface CommonApi<T = any> {
     readonly onDidLayoutFromJSON: Event<void>;
     focus(): void;
     layout(width: number, height: number): void;
-    resizeToFit(): void;
     fromJSON(data: T): void;
-
     toJSON(): T;
 }
 
@@ -69,6 +68,10 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
 
     get orientation(): Orientation {
         return this.component.orientation;
+    }
+
+    get panels(): ISplitviewPanel[] {
+        return this.component.panels;
     }
 
     get onDidLayoutFromJSON(): Event<void> {
@@ -101,10 +104,6 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
         this.component.setVisible(panel, isVisible);
     }
 
-    getPanels(): ISplitviewPanel[] {
-        return this.component.getPanels();
-    }
-
     focus(): void {
         this.component.focus();
     }
@@ -121,12 +120,8 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
         return this.component.layout(width, height);
     }
 
-    addPanel(options: AddSplitviewComponentOptions): void {
-        this.component.addPanel(options);
-    }
-
-    resizeToFit(): void {
-        this.component.resizeToFit();
+    addPanel(options: AddSplitviewComponentOptions): ISplitviewPanel {
+        return this.component.addPanel(options);
     }
 
     movePanel(from: number, to: number): void {
@@ -157,6 +152,10 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
 
     get width(): number {
         return this.component.width;
+    }
+
+    get panels(): IPaneviewPanel[] {
+        return this.component.panels;
     }
 
     get onDidLayoutChange(): Event<void> {
@@ -192,10 +191,6 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
 
     constructor(private readonly component: IPaneviewComponent) {}
 
-    getPanels(): IPaneviewPanel[] {
-        return this.component.getPanels();
-    }
-
     removePanel(panel: IPaneviewPanel): void {
         this.component.removePanel(panel);
     }
@@ -216,12 +211,8 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
         this.component.layout(width, height);
     }
 
-    addPanel(options: AddPaneviewComponentOptions): void {
-        this.component.addPanel(options);
-    }
-
-    resizeToFit(): void {
-        this.component.resizeToFit();
+    addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel {
+        return this.component.addPanel(options);
     }
 
     fromJSON(data: SerializedPaneview): void {
@@ -300,8 +291,8 @@ export class GridviewApi implements CommonApi<SerializedGridview> {
         this.component.layout(width, height, force);
     }
 
-    addPanel(options: AddComponentOptions): void {
-        this.component.addPanel(options);
+    addPanel(options: AddComponentOptions): IGridviewPanel {
+        return this.component.addPanel(options);
     }
 
     removePanel(panel: IGridviewPanel, sizing?: Sizing): void {
@@ -313,10 +304,6 @@ export class GridviewApi implements CommonApi<SerializedGridview> {
         options: { direction: Direction; reference: string; size?: number }
     ): void {
         this.component.movePanel(panel, options);
-    }
-
-    resizeToFit(): void {
-        this.component.resizeToFit();
     }
 
     getPanel(id: string): IGridviewPanel | undefined {
@@ -409,6 +396,10 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.onDidLayoutChange;
     }
 
+    get onDidDrop(): Event<DockviewDropEvent> {
+        return this.component.onDidDrop;
+    }
+
     get panels(): IGroupPanel[] {
         return this.component.panels;
     }
@@ -469,10 +460,6 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     removeGroup(group: IGroupviewPanel): void {
         this.component.removeGroup(<GroupviewPanel>group);
-    }
-
-    resizeToFit(): void {
-        return this.component.resizeToFit();
     }
 
     getGroup(id: string): IGroupviewPanel | undefined {

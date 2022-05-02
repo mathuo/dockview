@@ -16,8 +16,7 @@ export interface SuppressClosableEvent {
  * omit visibility modifiers since the visibility of a single group doesn't make sense
  * because it belongs to a groupview
  */
-export interface DockviewPanelApi
-    extends Omit<GridviewPanelApi, 'setVisible' | 'visible'> {
+export interface DockviewPanelApi extends Omit<GridviewPanelApi, 'setVisible'> {
     readonly group: GroupviewPanel | undefined;
     readonly isGroupActive: boolean;
     readonly title: string;

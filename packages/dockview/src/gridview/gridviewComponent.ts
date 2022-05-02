@@ -44,7 +44,7 @@ export interface AddComponentOptions extends BaseComponentOptions {
     maximumHeight?: number;
     position?: {
         direction: Direction;
-        reference: string;
+        referencePanel: string;
     };
     location?: number[];
 }
@@ -62,7 +62,7 @@ export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
     readonly orientation: Orientation;
     readonly onDidLayoutFromJSON: Event<void>;
     updateOptions(options: Partial<GridviewComponentUpdateOptions>): void;
-    addPanel(options: AddComponentOptions): void;
+    addPanel(options: AddComponentOptions): IGridviewPanel;
     removePanel(panel: IGridviewPanel, sizing?: Sizing): void;
     toggleVisibility(panel: IGridviewPanel): void;
     focus(): void;
@@ -273,17 +273,17 @@ export class GridviewComponent
         this.doAddGroup(removedPanel, relativeLocation, options.size);
     }
 
-    public addPanel(options: AddComponentOptions): void {
+    public addPanel(options: AddComponentOptions): IGridviewPanel {
         let relativeLocation: number[] = options.location || [0];
 
-        if (options.position?.reference) {
+        if (options.position?.referencePanel) {
             const referenceGroup = this._groups.get(
-                options.position.reference
+                options.position.referencePanel
             )?.value;
 
             if (!referenceGroup) {
                 throw new Error(
-                    `reference group ${options.position.reference} does not exist`
+                    `reference group ${options.position.referencePanel} does not exist`
                 );
             }
 
@@ -329,6 +329,8 @@ export class GridviewComponent
         this.registerPanel(view);
 
         this.doAddGroup(view, relativeLocation, options.size);
+
+        return view;
     }
 
     private registerPanel(panel: GridviewPanel) {

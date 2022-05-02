@@ -1,4 +1,3 @@
-import { DockviewComponent } from '../..';
 import {
     SplitviewApi,
     PaneviewApi,
@@ -8,6 +7,7 @@ import {
 import { GridviewComponent } from '../../gridview/gridviewComponent';
 import { PaneviewComponent } from '../../paneview/paneviewComponent';
 import { SplitviewComponent } from '../../splitview/splitviewComponent';
+import { DockviewComponent } from '../../dockview/dockviewComponent';
 
 describe('component.api', () => {
     describe('splitview', () => {
@@ -22,9 +22,8 @@ describe('component.api', () => {
                 'onDidLayoutChange',
                 'onDidAddView',
                 'onDidRemoveView',
-                'getPanels',
+                'panels',
                 'focus',
-                'resizeToFit',
                 'toJSON',
             ];
 
@@ -54,9 +53,8 @@ describe('component.api', () => {
                 'onDidLayoutChange',
                 'onDidAddView',
                 'onDidRemoveView',
-                'getPanels',
+                'panels',
                 'focus',
-                'resizeToFit',
                 'toJSON',
             ];
 
@@ -88,7 +86,6 @@ describe('component.api', () => {
                 'onDidLayoutChange',
                 'orientation',
                 'focus',
-                'resizeToFit',
                 'toJSON',
                 'onDidActiveGroupChange',
                 'onDidAddGroup',
@@ -130,7 +127,6 @@ describe('component.api', () => {
                 'activePanel',
                 'focus',
                 'closeAllGroups',
-                'resizeToFit',
                 'toJSON',
                 'onDidActiveGroupChange',
                 'onDidAddGroup',

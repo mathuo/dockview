@@ -36,11 +36,10 @@ export interface DockviewReadyEvent {
 }
 
 export interface IDockviewReactProps {
-    components?: PanelCollection<IDockviewPanelProps>;
+    components: PanelCollection<IDockviewPanelProps>;
     tabComponents?: PanelCollection<IDockviewPanelHeaderProps>;
     watermarkComponent?: React.FunctionComponent<IWatermarkPanelProps>;
-    onReady?: (event: DockviewReadyEvent) => void;
-    debug?: boolean;
+    onReady: (event: DockviewReadyEvent) => void;
     tabHeight?: number;
     onTabContextMenu?: (event: TabContextMenuEvent) => void;
     onDidDrop?: (event: DockviewDropEvent) => void;
@@ -127,7 +126,6 @@ export const DockviewReact = React.forwardRef(
                 frameworkComponents: props.components,
                 frameworkTabComponents: props.tabComponents,
                 tabHeight: props.tabHeight,
-                debug: props.debug,
                 watermarkFrameworkComponent: props.watermarkComponent,
                 styles: props.hideBorders
                     ? { separatorBorder: 'transparent' }
