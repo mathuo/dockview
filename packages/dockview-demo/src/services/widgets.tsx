@@ -151,56 +151,54 @@ export const Activitybar = (props: IGridviewPanelProps) => {
         };
     }, []);
 
-    const onClick = (container: ViewContainer, alwaysOpen = false) => (
-        event: React.MouseEvent
-    ) => {
-        const api = registry.get<GridviewApi>('gridview');
+    const onClick =
+        (container: ViewContainer, alwaysOpen = false) =>
+        (event: React.MouseEvent) => {
+            const api = registry.get<GridviewApi>('gridview');
 
-        const selectedActive = container.id === activeContainerid;
+            const selectedActive = container.id === activeContainerid;
 
-        const sidebarPanel = api.getPanel('sidebar');
-        if (sidebarPanel.api.isVisible) {
-            if (!alwaysOpen && selectedActive) {
-                api.setVisible(sidebarPanel, false);
-            }
-        } else {
-            event.preventDefault(); // prevent focus
-            api.setVisible(sidebarPanel, true);
-            sidebarPanel.focus();
-        }
-
-        viewService.model.setActiveViewContainer(container.id);
-    };
-
-    const onContainerDrop = (targetContainer: ViewContainer) => (
-        event: React.DragEvent,
-        direction: 'top' | 'bottom'
-    ) => {
-        const data = event.dataTransfer.getData('application/json');
-        if (data) {
-            const { container } = JSON.parse(data);
-            const sourceContainer = viewService.model.getViewContainer(
-                container
-            );
-
-            switch (direction) {
-                case 'bottom':
-                    viewService.model.insertContainerAfter(
-                        sourceContainer,
-                        targetContainer
-                    );
-                    break;
-                case 'top':
-                    viewService.model.insertContainerBefore(
-                        sourceContainer,
-                        targetContainer
-                    );
-                    break;
+            const sidebarPanel = api.getPanel('sidebar');
+            if (sidebarPanel.api.isVisible) {
+                if (!alwaysOpen && selectedActive) {
+                    api.setVisible(sidebarPanel, false);
+                }
+            } else {
+                event.preventDefault(); // prevent focus
+                api.setVisible(sidebarPanel, true);
+                sidebarPanel.focus();
             }
 
-            viewService.model.setActiveViewContainer(sourceContainer.id);
-        }
-    };
+            viewService.model.setActiveViewContainer(container.id);
+        };
+
+    const onContainerDrop =
+        (targetContainer: ViewContainer) =>
+        (event: React.DragEvent, direction: 'top' | 'bottom') => {
+            const data = event.dataTransfer.getData('application/json');
+            if (data) {
+                const { container } = JSON.parse(data);
+                const sourceContainer =
+                    viewService.model.getViewContainer(container);
+
+                switch (direction) {
+                    case 'bottom':
+                        viewService.model.insertContainerAfter(
+                            sourceContainer,
+                            targetContainer
+                        );
+                        break;
+                    case 'top':
+                        viewService.model.insertContainerBefore(
+                            sourceContainer,
+                            targetContainer
+                        );
+                        break;
+                }
+
+                viewService.model.setActiveViewContainer(sourceContainer.id);
+            }
+        };
 
     const onNewContainer = (event: React.DragEvent) => {
         const data = getPaneData();
@@ -371,7 +369,7 @@ export const SidebarPart = (props: { id: string }) => {
         if (schema) {
             api.fromJSON(schema);
         } else {
-            api.getPanels().forEach((p) => {
+            api.panels.forEach((p) => {
                 api.removePanel(p);
             });
             viewContainer.views.forEach((view) => {
@@ -400,9 +398,8 @@ export const SidebarPart = (props: { id: string }) => {
     const onDidDrop = (event: PaneviewDropEvent) => {
         const data = event.getData();
 
-        const containerData = event.nativeEvent.dataTransfer.getData(
-            'application/json'
-        );
+        const containerData =
+            event.nativeEvent.dataTransfer.getData('application/json');
 
         if (containerData) {
             const { container } = JSON.parse(containerData);
@@ -411,9 +408,8 @@ export const SidebarPart = (props: { id: string }) => {
                 return;
             }
 
-            const sourceContainer = viewService.model.getViewContainer(
-                container
-            );
+            const sourceContainer =
+                viewService.model.getViewContainer(container);
             const targetContainer = viewService.model.getViewContainer(
                 props.id
             );
@@ -439,7 +435,7 @@ export const SidebarPart = (props: { id: string }) => {
         }
 
         const targetPanel = event.panel;
-        const allPanels = event.api.getPanels();
+        const allPanels = event.api.panels;
         let toIndex = allPanels.indexOf(targetPanel);
 
         if (

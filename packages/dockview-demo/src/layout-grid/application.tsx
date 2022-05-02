@@ -74,7 +74,7 @@ export const Application = () => {
                 id: 'sidebar',
                 component: 'sidebar',
                 snap: true,
-                position: { reference: 'editor', direction: 'left' },
+                position: { referencePanel: 'editor', direction: 'left' },
                 minimumWidth: 170,
                 size: 100,
             });
@@ -82,7 +82,7 @@ export const Application = () => {
             event.api.addPanel({
                 id: 'panel',
                 component: 'panel',
-                position: { reference: 'editor', direction: 'below' },
+                position: { referencePanel: 'editor', direction: 'below' },
                 size: 200,
                 snap: true,
             });
