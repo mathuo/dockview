@@ -110,7 +110,7 @@ export const SplitPanel = (props: IDockviewPanelProps) => {
     };
 
     const onRemove = () => {
-        const panels = api.current.getPanels();
+        const panels = api.current.panels;
         if (panels.length === 0) {
             return;
         }

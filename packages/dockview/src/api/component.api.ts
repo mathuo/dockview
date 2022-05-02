@@ -41,9 +41,7 @@ export interface CommonApi<T = any> {
     readonly onDidLayoutFromJSON: Event<void>;
     focus(): void;
     layout(width: number, height: number): void;
-    resizeToFit(): void;
     fromJSON(data: T): void;
-
     toJSON(): T;
 }
 
@@ -126,10 +124,6 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
         return this.component.addPanel(options);
     }
 
-    resizeToFit(): void {
-        this.component.resizeToFit();
-    }
-
     movePanel(from: number, to: number): void {
         this.component.movePanel(from, to);
     }
@@ -197,10 +191,6 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
 
     constructor(private readonly component: IPaneviewComponent) {}
 
-    addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel {
-        return this.component.addPanel(options);
-    }
-
     removePanel(panel: IPaneviewPanel): void {
         this.component.removePanel(panel);
     }
@@ -221,8 +211,8 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
         this.component.layout(width, height);
     }
 
-    resizeToFit(): void {
-        this.component.resizeToFit();
+    addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel {
+        return this.component.addPanel(options);
     }
 
     fromJSON(data: SerializedPaneview): void {
@@ -314,10 +304,6 @@ export class GridviewApi implements CommonApi<SerializedGridview> {
         options: { direction: Direction; reference: string; size?: number }
     ): void {
         this.component.movePanel(panel, options);
-    }
-
-    resizeToFit(): void {
-        this.component.resizeToFit();
     }
 
     getPanel(id: string): IGridviewPanel | undefined {
@@ -474,10 +460,6 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     removeGroup(group: IGroupviewPanel): void {
         this.component.removeGroup(<GroupviewPanel>group);
-    }
-
-    resizeToFit(): void {
-        return this.component.resizeToFit();
     }
 
     getGroup(id: string): IGroupviewPanel | undefined {

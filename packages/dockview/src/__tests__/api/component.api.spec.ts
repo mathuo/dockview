@@ -24,7 +24,6 @@ describe('component.api', () => {
                 'onDidRemoveView',
                 'panels',
                 'focus',
-                'resizeToFit',
                 'toJSON',
             ];
 
@@ -54,9 +53,8 @@ describe('component.api', () => {
                 'onDidLayoutChange',
                 'onDidAddView',
                 'onDidRemoveView',
-                'getPanels',
+                'panels',
                 'focus',
-                'resizeToFit',
                 'toJSON',
             ];
 
@@ -88,7 +86,6 @@ describe('component.api', () => {
                 'onDidLayoutChange',
                 'orientation',
                 'focus',
-                'resizeToFit',
                 'toJSON',
                 'onDidActiveGroupChange',
                 'onDidAddGroup',
@@ -130,7 +127,6 @@ describe('component.api', () => {
                 'activePanel',
                 'focus',
                 'closeAllGroups',
-                'resizeToFit',
                 'toJSON',
                 'onDidActiveGroupChange',
                 'onDidAddGroup',
