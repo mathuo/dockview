@@ -119,7 +119,6 @@ const components: PanelCollection<IDockviewPanelProps> = {
                     components={components}
                     watermarkComponent={WatermarkComponent}
                     tabHeight={20}
-                    debug={true}
                 />
             </div>
         );
@@ -271,7 +270,6 @@ export const TestGrid = (props: IGridviewPanelProps) => {
                 onReady={onReady}
                 components={components}
                 tabComponents={tabComponents}
-                debug={false}
                 onTabContextMenu={onTabContextMenu}
                 watermarkComponent={Watermark}
                 showDndOverlay={(ev, target) => {
