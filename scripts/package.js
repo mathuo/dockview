@@ -10,6 +10,6 @@ const storybookAppDir = path.join(
     '../packages/dockview-demo/storybook-static'
 );
 
-fs.copySync(docsDir, path.join(output, 'docs'));
+fs.copySync(docsDir, path.join(output, 'typedocs'));
 fs.copySync(webpackAppDir, path.join(output, 'build'));
 fs.copySync(storybookAppDir, path.join(output, 'storybook-static'));

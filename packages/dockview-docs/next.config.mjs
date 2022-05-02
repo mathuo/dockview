@@ -8,12 +8,6 @@ const withTM = transpile(['dockview', 'dockview-demo'], {
     resolveSymlinks: true,
 });
 
-import path from 'path';
-
-import { URL } from 'url'; // in Browser, the URL in native accessible on window
-
-const __dirname = new URL('.', import.meta.url).pathname;
-
 const withMDX = mdx({
     extension: /\.mdx$/,
     options: {
@@ -33,6 +27,9 @@ const withMDX = mdx({
 
 export default withTM(
     withMDX({
+        basePath: '/dockview/docs',
+        assetPrefix: '/dockview/docs/',
+        //
         reactStrictMode: true,
         pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
         experimental: {

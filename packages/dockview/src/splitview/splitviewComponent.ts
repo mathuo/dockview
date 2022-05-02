@@ -206,7 +206,7 @@ export class SplitviewComponent
         this.splitview.moveView(from, to);
     }
 
-    setVisible(panel: SplitviewPanel, visible: boolean) {
+    setVisible(panel: SplitviewPanel, visible: boolean): void {
         const index = this.panels.indexOf(panel);
         this.splitview.setViewVisible(index, visible);
     }
@@ -228,7 +228,7 @@ export class SplitviewComponent
         }
     }
 
-    removePanel(panel: SplitviewPanel, sizing?: Sizing) {
+    removePanel(panel: SplitviewPanel, sizing?: Sizing): void {
         const disposable = this._panels.get(panel.id);
 
         if (!disposable) {
@@ -411,7 +411,7 @@ export class SplitviewComponent
         this._onDidLayoutfromJSON.fire();
     }
 
-    dispose() {
+    dispose(): void {
         for (const [_, value] of this._panels.entries()) {
             value.disposable.dispose();
             value.value.dispose();

@@ -10,6 +10,7 @@
     "lint": "eslint packages/**/src/** --ext .ts,.tsx,.js,.jsx",
     "package": "node scripts/package.js",
     "package-all": "npm run build-demo && npm run docs && node scripts/package.js",
+    "deploy-docs": "lerna run build --scope dockview-docs && lerna run export --scope dockview-docs && node scripts/package-docs.js",
     "build": "lerna run build --scope dockview",
     "build-demo": "lerna run build --scope dockview-demo",
     "docs": "lerna run docs --scope dockview",
