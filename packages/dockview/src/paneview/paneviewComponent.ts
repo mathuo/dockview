@@ -108,7 +108,6 @@ export interface IPaneviewComponent extends IDisposable {
     layout(width: number, height: number): void;
     toJSON(): SerializedPaneview;
     fromJSON(serializedPaneview: SerializedPaneview): void;
-    resizeToFit(): void;
     focus(): void;
     removePanel(panel: IPaneviewPanel): void;
     getPanel(id: string): IPaneviewPanel | undefined;
@@ -314,18 +313,6 @@ export class PaneviewComponent
                 ? [width, height]
                 : [height, width];
         this.paneview.layout(size, orthogonalSize);
-    }
-
-    /**
-     * Resize the layout to fit the parent container
-     */
-    resizeToFit(): void {
-        if (!this.element.parentElement) {
-            return;
-        }
-        const { width, height } =
-            this.element.parentElement.getBoundingClientRect();
-        this.layout(width, height);
     }
 
     toJSON(): SerializedPaneview {

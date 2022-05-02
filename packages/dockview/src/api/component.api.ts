@@ -41,9 +41,7 @@ export interface CommonApi<T = any> {
     readonly onDidLayoutFromJSON: Event<void>;
     focus(): void;
     layout(width: number, height: number): void;
-    resizeToFit(): void;
     fromJSON(data: T): void;
-
     toJSON(): T;
 }
 
@@ -124,10 +122,6 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
 
     addPanel(options: AddSplitviewComponentOptions): ISplitviewPanel {
         return this.component.addPanel(options);
-    }
-
-    resizeToFit(): void {
-        this.component.resizeToFit();
     }
 
     movePanel(from: number, to: number): void {
@@ -221,10 +215,6 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
         return this.component.addPanel(options);
     }
 
-    resizeToFit(): void {
-        this.component.resizeToFit();
-    }
-
     fromJSON(data: SerializedPaneview): void {
         this.component.fromJSON(data);
     }
@@ -314,10 +304,6 @@ export class GridviewApi implements CommonApi<SerializedGridview> {
         options: { direction: Direction; reference: string; size?: number }
     ): void {
         this.component.movePanel(panel, options);
-    }
-
-    resizeToFit(): void {
-        this.component.resizeToFit();
     }
 
     getPanel(id: string): IGridviewPanel | undefined {
@@ -474,10 +460,6 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     removeGroup(group: IGroupviewPanel): void {
         this.component.removeGroup(<GroupviewPanel>group);
-    }
-
-    resizeToFit(): void {
-        return this.component.resizeToFit();
     }
 
     getGroup(id: string): IGroupviewPanel | undefined {
