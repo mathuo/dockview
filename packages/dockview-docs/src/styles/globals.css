@@ -1,0 +1,72 @@
+@import "./navigation.css";
+@import "~dockview/dist/styles/dockview.css";
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  /* font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif; */
+  font-family: 'Roboto', sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color:dodgerblue;
+}
+
+a, a:hover, a:visited, a:active {
+  color:dodgerblue;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.icon-link {
+  background-image: url(/icon-link.svg);
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-position: center center;
+}
+
+
+.markdown-body table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 12px;
+}
+.markdown-body td,
+.markdown-body th {
+  padding: 0;
+}
+.markdown-body table tr {
+  background-color: rgb(255, 255, 255);
+  border-top: 1px solid rgb(198, 203, 209);
+}
+
+.markdown-body table th {
+  border:1px solid rgb(223, 226, 229);
+  padding: 6px 13px;
+}
+
+.markdown-body table td {
+  border:1px solid rgb(223, 226, 229);
+  padding: 6px 13px;
+}
+
+.markdown-body table tr:nth-child(2n) {
+  background-color: rgb(246, 248, 250);
+}

@@ -172,9 +172,9 @@ export const Common = (
                         maximumSize,
                         minimumSize,
                         length,
-                        visibility: api.current
-                            .getPanels()
-                            .map((_) => _.api.isVisible),
+                        visibility: api.current.panels.map(
+                            (_) => _.api.isVisible
+                        ),
                     });
                 }
             ),
@@ -226,19 +226,19 @@ export const Common = (
     };
 
     const toggleVisibility = (i: number) => () => {
-        const panel = api.current.getPanels()[i];
+        const panel = api.current.panels[i];
         api.current.setVisible(panel, !panel.api.isVisible);
         setDimensions((dimensions) => ({
             ...dimensions,
-            visibility: api.current.getPanels().map((_) => _.api.isVisible),
+            visibility: api.current.panels.map((_) => _.api.isVisible),
         }));
     };
 
     const move = () => {
-        api.current.movePanel(api.current.getPanels().length - 1, 0);
+        api.current.movePanel(api.current.panels.length - 1, 0);
         setDimensions((dimensions) => ({
             ...dimensions,
-            visibility: api.current.getPanels().map((_) => _.api.isVisible),
+            visibility: api.current.panels.map((_) => _.api.isVisible),
         }));
     };
 

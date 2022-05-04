@@ -1,0 +1,100 @@
+import { SimpleSplitview } from '../components/simpleSplitview';
+
+## Auto resizing
+
+`SplitviewReact`, `GridviewReact`, `PaneviewReact` and `DockviewReact` will all automatically resize to fill the size of their parent element.
+Internally this is achieved using a [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver).
+You can disable this by settings the `disableAutoResizing` prop to be `true`.
+
+You can manually resize a component using the API method `layout(width: number, height: number): void`.
+
+You can force a component to resize without providing any measurements using the API method `resizeToFit(): void`.
+This method will evaluate the width and height of the parent `HTMLElement` container and use these values to relayout.
+
+## Proportional layout
+
+<div
+    style={{
+        height: '100px',
+        backgroundColor: 'rgb(30,30,30)',
+        color: 'white',
+        margin: '20px 0px',
+    }}
+>
+    <SimpleSplitview proportional={false} />
+</div>
+
+<div
+    style={{
+        height: '100px',
+        backgroundColor: 'rgb(30,30,30)',
+        color: 'white',
+        margin: '20px 0px',
+    }}
+>
+    <SimpleSplitview proportional={true} />
+</div>
+
+## Panels
+
+The below examples use `ReactSplitview` but the logic holds for `ReactPaneview`, `ReactGridview` and `ReactDockview` using their respective implementations and interfaces.
+
+### Adding a panel with parameters
+
+You can pass parameters to a panel through the `params` object
+
+```tsx
+const onReady = (event: SplitviewReadyEvent) => {
+    event.api.addPanel({
+        id: 'panel_1',
+        component: 'myComponent',
+        params: {
+            title: 'My Title',
+        },
+    });
+};
+```
+
+and you can access those properties through the `props.params` object. The TypeScript interface accepts an optional generic type `T` that corresponds to the params objects type.
+
+```tsx
+const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+### Accessing the panel API
+
+You can access an extensive set of functions in the panel via both the panel `api` and `containerApi`. The `api` is specific to that particular panel and the `containerApi` corresponds to that api which you access during the `onReady` event.
+
+```tsx
+const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
+    React.useEffect(() => {
+        const disposable = props.api.onDidActiveChange((event) => {
+            console.log(`is panel active: ${event.isActive}`);
+        });
+
+        return () => {
+            disposable.dispose(); // remember to dispose of any subscriptions
+        };
+    }, [props.api]);
+
+    const addAnotherPanel = React.useCallback(() => {
+        props.containerApi.addPanel({
+            id: 'another_id',
+            component: 'anotherComponent',
+        });
+    }, [props.containerApi]);
+
+    return (
+        <div>
+            <span>{`My first panel has the title: ${props.params.title}`}</span>
+            <button onClick={addAnotherPanel}>Add Panel</button>
+        </div>
+    );
+};
+```
+
+### Serialization
+
+All components support `toJSON(): T` which returns a Typed object representation of the components state. This same Typed object can be used to deserialize a view using `fromJSON(object: T): void`.

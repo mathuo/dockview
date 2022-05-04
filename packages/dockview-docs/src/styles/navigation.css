@@ -1,0 +1,45 @@
+.navigation {
+  padding: 30px;
+  background-color: lightgray;
+  font-size: 16px;
+  width: 200px;
+  border-radius: 15px;
+}
+
+.node {
+  padding: 5px 0px;
+  cursor: pointer;
+}
+
+.expandable-node::after {
+
+}
+
+.expanded::after {
+  border-width: 6px 4px 0px;
+  border-color: grey transparent transparent;
+  content: '';
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-radius: 1px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 10px;
+  margin-bottom: 2px;
+}
+
+
+.collapsed::after {
+  border-width: 4px 6px 4px 0px;
+  border-color: transparent grey transparent;
+  content: '';
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-radius: 1px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 10px;
+  margin-bottom: 2px;
+}
