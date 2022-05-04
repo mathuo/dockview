@@ -15,12 +15,14 @@ export interface IPanelDeserializer {
     ): IGroupPanel;
 }
 
+export interface PanelDeserializerOptions {
+    createPanel: (id: string, group: GroupviewPanel) => IGroupPanel;
+}
+
 export class DefaultDeserializer implements IViewDeserializer {
     constructor(
         private readonly layout: DockviewComponent,
-        private panelDeserializer: {
-            createPanel: (id: string, group: GroupviewPanel) => IGroupPanel;
-        }
+        private panelDeserializer: PanelDeserializerOptions
     ) {}
 
     public fromJSON(node: ISerializedLeafNode<GroupPanelViewState>): IGridView {
@@ -31,7 +33,7 @@ export class DefaultDeserializer implements IViewDeserializer {
         const group = this.layout.createGroup({
             id: data.id,
             locked: !!data.locked,
-            headerHidden: !!data.headerHidden,
+            hideHeader: !!data.hideHeader,
         });
 
         for (const child of children) {

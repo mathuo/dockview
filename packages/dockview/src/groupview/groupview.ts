@@ -50,7 +50,7 @@ interface GroupMoveEvent {
 
 interface CoreGroupOptions {
     locked?: boolean;
-    headerHidden?: boolean;
+    hideHeader?: boolean;
 }
 
 export interface GroupOptions extends CoreGroupOptions {
@@ -260,7 +260,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             this.contentContainer.element
         );
 
-        this.header.hidden = !!options.headerHidden;
+        this.header.hidden = !!options.hideHeader;
         this.locked = !!options.locked;
 
         this.addDisposables(
@@ -314,7 +314,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
 
         if (this.header.hidden) {
-            result.headerHidden = true;
+            result.hideHeader = true;
         }
 
         return result;
