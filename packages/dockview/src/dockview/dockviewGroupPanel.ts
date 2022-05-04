@@ -19,7 +19,7 @@ export class DockviewGroupPanel
     private readonly mutableDisposable = new MutableDisposable();
 
     readonly api: DockviewPanelApiImpl;
-    private _group: GroupviewPanel | undefined;
+    private _group: GroupviewPanel;
     private _params?: Parameters;
 
     private _view?: IGroupPanelView;
@@ -39,7 +39,7 @@ export class DockviewGroupPanel
         return this._suppressClosable;
     }
 
-    get group(): GroupviewPanel | undefined {
+    get group(): GroupviewPanel {
         return this._group;
     }
 
@@ -50,11 +50,13 @@ export class DockviewGroupPanel
     constructor(
         public readonly id: string,
         accessor: DockviewComponent,
-        private readonly containerApi: DockviewApi
+        private readonly containerApi: DockviewApi,
+        group: GroupviewPanel
     ) {
         super();
         this._suppressClosable = false;
         this._title = '';
+        this._group = group;
 
         this.api = new DockviewPanelApiImpl(this, this._group);
 
@@ -169,7 +171,7 @@ export class DockviewGroupPanel
         // the obtain the correct dimensions of the content panel we must deduct the tab height
         this.api._onDidPanelDimensionChange.fire({
             width,
-            height: height - (this.group?.model.tabHeight || 0),
+            height: height - (this.group.model.header.height || 0),
         });
 
         this.view?.layout(width, height);

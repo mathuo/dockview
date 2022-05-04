@@ -4,36 +4,52 @@ import {
     IViewDeserializer,
 } from '../gridview/gridview';
 import { GroupviewPanelState, IGroupPanel } from '../groupview/groupPanel';
+import { GroupPanelViewState } from '../groupview/groupview';
+import { GroupviewPanel } from '../groupview/groupviewPanel';
 import { DockviewComponent } from './dockviewComponent';
 
 export interface IPanelDeserializer {
-    fromJSON(panelData: GroupviewPanelState): IGroupPanel;
+    fromJSON(
+        panelData: GroupviewPanelState,
+        group: GroupviewPanel
+    ): IGroupPanel;
+}
+
+export interface PanelDeserializerOptions {
+    createPanel: (id: string, group: GroupviewPanel) => IGroupPanel;
 }
 
 export class DefaultDeserializer implements IViewDeserializer {
     constructor(
         private readonly layout: DockviewComponent,
-        private panelDeserializer: {
-            createPanel: (id: string) => IGroupPanel;
-        }
+        private panelDeserializer: PanelDeserializerOptions
     ) {}
 
-    public fromJSON(node: ISerializedLeafNode): IGridView {
-        const children = node.data.views;
-        const active = node.data.activeView;
+    public fromJSON(node: ISerializedLeafNode<GroupPanelViewState>): IGridView {
+        const data = node.data;
+        const children = data.views;
+        const active = data.activeView;
 
-        const panels: IGroupPanel[] = [];
+        const group = this.layout.createGroup({
+            id: data.id,
+            locked: !!data.locked,
+            hideHeader: !!data.hideHeader,
+        });
 
         for (const child of children) {
-            const panel = this.panelDeserializer.createPanel(child);
+            const panel = this.panelDeserializer.createPanel(child, group);
 
-            panels.push(panel);
+            const isActive = typeof active === 'string' && active === panel.id;
+
+            group.model.openPanel(panel, {
+                skipSetActive: !isActive,
+            });
         }
 
-        return this.layout.createGroup({
-            panels,
-            activePanel: panels.find((p) => p.id === active),
-            id: node.data.id,
-        });
+        if (!group.activePanel && group.panels.length > 0) {
+            group.model.openPanel(group.panels[group.panels.length - 1]);
+        }
+
+        return group;
     }
 }

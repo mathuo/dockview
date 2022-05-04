@@ -25,7 +25,8 @@
     "prepack": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
     "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
-    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage"
+    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage",
+    "dev-publish": "node ./scripts/publishExperimental.js"
   },
   "files": [
     "dist",

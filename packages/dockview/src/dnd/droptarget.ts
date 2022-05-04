@@ -26,7 +26,9 @@ function isBooleanValue(
     return typeof canDisplayOverlay === 'boolean';
 }
 
-export type CanDisplayOverlay = boolean | ((dragEvent: DragEvent) => boolean);
+export type CanDisplayOverlay =
+    | boolean
+    | ((dragEvent: DragEvent, state: Quadrant | null) => boolean);
 
 export class Droptarget extends CompositeDisposable {
     private target: HTMLElement | undefined;
@@ -62,11 +64,29 @@ export class Droptarget extends CompositeDisposable {
             new DragAndDropObserver(this.element, {
                 onDragEnter: () => undefined,
                 onDragOver: (e) => {
+                    const width = this.element.clientWidth;
+                    const height = this.element.clientHeight;
+
+                    if (width === 0 || height === 0) {
+                        return; // avoid div!0
+                    }
+
+                    const x = e.offsetX;
+                    const y = e.offsetY;
+                    const xp = (100 * x) / width;
+                    const yp = (100 * y) / height;
+
+                    const quadrant = this.calculateQuadrant(
+                        this.options.validOverlays,
+                        xp,
+                        yp
+                    );
+
                     if (isBooleanValue(this.options.canDisplayOverlay)) {
                         if (!this.options.canDisplayOverlay) {
                             return;
                         }
-                    } else if (!this.options.canDisplayOverlay(e)) {
+                    } else if (!this.options.canDisplayOverlay(e, quadrant)) {
                         return;
                     }
 
@@ -89,24 +109,6 @@ export class Droptarget extends CompositeDisposable {
                     if (!this.target || !this.overlay) {
                         return;
                     }
-
-                    const width = this.target.clientWidth;
-                    const height = this.target.clientHeight;
-
-                    if (width === 0 || height === 0) {
-                        return; // avoid div!0
-                    }
-
-                    const x = e.offsetX;
-                    const y = e.offsetY;
-                    const xp = (100 * x) / width;
-                    const yp = (100 * y) / height;
-
-                    const quadrant = this.calculateQuadrant(
-                        this.options.validOverlays,
-                        xp,
-                        yp
-                    );
 
                     const isSmallX = width < 100;
                     const isSmallY = height < 100;

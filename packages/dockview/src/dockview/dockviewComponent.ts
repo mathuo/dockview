@@ -63,7 +63,7 @@ export interface SerializedDockview {
 }
 
 export type DockviewComponentUpdateOptions = Pick<
-    DockviewComponentOptions,
+DockviewComponentOptions,
     | 'orientation'
     | 'components'
     | 'frameworkComponents'
@@ -160,7 +160,7 @@ export class DockviewComponent
     }
 
     get panels(): IGroupPanel[] {
-        return this.groups.flatMap((group) => group.model.panels);
+        return this.groups.flatMap((group) => group.panels);
     }
 
     get deserializer(): IPanelDeserializer | undefined {
@@ -182,13 +182,13 @@ export class DockviewComponent
             return undefined;
         }
 
-        return activeGroup.model.activePanel;
+        return activeGroup.activePanel;
     }
 
     set tabHeight(height: number | undefined) {
         this.options.tabHeight = height;
         this._groups.forEach((value) => {
-            value.value.model.tabHeight = height;
+            value.value.model.header.height = height;
         });
     }
 
@@ -263,9 +263,6 @@ export class DockviewComponent
     }
 
     setActivePanel(panel: IGroupPanel): void {
-        if (!panel.group) {
-            throw new Error(`Panel ${panel.id} has no associated group`);
-        }
         this.doSetGroupActive(panel.group);
         panel.group.model.openPanel(panel);
     }
@@ -280,9 +277,9 @@ export class DockviewComponent
 
         if (options.includePanel && options.group) {
             if (
-                options.group.model.activePanel !==
-                options.group.model.panels[
-                    options.group.model.panels.length - 1
+                options.group.activePanel !==
+                options.group.panels[
+                    options.group.panels.length - 1
                 ]
             ) {
                 options.group.model.moveToNext({ suppressRoll: true });
@@ -291,7 +288,7 @@ export class DockviewComponent
         }
 
         const location = getGridLocation(options.group.element);
-        const next = this.gridview.next(location)?.view as GroupviewPanel;
+        const next = <GroupviewPanel>this.gridview.next(location)?.view
         this.doSetGroupActive(next);
     }
 
@@ -305,8 +302,8 @@ export class DockviewComponent
 
         if (options.includePanel && options.group) {
             if (
-                options.group.model.activePanel !==
-                options.group.model.panels[0]
+                options.group.activePanel !==
+                options.group.panels[0]
             ) {
                 options.group.model.moveToPrevious({ suppressRoll: true });
                 return;
@@ -367,9 +364,9 @@ export class DockviewComponent
         this.gridview.deserialize(
             grid,
             new DefaultDeserializer(this, {
-                createPanel: (id) => {
+                createPanel: (id, group) => {
                     const panelData = panels[id];
-                    return this.deserializer!.fromJSON(panelData);
+                    return this.deserializer!.fromJSON(panelData, group);
                 },
             })
         );
@@ -411,8 +408,6 @@ export class DockviewComponent
             throw new Error(`panel with id ${options.id} already exists`);
         }
 
-        const panel = this.createPanel(options);
-
         let referenceGroup: GroupviewPanel | undefined;
 
         if (options.position?.referencePanel) {
@@ -431,9 +426,12 @@ export class DockviewComponent
             referenceGroup = this.activeGroup;
         }
 
+      let panel: IGroupPanel
+
         if (referenceGroup) {
             const target = toTarget(options.position?.direction || 'within');
             if (target === Position.Center) {
+               panel = this.createPanel(options, referenceGroup)
                 referenceGroup.model.openPanel(panel);
             } else {
                 const location = getGridLocation(referenceGroup.element);
@@ -442,10 +440,14 @@ export class DockviewComponent
                     location,
                     target
                 );
-                this.addPanelToNewGroup(panel, relativeLocation);
+                const group = this.createGroupAtLocation(relativeLocation);
+                panel = this.createPanel(options, group)
+                group.model.openPanel(panel);
             }
         } else {
-            this.addPanelToNewGroup(panel);
+          const group = this.createGroupAtLocation();
+          panel = this.createPanel(options, group);
+          group.model.openPanel(panel);
         }
 
         return panel;
@@ -474,7 +476,7 @@ export class DockviewComponent
 
         if (
             !retainGroupForWatermark &&
-            group.model.size === 0 &&
+            group.size === 0 &&
             options.removeEmptyGroup
         ) {
             this.removeGroup(group);
@@ -532,7 +534,7 @@ export class DockviewComponent
     }
 
     removeGroup(group: GroupviewPanel, skipActive = false): void {
-        const panels = [...group.model.panels]; // reassign since group panels will mutate
+        const panels = [...group.panels]; // reassign since group panels will mutate
 
         for (const panel of panels) {
             this.removePanel(panel, {
@@ -577,7 +579,7 @@ export class DockviewComponent
                 target
             );
 
-            if (sourceGroup && sourceGroup.model.size < 2) {
+            if (sourceGroup && sourceGroup.size < 2) {
                 const [targetParentLocation, to] = tail(targetLocation);
                 const sourceLocation = getGridLocation(sourceGroup.element);
                 const [sourceParentLocation, from] = tail(sourceLocation);
@@ -622,7 +624,8 @@ export class DockviewComponent
                     target
                 );
 
-                this.addPanelToNewGroup(groupItem, dropLocation);
+                const group = this.createGroupAtLocation( dropLocation);
+                group.model.openPanel(groupItem);
             }
         }
     }
@@ -634,9 +637,9 @@ export class DockviewComponent
         const isGroupAlreadyFocused = this._activeGroup === group;
         super.doSetGroupActive(group, skipFocus);
 
-        if (!isGroupAlreadyFocused && this._activeGroup?.model.activePanel) {
+        if (!isGroupAlreadyFocused && this._activeGroup?.activePanel) {
             this._onDidActivePanelChange.fire(
-                this._activeGroup?.model.activePanel
+                this._activeGroup?.activePanel
             );
         }
     }
@@ -704,19 +707,19 @@ export class DockviewComponent
         view.initialize();
 
         if (typeof this.options.tabHeight === 'number') {
-            view.model.tabHeight = this.options.tabHeight;
+            view.model.header.height = this.options.tabHeight;
         }
 
         return view;
     }
 
-    private createPanel(options: AddPanelOptions): IGroupPanel {
+    private createPanel(options: AddPanelOptions, group: GroupviewPanel): IGroupPanel {
         const view = new DefaultGroupPanelView({
             content: this.createContentComponent(options.id, options.component),
             tab: this.createTabComponent(options.id, options.tabComponent),
         });
 
-        const panel = new DockviewGroupPanel(options.id, this, this._api);
+        const panel = new DockviewGroupPanel(options.id, this, this._api, group);
         panel.init({
             view,
             title: options.title || options.id,
@@ -754,14 +757,12 @@ export class DockviewComponent
         );
     }
 
-    private addPanelToNewGroup(
-        panel: IGroupPanel,
+    private createGroupAtLocation(
         location: number[] = [0]
-    ): void {
+    ): GroupviewPanel {
         const group = this.createGroup();
         this.doAddGroup(group, location);
-
-        group.model.openPanel(panel);
+        return group
     }
 
     private findGroup(panel: IGroupPanel): GroupviewPanel | undefined {

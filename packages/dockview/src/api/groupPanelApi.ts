@@ -17,7 +17,7 @@ export interface SuppressClosableEvent {
  * because it belongs to a groupview
  */
 export interface DockviewPanelApi extends Omit<GridviewPanelApi, 'setVisible'> {
-    readonly group: GroupviewPanel | undefined;
+    readonly group: GroupviewPanel;
     readonly isGroupActive: boolean;
     readonly title: string;
     readonly suppressClosable: boolean;
@@ -29,7 +29,7 @@ export class DockviewPanelApiImpl
     extends GridviewPanelApiImpl
     implements DockviewPanelApi
 {
-    private _group: GroupviewPanel | undefined;
+    private _group: GroupviewPanel;
 
     readonly _onDidTitleChange = new Emitter<TitleEvent>();
     readonly onDidTitleChange = this._onDidTitleChange.event;
@@ -60,7 +60,7 @@ export class DockviewPanelApiImpl
         return !!this.group?.isActive;
     }
 
-    set group(value: GroupviewPanel | undefined) {
+    set group(value: GroupviewPanel) {
         const isOldGroupActive = this.isGroupActive;
 
         this._group = value;
@@ -78,13 +78,13 @@ export class DockviewPanelApiImpl
         }
     }
 
-    get group(): GroupviewPanel | undefined {
+    get group(): GroupviewPanel {
         return this._group;
     }
 
-    constructor(private panel: IGroupPanel, group: GroupviewPanel | undefined) {
+    constructor(private panel: IGroupPanel, group: GroupviewPanel) {
         super(panel.id);
-        this.group = group;
+        this._group = group;
 
         this.addDisposables(
             this.disposable,

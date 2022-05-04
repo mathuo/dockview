@@ -619,7 +619,7 @@ describe('dockviewComponent', () => {
                                     data: {
                                         views: ['panel2', 'panel3'],
                                         id: 'group-2',
-                                        activeView: 'panel2',
+                                        activeView: 'panel3',
                                     },
                                     size: 500,
                                 },

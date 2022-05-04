@@ -11,3 +11,4 @@ storybook-static/
 .rollup.cache/
 test-report.xml
 *.code-workspace
+yarn-error.log

@@ -15,7 +15,11 @@ import {
 } from '../../groupview/types';
 import { PanelUpdateEvent } from '../../panel/types';
 import { GroupviewPanel } from '../../groupview/groupviewPanel';
-import { GroupChangeKind2, GroupOptions } from '../../groupview/groupview';
+import {
+    GroupChangeKind2,
+    GroupOptions,
+    Groupview,
+} from '../../groupview/groupview';
 import { DockviewPanelApi } from '../../api/groupPanelApi';
 import {
     DefaultGroupPanelView,
@@ -462,5 +466,60 @@ describe('groupview', () => {
 
         const panel = cut.addPanel({ id: 'id', component: 'component' });
         disposable.dispose();
+    });
+
+    test('toJSON() default', () => {
+        const dockviewComponent = new DockviewComponent(
+            document.createElement('div'),
+            {
+                components: {
+                    component: TestContentPart,
+                },
+            }
+        );
+
+        const cut = new Groupview(
+            document.createElement('div'),
+            dockviewComponent,
+            'id',
+            {},
+            null
+        );
+
+        expect(cut.toJSON()).toEqual({
+            views: [],
+            activeView: undefined,
+            id: 'id',
+        });
+    });
+
+    test('toJSON() locked and hideHeader', () => {
+        const dockviewComponent = new DockviewComponent(
+            document.createElement('div'),
+            {
+                components: {
+                    component: TestContentPart,
+                },
+            }
+        );
+
+        const cut = new Groupview(
+            document.createElement('div'),
+            dockviewComponent,
+            'id',
+            {},
+            null
+        );
+
+        cut.locked = true;
+        cut.header.hidden = true;
+
+        expect(cut.toJSON()).toEqual({
+            views: [],
+            activeView: undefined,
+            id: 'id',
+            locked: true,
+            hideHeader: true,
+        });
     });
 });

@@ -1,19 +1,26 @@
-import { DockviewComponent } from '../..';
+import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { DockviewApi } from '../../api/component.api';
 import { IGroupPanelView } from '../../dockview/defaultGroupPanelView';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
+import { GroupviewPanel } from '../../groupview/groupviewPanel';
 
 describe('dockviewGroupPanel', () => {
     test('update title', () => {
         const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
-            return {} as any;
+            return {
+                onDidActiveChange: jest.fn(),
+            } as any;
         });
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
+        const groupMock = jest.fn<GroupviewPanel, []>(() => {
+            return {} as any;
+        });
         const api = new dockviewApiMock();
         const accessor = new accessorMock();
-        const cut = new DockviewGroupPanel('fake-id', accessor, api);
+        const group = new groupMock();
+        const cut = new DockviewGroupPanel('fake-id', accessor, api, group);
 
         let latestTitle: string | undefined = undefined;
 
@@ -41,10 +48,14 @@ describe('dockviewGroupPanel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
+        const groupMock = jest.fn<GroupviewPanel, []>(() => {
+            return {} as any;
+        });
         const api = new dockviewApiMock();
         const accessor = new accessorMock();
+        const group = new groupMock();
 
-        const cut = new DockviewGroupPanel('fake-id', accessor, api);
+        const cut = new DockviewGroupPanel('fake-id', accessor, api, group);
 
         let latestSuppressClosable: boolean | undefined = undefined;
 
@@ -77,10 +88,14 @@ describe('dockviewGroupPanel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
+        const groupMock = jest.fn<GroupviewPanel, []>(() => {
+            return {} as any;
+        });
         const api = new dockviewApiMock();
         const accessor = new accessorMock();
+        const group = new groupMock();
 
-        const cut = new DockviewGroupPanel('fake-id', accessor, api);
+        const cut = new DockviewGroupPanel('fake-id', accessor, api, group);
 
         const viewMock = jest.fn<IGroupPanelView, []>(() => {
             return {
