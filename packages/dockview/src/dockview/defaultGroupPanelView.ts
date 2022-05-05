@@ -5,7 +5,7 @@ import {
     IContentRenderer,
     ITabRenderer,
 } from '../groupview/types';
-import { GroupviewPanel } from '../groupview/groupviewPanel';
+import { GroupPanel } from '../groupview/groupviewPanel';
 import { IDisposable } from '../lifecycle';
 import { GroupPanelUpdateEvent } from '../groupview/groupPanel';
 
@@ -16,7 +16,7 @@ export interface IGroupPanelView extends IDisposable {
     update(event: GroupPanelUpdateEvent): void;
     layout(width: number, height: number): void;
     init(params: GroupPanelPartInitParameters): void;
-    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void;
+    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void;
     toJSON(): {};
 }
 
@@ -61,7 +61,7 @@ export class DefaultGroupPanelView implements IGroupPanelView {
         this.tab.init(params);
     }
 
-    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void {
+    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void {
         this._content.updateParentGroup(group, isPanelVisible);
         this._tab?.updateParentGroup(group, isPanelVisible);
     }

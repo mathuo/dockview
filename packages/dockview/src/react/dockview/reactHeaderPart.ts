@@ -3,7 +3,7 @@ import {
     ITabRenderer,
     GroupPanelPartInitParameters,
 } from '../../groupview/types';
-import { GroupviewPanel } from '../../groupview/groupviewPanel';
+import { GroupPanel } from '../../groupview/groupviewPanel';
 import { PanelUpdateEvent } from '../../panel/types';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IGroupPanelBaseProps } from './dockview';
@@ -57,7 +57,7 @@ export class ReactPanelHeaderPart implements ITabRenderer {
     }
 
     public updateParentGroup(
-        _group: GroupviewPanel,
+        _group: GroupPanel,
         _isPanelVisible: boolean
     ): void {
         // noop - retrieval from api

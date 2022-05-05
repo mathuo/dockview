@@ -4,7 +4,7 @@ import {
 } from '../../dockview/deserializer';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { Groupview } from '../../groupview/groupview';
-import { GroupviewPanel } from '../../groupview/groupviewPanel';
+import { GroupPanel } from '../../groupview/groupviewPanel';
 
 describe('deserializer', () => {
     test('fromJSON', () => {
@@ -21,14 +21,14 @@ describe('deserializer', () => {
         const panel1 = jest.fn();
         const panel2 = jest.fn();
 
-        const groupMock = jest.fn<GroupviewPanel, []>(() => {
-            const result: Partial<GroupviewPanel> = {
+        const groupMock = jest.fn<GroupPanel, []>(() => {
+            const result: Partial<GroupPanel> = {
                 model: new model(),
                 panels: <any>[panel1, panel2],
                 activePanel: null,
             };
 
-            return result as GroupviewPanel;
+            return result as GroupPanel;
         });
         const group = new groupMock();
         const createGroup = jest.fn().mockReturnValue(new groupMock());

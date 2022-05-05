@@ -6,14 +6,14 @@ import {
 } from '../api/gridviewPanelApi';
 import { Groupview, GroupOptions, IHeader } from './groupview';
 import { GridviewPanel, IGridviewPanel } from '../gridview/gridviewPanel';
-import { IGroupPanel } from './groupPanel';
+import { IDockviewPanel } from './groupPanel';
 
 export interface IGroupviewPanel extends IGridviewPanel {
     model: Groupview;
     locked: boolean;
     readonly size: number;
-    readonly panels: IGroupPanel[];
-    readonly activePanel: IGroupPanel | undefined;
+    readonly panels: IDockviewPanel[];
+    readonly activePanel: IDockviewPanel | undefined;
 }
 
 export type IGroupviewPanelPublic = IGroupviewPanel;
@@ -22,14 +22,14 @@ export type GroupviewPanelApi = GridviewPanelApi;
 
 class GroupviewApi extends GridviewPanelApiImpl implements GroupviewPanelApi {}
 
-export class GroupviewPanel extends GridviewPanel implements IGroupviewPanel {
+export class GroupPanel extends GridviewPanel implements IGroupviewPanel {
     private readonly _model: Groupview;
 
-    get panels(): IGroupPanel[] {
+    get panels(): IDockviewPanel[] {
         return this._model.panels;
     }
 
-    get activePanel(): IGroupPanel | undefined {
+    get activePanel(): IDockviewPanel | undefined {
         return this._model.activePanel;
     }
 

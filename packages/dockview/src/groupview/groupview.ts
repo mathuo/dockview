@@ -8,11 +8,11 @@ import { IGridPanelView } from '../gridview/baseComponentGridview';
 import { IViewSize } from '../gridview/gridview';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
-import { IGroupPanel } from './groupPanel';
+import { IDockviewPanel } from './groupPanel';
 import { ContentContainer, IContentContainer } from './panel/content';
 import { ITabsContainer, TabsContainer } from './titlebar/tabsContainer';
 import { IWatermarkRenderer } from './types';
-import { GroupviewPanel } from './groupviewPanel';
+import { GroupPanel } from './groupviewPanel';
 import { DockviewDropTargets } from './dnd';
 
 export enum GroupChangeKind2 {
@@ -54,8 +54,8 @@ interface CoreGroupOptions {
 }
 
 export interface GroupOptions extends CoreGroupOptions {
-    readonly panels?: IGroupPanel[];
-    readonly activePanel?: IGroupPanel;
+    readonly panels?: IDockviewPanel[];
+    readonly activePanel?: IDockviewPanel;
     readonly id?: string;
     tabHeight?: number;
 }
@@ -68,7 +68,7 @@ export interface GroupPanelViewState extends CoreGroupOptions {
 
 export interface GroupviewChangeEvent {
     readonly kind: GroupChangeKind2;
-    readonly panel?: IGroupPanel;
+    readonly panel?: IDockviewPanel;
 }
 
 export interface GroupviewDropEvent {
@@ -86,8 +86,8 @@ export interface IHeader {
 export interface IGroupview extends IDisposable, IGridPanelView {
     readonly isActive: boolean;
     readonly size: number;
-    readonly panels: IGroupPanel[];
-    readonly activePanel: IGroupPanel | undefined;
+    readonly panels: IDockviewPanel[];
+    readonly activePanel: IDockviewPanel | undefined;
     readonly header: IHeader;
     readonly isContentFocused: boolean;
     readonly onDidDrop: Event<GroupviewDropEvent>;
@@ -95,20 +95,23 @@ export interface IGroupview extends IDisposable, IGridPanelView {
     readonly onMove: Event<GroupMoveEvent>;
     locked: boolean;
     // state
-    isPanelActive: (panel: IGroupPanel) => boolean;
-    indexOf(panel: IGroupPanel): number;
+    isPanelActive: (panel: IDockviewPanel) => boolean;
+    indexOf(panel: IDockviewPanel): number;
     // panel lifecycle
     openPanel(
-        panel: IGroupPanel,
+        panel: IDockviewPanel,
         options?: { index?: number; skipFocus?: boolean }
     ): void;
-    closePanel(panel: IGroupPanel): void;
+    closePanel(panel: IDockviewPanel): void;
     closeAllPanels(): void;
-    containsPanel(panel: IGroupPanel): boolean;
-    removePanel: (panelOrId: IGroupPanel | string) => IGroupPanel;
-    moveToNext(options?: { panel?: IGroupPanel; suppressRoll?: boolean }): void;
+    containsPanel(panel: IDockviewPanel): boolean;
+    removePanel: (panelOrId: IDockviewPanel | string) => IDockviewPanel;
+    moveToNext(options?: {
+        panel?: IDockviewPanel;
+        suppressRoll?: boolean;
+    }): void;
     moveToPrevious(options?: {
-        panel?: IGroupPanel;
+        panel?: IDockviewPanel;
         suppressRoll?: boolean;
     }): void;
     canDisplayOverlay(event: DragEvent, target: DockviewDropTargets): boolean;
@@ -118,12 +121,12 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     private readonly tabsContainer: ITabsContainer;
     private readonly contentContainer: IContentContainer;
     private readonly dropTarget: Droptarget;
-    private _activePanel?: IGroupPanel;
+    private _activePanel?: IDockviewPanel;
     private watermark?: IWatermarkRenderer;
     private _isGroupActive = false;
     private _locked = false;
 
-    private mostRecentlyUsed: IGroupPanel[] = [];
+    private mostRecentlyUsed: IDockviewPanel[] = [];
 
     private readonly _onDidChange = new Emitter<IViewSize | undefined>();
     readonly onDidChange: Event<IViewSize | undefined> =
@@ -132,7 +135,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     private _width = 0;
     private _height = 0;
 
-    private _panels: IGroupPanel[] = [];
+    private _panels: IDockviewPanel[] = [];
 
     private readonly _onMove = new Emitter<GroupMoveEvent>();
     readonly onMove: Event<GroupMoveEvent> = this._onMove.event;
@@ -148,7 +151,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         throw new Error('not supported');
     }
 
-    get activePanel(): IGroupPanel | undefined {
+    get activePanel(): IDockviewPanel | undefined {
         return this._activePanel;
     }
 
@@ -164,7 +167,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         return this._isGroupActive;
     }
 
-    get panels(): IGroupPanel[] {
+    get panels(): IDockviewPanel[] {
         return this._panels;
     }
 
@@ -217,7 +220,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         private accessor: IDockviewComponent,
         public id: string,
         private readonly options: GroupOptions,
-        private readonly parent: GroupviewPanel
+        private readonly parent: GroupPanel
     ) {
         super();
 
@@ -298,7 +301,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.updateContainer();
     }
 
-    public indexOf(panel: IGroupPanel) {
+    public indexOf(panel: IDockviewPanel) {
         return this.tabsContainer.indexOf(panel.id);
     }
 
@@ -321,7 +324,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
 
     public moveToNext(options?: {
-        panel?: IGroupPanel;
+        panel?: IDockviewPanel;
         suppressRoll?: boolean;
     }) {
         if (!options) {
@@ -347,7 +350,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
 
     public moveToPrevious(options?: {
-        panel?: IGroupPanel;
+        panel?: IDockviewPanel;
         suppressRoll?: boolean;
     }) {
         if (!options) {
@@ -376,7 +379,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.openPanel(this.panels[normalizedIndex]);
     }
 
-    public containsPanel(panel: IGroupPanel) {
+    public containsPanel(panel: IDockviewPanel) {
         return this.panels.includes(panel);
     }
 
@@ -393,7 +396,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
 
     public openPanel(
-        panel: IGroupPanel,
+        panel: IDockviewPanel,
         options: {
             index?: number;
             skipFocus?: boolean;
@@ -427,7 +430,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.updateContainer();
     }
 
-    public removePanel(groupItemOrId: IGroupPanel | string): IGroupPanel {
+    public removePanel(groupItemOrId: IDockviewPanel | string): IDockviewPanel {
         const id =
             typeof groupItemOrId === 'string'
                 ? groupItemOrId
@@ -454,15 +457,15 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
     }
 
-    public closePanel(panel: IGroupPanel): void {
+    public closePanel(panel: IDockviewPanel): void {
         this.doClose(panel);
     }
 
-    private doClose(panel: IGroupPanel) {
+    private doClose(panel: IDockviewPanel) {
         this.accessor.removePanel(panel);
     }
 
-    public isPanelActive(panel: IGroupPanel) {
+    public isPanelActive(panel: IDockviewPanel) {
         return this._activePanel === panel;
     }
 
@@ -515,7 +518,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
     }
 
-    private _removePanel(panel: IGroupPanel) {
+    private _removePanel(panel: IDockviewPanel) {
         const isActivePanel = this._activePanel === panel;
 
         this.doRemovePanel(panel);
@@ -533,7 +536,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         return panel;
     }
 
-    private doRemovePanel(panel: IGroupPanel) {
+    private doRemovePanel(panel: IDockviewPanel) {
         const index = this.panels.indexOf(panel);
 
         if (this._activePanel === panel) {
@@ -556,7 +559,10 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         });
     }
 
-    private doAddPanel(panel: IGroupPanel, index: number = this.panels.length) {
+    private doAddPanel(
+        panel: IDockviewPanel,
+        index: number = this.panels.length
+    ) {
         const existingPanel = this._panels.indexOf(panel);
         const hasExistingPanel = existingPanel > -1;
 
@@ -581,7 +587,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         });
     }
 
-    private doSetActivePanel(panel: IGroupPanel | undefined) {
+    private doSetActivePanel(panel: IDockviewPanel | undefined) {
         this._activePanel = panel;
 
         if (panel) {
@@ -598,7 +604,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
     }
 
-    private updateMru(panel: IGroupPanel) {
+    private updateMru(panel: IDockviewPanel) {
         if (this.mostRecentlyUsed.includes(panel)) {
             this.mostRecentlyUsed.splice(
                 this.mostRecentlyUsed.indexOf(panel),

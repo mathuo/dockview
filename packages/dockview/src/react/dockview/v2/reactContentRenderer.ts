@@ -2,7 +2,7 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
 } from '../../../groupview/types';
-import { GroupviewPanel } from '../../../groupview/groupviewPanel';
+import { GroupPanel } from '../../../groupview/groupviewPanel';
 import { HostedContainer } from '../../../hostedContainer';
 import { PanelUpdateEvent } from '../../../panel/types';
 import { ReactPart, ReactPortalStore } from '../../react';
@@ -13,7 +13,7 @@ export class ReactContentRenderer implements IContentRenderer {
 
     private _element: HTMLElement;
     private part?: ReactPart<IDockviewPanelProps>;
-    private _group: GroupviewPanel | undefined;
+    private _group: GroupPanel | undefined;
 
     private parameters: GroupPanelPartInitParameters | undefined;
 
@@ -89,7 +89,7 @@ export class ReactContentRenderer implements IContentRenderer {
     }
 
     public updateParentGroup(
-        group: GroupviewPanel,
+        group: GroupPanel,
         _isPanelVisible: boolean
     ): void {
         this._group = group;

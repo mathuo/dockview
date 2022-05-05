@@ -7,7 +7,7 @@ import {
     PanelUpdateEvent,
     Parameters,
 } from '../panel/types';
-import { GroupviewPanel } from './groupviewPanel';
+import { GroupPanel } from './groupviewPanel';
 import { IGroupPanelView } from '../dockview/defaultGroupPanelView';
 
 export interface IGroupPanelInitParameters
@@ -22,14 +22,14 @@ export type GroupPanelUpdateEvent = PanelUpdateEvent<{
     suppressClosable?: boolean;
 }>;
 
-export interface IGroupPanel extends IDisposable, IPanel {
+export interface IDockviewPanel extends IDisposable, IPanel {
     readonly view?: IGroupPanelView;
-    readonly group: GroupviewPanel;
+    readonly group: GroupPanel;
     readonly api: DockviewPanelApi;
     readonly title: string;
     readonly suppressClosable: boolean;
     readonly params: Record<string, any> | undefined;
-    updateParentGroup(group: GroupviewPanel, isGroupActive: boolean): void;
+    updateParentGroup(group: GroupPanel, isGroupActive: boolean): void;
     init(params: IGroupPanelInitParameters): void;
     toJSON(): GroupviewPanelState;
     update(event: GroupPanelUpdateEvent): void;

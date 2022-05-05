@@ -8,8 +8,8 @@ import {
 import { toggleClass } from '../dom';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { ITabRenderer } from './types';
-import { IGroupPanel } from './groupPanel';
-import { GroupviewPanel } from './groupviewPanel';
+import { IDockviewPanel } from './groupPanel';
+import { GroupPanel } from './groupviewPanel';
 import { DroptargetEvent, Droptarget } from '../dnd/droptarget';
 import { DockviewDropTargets } from './dnd';
 import { DragHandler } from '../dnd/abstractDragHandler';
@@ -22,7 +22,7 @@ export enum MouseEventKind {
 export interface LayoutMouseEvent {
     readonly kind: MouseEventKind;
     readonly event: MouseEvent;
-    readonly panel?: IGroupPanel;
+    readonly panel?: IDockviewPanel;
     readonly tab?: boolean;
 }
 
@@ -53,7 +53,7 @@ export class Tab extends CompositeDisposable implements ITab {
     constructor(
         public readonly panelId: string,
         accessor: IDockviewComponent,
-        private readonly group: GroupviewPanel
+        private readonly group: GroupPanel
     ) {
         super();
 

@@ -6,7 +6,7 @@ import { ActionContainer } from '../../../actionbar/actionsContainer';
 import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
 import { CompositeDisposable } from '../../../lifecycle';
-import { GroupviewPanel } from '../../../groupview/groupviewPanel';
+import { GroupPanel } from '../../../groupview/groupviewPanel';
 import { PanelUpdateEvent } from '../../../panel/types';
 
 export class Watermark
@@ -14,7 +14,7 @@ export class Watermark
     implements IWatermarkRenderer
 {
     private _element: HTMLElement;
-    private group: GroupviewPanel | undefined;
+    private group: GroupPanel | undefined;
     private params: GroupPanelPartInitParameters | undefined;
 
     get id() {
@@ -85,7 +85,7 @@ export class Watermark
         this.render();
     }
 
-    updateParentGroup(group: GroupviewPanel, _visible: boolean): void {
+    updateParentGroup(group: GroupPanel, _visible: boolean): void {
         this.group = group;
         this.render();
     }

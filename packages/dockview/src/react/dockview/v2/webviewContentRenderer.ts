@@ -2,7 +2,7 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
 } from '../../../groupview/types';
-import { GroupviewPanel } from '../../../groupview/groupviewPanel';
+import { GroupPanel } from '../../../groupview/groupviewPanel';
 import { HostedContainer } from '../../../hostedContainer';
 import { PanelUpdateEvent } from '../../../panel/types';
 
@@ -43,7 +43,7 @@ export class WebviewContentRenderer implements IContentRenderer {
     }
 
     public updateParentGroup(
-        _group: GroupviewPanel,
+        _group: GroupPanel,
         _isPanelVisible: boolean
     ): void {
         //
