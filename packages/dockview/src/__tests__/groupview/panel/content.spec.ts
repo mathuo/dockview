@@ -1,19 +1,20 @@
 import { fireEvent } from '@testing-library/dom';
 import { Emitter, Event } from '../../../events';
-import { IGroupPanel } from '../../../groupview/groupPanel';
 import { ContentContainer } from '../../../groupview/panel/content';
 import {
     GroupPanelContentPartInitParameters,
     IContentRenderer,
 } from '../../../groupview/types';
-import { GroupviewPanel } from '../../../groupview/groupviewPanel';
 import { CompositeDisposable } from '../../../lifecycle';
 import { PanelUpdateEvent } from '../../../panel/types';
 import { IGroupPanelView } from '../../../dockview/defaultGroupPanelView';
+import { IDockviewPanel } from '../../../groupview/groupPanel';
+import { GroupPanel } from '../../../groupview/groupviewPanel';
 
 class TestContentRenderer
     extends CompositeDisposable
-    implements IContentRenderer {
+    implements IContentRenderer
+{
     readonly element: HTMLElement;
 
     readonly _onDidFocus = new Emitter<void>();
@@ -26,7 +27,7 @@ class TestContentRenderer
         this.element = document.createElement('div');
     }
 
-    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void {
+    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void {
         //
     }
 
@@ -77,9 +78,9 @@ describe('contentContainer', () => {
             view: {
                 content: contentRenderer,
             } as Partial<IGroupPanelView>,
-        } as Partial<IGroupPanel>;
+        } as Partial<IDockviewPanel>;
 
-        cut.openPanel(panel as IGroupPanel);
+        cut.openPanel(panel as IDockviewPanel);
 
         expect(focus).toBe(0);
         expect(blur).toBe(0);
@@ -111,9 +112,9 @@ describe('contentContainer', () => {
             view: {
                 content: contentRenderer2,
             } as Partial<IGroupPanelView>,
-        } as Partial<IGroupPanel>;
+        } as Partial<IDockviewPanel>;
 
-        cut.openPanel(panel2 as IGroupPanel);
+        cut.openPanel(panel2 as IDockviewPanel);
         expect(focus).toBe(2);
         expect(blur).toBe(2);
 

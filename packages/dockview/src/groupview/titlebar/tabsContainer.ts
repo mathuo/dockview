@@ -6,10 +6,10 @@ import {
 import { addDisposableListener, Emitter, Event } from '../../events';
 import { ITab, MouseEventKind, Tab } from '../tab';
 import { last } from '../../array';
-import { IGroupPanel } from '../groupPanel';
+import { IDockviewPanel } from '../groupPanel';
 import { IDockviewComponent } from '../../dockview/dockviewComponent';
 import { getPanelData } from '../../dnd/dataTransfer';
-import { GroupviewPanel } from '../groupviewPanel';
+import { GroupPanel } from '../groupviewPanel';
 import { Droptarget } from '../../dnd/droptarget';
 import { DockviewDropTargets } from '../dnd';
 
@@ -28,10 +28,10 @@ export interface ITabsContainer extends IDisposable {
     at: (index: number) => ITab;
     onDrop: Event<TabDropIndexEvent>;
     setActive: (isGroupActive: boolean) => void;
-    setActivePanel: (panel: IGroupPanel) => void;
+    setActivePanel: (panel: IDockviewPanel) => void;
     isActive: (tab: ITab) => boolean;
-    closePanel: (panel: IGroupPanel) => void;
-    openPanel: (panel: IGroupPanel, index?: number) => void;
+    closePanel: (panel: IDockviewPanel) => void;
+    openPanel: (panel: IDockviewPanel, index?: number) => void;
     setActionElement(element: HTMLElement | undefined): void;
     hidden: boolean;
     show(): void;
@@ -52,7 +52,7 @@ export class TabsContainer
     private tabs: IValueDisposable<ITab>[] = [];
     private selectedIndex = -1;
     private active = false;
-    private activePanel: IGroupPanel | undefined;
+    private activePanel: IDockviewPanel | undefined;
     private actions: HTMLElement | undefined;
 
     private _height: number | undefined;
@@ -141,7 +141,7 @@ export class TabsContainer
 
     constructor(
         private accessor: IDockviewComponent,
-        private group: GroupviewPanel,
+        private group: GroupPanel,
         options: { tabHeight?: number }
     ) {
         super();
@@ -244,14 +244,14 @@ export class TabsContainer
         value.element.remove();
     }
 
-    public setActivePanel(panel: IGroupPanel) {
+    public setActivePanel(panel: IDockviewPanel) {
         this.tabs.forEach((tab) => {
             const isActivePanel = panel.id === tab.value.panelId;
             tab.value.setActive(isActivePanel);
         });
     }
 
-    public openPanel(panel: IGroupPanel, index: number = this.tabs.length) {
+    public openPanel(panel: IDockviewPanel, index: number = this.tabs.length) {
         if (this.tabs.find((tab) => tab.value.panelId === panel.id)) {
             return;
         }
@@ -294,7 +294,7 @@ export class TabsContainer
         this.activePanel = panel;
     }
 
-    public closePanel(panel: IGroupPanel) {
+    public closePanel(panel: IDockviewPanel) {
         this.delete(panel.id);
     }
 

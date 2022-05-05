@@ -3,7 +3,7 @@ import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { DockviewPanelApi } from '../api/groupPanelApi';
 import { PanelInitParameters, IPanel } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
-import { GroupviewPanel } from './groupviewPanel';
+import { GroupPanel } from './groupviewPanel';
 import { Event } from '../events';
 import { WrappedTab } from '../dockview/components/tab/defaultTab';
 
@@ -34,13 +34,13 @@ export interface GroupPanelContentPartInitParameters
 export interface IWatermarkRenderer extends IPanel {
     readonly element: HTMLElement;
     init: (params: GroupPanelPartInitParameters) => void;
-    updateParentGroup(group: GroupviewPanel, visible: boolean): void;
+    updateParentGroup(group: GroupPanel, visible: boolean): void;
 }
 
 export interface ITabRenderer extends IPanel {
     readonly element: HTMLElement;
     init(parameters: GroupPanelPartInitParameters): void;
-    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void;
+    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void;
 }
 
 export interface IActionsRenderer extends IDisposable {
@@ -52,7 +52,7 @@ export interface IContentRenderer extends IPanel {
     readonly actions?: HTMLElement;
     readonly onDidFocus?: Event<void>;
     readonly onDidBlur?: Event<void>;
-    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void;
+    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void;
     init(parameters: GroupPanelContentPartInitParameters): void;
     close?(): Promise<boolean>;
 }

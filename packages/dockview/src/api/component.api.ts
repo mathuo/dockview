@@ -15,7 +15,7 @@ import {
     SerializedGridview,
 } from '../gridview/gridviewComponent';
 import { IGridviewPanel } from '../gridview/gridviewPanel';
-import { IGroupPanel } from '../groupview/groupPanel';
+import { IDockviewPanel } from '../groupview/groupPanel';
 import {
     AddPaneviewComponentOptions,
     SerializedPaneview,
@@ -30,7 +30,7 @@ import {
 } from '../splitview/splitviewComponent';
 import { IView, Orientation, Sizing } from '../splitview/core/splitview';
 import { ISplitviewPanel } from '../splitview/splitviewPanel';
-import { GroupviewPanel, IGroupviewPanel } from '../groupview/groupviewPanel';
+import { GroupPanel, IGroupviewPanel } from '../groupview/groupviewPanel';
 import { Emitter, Event } from '../events';
 import { PaneviewDropEvent } from '../react';
 
@@ -376,15 +376,15 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.onDidRemoveGroup;
     }
 
-    get onDidActivePanelChange(): Event<IGroupPanel | undefined> {
+    get onDidActivePanelChange(): Event<IDockviewPanel | undefined> {
         return this.component.onDidActivePanelChange;
     }
 
-    get onDidAddPanel(): Event<IGroupPanel> {
+    get onDidAddPanel(): Event<IDockviewPanel> {
         return this.component.onDidAddPanel;
     }
 
-    get onDidRemovePanel(): Event<IGroupPanel> {
+    get onDidRemovePanel(): Event<IDockviewPanel> {
         return this.component.onDidRemovePanel;
     }
 
@@ -400,7 +400,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.onDidDrop;
     }
 
-    get panels(): IGroupPanel[] {
+    get panels(): IDockviewPanel[] {
         return this.component.panels;
     }
 
@@ -408,7 +408,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.groups;
     }
 
-    get activePanel(): IGroupPanel | undefined {
+    get activePanel(): IDockviewPanel | undefined {
         return this.component.activePanel;
     }
 
@@ -430,7 +430,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         this.component.focus();
     }
 
-    getPanel(id: string): IGroupPanel | undefined {
+    getPanel(id: string): IDockviewPanel | undefined {
         return this.component.getGroupPanel(id);
     }
 
@@ -438,7 +438,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         this.component.layout(width, height, force);
     }
 
-    addPanel(options: AddPanelOptions): IGroupPanel {
+    addPanel(options: AddPanelOptions): IDockviewPanel {
         return this.component.addPanel(options);
     }
 
@@ -459,7 +459,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     removeGroup(group: IGroupviewPanel): void {
-        this.component.removeGroup(<GroupviewPanel>group);
+        this.component.removeGroup(<GroupPanel>group);
     }
 
     getGroup(id: string): IGroupviewPanel | undefined {

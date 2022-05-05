@@ -5,14 +5,14 @@ import {
 } from '../../lifecycle';
 import { Emitter, Event } from '../../events';
 import { trackFocus } from '../../dom';
-import { IGroupPanel } from '../groupPanel';
+import { IDockviewPanel } from '../groupPanel';
 
 export interface IContentContainer extends IDisposable {
     onDidFocus: Event<void>;
     onDidBlur: Event<void>;
     element: HTMLElement;
     layout(width: number, height: number): void;
-    openPanel: (panel: IGroupPanel) => void;
+    openPanel: (panel: IDockviewPanel) => void;
     closePanel: () => void;
     show(): void;
     hide(): void;
@@ -23,7 +23,7 @@ export class ContentContainer
     implements IContentContainer
 {
     private _element: HTMLElement;
-    private panel: IGroupPanel | undefined;
+    private panel: IDockviewPanel | undefined;
     private disposable = new MutableDisposable();
 
     private readonly _onDidFocus = new Emitter<void>();
@@ -59,7 +59,7 @@ export class ContentContainer
         this.element.style.display = 'none';
     }
 
-    public openPanel(panel: IGroupPanel) {
+    public openPanel(panel: IDockviewPanel) {
         if (this.panel === panel) {
             return;
         }

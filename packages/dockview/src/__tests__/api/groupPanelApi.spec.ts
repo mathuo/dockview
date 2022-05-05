@@ -1,24 +1,25 @@
-import { IDockviewComponent, IGroupPanel } from '../..';
+import { IDockviewComponent } from '../../dockview/dockviewComponent';
 import { DockviewPanelApiImpl, TitleEvent } from '../../api/groupPanelApi';
-import { GroupviewPanel } from '../../groupview/groupviewPanel';
+import { IDockviewPanel } from '../../groupview/groupPanel';
+import { GroupPanel } from '../../groupview/groupviewPanel';
 
 describe('groupPanelApi', () => {
     test('title', () => {
-        const groupPanel: Partial<IGroupPanel> = {
+        const groupPanel: Partial<IDockviewPanel> = {
             id: 'test_id',
             title: 'test_title',
         };
 
         const accessor: Partial<IDockviewComponent> = {};
-        const groupViewPanel = new GroupviewPanel(
+        const groupViewPanel = new GroupPanel(
             <IDockviewComponent>accessor,
             '',
             {}
         );
 
         const cut = new DockviewPanelApiImpl(
-            <IGroupPanel>groupPanel,
-            <GroupviewPanel>groupViewPanel
+            <IDockviewPanel>groupPanel,
+            <GroupPanel>groupViewPanel
         );
 
         let events: TitleEvent[] = [];
@@ -39,20 +40,20 @@ describe('groupPanelApi', () => {
     });
 
     test('onDidGroupChange', () => {
-        const groupPanel: Partial<IGroupPanel> = {
+        const groupPanel: Partial<IDockviewPanel> = {
             id: 'test_id',
         };
 
         const accessor: Partial<IDockviewComponent> = {};
-        const groupViewPanel = new GroupviewPanel(
+        const groupViewPanel = new GroupPanel(
             <IDockviewComponent>accessor,
             '',
             {}
         );
 
         const cut = new DockviewPanelApiImpl(
-            <IGroupPanel>groupPanel,
-            <GroupviewPanel>groupViewPanel
+            <IDockviewPanel>groupPanel,
+            <GroupPanel>groupViewPanel
         );
 
         let events = 0;
@@ -64,7 +65,7 @@ describe('groupPanelApi', () => {
         expect(events).toBe(0);
         expect(cut.group).toBe(groupViewPanel);
 
-        const groupViewPanel2 = new GroupviewPanel(
+        const groupViewPanel2 = new GroupPanel(
             <IDockviewComponent>accessor,
             '',
             {}

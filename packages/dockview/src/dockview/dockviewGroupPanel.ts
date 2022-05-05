@@ -3,10 +3,10 @@ import { DockviewPanelApiImpl } from '../api/groupPanelApi';
 import {
     GroupPanelUpdateEvent,
     GroupviewPanelState,
-    IGroupPanel,
+    IDockviewPanel,
     IGroupPanelInitParameters,
 } from '../groupview/groupPanel';
-import { GroupviewPanel } from '../groupview/groupviewPanel';
+import { GroupPanel } from '../groupview/groupviewPanel';
 import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { Parameters } from '../panel/types';
 import { IGroupPanelView } from './defaultGroupPanelView';
@@ -14,12 +14,12 @@ import { DockviewComponent } from './dockviewComponent';
 
 export class DockviewGroupPanel
     extends CompositeDisposable
-    implements IGroupPanel
+    implements IDockviewPanel
 {
     private readonly mutableDisposable = new MutableDisposable();
 
     readonly api: DockviewPanelApiImpl;
-    private _group: GroupviewPanel;
+    private _group: GroupPanel;
     private _params?: Parameters;
 
     private _view?: IGroupPanelView;
@@ -39,7 +39,7 @@ export class DockviewGroupPanel
         return this._suppressClosable;
     }
 
-    get group(): GroupviewPanel {
+    get group(): GroupPanel {
         return this._group;
     }
 
@@ -51,7 +51,7 @@ export class DockviewGroupPanel
         public readonly id: string,
         accessor: DockviewComponent,
         private readonly containerApi: DockviewApi,
-        group: GroupviewPanel
+        group: GroupPanel
     ) {
         super();
         this._suppressClosable = false;
@@ -148,7 +148,7 @@ export class DockviewGroupPanel
         });
     }
 
-    public updateParentGroup(group: GroupviewPanel, isGroupActive: boolean) {
+    public updateParentGroup(group: GroupPanel, isGroupActive: boolean) {
         this._group = group;
         this.api.group = group;
 

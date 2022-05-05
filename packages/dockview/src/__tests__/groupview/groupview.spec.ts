@@ -4,7 +4,7 @@ import {
 } from '../../dockview/dockviewComponent';
 import {
     GroupviewPanelState,
-    IGroupPanel,
+    IDockviewPanel,
     IGroupPanelInitParameters,
 } from '../../groupview/groupPanel';
 import {
@@ -14,7 +14,6 @@ import {
     IWatermarkRenderer,
 } from '../../groupview/types';
 import { PanelUpdateEvent } from '../../panel/types';
-import { GroupviewPanel } from '../../groupview/groupviewPanel';
 import {
     GroupChangeKind2,
     GroupOptions,
@@ -25,6 +24,7 @@ import {
     DefaultGroupPanelView,
     IGroupPanelView,
 } from '../../dockview/defaultGroupPanelView';
+import { GroupPanel } from '../../groupview/groupviewPanel';
 
 class Watermark implements IWatermarkRenderer {
     public readonly element = document.createElement('div');
@@ -81,7 +81,7 @@ class TestContentPart implements IContentRenderer {
         //void
     }
 
-    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean) {
+    updateParentGroup(group: GroupPanel, isPanelVisible: boolean) {
         //noop
     }
 
@@ -116,7 +116,7 @@ class TestHeaderPart implements ITabRenderer {
         //void
     }
 
-    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean) {
+    updateParentGroup(group: GroupPanel, isPanelVisible: boolean) {
         //noop
     }
 
@@ -133,9 +133,9 @@ class TestHeaderPart implements ITabRenderer {
     }
 }
 
-class TestPanel implements IGroupPanel {
+class TestPanel implements IDockviewPanel {
     private _view: IGroupPanelView | undefined;
-    private _group: GroupviewPanel | undefined;
+    private _group: GroupPanel | undefined;
     private _params: IGroupPanelInitParameters;
 
     get title() {
@@ -175,7 +175,7 @@ class TestPanel implements IGroupPanel {
         this._params = params;
     }
 
-    updateParentGroup(group: GroupviewPanel, isGroupActive: boolean) {
+    updateParentGroup(group: GroupPanel, isGroupActive: boolean) {
         this._group = group;
     }
 
@@ -205,7 +205,7 @@ class TestPanel implements IGroupPanel {
 }
 
 describe('groupview', () => {
-    let groupview: GroupviewPanel;
+    let groupview: GroupPanel;
     let dockview: IDockviewComponent;
     let options: GroupOptions;
 
@@ -228,7 +228,7 @@ describe('groupview', () => {
         options = {
             tabHeight: 30,
         };
-        groupview = new GroupviewPanel(dockview, 'groupview-1', options);
+        groupview = new GroupPanel(dockview, 'groupview-1', options);
         groupview.initialize();
     });
 
@@ -237,7 +237,7 @@ describe('groupview', () => {
         const panel2 = new TestPanel('panel2', jest.fn() as any);
         const panel3 = new TestPanel('panel3', jest.fn() as any);
 
-        const groupview2 = new GroupviewPanel(dockview, 'groupview-2', {
+        const groupview2 = new GroupPanel(dockview, 'groupview-2', {
             tabHeight: 25,
             panels: [panel1, panel2, panel3],
             activePanel: panel2,
@@ -262,7 +262,7 @@ describe('groupview', () => {
         const panel2 = new TestPanel('panel2', jest.fn() as any);
         const panel3 = new TestPanel('panel3', jest.fn() as any);
 
-        const groupview2 = new GroupviewPanel(dockview, 'groupview-2', {
+        const groupview2 = new GroupPanel(dockview, 'groupview-2', {
             tabHeight: 25,
             panels: [panel1, panel2, panel3],
             activePanel: panel2,

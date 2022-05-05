@@ -5,7 +5,7 @@ import {
 } from '../../../groupview/types';
 import { addDisposableListener } from '../../../events';
 import { PanelUpdateEvent } from '../../../panel/types';
-import { GroupviewPanel } from '../../../groupview/groupviewPanel';
+import { GroupPanel } from '../../../groupview/groupviewPanel';
 
 export class WrappedTab implements ITabRenderer {
     private readonly _element: HTMLElement;
@@ -59,7 +59,7 @@ export class WrappedTab implements ITabRenderer {
         this.renderer.init(parameters);
     }
 
-    updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean): void {
+    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void {
         this.renderer.updateParentGroup(group, isPanelVisible);
     }
 
@@ -147,7 +147,7 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         }
     }
 
-    public updateParentGroup(group: GroupviewPanel, isPanelVisible: boolean) {
+    public updateParentGroup(group: GroupPanel, isPanelVisible: boolean) {
         this._isPanelVisible = isPanelVisible;
         this._isGroupActive = group.isActive;
 

@@ -2,7 +2,7 @@ import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { DockviewApi } from '../../api/component.api';
 import { IGroupPanelView } from '../../dockview/defaultGroupPanelView';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
-import { GroupviewPanel } from '../../groupview/groupviewPanel';
+import { GroupPanel } from '../../groupview/groupviewPanel';
 
 describe('dockviewGroupPanel', () => {
     test('update title', () => {
@@ -14,7 +14,7 @@ describe('dockviewGroupPanel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
-        const groupMock = jest.fn<GroupviewPanel, []>(() => {
+        const groupMock = jest.fn<GroupPanel, []>(() => {
             return {} as any;
         });
         const api = new dockviewApiMock();
@@ -48,7 +48,7 @@ describe('dockviewGroupPanel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
-        const groupMock = jest.fn<GroupviewPanel, []>(() => {
+        const groupMock = jest.fn<GroupPanel, []>(() => {
             return {} as any;
         });
         const api = new dockviewApiMock();
@@ -88,7 +88,7 @@ describe('dockviewGroupPanel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
-        const groupMock = jest.fn<GroupviewPanel, []>(() => {
+        const groupMock = jest.fn<GroupPanel, []>(() => {
             return {} as any;
         });
         const api = new dockviewApiMock();
