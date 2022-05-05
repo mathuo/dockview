@@ -1,25 +1,31 @@
 @import "./navigation.css";
 @import "~dockview/dist/styles/dockview.css";
 
+:root {
+  --primary-text-color:rgb(30,30,30);
+  --header-color:rgb(235, 235, 235);
+  --navigation-color:rgb(245, 245, 245);
+  --border-color:rgb(30,30,30)
+}
+
 html,
 body {
   padding: 0;
   margin: 0;
-  /* font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif; */
-  font-family: 'Roboto', sans-serif;
+  font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  font: 100% /1.65  system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
 }
 
-a {
+.markdown-body a {
   text-decoration: none;
   color:dodgerblue;
 }
 
-a, a:hover, a:visited, a:active {
+.markdown-body a, .markdown-body a:hover, .markdown-body a:visited, .markdown-body a:active {
   color:dodgerblue;
 }
 
-a:hover {
+.markdown-body a:hover {
   text-decoration: underline;
 }
 

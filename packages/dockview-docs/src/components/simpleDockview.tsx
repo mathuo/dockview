@@ -12,27 +12,16 @@ const components = {
 
 export const SimpleDockview = () => {
     const onReady = (event: DockviewReadyEvent) => {
-        event.api.onDidLayoutChange(() => {
-            localStorage.setItem(
-                'dockview_test',
-                JSON.stringify(event.api.toJSON())
-            );
-        });
-
-        const layout = localStorage.getItem('dockview_test');
-
-        if (layout) {
-            event.api.fromJSON(JSON.parse(layout));
-            return;
-        }
-
-        event.api.addPanel({
+        const panel = event.api.addPanel({
             id: 'panel_1',
             component: 'default',
             params: {
                 title: 'Panel 1',
             },
         });
+
+        panel.group.locked = true;
+        panel.group.header.hidden = true;
 
         event.api.addPanel({
             id: 'panel_2',

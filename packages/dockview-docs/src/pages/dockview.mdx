@@ -1,3 +1,43 @@
+import { SimpleDockview } from '../components/simpleDockview';
+
+Dockview is an abstraction built on top of [Gridviews](/gridview) where each view is a tabbed container.
+
+<div
+    style={{
+        height: '300px',
+        backgroundColor: 'rgb(30,30,30)',
+        color: 'white',
+        margin: '20px 0px',
+    }}
+>
+    <SimpleDockview />
+</div>
+
+```tsx
+const panel = event.api.addPanel(...);
+const anotherPanel = event.api.getPanel('somePanelid');
+```
+
+You can access the panels associated group through the `panel.group` variable.
+The group will always be defined and will change if a panel is moved into another group.
+
+### Locked group
+
+Locking a group will disable all drop events for this group ensuring a user can not add additional panels to the group.
+You can still add groups to a locked panel programatically using the api.
+
+```tsx
+panel.group.locked = true;
+```
+
+## Group header
+
+You may wish to hide the header section of a group. This can achieved through setting the `hidden` variable on `panel.group.header`.
+
+```tsx
+panel.group.header.hidden = true;
+```
+
 ## Component Props
 
 ```tsx
@@ -33,46 +73,45 @@ const onReady = (event: DockviewReadyEvent) => {
 };
 ```
 
-| Property               | Type                                              | Description                                 |
-| ---------------------- | ------------------------------------------------- | ------------------------------------------- |
-| height                 | `number`                                          | Component pixel height                      |
-| width                  | `number`                                          | Component pixel width                       |
-| minimumHeight          | `number`                                          |                                             |
-| maximumHeight          | `number`                                          |                                             |
-| maximumWidth           | `number`                                          |                                             |
-| maximumWidth           | `number`                                          |                                             |
-| length                 | `number`                                          | Number of panels                            |
-| size                   | `number`                                          | Number of Groups                            |
-| panels                 | `IGroupPanel[]`                                   |                                             |
-| groups                 | `IGroupviewPanel[]`                               |                                             |
-| activePanel            | `IGroupPanel \| undefined`                        |                                             |
-| activeGroup            | `IGroupviewPanel \| undefined`                    |                                             |
-|                        |                                                   |                                             |
-| onDidLayoutChange      | `Event<void>`                                     |                                             |
-| onDidLayoutFromJSON    | `Event<void>`                                     |                                             |
-| onDidAddGroup          | `Event<IGroupviewPanel>`                          |                                             |
-| onDidRemoveGroup       | `Event<IGroupviewPanel>`                          |                                             |
-| onDidActiveGroupChange | `Event<IGroupviewPanel \| undefined>`             |                                             |
-| onDidAddPanel          | `Event<IGroupPanel>`                              |                                             |
-| onDidRemovePanel       | `Event<IGroupPanel>`                              |                                             |
-| onDidActivePanelChange | `Event<IGroupPanel \| undefined>`                 |                                             |
-| onDidDrop              | `Event<DockviewDropEvent`                         |                                             |
-|                        |                                                   |                                             |
-| addPanel               | `addPanel(options: AddPanelOptions): IGroupPanel` |                                             |
-| getPanel               | `(id: string) \| IGroupPanel \| undefined`        |                                             |
-| addEmptyGroup          | `(options? AddGroupOptions): void`                |                                             |
-| closeAllGroups         | `(): void`                                        |                                             |
-| removeGroup            | `(group: IGroupviewPanel): void`                  |                                             |
-| getGroup               | `(id: string): IGroupviewPanel \| undefined`      |                                             |
-|                        |                                                   |                                             |
-| getTabHeight           | `(): number \| undefined`                         |                                             |
-| setTabHeight           | `(hegiht: number \| undefined): void`             |                                             |
-| updateOptions          | `(options:SplitviewComponentUpdateOptions): void` |                                             |
-| focus                  | `(): void`                                        |                                             |
-| layout                 | `(width: number, height:number): void`            | See [Auto resizing](/basics/#auto-resizing) |
-| resizeToFit            | `(): void`                                        | See [Auto resizing](/basics/#auto-resizing) |
-| fromJSON               | `(data: SerializedDockview): void`                | See [Serialization](/basics/#serialization) |
-| toJSON                 | `(): SerializedDockview`                          | See [Serialization](/basics/#serialization) |
+| Property               | Type                                                 | Description                                 |
+| ---------------------- | ---------------------------------------------------- | ------------------------------------------- |
+| height                 | `number`                                             | Component pixel height                      |
+| width                  | `number`                                             | Component pixel width                       |
+| minimumHeight          | `number`                                             |                                             |
+| maximumHeight          | `number`                                             |                                             |
+| maximumWidth           | `number`                                             |                                             |
+| maximumWidth           | `number`                                             |                                             |
+| length                 | `number`                                             | Number of panels                            |
+| size                   | `number`                                             | Number of Groups                            |
+| panels                 | `IDockviewPanel[]`                                   |                                             |
+| groups                 | `IDockviewPanel[]`                                   |                                             |
+| activePanel            | `IDockviewPanel \| undefined`                        |                                             |
+| activeGroup            | `IDockviewPanel \| undefined`                        |                                             |
+|                        |                                                      |                                             |
+| onDidLayoutChange      | `Event<void>`                                        |                                             |
+| onDidLayoutFromJSON    | `Event<void>`                                        |                                             |
+| onDidAddGroup          | `Event<IDockviewPanel>`                              |                                             |
+| onDidRemoveGroup       | `Event<IDockviewPanel>`                              |                                             |
+| onDidActiveGroupChange | `Event<IDockviewPanel \| undefined>`                 |                                             |
+| onDidAddPanel          | `Event<IDockviewPanel>`                              |                                             |
+| onDidRemovePanel       | `Event<IDockviewPanel>`                              |                                             |
+| onDidActivePanelChange | `Event<IDockviewPanel \| undefined>`                 |                                             |
+| onDidDrop              | `Event<DockviewDropEvent`                            |                                             |
+|                        |                                                      |                                             |
+| addPanel               | `addPanel(options: AddPanelOptions): IDockviewPanel` |                                             |
+| getPanel               | `(id: string) \| IDockviewPanel \| undefined`        |                                             |
+| addEmptyGroup          | `(options? AddGroupOptions): void`                   |                                             |
+| closeAllGroups         | `(): void`                                           |                                             |
+| removeGroup            | `(group: IDockviewPanel): void`                      |                                             |
+| getGroup               | `(id: string): IDockviewPanel \| undefined`          |                                             |
+|                        |                                                      |                                             |
+| getTabHeight           | `(): number \| undefined`                            |                                             |
+| setTabHeight           | `(hegiht: number \| undefined): void`                |                                             |
+| updateOptions          | `(options:SplitviewComponentUpdateOptions): void`    |                                             |
+| focus                  | `(): void`                                           |                                             |
+| layout                 | `(width: number, height:number): void`               | See [Auto resizing](/basics/#auto-resizing) |
+| fromJSON               | `(data: SerializedDockview): void`                   | See [Serialization](/basics/#serialization) |
+| toJSON                 | `(): SerializedDockview`                             | See [Serialization](/basics/#serialization) |
 
 ## Dockview Panel API
 
@@ -102,7 +141,7 @@ const MyComponent = (props: IDockviewPanelProps<{ title: string }>) => {
 | setConstraints         | `(value: PanelConstraintChangeEvent2): void;`               |                 |
 | setSize                | `(event: SizeEvent): void`                                  |                 |
 |                        |                                                             |                 |
-| group                  | `GroupviewPanel                                             | undefined`      |
+| group                  | `GroupPanel                                                 | undefined`      |
 | isGroupActive          | `boolean`                                                   |                 |
 | title                  | `string`                                                    |                 |
 | suppressClosable       | `boolean`                                                   |                 |

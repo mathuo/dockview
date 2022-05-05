@@ -1,39 +1,9 @@
 import { SimpleSplitview } from '../components/simpleSplitview';
+import { SimpleSplitview2 } from '../components/simpleSplitview2';
 
-## Auto resizing
+# Basics
 
-`SplitviewReact`, `GridviewReact`, `PaneviewReact` and `DockviewReact` will all automatically resize to fill the size of their parent element.
-Internally this is achieved using a [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver).
-You can disable this by settings the `disableAutoResizing` prop to be `true`.
-
-You can manually resize a component using the API method `layout(width: number, height: number): void`.
-
-You can force a component to resize without providing any measurements using the API method `resizeToFit(): void`.
-This method will evaluate the width and height of the parent `HTMLElement` container and use these values to relayout.
-
-## Proportional layout
-
-<div
-    style={{
-        height: '100px',
-        backgroundColor: 'rgb(30,30,30)',
-        color: 'white',
-        margin: '20px 0px',
-    }}
->
-    <SimpleSplitview proportional={false} />
-</div>
-
-<div
-    style={{
-        height: '100px',
-        backgroundColor: 'rgb(30,30,30)',
-        color: 'white',
-        margin: '20px 0px',
-    }}
->
-    <SimpleSplitview proportional={true} />
-</div>
+This section will take you through a number of concepts that can be applied to all dockview components.
 
 ## Panels
 
@@ -63,9 +33,12 @@ const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
 };
 ```
 
-### Accessing the panel API
+## API
 
-You can access an extensive set of functions in the panel via both the panel `api` and `containerApi`. The `api` is specific to that particular panel and the `containerApi` corresponds to that api which you access during the `onReady` event.
+There are two types of API you will interact with using `dockview`.
+
+-   The `panel API` is accessible via `props.api` in user defined panels and via the `.api` variable found on panel instances. This API contains actions and variable related to the the individual panel.
+-   The `component API` is accessible via `event.api` in the `onReady` events and `props.containerApi` in user defined panels. This API contains actions and variable related to the component as a whole.
 
 ```tsx
 const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
@@ -98,3 +71,20 @@ const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
 ### Serialization
 
 All components support `toJSON(): T` which returns a Typed object representation of the components state. This same Typed object can be used to deserialize a view using `fromJSON(object: T): void`.
+
+## Auto resizing
+
+`SplitviewReact`, `GridviewReact`, `PaneviewReact` and `DockviewReact` will all automatically resize to fill the size of their parent element.
+Internally this is achieved using a [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver).
+You can disable this by settings the `disableAutoResizing` prop to be `true`.
+
+You can manually resize a component using the API method `layout(width: number, height: number): void`.
+
+## Proportional layout
+
+The `proportionalLayout` property indicates the expected behaviour of the component as it's container resizes, should all views resize equally or should just one view expand to fill the new space. `proportionalLayout` can be set as a property on `SplitviewReact` and `GridviewReact` components.
+Although not configurable on `DockviewReact` and `PaneviewReact` these both behave as if `proportionalLayout=true` was set for them.
+
+<SimpleSplitview2 proportional={false} />
+
+<SimpleSplitview2 proportional={true} />

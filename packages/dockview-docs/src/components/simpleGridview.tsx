@@ -62,6 +62,7 @@ export const SimpleGridview = () => {
                 title: 'Panel 6',
             },
             position: { referencePanel: 'panel_5', direction: 'below' },
+            minimumWidth: 10,
         });
 
         event.api.addPanel({
@@ -71,6 +72,17 @@ export const SimpleGridview = () => {
                 title: 'Panel 7',
             },
             position: { referencePanel: 'panel_6', direction: 'right' },
+            minimumWidth: 10,
+        });
+
+        event.api.addPanel({
+            id: 'panel_8',
+            component: 'default',
+            params: {
+                title: 'Panel 8',
+            },
+            position: { referencePanel: 'panel_6', direction: 'right' },
+            minimumWidth: 10,
         });
     };
 
@@ -78,6 +90,7 @@ export const SimpleGridview = () => {
         <GridviewReact
             components={components}
             onReady={onReady}
+            proportionalLayout={false}
             orientation={Orientation.VERTICAL}
             className="dockview-theme-dark"
         />
