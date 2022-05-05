@@ -3,20 +3,17 @@ import {
     ISerializedLeafNode,
     IViewDeserializer,
 } from '../gridview/gridview';
-import { GroupviewPanelState, IGroupPanel } from '../groupview/groupPanel';
+import { GroupviewPanelState, IDockviewPanel } from '../groupview/groupPanel';
 import { GroupPanelViewState } from '../groupview/groupview';
-import { GroupviewPanel } from '../groupview/groupviewPanel';
+import { GroupPanel } from '../groupview/groupviewPanel';
 import { DockviewComponent } from './dockviewComponent';
 
 export interface IPanelDeserializer {
-    fromJSON(
-        panelData: GroupviewPanelState,
-        group: GroupviewPanel
-    ): IGroupPanel;
+    fromJSON(panelData: GroupviewPanelState, group: GroupPanel): IDockviewPanel;
 }
 
 export interface PanelDeserializerOptions {
-    createPanel: (id: string, group: GroupviewPanel) => IGroupPanel;
+    createPanel: (id: string, group: GroupPanel) => IDockviewPanel;
 }
 
 export class DefaultDeserializer implements IViewDeserializer {

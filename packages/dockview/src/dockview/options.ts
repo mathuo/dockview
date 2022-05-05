@@ -1,14 +1,14 @@
 import { DockviewApi } from '../api/component.api';
 import { Direction } from '../gridview/baseComponentGridview';
 import { IGridView } from '../gridview/gridview';
-import { IGroupPanel } from '../groupview/groupPanel';
+import { IDockviewPanel } from '../groupview/groupPanel';
 import {
     IContentRenderer,
     ITabRenderer,
     WatermarkConstructor,
     IWatermarkRenderer,
 } from '../groupview/types';
-import { GroupviewPanel } from '../groupview/groupviewPanel';
+import { GroupPanel } from '../groupview/groupviewPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
 import { DockviewDropTargets } from '../groupview/dnd';
@@ -22,7 +22,7 @@ export interface GroupPanelFrameworkComponentFactory {
 export interface TabContextMenuEvent {
     event: MouseEvent;
     api: DockviewApi;
-    panel: IGroupPanel;
+    panel: IDockviewPanel;
 }
 
 export interface DockviewRenderFunctions {
@@ -89,5 +89,5 @@ export interface MovementOptions2 {
 
 export interface MovementOptions extends MovementOptions2 {
     includePanel?: boolean;
-    group?: GroupviewPanel;
+    group?: GroupPanel;
 }

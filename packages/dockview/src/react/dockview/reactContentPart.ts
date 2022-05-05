@@ -8,7 +8,7 @@ import { IDockviewPanelProps } from '../dockview/dockview';
 import { PanelUpdateEvent } from '../../panel/types';
 import { DockviewPanelApi } from '../../api/groupPanelApi';
 import { DockviewApi } from '../../api/component.api';
-import { GroupviewPanel } from '../../groupview/groupviewPanel';
+import { GroupPanel } from '../../groupview/groupviewPanel';
 import { Emitter, Event } from '../../events';
 import { WrappedTab } from '../../dockview/components/tab/defaultTab';
 
@@ -30,7 +30,7 @@ export class ReactPanelContentPart implements IContentRenderer {
     //
     private _actionsElement: HTMLElement;
     private actionsPart?: ReactPart<any>;
-    private _group: GroupviewPanel | undefined;
+    private _group: GroupPanel | undefined;
 
     private readonly _onDidFocus = new Emitter<void>();
     readonly onDidFocus: Event<void> = this._onDidFocus.event;
@@ -94,7 +94,7 @@ export class ReactPanelContentPart implements IContentRenderer {
     }
 
     public updateParentGroup(
-        group: GroupviewPanel,
+        group: GroupPanel,
         _isPanelVisible: boolean
     ): void {
         this._group = group;

@@ -3,7 +3,7 @@ import {
     GroupPanelPartInitParameters,
     IWatermarkRenderer,
 } from '../../groupview/types';
-import { GroupviewPanel } from '../../groupview/groupviewPanel';
+import { GroupPanel } from '../../groupview/groupviewPanel';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IGroupPanelBaseProps } from './dockview';
 import { PanelUpdateEvent } from '../../panel/types';
@@ -15,7 +15,7 @@ export interface IWatermarkPanelProps extends IGroupPanelBaseProps {
 export class ReactWatermarkPart implements IWatermarkRenderer {
     private _element: HTMLElement;
     private part?: ReactPart<IWatermarkPanelProps>;
-    private _groupRef: { value: GroupviewPanel | undefined } = {
+    private _groupRef: { value: GroupPanel | undefined } = {
         value: undefined,
     };
     private parameters: GroupPanelPartInitParameters | undefined;
@@ -77,7 +77,7 @@ export class ReactWatermarkPart implements IWatermarkRenderer {
         // noop - retrieval from api
     }
 
-    updateParentGroup(group: GroupviewPanel, _isPanelVisible: boolean): void {
+    updateParentGroup(group: GroupPanel, _isPanelVisible: boolean): void {
         // noop - retrieval from api
         this._groupRef.value = group;
     }
