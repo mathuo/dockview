@@ -42,6 +42,7 @@
     "gulp-concat": "^2.6.1",
     "gulp-dart-sass": "^1.0.2",
     "jest": "^28.1.0",
+    "jest-environment-jsdom": "^28.1.0",
     "jest-sonar-reporter": "^2.0.0",
     "jsdom": "^19.0.0",
     "lerna": "^4.0.0",
