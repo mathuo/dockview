@@ -364,15 +364,15 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.totalPanels;
     }
 
-    get onDidActiveGroupChange(): Event<IGroupviewPanel | undefined> {
+    get onDidActiveGroupChange(): Event<GroupPanel | undefined> {
         return this.component.onDidActiveGroupChange;
     }
 
-    get onDidAddGroup(): Event<IGroupviewPanel> {
+    get onDidAddGroup(): Event<GroupPanel> {
         return this.component.onDidAddGroup;
     }
 
-    get onDidRemoveGroup(): Event<IGroupviewPanel> {
+    get onDidRemoveGroup(): Event<GroupPanel> {
         return this.component.onDidRemoveGroup;
     }
 
@@ -404,7 +404,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.panels;
     }
 
-    get groups(): IGroupviewPanel[] {
+    get groups(): GroupPanel[] {
         return this.component.groups;
     }
 
@@ -412,7 +412,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.activePanel;
     }
 
-    get activeGroup(): IGroupviewPanel | undefined {
+    get activeGroup(): GroupPanel | undefined {
         return this.component.activeGroup;
     }
 
@@ -462,7 +462,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         this.component.removeGroup(<GroupPanel>group);
     }
 
-    getGroup(id: string): IGroupviewPanel | undefined {
+    getGroup(id: string): GroupPanel | undefined {
         return this.component.getPanel(id);
     }
 

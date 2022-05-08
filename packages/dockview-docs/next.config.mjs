@@ -25,11 +25,18 @@ const withMDX = mdx({
     },
 });
 
+console.log(`CI=${process.env.CI}`);
+
+const extraParams = process.env.CI
+    ? {
+          basePath: '/dockview/docs',
+          assetPrefix: '/dockview/docs/',
+      }
+    : {};
+
 export default withTM(
     withMDX({
-        basePath: '/dockview/docs',
-        assetPrefix: '/dockview/docs/',
-        //
+        ...extraParams,
         reactStrictMode: true,
         pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
         experimental: {

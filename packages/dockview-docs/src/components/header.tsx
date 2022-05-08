@@ -31,16 +31,21 @@ export const Header = (props: {}) => {
     return (
         <div
             style={{
-                height: '0px',
-                backgroundColor: '#0070f3',
-                padding: '5vw',
+                backgroundColor: 'var(--header-color)',
+                padding: '0px 8px',
+                display: 'flex',
+                alignItems: 'center',
+                borderBottom: '1px solid var(--border-color)',
             }}
         >
-            <DockviewReact
-                onReady={onReady}
-                components={components}
-                className="dockview-theme-dark"
-            />
+            <div>
+                <div>
+                    <span style={{ fontSize: '2em' }}>dockview</span>
+                    <span style={{ fontSize: '1.25em' }}>
+                        {' documentation'}
+                    </span>
+                </div>
+            </div>
         </div>
     );
 };
