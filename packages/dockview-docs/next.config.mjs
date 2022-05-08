@@ -4,7 +4,7 @@ import autoLinkHeadings from 'rehype-autolink-headings';
 import mdx from '@next/mdx';
 import remarkGfm from 'remark-gfm';
 
-const withTM = transpile(['dockview', 'dockview-demo'], {
+const withTM = transpile(['dockview'], {
     resolveSymlinks: true,
 });
 
@@ -51,18 +51,7 @@ export default withTM(
                 test: /\.tsx?|\.ts?$/,
                 use: [options.defaultLoaders.babel],
             });
-            // config.resolve.alias['react'] = path.resolve(
-            //     __dirname,
-            //     '.',
-            //     'node_modules',
-            //     'react-dom'
-            // );
-            // config.resolve.alias['react-dom'] = path.resolve(
-            //     __dirname,
-            //     '.',
-            //     'node_modules',
-            //     'react-dom'
-            // );
+
             return config;
         },
     })

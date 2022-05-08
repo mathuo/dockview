@@ -11,10 +11,10 @@ module.exports = {
     mode: 'development',
     resolve: {
         extensions: ['.ts', '.js', '.tsx', 'jsx'],
-        alias: {
-            react: path.resolve(__dirname, 'node_modules/react'),
-            'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
-        },
+        // alias: {
+        //     react: path.resolve(__dirname, 'node_modules/react'),
+        //     'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+        // },
     },
     module: {
         rules: [
