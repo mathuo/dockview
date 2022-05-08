@@ -1,3 +1,16 @@
+import { SimplePaneview } from '../components/simplePaneview';
+
+<div
+    style={{
+        height: '400px',
+        backgroundColor: 'rgb(30,30,30)',
+        color: 'white',
+        margin: '20px 0px',
+    }}
+>
+    <SimplePaneview />
+</div>
+
 ## Component Props
 
 ```tsx
@@ -14,7 +27,66 @@ import { ReactPaneview } from 'dockview';
 | disableDnd          | boolean                              | Yes      | false   |                                             |
 | onDidDrop           | Event                                | Yes      |         |                                             |
 
-## Gridview API
+## Custom Header
+
+The above example shows the default header and will render the `title` along with a small icon to indicate a collapsed or expanded state.
+You can provide a custom header:
+
+```tsx
+const onReady = (event: PaneviewReadyEvent) => {
+    event.api.addPanel({
+        id: 'panel_1',
+        component: 'default',
+        headerComponent: 'myHeaderComponent',
+        params: {
+            valueA: 'A',
+        },
+        title: 'Panel 1',
+    });
+};
+```
+
+You can define a header component and listen to the expanded state to update the component accordingly.
+
+```tsx
+const CustomHeader = (props: IPaneviewPanelProps) => {
+    const [expanded, setExpanded] = React.useState<boolean>(
+        props.api.isExpanded
+    );
+
+    React.useEffect(() => {
+        const disposable = props.api.onDidExpansionChange((event) => {
+            setExpanded(event.isExpanded);
+        });
+
+        return () => {
+            disposable.dispose();
+        };
+    }, []);
+
+    const onClick = () => {
+        props.api.setExpanded(!expanded);
+    };
+
+    return (
+        <div>
+            <a
+                onClick={onClick}
+                className={expanded ? 'expanded' : 'collapsed'}
+            />
+            <span>{props.params.title}</span>
+        </div>
+    );
+};
+```
+
+You should provide a value for the `headerComponents` React prop.
+
+```tsx
+const headerComponents = { myHeaderComponent: CustomHeader };
+```
+
+## Paneview API
 
 ```tsx
 const MyComponent = (props: IGridviewPanelProps<{ title: string }>) => {
