@@ -8,7 +8,7 @@ import {
     DockviewReact,
     DockviewApi,
     IWatermarkPanelProps,
-    IGroupPanel,
+    IDockviewPanel,
     PanelCollection,
     DockviewComponents,
 } from 'dockview';
@@ -206,7 +206,7 @@ export const TestGrid = (props: IGridviewPanelProps) => {
         React.useState<{
             x: number;
             y: number;
-            panel: IGroupPanel;
+            panel: IDockviewPanel;
         }>(undefined);
 
     const onTabContextMenu = React.useMemo(
