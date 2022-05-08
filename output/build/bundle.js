@@ -2,3196 +2,26 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/dom.ts":
-/*!********************!*\
-  !*** ./src/dom.ts ***!
-  \********************/
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.toggleClass = void 0;
-var toggleClass = function (element, className, isToggled) {
-    var hasClass = element.classList.contains(className);
-    if (isToggled && !hasClass) {
-        element.classList.add(className);
-    }
-    if (!isToggled && hasClass) {
-        element.classList.remove(className);
-    }
-};
-exports.toggleClass = toggleClass;
-
-
-/***/ }),
-
-/***/ "./src/events.ts":
-/*!***********************!*\
-  !*** ./src/events.ts ***!
-  \***********************/
-/***/ (function(__unused_webpack_module, exports) {
-
-
-var __values = (this && this.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TickDelayedEvent = exports.addDisposableListener = exports.addDisposableWindowListener = exports.Emitter = exports.Event = void 0;
-var Event;
-(function (Event) {
-    Event.any = function () {
-        var children = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            children[_i] = arguments[_i];
-        }
-        return function (listener) {
-            var disposables = children.map(function (child) { return child(listener); });
-            return {
-                dispose: function () {
-                    disposables.forEach(function (d) {
-                        d.dispose();
-                    });
-                },
-            };
-        };
-    };
-})(Event = exports.Event || (exports.Event = {}));
-// dumb event emitter with better typings than nodes event emitter
-// https://github.com/microsoft/vscode/blob/master/src/vs/base/common/event.ts
-var Emitter = /** @class */ (function () {
-    function Emitter(options) {
-        this.options = options;
-        this._listeners = [];
-        this._disposed = false;
-    }
-    Object.defineProperty(Emitter.prototype, "event", {
-        get: function () {
-            var _this = this;
-            if (!this._event) {
-                this._event = function (listener) {
-                    var _a;
-                    if (((_a = _this.options) === null || _a === void 0 ? void 0 : _a.replay) && _this._last !== undefined) {
-                        listener(_this._last);
-                    }
-                    _this._listeners.push(listener);
-                    return {
-                        dispose: function () {
-                            var index = _this._listeners.indexOf(listener);
-                            if (index > -1) {
-                                _this._listeners.splice(index, 1);
-                            }
-                        },
-                    };
-                };
-            }
-            return this._event;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Emitter.prototype.fire = function (e) {
-        var e_1, _a;
-        this._last = e;
-        try {
-            for (var _b = __values(this._listeners), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var listener = _c.value;
-                listener(e);
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-    };
-    Emitter.prototype.dispose = function () {
-        this._listeners = [];
-        this._disposed = true;
-    };
-    return Emitter;
-}());
-exports.Emitter = Emitter;
-function addDisposableWindowListener(element, type, listener, options) {
-    element.addEventListener(type, listener, options);
-    return {
-        dispose: function () {
-            element.removeEventListener(type, listener);
-        },
-    };
-}
-exports.addDisposableWindowListener = addDisposableWindowListener;
-function addDisposableListener(element, type, listener, options) {
-    element.addEventListener(type, listener, options);
-    return {
-        dispose: function () {
-            element.removeEventListener(type, listener);
-        },
-    };
-}
-exports.addDisposableListener = addDisposableListener;
-var TickDelayedEvent = /** @class */ (function () {
-    function TickDelayedEvent() {
-        this._onFired = new Emitter();
-        this.onEvent = this._onFired.event;
-    }
-    TickDelayedEvent.prototype.fire = function () {
-        var _this = this;
-        if (this.timer) {
-            clearTimeout(this.timer);
-        }
-        this.timer = setTimeout(function () {
-            _this._onFired.fire();
-            clearTimeout(_this.timer);
-        });
-    };
-    TickDelayedEvent.prototype.dispose = function () {
-        this._onFired.dispose();
-    };
-    return TickDelayedEvent;
-}());
-exports.TickDelayedEvent = TickDelayedEvent;
-
-
-/***/ }),
-
-/***/ "./src/index.tsx":
-/*!***********************!*\
-  !*** ./src/index.tsx ***!
-  \***********************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var ReactDOM = __importStar(__webpack_require__(/*! react-dom/client */ "./node_modules/react-dom/client.js"));
-var application_1 = __webpack_require__(/*! ./layout-grid/application */ "./src/layout-grid/application.tsx");
-var recoil_1 = __webpack_require__(/*! recoil */ "./node_modules/recoil/es/recoil.js");
-__webpack_require__(/*! ./index.scss */ "./src/index.scss");
-document.getElementById('app').classList.add('dockview-theme-dark');
-var root = ReactDOM.createRoot(document.getElementById('app'));
-root.render(React.createElement(recoil_1.RecoilRoot, null,
-    React.createElement(application_1.Application, null)));
-
-
-/***/ }),
-
-/***/ "./src/layout-grid/application.tsx":
-/*!*****************************************!*\
-  !*** ./src/layout-grid/application.tsx ***!
-  \*****************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Application = void 0;
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
-var widgets_1 = __webpack_require__(/*! ../services/widgets */ "./src/services/widgets.tsx");
-var footer_1 = __webpack_require__(/*! ./footer */ "./src/layout-grid/footer.tsx");
-var panel_1 = __webpack_require__(/*! ./panel */ "./src/layout-grid/panel.tsx");
-var layoutGrid_1 = __webpack_require__(/*! ./layoutGrid */ "./src/layout-grid/layoutGrid.tsx");
-var registry_1 = __webpack_require__(/*! ./registry */ "./src/layout-grid/registry.ts");
-var widgets_2 = __webpack_require__(/*! ../services/widgets */ "./src/services/widgets.tsx");
-var rootcomponents = {
-    sidebar: widgets_2.Sidebar,
-    activitybar: widgets_1.Activitybar,
-    editor: layoutGrid_1.TestGrid,
-    footer: footer_1.Footer,
-    panel: panel_1.Panel,
-};
-var Application = function () {
-    var api = React.useRef();
-    var registry = (0, registry_1.useLayoutRegistry)();
-    var onReady = function (event) {
-        api.current = event.api;
-        registry.register('gridview', event.api);
-        var success = false;
-        var state = localStorage.getItem('dockview-layout');
-        if (state) {
-            try {
-                event.api.fromJSON(JSON.parse(state));
-                success = true;
-            }
-            catch (err) {
-                console.error('failed to load layout', err);
-            }
-        }
-        if (!success) {
-            event.api.addPanel({
-                id: 'i',
-                component: 'activitybar',
-                minimumWidth: 48,
-                maximumWidth: 48,
-                location: [0],
-            });
-            event.api.addPanel({
-                id: 'footer',
-                component: 'footer',
-                location: [1],
-                maximumHeight: 22,
-                minimumHeight: 22,
-            });
-            event.api.addPanel({
-                id: 'editor',
-                component: 'editor',
-                snap: true,
-                location: [0, 1],
-                priority: dockview_1.LayoutPriority.High,
-            });
-            event.api.addPanel({
-                id: 'sidebar',
-                component: 'sidebar',
-                snap: true,
-                position: { referencePanel: 'editor', direction: 'left' },
-                minimumWidth: 170,
-                size: 100,
-            });
-            event.api.addPanel({
-                id: 'panel',
-                component: 'panel',
-                position: { referencePanel: 'editor', direction: 'below' },
-                size: 200,
-                snap: true,
-            });
-        }
-        event.api.onDidLayoutChange(function () {
-            localStorage.setItem('dockview-layout', JSON.stringify(event.api.toJSON()));
-        });
-    };
-    return (React.createElement(dockview_1.GridviewReact, { components: rootcomponents, onReady: onReady, orientation: dockview_1.Orientation.VERTICAL, hideBorders: true, proportionalLayout: true }));
-};
-exports.Application = Application;
-
-
-/***/ }),
-
-/***/ "./src/layout-grid/controlCenter.tsx":
-/*!*******************************************!*\
-  !*** ./src/layout-grid/controlCenter.tsx ***!
-  \*******************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ControlCenter = void 0;
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var registry_1 = __webpack_require__(/*! ./registry */ "./src/layout-grid/registry.ts");
-__webpack_require__(/*! ./controlCenter.scss */ "./src/layout-grid/controlCenter.scss");
-var ControlCenter = function () {
-    var registry = (0, registry_1.useLayoutRegistry)();
-    var onAdd = function () {
-        var api = registry.get('dockview');
-        var _id = Date.now();
-        var id = "".concat(_id);
-        api.addPanel({
-            component: 'test_component',
-            id: id,
-            title: "Item ".concat(id),
-        });
-    };
-    var onAddTheSamePanel = function () {
-        var api = registry.get('dockview');
-        var id = "duplicate_panel";
-        var panel = api.getPanel(id);
-        if (panel) {
-            panel.api.setActive();
-            return;
-        }
-        api.addPanel({
-            component: 'test_component',
-            id: id,
-            title: "Item ".concat(id),
-        });
-    };
-    var onAddEmpty = function () {
-        var api = registry.get('dockview');
-        api.addEmptyGroup();
-    };
-    var nextPanel = function (ev) {
-        ev.preventDefault();
-        var api = registry.get('dockview');
-        api.moveToNext({ includePanel: true });
-    };
-    var nextGroup = function (ev) {
-        ev.preventDefault();
-        var api = registry.get('dockview');
-        api.moveToNext();
-    };
-    var previousPanel = function (ev) {
-        ev.preventDefault();
-        var api = registry.get('dockview');
-        api.moveToPrevious({ includePanel: true });
-    };
-    var previousGroup = function (ev) {
-        ev.preventDefault();
-        var api = registry.get('dockview');
-        api.moveToNext();
-    };
-    var onConfig = function () {
-        var api = registry.get('dockview');
-        var data = api.toJSON();
-        var stringData = JSON.stringify(data, null, 4);
-        console.log(stringData);
-        localStorage.setItem('layout', stringData);
-    };
-    var onLoad = function () { return __awaiter(void 0, void 0, void 0, function () {
-        var api, data, jsonData;
-        return __generator(this, function (_a) {
-            api = registry.get('dockview');
-            api.closeAllGroups();
-            data = localStorage.getItem('layout');
-            if (data) {
-                jsonData = JSON.parse(data);
-                api.fromJSON(jsonData);
-            }
-            return [2 /*return*/];
-        });
-    }); };
-    var onClear = function () {
-        var api = registry.get('dockview');
-        api.closeAllGroups();
-    };
-    var saveApplicationLayout = function () {
-        var api = registry.get('dockview');
-        console.log(JSON.stringify(api.toJSON(), null, 4));
-    };
-    var onAddSettings = function () {
-        var api = registry.get('dockview');
-        var settingsPanel = api.getPanel('settings');
-        if (settingsPanel) {
-            settingsPanel.api.setActive();
-            return;
-        }
-        api.addPanel({
-            id: 'settings',
-            component: 'settings',
-            title: 'Settings',
-        });
-    };
-    return (React.createElement("div", { className: "control-center" },
-        React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onMouseDown: onAdd }, "Add new")),
-        React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onMouseDown: onAddTheSamePanel }, "Add identical")),
-        React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onMouseDown: onAddSettings }, "Settings")),
-        React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onMouseDown: onAddEmpty }, "Add empty")),
-        React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onMouseDown: nextPanel }, "Next panel")),
-        React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onMouseDown: nextGroup }, "Next Group")),
-        React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onMouseDown: previousPanel }, "Previous Panel")),
-        React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onMouseDown: previousGroup }, "Previous Group")),
-        React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onClick: onConfig }, "Save")),
-        React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onClick: onLoad }, "Load")),
-        React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onClick: onClear }, "Clear")),
-        React.createElement("div", { className: "control-center-row" },
-            React.createElement("button", { onClick: saveApplicationLayout }, "Save application layout"))));
-};
-exports.ControlCenter = ControlCenter;
-
-
-/***/ }),
-
-/***/ "./src/layout-grid/customTab.tsx":
-/*!***************************************!*\
-  !*** ./src/layout-grid/customTab.tsx ***!
-  \***************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CustomTab = void 0;
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var CustomTab = function (props) {
-    return React.createElement("div", null, "hello");
-};
-exports.CustomTab = CustomTab;
-
-
-/***/ }),
-
-/***/ "./src/layout-grid/footer.tsx":
-/*!************************************!*\
-  !*** ./src/layout-grid/footer.tsx ***!
-  \************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Footer = exports.selectedPanelAtom = void 0;
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var recoil_1 = __webpack_require__(/*! recoil */ "./node_modules/recoil/es/recoil.js");
-exports.selectedPanelAtom = (0, recoil_1.atom)({
-    key: 'selectedPanelAtom',
-    default: '',
-});
-var Footer = function (props) {
-    var selectedPanel = (0, recoil_1.useRecoilValue)(exports.selectedPanelAtom);
-    return (React.createElement("div", { style: {
-            height: '22px',
-            backgroundColor: 'dodgerblue',
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0px 8px',
-        } },
-        React.createElement("span", { style: { flexGrow: 1 } }),
-        React.createElement("span", null, selectedPanel)));
-};
-exports.Footer = Footer;
-
-
-/***/ }),
-
-/***/ "./src/layout-grid/layoutGrid.tsx":
-/*!****************************************!*\
-  !*** ./src/layout-grid/layoutGrid.tsx ***!
-  \****************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TestGrid = exports.nextGuid = void 0;
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var ReactDOM = __importStar(__webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js"));
-var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
-var customTab_1 = __webpack_require__(/*! ./customTab */ "./src/layout-grid/customTab.tsx");
-var settingsPanel_1 = __webpack_require__(/*! ./settingsPanel */ "./src/layout-grid/settingsPanel.tsx");
-var registry_1 = __webpack_require__(/*! ./registry */ "./src/layout-grid/registry.ts");
-var splitPanel_1 = __webpack_require__(/*! ./splitPanel */ "./src/layout-grid/splitPanel.tsx");
-__webpack_require__(/*! ./layoutGrid.scss */ "./src/layout-grid/layoutGrid.scss");
-var welcome_1 = __webpack_require__(/*! ../panels/welcome/welcome */ "./src/panels/welcome/welcome.tsx");
-var splitview_1 = __webpack_require__(/*! ../panels/splitview/splitview */ "./src/panels/splitview/splitview.tsx");
-var gridview_1 = __webpack_require__(/*! ../panels/gridview/gridview */ "./src/panels/gridview/gridview.tsx");
-var recoil_1 = __webpack_require__(/*! recoil */ "./node_modules/recoil/es/recoil.js");
-var footer_1 = __webpack_require__(/*! ./footer */ "./src/layout-grid/footer.tsx");
-var exampleFunctions_1 = __webpack_require__(/*! ./panels/exampleFunctions */ "./src/layout-grid/panels/exampleFunctions.tsx");
-var lifecycle_1 = __webpack_require__(/*! ../lifecycle */ "./src/lifecycle.ts");
-var WatermarkComponent = function () {
-    return (React.createElement("div", { style: { backgroundColor: 'black', color: 'white' } }, "Watermark component"));
-};
-var Test = function (props) {
-    var _a = __read(React.useState(0), 2), counter = _a[0], setCounter = _a[1];
-    React.useEffect(function () {
-        var interval = setInterval(function () {
-            setCounter(function (_) { return _ + 1; });
-        }, 2000);
-        return function () {
-            clearInterval(interval);
-        };
-    }, []);
-    return (React.createElement(dockview_1.DockviewComponents.Panel, null,
-        counter % 4 === 0 && (React.createElement(dockview_1.DockviewComponents.Tab, null,
-            React.createElement("div", null, "custom tab ".concat(counter)))),
-        React.createElement(dockview_1.DockviewComponents.Content, null,
-            React.createElement("div", null,
-                React.createElement("div", null, "custom body ".concat(counter)),
-                React.createElement("button", null, "Toggle"))),
-        React.createElement(dockview_1.DockviewComponents.Actions, null,
-            React.createElement("div", null, "custom action ".concat(counter)))));
-};
-var components = {
-    test: Test,
-    welcome: welcome_1.WelcomePanel,
-    splitview: splitview_1.SplitviewPanel,
-    gridview: gridview_1.GridviewDemoPanel,
-    inner_component: function (props) {
-        var _api = React.useRef();
-        var onReady = function (event) {
-            _api.current = event.api;
-            event.api.addPanel({
-                component: 'test_component',
-                id: 'inner-1',
-                title: 'inner-1',
-            });
-            event.api.addPanel({
-                component: 'test_component',
-                id: 'inner-2',
-                title: 'inner-2',
-            });
-            event.api.addPanel({
-                component: 'test_component',
-                id: (0, exports.nextGuid)(),
-                title: 'inner-3',
-                position: {
-                    direction: 'within',
-                    referencePanel: 'inner-1',
-                },
-            });
-            event.api.addPanel({
-                component: 'test_component',
-                id: (0, exports.nextGuid)(),
-                title: 'inner-4',
-                position: {
-                    direction: 'within',
-                    referencePanel: 'inner-2',
-                },
-            });
-        };
-        return (React.createElement("div", { style: {
-                boxSizing: 'border-box',
-                // borderTop: "1px solid var(--dv-separator-border)",
-            } },
-            React.createElement(dockview_1.DockviewReact, { onReady: onReady, components: components, watermarkComponent: WatermarkComponent, tabHeight: 20 })));
-    },
-    test_component: exampleFunctions_1.ExampleFunctions,
-    settings: settingsPanel_1.Settings,
-    split_panel: splitPanel_1.SplitPanel,
-};
-var tabComponents = {
-    default: customTab_1.CustomTab,
-};
-exports.nextGuid = (function () {
-    var counter = 0;
-    return function () { return 'panel_' + (counter++).toString(); };
-})();
-var TestGrid = function (props) {
-    var _a = __read(React.useState(), 2), api = _a[0], setApi = _a[1];
-    var registry = (0, registry_1.useLayoutRegistry)();
-    var onReady = function (event) {
-        var api = event.api;
-        setApi(api);
-        registry.register('dockview', api);
-    };
-    var setSelectedPanel = (0, recoil_1.useRecoilCallback)(function (_a) {
-        var set = _a.set;
-        return function (value) {
-            return set(footer_1.selectedPanelAtom, value);
-        };
-    }, []);
-    React.useEffect(function () {
-        if (!api) {
-            return function () {
-                //
-            };
-        }
-        props.api.setConstraints({
-            minimumWidth: function () { return api.minimumWidth; },
-            minimumHeight: function () { return api.minimumHeight; },
-        });
-        var disposable = new lifecycle_1.CompositeDisposable(api.onDidLayoutChange(function () {
-            var state = api.toJSON();
-            localStorage.setItem('dockview', JSON.stringify(state));
-        }), api.onDidActivePanelChange(function (e) {
-            setSelectedPanel((e === null || e === void 0 ? void 0 : e.id) || '');
-        }));
-        var state = localStorage.getItem('dockview');
-        var success = false;
-        if (state) {
-            try {
-                api.fromJSON(JSON.parse(state));
-                success = true;
-            }
-            catch (err) {
-                console.error('failed to load layout', err);
-            }
-        }
-        var welcomePanel = api.getPanel('welcome');
-        if (!welcomePanel) {
-            api.addPanel({
-                component: 'welcome',
-                id: 'welcome',
-                title: 'Welcome',
-                suppressClosable: true,
-            });
-        }
-        return function () {
-            disposable.dispose();
-        };
-    }, [api]);
-    var _b = __read(React.useState(undefined), 2), coord = _b[0], setCoord = _b[1];
-    var onTabContextMenu = React.useMemo(function () { return function (event) {
-        event.event.preventDefault();
-        console.log(event.panel);
-        var cb = function (event) {
-            var element = event.target;
-            while (element) {
-                if (element.classList.contains('context-menu')) {
-                    return;
-                }
-                element = element.parentElement;
-            }
-            window.removeEventListener('mousedown', cb);
-            setCoord(undefined);
-        };
-        window.addEventListener('mousedown', cb);
-        setCoord({
-            x: event.event.clientX,
-            y: event.event.clientY,
-            panel: event.panel,
-        });
-    }; }, []);
-    var onClose = function () {
-        setCoord(undefined);
-        coord.panel.api.close();
-    };
-    var onChangeName = function () {
-        setCoord(undefined);
-        coord.panel.api.setTitle('This looks new?');
-    };
-    return (React.createElement(React.Fragment, null,
-        coord &&
-            ReactDOM.createPortal(React.createElement("div", { className: "context-menu", style: {
-                    left: "".concat(coord.x, "px"),
-                    top: "".concat(coord.y, "px"),
-                } },
-                React.createElement("div", { className: "context-action", onClick: onClose }, "Close"),
-                React.createElement("div", { className: "context-action", onClick: onChangeName }, "Rename")), document.getElementById('anchor')),
-        React.createElement(dockview_1.DockviewReact, { onReady: onReady, components: components, tabComponents: tabComponents, onTabContextMenu: onTabContextMenu, watermarkComponent: Watermark, showDndOverlay: function (ev, target) {
-                return true;
-            }, onDidDrop: function (ev) {
-                console.log('onDidDrop', ev);
-            } })));
-};
-exports.TestGrid = TestGrid;
-var Watermark = function (props) {
-    var _a = __read(React.useState(props.containerApi.size), 2), groups = _a[0], setGroups = _a[1];
-    React.useEffect(function () {
-        var disposable = new lifecycle_1.CompositeDisposable(props.containerApi.onDidLayoutChange(function () {
-            console.log("groups2 ".concat(props.containerApi.size));
-            setGroups(props.containerApi.size);
-        }));
-        return function () {
-            disposable.dispose();
-        };
-    }, []);
-    var onClick = function () {
-        props.close();
-    };
-    return (React.createElement("div", { style: {
-            display: 'flex',
-            width: '100%',
-            flexGrow: 1,
-            height: '100%',
-            flexDirection: 'column',
-        } },
-        React.createElement("div", { style: {
-                height: '35px',
-                display: 'flex',
-                width: '100%',
-            } },
-            React.createElement("span", { style: { flexGrow: 1 } }),
-            groups > 1 && (React.createElement("span", { onClick: onClick, style: {
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                } },
-                React.createElement("a", { className: "close-action" })))),
-        React.createElement("div", { style: {
-                flexGrow: 1,
-                display: 'flex',
-                justifyContent: 'center',
-            } },
-            React.createElement("span", null, "Watermark component"))));
-};
-
-
-/***/ }),
-
-/***/ "./src/layout-grid/panel.tsx":
-/*!***********************************!*\
-  !*** ./src/layout-grid/panel.tsx ***!
-  \***********************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Panel = void 0;
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var lifecycle_1 = __webpack_require__(/*! ../lifecycle */ "./src/lifecycle.ts");
-var Panel = function (props) {
-    var _a = __read(React.useState(), 2), active = _a[0], setActive = _a[1];
-    var _b = __read(React.useState(), 2), focused = _b[0], setFocused = _b[1];
-    React.useEffect(function () {
-        var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidActiveChange(function (event) {
-            setActive(event.isActive);
-        }), props.api.onDidFocusChange(function (event) {
-            setFocused(event.isFocused);
-        }));
-        return function () {
-            disposable.dispose();
-        };
-    }, []);
-    var onToggle = function () {
-        var editorPanel = props.containerApi.getPanel('editor');
-        editorPanel.api.setVisible(!editorPanel.api.isVisible);
-    };
-    var onClose = function () {
-        var editorPanel = props.containerApi.getPanel('editor');
-        editorPanel.api.setVisible(true);
-        props.api.setVisible(false);
-    };
-    var onMove = function () {
-        var thisPanel = props.containerApi.getPanel('panel');
-        var editor = props.containerApi.getPanel('editor');
-        props.containerApi.movePanel(thisPanel, {
-            direction: 'left',
-            reference: editor.id,
-        });
-    };
-    return (React.createElement("div", { style: {
-            borderTop: "1px solid var(--dv-separator-border)",
-            boxSizing: 'border-box',
-            backgroundColor: 'rgb(30,30,30)',
-            height: '100%',
-        } },
-        React.createElement("div", { style: { display: 'flex', padding: '5px' } },
-            React.createElement("span", null, "This panel is outside of the dockable layer"),
-            React.createElement("span", { style: { flexGrow: 1 } }),
-            React.createElement("button", { onClick: onToggle }, "Resize"),
-            React.createElement("button", { onClick: onClose }, "Close")),
-        React.createElement("div", { style: { padding: '0px 5px' } },
-            React.createElement("div", null, "isPanelActive: ".concat(active, " isPanelFocused: ").concat(focused)))));
-};
-exports.Panel = Panel;
-
-
-/***/ }),
-
-/***/ "./src/layout-grid/panels/exampleFunctions.tsx":
-/*!*****************************************************!*\
-  !*** ./src/layout-grid/panels/exampleFunctions.tsx ***!
-  \*****************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ExampleFunctions = void 0;
-var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var lifecycle_1 = __webpack_require__(/*! ../../lifecycle */ "./src/lifecycle.ts");
-__webpack_require__(/*! ./exampleFunctions.scss */ "./src/layout-grid/panels/exampleFunctions.scss");
-var ExampleFunctions = function (props) {
-    var _a = __read(React.useState({
-        isGroupActive: props.api.isActive,
-        isPanelVisible: props.api.isVisible,
-    }), 2), panelState = _a[0], setPanelState = _a[1];
-    var _b = __read(React.useState(), 2), panelName = _b[0], setPanelName = _b[1];
-    var input = React.useRef();
-    React.useEffect(function () {
-        var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidActiveChange(function (event) {
-            setPanelState(function (_) { return (__assign(__assign({}, _), { isGroupActive: event.isActive })); });
-        }), props.api.onDidVisibilityChange(function (x) {
-            setPanelState(function (_) { return (__assign(__assign({}, _), { isPanelVisible: x.isVisible })); });
-        }), props.api.onFocusEvent(function () {
-            input.current.focus();
-        }));
-        return function () {
-            disposable.dispose();
-        };
-    }, []);
-    var onRename = function () {
-        props.api.setTitle(panelName);
-    };
-    var onClose = function () {
-        props.api.close();
-    };
-    return (React.createElement(dockview_1.DockviewComponents.Panel, null,
-        React.createElement(dockview_1.DockviewComponents.Actions, null,
-            React.createElement("div", { style: {
-                    height: '100%',
-                    display: 'flex',
-                    backgroundColor: 'rgba(255,255,255,0.1)',
-                    padding: '0px 4px',
-                } },
-                React.createElement("span", { onClick: onClose, style: {
-                        height: '100%',
-                        width: '25px',
-                        display: 'flex',
-                        alignItems: 'center',
-                    } },
-                    React.createElement("a", { className: "material-icons" }, "menu")))),
-        React.createElement(dockview_1.DockviewComponents.Content, null,
-            React.createElement("div", { className: "example-functions-panel" },
-                React.createElement("div", { className: "example-functions-panel-header-bar" },
-                    React.createElement("span", { style: { padding: '0px 8px' } },
-                        React.createElement("span", null, 'isGroupActive: '),
-                        React.createElement("span", { style: {
-                                color: panelState.isGroupActive
-                                    ? '#23d16f'
-                                    : '#cd312b',
-                            } }, "".concat(panelState.isGroupActive))),
-                    React.createElement("span", { style: { padding: '0px 8px' } },
-                        React.createElement("span", null, 'isPanelVisible: '),
-                        React.createElement("span", { style: {
-                                color: panelState.isPanelVisible
-                                    ? '#23d16f'
-                                    : '#cd312b',
-                            } }, "".concat(panelState.isPanelVisible)))),
-                React.createElement("div", { className: "example-functions-panel-section" },
-                    React.createElement("input", { value: panelName, placeholder: "New Panel Name", type: "text", onChange: function (event) {
-                            return setPanelName(event.target.value);
-                        } }),
-                    React.createElement("button", { onClick: onRename }, "Rename")),
-                React.createElement("input", { style: { width: '175px' }, ref: input, placeholder: "This is focused by the panel" }),
-                React.createElement("input", { style: { width: '175px' }, placeholder: "This is also focusable" })))));
-};
-exports.ExampleFunctions = ExampleFunctions;
-
-
-/***/ }),
-
-/***/ "./src/layout-grid/registry.ts":
-/*!*************************************!*\
-  !*** ./src/layout-grid/registry.ts ***!
-  \*************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.useLayoutRegistry = void 0;
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var Registry = /** @class */ (function () {
-    function Registry() {
-        this.cache = new Map();
-    }
-    Registry.prototype.register = function (name, value) {
-        this.cache.set(name, value);
-    };
-    Registry.prototype.get = function (name) {
-        return this.cache.get(name);
-    };
-    return Registry;
-}());
-var RegistryInstance = new Registry();
-var useLayoutRegistry = function () {
-    var ref = React.useRef(RegistryInstance);
-    return ref.current;
-};
-exports.useLayoutRegistry = useLayoutRegistry;
-
-
-/***/ }),
-
-/***/ "./src/layout-grid/settingsPanel.tsx":
-/*!*******************************************!*\
-  !*** ./src/layout-grid/settingsPanel.tsx ***!
-  \*******************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Settings = void 0;
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var Settings = function (props) {
-    var _a = __read(React.useState(props.containerApi.getTabHeight()), 2), tabHeight = _a[0], setTabHeight = _a[1];
-    var onTabHeightChange = function (event) {
-        var value = Number(event.target.value);
-        if (!Number.isNaN(value)) {
-            setTabHeight(value);
-        }
-    };
-    var onClick = function () {
-        props.containerApi.setTabHeight(tabHeight);
-    };
-    var onRemove = function () {
-        props.containerApi.setTabHeight(undefined);
-    };
-    return (React.createElement("div", { style: { height: '100%', color: 'white' } },
-        React.createElement("label", null,
-            "Tab height",
-            React.createElement("input", { onChange: onTabHeightChange, value: tabHeight, type: "number" }),
-            React.createElement("button", { onClick: onClick }, "Apply"),
-            React.createElement("button", { onClick: onRemove }, "Remove"))));
-};
-exports.Settings = Settings;
-
-
-/***/ }),
-
-/***/ "./src/layout-grid/splitPanel.tsx":
-/*!****************************************!*\
-  !*** ./src/layout-grid/splitPanel.tsx ***!
-  \****************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SplitPanel = void 0;
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
-var registry_1 = __webpack_require__(/*! ./registry */ "./src/layout-grid/registry.ts");
-__webpack_require__(/*! ./splitPanel.scss */ "./src/layout-grid/splitPanel.scss");
-var lifecycle_1 = __webpack_require__(/*! ../lifecycle */ "./src/lifecycle.ts");
-var components = {
-    default1: function (props) {
-        var ref = React.useRef();
-        var _a = __read(React.useState(false), 2), focused = _a[0], setFocused = _a[1];
-        var _b = __read(React.useState(false), 2), active = _b[0], setActive = _b[1];
-        var onClick = function (ev) {
-            props.api.setSize({ size: 300 });
-        };
-        React.useEffect(function () {
-            var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidFocusChange(function (event) {
-                setFocused(event.isFocused);
-            }), props.api.onDidActiveChange(function (event) {
-                setActive(event.isActive);
-            }), props.api.onFocusEvent(function () {
-                ref.current.focus();
-            }));
-            return function () {
-                disposable.dispose();
-            };
-        }, []);
-        return (React.createElement("div", { style: { height: '100%' } },
-            React.createElement("div", { style: { display: 'flex', padding: '5px' } },
-                React.createElement("div", null, "This is a splitview panel inside a dockable panel"),
-                React.createElement("span", { style: { flexGrow: 1 } }),
-                React.createElement("button", { onClick: onClick }, "resize")),
-            React.createElement("div", { style: { padding: '0px 5px' } },
-                React.createElement("div", null, "isPanelActive: ".concat(active, " isPanelFocused: ").concat(focused)),
-                React.createElement("input", { ref: ref, type: "text", placeholder: "focus test" }),
-                React.createElement("span", null, props.text))));
-    },
-};
-var SplitPanel = function (props) {
-    var api = React.useRef();
-    var registry = (0, registry_1.useLayoutRegistry)();
-    React.useEffect(function () {
-        var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidDimensionsChange(function (event) {
-            var _a;
-            (_a = api.current) === null || _a === void 0 ? void 0 : _a.layout(event.width, event.height - 25);
-        }), props.api.onFocusEvent(function () {
-            api.current.focus();
-        }));
-        return function () {
-            disposable.dispose();
-        };
-    }, []);
-    var onReady = function (event) {
-        api.current = event.api;
-        registry.register('splitview', event.api);
-        event.api.fromJSON(__webpack_require__(/*! ./splitpanel.layout.json */ "./src/layout-grid/splitpanel.layout.json"));
-        return;
-        event.api.addPanel({
-            id: '1',
-            component: 'default1',
-            snap: true,
-            params: {
-                text: 'hiya',
-            },
-        });
-        event.api.addPanel({ id: '2', component: 'default1' });
-    };
-    var onUpdateProps = function () {
-        var panel = api.current.getPanel('1');
-        panel.update({ params: { text: Date.now().toString() } });
-    };
-    var onAdd = function () {
-        api.current.addPanel({
-            id: "".concat(Date.now()),
-            component: 'default1',
-            snap: true,
-            params: {
-                text: 'hiya',
-            },
-        });
-    };
-    var onRemove = function () {
-        var panels = api.current.panels;
-        if (panels.length === 0) {
-            return;
-        }
-        api.current.removePanel(panels[panels.length - 1]);
-    };
-    return (React.createElement("div", { style: {
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            color: 'white',
-        } },
-        React.createElement("div", { style: { height: '25px' } },
-            React.createElement("button", { onClick: onUpdateProps }, "Update props"),
-            React.createElement("button", { onClick: onAdd }, "Add"),
-            React.createElement("button", { onClick: onRemove }, "Remove")),
-        React.createElement(dockview_1.SplitviewReact, { components: components, onReady: onReady, orientation: dockview_1.Orientation.VERTICAL })));
-};
-exports.SplitPanel = SplitPanel;
-
-
-/***/ }),
-
-/***/ "./src/lifecycle.ts":
-/*!**************************!*\
-  !*** ./src/lifecycle.ts ***!
-  \**************************/
-/***/ (function(__unused_webpack_module, exports) {
-
-
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MutableDisposable = exports.CompositeDisposable = exports.Disposable = void 0;
-var Disposable;
-(function (Disposable) {
-    Disposable.NONE = {
-        dispose: function () {
-            // noop
-        },
-    };
-})(Disposable = exports.Disposable || (exports.Disposable = {}));
-var CompositeDisposable = /** @class */ (function () {
-    function CompositeDisposable() {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        this.disposables = args;
-    }
-    CompositeDisposable.from = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        return new (CompositeDisposable.bind.apply(CompositeDisposable, __spreadArray([void 0], __read(args), false)))();
-    };
-    CompositeDisposable.prototype.addDisposables = function () {
-        var _this = this;
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        args.forEach(function (arg) { return _this.disposables.push(arg); });
-    };
-    CompositeDisposable.prototype.dispose = function () {
-        this.disposables.forEach(function (arg) { return arg.dispose(); });
-    };
-    return CompositeDisposable;
-}());
-exports.CompositeDisposable = CompositeDisposable;
-var MutableDisposable = /** @class */ (function () {
-    function MutableDisposable() {
-        this._disposable = Disposable.NONE;
-    }
-    Object.defineProperty(MutableDisposable.prototype, "value", {
-        set: function (disposable) {
-            if (this._disposable) {
-                this._disposable.dispose();
-            }
-            this._disposable = disposable;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    MutableDisposable.prototype.dispose = function () {
-        if (this._disposable) {
-            this._disposable.dispose();
-            this._disposable = Disposable.NONE;
-        }
-    };
-    return MutableDisposable;
-}());
-exports.MutableDisposable = MutableDisposable;
-
-
-/***/ }),
-
-/***/ "./src/panels/gridview/gridview.tsx":
-/*!******************************************!*\
-  !*** ./src/panels/gridview/gridview.tsx ***!
-  \******************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GridviewDemo = exports.GridviewDemoPanel = void 0;
-var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var lifecycle_1 = __webpack_require__(/*! ../../lifecycle */ "./src/lifecycle.ts");
-var components = {
-    default: function (props) {
-        var _a = __read(React.useState(false), 2), active = _a[0], setActive = _a[1];
-        var _b = __read(React.useState(false), 2), visible = _b[0], setVisible = _b[1];
-        var _c = __read(React.useState(false), 2), focused = _c[0], setFocused = _c[1];
-        var _d = __read(React.useState({ width: 0, height: 0 }), 2), dimension = _d[0], setDimension = _d[1];
-        var _e = __read(React.useState({
-            minimumHeight: undefined,
-            maximumHeight: undefined,
-            minimumWidth: undefined,
-            maximumWidth: undefined,
-        }), 2), constraints = _e[0], setConstraints = _e[1];
-        React.useEffect(function () {
-            var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidActiveChange(function (event) {
-                setActive(event.isActive);
-            }), props.api.onDidConstraintsChange(function (event) {
-                setConstraints(event);
-            }), props.api.onDidDimensionsChange(function (event) {
-                setDimension(event);
-            }), props.api.onDidFocusChange(function (event) {
-                setFocused(event.isFocused);
-            }), props.api.onDidVisibilityChange(function (event) {
-                setVisible(event.isVisible);
-            }));
-            return function () {
-                disposable.dispose();
-            };
-        }, []);
-        var color = React.useMemo(function () {
-            return "rgb(".concat(Math.floor(256 * Math.random()), ",").concat(Math.floor(256 * Math.random()), ",").concat(Math.floor(256 * Math.random()), ")");
-        }, []);
-        return (React.createElement("div", { style: {
-                backgroundColor: color,
-            }, className: "splitview-demo-panel" },
-            React.createElement("div", { className: "api-parameter" },
-                React.createElement("span", null, "Width"),
-                React.createElement("span", null, dimension.width),
-                React.createElement("span", null, "Height"),
-                React.createElement("span", null, dimension.height),
-                React.createElement("span", null, "Min. height"),
-                React.createElement("span", null, constraints.minimumHeight),
-                React.createElement("span", null, "Max. height"),
-                React.createElement("span", null, constraints.maximumHeight),
-                React.createElement("span", null, "Min. width"),
-                React.createElement("span", null, constraints.minimumWidth),
-                React.createElement("span", null, "Max. width"),
-                React.createElement("span", null, constraints.maximumWidth),
-                React.createElement("span", null, "Active"),
-                React.createElement("span", null, active.toString()),
-                React.createElement("span", null, "Visible"),
-                React.createElement("span", null, visible.toString()),
-                React.createElement("span", null, "Focused"),
-                React.createElement("span", null, focused.toString()))));
-    },
-};
-var GridviewDemoPanel = function (props) {
-    return (React.createElement("div", { style: {
-            overflow: 'auto',
-            height: '100%',
-            padding: '10px 0px',
-            boxSizing: 'border-box',
-        } },
-        React.createElement("div", { style: { padding: '0px 20px' } },
-            React.createElement("h1", null, "Gridview")),
-        React.createElement("ul", { style: { padding: '0px 20px 0px 40px' } },
-            React.createElement("li", null, "The gridview is a collection of nested splitviews which forms a grid-based layout")),
-        React.createElement(exports.GridviewDemo, __assign({}, props))));
-};
-exports.GridviewDemoPanel = GridviewDemoPanel;
-var GridviewDemo = function (props) {
-    var api = React.useRef();
-    var _a = __read(React.useState(dockview_1.Orientation.VERTICAL), 2), orientation = _a[0], setOrientation = _a[1];
-    var onClick = function () {
-        api.current.orientation = (0, dockview_1.orthogonal)(api.current.orientation);
-        // load();
-    };
-    var load = function () {
-        api.current.fromJSON({
-            activePanel: '1',
-            grid: {
-                height: 3,
-                width: 2,
-                orientation: orientation,
-                root: {
-                    type: 'branch',
-                    size: 3,
-                    data: [
-                        {
-                            type: 'branch',
-                            size: 1,
-                            data: [
-                                {
-                                    type: 'leaf',
-                                    size: 1,
-                                    data: {
-                                        id: '1',
-                                        component: 'default',
-                                        minimumHeight: 50,
-                                        maximumHeight: Number.POSITIVE_INFINITY,
-                                        minimumWidth: 50,
-                                        maximumWidth: Number.POSITIVE_INFINITY,
-                                        snap: false,
-                                        priority: dockview_1.LayoutPriority.Normal,
-                                    },
-                                },
-                                {
-                                    type: 'branch',
-                                    size: 1,
-                                    data: [
-                                        {
-                                            type: 'leaf',
-                                            size: 0.5,
-                                            data: {
-                                                id: '2',
-                                                component: 'default',
-                                                minimumHeight: 50,
-                                                maximumHeight: Number.POSITIVE_INFINITY,
-                                                minimumWidth: 50,
-                                                maximumWidth: Number.POSITIVE_INFINITY,
-                                                snap: false,
-                                                priority: dockview_1.LayoutPriority.Normal,
-                                            },
-                                        },
-                                        {
-                                            type: 'branch',
-                                            size: 0.5,
-                                            data: [
-                                                {
-                                                    type: 'leaf',
-                                                    size: 0.5,
-                                                    data: {
-                                                        id: '2',
-                                                        component: 'default',
-                                                        minimumHeight: 50,
-                                                        maximumHeight: Number.POSITIVE_INFINITY,
-                                                        minimumWidth: 50,
-                                                        maximumWidth: Number.POSITIVE_INFINITY,
-                                                        snap: false,
-                                                        priority: dockview_1.LayoutPriority.Normal,
-                                                    },
-                                                },
-                                                {
-                                                    type: 'leaf',
-                                                    size: 0.5,
-                                                    data: {
-                                                        id: '3',
-                                                        component: 'default',
-                                                        minimumHeight: 50,
-                                                        maximumHeight: Number.POSITIVE_INFINITY,
-                                                        minimumWidth: 50,
-                                                        maximumWidth: Number.POSITIVE_INFINITY,
-                                                        snap: false,
-                                                        priority: dockview_1.LayoutPriority.Normal,
-                                                    },
-                                                },
-                                            ],
-                                        },
-                                    ],
-                                },
-                            ],
-                        },
-                        {
-                            type: 'leaf',
-                            size: 1,
-                            data: {
-                                id: '4',
-                                component: 'default',
-                                minimumHeight: 50,
-                                maximumHeight: Number.POSITIVE_INFINITY,
-                                minimumWidth: 50,
-                                maximumWidth: Number.POSITIVE_INFINITY,
-                                snap: false,
-                                priority: dockview_1.LayoutPriority.Normal,
-                            },
-                        },
-                        {
-                            type: 'branch',
-                            size: 1,
-                            data: [
-                                {
-                                    type: 'leaf',
-                                    size: 1,
-                                    data: {
-                                        id: '3',
-                                        component: 'default',
-                                        minimumHeight: 50,
-                                        maximumHeight: Number.POSITIVE_INFINITY,
-                                        minimumWidth: 50,
-                                        maximumWidth: Number.POSITIVE_INFINITY,
-                                        snap: false,
-                                        priority: dockview_1.LayoutPriority.Normal,
-                                    },
-                                },
-                                {
-                                    type: 'leaf',
-                                    size: 1,
-                                    data: {
-                                        id: '4',
-                                        component: 'default',
-                                        minimumHeight: 50,
-                                        maximumHeight: Number.POSITIVE_INFINITY,
-                                        minimumWidth: 50,
-                                        maximumWidth: Number.POSITIVE_INFINITY,
-                                        snap: false,
-                                        priority: dockview_1.LayoutPriority.Normal,
-                                    },
-                                },
-                            ],
-                        },
-                    ],
-                },
-            },
-        });
-    };
-    var onReady = function (event) {
-        var _a;
-        api.current = event.api;
-        (_a = api.current) === null || _a === void 0 ? void 0 : _a.layout(props.api.width - 80, 600);
-        load();
-    };
-    React.useEffect(function () {
-        var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidDimensionsChange(function (event) {
-            var _a;
-            (_a = api.current) === null || _a === void 0 ? void 0 : _a.layout(event.width - 80, 600);
-        }));
-        return function () {
-            disposable.dispose();
-        };
-    }, []);
-    return (React.createElement("div", { style: { height: '100%', width: '100%' } },
-        React.createElement("button", { onClick: onClick }, "Flip"),
-        React.createElement("div", { style: {
-                height: '400px',
-                margin: '40px',
-                backgroundColor: 'grey',
-            } },
-            React.createElement(dockview_1.GridviewReact, { proportionalLayout: true, components: components, orientation: dockview_1.Orientation.VERTICAL, onReady: onReady }))));
-};
-exports.GridviewDemo = GridviewDemo;
-
-
-/***/ }),
-
-/***/ "./src/panels/splitview/splitview.tsx":
-/*!********************************************!*\
-  !*** ./src/panels/splitview/splitview.tsx ***!
-  \********************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Common = exports.SplitviewPanel = void 0;
-var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var lifecycle_1 = __webpack_require__(/*! ../../lifecycle */ "./src/lifecycle.ts");
-__webpack_require__(/*! ./splitview.scss */ "./src/panels/splitview/splitview.scss");
-var components = {
-    default: function (props) {
-        var _a = __read(React.useState(false), 2), active = _a[0], setActive = _a[1];
-        var _b = __read(React.useState(false), 2), visible = _b[0], setVisible = _b[1];
-        var _c = __read(React.useState(false), 2), focused = _c[0], setFocused = _c[1];
-        var _d = __read(React.useState({ width: 0, height: 0 }), 2), dimension = _d[0], setDimension = _d[1];
-        var _e = __read(React.useState({ maximumSize: undefined, minimumSize: undefined }), 2), constraints = _e[0], setConstraints = _e[1];
-        React.useEffect(function () {
-            var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidActiveChange(function (event) {
-                setActive(event.isActive);
-            }), props.api.onDidConstraintsChange(function (event) {
-                setConstraints(event);
-            }), props.api.onDidDimensionsChange(function (event) {
-                setDimension(event);
-            }), props.api.onDidFocusChange(function (event) {
-                setFocused(event.isFocused);
-            }), props.api.onDidVisibilityChange(function (event) {
-                setVisible(event.isVisible);
-            }));
-            return function () {
-                disposable.dispose();
-            };
-        }, []);
-        var color = React.useMemo(function () { return 'rgba(14, 99, 156,0.4)'; }, 
-        // `rgb(${Math.floor(256 * Math.random())},${Math.floor(
-        //     256 * Math.random()
-        // )},${Math.floor(256 * Math.random())})`,
-        []);
-        return (React.createElement("div", { style: {
-                backgroundColor: color,
-                color: '#cccccc',
-            }, className: "splitview-demo-panel" },
-            React.createElement("div", { className: "api-parameter" },
-                React.createElement("span", null, "Id"),
-                React.createElement("span", null, props.api.id),
-                React.createElement("span", null, "Width"),
-                React.createElement("span", null, dimension.width),
-                React.createElement("span", null, "Height"),
-                React.createElement("span", null, dimension.height),
-                React.createElement("span", null, "Min. size"),
-                React.createElement("span", null, constraints.minimumSize),
-                React.createElement("span", null, "Max. size"),
-                React.createElement("span", null, constraints.maximumSize),
-                React.createElement("span", null, "Active"),
-                React.createElement("span", null, active.toString()),
-                React.createElement("span", null, "Visible"),
-                React.createElement("span", null, visible.toString()),
-                React.createElement("span", null, "Focused"),
-                React.createElement("span", null, focused.toString()))));
-    },
-};
-var SplitviewPanel = function (props) {
-    return (React.createElement("div", { style: {
-            overflow: 'auto',
-            height: '100%',
-            padding: '10px 0px',
-            boxSizing: 'border-box',
-        } },
-        React.createElement("div", { style: { padding: '0px 20px', fontSize: '36px' } }, "Splitview"),
-        React.createElement("ul", { style: { padding: '0px 20px 0px 40px' } },
-            React.createElement("li", null, "The splitview component exposes an API object, a selection of avaliable values are shown in the summary sections below"),
-            React.createElement("li", null, "Each panel exposes it's own API, and has access to the common API. A selector of panel API values are shown in each panel of the splitview.")),
-        React.createElement(exports.Common, __assign({}, props, { orientation: dockview_1.Orientation.HORIZONTAL })),
-        React.createElement(exports.Common, __assign({}, props, { orientation: dockview_1.Orientation.VERTICAL }))));
-};
-exports.SplitviewPanel = SplitviewPanel;
-var Common = function (props) {
-    var api = React.useRef();
-    var _a = __read(React.useState({
-        height: undefined,
-        width: undefined,
-        maximumSize: undefined,
-        minimumSize: undefined,
-        visibility: [],
-        length: undefined,
-    }), 2), dimensions = _a[0], setDimensions = _a[1];
-    React.useEffect(function () {
-        var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidDimensionsChange(function (event) {
-            switch (props.orientation) {
-                case dockview_1.Orientation.HORIZONTAL:
-                    api.current.layout(500, 100);
-                    break;
-                case dockview_1.Orientation.VERTICAL:
-                    api.current.layout(100, 500);
-                    break;
-            }
-            var height = api.current.height;
-            var width = api.current.width;
-            var maximumSize = api.current.maximumSize;
-            var minimumSize = api.current.minimumSize;
-            var length = api.current.length;
-            setDimensions({
-                height: height,
-                width: width,
-                maximumSize: maximumSize,
-                minimumSize: minimumSize,
-                length: length,
-                visibility: api.current.panels.map(function (_) { return _.api.isVisible; }),
-            });
-        }), api.current.onDidLayoutChange(function () {
-            //
-        }));
-        return function () {
-            disposable.dispose();
-        };
-    }, []);
-    var onReady = function (event) {
-        api.current = event.api;
-        event.api.fromJSON({
-            views: [
-                {
-                    data: {
-                        id: 'one',
-                        component: 'default',
-                        minimumSize: 10,
-                    },
-                    size: 1,
-                },
-                {
-                    data: {
-                        id: 'two',
-                        component: 'default',
-                        minimumSize: 10,
-                        maximumSize: 200,
-                    },
-                    size: 2,
-                },
-                {
-                    data: {
-                        id: 'three',
-                        component: 'default',
-                        minimumSize: 50,
-                    },
-                    size: 3,
-                    snap: true,
-                },
-            ],
-            size: 6,
-            activeView: 'one',
-            orientation: props.orientation,
-        });
-    };
-    var toggleVisibility = function (i) { return function () {
-        var panel = api.current.panels[i];
-        api.current.setVisible(panel, !panel.api.isVisible);
-        setDimensions(function (dimensions) { return (__assign(__assign({}, dimensions), { visibility: api.current.panels.map(function (_) { return _.api.isVisible; }) })); });
-    }; };
-    var move = function () {
-        api.current.movePanel(api.current.panels.length - 1, 0);
-        setDimensions(function (dimensions) { return (__assign(__assign({}, dimensions), { visibility: api.current.panels.map(function (_) { return _.api.isVisible; }) })); });
-    };
-    var text = React.useMemo(function () {
-        switch (props.orientation) {
-            case dockview_1.Orientation.VERTICAL:
-                return 'Vertical Splitview';
-            case dockview_1.Orientation.HORIZONTAL:
-                return 'Horizontal Splitview';
-        }
-    }, [props.orientation]);
-    return (React.createElement("div", { className: "splitview-demo-container ".concat(props.orientation.toLowerCase()) },
-        React.createElement("h3", null, text),
-        React.createElement("div", { className: "splitview-demo-content" },
-            React.createElement("div", { style: {
-                    backgroundColor: 'rgb(60,60,60)',
-                    padding: '10px',
-                    overflow: 'auto',
-                } },
-                React.createElement("div", { className: "splitview-demo-view" },
-                    React.createElement(dockview_1.SplitviewReact, { orientation: props.orientation, onReady: onReady, components: components }))),
-            React.createElement("div", { className: "api-parameter" },
-                React.createElement("span", null, "Height"),
-                React.createElement("span", null, dimensions.height),
-                React.createElement("span", null, "Width"),
-                React.createElement("span", null, dimensions.width),
-                React.createElement("span", null, "Lenght"),
-                React.createElement("span", null, dimensions.length),
-                React.createElement("span", null, "Min. size"),
-                React.createElement("span", null, dimensions.minimumSize),
-                React.createElement("span", null, "Max. size"),
-                React.createElement("span", null, dimensions.maximumSize),
-                React.createElement("span", null, "Visible"),
-                React.createElement("span", { style: { display: 'flex' } }, dimensions.visibility.map(function (_, i) {
-                    return (React.createElement("div", { className: "visibility-toggle", onClick: toggleVisibility(i), key: i }, _ ? 'Yes' : 'No'));
-                })),
-                React.createElement("span", null, "Move view"),
-                React.createElement("span", { className: "visibility-toggle", onClick: move }, "Go")))));
-};
-exports.Common = Common;
-
-
-/***/ }),
-
-/***/ "./src/panels/welcome/welcome.tsx":
-/*!****************************************!*\
-  !*** ./src/panels/welcome/welcome.tsx ***!
-  \****************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.WelcomePanel = void 0;
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-__webpack_require__(/*! ./welcome.scss */ "./src/panels/welcome/welcome.scss");
-var WelcomePanel = function (props) {
-    var onAddSplitview = function (event) {
-        var splitviewPanel = props.containerApi.getPanel('splitview');
-        if (splitviewPanel) {
-            splitviewPanel.api.setActive();
-            return;
-        }
-        props.containerApi.addPanel({
-            id: 'splitview',
-            component: 'splitview',
-            title: 'Splitview Docs',
-        });
-    };
-    var onAddGridview = function (event) {
-        var splitviewPanel = props.containerApi.getPanel('gridview');
-        if (splitviewPanel) {
-            splitviewPanel.api.setActive();
-            return;
-        }
-        props.containerApi.addPanel({
-            id: 'gridview',
-            component: 'gridview',
-            title: 'Gridview Docs',
-        });
-    };
-    return (React.createElement("div", { className: "welcome-panel" },
-        React.createElement("div", { className: "welcome-header" },
-            React.createElement("h1", null, "Dockview"),
-            React.createElement("h2", null, "Zero dependency layout manager")),
-        React.createElement("div", { className: "directory" },
-            React.createElement("div", { className: "directory-title" }, "Components"),
-            React.createElement("div", { className: "directory-item" }, "Dockview"),
-            React.createElement("div", { onClick: onAddSplitview, className: "directory-item" }, "Splitview"),
-            React.createElement("div", { onClick: onAddGridview, className: "directory-item" }, "Gridview"),
-            React.createElement("div", { className: "directory-item" }, "Paneview"))));
-};
-exports.WelcomePanel = WelcomePanel;
-
-
-/***/ }),
-
-/***/ "./src/services/sidebarItem.tsx":
-/*!**************************************!*\
-  !*** ./src/services/sidebarItem.tsx ***!
-  \**************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Container = void 0;
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var Container = function (props) {
-    var ref = React.useRef(null);
-    var _a = __read(React.useState(undefined), 2), selection = _a[0], setSelection = _a[1];
-    var isDragging = React.useRef(false);
-    var _b = __read(React.useState(false), 2), dragEntered = _b[0], setDragEntered = _b[1];
-    var timer = React.useRef(null);
-    var onDragOver = function (e) {
-        if (!timer.current) {
-            timer.current = setTimeout(function () {
-                props.onDragOver(e);
-            }, 1000);
-        }
-        if (isDragging.current) {
-            return;
-        }
-        setDragEntered(true);
-        e.preventDefault();
-        var target = e.target;
-        var width = target.clientWidth;
-        var height = target.clientHeight;
-        if (width === 0 || height === 0) {
-            return; // avoid div!0
-        }
-        var x = e.nativeEvent.offsetX;
-        var y = e.nativeEvent.offsetY;
-        var xp = (100 * x) / width;
-        var yp = (100 * y) / height;
-        var isTop = yp < 50;
-        var isBottom = yp >= 50;
-        setSelection(isTop ? 'top' : 'bottom');
-    };
-    var onDragLeave = function (e) {
-        if (timer.current) {
-            clearTimeout(timer.current);
-            timer.current = null;
-        }
-        if (isDragging.current) {
-            return;
-        }
-        setDragEntered(false);
-        setSelection(undefined);
-    };
-    var onDrop = function (e) {
-        if (timer.current) {
-            clearTimeout(timer.current);
-            timer.current = null;
-        }
-        if (isDragging.current) {
-            return;
-        }
-        setDragEntered(false);
-        props.onDrop(e, selection);
-        setSelection(undefined);
-    };
-    var onDragEnter = function (e) {
-        e.preventDefault();
-    };
-    var onDragStart = function (e) {
-        isDragging.current = true;
-        e.dataTransfer.setData('application/json', JSON.stringify({ container: props.container.id }));
-    };
-    var onDragEnd = function (e) {
-        isDragging.current = false;
-        setDragEntered(false);
-    };
-    return (React.createElement("div", { ref: ref, draggable: true, onClick: props.onClick, onDragOver: onDragOver, onDragEnter: onDragEnter, onDragStart: onDragStart, onDragLeave: onDragLeave, onDragEnd: onDragEnd, onDrop: onDrop, style: {
-            borderLeft: props.isActive
-                ? '2px solid white'
-                : '2px solid transparent',
-        }, className: "activity-bar-item".concat(props.isActive ? ' active' : '') },
-        dragEntered && (React.createElement("div", { style: {
-                position: 'absolute',
-                top: '0px',
-                left: '0px',
-                height: '100%',
-                width: '100%',
-                backgroundColor: 'transparent',
-                boxSizing: 'border-box',
-                borderTop: selection === 'top' ? '2px solid white' : '',
-                borderBottom: selection === 'bottom' ? '2px solid white' : '',
-                pointerEvents: 'none',
-            } })),
-        React.createElement("a", { className: "material-icons-outlined" }, props.container.icon)));
-};
-exports.Container = Container;
-
-
-/***/ }),
-
-/***/ "./src/services/view.ts":
-/*!******************************!*\
-  !*** ./src/services/view.ts ***!
-  \******************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DefaultView = void 0;
-var DefaultView = /** @class */ (function () {
-    function DefaultView(options) {
-        this._id = options.id;
-        this._title = options.title;
-        this._isExpanded = options.isExpanded;
-        this._isLocationEditable = options.isLocationEditable;
-        this._icon = options.icon;
-    }
-    Object.defineProperty(DefaultView.prototype, "id", {
-        get: function () {
-            return this._id;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(DefaultView.prototype, "title", {
-        get: function () {
-            return this._title;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(DefaultView.prototype, "isExpanded", {
-        get: function () {
-            return this._isExpanded;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(DefaultView.prototype, "isLocationEditable", {
-        get: function () {
-            return this._isLocationEditable;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(DefaultView.prototype, "icon", {
-        get: function () {
-            return this._icon;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    DefaultView.prototype.toJSON = function () {
-        return {
-            id: this.id,
-            isExpanded: this.isExpanded,
-        };
-    };
-    return DefaultView;
-}());
-exports.DefaultView = DefaultView;
-
-
-/***/ }),
-
-/***/ "./src/services/viewContainer.ts":
-/*!***************************************!*\
-  !*** ./src/services/viewContainer.ts ***!
-  \***************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __values = (this && this.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PaneviewContainer = void 0;
-var events_1 = __webpack_require__(/*! ../events */ "./src/events.ts");
-var view_1 = __webpack_require__(/*! ./view */ "./src/services/view.ts");
-var PaneviewContainer = /** @class */ (function () {
-    function PaneviewContainer(id, viewRegistry, views) {
-        var e_1, _a;
-        this._views = [];
-        this._onDidAddView = new events_1.Emitter();
-        this.onDidAddView = this._onDidAddView.event;
-        this._onDidRemoveView = new events_1.Emitter();
-        this.onDidRemoveView = this._onDidRemoveView.event;
-        this._id = id;
-        if (views) {
-            try {
-                for (var views_1 = __values(views), views_1_1 = views_1.next(); !views_1_1.done; views_1_1 = views_1.next()) {
-                    var view = views_1_1.value;
-                    var registeredView = viewRegistry.getRegisteredView(view.id);
-                    this.addView(new view_1.DefaultView({
-                        id: view.id,
-                        title: registeredView.title,
-                        isExpanded: view.isExpanded,
-                        isLocationEditable: registeredView.isLocationEditable,
-                        icon: registeredView.icon,
-                    }));
-                }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (views_1_1 && !views_1_1.done && (_a = views_1.return)) _a.call(views_1);
-                }
-                finally { if (e_1) throw e_1.error; }
-            }
-        }
-        // this.addDisposables(this._onDidAddView, this._onDidRemoveView);
-    }
-    Object.defineProperty(PaneviewContainer.prototype, "id", {
-        get: function () {
-            return this._id;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(PaneviewContainer.prototype, "views", {
-        get: function () {
-            return __spreadArray([], __read(this._views), false);
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(PaneviewContainer.prototype, "schema", {
-        get: function () {
-            if (!this._schema) {
-                this._schema = JSON.parse(localStorage.getItem("viewcontainer_".concat(this.id)));
-            }
-            return this._schema;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(PaneviewContainer.prototype, "icon", {
-        get: function () {
-            var _a;
-            var defaultIcon = 'search';
-            if (this.views.length > 0) {
-                return ((_a = this.views.find(function (v) { return !!v.icon; })) === null || _a === void 0 ? void 0 : _a.icon) || defaultIcon;
-            }
-            return defaultIcon;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    PaneviewContainer.prototype.layout = function (schema) {
-        this._schema = schema;
-        localStorage.setItem("viewcontainer_".concat(this.id), JSON.stringify(schema));
-    };
-    PaneviewContainer.prototype.addView = function (view, index) {
-        this._views.splice(index, 0, view);
-        this._onDidAddView.fire({ view: view, index: index });
-    };
-    PaneviewContainer.prototype.removeView = function (view) {
-        var index = this._views.indexOf(view);
-        if (index < 0) {
-            throw new Error('invalid');
-        }
-        this._views.splice(index, 1);
-        if (this._schema) {
-            this._schema = __assign({}, this._schema);
-            this._schema.views = this._schema.views.filter(function (v) { return v.data.id !== view.id; });
-            this.layout(this._schema);
-        }
-        this._onDidRemoveView.fire(view);
-    };
-    PaneviewContainer.prototype.clear = function () {
-        localStorage.removeItem("viewcontainer_".concat(this.id));
-    };
-    PaneviewContainer.prototype.toJSON = function () {
-        return { id: this.id, views: this.views.map(function (v) { return v.toJSON(); }) };
-    };
-    return PaneviewContainer;
-}());
-exports.PaneviewContainer = PaneviewContainer;
-
-
-/***/ }),
-
-/***/ "./src/services/viewRegistry.tsx":
-/*!***************************************!*\
-  !*** ./src/services/viewRegistry.tsx ***!
-  \***************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.VIEW_REGISTRY = exports.ViewRegistry = void 0;
-var react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var controlCenter_1 = __webpack_require__(/*! ../layout-grid/controlCenter */ "./src/layout-grid/controlCenter.tsx");
-var ViewRegistry = /** @class */ (function () {
-    function ViewRegistry() {
-        this._registry = new Map();
-    }
-    ViewRegistry.prototype.register = function (registeredView) {
-        this._registry.set(registeredView.id, registeredView);
-    };
-    ViewRegistry.prototype.getRegisteredView = function (id) {
-        return this._registry.get(id);
-    };
-    return ViewRegistry;
-}());
-exports.ViewRegistry = ViewRegistry;
-exports.VIEW_REGISTRY = new ViewRegistry();
-exports.VIEW_REGISTRY.register({
-    id: 'search_widget',
-    title: 'search',
-    icon: 'search',
-    isLocationEditable: false,
-    component: function () {
-        return (react_1.default.createElement("div", { style: {
-                backgroundColor: 'yellow',
-                color: 'black',
-                height: '100%',
-            } }, "This is a search bar component"));
-    },
-});
-exports.VIEW_REGISTRY.register({
-    id: 'home_widget',
-    title: 'Home',
-    icon: 'home',
-    isLocationEditable: true,
-    component: controlCenter_1.ControlCenter,
-});
-exports.VIEW_REGISTRY.register({
-    id: 'account_widget',
-    title: 'Account',
-    icon: 'account_circle',
-    isLocationEditable: true,
-    component: function () {
-        return (react_1.default.createElement("div", { style: {
-                backgroundColor: 'green',
-                color: 'black',
-                height: '100%',
-            } }, "account_circle"));
-    },
-});
-exports.VIEW_REGISTRY.register({
-    id: 'settings_widget',
-    title: 'Settings',
-    icon: 'settings',
-    isLocationEditable: true,
-    component: function () {
-        return (react_1.default.createElement("div", { style: {
-                backgroundColor: 'orange',
-                color: 'black',
-                height: '100%',
-            } }, "settings"));
-    },
-});
-
-
-/***/ }),
-
-/***/ "./src/services/viewService.ts":
-/*!*************************************!*\
-  !*** ./src/services/viewService.ts ***!
-  \*************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __values = (this && this.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ViewService = void 0;
-var events_1 = __webpack_require__(/*! ../events */ "./src/events.ts");
-var viewContainer_1 = __webpack_require__(/*! ./viewContainer */ "./src/services/viewContainer.ts");
-var ViewService = /** @class */ (function () {
-    function ViewService(viewRegistry) {
-        this.viewRegistry = viewRegistry;
-        this._viewContainers = [];
-        this._onDidActiveContainerChange = new events_1.Emitter();
-        this.onDidActiveContainerChange = this._onDidActiveContainerChange
-            .event;
-        this._onDidRemoveContainer = new events_1.Emitter();
-        this.onDidRemoveContainer = this._onDidRemoveContainer.event;
-        this._onDidAddContainer = new events_1.Emitter();
-        this.onDidAddContainer = this._onDidAddContainer.event;
-        this._onDidContainersChange = new events_1.Emitter();
-        this.onDidContainersChange = this._onDidContainersChange.event;
-        //
-    }
-    Object.defineProperty(ViewService.prototype, "containers", {
-        get: function () {
-            return this._viewContainers;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ViewService.prototype, "activeContainer", {
-        get: function () {
-            var _this = this;
-            return this._viewContainers.find(function (c) { return c.id === _this._activeViewContainerId; });
-        },
-        enumerable: false,
-        configurable: true
-    });
-    ViewService.prototype.load = function (layout) {
-        var e_1, _a;
-        var containers = layout.containers, activeContainer = layout.activeContainer;
-        try {
-            for (var containers_1 = __values(containers), containers_1_1 = containers_1.next(); !containers_1_1.done; containers_1_1 = containers_1.next()) {
-                var container = containers_1_1.value;
-                var id = container.id, views = container.views;
-                var viewContainer = new viewContainer_1.PaneviewContainer(id, this.viewRegistry, views);
-                this.addContainer(viewContainer);
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (containers_1_1 && !containers_1_1.done && (_a = containers_1.return)) _a.call(containers_1);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        this.setActiveViewContainer(activeContainer);
-    };
-    ViewService.prototype.insertContainerAfter = function (source, target) {
-        var sourceIndex = this._viewContainers.findIndex(function (c) { return c.id === source.id; });
-        var view = this._viewContainers.splice(sourceIndex, 1)[0];
-        var targetIndex = this._viewContainers.findIndex(function (c) { return c.id === target.id; });
-        this._viewContainers.splice(targetIndex + 1, 0, view);
-        this._viewContainers = __spreadArray([], __read(this._viewContainers), false);
-        this._onDidContainersChange.fire();
-    };
-    ViewService.prototype.insertContainerBefore = function (source, target) {
-        var sourceIndex = this._viewContainers.findIndex(function (c) { return c.id === source.id; });
-        var view = this._viewContainers.splice(sourceIndex, 1)[0];
-        var targetIndex = this._viewContainers.findIndex(function (c) { return c.id === target.id; });
-        this._viewContainers.splice(Math.max(targetIndex, 0), 0, view);
-        this._viewContainers = __spreadArray([], __read(this._viewContainers), false);
-        this._onDidContainersChange.fire();
-    };
-    ViewService.prototype.addContainer = function (container) {
-        this._viewContainers = __spreadArray(__spreadArray([], __read(this._viewContainers), false), [container], false);
-        this._activeViewContainerId = container.id;
-        this._onDidAddContainer.fire();
-    };
-    ViewService.prototype.removeContainer = function (container) {
-        this._viewContainers = this._viewContainers.filter(function (c) { return c.id !== container.id; });
-        if (this._activeViewContainerId === container.id) {
-            this._activeViewContainerId =
-                this._viewContainers.length > 0
-                    ? this._viewContainers[0].id
-                    : undefined;
-        }
-        this._onDidRemoveContainer.fire();
-    };
-    ViewService.prototype.setActiveViewContainer = function (id) {
-        if (!this._viewContainers.find(function (c) { return c.id === id; })) {
-            throw new Error("invalid container ".concat(id));
-        }
-        this._activeViewContainerId = id;
-        this._onDidActiveContainerChange.fire();
-    };
-    ViewService.prototype.getView = function (id) {
-        var e_2, _a;
-        try {
-            for (var _b = __values(Array.from(this._viewContainers.values())), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var container = _c.value;
-                var view = container.views.find(function (v) { return v.id === id; });
-                if (view) {
-                    return view;
-                }
-            }
-        }
-        catch (e_2_1) { e_2 = { error: e_2_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-            }
-            finally { if (e_2) throw e_2.error; }
-        }
-        return undefined;
-    };
-    ViewService.prototype.moveViewToLocation = function (view, targetViewContainer, targetLocation) {
-        var sourceViewContainer = this.getViewContainer2(view);
-        this.removeViews([view], sourceViewContainer);
-        this.addViews(view, targetViewContainer, targetLocation);
-    };
-    ViewService.prototype.addViews = function (view, viewContainer, location) {
-        viewContainer.addView(view, location);
-    };
-    ViewService.prototype.removeViews = function (removeViews, viewContainer) {
-        var e_3, _a;
-        try {
-            for (var removeViews_1 = __values(removeViews), removeViews_1_1 = removeViews_1.next(); !removeViews_1_1.done; removeViews_1_1 = removeViews_1.next()) {
-                var view = removeViews_1_1.value;
-                viewContainer.removeView(view);
-                if (viewContainer.views.length === 0) {
-                    viewContainer.clear();
-                    this.removeContainer(viewContainer);
-                }
-            }
-        }
-        catch (e_3_1) { e_3 = { error: e_3_1 }; }
-        finally {
-            try {
-                if (removeViews_1_1 && !removeViews_1_1.done && (_a = removeViews_1.return)) _a.call(removeViews_1);
-            }
-            finally { if (e_3) throw e_3.error; }
-        }
-    };
-    ViewService.prototype.getViewContainer = function (id) {
-        return this._viewContainers.find(function (c) { return c.id === id; });
-    };
-    ViewService.prototype.getViewContainer2 = function (view) {
-        var e_4, _a;
-        try {
-            for (var _b = __values(Array.from(this._viewContainers.values())), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var container = _c.value;
-                var v = container.views.find(function (v) { return v.id === view.id; });
-                if (v) {
-                    return container;
-                }
-            }
-        }
-        catch (e_4_1) { e_4 = { error: e_4_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-            }
-            finally { if (e_4) throw e_4.error; }
-        }
-        return undefined;
-    };
-    ViewService.prototype.toJSON = function () {
-        return {
-            containers: this.containers.map(function (c) { return c.toJSON(); }),
-            activeContainer: this.activeContainer.id,
-        };
-    };
-    ViewService.prototype.dispose = function () {
-        this._onDidActiveContainerChange.dispose();
-        this._onDidAddContainer.dispose();
-        this._onDidRemoveContainer.dispose();
-    };
-    return ViewService;
-}());
-exports.ViewService = ViewService;
-
-
-/***/ }),
-
-/***/ "./src/services/widgets.tsx":
-/*!**********************************!*\
-  !*** ./src/services/widgets.tsx ***!
-  \**********************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SidebarPart = exports.Sidebar = exports.Activitybar = void 0;
-var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
-var React = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var registry_1 = __webpack_require__(/*! ../layout-grid/registry */ "./src/layout-grid/registry.ts");
-var viewContainer_1 = __webpack_require__(/*! ./viewContainer */ "./src/services/viewContainer.ts");
-var viewService_1 = __webpack_require__(/*! ./viewService */ "./src/services/viewService.ts");
-var view_1 = __webpack_require__(/*! ./view */ "./src/services/view.ts");
-var viewRegistry_1 = __webpack_require__(/*! ./viewRegistry */ "./src/services/viewRegistry.tsx");
-var dom_1 = __webpack_require__(/*! ../dom */ "./src/dom.ts");
-var sidebarItem_1 = __webpack_require__(/*! ./sidebarItem */ "./src/services/sidebarItem.tsx");
-__webpack_require__(/*! ./widgets.scss */ "./src/services/widgets.scss");
-var lifecycle_1 = __webpack_require__(/*! ../lifecycle */ "./src/lifecycle.ts");
-var ViewServiceModel = /** @class */ (function () {
-    function ViewServiceModel() {
-        this.viewService = new viewService_1.ViewService(viewRegistry_1.VIEW_REGISTRY);
-        this.init();
-    }
-    Object.defineProperty(ViewServiceModel.prototype, "model", {
-        get: function () {
-            return this.viewService;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    ViewServiceModel.prototype.init = function () {
-        var _this = this;
-        var layout = localStorage.getItem('viewservice');
-        if (layout) {
-            this.viewService.load(JSON.parse(layout));
-        }
-        else {
-            var container1 = new viewContainer_1.PaneviewContainer('default_container_1', viewRegistry_1.VIEW_REGISTRY);
-            if (!container1.schema) {
-                this.addView(container1, viewRegistry_1.VIEW_REGISTRY.getRegisteredView('search_widget'));
-                this.addView(container1, viewRegistry_1.VIEW_REGISTRY.getRegisteredView('home_widget'));
-            }
-            var container2 = new viewContainer_1.PaneviewContainer('default_container_2', viewRegistry_1.VIEW_REGISTRY);
-            if (!container2.schema) {
-                this.addView(container2, viewRegistry_1.VIEW_REGISTRY.getRegisteredView('account_widget'));
-                this.addView(container2, viewRegistry_1.VIEW_REGISTRY.getRegisteredView('settings_widget'));
-            }
-            this.viewService.addContainer(container1);
-            this.viewService.addContainer(container2);
-        }
-        var save = function () {
-            localStorage.setItem('viewservice', JSON.stringify(_this.viewService.toJSON()));
-        };
-        this.viewService.onDidActiveContainerChange(save);
-        this.viewService.onDidRemoveContainer(save);
-        this.viewService.onDidAddContainer(save);
-    };
-    ViewServiceModel.prototype.addView = function (container, registedView) {
-        container.addView(new view_1.DefaultView({
-            id: registedView.id,
-            title: registedView.title,
-            isExpanded: true,
-            isLocationEditable: registedView.isLocationEditable,
-            icon: registedView.icon,
-        }));
-    };
-    return ViewServiceModel;
-}());
-var viewService = new ViewServiceModel();
-var colors = {
-    home_widget: 'red',
-    account_widget: 'green',
-    settings_widget: 'yellow',
-    search_widget: 'orange',
-};
-var components = {
-    default: function (props) {
-        var Component = React.useMemo(function () {
-            var registeredView = viewRegistry_1.VIEW_REGISTRY.getRegisteredView(props.params.viewId);
-            return registeredView === null || registeredView === void 0 ? void 0 : registeredView.component;
-        }, [props.params.viewId]);
-        return Component ? React.createElement(Component, null) : null;
-    },
-};
-var Activitybar = function (props) {
-    var _a = __read(React.useState(viewService.model.activeContainer.id), 2), activeContainerid = _a[0], setActiveContainerId = _a[1];
-    var _b = __read(React.useState(viewService.model.containers), 2), containers = _b[0], setContainers = _b[1];
-    var registry = (0, registry_1.useLayoutRegistry)();
-    React.useEffect(function () {
-        var disposable = new lifecycle_1.CompositeDisposable(viewService.model.onDidActiveContainerChange(function () {
-            setActiveContainerId(viewService.model.activeContainer.id);
-        }), viewService.model.onDidAddContainer(function () {
-            setContainers(viewService.model.containers);
-        }), viewService.model.onDidRemoveContainer(function () {
-            setContainers(viewService.model.containers);
-        }), viewService.model.onDidContainersChange(function () {
-            setContainers(viewService.model.containers);
-        }));
-        return function () {
-            disposable.dispose();
-        };
-    }, []);
-    var onClick = function (container, alwaysOpen) {
-        if (alwaysOpen === void 0) { alwaysOpen = false; }
-        return function (event) {
-            var api = registry.get('gridview');
-            var selectedActive = container.id === activeContainerid;
-            var sidebarPanel = api.getPanel('sidebar');
-            if (sidebarPanel.api.isVisible) {
-                if (!alwaysOpen && selectedActive) {
-                    api.setVisible(sidebarPanel, false);
-                }
-            }
-            else {
-                event.preventDefault(); // prevent focus
-                api.setVisible(sidebarPanel, true);
-                sidebarPanel.focus();
-            }
-            viewService.model.setActiveViewContainer(container.id);
-        };
-    };
-    var onContainerDrop = function (targetContainer) {
-        return function (event, direction) {
-            var data = event.dataTransfer.getData('application/json');
-            if (data) {
-                var container = JSON.parse(data).container;
-                var sourceContainer = viewService.model.getViewContainer(container);
-                switch (direction) {
-                    case 'bottom':
-                        viewService.model.insertContainerAfter(sourceContainer, targetContainer);
-                        break;
-                    case 'top':
-                        viewService.model.insertContainerBefore(sourceContainer, targetContainer);
-                        break;
-                }
-                viewService.model.setActiveViewContainer(sourceContainer.id);
-            }
-        };
-    };
-    var onNewContainer = function (event) {
-        var data = (0, dockview_1.getPaneData)();
-        if (data) {
-            var paneId = data.paneId;
-            var view = viewService.model.getView(paneId);
-            if (!view) {
-                console.log("view ".concat(paneId, " doesn't exist"));
-                return;
-            }
-            var viewContainer = viewService.model.getViewContainer2(view);
-            if (!viewContainer) {
-                console.log("viewContainer for view ".concat(view.id, " doesn't exist"));
-                return;
-            }
-            viewService.model.removeViews([view], viewContainer);
-            var newContainer = new viewContainer_1.PaneviewContainer("t_".concat(Date.now().toString().substr(5)), viewRegistry_1.VIEW_REGISTRY);
-            newContainer.addView(view);
-            viewService.model.addContainer(newContainer);
-        }
-    };
-    var onDragOver = function (container) { return function (e) {
-        var api = registry.get('gridview');
-        var sidebarPanel = api.getPanel('sidebar');
-        if (!sidebarPanel.api.isVisible) {
-            api.setVisible(sidebarPanel, true);
-            sidebarPanel.focus();
-        }
-        viewService.model.setActiveViewContainer(container.id);
-    }; };
-    return (React.createElement("div", { className: "activity-bar-part" },
-        containers.map(function (container, i) {
-            var isActive = activeContainerid === container.id;
-            return (React.createElement(sidebarItem_1.Container, { key: i, container: container, isActive: isActive, onDragOver: onDragOver(container), onClick: onClick(container), onDrop: onContainerDrop(container) }));
-        }),
-        React.createElement(ExtraSpace, { onNewContainer: onNewContainer })));
-};
-exports.Activitybar = Activitybar;
-var ExtraSpace = function (props) {
-    var ref = React.useRef(null);
-    var onDrop = function (event) {
-        (0, dom_1.toggleClass)(ref.current, 'activity-bar-space-dragover', false);
-        props.onNewContainer(event);
-    };
-    return (React.createElement("div", { ref: ref, className: "activity-bar-space", onDragOver: function (e) {
-            e.preventDefault();
-        }, onDragEnter: function (e) {
-            (0, dom_1.toggleClass)(ref.current, 'activity-bar-space-dragover', true);
-            e.preventDefault();
-        }, onDragLeave: function (e) {
-            (0, dom_1.toggleClass)(ref.current, 'activity-bar-space-dragover', false);
-        }, onDrop: onDrop }));
-};
-var Sidebar = function () {
-    var _a = __read(React.useState(viewService.model.activeContainer.id), 2), sidebarId = _a[0], setSidebarId = _a[1];
-    React.useEffect(function () {
-        var disposable = viewService.model.onDidActiveContainerChange(function () {
-            setSidebarId(viewService.model.activeContainer.id);
-        });
-        return function () {
-            disposable.dispose();
-        };
-    }, []);
-    return React.createElement(exports.SidebarPart, { id: sidebarId });
-};
-exports.Sidebar = Sidebar;
-var headerComponents = {
-    default: function (props) {
-        var onClick = function () { return props.api.setExpanded(!props.api.isExpanded); };
-        return (React.createElement("div", { onClick: onClick, style: {
-                display: 'flex',
-                alignItems: 'center',
-                padding: '0px 8px',
-                cursor: 'pointer',
-            } },
-            React.createElement("a", { className: "material-icons-outlined" }, props.api.isExpanded ? 'expand_more' : 'chevron_right'),
-            React.createElement("span", null, props.title)));
-    },
-};
-var SidebarPart = function (props) {
-    var _a = __read(React.useState(), 2), api = _a[0], setApi = _a[1];
-    React.useEffect(function () {
-        if (!api) {
-            return function () {
-                //
-            };
-        }
-        var viewContainer = viewService.model.getViewContainer(props.id);
-        var disposables = new lifecycle_1.CompositeDisposable(api.onDidLayoutChange(function () {
-            viewContainer.layout(api.toJSON());
-        }), viewContainer.onDidAddView(function (_a) {
-            var view = _a.view, index = _a.index;
-            api.addPanel({
-                id: view.id,
-                isExpanded: view.isExpanded,
-                title: view.title,
-                component: 'default',
-                headerComponent: 'default',
-                params: {
-                    viewId: view.id,
-                },
-                index: index,
-            });
-        }), viewContainer.onDidRemoveView(function (view) {
-            var panel = api.getPanel(view.id);
-            api.removePanel(panel);
-        }));
-        var schema = viewContainer.schema;
-        if (schema) {
-            api.fromJSON(schema);
-        }
-        else {
-            api.panels.forEach(function (p) {
-                api.removePanel(p);
-            });
-            viewContainer.views.forEach(function (view) {
-                api.addPanel({
-                    id: view.id,
-                    isExpanded: view.isExpanded,
-                    title: view.title,
-                    component: 'default',
-                    headerComponent: 'default',
-                    params: {
-                        viewId: view.id,
-                    },
-                });
-            });
-        }
-        return function () {
-            disposables.dispose();
-        };
-    }, [api, props.id]);
-    var onReady = function (event) {
-        setApi(event.api);
-    };
-    var onDidDrop = function (event) {
-        var data = event.getData();
-        var containerData = event.nativeEvent.dataTransfer.getData('application/json');
-        if (containerData) {
-            var container = JSON.parse(containerData).container;
-            if (container === props.id) {
-                return;
-            }
-            var sourceContainer = viewService.model.getViewContainer(container);
-            var targetContainer_1 = viewService.model.getViewContainer(props.id);
-            if (!sourceContainer) {
-                console.log("sourceContainer ".concat(props.id, " doesn't exist"));
-                return;
-            }
-            if (!targetContainer_1) {
-                console.log("targetContainer ".concat(props.id, " doesn't exist"));
-                return;
-            }
-            sourceContainer.views.forEach(function (v) {
-                viewService.model.moveViewToLocation(v, targetContainer_1, 0);
-            });
-            return;
-        }
-        if (!data) {
-            return;
-        }
-        var targetPanel = event.panel;
-        var allPanels = event.api.panels;
-        var toIndex = allPanels.indexOf(targetPanel);
-        if (event.position === dockview_1.Position.Right ||
-            event.position === dockview_1.Position.Bottom) {
-            toIndex = Math.min(allPanels.length, toIndex + 1);
-        }
-        var viewId = data.paneId;
-        var viewContainer = viewService.model.getViewContainer(props.id);
-        if (!viewContainer) {
-            console.log("viewContainer ".concat(props.id, " doesn't exist"));
-            return;
-        }
-        var view = viewService.model.getView(viewId);
-        viewService.model.moveViewToLocation(view, viewContainer, toIndex);
-    };
-    if (!props.id) {
-        return null;
-    }
-    return (React.createElement(dockview_1.PaneviewReact, { className: "sidebar-part", onDidDrop: onDidDrop, components: components, headerComponents: headerComponents, onReady: onReady }));
-};
-exports.SidebarPart = SidebarPart;
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/index.scss":
-/*!*********************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/index.scss ***!
-  \*********************************************************************************************************/
+/***/ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/index.scss":
+/*!*************************************************************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/index.scss ***!
+  \*************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/cssWithMappingToString.js */ "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js");
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "../../node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "../../node_modules/css-loader/dist/runtime/api.js");
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_dockview_dist_styles_dockview_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! -!../node_modules/css-loader/dist/cjs.js!../../dockview/dist/styles/dockview.css */ "./node_modules/css-loader/dist/cjs.js!../dockview/dist/styles/dockview.css");
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_dockview_dist_styles_dockview_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! -!../../../node_modules/css-loader/dist/cjs.js!../../dockview/dist/styles/dockview.css */ "../../node_modules/css-loader/dist/cjs.js!../dockview/dist/styles/dockview.css");
 // Imports
 
 
 
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_dockview_dist_styles_dockview_css__WEBPACK_IMPORTED_MODULE_2__["default"]);
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "body {\n  margin: 0;\n  font-family: \"Roboto\", sans-serif;\n  overflow: hidden;\n  color: rgb(204, 204, 204);\n  font-size: 13px;\n}\n\n::-webkit-scrollbar {\n  height: 8px;\n  width: 8px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n  background: transparent;\n}\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n  background: var(--dv-tabs-container-scrollbar-color);\n}\n\n.close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n  cursor: pointer;\n}\n.close-action:active {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n\nbutton {\n  text-overflow: ellipsis;\n  overflow: hidden;\n  white-space: nowrap;\n  border: none;\n  background-color: rgb(14, 99, 156);\n  color: white;\n  font-family: inherit;\n  outline: none;\n  padding: 2px 14px;\n  margin: 2px 0px;\n}\nbutton:hover {\n  background-color: rgb(17, 119, 187);\n  cursor: pointer;\n}", "",{"version":3,"sources":["webpack://./src/index.scss"],"names":[],"mappings":"AAEA;EACI,SAAA;EACA,iCAAA;EACA,gBAAA;EACA,yBAAA;EACA,eAAA;AAAJ;;AAGA;EACI,WAAA;EACA,UAAA;AAAJ;;AAGA,UAAA;AACA;EACI,uBAAA;AAAJ;;AAGA,WAAA;AACA;EACI,oDAAA;AAAJ;;AAWA;EAMI,uBAAA;EACA,YAAA;EACA,WAAA;EACA,cAAA;EACA,gEAAA;EACA,wDAAA;EACA,qBAAA;EACA,eAAA;AAbJ;AACI;EACI,uCAAA;EACA,+BAAA;AACR;;AAYA;EACI,uBAAA;EACA,gBAAA;EACA,mBAAA;EACA,YAAA;EACA,kCAAA;EACA,YAAA;EACA,oBAAA;EACA,aAAA;EACA,iBAAA;EACA,eAAA;AATJ;AAWI;EACI,mCAAA;EACA,eAAA;AATR","sourcesContent":["@import '~dockview/dist/styles/dockview.css';\n\nbody {\n    margin: 0;\n    font-family: 'Roboto', sans-serif;\n    overflow: hidden;\n    color: rgb(204, 204, 204);\n    font-size: 13px;\n}\n\n::-webkit-scrollbar {\n    height: 8px;\n    width: 8px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n    background: transparent;\n}\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n    background: var(--dv-tabs-container-scrollbar-color);\n}\n\n// *,\n// *::after,\n// *::before {\n//     -webkit-user-drag: none;\n//     -webkit-app-region: no-drag;\n//     -webkit-user-select: none;\n// }\n\n.close-action {\n    &:active {\n        -webkit-mask-size: 100% 100% !important;\n        mask-size: 100% 100% !important;\n    }\n\n    background-color: white;\n    height: 16px;\n    width: 16px;\n    display: block;\n    -webkit-mask: var(--dv-tab-close-icon) 50% 50% / 90% 90% no-repeat;\n    mask: var(--dv-tab-close-icon) 50% 50% / 90% 90% no-repeat;\n    margin-right: '0.5em';\n    cursor: pointer;\n}\n\nbutton {\n    text-overflow: ellipsis;\n    overflow: hidden;\n    white-space: nowrap;\n    border: none;\n    background-color: rgb(14, 99, 156);\n    color: white;\n    font-family: inherit;\n    outline: none;\n    padding: 2px 14px;\n    margin: 2px 0px;\n\n    &:hover {\n        background-color: rgb(17, 119, 187);\n        cursor: pointer;\n    }\n}\n"],"sourceRoot":""}]);
@@ -3201,24 +31,24 @@ ___CSS_LOADER_EXPORT___.push([module.id, "body {\n  margin: 0;\n  font-family: \
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/controlCenter.scss":
-/*!*****************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/controlCenter.scss ***!
-  \*****************************************************************************************************************************/
+/***/ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/controlCenter.scss":
+/*!*********************************************************************************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/controlCenter.scss ***!
+  \*********************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/cssWithMappingToString.js */ "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js");
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "../../node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "../../node_modules/css-loader/dist/runtime/api.js");
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
 // Imports
 
 
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, ".control-center {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  padding: 4px 8px;\n  box-sizing: border-box;\n}\n.control-center .control-center-row {\n  height: 25px;\n  box-sizing: border-box;\n}\n.control-center .control-center-row button {\n  width: 175px;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  white-space: nowrap;\n  border: none;\n  background-color: rgb(14, 99, 156);\n  color: white;\n  font-family: inherit;\n  outline: none;\n  padding: 2px 14px;\n  margin: 2px 0px;\n}\n.control-center .control-center-row button:hover {\n  background-color: rgb(17, 119, 187);\n}", "",{"version":3,"sources":["webpack://./src/layout-grid/controlCenter.scss"],"names":[],"mappings":"AAAA;EACI,aAAA;EACA,sBAAA;EACA,YAAA;EACA,gBAAA;EACA,sBAAA;AACJ;AACI;EACI,YAAA;EACA,sBAAA;AACR;AACQ;EACI,YAAA;EACA,uBAAA;EACA,gBAAA;EACA,mBAAA;EACA,YAAA;EACA,kCAAA;EACA,YAAA;EACA,oBAAA;EACA,aAAA;EACA,iBAAA;EACA,eAAA;AACZ;AACY;EACI,mCAAA;AAChB","sourcesContent":[".control-center {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n    padding: 4px 8px;\n    box-sizing: border-box;\n\n    .control-center-row {\n        height: 25px;\n        box-sizing: border-box;\n\n        button {\n            width: 175px;\n            text-overflow: ellipsis;\n            overflow: hidden;\n            white-space: nowrap;\n            border: none;\n            background-color: rgb(14, 99, 156);\n            color: white;\n            font-family: inherit;\n            outline: none;\n            padding: 2px 14px;\n            margin: 2px 0px;\n\n            &:hover {\n                background-color: rgb(17, 119, 187);\n            }\n        }\n    }\n}\n"],"sourceRoot":""}]);
 // Exports
@@ -3227,24 +57,24 @@ ___CSS_LOADER_EXPORT___.push([module.id, ".control-center {\n  display: flex;\n 
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/layoutGrid.scss":
-/*!**************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/layoutGrid.scss ***!
-  \**************************************************************************************************************************/
+/***/ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/layoutGrid.scss":
+/*!******************************************************************************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/layoutGrid.scss ***!
+  \******************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/cssWithMappingToString.js */ "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js");
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "../../node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "../../node_modules/css-loader/dist/runtime/api.js");
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
 // Imports
 
 
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, ".context-menu {\n  position: absolute;\n  height: 100px;\n  width: 170px;\n  font-size: 13px;\n  z-index: 999;\n  color: rgb(204, 204, 204);\n  background: rgb(37, 37, 38);\n  box-shadow: rgb(0, 0, 0) 0px 2px 4px;\n  padding: 10px 0px;\n}\n.context-menu .context-action {\n  height: 20px;\n  line-height: 20px;\n  padding: 2px 10px;\n  cursor: pointer;\n}\n.context-menu .context-action:hover {\n  background-color: rgb(51, 51, 51);\n}", "",{"version":3,"sources":["webpack://./src/layout-grid/layoutGrid.scss"],"names":[],"mappings":"AAAA;EACI,kBAAA;EACA,aAAA;EACA,YAAA;EACA,eAAA;EACA,YAAA;EACA,yBAAA;EACA,2BAAA;EACA,oCAAA;EACA,iBAAA;AACJ;AACI;EACI,YAAA;EACA,iBAAA;EACA,iBAAA;EACA,eAAA;AACR;AACQ;EACI,iCAAA;AACZ","sourcesContent":[".context-menu {\n    position: absolute;\n    height: 100px;\n    width: 170px;\n    font-size: 13px;\n    z-index: 999;\n    color: rgb(204, 204, 204);\n    background: rgb(37, 37, 38);\n    box-shadow: rgb(0, 0, 0) 0px 2px 4px;\n    padding: 10px 0px;\n\n    .context-action {\n        height: 20px;\n        line-height: 20px;\n        padding: 2px 10px;\n        cursor: pointer;\n\n        &:hover {\n            background-color: rgb(51, 51, 51);\n        }\n    }\n}\n"],"sourceRoot":""}]);
 // Exports
@@ -3253,24 +83,24 @@ ___CSS_LOADER_EXPORT___.push([module.id, ".context-menu {\n  position: absolute;
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/panels/exampleFunctions.scss":
-/*!***************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/panels/exampleFunctions.scss ***!
-  \***************************************************************************************************************************************/
+/***/ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/panels/exampleFunctions.scss":
+/*!*******************************************************************************************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/panels/exampleFunctions.scss ***!
+  \*******************************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/cssWithMappingToString.js */ "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js");
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "../../node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../../node_modules/css-loader/dist/runtime/api.js */ "../../node_modules/css-loader/dist/runtime/api.js");
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
 // Imports
 
 
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, ".example-functions-panel {\n  padding: 5px;\n  display: flex;\n  flex-direction: column;\n}\n.example-functions-panel .example-functions-panel-header-bar {\n  display: flex;\n  justify-content: flex-end;\n}\n.example-functions-panel .example-functions-panel-section {\n  padding: 8px 0px;\n}", "",{"version":3,"sources":["webpack://./src/layout-grid/panels/exampleFunctions.scss"],"names":[],"mappings":"AAAA;EACI,YAAA;EACA,aAAA;EACA,sBAAA;AACJ;AACI;EACI,aAAA;EACA,yBAAA;AACR;AAEI;EACI,gBAAA;AAAR","sourcesContent":[".example-functions-panel {\n    padding: 5px;\n    display: flex;\n    flex-direction: column;\n\n    .example-functions-panel-header-bar {\n        display: flex;\n        justify-content: flex-end;\n    }\n\n    .example-functions-panel-section {\n        padding: 8px 0px;\n    }\n}\n"],"sourceRoot":""}]);
 // Exports
@@ -3279,24 +109,24 @@ ___CSS_LOADER_EXPORT___.push([module.id, ".example-functions-panel {\n  padding:
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/splitPanel.scss":
-/*!**************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/splitPanel.scss ***!
-  \**************************************************************************************************************************/
+/***/ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/splitPanel.scss":
+/*!******************************************************************************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/splitPanel.scss ***!
+  \******************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/cssWithMappingToString.js */ "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js");
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "../../node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "../../node_modules/css-loader/dist/runtime/api.js");
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
 // Imports
 
 
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "", "",{"version":3,"sources":[],"names":[],"mappings":"","sourceRoot":""}]);
 // Exports
@@ -3305,24 +135,24 @@ ___CSS_LOADER_EXPORT___.push([module.id, "", "",{"version":3,"sources":[],"names
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/splitview/splitview.scss":
-/*!******************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/splitview/splitview.scss ***!
-  \******************************************************************************************************************************/
+/***/ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/splitview/splitview.scss":
+/*!**********************************************************************************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/splitview/splitview.scss ***!
+  \**********************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/cssWithMappingToString.js */ "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js");
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "../../node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../../node_modules/css-loader/dist/runtime/api.js */ "../../node_modules/css-loader/dist/runtime/api.js");
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
 // Imports
 
 
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, ".splitview-demo-container {\n  width: 100%;\n  padding: 0px 20px;\n  box-sizing: border-box;\n}\n.splitview-demo-container .splitview-demo-content {\n  display: flex;\n  --dv-separator-border: white;\n}\n.splitview-demo-container.vertical .api-parameter {\n  padding-left: 10px;\n}\n.splitview-demo-container.vertical .splitview-demo-view {\n  height: 500px;\n  width: 150px;\n}\n.splitview-demo-container.vertical .splitview-demo-view .api-parameter {\n  padding-left: 0px;\n}\n.splitview-demo-container.horizontal .splitview-demo-content {\n  flex-direction: column;\n}\n.splitview-demo-container.horizontal .api-parameter {\n  padding-top: 10px;\n}\n.splitview-demo-container.horizontal .splitview-demo-view {\n  height: 180px;\n  width: 500px;\n}\n.splitview-demo-container.horizontal .splitview-demo-view .api-parameter {\n  padding-top: 0px;\n}\n\n.api-parameter {\n  display: grid;\n  grid-template-columns: 70px 50px;\n  grid-auto-rows: 18px;\n}\n.api-parameter span:nth-child(2n) {\n  text-align: right;\n}\n.api-parameter .visibility-toggle {\n  height: 16px;\n  outline: 1px solid dodgerblue;\n  outline-offset: -1px;\n  padding: 0px 4px;\n  display: flex;\n  cursor: pointer;\n}\n.api-parameter .visibility-toggle:not(:first-child) {\n  margin-left: 4px;\n}\n\n.splitview-demo-panel {\n  background-color: #2d2d2d;\n  height: 100%;\n  padding: 10px;\n  box-sizing: border-box;\n  overflow: hidden;\n}", "",{"version":3,"sources":["webpack://./src/panels/splitview/splitview.scss"],"names":[],"mappings":"AAAA;EACI,WAAA;EACA,iBAAA;EACA,sBAAA;AACJ;AACI;EACI,aAAA;EACA,4BAAA;AACR;AAGQ;EACI,kBAAA;AADZ;AAIQ;EACI,aAAA;EACA,YAAA;AAFZ;AAIY;EACI,iBAAA;AAFhB;AAOQ;EACI,sBAAA;AALZ;AAQQ;EACI,iBAAA;AANZ;AASQ;EACI,aAAA;EACA,YAAA;AAPZ;AASY;EACI,gBAAA;AAPhB;;AAaA;EACI,aAAA;EACA,gCAAA;EACA,oBAAA;AAVJ;AAaQ;EACI,iBAAA;AAXZ;AAeI;EACI,YAAA;EACA,6BAAA;EACA,oBAAA;EACA,gBAAA;EACA,aAAA;EACA,eAAA;AAbR;AAeQ;EACI,gBAAA;AAbZ;;AAkBA;EACI,yBAAA;EACA,YAAA;EACA,aAAA;EACA,sBAAA;EACA,gBAAA;AAfJ","sourcesContent":[".splitview-demo-container {\n    width: 100%;\n    padding: 0px 20px;\n    box-sizing: border-box;\n\n    .splitview-demo-content {\n        display: flex;\n        --dv-separator-border: white;\n    }\n\n    &.vertical {\n        .api-parameter {\n            padding-left: 10px;\n        }\n\n        .splitview-demo-view {\n            height: 500px;\n            width: 150px;\n\n            .api-parameter {\n                padding-left: 0px;\n            }\n        }\n    }\n    &.horizontal {\n        .splitview-demo-content {\n            flex-direction: column;\n        }\n\n        .api-parameter {\n            padding-top: 10px;\n        }\n\n        .splitview-demo-view {\n            height: 180px;\n            width: 500px;\n\n            .api-parameter {\n                padding-top: 0px;\n            }\n        }\n    }\n}\n\n.api-parameter {\n    display: grid;\n    grid-template-columns: 70px 50px;\n    grid-auto-rows: 18px;\n\n    span {\n        &:nth-child(2n) {\n            text-align: right;\n        }\n    }\n\n    .visibility-toggle {\n        height: 16px;\n        outline: 1px solid dodgerblue;\n        outline-offset: -1px;\n        padding: 0px 4px;\n        display: flex;\n        cursor: pointer;\n\n        &:not(:first-child) {\n            margin-left: 4px;\n        }\n    }\n}\n\n.splitview-demo-panel {\n    background-color: #2d2d2d;\n    height: 100%;\n    padding: 10px;\n    box-sizing: border-box;\n    overflow: hidden;\n}\n"],"sourceRoot":""}]);
 // Exports
@@ -3331,24 +161,24 @@ ___CSS_LOADER_EXPORT___.push([module.id, ".splitview-demo-container {\n  width: 
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/welcome/welcome.scss":
-/*!**************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/welcome/welcome.scss ***!
-  \**************************************************************************************************************************/
+/***/ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/welcome/welcome.scss":
+/*!******************************************************************************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/welcome/welcome.scss ***!
+  \******************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/cssWithMappingToString.js */ "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js");
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "../../node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../../node_modules/css-loader/dist/runtime/api.js */ "../../node_modules/css-loader/dist/runtime/api.js");
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
 // Imports
 
 
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, ".welcome-panel {\n  color: #cccccc;\n  margin: 40px;\n}\n.welcome-panel .welcome-header {\n  margin-bottom: 40px;\n}\n.welcome-panel .welcome-header h1 {\n  font-size: 30px;\n}\n.welcome-panel .welcome-header h2 {\n  font-size: 20px;\n}\n.welcome-panel .directory .directory-title {\n  font-size: 16px;\n  height: 25px;\n  line-height: 25px;\n}\n.welcome-panel .directory .directory-item {\n  font-size: 13px;\n  height: 20px;\n  line-height: 20px;\n  color: dodgerblue;\n  cursor: pointer;\n}\n.welcome-panel .directory .directory-item:hover {\n  text-decoration: underline;\n}", "",{"version":3,"sources":["webpack://./src/panels/welcome/welcome.scss"],"names":[],"mappings":"AAAA;EACI,cAAA;EACA,YAAA;AACJ;AACI;EACI,mBAAA;AACR;AAAQ;EACI,eAAA;AAEZ;AAAQ;EACI,eAAA;AAEZ;AAGQ;EACI,eAAA;EACA,YAAA;EACA,iBAAA;AADZ;AAGQ;EACI,eAAA;EACA,YAAA;EACA,iBAAA;EACA,iBAAA;EACA,eAAA;AADZ;AAGY;EACI,0BAAA;AADhB","sourcesContent":[".welcome-panel {\n    color: #cccccc;\n    margin: 40px;\n\n    .welcome-header {\n        margin-bottom: 40px;\n        h1 {\n            font-size: 30px;\n        }\n        h2 {\n            font-size: 20px;\n        }\n    }\n\n    .directory {\n        .directory-title {\n            font-size: 16px;\n            height: 25px;\n            line-height: 25px;\n        }\n        .directory-item {\n            font-size: 13px;\n            height: 20px;\n            line-height: 20px;\n            color: dodgerblue;\n            cursor: pointer;\n\n            &:hover {\n                text-decoration: underline;\n            }\n        }\n    }\n}\n"],"sourceRoot":""}]);
 // Exports
@@ -3357,24 +187,24 @@ ___CSS_LOADER_EXPORT___.push([module.id, ".welcome-panel {\n  color: #cccccc;\n 
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/services/widgets.scss":
-/*!********************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/services/widgets.scss ***!
-  \********************************************************************************************************************/
+/***/ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/services/widgets.scss":
+/*!************************************************************************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/services/widgets.scss ***!
+  \************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/cssWithMappingToString.js */ "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js");
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "../../node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "../../node_modules/css-loader/dist/runtime/api.js");
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
 // Imports
 
 
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, ".sidebar-part {\n  background-color: #252526;\n}\n\n.activity-bar-part {\n  background-color: #333333;\n}\n.activity-bar-part .activity-bar-item {\n  display: flex;\n  cursor: pointer;\n  justify-content: center;\n  align-items: center;\n  height: 48px;\n  box-sizing: border-box;\n  position: relative;\n  color: grey;\n  font-size: 24px;\n}\n.activity-bar-part .activity-bar-item:hover, .activity-bar-part .activity-bar-item.active {\n  color: white;\n}\n.activity-bar-part .activity-bar-space {\n  height: 100%;\n}\n.activity-bar-part .activity-bar-space.activity-bar-space-dragover {\n  border-top: 2px solid white;\n}", "",{"version":3,"sources":["webpack://./src/services/widgets.scss"],"names":[],"mappings":"AAAA;EACI,yBAAA;AACJ;;AAEA;EACI,yBAAA;AACJ;AACI;EACI,aAAA;EACA,eAAA;EACA,uBAAA;EACA,mBAAA;EACA,YAAA;EACA,sBAAA;EACA,kBAAA;EACA,WAAA;EACA,eAAA;AACR;AACQ;EAEI,YAAA;AAAZ;AAII;EACI,YAAA;AAFR;AAIQ;EACI,2BAAA;AAFZ","sourcesContent":[".sidebar-part {\n    background-color: #252526;\n}\n\n.activity-bar-part {\n    background-color: #333333;\n\n    .activity-bar-item {\n        display: flex;\n        cursor: pointer;\n        justify-content: center;\n        align-items: center;\n        height: 48px;\n        box-sizing: border-box;\n        position: relative;\n        color: grey;\n        font-size: 24px;\n\n        &:hover,\n        &.active {\n            color: white;\n        }\n    }\n\n    .activity-bar-space {\n        height: 100%;\n\n        &.activity-bar-space-dragover {\n            border-top: 2px solid white;\n        }\n    }\n}\n"],"sourceRoot":""}]);
 // Exports
@@ -3383,36 +213,41 @@ ___CSS_LOADER_EXPORT___.push([module.id, ".sidebar-part {\n  background-color: #
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js!../dockview/dist/styles/dockview.css":
-/*!**********************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!../dockview/dist/styles/dockview.css ***!
-  \**********************************************************************************/
+/***/ "../../node_modules/css-loader/dist/cjs.js!../dockview/dist/styles/dockview.css":
+/*!**************************************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/cjs.js!../dockview/dist/styles/dockview.css ***!
+  \**************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _dockview_demo_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../dockview-demo/node_modules/css-loader/dist/runtime/cssWithMappingToString.js */ "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js");
-/* harmony import */ var _dockview_demo_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_dockview_demo_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _dockview_demo_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../dockview-demo/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
-/* harmony import */ var _dockview_demo_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_dockview_demo_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "../../node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "../../node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/getUrl.js */ "../../node_modules/css-loader/dist/runtime/getUrl.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2__);
 // Imports
 
 
-var ___CSS_LOADER_EXPORT___ = _dockview_demo_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_dockview_demo_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
+
+var ___CSS_LOADER_URL_IMPORT_0___ = new URL(/* asset import */ __webpack_require__(/*! data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg> */ "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>"), __webpack_require__.b);
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+var ___CSS_LOADER_URL_REPLACEMENT_0___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(___CSS_LOADER_URL_IMPORT_0___);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".dockview-theme-dark {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n}\n\n.dockview-theme-light {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: white;\n  --dv-tabs-and-actions-container-background-color: #f3f3f3;\n  --dv-activegroup-visiblepanel-tab-background-color: white;\n  --dv-activegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-inactivegroup-visiblepanel-tab-background-color: white;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-tab-divider-color: white;\n  --dv-activegroup-visiblepanel-tab-color: rgb(51, 51, 51);\n  --dv-activegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-visiblepanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.35);\n  --dv-separator-border: rgba(128, 128, 128, 0.35);\n  --dv-paneview-header-border-color: rgb(51, 51, 51);\n}\n\n.dockview-theme-vs {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n  --dv-activegroup-visiblepanel-tab-background-color: dodgerblue;\n  --dv-tabs-and-actions-container-height: 18px;\n  --dv-tabs-and-actions-container-font-size: 11px;\n}\n.dockview-theme-vs .groupview.active-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-activegroup-visiblepanel-tab-background-color);\n}\n.dockview-theme-vs .groupview.inactive-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-inactivegroup-visiblepanel-tab-background-color);\n}\n.actions-bar {\n  text-align: right;\n  width: 28px;\n  display: flex;\n  align-items: center;\n  flex-shrink: 0;\n}\n.actions-bar .actions-container {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.actions-bar .actions-container a:active {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.actions-bar .actions-container .close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n  cursor: pointer;\n}\n.drop-target {\n  position: relative;\n}\n.drop-target > .drop-target-dropzone {\n  position: absolute;\n  left: 0px;\n  top: 0px;\n  height: 100%;\n  width: 100%;\n  z-index: 10000;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection {\n  position: relative;\n  box-sizing: border-box;\n  height: 100%;\n  width: 100%;\n  background-color: var(--dv-drag-over-background-color);\n  transition: top 70ms ease-out, left 70ms ease-out, width 70ms ease-out, height 70ms ease-out, opacity 0.15s ease-out;\n  will-change: transform;\n  pointer-events: none;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.left {\n  transform: translateX(-25%) scaleX(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.right {\n  transform: translateX(25%) scaleX(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.top {\n  transform: translateY(-25%) scaleY(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n  transform: translateY(25%) scaleY(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-top {\n  border-top: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-bottom {\n  border-bottom: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-left {\n  border-left: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-right {\n  border-right: 1px solid var(--dv-drag-over-border-color);\n}\n.custom-dragging {\n  height: 24px;\n  line-height: 24px;\n  font-size: 11px;\n  width: 100px;\n  background-color: dodgerblue;\n  color: ghostwhite;\n  border-radius: 11px;\n  position: absolute;\n  padding-left: 10px;\n}\n\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-background-color);\n  color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n\n/**\n * when a tab is dragged we lose the above stylings because they are conditional on parent elements\n * therefore we also set some stylings for the dragging event\n **/\n.tab.dragging {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.grid-view,\n.branch-node {\n  height: 100%;\n  width: 100%;\n}\n.groupview {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  background-color: var(--dv-group-view-background-color);\n  overflow: hidden;\n}\n.groupview:focus {\n  outline: none;\n}\n.groupview.empty > .tabs-and-actions-container {\n  display: none;\n}\n.groupview > .content-container {\n  flex-grow: 1;\n  overflow: hidden;\n  outline: none;\n}\n.pane-container {\n  height: 100%;\n  width: 100%;\n}\n.pane-container.animated .view {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.pane-container .view {\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  padding: 0px !important;\n}\n.pane-container .view:not(:first-child)::before {\n  background-color: transparent !important;\n}\n.pane-container .view:not(:first-child) .pane > .pane-header {\n  border-top: 1px solid var(--dv-paneview-header-border-color);\n}\n.pane-container .view .default-header {\n  background-color: var(--dv-group-view-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n  display: flex;\n  padding: 0px 8px;\n}\n.pane-container .view .default-header > span {\n  flex-grow: 1;\n}\n.pane-container:first-of-type > .pane > .pane-header {\n  border-top: none !important;\n}\n.pane-container .pane {\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  height: 100%;\n}\n.pane-container .pane .pane-header {\n  box-sizing: border-box;\n  user-select: none;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-header.pane-draggable {\n  cursor: pointer;\n}\n.pane-container .pane .pane-header:focus:before, .pane-container .pane .pane-header:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.pane-container .pane .pane-body {\n  overflow-y: auto;\n  overflow-x: hidden;\n  flex-grow: 1;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-body:focus:before, .pane-container .pane .pane-body:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.tabs-and-actions-container {\n  display: flex;\n  background-color: var(--dv-tabs-and-actions-container-background-color);\n  flex-shrink: 0;\n  box-sizing: border-box;\n  height: var(--dv-tabs-and-actions-container-height);\n  font-size: var(--dv-tabs-and-actions-container-font-size);\n}\n.tabs-and-actions-container.hidden {\n  display: none;\n}\n.tabs-and-actions-container .void-container {\n  display: flex;\n  flex-grow: 1;\n}\n.tabs-and-actions-container .tabs-container {\n  display: flex;\n  overflow-x: overlay;\n  overflow-y: hidden;\n  scrollbar-width: thin;\n  /* Track */\n  /* Handle */\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar {\n  height: 3px;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-track {\n  background: transparent;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-thumb {\n  background: var(--dv-tabs-container-scrollbar-color);\n}\n.tabs-and-actions-container .tabs-container .tab {\n  -webkit-user-drag: element;\n  outline: none;\n  min-width: 75px;\n  cursor: pointer;\n  position: relative;\n  box-sizing: border-box;\n}\n.tabs-and-actions-container .tabs-container .tab:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-tab-divider-color);\n  width: 1px;\n  height: 100%;\n}\n.dockview-react-part {\n  height: 100%;\n  width: 100%;\n}\n.split-view-container {\n  position: relative;\n  overflow: hidden;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container.animation .view,\n.split-view-container.animation .sash {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.split-view-container.horizontal {\n  height: 100%;\n}\n.split-view-container.horizontal > .sash-container > .sash {\n  height: 100%;\n  width: 4px;\n}\n.split-view-container.horizontal > .sash-container > .sash.enabled {\n  cursor: ew-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.horizontal > .sash-container > .sash.maximum {\n  cursor: w-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.minimum {\n  cursor: e-resize;\n}\n.split-view-container.horizontal > .view-container > .view:not(:first-child)::before {\n  height: 100%;\n  width: 1px;\n}\n.split-view-container.vertical {\n  width: 100%;\n}\n.split-view-container.vertical > .sash-container > .sash {\n  width: 100%;\n  height: 4px;\n}\n.split-view-container.vertical > .sash-container > .sash.enabled {\n  cursor: ns-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.vertical > .sash-container > .sash.maximum {\n  cursor: n-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.minimum {\n  cursor: s-resize;\n}\n.split-view-container.vertical > .view-container > .view {\n  width: 100%;\n}\n.split-view-container.vertical > .view-container > .view:not(:first-child)::before {\n  height: 1px;\n  width: 100%;\n}\n.split-view-container .sash-container {\n  height: 100%;\n  width: 100%;\n  position: absolute;\n}\n.split-view-container .sash-container .sash {\n  position: absolute;\n  z-index: 99;\n  outline: none;\n}\n.split-view-container .sash-container .sash:active {\n  transition: background-color 0.1s ease-in-out;\n  background-color: var(--dv-active-sash-color, transparent);\n}\n.split-view-container .sash-container .sash:hover {\n  background-color: var(--dv-active-sash-color, transparent);\n  transition: background-color 0.1s ease-in-out;\n  transition-delay: 0.5s;\n}\n.split-view-container .view-container {\n  position: relative;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container .view-container .view {\n  height: 100%;\n  box-sizing: border-box;\n  overflow: auto;\n  position: absolute;\n}\n.split-view-container.separator-border .view:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-separator-border);\n}\n.dragged {\n  transform: translate3d(0px, 0px, 0px);\n  /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */\n}\n\n.tab {\n  flex-shrink: 0;\n}\n.tab.dragging .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.tab.active-tab > .default-tab .tab-action {\n  visibility: visible;\n}\n.tab.inactive-tab > .default-tab .tab-action {\n  visibility: hidden;\n}\n.tab.inactive-tab > .default-tab:hover .tab-action {\n  visibility: visible;\n}\n.tab .default-tab {\n  position: relative;\n  height: 100%;\n  display: flex;\n  min-width: 80px;\n  align-items: center;\n  padding-left: 10px;\n  white-space: nowrap;\n  text-overflow: elipsis;\n}\n.tab .default-tab .tab-content {\n  flex-grow: 1;\n}\n.tab .default-tab .action-container {\n  text-align: right;\n  width: 28px;\n  display: flex;\n}\n.tab .default-tab .action-container .tab-list {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.tab .default-tab .action-container .tab-list a:active:hover {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.tab .default-tab .action-container .tab-list .tab-action {\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n}\n.tab .default-tab .action-container .tab-list .tab-action.disable-close {\n  display: none;\n}\n.watermark {\n  display: flex;\n  width: 100%;\n}\n.watermark.has-actions .watermark-title .actions-bar {\n  display: none;\n}\n.watermark .watermark-title {\n  height: 35px;\n  width: 100%;\n  display: flex;\n}\n.watermark .watermark-content {\n  flex-grow: 1;\n}", "",{"version":3,"sources":["webpack://./../dockview/dist/styles/dockview.css"],"names":[],"mappings":"AAAA;EACE,8CAA8C;EAC9C,+CAA+C;EAC/C,4CAA4C;EAC5C,mSAAmS;EACnS,sDAAsD;EACtD,kCAAkC;EAClC,yCAAyC;EACzC,yCAAyC;EACzC,yDAAyD;EACzD,2DAA2D;EAC3D,0DAA0D;EAC1D,6DAA6D;EAC7D,4DAA4D;EAC5D,+BAA+B;EAC/B,8CAA8C;EAC9C,+CAA+C;EAC/C,kDAAkD;EAClD,iDAAiD;EACjD,sCAAsC;EACtC,2DAA2D;AAC7D;;AAEA;EACE,8CAA8C;EAC9C,+CAA+C;EAC/C,4CAA4C;EAC5C,mSAAmS;EACnS,sDAAsD;EACtD,kCAAkC;EAClC,yCAAyC;EACzC,uCAAuC;EACvC,yDAAyD;EACzD,yDAAyD;EACzD,0DAA0D;EAC1D,2DAA2D;EAC3D,4DAA4D;EAC5D,6BAA6B;EAC7B,wDAAwD;EACxD,6DAA6D;EAC7D,gEAAgE;EAChE,gEAAgE;EAChE,gDAAgD;EAChD,kDAAkD;AACpD;;AAEA;EACE,8CAA8C;EAC9C,+CAA+C;EAC/C,4CAA4C;EAC5C,mSAAmS;EACnS,sDAAsD;EACtD,kCAAkC;EAClC,yCAAyC;EACzC,yCAAyC;EACzC,yDAAyD;EACzD,2DAA2D;EAC3D,0DAA0D;EAC1D,6DAA6D;EAC7D,4DAA4D;EAC5D,+BAA+B;EAC/B,8CAA8C;EAC9C,+CAA+C;EAC/C,kDAAkD;EAClD,iDAAiD;EACjD,sCAAsC;EACtC,2DAA2D;EAC3D,8DAA8D;EAC9D,4CAA4C;EAC5C,+CAA+C;AACjD;AACA;EACE,gFAAgF;AAClF;AACA;EACE,kFAAkF;AACpF;AACA;EACE,iBAAiB;EACjB,WAAW;EACX,aAAa;EACb,mBAAmB;EACnB,cAAc;AAChB;AACA;EACE,aAAa;EACb,YAAY;EACZ,WAAW;EACX,yBAAyB;AAC3B;AACA;EACE,uCAAuC;EACvC,+BAA+B;AACjC;AACA;EACE,uBAAuB;EACvB,YAAY;EACZ,WAAW;EACX,cAAc;EACd,gEAAgE;EAChE,wDAAwD;EACxD,qBAAqB;EACrB,eAAe;AACjB;AACA;EACE,kBAAkB;AACpB;AACA;EACE,kBAAkB;EAClB,SAAS;EACT,QAAQ;EACR,YAAY;EACZ,WAAW;EACX,cAAc;AAChB;AACA;EACE,kBAAkB;EAClB,sBAAsB;EACtB,YAAY;EACZ,WAAW;EACX,sDAAsD;EACtD,oHAAoH;EACpH,sBAAsB;EACtB,oBAAoB;AACtB;AACA;EACE,uCAAuC;AACzC;AACA;EACE,sCAAsC;AACxC;AACA;EACE,uCAAuC;AACzC;AACA;EACE,sCAAsC;AACxC;AACA;EACE,sDAAsD;AACxD;AACA;EACE,yDAAyD;AAC3D;AACA;EACE,uDAAuD;AACzD;AACA;EACE,wDAAwD;AAC1D;AACA;EACE,YAAY;EACZ,iBAAiB;EACjB,eAAe;EACf,YAAY;EACZ,4BAA4B;EAC5B,iBAAiB;EACjB,mBAAmB;EACnB,kBAAkB;EAClB,kBAAkB;AACpB;;AAEA;EACE,yEAAyE;EACzE,mDAAmD;AACrD;AACA;EACE,8DAA8D;AAChE;AACA;EACE,wEAAwE;EACxE,kDAAkD;AACpD;AACA;EACE,6DAA6D;AAC/D;AACA;EACE,2EAA2E;EAC3E,qDAAqD;AACvD;AACA;EACE,gEAAgE;AAClE;AACA;EACE,0EAA0E;EAC1E,oDAAoD;AACtD;AACA;EACE,+DAA+D;AACjE;;AAEA;;;GAGG;AACH;EACE,yEAAyE;EACzE,mDAAmD;AACrD;AACA;;EAEE,YAAY;EACZ,WAAW;AACb;AACA;EACE,aAAa;EACb,sBAAsB;EACtB,YAAY;EACZ,uDAAuD;EACvD,gBAAgB;AAClB;AACA;EACE,aAAa;AACf;AACA;EACE,aAAa;AACf;AACA;EACE,YAAY;EACZ,gBAAgB;EAChB,aAAa;AACf;AACA;EACE,YAAY;EACZ,WAAW;AACb;AACA;EACE,0BAA0B;EAC1B,oCAAoC;AACtC;AACA;EACE,gBAAgB;EAChB,aAAa;EACb,sBAAsB;EACtB,uBAAuB;AACzB;AACA;EACE,wCAAwC;AAC1C;AACA;EACE,4DAA4D;AAC9D;AACA;EACE,uDAAuD;EACvD,mDAAmD;EACnD,aAAa;EACb,gBAAgB;AAClB;AACA;EACE,YAAY;AACd;AACA;EACE,2BAA2B;AAC7B;AACA;EACE,aAAa;EACb,sBAAsB;EACtB,gBAAgB;EAChB,YAAY;AACd;AACA;EACE,sBAAsB;EACtB,iBAAiB;EACjB,kBAAkB;EAClB,aAAa;AACf;AACA;EACE,eAAe;AACjB;AACA;EACE,kBAAkB;EAClB,MAAM;EACN,OAAO;EACP,WAAW;EACX,YAAY;EACZ,UAAU;EACV,WAAW;EACX,oBAAoB;EACpB,kBAAkB;EAClB,mBAAmB;EACnB,oBAAoB;EACpB,oBAAoB;EACpB,sDAAsD;AACxD;AACA;EACE,gBAAgB;EAChB,kBAAkB;EAClB,YAAY;EACZ,kBAAkB;EAClB,aAAa;AACf;AACA;EACE,kBAAkB;EAClB,MAAM;EACN,OAAO;EACP,WAAW;EACX,YAAY;EACZ,UAAU;EACV,WAAW;EACX,oBAAoB;EACpB,kBAAkB;EAClB,mBAAmB;EACnB,oBAAoB;EACpB,oBAAoB;EACpB,sDAAsD;AACxD;AACA;EACE,aAAa;EACb,uEAAuE;EACvE,cAAc;EACd,sBAAsB;EACtB,mDAAmD;EACnD,yDAAyD;AAC3D;AACA;EACE,aAAa;AACf;AACA;EACE,aAAa;EACb,YAAY;AACd;AACA;EACE,aAAa;EACb,mBAAmB;EACnB,kBAAkB;EAClB,qBAAqB;EACrB,UAAU;EACV,WAAW;AACb;AACA;EACE,WAAW;AACb;AACA;EACE,uBAAuB;AACzB;AACA;EACE,oDAAoD;AACtD;AACA;EACE,0BAA0B;EAC1B,aAAa;EACb,eAAe;EACf,eAAe;EACf,kBAAkB;EAClB,sBAAsB;AACxB;AACA;EACE,YAAY;EACZ,kBAAkB;EAClB,MAAM;EACN,OAAO;EACP,UAAU;EACV,oBAAoB;EACpB,6CAA6C;EAC7C,UAAU;EACV,YAAY;AACd;AACA;EACE,YAAY;EACZ,WAAW;AACb;AACA;EACE,kBAAkB;EAClB,gBAAgB;EAChB,YAAY;EACZ,WAAW;AACb;AACA;;EAEE,0BAA0B;EAC1B,oCAAoC;AACtC;AACA;EACE,YAAY;AACd;AACA;EACE,YAAY;EACZ,UAAU;AACZ;AACA;EACE,iBAAiB;AACnB;AACA;EACE,eAAe;AACjB;AACA;EACE,gBAAgB;AAClB;AACA;EACE,gBAAgB;AAClB;AACA;EACE,YAAY;EACZ,UAAU;AACZ;AACA;EACE,WAAW;AACb;AACA;EACE,WAAW;EACX,WAAW;AACb;AACA;EACE,iBAAiB;AACnB;AACA;EACE,eAAe;AACjB;AACA;EACE,gBAAgB;AAClB;AACA;EACE,gBAAgB;AAClB;AACA;EACE,WAAW;AACb;AACA;EACE,WAAW;EACX,WAAW;AACb;AACA;EACE,YAAY;EACZ,WAAW;EACX,kBAAkB;AACpB;AACA;EACE,kBAAkB;EAClB,WAAW;EACX,aAAa;AACf;AACA;EACE,6CAA6C;EAC7C,0DAA0D;AAC5D;AACA;EACE,0DAA0D;EAC1D,6CAA6C;EAC7C,sBAAsB;AACxB;AACA;EACE,kBAAkB;EAClB,YAAY;EACZ,WAAW;AACb;AACA;EACE,YAAY;EACZ,sBAAsB;EACtB,cAAc;EACd,kBAAkB;AACpB;AACA;EACE,YAAY;EACZ,kBAAkB;EAClB,MAAM;EACN,OAAO;EACP,UAAU;EACV,oBAAoB;EACpB,4CAA4C;AAC9C;AACA;EACE,qCAAqC;EACrC,sGAAsG;AACxG;;AAEA;EACE,cAAc;AAChB;AACA;EACE,8DAA8D;AAChE;AACA;EACE,mBAAmB;AACrB;AACA;EACE,kBAAkB;AACpB;AACA;EACE,mBAAmB;AACrB;AACA;EACE,kBAAkB;EAClB,YAAY;EACZ,aAAa;EACb,eAAe;EACf,mBAAmB;EACnB,kBAAkB;EAClB,mBAAmB;EACnB,sBAAsB;AACxB;AACA;EACE,YAAY;AACd;AACA;EACE,iBAAiB;EACjB,WAAW;EACX,aAAa;AACf;AACA;EACE,aAAa;EACb,YAAY;EACZ,WAAW;EACX,yBAAyB;AAC3B;AACA;EACE,uCAAuC;EACvC,+BAA+B;AACjC;AACA;EACE,YAAY;EACZ,WAAW;EACX,cAAc;EACd,gEAAgE;EAChE,wDAAwD;EACxD,qBAAqB;AACvB;AACA;EACE,aAAa;AACf;AACA;EACE,aAAa;EACb,WAAW;AACb;AACA;EACE,aAAa;AACf;AACA;EACE,YAAY;EACZ,WAAW;EACX,aAAa;AACf;AACA;EACE,YAAY;AACd","sourcesContent":[".dockview-theme-dark {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n}\n\n.dockview-theme-light {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: white;\n  --dv-tabs-and-actions-container-background-color: #f3f3f3;\n  --dv-activegroup-visiblepanel-tab-background-color: white;\n  --dv-activegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-inactivegroup-visiblepanel-tab-background-color: white;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-tab-divider-color: white;\n  --dv-activegroup-visiblepanel-tab-color: rgb(51, 51, 51);\n  --dv-activegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-visiblepanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.35);\n  --dv-separator-border: rgba(128, 128, 128, 0.35);\n  --dv-paneview-header-border-color: rgb(51, 51, 51);\n}\n\n.dockview-theme-vs {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n  --dv-activegroup-visiblepanel-tab-background-color: dodgerblue;\n  --dv-tabs-and-actions-container-height: 18px;\n  --dv-tabs-and-actions-container-font-size: 11px;\n}\n.dockview-theme-vs .groupview.active-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-activegroup-visiblepanel-tab-background-color);\n}\n.dockview-theme-vs .groupview.inactive-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-inactivegroup-visiblepanel-tab-background-color);\n}\n.actions-bar {\n  text-align: right;\n  width: 28px;\n  display: flex;\n  align-items: center;\n  flex-shrink: 0;\n}\n.actions-bar .actions-container {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.actions-bar .actions-container a:active {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.actions-bar .actions-container .close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n  cursor: pointer;\n}\n.drop-target {\n  position: relative;\n}\n.drop-target > .drop-target-dropzone {\n  position: absolute;\n  left: 0px;\n  top: 0px;\n  height: 100%;\n  width: 100%;\n  z-index: 10000;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection {\n  position: relative;\n  box-sizing: border-box;\n  height: 100%;\n  width: 100%;\n  background-color: var(--dv-drag-over-background-color);\n  transition: top 70ms ease-out, left 70ms ease-out, width 70ms ease-out, height 70ms ease-out, opacity 0.15s ease-out;\n  will-change: transform;\n  pointer-events: none;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.left {\n  transform: translateX(-25%) scaleX(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.right {\n  transform: translateX(25%) scaleX(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.top {\n  transform: translateY(-25%) scaleY(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n  transform: translateY(25%) scaleY(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-top {\n  border-top: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-bottom {\n  border-bottom: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-left {\n  border-left: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-right {\n  border-right: 1px solid var(--dv-drag-over-border-color);\n}\n.custom-dragging {\n  height: 24px;\n  line-height: 24px;\n  font-size: 11px;\n  width: 100px;\n  background-color: dodgerblue;\n  color: ghostwhite;\n  border-radius: 11px;\n  position: absolute;\n  padding-left: 10px;\n}\n\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-background-color);\n  color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n\n/**\n * when a tab is dragged we lose the above stylings because they are conditional on parent elements\n * therefore we also set some stylings for the dragging event\n **/\n.tab.dragging {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.grid-view,\n.branch-node {\n  height: 100%;\n  width: 100%;\n}\n.groupview {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  background-color: var(--dv-group-view-background-color);\n  overflow: hidden;\n}\n.groupview:focus {\n  outline: none;\n}\n.groupview.empty > .tabs-and-actions-container {\n  display: none;\n}\n.groupview > .content-container {\n  flex-grow: 1;\n  overflow: hidden;\n  outline: none;\n}\n.pane-container {\n  height: 100%;\n  width: 100%;\n}\n.pane-container.animated .view {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.pane-container .view {\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  padding: 0px !important;\n}\n.pane-container .view:not(:first-child)::before {\n  background-color: transparent !important;\n}\n.pane-container .view:not(:first-child) .pane > .pane-header {\n  border-top: 1px solid var(--dv-paneview-header-border-color);\n}\n.pane-container .view .default-header {\n  background-color: var(--dv-group-view-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n  display: flex;\n  padding: 0px 8px;\n}\n.pane-container .view .default-header > span {\n  flex-grow: 1;\n}\n.pane-container:first-of-type > .pane > .pane-header {\n  border-top: none !important;\n}\n.pane-container .pane {\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  height: 100%;\n}\n.pane-container .pane .pane-header {\n  box-sizing: border-box;\n  user-select: none;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-header.pane-draggable {\n  cursor: pointer;\n}\n.pane-container .pane .pane-header:focus:before, .pane-container .pane .pane-header:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.pane-container .pane .pane-body {\n  overflow-y: auto;\n  overflow-x: hidden;\n  flex-grow: 1;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-body:focus:before, .pane-container .pane .pane-body:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.tabs-and-actions-container {\n  display: flex;\n  background-color: var(--dv-tabs-and-actions-container-background-color);\n  flex-shrink: 0;\n  box-sizing: border-box;\n  height: var(--dv-tabs-and-actions-container-height);\n  font-size: var(--dv-tabs-and-actions-container-font-size);\n}\n.tabs-and-actions-container.hidden {\n  display: none;\n}\n.tabs-and-actions-container .void-container {\n  display: flex;\n  flex-grow: 1;\n}\n.tabs-and-actions-container .tabs-container {\n  display: flex;\n  overflow-x: overlay;\n  overflow-y: hidden;\n  scrollbar-width: thin;\n  /* Track */\n  /* Handle */\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar {\n  height: 3px;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-track {\n  background: transparent;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-thumb {\n  background: var(--dv-tabs-container-scrollbar-color);\n}\n.tabs-and-actions-container .tabs-container .tab {\n  -webkit-user-drag: element;\n  outline: none;\n  min-width: 75px;\n  cursor: pointer;\n  position: relative;\n  box-sizing: border-box;\n}\n.tabs-and-actions-container .tabs-container .tab:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-tab-divider-color);\n  width: 1px;\n  height: 100%;\n}\n.dockview-react-part {\n  height: 100%;\n  width: 100%;\n}\n.split-view-container {\n  position: relative;\n  overflow: hidden;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container.animation .view,\n.split-view-container.animation .sash {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.split-view-container.horizontal {\n  height: 100%;\n}\n.split-view-container.horizontal > .sash-container > .sash {\n  height: 100%;\n  width: 4px;\n}\n.split-view-container.horizontal > .sash-container > .sash.enabled {\n  cursor: ew-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.horizontal > .sash-container > .sash.maximum {\n  cursor: w-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.minimum {\n  cursor: e-resize;\n}\n.split-view-container.horizontal > .view-container > .view:not(:first-child)::before {\n  height: 100%;\n  width: 1px;\n}\n.split-view-container.vertical {\n  width: 100%;\n}\n.split-view-container.vertical > .sash-container > .sash {\n  width: 100%;\n  height: 4px;\n}\n.split-view-container.vertical > .sash-container > .sash.enabled {\n  cursor: ns-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.vertical > .sash-container > .sash.maximum {\n  cursor: n-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.minimum {\n  cursor: s-resize;\n}\n.split-view-container.vertical > .view-container > .view {\n  width: 100%;\n}\n.split-view-container.vertical > .view-container > .view:not(:first-child)::before {\n  height: 1px;\n  width: 100%;\n}\n.split-view-container .sash-container {\n  height: 100%;\n  width: 100%;\n  position: absolute;\n}\n.split-view-container .sash-container .sash {\n  position: absolute;\n  z-index: 99;\n  outline: none;\n}\n.split-view-container .sash-container .sash:active {\n  transition: background-color 0.1s ease-in-out;\n  background-color: var(--dv-active-sash-color, transparent);\n}\n.split-view-container .sash-container .sash:hover {\n  background-color: var(--dv-active-sash-color, transparent);\n  transition: background-color 0.1s ease-in-out;\n  transition-delay: 0.5s;\n}\n.split-view-container .view-container {\n  position: relative;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container .view-container .view {\n  height: 100%;\n  box-sizing: border-box;\n  overflow: auto;\n  position: absolute;\n}\n.split-view-container.separator-border .view:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-separator-border);\n}\n.dragged {\n  transform: translate3d(0px, 0px, 0px);\n  /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */\n}\n\n.tab {\n  flex-shrink: 0;\n}\n.tab.dragging .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.tab.active-tab > .default-tab .tab-action {\n  visibility: visible;\n}\n.tab.inactive-tab > .default-tab .tab-action {\n  visibility: hidden;\n}\n.tab.inactive-tab > .default-tab:hover .tab-action {\n  visibility: visible;\n}\n.tab .default-tab {\n  position: relative;\n  height: 100%;\n  display: flex;\n  min-width: 80px;\n  align-items: center;\n  padding-left: 10px;\n  white-space: nowrap;\n  text-overflow: elipsis;\n}\n.tab .default-tab .tab-content {\n  flex-grow: 1;\n}\n.tab .default-tab .action-container {\n  text-align: right;\n  width: 28px;\n  display: flex;\n}\n.tab .default-tab .action-container .tab-list {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.tab .default-tab .action-container .tab-list a:active:hover {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.tab .default-tab .action-container .tab-list .tab-action {\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n}\n.tab .default-tab .action-container .tab-list .tab-action.disable-close {\n  display: none;\n}\n.watermark {\n  display: flex;\n  width: 100%;\n}\n.watermark.has-actions .watermark-title .actions-bar {\n  display: none;\n}\n.watermark .watermark-title {\n  height: 35px;\n  width: 100%;\n  display: flex;\n}\n.watermark .watermark-content {\n  flex-grow: 1;\n}"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, ".dockview-theme-dark {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n}\n\n.dockview-theme-light {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: white;\n  --dv-tabs-and-actions-container-background-color: #f3f3f3;\n  --dv-activegroup-visiblepanel-tab-background-color: white;\n  --dv-activegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-inactivegroup-visiblepanel-tab-background-color: white;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-tab-divider-color: white;\n  --dv-activegroup-visiblepanel-tab-color: rgb(51, 51, 51);\n  --dv-activegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-visiblepanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.35);\n  --dv-separator-border: rgba(128, 128, 128, 0.35);\n  --dv-paneview-header-border-color: rgb(51, 51, 51);\n}\n\n.dockview-theme-vs {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n  --dv-activegroup-visiblepanel-tab-background-color: dodgerblue;\n  --dv-tabs-and-actions-container-height: 18px;\n  --dv-tabs-and-actions-container-font-size: 11px;\n}\n.dockview-theme-vs .groupview.active-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-activegroup-visiblepanel-tab-background-color);\n}\n.dockview-theme-vs .groupview.inactive-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-inactivegroup-visiblepanel-tab-background-color);\n}\n.actions-bar {\n  text-align: right;\n  width: 28px;\n  display: flex;\n  align-items: center;\n  flex-shrink: 0;\n}\n.actions-bar .actions-container {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.actions-bar .actions-container a:active {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.actions-bar .actions-container .close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n  cursor: pointer;\n}\n.drop-target {\n  position: relative;\n}\n.drop-target > .drop-target-dropzone {\n  position: absolute;\n  left: 0px;\n  top: 0px;\n  height: 100%;\n  width: 100%;\n  z-index: 10000;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection {\n  position: relative;\n  box-sizing: border-box;\n  height: 100%;\n  width: 100%;\n  background-color: var(--dv-drag-over-background-color);\n  transition: top 70ms ease-out, left 70ms ease-out, width 70ms ease-out, height 70ms ease-out, opacity 0.15s ease-out;\n  will-change: transform;\n  pointer-events: none;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.left {\n  transform: translateX(-25%) scaleX(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.right {\n  transform: translateX(25%) scaleX(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.top {\n  transform: translateY(-25%) scaleY(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n  transform: translateY(25%) scaleY(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-top {\n  border-top: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-bottom {\n  border-bottom: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-left {\n  border-left: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-right {\n  border-right: 1px solid var(--dv-drag-over-border-color);\n}\n.custom-dragging {\n  height: 24px;\n  line-height: 24px;\n  font-size: 11px;\n  width: 100px;\n  background-color: dodgerblue;\n  color: ghostwhite;\n  border-radius: 11px;\n  position: absolute;\n  padding-left: 10px;\n}\n\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-background-color);\n  color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n\n/**\n * when a tab is dragged we lose the above stylings because they are conditional on parent elements\n * therefore we also set some stylings for the dragging event\n **/\n.tab.dragging {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.grid-view,\n.branch-node {\n  height: 100%;\n  width: 100%;\n}\n.groupview {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  background-color: var(--dv-group-view-background-color);\n  overflow: hidden;\n}\n.groupview:focus {\n  outline: none;\n}\n.groupview.empty > .tabs-and-actions-container {\n  display: none;\n}\n.groupview > .content-container {\n  flex-grow: 1;\n  overflow: hidden;\n  outline: none;\n}\n.pane-container {\n  height: 100%;\n  width: 100%;\n}\n.pane-container.animated .view {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.pane-container .view {\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  padding: 0px !important;\n}\n.pane-container .view:not(:first-child)::before {\n  background-color: transparent !important;\n}\n.pane-container .view:not(:first-child) .pane > .pane-header {\n  border-top: 1px solid var(--dv-paneview-header-border-color);\n}\n.pane-container .view .default-header {\n  background-color: var(--dv-group-view-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n  display: flex;\n  padding: 0px 8px;\n}\n.pane-container .view .default-header > span {\n  flex-grow: 1;\n}\n.pane-container:first-of-type > .pane > .pane-header {\n  border-top: none !important;\n}\n.pane-container .pane {\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  height: 100%;\n}\n.pane-container .pane .pane-header {\n  box-sizing: border-box;\n  user-select: none;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-header.pane-draggable {\n  cursor: pointer;\n}\n.pane-container .pane .pane-header:focus:before, .pane-container .pane .pane-header:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.pane-container .pane .pane-body {\n  overflow-y: auto;\n  overflow-x: hidden;\n  flex-grow: 1;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-body:focus:before, .pane-container .pane .pane-body:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.tabs-and-actions-container {\n  display: flex;\n  background-color: var(--dv-tabs-and-actions-container-background-color);\n  flex-shrink: 0;\n  box-sizing: border-box;\n  height: var(--dv-tabs-and-actions-container-height);\n  font-size: var(--dv-tabs-and-actions-container-font-size);\n}\n.tabs-and-actions-container.hidden {\n  display: none;\n}\n.tabs-and-actions-container .void-container {\n  display: flex;\n  flex-grow: 1;\n}\n.tabs-and-actions-container .tabs-container {\n  display: flex;\n  overflow-x: overlay;\n  overflow-y: hidden;\n  scrollbar-width: thin;\n  /* Track */\n  /* Handle */\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar {\n  height: 3px;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-track {\n  background: transparent;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-thumb {\n  background: var(--dv-tabs-container-scrollbar-color);\n}\n.tabs-and-actions-container .tabs-container .tab {\n  -webkit-user-drag: element;\n  outline: none;\n  min-width: 75px;\n  cursor: pointer;\n  position: relative;\n  box-sizing: border-box;\n}\n.tabs-and-actions-container .tabs-container .tab:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-tab-divider-color);\n  width: 1px;\n  height: 100%;\n}\n.dockview-react-part {\n  height: 100%;\n  width: 100%;\n}\n.split-view-container {\n  position: relative;\n  overflow: hidden;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container.animation .view,\n.split-view-container.animation .sash {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.split-view-container.horizontal {\n  height: 100%;\n}\n.split-view-container.horizontal > .sash-container > .sash {\n  height: 100%;\n  width: 4px;\n}\n.split-view-container.horizontal > .sash-container > .sash.enabled {\n  cursor: ew-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.horizontal > .sash-container > .sash.maximum {\n  cursor: w-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.minimum {\n  cursor: e-resize;\n}\n.split-view-container.horizontal > .view-container > .view:not(:first-child)::before {\n  height: 100%;\n  width: 1px;\n}\n.split-view-container.vertical {\n  width: 100%;\n}\n.split-view-container.vertical > .sash-container > .sash {\n  width: 100%;\n  height: 4px;\n}\n.split-view-container.vertical > .sash-container > .sash.enabled {\n  cursor: ns-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.vertical > .sash-container > .sash.maximum {\n  cursor: n-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.minimum {\n  cursor: s-resize;\n}\n.split-view-container.vertical > .view-container > .view {\n  width: 100%;\n}\n.split-view-container.vertical > .view-container > .view:not(:first-child)::before {\n  height: 1px;\n  width: 100%;\n}\n.split-view-container .sash-container {\n  height: 100%;\n  width: 100%;\n  position: absolute;\n}\n.split-view-container .sash-container .sash {\n  position: absolute;\n  z-index: 99;\n  outline: none;\n}\n.split-view-container .sash-container .sash:active {\n  transition: background-color 0.1s ease-in-out;\n  background-color: var(--dv-active-sash-color, transparent);\n}\n.split-view-container .sash-container .sash:hover {\n  background-color: var(--dv-active-sash-color, transparent);\n  transition: background-color 0.1s ease-in-out;\n  transition-delay: 0.5s;\n}\n.split-view-container .view-container {\n  position: relative;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container .view-container .view {\n  height: 100%;\n  box-sizing: border-box;\n  overflow: auto;\n  position: absolute;\n}\n.split-view-container.separator-border .view:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-separator-border);\n}\n.dragged {\n  transform: translate3d(0px, 0px, 0px);\n  /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */\n}\n\n.tab {\n  flex-shrink: 0;\n}\n.tab.dragging .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.tab.active-tab > .default-tab .tab-action {\n  visibility: visible;\n}\n.tab.inactive-tab > .default-tab .tab-action {\n  visibility: hidden;\n}\n.tab.inactive-tab > .default-tab:hover .tab-action {\n  visibility: visible;\n}\n.tab .default-tab {\n  position: relative;\n  height: 100%;\n  display: flex;\n  min-width: 80px;\n  align-items: center;\n  padding-left: 10px;\n  white-space: nowrap;\n  text-overflow: elipsis;\n}\n.tab .default-tab .tab-content {\n  flex-grow: 1;\n}\n.tab .default-tab .action-container {\n  text-align: right;\n  width: 28px;\n  display: flex;\n}\n.tab .default-tab .action-container .tab-list {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.tab .default-tab .action-container .tab-list a:active:hover {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.tab .default-tab .action-container .tab-list .tab-action {\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n}\n.tab .default-tab .action-container .tab-list .tab-action.disable-close {\n  display: none;\n}\n.watermark {\n  display: flex;\n  width: 100%;\n}\n.watermark.has-actions .watermark-title .actions-bar {\n  display: none;\n}\n.watermark .watermark-title {\n  height: 35px;\n  width: 100%;\n  display: flex;\n}\n.watermark .watermark-content {\n  flex-grow: 1;\n}", "",{"version":3,"sources":["webpack://./../dockview/dist/styles/dockview.css"],"names":[],"mappings":"AAAA;EACE,8CAA8C;EAC9C,+CAA+C;EAC/C,4CAA4C;EAC5C,4DAAmS;EACnS,sDAAsD;EACtD,kCAAkC;EAClC,yCAAyC;EACzC,yCAAyC;EACzC,yDAAyD;EACzD,2DAA2D;EAC3D,0DAA0D;EAC1D,6DAA6D;EAC7D,4DAA4D;EAC5D,+BAA+B;EAC/B,8CAA8C;EAC9C,+CAA+C;EAC/C,kDAAkD;EAClD,iDAAiD;EACjD,sCAAsC;EACtC,2DAA2D;AAC7D;;AAEA;EACE,8CAA8C;EAC9C,+CAA+C;EAC/C,4CAA4C;EAC5C,4DAAmS;EACnS,sDAAsD;EACtD,kCAAkC;EAClC,yCAAyC;EACzC,uCAAuC;EACvC,yDAAyD;EACzD,yDAAyD;EACzD,0DAA0D;EAC1D,2DAA2D;EAC3D,4DAA4D;EAC5D,6BAA6B;EAC7B,wDAAwD;EACxD,6DAA6D;EAC7D,gEAAgE;EAChE,gEAAgE;EAChE,gDAAgD;EAChD,kDAAkD;AACpD;;AAEA;EACE,8CAA8C;EAC9C,+CAA+C;EAC/C,4CAA4C;EAC5C,4DAAmS;EACnS,sDAAsD;EACtD,kCAAkC;EAClC,yCAAyC;EACzC,yCAAyC;EACzC,yDAAyD;EACzD,2DAA2D;EAC3D,0DAA0D;EAC1D,6DAA6D;EAC7D,4DAA4D;EAC5D,+BAA+B;EAC/B,8CAA8C;EAC9C,+CAA+C;EAC/C,kDAAkD;EAClD,iDAAiD;EACjD,sCAAsC;EACtC,2DAA2D;EAC3D,8DAA8D;EAC9D,4CAA4C;EAC5C,+CAA+C;AACjD;AACA;EACE,gFAAgF;AAClF;AACA;EACE,kFAAkF;AACpF;AACA;EACE,iBAAiB;EACjB,WAAW;EACX,aAAa;EACb,mBAAmB;EACnB,cAAc;AAChB;AACA;EACE,aAAa;EACb,YAAY;EACZ,WAAW;EACX,yBAAyB;AAC3B;AACA;EACE,uCAAuC;EACvC,+BAA+B;AACjC;AACA;EACE,uBAAuB;EACvB,YAAY;EACZ,WAAW;EACX,cAAc;EACd,gEAAgE;EAChE,wDAAwD;EACxD,qBAAqB;EACrB,eAAe;AACjB;AACA;EACE,kBAAkB;AACpB;AACA;EACE,kBAAkB;EAClB,SAAS;EACT,QAAQ;EACR,YAAY;EACZ,WAAW;EACX,cAAc;AAChB;AACA;EACE,kBAAkB;EAClB,sBAAsB;EACtB,YAAY;EACZ,WAAW;EACX,sDAAsD;EACtD,oHAAoH;EACpH,sBAAsB;EACtB,oBAAoB;AACtB;AACA;EACE,uCAAuC;AACzC;AACA;EACE,sCAAsC;AACxC;AACA;EACE,uCAAuC;AACzC;AACA;EACE,sCAAsC;AACxC;AACA;EACE,sDAAsD;AACxD;AACA;EACE,yDAAyD;AAC3D;AACA;EACE,uDAAuD;AACzD;AACA;EACE,wDAAwD;AAC1D;AACA;EACE,YAAY;EACZ,iBAAiB;EACjB,eAAe;EACf,YAAY;EACZ,4BAA4B;EAC5B,iBAAiB;EACjB,mBAAmB;EACnB,kBAAkB;EAClB,kBAAkB;AACpB;;AAEA;EACE,yEAAyE;EACzE,mDAAmD;AACrD;AACA;EACE,8DAA8D;AAChE;AACA;EACE,wEAAwE;EACxE,kDAAkD;AACpD;AACA;EACE,6DAA6D;AAC/D;AACA;EACE,2EAA2E;EAC3E,qDAAqD;AACvD;AACA;EACE,gEAAgE;AAClE;AACA;EACE,0EAA0E;EAC1E,oDAAoD;AACtD;AACA;EACE,+DAA+D;AACjE;;AAEA;;;GAGG;AACH;EACE,yEAAyE;EACzE,mDAAmD;AACrD;AACA;;EAEE,YAAY;EACZ,WAAW;AACb;AACA;EACE,aAAa;EACb,sBAAsB;EACtB,YAAY;EACZ,uDAAuD;EACvD,gBAAgB;AAClB;AACA;EACE,aAAa;AACf;AACA;EACE,aAAa;AACf;AACA;EACE,YAAY;EACZ,gBAAgB;EAChB,aAAa;AACf;AACA;EACE,YAAY;EACZ,WAAW;AACb;AACA;EACE,0BAA0B;EAC1B,oCAAoC;AACtC;AACA;EACE,gBAAgB;EAChB,aAAa;EACb,sBAAsB;EACtB,uBAAuB;AACzB;AACA;EACE,wCAAwC;AAC1C;AACA;EACE,4DAA4D;AAC9D;AACA;EACE,uDAAuD;EACvD,mDAAmD;EACnD,aAAa;EACb,gBAAgB;AAClB;AACA;EACE,YAAY;AACd;AACA;EACE,2BAA2B;AAC7B;AACA;EACE,aAAa;EACb,sBAAsB;EACtB,gBAAgB;EAChB,YAAY;AACd;AACA;EACE,sBAAsB;EACtB,iBAAiB;EACjB,kBAAkB;EAClB,aAAa;AACf;AACA;EACE,eAAe;AACjB;AACA;EACE,kBAAkB;EAClB,MAAM;EACN,OAAO;EACP,WAAW;EACX,YAAY;EACZ,UAAU;EACV,WAAW;EACX,oBAAoB;EACpB,kBAAkB;EAClB,mBAAmB;EACnB,oBAAoB;EACpB,oBAAoB;EACpB,sDAAsD;AACxD;AACA;EACE,gBAAgB;EAChB,kBAAkB;EAClB,YAAY;EACZ,kBAAkB;EAClB,aAAa;AACf;AACA;EACE,kBAAkB;EAClB,MAAM;EACN,OAAO;EACP,WAAW;EACX,YAAY;EACZ,UAAU;EACV,WAAW;EACX,oBAAoB;EACpB,kBAAkB;EAClB,mBAAmB;EACnB,oBAAoB;EACpB,oBAAoB;EACpB,sDAAsD;AACxD;AACA;EACE,aAAa;EACb,uEAAuE;EACvE,cAAc;EACd,sBAAsB;EACtB,mDAAmD;EACnD,yDAAyD;AAC3D;AACA;EACE,aAAa;AACf;AACA;EACE,aAAa;EACb,YAAY;AACd;AACA;EACE,aAAa;EACb,mBAAmB;EACnB,kBAAkB;EAClB,qBAAqB;EACrB,UAAU;EACV,WAAW;AACb;AACA;EACE,WAAW;AACb;AACA;EACE,uBAAuB;AACzB;AACA;EACE,oDAAoD;AACtD;AACA;EACE,0BAA0B;EAC1B,aAAa;EACb,eAAe;EACf,eAAe;EACf,kBAAkB;EAClB,sBAAsB;AACxB;AACA;EACE,YAAY;EACZ,kBAAkB;EAClB,MAAM;EACN,OAAO;EACP,UAAU;EACV,oBAAoB;EACpB,6CAA6C;EAC7C,UAAU;EACV,YAAY;AACd;AACA;EACE,YAAY;EACZ,WAAW;AACb;AACA;EACE,kBAAkB;EAClB,gBAAgB;EAChB,YAAY;EACZ,WAAW;AACb;AACA;;EAEE,0BAA0B;EAC1B,oCAAoC;AACtC;AACA;EACE,YAAY;AACd;AACA;EACE,YAAY;EACZ,UAAU;AACZ;AACA;EACE,iBAAiB;AACnB;AACA;EACE,eAAe;AACjB;AACA;EACE,gBAAgB;AAClB;AACA;EACE,gBAAgB;AAClB;AACA;EACE,YAAY;EACZ,UAAU;AACZ;AACA;EACE,WAAW;AACb;AACA;EACE,WAAW;EACX,WAAW;AACb;AACA;EACE,iBAAiB;AACnB;AACA;EACE,eAAe;AACjB;AACA;EACE,gBAAgB;AAClB;AACA;EACE,gBAAgB;AAClB;AACA;EACE,WAAW;AACb;AACA;EACE,WAAW;EACX,WAAW;AACb;AACA;EACE,YAAY;EACZ,WAAW;EACX,kBAAkB;AACpB;AACA;EACE,kBAAkB;EAClB,WAAW;EACX,aAAa;AACf;AACA;EACE,6CAA6C;EAC7C,0DAA0D;AAC5D;AACA;EACE,0DAA0D;EAC1D,6CAA6C;EAC7C,sBAAsB;AACxB;AACA;EACE,kBAAkB;EAClB,YAAY;EACZ,WAAW;AACb;AACA;EACE,YAAY;EACZ,sBAAsB;EACtB,cAAc;EACd,kBAAkB;AACpB;AACA;EACE,YAAY;EACZ,kBAAkB;EAClB,MAAM;EACN,OAAO;EACP,UAAU;EACV,oBAAoB;EACpB,4CAA4C;AAC9C;AACA;EACE,qCAAqC;EACrC,sGAAsG;AACxG;;AAEA;EACE,cAAc;AAChB;AACA;EACE,8DAA8D;AAChE;AACA;EACE,mBAAmB;AACrB;AACA;EACE,kBAAkB;AACpB;AACA;EACE,mBAAmB;AACrB;AACA;EACE,kBAAkB;EAClB,YAAY;EACZ,aAAa;EACb,eAAe;EACf,mBAAmB;EACnB,kBAAkB;EAClB,mBAAmB;EACnB,sBAAsB;AACxB;AACA;EACE,YAAY;AACd;AACA;EACE,iBAAiB;EACjB,WAAW;EACX,aAAa;AACf;AACA;EACE,aAAa;EACb,YAAY;EACZ,WAAW;EACX,yBAAyB;AAC3B;AACA;EACE,uCAAuC;EACvC,+BAA+B;AACjC;AACA;EACE,YAAY;EACZ,WAAW;EACX,cAAc;EACd,gEAAgE;EAChE,wDAAwD;EACxD,qBAAqB;AACvB;AACA;EACE,aAAa;AACf;AACA;EACE,aAAa;EACb,WAAW;AACb;AACA;EACE,aAAa;AACf;AACA;EACE,YAAY;EACZ,WAAW;EACX,aAAa;AACf;AACA;EACE,YAAY;AACd","sourcesContent":[".dockview-theme-dark {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n}\n\n.dockview-theme-light {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: white;\n  --dv-tabs-and-actions-container-background-color: #f3f3f3;\n  --dv-activegroup-visiblepanel-tab-background-color: white;\n  --dv-activegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-inactivegroup-visiblepanel-tab-background-color: white;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #ececec;\n  --dv-tab-divider-color: white;\n  --dv-activegroup-visiblepanel-tab-color: rgb(51, 51, 51);\n  --dv-activegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-visiblepanel-tab-color: rgba(51, 51, 51, 0.7);\n  --dv-inactivegroup-hiddenpanel-tab-color: rgba(51, 51, 51, 0.35);\n  --dv-separator-border: rgba(128, 128, 128, 0.35);\n  --dv-paneview-header-border-color: rgb(51, 51, 51);\n}\n\n.dockview-theme-vs {\n  --dv-paneview-active-outline-color: dodgerblue;\n  --dv-tabs-and-actions-container-font-size: 13px;\n  --dv-tabs-and-actions-container-height: 35px;\n  --dv-tab-close-icon: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>');\n  --dv-drag-over-background-color: rgba(83, 89, 93, 0.5);\n  --dv-drag-over-border-color: white;\n  --dv-tabs-container-scrollbar-color: #888;\n  --dv-group-view-background-color: #1e1e1e;\n  --dv-tabs-and-actions-container-background-color: #252526;\n  --dv-activegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-activegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-inactivegroup-visiblepanel-tab-background-color: #1e1e1e;\n  --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2d2d;\n  --dv-tab-divider-color: #1e1e1e;\n  --dv-activegroup-visiblepanel-tab-color: white;\n  --dv-activegroup-hiddenpanel-tab-color: #969696;\n  --dv-inactivegroup-visiblepanel-tab-color: #8f8f8f;\n  --dv-inactivegroup-hiddenpanel-tab-color: #626262;\n  --dv-separator-border: rgb(68, 68, 68);\n  --dv-paneview-header-border-color: rgba(204, 204, 204, 0.2);\n  --dv-activegroup-visiblepanel-tab-background-color: dodgerblue;\n  --dv-tabs-and-actions-container-height: 18px;\n  --dv-tabs-and-actions-container-font-size: 11px;\n}\n.dockview-theme-vs .groupview.active-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-activegroup-visiblepanel-tab-background-color);\n}\n.dockview-theme-vs .groupview.inactive-group > .tabs-and-actions-container {\n  border-bottom: 2px solid var(--dv-inactivegroup-visiblepanel-tab-background-color);\n}\n.actions-bar {\n  text-align: right;\n  width: 28px;\n  display: flex;\n  align-items: center;\n  flex-shrink: 0;\n}\n.actions-bar .actions-container {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.actions-bar .actions-container a:active {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.actions-bar .actions-container .close-action {\n  background-color: white;\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n  cursor: pointer;\n}\n.drop-target {\n  position: relative;\n}\n.drop-target > .drop-target-dropzone {\n  position: absolute;\n  left: 0px;\n  top: 0px;\n  height: 100%;\n  width: 100%;\n  z-index: 10000;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection {\n  position: relative;\n  box-sizing: border-box;\n  height: 100%;\n  width: 100%;\n  background-color: var(--dv-drag-over-background-color);\n  transition: top 70ms ease-out, left 70ms ease-out, width 70ms ease-out, height 70ms ease-out, opacity 0.15s ease-out;\n  will-change: transform;\n  pointer-events: none;\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.left {\n  transform: translateX(-25%) scaleX(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.right {\n  transform: translateX(25%) scaleX(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.top {\n  transform: translateY(-25%) scaleY(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.bottom {\n  transform: translateY(25%) scaleY(0.5);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-top {\n  border-top: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-bottom {\n  border-bottom: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-left {\n  border-left: 1px solid var(--dv-drag-over-border-color);\n}\n.drop-target > .drop-target-dropzone > .drop-target-selection.small-right {\n  border-right: 1px solid var(--dv-drag-over-border-color);\n}\n.custom-dragging {\n  height: 24px;\n  line-height: 24px;\n  font-size: 11px;\n  width: 100px;\n  background-color: dodgerblue;\n  color: ghostwhite;\n  border-radius: 11px;\n  position: absolute;\n  padding-left: 10px;\n}\n\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.active-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-activegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-background-color);\n  color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.active-tab .tab-action {\n  background-color: var(--dv-inactivegroup-visiblepanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-background-color);\n  color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n.groupview.inactive-group > .tabs-and-actions-container > .tabs-container > .tab.inactive-tab .tab-action {\n  background-color: var(--dv-inactivegroup-hiddenpanel-tab-color);\n}\n\n/**\n * when a tab is dragged we lose the above stylings because they are conditional on parent elements\n * therefore we also set some stylings for the dragging event\n **/\n.tab.dragging {\n  background-color: var(--dv-activegroup-visiblepanel-tab-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.grid-view,\n.branch-node {\n  height: 100%;\n  width: 100%;\n}\n.groupview {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  background-color: var(--dv-group-view-background-color);\n  overflow: hidden;\n}\n.groupview:focus {\n  outline: none;\n}\n.groupview.empty > .tabs-and-actions-container {\n  display: none;\n}\n.groupview > .content-container {\n  flex-grow: 1;\n  overflow: hidden;\n  outline: none;\n}\n.pane-container {\n  height: 100%;\n  width: 100%;\n}\n.pane-container.animated .view {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.pane-container .view {\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  padding: 0px !important;\n}\n.pane-container .view:not(:first-child)::before {\n  background-color: transparent !important;\n}\n.pane-container .view:not(:first-child) .pane > .pane-header {\n  border-top: 1px solid var(--dv-paneview-header-border-color);\n}\n.pane-container .view .default-header {\n  background-color: var(--dv-group-view-background-color);\n  color: var(--dv-activegroup-visiblepanel-tab-color);\n  display: flex;\n  padding: 0px 8px;\n}\n.pane-container .view .default-header > span {\n  flex-grow: 1;\n}\n.pane-container:first-of-type > .pane > .pane-header {\n  border-top: none !important;\n}\n.pane-container .pane {\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  height: 100%;\n}\n.pane-container .pane .pane-header {\n  box-sizing: border-box;\n  user-select: none;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-header.pane-draggable {\n  cursor: pointer;\n}\n.pane-container .pane .pane-header:focus:before, .pane-container .pane .pane-header:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.pane-container .pane .pane-body {\n  overflow-y: auto;\n  overflow-x: hidden;\n  flex-grow: 1;\n  position: relative;\n  outline: none;\n}\n.pane-container .pane .pane-body:focus:before, .pane-container .pane .pane-body:focus-within:before {\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 5;\n  content: \"\";\n  pointer-events: none;\n  outline: 1px solid;\n  outline-width: -1px;\n  outline-style: solid;\n  outline-offset: -1px;\n  outline-color: var(--dv-paneview-active-outline-color);\n}\n.tabs-and-actions-container {\n  display: flex;\n  background-color: var(--dv-tabs-and-actions-container-background-color);\n  flex-shrink: 0;\n  box-sizing: border-box;\n  height: var(--dv-tabs-and-actions-container-height);\n  font-size: var(--dv-tabs-and-actions-container-font-size);\n}\n.tabs-and-actions-container.hidden {\n  display: none;\n}\n.tabs-and-actions-container .void-container {\n  display: flex;\n  flex-grow: 1;\n}\n.tabs-and-actions-container .tabs-container {\n  display: flex;\n  overflow-x: overlay;\n  overflow-y: hidden;\n  scrollbar-width: thin;\n  /* Track */\n  /* Handle */\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar {\n  height: 3px;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-track {\n  background: transparent;\n}\n.tabs-and-actions-container .tabs-container::-webkit-scrollbar-thumb {\n  background: var(--dv-tabs-container-scrollbar-color);\n}\n.tabs-and-actions-container .tabs-container .tab {\n  -webkit-user-drag: element;\n  outline: none;\n  min-width: 75px;\n  cursor: pointer;\n  position: relative;\n  box-sizing: border-box;\n}\n.tabs-and-actions-container .tabs-container .tab:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-tab-divider-color);\n  width: 1px;\n  height: 100%;\n}\n.dockview-react-part {\n  height: 100%;\n  width: 100%;\n}\n.split-view-container {\n  position: relative;\n  overflow: hidden;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container.animation .view,\n.split-view-container.animation .sash {\n  transition-duration: 0.15s;\n  transition-timing-function: ease-out;\n}\n.split-view-container.horizontal {\n  height: 100%;\n}\n.split-view-container.horizontal > .sash-container > .sash {\n  height: 100%;\n  width: 4px;\n}\n.split-view-container.horizontal > .sash-container > .sash.enabled {\n  cursor: ew-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.horizontal > .sash-container > .sash.maximum {\n  cursor: w-resize;\n}\n.split-view-container.horizontal > .sash-container > .sash.minimum {\n  cursor: e-resize;\n}\n.split-view-container.horizontal > .view-container > .view:not(:first-child)::before {\n  height: 100%;\n  width: 1px;\n}\n.split-view-container.vertical {\n  width: 100%;\n}\n.split-view-container.vertical > .sash-container > .sash {\n  width: 100%;\n  height: 4px;\n}\n.split-view-container.vertical > .sash-container > .sash.enabled {\n  cursor: ns-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.disabled {\n  cursor: default;\n}\n.split-view-container.vertical > .sash-container > .sash.maximum {\n  cursor: n-resize;\n}\n.split-view-container.vertical > .sash-container > .sash.minimum {\n  cursor: s-resize;\n}\n.split-view-container.vertical > .view-container > .view {\n  width: 100%;\n}\n.split-view-container.vertical > .view-container > .view:not(:first-child)::before {\n  height: 1px;\n  width: 100%;\n}\n.split-view-container .sash-container {\n  height: 100%;\n  width: 100%;\n  position: absolute;\n}\n.split-view-container .sash-container .sash {\n  position: absolute;\n  z-index: 99;\n  outline: none;\n}\n.split-view-container .sash-container .sash:active {\n  transition: background-color 0.1s ease-in-out;\n  background-color: var(--dv-active-sash-color, transparent);\n}\n.split-view-container .sash-container .sash:hover {\n  background-color: var(--dv-active-sash-color, transparent);\n  transition: background-color 0.1s ease-in-out;\n  transition-delay: 0.5s;\n}\n.split-view-container .view-container {\n  position: relative;\n  height: 100%;\n  width: 100%;\n}\n.split-view-container .view-container .view {\n  height: 100%;\n  box-sizing: border-box;\n  overflow: auto;\n  position: absolute;\n}\n.split-view-container.separator-border .view:not(:first-child)::before {\n  content: \" \";\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 5;\n  pointer-events: none;\n  background-color: var(--dv-separator-border);\n}\n.dragged {\n  transform: translate3d(0px, 0px, 0px);\n  /* forces tab to be drawn on a separate layer (see https://github.com/microsoft/vscode/issues/18733) */\n}\n\n.tab {\n  flex-shrink: 0;\n}\n.tab.dragging .tab-action {\n  background-color: var(--dv-activegroup-visiblepanel-tab-color);\n}\n.tab.active-tab > .default-tab .tab-action {\n  visibility: visible;\n}\n.tab.inactive-tab > .default-tab .tab-action {\n  visibility: hidden;\n}\n.tab.inactive-tab > .default-tab:hover .tab-action {\n  visibility: visible;\n}\n.tab .default-tab {\n  position: relative;\n  height: 100%;\n  display: flex;\n  min-width: 80px;\n  align-items: center;\n  padding-left: 10px;\n  white-space: nowrap;\n  text-overflow: elipsis;\n}\n.tab .default-tab .tab-content {\n  flex-grow: 1;\n}\n.tab .default-tab .action-container {\n  text-align: right;\n  width: 28px;\n  display: flex;\n}\n.tab .default-tab .action-container .tab-list {\n  display: flex;\n  padding: 0px;\n  margin: 0px;\n  justify-content: flex-end;\n}\n.tab .default-tab .action-container .tab-list a:active:hover {\n  -webkit-mask-size: 100% 100% !important;\n  mask-size: 100% 100% !important;\n}\n.tab .default-tab .action-container .tab-list .tab-action {\n  height: 16px;\n  width: 16px;\n  display: block;\n  -webkit-mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  mask: var(--dv-tab-close-icon) 50% 50%/90% 90% no-repeat;\n  margin-right: \"0.5em\";\n}\n.tab .default-tab .action-container .tab-list .tab-action.disable-close {\n  display: none;\n}\n.watermark {\n  display: flex;\n  width: 100%;\n}\n.watermark.has-actions .watermark-title .actions-bar {\n  display: none;\n}\n.watermark .watermark-title {\n  height: 35px;\n  width: 100%;\n  display: flex;\n}\n.watermark .watermark-content {\n  flex-grow: 1;\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/runtime/api.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/css-loader/dist/runtime/api.js ***!
-  \*****************************************************/
+/***/ "../../node_modules/css-loader/dist/runtime/api.js":
+/*!*********************************************************!*\
+  !*** ../../node_modules/css-loader/dist/runtime/api.js ***!
+  \*********************************************************/
 /***/ ((module) => {
 
 
@@ -3421,37 +256,55 @@ ___CSS_LOADER_EXPORT___.push([module.id, ".dockview-theme-dark {\n  --dv-panevie
   MIT License http://www.opensource.org/licenses/mit-license.php
   Author Tobias Koppers @sokra
 */
-// css base code, injected by the css-loader
-// eslint-disable-next-line func-names
 module.exports = function (cssWithMappingToString) {
   var list = []; // return the list of modules as css string
 
   list.toString = function toString() {
     return this.map(function (item) {
-      var content = cssWithMappingToString(item);
+      var content = "";
+      var needLayer = typeof item[5] !== "undefined";
+
+      if (item[4]) {
+        content += "@supports (".concat(item[4], ") {");
+      }
 
       if (item[2]) {
-        return "@media ".concat(item[2], " {").concat(content, "}");
+        content += "@media ".concat(item[2], " {");
+      }
+
+      if (needLayer) {
+        content += "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {");
+      }
+
+      content += cssWithMappingToString(item);
+
+      if (needLayer) {
+        content += "}";
+      }
+
+      if (item[2]) {
+        content += "}";
+      }
+
+      if (item[4]) {
+        content += "}";
       }
 
       return content;
     }).join("");
   }; // import a list of modules into the list
-  // eslint-disable-next-line func-names
 
 
-  list.i = function (modules, mediaQuery, dedupe) {
+  list.i = function i(modules, media, dedupe, supports, layer) {
     if (typeof modules === "string") {
-      // eslint-disable-next-line no-param-reassign
-      modules = [[null, modules, ""]];
+      modules = [[null, modules, undefined]];
     }
 
     var alreadyImportedModules = {};
 
     if (dedupe) {
-      for (var i = 0; i < this.length; i++) {
-        // eslint-disable-next-line prefer-destructuring
-        var id = this[i][0];
+      for (var k = 0; k < this.length; k++) {
+        var id = this[k][0];
 
         if (id != null) {
           alreadyImportedModules[id] = true;
@@ -3459,19 +312,37 @@ module.exports = function (cssWithMappingToString) {
       }
     }
 
-    for (var _i = 0; _i < modules.length; _i++) {
-      var item = [].concat(modules[_i]);
+    for (var _k = 0; _k < modules.length; _k++) {
+      var item = [].concat(modules[_k]);
 
       if (dedupe && alreadyImportedModules[item[0]]) {
-        // eslint-disable-next-line no-continue
         continue;
       }
 
-      if (mediaQuery) {
-        if (!item[2]) {
-          item[2] = mediaQuery;
+      if (typeof layer !== "undefined") {
+        if (typeof item[5] === "undefined") {
+          item[5] = layer;
         } else {
-          item[2] = "".concat(mediaQuery, " and ").concat(item[2]);
+          item[1] = "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {").concat(item[1], "}");
+          item[5] = layer;
+        }
+      }
+
+      if (media) {
+        if (!item[2]) {
+          item[2] = media;
+        } else {
+          item[1] = "@media ".concat(item[2], " {").concat(item[1], "}");
+          item[2] = media;
+        }
+      }
+
+      if (supports) {
+        if (!item[4]) {
+          item[4] = "".concat(supports);
+        } else {
+          item[1] = "@supports (".concat(item[4], ") {").concat(item[1], "}");
+          item[4] = supports;
         }
       }
 
@@ -3484,37 +355,61 @@ module.exports = function (cssWithMappingToString) {
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js":
-/*!************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/runtime/cssWithMappingToString.js ***!
-  \************************************************************************/
+/***/ "../../node_modules/css-loader/dist/runtime/getUrl.js":
+/*!************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/runtime/getUrl.js ***!
+  \************************************************************/
 /***/ ((module) => {
 
 
 
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+module.exports = function (url, options) {
+  if (!options) {
+    options = {};
+  }
 
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+  if (!url) {
+    return url;
+  }
 
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+  url = String(url.__esModule ? url.default : url); // If url is already wrapped in quotes, remove them
 
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+  if (/^['"].*['"]$/.test(url)) {
+    url = url.slice(1, -1);
+  }
 
-function _iterableToArrayLimit(arr, i) { var _i = arr && (typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]); if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+  if (options.hash) {
+    url += options.hash;
+  } // Should url be wrapped?
+  // See https://drafts.csswg.org/css-values-3/#urls
 
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-module.exports = function cssWithMappingToString(item) {
-  var _item = _slicedToArray(item, 4),
-      content = _item[1],
-      cssMapping = _item[3];
+  if (/["'() \t\n]|(%20)/.test(url) || options.needQuotes) {
+    return "\"".concat(url.replace(/"/g, '\\"').replace(/\n/g, "\\n"), "\"");
+  }
+
+  return url;
+};
+
+/***/ }),
+
+/***/ "../../node_modules/css-loader/dist/runtime/sourceMaps.js":
+/*!****************************************************************!*\
+  !*** ../../node_modules/css-loader/dist/runtime/sourceMaps.js ***!
+  \****************************************************************/
+/***/ ((module) => {
+
+
+
+module.exports = function (item) {
+  var content = item[1];
+  var cssMapping = item[3];
 
   if (!cssMapping) {
     return content;
   }
 
   if (typeof btoa === "function") {
-    // eslint-disable-next-line no-undef
     var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(cssMapping))));
     var data = "sourceMappingURL=data:application/json;charset=utf-8;base64,".concat(base64);
     var sourceMapping = "/*# ".concat(data, " */");
@@ -3529,10 +424,10 @@ module.exports = function cssWithMappingToString(item) {
 
 /***/ }),
 
-/***/ "./node_modules/react-dom/cjs/react-dom.development.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/react-dom/cjs/react-dom.development.js ***!
-  \*************************************************************/
+/***/ "../../node_modules/react-dom/cjs/react-dom.development.js":
+/*!*****************************************************************!*\
+  !*** ../../node_modules/react-dom/cjs/react-dom.development.js ***!
+  \*****************************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 /**
@@ -3560,8 +455,8 @@ if (
 ) {
   __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
 }
-          var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-var Scheduler = __webpack_require__(/*! scheduler */ "./node_modules/scheduler/index.js");
+          var React = __webpack_require__(/*! react */ "../../node_modules/react/index.js");
+var Scheduler = __webpack_require__(/*! scheduler */ "../../node_modules/scheduler/index.js");
 
 var ReactSharedInternals = React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
 
@@ -3654,7 +549,8 @@ var CacheComponent = 24;
 var TracingMarkerComponent = 25;
 
 // -----------------------------------------------------------------------------
-var enableClientRenderFallbackOnTextMismatch = true; // Recoil still uses useMutableSource in www, need to delete
+
+var enableClientRenderFallbackOnTextMismatch = true; // TODO: Need to review this code one more time before landing
 // the react-reconciler package.
 
 var enableNewReconciler = false; // Support legacy Primer support on internal FB www
@@ -4393,28 +1289,26 @@ function setValueForProperty(node, name, value, isCustomComponentTag) {
 }
 
 // ATTENTION
-// When adding new symbols to this file,
-// Please consider also adding to 'react-devtools-shared/src/backend/ReactSymbols'
-// The Symbol used to tag the ReactElement-like types.
-var REACT_ELEMENT_TYPE = Symbol.for('react.element');
-var REACT_PORTAL_TYPE = Symbol.for('react.portal');
-var REACT_FRAGMENT_TYPE = Symbol.for('react.fragment');
-var REACT_STRICT_MODE_TYPE = Symbol.for('react.strict_mode');
-var REACT_PROFILER_TYPE = Symbol.for('react.profiler');
-var REACT_PROVIDER_TYPE = Symbol.for('react.provider');
-var REACT_CONTEXT_TYPE = Symbol.for('react.context');
-var REACT_FORWARD_REF_TYPE = Symbol.for('react.forward_ref');
-var REACT_SUSPENSE_TYPE = Symbol.for('react.suspense');
-var REACT_SUSPENSE_LIST_TYPE = Symbol.for('react.suspense_list');
-var REACT_MEMO_TYPE = Symbol.for('react.memo');
-var REACT_LAZY_TYPE = Symbol.for('react.lazy');
-var REACT_SCOPE_TYPE = Symbol.for('react.scope');
-var REACT_DEBUG_TRACING_MODE_TYPE = Symbol.for('react.debug_trace_mode');
-var REACT_OFFSCREEN_TYPE = Symbol.for('react.offscreen');
-var REACT_LEGACY_HIDDEN_TYPE = Symbol.for('react.legacy_hidden');
-var REACT_CACHE_TYPE = Symbol.for('react.cache');
-var REACT_TRACING_MARKER_TYPE = Symbol.for('react.tracing_marker');
-var MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
+
+var REACT_ELEMENT_TYPE =  Symbol.for('react.element');
+var REACT_PORTAL_TYPE =  Symbol.for('react.portal');
+var REACT_FRAGMENT_TYPE =  Symbol.for('react.fragment');
+var REACT_STRICT_MODE_TYPE =  Symbol.for('react.strict_mode');
+var REACT_PROFILER_TYPE =  Symbol.for('react.profiler');
+var REACT_PROVIDER_TYPE =  Symbol.for('react.provider');
+var REACT_CONTEXT_TYPE =  Symbol.for('react.context');
+var REACT_FORWARD_REF_TYPE =  Symbol.for('react.forward_ref');
+var REACT_SUSPENSE_TYPE =  Symbol.for('react.suspense');
+var REACT_SUSPENSE_LIST_TYPE =  Symbol.for('react.suspense_list');
+var REACT_MEMO_TYPE =  Symbol.for('react.memo');
+var REACT_LAZY_TYPE =  Symbol.for('react.lazy');
+var REACT_SCOPE_TYPE =  Symbol.for('react.scope');
+var REACT_DEBUG_TRACING_MODE_TYPE =  Symbol.for('react.debug_trace_mode');
+var REACT_OFFSCREEN_TYPE =  Symbol.for('react.offscreen');
+var REACT_LEGACY_HIDDEN_TYPE =  Symbol.for('react.legacy_hidden');
+var REACT_CACHE_TYPE =  Symbol.for('react.cache');
+var REACT_TRACING_MARKER_TYPE =  Symbol.for('react.tracing_marker');
+var MAYBE_ITERATOR_SYMBOL =  Symbol.iterator;
 var FAUX_ITERATOR_SYMBOL = '@@iterator';
 function getIteratorFn(maybeIterable) {
   if (maybeIterable === null || typeof maybeIterable !== 'object') {
@@ -5067,9 +1961,14 @@ function resetCurrentFiber() {
 }
 function setCurrentFiber(fiber) {
   {
-    ReactDebugCurrentFrame.getCurrentStack = getCurrentFiberStackInDev;
+    ReactDebugCurrentFrame.getCurrentStack = fiber === null ? null : getCurrentFiberStackInDev;
     current = fiber;
     isRendering = false;
+  }
+}
+function getCurrentFiber() {
+  {
+    return current;
   }
 }
 function setIsRendering(rendering) {
@@ -7889,9 +4788,6 @@ var Placement =
 var Update =
 /*                       */
 4;
-var PlacementAndUpdate =
-/*           */
-Placement | Update;
 var ChildDeletion =
 /*                */
 16;
@@ -7919,9 +4815,6 @@ var Passive =
 var Hydrating =
 /*                    */
 4096;
-var HydratingAndUpdate =
-/*           */
-Hydrating | Update;
 var Visibility =
 /*                   */
 8192;
@@ -8719,13 +5612,13 @@ var InputContinuousHydrationLane =
 /*    */
 2;
 var InputContinuousLane =
-/*            */
+/*             */
 4;
 var DefaultHydrationLane =
 /*            */
 8;
 var DefaultLane =
-/*                    */
+/*                     */
 16;
 var TransitionHydrationLane =
 /*                */
@@ -8804,13 +5697,13 @@ var SelectiveHydrationLane =
 /*          */
 134217728;
 var NonIdleLanes =
-/*                                 */
+/*                          */
 268435455;
 var IdleHydrationLane =
 /*               */
 268435456;
 var IdleLane =
-/*                       */
+/*                        */
 536870912;
 var OffscreenLane =
 /*                   */
@@ -9196,6 +6089,10 @@ function includesNonIdleWork(lanes) {
 function includesOnlyRetries(lanes) {
   return (lanes & RetryLanes) === lanes;
 }
+function includesOnlyNonUrgentLanes(lanes) {
+  var UrgentLanes = SyncLane | InputContinuousLane | DefaultLane;
+  return (lanes & UrgentLanes) === NoLanes;
+}
 function includesOnlyTransitions(lanes) {
   return (lanes & TransitionLanes) === lanes;
 }
@@ -9210,7 +6107,7 @@ function includesExpiredLane(root, lanes) {
   return (lanes & root.expiredLanes) !== NoLanes;
 }
 function isTransitionLane(lane) {
-  return (lane & TransitionLanes) !== 0;
+  return (lane & TransitionLanes) !== NoLanes;
 }
 function claimNextTransitionLane() {
   // Cycle through the lanes, assigning each new transition to the next lane.
@@ -9219,7 +6116,7 @@ function claimNextTransitionLane() {
   var lane = nextTransitionLane;
   nextTransitionLane <<= 1;
 
-  if ((nextTransitionLane & TransitionLanes) === 0) {
+  if ((nextTransitionLane & TransitionLanes) === NoLanes) {
     nextTransitionLane = TransitionLane1;
   }
 
@@ -9229,7 +6126,7 @@ function claimNextRetryLane() {
   var lane = nextRetryLane;
   nextRetryLane <<= 1;
 
-  if ((nextRetryLane & RetryLanes) === 0) {
+  if ((nextRetryLane & RetryLanes) === NoLanes) {
     nextRetryLane = RetryLane1;
   }
 
@@ -9335,8 +6232,8 @@ function markRootFinished(root, remainingLanes) {
   var noLongerPendingLanes = root.pendingLanes & ~remainingLanes;
   root.pendingLanes = remainingLanes; // Let's try everything again
 
-  root.suspendedLanes = 0;
-  root.pingedLanes = 0;
+  root.suspendedLanes = NoLanes;
+  root.pingedLanes = NoLanes;
   root.expiredLanes &= remainingLanes;
   root.mutableReadLanes &= remainingLanes;
   root.entangledLanes &= remainingLanes;
@@ -9486,6 +6383,11 @@ function movePendingFibersToMemoized(root, lanes) {
     lanes &= ~lane;
   }
 }
+function getTransitionsForLanes(root, lanes) {
+  {
+    return null;
+  }
+}
 
 var DiscreteEventPriority = SyncLane;
 var ContinuousEventPriority = InputContinuousLane;
@@ -9582,10 +6484,10 @@ var queuedPointers = new Map();
 var queuedPointerCaptures = new Map(); // We could consider replaying selectionchange and touchmoves too.
 
 var queuedExplicitHydrationTargets = [];
-var synchronouslyHydratedEvents = ['mousedown', 'mouseup', 'touchcancel', 'touchend', 'touchstart', 'auxclick', 'dblclick', 'pointercancel', 'pointerdown', 'pointerup', 'dragend', 'dragstart', 'drop', 'compositionend', 'compositionstart', 'keydown', 'keypress', 'keyup', 'input', 'textInput', // Intentionally camelCase
+var discreteReplayableEvents = ['mousedown', 'mouseup', 'touchcancel', 'touchend', 'touchstart', 'auxclick', 'dblclick', 'pointercancel', 'pointerdown', 'pointerup', 'dragend', 'dragstart', 'drop', 'compositionend', 'compositionstart', 'keydown', 'keypress', 'keyup', 'input', 'textInput', // Intentionally camelCase
 'copy', 'cut', 'paste', 'click', 'change', 'contextmenu', 'reset', 'submit'];
 function isDiscreteEventThatRequiresHydration(eventType) {
-  return synchronouslyHydratedEvents.indexOf(eventType) > -1;
+  return discreteReplayableEvents.indexOf(eventType) > -1;
 }
 
 function createQueuedReplayableEvent(blockedOn, domEventName, eventSystemFlags, targetContainer, nativeEvent) {
@@ -9596,8 +6498,7 @@ function createQueuedReplayableEvent(blockedOn, domEventName, eventSystemFlags, 
     nativeEvent: nativeEvent,
     targetContainers: [targetContainer]
   };
-} // Resets the replaying for this type of continuous event to no event.
-
+}
 
 function clearIfContinuousEvent(domEventName, nativeEvent) {
   switch (domEventName) {
@@ -9639,11 +6540,11 @@ function accumulateOrCreateContinuousQueuedReplayableEvent(existingQueuedEvent, 
     var queuedEvent = createQueuedReplayableEvent(blockedOn, domEventName, eventSystemFlags, targetContainer, nativeEvent);
 
     if (blockedOn !== null) {
-      var _fiber = getInstanceFromNode(blockedOn);
+      var _fiber2 = getInstanceFromNode(blockedOn);
 
-      if (_fiber !== null) {
+      if (_fiber2 !== null) {
         // Attempt to increase the priority of this target.
-        attemptContinuousHydration(_fiber);
+        attemptContinuousHydration(_fiber2);
       }
     }
 
@@ -9751,30 +6652,28 @@ function attemptExplicitHydrationTarget(queuedTarget) {
 }
 
 function queueExplicitHydrationTarget(target) {
-  {
-    // TODO: This will read the priority if it's dispatched by the React
-    // event system but not native events. Should read window.event.type, like
-    // we do for updates (getCurrentEventPriority).
-    var updatePriority = getCurrentUpdatePriority$1();
-    var queuedTarget = {
-      blockedOn: null,
-      target: target,
-      priority: updatePriority
-    };
-    var i = 0;
+  // TODO: This will read the priority if it's dispatched by the React
+  // event system but not native events. Should read window.event.type, like
+  // we do for updates (getCurrentEventPriority).
+  var updatePriority = getCurrentUpdatePriority$1();
+  var queuedTarget = {
+    blockedOn: null,
+    target: target,
+    priority: updatePriority
+  };
+  var i = 0;
 
-    for (; i < queuedExplicitHydrationTargets.length; i++) {
-      // Stop once we hit the first target with lower priority than
-      if (!isHigherEventPriority(updatePriority, queuedExplicitHydrationTargets[i].priority)) {
-        break;
-      }
+  for (; i < queuedExplicitHydrationTargets.length; i++) {
+    // Stop once we hit the first target with lower priority than
+    if (!isHigherEventPriority(updatePriority, queuedExplicitHydrationTargets[i].priority)) {
+      break;
     }
+  }
 
-    queuedExplicitHydrationTargets.splice(i, 0, queuedTarget);
+  queuedExplicitHydrationTargets.splice(i, 0, queuedTarget);
 
-    if (i === 0) {
-      attemptExplicitHydrationTarget(queuedTarget);
-    }
+  if (i === 0) {
+    attemptExplicitHydrationTarget(queuedTarget);
   }
 }
 
@@ -9790,17 +6689,19 @@ function attemptReplayContinuousQueuedEvent(queuedEvent) {
     var nextBlockedOn = findInstanceBlockingEvent(queuedEvent.domEventName, queuedEvent.eventSystemFlags, targetContainer, queuedEvent.nativeEvent);
 
     if (nextBlockedOn === null) {
-      var nativeEvent = queuedEvent.nativeEvent;
-      var nativeEventClone = new nativeEvent.constructor(nativeEvent.type, nativeEvent);
-      setReplayingEvent(nativeEventClone);
-      nativeEvent.target.dispatchEvent(nativeEventClone);
-      resetReplayingEvent();
+      {
+        var nativeEvent = queuedEvent.nativeEvent;
+        var nativeEventClone = new nativeEvent.constructor(nativeEvent.type, nativeEvent);
+        setReplayingEvent(nativeEventClone);
+        nativeEvent.target.dispatchEvent(nativeEventClone);
+        resetReplayingEvent();
+      }
     } else {
       // We're still blocked. Try again later.
-      var _fiber2 = getInstanceFromNode(nextBlockedOn);
+      var _fiber3 = getInstanceFromNode(nextBlockedOn);
 
-      if (_fiber2 !== null) {
-        attemptContinuousHydration(_fiber2);
+      if (_fiber3 !== null) {
+        attemptContinuousHydration(_fiber3);
       }
 
       queuedEvent.blockedOn = nextBlockedOn;
@@ -9821,7 +6722,8 @@ function attemptReplayContinuousQueuedEventInMap(queuedEvent, key, map) {
 }
 
 function replayUnblockedEvents() {
-  hasScheduledReplayAttempt = false; // Next replay any continuous events.
+  hasScheduledReplayAttempt = false;
+
 
   if (queuedFocus !== null && attemptReplayContinuousQueuedEvent(queuedFocus)) {
     queuedFocus = null;
@@ -9915,6 +6817,16 @@ function retryIfBlockedOn(unblocked) {
 }
 
 var ReactCurrentBatchConfig = ReactSharedInternals.ReactCurrentBatchConfig; // TODO: can we stop exporting these?
+
+var _enabled = true; // This is exported in FB builds for use by legacy FB layer infra.
+// We'd like to remove this but it's not clear if this is safe.
+
+function setEnabled(enabled) {
+  _enabled = !!enabled;
+}
+function isEnabled() {
+  return _enabled;
+}
 function createEventListenerWrapperWithPriority(targetContainer, domEventName, eventSystemFlags) {
   var eventPriority = getEventPriority(domEventName);
   var listenerWrapper;
@@ -9966,6 +6878,16 @@ function dispatchContinuousEvent(domEventName, eventSystemFlags, container, nati
 }
 
 function dispatchEvent(domEventName, eventSystemFlags, targetContainer, nativeEvent) {
+  if (!_enabled) {
+    return;
+  }
+
+  {
+    dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay(domEventName, eventSystemFlags, targetContainer, nativeEvent);
+  }
+}
+
+function dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay(domEventName, eventSystemFlags, targetContainer, nativeEvent) {
   var blockedOn = findInstanceBlockingEvent(domEventName, eventSystemFlags, targetContainer, nativeEvent);
 
   if (blockedOn === null) {
@@ -13023,7 +9945,6 @@ var CHILDREN = 'children';
 var STYLE = 'style';
 var HTML$1 = '__html';
 var warnedUnknownTags;
-var suppressHydrationWarning;
 var validatePropertiesInDevelopment;
 var warnForPropDifference;
 var warnForExtraAttributes;
@@ -13688,7 +10609,6 @@ function diffHydratedProperties(domElement, tag, rawProps, parentNamespace, root
   var extraAttributeNames;
 
   {
-    suppressHydrationWarning = rawProps[SUPPRESS_HYDRATION_WARNING] === true;
     isCustomComponentTag = isCustomComponent(tag, rawProps);
     validatePropertiesInDevelopment(tag, rawProps);
   } // TODO: Make sure that we check isMounted before firing any of these events.
@@ -13815,7 +10735,7 @@ function diffHydratedProperties(domElement, tag, rawProps, parentNamespace, root
       // TODO: Should we use domElement.firstChild.nodeValue to compare?
       if (typeof nextProp === 'string') {
         if (domElement.textContent !== nextProp) {
-          if (!suppressHydrationWarning) {
+          if (rawProps[SUPPRESS_HYDRATION_WARNING] !== true) {
             checkForUnmatchedText(domElement.textContent, nextProp, isConcurrentMode, shouldWarnDev);
           }
 
@@ -13823,7 +10743,7 @@ function diffHydratedProperties(domElement, tag, rawProps, parentNamespace, root
         }
       } else if (typeof nextProp === 'number') {
         if (domElement.textContent !== '' + nextProp) {
-          if (!suppressHydrationWarning) {
+          if (rawProps[SUPPRESS_HYDRATION_WARNING] !== true) {
             checkForUnmatchedText(domElement.textContent, nextProp, isConcurrentMode, shouldWarnDev);
           }
 
@@ -13846,7 +10766,7 @@ function diffHydratedProperties(domElement, tag, rawProps, parentNamespace, root
       var serverValue = void 0;
       var propertyInfo = isCustomComponentTag && enableCustomElementPropertySupport ? null : getPropertyInfo(propKey);
 
-      if (suppressHydrationWarning) ; else if (propKey === SUPPRESS_CONTENT_EDITABLE_WARNING || propKey === SUPPRESS_HYDRATION_WARNING || // Controlled attributes are not validated
+      if (rawProps[SUPPRESS_HYDRATION_WARNING] === true) ; else if (propKey === SUPPRESS_CONTENT_EDITABLE_WARNING || propKey === SUPPRESS_HYDRATION_WARNING || // Controlled attributes are not validated
       // TODO: Only ignore them on controlled tags.
       propKey === 'value' || propKey === 'checked' || propKey === 'selected') ; else if (propKey === DANGEROUSLY_SET_INNER_HTML) {
         var serverHTML = domElement.innerHTML;
@@ -13928,8 +10848,8 @@ function diffHydratedProperties(domElement, tag, rawProps, parentNamespace, root
 
   {
     if (shouldWarnDev) {
-      // $FlowFixMe - Should be inferred as not undefined.
-      if (extraAttributeNames.size > 0 && !suppressHydrationWarning) {
+      if ( // $FlowFixMe - Should be inferred as not undefined.
+      extraAttributeNames.size > 0 && rawProps[SUPPRESS_HYDRATION_WARNING] !== true) {
         // $FlowFixMe - Should be inferred as not undefined.
         warnForExtraAttributes(extraAttributeNames);
       }
@@ -14360,17 +11280,13 @@ var updatedAncestorInfo = function () {};
   };
 }
 
-var SUPPRESS_HYDRATION_WARNING$1;
-
-{
-  SUPPRESS_HYDRATION_WARNING$1 = 'suppressHydrationWarning';
-}
-
+var SUPPRESS_HYDRATION_WARNING$1 = 'suppressHydrationWarning';
 var SUSPENSE_START_DATA = '$';
 var SUSPENSE_END_DATA = '/$';
 var SUSPENSE_PENDING_START_DATA = '$?';
 var SUSPENSE_FALLBACK_START_DATA = '$!';
 var STYLE$1 = 'style';
+var eventsEnabled = null;
 var selectionInformation = null;
 function getRootHostContext(rootContainerInstance) {
   var type;
@@ -14421,12 +11337,17 @@ function getPublicInstance(instance) {
   return instance;
 }
 function prepareForCommit(containerInfo) {
+  eventsEnabled = isEnabled();
   selectionInformation = getSelectionInformation();
   var activeInstance = null;
+
+  setEnabled(false);
   return activeInstance;
 }
 function resetAfterCommit(containerInfo) {
   restoreSelection(selectionInformation);
+  setEnabled(eventsEnabled);
+  eventsEnabled = null;
   selectionInformation = null;
 }
 function createInstance(type, props, rootContainerInstance, hostContext, internalInstanceHandle) {
@@ -14738,17 +11659,15 @@ function getNextHydratable(node) {
       break;
     }
 
-    {
-      if (nodeType === COMMENT_NODE) {
-        var nodeData = node.data;
+    if (nodeType === COMMENT_NODE) {
+      var nodeData = node.data;
 
-        if (nodeData === SUSPENSE_START_DATA || nodeData === SUSPENSE_FALLBACK_START_DATA || nodeData === SUSPENSE_PENDING_START_DATA) {
-          break;
-        }
+      if (nodeData === SUSPENSE_START_DATA || nodeData === SUSPENSE_FALLBACK_START_DATA || nodeData === SUSPENSE_PENDING_START_DATA) {
+        break;
+      }
 
-        if (nodeData === SUSPENSE_END_DATA) {
-          return null;
-        }
+      if (nodeData === SUSPENSE_END_DATA) {
+        return null;
       }
     }
   }
@@ -14897,12 +11816,14 @@ function didNotHydrateInstanceWithinSuspenseInstance(parentInstance, instance) {
     }
   }
 }
-function didNotHydrateInstance(parentType, parentProps, parentInstance, instance) {
-  if ( parentProps[SUPPRESS_HYDRATION_WARNING$1] !== true) {
-    if (instance.nodeType === ELEMENT_NODE) {
-      warnForDeletedHydratableElement(parentInstance, instance);
-    } else if (instance.nodeType === COMMENT_NODE) ; else {
-      warnForDeletedHydratableText(parentInstance, instance);
+function didNotHydrateInstance(parentType, parentProps, parentInstance, instance, isConcurrentMode) {
+  {
+    if (isConcurrentMode || parentProps[SUPPRESS_HYDRATION_WARNING$1] !== true) {
+      if (instance.nodeType === ELEMENT_NODE) {
+        warnForDeletedHydratableElement(parentInstance, instance);
+      } else if (instance.nodeType === COMMENT_NODE) ; else {
+        warnForDeletedHydratableText(parentInstance, instance);
+      }
     }
   }
 }
@@ -14930,18 +11851,19 @@ function didNotFindHydratableTextInstanceWithinSuspenseInstance(parentInstance, 
     if (parentNode !== null) warnForInsertedHydratedText(parentNode, text);
   }
 }
-function didNotFindHydratableInstance(parentType, parentProps, parentInstance, type, props) {
-  if ( parentProps[SUPPRESS_HYDRATION_WARNING$1] !== true) {
-    warnForInsertedHydratedElement(parentInstance, type);
+function didNotFindHydratableInstance(parentType, parentProps, parentInstance, type, props, isConcurrentMode) {
+  {
+    if (isConcurrentMode || parentProps[SUPPRESS_HYDRATION_WARNING$1] !== true) {
+      warnForInsertedHydratedElement(parentInstance, type);
+    }
   }
 }
-function didNotFindHydratableTextInstance(parentType, parentProps, parentInstance, text) {
-  if ( parentProps[SUPPRESS_HYDRATION_WARNING$1] !== true) {
-    warnForInsertedHydratedText(parentInstance, text);
+function didNotFindHydratableTextInstance(parentType, parentProps, parentInstance, text, isConcurrentMode) {
+  {
+    if (isConcurrentMode || parentProps[SUPPRESS_HYDRATION_WARNING$1] !== true) {
+      warnForInsertedHydratedText(parentInstance, text);
+    }
   }
-}
-function didNotFindHydratableSuspenseInstance(parentType, parentProps, parentInstance) {
-  if ( parentProps[SUPPRESS_HYDRATION_WARNING$1] !== true) ;
 }
 function errorHydratingContainer(parentContainer) {
   {
@@ -15966,7 +12888,7 @@ function propagateContextChange_eager(workInProgress, context, renderLanes) {
     } else if (fiber.tag === ContextProvider) {
       // Don't scan deeper if this is a matching provider
       nextFiber = fiber.type === workInProgress.type ? null : fiber.child;
-    } else if ( fiber.tag === DehydratedFragment) {
+    } else if (fiber.tag === DehydratedFragment) {
       // If a dehydrated suspense boundary is in this subtree, we don't know
       // if it will have any context consumers in it. The best we can do is
       // mark it as having updates.
@@ -16096,6 +13018,9 @@ function pushInterleavedQueue(queue) {
   } else {
     interleavedQueues.push(queue);
   }
+}
+function hasInterleavedUpdates() {
+  return interleavedQueues !== null;
 }
 function enqueueInterleavedUpdates() {
   // Transfer the interleaved updates onto the main queue. Each queue has a
@@ -17639,8 +14564,10 @@ function warnIfNotHydrating() {
 
 var hydrationParentFiber = null;
 var nextHydratableInstance = null;
-var isHydrating = false;
-var didSuspend = false; // Hydration errors that were thrown inside this boundary
+var isHydrating = false; // This flag allows for warning supression when we expect there to be mismatches
+// due to earlier mismatches or a suspended fiber.
+
+var didSuspendOrErrorDEV = false; // Hydration errors that were thrown inside this boundary
 
 var hydrationErrors = null;
 
@@ -17652,9 +14579,9 @@ function warnIfHydrating() {
   }
 }
 
-function markDidSuspendWhileHydratingDEV() {
+function markDidThrowWhileHydratingDEV() {
   {
-    didSuspend = true;
+    didSuspendOrErrorDEV = true;
   }
 }
 
@@ -17665,7 +14592,7 @@ function enterHydrationState(fiber) {
   hydrationParentFiber = fiber;
   isHydrating = true;
   hydrationErrors = null;
-  didSuspend = false;
+  didSuspendOrErrorDEV = false;
   return true;
 }
 
@@ -17675,7 +14602,7 @@ function reenterHydrationStateFromDehydratedSuspenseInstance(fiber, suspenseInst
   hydrationParentFiber = fiber;
   isHydrating = true;
   hydrationErrors = null;
-  didSuspend = false;
+  didSuspendOrErrorDEV = false;
 
   if (treeContext !== null) {
     restoreSuspendedTreeContext(fiber, treeContext);
@@ -17688,17 +14615,25 @@ function warnUnhydratedInstance(returnFiber, instance) {
   {
     switch (returnFiber.tag) {
       case HostRoot:
-        didNotHydrateInstanceWithinContainer(returnFiber.stateNode.containerInfo, instance);
-        break;
+        {
+          didNotHydrateInstanceWithinContainer(returnFiber.stateNode.containerInfo, instance);
+          break;
+        }
 
       case HostComponent:
-        didNotHydrateInstance(returnFiber.type, returnFiber.memoizedProps, returnFiber.stateNode, instance);
-        break;
+        {
+          var isConcurrentMode = (returnFiber.mode & ConcurrentMode) !== NoMode;
+          didNotHydrateInstance(returnFiber.type, returnFiber.memoizedProps, returnFiber.stateNode, instance, // TODO: Delete this argument when we remove the legacy root API.
+          isConcurrentMode);
+          break;
+        }
 
       case SuspenseComponent:
-        var suspenseState = returnFiber.memoizedState;
-        if (suspenseState.dehydrated !== null) didNotHydrateInstanceWithinSuspenseInstance(suspenseState.dehydrated, instance);
-        break;
+        {
+          var suspenseState = returnFiber.memoizedState;
+          if (suspenseState.dehydrated !== null) didNotHydrateInstanceWithinSuspenseInstance(suspenseState.dehydrated, instance);
+          break;
+        }
     }
   }
 }
@@ -17720,7 +14655,7 @@ function deleteHydratableInstance(returnFiber, instance) {
 
 function warnNonhydratedInstance(returnFiber, fiber) {
   {
-    if (didSuspend) {
+    if (didSuspendOrErrorDEV) {
       // Inside a boundary that already suspended. We're currently rendering the
       // siblings of a suspended node. The mismatch may be due to the missing
       // data, so it's probably a false positive.
@@ -17756,19 +14691,25 @@ function warnNonhydratedInstance(returnFiber, fiber) {
 
           switch (fiber.tag) {
             case HostComponent:
-              var _type = fiber.type;
-              var _props = fiber.pendingProps;
-              didNotFindHydratableInstance(parentType, parentProps, parentInstance, _type);
-              break;
+              {
+                var _type = fiber.type;
+                var _props = fiber.pendingProps;
+                var isConcurrentMode = (returnFiber.mode & ConcurrentMode) !== NoMode;
+                didNotFindHydratableInstance(parentType, parentProps, parentInstance, _type, _props, // TODO: Delete this argument when we remove the legacy root API.
+                isConcurrentMode);
+                break;
+              }
 
             case HostText:
-              var _text = fiber.pendingProps;
-              didNotFindHydratableTextInstance(parentType, parentProps, parentInstance, _text);
-              break;
+              {
+                var _text = fiber.pendingProps;
 
-            case SuspenseComponent:
-              didNotFindHydratableSuspenseInstance(parentType, parentProps);
-              break;
+                var _isConcurrentMode = (returnFiber.mode & ConcurrentMode) !== NoMode;
+
+                didNotFindHydratableTextInstance(parentType, parentProps, parentInstance, _text, // TODO: Delete this argument when we remove the legacy root API.
+                _isConcurrentMode);
+                break;
+              }
           }
 
           break;
@@ -17840,29 +14781,27 @@ function tryHydrate(fiber, nextInstance) {
 
     case SuspenseComponent:
       {
-        {
-          var suspenseInstance = canHydrateSuspenseInstance(nextInstance);
+        var suspenseInstance = canHydrateSuspenseInstance(nextInstance);
 
-          if (suspenseInstance !== null) {
-            var suspenseState = {
-              dehydrated: suspenseInstance,
-              treeContext: getSuspendedTreeContext(),
-              retryLane: OffscreenLane
-            };
-            fiber.memoizedState = suspenseState; // Store the dehydrated fragment as a child fiber.
-            // This simplifies the code for getHostSibling and deleting nodes,
-            // since it doesn't have to consider all Suspense boundaries and
-            // check if they're dehydrated ones or not.
+        if (suspenseInstance !== null) {
+          var suspenseState = {
+            dehydrated: suspenseInstance,
+            treeContext: getSuspendedTreeContext(),
+            retryLane: OffscreenLane
+          };
+          fiber.memoizedState = suspenseState; // Store the dehydrated fragment as a child fiber.
+          // This simplifies the code for getHostSibling and deleting nodes,
+          // since it doesn't have to consider all Suspense boundaries and
+          // check if they're dehydrated ones or not.
 
-            var dehydratedFragment = createFiberFromDehydratedFragment(suspenseInstance);
-            dehydratedFragment.return = fiber;
-            fiber.child = dehydratedFragment;
-            hydrationParentFiber = fiber; // While a Suspense Instance does have children, we won't step into
-            // it during the first pass. Instead, we'll reenter it later.
+          var dehydratedFragment = createFiberFromDehydratedFragment(suspenseInstance);
+          dehydratedFragment.return = fiber;
+          fiber.child = dehydratedFragment;
+          hydrationParentFiber = fiber; // While a Suspense Instance does have children, we won't step into
+          // it during the first pass. Instead, we'll reenter it later.
 
-            nextHydratableInstance = null;
-            return true;
-          }
+          nextHydratableInstance = null;
+          return true;
         }
 
         return false;
@@ -17874,7 +14813,7 @@ function tryHydrate(fiber, nextInstance) {
 }
 
 function shouldClientRenderOnMismatch(fiber) {
-  return  (fiber.mode & ConcurrentMode) !== NoMode && (fiber.flags & DidCapture) === NoFlags;
+  return (fiber.mode & ConcurrentMode) !== NoMode && (fiber.flags & DidCapture) === NoFlags;
 }
 
 function throwOnHydrationMismatch(fiber) {
@@ -17934,7 +14873,7 @@ function tryToClaimNextHydratableInstance(fiber) {
 function prepareToHydrateHostInstance(fiber, rootContainerInstance, hostContext) {
 
   var instance = fiber.stateNode;
-  var shouldWarnIfMismatchDev = !didSuspend;
+  var shouldWarnIfMismatchDev = !didSuspendOrErrorDEV;
   var updatePayload = hydrateInstance(instance, fiber.type, fiber.memoizedProps, rootContainerInstance, hostContext, fiber, shouldWarnIfMismatchDev); // TODO: Type this specific to this type of component.
 
   fiber.updateQueue = updatePayload; // If the update payload indicates that there is a change or if there
@@ -17959,12 +14898,11 @@ function prepareToHydrateHostTextInstance(fiber) {
     var returnFiber = hydrationParentFiber;
 
     if (returnFiber !== null) {
-      var isConcurrentMode = (returnFiber.mode & ConcurrentMode) !== NoMode;
-
       switch (returnFiber.tag) {
         case HostRoot:
           {
             var parentContainer = returnFiber.stateNode.containerInfo;
+            var isConcurrentMode = (returnFiber.mode & ConcurrentMode) !== NoMode;
             didNotMatchHydratedContainerTextInstance(parentContainer, textInstance, textContent, // TODO: Delete this argument when we remove the legacy root API.
             isConcurrentMode);
             break;
@@ -17975,8 +14913,11 @@ function prepareToHydrateHostTextInstance(fiber) {
             var parentType = returnFiber.type;
             var parentProps = returnFiber.memoizedProps;
             var parentInstance = returnFiber.stateNode;
+
+            var _isConcurrentMode2 = (returnFiber.mode & ConcurrentMode) !== NoMode;
+
             didNotMatchHydratedTextInstance(parentType, parentProps, parentInstance, textInstance, textContent, // TODO: Delete this argument when we remove the legacy root API.
-            isConcurrentMode);
+            _isConcurrentMode2);
             break;
           }
       }
@@ -18086,7 +15027,7 @@ function resetHydrationState() {
   hydrationParentFiber = null;
   nextHydratableInstance = null;
   isHydrating = false;
-  didSuspend = false;
+  didSuspendOrErrorDEV = false;
 }
 
 function upgradeHydrationErrorsToRecoverable() {
@@ -18403,7 +15344,7 @@ function ChildReconciler(shouldTrackSideEffects) {
       // We need to do this after the Hot Reloading check above,
       // because hot reloading has different semantics than prod because
       // it doesn't resuspend. So we can't let the call below suspend.
-       typeof elementType === 'object' && elementType !== null && elementType.$$typeof === REACT_LAZY_TYPE && resolveLazy(elementType) === current.type) {
+      typeof elementType === 'object' && elementType !== null && elementType.$$typeof === REACT_LAZY_TYPE && resolveLazy(elementType) === current.type) {
         // Move based on index
         var existing = useFiber(current, element.props);
         existing.ref = coerceRef(returnFiber, current, element);
@@ -18484,11 +15425,9 @@ function ChildReconciler(shouldTrackSideEffects) {
 
         case REACT_LAZY_TYPE:
           {
-            {
-              var payload = newChild._payload;
-              var init = newChild._init;
-              return createChild(returnFiber, init(payload), lanes);
-            }
+            var payload = newChild._payload;
+            var init = newChild._init;
+            return createChild(returnFiber, init(payload), lanes);
           }
       }
 
@@ -18548,11 +15487,9 @@ function ChildReconciler(shouldTrackSideEffects) {
 
         case REACT_LAZY_TYPE:
           {
-            {
-              var payload = newChild._payload;
-              var init = newChild._init;
-              return updateSlot(returnFiber, oldFiber, init(payload), lanes);
-            }
+            var payload = newChild._payload;
+            var init = newChild._init;
+            return updateSlot(returnFiber, oldFiber, init(payload), lanes);
           }
       }
 
@@ -18601,12 +15538,9 @@ function ChildReconciler(shouldTrackSideEffects) {
           }
 
         case REACT_LAZY_TYPE:
-          {
-            var payload = newChild._payload;
-            var init = newChild._init;
-            return updateFromMap(existingChildren, returnFiber, newIdx, init(payload), lanes);
-          }
-
+          var payload = newChild._payload;
+          var init = newChild._init;
+          return updateFromMap(existingChildren, returnFiber, newIdx, init(payload), lanes);
       }
 
       if (isArray(newChild) || getIteratorFn(newChild)) {
@@ -18663,12 +15597,10 @@ function ChildReconciler(shouldTrackSideEffects) {
           break;
 
         case REACT_LAZY_TYPE:
-          {
-            var payload = child._payload;
-            var init = child._init;
-            warnOnInvalidKey(init(payload), knownKeys, returnFiber);
-            break;
-          }
+          var payload = child._payload;
+          var init = child._init;
+          warnOnInvalidKey(init(payload), knownKeys, returnFiber);
+          break;
       }
     }
 
@@ -19085,7 +16017,7 @@ function ChildReconciler(shouldTrackSideEffects) {
           // We need to do this after the Hot Reloading check above,
           // because hot reloading has different semantics than prod because
           // it doesn't resuspend. So we can't let the call below suspend.
-           typeof elementType === 'object' && elementType !== null && elementType.$$typeof === REACT_LAZY_TYPE && resolveLazy(elementType) === child.type) {
+          typeof elementType === 'object' && elementType !== null && elementType.$$typeof === REACT_LAZY_TYPE && resolveLazy(elementType) === child.type) {
             deleteRemainingChildren(returnFiber, child.sibling);
 
             var _existing = useFiber(child, element.props);
@@ -19181,13 +16113,10 @@ function ChildReconciler(shouldTrackSideEffects) {
           return placeSingleChild(reconcileSinglePortal(returnFiber, currentFirstChild, newChild, lanes));
 
         case REACT_LAZY_TYPE:
-          {
-            var payload = newChild._payload;
-            var init = newChild._init; // TODO: This function is supposed to be non-recursive.
+          var payload = newChild._payload;
+          var init = newChild._init; // TODO: This function is supposed to be non-recursive.
 
-            return reconcileChildFibers(returnFiber, currentFirstChild, init(payload), lanes);
-          }
-
+          return reconcileChildFibers(returnFiber, currentFirstChild, init(payload), lanes);
       }
 
       if (isArray(newChild)) {
@@ -20618,57 +17547,70 @@ function updateMemo(nextCreate, deps) {
 }
 
 function mountDeferredValue(value) {
-  var _mountState = mountState(value),
-      prevValue = _mountState[0],
-      setValue = _mountState[1];
-
-  mountEffect(function () {
-    var prevTransition = ReactCurrentBatchConfig$2.transition;
-    ReactCurrentBatchConfig$2.transition = {};
-
-    try {
-      setValue(value);
-    } finally {
-      ReactCurrentBatchConfig$2.transition = prevTransition;
-    }
-  }, [value]);
-  return prevValue;
+  var hook = mountWorkInProgressHook();
+  hook.memoizedState = value;
+  return value;
 }
 
 function updateDeferredValue(value) {
-  var _updateState = updateState(),
-      prevValue = _updateState[0],
-      setValue = _updateState[1];
-
-  updateEffect(function () {
-    var prevTransition = ReactCurrentBatchConfig$2.transition;
-    ReactCurrentBatchConfig$2.transition = {};
-
-    try {
-      setValue(value);
-    } finally {
-      ReactCurrentBatchConfig$2.transition = prevTransition;
-    }
-  }, [value]);
-  return prevValue;
+  var hook = updateWorkInProgressHook();
+  var resolvedCurrentHook = currentHook;
+  var prevValue = resolvedCurrentHook.memoizedState;
+  return updateDeferredValueImpl(hook, prevValue, value);
 }
 
 function rerenderDeferredValue(value) {
-  var _rerenderState = rerenderState(),
-      prevValue = _rerenderState[0],
-      setValue = _rerenderState[1];
+  var hook = updateWorkInProgressHook();
 
-  updateEffect(function () {
-    var prevTransition = ReactCurrentBatchConfig$2.transition;
-    ReactCurrentBatchConfig$2.transition = {};
+  if (currentHook === null) {
+    // This is a rerender during a mount.
+    hook.memoizedState = value;
+    return value;
+  } else {
+    // This is a rerender during an update.
+    var prevValue = currentHook.memoizedState;
+    return updateDeferredValueImpl(hook, prevValue, value);
+  }
+}
 
-    try {
-      setValue(value);
-    } finally {
-      ReactCurrentBatchConfig$2.transition = prevTransition;
+function updateDeferredValueImpl(hook, prevValue, value) {
+  var shouldDeferValue = !includesOnlyNonUrgentLanes(renderLanes);
+
+  if (shouldDeferValue) {
+    // This is an urgent update. If the value has changed, keep using the
+    // previous value and spawn a deferred render to update it later.
+    if (!objectIs(value, prevValue)) {
+      // Schedule a deferred render
+      var deferredLane = claimNextTransitionLane();
+      currentlyRenderingFiber$1.lanes = mergeLanes(currentlyRenderingFiber$1.lanes, deferredLane);
+      markSkippedUpdateLanes(deferredLane); // Set this to true to indicate that the rendered value is inconsistent
+      // from the latest value. The name "baseState" doesn't really match how we
+      // use it because we're reusing a state hook field instead of creating a
+      // new one.
+
+      hook.baseState = true;
+    } // Reuse the previous value
+
+
+    return prevValue;
+  } else {
+    // This is not an urgent update, so we can use the latest value regardless
+    // of what it is. No need to defer it.
+    // However, if we're currently inside a spawned render, then we need to mark
+    // this as an update to prevent the fiber from bailing out.
+    //
+    // `baseState` is true when the current value is different from the rendered
+    // value. The name doesn't really match how we use it because we're reusing
+    // a state hook field instead of creating a new one.
+    if (hook.baseState) {
+      // Flip this back to false.
+      hook.baseState = false;
+      markWorkInProgressReceivedUpdate();
     }
-  }, [value]);
-  return prevValue;
+
+    hook.memoizedState = value;
+    return value;
+  }
 }
 
 function startTransition(setPending, callback, options) {
@@ -20705,9 +17647,9 @@ function startTransition(setPending, callback, options) {
 }
 
 function mountTransition() {
-  var _mountState2 = mountState(false),
-      isPending = _mountState2[0],
-      setPending = _mountState2[1]; // The `start` method never changes.
+  var _mountState = mountState(false),
+      isPending = _mountState[0],
+      setPending = _mountState[1]; // The `start` method never changes.
 
 
   var start = startTransition.bind(null, setPending);
@@ -20717,8 +17659,8 @@ function mountTransition() {
 }
 
 function updateTransition() {
-  var _updateState2 = updateState(),
-      isPending = _updateState2[0];
+  var _updateState = updateState(),
+      isPending = _updateState[0];
 
   var hook = updateWorkInProgressHook();
   var start = hook.memoizedState;
@@ -20726,8 +17668,8 @@ function updateTransition() {
 }
 
 function rerenderTransition() {
-  var _rerenderState2 = rerenderState(),
-      isPending = _rerenderState2[0];
+  var _rerenderState = rerenderState(),
+      isPending = _rerenderState[0];
 
   var hook = updateWorkInProgressHook();
   var start = hook.memoizedState;
@@ -22383,6 +19325,12 @@ function throwException(root, returnFiber, sourceFiber, value, rootRenderLanes) 
     var wakeable = value;
     resetSuspendedComponent(sourceFiber);
 
+    {
+      if (getIsHydrating() && sourceFiber.mode & ConcurrentMode) {
+        markDidThrowWhileHydratingDEV();
+      }
+    }
+
 
     var suspenseBoundary = getNearestSuspenseBoundaryToCapture(returnFiber);
 
@@ -22424,7 +19372,7 @@ function throwException(root, returnFiber, sourceFiber, value, rootRenderLanes) 
   } else {
     // This is a regular error, not a Suspense wakeable.
     if (getIsHydrating() && sourceFiber.mode & ConcurrentMode) {
-      markDidSuspendWhileHydratingDEV();
+      markDidThrowWhileHydratingDEV();
 
       var _suspenseBoundary = getNearestSuspenseBoundaryToCapture(returnFiber); // If the error was thrown during hydration, we may be able to recover by
       // discarding the dehydrated content and switching to a client render.
@@ -22805,7 +19753,6 @@ function completeWork(current, workInProgress, renderLanes) {
     case HostRoot:
       {
         var fiberRoot = workInProgress.stateNode;
-
         popHostContainer(workInProgress);
         popTopLevelContextObject(workInProgress);
         resetWorkInProgressVersions();
@@ -22849,6 +19796,7 @@ function completeWork(current, workInProgress, renderLanes) {
 
         updateHostContainer(current, workInProgress);
         bubbleProperties(workInProgress);
+
         return null;
       }
 
@@ -22953,88 +19901,86 @@ function completeWork(current, workInProgress, renderLanes) {
         popSuspenseContext(workInProgress);
         var nextState = workInProgress.memoizedState;
 
-        {
-          if ( hasUnhydratedTailNodes() && (workInProgress.mode & ConcurrentMode) !== NoMode && (workInProgress.flags & DidCapture) === NoFlags) {
-            warnIfUnhydratedTailNodes(workInProgress);
-            resetHydrationState();
-            workInProgress.flags |= ForceClientRender | Incomplete | ShouldCapture;
-            return workInProgress;
-          }
-
-          if (nextState !== null && nextState.dehydrated !== null) {
-            // We might be inside a hydration state the first time we're picking up this
-            // Suspense boundary, and also after we've reentered it for further hydration.
-            var _wasHydrated3 = popHydrationState(workInProgress);
-
-            if (current === null) {
-              if (!_wasHydrated3) {
-                throw new Error('A dehydrated suspense component was completed without a hydrated node. ' + 'This is probably a bug in React.');
-              }
-
-              prepareToHydrateHostSuspenseInstance(workInProgress);
-              bubbleProperties(workInProgress);
-
-              {
-                if ((workInProgress.mode & ProfileMode) !== NoMode) {
-                  var isTimedOutSuspense = nextState !== null;
-
-                  if (isTimedOutSuspense) {
-                    // Don't count time spent in a timed out Suspense subtree as part of the base duration.
-                    var primaryChildFragment = workInProgress.child;
-
-                    if (primaryChildFragment !== null) {
-                      // $FlowFixMe Flow doesn't support type casting in combination with the -= operator
-                      workInProgress.treeBaseDuration -= primaryChildFragment.treeBaseDuration;
-                    }
-                  }
-                }
-              }
-
-              return null;
-            } else {
-              // We might have reentered this boundary to hydrate it. If so, we need to reset the hydration
-              // state since we're now exiting out of it. popHydrationState doesn't do that for us.
-              resetHydrationState();
-
-              if ((workInProgress.flags & DidCapture) === NoFlags) {
-                // This boundary did not suspend so it's now hydrated and unsuspended.
-                workInProgress.memoizedState = null;
-              } // If nothing suspended, we need to schedule an effect to mark this boundary
-              // as having hydrated so events know that they're free to be invoked.
-              // It's also a signal to replay events and the suspense callback.
-              // If something suspended, schedule an effect to attach retry listeners.
-              // So we might as well always mark this.
-
-
-              workInProgress.flags |= Update;
-              bubbleProperties(workInProgress);
-
-              {
-                if ((workInProgress.mode & ProfileMode) !== NoMode) {
-                  var _isTimedOutSuspense = nextState !== null;
-
-                  if (_isTimedOutSuspense) {
-                    // Don't count time spent in a timed out Suspense subtree as part of the base duration.
-                    var _primaryChildFragment = workInProgress.child;
-
-                    if (_primaryChildFragment !== null) {
-                      // $FlowFixMe Flow doesn't support type casting in combination with the -= operator
-                      workInProgress.treeBaseDuration -= _primaryChildFragment.treeBaseDuration;
-                    }
-                  }
-                }
-              }
-
-              return null;
-            }
-          } // Successfully completed this tree. If this was a forced client render,
-          // there may have been recoverable errors during first hydration
-          // attempt. If so, add them to a queue so we can log them in the
-          // commit phase.
-
-
-          upgradeHydrationErrorsToRecoverable();
+        if (hasUnhydratedTailNodes() && (workInProgress.mode & ConcurrentMode) !== NoMode && (workInProgress.flags & DidCapture) === NoFlags) {
+          warnIfUnhydratedTailNodes(workInProgress);
+          resetHydrationState();
+          workInProgress.flags |= ForceClientRender | Incomplete | ShouldCapture;
+          return workInProgress;
         }
+
+        if (nextState !== null && nextState.dehydrated !== null) {
+          // We might be inside a hydration state the first time we're picking up this
+          // Suspense boundary, and also after we've reentered it for further hydration.
+          var _wasHydrated3 = popHydrationState(workInProgress);
+
+          if (current === null) {
+            if (!_wasHydrated3) {
+              throw new Error('A dehydrated suspense component was completed without a hydrated node. ' + 'This is probably a bug in React.');
+            }
+
+            prepareToHydrateHostSuspenseInstance(workInProgress);
+            bubbleProperties(workInProgress);
+
+            {
+              if ((workInProgress.mode & ProfileMode) !== NoMode) {
+                var isTimedOutSuspense = nextState !== null;
+
+                if (isTimedOutSuspense) {
+                  // Don't count time spent in a timed out Suspense subtree as part of the base duration.
+                  var primaryChildFragment = workInProgress.child;
+
+                  if (primaryChildFragment !== null) {
+                    // $FlowFixMe Flow doesn't support type casting in combination with the -= operator
+                    workInProgress.treeBaseDuration -= primaryChildFragment.treeBaseDuration;
+                  }
+                }
+              }
+            }
+
+            return null;
+          } else {
+            // We might have reentered this boundary to hydrate it. If so, we need to reset the hydration
+            // state since we're now exiting out of it. popHydrationState doesn't do that for us.
+            resetHydrationState();
+
+            if ((workInProgress.flags & DidCapture) === NoFlags) {
+              // This boundary did not suspend so it's now hydrated and unsuspended.
+              workInProgress.memoizedState = null;
+            } // If nothing suspended, we need to schedule an effect to mark this boundary
+            // as having hydrated so events know that they're free to be invoked.
+            // It's also a signal to replay events and the suspense callback.
+            // If something suspended, schedule an effect to attach retry listeners.
+            // So we might as well always mark this.
+
+
+            workInProgress.flags |= Update;
+            bubbleProperties(workInProgress);
+
+            {
+              if ((workInProgress.mode & ProfileMode) !== NoMode) {
+                var _isTimedOutSuspense = nextState !== null;
+
+                if (_isTimedOutSuspense) {
+                  // Don't count time spent in a timed out Suspense subtree as part of the base duration.
+                  var _primaryChildFragment = workInProgress.child;
+
+                  if (_primaryChildFragment !== null) {
+                    // $FlowFixMe Flow doesn't support type casting in combination with the -= operator
+                    workInProgress.treeBaseDuration -= _primaryChildFragment.treeBaseDuration;
+                  }
+                }
+              }
+            }
+
+            return null;
+          }
+        } // Successfully completed this tree. If this was a forced client render,
+        // there may have been recoverable errors during first hydration
+        // attempt. If so, add them to a queue so we can log them in the
+        // commit phase.
+
+
+        upgradeHydrationErrorsToRecoverable();
 
         if ((workInProgress.flags & DidCapture) !== NoFlags) {
           // Something suspended. Re-render with the fallback children.
@@ -23057,42 +20003,47 @@ function completeWork(current, workInProgress, renderLanes) {
           var _prevState = current.memoizedState;
           prevDidTimeout = _prevState !== null;
         }
-        // an effect to toggle the subtree's visibility. When we switch from
-        // fallback -> primary, the inner Offscreen fiber schedules this effect
-        // as part of its normal complete phase. But when we switch from
-        // primary -> fallback, the inner Offscreen fiber does not have a complete
-        // phase. So we need to schedule its effect here.
-        //
-        // We also use this flag to connect/disconnect the effects, but the same
-        // logic applies: when re-connecting, the Offscreen fiber's complete
-        // phase will handle scheduling the effect. It's only when the fallback
-        // is active that we have to do anything special.
+        // a passive effect, which is when we process the transitions
 
 
-        if (nextDidTimeout && !prevDidTimeout) {
-          var _offscreenFiber = workInProgress.child;
-          _offscreenFiber.flags |= Visibility; // TODO: This will still suspend a synchronous tree if anything
-          // in the concurrent tree already suspended during this render.
-          // This is a known bug.
+        if (nextDidTimeout !== prevDidTimeout) {
+          // an effect to toggle the subtree's visibility. When we switch from
+          // fallback -> primary, the inner Offscreen fiber schedules this effect
+          // as part of its normal complete phase. But when we switch from
+          // primary -> fallback, the inner Offscreen fiber does not have a complete
+          // phase. So we need to schedule its effect here.
+          //
+          // We also use this flag to connect/disconnect the effects, but the same
+          // logic applies: when re-connecting, the Offscreen fiber's complete
+          // phase will handle scheduling the effect. It's only when the fallback
+          // is active that we have to do anything special.
 
-          if ((workInProgress.mode & ConcurrentMode) !== NoMode) {
-            // TODO: Move this back to throwException because this is too late
-            // if this is a large tree which is common for initial loads. We
-            // don't know if we should restart a render or not until we get
-            // this marker, and this is too late.
-            // If this render already had a ping or lower pri updates,
-            // and this is the first time we know we're going to suspend we
-            // should be able to immediately restart from within throwException.
-            var hasInvisibleChildContext = current === null && (workInProgress.memoizedProps.unstable_avoidThisFallback !== true || !enableSuspenseAvoidThisFallback);
 
-            if (hasInvisibleChildContext || hasSuspenseContext(suspenseStackCursor.current, InvisibleParentSuspenseContext)) {
-              // If this was in an invisible tree or a new render, then showing
-              // this boundary is ok.
-              renderDidSuspend();
-            } else {
-              // Otherwise, we're going to have to hide content so we should
-              // suspend for longer if possible.
-              renderDidSuspendDelayIfPossible();
+          if (nextDidTimeout) {
+            var _offscreenFiber2 = workInProgress.child;
+            _offscreenFiber2.flags |= Visibility; // TODO: This will still suspend a synchronous tree if anything
+            // in the concurrent tree already suspended during this render.
+            // This is a known bug.
+
+            if ((workInProgress.mode & ConcurrentMode) !== NoMode) {
+              // TODO: Move this back to throwException because this is too late
+              // if this is a large tree which is common for initial loads. We
+              // don't know if we should restart a render or not until we get
+              // this marker, and this is too late.
+              // If this render already had a ping or lower pri updates,
+              // and this is the first time we know we're going to suspend we
+              // should be able to immediately restart from within throwException.
+              var hasInvisibleChildContext = current === null && (workInProgress.memoizedProps.unstable_avoidThisFallback !== true || !enableSuspenseAvoidThisFallback);
+
+              if (hasInvisibleChildContext || hasSuspenseContext(suspenseStackCursor.current, InvisibleParentSuspenseContext)) {
+                // If this was in an invisible tree or a new render, then showing
+                // this boundary is ok.
+                renderDidSuspend();
+              } else {
+                // Otherwise, we're going to have to hide content so we should
+                // suspend for longer if possible.
+                renderDidSuspendDelayIfPossible();
+              }
             }
           }
         }
@@ -23390,7 +20341,6 @@ function completeWork(current, workInProgress, renderLanes) {
             }
           }
         }
-
         return null;
       }
 
@@ -23654,7 +20604,23 @@ function updateSimpleMemoComponent(current, workInProgress, Component, nextProps
 
     if (shallowEqual(prevProps, nextProps) && current.ref === workInProgress.ref && ( // Prevent bailout if the implementation changed due to hot reload.
      workInProgress.type === current.type )) {
-      didReceiveUpdate = false;
+      didReceiveUpdate = false; // The props are shallowly equal. Reuse the previous props object, like we
+      // would during a normal fiber bailout.
+      //
+      // We don't have strong guarantees that the props object is referentially
+      // equal during updates where we can't bail out anyway — like if the props
+      // are shallowly equal, but there's a local state or context update in the
+      // same batch.
+      //
+      // However, as a principle, we should aim to make the behavior consistent
+      // across different ways of memoizing a component. For example, React.memo
+      // has a different internal Fiber layout if you pass a normal function
+      // component (SimpleMemoComponent) versus if you pass a different type
+      // like forwardRef (MemoComponent). But this is an implementation detail.
+      // Wrapping a component in forwardRef (or React.lazy, etc) shouldn't
+      // affect whether the props object is reused during a bailout.
+
+      workInProgress.pendingProps = nextProps = prevProps;
 
       if (!checkScheduledUpdateOrContext(current, renderLanes)) {
         // The pending lanes were cleared at the beginning of beginWork. We're
@@ -23692,9 +20658,11 @@ function updateOffscreenComponent(current, workInProgress, renderLanes) {
     // Rendering a hidden tree.
     if ((workInProgress.mode & ConcurrentMode) === NoMode) {
       // In legacy sync mode, don't defer the subtree. Render it now.
+      // TODO: Consider how Offscreen should work with transitions in the future
       var nextState = {
         baseLanes: NoLanes,
-        cachePool: null
+        cachePool: null,
+        transitions: null
       };
       workInProgress.memoizedState = nextState;
 
@@ -23716,7 +20684,8 @@ function updateOffscreenComponent(current, workInProgress, renderLanes) {
       workInProgress.lanes = workInProgress.childLanes = laneToLanes(OffscreenLane);
       var _nextState = {
         baseLanes: nextBaseLanes,
-        cachePool: spawnedCachePool
+        cachePool: spawnedCachePool,
+        transitions: null
       };
       workInProgress.memoizedState = _nextState;
       workInProgress.updateQueue = null;
@@ -23732,7 +20701,8 @@ function updateOffscreenComponent(current, workInProgress, renderLanes) {
       // Rendering at offscreen, so we can clear the base lanes.
       var _nextState2 = {
         baseLanes: NoLanes,
-        cachePool: null
+        cachePool: null,
+        transitions: null
       };
       workInProgress.memoizedState = _nextState2; // Push the lanes that were skipped when we bailed out.
 
@@ -23747,7 +20717,6 @@ function updateOffscreenComponent(current, workInProgress, renderLanes) {
     if (prevState !== null) {
       // We're going from hidden -> visible.
       _subtreeRenderLanes = mergeLanes(prevState.baseLanes, renderLanes);
-
 
       workInProgress.memoizedState = null;
     } else {
@@ -24101,6 +21070,7 @@ function updateHostRoot(current, workInProgress, renderLanes) {
       element: nextChildren,
       isDehydrated: false,
       cache: nextState.cache,
+      pendingSuspenseBoundaries: nextState.pendingSuspenseBoundaries,
       transitions: nextState.transitions
     };
     var updateQueue = workInProgress.updateQueue; // `baseState` can always be the last state because the root doesn't
@@ -24521,7 +21491,8 @@ var SUSPENDED_MARKER = {
 function mountSuspenseOffscreenState(renderLanes) {
   return {
     baseLanes: renderLanes,
-    cachePool: getSuspendedCache()
+    cachePool: getSuspendedCache(),
+    transitions: null
   };
 }
 
@@ -24530,7 +21501,8 @@ function updateSuspenseOffscreenState(prevOffscreenState, renderLanes) {
 
   return {
     baseLanes: mergeLanes(prevOffscreenState.baseLanes, renderLanes),
-    cachePool: cachePool
+    cachePool: cachePool,
+    transitions: prevOffscreenState.transitions
   };
 } // TODO: Probably should inline this back
 
@@ -24620,15 +21592,13 @@ function updateSuspenseComponent(current, workInProgress, renderLanes) {
     // If we're currently hydrating, try to hydrate this boundary.
     tryToClaimNextHydratableInstance(workInProgress); // This could've been a dehydrated suspense component.
 
-    {
-      var suspenseState = workInProgress.memoizedState;
+    var suspenseState = workInProgress.memoizedState;
 
-      if (suspenseState !== null) {
-        var dehydrated = suspenseState.dehydrated;
+    if (suspenseState !== null) {
+      var dehydrated = suspenseState.dehydrated;
 
-        if (dehydrated !== null) {
-          return mountDehydratedSuspenseComponent(workInProgress, dehydrated);
-        }
+      if (dehydrated !== null) {
+        return mountDehydratedSuspenseComponent(workInProgress, dehydrated);
       }
     }
 
@@ -24640,6 +21610,7 @@ function updateSuspenseComponent(current, workInProgress, renderLanes) {
       var primaryChildFragment = workInProgress.child;
       primaryChildFragment.memoizedState = mountSuspenseOffscreenState(renderLanes);
       workInProgress.memoizedState = SUSPENDED_MARKER;
+
       return fallbackFragment;
     } else {
       return mountSuspensePrimaryChildren(workInProgress, nextPrimaryChildren);
@@ -24653,35 +21624,33 @@ function updateSuspenseComponent(current, workInProgress, renderLanes) {
     if (prevState !== null) {
       // The current tree is already showing a fallback
       // Special path for hydration
-      {
-        var _dehydrated = prevState.dehydrated;
+      var _dehydrated = prevState.dehydrated;
 
-        if (_dehydrated !== null) {
-          if (!didSuspend) {
-            return updateDehydratedSuspenseComponent(current, workInProgress, _dehydrated, prevState, renderLanes);
-          } else if (workInProgress.flags & ForceClientRender) {
-            // Something errored during hydration. Try again without hydrating.
-            workInProgress.flags &= ~ForceClientRender;
-            return retrySuspenseComponentWithoutHydrating(current, workInProgress, renderLanes, new Error('There was an error while hydrating this Suspense boundary. ' + 'Switched to client rendering.'));
-          } else if (workInProgress.memoizedState !== null) {
-            // Something suspended and we should still be in dehydrated mode.
-            // Leave the existing child in place.
-            workInProgress.child = current.child; // The dehydrated completion pass expects this flag to be there
-            // but the normal suspense pass doesn't.
+      if (_dehydrated !== null) {
+        if (!didSuspend) {
+          return updateDehydratedSuspenseComponent(current, workInProgress, _dehydrated, prevState, renderLanes);
+        } else if (workInProgress.flags & ForceClientRender) {
+          // Something errored during hydration. Try again without hydrating.
+          workInProgress.flags &= ~ForceClientRender;
+          return retrySuspenseComponentWithoutHydrating(current, workInProgress, renderLanes, new Error('There was an error while hydrating this Suspense boundary. ' + 'Switched to client rendering.'));
+        } else if (workInProgress.memoizedState !== null) {
+          // Something suspended and we should still be in dehydrated mode.
+          // Leave the existing child in place.
+          workInProgress.child = current.child; // The dehydrated completion pass expects this flag to be there
+          // but the normal suspense pass doesn't.
 
-            workInProgress.flags |= DidCapture;
-            return null;
-          } else {
-            // Suspended but we should no longer be in dehydrated mode.
-            // Therefore we now have to render the fallback.
-            var _nextPrimaryChildren = nextProps.children;
-            var _nextFallbackChildren = nextProps.fallback;
-            var fallbackChildFragment = mountSuspenseFallbackAfterRetryWithoutHydrating(current, workInProgress, _nextPrimaryChildren, _nextFallbackChildren, renderLanes);
-            var _primaryChildFragment2 = workInProgress.child;
-            _primaryChildFragment2.memoizedState = mountSuspenseOffscreenState(renderLanes);
-            workInProgress.memoizedState = SUSPENDED_MARKER;
-            return fallbackChildFragment;
-          }
+          workInProgress.flags |= DidCapture;
+          return null;
+        } else {
+          // Suspended but we should no longer be in dehydrated mode.
+          // Therefore we now have to render the fallback.
+          var _nextPrimaryChildren = nextProps.children;
+          var _nextFallbackChildren = nextProps.fallback;
+          var fallbackChildFragment = mountSuspenseFallbackAfterRetryWithoutHydrating(current, workInProgress, _nextPrimaryChildren, _nextFallbackChildren, renderLanes);
+          var _primaryChildFragment2 = workInProgress.child;
+          _primaryChildFragment2.memoizedState = mountSuspenseOffscreenState(renderLanes);
+          workInProgress.memoizedState = SUSPENDED_MARKER;
+          return fallbackChildFragment;
         }
       }
 
@@ -24694,6 +21663,7 @@ function updateSuspenseComponent(current, workInProgress, renderLanes) {
         var _primaryChildFragment3 = workInProgress.child;
         var prevOffscreenState = current.child.memoizedState;
         _primaryChildFragment3.memoizedState = prevOffscreenState === null ? mountSuspenseOffscreenState(renderLanes) : updateSuspenseOffscreenState(prevOffscreenState, renderLanes);
+
         _primaryChildFragment3.childLanes = getRemainingWorkInPrimaryTree(current, renderLanes);
         workInProgress.memoizedState = SUSPENDED_MARKER;
         return _fallbackChildFragment;
@@ -24717,8 +21687,9 @@ function updateSuspenseComponent(current, workInProgress, renderLanes) {
         var _primaryChildFragment5 = workInProgress.child;
         var _prevOffscreenState = current.child.memoizedState;
         _primaryChildFragment5.memoizedState = _prevOffscreenState === null ? mountSuspenseOffscreenState(renderLanes) : updateSuspenseOffscreenState(_prevOffscreenState, renderLanes);
-        _primaryChildFragment5.childLanes = getRemainingWorkInPrimaryTree(current, renderLanes); // Skip the primary children, and continue working on the
+        _primaryChildFragment5.childLanes = getRemainingWorkInPrimaryTree(current, renderLanes);
         // fallback children.
+
 
         workInProgress.memoizedState = SUSPENDED_MARKER;
         return _fallbackChildFragment2;
@@ -25684,17 +22655,15 @@ function attemptEarlyBailoutIfNoScheduledUpdate(current, workInProgress, renderL
         var state = workInProgress.memoizedState;
 
         if (state !== null) {
-          {
-            if (state.dehydrated !== null) {
-              pushSuspenseContext(workInProgress, setDefaultShallowSuspenseContext(suspenseStackCursor.current)); // We know that this component will suspend again because if it has
-              // been unsuspended it has committed as a resolved Suspense component.
-              // If it needs to be retried, it should have work scheduled on it.
+          if (state.dehydrated !== null) {
+            pushSuspenseContext(workInProgress, setDefaultShallowSuspenseContext(suspenseStackCursor.current)); // We know that this component will suspend again because if it has
+            // been unsuspended it has committed as a resolved Suspense component.
+            // If it needs to be retried, it should have work scheduled on it.
 
-              workInProgress.flags |= DidCapture; // We should never render the children of a dehydrated boundary until we
-              // upgrade it. We return null instead of bailoutOnAlreadyFinishedWork.
+            workInProgress.flags |= DidCapture; // We should never render the children of a dehydrated boundary until we
+            // upgrade it. We return null instead of bailoutOnAlreadyFinishedWork.
 
-              return null;
-            }
+            return null;
           } // If this boundary is currently timed out, we need to decide
           // whether to retry the primary children, or to skip over it and
           // go straight to the fallback. Check the priority of the primary
@@ -26028,7 +22997,7 @@ function unwindWork(current, workInProgress, renderLanes) {
 
     case HostRoot:
       {
-
+        var root = workInProgress.stateNode;
         popHostContainer(workInProgress);
         popTopLevelContextObject(workInProgress);
         resetWorkInProgressVersions();
@@ -26055,17 +23024,14 @@ function unwindWork(current, workInProgress, renderLanes) {
     case SuspenseComponent:
       {
         popSuspenseContext(workInProgress);
+        var suspenseState = workInProgress.memoizedState;
 
-        {
-          var suspenseState = workInProgress.memoizedState;
-
-          if (suspenseState !== null && suspenseState.dehydrated !== null) {
-            if (workInProgress.alternate === null) {
-              throw new Error('Threw in newly mounted dehydrated component. This is likely a bug in ' + 'React. Please file an issue.');
-            }
-
-            resetHydrationState();
+        if (suspenseState !== null && suspenseState.dehydrated !== null) {
+          if (workInProgress.alternate === null) {
+            throw new Error('Threw in newly mounted dehydrated component. This is likely a bug in ' + 'React. Please file an issue.');
           }
+
+          resetHydrationState();
         }
 
         var _flags2 = workInProgress.flags;
@@ -26103,7 +23069,6 @@ function unwindWork(current, workInProgress, renderLanes) {
     case OffscreenComponent:
     case LegacyHiddenComponent:
       popRenderLanes(workInProgress);
-
       return null;
 
     case CacheComponent:
@@ -26136,7 +23101,7 @@ function unwindInterruptedWork(current, interruptedWork, renderLanes) {
 
     case HostRoot:
       {
-
+        var root = interruptedWork.stateNode;
         popHostContainer(interruptedWork);
         popTopLevelContextObject(interruptedWork);
         resetWorkInProgressVersions();
@@ -26169,7 +23134,6 @@ function unwindInterruptedWork(current, interruptedWork, renderLanes) {
     case OffscreenComponent:
     case LegacyHiddenComponent:
       popRenderLanes(interruptedWork);
-
       break;
   }
 }
@@ -26190,7 +23154,6 @@ var nextEffect = null; // Used for Profiling builds to track updaters.
 
 var inProgressLanes = null;
 var inProgressRoot = null;
-
 function reportUncaughtErrorInDEV(error) {
   // Wrapping each small part of the commit phase into a guarded
   // callback is a bit too slow (https://github.com/facebook/react/pull/21666).
@@ -26226,7 +23189,6 @@ function safelyCallCommitHookLayoutEffectListMount(current, nearestMountedAncest
   try {
     commitHookEffectListMount(Layout, current);
   } catch (error) {
-    reportUncaughtErrorInDEV(error);
     captureCommitPhaseError(current, nearestMountedAncestor, error);
   }
 } // Capture errors so they don't interrupt unmounting.
@@ -26236,7 +23198,6 @@ function safelyCallComponentWillUnmount(current, nearestMountedAncestor, instanc
   try {
     callComponentWillUnmountWithTimer(current, instance);
   } catch (error) {
-    reportUncaughtErrorInDEV(error);
     captureCommitPhaseError(current, nearestMountedAncestor, error);
   }
 } // Capture errors so they don't interrupt mounting.
@@ -26246,7 +23207,6 @@ function safelyCallComponentDidMount(current, nearestMountedAncestor, instance) 
   try {
     instance.componentDidMount();
   } catch (error) {
-    reportUncaughtErrorInDEV(error);
     captureCommitPhaseError(current, nearestMountedAncestor, error);
   }
 } // Capture errors so they don't interrupt mounting.
@@ -26256,7 +23216,6 @@ function safelyAttachRef(current, nearestMountedAncestor) {
   try {
     commitAttachRef(current);
   } catch (error) {
-    reportUncaughtErrorInDEV(error);
     captureCommitPhaseError(current, nearestMountedAncestor, error);
   }
 }
@@ -26280,7 +23239,6 @@ function safelyDetachRef(current, nearestMountedAncestor) {
           retVal = ref(null);
         }
       } catch (error) {
-        reportUncaughtErrorInDEV(error);
         captureCommitPhaseError(current, nearestMountedAncestor, error);
       }
 
@@ -26299,7 +23257,6 @@ function safelyCallDestroy(current, nearestMountedAncestor, destroy) {
   try {
     destroy();
   } catch (error) {
-    reportUncaughtErrorInDEV(error);
     captureCommitPhaseError(current, nearestMountedAncestor, error);
   }
 }
@@ -26324,7 +23281,7 @@ function commitBeforeMutationEffects_begin() {
     var child = fiber.child;
 
     if ((fiber.subtreeFlags & BeforeMutationMask) !== NoFlags && child !== null) {
-      ensureCorrectReturnPointer(child, fiber);
+      child.return = fiber;
       nextEffect = child;
     } else {
       commitBeforeMutationEffects_complete();
@@ -26340,7 +23297,6 @@ function commitBeforeMutationEffects_complete() {
     try {
       commitBeforeMutationEffectsOnFiber(fiber);
     } catch (error) {
-      reportUncaughtErrorInDEV(error);
       captureCommitPhaseError(fiber, fiber.return, error);
     }
 
@@ -26348,7 +23304,7 @@ function commitBeforeMutationEffects_complete() {
     var sibling = fiber.sibling;
 
     if (sibling !== null) {
-      ensureCorrectReturnPointer(sibling, fiber.return);
+      sibling.return = fiber.return;
       nextEffect = sibling;
       return;
     }
@@ -26461,7 +23417,19 @@ function commitHookEffectListUnmount(flags, finishedWork, nearestMountedAncestor
             }
           }
 
+          {
+            if ((flags & Insertion) !== NoFlags$1) {
+              setIsRunningInsertionEffect(true);
+            }
+          }
+
           safelyCallDestroy(finishedWork, nearestMountedAncestor, destroy);
+
+          {
+            if ((flags & Insertion) !== NoFlags$1) {
+              setIsRunningInsertionEffect(false);
+            }
+          }
 
           {
             if ((flags & Passive$1) !== NoFlags$1) {
@@ -26498,7 +23466,20 @@ function commitHookEffectListMount(flags, finishedWork) {
 
 
         var create = effect.create;
+
+        {
+          if ((flags & Insertion) !== NoFlags$1) {
+            setIsRunningInsertionEffect(true);
+          }
+        }
+
         effect.destroy = create();
+
+        {
+          if ((flags & Insertion) !== NoFlags$1) {
+            setIsRunningInsertionEffect(false);
+          }
+        }
 
         {
           if ((flags & Passive$1) !== NoFlags$1) {
@@ -26905,22 +23886,31 @@ function hideOrUnhideAllChildren(finishedWork, isHidden) {
       if (node.tag === HostComponent) {
         if (hostSubtreeRoot === null) {
           hostSubtreeRoot = node;
-          var instance = node.stateNode;
 
-          if (isHidden) {
-            hideInstance(instance);
-          } else {
-            unhideInstance(node.stateNode, node.memoizedProps);
+          try {
+            var instance = node.stateNode;
+
+            if (isHidden) {
+              hideInstance(instance);
+            } else {
+              unhideInstance(node.stateNode, node.memoizedProps);
+            }
+          } catch (error) {
+            captureCommitPhaseError(finishedWork, finishedWork.return, error);
           }
         }
       } else if (node.tag === HostText) {
         if (hostSubtreeRoot === null) {
-          var _instance3 = node.stateNode;
+          try {
+            var _instance3 = node.stateNode;
 
-          if (isHidden) {
-            hideTextInstance(_instance3);
-          } else {
-            unhideTextInstance(_instance3, node.memoizedProps);
+            if (isHidden) {
+              hideTextInstance(_instance3);
+            } else {
+              unhideTextInstance(_instance3, node.memoizedProps);
+            }
+          } catch (error) {
+            captureCommitPhaseError(finishedWork, finishedWork.return, error);
           }
         }
       } else if ((node.tag === OffscreenComponent || node.tag === LegacyHiddenComponent) && node.memoizedState !== null && node !== finishedWork) ; else if (node.child !== null) {
@@ -26999,164 +23989,6 @@ function commitAttachRef(finishedWork) {
 
       ref.current = instanceToUse;
     }
-  }
-}
-
-function commitDetachRef(current) {
-  var currentRef = current.ref;
-
-  if (currentRef !== null) {
-    if (typeof currentRef === 'function') {
-      if ( current.mode & ProfileMode) {
-        try {
-          startLayoutEffectTimer();
-          currentRef(null);
-        } finally {
-          recordLayoutEffectDuration(current);
-        }
-      } else {
-        currentRef(null);
-      }
-    } else {
-      currentRef.current = null;
-    }
-  }
-} // User-originating errors (lifecycles and refs) should not interrupt
-// deletion, so don't let them throw. Host-originating errors should
-// interrupt deletion, so it's okay
-
-
-function commitUnmount(finishedRoot, current, nearestMountedAncestor) {
-  onCommitUnmount(current);
-
-  switch (current.tag) {
-    case FunctionComponent:
-    case ForwardRef:
-    case MemoComponent:
-    case SimpleMemoComponent:
-      {
-        var updateQueue = current.updateQueue;
-
-        if (updateQueue !== null) {
-          var lastEffect = updateQueue.lastEffect;
-
-          if (lastEffect !== null) {
-            var firstEffect = lastEffect.next;
-            var effect = firstEffect;
-
-            do {
-              var _effect = effect,
-                  destroy = _effect.destroy,
-                  tag = _effect.tag;
-
-              if (destroy !== undefined) {
-                if ((tag & Insertion) !== NoFlags$1) {
-                  safelyCallDestroy(current, nearestMountedAncestor, destroy);
-                } else if ((tag & Layout) !== NoFlags$1) {
-                  {
-                    markComponentLayoutEffectUnmountStarted(current);
-                  }
-
-                  if ( current.mode & ProfileMode) {
-                    startLayoutEffectTimer();
-                    safelyCallDestroy(current, nearestMountedAncestor, destroy);
-                    recordLayoutEffectDuration(current);
-                  } else {
-                    safelyCallDestroy(current, nearestMountedAncestor, destroy);
-                  }
-
-                  {
-                    markComponentLayoutEffectUnmountStopped();
-                  }
-                }
-              }
-
-              effect = effect.next;
-            } while (effect !== firstEffect);
-          }
-        }
-
-        return;
-      }
-
-    case ClassComponent:
-      {
-        safelyDetachRef(current, nearestMountedAncestor);
-        var instance = current.stateNode;
-
-        if (typeof instance.componentWillUnmount === 'function') {
-          safelyCallComponentWillUnmount(current, nearestMountedAncestor, instance);
-        }
-
-        return;
-      }
-
-    case HostComponent:
-      {
-        safelyDetachRef(current, nearestMountedAncestor);
-        return;
-      }
-
-    case HostPortal:
-      {
-        // TODO: this is recursive.
-        // We are also not using this parent because
-        // the portal will get pushed immediately.
-        {
-          unmountHostComponents(finishedRoot, current, nearestMountedAncestor);
-        }
-
-        return;
-      }
-
-    case DehydratedFragment:
-      {
-
-        return;
-      }
-
-    case ScopeComponent:
-      {
-
-        return;
-      }
-  }
-}
-
-function commitNestedUnmounts(finishedRoot, root, nearestMountedAncestor) {
-  // While we're inside a removed host node we don't want to call
-  // removeChild on the inner nodes because they're removed by the top
-  // call anyway. We also want to call componentWillUnmount on all
-  // composites before this host node is removed from the tree. Therefore
-  // we do an inner loop while we're still inside the host node.
-  var node = root;
-
-  while (true) {
-    commitUnmount(finishedRoot, node, nearestMountedAncestor); // Visit children because they may contain more composite or host nodes.
-    // Skip portals because commitUnmount() currently visits them recursively.
-
-    if (node.child !== null && ( // If we use mutation we drill down into portals using commitUnmount above.
-    // If we don't use mutation we drill down into portals here instead.
-     node.tag !== HostPortal)) {
-      node.child.return = node;
-      node = node.child;
-      continue;
-    }
-
-    if (node === root) {
-      return;
-    }
-
-    while (node.sibling === null) {
-      if (node.return === null || node.return === root) {
-        return;
-      }
-
-      node = node.return;
-    }
-
-    node.sibling.return = node.return;
-    node = node.sibling;
   }
 }
 
@@ -27407,208 +24239,118 @@ function insertOrAppendPlacementNode(node, before, parent) {
       }
     }
   }
-}
-
-function unmountHostComponents(finishedRoot, current, nearestMountedAncestor) {
-  // We only have the top Fiber that was deleted but we need to recurse down its
-  // children to find all the terminal nodes.
-  var node = current; // Each iteration, currentParent is populated with node's host parent if not
-  // currentParentIsValid.
-
-  var currentParentIsValid = false; // Note: these two variables *must* always be updated together.
-
-  var currentParent;
-  var currentParentIsContainer;
-
-  while (true) {
-    if (!currentParentIsValid) {
-      var parent = node.return;
-
-      findParent: while (true) {
-        if (parent === null) {
-          throw new Error('Expected to find a host parent. This error is likely caused by ' + 'a bug in React. Please file an issue.');
-        }
-
-        var parentStateNode = parent.stateNode;
-
-        switch (parent.tag) {
-          case HostComponent:
-            currentParent = parentStateNode;
-            currentParentIsContainer = false;
-            break findParent;
-
-          case HostRoot:
-            currentParent = parentStateNode.containerInfo;
-            currentParentIsContainer = true;
-            break findParent;
-
-          case HostPortal:
-            currentParent = parentStateNode.containerInfo;
-            currentParentIsContainer = true;
-            break findParent;
-        }
-
-        parent = parent.return;
-      }
-
-      currentParentIsValid = true;
-    }
-
-    if (node.tag === HostComponent || node.tag === HostText) {
-      commitNestedUnmounts(finishedRoot, node, nearestMountedAncestor); // After all the children have unmounted, it is now safe to remove the
-      // node from the tree.
-
-      if (currentParentIsContainer) {
-        removeChildFromContainer(currentParent, node.stateNode);
-      } else {
-        removeChild(currentParent, node.stateNode);
-      } // Don't visit children because we already visited them.
-
-    } else if ( node.tag === DehydratedFragment) {
+} // These are tracked on the stack as we recursively traverse a
+// deleted subtree.
+// TODO: Update these during the whole mutation phase, not just during
+// a deletion.
 
 
-      if (currentParentIsContainer) {
-        clearSuspenseBoundaryFromContainer(currentParent, node.stateNode);
-      } else {
-        clearSuspenseBoundary(currentParent, node.stateNode);
-      }
-    } else if (node.tag === HostPortal) {
-      if (node.child !== null) {
-        // When we go into a portal, it becomes the parent to remove from.
-        // We will reassign it back when we pop the portal on the way up.
-        currentParent = node.stateNode.containerInfo;
-        currentParentIsContainer = true; // Visit children because portals might contain host components.
+var hostParent = null;
+var hostParentIsContainer = false;
 
-        node.child.return = node;
-        node = node.child;
-        continue;
-      }
-    } else {
-      commitUnmount(finishedRoot, node, nearestMountedAncestor); // Visit children because we may find more host components below.
-
-      if (node.child !== null) {
-        node.child.return = node;
-        node = node.child;
-        continue;
-      }
-    }
-
-    if (node === current) {
-      return;
-    }
-
-    while (node.sibling === null) {
-      if (node.return === null || node.return === current) {
-        return;
-      }
-
-      node = node.return;
-
-      if (node.tag === HostPortal) {
-        // When we go out of the portal, we need to restore the parent.
-        // Since we don't keep a stack of them, we will search for it.
-        currentParentIsValid = false;
-      }
-    }
-
-    node.sibling.return = node.return;
-    node = node.sibling;
-  }
-}
-
-function commitDeletion(finishedRoot, current, nearestMountedAncestor) {
+function commitDeletionEffects(root, returnFiber, deletedFiber) {
   {
-    // Recursively delete all host nodes from the parent.
-    // Detach refs and call componentWillUnmount() on the whole subtree.
-    unmountHostComponents(finishedRoot, current, nearestMountedAncestor);
+    // We only have the top Fiber that was deleted but we need to recurse down its
+    // children to find all the terminal nodes.
+    // Recursively delete all host nodes from the parent, detach refs, clean
+    // up mounted layout effects, and call componentWillUnmount.
+    // We only need to remove the topmost host child in each branch. But then we
+    // still need to keep traversing to unmount effects, refs, and cWU. TODO: We
+    // could split this into two separate traversals functions, where the second
+    // one doesn't include any removeChild logic. This is maybe the same
+    // function as "disappearLayoutEffects" (or whatever that turns into after
+    // the layout phase is refactored to use recursion).
+    // Before starting, find the nearest host parent on the stack so we know
+    // which instance/container to remove the children from.
+    // TODO: Instead of searching up the fiber return path on every deletion, we
+    // can track the nearest host component on the JS stack as we traverse the
+    // tree during the commit phase. This would make insertions faster, too.
+    var parent = returnFiber;
+
+    findParent: while (parent !== null) {
+      switch (parent.tag) {
+        case HostComponent:
+          {
+            hostParent = parent.stateNode;
+            hostParentIsContainer = false;
+            break findParent;
+          }
+
+        case HostRoot:
+          {
+            hostParent = parent.stateNode.containerInfo;
+            hostParentIsContainer = true;
+            break findParent;
+          }
+
+        case HostPortal:
+          {
+            hostParent = parent.stateNode.containerInfo;
+            hostParentIsContainer = true;
+            break findParent;
+          }
+      }
+
+      parent = parent.return;
+    }
+
+    if (hostParent === null) {
+      throw new Error('Expected to find a host parent. This error is likely caused by ' + 'a bug in React. Please file an issue.');
+    }
+
+    commitDeletionEffectsOnFiber(root, returnFiber, deletedFiber);
+    hostParent = null;
+    hostParentIsContainer = false;
   }
 
-  detachFiberMutation(current);
+  detachFiberMutation(deletedFiber);
 }
 
-function commitWork(current, finishedWork) {
+function recursivelyTraverseDeletionEffects(finishedRoot, nearestMountedAncestor, parent) {
+  // TODO: Use a static flag to skip trees that don't have unmount effects
+  var child = parent.child;
 
-  switch (finishedWork.tag) {
-    case FunctionComponent:
-    case ForwardRef:
-    case MemoComponent:
-    case SimpleMemoComponent:
-      {
-        commitHookEffectListUnmount(Insertion | HasEffect, finishedWork, finishedWork.return);
-        commitHookEffectListMount(Insertion | HasEffect, finishedWork); // Layout effects are destroyed during the mutation phase so that all
-        // destroy functions for all fibers are called before any create functions.
-        // This prevents sibling component effects from interfering with each other,
-        // e.g. a destroy function in one component should never override a ref set
-        // by a create function in another component during the same commit.
+  while (child !== null) {
+    commitDeletionEffectsOnFiber(finishedRoot, nearestMountedAncestor, child);
+    child = child.sibling;
+  }
+}
 
-        if ( finishedWork.mode & ProfileMode) {
-          try {
-            startLayoutEffectTimer();
-            commitHookEffectListUnmount(Layout | HasEffect, finishedWork, finishedWork.return);
-          } finally {
-            recordLayoutEffectDuration(finishedWork);
-          }
-        } else {
-          commitHookEffectListUnmount(Layout | HasEffect, finishedWork, finishedWork.return);
-        }
+function commitDeletionEffectsOnFiber(finishedRoot, nearestMountedAncestor, deletedFiber) {
+  onCommitUnmount(deletedFiber); // The cases in this outer switch modify the stack before they traverse
+  // into their subtree. There are simpler cases in the inner switch
+  // that don't modify the stack.
 
-        return;
-      }
-
-    case ClassComponent:
-      {
-        return;
-      }
-
+  switch (deletedFiber.tag) {
     case HostComponent:
       {
-        var instance = finishedWork.stateNode;
+        if (!offscreenSubtreeWasHidden) {
+          safelyDetachRef(deletedFiber, nearestMountedAncestor);
+        } // Intentional fallthrough to next branch
 
-        if (instance != null) {
-          // Commit the work prepared earlier.
-          var newProps = finishedWork.memoizedProps; // For hydration we reuse the update path but we treat the oldProps
-          // as the newProps. The updatePayload will contain the real change in
-          // this case.
-
-          var oldProps = current !== null ? current.memoizedProps : newProps;
-          var type = finishedWork.type; // TODO: Type the updateQueue to be specific to host components.
-
-          var updatePayload = finishedWork.updateQueue;
-          finishedWork.updateQueue = null;
-
-          if (updatePayload !== null) {
-            commitUpdate(instance, updatePayload, type, oldProps, newProps);
-          }
-        }
-
-        return;
       }
+    // eslint-disable-next-line-no-fallthrough
 
     case HostText:
       {
-        if (finishedWork.stateNode === null) {
-          throw new Error('This should have a text node initialized. This error is likely ' + 'caused by a bug in React. Please file an issue.');
-        }
-
-        var textInstance = finishedWork.stateNode;
-        var newText = finishedWork.memoizedProps; // For hydration we reuse the update path but we treat the oldProps
-        // as the newProps. The updatePayload will contain the real change in
-        // this case.
-
-        var oldText = current !== null ? current.memoizedProps : newText;
-        commitTextUpdate(textInstance, oldText, newText);
-        return;
-      }
-
-    case HostRoot:
-      {
+        // We only need to remove the nearest host child. Set the host parent
+        // to `null` on the stack to indicate that nested children don't
+        // need to be removed.
         {
-          if (current !== null) {
-            var _prevRootState = current.memoizedState;
+          var prevHostParent = hostParent;
+          var prevHostParentIsContainer = hostParentIsContainer;
+          hostParent = null;
+          recursivelyTraverseDeletionEffects(finishedRoot, nearestMountedAncestor, deletedFiber);
+          hostParent = prevHostParent;
+          hostParentIsContainer = prevHostParentIsContainer;
 
-            if (_prevRootState.isDehydrated) {
-              var _root = finishedWork.stateNode;
-              commitHydratedContainer(_root.containerInfo);
+          if (hostParent !== null) {
+            // Now that all the child effects have unmounted, we can remove the
+            // node from the tree.
+            if (hostParentIsContainer) {
+              removeChildFromContainer(hostParent, deletedFiber.stateNode);
+            } else {
+              removeChild(hostParent, deletedFiber.stateNode);
             }
           }
         }
@@ -27616,31 +24358,144 @@ function commitWork(current, finishedWork) {
         return;
       }
 
-    case Profiler:
+    case DehydratedFragment:
       {
+        // Delete the dehydrated suspense boundary and all of its content.
+
+
+        {
+          if (hostParent !== null) {
+            if (hostParentIsContainer) {
+              clearSuspenseBoundaryFromContainer(hostParent, deletedFiber.stateNode);
+            } else {
+              clearSuspenseBoundary(hostParent, deletedFiber.stateNode);
+            }
+          }
+        }
+
         return;
       }
 
-    case SuspenseComponent:
+    case HostPortal:
       {
-        commitSuspenseCallback(finishedWork);
-        attachSuspenseRetryListeners(finishedWork);
+        {
+          // When we go into a portal, it becomes the parent to remove from.
+          var _prevHostParent = hostParent;
+          var _prevHostParentIsContainer = hostParentIsContainer;
+          hostParent = deletedFiber.stateNode.containerInfo;
+          hostParentIsContainer = true;
+          recursivelyTraverseDeletionEffects(finishedRoot, nearestMountedAncestor, deletedFiber);
+          hostParent = _prevHostParent;
+          hostParentIsContainer = _prevHostParentIsContainer;
+        }
+
         return;
       }
 
-    case SuspenseListComponent:
+    case FunctionComponent:
+    case ForwardRef:
+    case MemoComponent:
+    case SimpleMemoComponent:
       {
-        attachSuspenseRetryListeners(finishedWork);
+        if (!offscreenSubtreeWasHidden) {
+          var updateQueue = deletedFiber.updateQueue;
+
+          if (updateQueue !== null) {
+            var lastEffect = updateQueue.lastEffect;
+
+            if (lastEffect !== null) {
+              var firstEffect = lastEffect.next;
+              var effect = firstEffect;
+
+              do {
+                var _effect = effect,
+                    destroy = _effect.destroy,
+                    tag = _effect.tag;
+
+                if (destroy !== undefined) {
+                  if ((tag & Insertion) !== NoFlags$1) {
+                    safelyCallDestroy(deletedFiber, nearestMountedAncestor, destroy);
+                  } else if ((tag & Layout) !== NoFlags$1) {
+                    {
+                      markComponentLayoutEffectUnmountStarted(deletedFiber);
+                    }
+
+                    if ( deletedFiber.mode & ProfileMode) {
+                      startLayoutEffectTimer();
+                      safelyCallDestroy(deletedFiber, nearestMountedAncestor, destroy);
+                      recordLayoutEffectDuration(deletedFiber);
+                    } else {
+                      safelyCallDestroy(deletedFiber, nearestMountedAncestor, destroy);
+                    }
+
+                    {
+                      markComponentLayoutEffectUnmountStopped();
+                    }
+                  }
+                }
+
+                effect = effect.next;
+              } while (effect !== firstEffect);
+            }
+          }
+        }
+
+        recursivelyTraverseDeletionEffects(finishedRoot, nearestMountedAncestor, deletedFiber);
         return;
       }
 
-    case IncompleteClassComponent:
+    case ClassComponent:
       {
+        if (!offscreenSubtreeWasHidden) {
+          safelyDetachRef(deletedFiber, nearestMountedAncestor);
+          var instance = deletedFiber.stateNode;
+
+          if (typeof instance.componentWillUnmount === 'function') {
+            safelyCallComponentWillUnmount(deletedFiber, nearestMountedAncestor, instance);
+          }
+        }
+
+        recursivelyTraverseDeletionEffects(finishedRoot, nearestMountedAncestor, deletedFiber);
+        return;
+      }
+
+    case ScopeComponent:
+      {
+
+        recursivelyTraverseDeletionEffects(finishedRoot, nearestMountedAncestor, deletedFiber);
+        return;
+      }
+
+    case OffscreenComponent:
+      {
+        if ( // TODO: Remove this dead flag
+         deletedFiber.mode & ConcurrentMode) {
+          // If this offscreen component is hidden, we already unmounted it. Before
+          // deleting the children, track that it's already unmounted so that we
+          // don't attempt to unmount the effects again.
+          // TODO: If the tree is hidden, in most cases we should be able to skip
+          // over the nested children entirely. An exception is we haven't yet found
+          // the topmost host node to delete, which we already track on the stack.
+          // But the other case is portals, which need to be detached no matter how
+          // deeply they are nested. We should use a subtree flag to track whether a
+          // subtree includes a nested portal.
+          var prevOffscreenSubtreeWasHidden = offscreenSubtreeWasHidden;
+          offscreenSubtreeWasHidden = prevOffscreenSubtreeWasHidden || deletedFiber.memoizedState !== null;
+          recursivelyTraverseDeletionEffects(finishedRoot, nearestMountedAncestor, deletedFiber);
+          offscreenSubtreeWasHidden = prevOffscreenSubtreeWasHidden;
+        } else {
+          recursivelyTraverseDeletionEffects(finishedRoot, nearestMountedAncestor, deletedFiber);
+        }
+
+        break;
+      }
+
+    default:
+      {
+        recursivelyTraverseDeletionEffects(finishedRoot, nearestMountedAncestor, deletedFiber);
         return;
       }
   }
-
-  throw new Error('This unit of work tag should not have side-effects. This error is ' + 'likely caused by a bug in React. Please file an issue.');
 }
 
 function commitSuspenseCallback(finishedWork) {
@@ -27706,124 +24561,285 @@ function attachSuspenseRetryListeners(finishedWork) {
     });
   }
 } // This function detects when a Suspense boundary goes from visible to hidden.
-
-function commitResetTextContent(current) {
-
-  resetTextContent(current.stateNode);
-}
-
-function commitMutationEffects(root, firstChild, committedLanes) {
+function commitMutationEffects(root, finishedWork, committedLanes) {
   inProgressLanes = committedLanes;
   inProgressRoot = root;
-  nextEffect = firstChild;
-  commitMutationEffects_begin(root, committedLanes);
+  setCurrentFiber(finishedWork);
+  commitMutationEffectsOnFiber(finishedWork, root);
+  setCurrentFiber(finishedWork);
   inProgressLanes = null;
   inProgressRoot = null;
 }
 
-function commitMutationEffects_begin(root, lanes) {
-  while (nextEffect !== null) {
-    var fiber = nextEffect; // TODO: Should wrap this in flags check, too, as optimization
+function recursivelyTraverseMutationEffects(root, parentFiber, lanes) {
+  // Deletions effects can be scheduled on any fiber type. They need to happen
+  // before the children effects hae fired.
+  var deletions = parentFiber.deletions;
 
-    var deletions = fiber.deletions;
+  if (deletions !== null) {
+    for (var i = 0; i < deletions.length; i++) {
+      var childToDelete = deletions[i];
 
-    if (deletions !== null) {
-      for (var i = 0; i < deletions.length; i++) {
-        var childToDelete = deletions[i];
-
-        try {
-          commitDeletion(root, childToDelete, fiber);
-        } catch (error) {
-          reportUncaughtErrorInDEV(error);
-          captureCommitPhaseError(childToDelete, fiber, error);
-        }
+      try {
+        commitDeletionEffects(root, parentFiber, childToDelete);
+      } catch (error) {
+        captureCommitPhaseError(childToDelete, parentFiber, error);
       }
     }
+  }
 
-    var child = fiber.child;
+  var prevDebugFiber = getCurrentFiber();
 
-    if ((fiber.subtreeFlags & MutationMask) !== NoFlags && child !== null) {
-      ensureCorrectReturnPointer(child, fiber);
-      nextEffect = child;
-    } else {
-      commitMutationEffects_complete(root, lanes);
+  if (parentFiber.subtreeFlags & MutationMask) {
+    var child = parentFiber.child;
+
+    while (child !== null) {
+      setCurrentFiber(child);
+      commitMutationEffectsOnFiber(child, root);
+      child = child.sibling;
     }
   }
-}
 
-function commitMutationEffects_complete(root, lanes) {
-  while (nextEffect !== null) {
-    var fiber = nextEffect;
-    setCurrentFiber(fiber);
-
-    try {
-      commitMutationEffectsOnFiber(fiber, root, lanes);
-    } catch (error) {
-      reportUncaughtErrorInDEV(error);
-      captureCommitPhaseError(fiber, fiber.return, error);
-    }
-
-    resetCurrentFiber();
-    var sibling = fiber.sibling;
-
-    if (sibling !== null) {
-      ensureCorrectReturnPointer(sibling, fiber.return);
-      nextEffect = sibling;
-      return;
-    }
-
-    nextEffect = fiber.return;
-  }
+  setCurrentFiber(prevDebugFiber);
 }
 
 function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
-  // TODO: The factoring of this phase could probably be improved. Consider
-  // switching on the type of work before checking the flags. That's what
-  // we do in all the other phases. I think this one is only different
-  // because of the shared reconciliation logic below.
-  var flags = finishedWork.flags;
+  var current = finishedWork.alternate;
+  var flags = finishedWork.flags; // The effect flag should be checked *after* we refine the type of fiber,
+  // because the fiber tag is more specific. An exception is any flag related
+  // to reconcilation, because those can be set on all fiber types.
 
-  if (flags & ContentReset) {
-    commitResetTextContent(finishedWork);
-  }
+  switch (finishedWork.tag) {
+    case FunctionComponent:
+    case ForwardRef:
+    case MemoComponent:
+    case SimpleMemoComponent:
+      {
+        recursivelyTraverseMutationEffects(root, finishedWork);
+        commitReconciliationEffects(finishedWork);
 
-  if (flags & Ref) {
-    var current = finishedWork.alternate;
+        if (flags & Update) {
+          try {
+            commitHookEffectListUnmount(Insertion | HasEffect, finishedWork, finishedWork.return);
+            commitHookEffectListMount(Insertion | HasEffect, finishedWork);
+          } catch (error) {
+            captureCommitPhaseError(finishedWork, finishedWork.return, error);
+          } // Layout effects are destroyed during the mutation phase so that all
+          // destroy functions for all fibers are called before any create functions.
+          // This prevents sibling component effects from interfering with each other,
+          // e.g. a destroy function in one component should never override a ref set
+          // by a create function in another component during the same commit.
 
-    if (current !== null) {
-      commitDetachRef(current);
-    }
-  }
 
-  if (flags & Visibility) {
-    switch (finishedWork.tag) {
-      case SuspenseComponent:
+          if ( finishedWork.mode & ProfileMode) {
+            try {
+              startLayoutEffectTimer();
+              commitHookEffectListUnmount(Layout | HasEffect, finishedWork, finishedWork.return);
+            } catch (error) {
+              captureCommitPhaseError(finishedWork, finishedWork.return, error);
+            }
+
+            recordLayoutEffectDuration(finishedWork);
+          } else {
+            try {
+              commitHookEffectListUnmount(Layout | HasEffect, finishedWork, finishedWork.return);
+            } catch (error) {
+              captureCommitPhaseError(finishedWork, finishedWork.return, error);
+            }
+          }
+        }
+
+        return;
+      }
+
+    case ClassComponent:
+      {
+        recursivelyTraverseMutationEffects(root, finishedWork);
+        commitReconciliationEffects(finishedWork);
+
+        if (flags & Ref) {
+          if (current !== null) {
+            safelyDetachRef(current, current.return);
+          }
+        }
+
+        return;
+      }
+
+    case HostComponent:
+      {
+        recursivelyTraverseMutationEffects(root, finishedWork);
+        commitReconciliationEffects(finishedWork);
+
+        if (flags & Ref) {
+          if (current !== null) {
+            safelyDetachRef(current, current.return);
+          }
+        }
+
         {
-          var newState = finishedWork.memoizedState;
+          // TODO: ContentReset gets cleared by the children during the commit
+          // phase. This is a refactor hazard because it means we must read
+          // flags the flags after `commitReconciliationEffects` has already run;
+          // the order matters. We should refactor so that ContentReset does not
+          // rely on mutating the flag during commit. Like by setting a flag
+          // during the render phase instead.
+          if (finishedWork.flags & ContentReset) {
+            var instance = finishedWork.stateNode;
+
+            try {
+              resetTextContent(instance);
+            } catch (error) {
+              captureCommitPhaseError(finishedWork, finishedWork.return, error);
+            }
+          }
+
+          if (flags & Update) {
+            var _instance4 = finishedWork.stateNode;
+
+            if (_instance4 != null) {
+              // Commit the work prepared earlier.
+              var newProps = finishedWork.memoizedProps; // For hydration we reuse the update path but we treat the oldProps
+              // as the newProps. The updatePayload will contain the real change in
+              // this case.
+
+              var oldProps = current !== null ? current.memoizedProps : newProps;
+              var type = finishedWork.type; // TODO: Type the updateQueue to be specific to host components.
+
+              var updatePayload = finishedWork.updateQueue;
+              finishedWork.updateQueue = null;
+
+              if (updatePayload !== null) {
+                try {
+                  commitUpdate(_instance4, updatePayload, type, oldProps, newProps, finishedWork);
+                } catch (error) {
+                  captureCommitPhaseError(finishedWork, finishedWork.return, error);
+                }
+              }
+            }
+          }
+        }
+
+        return;
+      }
+
+    case HostText:
+      {
+        recursivelyTraverseMutationEffects(root, finishedWork);
+        commitReconciliationEffects(finishedWork);
+
+        if (flags & Update) {
+          {
+            if (finishedWork.stateNode === null) {
+              throw new Error('This should have a text node initialized. This error is likely ' + 'caused by a bug in React. Please file an issue.');
+            }
+
+            var textInstance = finishedWork.stateNode;
+            var newText = finishedWork.memoizedProps; // For hydration we reuse the update path but we treat the oldProps
+            // as the newProps. The updatePayload will contain the real change in
+            // this case.
+
+            var oldText = current !== null ? current.memoizedProps : newText;
+
+            try {
+              commitTextUpdate(textInstance, oldText, newText);
+            } catch (error) {
+              captureCommitPhaseError(finishedWork, finishedWork.return, error);
+            }
+          }
+        }
+
+        return;
+      }
+
+    case HostRoot:
+      {
+        recursivelyTraverseMutationEffects(root, finishedWork);
+        commitReconciliationEffects(finishedWork);
+
+        if (flags & Update) {
+          {
+            if (current !== null) {
+              var prevRootState = current.memoizedState;
+
+              if (prevRootState.isDehydrated) {
+                try {
+                  commitHydratedContainer(root.containerInfo);
+                } catch (error) {
+                  captureCommitPhaseError(finishedWork, finishedWork.return, error);
+                }
+              }
+            }
+          }
+        }
+
+        return;
+      }
+
+    case HostPortal:
+      {
+        recursivelyTraverseMutationEffects(root, finishedWork);
+        commitReconciliationEffects(finishedWork);
+
+        return;
+      }
+
+    case SuspenseComponent:
+      {
+        recursivelyTraverseMutationEffects(root, finishedWork);
+        commitReconciliationEffects(finishedWork);
+        var offscreenFiber = finishedWork.child;
+
+        if (offscreenFiber.flags & Visibility) {
+          var newState = offscreenFiber.memoizedState;
           var isHidden = newState !== null;
 
           if (isHidden) {
-            var _current = finishedWork.alternate;
-            var wasHidden = _current !== null && _current.memoizedState !== null;
+            var wasHidden = offscreenFiber.alternate !== null && offscreenFiber.alternate.memoizedState !== null;
 
             if (!wasHidden) {
               // TODO: Move to passive phase
               markCommitTimeOfFallback();
             }
           }
-
-          break;
         }
 
-      case OffscreenComponent:
-        {
+        if (flags & Update) {
+          try {
+            commitSuspenseCallback(finishedWork);
+          } catch (error) {
+            captureCommitPhaseError(finishedWork, finishedWork.return, error);
+          }
+
+          attachSuspenseRetryListeners(finishedWork);
+        }
+
+        return;
+      }
+
+    case OffscreenComponent:
+      {
+        var _wasHidden = current !== null && current.memoizedState !== null;
+
+        if ( // TODO: Remove this dead flag
+         finishedWork.mode & ConcurrentMode) {
+          // Before committing the children, track on the stack whether this
+          // offscreen subtree was already hidden, so that we don't unmount the
+          // effects again.
+          var prevOffscreenSubtreeWasHidden = offscreenSubtreeWasHidden;
+          offscreenSubtreeWasHidden = prevOffscreenSubtreeWasHidden || _wasHidden;
+          recursivelyTraverseMutationEffects(root, finishedWork);
+          offscreenSubtreeWasHidden = prevOffscreenSubtreeWasHidden;
+        } else {
+          recursivelyTraverseMutationEffects(root, finishedWork);
+        }
+
+        commitReconciliationEffects(finishedWork);
+
+        if (flags & Visibility) {
           var _newState = finishedWork.memoizedState;
 
           var _isHidden = _newState !== null;
-
-          var _current2 = finishedWork.alternate;
-
-          var _wasHidden = _current2 !== null && _current2.memoizedState !== null;
 
           var offscreenBoundary = finishedWork;
 
@@ -27848,65 +24864,61 @@ function commitMutationEffectsOnFiber(finishedWork, root, lanes) {
                 }
               }
             }
-
-            break;
           }
         }
-    }
-  } // The following switch statement is only concerned about placement,
-  // updates, and deletions. To avoid needing to add a case for every possible
-  // bitmap value, we remove the secondary effects from the effect tag and
-  // switch on that value.
 
-
-  var primaryFlags = flags & (Placement | Update | Hydrating);
-
-   switch (primaryFlags) {
-    case Placement:
-      {
-        commitPlacement(finishedWork); // Clear the "placement" from effect tag so that we know that this is
-        // inserted, before any life-cycles like componentDidMount gets called.
-        // TODO: findDOMNode doesn't rely on this any more but isMounted does
-        // and isMounted is deprecated anyway so we should be able to kill this.
-
-        finishedWork.flags &= ~Placement;
-        break;
+        return;
       }
 
-    case PlacementAndUpdate:
+    case SuspenseListComponent:
       {
-        // Placement
-        commitPlacement(finishedWork); // Clear the "placement" from effect tag so that we know that this is
-        // inserted, before any life-cycles like componentDidMount gets called.
+        recursivelyTraverseMutationEffects(root, finishedWork);
+        commitReconciliationEffects(finishedWork);
 
-        finishedWork.flags &= ~Placement; // Update
+        if (flags & Update) {
+          attachSuspenseRetryListeners(finishedWork);
+        }
 
-        var _current3 = finishedWork.alternate;
-        commitWork(_current3, finishedWork);
-        break;
+        return;
       }
 
-    case Hydrating:
+    case ScopeComponent:
       {
-        finishedWork.flags &= ~Hydrating;
-        break;
+
+        return;
       }
 
-    case HydratingAndUpdate:
+    default:
       {
-        finishedWork.flags &= ~Hydrating; // Update
-
-        var _current4 = finishedWork.alternate;
-        commitWork(_current4, finishedWork);
-        break;
+        recursivelyTraverseMutationEffects(root, finishedWork);
+        commitReconciliationEffects(finishedWork);
+        return;
       }
+  }
+}
 
-    case Update:
-      {
-        var _current5 = finishedWork.alternate;
-        commitWork(_current5, finishedWork);
-        break;
-      }
+function commitReconciliationEffects(finishedWork) {
+  // Placement effects (insertions, reorders) can be scheduled on any fiber
+  // type. They needs to happen after the children effects have fired, but
+  // before the effects on this fiber have fired.
+  var flags = finishedWork.flags;
+
+  if (flags & Placement) {
+    try {
+      commitPlacement(finishedWork);
+    } catch (error) {
+      captureCommitPhaseError(finishedWork, finishedWork.return, error);
+    } // Clear the "placement" from effect tag so that we know that this is
+    // inserted, before any life-cycles like componentDidMount gets called.
+    // TODO: findDOMNode doesn't rely on this any more but isMounted does
+    // and isMounted is deprecated anyway so we should be able to kill this.
+
+
+    finishedWork.flags &= ~Placement;
+  }
+
+  if (flags & Hydrating) {
+    finishedWork.flags &= ~Hydrating;
   }
 }
 
@@ -27973,7 +24985,7 @@ function commitLayoutEffects_begin(subtreeRoot, root, committedLanes) {
     }
 
     if ((fiber.subtreeFlags & LayoutMask) !== NoFlags && firstChild !== null) {
-      ensureCorrectReturnPointer(firstChild, fiber);
+      firstChild.return = fiber;
       nextEffect = firstChild;
     } else {
       commitLayoutMountEffects_complete(subtreeRoot, root, committedLanes);
@@ -27992,7 +25004,6 @@ function commitLayoutMountEffects_complete(subtreeRoot, root, committedLanes) {
       try {
         commitLayoutEffectOnFiber(root, current, fiber, committedLanes);
       } catch (error) {
-        reportUncaughtErrorInDEV(error);
         captureCommitPhaseError(fiber, fiber.return, error);
       }
 
@@ -28007,7 +25018,7 @@ function commitLayoutMountEffects_complete(subtreeRoot, root, committedLanes) {
     var sibling = fiber.sibling;
 
     if (sibling !== null) {
-      ensureCorrectReturnPointer(sibling, fiber.return);
+      sibling.return = fiber.return;
       nextEffect = sibling;
       return;
     }
@@ -28143,7 +25154,6 @@ function reappearLayoutEffects_complete(subtreeRoot) {
     try {
       reappearLayoutEffectsOnFiber(fiber);
     } catch (error) {
-      reportUncaughtErrorInDEV(error);
       captureCommitPhaseError(fiber, fiber.return, error);
     }
 
@@ -28168,26 +25178,26 @@ function reappearLayoutEffects_complete(subtreeRoot) {
   }
 }
 
-function commitPassiveMountEffects(root, finishedWork) {
+function commitPassiveMountEffects(root, finishedWork, committedLanes, committedTransitions) {
   nextEffect = finishedWork;
-  commitPassiveMountEffects_begin(finishedWork, root);
+  commitPassiveMountEffects_begin(finishedWork, root, committedLanes, committedTransitions);
 }
 
-function commitPassiveMountEffects_begin(subtreeRoot, root) {
+function commitPassiveMountEffects_begin(subtreeRoot, root, committedLanes, committedTransitions) {
   while (nextEffect !== null) {
     var fiber = nextEffect;
     var firstChild = fiber.child;
 
     if ((fiber.subtreeFlags & PassiveMask) !== NoFlags && firstChild !== null) {
-      ensureCorrectReturnPointer(firstChild, fiber);
+      firstChild.return = fiber;
       nextEffect = firstChild;
     } else {
-      commitPassiveMountEffects_complete(subtreeRoot, root);
+      commitPassiveMountEffects_complete(subtreeRoot, root, committedLanes, committedTransitions);
     }
   }
 }
 
-function commitPassiveMountEffects_complete(subtreeRoot, root) {
+function commitPassiveMountEffects_complete(subtreeRoot, root, committedLanes, committedTransitions) {
   while (nextEffect !== null) {
     var fiber = nextEffect;
 
@@ -28195,9 +25205,8 @@ function commitPassiveMountEffects_complete(subtreeRoot, root) {
       setCurrentFiber(fiber);
 
       try {
-        commitPassiveMountOnFiber(root, fiber);
+        commitPassiveMountOnFiber(root, fiber, committedLanes, committedTransitions);
       } catch (error) {
-        reportUncaughtErrorInDEV(error);
         captureCommitPhaseError(fiber, fiber.return, error);
       }
 
@@ -28212,7 +25221,7 @@ function commitPassiveMountEffects_complete(subtreeRoot, root) {
     var sibling = fiber.sibling;
 
     if (sibling !== null) {
-      ensureCorrectReturnPointer(sibling, fiber.return);
+      sibling.return = fiber.return;
       nextEffect = sibling;
       return;
     }
@@ -28221,7 +25230,7 @@ function commitPassiveMountEffects_complete(subtreeRoot, root) {
   }
 }
 
-function commitPassiveMountOnFiber(finishedRoot, finishedWork) {
+function commitPassiveMountOnFiber(finishedRoot, finishedWork, committedLanes, committedTransitions) {
   switch (finishedWork.tag) {
     case FunctionComponent:
     case ForwardRef:
@@ -28298,7 +25307,7 @@ function commitPassiveUnmountEffects_begin() {
     }
 
     if ((fiber.subtreeFlags & PassiveMask) !== NoFlags && child !== null) {
-      ensureCorrectReturnPointer(child, fiber);
+      child.return = fiber;
       nextEffect = child;
     } else {
       commitPassiveUnmountEffects_complete();
@@ -28319,7 +25328,7 @@ function commitPassiveUnmountEffects_complete() {
     var sibling = fiber.sibling;
 
     if (sibling !== null) {
-      ensureCorrectReturnPointer(sibling, fiber.return);
+      sibling.return = fiber.return;
       nextEffect = sibling;
       return;
     }
@@ -28359,7 +25368,7 @@ function commitPassiveUnmountEffectsInsideOfDeletedTree_begin(deletedSubtreeRoot
     // do this, still need to handle `deletedTreeCleanUpLevel` correctly.)
 
     if (child !== null) {
-      ensureCorrectReturnPointer(child, fiber);
+      child.return = fiber;
       nextEffect = child;
     } else {
       commitPassiveUnmountEffectsInsideOfDeletedTree_complete(deletedSubtreeRoot);
@@ -28386,7 +25395,7 @@ function commitPassiveUnmountEffectsInsideOfDeletedTree_complete(deletedSubtreeR
     }
 
     if (sibling !== null) {
-      ensureCorrectReturnPointer(sibling, returnFiber);
+      sibling.return = returnFiber;
       nextEffect = sibling;
       return;
     }
@@ -28412,22 +25421,6 @@ function commitPassiveUnmountInsideDeletedTreeOnFiber(current, nearestMountedAnc
         break;
       }
   }
-}
-
-var didWarnWrongReturnPointer = false;
-
-function ensureCorrectReturnPointer(fiber, expectedReturnFiber) {
-  {
-    if (!didWarnWrongReturnPointer && fiber.return !== expectedReturnFiber) {
-      didWarnWrongReturnPointer = true;
-
-      error('Internal React error: Return pointer is inconsistent ' + 'with parent.');
-    }
-  } // TODO: Remove this assignment once we're confident that it won't break
-  // anything, by checking the warning logs for the above invariant
-
-
-  fiber.return = expectedReturnFiber;
 } // TODO: Reuse reappearLayoutEffects traversal here?
 
 
@@ -28443,7 +25436,6 @@ function invokeLayoutEffectMountInDEV(fiber) {
           try {
             commitHookEffectListMount(Layout | HasEffect, fiber);
           } catch (error) {
-            reportUncaughtErrorInDEV(error);
             captureCommitPhaseError(fiber, fiber.return, error);
           }
 
@@ -28457,7 +25449,6 @@ function invokeLayoutEffectMountInDEV(fiber) {
           try {
             instance.componentDidMount();
           } catch (error) {
-            reportUncaughtErrorInDEV(error);
             captureCommitPhaseError(fiber, fiber.return, error);
           }
 
@@ -28479,7 +25470,6 @@ function invokePassiveEffectMountInDEV(fiber) {
           try {
             commitHookEffectListMount(Passive$1 | HasEffect, fiber);
           } catch (error) {
-            reportUncaughtErrorInDEV(error);
             captureCommitPhaseError(fiber, fiber.return, error);
           }
 
@@ -28501,7 +25491,6 @@ function invokeLayoutEffectUnmountInDEV(fiber) {
           try {
             commitHookEffectListUnmount(Layout | HasEffect, fiber, fiber.return);
           } catch (error) {
-            reportUncaughtErrorInDEV(error);
             captureCommitPhaseError(fiber, fiber.return, error);
           }
 
@@ -28534,7 +25523,6 @@ function invokePassiveEffectUnmountInDEV(fiber) {
           try {
             commitHookEffectListUnmount(Passive$1 | HasEffect, fiber, fiber.return);
           } catch (error) {
-            reportUncaughtErrorInDEV(error);
             captureCommitPhaseError(fiber, fiber.return, error);
           }
         }
@@ -28666,6 +25654,7 @@ var workInProgressRootRenderTargetTime = Infinity; // How long a render is suppo
 // suspense heuristics and opt out of rendering more content.
 
 var RENDER_TIMEOUT_MS = 500;
+var workInProgressTransitions = null;
 
 function resetRenderTimer() {
   workInProgressRootRenderTargetTime = now() + RENDER_TIMEOUT_MS;
@@ -28681,17 +25670,22 @@ var rootDoesHavePassiveEffects = false;
 var rootWithPendingPassiveEffects = null;
 var pendingPassiveEffectsLanes = NoLanes;
 var pendingPassiveProfilerEffects = [];
+var pendingPassiveTransitions = null; // Use these to prevent an infinite loop of nested updates
 
 var NESTED_UPDATE_LIMIT = 50;
 var nestedUpdateCount = 0;
 var rootWithNestedUpdates = null;
+var isFlushingPassiveEffects = false;
+var didScheduleUpdateDuringPassiveEffects = false;
 var NESTED_PASSIVE_UPDATE_LIMIT = 50;
-var nestedPassiveUpdateCount = 0; // If two updates are scheduled within the same event, we should treat their
+var nestedPassiveUpdateCount = 0;
+var rootWithPassiveNestedUpdates = null; // If two updates are scheduled within the same event, we should treat their
 // event times as simultaneous, even if the actual clock time has advanced
 // between the first and second call.
 
 var currentEventTime = NoTimestamp;
 var currentEventTransitionLane = NoLanes;
+var isRunningInsertionEffect = false;
 function getWorkInProgressRoot() {
   return workInProgressRoot;
 }
@@ -28796,10 +25790,23 @@ function requestRetryLane(fiber) {
 
 function scheduleUpdateOnFiber(fiber, lane, eventTime) {
   checkForNestedUpdates();
+
+  {
+    if (isRunningInsertionEffect) {
+      error('useInsertionEffect must not schedule updates.');
+    }
+  }
+
   var root = markUpdateLaneFromFiberToRoot(fiber, lane);
 
   if (root === null) {
     return null;
+  }
+
+  {
+    if (isFlushingPassiveEffects) {
+      didScheduleUpdateDuringPassiveEffects = true;
+    }
   } // Mark that the root has a pending update.
 
 
@@ -28929,7 +25936,12 @@ function isInterleavedUpdate(fiber, lane) {
   return (// TODO: Optimize slightly by comparing to root that fiber belongs to.
     // Requires some refactoring. Not a big deal though since it's rare for
     // concurrent apps to have more than a single root.
-    workInProgressRoot !== null && (fiber.mode & ConcurrentMode) !== NoMode && ( // If this is a render phase update (i.e. UNSAFE_componentWillReceiveProps),
+    (workInProgressRoot !== null || // If the interleaved updates queue hasn't been cleared yet, then
+    // we should treat this as an interleaved update, too. This is also a
+    // defensive coding measure in case a new update comes in between when
+    // rendering has finished and when the interleaved updates are transferred
+    // to the main queue.
+    hasInterleavedUpdates()) && (fiber.mode & ConcurrentMode) !== NoMode && ( // If this is a render phase update (i.e. UNSAFE_componentWillReceiveProps),
     // then don't treat this as an interleaved update. This pattern is
     // accompanied by a warning but we haven't fully deprecated it yet. We can
     // remove once the deferRenderPhaseUpdateToNextBatch flag is enabled.
@@ -29260,7 +26272,7 @@ function finishConcurrentRender(root, exitStatus, lanes) {
       {
         // We should have already attempted to retry this tree. If we reached
         // this point, it errored again. Commit it.
-        commitRoot(root, workInProgressRootRecoverableErrors);
+        commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions);
         break;
       }
 
@@ -29298,13 +26310,13 @@ function finishConcurrentRender(root, exitStatus, lanes) {
             // immediately, wait for more data to arrive.
 
 
-            root.timeoutHandle = scheduleTimeout(commitRoot.bind(null, root, workInProgressRootRecoverableErrors), msUntilTimeout);
+            root.timeoutHandle = scheduleTimeout(commitRoot.bind(null, root, workInProgressRootRecoverableErrors, workInProgressTransitions), msUntilTimeout);
             break;
           }
         } // The work expired. Commit immediately.
 
 
-        commitRoot(root, workInProgressRootRecoverableErrors);
+        commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions);
         break;
       }
 
@@ -29336,20 +26348,20 @@ function finishConcurrentRender(root, exitStatus, lanes) {
           if (_msUntilTimeout > 10) {
             // Instead of committing the fallback immediately, wait for more data
             // to arrive.
-            root.timeoutHandle = scheduleTimeout(commitRoot.bind(null, root, workInProgressRootRecoverableErrors), _msUntilTimeout);
+            root.timeoutHandle = scheduleTimeout(commitRoot.bind(null, root, workInProgressRootRecoverableErrors, workInProgressTransitions), _msUntilTimeout);
             break;
           }
         } // Commit the placeholder.
 
 
-        commitRoot(root, workInProgressRootRecoverableErrors);
+        commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions);
         break;
       }
 
     case RootCompleted:
       {
         // The work completed. Ready to commit.
-        commitRoot(root, workInProgressRootRecoverableErrors);
+        commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions);
         break;
       }
 
@@ -29485,7 +26497,7 @@ function performSyncWorkOnRoot(root) {
   var finishedWork = root.current.alternate;
   root.finishedWork = finishedWork;
   root.finishedLanes = lanes;
-  commitRoot(root, workInProgressRootRecoverableErrors); // Before exiting, make sure there's a callback scheduled for the next
+  commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions); // Before exiting, make sure there's a callback scheduled for the next
   // pending level.
 
   ensureRootIsScheduled(root, now());
@@ -29791,6 +26803,8 @@ function renderRootSync(root, lanes) {
         movePendingFibersToMemoized(root, lanes);
       }
     }
+
+    workInProgressTransitions = getTransitionsForLanes();
     prepareFreshStack(root, lanes);
   }
 
@@ -29859,6 +26873,8 @@ function renderRootConcurrent(root, lanes) {
         movePendingFibersToMemoized(root, lanes);
       }
     }
+
+    workInProgressTransitions = getTransitionsForLanes();
     resetRenderTimer();
     prepareFreshStack(root, lanes);
   }
@@ -30037,7 +27053,7 @@ function completeUnitOfWork(unitOfWork) {
   }
 }
 
-function commitRoot(root, recoverableErrors) {
+function commitRoot(root, recoverableErrors, transitions) {
   // TODO: This no longer makes any sense. We already wrap the mutation and
   // layout phases. Should be able to remove.
   var previousUpdateLanePriority = getCurrentUpdatePriority();
@@ -30046,7 +27062,7 @@ function commitRoot(root, recoverableErrors) {
   try {
     ReactCurrentBatchConfig$3.transition = null;
     setCurrentUpdatePriority(DiscreteEventPriority);
-    commitRootImpl(root, recoverableErrors, previousUpdateLanePriority);
+    commitRootImpl(root, recoverableErrors, transitions, previousUpdateLanePriority);
   } finally {
     ReactCurrentBatchConfig$3.transition = prevTransition;
     setCurrentUpdatePriority(previousUpdateLanePriority);
@@ -30055,7 +27071,7 @@ function commitRoot(root, recoverableErrors) {
   return null;
 }
 
-function commitRootImpl(root, recoverableErrors, renderPriorityLevel) {
+function commitRootImpl(root, recoverableErrors, transitions, renderPriorityLevel) {
   do {
     // `flushPassiveEffects` will call `flushSyncUpdateQueue` at the end, which
     // means `flushPassiveEffects` will sometimes result in additional
@@ -30125,6 +27141,13 @@ function commitRootImpl(root, recoverableErrors, renderPriorityLevel) {
   if ((finishedWork.subtreeFlags & PassiveMask) !== NoFlags || (finishedWork.flags & PassiveMask) !== NoFlags) {
     if (!rootDoesHavePassiveEffects) {
       rootDoesHavePassiveEffects = true;
+      // to store it in pendingPassiveTransitions until they get processed
+      // We need to pass this through as an argument to commitRoot
+      // because workInProgressTransitions might have changed between
+      // the previous render and commit if we throttle the commit
+      // with setTimeout
+
+      pendingPassiveTransitions = transitions;
       scheduleCallback$1(NormalPriority, function () {
         flushPassiveEffects(); // This render triggered passive effects: release the root cache pool
         // *after* passive effects fire to avoid freeing a cache pool that may
@@ -30212,6 +27235,12 @@ function commitRootImpl(root, recoverableErrors, renderPriorityLevel) {
     rootDoesHavePassiveEffects = false;
     rootWithPendingPassiveEffects = root;
     pendingPassiveEffectsLanes = lanes;
+  } else {
+
+    {
+      nestedPassiveUpdateCount = 0;
+      rootWithPassiveNestedUpdates = null;
+    }
   } // Read this again, since an effect might have updated it
 
 
@@ -30356,8 +27385,11 @@ function enqueuePendingPassiveProfilerEffect(fiber) {
 function flushPassiveEffectsImpl() {
   if (rootWithPendingPassiveEffects === null) {
     return false;
-  }
+  } // Cache and clear the transitions flag
 
+
+  var transitions = pendingPassiveTransitions;
+  pendingPassiveTransitions = null;
   var root = rootWithPendingPassiveEffects;
   var lanes = pendingPassiveEffectsLanes;
   rootWithPendingPassiveEffects = null; // TODO: This is sometimes out of sync with rootWithPendingPassiveEffects.
@@ -30371,13 +27403,18 @@ function flushPassiveEffectsImpl() {
   }
 
   {
+    isFlushingPassiveEffects = true;
+    didScheduleUpdateDuringPassiveEffects = false;
+  }
+
+  {
     markPassiveEffectsStarted(lanes);
   }
 
   var prevExecutionContext = executionContext;
   executionContext |= CommitContext;
   commitPassiveUnmountEffects(root.current);
-  commitPassiveMountEffects(root, root.current); // TODO: Move to commitPassiveMountEffects
+  commitPassiveMountEffects(root, root.current, lanes, transitions); // TODO: Move to commitPassiveMountEffects
 
   {
     var profilerEffects = pendingPassiveProfilerEffects;
@@ -30398,10 +27435,26 @@ function flushPassiveEffectsImpl() {
   }
 
   executionContext = prevExecutionContext;
-  flushSyncCallbacks(); // If additional passive effects were scheduled, increment a counter. If this
-  // exceeds the limit, we'll fire a warning.
+  flushSyncCallbacks();
 
-  nestedPassiveUpdateCount = rootWithPendingPassiveEffects === null ? 0 : nestedPassiveUpdateCount + 1; // TODO: Move to commitPassiveMountEffects
+  {
+    // If additional passive effects were scheduled, increment a counter. If this
+    // exceeds the limit, we'll fire a warning.
+    if (didScheduleUpdateDuringPassiveEffects) {
+      if (root === rootWithPassiveNestedUpdates) {
+        nestedPassiveUpdateCount++;
+      } else {
+        nestedPassiveUpdateCount = 0;
+        rootWithPassiveNestedUpdates = root;
+      }
+    } else {
+      nestedPassiveUpdateCount = 0;
+    }
+
+    isFlushingPassiveEffects = false;
+    didScheduleUpdateDuringPassiveEffects = false;
+  } // TODO: Move to commitPassiveMountEffects
+
 
   onPostCommitRoot(root);
 
@@ -30448,6 +27501,11 @@ function captureCommitPhaseErrorOnRoot(rootFiber, sourceFiber, error) {
 }
 
 function captureCommitPhaseError(sourceFiber, nearestMountedAncestor, error$1) {
+  {
+    reportUncaughtErrorInDEV(error$1);
+    setIsRunningInsertionEffect(false);
+  }
+
   if (sourceFiber.tag === HostRoot) {
     // Error was thrown at the root. There is no parent, so the root
     // itself should capture it.
@@ -30567,25 +27625,23 @@ function resolveRetryWakeable(boundaryFiber, wakeable) {
 
   var retryCache;
 
-  {
-    switch (boundaryFiber.tag) {
-      case SuspenseComponent:
-        retryCache = boundaryFiber.stateNode;
-        var suspenseState = boundaryFiber.memoizedState;
+  switch (boundaryFiber.tag) {
+    case SuspenseComponent:
+      retryCache = boundaryFiber.stateNode;
+      var suspenseState = boundaryFiber.memoizedState;
 
-        if (suspenseState !== null) {
-          retryLane = suspenseState.retryLane;
-        }
+      if (suspenseState !== null) {
+        retryLane = suspenseState.retryLane;
+      }
 
-        break;
+      break;
 
-      case SuspenseListComponent:
-        retryCache = boundaryFiber.stateNode;
-        break;
+    case SuspenseListComponent:
+      retryCache = boundaryFiber.stateNode;
+      break;
 
-      default:
-        throw new Error('Pinged unknown suspense boundary type. ' + 'This is probably a bug in React.');
-    }
+    default:
+      throw new Error('Pinged unknown suspense boundary type. ' + 'This is probably a bug in React.');
   }
 
   if (retryCache !== null) {
@@ -30619,6 +27675,7 @@ function checkForNestedUpdates() {
   {
     if (nestedPassiveUpdateCount > NESTED_PASSIVE_UPDATE_LIMIT) {
       nestedPassiveUpdateCount = 0;
+      rootWithPassiveNestedUpdates = null;
 
       error('Maximum update depth exceeded. This can happen when a component ' + "calls setState inside useEffect, but useEffect either doesn't " + 'have a dependency array, or one of the dependencies changes on ' + 'every render.');
     }
@@ -30927,6 +27984,12 @@ function warnIfSuspenseResolutionNotWrappedWithActDEV(root) {
     if (root.tag !== LegacyRoot && isConcurrentActEnvironment() && ReactCurrentActQueue$1.current === null) {
       error('A suspended resource finished loading inside a test, but the event ' + 'was not wrapped in act(...).\n\n' + 'When testing, code that resolves suspended data should be wrapped ' + 'into act(...):\n\n' + 'act(() => {\n' + '  /* finish loading suspended data */\n' + '});\n' + '/* assert on the output */\n\n' + "This ensures that you're testing the behavior the user would see " + 'in the browser.' + ' Learn more at https://reactjs.org/link/wrap-tests-with-act');
     }
+  }
+}
+
+function setIsRunningInsertionEffect(isRunning) {
+  {
+    isRunningInsertionEffect = isRunning;
   }
 }
 
@@ -31984,7 +29047,8 @@ identifierPrefix, onRecoverableError, transitionCallbacks) {
       isDehydrated: hydrate,
       cache: null,
       // not enabled yet
-      transitions: null
+      transitions: null,
+      pendingSuspenseBoundaries: null
     };
     uninitializedFiber.memoizedState = _initialState;
   }
@@ -31993,7 +29057,7 @@ identifierPrefix, onRecoverableError, transitionCallbacks) {
   return root;
 }
 
-var ReactVersion = '18.0.0-fc46dba67-20220329';
+var ReactVersion = '18.1.0';
 
 function createPortal(children, containerInfo, // TODO: figure out the API for cross-renderer implementation.
 implementation) {
@@ -32231,7 +29295,6 @@ function markRetryLaneIfNotHydrated(fiber, retryLane) {
     markRetryLaneImpl(alternate, retryLane);
   }
 }
-
 function attemptContinuousHydration$1(fiber) {
   if (fiber.tag !== SuspenseComponent) {
     // We ignore HostRoots here because we can't increase
@@ -33058,7 +30121,7 @@ var Internals = {
 
 function createRoot$1(container, options) {
   {
-    if (!Internals.usingClientEntryPoint) {
+    if (!Internals.usingClientEntryPoint && !false) {
       error('You are importing createRoot from "react-dom" which is not supported. ' + 'You should instead import it from "react-dom/client".');
     }
   }
@@ -33068,7 +30131,7 @@ function createRoot$1(container, options) {
 
 function hydrateRoot$1(container, initialChildren, options) {
   {
-    if (!Internals.usingClientEntryPoint) {
+    if (!Internals.usingClientEntryPoint && !false) {
       error('You are importing hydrateRoot from "react-dom" which is not supported. ' + 'You should instead import it from "react-dom/client".');
     }
   }
@@ -33136,15 +30199,15 @@ if (
 
 /***/ }),
 
-/***/ "./node_modules/react-dom/client.js":
-/*!******************************************!*\
-  !*** ./node_modules/react-dom/client.js ***!
-  \******************************************/
+/***/ "../../node_modules/react-dom/client.js":
+/*!**********************************************!*\
+  !*** ../../node_modules/react-dom/client.js ***!
+  \**********************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 
-var m = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+var m = __webpack_require__(/*! react-dom */ "../../node_modules/react-dom/index.js");
 if (false) {} else {
   var i = m.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
   exports.createRoot = function(c, o) {
@@ -33168,10 +30231,10 @@ if (false) {} else {
 
 /***/ }),
 
-/***/ "./node_modules/react-dom/index.js":
-/*!*****************************************!*\
-  !*** ./node_modules/react-dom/index.js ***!
-  \*****************************************/
+/***/ "../../node_modules/react-dom/index.js":
+/*!*********************************************!*\
+  !*** ../../node_modules/react-dom/index.js ***!
+  \*********************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
@@ -33205,16 +30268,16 @@ function checkDCE() {
 }
 
 if (false) {} else {
-  module.exports = __webpack_require__(/*! ./cjs/react-dom.development.js */ "./node_modules/react-dom/cjs/react-dom.development.js");
+  module.exports = __webpack_require__(/*! ./cjs/react-dom.development.js */ "../../node_modules/react-dom/cjs/react-dom.development.js");
 }
 
 
 /***/ }),
 
-/***/ "./node_modules/react/cjs/react.development.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/react/cjs/react.development.js ***!
-  \*****************************************************/
+/***/ "../../node_modules/react/cjs/react.development.js":
+/*!*********************************************************!*\
+  !*** ../../node_modules/react/cjs/react.development.js ***!
+  \*********************************************************/
 /***/ ((module, exports, __webpack_require__) => {
 
 /* module decorator */ module = __webpack_require__.nmd(module);
@@ -33243,26 +30306,36 @@ if (
 ) {
   __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
 }
-          var ReactVersion = '18.0.0-fc46dba67-20220329';
+          var ReactVersion = '18.1.0';
+
+// -----------------------------------------------------------------------------
+
+var enableScopeAPI = false; // Experimental Create Event Handle API.
+var enableCacheElement = false;
+var enableTransitionTracing = false; // No known bugs, but needs performance testing
+
+var enableLegacyHidden = false; // Enables unstable_avoidThisFallback feature in Fiber
+// stuff. Intended to enable React core members to more easily debug scheduling
+// issues in DEV builds.
+
+var enableDebugTracing = false; // Track which Fiber(s) schedule render work.
 
 // ATTENTION
-// When adding new symbols to this file,
-// Please consider also adding to 'react-devtools-shared/src/backend/ReactSymbols'
-// The Symbol used to tag the ReactElement-like types.
-var REACT_ELEMENT_TYPE = Symbol.for('react.element');
-var REACT_PORTAL_TYPE = Symbol.for('react.portal');
-var REACT_FRAGMENT_TYPE = Symbol.for('react.fragment');
-var REACT_STRICT_MODE_TYPE = Symbol.for('react.strict_mode');
-var REACT_PROFILER_TYPE = Symbol.for('react.profiler');
-var REACT_PROVIDER_TYPE = Symbol.for('react.provider');
-var REACT_CONTEXT_TYPE = Symbol.for('react.context');
-var REACT_FORWARD_REF_TYPE = Symbol.for('react.forward_ref');
-var REACT_SUSPENSE_TYPE = Symbol.for('react.suspense');
-var REACT_SUSPENSE_LIST_TYPE = Symbol.for('react.suspense_list');
-var REACT_MEMO_TYPE = Symbol.for('react.memo');
-var REACT_LAZY_TYPE = Symbol.for('react.lazy');
-var REACT_OFFSCREEN_TYPE = Symbol.for('react.offscreen');
-var MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
+
+var REACT_ELEMENT_TYPE =  Symbol.for('react.element');
+var REACT_PORTAL_TYPE =  Symbol.for('react.portal');
+var REACT_FRAGMENT_TYPE =  Symbol.for('react.fragment');
+var REACT_STRICT_MODE_TYPE =  Symbol.for('react.strict_mode');
+var REACT_PROFILER_TYPE =  Symbol.for('react.profiler');
+var REACT_PROVIDER_TYPE =  Symbol.for('react.provider');
+var REACT_CONTEXT_TYPE =  Symbol.for('react.context');
+var REACT_FORWARD_REF_TYPE =  Symbol.for('react.forward_ref');
+var REACT_SUSPENSE_TYPE =  Symbol.for('react.suspense');
+var REACT_SUSPENSE_LIST_TYPE =  Symbol.for('react.suspense_list');
+var REACT_MEMO_TYPE =  Symbol.for('react.memo');
+var REACT_LAZY_TYPE =  Symbol.for('react.lazy');
+var REACT_OFFSCREEN_TYPE =  Symbol.for('react.offscreen');
+var MAYBE_ITERATOR_SYMBOL =  Symbol.iterator;
 var FAUX_ITERATOR_SYMBOL = '@@iterator';
 function getIteratorFn(maybeIterable) {
   if (maybeIterable === null || typeof maybeIterable !== 'object') {
@@ -33353,18 +30426,6 @@ function setExtraStackFrame(stack) {
     return stack;
   };
 }
-
-// -----------------------------------------------------------------------------
-
-var enableScopeAPI = false; // Experimental Create Event Handle API.
-var enableCacheElement = false;
-var enableTransitionTracing = false; // No known bugs, but needs performance testing
-
-var enableLegacyHidden = false; // Enables unstable_avoidThisFallback feature in Fiber
-// stuff. Intended to enable React core members to more easily debug scheduling
-// issues in DEV builds.
-
-var enableDebugTracing = false; // Track which Fiber(s) schedule render work.
 
 var ReactSharedInternals = {
   ReactCurrentDispatcher: ReactCurrentDispatcher,
@@ -34735,7 +31796,12 @@ function forwardRef(render) {
   return elementType;
 }
 
-var REACT_MODULE_REFERENCE = Symbol.for('react.module.reference');
+var REACT_MODULE_REFERENCE;
+
+{
+  REACT_MODULE_REFERENCE = Symbol.for('react.module.reference');
+}
+
 function isValidElementType(type) {
   if (typeof type === 'string' || typeof type === 'function') {
     return true;
@@ -35956,25 +33022,25 @@ if (
 
 /***/ }),
 
-/***/ "./node_modules/react/index.js":
-/*!*************************************!*\
-  !*** ./node_modules/react/index.js ***!
-  \*************************************/
+/***/ "../../node_modules/react/index.js":
+/*!*****************************************!*\
+  !*** ../../node_modules/react/index.js ***!
+  \*****************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
 
 if (false) {} else {
-  module.exports = __webpack_require__(/*! ./cjs/react.development.js */ "./node_modules/react/cjs/react.development.js");
+  module.exports = __webpack_require__(/*! ./cjs/react.development.js */ "../../node_modules/react/cjs/react.development.js");
 }
 
 
 /***/ }),
 
-/***/ "./node_modules/recoil/es/recoil.js":
-/*!******************************************!*\
-  !*** ./node_modules/recoil/es/recoil.js ***!
-  \******************************************/
+/***/ "../../node_modules/recoil/es/recoil.js":
+/*!**********************************************!*\
+  !*** ../../node_modules/recoil/es/recoil.js ***!
+  \**********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -36018,9 +33084,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "waitForAny": () => (/* binding */ Recoil_index_16),
 /* harmony export */   "waitForNone": () => (/* binding */ Recoil_index_15)
 /* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "../../node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "../../node_modules/react-dom/index.js");
 
 
 
@@ -45045,10 +42111,10 @@ var Recoil_index_37 = Recoil_index.retentionZone;
 
 /***/ }),
 
-/***/ "./node_modules/scheduler/cjs/scheduler.development.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/scheduler/cjs/scheduler.development.js ***!
-  \*************************************************************/
+/***/ "../../node_modules/scheduler/cjs/scheduler.development.js":
+/*!*****************************************************************!*\
+  !*** ../../node_modules/scheduler/cjs/scheduler.development.js ***!
+  \*****************************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 /**
@@ -45689,16 +42755,16 @@ if (
 
 /***/ }),
 
-/***/ "./node_modules/scheduler/index.js":
-/*!*****************************************!*\
-  !*** ./node_modules/scheduler/index.js ***!
-  \*****************************************/
+/***/ "../../node_modules/scheduler/index.js":
+/*!*********************************************!*\
+  !*** ../../node_modules/scheduler/index.js ***!
+  \*********************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
 
 if (false) {} else {
-  module.exports = __webpack_require__(/*! ./cjs/scheduler.development.js */ "./node_modules/scheduler/cjs/scheduler.development.js");
+  module.exports = __webpack_require__(/*! ./cjs/scheduler.development.js */ "../../node_modules/scheduler/cjs/scheduler.development.js");
 }
 
 
@@ -45714,22 +42780,47 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../node_modules/css-loader/dist/cjs.js!../../../node_modules/sass-loader/dist/cjs.js!./index.scss */ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/index.scss");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "../../node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/insertBySelector.js */ "../../node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "../../node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "../../node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js!../../../node_modules/sass-loader/dist/cjs.js!./index.scss */ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/index.scss");
 
-            
+      
+      
+      
+      
+      
+      
+      
+      
+      
 
 var options = {};
 
-options.insert = "head";
-options.singleton = false;
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
 
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_scss__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+      options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_scss__WEBPACK_IMPORTED_MODULE_6__["default"], options);
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_scss__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_scss__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_index_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
 
 /***/ }),
 
@@ -45743,22 +42834,47 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_controlCenter_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./controlCenter.scss */ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/controlCenter.scss");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "../../node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/insertBySelector.js */ "../../node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "../../node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "../../node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_controlCenter_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./controlCenter.scss */ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/controlCenter.scss");
 
-            
+      
+      
+      
+      
+      
+      
+      
+      
+      
 
 var options = {};
 
-options.insert = "head";
-options.singleton = false;
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
 
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_controlCenter_scss__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+      options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_controlCenter_scss__WEBPACK_IMPORTED_MODULE_6__["default"], options);
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_controlCenter_scss__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_controlCenter_scss__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_controlCenter_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_controlCenter_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
 
 /***/ }),
 
@@ -45772,22 +42888,47 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_layoutGrid_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./layoutGrid.scss */ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/layoutGrid.scss");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "../../node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/insertBySelector.js */ "../../node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "../../node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "../../node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_layoutGrid_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./layoutGrid.scss */ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/layoutGrid.scss");
 
-            
+      
+      
+      
+      
+      
+      
+      
+      
+      
 
 var options = {};
 
-options.insert = "head";
-options.singleton = false;
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
 
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_layoutGrid_scss__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+      options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_layoutGrid_scss__WEBPACK_IMPORTED_MODULE_6__["default"], options);
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_layoutGrid_scss__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_layoutGrid_scss__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_layoutGrid_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_layoutGrid_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
 
 /***/ }),
 
@@ -45801,22 +42942,47 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_exampleFunctions_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js!../../../../../node_modules/sass-loader/dist/cjs.js!./exampleFunctions.scss */ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/panels/exampleFunctions.scss");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "../../node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/insertBySelector.js */ "../../node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "../../node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "../../node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_exampleFunctions_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../../../node_modules/css-loader/dist/cjs.js!../../../../../node_modules/sass-loader/dist/cjs.js!./exampleFunctions.scss */ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/panels/exampleFunctions.scss");
 
-            
+      
+      
+      
+      
+      
+      
+      
+      
+      
 
 var options = {};
 
-options.insert = "head";
-options.singleton = false;
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
 
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_exampleFunctions_scss__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+      options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_exampleFunctions_scss__WEBPACK_IMPORTED_MODULE_6__["default"], options);
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_exampleFunctions_scss__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_exampleFunctions_scss__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_exampleFunctions_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_exampleFunctions_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
 
 /***/ }),
 
@@ -45830,22 +42996,47 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitPanel_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./splitPanel.scss */ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/splitPanel.scss");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "../../node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/insertBySelector.js */ "../../node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "../../node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "../../node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitPanel_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./splitPanel.scss */ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/layout-grid/splitPanel.scss");
 
-            
+      
+      
+      
+      
+      
+      
+      
+      
+      
 
 var options = {};
 
-options.insert = "head";
-options.singleton = false;
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
 
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitPanel_scss__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+      options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitPanel_scss__WEBPACK_IMPORTED_MODULE_6__["default"], options);
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitPanel_scss__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitPanel_scss__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitPanel_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitPanel_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
 
 /***/ }),
 
@@ -45859,22 +43050,47 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitview_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js!../../../../../node_modules/sass-loader/dist/cjs.js!./splitview.scss */ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/splitview/splitview.scss");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "../../node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/insertBySelector.js */ "../../node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "../../node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "../../node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitview_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../../../node_modules/css-loader/dist/cjs.js!../../../../../node_modules/sass-loader/dist/cjs.js!./splitview.scss */ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/splitview/splitview.scss");
 
-            
+      
+      
+      
+      
+      
+      
+      
+      
+      
 
 var options = {};
 
-options.insert = "head";
-options.singleton = false;
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
 
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitview_scss__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+      options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitview_scss__WEBPACK_IMPORTED_MODULE_6__["default"], options);
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitview_scss__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitview_scss__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitview_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_splitview_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
 
 /***/ }),
 
@@ -45888,22 +43104,47 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_welcome_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js!../../../../../node_modules/sass-loader/dist/cjs.js!./welcome.scss */ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/welcome/welcome.scss");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "../../node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/insertBySelector.js */ "../../node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "../../node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "../../node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_welcome_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../../../node_modules/css-loader/dist/cjs.js!../../../../../node_modules/sass-loader/dist/cjs.js!./welcome.scss */ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/panels/welcome/welcome.scss");
 
-            
+      
+      
+      
+      
+      
+      
+      
+      
+      
 
 var options = {};
 
-options.insert = "head";
-options.singleton = false;
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
 
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_welcome_scss__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+      options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_welcome_scss__WEBPACK_IMPORTED_MODULE_6__["default"], options);
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_welcome_scss__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_welcome_scss__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_welcome_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_welcome_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
 
 /***/ }),
 
@@ -45917,80 +43158,65 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_widgets_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./widgets.scss */ "./node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/services/widgets.scss");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "../../node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/insertBySelector.js */ "../../node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "../../node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "../../node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_widgets_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./widgets.scss */ "../../node_modules/css-loader/dist/cjs.js!../../node_modules/sass-loader/dist/cjs.js!./src/services/widgets.scss");
 
-            
+      
+      
+      
+      
+      
+      
+      
+      
+      
 
 var options = {};
 
-options.insert = "head";
-options.singleton = false;
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
 
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_widgets_scss__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+      options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_widgets_scss__WEBPACK_IMPORTED_MODULE_6__["default"], options);
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_widgets_scss__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_widgets_scss__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_widgets_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_widgets_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
 
 /***/ }),
 
-/***/ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js":
-/*!****************************************************************************!*\
-  !*** ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js ***!
-  \****************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ "../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js":
+/*!********************************************************************************!*\
+  !*** ../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js ***!
+  \********************************************************************************/
+/***/ ((module) => {
 
 
 
-var isOldIE = function isOldIE() {
-  var memo;
-  return function memorize() {
-    if (typeof memo === 'undefined') {
-      // Test for IE <= 9 as proposed by Browserhacks
-      // @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805
-      // Tests for existence of standard globals is to allow style-loader
-      // to operate correctly into non-standard environments
-      // @see https://github.com/webpack-contrib/style-loader/issues/177
-      memo = Boolean(window && document && document.all && !window.atob);
-    }
-
-    return memo;
-  };
-}();
-
-var getTarget = function getTarget() {
-  var memo = {};
-  return function memorize(target) {
-    if (typeof memo[target] === 'undefined') {
-      var styleTarget = document.querySelector(target); // Special case to return head of iframe instead of iframe itself
-
-      if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
-        try {
-          // This will throw an exception if access to iframe is blocked
-          // due to cross-origin restrictions
-          styleTarget = styleTarget.contentDocument.head;
-        } catch (e) {
-          // istanbul ignore next
-          styleTarget = null;
-        }
-      }
-
-      memo[target] = styleTarget;
-    }
-
-    return memo[target];
-  };
-}();
-
-var stylesInDom = [];
+var stylesInDOM = [];
 
 function getIndexByIdentifier(identifier) {
   var result = -1;
 
-  for (var i = 0; i < stylesInDom.length; i++) {
-    if (stylesInDom[i].identifier === identifier) {
+  for (var i = 0; i < stylesInDOM.length; i++) {
+    if (stylesInDOM[i].identifier === identifier) {
       result = i;
       break;
     }
@@ -46009,20 +43235,24 @@ function modulesToDom(list, options) {
     var count = idCountMap[id] || 0;
     var identifier = "".concat(id, " ").concat(count);
     idCountMap[id] = count + 1;
-    var index = getIndexByIdentifier(identifier);
+    var indexByIdentifier = getIndexByIdentifier(identifier);
     var obj = {
       css: item[1],
       media: item[2],
-      sourceMap: item[3]
+      sourceMap: item[3],
+      supports: item[4],
+      layer: item[5]
     };
 
-    if (index !== -1) {
-      stylesInDom[index].references++;
-      stylesInDom[index].updater(obj);
+    if (indexByIdentifier !== -1) {
+      stylesInDOM[indexByIdentifier].references++;
+      stylesInDOM[indexByIdentifier].updater(obj);
     } else {
-      stylesInDom.push({
+      var updater = addElementStyle(obj, options);
+      options.byIndex = i;
+      stylesInDOM.splice(i, 0, {
         identifier: identifier,
-        updater: addStyle(obj, options),
+        updater: updater,
         references: 1
       });
     }
@@ -46033,165 +43263,36 @@ function modulesToDom(list, options) {
   return identifiers;
 }
 
-function insertStyleElement(options) {
-  var style = document.createElement('style');
-  var attributes = options.attributes || {};
+function addElementStyle(obj, options) {
+  var api = options.domAPI(options);
+  api.update(obj);
 
-  if (typeof attributes.nonce === 'undefined') {
-    var nonce =  true ? __webpack_require__.nc : 0;
-
-    if (nonce) {
-      attributes.nonce = nonce;
-    }
-  }
-
-  Object.keys(attributes).forEach(function (key) {
-    style.setAttribute(key, attributes[key]);
-  });
-
-  if (typeof options.insert === 'function') {
-    options.insert(style);
-  } else {
-    var target = getTarget(options.insert || 'head');
-
-    if (!target) {
-      throw new Error("Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.");
-    }
-
-    target.appendChild(style);
-  }
-
-  return style;
-}
-
-function removeStyleElement(style) {
-  // istanbul ignore if
-  if (style.parentNode === null) {
-    return false;
-  }
-
-  style.parentNode.removeChild(style);
-}
-/* istanbul ignore next  */
-
-
-var replaceText = function replaceText() {
-  var textStore = [];
-  return function replace(index, replacement) {
-    textStore[index] = replacement;
-    return textStore.filter(Boolean).join('\n');
-  };
-}();
-
-function applyToSingletonTag(style, index, remove, obj) {
-  var css = remove ? '' : obj.media ? "@media ".concat(obj.media, " {").concat(obj.css, "}") : obj.css; // For old IE
-
-  /* istanbul ignore if  */
-
-  if (style.styleSheet) {
-    style.styleSheet.cssText = replaceText(index, css);
-  } else {
-    var cssNode = document.createTextNode(css);
-    var childNodes = style.childNodes;
-
-    if (childNodes[index]) {
-      style.removeChild(childNodes[index]);
-    }
-
-    if (childNodes.length) {
-      style.insertBefore(cssNode, childNodes[index]);
-    } else {
-      style.appendChild(cssNode);
-    }
-  }
-}
-
-function applyToTag(style, options, obj) {
-  var css = obj.css;
-  var media = obj.media;
-  var sourceMap = obj.sourceMap;
-
-  if (media) {
-    style.setAttribute('media', media);
-  } else {
-    style.removeAttribute('media');
-  }
-
-  if (sourceMap && typeof btoa !== 'undefined') {
-    css += "\n/*# sourceMappingURL=data:application/json;base64,".concat(btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))), " */");
-  } // For old IE
-
-  /* istanbul ignore if  */
-
-
-  if (style.styleSheet) {
-    style.styleSheet.cssText = css;
-  } else {
-    while (style.firstChild) {
-      style.removeChild(style.firstChild);
-    }
-
-    style.appendChild(document.createTextNode(css));
-  }
-}
-
-var singleton = null;
-var singletonCounter = 0;
-
-function addStyle(obj, options) {
-  var style;
-  var update;
-  var remove;
-
-  if (options.singleton) {
-    var styleIndex = singletonCounter++;
-    style = singleton || (singleton = insertStyleElement(options));
-    update = applyToSingletonTag.bind(null, style, styleIndex, false);
-    remove = applyToSingletonTag.bind(null, style, styleIndex, true);
-  } else {
-    style = insertStyleElement(options);
-    update = applyToTag.bind(null, style, options);
-
-    remove = function remove() {
-      removeStyleElement(style);
-    };
-  }
-
-  update(obj);
-  return function updateStyle(newObj) {
+  var updater = function updater(newObj) {
     if (newObj) {
-      if (newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap) {
+      if (newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap && newObj.supports === obj.supports && newObj.layer === obj.layer) {
         return;
       }
 
-      update(obj = newObj);
+      api.update(obj = newObj);
     } else {
-      remove();
+      api.remove();
     }
   };
+
+  return updater;
 }
 
 module.exports = function (list, options) {
-  options = options || {}; // Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
-  // tags it will allow on a page
-
-  if (!options.singleton && typeof options.singleton !== 'boolean') {
-    options.singleton = isOldIE();
-  }
-
+  options = options || {};
   list = list || [];
   var lastIdentifiers = modulesToDom(list, options);
   return function update(newList) {
     newList = newList || [];
 
-    if (Object.prototype.toString.call(newList) !== '[object Array]') {
-      return;
-    }
-
     for (var i = 0; i < lastIdentifiers.length; i++) {
       var identifier = lastIdentifiers[i];
       var index = getIndexByIdentifier(identifier);
-      stylesInDom[index].references--;
+      stylesInDOM[index].references--;
     }
 
     var newLastIdentifiers = modulesToDom(newList, options);
@@ -46201,16 +43302,3379 @@ module.exports = function (list, options) {
 
       var _index = getIndexByIdentifier(_identifier);
 
-      if (stylesInDom[_index].references === 0) {
-        stylesInDom[_index].updater();
+      if (stylesInDOM[_index].references === 0) {
+        stylesInDOM[_index].updater();
 
-        stylesInDom.splice(_index, 1);
+        stylesInDOM.splice(_index, 1);
       }
     }
 
     lastIdentifiers = newLastIdentifiers;
   };
 };
+
+/***/ }),
+
+/***/ "../../node_modules/style-loader/dist/runtime/insertBySelector.js":
+/*!************************************************************************!*\
+  !*** ../../node_modules/style-loader/dist/runtime/insertBySelector.js ***!
+  \************************************************************************/
+/***/ ((module) => {
+
+
+
+var memo = {};
+/* istanbul ignore next  */
+
+function getTarget(target) {
+  if (typeof memo[target] === "undefined") {
+    var styleTarget = document.querySelector(target); // Special case to return head of iframe instead of iframe itself
+
+    if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
+      try {
+        // This will throw an exception if access to iframe is blocked
+        // due to cross-origin restrictions
+        styleTarget = styleTarget.contentDocument.head;
+      } catch (e) {
+        // istanbul ignore next
+        styleTarget = null;
+      }
+    }
+
+    memo[target] = styleTarget;
+  }
+
+  return memo[target];
+}
+/* istanbul ignore next  */
+
+
+function insertBySelector(insert, style) {
+  var target = getTarget(insert);
+
+  if (!target) {
+    throw new Error("Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.");
+  }
+
+  target.appendChild(style);
+}
+
+module.exports = insertBySelector;
+
+/***/ }),
+
+/***/ "../../node_modules/style-loader/dist/runtime/insertStyleElement.js":
+/*!**************************************************************************!*\
+  !*** ../../node_modules/style-loader/dist/runtime/insertStyleElement.js ***!
+  \**************************************************************************/
+/***/ ((module) => {
+
+
+
+/* istanbul ignore next  */
+function insertStyleElement(options) {
+  var element = document.createElement("style");
+  options.setAttributes(element, options.attributes);
+  options.insert(element, options.options);
+  return element;
+}
+
+module.exports = insertStyleElement;
+
+/***/ }),
+
+/***/ "../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js":
+/*!**************************************************************************************!*\
+  !*** ../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js ***!
+  \**************************************************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+
+
+/* istanbul ignore next  */
+function setAttributesWithoutAttributes(styleElement) {
+  var nonce =  true ? __webpack_require__.nc : 0;
+
+  if (nonce) {
+    styleElement.setAttribute("nonce", nonce);
+  }
+}
+
+module.exports = setAttributesWithoutAttributes;
+
+/***/ }),
+
+/***/ "../../node_modules/style-loader/dist/runtime/styleDomAPI.js":
+/*!*******************************************************************!*\
+  !*** ../../node_modules/style-loader/dist/runtime/styleDomAPI.js ***!
+  \*******************************************************************/
+/***/ ((module) => {
+
+
+
+/* istanbul ignore next  */
+function apply(styleElement, options, obj) {
+  var css = "";
+
+  if (obj.supports) {
+    css += "@supports (".concat(obj.supports, ") {");
+  }
+
+  if (obj.media) {
+    css += "@media ".concat(obj.media, " {");
+  }
+
+  var needLayer = typeof obj.layer !== "undefined";
+
+  if (needLayer) {
+    css += "@layer".concat(obj.layer.length > 0 ? " ".concat(obj.layer) : "", " {");
+  }
+
+  css += obj.css;
+
+  if (needLayer) {
+    css += "}";
+  }
+
+  if (obj.media) {
+    css += "}";
+  }
+
+  if (obj.supports) {
+    css += "}";
+  }
+
+  var sourceMap = obj.sourceMap;
+
+  if (sourceMap && typeof btoa !== "undefined") {
+    css += "\n/*# sourceMappingURL=data:application/json;base64,".concat(btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))), " */");
+  } // For old IE
+
+  /* istanbul ignore if  */
+
+
+  options.styleTagTransform(css, styleElement, options.options);
+}
+
+function removeStyleElement(styleElement) {
+  // istanbul ignore if
+  if (styleElement.parentNode === null) {
+    return false;
+  }
+
+  styleElement.parentNode.removeChild(styleElement);
+}
+/* istanbul ignore next  */
+
+
+function domAPI(options) {
+  var styleElement = options.insertStyleElement(options);
+  return {
+    update: function update(obj) {
+      apply(styleElement, options, obj);
+    },
+    remove: function remove() {
+      removeStyleElement(styleElement);
+    }
+  };
+}
+
+module.exports = domAPI;
+
+/***/ }),
+
+/***/ "../../node_modules/style-loader/dist/runtime/styleTagTransform.js":
+/*!*************************************************************************!*\
+  !*** ../../node_modules/style-loader/dist/runtime/styleTagTransform.js ***!
+  \*************************************************************************/
+/***/ ((module) => {
+
+
+
+/* istanbul ignore next  */
+function styleTagTransform(css, styleElement) {
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = css;
+  } else {
+    while (styleElement.firstChild) {
+      styleElement.removeChild(styleElement.firstChild);
+    }
+
+    styleElement.appendChild(document.createTextNode(css));
+  }
+}
+
+module.exports = styleTagTransform;
+
+/***/ }),
+
+/***/ "./src/dom.ts":
+/*!********************!*\
+  !*** ./src/dom.ts ***!
+  \********************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.toggleClass = void 0;
+var toggleClass = function (element, className, isToggled) {
+    var hasClass = element.classList.contains(className);
+    if (isToggled && !hasClass) {
+        element.classList.add(className);
+    }
+    if (!isToggled && hasClass) {
+        element.classList.remove(className);
+    }
+};
+exports.toggleClass = toggleClass;
+
+
+/***/ }),
+
+/***/ "./src/events.ts":
+/*!***********************!*\
+  !*** ./src/events.ts ***!
+  \***********************/
+/***/ (function(__unused_webpack_module, exports) {
+
+
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TickDelayedEvent = exports.addDisposableListener = exports.addDisposableWindowListener = exports.Emitter = exports.Event = void 0;
+var Event;
+(function (Event) {
+    Event.any = function () {
+        var children = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            children[_i] = arguments[_i];
+        }
+        return function (listener) {
+            var disposables = children.map(function (child) { return child(listener); });
+            return {
+                dispose: function () {
+                    disposables.forEach(function (d) {
+                        d.dispose();
+                    });
+                },
+            };
+        };
+    };
+})(Event = exports.Event || (exports.Event = {}));
+// dumb event emitter with better typings than nodes event emitter
+// https://github.com/microsoft/vscode/blob/master/src/vs/base/common/event.ts
+var Emitter = /** @class */ (function () {
+    function Emitter(options) {
+        this.options = options;
+        this._listeners = [];
+        this._disposed = false;
+    }
+    Object.defineProperty(Emitter.prototype, "event", {
+        get: function () {
+            var _this = this;
+            if (!this._event) {
+                this._event = function (listener) {
+                    var _a;
+                    if (((_a = _this.options) === null || _a === void 0 ? void 0 : _a.replay) && _this._last !== undefined) {
+                        listener(_this._last);
+                    }
+                    _this._listeners.push(listener);
+                    return {
+                        dispose: function () {
+                            var index = _this._listeners.indexOf(listener);
+                            if (index > -1) {
+                                _this._listeners.splice(index, 1);
+                            }
+                        },
+                    };
+                };
+            }
+            return this._event;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Emitter.prototype.fire = function (e) {
+        var e_1, _a;
+        this._last = e;
+        try {
+            for (var _b = __values(this._listeners), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var listener = _c.value;
+                listener(e);
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+    };
+    Emitter.prototype.dispose = function () {
+        this._listeners = [];
+        this._disposed = true;
+    };
+    return Emitter;
+}());
+exports.Emitter = Emitter;
+function addDisposableWindowListener(element, type, listener, options) {
+    element.addEventListener(type, listener, options);
+    return {
+        dispose: function () {
+            element.removeEventListener(type, listener);
+        },
+    };
+}
+exports.addDisposableWindowListener = addDisposableWindowListener;
+function addDisposableListener(element, type, listener, options) {
+    element.addEventListener(type, listener, options);
+    return {
+        dispose: function () {
+            element.removeEventListener(type, listener);
+        },
+    };
+}
+exports.addDisposableListener = addDisposableListener;
+var TickDelayedEvent = /** @class */ (function () {
+    function TickDelayedEvent() {
+        this._onFired = new Emitter();
+        this.onEvent = this._onFired.event;
+    }
+    TickDelayedEvent.prototype.fire = function () {
+        var _this = this;
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
+        this.timer = setTimeout(function () {
+            _this._onFired.fire();
+            clearTimeout(_this.timer);
+        });
+    };
+    TickDelayedEvent.prototype.dispose = function () {
+        this._onFired.dispose();
+    };
+    return TickDelayedEvent;
+}());
+exports.TickDelayedEvent = TickDelayedEvent;
+
+
+/***/ }),
+
+/***/ "./src/index.tsx":
+/*!***********************!*\
+  !*** ./src/index.tsx ***!
+  \***********************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var ReactDOM = __importStar(__webpack_require__(/*! react-dom/client */ "../../node_modules/react-dom/client.js"));
+var application_1 = __webpack_require__(/*! ./layout-grid/application */ "./src/layout-grid/application.tsx");
+var recoil_1 = __webpack_require__(/*! recoil */ "../../node_modules/recoil/es/recoil.js");
+__webpack_require__(/*! ./index.scss */ "./src/index.scss");
+document.getElementById('app').classList.add('dockview-theme-dark');
+var root = ReactDOM.createRoot(document.getElementById('app'));
+root.render(React.createElement(recoil_1.RecoilRoot, null,
+    React.createElement(application_1.Application, null)));
+
+
+/***/ }),
+
+/***/ "./src/layout-grid/application.tsx":
+/*!*****************************************!*\
+  !*** ./src/layout-grid/application.tsx ***!
+  \*****************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Application = void 0;
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
+var widgets_1 = __webpack_require__(/*! ../services/widgets */ "./src/services/widgets.tsx");
+var footer_1 = __webpack_require__(/*! ./footer */ "./src/layout-grid/footer.tsx");
+var panel_1 = __webpack_require__(/*! ./panel */ "./src/layout-grid/panel.tsx");
+var layoutGrid_1 = __webpack_require__(/*! ./layoutGrid */ "./src/layout-grid/layoutGrid.tsx");
+var registry_1 = __webpack_require__(/*! ./registry */ "./src/layout-grid/registry.ts");
+var widgets_2 = __webpack_require__(/*! ../services/widgets */ "./src/services/widgets.tsx");
+var rootcomponents = {
+    sidebar: widgets_2.Sidebar,
+    activitybar: widgets_1.Activitybar,
+    editor: layoutGrid_1.TestGrid,
+    footer: footer_1.Footer,
+    panel: panel_1.Panel,
+};
+var Application = function () {
+    var api = React.useRef();
+    var registry = (0, registry_1.useLayoutRegistry)();
+    var onReady = function (event) {
+        api.current = event.api;
+        registry.register('gridview', event.api);
+        var success = false;
+        var state = localStorage.getItem('dockview-layout');
+        if (state) {
+            try {
+                event.api.fromJSON(JSON.parse(state));
+                success = true;
+            }
+            catch (err) {
+                console.error('failed to load layout', err);
+            }
+        }
+        if (!success) {
+            event.api.addPanel({
+                id: 'i',
+                component: 'activitybar',
+                minimumWidth: 48,
+                maximumWidth: 48,
+                location: [0],
+            });
+            event.api.addPanel({
+                id: 'footer',
+                component: 'footer',
+                location: [1],
+                maximumHeight: 22,
+                minimumHeight: 22,
+            });
+            event.api.addPanel({
+                id: 'editor',
+                component: 'editor',
+                snap: true,
+                location: [0, 1],
+                priority: dockview_1.LayoutPriority.High,
+            });
+            event.api.addPanel({
+                id: 'sidebar',
+                component: 'sidebar',
+                snap: true,
+                position: { referencePanel: 'editor', direction: 'left' },
+                minimumWidth: 170,
+                size: 100,
+            });
+            event.api.addPanel({
+                id: 'panel',
+                component: 'panel',
+                position: { referencePanel: 'editor', direction: 'below' },
+                size: 200,
+                snap: true,
+            });
+        }
+        event.api.onDidLayoutChange(function () {
+            localStorage.setItem('dockview-layout', JSON.stringify(event.api.toJSON()));
+        });
+    };
+    return (React.createElement(dockview_1.GridviewReact, { components: rootcomponents, onReady: onReady, orientation: dockview_1.Orientation.VERTICAL, hideBorders: true, proportionalLayout: true }));
+};
+exports.Application = Application;
+
+
+/***/ }),
+
+/***/ "./src/layout-grid/controlCenter.tsx":
+/*!*******************************************!*\
+  !*** ./src/layout-grid/controlCenter.tsx ***!
+  \*******************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ControlCenter = void 0;
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var registry_1 = __webpack_require__(/*! ./registry */ "./src/layout-grid/registry.ts");
+__webpack_require__(/*! ./controlCenter.scss */ "./src/layout-grid/controlCenter.scss");
+var ControlCenter = function () {
+    var registry = (0, registry_1.useLayoutRegistry)();
+    var onAdd = function () {
+        var api = registry.get('dockview');
+        var _id = Date.now();
+        var id = "".concat(_id);
+        api.addPanel({
+            component: 'test_component',
+            id: id,
+            title: "Item ".concat(id),
+        });
+    };
+    var onAddTheSamePanel = function () {
+        var api = registry.get('dockview');
+        var id = "duplicate_panel";
+        var panel = api.getPanel(id);
+        if (panel) {
+            panel.api.setActive();
+            return;
+        }
+        api.addPanel({
+            component: 'test_component',
+            id: id,
+            title: "Item ".concat(id),
+        });
+    };
+    var onAddEmpty = function () {
+        var api = registry.get('dockview');
+        api.addEmptyGroup();
+    };
+    var nextPanel = function (ev) {
+        ev.preventDefault();
+        var api = registry.get('dockview');
+        api.moveToNext({ includePanel: true });
+    };
+    var nextGroup = function (ev) {
+        ev.preventDefault();
+        var api = registry.get('dockview');
+        api.moveToNext();
+    };
+    var previousPanel = function (ev) {
+        ev.preventDefault();
+        var api = registry.get('dockview');
+        api.moveToPrevious({ includePanel: true });
+    };
+    var previousGroup = function (ev) {
+        ev.preventDefault();
+        var api = registry.get('dockview');
+        api.moveToNext();
+    };
+    var onConfig = function () {
+        var api = registry.get('dockview');
+        var data = api.toJSON();
+        var stringData = JSON.stringify(data, null, 4);
+        console.log(stringData);
+        localStorage.setItem('layout', stringData);
+    };
+    var onLoad = function () { return __awaiter(void 0, void 0, void 0, function () {
+        var api, data, jsonData;
+        return __generator(this, function (_a) {
+            api = registry.get('dockview');
+            api.closeAllGroups();
+            data = localStorage.getItem('layout');
+            if (data) {
+                jsonData = JSON.parse(data);
+                api.fromJSON(jsonData);
+            }
+            return [2 /*return*/];
+        });
+    }); };
+    var onClear = function () {
+        var api = registry.get('dockview');
+        api.closeAllGroups();
+    };
+    var saveApplicationLayout = function () {
+        var api = registry.get('dockview');
+        console.log(JSON.stringify(api.toJSON(), null, 4));
+    };
+    var onAddSettings = function () {
+        var api = registry.get('dockview');
+        var settingsPanel = api.getPanel('settings');
+        if (settingsPanel) {
+            settingsPanel.api.setActive();
+            return;
+        }
+        api.addPanel({
+            id: 'settings',
+            component: 'settings',
+            title: 'Settings',
+        });
+    };
+    return (React.createElement("div", { className: "control-center" },
+        React.createElement("div", { className: "control-center-row" },
+            React.createElement("button", { onMouseDown: onAdd }, "Add new")),
+        React.createElement("div", { className: "control-center-row" },
+            React.createElement("button", { onMouseDown: onAddTheSamePanel }, "Add identical")),
+        React.createElement("div", { className: "control-center-row" },
+            React.createElement("button", { onMouseDown: onAddSettings }, "Settings")),
+        React.createElement("div", { className: "control-center-row" },
+            React.createElement("button", { onMouseDown: onAddEmpty }, "Add empty")),
+        React.createElement("div", { className: "control-center-row" },
+            React.createElement("button", { onMouseDown: nextPanel }, "Next panel")),
+        React.createElement("div", { className: "control-center-row" },
+            React.createElement("button", { onMouseDown: nextGroup }, "Next Group")),
+        React.createElement("div", { className: "control-center-row" },
+            React.createElement("button", { onMouseDown: previousPanel }, "Previous Panel")),
+        React.createElement("div", { className: "control-center-row" },
+            React.createElement("button", { onMouseDown: previousGroup }, "Previous Group")),
+        React.createElement("div", { className: "control-center-row" },
+            React.createElement("button", { onClick: onConfig }, "Save")),
+        React.createElement("div", { className: "control-center-row" },
+            React.createElement("button", { onClick: onLoad }, "Load")),
+        React.createElement("div", { className: "control-center-row" },
+            React.createElement("button", { onClick: onClear }, "Clear")),
+        React.createElement("div", { className: "control-center-row" },
+            React.createElement("button", { onClick: saveApplicationLayout }, "Save application layout"))));
+};
+exports.ControlCenter = ControlCenter;
+
+
+/***/ }),
+
+/***/ "./src/layout-grid/customTab.tsx":
+/*!***************************************!*\
+  !*** ./src/layout-grid/customTab.tsx ***!
+  \***************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CustomTab = void 0;
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var CustomTab = function (props) {
+    return React.createElement("div", null, "hello");
+};
+exports.CustomTab = CustomTab;
+
+
+/***/ }),
+
+/***/ "./src/layout-grid/footer.tsx":
+/*!************************************!*\
+  !*** ./src/layout-grid/footer.tsx ***!
+  \************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Footer = exports.selectedPanelAtom = void 0;
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var recoil_1 = __webpack_require__(/*! recoil */ "../../node_modules/recoil/es/recoil.js");
+exports.selectedPanelAtom = (0, recoil_1.atom)({
+    key: 'selectedPanelAtom',
+    default: '',
+});
+var Footer = function (props) {
+    var selectedPanel = (0, recoil_1.useRecoilValue)(exports.selectedPanelAtom);
+    return (React.createElement("div", { style: {
+            height: '22px',
+            backgroundColor: 'dodgerblue',
+            display: 'flex',
+            alignItems: 'center',
+            padding: '0px 8px',
+        } },
+        React.createElement("span", { style: { flexGrow: 1 } }),
+        React.createElement("span", null, selectedPanel)));
+};
+exports.Footer = Footer;
+
+
+/***/ }),
+
+/***/ "./src/layout-grid/layoutGrid.tsx":
+/*!****************************************!*\
+  !*** ./src/layout-grid/layoutGrid.tsx ***!
+  \****************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TestGrid = exports.nextGuid = void 0;
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var ReactDOM = __importStar(__webpack_require__(/*! react-dom */ "../../node_modules/react-dom/index.js"));
+var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
+var customTab_1 = __webpack_require__(/*! ./customTab */ "./src/layout-grid/customTab.tsx");
+var settingsPanel_1 = __webpack_require__(/*! ./settingsPanel */ "./src/layout-grid/settingsPanel.tsx");
+var registry_1 = __webpack_require__(/*! ./registry */ "./src/layout-grid/registry.ts");
+var splitPanel_1 = __webpack_require__(/*! ./splitPanel */ "./src/layout-grid/splitPanel.tsx");
+__webpack_require__(/*! ./layoutGrid.scss */ "./src/layout-grid/layoutGrid.scss");
+var welcome_1 = __webpack_require__(/*! ../panels/welcome/welcome */ "./src/panels/welcome/welcome.tsx");
+var splitview_1 = __webpack_require__(/*! ../panels/splitview/splitview */ "./src/panels/splitview/splitview.tsx");
+var gridview_1 = __webpack_require__(/*! ../panels/gridview/gridview */ "./src/panels/gridview/gridview.tsx");
+var recoil_1 = __webpack_require__(/*! recoil */ "../../node_modules/recoil/es/recoil.js");
+var footer_1 = __webpack_require__(/*! ./footer */ "./src/layout-grid/footer.tsx");
+var exampleFunctions_1 = __webpack_require__(/*! ./panels/exampleFunctions */ "./src/layout-grid/panels/exampleFunctions.tsx");
+var lifecycle_1 = __webpack_require__(/*! ../lifecycle */ "./src/lifecycle.ts");
+var WatermarkComponent = function () {
+    return (React.createElement("div", { style: { backgroundColor: 'black', color: 'white' } }, "Watermark component"));
+};
+var Test = function (props) {
+    var _a = __read(React.useState(0), 2), counter = _a[0], setCounter = _a[1];
+    React.useEffect(function () {
+        var interval = setInterval(function () {
+            setCounter(function (_) { return _ + 1; });
+        }, 2000);
+        return function () {
+            clearInterval(interval);
+        };
+    }, []);
+    return (React.createElement(dockview_1.DockviewComponents.Panel, null,
+        counter % 4 === 0 && (React.createElement(dockview_1.DockviewComponents.Tab, null,
+            React.createElement("div", null, "custom tab ".concat(counter)))),
+        React.createElement(dockview_1.DockviewComponents.Content, null,
+            React.createElement("div", null,
+                React.createElement("div", null, "custom body ".concat(counter)),
+                React.createElement("button", null, "Toggle"))),
+        React.createElement(dockview_1.DockviewComponents.Actions, null,
+            React.createElement("div", null, "custom action ".concat(counter)))));
+};
+var components = {
+    test: Test,
+    welcome: welcome_1.WelcomePanel,
+    splitview: splitview_1.SplitviewPanel,
+    gridview: gridview_1.GridviewDemoPanel,
+    inner_component: function (props) {
+        var _api = React.useRef();
+        var onReady = function (event) {
+            _api.current = event.api;
+            event.api.addPanel({
+                component: 'test_component',
+                id: 'inner-1',
+                title: 'inner-1',
+            });
+            event.api.addPanel({
+                component: 'test_component',
+                id: 'inner-2',
+                title: 'inner-2',
+            });
+            event.api.addPanel({
+                component: 'test_component',
+                id: (0, exports.nextGuid)(),
+                title: 'inner-3',
+                position: {
+                    direction: 'within',
+                    referencePanel: 'inner-1',
+                },
+            });
+            event.api.addPanel({
+                component: 'test_component',
+                id: (0, exports.nextGuid)(),
+                title: 'inner-4',
+                position: {
+                    direction: 'within',
+                    referencePanel: 'inner-2',
+                },
+            });
+        };
+        return (React.createElement("div", { style: {
+                boxSizing: 'border-box',
+                // borderTop: "1px solid var(--dv-separator-border)",
+            } },
+            React.createElement(dockview_1.DockviewReact, { onReady: onReady, components: components, watermarkComponent: WatermarkComponent, tabHeight: 20 })));
+    },
+    test_component: exampleFunctions_1.ExampleFunctions,
+    settings: settingsPanel_1.Settings,
+    split_panel: splitPanel_1.SplitPanel,
+};
+var tabComponents = {
+    default: customTab_1.CustomTab,
+};
+exports.nextGuid = (function () {
+    var counter = 0;
+    return function () { return 'panel_' + (counter++).toString(); };
+})();
+var TestGrid = function (props) {
+    var _a = __read(React.useState(), 2), api = _a[0], setApi = _a[1];
+    var registry = (0, registry_1.useLayoutRegistry)();
+    var onReady = function (event) {
+        var api = event.api;
+        setApi(api);
+        registry.register('dockview', api);
+    };
+    var setSelectedPanel = (0, recoil_1.useRecoilCallback)(function (_a) {
+        var set = _a.set;
+        return function (value) {
+            return set(footer_1.selectedPanelAtom, value);
+        };
+    }, []);
+    React.useEffect(function () {
+        if (!api) {
+            return function () {
+                //
+            };
+        }
+        props.api.setConstraints({
+            minimumWidth: function () { return api.minimumWidth; },
+            minimumHeight: function () { return api.minimumHeight; },
+        });
+        var disposable = new lifecycle_1.CompositeDisposable(api.onDidLayoutChange(function () {
+            var state = api.toJSON();
+            localStorage.setItem('dockview', JSON.stringify(state));
+        }), api.onDidActivePanelChange(function (e) {
+            setSelectedPanel((e === null || e === void 0 ? void 0 : e.id) || '');
+        }));
+        var state = localStorage.getItem('dockview');
+        var success = false;
+        if (state) {
+            try {
+                api.fromJSON(JSON.parse(state));
+                success = true;
+            }
+            catch (err) {
+                console.error('failed to load layout', err);
+            }
+        }
+        var welcomePanel = api.getPanel('welcome');
+        if (!welcomePanel) {
+            api.addPanel({
+                component: 'welcome',
+                id: 'welcome',
+                title: 'Welcome',
+                suppressClosable: true,
+            });
+        }
+        return function () {
+            disposable.dispose();
+        };
+    }, [api]);
+    var _b = __read(React.useState(undefined), 2), coord = _b[0], setCoord = _b[1];
+    var onTabContextMenu = React.useMemo(function () { return function (event) {
+        event.event.preventDefault();
+        console.log(event.panel);
+        var cb = function (event) {
+            var element = event.target;
+            while (element) {
+                if (element.classList.contains('context-menu')) {
+                    return;
+                }
+                element = element.parentElement;
+            }
+            window.removeEventListener('mousedown', cb);
+            setCoord(undefined);
+        };
+        window.addEventListener('mousedown', cb);
+        setCoord({
+            x: event.event.clientX,
+            y: event.event.clientY,
+            panel: event.panel,
+        });
+    }; }, []);
+    var onClose = function () {
+        setCoord(undefined);
+        coord.panel.api.close();
+    };
+    var onChangeName = function () {
+        setCoord(undefined);
+        coord.panel.api.setTitle('This looks new?');
+    };
+    return (React.createElement(React.Fragment, null,
+        coord &&
+            ReactDOM.createPortal(React.createElement("div", { className: "context-menu", style: {
+                    left: "".concat(coord.x, "px"),
+                    top: "".concat(coord.y, "px"),
+                } },
+                React.createElement("div", { className: "context-action", onClick: onClose }, "Close"),
+                React.createElement("div", { className: "context-action", onClick: onChangeName }, "Rename")), document.getElementById('anchor')),
+        React.createElement(dockview_1.DockviewReact, { onReady: onReady, components: components, tabComponents: tabComponents, onTabContextMenu: onTabContextMenu, watermarkComponent: Watermark, showDndOverlay: function (ev, target) {
+                return true;
+            }, onDidDrop: function (ev) {
+                console.log('onDidDrop', ev);
+            } })));
+};
+exports.TestGrid = TestGrid;
+var Watermark = function (props) {
+    var _a = __read(React.useState(props.containerApi.size), 2), groups = _a[0], setGroups = _a[1];
+    React.useEffect(function () {
+        var disposable = new lifecycle_1.CompositeDisposable(props.containerApi.onDidLayoutChange(function () {
+            console.log("groups2 ".concat(props.containerApi.size));
+            setGroups(props.containerApi.size);
+        }));
+        return function () {
+            disposable.dispose();
+        };
+    }, []);
+    var onClick = function () {
+        props.close();
+    };
+    return (React.createElement("div", { style: {
+            display: 'flex',
+            width: '100%',
+            flexGrow: 1,
+            height: '100%',
+            flexDirection: 'column',
+        } },
+        React.createElement("div", { style: {
+                height: '35px',
+                display: 'flex',
+                width: '100%',
+            } },
+            React.createElement("span", { style: { flexGrow: 1 } }),
+            groups > 1 && (React.createElement("span", { onClick: onClick, style: {
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                } },
+                React.createElement("a", { className: "close-action" })))),
+        React.createElement("div", { style: {
+                flexGrow: 1,
+                display: 'flex',
+                justifyContent: 'center',
+            } },
+            React.createElement("span", null, "Watermark component"))));
+};
+
+
+/***/ }),
+
+/***/ "./src/layout-grid/panel.tsx":
+/*!***********************************!*\
+  !*** ./src/layout-grid/panel.tsx ***!
+  \***********************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Panel = void 0;
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var lifecycle_1 = __webpack_require__(/*! ../lifecycle */ "./src/lifecycle.ts");
+var Panel = function (props) {
+    var _a = __read(React.useState(), 2), active = _a[0], setActive = _a[1];
+    var _b = __read(React.useState(), 2), focused = _b[0], setFocused = _b[1];
+    React.useEffect(function () {
+        var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidActiveChange(function (event) {
+            setActive(event.isActive);
+        }), props.api.onDidFocusChange(function (event) {
+            setFocused(event.isFocused);
+        }));
+        return function () {
+            disposable.dispose();
+        };
+    }, []);
+    var onToggle = function () {
+        var editorPanel = props.containerApi.getPanel('editor');
+        editorPanel.api.setVisible(!editorPanel.api.isVisible);
+    };
+    var onClose = function () {
+        var editorPanel = props.containerApi.getPanel('editor');
+        editorPanel.api.setVisible(true);
+        props.api.setVisible(false);
+    };
+    var onMove = function () {
+        var thisPanel = props.containerApi.getPanel('panel');
+        var editor = props.containerApi.getPanel('editor');
+        props.containerApi.movePanel(thisPanel, {
+            direction: 'left',
+            reference: editor.id,
+        });
+    };
+    return (React.createElement("div", { style: {
+            borderTop: "1px solid var(--dv-separator-border)",
+            boxSizing: 'border-box',
+            backgroundColor: 'rgb(30,30,30)',
+            height: '100%',
+        } },
+        React.createElement("div", { style: { display: 'flex', padding: '5px' } },
+            React.createElement("span", null, "This panel is outside of the dockable layer"),
+            React.createElement("span", { style: { flexGrow: 1 } }),
+            React.createElement("button", { onClick: onToggle }, "Resize"),
+            React.createElement("button", { onClick: onClose }, "Close")),
+        React.createElement("div", { style: { padding: '0px 5px' } },
+            React.createElement("div", null, "isPanelActive: ".concat(active, " isPanelFocused: ").concat(focused)))));
+};
+exports.Panel = Panel;
+
+
+/***/ }),
+
+/***/ "./src/layout-grid/panels/exampleFunctions.tsx":
+/*!*****************************************************!*\
+  !*** ./src/layout-grid/panels/exampleFunctions.tsx ***!
+  \*****************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ExampleFunctions = void 0;
+var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var lifecycle_1 = __webpack_require__(/*! ../../lifecycle */ "./src/lifecycle.ts");
+__webpack_require__(/*! ./exampleFunctions.scss */ "./src/layout-grid/panels/exampleFunctions.scss");
+var ExampleFunctions = function (props) {
+    var _a = __read(React.useState({
+        isGroupActive: props.api.isActive,
+        isPanelVisible: props.api.isVisible,
+    }), 2), panelState = _a[0], setPanelState = _a[1];
+    var _b = __read(React.useState(), 2), panelName = _b[0], setPanelName = _b[1];
+    var input = React.useRef();
+    React.useEffect(function () {
+        var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidActiveChange(function (event) {
+            setPanelState(function (_) { return (__assign(__assign({}, _), { isGroupActive: event.isActive })); });
+        }), props.api.onDidVisibilityChange(function (x) {
+            setPanelState(function (_) { return (__assign(__assign({}, _), { isPanelVisible: x.isVisible })); });
+        }), props.api.onFocusEvent(function () {
+            input.current.focus();
+        }));
+        return function () {
+            disposable.dispose();
+        };
+    }, []);
+    var onRename = function () {
+        props.api.setTitle(panelName);
+    };
+    var onClose = function () {
+        props.api.close();
+    };
+    return (React.createElement(dockview_1.DockviewComponents.Panel, null,
+        React.createElement(dockview_1.DockviewComponents.Actions, null,
+            React.createElement("div", { style: {
+                    height: '100%',
+                    display: 'flex',
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    padding: '0px 4px',
+                } },
+                React.createElement("span", { onClick: onClose, style: {
+                        height: '100%',
+                        width: '25px',
+                        display: 'flex',
+                        alignItems: 'center',
+                    } },
+                    React.createElement("a", { className: "material-icons" }, "menu")))),
+        React.createElement(dockview_1.DockviewComponents.Content, null,
+            React.createElement("div", { className: "example-functions-panel" },
+                React.createElement("div", { className: "example-functions-panel-header-bar" },
+                    React.createElement("span", { style: { padding: '0px 8px' } },
+                        React.createElement("span", null, 'isGroupActive: '),
+                        React.createElement("span", { style: {
+                                color: panelState.isGroupActive
+                                    ? '#23d16f'
+                                    : '#cd312b',
+                            } }, "".concat(panelState.isGroupActive))),
+                    React.createElement("span", { style: { padding: '0px 8px' } },
+                        React.createElement("span", null, 'isPanelVisible: '),
+                        React.createElement("span", { style: {
+                                color: panelState.isPanelVisible
+                                    ? '#23d16f'
+                                    : '#cd312b',
+                            } }, "".concat(panelState.isPanelVisible)))),
+                React.createElement("div", { className: "example-functions-panel-section" },
+                    React.createElement("input", { value: panelName, placeholder: "New Panel Name", type: "text", onChange: function (event) {
+                            return setPanelName(event.target.value);
+                        } }),
+                    React.createElement("button", { onClick: onRename }, "Rename")),
+                React.createElement("input", { style: { width: '175px' }, ref: input, placeholder: "This is focused by the panel" }),
+                React.createElement("input", { style: { width: '175px' }, placeholder: "This is also focusable" })))));
+};
+exports.ExampleFunctions = ExampleFunctions;
+
+
+/***/ }),
+
+/***/ "./src/layout-grid/registry.ts":
+/*!*************************************!*\
+  !*** ./src/layout-grid/registry.ts ***!
+  \*************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.useLayoutRegistry = void 0;
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var Registry = /** @class */ (function () {
+    function Registry() {
+        this.cache = new Map();
+    }
+    Registry.prototype.register = function (name, value) {
+        this.cache.set(name, value);
+    };
+    Registry.prototype.get = function (name) {
+        return this.cache.get(name);
+    };
+    return Registry;
+}());
+var RegistryInstance = new Registry();
+var useLayoutRegistry = function () {
+    var ref = React.useRef(RegistryInstance);
+    return ref.current;
+};
+exports.useLayoutRegistry = useLayoutRegistry;
+
+
+/***/ }),
+
+/***/ "./src/layout-grid/settingsPanel.tsx":
+/*!*******************************************!*\
+  !*** ./src/layout-grid/settingsPanel.tsx ***!
+  \*******************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Settings = void 0;
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var Settings = function (props) {
+    var _a = __read(React.useState(props.containerApi.getTabHeight()), 2), tabHeight = _a[0], setTabHeight = _a[1];
+    var onTabHeightChange = function (event) {
+        var value = Number(event.target.value);
+        if (!Number.isNaN(value)) {
+            setTabHeight(value);
+        }
+    };
+    var onClick = function () {
+        props.containerApi.setTabHeight(tabHeight);
+    };
+    var onRemove = function () {
+        props.containerApi.setTabHeight(undefined);
+    };
+    return (React.createElement("div", { style: { height: '100%', color: 'white' } },
+        React.createElement("label", null,
+            "Tab height",
+            React.createElement("input", { onChange: onTabHeightChange, value: tabHeight, type: "number" }),
+            React.createElement("button", { onClick: onClick }, "Apply"),
+            React.createElement("button", { onClick: onRemove }, "Remove"))));
+};
+exports.Settings = Settings;
+
+
+/***/ }),
+
+/***/ "./src/layout-grid/splitPanel.tsx":
+/*!****************************************!*\
+  !*** ./src/layout-grid/splitPanel.tsx ***!
+  \****************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SplitPanel = void 0;
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
+var registry_1 = __webpack_require__(/*! ./registry */ "./src/layout-grid/registry.ts");
+__webpack_require__(/*! ./splitPanel.scss */ "./src/layout-grid/splitPanel.scss");
+var lifecycle_1 = __webpack_require__(/*! ../lifecycle */ "./src/lifecycle.ts");
+var components = {
+    default1: function (props) {
+        var ref = React.useRef();
+        var _a = __read(React.useState(false), 2), focused = _a[0], setFocused = _a[1];
+        var _b = __read(React.useState(false), 2), active = _b[0], setActive = _b[1];
+        var onClick = function (ev) {
+            props.api.setSize({ size: 300 });
+        };
+        React.useEffect(function () {
+            var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidFocusChange(function (event) {
+                setFocused(event.isFocused);
+            }), props.api.onDidActiveChange(function (event) {
+                setActive(event.isActive);
+            }), props.api.onFocusEvent(function () {
+                ref.current.focus();
+            }));
+            return function () {
+                disposable.dispose();
+            };
+        }, []);
+        return (React.createElement("div", { style: { height: '100%' } },
+            React.createElement("div", { style: { display: 'flex', padding: '5px' } },
+                React.createElement("div", null, "This is a splitview panel inside a dockable panel"),
+                React.createElement("span", { style: { flexGrow: 1 } }),
+                React.createElement("button", { onClick: onClick }, "resize")),
+            React.createElement("div", { style: { padding: '0px 5px' } },
+                React.createElement("div", null, "isPanelActive: ".concat(active, " isPanelFocused: ").concat(focused)),
+                React.createElement("input", { ref: ref, type: "text", placeholder: "focus test" }),
+                React.createElement("span", null, props.text))));
+    },
+};
+var SplitPanel = function (props) {
+    var api = React.useRef();
+    var registry = (0, registry_1.useLayoutRegistry)();
+    React.useEffect(function () {
+        var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidDimensionsChange(function (event) {
+            var _a;
+            (_a = api.current) === null || _a === void 0 ? void 0 : _a.layout(event.width, event.height - 25);
+        }), props.api.onFocusEvent(function () {
+            api.current.focus();
+        }));
+        return function () {
+            disposable.dispose();
+        };
+    }, []);
+    var onReady = function (event) {
+        api.current = event.api;
+        registry.register('splitview', event.api);
+        event.api.fromJSON(__webpack_require__(/*! ./splitpanel.layout.json */ "./src/layout-grid/splitpanel.layout.json"));
+        return;
+        event.api.addPanel({
+            id: '1',
+            component: 'default1',
+            snap: true,
+            params: {
+                text: 'hiya',
+            },
+        });
+        event.api.addPanel({ id: '2', component: 'default1' });
+    };
+    var onUpdateProps = function () {
+        var panel = api.current.getPanel('1');
+        panel.update({ params: { text: Date.now().toString() } });
+    };
+    var onAdd = function () {
+        api.current.addPanel({
+            id: "".concat(Date.now()),
+            component: 'default1',
+            snap: true,
+            params: {
+                text: 'hiya',
+            },
+        });
+    };
+    var onRemove = function () {
+        var panels = api.current.panels;
+        if (panels.length === 0) {
+            return;
+        }
+        api.current.removePanel(panels[panels.length - 1]);
+    };
+    return (React.createElement("div", { style: {
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            color: 'white',
+        } },
+        React.createElement("div", { style: { height: '25px' } },
+            React.createElement("button", { onClick: onUpdateProps }, "Update props"),
+            React.createElement("button", { onClick: onAdd }, "Add"),
+            React.createElement("button", { onClick: onRemove }, "Remove")),
+        React.createElement(dockview_1.SplitviewReact, { components: components, onReady: onReady, orientation: dockview_1.Orientation.VERTICAL })));
+};
+exports.SplitPanel = SplitPanel;
+
+
+/***/ }),
+
+/***/ "./src/lifecycle.ts":
+/*!**************************!*\
+  !*** ./src/lifecycle.ts ***!
+  \**************************/
+/***/ (function(__unused_webpack_module, exports) {
+
+
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.MutableDisposable = exports.CompositeDisposable = exports.Disposable = void 0;
+var Disposable;
+(function (Disposable) {
+    Disposable.NONE = {
+        dispose: function () {
+            // noop
+        },
+    };
+})(Disposable = exports.Disposable || (exports.Disposable = {}));
+var CompositeDisposable = /** @class */ (function () {
+    function CompositeDisposable() {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        this.disposables = args;
+    }
+    CompositeDisposable.from = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        return new (CompositeDisposable.bind.apply(CompositeDisposable, __spreadArray([void 0], __read(args), false)))();
+    };
+    CompositeDisposable.prototype.addDisposables = function () {
+        var _this = this;
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        args.forEach(function (arg) { return _this.disposables.push(arg); });
+    };
+    CompositeDisposable.prototype.dispose = function () {
+        this.disposables.forEach(function (arg) { return arg.dispose(); });
+    };
+    return CompositeDisposable;
+}());
+exports.CompositeDisposable = CompositeDisposable;
+var MutableDisposable = /** @class */ (function () {
+    function MutableDisposable() {
+        this._disposable = Disposable.NONE;
+    }
+    Object.defineProperty(MutableDisposable.prototype, "value", {
+        set: function (disposable) {
+            if (this._disposable) {
+                this._disposable.dispose();
+            }
+            this._disposable = disposable;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    MutableDisposable.prototype.dispose = function () {
+        if (this._disposable) {
+            this._disposable.dispose();
+            this._disposable = Disposable.NONE;
+        }
+    };
+    return MutableDisposable;
+}());
+exports.MutableDisposable = MutableDisposable;
+
+
+/***/ }),
+
+/***/ "./src/panels/gridview/gridview.tsx":
+/*!******************************************!*\
+  !*** ./src/panels/gridview/gridview.tsx ***!
+  \******************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GridviewDemo = exports.GridviewDemoPanel = void 0;
+var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var lifecycle_1 = __webpack_require__(/*! ../../lifecycle */ "./src/lifecycle.ts");
+var components = {
+    default: function (props) {
+        var _a = __read(React.useState(false), 2), active = _a[0], setActive = _a[1];
+        var _b = __read(React.useState(false), 2), visible = _b[0], setVisible = _b[1];
+        var _c = __read(React.useState(false), 2), focused = _c[0], setFocused = _c[1];
+        var _d = __read(React.useState({ width: 0, height: 0 }), 2), dimension = _d[0], setDimension = _d[1];
+        var _e = __read(React.useState({
+            minimumHeight: undefined,
+            maximumHeight: undefined,
+            minimumWidth: undefined,
+            maximumWidth: undefined,
+        }), 2), constraints = _e[0], setConstraints = _e[1];
+        React.useEffect(function () {
+            var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidActiveChange(function (event) {
+                setActive(event.isActive);
+            }), props.api.onDidConstraintsChange(function (event) {
+                setConstraints(event);
+            }), props.api.onDidDimensionsChange(function (event) {
+                setDimension(event);
+            }), props.api.onDidFocusChange(function (event) {
+                setFocused(event.isFocused);
+            }), props.api.onDidVisibilityChange(function (event) {
+                setVisible(event.isVisible);
+            }));
+            return function () {
+                disposable.dispose();
+            };
+        }, []);
+        var color = React.useMemo(function () {
+            return "rgb(".concat(Math.floor(256 * Math.random()), ",").concat(Math.floor(256 * Math.random()), ",").concat(Math.floor(256 * Math.random()), ")");
+        }, []);
+        return (React.createElement("div", { style: {
+                backgroundColor: color,
+            }, className: "splitview-demo-panel" },
+            React.createElement("div", { className: "api-parameter" },
+                React.createElement("span", null, "Width"),
+                React.createElement("span", null, dimension.width),
+                React.createElement("span", null, "Height"),
+                React.createElement("span", null, dimension.height),
+                React.createElement("span", null, "Min. height"),
+                React.createElement("span", null, constraints.minimumHeight),
+                React.createElement("span", null, "Max. height"),
+                React.createElement("span", null, constraints.maximumHeight),
+                React.createElement("span", null, "Min. width"),
+                React.createElement("span", null, constraints.minimumWidth),
+                React.createElement("span", null, "Max. width"),
+                React.createElement("span", null, constraints.maximumWidth),
+                React.createElement("span", null, "Active"),
+                React.createElement("span", null, active.toString()),
+                React.createElement("span", null, "Visible"),
+                React.createElement("span", null, visible.toString()),
+                React.createElement("span", null, "Focused"),
+                React.createElement("span", null, focused.toString()))));
+    },
+};
+var GridviewDemoPanel = function (props) {
+    return (React.createElement("div", { style: {
+            overflow: 'auto',
+            height: '100%',
+            padding: '10px 0px',
+            boxSizing: 'border-box',
+        } },
+        React.createElement("div", { style: { padding: '0px 20px' } },
+            React.createElement("h1", null, "Gridview")),
+        React.createElement("ul", { style: { padding: '0px 20px 0px 40px' } },
+            React.createElement("li", null, "The gridview is a collection of nested splitviews which forms a grid-based layout")),
+        React.createElement(exports.GridviewDemo, __assign({}, props))));
+};
+exports.GridviewDemoPanel = GridviewDemoPanel;
+var GridviewDemo = function (props) {
+    var api = React.useRef();
+    var _a = __read(React.useState(dockview_1.Orientation.VERTICAL), 2), orientation = _a[0], setOrientation = _a[1];
+    var onClick = function () {
+        api.current.orientation = (0, dockview_1.orthogonal)(api.current.orientation);
+        // load();
+    };
+    var load = function () {
+        api.current.fromJSON({
+            activePanel: '1',
+            grid: {
+                height: 3,
+                width: 2,
+                orientation: orientation,
+                root: {
+                    type: 'branch',
+                    size: 3,
+                    data: [
+                        {
+                            type: 'branch',
+                            size: 1,
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    size: 1,
+                                    data: {
+                                        id: '1',
+                                        component: 'default',
+                                        minimumHeight: 50,
+                                        maximumHeight: Number.POSITIVE_INFINITY,
+                                        minimumWidth: 50,
+                                        maximumWidth: Number.POSITIVE_INFINITY,
+                                        snap: false,
+                                        priority: dockview_1.LayoutPriority.Normal,
+                                    },
+                                },
+                                {
+                                    type: 'branch',
+                                    size: 1,
+                                    data: [
+                                        {
+                                            type: 'leaf',
+                                            size: 0.5,
+                                            data: {
+                                                id: '2',
+                                                component: 'default',
+                                                minimumHeight: 50,
+                                                maximumHeight: Number.POSITIVE_INFINITY,
+                                                minimumWidth: 50,
+                                                maximumWidth: Number.POSITIVE_INFINITY,
+                                                snap: false,
+                                                priority: dockview_1.LayoutPriority.Normal,
+                                            },
+                                        },
+                                        {
+                                            type: 'branch',
+                                            size: 0.5,
+                                            data: [
+                                                {
+                                                    type: 'leaf',
+                                                    size: 0.5,
+                                                    data: {
+                                                        id: '2',
+                                                        component: 'default',
+                                                        minimumHeight: 50,
+                                                        maximumHeight: Number.POSITIVE_INFINITY,
+                                                        minimumWidth: 50,
+                                                        maximumWidth: Number.POSITIVE_INFINITY,
+                                                        snap: false,
+                                                        priority: dockview_1.LayoutPriority.Normal,
+                                                    },
+                                                },
+                                                {
+                                                    type: 'leaf',
+                                                    size: 0.5,
+                                                    data: {
+                                                        id: '3',
+                                                        component: 'default',
+                                                        minimumHeight: 50,
+                                                        maximumHeight: Number.POSITIVE_INFINITY,
+                                                        minimumWidth: 50,
+                                                        maximumWidth: Number.POSITIVE_INFINITY,
+                                                        snap: false,
+                                                        priority: dockview_1.LayoutPriority.Normal,
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                        {
+                            type: 'leaf',
+                            size: 1,
+                            data: {
+                                id: '4',
+                                component: 'default',
+                                minimumHeight: 50,
+                                maximumHeight: Number.POSITIVE_INFINITY,
+                                minimumWidth: 50,
+                                maximumWidth: Number.POSITIVE_INFINITY,
+                                snap: false,
+                                priority: dockview_1.LayoutPriority.Normal,
+                            },
+                        },
+                        {
+                            type: 'branch',
+                            size: 1,
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    size: 1,
+                                    data: {
+                                        id: '3',
+                                        component: 'default',
+                                        minimumHeight: 50,
+                                        maximumHeight: Number.POSITIVE_INFINITY,
+                                        minimumWidth: 50,
+                                        maximumWidth: Number.POSITIVE_INFINITY,
+                                        snap: false,
+                                        priority: dockview_1.LayoutPriority.Normal,
+                                    },
+                                },
+                                {
+                                    type: 'leaf',
+                                    size: 1,
+                                    data: {
+                                        id: '4',
+                                        component: 'default',
+                                        minimumHeight: 50,
+                                        maximumHeight: Number.POSITIVE_INFINITY,
+                                        minimumWidth: 50,
+                                        maximumWidth: Number.POSITIVE_INFINITY,
+                                        snap: false,
+                                        priority: dockview_1.LayoutPriority.Normal,
+                                    },
+                                },
+                            ],
+                        },
+                    ],
+                },
+            },
+        });
+    };
+    var onReady = function (event) {
+        var _a;
+        api.current = event.api;
+        (_a = api.current) === null || _a === void 0 ? void 0 : _a.layout(props.api.width - 80, 600);
+        load();
+    };
+    React.useEffect(function () {
+        var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidDimensionsChange(function (event) {
+            var _a;
+            (_a = api.current) === null || _a === void 0 ? void 0 : _a.layout(event.width - 80, 600);
+        }));
+        return function () {
+            disposable.dispose();
+        };
+    }, []);
+    return (React.createElement("div", { style: { height: '100%', width: '100%' } },
+        React.createElement("button", { onClick: onClick }, "Flip"),
+        React.createElement("div", { style: {
+                height: '400px',
+                margin: '40px',
+                backgroundColor: 'grey',
+            } },
+            React.createElement(dockview_1.GridviewReact, { proportionalLayout: true, components: components, orientation: dockview_1.Orientation.VERTICAL, onReady: onReady }))));
+};
+exports.GridviewDemo = GridviewDemo;
+
+
+/***/ }),
+
+/***/ "./src/panels/splitview/splitview.tsx":
+/*!********************************************!*\
+  !*** ./src/panels/splitview/splitview.tsx ***!
+  \********************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Common = exports.SplitviewPanel = void 0;
+var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var lifecycle_1 = __webpack_require__(/*! ../../lifecycle */ "./src/lifecycle.ts");
+__webpack_require__(/*! ./splitview.scss */ "./src/panels/splitview/splitview.scss");
+var components = {
+    default: function (props) {
+        var _a = __read(React.useState(false), 2), active = _a[0], setActive = _a[1];
+        var _b = __read(React.useState(false), 2), visible = _b[0], setVisible = _b[1];
+        var _c = __read(React.useState(false), 2), focused = _c[0], setFocused = _c[1];
+        var _d = __read(React.useState({ width: 0, height: 0 }), 2), dimension = _d[0], setDimension = _d[1];
+        var _e = __read(React.useState({ maximumSize: undefined, minimumSize: undefined }), 2), constraints = _e[0], setConstraints = _e[1];
+        React.useEffect(function () {
+            var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidActiveChange(function (event) {
+                setActive(event.isActive);
+            }), props.api.onDidConstraintsChange(function (event) {
+                setConstraints(event);
+            }), props.api.onDidDimensionsChange(function (event) {
+                setDimension(event);
+            }), props.api.onDidFocusChange(function (event) {
+                setFocused(event.isFocused);
+            }), props.api.onDidVisibilityChange(function (event) {
+                setVisible(event.isVisible);
+            }));
+            return function () {
+                disposable.dispose();
+            };
+        }, []);
+        var color = React.useMemo(function () { return 'rgba(14, 99, 156,0.4)'; }, 
+        // `rgb(${Math.floor(256 * Math.random())},${Math.floor(
+        //     256 * Math.random()
+        // )},${Math.floor(256 * Math.random())})`,
+        []);
+        return (React.createElement("div", { style: {
+                backgroundColor: color,
+                color: '#cccccc',
+            }, className: "splitview-demo-panel" },
+            React.createElement("div", { className: "api-parameter" },
+                React.createElement("span", null, "Id"),
+                React.createElement("span", null, props.api.id),
+                React.createElement("span", null, "Width"),
+                React.createElement("span", null, dimension.width),
+                React.createElement("span", null, "Height"),
+                React.createElement("span", null, dimension.height),
+                React.createElement("span", null, "Min. size"),
+                React.createElement("span", null, constraints.minimumSize),
+                React.createElement("span", null, "Max. size"),
+                React.createElement("span", null, constraints.maximumSize),
+                React.createElement("span", null, "Active"),
+                React.createElement("span", null, active.toString()),
+                React.createElement("span", null, "Visible"),
+                React.createElement("span", null, visible.toString()),
+                React.createElement("span", null, "Focused"),
+                React.createElement("span", null, focused.toString()))));
+    },
+};
+var SplitviewPanel = function (props) {
+    return (React.createElement("div", { style: {
+            overflow: 'auto',
+            height: '100%',
+            padding: '10px 0px',
+            boxSizing: 'border-box',
+        } },
+        React.createElement("div", { style: { padding: '0px 20px', fontSize: '36px' } }, "Splitview"),
+        React.createElement("ul", { style: { padding: '0px 20px 0px 40px' } },
+            React.createElement("li", null, "The splitview component exposes an API object, a selection of avaliable values are shown in the summary sections below"),
+            React.createElement("li", null, "Each panel exposes it's own API, and has access to the common API. A selector of panel API values are shown in each panel of the splitview.")),
+        React.createElement(exports.Common, __assign({}, props, { orientation: dockview_1.Orientation.HORIZONTAL })),
+        React.createElement(exports.Common, __assign({}, props, { orientation: dockview_1.Orientation.VERTICAL }))));
+};
+exports.SplitviewPanel = SplitviewPanel;
+var Common = function (props) {
+    var api = React.useRef();
+    var _a = __read(React.useState({
+        height: undefined,
+        width: undefined,
+        maximumSize: undefined,
+        minimumSize: undefined,
+        visibility: [],
+        length: undefined,
+    }), 2), dimensions = _a[0], setDimensions = _a[1];
+    React.useEffect(function () {
+        var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidDimensionsChange(function (event) {
+            switch (props.orientation) {
+                case dockview_1.Orientation.HORIZONTAL:
+                    api.current.layout(500, 100);
+                    break;
+                case dockview_1.Orientation.VERTICAL:
+                    api.current.layout(100, 500);
+                    break;
+            }
+            var height = api.current.height;
+            var width = api.current.width;
+            var maximumSize = api.current.maximumSize;
+            var minimumSize = api.current.minimumSize;
+            var length = api.current.length;
+            setDimensions({
+                height: height,
+                width: width,
+                maximumSize: maximumSize,
+                minimumSize: minimumSize,
+                length: length,
+                visibility: api.current.panels.map(function (_) { return _.api.isVisible; }),
+            });
+        }), api.current.onDidLayoutChange(function () {
+            //
+        }));
+        return function () {
+            disposable.dispose();
+        };
+    }, []);
+    var onReady = function (event) {
+        api.current = event.api;
+        event.api.fromJSON({
+            views: [
+                {
+                    data: {
+                        id: 'one',
+                        component: 'default',
+                        minimumSize: 10,
+                    },
+                    size: 1,
+                },
+                {
+                    data: {
+                        id: 'two',
+                        component: 'default',
+                        minimumSize: 10,
+                        maximumSize: 200,
+                    },
+                    size: 2,
+                },
+                {
+                    data: {
+                        id: 'three',
+                        component: 'default',
+                        minimumSize: 50,
+                    },
+                    size: 3,
+                    snap: true,
+                },
+            ],
+            size: 6,
+            activeView: 'one',
+            orientation: props.orientation,
+        });
+    };
+    var toggleVisibility = function (i) { return function () {
+        var panel = api.current.panels[i];
+        api.current.setVisible(panel, !panel.api.isVisible);
+        setDimensions(function (dimensions) { return (__assign(__assign({}, dimensions), { visibility: api.current.panels.map(function (_) { return _.api.isVisible; }) })); });
+    }; };
+    var move = function () {
+        api.current.movePanel(api.current.panels.length - 1, 0);
+        setDimensions(function (dimensions) { return (__assign(__assign({}, dimensions), { visibility: api.current.panels.map(function (_) { return _.api.isVisible; }) })); });
+    };
+    var text = React.useMemo(function () {
+        switch (props.orientation) {
+            case dockview_1.Orientation.VERTICAL:
+                return 'Vertical Splitview';
+            case dockview_1.Orientation.HORIZONTAL:
+                return 'Horizontal Splitview';
+        }
+    }, [props.orientation]);
+    return (React.createElement("div", { className: "splitview-demo-container ".concat(props.orientation.toLowerCase()) },
+        React.createElement("h3", null, text),
+        React.createElement("div", { className: "splitview-demo-content" },
+            React.createElement("div", { style: {
+                    backgroundColor: 'rgb(60,60,60)',
+                    padding: '10px',
+                    overflow: 'auto',
+                } },
+                React.createElement("div", { className: "splitview-demo-view" },
+                    React.createElement(dockview_1.SplitviewReact, { orientation: props.orientation, onReady: onReady, components: components }))),
+            React.createElement("div", { className: "api-parameter" },
+                React.createElement("span", null, "Height"),
+                React.createElement("span", null, dimensions.height),
+                React.createElement("span", null, "Width"),
+                React.createElement("span", null, dimensions.width),
+                React.createElement("span", null, "Lenght"),
+                React.createElement("span", null, dimensions.length),
+                React.createElement("span", null, "Min. size"),
+                React.createElement("span", null, dimensions.minimumSize),
+                React.createElement("span", null, "Max. size"),
+                React.createElement("span", null, dimensions.maximumSize),
+                React.createElement("span", null, "Visible"),
+                React.createElement("span", { style: { display: 'flex' } }, dimensions.visibility.map(function (_, i) {
+                    return (React.createElement("div", { className: "visibility-toggle", onClick: toggleVisibility(i), key: i }, _ ? 'Yes' : 'No'));
+                })),
+                React.createElement("span", null, "Move view"),
+                React.createElement("span", { className: "visibility-toggle", onClick: move }, "Go")))));
+};
+exports.Common = Common;
+
+
+/***/ }),
+
+/***/ "./src/panels/welcome/welcome.tsx":
+/*!****************************************!*\
+  !*** ./src/panels/welcome/welcome.tsx ***!
+  \****************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.WelcomePanel = void 0;
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+__webpack_require__(/*! ./welcome.scss */ "./src/panels/welcome/welcome.scss");
+var WelcomePanel = function (props) {
+    var onAddSplitview = function (event) {
+        var splitviewPanel = props.containerApi.getPanel('splitview');
+        if (splitviewPanel) {
+            splitviewPanel.api.setActive();
+            return;
+        }
+        props.containerApi.addPanel({
+            id: 'splitview',
+            component: 'splitview',
+            title: 'Splitview Docs',
+        });
+    };
+    var onAddGridview = function (event) {
+        var splitviewPanel = props.containerApi.getPanel('gridview');
+        if (splitviewPanel) {
+            splitviewPanel.api.setActive();
+            return;
+        }
+        props.containerApi.addPanel({
+            id: 'gridview',
+            component: 'gridview',
+            title: 'Gridview Docs',
+        });
+    };
+    return (React.createElement("div", { className: "welcome-panel" },
+        React.createElement("div", { className: "welcome-header" },
+            React.createElement("h1", null, "Dockview"),
+            React.createElement("h2", null, "Zero dependency layout manager")),
+        React.createElement("div", { className: "directory" },
+            React.createElement("div", { className: "directory-title" }, "Components"),
+            React.createElement("div", { className: "directory-item" }, "Dockview"),
+            React.createElement("div", { onClick: onAddSplitview, className: "directory-item" }, "Splitview"),
+            React.createElement("div", { onClick: onAddGridview, className: "directory-item" }, "Gridview"),
+            React.createElement("div", { className: "directory-item" }, "Paneview"))));
+};
+exports.WelcomePanel = WelcomePanel;
+
+
+/***/ }),
+
+/***/ "./src/services/sidebarItem.tsx":
+/*!**************************************!*\
+  !*** ./src/services/sidebarItem.tsx ***!
+  \**************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Container = void 0;
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var Container = function (props) {
+    var ref = React.useRef(null);
+    var _a = __read(React.useState(undefined), 2), selection = _a[0], setSelection = _a[1];
+    var isDragging = React.useRef(false);
+    var _b = __read(React.useState(false), 2), dragEntered = _b[0], setDragEntered = _b[1];
+    var timer = React.useRef(null);
+    var onDragOver = function (e) {
+        if (!timer.current) {
+            timer.current = setTimeout(function () {
+                props.onDragOver(e);
+            }, 1000);
+        }
+        if (isDragging.current) {
+            return;
+        }
+        setDragEntered(true);
+        e.preventDefault();
+        var target = e.target;
+        var width = target.clientWidth;
+        var height = target.clientHeight;
+        if (width === 0 || height === 0) {
+            return; // avoid div!0
+        }
+        var x = e.nativeEvent.offsetX;
+        var y = e.nativeEvent.offsetY;
+        var xp = (100 * x) / width;
+        var yp = (100 * y) / height;
+        var isTop = yp < 50;
+        var isBottom = yp >= 50;
+        setSelection(isTop ? 'top' : 'bottom');
+    };
+    var onDragLeave = function (e) {
+        if (timer.current) {
+            clearTimeout(timer.current);
+            timer.current = null;
+        }
+        if (isDragging.current) {
+            return;
+        }
+        setDragEntered(false);
+        setSelection(undefined);
+    };
+    var onDrop = function (e) {
+        if (timer.current) {
+            clearTimeout(timer.current);
+            timer.current = null;
+        }
+        if (isDragging.current) {
+            return;
+        }
+        setDragEntered(false);
+        props.onDrop(e, selection);
+        setSelection(undefined);
+    };
+    var onDragEnter = function (e) {
+        e.preventDefault();
+    };
+    var onDragStart = function (e) {
+        isDragging.current = true;
+        e.dataTransfer.setData('application/json', JSON.stringify({ container: props.container.id }));
+    };
+    var onDragEnd = function (e) {
+        isDragging.current = false;
+        setDragEntered(false);
+    };
+    return (React.createElement("div", { ref: ref, draggable: true, onClick: props.onClick, onDragOver: onDragOver, onDragEnter: onDragEnter, onDragStart: onDragStart, onDragLeave: onDragLeave, onDragEnd: onDragEnd, onDrop: onDrop, style: {
+            borderLeft: props.isActive
+                ? '2px solid white'
+                : '2px solid transparent',
+        }, className: "activity-bar-item".concat(props.isActive ? ' active' : '') },
+        dragEntered && (React.createElement("div", { style: {
+                position: 'absolute',
+                top: '0px',
+                left: '0px',
+                height: '100%',
+                width: '100%',
+                backgroundColor: 'transparent',
+                boxSizing: 'border-box',
+                borderTop: selection === 'top' ? '2px solid white' : '',
+                borderBottom: selection === 'bottom' ? '2px solid white' : '',
+                pointerEvents: 'none',
+            } })),
+        React.createElement("a", { className: "material-icons-outlined" }, props.container.icon)));
+};
+exports.Container = Container;
+
+
+/***/ }),
+
+/***/ "./src/services/view.ts":
+/*!******************************!*\
+  !*** ./src/services/view.ts ***!
+  \******************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DefaultView = void 0;
+var DefaultView = /** @class */ (function () {
+    function DefaultView(options) {
+        this._id = options.id;
+        this._title = options.title;
+        this._isExpanded = options.isExpanded;
+        this._isLocationEditable = options.isLocationEditable;
+        this._icon = options.icon;
+    }
+    Object.defineProperty(DefaultView.prototype, "id", {
+        get: function () {
+            return this._id;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(DefaultView.prototype, "title", {
+        get: function () {
+            return this._title;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(DefaultView.prototype, "isExpanded", {
+        get: function () {
+            return this._isExpanded;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(DefaultView.prototype, "isLocationEditable", {
+        get: function () {
+            return this._isLocationEditable;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(DefaultView.prototype, "icon", {
+        get: function () {
+            return this._icon;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    DefaultView.prototype.toJSON = function () {
+        return {
+            id: this.id,
+            isExpanded: this.isExpanded,
+        };
+    };
+    return DefaultView;
+}());
+exports.DefaultView = DefaultView;
+
+
+/***/ }),
+
+/***/ "./src/services/viewContainer.ts":
+/*!***************************************!*\
+  !*** ./src/services/viewContainer.ts ***!
+  \***************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PaneviewContainer = void 0;
+var events_1 = __webpack_require__(/*! ../events */ "./src/events.ts");
+var view_1 = __webpack_require__(/*! ./view */ "./src/services/view.ts");
+var PaneviewContainer = /** @class */ (function () {
+    function PaneviewContainer(id, viewRegistry, views) {
+        var e_1, _a;
+        this._views = [];
+        this._onDidAddView = new events_1.Emitter();
+        this.onDidAddView = this._onDidAddView.event;
+        this._onDidRemoveView = new events_1.Emitter();
+        this.onDidRemoveView = this._onDidRemoveView.event;
+        this._id = id;
+        if (views) {
+            try {
+                for (var views_1 = __values(views), views_1_1 = views_1.next(); !views_1_1.done; views_1_1 = views_1.next()) {
+                    var view = views_1_1.value;
+                    var registeredView = viewRegistry.getRegisteredView(view.id);
+                    this.addView(new view_1.DefaultView({
+                        id: view.id,
+                        title: registeredView.title,
+                        isExpanded: view.isExpanded,
+                        isLocationEditable: registeredView.isLocationEditable,
+                        icon: registeredView.icon,
+                    }));
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (views_1_1 && !views_1_1.done && (_a = views_1.return)) _a.call(views_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+        }
+        // this.addDisposables(this._onDidAddView, this._onDidRemoveView);
+    }
+    Object.defineProperty(PaneviewContainer.prototype, "id", {
+        get: function () {
+            return this._id;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PaneviewContainer.prototype, "views", {
+        get: function () {
+            return __spreadArray([], __read(this._views), false);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PaneviewContainer.prototype, "schema", {
+        get: function () {
+            if (!this._schema) {
+                this._schema = JSON.parse(localStorage.getItem("viewcontainer_".concat(this.id)));
+            }
+            return this._schema;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PaneviewContainer.prototype, "icon", {
+        get: function () {
+            var _a;
+            var defaultIcon = 'search';
+            if (this.views.length > 0) {
+                return ((_a = this.views.find(function (v) { return !!v.icon; })) === null || _a === void 0 ? void 0 : _a.icon) || defaultIcon;
+            }
+            return defaultIcon;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    PaneviewContainer.prototype.layout = function (schema) {
+        this._schema = schema;
+        localStorage.setItem("viewcontainer_".concat(this.id), JSON.stringify(schema));
+    };
+    PaneviewContainer.prototype.addView = function (view, index) {
+        this._views.splice(index, 0, view);
+        this._onDidAddView.fire({ view: view, index: index });
+    };
+    PaneviewContainer.prototype.removeView = function (view) {
+        var index = this._views.indexOf(view);
+        if (index < 0) {
+            throw new Error('invalid');
+        }
+        this._views.splice(index, 1);
+        if (this._schema) {
+            this._schema = __assign({}, this._schema);
+            this._schema.views = this._schema.views.filter(function (v) { return v.data.id !== view.id; });
+            this.layout(this._schema);
+        }
+        this._onDidRemoveView.fire(view);
+    };
+    PaneviewContainer.prototype.clear = function () {
+        localStorage.removeItem("viewcontainer_".concat(this.id));
+    };
+    PaneviewContainer.prototype.toJSON = function () {
+        return { id: this.id, views: this.views.map(function (v) { return v.toJSON(); }) };
+    };
+    return PaneviewContainer;
+}());
+exports.PaneviewContainer = PaneviewContainer;
+
+
+/***/ }),
+
+/***/ "./src/services/viewRegistry.tsx":
+/*!***************************************!*\
+  !*** ./src/services/viewRegistry.tsx ***!
+  \***************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.VIEW_REGISTRY = exports.ViewRegistry = void 0;
+var react_1 = __importDefault(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var controlCenter_1 = __webpack_require__(/*! ../layout-grid/controlCenter */ "./src/layout-grid/controlCenter.tsx");
+var ViewRegistry = /** @class */ (function () {
+    function ViewRegistry() {
+        this._registry = new Map();
+    }
+    ViewRegistry.prototype.register = function (registeredView) {
+        this._registry.set(registeredView.id, registeredView);
+    };
+    ViewRegistry.prototype.getRegisteredView = function (id) {
+        return this._registry.get(id);
+    };
+    return ViewRegistry;
+}());
+exports.ViewRegistry = ViewRegistry;
+exports.VIEW_REGISTRY = new ViewRegistry();
+exports.VIEW_REGISTRY.register({
+    id: 'search_widget',
+    title: 'search',
+    icon: 'search',
+    isLocationEditable: false,
+    component: function () {
+        return (react_1.default.createElement("div", { style: {
+                backgroundColor: 'yellow',
+                color: 'black',
+                height: '100%',
+            } }, "This is a search bar component"));
+    },
+});
+exports.VIEW_REGISTRY.register({
+    id: 'home_widget',
+    title: 'Home',
+    icon: 'home',
+    isLocationEditable: true,
+    component: controlCenter_1.ControlCenter,
+});
+exports.VIEW_REGISTRY.register({
+    id: 'account_widget',
+    title: 'Account',
+    icon: 'account_circle',
+    isLocationEditable: true,
+    component: function () {
+        return (react_1.default.createElement("div", { style: {
+                backgroundColor: 'green',
+                color: 'black',
+                height: '100%',
+            } }, "account_circle"));
+    },
+});
+exports.VIEW_REGISTRY.register({
+    id: 'settings_widget',
+    title: 'Settings',
+    icon: 'settings',
+    isLocationEditable: true,
+    component: function () {
+        return (react_1.default.createElement("div", { style: {
+                backgroundColor: 'orange',
+                color: 'black',
+                height: '100%',
+            } }, "settings"));
+    },
+});
+
+
+/***/ }),
+
+/***/ "./src/services/viewService.ts":
+/*!*************************************!*\
+  !*** ./src/services/viewService.ts ***!
+  \*************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ViewService = void 0;
+var events_1 = __webpack_require__(/*! ../events */ "./src/events.ts");
+var viewContainer_1 = __webpack_require__(/*! ./viewContainer */ "./src/services/viewContainer.ts");
+var ViewService = /** @class */ (function () {
+    function ViewService(viewRegistry) {
+        this.viewRegistry = viewRegistry;
+        this._viewContainers = [];
+        this._onDidActiveContainerChange = new events_1.Emitter();
+        this.onDidActiveContainerChange = this._onDidActiveContainerChange
+            .event;
+        this._onDidRemoveContainer = new events_1.Emitter();
+        this.onDidRemoveContainer = this._onDidRemoveContainer.event;
+        this._onDidAddContainer = new events_1.Emitter();
+        this.onDidAddContainer = this._onDidAddContainer.event;
+        this._onDidContainersChange = new events_1.Emitter();
+        this.onDidContainersChange = this._onDidContainersChange.event;
+        //
+    }
+    Object.defineProperty(ViewService.prototype, "containers", {
+        get: function () {
+            return this._viewContainers;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ViewService.prototype, "activeContainer", {
+        get: function () {
+            var _this = this;
+            return this._viewContainers.find(function (c) { return c.id === _this._activeViewContainerId; });
+        },
+        enumerable: false,
+        configurable: true
+    });
+    ViewService.prototype.load = function (layout) {
+        var e_1, _a;
+        var containers = layout.containers, activeContainer = layout.activeContainer;
+        try {
+            for (var containers_1 = __values(containers), containers_1_1 = containers_1.next(); !containers_1_1.done; containers_1_1 = containers_1.next()) {
+                var container = containers_1_1.value;
+                var id = container.id, views = container.views;
+                var viewContainer = new viewContainer_1.PaneviewContainer(id, this.viewRegistry, views);
+                this.addContainer(viewContainer);
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (containers_1_1 && !containers_1_1.done && (_a = containers_1.return)) _a.call(containers_1);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        this.setActiveViewContainer(activeContainer);
+    };
+    ViewService.prototype.insertContainerAfter = function (source, target) {
+        var sourceIndex = this._viewContainers.findIndex(function (c) { return c.id === source.id; });
+        var view = this._viewContainers.splice(sourceIndex, 1)[0];
+        var targetIndex = this._viewContainers.findIndex(function (c) { return c.id === target.id; });
+        this._viewContainers.splice(targetIndex + 1, 0, view);
+        this._viewContainers = __spreadArray([], __read(this._viewContainers), false);
+        this._onDidContainersChange.fire();
+    };
+    ViewService.prototype.insertContainerBefore = function (source, target) {
+        var sourceIndex = this._viewContainers.findIndex(function (c) { return c.id === source.id; });
+        var view = this._viewContainers.splice(sourceIndex, 1)[0];
+        var targetIndex = this._viewContainers.findIndex(function (c) { return c.id === target.id; });
+        this._viewContainers.splice(Math.max(targetIndex, 0), 0, view);
+        this._viewContainers = __spreadArray([], __read(this._viewContainers), false);
+        this._onDidContainersChange.fire();
+    };
+    ViewService.prototype.addContainer = function (container) {
+        this._viewContainers = __spreadArray(__spreadArray([], __read(this._viewContainers), false), [container], false);
+        this._activeViewContainerId = container.id;
+        this._onDidAddContainer.fire();
+    };
+    ViewService.prototype.removeContainer = function (container) {
+        this._viewContainers = this._viewContainers.filter(function (c) { return c.id !== container.id; });
+        if (this._activeViewContainerId === container.id) {
+            this._activeViewContainerId =
+                this._viewContainers.length > 0
+                    ? this._viewContainers[0].id
+                    : undefined;
+        }
+        this._onDidRemoveContainer.fire();
+    };
+    ViewService.prototype.setActiveViewContainer = function (id) {
+        if (!this._viewContainers.find(function (c) { return c.id === id; })) {
+            throw new Error("invalid container ".concat(id));
+        }
+        this._activeViewContainerId = id;
+        this._onDidActiveContainerChange.fire();
+    };
+    ViewService.prototype.getView = function (id) {
+        var e_2, _a;
+        try {
+            for (var _b = __values(Array.from(this._viewContainers.values())), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var container = _c.value;
+                var view = container.views.find(function (v) { return v.id === id; });
+                if (view) {
+                    return view;
+                }
+            }
+        }
+        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_2) throw e_2.error; }
+        }
+        return undefined;
+    };
+    ViewService.prototype.moveViewToLocation = function (view, targetViewContainer, targetLocation) {
+        var sourceViewContainer = this.getViewContainer2(view);
+        this.removeViews([view], sourceViewContainer);
+        this.addViews(view, targetViewContainer, targetLocation);
+    };
+    ViewService.prototype.addViews = function (view, viewContainer, location) {
+        viewContainer.addView(view, location);
+    };
+    ViewService.prototype.removeViews = function (removeViews, viewContainer) {
+        var e_3, _a;
+        try {
+            for (var removeViews_1 = __values(removeViews), removeViews_1_1 = removeViews_1.next(); !removeViews_1_1.done; removeViews_1_1 = removeViews_1.next()) {
+                var view = removeViews_1_1.value;
+                viewContainer.removeView(view);
+                if (viewContainer.views.length === 0) {
+                    viewContainer.clear();
+                    this.removeContainer(viewContainer);
+                }
+            }
+        }
+        catch (e_3_1) { e_3 = { error: e_3_1 }; }
+        finally {
+            try {
+                if (removeViews_1_1 && !removeViews_1_1.done && (_a = removeViews_1.return)) _a.call(removeViews_1);
+            }
+            finally { if (e_3) throw e_3.error; }
+        }
+    };
+    ViewService.prototype.getViewContainer = function (id) {
+        return this._viewContainers.find(function (c) { return c.id === id; });
+    };
+    ViewService.prototype.getViewContainer2 = function (view) {
+        var e_4, _a;
+        try {
+            for (var _b = __values(Array.from(this._viewContainers.values())), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var container = _c.value;
+                var v = container.views.find(function (v) { return v.id === view.id; });
+                if (v) {
+                    return container;
+                }
+            }
+        }
+        catch (e_4_1) { e_4 = { error: e_4_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_4) throw e_4.error; }
+        }
+        return undefined;
+    };
+    ViewService.prototype.toJSON = function () {
+        return {
+            containers: this.containers.map(function (c) { return c.toJSON(); }),
+            activeContainer: this.activeContainer.id,
+        };
+    };
+    ViewService.prototype.dispose = function () {
+        this._onDidActiveContainerChange.dispose();
+        this._onDidAddContainer.dispose();
+        this._onDidRemoveContainer.dispose();
+    };
+    return ViewService;
+}());
+exports.ViewService = ViewService;
+
+
+/***/ }),
+
+/***/ "./src/services/widgets.tsx":
+/*!**********************************!*\
+  !*** ./src/services/widgets.tsx ***!
+  \**********************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SidebarPart = exports.Sidebar = exports.Activitybar = void 0;
+var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
+var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
+var registry_1 = __webpack_require__(/*! ../layout-grid/registry */ "./src/layout-grid/registry.ts");
+var viewContainer_1 = __webpack_require__(/*! ./viewContainer */ "./src/services/viewContainer.ts");
+var viewService_1 = __webpack_require__(/*! ./viewService */ "./src/services/viewService.ts");
+var view_1 = __webpack_require__(/*! ./view */ "./src/services/view.ts");
+var viewRegistry_1 = __webpack_require__(/*! ./viewRegistry */ "./src/services/viewRegistry.tsx");
+var dom_1 = __webpack_require__(/*! ../dom */ "./src/dom.ts");
+var sidebarItem_1 = __webpack_require__(/*! ./sidebarItem */ "./src/services/sidebarItem.tsx");
+__webpack_require__(/*! ./widgets.scss */ "./src/services/widgets.scss");
+var lifecycle_1 = __webpack_require__(/*! ../lifecycle */ "./src/lifecycle.ts");
+var ViewServiceModel = /** @class */ (function () {
+    function ViewServiceModel() {
+        this.viewService = new viewService_1.ViewService(viewRegistry_1.VIEW_REGISTRY);
+        this.init();
+    }
+    Object.defineProperty(ViewServiceModel.prototype, "model", {
+        get: function () {
+            return this.viewService;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    ViewServiceModel.prototype.init = function () {
+        var _this = this;
+        var layout = localStorage.getItem('viewservice');
+        if (layout) {
+            this.viewService.load(JSON.parse(layout));
+        }
+        else {
+            var container1 = new viewContainer_1.PaneviewContainer('default_container_1', viewRegistry_1.VIEW_REGISTRY);
+            if (!container1.schema) {
+                this.addView(container1, viewRegistry_1.VIEW_REGISTRY.getRegisteredView('search_widget'));
+                this.addView(container1, viewRegistry_1.VIEW_REGISTRY.getRegisteredView('home_widget'));
+            }
+            var container2 = new viewContainer_1.PaneviewContainer('default_container_2', viewRegistry_1.VIEW_REGISTRY);
+            if (!container2.schema) {
+                this.addView(container2, viewRegistry_1.VIEW_REGISTRY.getRegisteredView('account_widget'));
+                this.addView(container2, viewRegistry_1.VIEW_REGISTRY.getRegisteredView('settings_widget'));
+            }
+            this.viewService.addContainer(container1);
+            this.viewService.addContainer(container2);
+        }
+        var save = function () {
+            localStorage.setItem('viewservice', JSON.stringify(_this.viewService.toJSON()));
+        };
+        this.viewService.onDidActiveContainerChange(save);
+        this.viewService.onDidRemoveContainer(save);
+        this.viewService.onDidAddContainer(save);
+    };
+    ViewServiceModel.prototype.addView = function (container, registedView) {
+        container.addView(new view_1.DefaultView({
+            id: registedView.id,
+            title: registedView.title,
+            isExpanded: true,
+            isLocationEditable: registedView.isLocationEditable,
+            icon: registedView.icon,
+        }));
+    };
+    return ViewServiceModel;
+}());
+var viewService = new ViewServiceModel();
+var colors = {
+    home_widget: 'red',
+    account_widget: 'green',
+    settings_widget: 'yellow',
+    search_widget: 'orange',
+};
+var components = {
+    default: function (props) {
+        var Component = React.useMemo(function () {
+            var registeredView = viewRegistry_1.VIEW_REGISTRY.getRegisteredView(props.params.viewId);
+            return registeredView === null || registeredView === void 0 ? void 0 : registeredView.component;
+        }, [props.params.viewId]);
+        return Component ? React.createElement(Component, null) : null;
+    },
+};
+var Activitybar = function (props) {
+    var _a = __read(React.useState(viewService.model.activeContainer.id), 2), activeContainerid = _a[0], setActiveContainerId = _a[1];
+    var _b = __read(React.useState(viewService.model.containers), 2), containers = _b[0], setContainers = _b[1];
+    var registry = (0, registry_1.useLayoutRegistry)();
+    React.useEffect(function () {
+        var disposable = new lifecycle_1.CompositeDisposable(viewService.model.onDidActiveContainerChange(function () {
+            setActiveContainerId(viewService.model.activeContainer.id);
+        }), viewService.model.onDidAddContainer(function () {
+            setContainers(viewService.model.containers);
+        }), viewService.model.onDidRemoveContainer(function () {
+            setContainers(viewService.model.containers);
+        }), viewService.model.onDidContainersChange(function () {
+            setContainers(viewService.model.containers);
+        }));
+        return function () {
+            disposable.dispose();
+        };
+    }, []);
+    var onClick = function (container, alwaysOpen) {
+        if (alwaysOpen === void 0) { alwaysOpen = false; }
+        return function (event) {
+            var api = registry.get('gridview');
+            var selectedActive = container.id === activeContainerid;
+            var sidebarPanel = api.getPanel('sidebar');
+            if (sidebarPanel.api.isVisible) {
+                if (!alwaysOpen && selectedActive) {
+                    api.setVisible(sidebarPanel, false);
+                }
+            }
+            else {
+                event.preventDefault(); // prevent focus
+                api.setVisible(sidebarPanel, true);
+                sidebarPanel.focus();
+            }
+            viewService.model.setActiveViewContainer(container.id);
+        };
+    };
+    var onContainerDrop = function (targetContainer) {
+        return function (event, direction) {
+            var data = event.dataTransfer.getData('application/json');
+            if (data) {
+                var container = JSON.parse(data).container;
+                var sourceContainer = viewService.model.getViewContainer(container);
+                switch (direction) {
+                    case 'bottom':
+                        viewService.model.insertContainerAfter(sourceContainer, targetContainer);
+                        break;
+                    case 'top':
+                        viewService.model.insertContainerBefore(sourceContainer, targetContainer);
+                        break;
+                }
+                viewService.model.setActiveViewContainer(sourceContainer.id);
+            }
+        };
+    };
+    var onNewContainer = function (event) {
+        var data = (0, dockview_1.getPaneData)();
+        if (data) {
+            var paneId = data.paneId;
+            var view = viewService.model.getView(paneId);
+            if (!view) {
+                console.log("view ".concat(paneId, " doesn't exist"));
+                return;
+            }
+            var viewContainer = viewService.model.getViewContainer2(view);
+            if (!viewContainer) {
+                console.log("viewContainer for view ".concat(view.id, " doesn't exist"));
+                return;
+            }
+            viewService.model.removeViews([view], viewContainer);
+            var newContainer = new viewContainer_1.PaneviewContainer("t_".concat(Date.now().toString().substr(5)), viewRegistry_1.VIEW_REGISTRY);
+            newContainer.addView(view);
+            viewService.model.addContainer(newContainer);
+        }
+    };
+    var onDragOver = function (container) { return function (e) {
+        var api = registry.get('gridview');
+        var sidebarPanel = api.getPanel('sidebar');
+        if (!sidebarPanel.api.isVisible) {
+            api.setVisible(sidebarPanel, true);
+            sidebarPanel.focus();
+        }
+        viewService.model.setActiveViewContainer(container.id);
+    }; };
+    return (React.createElement("div", { className: "activity-bar-part" },
+        containers.map(function (container, i) {
+            var isActive = activeContainerid === container.id;
+            return (React.createElement(sidebarItem_1.Container, { key: i, container: container, isActive: isActive, onDragOver: onDragOver(container), onClick: onClick(container), onDrop: onContainerDrop(container) }));
+        }),
+        React.createElement(ExtraSpace, { onNewContainer: onNewContainer })));
+};
+exports.Activitybar = Activitybar;
+var ExtraSpace = function (props) {
+    var ref = React.useRef(null);
+    var onDrop = function (event) {
+        (0, dom_1.toggleClass)(ref.current, 'activity-bar-space-dragover', false);
+        props.onNewContainer(event);
+    };
+    return (React.createElement("div", { ref: ref, className: "activity-bar-space", onDragOver: function (e) {
+            e.preventDefault();
+        }, onDragEnter: function (e) {
+            (0, dom_1.toggleClass)(ref.current, 'activity-bar-space-dragover', true);
+            e.preventDefault();
+        }, onDragLeave: function (e) {
+            (0, dom_1.toggleClass)(ref.current, 'activity-bar-space-dragover', false);
+        }, onDrop: onDrop }));
+};
+var Sidebar = function () {
+    var _a = __read(React.useState(viewService.model.activeContainer.id), 2), sidebarId = _a[0], setSidebarId = _a[1];
+    React.useEffect(function () {
+        var disposable = viewService.model.onDidActiveContainerChange(function () {
+            setSidebarId(viewService.model.activeContainer.id);
+        });
+        return function () {
+            disposable.dispose();
+        };
+    }, []);
+    return React.createElement(exports.SidebarPart, { id: sidebarId });
+};
+exports.Sidebar = Sidebar;
+var headerComponents = {
+    default: function (props) {
+        var onClick = function () { return props.api.setExpanded(!props.api.isExpanded); };
+        return (React.createElement("div", { onClick: onClick, style: {
+                display: 'flex',
+                alignItems: 'center',
+                padding: '0px 8px',
+                cursor: 'pointer',
+            } },
+            React.createElement("a", { className: "material-icons-outlined" }, props.api.isExpanded ? 'expand_more' : 'chevron_right'),
+            React.createElement("span", null, props.title)));
+    },
+};
+var SidebarPart = function (props) {
+    var _a = __read(React.useState(), 2), api = _a[0], setApi = _a[1];
+    React.useEffect(function () {
+        if (!api) {
+            return function () {
+                //
+            };
+        }
+        var viewContainer = viewService.model.getViewContainer(props.id);
+        var disposables = new lifecycle_1.CompositeDisposable(api.onDidLayoutChange(function () {
+            viewContainer.layout(api.toJSON());
+        }), viewContainer.onDidAddView(function (_a) {
+            var view = _a.view, index = _a.index;
+            api.addPanel({
+                id: view.id,
+                isExpanded: view.isExpanded,
+                title: view.title,
+                component: 'default',
+                headerComponent: 'default',
+                params: {
+                    viewId: view.id,
+                },
+                index: index,
+            });
+        }), viewContainer.onDidRemoveView(function (view) {
+            var panel = api.getPanel(view.id);
+            api.removePanel(panel);
+        }));
+        var schema = viewContainer.schema;
+        if (schema) {
+            api.fromJSON(schema);
+        }
+        else {
+            api.panels.forEach(function (p) {
+                api.removePanel(p);
+            });
+            viewContainer.views.forEach(function (view) {
+                api.addPanel({
+                    id: view.id,
+                    isExpanded: view.isExpanded,
+                    title: view.title,
+                    component: 'default',
+                    headerComponent: 'default',
+                    params: {
+                        viewId: view.id,
+                    },
+                });
+            });
+        }
+        return function () {
+            disposables.dispose();
+        };
+    }, [api, props.id]);
+    var onReady = function (event) {
+        setApi(event.api);
+    };
+    var onDidDrop = function (event) {
+        var data = event.getData();
+        var containerData = event.nativeEvent.dataTransfer.getData('application/json');
+        if (containerData) {
+            var container = JSON.parse(containerData).container;
+            if (container === props.id) {
+                return;
+            }
+            var sourceContainer = viewService.model.getViewContainer(container);
+            var targetContainer_1 = viewService.model.getViewContainer(props.id);
+            if (!sourceContainer) {
+                console.log("sourceContainer ".concat(props.id, " doesn't exist"));
+                return;
+            }
+            if (!targetContainer_1) {
+                console.log("targetContainer ".concat(props.id, " doesn't exist"));
+                return;
+            }
+            sourceContainer.views.forEach(function (v) {
+                viewService.model.moveViewToLocation(v, targetContainer_1, 0);
+            });
+            return;
+        }
+        if (!data) {
+            return;
+        }
+        var targetPanel = event.panel;
+        var allPanels = event.api.panels;
+        var toIndex = allPanels.indexOf(targetPanel);
+        if (event.position === dockview_1.Position.Right ||
+            event.position === dockview_1.Position.Bottom) {
+            toIndex = Math.min(allPanels.length, toIndex + 1);
+        }
+        var viewId = data.paneId;
+        var viewContainer = viewService.model.getViewContainer(props.id);
+        if (!viewContainer) {
+            console.log("viewContainer ".concat(props.id, " doesn't exist"));
+            return;
+        }
+        var view = viewService.model.getView(viewId);
+        viewService.model.moveViewToLocation(view, viewContainer, toIndex);
+    };
+    if (!props.id) {
+        return null;
+    }
+    return (React.createElement(dockview_1.PaneviewReact, { className: "sidebar-part", onDidDrop: onDidDrop, components: components, headerComponents: headerComponents, onReady: onReady }));
+};
+exports.SidebarPart = SidebarPart;
+
 
 /***/ }),
 
@@ -46664,7 +47128,7 @@ class DockviewPanelApiImpl extends _gridviewPanelApi__WEBPACK_IMPORTED_MODULE_1_
         this._onDidGroupChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
         this.onDidGroupChange = this._onDidGroupChange.event;
         this.disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_2__.MutableDisposable();
-        this.group = group;
+        this._group = group;
         this.addDisposables(this.disposable, this._onDidTitleChange, this._titleChanged, this._suppressClosableChanged, this._onDidGroupChange, this._onDidActiveGroupChange);
     }
     get title() {
@@ -47211,12 +47675,22 @@ class Droptarget extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDispos
         this.addDisposables(this._onDrop, new _dnd__WEBPACK_IMPORTED_MODULE_3__.DragAndDropObserver(this.element, {
             onDragEnter: () => undefined,
             onDragOver: (e) => {
+                const width = this.element.clientWidth;
+                const height = this.element.clientHeight;
+                if (width === 0 || height === 0) {
+                    return; // avoid div!0
+                }
+                const x = e.offsetX;
+                const y = e.offsetY;
+                const xp = (100 * x) / width;
+                const yp = (100 * y) / height;
+                const quadrant = this.calculateQuadrant(this.options.validOverlays, xp, yp);
                 if (isBooleanValue(this.options.canDisplayOverlay)) {
                     if (!this.options.canDisplayOverlay) {
                         return;
                     }
                 }
-                else if (!this.options.canDisplayOverlay(e)) {
+                else if (!this.options.canDisplayOverlay(e, quadrant)) {
                     return;
                 }
                 if (!this.target) {
@@ -47235,16 +47709,6 @@ class Droptarget extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDispos
                 if (!this.target || !this.overlay) {
                     return;
                 }
-                const width = this.target.clientWidth;
-                const height = this.target.clientHeight;
-                if (width === 0 || height === 0) {
-                    return; // avoid div!0
-                }
-                const x = e.offsetX;
-                const y = e.offsetY;
-                const xp = (100 * x) / width;
-                const yp = (100 * y) / height;
-                const quadrant = this.calculateQuadrant(this.options.validOverlays, xp, yp);
                 const isSmallX = width < 100;
                 const isSmallY = height < 100;
                 this.toggleClasses(quadrant, isSmallX, isSmallY);
@@ -47670,18 +48134,25 @@ class DefaultDeserializer {
         this.panelDeserializer = panelDeserializer;
     }
     fromJSON(node) {
-        const children = node.data.views;
-        const active = node.data.activeView;
-        const panels = [];
-        for (const child of children) {
-            const panel = this.panelDeserializer.createPanel(child);
-            panels.push(panel);
-        }
-        return this.layout.createGroup({
-            panels,
-            activePanel: panels.find((p) => p.id === active),
-            id: node.data.id,
+        const data = node.data;
+        const children = data.views;
+        const active = data.activeView;
+        const group = this.layout.createGroup({
+            id: data.id,
+            locked: !!data.locked,
+            hideHeader: !!data.hideHeader,
         });
+        for (const child of children) {
+            const panel = this.panelDeserializer.createPanel(child, group);
+            const isActive = typeof active === 'string' && active === panel.id;
+            group.model.openPanel(panel, {
+                skipSetActive: !isActive,
+            });
+        }
+        if (!group.activePanel && group.panels.length > 0) {
+            group.model.openPanel(group.panels[group.panels.length - 1]);
+        }
+        return group;
     }
 }
 
@@ -47783,7 +48254,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         return this.panels.length;
     }
     get panels() {
-        return this.groups.flatMap((group) => group.model.panels);
+        return this.groups.flatMap((group) => group.panels);
     }
     get deserializer() {
         return this._deserializer;
@@ -47799,12 +48270,12 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         if (!activeGroup) {
             return undefined;
         }
-        return activeGroup.model.activePanel;
+        return activeGroup.activePanel;
     }
     set tabHeight(height) {
         this.options.tabHeight = height;
         this._groups.forEach((value) => {
-            value.value.model.tabHeight = height;
+            value.value.model.header.height = height;
         });
     }
     get tabHeight() {
@@ -47827,9 +48298,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         return this.panels.find((panel) => panel.id === id);
     }
     setActivePanel(panel) {
-        if (!panel.group) {
-            throw new Error(`Panel ${panel.id} has no associated group`);
-        }
         this.doSetGroupActive(panel.group);
         panel.group.model.openPanel(panel);
     }
@@ -47842,8 +48310,8 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             options.group = this.activeGroup;
         }
         if (options.includePanel && options.group) {
-            if (options.group.model.activePanel !==
-                options.group.model.panels[options.group.model.panels.length - 1]) {
+            if (options.group.activePanel !==
+                options.group.panels[options.group.panels.length - 1]) {
                 options.group.model.moveToNext({ suppressRoll: true });
                 return;
             }
@@ -47861,8 +48329,8 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             options.group = this.activeGroup;
         }
         if (options.includePanel && options.group) {
-            if (options.group.model.activePanel !==
-                options.group.model.panels[0]) {
+            if (options.group.activePanel !==
+                options.group.panels[0]) {
                 options.group.model.moveToPrevious({ suppressRoll: true });
                 return;
             }
@@ -47910,9 +48378,9 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             throw new Error('no deserializer provided');
         }
         this.gridview.deserialize(grid, new _deserializer__WEBPACK_IMPORTED_MODULE_8__.DefaultDeserializer(this, {
-            createPanel: (id) => {
+            createPanel: (id, group) => {
                 const panelData = panels[id];
-                return this.deserializer.fromJSON(panelData);
+                return this.deserializer.fromJSON(panelData, group);
             },
         }));
         if (typeof activeGroup === 'string') {
@@ -47946,7 +48414,6 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         if (this.panels.find((_) => _.id === options.id)) {
             throw new Error(`panel with id ${options.id} already exists`);
         }
-        const panel = this.createPanel(options);
         let referenceGroup;
         if ((_a = options.position) === null || _a === void 0 ? void 0 : _a.referencePanel) {
             const referencePanel = this.getGroupPanel(options.position.referencePanel);
@@ -47958,19 +48425,25 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         else {
             referenceGroup = this.activeGroup;
         }
+        let panel;
         if (referenceGroup) {
             const target = (0,_gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_10__.toTarget)(((_b = options.position) === null || _b === void 0 ? void 0 : _b.direction) || 'within');
             if (target === _dnd_droptarget__WEBPACK_IMPORTED_MODULE_1__.Position.Center) {
+                panel = this.createPanel(options, referenceGroup);
                 referenceGroup.model.openPanel(panel);
             }
             else {
                 const location = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
                 const relativeLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location, target);
-                this.addPanelToNewGroup(panel, relativeLocation);
+                const group = this.createGroupAtLocation(relativeLocation);
+                panel = this.createPanel(options, group);
+                group.model.openPanel(panel);
             }
         }
         else {
-            this.addPanelToNewGroup(panel);
+            const group = this.createGroupAtLocation();
+            panel = this.createPanel(options, group);
+            group.model.openPanel(panel);
         }
         return panel;
     }
@@ -47986,7 +48459,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         panel.dispose();
         const retainGroupForWatermark = this.size === 1;
         if (!retainGroupForWatermark &&
-            group.model.size === 0 &&
+            group.size === 0 &&
             options.removeEmptyGroup) {
             this.removeGroup(group);
         }
@@ -48020,7 +48493,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         }
     }
     removeGroup(group, skipActive = false) {
-        const panels = [...group.model.panels]; // reassign since group panels will mutate
+        const panels = [...group.panels]; // reassign since group panels will mutate
         for (const panel of panels) {
             this.removePanel(panel, {
                 removeEmptyGroup: false,
@@ -48048,7 +48521,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         else {
             const referenceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(referenceGroup.element);
             const targetLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
-            if (sourceGroup && sourceGroup.model.size < 2) {
+            if (sourceGroup && sourceGroup.size < 2) {
                 const [targetParentLocation, to] = (0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(targetLocation);
                 const sourceLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getGridLocation)(sourceGroup.element);
                 const [sourceParentLocation, from] = (0,_array__WEBPACK_IMPORTED_MODULE_2__.tail)(sourceLocation);
@@ -48077,7 +48550,8 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
                     throw new Error(`No panel with id ${itemId}`);
                 }
                 const dropLocation = (0,_gridview_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, referenceLocation, target);
-                this.addPanelToNewGroup(groupItem, dropLocation);
+                const group = this.createGroupAtLocation(dropLocation);
+                group.model.openPanel(groupItem);
             }
         }
     }
@@ -48085,8 +48559,8 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         var _a, _b;
         const isGroupAlreadyFocused = this._activeGroup === group;
         super.doSetGroupActive(group, skipFocus);
-        if (!isGroupAlreadyFocused && ((_a = this._activeGroup) === null || _a === void 0 ? void 0 : _a.model.activePanel)) {
-            this._onDidActivePanelChange.fire((_b = this._activeGroup) === null || _b === void 0 ? void 0 : _b.model.activePanel);
+        if (!isGroupAlreadyFocused && ((_a = this._activeGroup) === null || _a === void 0 ? void 0 : _a.activePanel)) {
+            this._onDidActivePanelChange.fire((_b = this._activeGroup) === null || _b === void 0 ? void 0 : _b.activePanel);
         }
     }
     createGroup(options) {
@@ -48107,7 +48581,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
                 id = nextGroupId.next();
             }
         }
-        const view = new _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_16__.GroupviewPanel(this, id, options);
+        const view = new _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_16__.GroupPanel(this, id, options);
         view.init({ params: {}, containerApi: null }); // required to initialized .part and allow for correct disposal of group
         if (!this._groups.has(view.id)) {
             const disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.CompositeDisposable(view.model.onMove((event) => {
@@ -48138,16 +48612,16 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         // not an ideal pattern
         view.initialize();
         if (typeof this.options.tabHeight === 'number') {
-            view.model.tabHeight = this.options.tabHeight;
+            view.model.header.height = this.options.tabHeight;
         }
         return view;
     }
-    createPanel(options) {
+    createPanel(options, group) {
         const view = new _defaultGroupPanelView__WEBPACK_IMPORTED_MODULE_17__.DefaultGroupPanelView({
             content: this.createContentComponent(options.id, options.component),
             tab: this.createTabComponent(options.id, options.tabComponent),
         });
-        const panel = new _dockviewGroupPanel__WEBPACK_IMPORTED_MODULE_3__.DockviewGroupPanel(options.id, this, this._api);
+        const panel = new _dockviewGroupPanel__WEBPACK_IMPORTED_MODULE_3__.DockviewGroupPanel(options.id, this, this._api, group);
         panel.init({
             view,
             title: options.title || options.id,
@@ -48164,10 +48638,10 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
         var _a;
         return (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_9__.createComponent)(id, componentName, this.options.tabComponents || {}, this.options.frameworkTabComponents, (_a = this.options.frameworkComponentFactory) === null || _a === void 0 ? void 0 : _a.tab, () => new _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_14__.DefaultTab());
     }
-    addPanelToNewGroup(panel, location = [0]) {
+    createGroupAtLocation(location = [0]) {
         const group = this.createGroup();
         this.doAddGroup(group, location);
-        group.model.openPanel(panel);
+        return group;
     }
     findGroup(panel) {
         var _a;
@@ -48200,13 +48674,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class DockviewGroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable {
-    constructor(id, accessor, containerApi) {
+    constructor(id, accessor, containerApi, group) {
         super();
         this.id = id;
         this.containerApi = containerApi;
         this.mutableDisposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_1__.MutableDisposable();
         this._suppressClosable = false;
         this._title = '';
+        this._group = group;
         this.api = new _api_groupPanelApi__WEBPACK_IMPORTED_MODULE_0__.DockviewPanelApiImpl(this, this._group);
         this.addDisposables(this.api.onActiveChange(() => {
             accessor.setActivePanel(this);
@@ -48303,13 +48778,13 @@ class DockviewGroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.Composi
         (_a = this.view) === null || _a === void 0 ? void 0 : _a.updateParentGroup(this._group, this._group.model.isPanelActive(this));
     }
     layout(width, height) {
-        var _a, _b;
+        var _a;
         // the obtain the correct dimensions of the content panel we must deduct the tab height
         this.api._onDidPanelDimensionChange.fire({
             width,
-            height: height - (((_a = this.group) === null || _a === void 0 ? void 0 : _a.model.tabHeight) || 0),
+            height: height - (this.group.model.header.height || 0),
         });
-        (_b = this.view) === null || _b === void 0 ? void 0 : _b.layout(width, height);
+        (_a = this.view) === null || _a === void 0 ? void 0 : _a.layout(width, height);
     }
     dispose() {
         var _a;
@@ -50137,6 +50612,7 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
         this.options = options;
         this.parent = parent;
         this._isGroupActive = false;
+        this._locked = false;
         this.mostRecentlyUsed = [];
         this._onDidChange = new _events__WEBPACK_IMPORTED_MODULE_4__.Emitter();
         this.onDidChange = this._onDidChange.event;
@@ -50157,7 +50633,10 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
         this.contentContainer = new _panel_content__WEBPACK_IMPORTED_MODULE_6__.ContentContainer();
         this.dropTarget = new _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Droptarget(this.contentContainer.element, {
             validOverlays: 'all',
-            canDisplayOverlay: (event) => {
+            canDisplayOverlay: (event, quadrant) => {
+                if (this.locked && !quadrant) {
+                    return false;
+                }
                 const data = (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.getPanelData)();
                 if (data) {
                     const groupHasOnePanelAndIsActiveDragElement = this._panels.length === 1 && data.groupId === this.id;
@@ -50167,6 +50646,8 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
             },
         });
         container.append(this.tabsContainer.element, this.contentContainer.element);
+        this.header.hidden = !!options.hideHeader;
+        this.locked = !!options.locked;
         this.addDisposables(this._onMove, this._onDidGroupChange, this.tabsContainer.onDrop((event) => {
             this.handleDropEvent(event.event, _dnd_droptarget__WEBPACK_IMPORTED_MODULE_2__.Position.Center, event.index);
         }), this.contentContainer.onDidFocus(() => {
@@ -50183,12 +50664,11 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
     get activePanel() {
         return this._activePanel;
     }
-    get tabHeight() {
-        return this.tabsContainer.height;
+    get locked() {
+        return this._locked;
     }
-    set tabHeight(height) {
-        this.tabsContainer.height = height;
-        this.layout(this._width, this._height);
+    set locked(value) {
+        this._locked = value;
     }
     get isActive() {
         return this._isGroupActive;
@@ -50217,6 +50697,15 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
     get hasWatermark() {
         return !!(this.watermark && this.container.contains(this.watermark.element));
     }
+    get header() {
+        return this.tabsContainer;
+    }
+    get isContentFocused() {
+        if (!document.activeElement) {
+            return false;
+        }
+        return (0,_dom__WEBPACK_IMPORTED_MODULE_3__.isAncestor)(document.activeElement, this.contentContainer.element);
+    }
     initialize() {
         var _a, _b;
         if ((_a = this.options) === null || _a === void 0 ? void 0 : _a.panels) {
@@ -50232,22 +50721,23 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
         this.setActive(this.isActive, true, true);
         this.updateContainer();
     }
-    isContentFocused() {
-        if (!document.activeElement) {
-            return false;
-        }
-        return (0,_dom__WEBPACK_IMPORTED_MODULE_3__.isAncestor)(document.activeElement, this.contentContainer.element);
-    }
     indexOf(panel) {
         return this.tabsContainer.indexOf(panel.id);
     }
     toJSON() {
         var _a;
-        return {
+        const result = {
             views: this.tabsContainer.panels,
             activeView: (_a = this._activePanel) === null || _a === void 0 ? void 0 : _a.id,
             id: this.id,
         };
+        if (this.locked) {
+            result.locked = true;
+        }
+        if (this.header.hidden) {
+            result.hideHeader = true;
+        }
+        return result;
     }
     moveToNext(options) {
         if (!options) {
@@ -50310,15 +50800,18 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
             options.index > this.panels.length) {
             options.index = this.panels.length;
         }
+        const skipSetActive = !!options.skipSetActive;
         // ensure the group is updated before we fire any events
         panel.updateParentGroup(this.parent, true);
-        if (this._activePanel === panel) {
+        if (!skipSetActive && this._activePanel === panel) {
             this.accessor.doSetGroupActive(this.parent);
             return;
         }
         this.doAddPanel(panel, options.index);
-        this.doSetActivePanel(panel);
-        this.accessor.doSetGroupActive(this.parent, !!options.skipFocus);
+        if (!skipSetActive) {
+            this.doSetActivePanel(panel);
+            this.accessor.doSetGroupActive(this.parent, !!options.skipFocus);
+        }
         this.updateContainer();
     }
     removePanel(groupItemOrId) {
@@ -50517,7 +51010,12 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
             });
         }
         else {
-            this._onDidDrop.fire({ nativeEvent: event, position, index });
+            this._onDidDrop.fire({
+                nativeEvent: event,
+                position,
+                index,
+                getData: () => (0,_dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_1__.getPanelData)(),
+            });
         }
     }
     dispose() {
@@ -50544,7 +51042,7 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GroupviewPanel": () => (/* binding */ GroupviewPanel)
+/* harmony export */   "GroupPanel": () => (/* binding */ GroupPanel)
 /* harmony export */ });
 /* harmony import */ var _api_gridviewPanelApi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/gridviewPanelApi */ "../dockview/dist/esm/api/gridviewPanelApi.js");
 /* harmony import */ var _groupview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./groupview */ "../dockview/dist/esm/groupview/groupview.js");
@@ -50552,10 +51050,21 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-class GroupviewPanel extends _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_2__.GridviewPanel {
+class GroupviewApi extends _api_gridviewPanelApi__WEBPACK_IMPORTED_MODULE_0__.GridviewPanelApiImpl {
+}
+class GroupPanel extends _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_2__.GridviewPanel {
     constructor(accessor, id, options) {
-        super(id, 'groupview_default', new _api_gridviewPanelApi__WEBPACK_IMPORTED_MODULE_0__.GridviewPanelApiImpl(id));
+        super(id, 'groupview_default', new GroupviewApi(id));
         this._model = new _groupview__WEBPACK_IMPORTED_MODULE_1__.Groupview(this.element, accessor, id, options, this);
+    }
+    get panels() {
+        return this._model.panels;
+    }
+    get activePanel() {
+        return this._model.activePanel;
+    }
+    get size() {
+        return this._model.size;
     }
     get model() {
         return this._model;
@@ -50572,8 +51081,17 @@ class GroupviewPanel extends _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_2_
     get maximumWidth() {
         return this._model.maximumWidth;
     }
+    get locked() {
+        return this._model.locked;
+    }
+    set locked(value) {
+        this._model.locked = value;
+    }
+    get header() {
+        return this._model.header;
+    }
     initialize() {
-        this.model.initialize();
+        this._model.initialize();
     }
     setActive(isActive) {
         super.setActive(isActive);
@@ -50832,6 +51350,7 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
         this.tabs = [];
         this.selectedIndex = -1;
         this.active = false;
+        this._hidden = false;
         this._onDrop = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
         this.onDrop = this._onDrop.event;
         this.addDisposables(this._onDrop);
@@ -50892,11 +51411,20 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
             this.element.style.setProperty('--dv-tabs-and-actions-container-height', `${value}px`);
         }
     }
+    get hidden() {
+        return this._hidden;
+    }
+    set hidden(value) {
+        this._hidden = value;
+        this.element.style.display = value ? 'none' : '';
+    }
     show() {
-        this.element.style.display = '';
+        if (!this.hidden) {
+            this.element.style.display = '';
+        }
     }
     hide() {
-        this.element.style.display = 'none';
+        this._element.style.display = 'none';
     }
     setActionElement(element) {
         if (this.actions === element) {
@@ -50968,7 +51496,7 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
         const disposable = _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable.from(tabToAdd.onChanged((event) => {
             var _a;
             const alreadyFocused = panel.id === ((_a = this.group.model.activePanel) === null || _a === void 0 ? void 0 : _a.id) &&
-                this.group.model.isContentFocused();
+                this.group.model.isContentFocused;
             this.accessor.fireMouseEvent(Object.assign(Object.assign({}, event), { panel, tab: true }));
             const isLeftClick = event.event.button === 0;
             if (!isLeftClick || event.event.defaultPrevented) {
@@ -51024,81 +51552,80 @@ __webpack_require__.r(__webpack_exports__);
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "BaseGrid": () => (/* reexport safe */ _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_6__.BaseGrid),
-/* harmony export */   "ContentContainer": () => (/* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_7__.ContentContainer),
-/* harmony export */   "DockviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_1__.DockviewApi),
-/* harmony export */   "DockviewComponent": () => (/* reexport safe */ _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_11__.DockviewComponent),
-/* harmony export */   "DockviewComponents": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_19__.DockviewComponents),
-/* harmony export */   "DockviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_19__.DockviewReact),
-/* harmony export */   "Event": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_20__.Event),
-/* harmony export */   "Gridview": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.Gridview),
-/* harmony export */   "GridviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_1__.GridviewApi),
-/* harmony export */   "GridviewComponent": () => (/* reexport safe */ _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_12__.GridviewComponent),
-/* harmony export */   "GridviewPanel": () => (/* reexport safe */ _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_15__.GridviewPanel),
-/* harmony export */   "GridviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_19__.GridviewReact),
-/* harmony export */   "GroupChangeKind2": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_5__.GroupChangeKind2),
-/* harmony export */   "Groupview": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_5__.Groupview),
-/* harmony export */   "LayoutPriority": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_2__.LayoutPriority),
+/* harmony export */   "BaseGrid": () => (/* reexport safe */ _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_5__.BaseGrid),
+/* harmony export */   "ContentContainer": () => (/* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_6__.ContentContainer),
+/* harmony export */   "DockviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_21__.DockviewApi),
+/* harmony export */   "DockviewComponent": () => (/* reexport safe */ _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_10__.DockviewComponent),
+/* harmony export */   "DockviewComponents": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.DockviewComponents),
+/* harmony export */   "DockviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.DockviewReact),
+/* harmony export */   "Event": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_19__.Event),
+/* harmony export */   "Gridview": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_3__.Gridview),
+/* harmony export */   "GridviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_21__.GridviewApi),
+/* harmony export */   "GridviewComponent": () => (/* reexport safe */ _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_11__.GridviewComponent),
+/* harmony export */   "GridviewPanel": () => (/* reexport safe */ _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_14__.GridviewPanel),
+/* harmony export */   "GridviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.GridviewReact),
+/* harmony export */   "GroupChangeKind2": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_4__.GroupChangeKind2),
+/* harmony export */   "Groupview": () => (/* reexport safe */ _groupview_groupview__WEBPACK_IMPORTED_MODULE_4__.Groupview),
+/* harmony export */   "LayoutPriority": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_1__.LayoutPriority),
 /* harmony export */   "LocalSelectionTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_0__.LocalSelectionTransfer),
-/* harmony export */   "MouseEventKind": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_8__.MouseEventKind),
-/* harmony export */   "Orientation": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_2__.Orientation),
-/* harmony export */   "PaneFramework": () => (/* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_14__.PaneFramework),
+/* harmony export */   "MouseEventKind": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_7__.MouseEventKind),
+/* harmony export */   "Orientation": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_1__.Orientation),
+/* harmony export */   "PaneFramework": () => (/* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_13__.PaneFramework),
 /* harmony export */   "PaneTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_0__.PaneTransfer),
 /* harmony export */   "PanelTransfer": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_0__.PanelTransfer),
-/* harmony export */   "Paneview": () => (/* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_3__.Paneview),
-/* harmony export */   "PaneviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_1__.PaneviewApi),
-/* harmony export */   "PaneviewComponent": () => (/* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_14__.PaneviewComponent),
-/* harmony export */   "PaneviewPanel": () => (/* reexport safe */ _paneview_paneviewPanel__WEBPACK_IMPORTED_MODULE_17__.PaneviewPanel),
-/* harmony export */   "PaneviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_19__.PaneviewReact),
-/* harmony export */   "Position": () => (/* reexport safe */ _dnd_droptarget__WEBPACK_IMPORTED_MODULE_21__.Position),
-/* harmony export */   "ReactPanelContentPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_19__.ReactPanelContentPart),
-/* harmony export */   "ReactPanelHeaderPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_19__.ReactPanelHeaderPart),
-/* harmony export */   "ReactPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_19__.ReactPart),
-/* harmony export */   "ReactPartContext": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_19__.ReactPartContext),
-/* harmony export */   "SashState": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_2__.SashState),
-/* harmony export */   "Sizing": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_2__.Sizing),
-/* harmony export */   "Splitview": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_2__.Splitview),
-/* harmony export */   "SplitviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_1__.SplitviewApi),
-/* harmony export */   "SplitviewComponent": () => (/* reexport safe */ _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_13__.SplitviewComponent),
-/* harmony export */   "SplitviewPanel": () => (/* reexport safe */ _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_16__.SplitviewPanel),
-/* harmony export */   "SplitviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_19__.SplitviewReact),
-/* harmony export */   "Tab": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_8__.Tab),
-/* harmony export */   "getDirectionOrientation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getDirectionOrientation),
-/* harmony export */   "getGridLocation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getGridLocation),
-/* harmony export */   "getLocationOrientation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getLocationOrientation),
+/* harmony export */   "Paneview": () => (/* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_2__.Paneview),
+/* harmony export */   "PaneviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_21__.PaneviewApi),
+/* harmony export */   "PaneviewComponent": () => (/* reexport safe */ _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_13__.PaneviewComponent),
+/* harmony export */   "PaneviewPanel": () => (/* reexport safe */ _paneview_paneviewPanel__WEBPACK_IMPORTED_MODULE_16__.PaneviewPanel),
+/* harmony export */   "PaneviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.PaneviewReact),
+/* harmony export */   "Position": () => (/* reexport safe */ _dnd_droptarget__WEBPACK_IMPORTED_MODULE_20__.Position),
+/* harmony export */   "ReactPanelContentPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.ReactPanelContentPart),
+/* harmony export */   "ReactPanelHeaderPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.ReactPanelHeaderPart),
+/* harmony export */   "ReactPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.ReactPart),
+/* harmony export */   "ReactPartContext": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.ReactPartContext),
+/* harmony export */   "SashState": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_1__.SashState),
+/* harmony export */   "Sizing": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_1__.Sizing),
+/* harmony export */   "Splitview": () => (/* reexport safe */ _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_1__.Splitview),
+/* harmony export */   "SplitviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_21__.SplitviewApi),
+/* harmony export */   "SplitviewComponent": () => (/* reexport safe */ _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_12__.SplitviewComponent),
+/* harmony export */   "SplitviewPanel": () => (/* reexport safe */ _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_15__.SplitviewPanel),
+/* harmony export */   "SplitviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.SplitviewReact),
+/* harmony export */   "Tab": () => (/* reexport safe */ _groupview_tab__WEBPACK_IMPORTED_MODULE_7__.Tab),
+/* harmony export */   "getDirectionOrientation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_3__.getDirectionOrientation),
+/* harmony export */   "getGridLocation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_3__.getGridLocation),
+/* harmony export */   "getLocationOrientation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_3__.getLocationOrientation),
 /* harmony export */   "getPaneData": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_0__.getPaneData),
 /* harmony export */   "getPanelData": () => (/* reexport safe */ _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_0__.getPanelData),
-/* harmony export */   "getRelativeLocation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.getRelativeLocation),
-/* harmony export */   "indexInParent": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.indexInParent),
-/* harmony export */   "isGridBranchNode": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.isGridBranchNode),
-/* harmony export */   "isReactElement": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_19__.isReactElement),
-/* harmony export */   "orthogonal": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__.orthogonal),
-/* harmony export */   "toTarget": () => (/* reexport safe */ _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_6__.toTarget),
-/* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_19__.usePortalsLifecycle)
+/* harmony export */   "getRelativeLocation": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_3__.getRelativeLocation),
+/* harmony export */   "indexInParent": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_3__.indexInParent),
+/* harmony export */   "isGridBranchNode": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_3__.isGridBranchNode),
+/* harmony export */   "isReactElement": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.isReactElement),
+/* harmony export */   "orthogonal": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_3__.orthogonal),
+/* harmony export */   "toTarget": () => (/* reexport safe */ _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_5__.toTarget),
+/* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.usePortalsLifecycle)
 /* harmony export */ });
 /* harmony import */ var _dnd_dataTransfer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dnd/dataTransfer */ "../dockview/dist/esm/dnd/dataTransfer.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./api/component.api */ "../dockview/dist/esm/api/component.api.js");
-/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./splitview/core/splitview */ "../dockview/dist/esm/splitview/core/splitview.js");
-/* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./paneview/paneview */ "../dockview/dist/esm/paneview/paneview.js");
-/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./gridview/gridview */ "../dockview/dist/esm/gridview/gridview.js");
-/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./groupview/groupview */ "../dockview/dist/esm/groupview/groupview.js");
-/* harmony import */ var _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./gridview/baseComponentGridview */ "../dockview/dist/esm/gridview/baseComponentGridview.js");
-/* harmony import */ var _groupview_panel_content__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./groupview/panel/content */ "../dockview/dist/esm/groupview/panel/content.js");
-/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./groupview/tab */ "../dockview/dist/esm/groupview/tab.js");
-/* harmony import */ var _groupview_types__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./groupview/types */ "../dockview/dist/esm/groupview/types.js");
-/* harmony import */ var _dockview_options__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./dockview/options */ "../dockview/dist/esm/dockview/options.js");
-/* harmony import */ var _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./dockview/dockviewComponent */ "../dockview/dist/esm/dockview/dockviewComponent.js");
-/* harmony import */ var _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./gridview/gridviewComponent */ "../dockview/dist/esm/gridview/gridviewComponent.js");
-/* harmony import */ var _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./splitview/splitviewComponent */ "../dockview/dist/esm/splitview/splitviewComponent.js");
-/* harmony import */ var _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./paneview/paneviewComponent */ "../dockview/dist/esm/paneview/paneviewComponent.js");
-/* harmony import */ var _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./gridview/gridviewPanel */ "../dockview/dist/esm/gridview/gridviewPanel.js");
-/* harmony import */ var _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./splitview/splitviewPanel */ "../dockview/dist/esm/splitview/splitviewPanel.js");
-/* harmony import */ var _paneview_paneviewPanel__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./paneview/paneviewPanel */ "../dockview/dist/esm/paneview/paneviewPanel.js");
-/* harmony import */ var _groupview_groupPanel__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./groupview/groupPanel */ "../dockview/dist/esm/groupview/groupPanel.js");
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./react */ "../dockview/dist/esm/react/index.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./events */ "../dockview/dist/esm/events.js");
-/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./dnd/droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
-
+/* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitview/core/splitview */ "../dockview/dist/esm/splitview/core/splitview.js");
+/* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./paneview/paneview */ "../dockview/dist/esm/paneview/paneview.js");
+/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./gridview/gridview */ "../dockview/dist/esm/gridview/gridview.js");
+/* harmony import */ var _groupview_groupview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./groupview/groupview */ "../dockview/dist/esm/groupview/groupview.js");
+/* harmony import */ var _gridview_baseComponentGridview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./gridview/baseComponentGridview */ "../dockview/dist/esm/gridview/baseComponentGridview.js");
+/* harmony import */ var _groupview_panel_content__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./groupview/panel/content */ "../dockview/dist/esm/groupview/panel/content.js");
+/* harmony import */ var _groupview_tab__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./groupview/tab */ "../dockview/dist/esm/groupview/tab.js");
+/* harmony import */ var _groupview_types__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./groupview/types */ "../dockview/dist/esm/groupview/types.js");
+/* harmony import */ var _dockview_options__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./dockview/options */ "../dockview/dist/esm/dockview/options.js");
+/* harmony import */ var _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./dockview/dockviewComponent */ "../dockview/dist/esm/dockview/dockviewComponent.js");
+/* harmony import */ var _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./gridview/gridviewComponent */ "../dockview/dist/esm/gridview/gridviewComponent.js");
+/* harmony import */ var _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./splitview/splitviewComponent */ "../dockview/dist/esm/splitview/splitviewComponent.js");
+/* harmony import */ var _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./paneview/paneviewComponent */ "../dockview/dist/esm/paneview/paneviewComponent.js");
+/* harmony import */ var _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./gridview/gridviewPanel */ "../dockview/dist/esm/gridview/gridviewPanel.js");
+/* harmony import */ var _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./splitview/splitviewPanel */ "../dockview/dist/esm/splitview/splitviewPanel.js");
+/* harmony import */ var _paneview_paneviewPanel__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./paneview/paneviewPanel */ "../dockview/dist/esm/paneview/paneviewPanel.js");
+/* harmony import */ var _groupview_groupPanel__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./groupview/groupPanel */ "../dockview/dist/esm/groupview/groupPanel.js");
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./react */ "../dockview/dist/esm/react/index.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./events */ "../dockview/dist/esm/events.js");
+/* harmony import */ var _dnd_droptarget__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./dnd/droptarget */ "../dockview/dist/esm/dnd/droptarget.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./api/component.api */ "../dockview/dist/esm/api/component.api.js");
 
 
 
@@ -51118,6 +51645,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
  // TODO: should be conditional on whether user wants the React wrappers
+
 
 
 
@@ -52068,7 +52596,7 @@ class ReactPanelDeserialzier {
     constructor(layout) {
         this.layout = layout;
     }
-    fromJSON(panelData) {
+    fromJSON(panelData, group) {
         var _a, _b, _c;
         const panelId = panelData.id;
         const params = panelData.params;
@@ -52081,7 +52609,7 @@ class ReactPanelDeserialzier {
                 ? (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_1__.createComponent)(viewData.tab.id, viewData.tab.id, this.layout.options.tabComponents, this.layout.options.frameworkTabComponents, (_c = this.layout.options.frameworkComponentFactory) === null || _c === void 0 ? void 0 : _c.tab)
                 : new _dockview_components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_3__.DefaultTab(),
         });
-        const panel = new _dockview_dockviewGroupPanel__WEBPACK_IMPORTED_MODULE_0__.DockviewGroupPanel(panelId, this.layout, new _api_component_api__WEBPACK_IMPORTED_MODULE_2__.DockviewApi(this.layout));
+        const panel = new _dockview_dockviewGroupPanel__WEBPACK_IMPORTED_MODULE_0__.DockviewGroupPanel(panelId, this.layout, new _api_component_api__WEBPACK_IMPORTED_MODULE_2__.DockviewApi(this.layout), group);
         panel.init({
             view,
             title,
@@ -52105,9 +52633,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "DockviewComponents": () => (/* binding */ DockviewComponents)
 /* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "../../node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "../../node_modules/react-dom/index.js");
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../react */ "../dockview/dist/esm/react/react.js");
 
 
@@ -52177,7 +52705,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "DockviewReact": () => (/* binding */ DockviewReact)
 /* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "../../node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../dockview/dockviewComponent */ "../dockview/dist/esm/dockview/dockviewComponent.js");
 /* harmony import */ var _reactContentPart__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./reactContentPart */ "../dockview/dist/esm/react/dockview/reactContentPart.js");
@@ -52551,7 +53079,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "GridviewReact": () => (/* binding */ GridviewReact)
 /* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "../../node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _gridview_gridviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../gridview/gridviewComponent */ "../dockview/dist/esm/gridview/gridviewComponent.js");
 /* harmony import */ var _splitview_core_splitview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../splitview/core/splitview */ "../dockview/dist/esm/splitview/core/splitview.js");
@@ -52719,7 +53247,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "PaneviewReact": () => (/* binding */ PaneviewReact)
 /* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "../../node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _paneview_paneviewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../paneview/paneviewComponent */ "../dockview/dist/esm/paneview/paneviewComponent.js");
 /* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../react */ "../dockview/dist/esm/react/react.js");
@@ -52884,9 +53412,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "isReactElement": () => (/* binding */ isReactElement),
 /* harmony export */   "usePortalsLifecycle": () => (/* binding */ usePortalsLifecycle)
 /* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "../../node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "../../node_modules/react-dom/index.js");
 /* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../math */ "../dockview/dist/esm/math.js");
 
 
@@ -53017,7 +53545,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "SplitviewReact": () => (/* binding */ SplitviewReact)
 /* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "../../node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../api/component.api */ "../dockview/dist/esm/api/component.api.js");
 /* harmony import */ var _splitview_splitviewComponent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../splitview/splitviewComponent */ "../dockview/dist/esm/splitview/splitviewComponent.js");
@@ -54340,6 +54868,16 @@ class SplitviewPanel extends _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_0_
 
 /***/ }),
 
+/***/ "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg> ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module) => {
+
+module.exports = "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\"><path d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z\"/></svg>";
+
+/***/ }),
+
 /***/ "./src/layout-grid/splitpanel.layout.json":
 /*!************************************************!*\
   !*** ./src/layout-grid/splitpanel.layout.json ***!
@@ -54378,6 +54916,9 @@ module.exports = JSON.parse('{"views":[{"size":200,"data":{"id":"1","component":
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
+/******/ 	
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = __webpack_modules__;
 /******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat get default export */
@@ -54427,6 +54968,32 @@ module.exports = JSON.parse('{"views":[{"size":200,"data":{"id":"1","component":
 /******/ 			if (!module.children) module.children = [];
 /******/ 			return module;
 /******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/jsonp chunk loading */
+/******/ 	(() => {
+/******/ 		__webpack_require__.b = document.baseURI || self.location.href;
+/******/ 		
+/******/ 		// object to store loaded and loading chunks
+/******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
+/******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
+/******/ 		var installedChunks = {
+/******/ 			"main": 0
+/******/ 		};
+/******/ 		
+/******/ 		// no chunk on demand loading
+/******/ 		
+/******/ 		// no prefetching
+/******/ 		
+/******/ 		// no preloaded
+/******/ 		
+/******/ 		// no HMR
+/******/ 		
+/******/ 		// no HMR manifest
+/******/ 		
+/******/ 		// no on chunks loaded
+/******/ 		
+/******/ 		// no jsonp function
 /******/ 	})();
 /******/ 	
 /************************************************************************/
