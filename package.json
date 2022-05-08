@@ -2,6 +2,9 @@
   "name": "dockview-monorepo-root",
   "private": true,
   "description": "Monorepo for https://github.com/mathuo/dockview",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "test": "jest",
     "lint": "eslint packages/**/src/** --ext .ts,.tsx,.js,.jsx",
@@ -13,7 +16,6 @@
     "docs": "lerna run docs --scope dockview",
     "clean": "lerna run clean",
     "bootstrap": "lerna bootstrap",
-    "bootstrap-no-hoist": "lerna bootstrap",
     "test:cov": "jest --coverage",
     "version-beta-build": "lerna version prerelease --preid beta",
     "publish-app": "lerna publish"

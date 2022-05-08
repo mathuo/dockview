@@ -4,7 +4,7 @@
   "version": "1.4.0",
   "description": "Demo project for https://github.com/mathuo/dockview",
   "scripts": {
-    "build": "npm run build-webpack && npm run build-storybook",
+    "build": "npm run build-webpack",
     "build-webpack": "cross-env ../../node_modules/.bin/webpack --config webpack.config.js",
     "start": "cross-env ../../node_modules/.bin/webpack serve --config webpack.config.js",
     "clean": "rimraf dist/ .build/",

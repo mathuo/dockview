@@ -4,6 +4,8 @@ on:
     schedule:
         - cron: '0 3 * * *' # every day at 3 am UTC
 
+# on: [push]
+
 jobs:
     deploy-nightly-demo-app:
         runs-on: ubuntu-latest
@@ -26,7 +28,7 @@ jobs:
                       ${{ runner.os }}-node-
 
             - run: yarn
-            - run: npm run bootstrap-no-hoist
+            - run: npm run bootstrap
             - run: npm run build
             - run: npm run test
             - run: npm run package-all

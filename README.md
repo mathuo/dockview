@@ -19,7 +19,6 @@ A zero dependency layout manager based on the layering of splitview with support
 
 -   [➡️](https://mathuo.github.io/dockview/docs) Documentation
 -   [➡️](https://mathuo.github.io/dockview/) Live demo
--   [➡️](https://mathuo.github.io/dockview/output/storybook-static) Storybook demo
 -   [➡️](https://github.com/mathuo/dockview/tree/master/packages/dockview-demo/src/stories) Code examples
 -   [➡️](https://mathuo.github.io/dockview/output/docs/index.html) Generated TypeDocs
 

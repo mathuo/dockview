@@ -2,7 +2,7 @@ name: Deploy Docs
 
 on:
     schedule:
-        - cron: '0 4 * * *'
+        - cron: '0 3 * * *' # every day at 3 am UTC
 
 # on: [push]
 
@@ -27,8 +27,8 @@ jobs:
                   restore-keys: |
                       ${{ runner.os }}-node-
 
-            - run: yarn
-            - run: npm run bootstrap-no-hoist
+            - run: yarn install
+            - run: npm run bootstrap
             - run: npm run build
             - run: npm run test
             - run: npm run deploy-docs
