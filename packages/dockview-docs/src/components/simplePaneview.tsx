@@ -3,10 +3,59 @@ import {
     PaneviewReact,
     PaneviewReadyEvent,
 } from 'dockview';
+import * as React from 'react';
 
 const components = {
     default: (props: IPaneviewPanelProps<{ title: string }>) => {
-        return <div style={{ padding: '20px' }}>{props.params.title}</div>;
+        return (
+            <div
+                style={{
+                    padding: '10px',
+                    height: '100%',
+                    backgroundColor: 'rgb(60,60,60)',
+                }}
+            >
+                {props.params.title}
+            </div>
+        );
+    },
+};
+
+const headerComponents = {
+    myHeaderComponent: (props: IPaneviewPanelProps<{ title: string }>) => {
+        const [expanded, setExpanded] = React.useState<boolean>(
+            props.api.isExpanded
+        );
+
+        React.useEffect(() => {
+            const disposable = props.api.onDidExpansionChange((event) => {
+                setExpanded(event.isExpanded);
+            });
+
+            return () => {
+                disposable.dispose();
+            };
+        }, []);
+
+        const onClick = () => {
+            props.api.setExpanded(!expanded);
+        };
+
+        return (
+            <div
+                style={{
+                    padding: '10px',
+                    height: '100%',
+                    backgroundColor: 'rgb(60,60,60)',
+                }}
+            >
+                <a
+                    onClick={onClick}
+                    className={expanded ? 'expanded' : 'collapsed'}
+                />
+                <span>{props.params.title}</span>
+            </div>
+        );
     },
 };
 
@@ -43,6 +92,7 @@ export const SimplePaneview = () => {
     return (
         <PaneviewReact
             components={components}
+            headerComponents={headerComponents}
             onReady={onReady}
             className="dockview-theme-dark"
         />

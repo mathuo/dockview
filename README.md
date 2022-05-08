@@ -124,31 +124,6 @@ const Component = () => {
 };
 ```
 
-Specifically for `DockviewReact` there exists higher-order components to encapsulate both the tab and contents into one logical component for the user making state sharing between the two simple, which is an optional feature.
-
-```tsx
-const components: PanelCollection<IDockviewPanelProps> = {
-    default: (props: IDockviewPanelProps<{ someProps: string }>) => {
-        return <div>{props.params.someProps}</div>;
-    },
-    fancy: (props: IDockviewPanelProps) => {
-        return (
-            <DockviewComponents.Panel>
-                <DockviewComponents.Tab>
-                    <div>
-                        <span>{props.api.title}</span>
-                        <span onClick={() => props.api.close()}>{'Close'}</span>
-                    </div>
-                </DockviewComponents.Tab>
-                <DockviewComponents.Content>
-                    <div>{'Hello world'}</div>
-                </DockviewComponents.Content>
-            </DockviewComponents.Panel>
-        );
-    },
-};
-```
-
 ## Sandbox examples
 
 -   [Dockview](https://codesandbox.io/s/simple-dockview-t6491)

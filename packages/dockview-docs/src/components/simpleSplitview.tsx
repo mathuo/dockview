@@ -39,6 +39,13 @@ export const SimpleSplitview = (props: { proportional?: boolean }) => {
             },
             minimumSize: 100,
         });
+
+        event.api.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            minimumSize: 100,
+            maximumSize: 1000,
+        });
     };
 
     return (

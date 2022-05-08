@@ -14,7 +14,7 @@ export const Container = (props: { children: React.ReactNode }) => {
                 <Navigation pages={PAGES} />
             </div>
             <div
-                style={{ flexGrow: 1, padding: '20px' }}
+                style={{ flexGrow: 1, padding: '20px', maxWidth: '1440px' }}
                 className="markdown-body"
             >
                 {props.children}

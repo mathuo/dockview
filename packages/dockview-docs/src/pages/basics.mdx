@@ -80,6 +80,23 @@ You can disable this by settings the `disableAutoResizing` prop to be `true`.
 
 You can manually resize a component using the API method `layout(width: number, height: number): void`.
 
+## Events
+
+Many API properties can be listened on using the `Event` pattern. For example `api.onDidFocusChange(() => {...})`.
+You should dispose of any event listeners you create cleaning up any listeners you would have created.
+
+```tsx
+React.useEffect(() => {
+    const disposable = api.onDidFocusChange(() => {
+        // write some code
+    });
+
+    return () => {
+        disposable.dispose();
+    };
+}, []);
+```
+
 ## Proportional layout
 
 The `proportionalLayout` property indicates the expected behaviour of the component as it's container resizes, should all views resize equally or should just one view expand to fill the new space. `proportionalLayout` can be set as a property on `SplitviewReact` and `GridviewReact` components.
@@ -88,3 +105,7 @@ Although not configurable on `DockviewReact` and `PaneviewReact` these both beha
 <SimpleSplitview2 proportional={false} />
 
 <SimpleSplitview2 proportional={true} />
+
+## Browser support
+
+dockview is intended to support all major browsers
