@@ -99,6 +99,7 @@ const Component = () => {
         event.api.addPanel({
             id: 'panel1',
             component: 'default',
+            tabComponent: 'customTab', // optional custom header
             params: {
                 someProps: 'Hello',
             },
@@ -116,7 +117,7 @@ const Component = () => {
     return (
         <DockviewReact
             components={components}
-            tabComponents={headers}
+            tabComponents={headers} // optional headers renderer
             onReady={onReady}
         />
     );
@@ -131,13 +132,12 @@ const components: PanelCollection<IDockviewPanelProps> = {
         return <div>{props.params.someProps}</div>;
     },
     fancy: (props: IDockviewPanelProps) => {
-        const close = () => props.api.close();
         return (
             <DockviewComponents.Panel>
                 <DockviewComponents.Tab>
                     <div>
                         <span>{props.api.title}</span>
-                        <span onClick={close}>{'Close'}</span>
+                        <span onClick={() => props.api.close()}>{'Close'}</span>
                     </div>
                 </DockviewComponents.Tab>
                 <DockviewComponents.Content>

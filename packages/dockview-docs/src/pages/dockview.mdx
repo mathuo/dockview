@@ -84,15 +84,15 @@ const onReady = (event: DockviewReadyEvent) => {
 | length                 | `number`                                             | Number of panels                            |
 | size                   | `number`                                             | Number of Groups                            |
 | panels                 | `IDockviewPanel[]`                                   |                                             |
-| groups                 | `IDockviewPanel[]`                                   |                                             |
+| groups                 | `GroupPanel[]`                                       |                                             |
 | activePanel            | `IDockviewPanel \| undefined`                        |                                             |
 | activeGroup            | `IDockviewPanel \| undefined`                        |                                             |
 |                        |                                                      |                                             |
 | onDidLayoutChange      | `Event<void>`                                        |                                             |
 | onDidLayoutFromJSON    | `Event<void>`                                        |                                             |
-| onDidAddGroup          | `Event<IDockviewPanel>`                              |                                             |
-| onDidRemoveGroup       | `Event<IDockviewPanel>`                              |                                             |
-| onDidActiveGroupChange | `Event<IDockviewPanel \| undefined>`                 |                                             |
+| onDidAddGroup          | `Event<GroupPanel>`                                  |                                             |
+| onDidRemoveGroup       | `Event<GroupPanel>`                                  |                                             |
+| onDidActiveGroupChange | `Event<GroupPanel \| undefined>`                     |                                             |
 | onDidAddPanel          | `Event<IDockviewPanel>`                              |                                             |
 | onDidRemovePanel       | `Event<IDockviewPanel>`                              |                                             |
 | onDidActivePanelChange | `Event<IDockviewPanel \| undefined>`                 |                                             |
@@ -102,8 +102,8 @@ const onReady = (event: DockviewReadyEvent) => {
 | getPanel               | `(id: string) \| IDockviewPanel \| undefined`        |                                             |
 | addEmptyGroup          | `(options? AddGroupOptions): void`                   |                                             |
 | closeAllGroups         | `(): void`                                           |                                             |
-| removeGroup            | `(group: IDockviewPanel): void`                      |                                             |
-| getGroup               | `(id: string): IDockviewPanel \| undefined`          |                                             |
+| removeGroup            | `(group: GroupPanel): void`                          |                                             |
+| getGroup               | `(id: string): GroupPanel \| undefined`              |                                             |
 |                        |                                                      |                                             |
 | getTabHeight           | `(): number \| undefined`                            |                                             |
 | setTabHeight           | `(hegiht: number \| undefined): void`                |                                             |
