@@ -10,7 +10,6 @@ import {
     IWatermarkPanelProps,
     IDockviewPanel,
     PanelCollection,
-    DockviewComponents,
 } from 'dockview';
 import { CustomTab } from './customTab';
 import { Settings } from './settingsPanel';
@@ -47,22 +46,10 @@ const Test = (props: IDockviewPanelProps) => {
     }, []);
 
     return (
-        <DockviewComponents.Panel>
-            {counter % 4 === 0 && (
-                <DockviewComponents.Tab>
-                    <div>{`custom tab ${counter}`}</div>
-                </DockviewComponents.Tab>
-            )}
-            <DockviewComponents.Content>
-                <div>
-                    <div>{`custom body ${counter}`}</div>
-                    <button>Toggle</button>
-                </div>
-            </DockviewComponents.Content>
-            <DockviewComponents.Actions>
-                <div>{`custom action ${counter}`}</div>
-            </DockviewComponents.Actions>
-        </DockviewComponents.Panel>
+        <div>
+            <div>{`custom body ${counter}`}</div>
+            <button>Toggle</button>
+        </div>
     );
 };
 
