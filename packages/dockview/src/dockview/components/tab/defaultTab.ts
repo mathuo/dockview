@@ -104,6 +104,8 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     }
 
     private render() {
-        this._content.textContent = this.params.title;
+        if (this._content.textContent !== this.params.title) {
+            this._content.textContent = this.params.title;
+        }
     }
 }
