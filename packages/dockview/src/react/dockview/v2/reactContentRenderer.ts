@@ -99,10 +99,6 @@ export class ReactContentRenderer implements IContentRenderer {
         this._hostedContainer.layout(this.element);
     }
 
-    public close(): Promise<boolean> {
-        return Promise.resolve(true);
-    }
-
     public dispose() {
         this.part?.dispose();
     }
