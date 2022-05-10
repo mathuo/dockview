@@ -5,7 +5,6 @@ import { PanelInitParameters, IPanel } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
 import { GroupPanel } from './groupviewPanel';
 import { Event } from '../events';
-import { WrappedTab } from '../dockview/components/tab/defaultTab';
 
 export interface IRenderable {
     id: string;
@@ -28,7 +27,7 @@ export interface GroupPanelPartInitParameters
 
 export interface GroupPanelContentPartInitParameters
     extends GroupPanelPartInitParameters {
-    tab: WrappedTab;
+    tab: ITabRenderer;
 }
 
 export interface IWatermarkRenderer extends IPanel {
@@ -54,7 +53,6 @@ export interface IContentRenderer extends IPanel {
     readonly onDidBlur?: Event<void>;
     updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void;
     init(parameters: GroupPanelContentPartInitParameters): void;
-    close?(): Promise<boolean>;
 }
 
 // watermark component
