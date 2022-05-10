@@ -161,11 +161,11 @@ export const Activitybar = (props: IGridviewPanelProps) => {
             const sidebarPanel = api.getPanel('sidebar');
             if (sidebarPanel.api.isVisible) {
                 if (!alwaysOpen && selectedActive) {
-                    api.setVisible(sidebarPanel, false);
+                    sidebarPanel.api.setVisible(false);
                 }
             } else {
                 event.preventDefault(); // prevent focus
-                api.setVisible(sidebarPanel, true);
+                sidebarPanel.api.setVisible(true);
                 sidebarPanel.focus();
             }
 
@@ -234,7 +234,7 @@ export const Activitybar = (props: IGridviewPanelProps) => {
 
         const sidebarPanel = api.getPanel('sidebar');
         if (!sidebarPanel.api.isVisible) {
-            api.setVisible(sidebarPanel, true);
+            sidebarPanel.api.setVisible(true);
             sidebarPanel.focus();
         }
 

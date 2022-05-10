@@ -29,8 +29,10 @@ const components = {
                 props.api.onDidActiveChange((event) => {
                     setActive(event.isActive);
                 }),
-                props.api.onFocusEvent(() => {
-                    ref.current.focus();
+                props.api.onDidFocusChange(({ isFocused }) => {
+                    if (isFocused) {
+                        ref.current.focus();
+                    }
                 })
             );
 
@@ -65,8 +67,10 @@ export const SplitPanel = (props: IDockviewPanelProps) => {
             props.api.onDidDimensionsChange((event) => {
                 api.current?.layout(event.width, event.height - 25);
             }),
-            props.api.onFocusEvent(() => {
-                api.current.focus();
+            props.api.onDidFocusChange(({ isFocused }) => {
+                if (isFocused) {
+                    api.current.focus();
+                }
             })
         );
 
