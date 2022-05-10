@@ -1,5 +1,8 @@
 import { PanelInitParameters } from '../panel/types';
-import { IGridPanelComponentView } from './gridviewComponent';
+import {
+    GridviewComponent,
+    IGridPanelComponentView,
+} from './gridviewComponent';
 import { FunctionOrValue } from '../types';
 import {
     BasePanelView,
@@ -10,7 +13,6 @@ import { GridviewPanelApiImpl } from '../api/gridviewPanelApi';
 import { LayoutPriority } from '../splitview/core/splitview';
 import { Emitter, Event } from '../events';
 import { IViewSize } from './gridview';
-import { GridviewApi } from '../api/component.api';
 
 export interface GridviewInitParameters extends PanelInitParameters {
     minimumWidth?: number;
@@ -19,7 +21,7 @@ export interface GridviewInitParameters extends PanelInitParameters {
     maximumHeight?: number;
     priority?: LayoutPriority;
     snap?: boolean;
-    containerApi: GridviewApi;
+    accessor: GridviewComponent;
     isVisible?: boolean;
 }
 
@@ -132,12 +134,12 @@ export abstract class GridviewPanel
             this._onDidChange,
             this.api.onVisibilityChange((event) => {
                 const { isVisible } = event;
-                const { containerApi } = this._params as GridviewInitParameters;
-                containerApi.setVisible(this, isVisible);
+                const { accessor } = this._params as GridviewInitParameters;
+                accessor.setVisible(this, isVisible);
             }),
             this.api.onActiveChange(() => {
-                const { containerApi } = this._params as GridviewInitParameters;
-                containerApi.setActive(this);
+                const { accessor } = this._params as GridviewInitParameters;
+                accessor.setActive(this);
             }),
             this.api.onDidConstraintsChangeInternal((event) => {
                 if (

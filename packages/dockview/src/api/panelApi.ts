@@ -23,8 +23,6 @@ export interface PanelApi {
     readonly onDidFocusChange: Event<FocusEvent>;
     readonly onDidVisibilityChange: Event<VisibilityEvent>;
     readonly onDidActiveChange: Event<ActiveEvent>;
-    readonly onFocusEvent: Event<void>;
-    //
     setVisible(isVisible: boolean): void;
     setActive(): void;
     /**
@@ -63,11 +61,10 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
     private _width = 0;
     private _height = 0;
 
-    readonly _onDidPanelDimensionChange =
-        new Emitter<PanelDimensionChangeEvent>({
-            replay: true,
-        });
-    readonly onDidDimensionsChange = this._onDidPanelDimensionChange.event;
+    readonly _onDidDimensionChange = new Emitter<PanelDimensionChangeEvent>({
+        replay: true,
+    });
+    readonly onDidDimensionsChange = this._onDidDimensionChange.event;
     //
     readonly _onDidChangeFocus = new Emitter<FocusEvent>({
         replay: true,
@@ -121,7 +118,7 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
         super();
 
         this.addDisposables(
-            this._onDidPanelDimensionChange,
+            this._onDidDimensionChange,
             this._onDidChangeFocus,
             this._onDidVisibilityChange,
             this._onDidActiveChange,

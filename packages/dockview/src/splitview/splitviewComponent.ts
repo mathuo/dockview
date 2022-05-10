@@ -14,7 +14,6 @@ import {
 import { SplitviewComponentOptions } from './core/options';
 import { BaseComponentOptions } from '../panel/types';
 import { Emitter, Event } from '../events';
-import { SplitviewApi } from '../api/component.api';
 import { SplitviewPanel, ISplitviewPanel } from './splitviewPanel';
 import { createComponent } from '../panel/componentFactory';
 
@@ -70,7 +69,6 @@ export interface ISplitviewComponent extends IDisposable {
     fromJSON(serializedSplitview: SerializedSplitview): void;
     focus(): void;
     getPanel(id: string): ISplitviewPanel | undefined;
-    setActive(view: ISplitviewPanel, skipFocus?: boolean): void;
     removePanel(panel: ISplitviewPanel, sizing?: Sizing): void;
     setVisible(panel: ISplitviewPanel, visible: boolean): void;
     movePanel(from: number, to: number): void;
@@ -279,7 +277,7 @@ export class SplitviewComponent
             maximumSize: options.maximumSize,
             snap: options.snap,
             priority: options.priority,
-            containerApi: new SplitviewApi(this),
+            accessor: this,
         });
 
         const size: Sizing | number =
@@ -380,7 +378,7 @@ export class SplitviewComponent
                             maximumSize: data.maximumSize,
                             snap: view.snap,
                             priority: view.priority,
-                            containerApi: new SplitviewApi(this),
+                            accessor: this,
                         });
                     });
 
