@@ -1,3 +1,4 @@
+import { GridviewApi } from '../../api/component.api';
 import {
     GridviewPanel,
     GridviewInitParameters,
@@ -24,8 +25,9 @@ export class ReactGridPanelView extends GridviewPanel {
             {
                 params: this._params?.params || {},
                 api: this.api,
-                containerApi: (this._params as GridviewInitParameters)
-                    .containerApi,
+                containerApi: new GridviewApi(
+                    (this._params as GridviewInitParameters).accessor
+                ),
             }
         );
     }

@@ -30,8 +30,10 @@ export const ExampleFunctions = (
                     isPanelVisible: x.isVisible,
                 }));
             }),
-            props.api.onFocusEvent(() => {
-                input.current.focus();
+            props.api.onDidFocusChange(({ isFocused }) => {
+                if (isFocused) {
+                    input.current.focus();
+                }
             })
         );
 

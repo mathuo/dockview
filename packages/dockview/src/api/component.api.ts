@@ -100,20 +100,12 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
         this.component.removePanel(panel, sizing);
     }
 
-    setVisible(panel: ISplitviewPanel, isVisible: boolean): void {
-        this.component.setVisible(panel, isVisible);
-    }
-
     focus(): void {
         this.component.focus();
     }
 
     getPanel(id: string): ISplitviewPanel | undefined {
         return this.component.getPanel(id);
-    }
-
-    setActive(panel: ISplitviewPanel): void {
-        this.component.setActive(panel);
     }
 
     layout(width: number, height: number): void {
@@ -308,18 +300,6 @@ export class GridviewApi implements CommonApi<SerializedGridview> {
 
     getPanel(id: string): IGridviewPanel | undefined {
         return this.component.getPanel(id);
-    }
-
-    toggleVisibility(panel: IGridviewPanel): void {
-        this.component.toggleVisibility(panel);
-    }
-
-    setVisible(panel: IGridviewPanel, visible: boolean): void {
-        this.component.setVisible(panel, visible);
-    }
-
-    setActive(panel: IGridviewPanel): void {
-        this.component.setActive(panel);
     }
 
     fromJSON(data: SerializedGridview): void {

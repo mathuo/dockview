@@ -41,11 +41,11 @@ describe('api', () => {
         expect(api.height).toBe(0);
         expect(api.width).toBe(0);
 
-        api._onDidPanelDimensionChange.fire({ height: 10, width: 20 });
+        api._onDidDimensionChange.fire({ height: 10, width: 20 });
         expect(api.height).toBe(10);
         expect(api.width).toBe(20);
 
-        api._onDidPanelDimensionChange.fire({ height: 20, width: 10 });
+        api._onDidDimensionChange.fire({ height: 20, width: 10 });
         expect(api.height).toBe(20);
         expect(api.width).toBe(10);
     });

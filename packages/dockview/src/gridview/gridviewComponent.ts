@@ -22,7 +22,6 @@ import {
     IGridviewPanel,
 } from './gridviewPanel';
 import { BaseComponentOptions } from '../panel/types';
-import { GridviewApi } from '../api/component.api';
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { createComponent } from '../panel/componentFactory';
 import { Emitter, Event } from '../events';
@@ -64,7 +63,6 @@ export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
     updateOptions(options: Partial<GridviewComponentUpdateOptions>): void;
     addPanel(options: AddComponentOptions): IGridviewPanel;
     removePanel(panel: IGridviewPanel, sizing?: Sizing): void;
-    toggleVisibility(panel: IGridviewPanel): void;
     focus(): void;
     fromJSON(serializedGridview: SerializedGridview): void;
     toJSON(): SerializedGridview;
@@ -170,10 +168,6 @@ export class GridviewComponent
         });
     }
 
-    toggleVisibility(panel: GridviewPanel) {
-        this.setVisible(panel, !this.isVisible(panel));
-    }
-
     focus() {
         this.activeGroup?.focus();
     }
@@ -217,7 +211,7 @@ export class GridviewComponent
                         maximumHeight: data.maximumHeight,
                         priority: data.priority,
                         snap: !!data.snap,
-                        containerApi: new GridviewApi(this),
+                        accessor: this,
                         isVisible: node.visible,
                     })
                 );
@@ -322,7 +316,7 @@ export class GridviewComponent
             maximumHeight: options.maximumHeight,
             priority: options.priority,
             snap: !!options.snap,
-            containerApi: new GridviewApi(this),
+            accessor: this,
             isVisible: true,
         });
 
