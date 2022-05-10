@@ -1,6 +1,8 @@
 import { SimplePaneview } from '../components/simplePaneview';
 import Link from 'next/link';
 
+# Paneview
+
 <div
     style={{
         height: '400px',
@@ -103,30 +105,30 @@ const onReady = (event: GridviewReadyEvent) => {
 };
 ```
 
-| Property            | Type                                                             | Description                                                  |
-| ------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------ |
-| height              | `number`                                                         | Component pixel height                                       |
-| width               | `number`                                                         | Component pixel width                                        |
-| minimumSize         | `number`                                                         |                                                              |
-| maximumSize         | `number`                                                         |                                                              |
-| length              | `number`                                                         | Number of panels                                             |
-| panels              | `IPaneviewPanel[]`                                               |                                                              |
-|                     |                                                                  |                                                              |
-| onDidLayoutChange   | `Event<void>`                                                    |                                                              |
-| onDidLayoutFromJSON | `Event<void>`                                                    |                                                              |
-| onDidAddView        | `Event<IPaneviewPanel>`                                          |                                                              |
-| onDidRemoveView     | `Event<IPaneviewPanel>`                                          |                                                              |
-| onDidDrop           | `Event<PaneviewDropEvent`                                        |                                                              |
-|                     |                                                                  |                                                              |
-| addPanel            | `addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel` |                                                              |
-| removePanel         | `(panel: IPaneviewPanel): void`                                  |                                                              |
-| movePanel           | `(from: number, to: number): void`                               |                                                              |
-| getPanel            | `(id:string): IPaneviewPanel \| undefined`                       |                                                              |
-|                     |                                                                  |                                                              |
-| focus               | `(): void`                                                       |                                                              |
-| layout              | `(width: number, height:number): void`                           | See <Link href="/basics/#auto-resizing">Auto Resizing</Link> |
-| fromJSON            | `(data: SerializedPaneview): void`                               | <Link href="/basics/#serialization">Serialization</Link>     |
-| toJSON              | `(): SerializedPaneview`                                         | <Link href="/basics/#serialization">Serialization</Link>     |
+| Property            | Type                                                             | Description                                                                                      |
+| ------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| height              | `number`                                                         | Component pixel height                                                                           |
+| width               | `number`                                                         | Component pixel width                                                                            |
+| minimumSize         | `number`                                                         | The sum of the `minimumSize` property for each panel                                             |
+| maximumSize         | `number`                                                         | The sum of the `maximumSize` property for each panel                                             |
+| length              | `number`                                                         | Number of panels                                                                                 |
+| panels              | `IPaneviewPanel[]`                                               | All panels                                                                                       |
+|                     |                                                                  |                                                                                                  |
+| onDidLayoutChange   | `Event<void>`                                                    | Fires on layout change                                                                           |
+| onDidLayoutFromJSON | `Event<void>`                                                    | Fires of layout change caused by a fromJSON deserialization call                                 |
+| onDidAddView        | `Event<IPaneviewPanel>`                                          | Fires when a view is added                                                                       |
+| onDidRemoveView     | `Event<IPaneviewPanel>`                                          | Fires when a view is removed                                                                     |
+| onDidDrop           | `Event<PaneviewDropEvent`                                        | Fires on an external drop event (See <Link href="/paneview/#drag-and-drop">Drag and Drop</Link>) |
+|                     |                                                                  |                                                                                                  |
+| addPanel            | `addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel` |                                                                                                  |
+| removePanel         | `(panel: IPaneviewPanel): void`                                  |                                                                                                  |
+| movePanel           | `(from: number, to: number): void`                               |                                                                                                  |
+| getPanel            | `(id:string): IPaneviewPanel \| undefined`                       |                                                                                                  |
+|                     |                                                                  |                                                                                                  |
+| focus               | `(): void`                                                       | Focus the active panel, if exists                                                                |
+| layout              | `(width: number, height:number): void`                           | See <Link href="/basics/#auto-resizing">Auto Resizing</Link>                                     |
+| fromJSON            | `(data: SerializedPaneview): void`                               | <Link href="/basics/#serialization">Serialization</Link>                                         |
+| toJSON              | `(): SerializedPaneview`                                         | <Link href="/basics/#serialization">Serialization</Link>                                         |
 
 ## Gridview Panel API
 
@@ -157,3 +159,5 @@ const MyComponent = (props: IGridviewPanelProps<{ title: string }>) => {
 | setActive              | `(): void`                                                  |                  |
 | setConstraints         | `(value: PanelConstraintChangeEvent2): void;`               |                  |
 | setSize                | `(event: SizeEvent): void`                                  |                  |
+
+# Drag And Drop

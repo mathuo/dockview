@@ -1,5 +1,7 @@
 import { SimpleGridview } from '../components/simpleGridview';
-import Link from 'next/link
+import Link from 'next/link';
+
+# Gridview
 
 <div
     style={{
@@ -44,34 +46,34 @@ const onReady = (event: GridviewReadyEvent) => {
 };
 ```
 
-| Property               | Type                                                                                              | Description                                              |
-| ---------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| height                 | `number`                                                                                          | Component pixel height                                   |
-| width                  | `number`                                                                                          | Component pixel width                                    |
-| minimumHeight          | `number`                                                                                          |                                                          |
-| maximumHeight          | `number`                                                                                          |                                                          |
-| maximumWidth           | `number`                                                                                          |                                                          |
-| maximumWidth           | `number`                                                                                          |                                                          |
-| length                 | `number`                                                                                          | Number of panels                                         |
-| panels                 | `ISplitviewPanel[]`                                                                               |                                                          |
-| orientation            | `Orientation`                                                                                     |                                                          |
-|                        |                                                                                                   |                                                          |
-| onDidLayoutChange      | `Event<void>`                                                                                     |                                                          |
-| onDidLayoutFromJSON    | `Event<void>`                                                                                     |                                                          |
-| onDidAddGroup          | `Event<IGridviewPanel>`                                                                           |                                                          |
-| onDidRemoveGroup       | `Event<IGridviewPanel>`                                                                           |                                                          |
-| onDidActiveGroupChange | `Event<IGridviewPanel \| undefined>`                                                              |                                                          |
-|                        |                                                                                                   |                                                          |
-| addPanel               | `addPanel(options: AddComponentOptions): IGridviewPanel`                                          |                                                          |
-| removePanel            | `(panel: IGridviewPanel, sizing?: Sizing): void`                                                  |                                                          |
-| movePanel              | `(panel: IGridviewPanel, options: {direction: Direction, refernece:string, size?: number}): void` |                                                          |
-| getPanel               | `(id: string) \| IGridviewPanel \| undefined`                                                     |                                                          |
-|                        |                                                                                                   |                                                          |
-| updateOptions          | `(options:SplitviewComponentUpdateOptions): void`                                                 |                                                          |
-| focus                  | `(): void`                                                                                        |                                                          |
-| layout                 | `(width: number, height:number): void`                                                            | <Link href="/basics/#auto-resizing">Auto Resizing</Link> |
-| fromJSON               | `(data: SerializedGridview): void`                                                                | <Link href="/basics/#serialization">Serialization</Link> |
-| toJSON                 | `(): SerializedGridview`                                                                          | <Link href="/basics/#serialization">Serialization</Link> |
+| Property               | Type                                                                                              | Description                                                      |
+| ---------------------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| height                 | `number`                                                                                          | Component pixel height                                           |
+| width                  | `number`                                                                                          | Component pixel width                                            |
+| minimumHeight          | `number`                                                                                          |                                                                  |
+| maximumHeight          | `number`                                                                                          |                                                                  |
+| maximumWidth           | `number`                                                                                          |                                                                  |
+| maximumWidth           | `number`                                                                                          |                                                                  |
+| length                 | `number`                                                                                          | Number of panels                                                 |
+| panels                 | `ISplitviewPanel[]`                                                                               | all panels                                                       |
+| orientation            | `Orientation`                                                                                     |                                                                  |
+|                        |                                                                                                   |                                                                  |
+| onDidLayoutChange      | `Event<void>`                                                                                     | Fires on layout change                                           |
+| onDidLayoutFromJSON    | `Event<void>`                                                                                     | Fires of layout change caused by a fromJSON deserialization call |
+| onDidAddPanel          | `Event<IGridviewPanel>`                                                                           | Fires when a view is added                                       |
+| onDidRemovePanel       | `Event<IGridviewPanel>`                                                                           | Fires when a view is removed                                     |
+| onDidActivePanelChange | `Event<IGridviewPanel \| undefined>`                                                              | Fires when the active group changes                              |
+|                        |                                                                                                   |                                                                  |
+| addPanel               | `addPanel(options: AddComponentOptions): IGridviewPanel`                                          |                                                                  |
+| removePanel            | `(panel: IGridviewPanel, sizing?: Sizing): void`                                                  |                                                                  |
+| movePanel              | `(panel: IGridviewPanel, options: {direction: Direction, refernece:string, size?: number}): void` |                                                                  |
+| getPanel               | `(id: string) \| IGridviewPanel \| undefined`                                                     |                                                                  |
+|                        |                                                                                                   |                                                                  |
+| updateOptions          | `(options:SplitviewComponentUpdateOptions): void`                                                 |                                                                  |
+| focus                  | `(): void`                                                                                        | Focus the active panel, if exists                                |
+| layout                 | `(width: number, height:number): void`                                                            | <Link href="/basics/#auto-resizing">Auto Resizing</Link>         |
+| fromJSON               | `(data: SerializedGridview): void`                                                                | <Link href="/basics/#serialization">Serialization</Link>         |
+| toJSON                 | `(): SerializedGridview`                                                                          | <Link href="/basics/#serialization">Serialization</Link>         |
 
 ## Gridview Panel API
 

@@ -21,42 +21,44 @@ const components = {
     },
 };
 
-const headerComponents = {
-    myHeaderComponent: (props: IPaneviewPanelProps<{ title: string }>) => {
-        const [expanded, setExpanded] = React.useState<boolean>(
-            props.api.isExpanded
-        );
+const MyHeaderComponent = (props: IPaneviewPanelProps<{ title: string }>) => {
+    const [expanded, setExpanded] = React.useState<boolean>(
+        props.api.isExpanded
+    );
 
-        React.useEffect(() => {
-            const disposable = props.api.onDidExpansionChange((event) => {
-                setExpanded(event.isExpanded);
-            });
+    React.useEffect(() => {
+        const disposable = props.api.onDidExpansionChange((event) => {
+            setExpanded(event.isExpanded);
+        });
 
-            return () => {
-                disposable.dispose();
-            };
-        }, []);
-
-        const onClick = () => {
-            props.api.setExpanded(!expanded);
+        return () => {
+            disposable.dispose();
         };
+    }, []);
 
-        return (
-            <div
-                style={{
-                    padding: '10px',
-                    height: '100%',
-                    backgroundColor: 'rgb(60,60,60)',
-                }}
-            >
-                <a
-                    onClick={onClick}
-                    className={expanded ? 'expanded' : 'collapsed'}
-                />
-                <span>{props.params.title}</span>
-            </div>
-        );
-    },
+    const onClick = () => {
+        props.api.setExpanded(!expanded);
+    };
+
+    return (
+        <div
+            style={{
+                padding: '10px',
+                height: '100%',
+                backgroundColor: 'rgb(60,60,60)',
+            }}
+        >
+            <a
+                onClick={onClick}
+                className={expanded ? 'expanded' : 'collapsed'}
+            />
+            <span>{props.params.title}</span>
+        </div>
+    );
+};
+
+const headerComponents = {
+    myHeaderComponent: MyHeaderComponent,
 };
 
 export const SimplePaneview = () => {

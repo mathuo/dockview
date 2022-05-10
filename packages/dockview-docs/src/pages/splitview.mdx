@@ -107,7 +107,7 @@ const onReady = (event: SplitviewReadyEvent) => {
 | minimumSize         | `number`                                                           | The sum of the `minimumSize` property for each panel             |
 | maximumSize         | `number`                                                           | The sum of the `maximumSize` property for each panel             |
 | length              | `number`                                                           | Number of panels                                                 |
-| panels              | `ISplitviewPanel[]`                                                |                                                                  |
+| panels              | `ISplitviewPanel[]`                                                | All panels                                                       |
 |                     |                                                                    |                                                                  |
 | onDidLayoutChange   | `Event<void>`                                                      | Fires on layout change                                           |
 | onDidLayoutFromJSON | `Event<void>`                                                      | Fires of layout change caused by a fromJSON deserialization call |
@@ -120,7 +120,7 @@ const onReady = (event: SplitviewReadyEvent) => {
 | movePanel           | `(from: number, to: number): void`                                 |                                                                  |
 |                     |                                                                    |
 | updateOptions       | `(options:SplitviewComponentUpdateOptions): void`                  |                                                                  |
-| focus               | `(): void`                                                         |                                                                  |
+| focus               | `(): void`                                                         | Focus the active panel, if exists                                |
 | layout              | `(width: number, height:number): void`                             | See <Link href="/basics/#auto-resizing">Auto Resizing</Link>     |
 | fromJSON            | `(data: SerializedSplitview): void`                                | <Link href="/basics/#serialization">Serialization</Link>         |
 | toJSON              | `(): SerializedSplitview`                                          | <Link href="/basics/#serialization">Serialization</Link>         |

@@ -1,25 +1,24 @@
 import {
-    ISplitviewPanelProps,
-    Orientation,
-    SplitviewReact,
-    SplitviewReadyEvent,
+    DockviewReact,
+    DockviewReadyEvent,
+    IDockviewPanelProps,
 } from 'dockview';
 
+//
 const components = {
-    default: (props: ISplitviewPanelProps<{ title: string }>) => {
+    default: (props: IDockviewPanelProps<{ title: string }>) => {
         return <div style={{ padding: '20px' }}>{props.params.title}</div>;
     },
 };
 
-export const SimpleSplitview = (props: { proportional?: boolean }) => {
-    const onReady = (event: SplitviewReadyEvent) => {
+export const CustomCSSDockview = () => {
+    const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
             id: 'panel_1',
             component: 'default',
             params: {
                 title: 'Panel 1',
             },
-            minimumSize: 100,
         });
 
         event.api.addPanel({
@@ -28,7 +27,6 @@ export const SimpleSplitview = (props: { proportional?: boolean }) => {
             params: {
                 title: 'Panel 2',
             },
-            minimumSize: 100,
         });
 
         event.api.addPanel({
@@ -37,17 +35,23 @@ export const SimpleSplitview = (props: { proportional?: boolean }) => {
             params: {
                 title: 'Panel 3',
             },
-            minimumSize: 100,
+        });
+
+        event.api.addPanel({
+            id: 'panel_4',
+            component: 'default',
+            params: {
+                title: 'Panel 4',
+            },
+            position: { referencePanel: 'panel_1', direction: 'right' },
         });
     };
 
     return (
-        <SplitviewReact
+        <DockviewReact
             components={components}
-            proportionalLayout={props.proportional}
             onReady={onReady}
-            orientation={Orientation.HORIZONTAL}
-            className="dockview-theme-dark"
+            className="dockview-theme-vs"
         />
     );
 };
