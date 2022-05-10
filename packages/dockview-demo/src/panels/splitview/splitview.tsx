@@ -227,7 +227,7 @@ export const Common = (
 
     const toggleVisibility = (i: number) => () => {
         const panel = api.current.panels[i];
-        api.current.setVisible(panel, !panel.api.isVisible);
+        panel.api.setVisible(panel.api.isVisible);
         setDimensions((dimensions) => ({
             ...dimensions,
             visibility: api.current.panels.map((_) => _.api.isVisible),

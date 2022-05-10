@@ -2,14 +2,14 @@ import { IPanel, PanelInitParameters } from '../../panel/types';
 import { IView, SplitViewOptions, LayoutPriority } from './splitview';
 import { FrameworkFactory } from '../../types';
 import { SplitviewPanel } from '../splitviewPanel';
-import { SplitviewApi } from '../../api/component.api';
+import { SplitviewComponent } from '../splitviewComponent';
 
 export interface PanelViewInitParameters extends PanelInitParameters {
     minimumSize?: number;
     maximumSize?: number;
     snap?: boolean;
     priority?: LayoutPriority;
-    containerApi: SplitviewApi;
+    accessor: SplitviewComponent;
 }
 
 export interface ISerializableView extends IView, IPanel {

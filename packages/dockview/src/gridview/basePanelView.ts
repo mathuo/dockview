@@ -90,7 +90,7 @@ export abstract class BasePanelView<T extends PanelApiImpl>
     layout(width: number, height: number) {
         this._width = width;
         this._height = height;
-        this.api._onDidPanelDimensionChange.fire({ width, height });
+        this.api._onDidDimensionChange.fire({ width, height });
 
         if (this.part) {
             if (this._params) {
