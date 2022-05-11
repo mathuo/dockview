@@ -1,7 +1,7 @@
 {
   "name": "dockview-demo",
   "private": true,
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Demo project for https://github.com/mathuo/dockview",
   "scripts": {
     "build": "npm run build-webpack",
@@ -15,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "@mdx-js/react": "^2.1.1",
-    "dockview": "^1.4.0",
+    "dockview": "^1.4.1",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "recoil": "^0.7.2"
