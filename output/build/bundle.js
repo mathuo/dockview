@@ -44192,15 +44192,9 @@ var Test = function (props) {
             clearInterval(interval);
         };
     }, []);
-    return (React.createElement(dockview_1.DockviewComponents.Panel, null,
-        counter % 4 === 0 && (React.createElement(dockview_1.DockviewComponents.Tab, null,
-            React.createElement("div", null, "custom tab ".concat(counter)))),
-        React.createElement(dockview_1.DockviewComponents.Content, null,
-            React.createElement("div", null,
-                React.createElement("div", null, "custom body ".concat(counter)),
-                React.createElement("button", null, "Toggle"))),
-        React.createElement(dockview_1.DockviewComponents.Actions, null,
-            React.createElement("div", null, "custom action ".concat(counter)))));
+    return (React.createElement("div", null,
+        React.createElement("div", null, "custom body ".concat(counter)),
+        React.createElement("button", null, "Toggle")));
 };
 var components = {
     test: Test,
@@ -44558,7 +44552,6 @@ var __read = (this && this.__read) || function (o, n) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ExampleFunctions = void 0;
-var dockview_1 = __webpack_require__(/*! dockview */ "../dockview/dist/esm/index.js");
 var React = __importStar(__webpack_require__(/*! react */ "../../node_modules/react/index.js"));
 var lifecycle_1 = __webpack_require__(/*! ../../lifecycle */ "./src/lifecycle.ts");
 __webpack_require__(/*! ./exampleFunctions.scss */ "./src/layout-grid/panels/exampleFunctions.scss");
@@ -44574,8 +44567,11 @@ var ExampleFunctions = function (props) {
             setPanelState(function (_) { return (__assign(__assign({}, _), { isGroupActive: event.isActive })); });
         }), props.api.onDidVisibilityChange(function (x) {
             setPanelState(function (_) { return (__assign(__assign({}, _), { isPanelVisible: x.isVisible })); });
-        }), props.api.onFocusEvent(function () {
-            input.current.focus();
+        }), props.api.onDidFocusChange(function (_a) {
+            var isFocused = _a.isFocused;
+            if (isFocused) {
+                input.current.focus();
+            }
         }));
         return function () {
             disposable.dispose();
@@ -44587,45 +44583,27 @@ var ExampleFunctions = function (props) {
     var onClose = function () {
         props.api.close();
     };
-    return (React.createElement(dockview_1.DockviewComponents.Panel, null,
-        React.createElement(dockview_1.DockviewComponents.Actions, null,
-            React.createElement("div", { style: {
-                    height: '100%',
-                    display: 'flex',
-                    backgroundColor: 'rgba(255,255,255,0.1)',
-                    padding: '0px 4px',
-                } },
-                React.createElement("span", { onClick: onClose, style: {
-                        height: '100%',
-                        width: '25px',
-                        display: 'flex',
-                        alignItems: 'center',
-                    } },
-                    React.createElement("a", { className: "material-icons" }, "menu")))),
-        React.createElement(dockview_1.DockviewComponents.Content, null,
-            React.createElement("div", { className: "example-functions-panel" },
-                React.createElement("div", { className: "example-functions-panel-header-bar" },
-                    React.createElement("span", { style: { padding: '0px 8px' } },
-                        React.createElement("span", null, 'isGroupActive: '),
-                        React.createElement("span", { style: {
-                                color: panelState.isGroupActive
-                                    ? '#23d16f'
-                                    : '#cd312b',
-                            } }, "".concat(panelState.isGroupActive))),
-                    React.createElement("span", { style: { padding: '0px 8px' } },
-                        React.createElement("span", null, 'isPanelVisible: '),
-                        React.createElement("span", { style: {
-                                color: panelState.isPanelVisible
-                                    ? '#23d16f'
-                                    : '#cd312b',
-                            } }, "".concat(panelState.isPanelVisible)))),
-                React.createElement("div", { className: "example-functions-panel-section" },
-                    React.createElement("input", { value: panelName, placeholder: "New Panel Name", type: "text", onChange: function (event) {
-                            return setPanelName(event.target.value);
-                        } }),
-                    React.createElement("button", { onClick: onRename }, "Rename")),
-                React.createElement("input", { style: { width: '175px' }, ref: input, placeholder: "This is focused by the panel" }),
-                React.createElement("input", { style: { width: '175px' }, placeholder: "This is also focusable" })))));
+    return (React.createElement("div", { className: "example-functions-panel" },
+        React.createElement("div", { className: "example-functions-panel-header-bar" },
+            React.createElement("span", { style: { padding: '0px 8px' } },
+                React.createElement("span", null, 'isGroupActive: '),
+                React.createElement("span", { style: {
+                        color: panelState.isGroupActive
+                            ? '#23d16f'
+                            : '#cd312b',
+                    } }, "".concat(panelState.isGroupActive))),
+            React.createElement("span", { style: { padding: '0px 8px' } },
+                React.createElement("span", null, 'isPanelVisible: '),
+                React.createElement("span", { style: {
+                        color: panelState.isPanelVisible
+                            ? '#23d16f'
+                            : '#cd312b',
+                    } }, "".concat(panelState.isPanelVisible)))),
+        React.createElement("div", { className: "example-functions-panel-section" },
+            React.createElement("input", { value: panelName, placeholder: "New Panel Name", type: "text", onChange: function (event) { return setPanelName(event.target.value); } }),
+            React.createElement("button", { onClick: onRename }, "Rename")),
+        React.createElement("input", { style: { width: '175px' }, ref: input, placeholder: "This is focused by the panel" }),
+        React.createElement("input", { style: { width: '175px' }, placeholder: "This is also focusable" })));
 };
 exports.ExampleFunctions = ExampleFunctions;
 
@@ -44828,8 +44806,11 @@ var components = {
                 setFocused(event.isFocused);
             }), props.api.onDidActiveChange(function (event) {
                 setActive(event.isActive);
-            }), props.api.onFocusEvent(function () {
-                ref.current.focus();
+            }), props.api.onDidFocusChange(function (_a) {
+                var isFocused = _a.isFocused;
+                if (isFocused) {
+                    ref.current.focus();
+                }
             }));
             return function () {
                 disposable.dispose();
@@ -44853,8 +44834,11 @@ var SplitPanel = function (props) {
         var disposable = new lifecycle_1.CompositeDisposable(props.api.onDidDimensionsChange(function (event) {
             var _a;
             (_a = api.current) === null || _a === void 0 ? void 0 : _a.layout(event.width, event.height - 25);
-        }), props.api.onFocusEvent(function () {
-            api.current.focus();
+        }), props.api.onDidFocusChange(function (_a) {
+            var isFocused = _a.isFocused;
+            if (isFocused) {
+                api.current.focus();
+            }
         }));
         return function () {
             disposable.dispose();
@@ -45523,7 +45507,7 @@ var Common = function (props) {
     };
     var toggleVisibility = function (i) { return function () {
         var panel = api.current.panels[i];
-        api.current.setVisible(panel, !panel.api.isVisible);
+        panel.api.setVisible(panel.api.isVisible);
         setDimensions(function (dimensions) { return (__assign(__assign({}, dimensions), { visibility: api.current.panels.map(function (_) { return _.api.isVisible; }) })); });
     }; };
     var move = function () {
@@ -46463,12 +46447,12 @@ var Activitybar = function (props) {
             var sidebarPanel = api.getPanel('sidebar');
             if (sidebarPanel.api.isVisible) {
                 if (!alwaysOpen && selectedActive) {
-                    api.setVisible(sidebarPanel, false);
+                    sidebarPanel.api.setVisible(false);
                 }
             }
             else {
                 event.preventDefault(); // prevent focus
-                api.setVisible(sidebarPanel, true);
+                sidebarPanel.api.setVisible(true);
                 sidebarPanel.focus();
             }
             viewService.model.setActiveViewContainer(container.id);
@@ -46516,7 +46500,7 @@ var Activitybar = function (props) {
         var api = registry.get('gridview');
         var sidebarPanel = api.getPanel('sidebar');
         if (!sidebarPanel.api.isVisible) {
-            api.setVisible(sidebarPanel, true);
+            sidebarPanel.api.setVisible(true);
             sidebarPanel.focus();
         }
         viewService.model.setActiveViewContainer(container.id);
@@ -46767,17 +46751,11 @@ class SplitviewApi {
     removePanel(panel, sizing) {
         this.component.removePanel(panel, sizing);
     }
-    setVisible(panel, isVisible) {
-        this.component.setVisible(panel, isVisible);
-    }
     focus() {
         this.component.focus();
     }
     getPanel(id) {
         return this.component.getPanel(id);
-    }
-    setActive(panel) {
-        this.component.setActive(panel);
     }
     layout(width, height) {
         return this.component.layout(width, height);
@@ -46925,15 +46903,6 @@ class GridviewApi {
     }
     getPanel(id) {
         return this.component.getPanel(id);
-    }
-    toggleVisibility(panel) {
-        this.component.toggleVisibility(panel);
-    }
-    setVisible(panel, visible) {
-        this.component.setVisible(panel, visible);
-    }
-    setActive(panel) {
-        this.component.setActive(panel);
     }
     fromJSON(data) {
         return this.component.fromJSON(data);
@@ -47197,10 +47166,10 @@ class PanelApiImpl extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisp
         this._isVisible = true;
         this._width = 0;
         this._height = 0;
-        this._onDidPanelDimensionChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
+        this._onDidDimensionChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
             replay: true,
         });
-        this.onDidDimensionsChange = this._onDidPanelDimensionChange.event;
+        this.onDidDimensionsChange = this._onDidDimensionChange.event;
         //
         this._onDidChangeFocus = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter({
             replay: true,
@@ -47225,7 +47194,7 @@ class PanelApiImpl extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisp
         //
         this._onActiveChange = new _events__WEBPACK_IMPORTED_MODULE_0__.Emitter();
         this.onActiveChange = this._onActiveChange.event;
-        this.addDisposables(this._onDidPanelDimensionChange, this._onDidChangeFocus, this._onDidVisibilityChange, this._onDidActiveChange, this._onFocusEvent, this._onActiveChange, this._onVisibilityChange, this.onDidFocusChange((event) => {
+        this.addDisposables(this._onDidDimensionChange, this._onDidChangeFocus, this._onDidVisibilityChange, this._onDidActiveChange, this._onFocusEvent, this._onActiveChange, this._onVisibilityChange, this.onDidFocusChange((event) => {
             this._isFocused = event.isFocused;
         }), this.onDidActiveChange((event) => {
             this._isActive = event.isActive;
@@ -47829,60 +47798,12 @@ class Droptarget extends _lifecycle__WEBPACK_IMPORTED_MODULE_2__.CompositeDispos
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DefaultTab": () => (/* binding */ DefaultTab),
-/* harmony export */   "WrappedTab": () => (/* binding */ WrappedTab)
+/* harmony export */   "DefaultTab": () => (/* binding */ DefaultTab)
 /* harmony export */ });
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../lifecycle */ "../dockview/dist/esm/lifecycle.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../events */ "../dockview/dist/esm/events.js");
 
 
-class WrappedTab {
-    constructor(renderer) {
-        this.renderer = renderer;
-        this._element = document.createElement('element');
-        this.show();
-    }
-    get innerRenderer() {
-        return this.renderer;
-    }
-    get element() {
-        return this._element;
-    }
-    get id() {
-        return this.renderer.id;
-    }
-    show() {
-        if (!this.renderer.element.parentElement) {
-            this._element.appendChild(this.renderer.element);
-        }
-    }
-    hide() {
-        if (this.renderer.element.parentElement) {
-            this.renderer.element.remove();
-        }
-    }
-    layout(width, height) {
-        this.renderer.layout(width, height);
-    }
-    update(event) {
-        this.renderer.update(event);
-    }
-    toJSON() {
-        return this.renderer.toJSON();
-    }
-    focus() {
-        this.renderer.focus();
-    }
-    init(parameters) {
-        this.renderer.init(parameters);
-    }
-    updateParentGroup(group, isPanelVisible) {
-        this.renderer.updateParentGroup(group, isPanelVisible);
-    }
-    dispose() {
-        this.renderer.dispose();
-    }
-}
 class DefaultTab extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDisposable {
     constructor() {
         super();
@@ -47945,15 +47866,21 @@ class DefaultTab extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDispos
         }
     }
     updateParentGroup(group, isPanelVisible) {
+        const changed = this._isPanelVisible !== isPanelVisible ||
+            this._isGroupActive !== group.isActive;
         this._isPanelVisible = isPanelVisible;
         this._isGroupActive = group.isActive;
-        this.render();
+        if (changed) {
+            this.render();
+        }
     }
     layout(_width, _height) {
         // noop
     }
     render() {
-        this._content.textContent = this.params.title;
+        if (this._content.textContent !== this.params.title) {
+            this._content.textContent = this.params.title;
+        }
     }
 }
 
@@ -48062,7 +47989,7 @@ class DefaultGroupPanelView {
     constructor(renderers) {
         var _a;
         this._content = renderers.content;
-        this._tab = new _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_0__.WrappedTab((_a = renderers.tab) !== null && _a !== void 0 ? _a : new _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_0__.DefaultTab());
+        this._tab = (_a = renderers.tab) !== null && _a !== void 0 ? _a : new _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_0__.DefaultTab();
         this._actions =
             renderers.actions ||
                 (this.content.actions
@@ -48102,9 +48029,7 @@ class DefaultGroupPanelView {
     toJSON() {
         return {
             content: this.content.toJSON(),
-            tab: this.tab.innerRenderer instanceof _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_0__.DefaultTab
-                ? undefined
-                : this.tab.toJSON(),
+            tab: this.tab instanceof _components_tab_defaultTab__WEBPACK_IMPORTED_MODULE_0__.DefaultTab ? undefined : this.tab.toJSON(),
         };
     }
     dispose() {
@@ -48582,7 +48507,7 @@ class DockviewComponent extends _gridview_baseComponentGridview__WEBPACK_IMPORTE
             }
         }
         const view = new _groupview_groupviewPanel__WEBPACK_IMPORTED_MODULE_16__.GroupPanel(this, id, options);
-        view.init({ params: {}, containerApi: null }); // required to initialized .part and allow for correct disposal of group
+        view.init({ params: {}, accessor: null }); // required to initialized .part and allow for correct disposal of group
         if (!this._groups.has(view.id)) {
             const disposable = new _lifecycle__WEBPACK_IMPORTED_MODULE_4__.CompositeDisposable(view.model.onMove((event) => {
                 const { groupId, itemId, target, index } = event;
@@ -48780,7 +48705,7 @@ class DockviewGroupPanel extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.Composi
     layout(width, height) {
         var _a;
         // the obtain the correct dimensions of the content panel we must deduct the tab height
-        this.api._onDidPanelDimensionChange.fire({
+        this.api._onDidDimensionChange.fire({
             width,
             height: height - (this.group.model.header.height || 0),
         });
@@ -49314,7 +49239,7 @@ class BasePanelView extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDis
     layout(width, height) {
         this._width = width;
         this._height = height;
-        this.api._onDidPanelDimensionChange.fire({ width, height });
+        this.api._onDidDimensionChange.fire({ width, height });
         if (this.part) {
             if (this._params) {
                 this.part.update(this._params.params);
@@ -50026,10 +49951,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../array */ "../dockview/dist/esm/array.js");
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
 /* harmony import */ var _baseComponentGridview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./baseComponentGridview */ "../dockview/dist/esm/gridview/baseComponentGridview.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../api/component.api */ "../dockview/dist/esm/api/component.api.js");
-/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../panel/componentFactory */ "../dockview/dist/esm/panel/componentFactory.js");
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
-
+/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../panel/componentFactory */ "../dockview/dist/esm/panel/componentFactory.js");
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
 
 
 
@@ -50044,7 +49967,7 @@ class GridviewComponent extends _baseComponentGridview__WEBPACK_IMPORTED_MODULE_
             orientation: options.orientation,
             styles: options.styles,
         });
-        this._onDidLayoutfromJSON = new _events__WEBPACK_IMPORTED_MODULE_7__.Emitter();
+        this._onDidLayoutfromJSON = new _events__WEBPACK_IMPORTED_MODULE_6__.Emitter();
         this.onDidLayoutFromJSON = this._onDidLayoutfromJSON.event;
         this._options = options;
         if (!this.options.components) {
@@ -50102,9 +50025,6 @@ class GridviewComponent extends _baseComponentGridview__WEBPACK_IMPORTED_MODULE_
             value.value.setActive(panel === value.value);
         });
     }
-    toggleVisibility(panel) {
-        this.setVisible(panel, !this.isVisible(panel));
-    }
     focus() {
         var _a;
         (_a = this.activeGroup) === null || _a === void 0 ? void 0 : _a.focus();
@@ -50121,7 +50041,7 @@ class GridviewComponent extends _baseComponentGridview__WEBPACK_IMPORTED_MODULE_
         this.gridview.deserialize(grid, {
             fromJSON: (node) => {
                 const { data } = node;
-                const view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(data.id, data.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkComponentFactory
+                const view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_5__.createComponent)(data.id, data.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkComponentFactory
                     ? {
                         createComponent: this.options.frameworkComponentFactory
                             .createComponent,
@@ -50135,7 +50055,7 @@ class GridviewComponent extends _baseComponentGridview__WEBPACK_IMPORTED_MODULE_
                     maximumHeight: data.maximumHeight,
                     priority: data.priority,
                     snap: !!data.snap,
-                    containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_5__.GridviewApi(this),
+                    accessor: this,
                     isVisible: node.visible,
                 }));
                 this.registerPanel(view);
@@ -50187,7 +50107,7 @@ class GridviewComponent extends _baseComponentGridview__WEBPACK_IMPORTED_MODULE_
                 relativeLocation = (0,_gridview__WEBPACK_IMPORTED_MODULE_0__.getRelativeLocation)(this.gridview.orientation, location, target);
             }
         }
-        const view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_6__.createComponent)(options.id, options.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkComponentFactory
+        const view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_5__.createComponent)(options.id, options.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkComponentFactory
             ? {
                 createComponent: this.options.frameworkComponentFactory
                     .createComponent,
@@ -50201,7 +50121,7 @@ class GridviewComponent extends _baseComponentGridview__WEBPACK_IMPORTED_MODULE_
             maximumHeight: options.maximumHeight,
             priority: options.priority,
             snap: !!options.snap,
-            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_5__.GridviewApi(this),
+            accessor: this,
             isVisible: true,
         });
         this.registerPanel(view);
@@ -50299,11 +50219,11 @@ class GridviewPanel extends _basePanelView__WEBPACK_IMPORTED_MODULE_0__.BasePane
         this.onDidChange = this._onDidChange.event;
         this.addDisposables(this._onDidChange, this.api.onVisibilityChange((event) => {
             const { isVisible } = event;
-            const { containerApi } = this._params;
-            containerApi.setVisible(this, isVisible);
+            const { accessor } = this._params;
+            accessor.setVisible(this, isVisible);
         }), this.api.onActiveChange(() => {
-            const { containerApi } = this._params;
-            containerApi.setActive(this);
+            const { accessor } = this._params;
+            accessor.setActive(this);
         }), this.api.onDidConstraintsChangeInternal((event) => {
             if (typeof event.minimumWidth === 'number' ||
                 typeof event.minimumWidth === 'function') {
@@ -51556,7 +51476,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "ContentContainer": () => (/* reexport safe */ _groupview_panel_content__WEBPACK_IMPORTED_MODULE_6__.ContentContainer),
 /* harmony export */   "DockviewApi": () => (/* reexport safe */ _api_component_api__WEBPACK_IMPORTED_MODULE_21__.DockviewApi),
 /* harmony export */   "DockviewComponent": () => (/* reexport safe */ _dockview_dockviewComponent__WEBPACK_IMPORTED_MODULE_10__.DockviewComponent),
-/* harmony export */   "DockviewComponents": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.DockviewComponents),
 /* harmony export */   "DockviewReact": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_18__.DockviewReact),
 /* harmony export */   "Event": () => (/* reexport safe */ _events__WEBPACK_IMPORTED_MODULE_19__.Event),
 /* harmony export */   "Gridview": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_3__.Gridview),
@@ -52623,78 +52542,6 @@ class ReactPanelDeserialzier {
 
 /***/ }),
 
-/***/ "../dockview/dist/esm/react/dockview/components.js":
-/*!*********************************************************!*\
-  !*** ../dockview/dist/esm/react/dockview/components.js ***!
-  \*********************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DockviewComponents": () => (/* binding */ DockviewComponents)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "../../node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "../../node_modules/react-dom/index.js");
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../react */ "../dockview/dist/esm/react/react.js");
-
-
-
-const Tab = (props) => {
-    return react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, props.children);
-};
-const Content = (props) => {
-    return react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, props.children);
-};
-const Actions = (props) => {
-    return react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, props.children);
-};
-function isValidComponent(element) {
-    return [Content, Actions, Tab].find((comp) => element.type === comp);
-}
-const Panel = (props) => {
-    const context = react__WEBPACK_IMPORTED_MODULE_0__.useContext(_react__WEBPACK_IMPORTED_MODULE_2__.ReactPartContext);
-    const sections = react__WEBPACK_IMPORTED_MODULE_0__.useMemo(() => {
-        var _a;
-        const childs = ((_a = react__WEBPACK_IMPORTED_MODULE_0__.Children.map(props.children, (_) => _)) === null || _a === void 0 ? void 0 : _a.filter(_react__WEBPACK_IMPORTED_MODULE_2__.isReactElement)) || [];
-        const isInvalid = !!childs.find((_) => !isValidComponent(_));
-        if (isInvalid) {
-            throw new Error('Children of DockviewComponents.Panel must be one of the following: DockviewComponents.Content, DockviewComponents.Actions, DockviewComponents.Tab');
-        }
-        const body = childs.find((_) => _.type === Content);
-        const actions = childs.find((_) => _.type === Actions);
-        const tab = childs.find((_) => _.type === Tab);
-        return { body, actions, tab };
-    }, [props.children]);
-    react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
-        /**
-         * hide or show the default tab behavior based on whether we want to override
-         * with our own React tab.
-         */
-        if (sections.tab) {
-            context.tabPortalElement.hide();
-        }
-        else {
-            context.tabPortalElement.show();
-        }
-    }, [sections.tab]);
-    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null,
-        sections.actions &&
-            react_dom__WEBPACK_IMPORTED_MODULE_1__.createPortal(sections.actions, context.actionsPortalElement),
-        sections.tab &&
-            react_dom__WEBPACK_IMPORTED_MODULE_1__.createPortal(sections.tab, context.tabPortalElement.element),
-        sections.body || props.children));
-};
-const DockviewComponents = {
-    Tab,
-    Content,
-    Actions,
-    Panel,
-};
-
-
-/***/ }),
-
 /***/ "../dockview/dist/esm/react/dockview/dockview.js":
 /*!*******************************************************!*\
   !*** ../dockview/dist/esm/react/dockview/dockview.js ***!
@@ -52926,9 +52773,6 @@ class ReactPanelContentPart {
     }
     layout(_width, _height) {
         // noop
-    }
-    close() {
-        return Promise.resolve(true);
     }
     dispose() {
         var _a, _b;
@@ -53171,11 +53015,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "ReactGridPanelView": () => (/* binding */ ReactGridPanelView)
 /* harmony export */ });
-/* harmony import */ var _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../gridview/gridviewPanel */ "../dockview/dist/esm/gridview/gridviewPanel.js");
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../react */ "../dockview/dist/esm/react/react.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../api/component.api */ "../dockview/dist/esm/api/component.api.js");
+/* harmony import */ var _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../gridview/gridviewPanel */ "../dockview/dist/esm/gridview/gridviewPanel.js");
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../react */ "../dockview/dist/esm/react/react.js");
 
 
-class ReactGridPanelView extends _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_0__.GridviewPanel {
+
+class ReactGridPanelView extends _gridview_gridviewPanel__WEBPACK_IMPORTED_MODULE_1__.GridviewPanel {
     constructor(id, component, reactComponent, reactPortalStore) {
         super(id, component);
         this.reactComponent = reactComponent;
@@ -53183,11 +53029,10 @@ class ReactGridPanelView extends _gridview_gridviewPanel__WEBPACK_IMPORTED_MODUL
     }
     getComponent() {
         var _a;
-        return new _react__WEBPACK_IMPORTED_MODULE_1__.ReactPart(this.element, this.reactPortalStore, this.reactComponent, {
+        return new _react__WEBPACK_IMPORTED_MODULE_2__.ReactPart(this.element, this.reactPortalStore, this.reactComponent, {
             params: ((_a = this._params) === null || _a === void 0 ? void 0 : _a.params) || {},
             api: this.api,
-            containerApi: this._params
-                .containerApi,
+            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_0__.GridviewApi(this._params.accessor),
         });
     }
 }
@@ -53203,28 +53048,25 @@ class ReactGridPanelView extends _gridview_gridviewPanel__WEBPACK_IMPORTED_MODUL
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DockviewComponents": () => (/* reexport safe */ _dockview_components__WEBPACK_IMPORTED_MODULE_1__.DockviewComponents),
 /* harmony export */   "DockviewReact": () => (/* reexport safe */ _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__.DockviewReact),
-/* harmony export */   "GridviewReact": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_3__.GridviewReact),
-/* harmony export */   "PaneviewReact": () => (/* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__.PaneviewReact),
-/* harmony export */   "ReactPanelContentPart": () => (/* reexport safe */ _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_4__.ReactPanelContentPart),
-/* harmony export */   "ReactPanelHeaderPart": () => (/* reexport safe */ _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_5__.ReactPanelHeaderPart),
-/* harmony export */   "ReactPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_8__.ReactPart),
-/* harmony export */   "ReactPartContext": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_8__.ReactPartContext),
-/* harmony export */   "SplitviewReact": () => (/* reexport safe */ _splitview_splitview__WEBPACK_IMPORTED_MODULE_2__.SplitviewReact),
-/* harmony export */   "isReactElement": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_8__.isReactElement),
-/* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_8__.usePortalsLifecycle)
+/* harmony export */   "GridviewReact": () => (/* reexport safe */ _gridview_gridview__WEBPACK_IMPORTED_MODULE_2__.GridviewReact),
+/* harmony export */   "PaneviewReact": () => (/* reexport safe */ _paneview_paneview__WEBPACK_IMPORTED_MODULE_5__.PaneviewReact),
+/* harmony export */   "ReactPanelContentPart": () => (/* reexport safe */ _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_3__.ReactPanelContentPart),
+/* harmony export */   "ReactPanelHeaderPart": () => (/* reexport safe */ _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_4__.ReactPanelHeaderPart),
+/* harmony export */   "ReactPart": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_7__.ReactPart),
+/* harmony export */   "ReactPartContext": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_7__.ReactPartContext),
+/* harmony export */   "SplitviewReact": () => (/* reexport safe */ _splitview_splitview__WEBPACK_IMPORTED_MODULE_1__.SplitviewReact),
+/* harmony export */   "isReactElement": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_7__.isReactElement),
+/* harmony export */   "usePortalsLifecycle": () => (/* reexport safe */ _react__WEBPACK_IMPORTED_MODULE_7__.usePortalsLifecycle)
 /* harmony export */ });
 /* harmony import */ var _dockview_dockview__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dockview/dockview */ "../dockview/dist/esm/react/dockview/dockview.js");
-/* harmony import */ var _dockview_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./dockview/components */ "../dockview/dist/esm/react/dockview/components.js");
-/* harmony import */ var _splitview_splitview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./splitview/splitview */ "../dockview/dist/esm/react/splitview/splitview.js");
-/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./gridview/gridview */ "../dockview/dist/esm/react/gridview/gridview.js");
-/* harmony import */ var _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./dockview/reactContentPart */ "../dockview/dist/esm/react/dockview/reactContentPart.js");
-/* harmony import */ var _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./dockview/reactHeaderPart */ "../dockview/dist/esm/react/dockview/reactHeaderPart.js");
-/* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./paneview/paneview */ "../dockview/dist/esm/react/paneview/paneview.js");
-/* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./types */ "../dockview/dist/esm/react/types.js");
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./react */ "../dockview/dist/esm/react/react.js");
-
+/* harmony import */ var _splitview_splitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./splitview/splitview */ "../dockview/dist/esm/react/splitview/splitview.js");
+/* harmony import */ var _gridview_gridview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./gridview/gridview */ "../dockview/dist/esm/react/gridview/gridview.js");
+/* harmony import */ var _dockview_reactContentPart__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./dockview/reactContentPart */ "../dockview/dist/esm/react/dockview/reactContentPart.js");
+/* harmony import */ var _dockview_reactHeaderPart__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./dockview/reactHeaderPart */ "../dockview/dist/esm/react/dockview/reactHeaderPart.js");
+/* harmony import */ var _paneview_paneview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./paneview/paneview */ "../dockview/dist/esm/react/paneview/paneview.js");
+/* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./types */ "../dockview/dist/esm/react/types.js");
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./react */ "../dockview/dist/esm/react/react.js");
 
 
 
@@ -53633,11 +53475,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "ReactPanelView": () => (/* binding */ ReactPanelView)
 /* harmony export */ });
-/* harmony import */ var _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../splitview/splitviewPanel */ "../dockview/dist/esm/splitview/splitviewPanel.js");
-/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../react */ "../dockview/dist/esm/react/react.js");
+/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../api/component.api */ "../dockview/dist/esm/api/component.api.js");
+/* harmony import */ var _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../splitview/splitviewPanel */ "../dockview/dist/esm/splitview/splitviewPanel.js");
+/* harmony import */ var _react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../react */ "../dockview/dist/esm/react/react.js");
 
 
-class ReactPanelView extends _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_0__.SplitviewPanel {
+
+class ReactPanelView extends _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_1__.SplitviewPanel {
     constructor(id, component, reactComponent, reactPortalStore) {
         super(id, component);
         this.reactComponent = reactComponent;
@@ -53645,11 +53489,10 @@ class ReactPanelView extends _splitview_splitviewPanel__WEBPACK_IMPORTED_MODULE_
     }
     getComponent() {
         var _a;
-        return new _react__WEBPACK_IMPORTED_MODULE_1__.ReactPart(this.element, this.reactPortalStore, this.reactComponent, {
+        return new _react__WEBPACK_IMPORTED_MODULE_2__.ReactPart(this.element, this.reactPortalStore, this.reactComponent, {
             params: ((_a = this._params) === null || _a === void 0 ? void 0 : _a.params) || {},
             api: this.api,
-            containerApi: this._params
-                .containerApi,
+            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_0__.SplitviewApi(this._params.accessor),
         });
     }
 }
@@ -54488,9 +54331,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _lifecycle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../lifecycle */ "../dockview/dist/esm/lifecycle.js");
 /* harmony import */ var _core_splitview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./core/splitview */ "../dockview/dist/esm/splitview/core/splitview.js");
 /* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../events */ "../dockview/dist/esm/events.js");
-/* harmony import */ var _api_component_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../api/component.api */ "../dockview/dist/esm/api/component.api.js");
-/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../panel/componentFactory */ "../dockview/dist/esm/panel/componentFactory.js");
-
+/* harmony import */ var _panel_componentFactory__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../panel/componentFactory */ "../dockview/dist/esm/panel/componentFactory.js");
 
 
 
@@ -54616,7 +54457,7 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
         if (this._panels.has(options.id)) {
             throw new Error(`panel ${options.id} already exists`);
         }
-        const view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__.createComponent)(options.id, options.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkWrapper
+        const view = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_3__.createComponent)(options.id, options.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkWrapper
             ? {
                 createComponent: this.options.frameworkWrapper.createComponent,
             }
@@ -54628,7 +54469,7 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
             maximumSize: options.maximumSize,
             snap: options.snap,
             priority: options.priority,
-            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.SplitviewApi(this),
+            accessor: this,
         });
         const size = typeof options.size === 'number' ? options.size : _core_splitview__WEBPACK_IMPORTED_MODULE_1__.Sizing.Distribute;
         const index = typeof options.index === 'number' ? options.index : undefined;
@@ -54691,7 +54532,7 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
                     if (this._panels.has(data.id)) {
                         throw new Error(`panel ${data.id} already exists`);
                     }
-                    const panel = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_4__.createComponent)(data.id, data.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkWrapper
+                    const panel = (0,_panel_componentFactory__WEBPACK_IMPORTED_MODULE_3__.createComponent)(data.id, data.component, this.options.components || {}, this.options.frameworkComponents || {}, this.options.frameworkWrapper
                         ? {
                             createComponent: this.options.frameworkWrapper
                                 .createComponent,
@@ -54704,7 +54545,7 @@ class SplitviewComponent extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.Composi
                             maximumSize: data.maximumSize,
                             snap: view.snap,
                             priority: view.priority,
-                            containerApi: new _api_component_api__WEBPACK_IMPORTED_MODULE_3__.SplitviewApi(this),
+                            accessor: this,
                         });
                     });
                     panel.orientation = orientation;
@@ -54771,13 +54612,11 @@ class SplitviewPanel extends _gridview_basePanelView__WEBPACK_IMPORTED_MODULE_0_
         this.onDidChange = this._onDidChange.event;
         this.addDisposables(this._onDidChange, this.api.onVisibilityChange((event) => {
             const { isVisible } = event;
-            const { containerApi } = this
-                ._params;
-            containerApi.setVisible(this, isVisible);
+            const { accessor } = this._params;
+            accessor.setVisible(this, isVisible);
         }), this.api.onActiveChange(() => {
-            const { containerApi } = this
-                ._params;
-            containerApi.setActive(this);
+            const { accessor } = this._params;
+            accessor.setActive(this);
         }), this.api.onDidConstraintsChangeInternal((event) => {
             if (typeof event.minimumSize === 'number' ||
                 typeof event.minimumSize === 'function') {
