@@ -245,15 +245,15 @@ export class GridviewApi implements CommonApi<SerializedGridview> {
         return this.component.onDidLayoutChange;
     }
 
-    get onDidAddGroup(): Event<IGridviewPanel> {
+    get onDidAddPanel(): Event<IGridviewPanel> {
         return this.component.onDidAddGroup;
     }
 
-    get onDidRemoveGroup(): Event<IGridviewPanel> {
+    get onDidRemovePanel(): Event<IGridviewPanel> {
         return this.component.onDidRemoveGroup;
     }
 
-    get onDidActiveGroupChange(): Event<IGridviewPanel | undefined> {
+    get onDidActivePanelChange(): Event<IGridviewPanel | undefined> {
         return this.component.onDidActiveGroupChange;
     }
 
