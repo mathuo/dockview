@@ -46865,13 +46865,13 @@ class GridviewApi {
     get onDidLayoutChange() {
         return this.component.onDidLayoutChange;
     }
-    get onDidAddGroup() {
+    get onDidAddPanel() {
         return this.component.onDidAddGroup;
     }
-    get onDidRemoveGroup() {
+    get onDidRemovePanel() {
         return this.component.onDidRemoveGroup;
     }
-    get onDidActiveGroupChange() {
+    get onDidActivePanelChange() {
         return this.component.onDidActiveGroupChange;
     }
     get onDidLayoutFromJSON() {
