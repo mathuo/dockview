@@ -1,4 +1,4 @@
-import { DockviewComponents, IDockviewPanelProps } from 'dockview';
+import { IDockviewPanelProps } from 'dockview';
 import * as React from 'react';
 import { CompositeDisposable } from '../../lifecycle';
 import './exampleFunctions.scss';
@@ -30,8 +30,10 @@ export const ExampleFunctions = (
                     isPanelVisible: x.isVisible,
                 }));
             }),
-            props.api.onFocusEvent(() => {
-                input.current.focus();
+            props.api.onDidFocusChange(({ isFocused }) => {
+                if (isFocused) {
+                    input.current.focus();
+                }
             })
         );
 
@@ -49,80 +51,52 @@ export const ExampleFunctions = (
     };
 
     return (
-        <DockviewComponents.Panel>
-            <DockviewComponents.Actions>
-                <div
-                    style={{
-                        height: '100%',
-                        display: 'flex',
-                        backgroundColor: 'rgba(255,255,255,0.1)',
-                        padding: '0px 4px',
-                    }}
-                >
+        <div className="example-functions-panel">
+            <div className="example-functions-panel-header-bar">
+                <span style={{ padding: '0px 8px' }}>
+                    <span>{'isGroupActive: '}</span>
                     <span
-                        onClick={onClose}
                         style={{
-                            height: '100%',
-                            width: '25px',
-                            display: 'flex',
-                            alignItems: 'center',
+                            color: panelState.isGroupActive
+                                ? '#23d16f'
+                                : '#cd312b',
                         }}
                     >
-                        <a className="material-icons">menu</a>
+                        {`${panelState.isGroupActive}`}
                     </span>
-                </div>
-            </DockviewComponents.Actions>
-            <DockviewComponents.Content>
-                <div className="example-functions-panel">
-                    <div className="example-functions-panel-header-bar">
-                        <span style={{ padding: '0px 8px' }}>
-                            <span>{'isGroupActive: '}</span>
-                            <span
-                                style={{
-                                    color: panelState.isGroupActive
-                                        ? '#23d16f'
-                                        : '#cd312b',
-                                }}
-                            >
-                                {`${panelState.isGroupActive}`}
-                            </span>
-                        </span>
-                        <span style={{ padding: '0px 8px' }}>
-                            <span>{'isPanelVisible: '}</span>
-                            <span
-                                style={{
-                                    color: panelState.isPanelVisible
-                                        ? '#23d16f'
-                                        : '#cd312b',
-                                }}
-                            >
-                                {`${panelState.isPanelVisible}`}
-                            </span>
-                        </span>
-                    </div>
-                    <div className="example-functions-panel-section">
-                        <input
-                            value={panelName}
-                            placeholder="New Panel Name"
-                            type="text"
-                            onChange={(event) =>
-                                setPanelName(event.target.value)
-                            }
-                        />
-                        <button onClick={onRename}>Rename</button>
-                    </div>
+                </span>
+                <span style={{ padding: '0px 8px' }}>
+                    <span>{'isPanelVisible: '}</span>
+                    <span
+                        style={{
+                            color: panelState.isPanelVisible
+                                ? '#23d16f'
+                                : '#cd312b',
+                        }}
+                    >
+                        {`${panelState.isPanelVisible}`}
+                    </span>
+                </span>
+            </div>
+            <div className="example-functions-panel-section">
+                <input
+                    value={panelName}
+                    placeholder="New Panel Name"
+                    type="text"
+                    onChange={(event) => setPanelName(event.target.value)}
+                />
+                <button onClick={onRename}>Rename</button>
+            </div>
 
-                    <input
-                        style={{ width: '175px' }}
-                        ref={input}
-                        placeholder="This is focused by the panel"
-                    />
-                    <input
-                        style={{ width: '175px' }}
-                        placeholder="This is also focusable"
-                    />
-                </div>
-            </DockviewComponents.Content>
-        </DockviewComponents.Panel>
+            <input
+                style={{ width: '175px' }}
+                ref={input}
+                placeholder="This is focused by the panel"
+            />
+            <input
+                style={{ width: '175px' }}
+                placeholder="This is also focusable"
+            />
+        </div>
     );
 };

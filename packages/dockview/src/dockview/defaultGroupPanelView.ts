@@ -1,4 +1,4 @@
-import { DefaultTab, WrappedTab } from './components/tab/defaultTab';
+import { DefaultTab } from './components/tab/defaultTab';
 import {
     GroupPanelPartInitParameters,
     IActionsRenderer,
@@ -22,7 +22,7 @@ export interface IGroupPanelView extends IDisposable {
 
 export class DefaultGroupPanelView implements IGroupPanelView {
     private readonly _content: IContentRenderer;
-    private readonly _tab: WrappedTab;
+    private readonly _tab: ITabRenderer;
     private readonly _actions: IActionsRenderer | undefined;
 
     get content() {
@@ -43,7 +43,7 @@ export class DefaultGroupPanelView implements IGroupPanelView {
         actions?: IActionsRenderer;
     }) {
         this._content = renderers.content;
-        this._tab = new WrappedTab(renderers.tab ?? new DefaultTab());
+        this._tab = renderers.tab ?? new DefaultTab();
         this._actions =
             renderers.actions ||
             (this.content.actions
@@ -78,10 +78,7 @@ export class DefaultGroupPanelView implements IGroupPanelView {
     toJSON(): {} {
         return {
             content: this.content.toJSON(),
-            tab:
-                this.tab.innerRenderer instanceof DefaultTab
-                    ? undefined
-                    : this.tab.toJSON(),
+            tab: this.tab instanceof DefaultTab ? undefined : this.tab.toJSON(),
         };
     }
 

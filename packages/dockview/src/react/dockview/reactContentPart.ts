@@ -2,6 +2,7 @@ import * as React from 'react';
 import {
     IContentRenderer,
     GroupPanelContentPartInitParameters,
+    ITabRenderer,
 } from '../../groupview/types';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IDockviewPanelProps } from '../dockview/dockview';
@@ -10,7 +11,6 @@ import { DockviewPanelApi } from '../../api/groupPanelApi';
 import { DockviewApi } from '../../api/component.api';
 import { GroupPanel } from '../../groupview/groupviewPanel';
 import { Emitter, Event } from '../../events';
-import { WrappedTab } from '../../dockview/components/tab/defaultTab';
 
 export interface IGroupPanelActionbarProps {
     api: DockviewPanelApi;
@@ -21,7 +21,7 @@ export interface ReactContentPartContext {
     api: DockviewPanelApi;
     containerApi: DockviewApi;
     actionsPortalElement: HTMLElement;
-    tabPortalElement: WrappedTab;
+    tabPortalElement: ITabRenderer;
 }
 
 export class ReactPanelContentPart implements IContentRenderer {
@@ -102,10 +102,6 @@ export class ReactPanelContentPart implements IContentRenderer {
 
     public layout(_width: number, _height: number): void {
         // noop
-    }
-
-    public close(): Promise<boolean> {
-        return Promise.resolve(true);
     }
 
     public dispose() {

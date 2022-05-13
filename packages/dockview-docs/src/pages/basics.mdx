@@ -8,6 +8,7 @@ This section will take you through a number of concepts that can be applied to a
 ## Panels
 
 The below examples use `ReactSplitview` but the logic holds for `ReactPaneview`, `ReactGridview` and `ReactDockview` using their respective implementations and interfaces.
+sAll components require you to provide an `onReady` prop which you can use to build and control your component.
 
 ### Adding a panel with parameters
 
@@ -38,7 +39,7 @@ const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
 There are two types of API you will interact with using `dockview`.
 
 -   The `panel API` is accessible via `props.api` in user defined panels and via the `.api` variable found on panel instances. This API contains actions and variable related to the the individual panel.
--   The `component API` is accessible via `event.api` in the `onReady` events and `props.containerApi` in user defined panels. This API contains actions and variable related to the component as a whole.
+-   The `container API` is accessible via `event.api` in the `onReady` events and `props.containerApi` in user defined panels. This API contains actions and variable related to the component as a whole.
 
 ```tsx
 const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
@@ -75,10 +76,28 @@ All components support `toJSON(): T` which returns a Typed object representation
 ## Auto resizing
 
 `SplitviewReact`, `GridviewReact`, `PaneviewReact` and `DockviewReact` will all automatically resize to fill the size of their parent element.
-Internally this is achieved using a [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver).
+Internally this is achieved using a [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver) which some users may need to polyfill.
 You can disable this by settings the `disableAutoResizing` prop to be `true`.
 
 You can manually resize a component using the API method `layout(width: number, height: number): void`.
+An advanced case may use this in conjunction with `disableAutoResizing=true` to allow a parent component to have ultimate control over the dimensions of the component.
+
+## Events
+
+Many API properties can be listened on using the `Event` pattern. For example `api.onDidFocusChange(() => {...})`.
+You should dispose of any event listeners you create cleaning up any listeners you would have created.
+
+```tsx
+React.useEffect(() => {
+    const disposable = api.onDidFocusChange(() => {
+        // write some code
+    });
+
+    return () => {
+        disposable.dispose();
+    };
+}, []);
+```
 
 ## Proportional layout
 
@@ -88,3 +107,7 @@ Although not configurable on `DockviewReact` and `PaneviewReact` these both beha
 <SimpleSplitview2 proportional={false} />
 
 <SimpleSplitview2 proportional={true} />
+
+## Browser support
+
+dockview is intended to support all major browsers. Some users may require a polyfill for [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver).

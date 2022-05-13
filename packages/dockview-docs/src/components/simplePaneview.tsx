@@ -18,6 +18,7 @@ const components = {
                 {props.params.title}
             </div>
         );
+<<<<<<< HEAD
     },
 };
 
@@ -56,7 +57,49 @@ const headerComponents = {
                 <span>{props.params.title}</span>
             </div>
         );
+=======
+>>>>>>> 10317206e04a4f043398ef500e0212b34620d804
     },
+};
+
+const MyHeaderComponent = (props: IPaneviewPanelProps<{ title: string }>) => {
+    const [expanded, setExpanded] = React.useState<boolean>(
+        props.api.isExpanded
+    );
+
+    React.useEffect(() => {
+        const disposable = props.api.onDidExpansionChange((event) => {
+            setExpanded(event.isExpanded);
+        });
+
+        return () => {
+            disposable.dispose();
+        };
+    }, []);
+
+    const onClick = () => {
+        props.api.setExpanded(!expanded);
+    };
+
+    return (
+        <div
+            style={{
+                padding: '10px',
+                height: '100%',
+                backgroundColor: 'rgb(60,60,60)',
+            }}
+        >
+            <a
+                onClick={onClick}
+                className={expanded ? 'expanded' : 'collapsed'}
+            />
+            <span>{props.params.title}</span>
+        </div>
+    );
+};
+
+const headerComponents = {
+    myHeaderComponent: MyHeaderComponent,
 };
 
 export const SimplePaneview = () => {

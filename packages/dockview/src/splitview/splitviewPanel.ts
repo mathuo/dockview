@@ -85,14 +85,12 @@ export abstract class SplitviewPanel
             this._onDidChange,
             this.api.onVisibilityChange((event) => {
                 const { isVisible } = event;
-                const { containerApi } = this
-                    ._params as PanelViewInitParameters;
-                containerApi.setVisible(this, isVisible);
+                const { accessor } = this._params as PanelViewInitParameters;
+                accessor.setVisible(this, isVisible);
             }),
             this.api.onActiveChange(() => {
-                const { containerApi } = this
-                    ._params as PanelViewInitParameters;
-                containerApi.setActive(this);
+                const { accessor } = this._params as PanelViewInitParameters;
+                accessor.setActive(this);
             }),
             this.api.onDidConstraintsChangeInternal((event) => {
                 if (

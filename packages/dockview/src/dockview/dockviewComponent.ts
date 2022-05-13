@@ -669,7 +669,7 @@ export class DockviewComponent
         }
 
         const view = new GroupPanel(this, id, options);
-        view.init({ params: {}, containerApi: <any>null }); // required to initialized .part and allow for correct disposal of group
+        view.init({ params: {}, accessor: <any>null }); // required to initialized .part and allow for correct disposal of group
 
         if (!this._groups.has(view.id)) {
             const disposable = new CompositeDisposable(

@@ -1,6 +1,5 @@
 import {
     DockviewApi,
-    DockviewComponents,
     DockviewReact,
     DockviewReadyEvent,
     IDockviewPanelProps,
@@ -18,35 +17,9 @@ const components: PanelCollection<IDockviewPanelProps<any>> = {
     ticker: (props: IDockviewPanelProps<{ ticker: number }>) => {
         const close = () => props.api.close();
         return (
-            <DockviewComponents.Panel>
-                <DockviewComponents.Tab>
-                    <div
-                        style={{
-                            border: '1px solid pink',
-                            height: '100%',
-                            boxSizing: 'border-box',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            padding: '0px 8px',
-                            width: '200px',
-                        }}
-                    >
-                        <span>{props.api.title}</span>
-                        <span
-                            style={{ fontSize: '9px' }}
-                        >{`(${props.params.ticker})`}</span>
-                        {!props.api.suppressClosable && (
-                            <span onClick={close}>X</span>
-                        )}
-                    </div>
-                </DockviewComponents.Tab>
-                <DockviewComponents.Content>
-                    <div style={{ padding: '10px', height: '100%' }}>
-                        {`The current ticker value is ${props.params.ticker}`}
-                    </div>
-                </DockviewComponents.Content>
-            </DockviewComponents.Panel>
+            <div style={{ padding: '10px', height: '100%' }}>
+                {`The current ticker value is ${props.params.ticker}`}
+            </div>
         );
     },
     iframe: (props) => {

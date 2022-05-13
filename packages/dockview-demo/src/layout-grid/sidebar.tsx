@@ -64,8 +64,10 @@ export const Sidebar = (props: IGridviewPanelProps) => {
             props.api.onDidVisibilityChange((event) => {
                 console.log(event);
             }),
-            props.api.onFocusEvent(() => {
-                api.current.focus();
+            props.api.onDidFocusChange(({ isFocused }) => {
+                if (isFocused) {
+                    api.current.focus();
+                }
             })
         );
 

@@ -1,3 +1,4 @@
+import { SplitviewApi } from '../../api/component.api';
 import { PanelViewInitParameters } from '../../splitview/core/options';
 import { SplitviewPanel } from '../../splitview/splitviewPanel';
 import { ReactPart, ReactPortalStore } from '../react';
@@ -21,8 +22,9 @@ export class ReactPanelView extends SplitviewPanel {
             {
                 params: this._params?.params || {},
                 api: this.api,
-                containerApi: (this._params as PanelViewInitParameters)
-                    .containerApi,
+                containerApi: new SplitviewApi(
+                    (this._params as PanelViewInitParameters).accessor
+                ),
             }
         );
     }

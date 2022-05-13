@@ -7,6 +7,7 @@ export interface Page {
 export const PAGES: Page[] = [
     { title: 'Introduction', url: '/#introduction' },
     { title: 'Basics', url: '/basics/#basics' },
+    { title: 'Theme', url: '/theme/#theme' },
     {
         title: 'API',
         url: '#api',
