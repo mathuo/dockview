@@ -64,6 +64,8 @@ export class Tab extends CompositeDisposable implements ITab {
         this._element.tabIndex = 0;
         this._element.draggable = true;
 
+        toggleClass(this.element, 'inactive-tab', true);
+
         this.addDisposables(
             new (class Handler extends DragHandler {
                 private readonly panelTransfer =

@@ -51,8 +51,6 @@ export class TabsContainer
 
     private tabs: IValueDisposable<ITab>[] = [];
     private selectedIndex = -1;
-    private active = false;
-    private activePanel: IDockviewPanel | undefined;
     private actions: HTMLElement | undefined;
 
     private _height: number | undefined;
@@ -205,8 +203,8 @@ export class TabsContainer
         );
     }
 
-    public setActive(isGroupActive: boolean) {
-        this.active = isGroupActive;
+    public setActive(_isGroupActive: boolean) {
+        // noop
     }
 
     private addTab(
@@ -291,7 +289,6 @@ export class TabsContainer
         const value: IValueDisposable<ITab> = { value: tabToAdd, disposable };
 
         this.addTab(value, index);
-        this.activePanel = panel;
     }
 
     public closePanel(panel: IDockviewPanel) {
