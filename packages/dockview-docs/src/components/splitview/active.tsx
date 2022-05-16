@@ -4,6 +4,7 @@ import {
     SplitviewReact,
     SplitviewReadyEvent,
 } from 'dockview';
+import * as React from 'react';
 
 const components = {
     default: (props: ISplitviewPanelProps<{ title: string }>) => {

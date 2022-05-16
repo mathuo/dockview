@@ -4,6 +4,7 @@ import {
     GridviewReact,
     GridviewReadyEvent,
 } from 'dockview';
+import * as React from 'react';
 
 const components = {
     default: (props: IGridviewPanelProps<{ title: string }>) => {

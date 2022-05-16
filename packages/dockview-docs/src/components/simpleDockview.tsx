@@ -3,6 +3,7 @@ import {
     DockviewReadyEvent,
     IDockviewPanelProps,
 } from 'dockview';
+import * as React from 'react';
 
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {

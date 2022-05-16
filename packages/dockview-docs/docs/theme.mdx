@@ -1,0 +1,76 @@
+---
+sidebar_position: 3
+---
+
+import { CustomCSSDockview } from '../src/components/dockview/customCss';
+
+# Theme
+
+`dockview` requires some css to work correctly.
+The css is exported as one file under [`dockview/dict/styles/dockview.css`](https://unpkg.com/browse/dockview@latest/dist/styles/dockview.css)
+and depending can be imported
+
+```css
+@import './node_modules/dockview/dist/styles/dockview.css';
+```
+
+`dockview` supports theming through the use of css properties.
+You can view the built-in themes at [`dockview/src/theme.scss`](https://github.com/mathuo/dockview/blob/master/packages/dockview/src/theme.scss)
+and are free to build your own themes based on these css properties.
+
+| CSS Property                                         | Description |
+| ---------------------------------------------------- | ----------- |
+| --dv-paneview-active-outline-color                   |             |
+| --dv-tabs-and-actions-container-font-size            |             |
+| --dv-tabs-and-actions-container-height               |             |
+| --dv-tab-close-icon                                  |             |
+| --dv-drag-over-background-color                      |             |
+| --dv-drag-over-border-color                          |             |
+| --dv-tabs-container-scrollbar-color                  |             |
+|                                                      |             |
+| --dv-group-view-background-color                     |             |
+|                                                      |             |
+| --dv-tabs-and-actions-container-background-color     |             |
+|                                                      |             |
+| --dv-activegroup-visiblepanel-tab-background-color   |             |
+| --dv-activegroup-hiddenpanel-tab-background-color    |             |
+| --dv-inactivegroup-visiblepanel-tab-background-color |             |
+| --dv-inactivegroup-hiddenpanel-tab-background-color  |             |
+| --dv-tab-divider-color                               |             |
+|                                                      |             |
+| --dv-activegroup-visiblepanel-tab-color              |             |
+| --dv-activegroup-hiddenpanel-tab-color               |             |
+| --dv-inactivegroup-visiblepanel-tab-color            |             |
+| --dv-inactivegroup-hiddenpanel-tab-color             |             |
+|                                                      |             |
+| --dv-separator-border                                |             |
+| --dv-paneview-header-border-color                    |             |
+
+You can further customise the theme through adjusting class properties but this is up you.
+As an example if you wanted to add a bottom border to the tab container for an active group in the `DockviewReact` component you could write:
+
+```css
+.groupview {
+    &.active-group {
+        > .tabs-and-actions-container {
+            border-bottom: 2px solid var(--dv-activegroup-visiblepanel-tab-background-color);
+        }
+    }
+    &.inactive-group {
+        > .tabs-and-actions-container {
+            border-bottom: 2px solid var(--dv-inactivegroup-visiblepanel-tab-background-color);
+        }
+    }
+}
+```
+
+<div
+    style={{
+        height: '300px',
+        backgroundColor: 'rgb(30,30,30)',
+        color: 'white',
+        margin: '20px 0px',
+    }}
+>
+    <CustomCSSDockview />
+</div>
