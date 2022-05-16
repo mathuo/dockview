@@ -19,12 +19,16 @@ import {
     GroupOptions,
     Groupview,
 } from '../../groupview/groupview';
-import { DockviewPanelApi } from '../../api/groupPanelApi';
+import {
+    DockviewPanelApi,
+    DockviewPanelApiImpl,
+} from '../../api/groupPanelApi';
 import {
     DefaultGroupPanelView,
     IGroupPanelView,
 } from '../../dockview/defaultGroupPanelView';
 import { GroupPanel } from '../../groupview/groupviewPanel';
+import { DockviewApi } from '../../api/component.api';
 
 class Watermark implements IWatermarkRenderer {
     public readonly element = document.createElement('div');
@@ -521,5 +525,50 @@ describe('groupview', () => {
             locked: true,
             hideHeader: true,
         });
+    });
+
+    test("that openPanel with skipSetActive doesn't set panel to active", () => {
+        const dockviewComponent: IDockviewComponent = new DockviewComponent(
+            document.createElement('div'),
+            {
+                components: {
+                    component: TestContentPart,
+                },
+            }
+        );
+
+        const groupviewContainer = document.createElement('div');
+        const cut = new Groupview(
+            groupviewContainer,
+            dockviewComponent,
+            'id',
+            {},
+            null
+        );
+        const contentContainer = groupviewContainer
+            .getElementsByClassName('content-container')
+            .item(0).childNodes;
+
+        const panel1 = new TestPanel('id_1', null);
+
+        cut.openPanel(panel1);
+        expect(contentContainer.length).toBe(1);
+        expect(contentContainer.item(0)).toBe(panel1.view.content.element);
+
+        const panel2 = new TestPanel('id_2', null);
+
+        cut.openPanel(panel2);
+        expect(contentContainer.length).toBe(1);
+        expect(contentContainer.item(0)).toBe(panel2.view.content.element);
+
+        const panel3 = new TestPanel('id_2', null);
+
+        cut.openPanel(panel3, { skipSetActive: true });
+        expect(contentContainer.length).toBe(1);
+        expect(contentContainer.item(0)).toBe(panel2.view.content.element);
+
+        cut.openPanel(panel3);
+        expect(contentContainer.length).toBe(1);
+        expect(contentContainer.item(0)).toBe(panel3.view.content.element);
     });
 });

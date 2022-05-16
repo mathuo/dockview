@@ -420,7 +420,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             return;
         }
 
-        this.doAddPanel(panel, options.index);
+        this.doAddPanel(panel, options.index, skipSetActive);
 
         if (!skipSetActive) {
             this.doSetActivePanel(panel);
@@ -561,14 +561,17 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
     private doAddPanel(
         panel: IDockviewPanel,
-        index: number = this.panels.length
+        index: number = this.panels.length,
+        skipSetActive = false
     ) {
         const existingPanel = this._panels.indexOf(panel);
         const hasExistingPanel = existingPanel > -1;
 
         this.tabsContainer.openPanel(panel, index);
 
-        this.contentContainer.openPanel(panel);
+        if (!skipSetActive) {
+            this.contentContainer.openPanel(panel);
+        }
 
         this.tabsContainer.show();
         this.contentContainer.show();
