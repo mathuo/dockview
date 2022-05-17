@@ -50727,7 +50727,7 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
             this.accessor.doSetGroupActive(this.parent);
             return;
         }
-        this.doAddPanel(panel, options.index);
+        this.doAddPanel(panel, options.index, skipSetActive);
         if (!skipSetActive) {
             this.doSetActivePanel(panel);
             this.accessor.doSetGroupActive(this.parent, !!options.skipFocus);
@@ -50833,11 +50833,13 @@ class Groupview extends _lifecycle__WEBPACK_IMPORTED_MODULE_5__.CompositeDisposa
             panel,
         });
     }
-    doAddPanel(panel, index = this.panels.length) {
+    doAddPanel(panel, index = this.panels.length, skipSetActive = false) {
         const existingPanel = this._panels.indexOf(panel);
         const hasExistingPanel = existingPanel > -1;
         this.tabsContainer.openPanel(panel, index);
-        this.contentContainer.openPanel(panel);
+        if (!skipSetActive) {
+            this.contentContainer.openPanel(panel);
+        }
         this.tabsContainer.show();
         this.contentContainer.show();
         if (hasExistingPanel) {
@@ -51166,6 +51168,7 @@ class Tab extends _lifecycle__WEBPACK_IMPORTED_MODULE_1__.CompositeDisposable {
         this._element.className = 'tab';
         this._element.tabIndex = 0;
         this._element.draggable = true;
+        (0,_dom__WEBPACK_IMPORTED_MODULE_3__.toggleClass)(this.element, 'inactive-tab', true);
         this.addDisposables(new (class Handler extends _dnd_abstractDragHandler__WEBPACK_IMPORTED_MODULE_6__.DragHandler {
             constructor() {
                 super(...arguments);
@@ -51269,7 +51272,6 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
         this.group = group;
         this.tabs = [];
         this.selectedIndex = -1;
-        this.active = false;
         this._hidden = false;
         this._onDrop = new _events__WEBPACK_IMPORTED_MODULE_1__.Emitter();
         this.onDrop = this._onDrop.event;
@@ -51373,8 +51375,8 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
     indexOf(id) {
         return this.tabs.findIndex((tab) => tab.value.panelId === id);
     }
-    setActive(isGroupActive) {
-        this.active = isGroupActive;
+    setActive(_isGroupActive) {
+        // noop
     }
     addTab(tab, index = this.tabs.length) {
         if (index < 0 || index > this.tabs.length) {
@@ -51435,7 +51437,6 @@ class TabsContainer extends _lifecycle__WEBPACK_IMPORTED_MODULE_0__.CompositeDis
         }));
         const value = { value: tabToAdd, disposable };
         this.addTab(value, index);
-        this.activePanel = panel;
     }
     closePanel(panel) {
         this.delete(panel.id);
