@@ -1,0 +1,24 @@
+.console-container {
+    background-color: black;
+    color: white;
+    padding: 8px 0px;
+    max-height: 200px;
+    overflow-y: scroll;
+    overflow-x: auto;
+
+    .console-line {
+        height: 20px;
+        line-height: 20px;
+        font-size: 13px;
+        border-bottom: 1px solid rgb(30, 30, 30);
+
+        .console-line-timestamp {
+            padding: 0px 8px;
+            color: lightgray;
+        }
+
+        .console-line-text {
+            padding-right: 8px;
+        }
+    }
+}

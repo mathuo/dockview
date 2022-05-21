@@ -1,0 +1,271 @@
+import { SimpleDockview } from '../../src/components/simpleDockview';
+import {
+    RenderingDockview,
+    Checkbox,
+} from '../../src/components/dockview/rendering';
+import { DndDockview } from '../../src/components/dockview/dnd';
+import Link from '@docusaurus/Link';
+
+# Dockview
+
+## Introduction
+
+Dockview is an abstraction built on top of [Gridviews](/docs/api/gridview) where each view is a tabbed container.
+
+<div
+    style={{
+        height: '300px',
+        backgroundColor: 'rgb(30,30,30)',
+        color: 'white',
+        margin: '20px 0px',
+    }}
+>
+    <SimpleDockview />
+</div>
+
+```tsx
+const panel = event.api.addPanel(...);
+const anotherPanel = event.api.getPanel('somePanelid');
+```
+
+You can access the panels associated group through the `panel.group` variable.
+The group will always be defined and will change if a panel is moved into another group.
+
+## DockviewReact Component
+
+```tsx
+import { ReactDockview } from 'dockview';
+```
+
+| Property            | Type                                 | Optional | Default | Description                                                     |
+| ------------------- | ------------------------------------ | -------- | ------- | --------------------------------------------------------------- |
+| onReady             | (event: SplitviewReadyEvent) => void | No       |         |                                                                 |
+| components          | object                               | No       |         |                                                                 |
+| tabComponents       | object                               | Yes      |         |                                                                 |
+| watermarkComponent  | object                               | Yes      |         |                                                                 |
+| hideBorders         | boolean                              | Yes      | false   |                                                                 |
+| className           | string                               | Yes      | ''      |                                                                 |
+| disableAutoResizing | boolean                              | Yes      | false   | See <Link to="/docs/basics/#auto-resizing">Auto Resizing</Link> |
+| onTabContextMenu    | Event                                | Yes      | false   |                                                                 |
+| onDidDrop           | Event                                | Yes      | false   |                                                                 |
+| showDndOverlay      | Event                                | Yes      | false   |                                                                 |
+
+## Dockview API
+
+```tsx
+const MyComponent = (props: IDockviewPanelProps<{ title: string }>) => {
+    // props.containerApi...
+
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+```tsx
+const onReady = (event: DockviewReadyEvent) => {
+    // event.api...
+};
+```
+
+| Property               | Type                                                 | Description                                                 |
+| ---------------------- | ---------------------------------------------------- | ----------------------------------------------------------- |
+| height                 | `number`                                             | Component pixel height                                      |
+| width                  | `number`                                             | Component pixel width                                       |
+| minimumHeight          | `number`                                             |                                                             |
+| maximumHeight          | `number`                                             |                                                             |
+| maximumWidth           | `number`                                             |                                                             |
+| maximumWidth           | `number`                                             |                                                             |
+| length                 | `number`                                             | Number of panels                                            |
+| size                   | `number`                                             | Number of Groups                                            |
+| panels                 | `IDockviewPanel[]`                                   |                                                             |
+| groups                 | `GroupPanel[]`                                       |                                                             |
+| activePanel            | `IDockviewPanel \| undefined`                        |                                                             |
+| activeGroup            | `IDockviewPanel \| undefined`                        |                                                             |
+|                        |                                                      |                                                             |
+| onDidLayoutChange      | `Event<void>`                                        |                                                             |
+| onDidLayoutFromJSON    | `Event<void>`                                        |                                                             |
+| onDidAddGroup          | `Event<GroupPanel>`                                  |                                                             |
+| onDidRemoveGroup       | `Event<GroupPanel>`                                  |                                                             |
+| onDidActiveGroupChange | `Event<GroupPanel \| undefined>`                     |                                                             |
+| onDidAddPanel          | `Event<IDockviewPanel>`                              |                                                             |
+| onDidRemovePanel       | `Event<IDockviewPanel>`                              |                                                             |
+| onDidActivePanelChange | `Event<IDockviewPanel \| undefined>`                 |                                                             |
+| onDidDrop              | `Event<DockviewDropEvent`                            |                                                             |
+|                        |                                                      |                                                             |
+| addPanel               | `addPanel(options: AddPanelOptions): IDockviewPanel` |                                                             |
+| getPanel               | `(id: string) \| IDockviewPanel \| undefined`        |                                                             |
+| addEmptyGroup          | `(options? AddGroupOptions): void`                   |                                                             |
+| closeAllGroups         | `(): void`                                           |                                                             |
+| removeGroup            | `(group: GroupPanel): void`                          |                                                             |
+| getGroup               | `(id: string): GroupPanel \| undefined`              |                                                             |
+|                        |                                                      |                                                             |
+| getTabHeight           | `(): number \| undefined`                            |                                                             |
+| setTabHeight           | `(hegiht: number \| undefined): void`                |                                                             |
+| updateOptions          | `(options:SplitviewComponentUpdateOptions): void`    |                                                             |
+| focus                  | `(): void`                                           |                                                             |
+| layout                 | `(width: number, height:number): void`               | <Link to="/docs/basics/#auto-resizing">Auto Resizing</Link> |
+| fromJSON               | `(data: SerializedDockview): void`                   | <Link to="/docs/basics/#serialization">Serialization</Link> |
+| toJSON                 | `(): SerializedDockview`                             | <Link to="/docs/basics/#serialization">Serialization</Link> |
+
+## Dockview Panel API
+
+```tsx
+const MyComponent = (props: IDockviewPanelProps<{ title: string }>) => {
+    // props.api...
+
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+| Property               | Type                                                        | Description     |
+| ---------------------- | ----------------------------------------------------------- | --------------- |
+| id                     | `string`                                                    | Panel id        |
+| isFocused              | `boolean`                                                   | Is panel focsed |
+| isActive               | `boolean`                                                   | Is panel active |
+| width                  | `number`                                                    | Panel width     |
+| height                 | `number`                                                    | Panel height    |
+| onDidDimensionsChange  | `Event<PanelDimensionChangeEvent>`                          |                 |
+| onDidFocusChange       | `Event<FocusEvent>`                                         |                 |
+| onDidVisibilityChange  | `Event<VisibilityEvent>`                                    |                 |
+| onDidActiveChange      | `Event<ActiveEvent>`                                        |                 |
+| setActive              | `(): void`                                                  |                 |
+|                        |                                                             |                 |
+| onDidConstraintsChange | `onDidConstraintsChange: Event<PanelConstraintChangeEvent>` |                 |
+| setConstraints         | `(value: PanelConstraintChangeEvent2): void;`               |                 |
+| setSize                | `(event: SizeEvent): void`                                  |                 |
+|                        |                                                             |                 |
+| group                  | `GroupPanel                                                 | undefined`      |
+| isGroupActive          | `boolean`                                                   |                 |
+| title                  | `string`                                                    |                 |
+| suppressClosable       | `boolean`                                                   |                 |
+| close                  | `(): void`                                                  |                 |
+| setTitle               | `(title: string): void`                                     |                 |
+
+## Advanced Features
+
+### Locked group
+
+Locking a group will disable all drop events for this group ensuring a user can not add additional panels to the group.
+You can still add groups to a locked panel programatically using the api.
+
+```tsx
+panel.group.locked = true;
+```
+
+### Group header
+
+You may wish to hide the header section of a group. This can achieved through setting the `hidden` variable on `panel.group.header`.
+
+```tsx
+panel.group.header.hidden = true;
+```
+
+### Context Menu
+
+import { ContextMenuDockview } from '../../src/components/dockview/contextMenu';
+
+<div
+    style={{
+        height: '300px',
+        backgroundColor: 'rgb(30,30,30)',
+        color: 'white',
+        margin: '20px 0px',
+    }}
+>
+    <ContextMenuDockview />
+</div>
+
+### Rendering
+
+Although `DockviewReact` will only add those tabs that are visible to the DOM all associated React Components for each tab including those that
+are not initially visible will be created.
+This will mean that any hooks in those components will run and if you running expensive operations in the tabs you may end up doing a lot of initial
+work for what are hidden tabs.
+
+This is the default behaviour to ensure the greatest flexibility for the user but you can create a Higher-Order component wrapping your components that
+will ensure the component is only created if the tab is visible as below:
+
+```tsx
+import { PanelApi } from 'dockview';
+import * as React from 'react';
+
+function RenderWhenVisible<
+    T extends { api: Pick<PanelApi, 'isVisible' | 'onDidVisibilityChange'> }
+>(component: React.FunctionComponent<T>) {
+    const HigherOrderComponent = (props: T) => {
+        const [visible, setVisible] = React.useState<boolean>(
+            props.api.isVisible
+        );
+
+        React.useEffect(() => {
+            const disposable = props.api.onDidVisibilityChange((event) =>
+                setVisible(event.isVisible)
+            );
+
+            return () => {
+                disposable.dispose();
+            };
+        }, [props.api]);
+
+        if (!visible) {
+            return null;
+        }
+
+        return React.createElement(component, props);
+    };
+    return HigherOrderComponent;
+}
+```
+
+```tsx
+const component = RenderWhenVisible(MyComponent);
+```
+
+Through toggling the checkbox you can see that when you only render those panels which are visible the underling React component is destroyed when it becomes hidden and re-created when it becomes visible.
+
+<Checkbox />
+<div
+    style={{
+        height: '300px',
+        backgroundColor: 'rgb(30,30,30)',
+        color: 'white',
+        margin: '20px 0px',
+    }}
+>
+    <RenderingDockview renderVisibleOnly={false} />
+</div>
+
+### Drag And Drop
+
+<DndDockview />
+
+Both `DockviewReact` and `PaneviewReact` support drag and drop functionality out of the box.
+
+-   `DockviewReact` allows tabs to be repositioned using drag and drop.
+-   `PaneviewReact` allows the repositioning of views using drag and drop on the header section.
+
+You can use the utility methods `getPaneData` and `getPanelData` to manually extract the data transfer metadata associated with an active drag and drop event for either of the above components.
+
+```tsx
+import {
+    getPaneData,
+    getPanelData,
+    PanelTransfer,
+    PaneTransfer,
+} from 'dockview';
+
+const panelData: PanelTransfer | undefined = getPanelData();
+
+if (panelData) {
+    // DockviewReact: data transfer metadata associated with the active drag and drop event
+    const { viewId, groupId, panelId } = panelData; // deconstructed object
+}
+
+const paneData: PaneTransfer | undefined = getPaneData();
+
+if (paneData) {
+    // PaneviewReact: data transfer metadata associated with the active drag and drop event
+    const { viewId, paneId } = paneData; // deconstructed object
+}
+```
+
+See example [here](https://codesandbox.io/s/workspace-saving-example-euo5d).

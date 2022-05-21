@@ -1,0 +1,63 @@
+.splitview-math-blog {
+    .sash {
+        background-color: orange;
+        position: absolute;
+        top: 0px;
+        width: 4px;
+        height: 100%;
+        z-index: 2;
+        cursor: ew-resize;
+        user-select: none;
+    }
+
+    .debug-sash-max {
+        height: 10px;
+        width: 1px;
+        position: absolute;
+        z-index: 999;
+        top: -10px;
+    }
+
+    .debug-sash-min {
+        height: 10px;
+        width: 1px;
+        position: absolute;
+        z-index: 999;
+        top: 100%;
+    }
+
+    .debug-sash-text {
+        height: 20px;
+        line-height: 20px;
+        width: 80px;
+        display: flex;
+        justify-content: center;
+        position: absolute;
+        z-index: 999;
+        font-size: 14px;
+    }
+
+    .sash-container {
+        position: absolute;
+        height: 100%;
+    }
+
+    .view-container {
+        position: relative;
+        height: 100%;
+    }
+
+    .view {
+        position: absolute;
+        height: 100%;
+        background-color: dodgerblue;
+        z-index: 1;
+        top: 0px;
+        padding: 10px;
+        color: white;
+    }
+
+    .sash.drag-sash {
+        background-color: red;
+    }
+}
