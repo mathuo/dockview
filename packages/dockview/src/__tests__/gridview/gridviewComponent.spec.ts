@@ -1761,4 +1761,126 @@ describe('gridview', () => {
         expect(panel1Spy).toHaveBeenCalledTimes(1);
         expect(panel2Spy).toHaveBeenCalledTimes(1);
     });
+
+    test('fromJSON  events should still fire', () => {
+        jest.useFakeTimers();
+
+        const gridview = new GridviewComponent(container, {
+            proportionalLayout: true,
+            orientation: Orientation.HORIZONTAL,
+            components: { default: TestGridview },
+        });
+
+        let addGroup: GridviewPanel[] = [];
+        let removeGroup: GridviewPanel[] = [];
+        let activeGroup: (GridviewPanel | undefined)[] = [];
+        let layoutChange = 0;
+        let layoutChangeFromJson = 0;
+
+        const disposable = new CompositeDisposable(
+            gridview.onDidAddGroup((panel) => {
+                addGroup.push(panel);
+            }),
+            gridview.onDidRemoveGroup((panel) => {
+                removeGroup.push(panel);
+            }),
+            gridview.onDidActiveGroupChange((event) => {
+                activeGroup.push(event);
+            }),
+            gridview.onDidLayoutChange(() => {
+                layoutChange++;
+            }),
+            gridview.onDidLayoutFromJSON(() => {
+                layoutChangeFromJson++;
+            })
+        );
+
+        gridview.fromJSON({
+            grid: {
+                height: 400,
+                width: 800,
+                orientation: Orientation.HORIZONTAL,
+                root: {
+                    type: 'branch',
+                    size: 400,
+                    data: [
+                        {
+                            type: 'leaf',
+                            size: 200,
+                            data: {
+                                id: 'panel_1',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                        {
+                            type: 'branch',
+                            size: 400,
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    size: 250,
+                                    data: {
+                                        id: 'panel_2',
+                                        component: 'default',
+                                        snap: false,
+                                    },
+                                },
+                                {
+                                    type: 'leaf',
+                                    size: 150,
+                                    data: {
+                                        id: 'panel_3',
+                                        component: 'default',
+                                        snap: false,
+                                    },
+                                },
+                            ],
+                        },
+                        {
+                            type: 'leaf',
+                            size: 200,
+                            data: {
+                                id: 'panel_4',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                    ],
+                },
+            },
+            activePanel: 'panel_1',
+        });
+
+        jest.runAllTimers();
+
+        expect(addGroup.length).toBe(4);
+        expect(removeGroup.length).toBe(0);
+        expect(activeGroup.length).toBe(1);
+        expect(activeGroup[0]).toEqual(gridview.getPanel('panel_1'));
+        expect(layoutChange).toBe(1);
+        expect(layoutChangeFromJson).toBe(1);
+
+        addGroup = [];
+        activeGroup = [];
+
+        gridview.fromJSON({
+            grid: {
+                height: 0,
+                width: 0,
+                root: { type: 'branch', data: [] },
+                orientation: Orientation.HORIZONTAL,
+            },
+        });
+
+        jest.runAllTimers();
+
+        expect(addGroup.length).toBe(0);
+        expect(removeGroup.length).toBe(4);
+        expect(activeGroup.length).toBe(1);
+        expect(layoutChange).toBe(2);
+        expect(layoutChangeFromJson).toBe(2);
+
+        return disposable.dispose();
+    });
 });
