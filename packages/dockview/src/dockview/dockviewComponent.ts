@@ -75,6 +75,7 @@ DockviewComponentOptions,
 
 export interface DockviewDropEvent extends GroupviewDropEvent {
     api: DockviewApi;
+    group: GroupPanel
 }
 
 export interface IDockviewComponent extends IBaseGrid<GroupPanel> {
@@ -678,7 +679,7 @@ export class DockviewComponent
                     this.moveGroupOrPanel(view, groupId, itemId, target, index);
                 }),
                 view.model.onDidDrop((event) => {
-                    this._onDidDrop.fire({ ...event, api: this._api });
+                    this._onDidDrop.fire({ ...event, api: this._api, group: view });
                 }),
                 view.model.onDidGroupChange((event) => {
                     switch (event.kind) {

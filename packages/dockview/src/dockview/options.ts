@@ -49,6 +49,12 @@ export interface ViewFactoryData {
     tab?: string;
 }
 
+export interface DockviewDndOverlayEvent {
+    nativeEvent: DragEvent;
+    target: DockviewDropTargets;
+    group: GroupPanel;
+}
+
 export interface DockviewComponentOptions extends DockviewRenderFunctions {
     watermarkComponent?: WatermarkConstructor;
     watermarkFrameworkComponent?: any;
@@ -56,7 +62,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     tabHeight?: number;
     orientation?: Orientation;
     styles?: ISplitviewStyles;
-    showDndOverlay?: (event: DragEvent, target: DockviewDropTargets) => boolean;
+    showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
 }
 
 export interface PanelOptions {

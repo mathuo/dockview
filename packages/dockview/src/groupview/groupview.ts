@@ -659,7 +659,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     canDisplayOverlay(event: DragEvent, target: DockviewDropTargets): boolean {
         // custom overlay handler
         if (this.accessor.options.showDndOverlay) {
-            return this.accessor.options.showDndOverlay(event, target);
+            return this.accessor.options.showDndOverlay({
+                nativeEvent: event,
+                target,
+                group: this.accessor.getPanel(this.id)!,
+            });
         }
         return false;
     }

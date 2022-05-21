@@ -8,6 +8,7 @@ export * from './gridview/baseComponentGridview';
 
 export * from './groupview/panel/content';
 export * from './groupview/tab';
+export * from './groupview/dnd';
 export * from './groupview/types';
 export * from './dockview/options';
 
