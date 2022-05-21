@@ -134,7 +134,7 @@ describe('component.api', () => {
                 'onDidActivePanelChange',
                 'onDidAddPanel',
                 'onDidRemovePanel',
-                'onDidLayoutfromJSON',
+                'onDidLayoutFromJSON',
             ];
 
             for (const _ of list) {

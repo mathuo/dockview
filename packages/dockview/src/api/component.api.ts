@@ -369,7 +369,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     get onDidLayoutFromJSON(): Event<void> {
-        return this.component.onDidLayoutfromJSON;
+        return this.component.onDidLayoutFromJSON;
     }
 
     get onDidLayoutChange(): Event<void> {
