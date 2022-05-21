@@ -236,36 +236,44 @@ Through toggling the checkbox you can see that when you only render those panels
 
 ### Drag And Drop
 
-<DndDockview />
-
-Both `DockviewReact` and `PaneviewReact` support drag and drop functionality out of the box.
-
--   `DockviewReact` allows tabs to be repositioned using drag and drop.
--   `PaneviewReact` allows the repositioning of views using drag and drop on the header section.
-
-You can use the utility methods `getPaneData` and `getPanelData` to manually extract the data transfer metadata associated with an active drag and drop event for either of the above components.
+The component exposes some method to help determine whether external drag events should be interacted with or not.
 
 ```tsx
-import {
-    getPaneData,
-    getPanelData,
-    PanelTransfer,
-    PaneTransfer,
-} from 'dockview';
+/**
+ * called when an ondrop event which does not originate from the dockview libray and
+ * passes the showDndOverlay condition occurs
+ **/
+const onDidDrop = (event: DockviewDropEvent) => {
+    const { group } = event;
 
-const panelData: PanelTransfer | undefined = getPanelData();
+    event.api.addPanel({
+        id: 'test',
+        component: 'default',
+        position: {
+            referencePanel: group.activePanel.id,
+            direction: 'within',
+        },
+    });
+};
 
-if (panelData) {
-    // DockviewReact: data transfer metadata associated with the active drag and drop event
-    const { viewId, groupId, panelId } = panelData; // deconstructed object
-}
+/**
+ * called for drag over events which do not originate from the dockview library
+ * allowing the developer to decide where the overlay should be shown for a
+ * particular drag event
+ **/
+const showDndOverlay = (event: DockviewDndOverlayEvent) => {
+    return true;
+};
 
-const paneData: PaneTransfer | undefined = getPaneData();
-
-if (paneData) {
-    // PaneviewReact: data transfer metadata associated with the active drag and drop event
-    const { viewId, paneId } = paneData; // deconstructed object
-}
+return (
+    <DockviewReact
+        components={components}
+        onReady={onReady}
+        className="dockview-theme-dark"
+        onDidDrop={onDidDrop}
+        showDndOverlay={showDndOverlay}
+    />
+);
 ```
 
-See example [here](https://codesandbox.io/s/workspace-saving-example-euo5d).
+<DndDockview />

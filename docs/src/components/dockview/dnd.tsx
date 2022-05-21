@@ -1,10 +1,10 @@
 import {
+    DockviewDndOverlayEvent,
     DockviewDropEvent,
     DockviewReact,
     DockviewReadyEvent,
     IDockviewPanelProps,
 } from 'dockview';
-import { DockviewDropTargets } from 'dockview/dist/cjs/groupview/dnd';
 import * as React from 'react';
 
 const components = {
@@ -54,10 +54,19 @@ export const DndDockview = (props: { renderVisibleOnly: boolean }) => {
     };
 
     const onDidDrop = (event: DockviewDropEvent) => {
-        console.log(event);
+        const { group } = event;
+
+        event.api.addPanel({
+            id: 'test',
+            component: 'default',
+            position: {
+                referencePanel: group.activePanel.id,
+                direction: 'within',
+            },
+        });
     };
 
-    const showDndOverlay = (event: DragEvent, targets: DockviewDropTargets) => {
+    const showDndOverlay = (event: DockviewDndOverlayEvent) => {
         return true;
     };
 
@@ -66,8 +75,10 @@ export const DndDockview = (props: { renderVisibleOnly: boolean }) => {
             <div
                 style={{
                     backgroundColor: 'orange',
-                    color: 'white',
+                    padding: '0px 8px',
+                    borderRadius: '4px',
                     width: '100px',
+                    cursor: 'pointer',
                 }}
                 draggable={true}
             >

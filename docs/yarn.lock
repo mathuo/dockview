@@ -3354,10 +3354,10 @@ dns-packet@^5.2.2:
   dependencies:
     "@leichtgewicht/ip-codec" "^2.0.1"
 
-dockview@^1.4.1:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/dockview/-/dockview-1.4.2.tgz#20efbedccdebc64f0ee95d19460f158d52dc7792"
-  integrity sha512-GPELYEOd6u83VLJ8XXMV4VE9otuHJydSoeoy4uKyrZ+ZAxxv1UVJiEjub0GVlsMRgeeatT4pnBQsgRpgm8jPkQ==
+dockview@0.0.0-experimental-d306387a-20220521:
+  version "0.0.0-experimental-d306387a-20220521"
+  resolved "https://registry.yarnpkg.com/dockview/-/dockview-0.0.0-experimental-d306387a-20220521.tgz#64ecf9ee358c45c7007d0a4b01f0437064fa5232"
+  integrity sha512-pyOhqXORHY9Y6FOmhzFnZueoJ5kdM1J3elcxNbL+hgvaabcykGHeu+3C42lAFA9xnzi/4ru/31547CRFw26oCw==
 
 docusaurus-plugin-sass@^0.2.2:
   version "0.2.2"
