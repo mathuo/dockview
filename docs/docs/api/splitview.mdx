@@ -1,0 +1,242 @@
+import { SimpleSplitview } from '../../src/components/simpleSplitview';
+import { SplitviewExample1 } from '../../src/components/splitview/active';
+import Link from '@docusaurus/Link';
+
+# Splitview
+
+## Introduction
+
+A Splitview is a collection resizable horizontally or vertically stacked panels.
+The Splitview exposes a component level API through the `onReady` event and through the `props.containerApi` variable on the panel props.
+A panel level API is exposed on each panel through it's props as `props.api`.
+
+<div
+    style={{
+        height: '100px',
+        backgroundColor: 'rgb(30,30,30)',
+        color: 'white',
+        margin: '20px 0px',
+    }}
+>
+    <SimpleSplitview />
+</div>
+
+```tsx title="Simple Splitview example"
+import {
+    ISplitviewPanelProps,
+    Orientation,
+    SplitviewReact,
+    SplitviewReadyEvent,
+} from 'dockview';
+
+const components = {
+    default: (props: ISplitviewPanelProps<{ title: string }>) => {
+        return <div style={{ padding: '20px' }}>{props.params.title}</div>;
+    },
+};
+
+export const SimpleSplitview = () => {
+    const onReady = (event: SplitviewReadyEvent) => {
+        event.api.addPanel({
+            id: 'panel_1',
+            component: 'default',
+            params: {
+                title: 'Panel 1',
+            },
+        });
+
+        event.api.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            params: {
+                title: 'Panel 2',
+            },
+        });
+
+        event.api.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            params: {
+                title: 'Panel 3',
+            },
+        });
+    };
+
+    return (
+        <SplitviewReact
+            components={components}
+            onReady={onReady}
+            orientation={Orientation.HORIZONTAL}
+            className="dockview-theme-dark"
+        />
+    );
+};
+```
+
+## SplitviewReact Component
+
+You can create a Splitview through the use of the `ReactSplitview` component.
+
+```tsx
+import { ReactSplitview } from 'dockview';
+```
+
+Using the `onReady` prop you can access to the component `api` and add panels either through deserialization or indivial addition of panels.
+
+| Property            | Type                                   | Optional | Default                  | Description                                                                 |
+| ------------------- | -------------------------------------- | -------- | ------------------------ | --------------------------------------------------------------------------- |
+| onReady             | `(event: SplitviewReadyEvent) => void` | No       |                          | Function                                                                    |
+| components          | `Record<string, ISplitviewPanelProps>` | No       |                          | Panel renderers                                                             |
+| orientation         | `Orientation`                          | Yes      | `Orientation.HORIZONTAL` | Orientation of the Splitview                                                |
+| proportionalLayout  | `boolean`                              | Yes      | `true`                   | See <Link to="/docs/basics/#proportional-layout">Proportional layout</Link> |
+| hideBorders         | `boolean`                              | Yes      | `false`                  | Hide the borders between panels                                             |
+| className           | `string`                               | Yes      | `''`                     | Attaches a classname                                                        |
+| disableAutoResizing | `boolean`                              | Yes      | `false`                  | See <Link to="/docs/basics/#auto-resizing">Auto Resizing</Link>             |
+
+## Splitview API
+
+The Splitview API is exposed both at the `onReady` event and on each panel through `props.containerApi`.
+
+```tsx title="Splitview API via Panel component"
+const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
+    // props.containerApi...
+
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+```tsx title="Splitview API via the onReady callback"
+const onReady = (event: SplitviewReadyEvent) => {
+    // event.api...
+};
+```
+
+| Property            | Type                                                               | Description                                                      |
+| ------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| height              | `number`                                                           | Component pixel height                                           |
+| width               | `number`                                                           | Component pixel width                                            |
+| minimumSize         | `number`                                                           | The sum of the `minimumSize` property for each panel             |
+| maximumSize         | `number`                                                           | The sum of the `maximumSize` property for each panel             |
+| length              | `number`                                                           | Number of panels                                                 |
+| panels              | `ISplitviewPanel[]`                                                | All panels                                                       |
+|                     |                                                                    |                                                                  |
+| onDidLayoutChange   | `Event<void>`                                                      | Fires on layout change                                           |
+| onDidLayoutFromJSON | `Event<void>`                                                      | Fires of layout change caused by a fromJSON deserialization call |
+| onDidAddView        | `Event<IView>`                                                     | Fires when a view is added                                       |
+| onDidRemoveView     | `Event<IView>`                                                     | Fires when a view is removed                                     |
+|                     |                                                                    |                                                                  |
+| addPanel            | `addPanel(options: AddSplitviewComponentOptions): ISplitviewPanel` |                                                                  |
+| removePanel         | `(panel: ISplitviewPanel, sizing?: Sizing): void`                  |                                                                  |
+| getPanel            | `(id:string): ISplitviewPanel \| undefined`                        |                                                                  |
+| movePanel           | `(from: number, to: number): void`                                 |                                                                  |
+|                     |                                                                    |
+| updateOptions       | `(options: SplitviewComponentUpdateOptions): void`                 |                                                                  |
+| focus               | `(): void`                                                         | Focus the active panel, if exists                                |
+| layout              | `(width: number, height:number): void`                             | See <Link to="/docs/basics/#auto-resizing">Auto Resizing</Link>  |
+| fromJSON            | `(data: SerializedSplitview): void`                                | <Link to="/docs/basics/#serialization">Serialization</Link>      |
+| toJSON              | `(): SerializedSplitview`                                          | <Link to="/docs/basics/#serialization">Serialization</Link>      |
+
+## Splitview Panel API
+
+The Splitview panel API is exposed on each panel and contains actions and variables specific to that panel.
+
+```tsx title="Splitview panel API via Panel component"
+const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
+    // props.api...
+
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+| Property               | Type                                                        | Description                                                                                                                  |
+| ---------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| id                     | `string`                                                    | Panel id                                                                                                                     |
+| isFocused              | `boolean`                                                   | Is panel focsed                                                                                                              |
+| isActive               | `boolean`                                                   | Is panel active                                                                                                              |
+| isVisible              | `boolean`                                                   | Is panel visible                                                                                                             |
+| width                  | `number`                                                    | Panel width                                                                                                                  |
+| height                 | `number`                                                    | Panel height                                                                                                                 |
+|                        |                                                             |                                                                                                                              |
+| onDidDimensionsChange  | `Event<PanelDimensionChangeEvent>`                          | Fires when panel dimensions change                                                                                           |
+| onDidFocusChange       | `Event<FocusEvent>`                                         | Fire when panel is focused and blurred                                                                                       |
+| onDidVisibilityChange  | `Event<VisibilityEvent>`                                    | Fires when the panels visiblity property is changed (see <Link to="/docs/api/splitview/#visibility">Panel Visibility</Link>) |
+| onDidActiveChange      | `Event<ActiveEvent>`                                        | Fires when the panels active property is changed (see <Link to="/docs/api/splitview/#active">Active Panel</Link>)            |
+| onDidConstraintsChange | `onDidConstraintsChange: Event<PanelConstraintChangeEvent>` | Fires when the panels size contrainsts change (see <Link to="/docs/api/splitview/#contraints">Panel Constraints</Link>)      |
+|                        |                                                             |                                                                                                                              |
+| setVisible             | `(isVisible: boolean): void`                                |                                                                                                                              |
+| setActive              | `(): void`                                                  |                                                                                                                              |
+|                        |                                                             |                                                                                                                              |
+| setConstraints         | `(value: PanelConstraintChangeEvent2): void;`               |                                                                                                                              |
+| setSize                | `(event: PanelSizeEvent): void`                             |                                                                                                                              |
+
+## Advanced Features
+
+Listed below are some functionality avalaible to you through both the panel and component APIs. The live demo shows examples of these in real-time.
+
+<div
+    style={{
+        height: '200px',
+        margin: '20px 0px',
+    }}
+>
+    <SplitviewExample1 />
+</div>
+
+### Visibility
+
+A panels visibility can be controlled and monitoring through the following code.
+A panel with visibility set to `false` will remain as a part of the components list of panels but will not be rendered.
+
+```tsx
+const disposable = props.api.onDidVisibilityChange(({ isVisible }) => {
+    //
+});
+```
+
+```tsx
+api.setVisible(true);
+```
+
+### Active
+
+Only one panel in the `splitview` can be the active panel at any one time.
+Setting a panel as active will set all the others as inactive.
+A focused panel is always the active panel but an active panel is not always focused.
+
+```tsx
+const disposable = props.api.onDidActiveChange(({ isActive }) => {
+    //
+});
+```
+
+```tsx
+api.setActive();
+```
+
+### Contraints
+
+When adding a panel you can specify pixel size contraints
+
+```tsx
+event.api.addPanel({
+    id: 'panel_3',
+    component: 'default',
+    minimumSize: 100,
+    maximumSize: 1000,
+});
+```
+
+These contraints can be updated throughout the lifecycle of the `splitview` using the panel API
+
+```tsx
+props.api.onDidConstraintsChange(({ maximumSize, minimumSize }) => {
+    //
+});
+```
+
+```tsx
+api.setConstraints({
+    maximumSize: 200,
+    minimumSize: 400,
+});
+```

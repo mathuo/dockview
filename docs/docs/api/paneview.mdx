@@ -1,0 +1,182 @@
+import { SimplePaneview } from '../../src/components/simplePaneview';
+import Link from '@docusaurus/Link';
+
+# Paneview
+
+<div
+    style={{
+        height: '400px',
+        backgroundColor: 'rgb(30,30,30)',
+        color: 'white',
+        margin: '20px 0px',
+    }}
+>
+    <SimplePaneview />
+</div>
+
+## Component Props
+
+```tsx
+import { ReactPaneview } from 'dockview';
+```
+
+| Property            | Type                                 | Optional | Default | Description                                                 |
+| ------------------- | ------------------------------------ | -------- | ------- | ----------------------------------------------------------- |
+| onReady             | (event: SplitviewReadyEvent) => void | No       |         |                                                             |
+| components          | object                               | No       |         |                                                             |
+| headerComponents    | object                               | Yes      |         |                                                             |
+| className           | string                               | Yes      | ''      |                                                             |
+| disableAutoResizing | boolean                              | Yes      | false   | <Link to="/docs/basics/#auto-resizing">Auto Resizing</Link> |
+| disableDnd          | boolean                              | Yes      | false   |                                                             |
+| onDidDrop           | Event                                | Yes      |         |                                                             |
+
+## Custom Header
+
+The above example shows the default header and will render the `title` along with a small icon to indicate a collapsed or expanded state.
+You can provide a custom header:
+
+```tsx
+const onReady = (event: PaneviewReadyEvent) => {
+    event.api.addPanel({
+        id: 'panel_1',
+        component: 'default',
+        headerComponent: 'myHeaderComponent',
+        params: {
+            valueA: 'A',
+        },
+        title: 'Panel 1',
+    });
+};
+```
+
+## Custom Header
+
+The above example shows the default header and will render the `title` along with a small icon to indicate a collapsed or expanded state.
+You can provide a custom header:
+
+```tsx
+const onReady = (event: PaneviewReadyEvent) => {
+    event.api.addPanel({
+        id: 'panel_1',
+        component: 'default',
+        headerComponent: 'myHeaderComponent',
+        params: {
+            valueA: 'A',
+        },
+        title: 'Panel 1',
+    });
+};
+```
+
+You can define a header component and listen to the expanded state to update the component accordingly.
+
+```tsx
+const CustomHeader = (props: IPaneviewPanelProps) => {
+    const [expanded, setExpanded] = React.useState<boolean>(
+        props.api.isExpanded
+    );
+
+    React.useEffect(() => {
+        const disposable = props.api.onDidExpansionChange((event) => {
+            setExpanded(event.isExpanded);
+        });
+
+        return () => {
+            disposable.dispose();
+        };
+    }, []);
+
+    const onClick = () => {
+        props.api.setExpanded(!expanded);
+    };
+
+    return (
+        <div>
+            <a
+                onClick={onClick}
+                className={expanded ? 'expanded' : 'collapsed'}
+            />
+            <span>{props.params.title}</span>
+        </div>
+    );
+};
+```
+
+You should provide a value for the `headerComponents` React prop.
+
+```tsx
+const headerComponents = { myHeaderComponent: CustomHeader };
+```
+
+## Paneview API
+
+```tsx
+const MyComponent = (props: IGridviewPanelProps<{ title: string }>) => {
+    // props.containerApi...
+
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+```tsx
+const onReady = (event: GridviewReadyEvent) => {
+    // event.api...
+};
+```
+
+| Property            | Type                                                             | Description                                                                                             |
+| ------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| height              | `number`                                                         | Component pixel height                                                                                  |
+| width               | `number`                                                         | Component pixel width                                                                                   |
+| minimumSize         | `number`                                                         | The sum of the `minimumSize` property for each panel                                                    |
+| maximumSize         | `number`                                                         | The sum of the `maximumSize` property for each panel                                                    |
+| length              | `number`                                                         | Number of panels                                                                                        |
+| panels              | `IPaneviewPanel[]`                                               | All panels                                                                                              |
+|                     |                                                                  |                                                                                                         |
+| onDidLayoutChange   | `Event<void>`                                                    | Fires on layout change                                                                                  |
+| onDidLayoutFromJSON | `Event<void>`                                                    | Fires of layout change caused by a fromJSON deserialization call                                        |
+| onDidAddView        | `Event<IPaneviewPanel>`                                          | Fires when a view is added                                                                              |
+| onDidRemoveView     | `Event<IPaneviewPanel>`                                          | Fires when a view is removed                                                                            |
+| onDidDrop           | `Event<PaneviewDropEvent`                                        | Fires on an external drop event (See <Link to="/docs/api/paneview/#drag-and-drop">Drag and Drop</Link>) |
+|                     |                                                                  |                                                                                                         |
+| addPanel            | `addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel` |                                                                                                         |
+| removePanel         | `(panel: IPaneviewPanel): void`                                  |                                                                                                         |
+| movePanel           | `(from: number, to: number): void`                               |                                                                                                         |
+| getPanel            | `(id:string): IPaneviewPanel \| undefined`                       |                                                                                                         |
+|                     |                                                                  |                                                                                                         |
+| focus               | `(): void`                                                       | Focus the active panel, if exists                                                                       |
+| layout              | `(width: number, height:number): void`                           | See <Link to="/docs/basics/#auto-resizing">Auto Resizing</Link>                                         |
+| fromJSON            | `(data: SerializedPaneview): void`                               | <Link to="/docs/basics/#serialization">Serialization</Link>                                             |
+| toJSON              | `(): SerializedPaneview`                                         | <Link to="/docs/basics/#serialization">Serialization</Link>                                             |
+
+## Gridview Panel API
+
+```tsx
+const MyComponent = (props: IGridviewPanelProps<{ title: string }>) => {
+    // props.api...
+
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+| Property               | Type                                                        | Description      |
+| ---------------------- | ----------------------------------------------------------- | ---------------- |
+| id                     | `string`                                                    | Panel id         |
+| isFocused              | `boolean`                                                   | Is panel focsed  |
+| isActive               | `boolean`                                                   | Is panel active  |
+| isVisible              | `boolean`                                                   | Is panel visible |
+| width                  | `number`                                                    | Panel width      |
+| height                 | `number`                                                    | Panel height     |
+|                        |                                                             |
+| onDidDimensionsChange  | `Event<PanelDimensionChangeEvent>`                          |                  |
+| onDidFocusChange       | `Event<FocusEvent>`                                         |                  |
+| onDidVisibilityChange  | `Event<VisibilityEvent>`                                    |                  |
+| onDidActiveChange      | `Event<ActiveEvent>`                                        |                  |
+| onDidConstraintsChange | `onDidConstraintsChange: Event<PanelConstraintChangeEvent>` |                  |
+|                        |                                                             |
+| setVisible             | `(isVisible: boolean): void`                                |                  |
+| setActive              | `(): void`                                                  |                  |
+| setConstraints         | `(value: PanelConstraintChangeEvent2): void;`               |                  |
+| setSize                | `(event: SizeEvent): void`                                  |                  |
+
+# Drag And Drop
