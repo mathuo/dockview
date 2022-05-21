@@ -1,7 +1,4 @@
-import {
-    IDockviewComponent,
-    DockviewComponent,
-} from '../../dockview/dockviewComponent';
+import { DockviewComponent } from '../../dockview/dockviewComponent';
 import {
     GroupviewPanelState,
     IDockviewPanel,
@@ -210,7 +207,7 @@ class TestPanel implements IDockviewPanel {
 
 describe('groupview', () => {
     let groupview: GroupPanel;
-    let dockview: IDockviewComponent;
+    let dockview: DockviewComponent;
     let options: GroupOptions;
 
     let removePanelMock: jest.Mock;
@@ -528,7 +525,7 @@ describe('groupview', () => {
     });
 
     test("that openPanel with skipSetActive doesn't set panel to active", () => {
-        const dockviewComponent: IDockviewComponent = new DockviewComponent(
+        const dockviewComponent = new DockviewComponent(
             document.createElement('div'),
             {
                 components: {

@@ -7,7 +7,7 @@ import { addDisposableListener, Emitter, Event } from '../../events';
 import { ITab, MouseEventKind, Tab } from '../tab';
 import { last } from '../../array';
 import { IDockviewPanel } from '../groupPanel';
-import { IDockviewComponent } from '../../dockview/dockviewComponent';
+import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { getPanelData } from '../../dnd/dataTransfer';
 import { GroupPanel } from '../groupviewPanel';
 import { Droptarget } from '../../dnd/droptarget';
@@ -138,7 +138,7 @@ export class TabsContainer
     }
 
     constructor(
-        private accessor: IDockviewComponent,
+        private accessor: DockviewComponent,
         private group: GroupPanel,
         options: { tabHeight?: number }
     ) {
