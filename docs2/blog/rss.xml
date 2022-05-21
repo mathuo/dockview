@@ -4,7 +4,7 @@
         <title>Dockview Blog</title>
         <link>https://your-docusaurus-test-site.com/dockview/docs2/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Sat, 21 May 2022 17:43:41 GMT</lastBuildDate>
+        <lastBuildDate>Sat, 21 May 2022 18:50:12 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
@@ -12,7 +12,7 @@
             <title><![CDATA[math/math]]></title>
             <link>https://your-docusaurus-test-site.com/dockview/docs2/blog/math/math</link>
             <guid>/math/math</guid>
-            <pubDate>Sat, 21 May 2022 17:43:41 GMT</pubDate>
+            <pubDate>Sat, 21 May 2022 18:50:12 GMT</pubDate>
             <description><![CDATA[Wondering how to create a resizable split view, pane or window; whichever you may call it?]]></description>
             <content:encoded><![CDATA[<p>Wondering how to create a resizable split view, pane or window; whichever you may call it?
 Here's a langauge indepedant walkthrough of how to design a split view control from scratch and the simple math behind it.
