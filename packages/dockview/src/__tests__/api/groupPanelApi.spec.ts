@@ -1,4 +1,4 @@
-import { IDockviewComponent } from '../../dockview/dockviewComponent';
+import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { DockviewPanelApiImpl, TitleEvent } from '../../api/groupPanelApi';
 import { IDockviewPanel } from '../../groupview/groupPanel';
 import { GroupPanel } from '../../groupview/groupviewPanel';
@@ -10,9 +10,9 @@ describe('groupPanelApi', () => {
             title: 'test_title',
         };
 
-        const accessor: Partial<IDockviewComponent> = {};
+        const accessor: Partial<DockviewComponent> = {};
         const groupViewPanel = new GroupPanel(
-            <IDockviewComponent>accessor,
+            <DockviewComponent>accessor,
             '',
             {}
         );
@@ -44,9 +44,9 @@ describe('groupPanelApi', () => {
             id: 'test_id',
         };
 
-        const accessor: Partial<IDockviewComponent> = {};
+        const accessor: Partial<DockviewComponent> = {};
         const groupViewPanel = new GroupPanel(
-            <IDockviewComponent>accessor,
+            <DockviewComponent>accessor,
             '',
             {}
         );
@@ -66,7 +66,7 @@ describe('groupPanelApi', () => {
         expect(cut.group).toBe(groupViewPanel);
 
         const groupViewPanel2 = new GroupPanel(
-            <IDockviewComponent>accessor,
+            <DockviewComponent>accessor,
             '',
             {}
         );

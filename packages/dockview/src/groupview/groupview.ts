@@ -1,7 +1,7 @@
 import { DockviewApi } from '../api/component.api';
 import { getPanelData, PanelTransfer } from '../dnd/dataTransfer';
 import { Droptarget, Position } from '../dnd/droptarget';
-import { IDockviewComponent } from '../dockview/dockviewComponent';
+import { DockviewComponent } from '../dockview/dockviewComponent';
 import { isAncestor, toggleClass } from '../dom';
 import { addDisposableListener, Emitter, Event } from '../events';
 import { IGridPanelView } from '../gridview/baseComponentGridview';
@@ -217,7 +217,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
     constructor(
         private readonly container: HTMLElement,
-        private accessor: IDockviewComponent,
+        private accessor: DockviewComponent,
         public id: string,
         private readonly options: GroupOptions,
         private readonly parent: GroupPanel

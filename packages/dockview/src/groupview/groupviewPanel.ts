@@ -1,5 +1,5 @@
 import { IFrameworkPart } from '../panel/types';
-import { IDockviewComponent } from '../dockview/dockviewComponent';
+import { DockviewComponent } from '../dockview/dockviewComponent';
 import {
     GridviewPanelApi,
     GridviewPanelApiImpl,
@@ -70,7 +70,7 @@ export class GroupPanel extends GridviewPanel implements IGroupviewPanel {
     }
 
     constructor(
-        accessor: IDockviewComponent,
+        accessor: DockviewComponent,
         id: string,
         options: GroupOptions
     ) {

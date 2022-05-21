@@ -63,7 +63,7 @@ export interface SerializedDockview {
 }
 
 export type DockviewComponentUpdateOptions = Pick<
-DockviewComponentOptions,
+    DockviewComponentOptions,
     | 'orientation'
     | 'components'
     | 'frameworkComponents'
@@ -98,13 +98,11 @@ export interface IDockviewComponent extends IBaseGrid<GroupPanel> {
     addPanel(options: AddPanelOptions): IDockviewPanel;
     removePanel(panel: IDockviewPanel): void;
     getGroupPanel: (id: string) => IDockviewPanel | undefined;
-    fireMouseEvent(event: LayoutMouseEvent): void;
     createWatermarkComponent(): IWatermarkRenderer;
     // lifecycle
     addEmptyGroup(options?: AddGroupOptions): void;
     closeAllGroups(): void;
     // events
-    onTabInteractionEvent: Event<LayoutMouseEvent>;
     onTabContextMenu: Event<TabContextMenuEvent>;
     moveToNext(options?: MovementOptions): void;
     moveToPrevious(options?: MovementOptions): void;
@@ -115,7 +113,7 @@ export interface IDockviewComponent extends IBaseGrid<GroupPanel> {
     //
     readonly onDidRemovePanel: Event<IDockviewPanel>;
     readonly onDidAddPanel: Event<IDockviewPanel>;
-    readonly onDidLayoutfromJSON: Event<void>;
+    readonly onDidLayoutFromJSON: Event<void>;
     readonly onDidActivePanelChange: Event<IDockviewPanel | undefined>;
 }
 
@@ -126,11 +124,6 @@ export class DockviewComponent
     private _deserializer: IPanelDeserializer | undefined;
     private _api: DockviewApi;
     private _options: DockviewComponentOptions;
-
-    // events
-    private readonly _onTabInteractionEvent = new Emitter<LayoutMouseEvent>();
-    readonly onTabInteractionEvent: Event<LayoutMouseEvent> =
-        this._onTabInteractionEvent.event;
 
     private readonly _onTabContextMenu = new Emitter<TabContextMenuEvent>();
     readonly onTabContextMenu: Event<TabContextMenuEvent> =
@@ -147,7 +140,7 @@ export class DockviewComponent
     readonly onDidAddPanel: Event<IDockviewPanel> = this._onDidAddPanel.event;
 
     private readonly _onDidLayoutfromJSON = new Emitter<void>();
-    readonly onDidLayoutfromJSON: Event<void> = this._onDidLayoutfromJSON.event;
+    readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutfromJSON.event;
 
     private readonly _onDidActivePanelChange = new Emitter<
         IDockviewPanel | undefined
@@ -204,7 +197,6 @@ export class DockviewComponent
         });
 
         this.addDisposables(
-            this._onTabInteractionEvent,
             this._onTabContextMenu,
             this._onDidDrop,
             Event.any(
@@ -278,9 +270,7 @@ export class DockviewComponent
         if (options.includePanel && options.group) {
             if (
                 options.group.activePanel !==
-                options.group.panels[
-                    options.group.panels.length - 1
-                ]
+                options.group.panels[options.group.panels.length - 1]
             ) {
                 options.group.model.moveToNext({ suppressRoll: true });
                 return;
@@ -288,7 +278,7 @@ export class DockviewComponent
         }
 
         const location = getGridLocation(options.group.element);
-        const next = <GroupPanel>this.gridview.next(location)?.view
+        const next = <GroupPanel>this.gridview.next(location)?.view;
         this.doSetGroupActive(next);
     }
 
@@ -301,10 +291,7 @@ export class DockviewComponent
         }
 
         if (options.includePanel && options.group) {
-            if (
-                options.group.activePanel !==
-                options.group.panels[0]
-            ) {
+            if (options.group.activePanel !== options.group.panels[0]) {
                 options.group.model.moveToPrevious({ suppressRoll: true });
                 return;
             }
@@ -362,14 +349,14 @@ export class DockviewComponent
         }
 
         this.gridview.deserialize(
-            grid,
-            new DefaultDeserializer(this, {
-                createPanel: (id, group) => {
-                    const panelData = panels[id];
-                    return this.deserializer!.fromJSON(panelData, group);
-                },
-            })
-        );
+          grid,
+          new DefaultDeserializer(this, {
+              createPanel: (id, group) => {
+                  const panelData = panels[id];
+                  return this.deserializer!.fromJSON(panelData, group);
+              },
+          })
+      );
 
         if (typeof activeGroup === 'string') {
             const panel = this.getPanel(activeGroup);
@@ -411,27 +398,27 @@ export class DockviewComponent
         let referenceGroup: GroupPanel | undefined;
 
         if (options.position?.referencePanel) {
-          const referencePanel = this.getGroupPanel(
-              options.position.referencePanel
-          );
+            const referencePanel = this.getGroupPanel(
+                options.position.referencePanel
+            );
 
-          if (!referencePanel) {
-              throw new Error(
-                  `referencePanel ${options.position.referencePanel} does not exist`
-              );
-          }
+            if (!referencePanel) {
+                throw new Error(
+                    `referencePanel ${options.position.referencePanel} does not exist`
+                );
+            }
 
             referenceGroup = this.findGroup(referencePanel);
         } else {
             referenceGroup = this.activeGroup;
         }
 
-      let panel: IDockviewPanel
+        let panel: IDockviewPanel;
 
         if (referenceGroup) {
             const target = toTarget(options.position?.direction || 'within');
             if (target === Position.Center) {
-               panel = this.createPanel(options, referenceGroup)
+                panel = this.createPanel(options, referenceGroup);
                 referenceGroup.model.openPanel(panel);
             } else {
                 const location = getGridLocation(referenceGroup.element);
@@ -441,13 +428,13 @@ export class DockviewComponent
                     target
                 );
                 const group = this.createGroupAtLocation(relativeLocation);
-                panel = this.createPanel(options, group)
+                panel = this.createPanel(options, group);
                 group.model.openPanel(panel);
             }
         } else {
-          const group = this.createGroupAtLocation();
-          panel = this.createPanel(options, group);
-          group.model.openPanel(panel);
+            const group = this.createGroupAtLocation();
+            panel = this.createPanel(options, group);
+            group.model.openPanel(panel);
         }
 
         return panel;
@@ -624,25 +611,25 @@ export class DockviewComponent
                     target
                 );
 
-                const group = this.createGroupAtLocation( dropLocation);
+                const group = this.createGroupAtLocation(dropLocation);
                 group.model.openPanel(groupItem);
             }
         }
     }
 
     override doSetGroupActive(
-        group: GroupPanel | undefined,
-        skipFocus?: boolean
-    ): void {
-        const isGroupAlreadyFocused = this._activeGroup === group;
-        super.doSetGroupActive(group, skipFocus);
+      group: GroupPanel | undefined,
+      skipFocus?: boolean
+  ): void {
+      const isGroupAlreadyFocused = this._activeGroup === group;
+      super.doSetGroupActive(group, skipFocus);
 
-        if (!isGroupAlreadyFocused && this._activeGroup?.activePanel) {
-            this._onDidActivePanelChange.fire(
-                this._activeGroup?.activePanel
-            );
-        }
-    }
+      if (!isGroupAlreadyFocused && this._activeGroup?.activePanel) {
+          this._onDidActivePanelChange.fire(
+              this._activeGroup?.activePanel
+          );
+      }
+  }
 
     createGroup(options?: GroupOptions): GroupPanel {
         if (!options) {
@@ -713,13 +700,21 @@ export class DockviewComponent
         return view;
     }
 
-    private createPanel(options: AddPanelOptions, group: GroupPanel): IDockviewPanel {
+    private createPanel(
+        options: AddPanelOptions,
+        group: GroupPanel
+    ): IDockviewPanel {
         const view = new DefaultGroupPanelView({
             content: this.createContentComponent(options.id, options.component),
             tab: this.createTabComponent(options.id, options.tabComponent),
         });
 
-        const panel = new DockviewGroupPanel(options.id, this, this._api, group);
+        const panel = new DockviewGroupPanel(
+            options.id,
+            this,
+            this._api,
+            group
+        );
         panel.init({
             view,
             title: options.title || options.id,
@@ -757,12 +752,10 @@ export class DockviewComponent
         );
     }
 
-    private createGroupAtLocation(
-        location: number[] = [0]
-    ): GroupPanel {
+    private createGroupAtLocation(location: number[] = [0]): GroupPanel {
         const group = this.createGroup();
         this.doAddGroup(group, location);
-        return group
+        return group;
     }
 
     private findGroup(panel: IDockviewPanel): GroupPanel | undefined {

@@ -1,7 +1,4 @@
-import {
-    DockviewComponent,
-    IDockviewComponent,
-} from '../../dockview/dockviewComponent';
+import { DockviewComponent } from '../../dockview/dockviewComponent';
 import {
     GroupPanelPartInitParameters,
     IContentRenderer,
@@ -153,7 +150,7 @@ class TestGroupPanel implements IDockviewPanel {
     constructor(
         public readonly id: string,
         public readonly title: string,
-        accessor: IDockviewComponent
+        accessor: DockviewComponent
     ) {
         this.api = new DockviewPanelApiImpl(this, this._group);
         this._group = new GroupPanel(accessor, id, {});
