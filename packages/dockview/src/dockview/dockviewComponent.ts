@@ -115,7 +115,7 @@ export interface IDockviewComponent extends IBaseGrid<GroupPanel> {
     //
     readonly onDidRemovePanel: Event<IDockviewPanel>;
     readonly onDidAddPanel: Event<IDockviewPanel>;
-    readonly onDidLayoutfromJSON: Event<void>;
+    readonly onDidLayoutFromJSON: Event<void>;
     readonly onDidActivePanelChange: Event<IDockviewPanel | undefined>;
 }
 
@@ -147,7 +147,7 @@ export class DockviewComponent
     readonly onDidAddPanel: Event<IDockviewPanel> = this._onDidAddPanel.event;
 
     private readonly _onDidLayoutfromJSON = new Emitter<void>();
-    readonly onDidLayoutfromJSON: Event<void> = this._onDidLayoutfromJSON.event;
+    readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutfromJSON.event;
 
     private readonly _onDidActivePanelChange = new Emitter<
         IDockviewPanel | undefined
