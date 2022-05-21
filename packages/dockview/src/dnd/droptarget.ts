@@ -11,7 +11,7 @@ export enum Position {
     Center = 'Center',
 }
 
-type Quadrant = 'top' | 'bottom' | 'left' | 'right';
+export type Quadrant = 'top' | 'bottom' | 'left' | 'right';
 
 export interface DroptargetEvent {
     position: Position;
