@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdockview_docs=self.webpackChunkdockview_docs||[]).push([[5073],{3265:function(o){o.exports=JSON.parse('{"label":"facebook","permalink":"/dockview/docs2/blog/tags/facebook","allTagsPath":"/dockview/docs2/blog/tags","count":1}')}}]);
