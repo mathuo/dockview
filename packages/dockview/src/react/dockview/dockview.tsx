@@ -7,6 +7,7 @@ import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
 import { ReactPanelDeserialzier } from '../deserializer';
 import {
+    DockviewDndOverlayEvent,
     GroupPanelFrameworkComponentFactory,
     TabContextMenuEvent,
 } from '../../dockview/options';
@@ -17,7 +18,6 @@ import { IWatermarkPanelProps, ReactWatermarkPart } from './reactWatermarkPart';
 import { PanelCollection, PanelParameters } from '../types';
 import { watchElementResize } from '../../dom';
 import { IContentRenderer, ITabRenderer } from '../../groupview/types';
-import { DockviewDropTargets } from '../../groupview/dnd';
 
 export interface IGroupPanelBaseProps<T extends {} = Record<string, any>>
     extends PanelParameters<T> {
@@ -43,7 +43,7 @@ export interface IDockviewReactProps {
     tabHeight?: number;
     onTabContextMenu?: (event: TabContextMenuEvent) => void;
     onDidDrop?: (event: DockviewDropEvent) => void;
-    showDndOverlay?: (event: DragEvent, target: DockviewDropTargets) => boolean;
+    showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
     hideBorders?: boolean;
     className?: string;
     disableAutoResizing?: boolean;
