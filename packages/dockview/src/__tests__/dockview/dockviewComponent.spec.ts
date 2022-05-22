@@ -254,34 +254,34 @@ describe('dockviewComponent', () => {
         const panel3 = dockview.getGroupPanel('panel3');
         const panel4 = dockview.getGroupPanel('panel4');
 
-        const group1 = panel1.group;
+        const group1 = panel1!.group;
         dockview.moveGroupOrPanel(group1, group1.id, 'panel1', Position.Right);
-        const group2 = panel1.group;
+        const group2 = panel1!.group;
         dockview.moveGroupOrPanel(group2, group1.id, 'panel3', Position.Center);
 
         expect(dockview.activeGroup).toBe(group2);
-        expect(dockview.activeGroup.model.activePanel).toBe(panel3);
-        expect(dockview.activeGroup.model.indexOf(panel3)).toBe(1);
+        expect(dockview.activeGroup!.model.activePanel).toBe(panel3);
+        expect(dockview.activeGroup!.model.indexOf(panel3!)).toBe(1);
 
         dockview.moveToPrevious({ includePanel: true });
         expect(dockview.activeGroup).toBe(group2);
-        expect(dockview.activeGroup.model.activePanel).toBe(panel1);
+        expect(dockview.activeGroup!.model.activePanel).toBe(panel1);
 
         dockview.moveToNext({ includePanel: true });
         expect(dockview.activeGroup).toBe(group2);
-        expect(dockview.activeGroup.model.activePanel).toBe(panel3);
+        expect(dockview.activeGroup!.model.activePanel).toBe(panel3);
 
         dockview.moveToPrevious({ includePanel: false });
         expect(dockview.activeGroup).toBe(group1);
-        expect(dockview.activeGroup.model.activePanel).toBe(panel4);
+        expect(dockview.activeGroup!.model.activePanel).toBe(panel4);
 
         dockview.moveToPrevious({ includePanel: true });
         expect(dockview.activeGroup).toBe(group1);
-        expect(dockview.activeGroup.model.activePanel).toBe(panel2);
+        expect(dockview.activeGroup!.model.activePanel).toBe(panel2);
 
         dockview.moveToNext({ includePanel: false });
         expect(dockview.activeGroup).toBe(group2);
-        expect(dockview.activeGroup.model.activePanel).toBe(panel3);
+        expect(dockview.activeGroup!.model.activePanel).toBe(panel3);
     });
 
     test('remove group', () => {
@@ -1515,6 +1515,175 @@ describe('dockviewComponent', () => {
         expect(groupSpy).toBeCalledTimes(1);
         expect(panel1Spy).toBeCalledTimes(1);
         expect(panel2Spy).toBeCalledTimes(1);
+    });
+
+    test('fromJSON events should still fire', () => {
+        jest.useFakeTimers();
+
+        dockview.layout(1000, 1000);
+
+        let addGroup: GroupPanel[] = [];
+        let removeGroup: GroupPanel[] = [];
+        let activeGroup: (GroupPanel | undefined)[] = [];
+        let addPanel: IDockviewPanel[] = [];
+        let removePanel: IDockviewPanel[] = [];
+        let activePanel: (IDockviewPanel | undefined)[] = [];
+        let layoutChange = 0;
+        let layoutChangeFromJson = 0;
+
+        const disposable = new CompositeDisposable(
+            dockview.onDidAddGroup((panel) => {
+                addGroup.push(panel);
+            }),
+            dockview.onDidRemoveGroup((panel) => {
+                removeGroup.push(panel);
+            }),
+            dockview.onDidActiveGroupChange((event) => {
+                activeGroup.push(event);
+            }),
+            dockview.onDidAddPanel((panel) => {
+                addPanel.push(panel);
+            }),
+            dockview.onDidRemovePanel((panel) => {
+                removePanel.push(panel);
+            }),
+            dockview.onDidActivePanelChange((event) => {
+                activePanel.push(event);
+            }),
+            dockview.onDidLayoutChange(() => {
+                layoutChange++;
+            }),
+            dockview.onDidLayoutFromJSON(() => {
+                layoutChangeFromJson++;
+            })
+        );
+
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.fromJSON({
+            activeGroup: 'group-1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 500,
+                        },
+                        {
+                            type: 'branch',
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    data: {
+                                        views: ['panel2', 'panel3'],
+                                        id: 'group-2',
+                                    },
+                                    size: 500,
+                                },
+                                {
+                                    type: 'leaf',
+                                    data: { views: ['panel4'], id: 'group-3' },
+                                    size: 500,
+                                },
+                            ],
+                            size: 250,
+                        },
+                        {
+                            type: 'leaf',
+                            data: { views: ['panel5'], id: 'group-4' },
+                            size: 250,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+                panel2: {
+                    id: 'panel2',
+                    view: { content: { id: 'default' } },
+                    title: 'panel2',
+                },
+                panel3: {
+                    id: 'panel3',
+                    view: { content: { id: 'default' } },
+                    title: 'panel3',
+                },
+                panel4: {
+                    id: 'panel4',
+                    view: { content: { id: 'default' } },
+                    title: 'panel4',
+                },
+                panel5: {
+                    id: 'panel5',
+                    view: { content: { id: 'default' } },
+                    title: 'panel5',
+                },
+            },
+            options: { tabHeight: 25 },
+        });
+
+        jest.runAllTimers();
+
+        console.log(activePanel.map((_) => _?.id).join(' '));
+
+        expect(addGroup.length).toBe(4);
+        expect(removeGroup.length).toBe(0);
+        expect(activeGroup.length).toBe(1);
+        expect(addPanel.length).toBe(5);
+        expect(removePanel.length).toBe(0);
+        expect(activePanel.length).toBe(5);
+        expect(layoutChange).toBe(1);
+        expect(layoutChangeFromJson).toBe(1);
+
+        addGroup = [];
+        removeGroup = [];
+        activeGroup = [];
+        addPanel = [];
+        removePanel = [];
+        activePanel = [];
+        layoutChange = 0;
+        layoutChangeFromJson = 0;
+
+        dockview.fromJSON({
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {},
+            options: { tabHeight: 25 },
+        });
+
+        jest.runAllTimers();
+
+        expect(addGroup.length).toBe(0);
+        expect(removeGroup.length).toBe(4);
+        expect(activeGroup.length).toBe(1);
+        expect(addPanel.length).toBe(0);
+        expect(removePanel.length).toBe(5);
+        expect(activePanel.length).toBe(1);
+        expect(layoutChange).toBe(1);
+        expect(layoutChangeFromJson).toBe(1);
+
+        return disposable.dispose();
     });
 
     // group is disposed of when dockview is disposed

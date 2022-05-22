@@ -29,6 +29,12 @@
             color: var(--dv-activegroup-visiblepanel-tab-color);
             display: flex;
             padding: 0px 8px;
+            cursor: pointer;
+
+            a {
+                padding-right: 8px;
+                width: 10px;
+            }
 
             > span {
                 flex-grow: 1;
