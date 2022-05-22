@@ -26,11 +26,11 @@ export class DefaultHeader
         this._content = document.createElement('span');
         this._expander = document.createElement('a');
 
-        this.element.appendChild(this._content);
         this.element.appendChild(this._expander);
+        this.element.appendChild(this._content);
 
         this.addDisposables(
-            addDisposableListener(this._expander, 'click', () => {
+            addDisposableListener(this._element, 'click', () => {
                 this.apiRef.api?.setExpanded(!this.apiRef.api.isExpanded);
             })
         );
@@ -40,10 +40,10 @@ export class DefaultHeader
         this.apiRef.api = params.api;
 
         this._content.textContent = params.title;
-        this._expander.textContent = params.api.isExpanded ? '<' : '>';
+        this._expander.textContent = params.api.isExpanded ? '▼' : '▶';
 
         this.disposable.value = params.api.onDidExpansionChange((e) => {
-            this._expander.textContent = e.isExpanded ? '<' : '>';
+            this._expander.textContent = e.isExpanded ? '▼' : '▶';
         });
     }
 
