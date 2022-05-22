@@ -560,7 +560,7 @@ describe('groupview', () => {
 
         const panel3 = new TestPanel('id_2', null);
 
-        cut.openPanel(panel3, { skipSetActive: true });
+        cut.openPanel(panel3, { skipSetPanelActive: true });
         expect(contentContainer.length).toBe(1);
         expect(contentContainer.item(0)).toBe(panel2.view.content.element);
 

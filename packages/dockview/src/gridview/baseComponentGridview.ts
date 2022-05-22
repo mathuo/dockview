@@ -82,7 +82,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
     private readonly _onDidRemoveGroup = new Emitter<T>();
     readonly onDidRemoveGroup: Event<T> = this._onDidRemoveGroup.event;
 
-    private readonly _onDidAddGroup = new Emitter<T>();
+    protected readonly _onDidAddGroup = new Emitter<T>();
     readonly onDidAddGroup: Event<T> = this._onDidAddGroup.event;
 
     private readonly _onDidActiveGroupChange = new Emitter<T | undefined>();
@@ -150,7 +150,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
         this.addDisposables(
             this.gridview.onDidChange(() => {
-                this._onDidLayoutChange.fire();
+                this._bufferOnDidLayoutChange.fire();
             })
         );
 

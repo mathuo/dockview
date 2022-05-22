@@ -175,10 +175,16 @@ export class GridviewComponent
     public fromJSON(serializedGridview: SerializedGridview) {
         const { grid, activePanel } = serializedGridview;
 
+        const hasActiveGroup = this.activeGroup;
+
         const groups = Array.from(this._groups.values()); // reassign since group panels will mutate
         for (const group of groups) {
             group.disposable.dispose();
             this.doRemoveGroup(group.value, { skipActive: true });
+        }
+
+        if (hasActiveGroup) {
+            this.doSetGroupActive(undefined);
         }
 
         this.gridview.clear();
@@ -215,6 +221,8 @@ export class GridviewComponent
                         isVisible: node.visible,
                     })
                 );
+
+                this._onDidAddGroup.fire(view);
 
                 this.registerPanel(view);
 
