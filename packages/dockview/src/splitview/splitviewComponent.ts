@@ -72,6 +72,7 @@ export interface ISplitviewComponent extends IDisposable {
     removePanel(panel: ISplitviewPanel, sizing?: Sizing): void;
     setVisible(panel: ISplitviewPanel, visible: boolean): void;
     movePanel(from: number, to: number): void;
+    clear(): void;
 }
 
 /**
@@ -334,14 +335,9 @@ export class SplitviewComponent
     }
 
     fromJSON(serializedSplitview: SerializedSplitview): void {
-        const { views, orientation, size, activeView } = serializedSplitview;
+        this.clear();
 
-        for (const [_, value] of this._panels.entries()) {
-            value.disposable.dispose();
-            value.value.dispose();
-        }
-        this._panels.clear();
-        this.splitview.dispose();
+        const { views, orientation, size, activeView } = serializedSplitview;
 
         const queue: Function[] = [];
 
@@ -407,6 +403,15 @@ export class SplitviewComponent
         }
 
         this._onDidLayoutfromJSON.fire();
+    }
+
+    clear(): void {
+        for (const [_, value] of this._panels.entries()) {
+            value.disposable.dispose();
+            value.value.dispose();
+        }
+        this._panels.clear();
+        this.splitview.dispose();
     }
 
     dispose(): void {

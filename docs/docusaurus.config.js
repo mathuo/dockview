@@ -14,7 +14,7 @@ const config = {
     title: 'Dockview',
     tagline: 'Zero dependency layout manager for React',
     url: 'https://your-docusaurus-test-site.com',
-    baseUrl: process.env.CI ? `/dockview/${DEPLOY_PATH}/` : '/',
+    baseUrl: process.env.CI ? `/${DEPLOY_PATH}/` : '/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
     favicon: 'img/favicon.ico',
@@ -37,15 +37,6 @@ const config = {
             return {
                 name: 'webpack',
                 configureWebpack: (config, isServer, utils) => {
-                    if (isServer) {
-                        return {
-                            externals: [
-                                'react',
-                                'react-dom',
-                                ...(config.externals || []),
-                            ],
-                        };
-                    }
                     return {
                         // externals: ['react', 'react-dom'],
                         devtool: 'source-map',

@@ -3,6 +3,7 @@ import { PaneviewPanelApiImpl } from '../api/paneviewPanelApi';
 import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { PanelUpdateEvent } from '../panel/types';
 import { IPaneHeaderPart, PanePanelInitParameter } from './paneviewPanel';
+import { toggleClass } from '../dom';
 
 export class DefaultHeader
     extends CompositeDisposable
@@ -40,10 +41,12 @@ export class DefaultHeader
         this.apiRef.api = params.api;
 
         this._content.textContent = params.title;
-        this._expander.textContent = params.api.isExpanded ? '▼' : '▶';
+        this._expander.textContent = '▼';
+
+        toggleClass(this._expander, 'collapsed', !params.api.isExpanded);
 
         this.disposable.value = params.api.onDidExpansionChange((e) => {
-            this._expander.textContent = e.isExpanded ? '▼' : '▶';
+            toggleClass(this._expander, 'collapsed', !e.isExpanded);
         });
     }
 
