@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdockview_docs=self.webpackChunkdockview_docs||[]).push([[247],{3909:function(e){e.exports=JSON.parse('[{"label":"release","permalink":"/dockview/docs2/blog/tags/release","count":2}]')}}]);
