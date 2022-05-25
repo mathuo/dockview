@@ -77,6 +77,7 @@ const onReady = (event: GridviewReadyEvent) => {
 | layout                 | `(width: number, height:number): void`                                                            | <Link to="/docs/basics/#auto-resizing">Auto Resizing</Link>      |
 | fromJSON               | `(data: SerializedGridview): void`                                                                | <Link to="/docs/basics/#serialization">Serialization</Link>      |
 | toJSON                 | `(): SerializedGridview`                                                                          | <Link to="/docs/basics/#serialization">Serialization</Link>      |
+| clear                  | `(): void`                                                                                        | Clears the current layout                                        |
 
 ## Gridview Panel API
 
@@ -109,5 +110,7 @@ const MyComponent = (props: IGridviewPanelProps<{ title: string }>) => {
 | setSize                | `(event: SizeEvent): void`                                  |                  |
 
 ## Events
+
+`GridviewReact` exposes a number of events that the developer can listen to and below is a simple example with a log panel showing those events that occur.
 
 <EventsGridview />

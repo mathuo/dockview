@@ -4,6 +4,7 @@ import {
     Checkbox,
 } from '../../src/components/dockview/rendering';
 import { DndDockview } from '../../src/components/dockview/dnd';
+import { EventsDockview } from '../../src/components/dockview/events';
 import Link from '@docusaurus/Link';
 
 # Dockview
@@ -105,6 +106,7 @@ const onReady = (event: DockviewReadyEvent) => {
 | layout                 | `(width: number, height:number): void`               | <Link to="/docs/basics/#auto-resizing">Auto Resizing</Link> |
 | fromJSON               | `(data: SerializedDockview): void`                   | <Link to="/docs/basics/#serialization">Serialization</Link> |
 | toJSON                 | `(): SerializedDockview`                             | <Link to="/docs/basics/#serialization">Serialization</Link> |
+| clear                  | `(): void`                                           | Clears the current layout                                   |
 
 ## Dockview Panel API
 
@@ -277,3 +279,7 @@ return (
 ```
 
 <DndDockview />
+
+### Events
+
+<EventsDockview />

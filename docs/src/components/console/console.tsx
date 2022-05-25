@@ -12,6 +12,7 @@ const formatTime = (now: Date) => {
 export interface Line {
     timestamp: Date;
     text: string;
+    css?: React.CSSProperties;
 }
 
 export interface IConsoleProps {
@@ -40,7 +41,9 @@ export const Console = (props: IConsoleProps) => {
                         <span className="console-line-timestamp">
                             {formatTime(line.timestamp)}
                         </span>
-                        <span className="console-line-text">{line.text}</span>
+                        <span className="console-line-text" style={line.css}>
+                            {line.text}
+                        </span>
                     </div>
                 );
             })}

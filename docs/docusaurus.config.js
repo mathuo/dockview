@@ -31,42 +31,43 @@ const config = {
         defaultLocale: 'en',
         locales: ['en'],
     },
-    plugins: ['docusaurus-plugin-sass'],
-    // plugins: [
-    //     (context, options) => {
-    //         return {
-    //             name: 'webpack',
-    //             configureWebpack: (config, isServer, utils) => {
-    //                 if (isServer) {
-    //                     return {
-    //                         externals: [
-    //                             'react',
-    //                             'react-dom',
-    //                             ...(config.externals || []),
-    //                         ],
-    //                     };
-    //                 }
-    //                 return {
-    //                     // externals: ['react', 'react-dom'],
-    //                     resolve: {
-    //                         alias: {
-    //                             react: path.join(
-    //                                 __dirname,
-    //                                 'node_modules',
-    //                                 'react'
-    //                             ),
-    //                             'react-dom': path.join(
-    //                                 __dirname,
-    //                                 'node_modules',
-    //                                 'react-dom'
-    //                             ),
-    //                         },
-    //                     },
-    //                 };
-    //             },
-    //         };
-    //     },
-    // ],
+    plugins: [
+        'docusaurus-plugin-sass',
+        (context, options) => {
+            return {
+                name: 'webpack',
+                configureWebpack: (config, isServer, utils) => {
+                    if (isServer) {
+                        return {
+                            externals: [
+                                'react',
+                                'react-dom',
+                                ...(config.externals || []),
+                            ],
+                        };
+                    }
+                    return {
+                        // externals: ['react', 'react-dom'],
+                        devtool: 'source-map',
+                        resolve: {
+                            alias: {
+                                react: path.join(
+                                    __dirname,
+                                    'node_modules',
+                                    'react'
+                                ),
+                                'react-dom': path.join(
+                                    __dirname,
+                                    'node_modules',
+                                    'react-dom'
+                                ),
+                            },
+                        },
+                    };
+                },
+            };
+        },
+    ],
     presets: [
         [
             'classic',
