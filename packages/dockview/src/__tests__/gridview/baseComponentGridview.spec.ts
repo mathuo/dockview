@@ -100,6 +100,10 @@ class ClassUnderTest extends BaseGrid<TestPanel> {
     public toJSON(): object {
         return {};
     }
+
+    public clear(): void {
+        //
+    }
 }
 
 describe('baseComponentGridview', () => {

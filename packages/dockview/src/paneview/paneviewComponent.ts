@@ -113,6 +113,7 @@ export interface IPaneviewComponent extends IDisposable {
     getPanel(id: string): IPaneviewPanel | undefined;
     movePanel(from: number, to: number): void;
     updateOptions(options: Partial<PaneviewComponentOptions>): void;
+    clear(): void;
 }
 
 export class PaneviewComponent
@@ -343,16 +344,11 @@ export class PaneviewComponent
     }
 
     fromJSON(serializedPaneview: SerializedPaneview): void {
+        this.clear();
+
         const { views, size } = serializedPaneview;
 
         const queue: Function[] = [];
-
-        for (const [_, value] of this._viewDisposables.entries()) {
-            value.dispose();
-        }
-        this._viewDisposables.clear();
-
-        this.paneview.dispose();
 
         this.paneview = new Paneview(this.element, {
             orientation: Orientation.VERTICAL,
@@ -435,6 +431,15 @@ export class PaneviewComponent
         queue.forEach((f) => f());
 
         this._onDidLayoutfromJSON.fire();
+    }
+
+    clear(): void {
+        for (const [_, value] of this._viewDisposables.entries()) {
+            value.dispose();
+        }
+        this._viewDisposables.clear();
+
+        this.paneview.dispose();
     }
 
     private doAddPanel(panel: PaneFramework) {

@@ -125,7 +125,7 @@ export class DockviewComponent
 {
   private _deserializer: IPanelDeserializer | undefined;
   private _api: DockviewApi;
-  private _options: DockviewComponentOptions;
+  private _options: Exclude<DockviewComponentOptions, 'orientation'>;
 
   private readonly _onTabContextMenu = new Emitter<TabContextMenuEvent>();
   readonly onTabContextMenu: Event<TabContextMenuEvent> =
@@ -237,7 +237,7 @@ export class DockviewComponent
   updateOptions(options: DockviewComponentUpdateOptions): void {
       const hasOrientationChanged =
           typeof options.orientation === 'string' &&
-          this.options.orientation !== options.orientation;
+          this.gridview.orientation !== options.orientation;
 
       this._options = { ...this.options, ...options };
 
@@ -333,25 +333,7 @@ export class DockviewComponent
   }
 
   fromJSON(data: SerializedDockview): void {
-      const groups = Array.from(this._groups.values()).map((_) => _.value);
-
-      const hasActiveGroup = !!this.activeGroup;
-      const hasActivePanel = !!this.activePanel
-
-      for (const group of groups) {
-          // remove the group will automatically remove the panels
-          this.removeGroup(group, true);
-      }
-
-      if (hasActiveGroup) {
-        this.doSetGroupActive(undefined);
-      }
-
-      if( hasActivePanel) {
-        this._onDidActivePanelChange.fire(undefined);
-      }
-
-      this.gridview.clear();
+      this.clear()
 
       if (!this.deserializer) {
           throw new Error('invalid deserializer');
@@ -412,6 +394,28 @@ export class DockviewComponent
       this.gridview.layout(this.width, this.height);
 
       this._onDidLayoutFromJSON.fire();
+  }
+
+  clear():void {
+    const groups = Array.from(this._groups.values()).map((_) => _.value);
+
+    const hasActiveGroup = !!this.activeGroup;
+    const hasActivePanel = !!this.activePanel
+
+    for (const group of groups) {
+        // remove the group will automatically remove the panels
+        this.removeGroup(group, true);
+    }
+
+    if (hasActiveGroup) {
+      this.doSetGroupActive(undefined);
+    }
+
+    if( hasActivePanel) {
+      this._onDidActivePanelChange.fire(undefined);
+    }
+
+    this.gridview.clear();
   }
 
   closeAllGroups(): void {

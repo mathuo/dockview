@@ -61,6 +61,7 @@ export interface IBaseGrid<T extends IGridPanelView> {
     getPanel(id: string): T | undefined;
     toJSON(): object;
     fromJSON(data: any): void;
+    clear(): void;
     layout(width: number, height: number, force?: boolean): void;
     setVisible(panel: T, visible: boolean): void;
     isVisible(panel: T): boolean;
@@ -172,6 +173,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
     public abstract toJSON(): object;
 
     public abstract fromJSON(data: any): void;
+
+    public abstract clear(): void;
 
     public setVisible(panel: T, visible: boolean) {
         this.gridview.setViewVisible(getGridLocation(panel.element), visible);

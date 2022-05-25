@@ -43,6 +43,7 @@ export interface CommonApi<T = any> {
     layout(width: number, height: number): void;
     fromJSON(data: T): void;
     toJSON(): T;
+    clear(): void;
 }
 
 export class SplitviewApi implements CommonApi<SerializedSplitview> {
@@ -126,6 +127,10 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
 
     toJSON(): SerializedSplitview {
         return this.component.toJSON();
+    }
+
+    clear(): void {
+        this.component.clear();
     }
 }
 
@@ -213,6 +218,10 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
 
     toJSON(): SerializedPaneview {
         return this.component.toJSON();
+    }
+
+    clear(): void {
+        this.component.clear();
     }
 }
 
@@ -308,6 +317,10 @@ export class GridviewApi implements CommonApi<SerializedGridview> {
 
     toJSON(): SerializedGridview {
         return this.component.toJSON();
+    }
+
+    clear(): void {
+        this.component.clear();
     }
 }
 
@@ -452,5 +465,9 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     toJSON(): SerializedDockview {
         return this.component.toJSON();
+    }
+
+    clear(): void {
+        this.component.clear();
     }
 }
