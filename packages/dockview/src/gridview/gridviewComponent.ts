@@ -78,7 +78,7 @@ export class GridviewComponent
     extends BaseGrid<GridviewPanel>
     implements IGridviewComponent
 {
-    private _options: GridviewComponentOptions;
+    private _options: Exclude<GridviewComponentOptions, 'orientation'>;
     private _deserializer: IPanelDeserializer | undefined;
 
     private readonly _onDidLayoutfromJSON = new Emitter<void>();
@@ -124,7 +124,7 @@ export class GridviewComponent
     updateOptions(options: Partial<GridviewComponentUpdateOptions>): void {
         const hasOrientationChanged =
             typeof options.orientation === 'string' &&
-            this.options.orientation !== options.orientation;
+            this.gridview.orientation !== options.orientation;
 
         this._options = { ...this.options, ...options };
 
@@ -173,21 +173,9 @@ export class GridviewComponent
     }
 
     public fromJSON(serializedGridview: SerializedGridview) {
+        this.clear();
+
         const { grid, activePanel } = serializedGridview;
-
-        const hasActiveGroup = this.activeGroup;
-
-        const groups = Array.from(this._groups.values()); // reassign since group panels will mutate
-        for (const group of groups) {
-            group.disposable.dispose();
-            this.doRemoveGroup(group.value, { skipActive: true });
-        }
-
-        if (hasActiveGroup) {
-            this.doSetGroupActive(undefined);
-        }
-
-        this.gridview.clear();
 
         const queue: Function[] = [];
 
@@ -242,6 +230,22 @@ export class GridviewComponent
         }
 
         this._onDidLayoutfromJSON.fire();
+    }
+
+    clear(): void {
+        const hasActiveGroup = this.activeGroup;
+
+        const groups = Array.from(this._groups.values()); // reassign since group panels will mutate
+        for (const group of groups) {
+            group.disposable.dispose();
+            this.doRemoveGroup(group.value, { skipActive: true });
+        }
+
+        if (hasActiveGroup) {
+            this.doSetGroupActive(undefined);
+        }
+
+        this.gridview.clear();
     }
 
     movePanel(
