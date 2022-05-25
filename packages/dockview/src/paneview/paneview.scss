@@ -31,12 +31,12 @@
             padding: 0px 8px;
             cursor: pointer;
 
-            a {
-                padding-right: 8px;
-                width: 10px;
+            .collapsed {
+                transform: rotate(-90deg);
             }
 
             > span {
+                padding-left: 8px;
                 flex-grow: 1;
             }
         }
