@@ -4,8 +4,6 @@ on:
     schedule:
         - cron: '0 3 * * *' # every day at 3 am UTC
 
-# on: [push]
-
 jobs:
     deploy-nightly-demo-app:
         runs-on: ubuntu-latest
@@ -28,7 +26,9 @@ jobs:
                       ${{ runner.os }}-node-
 
             - run: yarn install
-              working-directory: packages/docs
+            - run: lerna bootstrap
+            - run: yarn build
+              working-directory: packages/dockview
             - run: yarn build
               working-directory: packages/docs
             - run: npm run deploy-docs
