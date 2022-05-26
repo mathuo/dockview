@@ -1,0 +1,15 @@
+node_modules/
+coverage/
+dist/
+output/
+.idea/
+typedocs/
+.DS_Store
+*-debug.log
+.build
+storybook-static/
+.rollup.cache/
+test-report.xml
+*.code-workspace
+yarn-error.log
+/build

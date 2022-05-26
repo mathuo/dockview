@@ -1,0 +1,21 @@
+.watermark {
+    display: flex;
+    width: 100%;
+
+    &.has-actions {
+        .watermark-title {
+            .actions-bar {
+                display: none;
+            }
+        }
+    }
+
+    .watermark-title {
+        height: 35px;
+        width: 100%;
+        display: flex;
+    }
+    .watermark-content {
+        flex-grow: 1;
+    }
+}

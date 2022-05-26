@@ -1,0 +1,117 @@
+---
+sidebar_position: 1
+---
+
+import { SimpleSplitview } from '../src/components/simpleSplitview';
+import { SimpleSplitview2 } from '../src/components/simpleSplitview2';
+
+# Basics
+
+This section will take you through a number of concepts that can be applied to all dockview components.
+
+## Panels
+
+The below examples use `ReactSplitview` but the logic holds for `ReactPaneview`, `ReactGridview` and `ReactDockview` using their respective implementations and interfaces.
+All components require you to provide an `onReady` prop which you can use to build and control your component.
+
+### Adding a panel with parameters
+
+You can pass parameters to a panel through the `params` object
+
+```tsx
+const onReady = (event: SplitviewReadyEvent) => {
+    event.api.addPanel({
+        id: 'panel_1',
+        component: 'myComponent',
+        params: {
+            title: 'My Title',
+        },
+    });
+};
+```
+
+and you can access those properties through the `props.params` object. The TypeScript interface accepts an optional generic type `T` that corresponds to the params objects type.
+
+```tsx
+const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+## API
+
+There are two types of API you will interact with using `dockview`.
+
+-   The `panel API` is accessible via `props.api` in user defined panels and via the `.api` variable found on panel instances. This API contains actions and variable related to the the individual panel.
+-   The `container API` is accessible via `event.api` in the `onReady` events and `props.containerApi` in user defined panels. This API contains actions and variable related to the component as a whole.
+
+```tsx
+const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
+    React.useEffect(() => {
+        const disposable = props.api.onDidActiveChange((event) => {
+            console.log(`is panel active: ${event.isActive}`);
+        });
+
+        return () => {
+            disposable.dispose(); // remember to dispose of any subscriptions
+        };
+    }, [props.api]);
+
+    const addAnotherPanel = React.useCallback(() => {
+        props.containerApi.addPanel({
+            id: 'another_id',
+            component: 'anotherComponent',
+        });
+    }, [props.containerApi]);
+
+    return (
+        <div>
+            <span>{`My first panel has the title: ${props.params.title}`}</span>
+            <button onClick={addAnotherPanel}>Add Panel</button>
+        </div>
+    );
+};
+```
+
+### Serialization
+
+All components support `toJSON(): T` which returns a Typed object representation of the components state. This same Typed object can be used to deserialize a view using `fromJSON(object: T): void`.
+
+## Auto resizing
+
+`SplitviewReact`, `GridviewReact`, `PaneviewReact` and `DockviewReact` will all automatically resize to fill the size of their parent element.
+Internally this is achieved using a [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver) which some users may need to polyfill.
+You can disable this by settings the `disableAutoResizing` prop to be `true`.
+
+You can manually resize a component using the API method `layout(width: number, height: number): void`.
+An advanced case may use this in conjunction with `disableAutoResizing=true` to allow a parent component to have ultimate control over the dimensions of the component.
+
+## Events
+
+Many API properties can be listened on using the `Event` pattern. For example `api.onDidFocusChange(() => {...})`.
+You should dispose of any event listeners you create cleaning up any listeners you would have created.
+
+```tsx
+React.useEffect(() => {
+    const disposable = api.onDidFocusChange(() => {
+        // write some code
+    });
+
+    return () => {
+        disposable.dispose();
+    };
+}, []);
+```
+
+## Proportional layout
+
+The `proportionalLayout` property indicates the expected behaviour of the component as it's container resizes, should all views resize equally or should just one view expand to fill the new space. `proportionalLayout` can be set as a property on `SplitviewReact` and `GridviewReact` components.
+Although not configurable on `DockviewReact` and `PaneviewReact` these both behave as if `proportionalLayout=true` was set for them.
+
+<SimpleSplitview2 proportional={false} />
+
+<SimpleSplitview2 proportional={true} />
+
+## Browser support
+
+dockview is intended to support all major browsers. Some users may require a polyfill for [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver).

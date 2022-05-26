@@ -1,0 +1,30 @@
+.control-center {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 4px 8px;
+    box-sizing: border-box;
+
+    .control-center-row {
+        height: 25px;
+        box-sizing: border-box;
+
+        button {
+            width: 175px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            border: none;
+            background-color: rgb(14, 99, 156);
+            color: white;
+            font-family: inherit;
+            outline: none;
+            padding: 2px 14px;
+            margin: 2px 0px;
+
+            &:hover {
+                background-color: rgb(17, 119, 187);
+            }
+        }
+    }
+}

@@ -1,0 +1,349 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Library/Splitview/Documentation" />
+
+import { Splitview } from './splitview';
+import VisualOne from './visual_1.jpg';
+import Contraints from './constraints.jpg';
+
+# Splitview
+
+The splitview component is one of the libraries key components.
+The paneview is an extension of thesplitview, the gridview is a collection of nested splitviews and the dockview adds tabular panels to the gridview.
+
+You can view several interactive examples of the Splitview component in action here, as well as read a description as to how this key component actually works.
+
+# The math behind the split view layouting
+
+The below is a language independant walkthrough of the math used within to layout these panels. This is the end result and below will explain the steps taken to reach this point.
+The origins of this logic stem from the VSCode source code found [here](https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/splitview).
+
+<Splitview mode={3} debug={false} />
+
+## What is a Splitview?
+
+> A Splitview control is a collection of _views_ stacked either _horizontally_ or _vertically_ where each view can be indepedantly resized by dragging on the edge of a particular view.
+
+To explain how this works will require some better definitions so lets start with the two fundamental components of this control, the <b>View</b> and the <b>Sash</b>.
+
+Assume the Splitview control has <b>n</b> views where n is positive number (i.e if n=4 then our split view controls has 4 views). A single view can then be defined as
+
+<div>
+    <div>View</div>
+    <ul style={{ marginLeft: '40px' }}>
+        <li>
+            The size of the n<sup>th</sup> view will be known as V<sub>n</sub>
+        </li>
+        <li>
+            The minimum size of the n<sup>th</sup> view will be known as V
+            <sup>min</sup>
+            <sub>n</sub>
+        </li>
+        <li>
+            The maximum size of the n<sup>th</sup> view will be known as V
+            <sup>max</sup>
+            <sub>n</sub>
+        </li>
+    </ul>
+</div>
+
+Additionally by definition we can known V<sup>min</sup><sub>n</sub> <= V<sub>n</sub> <= V<sup>max</sup><sub>n</sub>
+
+To be able to resize a view you need to be able to drag on the edge of a view to increase or decrease it's size.
+This can be achieved by introducing a narrow component that sits between each view acting as a _drag handle_.
+Lets call this component a <b>Sash</b> (see [link](https://en.wikipedia.org/wiki/Sash_window)) and we can define this as
+
+<div>
+  <div>Sash</div>
+  <ul style={{marginLeft: "40px"}}>
+    <li>If we have n views then we will have n-1 sashes. There is no sash before V<sub>0</sub> nor after V<sub>n</sub></li>  
+    <li>The sash between V<sub>n</sub> and V<sub>n+1</sub> is known as S<sub>n</sub></li>  
+    <li>The sash is of fixed width, and it's sole purpose is to act a drag-handle for resizing views</li>
+
+  </ul>
+</div>
+
+To calculate the new view sizes after a sash is dragged we need to know which sash is being dragged.
+Lets denote the sash S<sub>i</sub> as the sash to drag, which will give us a set of definitions to work with inline with the below diagram.
+
+<img src={VisualOne} />
+
+If we are to drag the sash S<sub>i</sub> then it's also needed to know how far along the x-axis, or the y-axis (in the case of vertically stacked views) you have travelled.
+Lets denote this as the delta, using the symbol Δ. Delta is only limited by the width (or height) of the control so in it's most general form we say it ranges from negative to positive infinity, that is -∞ < Δ < ∞ .
+In reality as you will see we will apply a set of constraints on the value of Δ reducing it's overall set of valid values.
+
+This defines everything we need to describe the definition of a Splitview. The first approach to show will be the most native building the complexity after each iteration.
+
+## Iteration #1 - The naive approach (aka. the accordian)
+
+The most basic form of resizing may be to say as I add delta increase view sizes and as I remove delta I decrease view sizes. This could be further described with the following statements:
+
+-   As the sash moves left shrink each view to the left and as the sash moves right expand each view to left, from right-most to left-most in both cases.
+-   If there is enough delta to shrink a view to it's mimimum size then progress onto the next view, and if we have enough delta to expand a view to it's maximum size then again progress onto the next view.
+-   Shrink no more once everything to the left is at minimums and expand no more once everything to the left is at maximums
+-   We don't manipulate any views to the right of the active sash S<sub>i</sub>
+
+You should be able to show each of the four points above hold true for the below interactive example.
+You'll see that changes to the right will always remain at zero because we are not manipulating views to the right of the active sash.
+
+<Splitview mode={1} debug={true} />
+
+Putting this implemenation in psuedocode using the definitions from above where we drag sash S<sub>i</sub> by an amount Δ
+
+<div
+    style={{
+        display: 'inline-block',
+        marginLeft: '20px',
+        marginBottom: '20px',
+        borderLeft: '2px solid black',
+    }}
+>
+    <div className="markdown-line">
+        Δ<sub>remaining</sub> = Δ
+    </div>
+    <div className="markdown-line">
+        <span style={{ fontWeight: 'bold' }}>for</span>
+        <span>
+            (<span style={{ fontStyle: 'italic' }}>j = i; j >= 0; i--</span>)
+        </span>
+        <span style={{ fontWeight: 'bold' }}> do</span>
+    </div>
+    <div className="markdown-line indent-1">
+        <span>
+            V<sup>next</sup>
+            <sub>j</sub> = <span style={{ fontWeight: 'bold' }}>Min</span>(V<sup>
+                max
+            </sup>
+            <sub>j</sub>, <span style={{ fontWeight: 'bold' }}>Max</span>(V
+            <sup>min</sup>
+            <sub>j</sub>, V<sub>j</sub> + Δ<sub>remaining</sub>))
+        </span>
+    </div>
+    <div className="markdown-line indent-1">
+        <span>
+            V<sup>Δ</sup>
+            <sub>j</sub> = V<sup>next</sup>
+            <sub>j</sub> - V<sub>j</sub>
+        </span>
+    </div>
+    <div className="markdown-line indent-1">
+        <span>
+            Δ<sub>remaining</sub> = Δ<sub>remaining</sub> - V<sup>Δ</sup>
+            <sub>j</sub>
+        </span>
+    </div>
+    <div className="markdown-line indent-1">
+        <span>
+            V<sub>j</sub> = V<sup>next</sup>
+            <sub>j</sub>
+        </span>
+    </div>
+</div>
+
+and as instructions
+
+<div
+    style={{
+        borderLeft: '2px solid black',
+        margin: '0px 20px 20px 20px',
+        display: 'flex',
+        flexDirection: 'row',
+    }}
+>
+    <div
+        style={{ borderRight: '2px solid black', flexShrink: 0, width: '20px' }}
+    >
+        <div style={{ display: 'flex', justifyContent: 'center' }}>1</div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>2</div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>3</div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>4</div>
+    </div>
+    <div style={{ flexGrow: 1, marginLeft: '20px' }}>
+        <div>
+            For each view j to the left of the sash we have dragged, from
+            right-most to left-most
+        </div>
+        <div>
+            Add the delta to the view j (clamped at either the maximum or
+            minimum value)
+        </div>
+        <div>
+            Subtract the different between the new and old size (the used delta)
+            from the remaining delta
+        </div>
+        <div>repeat</div>
+    </div>
+</div>
+
+There are some obvious flaws with this approach. Nothing to the right of the active sash is resizes which also related to the fact that the width of the control does not remain constant.
+
+## Iteration #2 - When Δ is added an equal Δ must be removed
+
+For the width of the control to remain constant it would make sense that if I add Δ to the left then I should add -Δ (or remove Δ) on the right, and vice-versa, which is the approach of the below interactive example.
+As you may see it is right, but there are still some edge cases that fail.
+
+<Splitview mode={2} debug={true} />
+
+To write this approach in pseudocode lets define another variable to track the delta we've added on the left, Δ<sub>used</sub>.
+After we've applied changes to the left side we'll substract this Δ<sub>used</sub> from the right side with the aim to keep the width of the control constant.
+
+<div style={{display: "inline-block", marginLeft: "20px", marginBottom: "20px", borderLeft: "2px solid black"}}>
+    <div className="markdown-line">
+        Δ<sub>remaining</sub> = Δ
+    </div>
+     <div className="markdown-line markdown-highlight">
+        Δ<sub>used</sub> = 0
+    </div>
+     <div className="markdown-line">
+      <span style={{fontWeight: "bold"}}>for</span><span>(<span style={{fontStyle: "italic"}}>j = i; j >= 0; i--</span>)</span>
+      <span style={{fontWeight: "bold"}}> do</span>
+    </div>
+    <div className="markdown-line indent-1">
+      <span>
+          V<sup>next</sup><sub>j</sub> = <span style={{fontWeight: "bold"}}>Min</span>(V<sup>max</sup><sub>j</sub>, <span style={{fontWeight: "bold"}}>Max</span>(V<sup>min</sup><sub>j</sub>, V<sub>j</sub> + Δ<sub>remaining</sub>))  
+      </span>
+    </div>
+     <div className="markdown-line indent-1">
+      <span>
+            V<sup>Δ</sup><sub>j</sub> = V<sup>next</sup><sub>j</sub> - V<sub>j</sub>  
+      </span>
+    </div>
+    <div className="markdown-line indent-1">
+      <span>
+      Δ<sub>remaining</sub> = Δ<sub>remaining</sub> - V<sup>Δ</sup><sub>j</sub>  
+      </span>
+    </div>
+    <div className="markdown-line indent-1 markdown-highlight">
+      <span>
+      Δ<sub>used</sub> = Δ<sub>used</sub> + V<sup>Δ</sup><sub>j</sub>  
+      </span>
+    </div>
+    <div className="markdown-line indent-1">
+      <span>
+        V<sub>j</sub> = V<sup>next</sup><sub>j</sub>
+      </span>
+    </div>
+
+<div style={{height: "0px", width: "100%", marginBottom: "20px"}}/>
+<div className="markdown-line markdown-highlight">
+<span style={{fontWeight: "bold"}}>for</span><span>(<span style={{fontStyle: "italic"}}>{"j = i+1; j < n; i++"}</span>)</span>
+<span style={{fontWeight: "bold"}}> do</span>
+</div>
+<div className="markdown-line markdown-highlight indent-1">
+<span>
+    V<sup>next</sup><sub>j</sub> = <span style={{fontWeight: "bold"}}>Min</span>(V<sup>max</sup><sub>j</sub>, <span style={{fontWeight: "bold"}}>Max</span>(V<sup>min</sup><sub>j</sub>,V<sub>j</sub> - Δ<sub>used</sub>))  
+</span>
+</div>
+<div className="markdown-line markdown-highlight indent-1">
+<span>
+    V<sup>Δ</sup><sub>j</sub> = V<sup>next</sup><sub>j</sub> - V<sub>j</sub>  
+</span>
+</div>
+<div className="markdown-line markdown-highlight indent-1">
+<span>
+Δ<sub>used</sub> = Δ<sub>used</sub> + V<sup>Δ</sup><sub>j</sub>  
+</span>
+</div>
+<div style={{marginBottom: "20px"}} className="markdown-line markdown-highlight indent-1">
+<span>
+V<sub>j</sub> = V<sup>next</sup><sub>j</sub>
+</span>
+</div>
+</div>
+
+Go back and try to minimise or maximise every view in the container. The width is no longer preserved, you can see at some point the change to the left
+is not longer eqaul to the change on the right, which causes the container to once again flex.
+
+## Iteration #3 - Constraining the values of Δ
+
+The failure of iteration #2 can be explained as the addition or removal of too much delta which means we need to look at what constraints we can apply to the problem.
+For a sash S<sub>i</sub> think about the minimum and maximum amount of delta that can be both added and removed.
+
+Minimized view constraints
+
+-   S<sub>i</sub> can go no further left that the sum of the minimum sizes of the views to the left because you would then have a view smaller than it's minimum size
+-   S<sub>i</sub> can go no further further right than the sum of the minimum sizes of the views to the right because you would then have a view smaller than it's minimum size
+
+Maximised view constraints
+
+-   S<sub>i</sub> can go no further left that the sum of the maximum sizes of the views to the right because otherwise you would have a viewer larger than it's maximum size
+-   S<sub>i</sub> can go no further right that the sum of the maximum sizes of the views to the left because otherwise you would have a viewer larger than it's maximum size
+
+Since Δ is relative to S<sub>i</sub> we need these to define these constraints relative to S<sub>i</sub>.
+
+When the views to the left of S<sub>i</sub> are all at minimum size define the distance between here and Δ to be Δ<sup>min</sup><sub>left</sub>.
+This distance would be the sum of the differences between V<sup>min</sup><sub>j</sub> and V<sub>j</sub> for each view:
+
+<div style={{ margin: '20px' }}>
+    <span>
+        Δ<sup>min</sup>
+        <sub>left</sub> = Σ V<sup>min</sup>
+        <sub>j</sub> - V<sub>j</sub>
+    </span>
+    <span style={{ marginLeft: '20px' }}>j = i,...0</span>
+</div>
+
+Similarly we can work out the distance between S<sub>i</sub> and the point at each every view to the left is at its
+maximum size as the sum of differences between V<sup>max</sup><sub>j</sub> an V<sub>j</sub>
+
+<div style={{ margin: '20px' }}>
+    <span>
+        Δ<sup>max</sup>
+        <sub>left</sub> = Σ V<sup>max</sup>
+        <sub>j</sub> - V<sub>j</sub>
+    </span>
+    <span style={{ marginLeft: '20px' }}>j = i,...0</span>
+</div>
+
+The same logic can be applied to work out those values for Δ<sup>min</sup><sub>right</sub> and Δ<sup>max</sup><sub>right</sub>
+
+<div style={{ margin: '20px' }}>
+    <div style={{ marginBottom: '10px' }}>
+        <span>
+            Δ<sup>min</sup>
+            <sub>right</sub> = Σ V<sub>j</sub> - V<sup>min</sup>
+            <sub>j</sub>
+        </span>
+        <span style={{ marginLeft: '20px' }}>j = i+1...n</span>
+    </div>
+    <div>
+        <span>
+            Δ<sup>max</sup>
+            <sub>right</sub> = Σ V<sub>j</sub> - V<sup>min</sup>
+            <sub>j</sub>
+        </span>
+        <span style={{ marginLeft: '20px' }}>j = i+1...n</span>
+    </div>
+</div>
+
+This leaves us with two minimum constraints which are V<sup>min</sup><sub>left</sub> and V<sup>max</sup><sub>right</sub> and two maximum
+constraints V<sup>max</sup><sub>left</sub> and V<sup>min</sup><sub>right</sub>.
+We can reduce these down to a single minimum and maximum contraint by taking the maximum of the two minimums and the minimum of the two maximums leaving us with the following constraints:
+
+<div style={{ margin: '20px' }}>
+    <div style={{ marginBottom: '10px' }}>
+        Δ<sub>min</sub> = Max ( V<sup>min</sup>
+        <sub>left</sub> , V<sup>max</sup>
+        <sub>right</sub> )
+    </div>
+    <div>
+        Δ<sub>max</sub> = Min ( V<sup>max</sup>
+        <sub>left</sub> , V<sup>min</sup>
+        <sub>right</sub> )
+    </div>
+</div>
+
+Given these constraints we can clamp the value of Δ to be within this minimum and maxium boundary.
+This clamped delta can be used in place of delta in the pseudocode from Iteration #2.
+
+<div style={{ margin: '20px' }}>
+    Δ<sub>clamped</sub> = MIN ( V<sub>max</sub> , MAX ( V<sub>min</sub> , Δ ) )
+</div>
+
+You can see how this works in this interactive example which also visually indicates this boundary conditions.
+
+<Splitview mode={3} debug={true} />
+
+For a more visual explaination it's worth studying the below diagram:
+
+<img src={Contraints} />

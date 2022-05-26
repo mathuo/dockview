@@ -1,0 +1,18 @@
+.pane-header {
+    .my-header {
+        .actions {
+            display: none;
+        }
+        &.within {
+            .actions {
+                display: flex;
+            }
+        }
+    }
+
+    &:focus {
+        .actions {
+            display: flex;
+        }
+    }
+}

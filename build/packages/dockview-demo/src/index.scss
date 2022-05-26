@@ -1,0 +1,66 @@
+@import '~dockview/dist/styles/dockview.css';
+
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    overflow: hidden;
+    color: rgb(204, 204, 204);
+    font-size: 13px;
+}
+
+::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--dv-tabs-container-scrollbar-color);
+}
+
+// *,
+// *::after,
+// *::before {
+//     -webkit-user-drag: none;
+//     -webkit-app-region: no-drag;
+//     -webkit-user-select: none;
+// }
+
+.close-action {
+    &:active {
+        -webkit-mask-size: 100% 100% !important;
+        mask-size: 100% 100% !important;
+    }
+
+    background-color: white;
+    height: 16px;
+    width: 16px;
+    display: block;
+    -webkit-mask: var(--dv-tab-close-icon) 50% 50% / 90% 90% no-repeat;
+    mask: var(--dv-tab-close-icon) 50% 50% / 90% 90% no-repeat;
+    margin-right: '0.5em';
+    cursor: pointer;
+}
+
+button {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    border: none;
+    background-color: rgb(14, 99, 156);
+    color: white;
+    font-family: inherit;
+    outline: none;
+    padding: 2px 14px;
+    margin: 2px 0px;
+
+    &:hover {
+        background-color: rgb(17, 119, 187);
+        cursor: pointer;
+    }
+}

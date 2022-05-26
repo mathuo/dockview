@@ -1,0 +1,63 @@
+{
+  "name": "dockview-monorepo-root",
+  "private": true,
+  "description": "Monorepo for https://github.com/mathuo/dockview",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint packages/**/src/** --ext .ts,.tsx,.js,.jsx",
+    "package": "node scripts/package.js",
+    "package-all": "npm run build-demo && npm run docs && node scripts/package.js",
+    "build": "lerna run build --scope dockview",
+    "build-demo": "lerna run build --scope dockview-demo",
+    "docs": "lerna run docs --scope dockview",
+    "clean": "lerna run clean",
+    "bootstrap": "lerna bootstrap",
+    "test:cov": "jest --coverage",
+    "version-beta-build": "lerna version prerelease --preid beta",
+    "publish-app": "lerna publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mathuo/dockview.git"
+  },
+  "author": "https://github.com/mathuo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mathuo/dockview/issues"
+  },
+  "homepage": "https://github.com/mathuo/dockview#readme",
+  "devDependencies": {
+    "@testing-library/dom": "^8.13.0",
+    "@types/jest": "^27.5.0",
+    "@typescript-eslint/eslint-plugin": "^5.22.0",
+    "@typescript-eslint/parser": "^5.22.0",
+    "codecov": "^3.8.3",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.7.1",
+    "eslint": "^8.15.0",
+    "fs-extra": "^10.1.0",
+    "gulp": "^4.0.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-dart-sass": "^1.0.2",
+    "jest": "^28.1.0",
+    "jest-environment-jsdom": "^28.1.0",
+    "jest-sonar-reporter": "^2.0.0",
+    "jsdom": "^19.0.0",
+    "lerna": "^4.0.0",
+    "merge2": "^1.4.1",
+    "rimraf": "^3.0.2",
+    "sass": "^1.51.0",
+    "sass-loader": "^12.6.0",
+    "style-loader": "^3.3.1",
+    "ts-jest": "^28.0.2",
+    "ts-loader": "^9.3.0",
+    "tslib": "^2.4.0",
+    "typescript": "^4.6.4",
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.9.0"
+  }
+}

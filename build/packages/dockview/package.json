@@ -1,0 +1,77 @@
+{
+  "name": "dockview",
+  "version": "1.4.2",
+  "description": "Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support",
+  "main": "./dist/cjs/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "module": "./dist/esm/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mathuo/dockview.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mathuo/dockview/issues"
+  },
+  "homepage": "https://github.com/mathuo/dockview",
+  "scripts": {
+    "build:ci": "npm run build:cjs && npm run build:esm && npm run build:css",
+    "build:cjs": "cross-env ../../node_modules/.bin/tsc --project ./tsconfig.json --extendedDiagnostics",
+    "build:css": "gulp sass",
+    "build:esm": "cross-env ../../node_modules/.bin/tsc --project ./tsconfig.esm.json --extendedDiagnostics",
+    "build:modulefiles": "rollup -c",
+    "build": "npm run build:ci && npm run build:modulefiles",
+    "clean": "rimraf dist/ .build/",
+    "docs": "typedoc",
+    "prepack": "npm run rebuild && npm run test",
+    "rebuild": "npm run clean && npm run build",
+    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
+    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage",
+    "dev-publish": "node ./scripts/publishExperimental.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "splitview",
+    "split-view",
+    "gridview",
+    "grid-view",
+    "dockview",
+    "dock-view",
+    "grid",
+    "tabs",
+    "layout",
+    "layout manager",
+    "dock layout",
+    "dock",
+    "docking",
+    "splitter",
+    "drag-and-drop",
+    "drag",
+    "drop",
+    "react",
+    "react-component"
+  ],
+  "author": "https://github.com/mathuo",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^8.3.2",
+    "@testing-library/react": "^13.2.0",
+    "@types/react": "^18.0.9",
+    "@types/react-dom": "^18.0.3",
+    "cross-env": "^7.0.3",
+    "postcss": "^8.4.13",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.72.1",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-terser": "^7.0.2",
+    "typedoc": "^0.22.15"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0"
+  }
+}

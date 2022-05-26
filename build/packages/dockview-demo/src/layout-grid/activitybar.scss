@@ -1,0 +1,34 @@
+.activity-bar {
+    height: 100%;
+    background-color: rgb(51, 51, 51);
+
+    .activity-bar-item {
+        width: 100%;
+        padding-bottom: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        position: relative;
+
+        &:hover {
+            background-color: rgba(90, 90, 90, 0.5);
+        }
+
+        .activity-bar-item-image {
+            -webkit-mask-size: 65% 65%;
+            mask-size: 65% 65%;
+            -webkit-mask-position: 50% 50%;
+            mask-position: 50% 50%;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            height: 100%;
+            width: 100%;
+            display: block;
+            background-color: gray;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    }
+}

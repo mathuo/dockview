@@ -1,0 +1,60 @@
+.tabs-and-actions-container {
+    display: flex;
+    background-color: var(--dv-tabs-and-actions-container-background-color);
+    flex-shrink: 0;
+    box-sizing: border-box;
+    height: var(--dv-tabs-and-actions-container-height);
+    font-size: var(--dv-tabs-and-actions-container-font-size);
+
+    &.hidden {
+        display: none;
+    }
+
+    .void-container {
+        display: flex;
+        flex-grow: 1;
+    }
+
+    .tabs-container {
+        display: flex;
+        overflow-x: overlay;
+        overflow-y: hidden;
+
+        scrollbar-width: thin; // firefox
+
+        &::-webkit-scrollbar {
+            height: 3px;
+        }
+
+        /* Track */
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* Handle */
+        &::-webkit-scrollbar-thumb {
+            background: var(--dv-tabs-container-scrollbar-color);
+        }
+
+        .tab {
+            -webkit-user-drag: element;
+            outline: none;
+            min-width: 75px;
+            cursor: pointer;
+            position: relative;
+            box-sizing: border-box;
+
+            &:not(:first-child)::before {
+                content: ' ';
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 5;
+                pointer-events: none;
+                background-color: var(--dv-tab-divider-color);
+                width: 1px;
+                height: 100%;
+            }
+        }
+    }
+}

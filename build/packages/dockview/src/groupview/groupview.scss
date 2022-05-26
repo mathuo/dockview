@@ -1,0 +1,23 @@
+.groupview {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--dv-group-view-background-color);
+    overflow: hidden;
+
+    &:focus {
+        outline: none;
+    }
+
+    &.empty {
+        > .tabs-and-actions-container {
+            display: none;
+        }
+    }
+
+    > .content-container {
+        flex-grow: 1;
+        overflow: hidden;
+        outline: none;
+    }
+}

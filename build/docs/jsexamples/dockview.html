@@ -1,0 +1,27 @@
+<!-- <!DOCTYPE html> -->
+<html>
+    <head>
+      <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+      <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+      <script crossorigin src="https://unpkg.com/dockview@latest/dist/dockview.js"></script>
+      <link rel="stylesheet" href="https://unpkg.com/browse/dockview@latest/dist/styles/dockview.css">
+      <style>
+        body {
+          margin: 0;
+        }
+
+        #root {
+          height: 100vh;
+          width: 100vw;
+          background-color: grey;
+        }
+      </style>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script>
+          const root = document.getElementById("root")
+          const dockviewComponent = new dockview.DockviewComponent(root, {})
+        </script>
+    </body>
+</html>

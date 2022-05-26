@@ -1,0 +1,85 @@
+import {
+    DockviewApi,
+    DockviewReact,
+    DockviewReadyEvent,
+    IDockviewPanelProps,
+    PanelCollection,
+} from 'dockview';
+import * as React from 'react';
+import { Meta } from '@storybook/react';
+
+const components: PanelCollection<IDockviewPanelProps> = {
+    default: (props) => {
+        const close = () => props.api.close();
+        return (
+            <div style={{ padding: '10px', height: '100%' }}>hello world</div>
+        );
+    },
+};
+
+export const Tab = (props: {
+    theme: string;
+    hideBorders: boolean;
+    disableAutoResizing: boolean;
+}) => {
+    const api = React.useRef<DockviewApi>();
+
+    const onReady = (event: DockviewReadyEvent) => {
+        api.current = event.api;
+
+        event.api.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+        event.api.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+        event.api.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: { referencePanel: 'panel1', direction: 'right' },
+        });
+        event.api.addPanel({
+            id: 'panel4',
+            component: 'default',
+            position: { referencePanel: 'panel3', direction: 'below' },
+        });
+
+        // event.api.getPanel('panel1').api;
+    };
+
+    return (
+        <DockviewReact
+            className={props.theme}
+            onReady={onReady}
+            components={components}
+            hideBorders={props.hideBorders}
+            disableAutoResizing={props.disableAutoResizing}
+        />
+    );
+};
+
+export default {
+    title: 'Library/Dockview/Tab',
+    component: Tab,
+    decorators: [
+        (Component) => {
+            document.body.style.padding = '0px';
+            return (
+                <div style={{ height: '100vh', fontFamily: 'Arial' }}>
+                    <Component />
+                </div>
+            );
+        },
+    ],
+    args: { theme: 'dockview-theme-light' },
+    argTypes: {
+        theme: {
+            control: {
+                type: 'select',
+                options: ['dockview-theme-dark', 'dockview-theme-light'],
+            },
+        },
+    },
+} as Meta;

@@ -1,0 +1,22 @@
+  
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2019",
+        "sourceMap": true,
+        "declaration": true,
+        "jsx": "react",
+        "noImplicitReturns": true,
+        "noImplicitAny": true,
+        "allowUnreachableCode": false,
+        "forceConsistentCasingInFileNames": true,
+        // "strict": true,
+        "strictBindCallApply": true, // pass
+        "alwaysStrict": true, // pass
+        "noImplicitThis": true, // pass
+        "strictFunctionTypes": true, // pass
+        "strictNullChecks": false,
+        "strictPropertyInitialization": false,
+    },
+    "exclude": ["node_modules", "dist"]
+}

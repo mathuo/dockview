@@ -1,0 +1,24 @@
+---
+slug: dockview-1.4.1-release
+title: Dockview 1.4.1
+tags: [release]
+---
+
+# Release Notes
+
+## 🚀 Features
+
+-   Fix Drag and Drop issues in Dockview on Firefox [#103](https://github.com/mathuo/dockview/pull/103)
+
+## 🛠 Miscs
+
+-   Documentation enhancements https://mathuo.github.io/dockview/docs/
+
+## 🔥 Breaking changes
+
+All breaking changes here are designed to simplify the library with only one way to do something.
+
+-   Remove `setVisible` and `setActive` from the Splitview API. You can still achieve the same behaviors through calling `setVisible` and `setActive` on the Splitview Panel API. [#105](https://github.com/mathuo/dockview/pull/105)
+-   Remove `setVisible`, `setActive` and `toggleVisiblity` from Gridview API. You can still achieve the same behaviors through calling `setVisible` and `setActive` on the Gridview Panel API [#105](https://github.com/mathuo/dockview/pull/105)
+-   Remove `onFocusEvent` from Panel API as this was not intended to be a public method. You can use `onDidFocusChange` instead [#105](https://github.com/mathuo/dockview/pull/105)
+-   Remove HOC `<DockviewComponents.Panel\>`, `<DockviewComponents.Content>`, `<DockviewComponents.Tab>` and `<DockviewComponents.Actions>` [#105](https://github.com/mathuo/dockview/pull/105)

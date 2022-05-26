@@ -1,0 +1,29 @@
+{
+    "views": [
+        {
+            "size": 200,
+            "data": {
+                "id": "1",
+                "component": "default1",
+                "props": {
+                    "text": "hiya"
+                }
+            },
+            "minimumSize": 200,
+            "maximumSize": 9007199254740991,
+            "snap": true
+        },
+        {
+            "size": 409,
+            "data": {
+                "id": "2",
+                "component": "default1"
+            },
+            "minimumSize": 200,
+            "maximumSize": 9007199254740991
+        }
+    ],
+    "activeView": "2",
+    "size": 609,
+    "orientation": "VERTICAL"
+}
