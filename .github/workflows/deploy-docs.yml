@@ -4,8 +4,6 @@ on:
     schedule:
         - cron: '0 3 * * *' # every day at 3 am UTC
 
-# on: [push]
-
 jobs:
     deploy-nightly-demo-app:
         runs-on: ubuntu-latest
@@ -28,11 +26,13 @@ jobs:
                       ${{ runner.os }}-node-
 
             - run: yarn install
-              working-directory: docs
+            - run: lerna bootstrap
             - run: yarn build
-              working-directory: docs
+              working-directory: packages/dockview
+            - run: yarn build
+              working-directory: packages/docs
             - run: npm run deploy-docs
-              working-directory: docs
+              working-directory: packages/docs
             - name: Deploy 🚀
               uses: JamesIves/github-pages-deploy-action@3.7.1
               with:
