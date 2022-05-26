@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdockview_docs=self.webpackChunkdockview_docs||[]).push([[334],{1402:function(e){e.exports=JSON.parse('{"title":"API","slug":"/category/api","permalink":"/docs2/docs/category/api","navigation":{"previous":{"title":"Basics","permalink":"/docs2/docs/basics"},"next":{"title":"Dockview","permalink":"/docs2/docs/api/dockview"}}}')}}]);
