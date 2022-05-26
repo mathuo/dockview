@@ -5,7 +5,6 @@ const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 const path = require('path');
-const { DEPLOY_PATH } = require('./scripts/constants');
 
 console.log(`isCI: ${process.env.CI}`);
 
@@ -14,7 +13,7 @@ const config = {
     title: 'Dockview',
     tagline: 'Zero dependency layout manager for React',
     url: 'https://your-docusaurus-test-site.com',
-    baseUrl: process.env.CI ? `/${DEPLOY_PATH}/` : '/',
+    baseUrl: process.env.CI ? `/` : '/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
     favicon: 'img/favicon.ico',

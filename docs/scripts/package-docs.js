@@ -1,9 +1,8 @@
 const fs = require('fs-extra');
 const path = require('path');
-const { DEPLOY_PATH } = require('./constants');
 
-const output = path.join(__dirname, '../../');
+const output = path.join(__dirname, '../../build');
 
 const docsDir = path.join(__dirname, '../build');
 
-fs.copySync(docsDir, path.join(output, DEPLOY_PATH));
+fs.copySync(docsDir, path.join(output));

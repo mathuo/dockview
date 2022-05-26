@@ -259,7 +259,7 @@ export const TestGrid = (props: IGridviewPanelProps) => {
                 tabComponents={tabComponents}
                 onTabContextMenu={onTabContextMenu}
                 watermarkComponent={Watermark}
-                showDndOverlay={(ev, target) => {
+                showDndOverlay={(ev) => {
                     return true;
                 }}
                 onDidDrop={(ev) => {
