@@ -28,11 +28,11 @@ jobs:
                       ${{ runner.os }}-node-
 
             - run: yarn install
-              working-directory: docs
+              working-directory: packages/docs
             - run: yarn build
-              working-directory: docs
+              working-directory: packages/docs
             - run: npm run deploy-docs
-              working-directory: docs
+              working-directory: packages/docs
             - name: Deploy 🚀
               uses: JamesIves/github-pages-deploy-action@3.7.1
               with:
