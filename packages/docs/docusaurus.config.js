@@ -12,7 +12,7 @@ console.log(`isCI: ${process.env.CI}`);
 const config = {
     title: 'Dockview',
     tagline: 'Zero dependency layout manager for React',
-    url: 'https://your-docusaurus-test-site.com',
+    url: 'https://dockview.dev',
     baseUrl: process.env.CI ? `/` : '/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
@@ -87,6 +87,28 @@ const config = {
     themeConfig:
         /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
         ({
+            metadata: [
+                {
+                    name: 'keywords',
+                    content: [
+                        'react',
+                        'components',
+                        'typescript',
+                        'drag-and-drop',
+                        'reactjs',
+                        'layout',
+                        'drag',
+                        'drop',
+                        'tabs',
+                        'dock',
+                        'docking',
+                        'splitter',
+                        'docking-library',
+                        'layout-manager',
+                        'docking-layout',
+                    ].join(' ,'),
+                },
+            ],
             navbar: {
                 title: 'Dockview',
                 logo: {
