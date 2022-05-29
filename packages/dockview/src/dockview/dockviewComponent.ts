@@ -24,7 +24,6 @@ import {
   AddPanelOptions,
   DockviewComponentOptions,
   MovementOptions,
-  TabContextMenuEvent,
 } from './options';
 import {
   BaseGrid,
@@ -32,7 +31,6 @@ import {
   toTarget,
 } from '../gridview/baseComponentGridview';
 import { DockviewApi } from '../api/component.api';
-import { LayoutMouseEvent, MouseEventKind } from '../groupview/tab';
 import { Orientation } from '../splitview/core/splitview';
 import { DefaultTab } from './components/tab/defaultTab';
 import {
@@ -105,7 +103,6 @@ export interface IDockviewComponent extends IBaseGrid<GroupPanel> {
     addEmptyGroup(options?: AddGroupOptions): void;
     closeAllGroups(): void;
     // events
-    onTabContextMenu: Event<TabContextMenuEvent>;
     moveToNext(options?: MovementOptions): void;
     moveToPrevious(options?: MovementOptions): void;
     setActivePanel(panel: IDockviewPanel): void;
@@ -126,10 +123,6 @@ export class DockviewComponent
   private _deserializer: IPanelDeserializer | undefined;
   private _api: DockviewApi;
   private _options: Exclude<DockviewComponentOptions, 'orientation'>;
-
-  private readonly _onTabContextMenu = new Emitter<TabContextMenuEvent>();
-  readonly onTabContextMenu: Event<TabContextMenuEvent> =
-      this._onTabContextMenu.event;
 
   private readonly _onDidDrop = new Emitter<DockviewDropEvent>();
   readonly onDidDrop: Event<DockviewDropEvent> = this._onDidDrop.event;
@@ -199,7 +192,6 @@ export class DockviewComponent
       });
 
       this.addDisposables(
-          this._onTabContextMenu,
           this._onDidDrop,
           Event.any(
               this.onDidAddPanel,
@@ -423,18 +415,6 @@ export class DockviewComponent
           const [_, group] = entry;
 
           group.value.model.closeAllPanels();
-      }
-  }
-
-  fireMouseEvent(event: LayoutMouseEvent): void {
-      if (event.kind === MouseEventKind.CONTEXT_MENU) {
-          if (event.tab && event.panel) {
-              this._onTabContextMenu.fire({
-                  event: event.event,
-                  api: this._api,
-                  panel: event.panel,
-              });
-          }
       }
   }
 

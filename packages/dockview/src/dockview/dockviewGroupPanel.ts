@@ -63,10 +63,6 @@ export class DockviewGroupPanel
         this.addDisposables(
             this.api.onActiveChange(() => {
                 accessor.setActivePanel(this);
-            }),
-            this.api.onDidTitleChange((event) => {
-                const title = event.title;
-                this.update({ params: { title } });
             })
         );
     }
@@ -107,7 +103,15 @@ export class DockviewGroupPanel
 
         if (didTitleChange) {
             this._title = title;
-            this.api._titleChanged.fire({ title: this.title });
+
+            this.view?.update({
+                params: {
+                    params: this._params,
+                    title: this.title,
+                    suppressClosable: this.suppressClosable,
+                },
+            });
+            this.api._onDidTitleChange.fire({ title });
         }
     }
 
@@ -117,7 +121,15 @@ export class DockviewGroupPanel
 
         if (didSuppressChangableClose) {
             this._suppressClosable = suppressClosable;
-            this.api._suppressClosableChanged.fire({
+
+            this.view?.update({
+                params: {
+                    params: this._params,
+                    title: this.title,
+                    suppressClosable: this.suppressClosable,
+                },
+            });
+            this.api._onDidSuppressClosableChange.fire({
                 suppressClosable: !!this.suppressClosable,
             });
         }
@@ -132,11 +144,19 @@ export class DockviewGroupPanel
         };
 
         if (typeof params.title === 'string') {
-            this.setTitle(params.title);
+            if (params.title !== this.title) {
+                this._title = params.title;
+                this.api._onDidTitleChange.fire({ title: this.title });
+            }
         }
 
         if (typeof params.suppressClosable === 'boolean') {
-            this.setSuppressClosable(params.suppressClosable);
+            if (params.suppressClosable !== this._suppressClosable) {
+                this._suppressClosable = params.suppressClosable;
+                this.api._onDidSuppressClosableChange.fire({
+                    suppressClosable: !!this.suppressClosable,
+                });
+            }
         }
 
         this.view?.update({

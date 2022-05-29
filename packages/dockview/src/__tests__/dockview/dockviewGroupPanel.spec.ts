@@ -24,7 +24,7 @@ describe('dockviewGroupPanel', () => {
 
         let latestTitle: string | undefined = undefined;
 
-        const disposable = cut.api.titleChanged((event) => {
+        const disposable = cut.api.onDidTitleChange((event) => {
             latestTitle = event.title;
         });
 
@@ -59,7 +59,7 @@ describe('dockviewGroupPanel', () => {
 
         let latestSuppressClosable: boolean | undefined = undefined;
 
-        const disposable = cut.api.suppressClosableChanged((event) => {
+        const disposable = cut.api.onDidSuppressClosableChange((event) => {
             latestSuppressClosable = event.suppressClosable;
         });
 
@@ -101,6 +101,7 @@ describe('dockviewGroupPanel', () => {
             return {
                 init: jest.fn(),
                 dispose: jest.fn(),
+                update: jest.fn(),
             } as any;
         });
         const view = new viewMock();
