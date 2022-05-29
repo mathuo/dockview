@@ -224,7 +224,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     ) {
         super();
 
-        this.container.classList.add('groupview');
+        this.container.classList.add('dockview-groupview');
 
         this.addDisposables(
             this._onMove,
@@ -496,8 +496,8 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         this._isGroupActive = isGroupActive;
 
-        toggleClass(this.container, 'active-group', isGroupActive);
-        toggleClass(this.container, 'inactive-group', !isGroupActive);
+        toggleClass(this.container, 'dockview-active-group', isGroupActive);
+        toggleClass(this.container, 'dockview--inactive-group', !isGroupActive);
 
         this.tabsContainer.setActive(this.isActive);
 
@@ -626,7 +626,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
     private updateContainer() {
         this.updateActions();
-        toggleClass(this.container, 'empty', this.isEmpty);
+        toggleClass(this.container, 'dockview-empty', this.isEmpty);
 
         this.panels.forEach((panel) =>
             panel.updateParentGroup(this.parent, this.isActive)

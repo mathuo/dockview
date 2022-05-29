@@ -26,13 +26,13 @@ describe('abstractDragHandler', () => {
             }
         })(element);
 
-        expect(element.classList.contains('dragged')).toBeFalsy();
+        expect(element.classList.contains('dockview-dragged')).toBeFalsy();
 
         fireEvent.dragStart(element);
-        expect(element.classList.contains('dragged')).toBeTruthy();
+        expect(element.classList.contains('dockview-dragged')).toBeTruthy();
 
         jest.runAllTimers();
-        expect(element.classList.contains('dragged')).toBeFalsy();
+        expect(element.classList.contains('dockview-dragged')).toBeFalsy();
 
         handler.dispose();
     });

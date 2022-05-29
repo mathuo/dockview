@@ -39,7 +39,7 @@ export class ContentContainer
     constructor() {
         super();
         this._element = document.createElement('div');
-        this._element.className = 'content-container';
+        this._element.className = 'dockview-content-container';
         this._element.tabIndex = -1;
 
         this.addDisposables(this._onDidFocus, this._onDidBlur);

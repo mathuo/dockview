@@ -31,19 +31,19 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         super();
 
         this._element = document.createElement('div');
-        this._element.className = 'default-tab';
+        this._element.className = 'dockview-default-tab';
         //
         this._content = document.createElement('div');
-        this._content.className = 'tab-content';
+        this._content.className = 'dockview-tab-content';
         //
         this._actionContainer = document.createElement('div');
-        this._actionContainer.className = 'action-container';
+        this._actionContainer.className = 'dockview-action-container';
         //
         this._list = document.createElement('ul');
-        this._list.className = 'tab-list';
+        this._list.className = 'dockview-tab-list';
         //
         this.action = document.createElement('a');
-        this.action.className = 'tab-action';
+        this.action.className = 'dockview-tab-action';
         //
         this._element.appendChild(this._content);
         this._element.appendChild(this._actionContainer);
@@ -82,7 +82,7 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
                 this.params.api.close();
             });
         } else {
-            this.action.classList.add('disable-close');
+            this.action.classList.add('dockview-disable-close');
         }
     }
 

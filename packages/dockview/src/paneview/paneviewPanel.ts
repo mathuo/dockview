@@ -167,7 +167,7 @@ export abstract class PaneviewPanel
 
         this._orientation = orientation;
 
-        this.element.classList.add('pane');
+        this.element.classList.add('dockview-pane');
 
         this.addDisposables(
             this.api.onDidSizeChange((event) => {
@@ -297,7 +297,7 @@ export abstract class PaneviewPanel
         this.header = document.createElement('div');
         this.header.tabIndex = 0;
 
-        this.header.className = 'pane-header';
+        this.header.className = 'dockview-pane-header';
         this.header.style.height = `${this.headerSize}px`;
         this.header.style.lineHeight = `${this.headerSize}px`;
         this.header.style.minHeight = `${this.headerSize}px`;
@@ -307,7 +307,7 @@ export abstract class PaneviewPanel
 
         this.body = document.createElement('div');
 
-        this.body.className = 'pane-body';
+        this.body.className = 'dockview-pane-body';
 
         this.element.appendChild(this.body);
     }

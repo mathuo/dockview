@@ -423,12 +423,12 @@ describe('groupview', () => {
 
     test('default', () => {
         let viewQuery = groupview.element.querySelectorAll(
-            '.groupview > .tabs-and-actions-container'
+            '.groupview > .dockview-tabs-and-dockview-actions-container'
         );
         expect(viewQuery).toBeTruthy();
 
         viewQuery = groupview.element.querySelectorAll(
-            '.groupview > .content-container'
+            '.groupview > .dockview-content-container'
         );
         expect(viewQuery).toBeTruthy();
     });
@@ -543,7 +543,7 @@ describe('groupview', () => {
             null
         );
         const contentContainer = groupviewContainer
-            .getElementsByClassName('content-container')
+            .getElementsByClassName('dockview-content-container')
             .item(0).childNodes;
 
         const panel1 = new TestPanel('id_1', null);

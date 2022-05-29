@@ -1,4 +1,4 @@
-.groupview {
+.dockview-groupview {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -9,13 +9,13 @@
         outline: none;
     }
 
-    &.empty {
-        > .tabs-and-actions-container {
+    &.dockview-empty {
+        > .dockview-tabs-and-dockview-actions-container {
             display: none;
         }
     }
 
-    > .content-container {
+    > .dockview-content-container {
         flex-grow: 1;
         overflow: hidden;
         outline: none;

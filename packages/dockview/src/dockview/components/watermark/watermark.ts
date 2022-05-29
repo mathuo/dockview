@@ -24,16 +24,16 @@ export class Watermark
     constructor() {
         super();
         this._element = document.createElement('div');
-        this._element.className = 'watermark';
+        this._element.className = 'dockview-watermark';
 
         const title = document.createElement('div');
-        title.className = 'watermark-title';
+        title.className = 'dockview-watermark-title';
 
         const emptySpace = document.createElement('span');
         emptySpace.style.flexGrow = '1';
 
         const content = document.createElement('div');
-        content.className = 'watermark-content';
+        content.className = 'dockview-watermark-content';
 
         this._element.appendChild(title);
         this._element.appendChild(content);
@@ -98,7 +98,7 @@ export class Watermark
         const isOneGroup = !!(
             this.params && this.params.containerApi.size <= 1
         );
-        toggleClass(this.element, 'has-actions', isOneGroup);
+        toggleClass(this.element, 'dockview-watermark-has-actions', isOneGroup);
     }
 
     dispose() {

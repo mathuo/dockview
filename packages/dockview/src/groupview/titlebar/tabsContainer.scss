@@ -1,4 +1,4 @@
-.tabs-and-actions-container {
+.dockview-tabs-and-dockview-actions-container {
     display: flex;
     background-color: var(--dv-tabs-and-actions-container-background-color);
     flex-shrink: 0;
@@ -6,16 +6,12 @@
     height: var(--dv-tabs-and-actions-container-height);
     font-size: var(--dv-tabs-and-actions-container-font-size);
 
-    &.hidden {
-        display: none;
-    }
-
-    .void-container {
+    .dockview-void-container {
         display: flex;
         flex-grow: 1;
     }
 
-    .tabs-container {
+    .dockview-tabs-container {
         display: flex;
         overflow-x: overlay;
         overflow-y: hidden;
@@ -36,7 +32,7 @@
             background: var(--dv-tabs-container-scrollbar-color);
         }
 
-        .tab {
+        .dockview-tab {
             -webkit-user-drag: element;
             outline: none;
             min-width: 75px;

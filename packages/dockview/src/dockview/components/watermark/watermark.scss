@@ -1,21 +1,21 @@
-.watermark {
+.dockview-watermark {
     display: flex;
     width: 100%;
 
-    &.has-actions {
-        .watermark-title {
-            .actions-bar {
+    &.dockview-watermark-has-actions {
+        .dockview-watermark-title {
+            .dockview-actions-bar {
                 display: none;
             }
         }
     }
 
-    .watermark-title {
+    .dockview-watermark-title {
         height: 35px;
         width: 100%;
         display: flex;
     }
-    .watermark-content {
+    .dockview-watermark-content {
         flex-grow: 1;
     }
 }

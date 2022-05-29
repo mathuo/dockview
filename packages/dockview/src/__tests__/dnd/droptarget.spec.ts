@@ -43,7 +43,7 @@ describe('droptarget', () => {
         fireEvent.dragOver(element);
 
         const target = element.querySelector(
-            '.drop-target-dropzone'
+            '.dockview-drop-target-dropzone'
         ) as HTMLElement;
         fireEvent.drop(target);
         expect(position).toBe(Position.Center);
@@ -65,7 +65,7 @@ describe('droptarget', () => {
         fireEvent.dragOver(element);
 
         const target = element.querySelector(
-            '.drop-target-dropzone'
+            '.dockview-drop-target-dropzone'
         ) as HTMLElement;
 
         jest.spyOn(target, 'clientHeight', 'get').mockImplementation(() => 100);
@@ -93,12 +93,12 @@ describe('droptarget', () => {
         fireEvent.dragOver(element);
 
         let viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection'
+            '.dockview-drop-target > .dockview-drop-target-dropzone > .dockview-drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
 
         const target = element.querySelector(
-            '.drop-target-dropzone'
+            '.dockview-drop-target-dropzone'
         ) as HTMLElement;
 
         jest.spyOn(target, 'clientHeight', 'get').mockImplementation(() => 100);
@@ -110,7 +110,7 @@ describe('droptarget', () => {
         );
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection.left'
+            '.dockview-drop-target > .dockview-drop-target-dropzone > .dockview-drop-target-selection.dockview-left'
         );
         expect(viewQuery.length).toBe(1);
         expect(droptarget.state).toBe(Position.Left);
@@ -121,7 +121,7 @@ describe('droptarget', () => {
         );
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection.top'
+            '.dockview-drop-target > .dockview-drop-target-dropzone > .dockview-drop-target-selection.dockview-top'
         );
         expect(viewQuery.length).toBe(1);
         expect(droptarget.state).toBe(Position.Top);
@@ -132,7 +132,7 @@ describe('droptarget', () => {
         );
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection.bottom'
+            '.dockview-drop-target > .dockview-drop-target-dropzone > .dockview-drop-target-selection.dockview-bottom'
         );
         expect(viewQuery.length).toBe(1);
         expect(droptarget.state).toBe(Position.Bottom);
@@ -143,7 +143,7 @@ describe('droptarget', () => {
         );
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection.right'
+            '.dockview-drop-target > .dockview-drop-target-dropzone > .dockview-drop-target-selection.dockview-right'
         );
         expect(viewQuery.length).toBe(1);
         expect(droptarget.state).toBe(Position.Right);
@@ -156,7 +156,7 @@ describe('droptarget', () => {
 
         fireEvent.dragLeave(target);
         expect(droptarget.state).toBeUndefined();
-        viewQuery = element.querySelectorAll('.drop-target');
+        viewQuery = element.querySelectorAll('.dockview-drop-target');
         expect(viewQuery.length).toBe(0);
     });
 });

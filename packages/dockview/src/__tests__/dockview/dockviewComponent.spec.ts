@@ -466,7 +466,7 @@ describe('dockviewComponent', () => {
         expect(dockview.totalPanels).toBe(0);
     });
 
-    test('panel content added to content-container css check', () => {
+    test('panel content added to dockview-content-container css check', () => {
         dockview.layout(500, 1000);
 
         dockview.addPanel({
@@ -480,13 +480,13 @@ describe('dockviewComponent', () => {
         });
 
         let viewQuery = container.querySelectorAll(
-            '.branch-node > .split-view-container > .view-container > .view'
+            '.dockview-branch-node > .split-view-container > .view-container > .dockview-view'
         );
 
         expect(viewQuery.length).toBe(1);
 
         viewQuery = container.querySelectorAll(
-            '.branch-node > .split-view-container > .view-container > .view:nth-child(1) >.groupview > .content-container > .testpanel-panel2'
+            '.dockview-branch-node > .split-view-container > .view-container > .dockview-view:nth-child(1) >.dockview-groupview > .dockview-content-container > .testpanel-panel2'
         );
 
         expect(viewQuery.length).toBe(1);
@@ -495,19 +495,19 @@ describe('dockviewComponent', () => {
         dockview.moveGroupOrPanel(group, group.id, 'panel1', Position.Right);
 
         viewQuery = container.querySelectorAll(
-            '.branch-node > .split-view-container > .view-container > .view'
+            '.dockview-branch-node > .split-view-container > .view-container > .dockview-view'
         );
 
         expect(viewQuery.length).toBe(2);
 
         viewQuery = container.querySelectorAll(
-            '.branch-node > .split-view-container > .view-container > .view:nth-child(1) >.groupview > .content-container > .testpanel-panel2'
+            '.dockview-branch-node > .split-view-container > .view-container > .dockview-view:nth-child(1) >.dockview-groupview > .dockview-content-container > .testpanel-panel2'
         );
 
         expect(viewQuery.length).toBe(1);
 
         viewQuery = container.querySelectorAll(
-            '.branch-node > .split-view-container > .view-container > .view:nth-child(2) >.groupview > .content-container > .testpanel-panel1'
+            '.dockview-branch-node > .split-view-container > .view-container > .dockview-view:nth-child(2) >.dockview-groupview > .dockview-content-container > .testpanel-panel1'
         );
 
         expect(viewQuery.length).toBe(1);

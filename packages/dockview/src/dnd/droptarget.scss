@@ -1,7 +1,7 @@
-.drop-target {
+.dockview-drop-target {
     position: relative;
 
-    > .drop-target-dropzone {
+    > .dockview-drop-target-dropzone {
         position: absolute;
         left: 0px;
         top: 0px;
@@ -9,45 +9,47 @@
         width: 100%;
         z-index: 10000;
 
-        > .drop-target-selection {
+        > .dockview-drop-target-selection {
             position: relative;
             box-sizing: border-box;
             height: 100%;
             width: 100%;
             background-color: var(--dv-drag-over-background-color);
-            transition: top 70ms ease-out,left 70ms ease-out,width 70ms ease-out,height 70ms ease-out,opacity .15s ease-out;
+            transition: top 70ms ease-out, left 70ms ease-out,
+                width 70ms ease-out, height 70ms ease-out,
+                opacity 0.15s ease-out;
             will-change: transform;
             pointer-events: none;
 
-            &.left {
-              transform: translateX(-25%) scaleX(0.5)
+            &.dockview-left {
+                transform: translateX(-25%) scaleX(0.5);
             }
 
-            &.right {
-              transform: translateX(25%) scaleX(0.5)
+            &.dockview-right {
+                transform: translateX(25%) scaleX(0.5);
             }
 
-            &.top {
-              transform: translateY(-25%) scaleY(0.5);
+            &.dockview-top {
+                transform: translateY(-25%) scaleY(0.5);
             }
 
-            &.bottom {
-              transform: translateY(25%) scaleY(0.5);
+            &.dockview-bottom {
+                transform: translateY(25%) scaleY(0.5);
             }
 
-            &.small-top {
+            &.dockview-small-top {
                 border-top: 1px solid var(--dv-drag-over-border-color);
             }
 
-            &.small-bottom {
+            &.dockview-small-bottom {
                 border-bottom: 1px solid var(--dv-drag-over-border-color);
             }
 
-            &.small-left {
+            &.dockview-small-left {
                 border-left: 1px solid var(--dv-drag-over-border-color);
             }
 
-            &.small-right {
+            &.dockview-small-right {
                 border-right: 1px solid var(--dv-drag-over-border-color);
             }
         }

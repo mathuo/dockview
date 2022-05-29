@@ -1,37 +1,27 @@
-.custom-dragging {
-    height: 24px;
-    line-height: 24px;
-    font-size: 11px;
-    width: 100px;
-    background-color: dodgerblue;
-    color: ghostwhite;
-    border-radius: 11px;
-    position: absolute;
-    padding-left: 10px;
-}
-
 .groupview {
-    &.active-group {
-        > .tabs-and-actions-container > .tabs-container > .tab {
-            &.active-tab {
+    &.dockview-active-group {
+        > .dockview-tabs-and-dockview-actions-container
+            > .dockview-tabs-container
+            > .dockview-tab {
+            &.dockview-active-tab {
                 background-color: var(
                     --dv-activegroup-visiblepanel-tab-background-color
                 );
                 color: var(--dv-activegroup-visiblepanel-tab-color);
 
-                .tab-action {
+                .dockview-tab-action {
                     background-color: var(
                         --dv-activegroup-visiblepanel-tab-color
                     );
                 }
             }
-            &.inactive-tab {
+            &.dockview-inactive-tab {
                 background-color: var(
                     --dv-activegroup-hiddenpanel-tab-background-color
                 );
                 color: var(--dv-activegroup-hiddenpanel-tab-color);
 
-                .tab-action {
+                .dockview-tab-action {
                     background-color: var(
                         --dv-activegroup-hiddenpanel-tab-color
                     );
@@ -39,27 +29,29 @@
             }
         }
     }
-    &.inactive-group {
-        > .tabs-and-actions-container > .tabs-container > .tab {
-            &.active-tab {
+    &.dockview-inactive-group {
+        > .dockview-tabs-and-dockview-actions-container
+            > .dockview-tabs-container
+            > .dockview-tab {
+            &.dockview-active-tab {
                 background-color: var(
                     --dv-inactivegroup-visiblepanel-tab-background-color
                 );
                 color: var(--dv-inactivegroup-visiblepanel-tab-color);
 
-                .tab-action {
+                .dockview-tab-action {
                     background-color: var(
                         --dv-inactivegroup-visiblepanel-tab-color
                     );
                 }
             }
-            &.inactive-tab {
+            &.dockview-inactive-tab {
                 background-color: var(
                     --dv-inactivegroup-hiddenpanel-tab-background-color
                 );
                 color: var(--dv-inactivegroup-hiddenpanel-tab-color);
 
-                .tab-action {
+                .dockview-tab-action {
                     background-color: var(
                         --dv-inactivegroup-hiddenpanel-tab-color
                     );
@@ -73,8 +65,8 @@
  * when a tab is dragged we lose the above stylings because they are conditional on parent elements
  * therefore we also set some stylings for the dragging event
  **/
-.tab {
-    &.dragging {
+.dockview-tab {
+    &.dockview-tab-dragging {
         background-color: var(
             --dv-activegroup-visiblepanel-tab-background-color
         );

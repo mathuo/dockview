@@ -68,14 +68,14 @@
     --dv-tabs-and-actions-container-font-size: 11px;
 
     .groupview {
-        &.active-group {
-            > .tabs-and-actions-container {
+        &.dockview-active-group {
+            > .dockview-tabs-and-dockview-actions-container {
                 border-bottom: 2px solid
                     var(--dv-activegroup-visiblepanel-tab-background-color);
             }
         }
-        &.inactive-group {
-            > .tabs-and-actions-container {
+        &.dockview-inactive-group {
+            > .dockview-tabs-and-dockview-actions-container {
                 border-bottom: 2px solid
                     var(--dv-inactivegroup-visiblepanel-tab-background-color);
             }

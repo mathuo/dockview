@@ -92,13 +92,14 @@ export class Droptarget extends CompositeDisposable {
 
                     if (!this.target) {
                         this.target = document.createElement('div');
-                        this.target.className = 'drop-target-dropzone';
+                        this.target.className = 'dockview-drop-target-dropzone';
                         this.overlay = document.createElement('div');
-                        this.overlay.className = 'drop-target-selection';
+                        this.overlay.className =
+                            'dockview-drop-target-selection';
                         this._state = Position.Center;
                         this.target.appendChild(this.overlay);
 
-                        this.element.classList.add('drop-target');
+                        this.element.classList.add('dockview-drop-target');
                         this.element.append(this.target);
                     }
 
@@ -157,15 +158,19 @@ export class Droptarget extends CompositeDisposable {
         const isTop = quadrant === 'top';
         const isBottom = quadrant === 'bottom';
 
-        toggleClass(this.overlay, 'right', !isSmallX && isRight);
-        toggleClass(this.overlay, 'left', !isSmallX && isLeft);
-        toggleClass(this.overlay, 'top', !isSmallY && isTop);
-        toggleClass(this.overlay, 'bottom', !isSmallY && isBottom);
+        toggleClass(this.overlay, 'dockview-right', !isSmallX && isRight);
+        toggleClass(this.overlay, 'dockview-left', !isSmallX && isLeft);
+        toggleClass(this.overlay, 'dockview-top', !isSmallY && isTop);
+        toggleClass(this.overlay, 'dockview-bottom', !isSmallY && isBottom);
 
-        toggleClass(this.overlay, 'small-right', isSmallX && isRight);
-        toggleClass(this.overlay, 'small-left', isSmallX && isLeft);
-        toggleClass(this.overlay, 'small-top', isSmallY && isTop);
-        toggleClass(this.overlay, 'small-bottom', isSmallY && isBottom);
+        toggleClass(this.overlay, 'dockview-small-right', isSmallX && isRight);
+        toggleClass(this.overlay, 'dockview-small-left', isSmallX && isLeft);
+        toggleClass(this.overlay, 'dockview-small-top', isSmallY && isTop);
+        toggleClass(
+            this.overlay,
+            'dockview-small-bottom',
+            isSmallY && isBottom
+        );
     }
 
     private setState(quadrant: Quadrant | null) {
@@ -229,7 +234,7 @@ export class Droptarget extends CompositeDisposable {
             this._state = undefined;
             this.element.removeChild(this.target);
             this.target = undefined;
-            this.element.classList.remove('drop-target');
+            this.element.classList.remove('dockview-drop-target');
         }
     }
 }

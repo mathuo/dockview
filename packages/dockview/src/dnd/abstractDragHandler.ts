@@ -34,8 +34,11 @@ export abstract class DragHandler extends CompositeDisposable {
                     iframe.style.pointerEvents = 'none';
                 }
 
-                this.el.classList.add('dragged');
-                setTimeout(() => this.el.classList.remove('dragged'), 0);
+                this.el.classList.add('dockview-dragged');
+                setTimeout(
+                    () => this.el.classList.remove('dockview-dragged'),
+                    0
+                );
 
                 this.disposable.value = this.getData();
 

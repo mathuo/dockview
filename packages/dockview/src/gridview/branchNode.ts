@@ -121,7 +121,7 @@ export class BranchNode extends CompositeDisposable implements IView {
         this._orthogonalSize = orthogonalSize;
         this._size = size;
         this.element = document.createElement('div');
-        this.element.className = 'branch-node';
+        this.element.className = 'dockview-branch-node';
 
         if (!childDescriptors) {
             this.splitview = new Splitview(this.element, {

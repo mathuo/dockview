@@ -7,7 +7,9 @@ describe('tab', () => {
 
         const cut = new Tab('panelId', new accessorMock(), new groupMock());
 
-        expect(cut.element.className).toBe('tab inactive-tab');
+        expect(cut.element.className).toBe(
+            'dockview-tab dockview-inactive-tab'
+        );
     });
 
     test('that active tab has active-tab class', () => {
@@ -17,9 +19,11 @@ describe('tab', () => {
         const cut = new Tab('panelId', new accessorMock(), new groupMock());
 
         cut.setActive(true);
-        expect(cut.element.className).toBe('tab active-tab');
+        expect(cut.element.className).toBe('dockview-tab dockview-active-tab');
 
         cut.setActive(false);
-        expect(cut.element.className).toBe('tab inactive-tab');
+        expect(cut.element.className).toBe(
+            'dockview-tab dockview-inactive-tab'
+        );
     });
 });

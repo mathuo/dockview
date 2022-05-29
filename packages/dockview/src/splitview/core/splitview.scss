@@ -5,7 +5,7 @@
     width: 100%;
 
     &.animation {
-        .view,
+        .dockview-view,
         .sash {
             transition-duration: 0.15s;
             transition-timing-function: ease-out;
@@ -48,7 +48,7 @@
             }
         }
 
-        & > .view-container > .view {
+        & > .view-container > .dockview-view {
             &:not(:first-child) {
                 // padding-left: 1px;
                 &::before {
@@ -80,7 +80,7 @@
             }
         }
 
-        & > .view-container > .view {
+        & > .view-container > .dockview-view {
             width: 100%;
 
             &:not(:first-child) {
@@ -121,7 +121,7 @@
         height: 100%;
         width: 100%;
 
-        .view {
+        .dockview-view {
             height: 100%;
             box-sizing: border-box;
             overflow: auto;
@@ -130,7 +130,7 @@
     }
 
     &.separator-border {
-        .view:not(:first-child)::before {
+        .dockview-view:not(:first-child)::before {
             content: ' ';
             position: absolute;
             top: 0;

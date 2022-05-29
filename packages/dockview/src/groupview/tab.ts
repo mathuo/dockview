@@ -60,11 +60,11 @@ export class Tab extends CompositeDisposable implements ITab {
         this.addDisposables(this._onChanged, this._onDropped);
 
         this._element = document.createElement('div');
-        this._element.className = 'tab';
+        this._element.className = 'dockview-tab';
         this._element.tabIndex = 0;
         this._element.draggable = true;
 
-        toggleClass(this.element, 'inactive-tab', true);
+        toggleClass(this.element, 'dockview-inactive-tab', true);
 
         this.addDisposables(
             new (class Handler extends DragHandler {
@@ -101,7 +101,7 @@ export class Tab extends CompositeDisposable implements ITab {
                  * TODO: alternative to stopPropagation
                  *
                  * I need to stop the event propagation here since otherwise it'll be intercepted by event handlers
-                 * on the tabs-container. I cannot use event.preventDefault() since I need the on DragStart event to occur
+                 * on the dockview-tabs-container. I cannot use event.preventDefault() since I need the on DragStart event to occur
                  */
                 event.stopPropagation();
 
@@ -138,8 +138,8 @@ export class Tab extends CompositeDisposable implements ITab {
     }
 
     public setActive(isActive: boolean) {
-        toggleClass(this.element, 'active-tab', isActive);
-        toggleClass(this.element, 'inactive-tab', !isActive);
+        toggleClass(this.element, 'dockview-active-tab', isActive);
+        toggleClass(this.element, 'dockview-inactive-tab', !isActive);
     }
 
     public setContent(part: ITabRenderer) {

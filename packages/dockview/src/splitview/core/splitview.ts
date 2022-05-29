@@ -347,7 +347,7 @@ export class Splitview {
         skipLayout?: boolean
     ) {
         const container = document.createElement('div');
-        container.className = 'view';
+        container.className = 'dockview-view';
 
         container.appendChild(view.element);
 

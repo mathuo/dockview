@@ -1,14 +1,14 @@
-.pane-container {
+.dockview-pane-container {
     height: 100%;
     width: 100%;
 
-    &.animated {
-        .view {
+    &.dockview-animated {
+        .dockview-view {
             transition-duration: 0.15s;
             transition-timing-function: ease-out;
         }
     }
-    .view {
+    .dockview-view {
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -19,12 +19,12 @@
         }
 
         &:not(:first-child) {
-            .pane > .pane-header {
+            .dockview-pane > .dockview-pane-header {
                 border-top: 1px solid var(--dv-paneview-header-border-color);
             }
         }
 
-        .default-header {
+        .dockview-default-header {
             background-color: var(--dv-group-view-background-color);
             color: var(--dv-activegroup-visiblepanel-tab-color);
             display: flex;
@@ -42,23 +42,23 @@
         }
     }
 
-    &:first-of-type > .pane > .pane-header {
+    &:first-of-type > .dockview-pane > .dockview-pane-header {
         border-top: none !important;
     }
 
-    .pane {
+    .dockview-pane {
         display: flex;
         flex-direction: column;
         overflow: hidden;
         height: 100%;
 
-        .pane-header {
+        .dockview-pane-header {
             box-sizing: border-box;
             user-select: none;
             position: relative;
             outline: none;
 
-            &.pane-draggable {
+            &.dockview-pane-draggable {
                 cursor: pointer;
             }
 
@@ -81,7 +81,7 @@
                 }
             }
         }
-        .pane-body {
+        .dockview-pane-body {
             overflow-y: auto;
             overflow-x: hidden;
             flex-grow: 1;

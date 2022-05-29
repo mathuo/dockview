@@ -111,7 +111,7 @@ export function getGridLocation(element: HTMLElement): number[] {
         throw new Error('Invalid grid element');
     }
 
-    if (/\bgrid-view\b/.test(parentElement.className)) {
+    if (/\bdockview-grid-view\b/.test(parentElement.className)) {
         return [];
     }
 
@@ -497,7 +497,7 @@ export class Gridview implements IDisposable {
         orientation: Orientation
     ) {
         this.element = document.createElement('div');
-        this.element.className = 'grid-view';
+        this.element.className = 'dockview-grid-view';
         this.root = new BranchNode(
             orientation,
             proportionalLayout,

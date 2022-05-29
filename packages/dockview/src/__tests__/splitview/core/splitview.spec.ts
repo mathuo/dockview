@@ -123,7 +123,7 @@ describe('splitview', () => {
         splitview.addView(new Testview(50, 50));
 
         let viewQuery = container.querySelectorAll(
-            '.split-view-container > .view-container > .view'
+            '.split-view-container > .view-container > .dockview-view'
         );
         expect(viewQuery.length).toBe(3);
 
@@ -135,7 +135,7 @@ describe('splitview', () => {
         splitview.removeView(2);
 
         viewQuery = container.querySelectorAll(
-            '.split-view-container > .view-container > .view'
+            '.split-view-container > .view-container > .dockview-view'
         );
         expect(viewQuery.length).toBe(2);
 
@@ -147,7 +147,7 @@ describe('splitview', () => {
         splitview.removeView(0);
 
         viewQuery = container.querySelectorAll(
-            '.split-view-container > .view-container > .view'
+            '.split-view-container > .view-container > .dockview-view'
         );
         expect(viewQuery.length).toBe(1);
 
@@ -159,7 +159,7 @@ describe('splitview', () => {
         splitview.removeView(0);
 
         viewQuery = container.querySelectorAll(
-            '.split-view-container > .view-container > .view'
+            '.split-view-container > .view-container > .dockview-view'
         );
         expect(viewQuery.length).toBe(0);
 
@@ -183,14 +183,14 @@ describe('splitview', () => {
         splitview.addView(view2);
 
         let viewQuery = container.querySelectorAll(
-            '.split-view-container > .view-container > .view.visible'
+            '.split-view-container > .view-container > .dockview-view.visible'
         );
         expect(viewQuery.length).toBe(2);
 
         splitview.setViewVisible(1, false);
 
         viewQuery = container.querySelectorAll(
-            '.split-view-container > .view-container > .view.visible'
+            '.split-view-container > .view-container > .dockview-view.visible'
         );
         expect(viewQuery.length).toBe(1);
 

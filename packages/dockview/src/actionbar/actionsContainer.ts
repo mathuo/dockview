@@ -8,10 +8,10 @@ export class ActionContainer {
 
     constructor() {
         this._element = document.createElement('div');
-        this._element.className = 'actions-bar';
+        this._element.className = 'dockview-actions-bar';
 
         this._list = document.createElement('ul');
-        this._list.className = 'actions-container';
+        this._list.className = 'dockview-actions-container';
 
         this._element.appendChild(this._list);
     }

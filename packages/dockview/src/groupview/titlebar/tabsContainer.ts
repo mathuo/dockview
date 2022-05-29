@@ -75,11 +75,11 @@ export class TabsContainer
         this._height = value;
         if (typeof value !== 'number') {
             this.element.style.removeProperty(
-                '--dv-tabs-and-actions-container-height'
+                '--dv-dockview-tabs-and-dockview-actions-container-height'
             );
         } else {
             this.element.style.setProperty(
-                '--dv-tabs-and-actions-container-height',
+                '--dv-dockview-tabs-and-dockview-actions-container-height',
                 `${value}px`
             );
         }
@@ -147,18 +147,19 @@ export class TabsContainer
         this.addDisposables(this._onDrop);
 
         this._element = document.createElement('div');
-        this._element.className = 'tabs-and-actions-container';
+        this._element.className =
+            'dockview-tabs-and-dockview-actions-container';
 
         this.height = options.tabHeight;
 
         this.actionContainer = document.createElement('div');
-        this.actionContainer.className = 'action-container';
+        this.actionContainer.className = 'dockview-action-container';
 
         this.tabContainer = document.createElement('div');
-        this.tabContainer.className = 'tabs-container';
+        this.tabContainer.className = 'dockview-tabs-container';
 
         this.voidContainer = document.createElement('div');
-        this.voidContainer.className = 'void-container';
+        this.voidContainer.className = 'dockview-void-container';
 
         this._element.appendChild(this.tabContainer);
         this._element.appendChild(this.voidContainer);

@@ -22,7 +22,7 @@ export class DefaultHeader
     constructor() {
         super();
         this._element = document.createElement('div');
-        this.element.className = 'default-header';
+        this.element.className = 'dockview-default-header';
 
         this._content = document.createElement('span');
         this._expander = document.createElement('a');
