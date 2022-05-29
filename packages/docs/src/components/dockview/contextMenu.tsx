@@ -98,12 +98,18 @@ export const ContextMenuDockview = () => {
         });
     };
 
+    const onContextMenu = (event: TabContextMenuEvent) => {
+        event.event.preventDefault();
+        alert(`Content appear event fired for panel ${event.panel.id}`);
+    };
+
     return (
         <DockviewReact
             components={components}
             tabComponents={tabComponents}
             onReady={onReady}
             className="dockview-theme-dark"
+            onTabContextMenu={onContextMenu}
         />
     );
 };
