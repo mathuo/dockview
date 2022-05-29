@@ -25,12 +25,19 @@ const CustomTab = (
         [props.api]
     );
 
-    const onClick = React.useCallback(() => {
-        props.api.setActive();
-    }, [props.api]);
+    const onClick = React.useCallback(
+        (event: React.MouseEvent<HTMLDivElement>) => {
+            props.api.setActive();
+
+            if (props.onClick) {
+                props.onClick(event);
+            }
+        },
+        [props.api, props.onClick]
+    );
 
     return (
-        <div onClick={onClick} className="dockview-react-tab">
+        <div {...props} onClick={onClick} className="dockview-react-tab">
             <span className="dockview-react-tab-title">{props.api.title}</span>
             <span onClick={onClose} className="dockview-react-tab-action">
                 {'✕'}
@@ -40,11 +47,15 @@ const CustomTab = (
 };
 
 const Test = (props: IDockviewPanelHeaderProps) => {
-    return <CustomTab {...props} />;
+    const onContextMenu = (event: React.MouseEvent) => {
+        event.preventDefault();
+        alert('hiya');
+    };
+    return <CustomTab onContextMenu={onContextMenu} {...props} />;
 };
 
 const tabComponents = {
-    default: CustomTab,
+    default: Test,
 };
 
 export const ContextMenuDockview = () => {

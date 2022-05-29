@@ -69,6 +69,11 @@ const config = {
                     // Remove this to remove the "edit this page" links.
                     editUrl:
                         'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+                    versions: {
+                        current: {
+                            label: `Development 🚧`,
+                        },
+                    },
                 },
                 blog: {
                     showReadingTime: true,
@@ -80,6 +85,11 @@ const config = {
                 theme: {
                     customCss: require.resolve('./src/css/custom.css'),
                 },
+                gtag: process.env.CI
+                    ? {
+                          trackingID: 'G-KXGC1C9ZHC',
+                      }
+                    : undefined,
             }),
         ],
     ],
@@ -123,6 +133,10 @@ const config = {
                         label: 'Docs',
                     },
                     { to: '/blog', label: 'Blog', position: 'left' },
+                    {
+                        type: 'docsVersionDropdown',
+                        position: 'right',
+                    },
                     {
                         href: 'https://github.com/mathuo/dockview',
                         label: 'GitHub',
