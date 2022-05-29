@@ -1,14 +1,12 @@
-import { SimpleSplitview } from '../../src/components/simpleSplitview';
-import { SplitviewExample1 } from '../../src/components/splitview/active';
+import { SimpleSplitview } from '@site/src/components/simpleSplitview';
+import { SplitviewExample1 } from '@site/src/components/splitview/active';
 import Link from '@docusaurus/Link';
 
 # Splitview
 
 ## Introduction
 
-A Splitview is a collection resizable horizontally or vertically stacked panels.
-The Splitview exposes a component level API through the `onReady` event and through the `props.containerApi` variable on the panel props.
-A panel level API is exposed on each panel through it's props as `props.api`.
+A Splitview is a collection of resizable horizontally or vertically stacked panels.
 
 <div
     style={{
@@ -81,7 +79,7 @@ You can create a Splitview through the use of the `ReactSplitview` component.
 import { ReactSplitview } from 'dockview';
 ```
 
-Using the `onReady` prop you can access to the component `api` and add panels either through deserialization or indivial addition of panels.
+Using the `onReady` prop you can access to the component `api` and add panels either through deserialization or the individual addition of panels.
 
 | Property            | Type                                   | Optional | Default                  | Description                                                                 |
 | ------------------- | -------------------------------------- | -------- | ------------------------ | --------------------------------------------------------------------------- |
@@ -96,6 +94,7 @@ Using the `onReady` prop you can access to the component `api` and add panels ei
 ## Splitview API
 
 The Splitview API is exposed both at the `onReady` event and on each panel through `props.containerApi`.
+Through this API you can control general features of the component and access all added panels.
 
 ```tsx title="Splitview API via Panel component"
 const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
@@ -139,7 +138,7 @@ const onReady = (event: SplitviewReadyEvent) => {
 
 ## Splitview Panel API
 
-The Splitview panel API is exposed on each panel and contains actions and variables specific to that panel.
+The Splitview panel API is exposed on each panel containing actions and variables specific to that panel.
 
 ```tsx title="Splitview panel API via Panel component"
 const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
@@ -172,7 +171,7 @@ const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
 
 ## Advanced Features
 
-Listed below are some functionality avalaible to you through both the panel and component APIs. The live demo shows examples of these in real-time.
+Listed below are some functionalities avalaible through both the panel and component APIs. The live demo shows examples of these in real-time.
 
 <div
     style={{
@@ -185,7 +184,7 @@ Listed below are some functionality avalaible to you through both the panel and 
 
 ### Visibility
 
-A panels visibility can be controlled and monitoring through the following code.
+A panels visibility can be controlled and monitored through the following code.
 A panel with visibility set to `false` will remain as a part of the components list of panels but will not be rendered.
 
 ```tsx

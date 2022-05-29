@@ -1,17 +1,18 @@
-import { SimpleDockview } from '../../src/components/simpleDockview';
+import { SimpleDockview } from '@site/src/components/simpleDockview';
 import {
     RenderingDockview,
     Checkbox,
-} from '../../src/components/dockview/rendering';
-import { DndDockview } from '../../src/components/dockview/dnd';
-import { EventsDockview } from '../../src/components/dockview/events';
+} from '@site/src/components/dockview/rendering';
+import { DndDockview } from '@site/src/components/dockview/dnd';
+import { EventsDockview } from '@site/src/components/dockview/events';
+import { ContextMenuDockview } from '@site/src/components/dockview/contextMenu';
 import Link from '@docusaurus/Link';
 
 # Dockview
 
 ## Introduction
 
-Dockview is an abstraction built on top of [Gridviews](/docs/api/gridview) where each view is a tabbed container.
+Dockview is an abstraction built on top of [Gridviews](/docs/api/gridview) where each view is a container of many tabbed panels.
 
 <div
     style={{
@@ -24,15 +25,12 @@ Dockview is an abstraction built on top of [Gridviews](/docs/api/gridview) where
     <SimpleDockview />
 </div>
 
-```tsx
-const panel = event.api.addPanel(...);
-const anotherPanel = event.api.getPanel('somePanelid');
-```
-
 You can access the panels associated group through the `panel.group` variable.
 The group will always be defined and will change if a panel is moved into another group.
 
 ## DockviewReact Component
+
+You can create a Dockview through the use of the `ReactDockview` component.
 
 ```tsx
 import { ReactDockview } from 'dockview';
@@ -53,7 +51,10 @@ import { ReactDockview } from 'dockview';
 
 ## Dockview API
 
-```tsx
+The Dockview API is exposed both at the `onReady` event and on each panel through `props.containerApi`.
+Through this API you can control general features of the component and access all added panels.
+
+```tsx title="Dockview API via Panel component"
 const MyComponent = (props: IDockviewPanelProps<{ title: string }>) => {
     // props.containerApi...
 
@@ -61,7 +62,7 @@ const MyComponent = (props: IDockviewPanelProps<{ title: string }>) => {
 };
 ```
 
-```tsx
+```tsx title="Dockview API via the onReady callback"
 const onReady = (event: DockviewReadyEvent) => {
     // event.api...
 };
@@ -147,7 +148,7 @@ const MyComponent = (props: IDockviewPanelProps<{ title: string }>) => {
 ### Locked group
 
 Locking a group will disable all drop events for this group ensuring a user can not add additional panels to the group.
-You can still add groups to a locked panel programatically using the api.
+You can still add groups to a locked panel programatically using the API.
 
 ```tsx
 panel.group.locked = true;
@@ -163,7 +164,15 @@ panel.group.header.hidden = true;
 
 ### Context Menu
 
-import { ContextMenuDockview } from '../../src/components/dockview/contextMenu';
+Since overriding the context menu is a such a common feature rather than defining a custom tab the `ReactDockview` component exposes the prop `onTabContextMenu`.
+You can alternatively define a custom tab component for more granular control.
+
+:::caution
+
+The `onTabContextMenu` is intended to be removed in a future release to further simplify the library.
+In the future you will be required to define a custom tab component to intercept the context menu events.
+
+:::
 
 <div
     style={{

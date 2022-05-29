@@ -12,7 +12,7 @@ console.log(`isCI: ${process.env.CI}`);
 const config = {
     title: 'Dockview',
     tagline: 'Zero dependency layout manager for React',
-    url: 'https://your-docusaurus-test-site.com',
+    url: 'https://dockview.dev',
     baseUrl: process.env.CI ? `/` : '/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
@@ -69,6 +69,11 @@ const config = {
                     // Remove this to remove the "edit this page" links.
                     editUrl:
                         'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+                    versions: {
+                        current: {
+                            label: `Development 🚧`,
+                        },
+                    },
                 },
                 blog: {
                     showReadingTime: true,
@@ -80,6 +85,11 @@ const config = {
                 theme: {
                     customCss: require.resolve('./src/css/custom.css'),
                 },
+                gtag: process.env.CI
+                    ? {
+                          trackingID: 'G-KXGC1C9ZHC',
+                      }
+                    : undefined,
             }),
         ],
     ],
@@ -87,6 +97,28 @@ const config = {
     themeConfig:
         /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
         ({
+            metadata: [
+                {
+                    name: 'keywords',
+                    content: [
+                        'react',
+                        'components',
+                        'typescript',
+                        'drag-and-drop',
+                        'reactjs',
+                        'layout',
+                        'drag',
+                        'drop',
+                        'tabs',
+                        'dock',
+                        'docking',
+                        'splitter',
+                        'docking-library',
+                        'layout-manager',
+                        'docking-layout',
+                    ].join(' ,'),
+                },
+            ],
             navbar: {
                 title: 'Dockview',
                 logo: {
@@ -101,6 +133,10 @@ const config = {
                         label: 'Docs',
                     },
                     { to: '/blog', label: 'Blog', position: 'left' },
+                    {
+                        type: 'docsVersionDropdown',
+                        position: 'right',
+                    },
                     {
                         href: 'https://github.com/mathuo/dockview',
                         label: 'GitHub',
