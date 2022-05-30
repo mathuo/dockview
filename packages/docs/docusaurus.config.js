@@ -11,12 +11,12 @@ console.log(`isCI: ${process.env.CI}`);
 /** @type {import('@docusaurus/types').Config} */
 const config = {
     title: 'Dockview',
-    tagline: 'Zero dependency layout manager for React',
+    tagline: 'A zero dependency layout manager built for React',
     url: 'https://dockview.dev',
     baseUrl: process.env.CI ? `/` : '/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
-    favicon: 'img/favicon.ico',
+    favicon: 'img/dockview_logo.ico',
 
     // GitHub pages deployment config.
     // If you aren't using GitHub pages, you don't need these.
@@ -51,6 +51,9 @@ const config = {
                                     'node_modules',
                                     'react-dom'
                                 ),
+                            },
+                            fallback: {
+                                timers: false,
                             },
                         },
                     };
@@ -123,7 +126,7 @@ const config = {
                 title: 'Dockview',
                 logo: {
                     alt: 'My Site Logo',
-                    src: 'img/logo.svg',
+                    src: 'img/dockview_logo.svg',
                 },
                 items: [
                     {
