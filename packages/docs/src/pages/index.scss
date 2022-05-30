@@ -1,0 +1,27 @@
+.badge-container {
+    img:not(:first-child) {
+        padding-left: 10px;
+    }
+}
+
+.dockview-feature-panel {
+    max-width: 1000px;
+    display: flex;
+    padding: 20px;
+    justify-content: space-around;
+
+    .feature-banner {
+        .feature-banner-header {
+            // font-size: 1.25em;
+        }
+
+        .feature-banner-content {
+        }
+    }
+}
+
+.dockview-feature {
+    &:nth-child(2n) {
+        flex-direction: row-reverse;
+    }
+}
