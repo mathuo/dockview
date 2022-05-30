@@ -23,15 +23,15 @@ import Link from '@docusaurus/Link';
 import { ReactGridview } from 'dockview';
 ```
 
-| Property            | Type                                 | Optional | Default                | Description                                                                 |
-| ------------------- | ------------------------------------ | -------- | ---------------------- | --------------------------------------------------------------------------- |
-| onReady             | (event: SplitviewReadyEvent) => void | No       |                        |                                                                             |
-| components          | object                               | No       |                        |                                                                             |
-| orientation         | Orientation                          | Yes      | Orientation.HORIZONTAL |                                                                             |
-| proportionalLayout  | boolean                              | Yes      | true                   | See <Link to="/docs/basics/#proportional-layout">Proportional layout</Link> |
-| hideBorders         | boolean                              | Yes      | false                  |                                                                             |
-| className           | string                               | Yes      | ''                     |                                                                             |
-| disableAutoResizing | boolean                              | Yes      | false                  | See <Link to="/docs/basics/#auto-resizing">Auto Resizing</Link>             |
+| Property            | Type                                 | Optional | Default                | Description                                                              |
+| ------------------- | ------------------------------------ | -------- | ---------------------- | ------------------------------------------------------------------------ |
+| onReady             | (event: SplitviewReadyEvent) => void | No       |                        |                                                                          |
+| components          | object                               | No       |                        |                                                                          |
+| orientation         | Orientation                          | Yes      | Orientation.HORIZONTAL |                                                                          |
+| proportionalLayout  | boolean                              | Yes      | true                   | See <Link to="../basics/#proportional-layout">Proportional layout</Link> |
+| hideBorders         | boolean                              | Yes      | false                  |                                                                          |
+| className           | string                               | Yes      | ''                     |                                                                          |
+| disableAutoResizing | boolean                              | Yes      | false                  | See <Link to="../basics/#auto-resizing">Auto Resizing</Link>             |
 
 ## Gridview API
 
@@ -74,9 +74,9 @@ const onReady = (event: GridviewReadyEvent) => {
 |                        |                                                                                                   |                                                                  |
 | updateOptions          | `(options:SplitviewComponentUpdateOptions): void`                                                 |                                                                  |
 | focus                  | `(): void`                                                                                        | Focus the active panel, if exists                                |
-| layout                 | `(width: number, height:number): void`                                                            | <Link to="/docs/basics/#auto-resizing">Auto Resizing</Link>      |
-| fromJSON               | `(data: SerializedGridview): void`                                                                | <Link to="/docs/basics/#serialization">Serialization</Link>      |
-| toJSON                 | `(): SerializedGridview`                                                                          | <Link to="/docs/basics/#serialization">Serialization</Link>      |
+| layout                 | `(width: number, height:number): void`                                                            | <Link to="../basics/#auto-resizing">Auto Resizing</Link>         |
+| fromJSON               | `(data: SerializedGridview): void`                                                                | <Link to="../basics/#serialization">Serialization</Link>         |
+| toJSON                 | `(): SerializedGridview`                                                                          | <Link to="../basics/#serialization">Serialization</Link>         |
 | clear                  | `(): void`                                                                                        | Clears the current layout                                        |
 
 ## Gridview Panel API

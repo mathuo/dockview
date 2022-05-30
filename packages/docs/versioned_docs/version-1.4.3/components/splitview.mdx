@@ -81,15 +81,15 @@ import { ReactSplitview } from 'dockview';
 
 Using the `onReady` prop you can access to the component `api` and add panels either through deserialization or the individual addition of panels.
 
-| Property            | Type                                   | Optional | Default                  | Description                                                                 |
-| ------------------- | -------------------------------------- | -------- | ------------------------ | --------------------------------------------------------------------------- |
-| onReady             | `(event: SplitviewReadyEvent) => void` | No       |                          | Function                                                                    |
-| components          | `Record<string, ISplitviewPanelProps>` | No       |                          | Panel renderers                                                             |
-| orientation         | `Orientation`                          | Yes      | `Orientation.HORIZONTAL` | Orientation of the Splitview                                                |
-| proportionalLayout  | `boolean`                              | Yes      | `true`                   | See <Link to="/docs/basics/#proportional-layout">Proportional layout</Link> |
-| hideBorders         | `boolean`                              | Yes      | `false`                  | Hide the borders between panels                                             |
-| className           | `string`                               | Yes      | `''`                     | Attaches a classname                                                        |
-| disableAutoResizing | `boolean`                              | Yes      | `false`                  | See <Link to="/docs/basics/#auto-resizing">Auto Resizing</Link>             |
+| Property            | Type                                   | Optional | Default                  | Description                                                              |
+| ------------------- | -------------------------------------- | -------- | ------------------------ | ------------------------------------------------------------------------ |
+| onReady             | `(event: SplitviewReadyEvent) => void` | No       |                          | Function                                                                 |
+| components          | `Record<string, ISplitviewPanelProps>` | No       |                          | Panel renderers                                                          |
+| orientation         | `Orientation`                          | Yes      | `Orientation.HORIZONTAL` | Orientation of the Splitview                                             |
+| proportionalLayout  | `boolean`                              | Yes      | `true`                   | See <Link to="../basics/#proportional-layout">Proportional layout</Link> |
+| hideBorders         | `boolean`                              | Yes      | `false`                  | Hide the borders between panels                                          |
+| className           | `string`                               | Yes      | `''`                     | Attaches a classname                                                     |
+| disableAutoResizing | `boolean`                              | Yes      | `false`                  | See <Link to="../basics/#auto-resizing">Auto Resizing</Link>             |
 
 ## Splitview API
 
@@ -131,9 +131,9 @@ const onReady = (event: SplitviewReadyEvent) => {
 |                     |                                                                    |
 | updateOptions       | `(options: SplitviewComponentUpdateOptions): void`                 |                                                                  |
 | focus               | `(): void`                                                         | Focus the active panel, if exists                                |
-| layout              | `(width: number, height:number): void`                             | See <Link to="/docs/basics/#auto-resizing">Auto Resizing</Link>  |
-| fromJSON            | `(data: SerializedSplitview): void`                                | <Link to="/docs/basics/#serialization">Serialization</Link>      |
-| toJSON              | `(): SerializedSplitview`                                          | <Link to="/docs/basics/#serialization">Serialization</Link>      |
+| layout              | `(width: number, height:number): void`                             | See <Link to="../basics/#auto-resizing">Auto Resizing</Link>     |
+| fromJSON            | `(data: SerializedSplitview): void`                                | <Link to="../basics/#serialization">Serialization</Link>         |
+| toJSON              | `(): SerializedSplitview`                                          | <Link to="../basics/#serialization">Serialization</Link>         |
 | clear               | `(): void`                                                         | Clears the current layout                                        |
 
 ## Splitview Panel API
@@ -148,26 +148,26 @@ const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
 };
 ```
 
-| Property               | Type                                                        | Description                                                                                                                  |
-| ---------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| id                     | `string`                                                    | Panel id                                                                                                                     |
-| isFocused              | `boolean`                                                   | Is panel focsed                                                                                                              |
-| isActive               | `boolean`                                                   | Is panel active                                                                                                              |
-| isVisible              | `boolean`                                                   | Is panel visible                                                                                                             |
-| width                  | `number`                                                    | Panel width                                                                                                                  |
-| height                 | `number`                                                    | Panel height                                                                                                                 |
-|                        |                                                             |                                                                                                                              |
-| onDidDimensionsChange  | `Event<PanelDimensionChangeEvent>`                          | Fires when panel dimensions change                                                                                           |
-| onDidFocusChange       | `Event<FocusEvent>`                                         | Fire when panel is focused and blurred                                                                                       |
-| onDidVisibilityChange  | `Event<VisibilityEvent>`                                    | Fires when the panels visiblity property is changed (see <Link to="/docs/api/splitview/#visibility">Panel Visibility</Link>) |
-| onDidActiveChange      | `Event<ActiveEvent>`                                        | Fires when the panels active property is changed (see <Link to="/docs/api/splitview/#active">Active Panel</Link>)            |
-| onDidConstraintsChange | `onDidConstraintsChange: Event<PanelConstraintChangeEvent>` | Fires when the panels size contrainsts change (see <Link to="/docs/api/splitview/#contraints">Panel Constraints</Link>)      |
-|                        |                                                             |                                                                                                                              |
-| setVisible             | `(isVisible: boolean): void`                                |                                                                                                                              |
-| setActive              | `(): void`                                                  |                                                                                                                              |
-|                        |                                                             |                                                                                                                              |
-| setConstraints         | `(value: PanelConstraintChangeEvent2): void;`               |                                                                                                                              |
-| setSize                | `(event: PanelSizeEvent): void`                             |                                                                                                                              |
+| Property               | Type                                                        | Description                                                                                                          |
+| ---------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| id                     | `string`                                                    | Panel id                                                                                                             |
+| isFocused              | `boolean`                                                   | Is panel focsed                                                                                                      |
+| isActive               | `boolean`                                                   | Is panel active                                                                                                      |
+| isVisible              | `boolean`                                                   | Is panel visible                                                                                                     |
+| width                  | `number`                                                    | Panel width                                                                                                          |
+| height                 | `number`                                                    | Panel height                                                                                                         |
+|                        |                                                             |                                                                                                                      |
+| onDidDimensionsChange  | `Event<PanelDimensionChangeEvent>`                          | Fires when panel dimensions change                                                                                   |
+| onDidFocusChange       | `Event<FocusEvent>`                                         | Fire when panel is focused and blurred                                                                               |
+| onDidVisibilityChange  | `Event<VisibilityEvent>`                                    | Fires when the panels visiblity property is changed (see <Link to="./splitview/#visibility">Panel Visibility</Link>) |
+| onDidActiveChange      | `Event<ActiveEvent>`                                        | Fires when the panels active property is changed (see <Link to="./splitview/#active">Active Panel</Link>)            |
+| onDidConstraintsChange | `onDidConstraintsChange: Event<PanelConstraintChangeEvent>` | Fires when the panels size contrainsts change (see <Link to="./splitview/#contraints">Panel Constraints</Link>)      |
+|                        |                                                             |                                                                                                                      |
+| setVisible             | `(isVisible: boolean): void`                                |                                                                                                                      |
+| setActive              | `(): void`                                                  |                                                                                                                      |
+|                        |                                                             |                                                                                                                      |
+| setConstraints         | `(value: PanelConstraintChangeEvent2): void;`               |                                                                                                                      |
+| setSize                | `(event: PanelSizeEvent): void`                             |                                                                                                                      |
 
 ## Advanced Features
 
