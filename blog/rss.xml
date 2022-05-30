@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
     <channel>
         <title>Dockview Blog</title>
-        <link>https://your-docusaurus-test-site.com/blog</link>
+        <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
         <lastBuildDate>Thu, 26 May 2022 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
@@ -10,7 +10,7 @@
         <language>en</language>
         <item>
             <title><![CDATA[Dockview 1.4.3]]></title>
-            <link>https://your-docusaurus-test-site.com/blog/dockview-1.4.3-release</link>
+            <link>https://dockview.dev/blog/dockview-1.4.3-release</link>
             <guid>dockview-1.4.3-release</guid>
             <pubDate>Thu, 26 May 2022 00:00:00 GMT</pubDate>
             <description><![CDATA[🚀 Features]]></description>
@@ -19,7 +19,7 @@
         </item>
         <item>
             <title><![CDATA[Dockview 1.4.2]]></title>
-            <link>https://your-docusaurus-test-site.com/blog/dockview-1.4.2-release</link>
+            <link>https://dockview.dev/blog/dockview-1.4.2-release</link>
             <guid>dockview-1.4.2-release</guid>
             <pubDate>Mon, 16 May 2022 00:00:00 GMT</pubDate>
             <description><![CDATA[🚀 Features]]></description>
@@ -28,7 +28,7 @@
         </item>
         <item>
             <title><![CDATA[Dockview 1.4.1]]></title>
-            <link>https://your-docusaurus-test-site.com/blog/dockview-1.4.1-release</link>
+            <link>https://dockview.dev/blog/dockview-1.4.1-release</link>
             <guid>dockview-1.4.1-release</guid>
             <pubDate>Wed, 11 May 2022 00:00:00 GMT</pubDate>
             <description><![CDATA[🚀 Features]]></description>
