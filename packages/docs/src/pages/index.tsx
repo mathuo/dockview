@@ -8,6 +8,7 @@ import HomepageFeatures from '@site/src/components/HomepageFeatures';
 import { DockviewDemo } from '../components/dockview/demo';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import './index.scss';
+import { DockviewDemo2 } from '../components/dockview/demo2';
 
 function HomepageHeader() {
     const { siteConfig } = useDocusaurusContext();
@@ -19,7 +20,7 @@ function HomepageHeader() {
                 <div className={styles.buttons}>
                     <Link
                         className="button button--secondary button--lg"
-                        to="/docs"
+                        to={useBaseUrl('docs/')}
                     >
                         Get Started
                     </Link>
@@ -46,7 +47,7 @@ function HomepageHeader2() {
                 <div className={styles.buttons}>
                     <Link
                         className="button button--secondary button--lg"
-                        to="/docs"
+                        to={useBaseUrl('docs/')}
                     >
                         Get Started
                     </Link>
@@ -66,9 +67,8 @@ export default function Home(): JSX.Element {
             <HomepageHeader2 />
             <main className="container">
                 <HomepageFeatures />
-                <div style={{ height: '500px', margin: '20px 0px' }}>
-                    <DockviewDemo />
-                </div>
+                <DockviewDemo />
+                <DockviewDemo2 />
             </main>
         </Layout>
     );

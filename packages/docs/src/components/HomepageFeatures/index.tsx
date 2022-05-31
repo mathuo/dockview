@@ -20,7 +20,7 @@ const FeatureList: FeatureItem[] = [
                     </h3>
                     <p className="feature-banner-content">
                         Add and remove panels using the provided api or use the
-                        serialization method to persist layouts.
+                        serialziation methods to persist layouts.
                     </p>
                 </div>
                 <div className="feature-banner">
@@ -28,7 +28,7 @@ const FeatureList: FeatureItem[] = [
                         Customizable Theme
                     </h3>
                     <p className="feature-banner-content">
-                        Adjust a numbero of provided CSS Properties for a simple
+                        Adjust a number of provided CSS Properties for a simple
                         change or target specific classes for a more customized
                         approach.
                     </p>
@@ -38,9 +38,9 @@ const FeatureList: FeatureItem[] = [
                         Choose Your Control
                     </h3>
                     <p className="feature-banner-content">
-                        Choose from a simple splitview, a gridview, collapsable
+                        Choose from a simple splitview, gridview, collapsable
                         panes or a full docking solution. Combine multiple for
-                        more complex layouts.
+                        complex layouts.
                     </p>
                 </div>
             </>
@@ -54,8 +54,8 @@ const FeatureList: FeatureItem[] = [
                 <div className="feature-banner">
                     <h3 className="feature-banner-header">Drag And Drop</h3>
                     <p className="feature-banner-content">
-                        Drag and Drop to position your layout and interact with
-                        external drag events too.
+                        Drag and Drop tab to position your layout as well as
+                        interacting with external drag events.
                     </p>
                 </div>
                 <div className="feature-banner">
@@ -69,7 +69,7 @@ const FeatureList: FeatureItem[] = [
                         Code Quality and Transparency
                     </h3>
                     <p className="feature-banner-content">
-                        All of the code is run through Sonarcloud Code Analyis
+                        All of the code is run through Sonarcloud Code Analysis,
                         which along with the source code and high test coverage
                         can be viewed from the Github page.
                     </p>
@@ -93,7 +93,7 @@ function Feature({ title, Svg, description }: FeatureItem) {
             <Svg className={styles.featureSvg} role="img" />
             <div style={{ maxWidth: '400px', padding: '0px 20px' }}>
                 <h3>{title}</h3>
-                <p>{description}</p>
+                {description}
             </div>
         </div>
     );
