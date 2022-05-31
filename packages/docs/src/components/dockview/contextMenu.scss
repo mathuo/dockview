@@ -1,0 +1,28 @@
+.tab {
+    .dockview-react-tab {
+        display: flex;
+        padding: 0px 8px;
+        align-items: center;
+        height: 100%;
+
+        .dockview-react-tab-title {
+            padding: 0px 8px;
+            flex-grow: 1;
+        }
+
+        .dockview-react-tab-action {
+            padding: 0px 4px;
+
+            &:hover {
+                border-radius: 2px;
+                background-color: rgba(90, 93, 94, 0.31);
+            }
+        }
+    }
+
+    &.dockview-inactive-tab:not(:hover) {
+        .dockview-react-tab-action {
+            visibility: hidden;
+        }
+    }
+}

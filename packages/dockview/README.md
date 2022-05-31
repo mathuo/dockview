@@ -15,7 +15,7 @@
 
 ##
 
-Please see the website: https://mathuo.github.io/dockview/docs
+Please see the website: https://dockview.dev
 
 Want to inspect the latest deployment? Go to https://unpkg.com/browse/dockview@latest/
 

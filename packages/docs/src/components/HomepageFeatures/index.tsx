@@ -3,68 +3,112 @@ import clsx from 'clsx';
 import styles from './styles.module.css';
 
 type FeatureItem = {
-  title: string;
-  Svg: React.ComponentType<React.ComponentProps<'svg'>>;
-  description: JSX.Element;
+    title: string;
+    Svg: React.ComponentType<React.ComponentProps<'svg'>>;
+    description: JSX.Element;
 };
 
 const FeatureList: FeatureItem[] = [
-  {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
-    description: (
-      <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
-      </>
-    ),
-  },
-  {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
-    description: (
-      <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
-      </>
-    ),
-  },
-  {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
-    description: (
-      <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
-      </>
-    ),
-  },
+    {
+        title: '',
+        Svg: require('@site/static/img/dockview_grid_2.svg').default,
+        description: (
+            <>
+                <div className="feature-banner">
+                    <h3 className="feature-banner-header">
+                        Serialziable Layouts
+                    </h3>
+                    <p className="feature-banner-content">
+                        Add and remove panels using the provided api or use the
+                        serialization method to persist layouts.
+                    </p>
+                </div>
+                <div className="feature-banner">
+                    <h3 className="feature-banner-header">
+                        Customizable Theme
+                    </h3>
+                    <p className="feature-banner-content">
+                        Adjust a numbero of provided CSS Properties for a simple
+                        change or target specific classes for a more customized
+                        approach.
+                    </p>
+                </div>
+                <div className="feature-banner">
+                    <h3 className="feature-banner-header">
+                        Choose Your Control
+                    </h3>
+                    <p className="feature-banner-content">
+                        Choose from a simple splitview, a gridview, collapsable
+                        panes or a full docking solution. Combine multiple for
+                        more complex layouts.
+                    </p>
+                </div>
+            </>
+        ),
+    },
+    {
+        title: '',
+        Svg: require('@site/static/img/dockview_splash_2.svg').default,
+        description: (
+            <>
+                <div className="feature-banner">
+                    <h3 className="feature-banner-header">Drag And Drop</h3>
+                    <p className="feature-banner-content">
+                        Drag and Drop to position your layout and interact with
+                        external drag events too.
+                    </p>
+                </div>
+                <div className="feature-banner">
+                    <h3 className="feature-banner-header">Zero Dependencies</h3>
+                    <p className="feature-banner-content">
+                        Zero dependencies, that's all.
+                    </p>
+                </div>
+                <div className="feature-banner">
+                    <h3 className="feature-banner-header">
+                        Code Quality and Transparency
+                    </h3>
+                    <p className="feature-banner-content">
+                        All of the code is run through Sonarcloud Code Analyis
+                        which along with the source code and high test coverage
+                        can be viewed from the Github page.
+                    </p>
+                </div>
+            </>
+        ),
+    },
 ];
 
-function Feature({title, Svg, description}: FeatureItem) {
-  return (
-    <div className={clsx('col col--4')}>
-      <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
-      </div>
-      <div className="text--center padding-horiz--md">
-        <h3>{title}</h3>
-        <p>{description}</p>
-      </div>
-    </div>
-  );
+function Feature({ title, Svg, description }: FeatureItem) {
+    return (
+        <div
+            style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                margin: 'auto',
+                justifyContent: 'center',
+            }}
+            className="dockview-feature"
+        >
+            <Svg className={styles.featureSvg} role="img" />
+            <div style={{ maxWidth: '400px', padding: '0px 20px' }}>
+                <h3>{title}</h3>
+                <p>{description}</p>
+            </div>
+        </div>
+    );
 }
 
 export default function HomepageFeatures(): JSX.Element {
-  return (
-    <section className={styles.features}>
-      <div className="container">
-        <div className="row">
-          {FeatureList.map((props, idx) => (
-            <Feature key={idx} {...props} />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+    return (
+        <section className={styles.features}>
+            <div className="container">
+                <div className="row">
+                    {FeatureList.map((props, idx) => (
+                        <Feature key={idx} {...props} />
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
 }

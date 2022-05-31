@@ -1,0 +1,15 @@
+.news-panel {
+    height: 100%;
+    overflow: auto;
+
+    .story {
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+
+        .link {
+            color: white !important;
+            font-size: 11px;
+        }
+    }
+}
