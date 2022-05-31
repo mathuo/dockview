@@ -34,7 +34,7 @@ function HomepageHeader2() {
     const { siteConfig } = useDocusaurusContext();
     return (
         <header className={clsx('hero hero--primary', styles.heroBanner)}>
-            <div className="container">
+            <div className="container homepage">
                 <img src={useBaseUrl('/img/dockview_logo.svg')} />
                 <h1 className="hero__title">{siteConfig.title}</h1>
                 {/* <div className="badge-container">
@@ -50,6 +50,12 @@ function HomepageHeader2() {
                         to={useBaseUrl('docs/')}
                     >
                         Get Started
+                    </Link>
+                    <Link
+                        className="button button--secondary button--lg"
+                        to={'#live-demo'}
+                    >
+                        Live Demo
                     </Link>
                 </div>
             </div>
@@ -67,6 +73,24 @@ export default function Home(): JSX.Element {
             <HomepageHeader2 />
             <main className="container">
                 <HomepageFeatures />
+                <div
+                    id="live-demo"
+                    style={{
+                        height: '30px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        fontSize: '1.5em',
+                        fontWeight: 'bold',
+                    }}
+                >
+                    <img
+                        src={useBaseUrl('/img/dockview_logo.svg')}
+                        height={30}
+                    />
+                    <span style={{ paddingLeft: '8px' }}>
+                        Dockview Live Demos
+                    </span>
+                </div>
                 <DockviewDemo />
                 <DockviewDemo2 />
             </main>
