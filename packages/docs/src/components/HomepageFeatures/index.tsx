@@ -16,11 +16,11 @@ const FeatureList: FeatureItem[] = [
             <>
                 <div className="feature-banner">
                     <h3 className="feature-banner-header">
-                        Serialziable layouts
+                        Serialziable Layouts
                     </h3>
                     <p className="feature-banner-content">
-                        Add and remove panels using the provided api or use our
-                        serialization method to persist layouts
+                        Add and remove panels using the provided api or use the
+                        serialziation methods to persist layouts.
                     </p>
                 </div>
                 <div className="feature-banner">
@@ -28,18 +28,19 @@ const FeatureList: FeatureItem[] = [
                         Customizable Theme
                     </h3>
                     <p className="feature-banner-content">
-                        Overide a number of provided CSS Properties for a simple
+                        Adjust a number of provided CSS Properties for a simple
                         change or target specific classes for a more customized
-                        approach
+                        approach.
                     </p>
                 </div>
                 <div className="feature-banner">
                     <h3 className="feature-banner-header">
-                        Variety of Controls
+                        Choose Your Control
                     </h3>
                     <p className="feature-banner-content">
-                        Whether you want a simple splitview or a complete
-                        docking solution dockview has you covered
+                        Choose from a simple splitview, gridview, collapsable
+                        panes or a full docking solution. Combine multiple for
+                        complex layouts.
                     </p>
                 </div>
             </>
@@ -51,17 +52,16 @@ const FeatureList: FeatureItem[] = [
         description: (
             <>
                 <div className="feature-banner">
-                    <h3 className="feature-banner-header">Drag and Drop</h3>
+                    <h3 className="feature-banner-header">Drag And Drop</h3>
                     <p className="feature-banner-content">
-                        Supports a variety of drag and drop functionailties as
-                        well as providing the developer with an ability to
-                        interact with drag events
+                        Drag and Drop tab to position your layout as well as
+                        interacting with external drag events.
                     </p>
                 </div>
                 <div className="feature-banner">
                     <h3 className="feature-banner-header">Zero Dependencies</h3>
                     <p className="feature-banner-content">
-                        Zero dependencies, that's all
+                        Zero dependencies, that's all.
                     </p>
                 </div>
                 <div className="feature-banner">
@@ -69,9 +69,9 @@ const FeatureList: FeatureItem[] = [
                         Code Quality and Transparency
                     </h3>
                     <p className="feature-banner-content">
-                        All our code is run through Sonarcloud Code Analyis
-                        which along with our source code and high test coverage
-                        can be viewed from our Github page
+                        All of the code is run through Sonarcloud Code Analysis,
+                        which along with the source code and high test coverage
+                        can be viewed from the Github page.
                     </p>
                 </div>
             </>
@@ -91,9 +91,9 @@ function Feature({ title, Svg, description }: FeatureItem) {
             className="dockview-feature"
         >
             <Svg className={styles.featureSvg} role="img" />
-            <div style={{ maxWidth: '400px', paddingLeft: '20px' }}>
+            <div style={{ maxWidth: '400px', padding: '0px 20px' }}>
                 <h3>{title}</h3>
-                <p>{description}</p>
+                {description}
             </div>
         </div>
     );

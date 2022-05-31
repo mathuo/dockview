@@ -57,6 +57,7 @@ const Currencies = () => {
 };
 
 import axios from 'axios';
+import { BrowserHeader } from '../browserHeader';
 
 type Article = {
     id: 15255;
@@ -177,10 +178,22 @@ export const DockviewDemo = () => {
     };
 
     return (
-        <DockviewReact
-            components={components}
-            onReady={onReady}
-            className="dockview-theme-dark"
-        />
+        <div
+            style={{
+                height: '530px',
+                margin: '40px 0px',
+                display: 'flex',
+                flexDirection: 'column',
+            }}
+        >
+            <BrowserHeader />
+            <div style={{ flexGrow: 1 }}>
+                <DockviewReact
+                    components={components}
+                    onReady={onReady}
+                    className="dockview-theme-abyss"
+                />
+            </div>
+        </div>
     );
 };
