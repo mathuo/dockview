@@ -38,17 +38,17 @@
         display: flex;
         min-width: 80px;
         align-items: center;
-        padding-left: 10px;
+        padding: 0px 8px;
         white-space: nowrap;
         text-overflow: elipsis;
 
         .tab-content {
+            padding: 0px 8px;
             flex-grow: 1;
         }
 
         .action-container {
             text-align: right;
-            width: 28px;
             display: flex;
 
             .tab-list {
@@ -57,19 +57,17 @@
                 margin: 0px;
                 justify-content: flex-end;
 
-                a:active:hover {
-                    -webkit-mask-size: 100% 100% !important;
-                    mask-size: 100% 100% !important;
-                }
-
                 .tab-action {
-                    height: 16px;
-                    width: 16px;
-                    display: block;
-                    -webkit-mask: var(--dv-tab-close-icon) 50% 50% / 90% 90%
-                        no-repeat;
-                    mask: var(--dv-tab-close-icon) 50% 50% / 90% 90% no-repeat;
-                    margin-right: '0.5em';
+                    padding: 4px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-sizing: border-box;
+
+                    &:hover {
+                        border-radius: 2px;
+                        background-color: var(--dv-icon-hover-background-color);
+                    }
 
                     &.disable-close {
                         display: none;

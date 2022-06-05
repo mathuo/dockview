@@ -75,7 +75,7 @@ class PanelTabPartTest implements ITabRenderer {
     isDisposed: boolean = false;
 
     constructor(public readonly id: string, component: string) {
-        this.element.classList.add(`testpanel-${id}`);
+        this.element.className = `panel-tab-part-${id}`;
     }
 
     updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void {
@@ -1686,7 +1686,293 @@ describe('dockviewComponent', () => {
         return disposable.dispose();
     });
 
-    // group is disposed of when dockview is disposed
-    // watermark is disposed of when removed
-    // watermark is disposed of when dockview is disposed
+    test('load a layout with a non-existant tab id', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.fromJSON({
+            activeGroup: 'group-1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 500,
+                        },
+                        {
+                            type: 'branch',
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    data: {
+                                        views: ['panel2', 'panel3'],
+                                        id: 'group-2',
+                                    },
+                                    size: 500,
+                                },
+                                {
+                                    type: 'leaf',
+                                    data: { views: ['panel4'], id: 'group-3' },
+                                    size: 500,
+                                },
+                            ],
+                            size: 250,
+                        },
+                        {
+                            type: 'leaf',
+                            data: { views: ['panel5'], id: 'group-4' },
+                            size: 250,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+                panel2: {
+                    id: 'panel2',
+                    view: {
+                        content: { id: 'default' },
+                        tab: { id: '__non__existant_tab__' },
+                    },
+                    title: 'panel2',
+                },
+                panel3: {
+                    id: 'panel3',
+                    view: { content: { id: 'default' } },
+                    title: 'panel3',
+                },
+                panel4: {
+                    id: 'panel4',
+                    view: { content: { id: 'default' } },
+                    title: 'panel4',
+                },
+                panel5: {
+                    id: 'panel5',
+                    view: { content: { id: 'default' } },
+                    title: 'panel5',
+                },
+            },
+            options: { tabHeight: 25 },
+        });
+    });
+
+    test('load and persist layout with custom tab header', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.fromJSON({
+            activeGroup: 'group-1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 500,
+                        },
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel2'],
+                                id: 'group-2',
+                                activeView: 'panel2',
+                            },
+
+                            size: 500,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+                panel2: {
+                    id: 'panel2',
+                    view: {
+                        content: { id: 'default' },
+                        tab: { id: 'test_tab_id' },
+                    },
+                    title: 'panel2',
+                },
+            },
+            options: { tabHeight: 25 },
+        });
+
+        expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
+            activeGroup: 'group-1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 500,
+                        },
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel2'],
+                                id: 'group-2',
+                                activeView: 'panel2',
+                            },
+                            size: 500,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+                panel2: {
+                    id: 'panel2',
+                    view: {
+                        content: { id: 'default' },
+                        tab: { id: 'test_tab_id' },
+                    },
+                    title: 'panel2',
+                },
+            },
+            options: { tabHeight: 25 },
+        });
+    });
+
+    test('#2', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.fromJSON({
+            activeGroup: 'group-1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 500,
+                        },
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel2', 'panel3'],
+                                id: 'group-2',
+                                activeView: 'panel2',
+                            },
+
+                            size: 500,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+                panel2: {
+                    id: 'panel2',
+                    view: {
+                        content: { id: 'default' },
+                        tab: { id: 'test_tab_id' },
+                    },
+                    title: 'panel2',
+                },
+                panel3: {
+                    id: 'panel3',
+                    view: { content: { id: 'default' } },
+                    title: 'panel3',
+                },
+            },
+            options: { tabHeight: 25 },
+        });
+
+        const group = dockview.getGroupPanel('panel2')!.api.group;
+
+        const viewQuery = group.element.querySelectorAll(
+            '.groupview > .tabs-and-actions-container > .tabs-container > .tab'
+        );
+        expect(viewQuery.length).toBe(2);
+
+        const viewQuery2 = group.element.querySelectorAll(
+            '.groupview > .tabs-and-actions-container > .tabs-container > .tab > .default-tab'
+        );
+        expect(viewQuery2.length).toBe(1);
+
+        const viewQuery3 = group.element.querySelectorAll(
+            '.groupview > .tabs-and-actions-container > .tabs-container > .tab > .panel-tab-part-test_tab_id'
+        );
+        expect(viewQuery3.length).toBe(1);
+    });
+
+    // load a layout with a default tab identifier when react default is present
+
+    // load a layout with invialid panel identifier
 });

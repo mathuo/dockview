@@ -62,6 +62,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     tabHeight?: number;
     orientation?: Orientation;
     styles?: ISplitviewStyles;
+    defaultTabComponent?: string;
     showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
 }
 

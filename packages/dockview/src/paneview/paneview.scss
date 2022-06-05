@@ -31,8 +31,10 @@
             padding: 0px 8px;
             cursor: pointer;
 
-            .collapsed {
-                transform: rotate(-90deg);
+            .dockview-pane-header-icon {
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
 
             > span {
