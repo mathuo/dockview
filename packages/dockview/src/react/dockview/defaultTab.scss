@@ -11,16 +11,20 @@
         }
 
         .dockview-react-tab-action {
-            padding: 0px 4px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
 
             &:hover {
                 border-radius: 2px;
-                background-color: rgba(90, 93, 94, 0.31);
+                background-color: var(--dv-icon-hover-background-color);
             }
         }
     }
 
-    &.dockview-inactive-tab:not(:hover) {
+    &.inactive-tab:not(:hover) {
         .dockview-react-tab-action {
             visibility: hidden;
         }

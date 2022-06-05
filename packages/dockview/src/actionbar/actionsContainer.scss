@@ -11,20 +11,19 @@
         margin: 0px;
         justify-content: flex-end;
 
-        a:active {
-            -webkit-mask-size: 100% 100% !important;
-            mask-size: 100% 100% !important;
-        }
-
         .close-action {
-            background-color: white;
-            height: 16px;
-            width: 16px;
-            display: block;
-            -webkit-mask: var(--dv-tab-close-icon) 50% 50% / 90% 90% no-repeat;
-            mask: var(--dv-tab-close-icon) 50% 50% / 90% 90% no-repeat;
-            margin-right: '0.5em';
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
             cursor: pointer;
+            color: var(--dv-activegroup-hiddenpanel-tab-color);
+
+            &:hover {
+                border-radius: 2px;
+                background-color: var(--dv-icon-hover-background-color);
+            }
         }
     }
 }

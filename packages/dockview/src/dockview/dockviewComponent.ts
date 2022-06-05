@@ -70,6 +70,7 @@ export type DockviewComponentUpdateOptions = Pick<
     | 'frameworkTabComponents'
     | 'showDndOverlay'
     | 'watermarkFrameworkComponent'
+    | 'defaultTabComponent'
 >;
 
 export interface DockviewDropEvent extends GroupviewDropEvent {
@@ -731,7 +732,7 @@ export class DockviewComponent
   private createPanel(options: AddPanelOptions, group: GroupPanel): IDockviewPanel {
       const view = new DefaultGroupPanelView({
           content: this.createContentComponent(options.id, options.component),
-          tab: this.createTabComponent(options.id, options.tabComponent),
+          tab: this.createTabComponent(options.id, options.tabComponent || this.options.defaultTabComponent),
       });
 
       const panel = new DockviewGroupPanel(options.id, this, this._api, group);

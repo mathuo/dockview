@@ -1,39 +1,42 @@
 import { IDockviewPanelHeaderProps } from './dockview';
 import * as React from 'react';
+import { CloseButton } from '../svg';
 
-export const DefaultTab = (
-    props: IDockviewPanelHeaderProps & React.DOMAttributes<HTMLDivElement>
-) => {
-    const onClose = React.useCallback(
-        (event: React.MouseEvent<HTMLSpanElement>) => {
-            event.stopPropagation();
-            props.api.close();
-        },
-        [props.api]
-    );
+export type IDockviewDefaultTabProps = IDockviewPanelHeaderProps &
+    React.DOMAttributes<HTMLDivElement>;
 
-    const onClick = React.useCallback(
-        (event: React.MouseEvent<HTMLDivElement>) => {
-            props.api.setActive();
+export const DockviewDefaultTab: React.FunctionComponent<IDockviewDefaultTabProps> =
+    ({ api, containerApi: _containerApi, params: _params, ...rest }) => {
+        const onClose = React.useCallback(
+            (event: React.MouseEvent<HTMLSpanElement>) => {
+                event.stopPropagation();
+                api.close();
+            },
+            [api]
+        );
 
-            if (props.onClick) {
-                props.onClick(event);
-            }
-        },
-        [props.api, props.onClick]
-    );
+        const onClick = React.useCallback(
+            (event: React.MouseEvent<HTMLDivElement>) => {
+                api.setActive();
 
-    const iconClassname = React.useMemo(() => {
-        const cn = ['dockview-react-tab-action'];
-        return cn.join(',');
-    }, [props.api.suppressClosable]);
+                if (rest.onClick) {
+                    rest.onClick(event);
+                }
+            },
+            [api, rest.onClick]
+        );
 
-    return (
-        <div {...props} onClick={onClick} className="dockview-react-tab">
-            <span className="dockview-react-tab-title">{props.api.title}</span>
-            <span onClick={onClose} className={iconClassname}>
-                {'✕'}
-            </span>
-        </div>
-    );
-};
+        const iconClassname = React.useMemo(() => {
+            const cn = ['dockview-react-tab-action'];
+            return cn.join(',');
+        }, [api.suppressClosable]);
+
+        return (
+            <div {...rest} onClick={onClick} className="dockview-react-tab">
+                <span className="dockview-react-tab-title">{api.title}</span>
+                <div className={iconClassname} onClick={onClose}>
+                    <CloseButton />
+                </div>
+            </div>
+        );
+    };

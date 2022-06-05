@@ -18,24 +18,12 @@
                     --dv-activegroup-visiblepanel-tab-background-color
                 );
                 color: var(--dv-activegroup-visiblepanel-tab-color);
-
-                .tab-action {
-                    background-color: var(
-                        --dv-activegroup-visiblepanel-tab-color
-                    );
-                }
             }
             &.inactive-tab {
                 background-color: var(
                     --dv-activegroup-hiddenpanel-tab-background-color
                 );
                 color: var(--dv-activegroup-hiddenpanel-tab-color);
-
-                .tab-action {
-                    background-color: var(
-                        --dv-activegroup-hiddenpanel-tab-color
-                    );
-                }
             }
         }
     }
@@ -46,24 +34,12 @@
                     --dv-inactivegroup-visiblepanel-tab-background-color
                 );
                 color: var(--dv-inactivegroup-visiblepanel-tab-color);
-
-                .tab-action {
-                    background-color: var(
-                        --dv-inactivegroup-visiblepanel-tab-color
-                    );
-                }
             }
             &.inactive-tab {
                 background-color: var(
                     --dv-inactivegroup-hiddenpanel-tab-background-color
                 );
                 color: var(--dv-inactivegroup-hiddenpanel-tab-color);
-
-                .tab-action {
-                    background-color: var(
-                        --dv-inactivegroup-hiddenpanel-tab-color
-                    );
-                }
             }
         }
     }

@@ -7,6 +7,7 @@ import { DockviewApi } from '../api/component.api';
 import { DefaultTab } from '../dockview/components/tab/defaultTab';
 import { DefaultGroupPanelView } from '../dockview/defaultGroupPanelView';
 import { GroupPanel } from '../groupview/groupviewPanel';
+import { ITabRenderer } from '../groupview/types';
 
 export class ReactPanelDeserialzier implements IPanelDeserializer {
     constructor(private readonly layout: DockviewComponent) {}
@@ -21,6 +22,30 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
         const suppressClosable = panelData.suppressClosable;
         const viewData = panelData.view;
 
+        let tab: ITabRenderer;
+
+        if (viewData.tab?.id) {
+            tab = createComponent(
+                viewData.tab.id,
+                viewData.tab.id,
+                this.layout.options.tabComponents,
+                this.layout.options.frameworkTabComponents,
+                this.layout.options.frameworkComponentFactory?.tab,
+                () => new DefaultTab()
+            );
+        } else if (this.layout.options.defaultTabComponent) {
+            tab = createComponent(
+                this.layout.options.defaultTabComponent,
+                this.layout.options.defaultTabComponent,
+                this.layout.options.tabComponents,
+                this.layout.options.frameworkTabComponents,
+                this.layout.options.frameworkComponentFactory?.tab,
+                () => new DefaultTab()
+            );
+        } else {
+            tab = new DefaultTab();
+        }
+
         const view = new DefaultGroupPanelView({
             content: createComponent(
                 viewData.content.id,
@@ -29,15 +54,7 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
                 this.layout.options.frameworkComponents,
                 this.layout.options.frameworkComponentFactory?.content
             ),
-            tab: viewData.tab?.id
-                ? createComponent(
-                      viewData.tab.id,
-                      viewData.tab.id,
-                      this.layout.options.tabComponents,
-                      this.layout.options.frameworkTabComponents,
-                      this.layout.options.frameworkComponentFactory?.tab
-                  )
-                : new DefaultTab(),
+            tab,
         });
 
         const panel = new DockviewGroupPanel(

@@ -18,6 +18,8 @@ import { PanelCollection, PanelParameters } from '../types';
 import { watchElementResize } from '../../dom';
 import { IContentRenderer, ITabRenderer } from '../../groupview/types';
 
+export const DEFAULT_TAB_IDENTIFIER = '__default__tab__';
+
 export interface IGroupPanelBaseProps<T extends {} = Record<string, any>>
     extends PanelParameters<T> {
     api: DockviewPanelApi;
@@ -45,6 +47,7 @@ export interface IDockviewReactProps {
     hideBorders?: boolean;
     className?: string;
     disableAutoResizing?: boolean;
+    defaultTabComponent?: React.FunctionComponent<IDockviewPanelHeaderProps>;
 }
 
 export const DockviewReact = React.forwardRef(
@@ -122,9 +125,13 @@ export const DockviewReact = React.forwardRef(
             const dockview = new DockviewComponent(element, {
                 frameworkComponentFactory: factory,
                 frameworkComponents: props.components,
-                frameworkTabComponents: props.tabComponents,
+                frameworkTabComponents: {
+                    ...(props.tabComponents || {}),
+                    [DEFAULT_TAB_IDENTIFIER]: props.defaultTabComponent,
+                },
                 tabHeight: props.tabHeight,
                 watermarkFrameworkComponent: props.watermarkComponent,
+                defaultTabComponent: DEFAULT_TAB_IDENTIFIER,
                 styles: props.hideBorders
                     ? { separatorBorder: 'transparent' }
                     : undefined,
@@ -201,6 +208,19 @@ export const DockviewReact = React.forwardRef(
                 frameworkTabComponents: props.tabComponents,
             });
         }, [props.tabComponents]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+            dockviewRef.current.updateOptions({
+                defaultTabComponent: DEFAULT_TAB_IDENTIFIER,
+                frameworkTabComponents: {
+                    ...(props.tabComponents || {}),
+                    [DEFAULT_TAB_IDENTIFIER]: props.defaultTabComponent,
+                },
+            });
+        }, [props.defaultTabComponent]);
 
         return (
             <div
