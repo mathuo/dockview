@@ -8,6 +8,7 @@ import { toggleClass } from '../../../dom';
 import { CompositeDisposable } from '../../../lifecycle';
 import { GroupPanel } from '../../../groupview/groupviewPanel';
 import { PanelUpdateEvent } from '../../../panel/types';
+import { createCloseButton } from '../../../svg';
 
 export class Watermark
     extends CompositeDisposable
@@ -42,8 +43,9 @@ export class Watermark
         title.appendChild(emptySpace);
         title.appendChild(actions.element);
 
-        const closeAnchor = document.createElement('a');
+        const closeAnchor = document.createElement('div');
         closeAnchor.className = 'close-action';
+        closeAnchor.appendChild(createCloseButton());
 
         actions.add(closeAnchor);
 

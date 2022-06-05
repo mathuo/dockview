@@ -6,6 +6,8 @@ import {
 import { addDisposableListener } from '../../../events';
 import { PanelUpdateEvent } from '../../../panel/types';
 import { GroupPanel } from '../../../groupview/groupviewPanel';
+import { createCloseButton } from '../../../svg';
+import { DEFAULT_TAB_IDENTIFIER } from '../../../react';
 
 export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     private _element: HTMLElement;
@@ -24,7 +26,7 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     }
 
     get id() {
-        return '__DEFAULT_TAB__';
+        return DEFAULT_TAB_IDENTIFIER;
     }
 
     constructor() {
@@ -42,8 +44,10 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         this._list = document.createElement('ul');
         this._list.className = 'tab-list';
         //
-        this.action = document.createElement('a');
+        this.action = document.createElement('div');
         this.action.className = 'tab-action';
+        this.action.appendChild(createCloseButton());
+
         //
         this._element.appendChild(this._content);
         this._element.appendChild(this._actionContainer);
