@@ -52,7 +52,7 @@ export class Tab extends CompositeDisposable implements ITab {
 
     constructor(
         public readonly panelId: string,
-        accessor: IDockviewComponent,
+        private readonly accessor: IDockviewComponent,
         private readonly group: GroupPanel
     ) {
         super();
@@ -120,7 +120,10 @@ export class Tab extends CompositeDisposable implements ITab {
             canDisplayOverlay: (event) => {
                 const data = getPanelData();
                 if (data) {
-                    return this.panelId !== data.panelId;
+                    return (
+                        this.panelId !== data.panelId &&
+                        this.accessor.id === data.viewId
+                    );
                 }
 
                 return this.group.model.canDisplayOverlay(

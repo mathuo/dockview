@@ -137,6 +137,7 @@ export const DockviewReact = React.forwardRef(
                 styles: props.hideBorders
                     ? { separatorBorder: 'transparent' }
                     : undefined,
+                showDndOverlay: props.showDndOverlay,
             });
 
             domRef.current?.appendChild(dockview.element);

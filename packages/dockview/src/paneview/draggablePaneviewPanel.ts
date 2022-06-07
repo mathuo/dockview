@@ -8,6 +8,7 @@ import { Droptarget, DroptargetEvent, Position } from '../dnd/droptarget';
 import { Emitter } from '../events';
 import { IDisposable } from '../lifecycle';
 import { Orientation } from '../splitview/core/splitview';
+import { IPaneviewComponent } from './paneviewComponent';
 import {
     IPaneviewPanel,
     PanePanelInitParameter,
@@ -27,6 +28,7 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
     readonly onDidDrop = this._onDidDrop.event;
 
     constructor(
+        private readonly accessor: IPaneviewComponent,
         id: string,
         component: string,
         headerComponent: string | undefined,
@@ -47,12 +49,13 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
         }
 
         const id = this.id;
+        const accessorId = this.accessor.id;
         this.header.draggable = true;
 
         this.handler = new (class PaneDragHandler extends DragHandler {
             getData(): IDisposable {
                 LocalSelectionTransfer.getInstance().setData(
-                    [new PaneTransfer('paneview', id)],
+                    [new PaneTransfer(accessorId, id)],
                     PaneTransfer.prototype
                 );
 
@@ -68,14 +71,27 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
 
         this.target = new Droptarget(this.element, {
             validOverlays: 'vertical',
-            canDisplayOverlay: () => {
+            canDisplayOverlay: (event) => {
                 const data = getPaneData();
 
-                if (!data) {
-                    return true;
+                if (data) {
+                    if (
+                        data.paneId !== this.id &&
+                        data.viewId === this.accessor.id
+                    ) {
+                        return true;
+                    }
                 }
 
-                return data.paneId !== this.id;
+                if (this.accessor.options.showDndOverlay) {
+                    return this.accessor.options.showDndOverlay({
+                        nativeEvent: event,
+                        getData: getPaneData,
+                        panel: this,
+                    });
+                }
+
+                return false;
             },
         });
 
@@ -92,11 +108,13 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
     private onDrop(event: DroptargetEvent) {
         const data = getPaneData();
 
-        if (!data) {
+        if (!data || data.viewId !== this.accessor.id) {
+            // if there is no local drag event for this panel
+            // or if the drag event was creating by another Paneview instance
             this._onDidDrop.fire({
                 ...event,
                 panel: this,
-                getData: () => getPaneData(),
+                getData: getPaneData,
             });
             return;
         }
@@ -107,10 +125,11 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
 
         const existingPanel = containerApi.getPanel(panelId);
         if (!existingPanel) {
+            // if the panel doesn't exist
             this._onDidDrop.fire({
                 ...event,
                 panel: this,
-                getData: () => getPaneData(),
+                getData: getPaneData,
             });
             return;
         }
