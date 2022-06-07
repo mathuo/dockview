@@ -16,6 +16,7 @@ export * from './dockview/dockviewComponent';
 export * from './gridview/gridviewComponent';
 export * from './splitview/splitviewComponent';
 export * from './paneview/paneviewComponent';
+export { PaneviewComponentOptions } from './paneview/options';
 
 export * from './gridview/gridviewPanel';
 export * from './splitview/splitviewPanel';

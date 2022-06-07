@@ -247,7 +247,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
                 const data = getPanelData();
 
-                if (data) {
+                if (data && data.viewId === this.accessor.id) {
                     const groupHasOnePanelAndIsActiveDragElement =
                         this._panels.length === 1 && data.groupId === this.id;
 
@@ -670,6 +670,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 nativeEvent: event,
                 target,
                 group: this.accessor.getPanel(this.id)!,
+                getData: getPanelData,
             });
         }
         return false;

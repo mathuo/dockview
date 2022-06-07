@@ -169,7 +169,7 @@ export class TabsContainer
             canDisplayOverlay: (event) => {
                 const data = getPanelData();
 
-                if (data) {
+                if (data && this.accessor.id === data.viewId) {
                     // don't show the overlay if the tab being dragged is the last panel of this group
                     return last(this.tabs)?.value.panelId !== data.panelId;
                 }
