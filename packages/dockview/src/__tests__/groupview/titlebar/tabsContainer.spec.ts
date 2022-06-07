@@ -1,38 +1,18 @@
+import { DockviewComponent } from '../../../dockview/dockviewComponent';
+import { GroupPanel } from '../../../groupview/groupviewPanel';
+import { TabsContainer } from '../../../groupview/titlebar/tabsContainer';
 import { fireEvent } from '@testing-library/dom';
-import { LocalSelectionTransfer, PanelTransfer } from '../../dnd/dataTransfer';
-import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { Groupview } from '../../groupview/groupview';
-import { GroupPanel } from '../../groupview/groupviewPanel';
-import { Tab } from '../../groupview/tab';
+import { Groupview } from '../../../groupview/groupview';
+import {
+    LocalSelectionTransfer,
+    PanelTransfer,
+} from '../../../dnd/dataTransfer';
+import { TestPanel } from '../groupview.spec';
 
-describe('tab', () => {
-    test('that empty tab has inactive-tab class', () => {
-        const accessorMock = jest.fn();
-        const groupMock = jest.fn();
-
-        const cut = new Tab('panelId', new accessorMock(), new groupMock());
-
-        expect(cut.element.className).toBe('tab inactive-tab');
-    });
-
-    test('that active tab has active-tab class', () => {
-        const accessorMock = jest.fn();
-        const groupMock = jest.fn();
-
-        const cut = new Tab('panelId', new accessorMock(), new groupMock());
-
-        cut.setActive(true);
-        expect(cut.element.className).toBe('tab active-tab');
-
-        cut.setActive(false);
-        expect(cut.element.className).toBe('tab inactive-tab');
-    });
-
-    test('that an external event does not render a drop target and calls through to the group model', () => {
+describe('tabsContainer', () => {
+    test('that an external event does not render a drop target and calls through to the group mode', () => {
         const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-            };
+            return {};
         });
         const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
             return {
@@ -44,7 +24,6 @@ describe('tab', () => {
 
         const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
             return {
-                id: 'testgroupid',
                 model: groupView,
             };
         });
@@ -52,17 +31,25 @@ describe('tab', () => {
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as GroupPanel;
 
-        const cut = new Tab('panelId', accessor, groupPanel);
+        const cut = new TabsContainer(accessor, groupPanel, {});
 
-        jest.spyOn(cut.element, 'clientHeight', 'get').mockImplementation(
+        const emptySpace = cut.element
+            .getElementsByClassName('void-container')
+            .item(0);
+
+        if (!emptySpace) {
+            fail('element not found');
+        }
+
+        jest.spyOn(emptySpace, 'clientHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(cut.element, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace, 'clientWidth', 'get').mockImplementation(
             () => 100
         );
 
-        fireEvent.dragEnter(cut.element);
-        fireEvent.dragOver(cut.element);
+        fireEvent.dragEnter(emptySpace);
+        fireEvent.dragOver(emptySpace);
 
         expect(groupView.canDisplayOverlay).toBeCalled();
 
@@ -71,7 +58,7 @@ describe('tab', () => {
         ).toBe(0);
     });
 
-    test('that if you drag over yourself no drop target is shown', () => {
+    test('that a drag over event from another tab should render a drop target', () => {
         const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
             return {
                 id: 'testcomponentid',
@@ -95,70 +82,36 @@ describe('tab', () => {
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as GroupPanel;
 
-        const cut = new Tab('panel1', accessor, groupPanel);
+        const cut = new TabsContainer(accessor, groupPanel, {});
 
-        jest.spyOn(cut.element, 'clientHeight', 'get').mockImplementation(
+        const emptySpace = cut.element
+            .getElementsByClassName('void-container')
+            .item(0);
+
+        if (!emptySpace) {
+            fail('element not found');
+        }
+
+        jest.spyOn(emptySpace, 'clientHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(cut.element, 'clientWidth', 'get').mockImplementation(
-            () => 100
-        );
-
-        LocalSelectionTransfer.getInstance().setData(
-            [new PanelTransfer('testcomponentid', 'anothergroupid', 'panel1')],
-            PanelTransfer.prototype
-        );
-
-        fireEvent.dragEnter(cut.element);
-        fireEvent.dragOver(cut.element);
-
-        expect(groupView.canDisplayOverlay).toBeCalledTimes(0);
-
-        expect(
-            cut.element.getElementsByClassName('drop-target-dropzone').length
-        ).toBe(0);
-    });
-
-    test('that if you drag over another tab a drop target is shown', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-            };
-        });
-        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
-            return {
-                canDisplayOverlay: jest.fn(),
-            };
-        });
-
-        const groupView = new groupviewMock() as Groupview;
-
-        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
-            return {
-                id: 'testgroupid',
-                model: groupView,
-            };
-        });
-
-        const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as GroupPanel;
-
-        const cut = new Tab('panel1', accessor, groupPanel);
-
-        jest.spyOn(cut.element, 'clientHeight', 'get').mockImplementation(
-            () => 100
-        );
-        jest.spyOn(cut.element, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace, 'clientWidth', 'get').mockImplementation(
             () => 100
         );
 
         LocalSelectionTransfer.getInstance().setData(
-            [new PanelTransfer('testcomponentid', 'anothergroupid', 'panel2')],
+            [
+                new PanelTransfer(
+                    'testcomponentid',
+                    'anothergroupid',
+                    'anotherpanelid'
+                ),
+            ],
             PanelTransfer.prototype
         );
 
-        fireEvent.dragEnter(cut.element);
-        fireEvent.dragOver(cut.element);
+        fireEvent.dragEnter(emptySpace);
+        fireEvent.dragOver(emptySpace);
 
         expect(groupView.canDisplayOverlay).toBeCalledTimes(0);
 
@@ -167,7 +120,7 @@ describe('tab', () => {
         ).toBe(1);
     });
 
-    test('that dropping on a tab with the same id but from a different component should not render a drop over and call through to the group model', () => {
+    test('that dropping the last tab should render no drop target', () => {
         const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
             return {
                 id: 'testcomponentid',
@@ -191,12 +144,141 @@ describe('tab', () => {
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as GroupPanel;
 
-        const cut = new Tab('panel1', accessor, groupPanel);
+        const cut = new TabsContainer(accessor, groupPanel, {});
 
-        jest.spyOn(cut.element, 'clientHeight', 'get').mockImplementation(
+        cut.openPanel(new TestPanel('panel1', jest.fn() as any));
+        cut.openPanel(new TestPanel('panel2', jest.fn() as any));
+
+        const emptySpace = cut.element
+            .getElementsByClassName('void-container')
+            .item(0);
+
+        if (!emptySpace) {
+            fail('element not found');
+        }
+
+        jest.spyOn(emptySpace, 'clientHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(cut.element, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace, 'clientWidth', 'get').mockImplementation(
+            () => 100
+        );
+
+        LocalSelectionTransfer.getInstance().setData(
+            [new PanelTransfer('testcomponentid', 'anothergroupid', 'panel2')],
+            PanelTransfer.prototype
+        );
+
+        fireEvent.dragEnter(emptySpace);
+        fireEvent.dragOver(emptySpace);
+
+        expect(groupView.canDisplayOverlay).toBeCalledTimes(0);
+
+        expect(
+            cut.element.getElementsByClassName('drop-target-dropzone').length
+        ).toBe(0);
+    });
+
+    test('that dropping the first tab should render a drop target', () => {
+        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
+            return {
+                id: 'testcomponentid',
+            };
+        });
+        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
+            return {
+                canDisplayOverlay: jest.fn(),
+            };
+        });
+
+        const groupView = new groupviewMock() as Groupview;
+
+        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
+            return {
+                id: 'testgroupid',
+                model: groupView,
+            };
+        });
+
+        const accessor = new accessorMock() as DockviewComponent;
+        const groupPanel = new groupPanelMock() as GroupPanel;
+
+        const cut = new TabsContainer(accessor, groupPanel, {});
+
+        cut.openPanel(new TestPanel('panel1', jest.fn() as any));
+        cut.openPanel(new TestPanel('panel2', jest.fn() as any));
+
+        const emptySpace = cut.element
+            .getElementsByClassName('void-container')
+            .item(0);
+
+        if (!emptySpace) {
+            fail('element not found');
+        }
+
+        jest.spyOn(emptySpace, 'clientHeight', 'get').mockImplementation(
+            () => 100
+        );
+        jest.spyOn(emptySpace, 'clientWidth', 'get').mockImplementation(
+            () => 100
+        );
+
+        LocalSelectionTransfer.getInstance().setData(
+            [new PanelTransfer('testcomponentid', 'anothergroupid', 'panel1')],
+            PanelTransfer.prototype
+        );
+
+        fireEvent.dragEnter(emptySpace);
+        fireEvent.dragOver(emptySpace);
+
+        expect(groupView.canDisplayOverlay).toBeCalledTimes(0);
+
+        expect(
+            cut.element.getElementsByClassName('drop-target-dropzone').length
+        ).toBe(1);
+    });
+
+    test('that dropping a tab from another component should not render a drop target', () => {
+        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
+            return {
+                id: 'testcomponentid',
+            };
+        });
+        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
+            return {
+                canDisplayOverlay: jest.fn(),
+            };
+        });
+
+        const groupView = new groupviewMock() as Groupview;
+
+        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
+            return {
+                id: 'testgroupid',
+                model: groupView,
+            };
+        });
+
+        const accessor = new accessorMock() as DockviewComponent;
+        const groupPanel = new groupPanelMock() as GroupPanel;
+
+        const cut = new TabsContainer(accessor, groupPanel, {});
+
+        cut.openPanel(new TestPanel('panel1', jest.fn() as any));
+        cut.openPanel(new TestPanel('panel2', jest.fn() as any));
+
+        const emptySpace = cut.element
+            .getElementsByClassName('void-container')
+            .item(0);
+
+        if (!emptySpace) {
+            fail('element not found');
+        }
+
+        jest.spyOn(emptySpace, 'clientHeight', 'get').mockImplementation(
+            () => 100
+        );
+        jest.spyOn(emptySpace, 'clientWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -211,62 +293,8 @@ describe('tab', () => {
             PanelTransfer.prototype
         );
 
-        fireEvent.dragEnter(cut.element);
-        fireEvent.dragOver(cut.element);
-
-        expect(groupView.canDisplayOverlay).toBeCalledTimes(1);
-
-        expect(
-            cut.element.getElementsByClassName('drop-target-dropzone').length
-        ).toBe(0);
-    });
-
-    test('that dropping on a tab from a different component should not render a drop over and call through to the group model', () => {
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                id: 'testcomponentid',
-            };
-        });
-        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
-            return {
-                canDisplayOverlay: jest.fn(),
-            };
-        });
-
-        const groupView = new groupviewMock() as Groupview;
-
-        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
-            return {
-                id: 'testgroupid',
-                model: groupView,
-            };
-        });
-
-        const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as GroupPanel;
-
-        const cut = new Tab('panel1', accessor, groupPanel);
-
-        jest.spyOn(cut.element, 'clientHeight', 'get').mockImplementation(
-            () => 100
-        );
-        jest.spyOn(cut.element, 'clientWidth', 'get').mockImplementation(
-            () => 100
-        );
-
-        LocalSelectionTransfer.getInstance().setData(
-            [
-                new PanelTransfer(
-                    'anothercomponentid',
-                    'anothergroupid',
-                    'panel2'
-                ),
-            ],
-            PanelTransfer.prototype
-        );
-
-        fireEvent.dragEnter(cut.element);
-        fireEvent.dragOver(cut.element);
+        fireEvent.dragEnter(emptySpace);
+        fireEvent.dragOver(emptySpace);
 
         expect(groupView.canDisplayOverlay).toBeCalledTimes(1);
 

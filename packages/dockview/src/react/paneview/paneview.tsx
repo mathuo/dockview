@@ -3,6 +3,7 @@ import { PaneviewPanelApi } from '../../api/paneviewPanelApi';
 import {
     PaneviewComponent,
     IPaneviewComponent,
+    PaneviewDndOverlayEvent,
 } from '../../paneview/paneviewComponent';
 import { usePortalsLifecycle } from '../react';
 import { PaneviewApi } from '../../api/component.api';
@@ -33,6 +34,7 @@ export interface IPaneviewReactProps {
     className?: string;
     disableAutoResizing?: boolean;
     disableDnd?: boolean;
+    showDndOverlay?: (event: PaneviewDndOverlayEvent) => boolean;
     onDidDrop?(event: PaneviewDropEvent): void;
 }
 
@@ -85,6 +87,7 @@ export const PaneviewReact = React.forwardRef(
                         createComponent,
                     },
                 },
+                showDndOverlay: props.showDndOverlay,
             });
 
             const api = new PaneviewApi(paneview);
@@ -143,6 +146,15 @@ export const PaneviewReact = React.forwardRef(
                 disposable.dispose();
             };
         }, [props.onDidDrop]);
+
+        React.useEffect(() => {
+            if (!paneviewRef.current) {
+                return;
+            }
+            paneviewRef.current.updateOptions({
+                showDndOverlay: props.showDndOverlay,
+            });
+        }, [props.showDndOverlay]);
 
         return (
             <div

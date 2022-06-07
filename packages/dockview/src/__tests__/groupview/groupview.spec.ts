@@ -16,16 +16,14 @@ import {
     GroupOptions,
     Groupview,
 } from '../../groupview/groupview';
-import {
-    DockviewPanelApi,
-    DockviewPanelApiImpl,
-} from '../../api/groupPanelApi';
+import { DockviewPanelApi } from '../../api/groupPanelApi';
 import {
     DefaultGroupPanelView,
     IGroupPanelView,
 } from '../../dockview/defaultGroupPanelView';
 import { GroupPanel } from '../../groupview/groupviewPanel';
-import { DockviewApi } from '../../api/component.api';
+import { fireEvent } from '@testing-library/dom';
+import { LocalSelectionTransfer, PanelTransfer } from '../../dnd/dataTransfer';
 
 class Watermark implements IWatermarkRenderer {
     public readonly element = document.createElement('div');
@@ -134,7 +132,7 @@ class TestHeaderPart implements ITabRenderer {
     }
 }
 
-class TestPanel implements IDockviewPanel {
+export class TestPanel implements IDockviewPanel {
     private _view: IGroupPanelView | undefined;
     private _group: GroupPanel | undefined;
     private _params: IGroupPanelInitParameters;
@@ -148,7 +146,7 @@ class TestPanel implements IDockviewPanel {
     }
 
     get group() {
-        return this._group;
+        return this._group!;
     }
 
     get view() {
@@ -544,7 +542,7 @@ describe('groupview', () => {
         );
         const contentContainer = groupviewContainer
             .getElementsByClassName('content-container')
-            .item(0).childNodes;
+            .item(0)!.childNodes;
 
         const panel1 = new TestPanel('id_1', null);
 
@@ -567,5 +565,121 @@ describe('groupview', () => {
         cut.openPanel(panel3);
         expect(contentContainer.length).toBe(1);
         expect(contentContainer.item(0)).toBe(panel3.view.content.element);
+    });
+
+    test('that should not show drop target is external event', () => {
+        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
+            return {
+                id: 'testcomponentid',
+                options: {
+                    showDndOverlay: jest.fn(),
+                },
+                getPanel: jest.fn(),
+            };
+        });
+        const accessor = new accessorMock() as DockviewComponent;
+        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
+            return {
+                canDisplayOverlay: jest.fn(),
+            };
+        });
+
+        const groupView = new groupviewMock() as Groupview;
+
+        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
+            return {
+                id: 'testgroupid',
+                model: groupView,
+            };
+        });
+
+        const container = document.createElement('div');
+        const cut = new Groupview(
+            container,
+            accessor,
+            'groupviewid',
+            {},
+            new groupPanelMock() as GroupPanel
+        );
+
+        const element = container
+            .getElementsByClassName('content-container')
+            .item(0)!;
+
+        jest.spyOn(element, 'clientHeight', 'get').mockImplementation(
+            () => 100
+        );
+        jest.spyOn(element, 'clientWidth', 'get').mockImplementation(() => 100);
+
+        fireEvent.dragEnter(element);
+        fireEvent.dragOver(element);
+
+        expect(accessor.options.showDndOverlay).toBeCalledTimes(1);
+
+        expect(
+            element.getElementsByClassName('drop-target-dropzone').length
+        ).toBe(0);
+    });
+
+    test('that should not show drop target if dropping on self', () => {
+        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
+            return {
+                id: 'testcomponentid',
+                options: {
+                    showDndOverlay: jest.fn(),
+                },
+                getPanel: jest.fn(),
+                doSetGroupActive: jest.fn(),
+            };
+        });
+        const accessor = new accessorMock() as DockviewComponent;
+        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
+            return {
+                canDisplayOverlay: jest.fn(),
+            };
+        });
+
+        const groupView = new groupviewMock() as Groupview;
+
+        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
+            return {
+                id: 'testgroupid',
+                model: groupView,
+            };
+        });
+
+        const container = document.createElement('div');
+        const cut = new Groupview(
+            container,
+            accessor,
+            'groupviewid',
+            {},
+            new groupPanelMock() as GroupPanel
+        );
+
+        cut.openPanel(new TestPanel('panel1', jest.fn() as any));
+
+        const element = container
+            .getElementsByClassName('content-container')
+            .item(0)!;
+
+        jest.spyOn(element, 'clientHeight', 'get').mockImplementation(
+            () => 100
+        );
+        jest.spyOn(element, 'clientWidth', 'get').mockImplementation(() => 100);
+
+        LocalSelectionTransfer.getInstance().setData(
+            [new PanelTransfer('testcomponentid', 'groupviewid', 'panel1')],
+            PanelTransfer.prototype
+        );
+
+        fireEvent.dragEnter(element);
+        fireEvent.dragOver(element);
+
+        expect(accessor.options.showDndOverlay).toBeCalledTimes(0);
+
+        expect(
+            element.getElementsByClassName('drop-target-dropzone').length
+        ).toBe(0);
     });
 });

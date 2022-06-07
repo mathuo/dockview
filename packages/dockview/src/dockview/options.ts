@@ -12,6 +12,7 @@ import { GroupPanel } from '../groupview/groupviewPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
 import { DockviewDropTargets } from '../groupview/dnd';
+import { PanelTransfer } from '../dnd/dataTransfer';
 
 export interface GroupPanelFrameworkComponentFactory {
     content: FrameworkFactory<IContentRenderer>;
@@ -53,6 +54,7 @@ export interface DockviewDndOverlayEvent {
     nativeEvent: DragEvent;
     target: DockviewDropTargets;
     group: GroupPanel;
+    getData: () => PanelTransfer | undefined;
 }
 
 export interface DockviewComponentOptions extends DockviewRenderFunctions {
