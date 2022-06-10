@@ -24,6 +24,16 @@ import {
     PaneviewDropEvent2,
 } from './draggablePaneviewPanel';
 import { DefaultHeader } from './defaultPaneviewHeader';
+import { sequentialNumberGenerator } from '../math';
+import { PaneTransfer } from '../dnd/dataTransfer';
+
+const nextLayoutId = sequentialNumberGenerator();
+
+export interface PaneviewDndOverlayEvent {
+    nativeEvent: DragEvent;
+    panel: IPaneviewPanel;
+    getData: () => PaneTransfer | undefined;
+}
 
 export interface SerializedPaneviewPanel {
     snap?: boolean;
@@ -57,9 +67,11 @@ export class PaneFramework extends DraggablePaneviewPanel {
             orientation: Orientation;
             isExpanded: boolean;
             disableDnd: boolean;
+            accessor: IPaneviewComponent;
         }
     ) {
         super(
+            options.accessor,
             options.id,
             options.component,
             options.headerComponent,
@@ -94,11 +106,13 @@ export interface AddPaneviewComponentOptions {
 }
 
 export interface IPaneviewComponent extends IDisposable {
+    readonly id: string;
     readonly width: number;
     readonly height: number;
     readonly minimumSize: number;
     readonly maximumSize: number;
     readonly panels: IPaneviewPanel[];
+    readonly options: PaneviewComponentOptions;
     readonly onDidAddView: Event<PaneviewPanel>;
     readonly onDidRemoveView: Event<PaneviewPanel>;
     readonly onDidDrop: Event<PaneviewDropEvent2>;
@@ -120,6 +134,8 @@ export class PaneviewComponent
     extends CompositeDisposable
     implements IPaneviewComponent
 {
+    private readonly _id = nextLayoutId.next();
+    private _options: PaneviewComponentOptions;
     private _disposable = new MutableDisposable();
     private _viewDisposables = new Map<string, IDisposable>();
     private _paneview!: Paneview;
@@ -138,6 +154,10 @@ export class PaneviewComponent
 
     private readonly _onDidRemoveView = new Emitter<PaneviewPanel>();
     readonly onDidRemoveView = this._onDidRemoveView.event;
+
+    get id(): string {
+        return this._id;
+    }
 
     get panels(): PaneviewPanel[] {
         return this.paneview.getPanes();
@@ -179,9 +199,7 @@ export class PaneviewComponent
             : this.paneview.orthogonalSize;
     }
 
-    private _options: PaneviewComponentOptions;
-
-    get options() {
+    get options(): PaneviewComponentOptions {
         return this._options;
     }
 
@@ -267,6 +285,7 @@ export class PaneviewComponent
             orientation: Orientation.VERTICAL,
             isExpanded: !!options.isExpanded,
             disableDnd: !!this.options.disableDnd,
+            accessor: this,
         });
 
         this.doAddPanel(view);
@@ -400,6 +419,7 @@ export class PaneviewComponent
                         orientation: Orientation.VERTICAL,
                         isExpanded: !!view.expanded,
                         disableDnd: !!this.options.disableDnd,
+                        accessor: this,
                     });
 
                     this.doAddPanel(panel);

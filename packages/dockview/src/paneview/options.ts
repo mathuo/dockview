@@ -1,4 +1,5 @@
 import { FrameworkFactory } from '../types';
+import { PaneviewDndOverlayEvent } from './paneviewComponent';
 import { IPaneBodyPart, IPaneHeaderPart, PaneviewPanel } from './paneviewPanel';
 
 export interface PaneviewComponentOptions {
@@ -23,4 +24,5 @@ export interface PaneviewComponentOptions {
         body: FrameworkFactory<IPaneBodyPart>;
     };
     disableDnd?: boolean;
+    showDndOverlay?: (event: PaneviewDndOverlayEvent) => boolean;
 }
