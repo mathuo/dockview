@@ -12,14 +12,35 @@ import {
     TabContextMenuEvent,
 } from '../../dockview/options';
 import { DockviewPanelApi } from '../../api/groupPanelApi';
-import { usePortalsLifecycle } from '../react';
+import { ReactPortalStore, usePortalsLifecycle } from '../react';
 import { DockviewApi } from '../../api/component.api';
 import { IWatermarkPanelProps, ReactWatermarkPart } from './reactWatermarkPart';
 import { PanelCollection, PanelParameters } from '../types';
 import { watchElementResize } from '../../dom';
 import { IContentRenderer, ITabRenderer } from '../../groupview/types';
+import {
+    IDockviewGroupControlProps,
+    IGroupControlRenderer,
+    ReactGroupControlsRendererPart,
+} from './groupControlsRenderer';
+import { GroupPanel } from '../../groupview/groupviewPanel';
 
 export const DEFAULT_TAB_IDENTIFIER = '__default__tab__';
+
+function createGroupControlElement(
+    component: React.FunctionComponent<IDockviewGroupControlProps> | undefined,
+    store: ReactPortalStore
+): ((groupPanel: GroupPanel) => IGroupControlRenderer) | undefined {
+    return component
+        ? (groupPanel: GroupPanel) => {
+              return new ReactGroupControlsRendererPart(
+                  component,
+                  store,
+                  groupPanel
+              );
+          }
+        : undefined;
+}
 
 export interface IGroupPanelBaseProps<T extends {} = Record<string, any>>
     extends PanelParameters<T> {
@@ -50,6 +71,7 @@ export interface IDockviewReactProps {
     className?: string;
     disableAutoResizing?: boolean;
     defaultTabComponent?: React.FunctionComponent<IDockviewPanelHeaderProps>;
+    groupControlComponent?: React.FunctionComponent<IDockviewGroupControlProps>;
 }
 
 export const DockviewReact = React.forwardRef(
@@ -138,6 +160,10 @@ export const DockviewReact = React.forwardRef(
                     ? { separatorBorder: 'transparent' }
                     : undefined,
                 showDndOverlay: props.showDndOverlay,
+                createGroupControlElement: createGroupControlElement(
+                    props.groupControlComponent,
+                    { addPortal }
+                ),
             });
 
             domRef.current?.appendChild(dockview.element);
@@ -242,6 +268,18 @@ export const DockviewReact = React.forwardRef(
                 },
             });
         }, [props.defaultTabComponent]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+            dockviewRef.current.updateOptions({
+                createGroupControlElement: createGroupControlElement(
+                    props.groupControlComponent,
+                    { addPortal }
+                ),
+            });
+        }, [props.groupControlComponent]);
 
         return (
             <div

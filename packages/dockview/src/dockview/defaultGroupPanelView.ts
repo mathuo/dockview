@@ -1,7 +1,6 @@
 import { DefaultTab } from './components/tab/defaultTab';
 import {
     GroupPanelPartInitParameters,
-    IActionsRenderer,
     IContentRenderer,
     ITabRenderer,
 } from '../groupview/types';
@@ -12,7 +11,6 @@ import { GroupPanelUpdateEvent } from '../groupview/groupPanel';
 export interface IGroupPanelView extends IDisposable {
     readonly content: IContentRenderer;
     readonly tab?: ITabRenderer;
-    readonly actions?: IActionsRenderer;
     update(event: GroupPanelUpdateEvent): void;
     layout(width: number, height: number): void;
     init(params: GroupPanelPartInitParameters): void;
@@ -23,37 +21,18 @@ export interface IGroupPanelView extends IDisposable {
 export class DefaultGroupPanelView implements IGroupPanelView {
     private readonly _content: IContentRenderer;
     private readonly _tab: ITabRenderer;
-    private readonly _actions: IActionsRenderer | undefined;
 
-    get content() {
+    get content(): IContentRenderer {
         return this._content;
     }
 
-    get tab() {
+    get tab(): ITabRenderer {
         return this._tab;
     }
 
-    get actions() {
-        return this._actions;
-    }
-
-    constructor(renderers: {
-        content: IContentRenderer;
-        tab?: ITabRenderer;
-        actions?: IActionsRenderer;
-    }) {
+    constructor(renderers: { content: IContentRenderer; tab?: ITabRenderer }) {
         this._content = renderers.content;
         this._tab = renderers.tab ?? new DefaultTab();
-        this._actions =
-            renderers.actions ||
-            (this.content.actions
-                ? {
-                      element: this.content.actions,
-                      dispose: () => {
-                          //
-                      },
-                  }
-                : undefined);
     }
 
     init(params: GroupPanelPartInitParameters): void {
@@ -85,6 +64,5 @@ export class DefaultGroupPanelView implements IGroupPanelView {
     dispose(): void {
         this.content.dispose();
         this.tab.dispose();
-        this.actions?.dispose();
     }
 }

@@ -36,7 +36,6 @@ import { LayoutMouseEvent, MouseEventKind } from '../groupview/tab';
 import { Orientation } from '../splitview/core/splitview';
 import { DefaultTab } from './components/tab/defaultTab';
 import {
-  GroupChangeKind2,
   GroupOptions,
   GroupPanelViewState,
   GroupviewDropEvent,
@@ -73,6 +72,7 @@ export type DockviewComponentUpdateOptions = Pick<
     | 'showDndOverlay'
     | 'watermarkFrameworkComponent'
     | 'defaultTabComponent'
+    | 'createGroupControlElement'
 >;
 
 export interface DockviewDropEvent extends GroupviewDropEvent {
@@ -716,22 +716,14 @@ export class DockviewComponent
                 view.model.onDidDrop((event) => {
                     this._onDidDrop.fire({ ...event, api: this._api, group: view });
                 }),
-                view.model.onDidGroupChange((event) => {
-                    switch (event.kind) {
-                        case GroupChangeKind2.ADD_PANEL:
-                            if (event.panel) {
-                                this._onDidAddPanel.fire(event.panel);
-                            }
-                            break;
-                        case GroupChangeKind2.REMOVE_PANEL:
-                            if (event.panel) {
-                                this._onDidRemovePanel.fire(event.panel);
-                            }
-                            break;
-                        case GroupChangeKind2.PANEL_ACTIVE:
-                            this._onDidActivePanelChange.fire(event.panel);
-                            break;
-                    }
+                view.model.onDidAddPanel((event) => {
+                  this._onDidAddPanel.fire(event.panel);
+                }),
+                view.model.onDidRemovePanel((event) => {
+                  this._onDidRemovePanel.fire(event.panel);
+                }),
+                view.model.onDidActivePanelChange((event) => {
+                  this._onDidActivePanelChange.fire(event.panel);
                 })
             );
 

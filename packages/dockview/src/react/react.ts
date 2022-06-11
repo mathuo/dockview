@@ -65,6 +65,7 @@ export const ReactPartContext = React.createContext<{}>({});
 export class ReactPart<P extends object, C extends object = {}>
     implements IFrameworkPart
 {
+    private _initialProps: Record<string, any> = {};
     private componentInstance?: IPanelWrapperRef;
     private ref?: { portal: React.ReactPortal; disposable: IDisposable };
     private disposed = false;
@@ -84,7 +85,12 @@ export class ReactPart<P extends object, C extends object = {}>
             throw new Error('invalid operation: resource is already disposed');
         }
 
-        this.componentInstance?.update(props);
+        if (!this.componentInstance) {
+            // if the component is yet to be mounted store the props
+            this._initialProps = { ...this._initialProps, ...props };
+        } else {
+            this.componentInstance.update(props);
+        }
     }
 
     private createPortal() {
@@ -111,6 +117,11 @@ export class ReactPart<P extends object, C extends object = {}>
                 componentProps: this.parameters as unknown as {},
                 ref: (element: IPanelWrapperRef) => {
                     this.componentInstance = element;
+
+                    if (Object.keys(this._initialProps).length > 0) {
+                        this.componentInstance.update(this._initialProps);
+                        this._initialProps = {}; // don't keep a reference to the users object once no longer required
+                    }
                 },
             }
         );
