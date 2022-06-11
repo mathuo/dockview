@@ -11,11 +11,7 @@ import {
     IWatermarkRenderer,
 } from '../../groupview/types';
 import { PanelUpdateEvent } from '../../panel/types';
-import {
-    GroupChangeKind2,
-    GroupOptions,
-    Groupview,
-} from '../../groupview/groupview';
+import { GroupOptions, Groupview } from '../../groupview/groupview';
 import { DockviewPanelApi } from '../../api/groupPanelApi';
 import {
     DefaultGroupPanelView,
@@ -24,6 +20,13 @@ import {
 import { GroupPanel } from '../../groupview/groupviewPanel';
 import { fireEvent } from '@testing-library/dom';
 import { LocalSelectionTransfer, PanelTransfer } from '../../dnd/dataTransfer';
+import { CompositeDisposable } from '../../lifecycle';
+
+enum GroupChangeKind2 {
+    ADD_PANEL,
+    REMOVE_PANEL,
+    PANEL_ACTIVE,
+}
 
 class Watermark implements IWatermarkRenderer {
     public readonly element = document.createElement('div');
@@ -193,7 +196,7 @@ export class TestPanel implements IDockviewPanel {
     toJSON(): GroupviewPanelState {
         return {
             id: this.id,
-            view: this._view.toJSON(),
+            view: this._view?.toJSON(),
             title: this._params?.title,
         };
     }
@@ -269,10 +272,29 @@ describe('groupview', () => {
 
         const events: Array<{
             kind: GroupChangeKind2;
+            panel?: IDockviewPanel;
         }> = [];
-        const disposable = groupview2.model.onDidGroupChange((e) => {
-            events.push(e);
-        });
+
+        const disposable = new CompositeDisposable(
+            groupview2.model.onDidAddPanel((e) => {
+                events.push({
+                    kind: GroupChangeKind2.ADD_PANEL,
+                    panel: e.panel,
+                });
+            }),
+            groupview2.model.onDidRemovePanel((e) => {
+                events.push({
+                    kind: GroupChangeKind2.REMOVE_PANEL,
+                    panel: e.panel,
+                });
+            }),
+            groupview2.model.onDidActivePanelChange((e) => {
+                events.push({
+                    kind: GroupChangeKind2.PANEL_ACTIVE,
+                    panel: e.panel,
+                });
+            })
+        );
 
         groupview2.initialize();
 
@@ -301,10 +323,29 @@ describe('groupview', () => {
     test('panel events flow', () => {
         let events: Array<{
             kind: GroupChangeKind2;
+            panel?: IDockviewPanel;
         }> = [];
-        const disposable = groupview.model.onDidGroupChange((e) => {
-            events.push(e);
-        });
+
+        const disposable = new CompositeDisposable(
+            groupview.model.onDidAddPanel((e) => {
+                events.push({
+                    kind: GroupChangeKind2.ADD_PANEL,
+                    panel: e.panel,
+                });
+            }),
+            groupview.model.onDidRemovePanel((e) => {
+                events.push({
+                    kind: GroupChangeKind2.REMOVE_PANEL,
+                    panel: e.panel,
+                });
+            }),
+            groupview.model.onDidActivePanelChange((e) => {
+                events.push({
+                    kind: GroupChangeKind2.PANEL_ACTIVE,
+                    panel: e.panel,
+                });
+            })
+        );
 
         const panel1 = new TestPanel('panel1', jest.fn() as any);
         const panel2 = new TestPanel('panel2', jest.fn() as any);

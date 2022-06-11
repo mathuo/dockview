@@ -2,34 +2,17 @@ import * as React from 'react';
 import {
     IContentRenderer,
     GroupPanelContentPartInitParameters,
-    ITabRenderer,
 } from '../../groupview/types';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IDockviewPanelProps } from '../dockview/dockview';
 import { PanelUpdateEvent } from '../../panel/types';
-import { DockviewPanelApi } from '../../api/groupPanelApi';
-import { DockviewApi } from '../../api/component.api';
 import { GroupPanel } from '../../groupview/groupviewPanel';
 import { Emitter, Event } from '../../events';
-
-export interface IGroupPanelActionbarProps {
-    api: DockviewPanelApi;
-    containerApi: DockviewApi;
-}
-
-export interface ReactContentPartContext {
-    api: DockviewPanelApi;
-    containerApi: DockviewApi;
-    actionsPortalElement: HTMLElement;
-    tabPortalElement: ITabRenderer;
-}
 
 export class ReactPanelContentPart implements IContentRenderer {
     private _element: HTMLElement;
     private part?: ReactPart<IDockviewPanelProps>;
     //
-    private _actionsElement: HTMLElement;
-    private actionsPart?: ReactPart<any>;
     private _group: GroupPanel | undefined;
 
     private readonly _onDidFocus = new Emitter<void>();
@@ -42,10 +25,6 @@ export class ReactPanelContentPart implements IContentRenderer {
         return this._element;
     }
 
-    get actions(): HTMLElement {
-        return this._actionsElement;
-    }
-
     constructor(
         public readonly id: string,
         private readonly component: React.FunctionComponent<IDockviewPanelProps>,
@@ -53,9 +32,6 @@ export class ReactPanelContentPart implements IContentRenderer {
     ) {
         this._element = document.createElement('div');
         this._element.className = 'dockview-react-part';
-
-        this._actionsElement = document.createElement('div');
-        this._actionsElement.className = 'dockview-react-part';
     }
 
     focus() {
@@ -63,13 +39,6 @@ export class ReactPanelContentPart implements IContentRenderer {
     }
 
     public init(parameters: GroupPanelContentPartInitParameters): void {
-        const context: ReactContentPartContext = {
-            api: parameters.api,
-            containerApi: parameters.containerApi,
-            actionsPortalElement: this._actionsElement,
-            tabPortalElement: parameters.tab,
-        };
-
         this.part = new ReactPart(
             this.element,
             this.reactPortalStore,
@@ -78,8 +47,7 @@ export class ReactPanelContentPart implements IContentRenderer {
                 params: parameters.params,
                 api: parameters.api,
                 containerApi: parameters.containerApi,
-            },
-            context
+            }
         );
     }
 
@@ -108,6 +76,5 @@ export class ReactPanelContentPart implements IContentRenderer {
         this._onDidFocus.dispose();
         this._onDidBlur.dispose();
         this.part?.dispose();
-        this.actionsPart?.dispose();
     }
 }

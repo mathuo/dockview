@@ -1,4 +1,3 @@
-import { IDisposable } from '../lifecycle';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { DockviewPanelApi } from '../api/groupPanelApi';
 import { PanelInitParameters, IPanel } from '../panel/types';
@@ -40,10 +39,6 @@ export interface ITabRenderer extends IPanel {
     readonly element: HTMLElement;
     init(parameters: GroupPanelPartInitParameters): void;
     updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void;
-}
-
-export interface IActionsRenderer extends IDisposable {
-    readonly element: HTMLElement;
 }
 
 export interface IContentRenderer extends IPanel {

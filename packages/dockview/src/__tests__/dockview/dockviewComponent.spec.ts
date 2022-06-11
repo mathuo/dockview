@@ -152,7 +152,7 @@ class TestGroupPanel implements IDockviewPanel {
         public readonly title: string,
         accessor: DockviewComponent
     ) {
-        this.api = new DockviewPanelApiImpl(this, this._group);
+        this.api = new DockviewPanelApiImpl(this, this._group!);
         this._group = new GroupPanel(accessor, id, {});
         this.view = new TestGroupPanelView(
             new PanelContentPartTest(id, 'component')
@@ -162,9 +162,8 @@ class TestGroupPanel implements IDockviewPanel {
     get params(): Record<string, any> {
         return {};
     }
-
-    get group(): GroupPanel | undefined {
-        return this._group;
+    get group(): GroupPanel {
+        return this._group!;
     }
 
     updateParentGroup(group: GroupPanel, isGroupActive: boolean): void {

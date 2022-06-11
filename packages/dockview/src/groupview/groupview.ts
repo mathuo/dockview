@@ -14,12 +14,7 @@ import { ITabsContainer, TabsContainer } from './titlebar/tabsContainer';
 import { IWatermarkRenderer } from './types';
 import { GroupPanel } from './groupviewPanel';
 import { DockviewDropTargets } from './dnd';
-
-export enum GroupChangeKind2 {
-    ADD_PANEL = 'ADD_PANEL',
-    REMOVE_PANEL = 'REMOVE_PANEL',
-    PANEL_ACTIVE = 'PANEL_ACTIVE',
-}
+import { IGroupControlRenderer } from '../react/dockview/groupControlsRenderer';
 
 export interface DndService {
     canDisplayOverlay(
@@ -67,15 +62,14 @@ export interface GroupPanelViewState extends CoreGroupOptions {
 }
 
 export interface GroupviewChangeEvent {
-    readonly kind: GroupChangeKind2;
-    readonly panel?: IDockviewPanel;
+    readonly panel: IDockviewPanel;
 }
 
 export interface GroupviewDropEvent {
-    nativeEvent: DragEvent;
-    position: Position;
+    readonly nativeEvent: DragEvent;
+    readonly position: Position;
+    readonly index?: number;
     getData(): PanelTransfer | undefined;
-    index?: number;
 }
 
 export interface IHeader {
@@ -91,7 +85,9 @@ export interface IGroupview extends IDisposable, IGridPanelView {
     readonly header: IHeader;
     readonly isContentFocused: boolean;
     readonly onDidDrop: Event<GroupviewDropEvent>;
-    readonly onDidGroupChange: Event<GroupviewChangeEvent>;
+    readonly onDidAddPanel: Event<GroupviewChangeEvent>;
+    readonly onDidRemovePanel: Event<GroupviewChangeEvent>;
+    readonly onDidActivePanelChange: Event<GroupviewChangeEvent>;
     readonly onMove: Event<GroupMoveEvent>;
     locked: boolean;
     // state
@@ -121,10 +117,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     private readonly tabsContainer: ITabsContainer;
     private readonly contentContainer: IContentContainer;
     private readonly dropTarget: Droptarget;
-    private _activePanel?: IDockviewPanel;
+    private _activePanel: IDockviewPanel | undefined;
     private watermark?: IWatermarkRenderer;
     private _isGroupActive = false;
     private _locked = false;
+    private _control: IGroupControlRenderer | undefined;
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
 
@@ -140,12 +137,21 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     private readonly _onMove = new Emitter<GroupMoveEvent>();
     readonly onMove: Event<GroupMoveEvent> = this._onMove.event;
 
-    private readonly _onDidGroupChange = new Emitter<GroupviewChangeEvent>();
-    readonly onDidGroupChange: Event<GroupviewChangeEvent> =
-        this._onDidGroupChange.event;
-
     private readonly _onDidDrop = new Emitter<GroupviewDropEvent>();
     readonly onDidDrop: Event<GroupviewDropEvent> = this._onDidDrop.event;
+
+    private readonly _onDidAddPanel = new Emitter<GroupviewChangeEvent>();
+    readonly onDidAddPanel: Event<GroupviewChangeEvent> =
+        this._onDidAddPanel.event;
+
+    private readonly _onDidRemovePanel = new Emitter<GroupviewChangeEvent>();
+    readonly onDidRemovePanel: Event<GroupviewChangeEvent> =
+        this._onDidRemovePanel.event;
+
+    private readonly _onDidActivePanelChange =
+        new Emitter<GroupviewChangeEvent>();
+    readonly onDidActivePanelChange: Event<GroupviewChangeEvent> =
+        this._onDidActivePanelChange.event;
 
     get element(): HTMLElement {
         throw new Error('not supported');
@@ -226,16 +232,10 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         this.container.classList.add('groupview');
 
-        this.addDisposables(
-            this._onMove,
-            this._onDidGroupChange,
-            this._onDidChange,
-            this._onDidDrop
-        );
-
         this.tabsContainer = new TabsContainer(this.accessor, this.parent, {
             tabHeight: options.tabHeight,
         });
+
         this.contentContainer = new ContentContainer();
 
         this.dropTarget = new Droptarget(this.contentContainer.element, {
@@ -268,7 +268,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         this.addDisposables(
             this._onMove,
-            this._onDidGroupChange,
+            this._onDidChange,
+            this._onDidDrop,
+            this._onDidAddPanel,
+            this._onDidRemovePanel,
+            this._onDidActivePanelChange,
             this.tabsContainer.onDrop((event) => {
                 this.handleDropEvent(event.event, Position.Center, event.index);
             }),
@@ -284,7 +288,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         );
     }
 
-    initialize() {
+    initialize(): void {
         if (this.options?.panels) {
             this.options.panels.forEach((panel) => {
                 this.doAddPanel(panel);
@@ -299,9 +303,21 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         // correctly initialized
         this.setActive(this.isActive, true, true);
         this.updateContainer();
+
+        if (this.accessor.options.createGroupControlElement) {
+            this._control = this.accessor.options.createGroupControlElement(
+                this.parent
+            );
+            this.addDisposables(this._control);
+            this._control.init({
+                containerApi: new DockviewApi(this.accessor),
+                api: this.parent.api,
+            });
+            this.tabsContainer.setActionElement(this._control.element);
+        }
     }
 
-    public indexOf(panel: IDockviewPanel) {
+    public indexOf(panel: IDockviewPanel): number {
         return this.tabsContainer.indexOf(panel.id);
     }
 
@@ -326,7 +342,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     public moveToNext(options?: {
         panel?: IDockviewPanel;
         suppressRoll?: boolean;
-    }) {
+    }): void {
         if (!options) {
             options = {};
         }
@@ -352,7 +368,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     public moveToPrevious(options?: {
         panel?: IDockviewPanel;
         suppressRoll?: boolean;
-    }) {
+    }): void {
         if (!options) {
             options = {};
         }
@@ -379,19 +395,19 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.openPanel(this.panels[normalizedIndex]);
     }
 
-    public containsPanel(panel: IDockviewPanel) {
+    public containsPanel(panel: IDockviewPanel): boolean {
         return this.panels.includes(panel);
     }
 
-    init(_params: PanelInitParameters) {
+    init(_params: PanelInitParameters): void {
         //noop
     }
 
-    update(_params: PanelUpdateEvent) {
+    update(_params: PanelUpdateEvent): void {
         //noop
     }
 
-    focus() {
+    focus(): void {
         this._activePanel?.focus();
     }
 
@@ -403,7 +419,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             skipSetPanelActive?: boolean;
             skipSetGroupActive?: boolean;
         } = {}
-    ) {
+    ): void {
         if (
             typeof options.index !== 'number' ||
             options.index > this.panels.length
@@ -452,7 +468,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         return this._removePanel(panelToRemove);
     }
 
-    public closeAllPanels() {
+    public closeAllPanels(): void {
         if (this.panels.length > 0) {
             // take a copy since we will be edting the array as we iterate through
             const arrPanelCpy = [...this.panels];
@@ -468,25 +484,23 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.doClose(panel);
     }
 
-    private doClose(panel: IDockviewPanel) {
+    private doClose(panel: IDockviewPanel): void {
         this.accessor.removePanel(panel);
     }
 
-    public isPanelActive(panel: IDockviewPanel) {
+    public isPanelActive(panel: IDockviewPanel): boolean {
         return this._activePanel === panel;
     }
 
-    updateActions() {
-        if (this.isActive && this._activePanel?.view?.actions) {
-            this.tabsContainer.setActionElement(
-                this._activePanel.view.actions.element
-            );
-        } else {
-            this.tabsContainer.setActionElement(undefined);
-        }
+    updateActions(element: HTMLElement | undefined): void {
+        this.tabsContainer.setActionElement(element);
     }
 
-    public setActive(isGroupActive: boolean, skipFocus = false, force = false) {
+    public setActive(
+        isGroupActive: boolean,
+        skipFocus = false,
+        force = false
+    ): void {
         if (!force && this.isActive === isGroupActive) {
             if (!skipFocus) {
                 this._activePanel?.focus();
@@ -514,7 +528,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
     }
 
-    public layout(width: number, height: number) {
+    public layout(width: number, height: number): void {
         this._width = width;
         this._height = height;
 
@@ -525,7 +539,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
     }
 
-    private _removePanel(panel: IDockviewPanel) {
+    private _removePanel(panel: IDockviewPanel): IDockviewPanel {
         const isActivePanel = this._activePanel === panel;
 
         this.doRemovePanel(panel);
@@ -543,7 +557,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         return panel;
     }
 
-    private doRemovePanel(panel: IDockviewPanel) {
+    private doRemovePanel(panel: IDockviewPanel): void {
         const index = this.panels.indexOf(panel);
 
         if (this._activePanel === panel) {
@@ -560,17 +574,14 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             );
         }
 
-        this._onDidGroupChange.fire({
-            kind: GroupChangeKind2.REMOVE_PANEL,
-            panel,
-        });
+        this._onDidRemovePanel.fire({ panel });
     }
 
     private doAddPanel(
         panel: IDockviewPanel,
         index: number = this.panels.length,
         skipSetActive = false
-    ) {
+    ): void {
         const existingPanel = this._panels.indexOf(panel);
         const hasExistingPanel = existingPanel > -1;
 
@@ -591,13 +602,10 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.updateMru(panel);
         this.panels.splice(index, 0, panel);
 
-        this._onDidGroupChange.fire({
-            kind: GroupChangeKind2.ADD_PANEL,
-            panel,
-        });
+        this._onDidAddPanel.fire({ panel });
     }
 
-    private doSetActivePanel(panel: IDockviewPanel | undefined) {
+    private doSetActivePanel(panel: IDockviewPanel | undefined): void {
         this._activePanel = panel;
 
         if (panel) {
@@ -607,14 +615,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
             this.updateMru(panel);
 
-            this._onDidGroupChange.fire({
-                kind: GroupChangeKind2.PANEL_ACTIVE,
-                panel,
-            });
+            this._onDidActivePanelChange.fire({ panel });
         }
     }
 
-    private updateMru(panel: IDockviewPanel) {
+    private updateMru(panel: IDockviewPanel): void {
         if (this.mostRecentlyUsed.includes(panel)) {
             this.mostRecentlyUsed.splice(
                 this.mostRecentlyUsed.indexOf(panel),
@@ -624,8 +629,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         this.mostRecentlyUsed = [panel, ...this.mostRecentlyUsed];
     }
 
-    private updateContainer() {
-        this.updateActions();
+    private updateContainer(): void {
         toggleClass(this.container, 'empty', this.isEmpty);
 
         this.panels.forEach((panel) =>
@@ -680,7 +684,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         event: DragEvent,
         position: Position,
         index?: number
-    ) {
+    ): void {
         const data = getPanelData();
 
         if (data) {
@@ -716,7 +720,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
     }
 
-    public dispose() {
+    public dispose(): void {
         super.dispose();
 
         this.watermark?.dispose();

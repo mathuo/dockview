@@ -13,6 +13,7 @@ import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
 import { DockviewDropTargets } from '../groupview/dnd';
 import { PanelTransfer } from '../dnd/dataTransfer';
+import { IGroupControlRenderer } from '../react/dockview/groupControlsRenderer';
 
 export interface GroupPanelFrameworkComponentFactory {
     content: FrameworkFactory<IContentRenderer>;
@@ -66,6 +67,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     styles?: ISplitviewStyles;
     defaultTabComponent?: string;
     showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
+    createGroupControlElement?: (group: GroupPanel) => IGroupControlRenderer;
 }
 
 export interface PanelOptions {
