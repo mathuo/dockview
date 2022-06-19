@@ -1,4 +1,4 @@
-import { DEFAULT_TAB_IDENTIFIER } from '../../../react';
+import { DEFAULT_TAB_IDENTIFIER } from '../../../dockview/components/tab/defaultTab';
 import { ReactPanelHeaderPart } from '../../../react/dockview/reactHeaderPart';
 
 describe('reactHeaderPart', () => {
