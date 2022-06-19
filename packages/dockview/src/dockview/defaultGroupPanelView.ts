@@ -55,9 +55,16 @@ export class DefaultGroupPanelView implements IGroupPanelView {
     }
 
     toJSON(): {} {
+        let tab =
+            this.tab instanceof DefaultTab ? undefined : this.tab.toJSON();
+
+        if (tab && Object.keys(tab).length === 0) {
+            tab = undefined;
+        }
+
         return {
             content: this.content.toJSON(),
-            tab: this.tab instanceof DefaultTab ? undefined : this.tab.toJSON(),
+            tab,
         };
     }
 
