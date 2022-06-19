@@ -6,7 +6,8 @@ import {
 import { GroupPanel } from '../../groupview/groupviewPanel';
 import { PanelUpdateEvent } from '../../panel/types';
 import { ReactPart, ReactPortalStore } from '../react';
-import { DEFAULT_TAB_IDENTIFIER, IGroupPanelBaseProps } from './dockview';
+import { IGroupPanelBaseProps } from './dockview';
+import { DEFAULT_TAB_IDENTIFIER } from '../../dockview/components/tab/defaultTab';
 
 export class ReactPanelHeaderPart implements ITabRenderer {
     private _element: HTMLElement;

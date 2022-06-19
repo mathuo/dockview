@@ -24,8 +24,7 @@ import {
     ReactGroupControlsRendererPart,
 } from './groupControlsRenderer';
 import { GroupPanel } from '../../groupview/groupviewPanel';
-
-export const DEFAULT_TAB_IDENTIFIER = '__default__tab__';
+import { DEFAULT_TAB_IDENTIFIER } from '../../dockview/components/tab/defaultTab';
 
 function createGroupControlElement(
     component: React.FunctionComponent<IDockviewGroupControlProps> | undefined,

@@ -7,7 +7,8 @@ import { addDisposableListener } from '../../../events';
 import { PanelUpdateEvent } from '../../../panel/types';
 import { GroupPanel } from '../../../groupview/groupviewPanel';
 import { createCloseButton } from '../../../svg';
-import { DEFAULT_TAB_IDENTIFIER } from '../../../react';
+
+export const DEFAULT_TAB_IDENTIFIER = '__default__tab__';
 
 export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     private _element: HTMLElement;
