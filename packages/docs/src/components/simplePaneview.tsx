@@ -96,7 +96,7 @@ export const SimplePaneview = () => {
             components={components}
             headerComponents={headerComponents}
             onReady={onReady}
-            className="dockview-theme-dark"
+            className="dockview-theme-abyss"
         />
     );
 };

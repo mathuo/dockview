@@ -95,7 +95,7 @@ export const DndDockview = (props: { renderVisibleOnly: boolean }) => {
                 <DockviewReact
                     components={components}
                     onReady={onReady}
-                    className="dockview-theme-dark"
+                    className="dockview-theme-abyss"
                     onDidDrop={onDidDrop}
                     showDndOverlay={showDndOverlay}
                 />

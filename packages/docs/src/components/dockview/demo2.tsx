@@ -26,45 +26,6 @@ const paneComponents = {
     },
 };
 
-const headerComponents = {
-    default: (props: IPaneviewPanelProps) => {
-        const [expanded, setExpanded] = React.useState<boolean>(
-            props.api.isExpanded
-        );
-
-        React.useEffect(() => {
-            const disposable = props.api.onDidExpansionChange((event) =>
-                setExpanded(event.isExpanded)
-            );
-
-            return () => {
-                disposable.dispose();
-            };
-        }, [props.api]);
-
-        const onClick = () => props.api.setExpanded(!props.api.isExpanded);
-
-        return (
-            <div
-                onClick={onClick}
-                style={{
-                    background: '#1C1C2A',
-                    height: '100%',
-                    color: 'white',
-                    padding: '0px 8px',
-                    display: 'flex',
-                    cursor: 'pointer',
-                }}
-            >
-                <span className="material-symbols-outlined">
-                    {expanded ? 'expand_more' : 'chevron_right'}
-                </span>
-                {props.title}
-            </div>
-        );
-    },
-};
-
 const components = {
     default: (props: IGridviewPanelProps<{ title: string }>) => {
         return (
@@ -84,7 +45,6 @@ const components = {
             event.api.addPanel({
                 id: 'pane_1',
                 component: 'default',
-                headerComponent: 'default',
                 title: 'Pane 1',
                 isExpanded: false,
             });
@@ -92,7 +52,6 @@ const components = {
             event.api.addPanel({
                 id: 'pane_2',
                 component: 'default',
-                headerComponent: 'default',
                 title: 'Pane 2',
                 isExpanded: true,
             });
@@ -100,7 +59,6 @@ const components = {
             event.api.addPanel({
                 id: 'pane_3',
                 component: 'default',
-                headerComponent: 'default',
                 title: 'Pane 3',
                 isExpanded: true,
             });
@@ -108,7 +66,6 @@ const components = {
             event.api.addPanel({
                 id: 'pane_4',
                 component: 'default',
-                headerComponent: 'default',
                 title: 'Pane 4',
                 isExpanded: false,
             });
@@ -118,7 +75,6 @@ const components = {
             <PaneviewReact
                 onReady={onReady}
                 components={paneComponents}
-                headerComponents={headerComponents}
                 className="paneview-background"
             />
         );

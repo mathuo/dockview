@@ -1,0 +1,12 @@
+.nested-dockview {
+    position: relative;
+    ::after {
+        content: '';
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        height: 1px;
+        width: 100%;
+        background-color: var(--dv-separator-border);
+    }
+}

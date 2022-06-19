@@ -93,7 +93,7 @@ export const SimpleGridview = () => {
             onReady={onReady}
             proportionalLayout={false}
             orientation={Orientation.VERTICAL}
-            className="dockview-theme-dark"
+            className="dockview-theme-abyss"
         />
     );
 };

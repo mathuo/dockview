@@ -137,7 +137,7 @@ export const RenderingDockview = (props: { renderVisibleOnly: boolean }) => {
         <DockviewReact
             components={components}
             onReady={onReady}
-            className="dockview-theme-dark"
+            className="dockview-theme-abyss"
         />
     );
 };

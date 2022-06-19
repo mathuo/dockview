@@ -1,9 +1,13 @@
 import {
+    DockviewDefaultTab,
     DockviewReact,
     DockviewReadyEvent,
+    IDockviewPanelHeaderProps,
     IDockviewPanelProps,
+    IDockviewGroupControlProps,
 } from 'dockview';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import { CURRENCIES, Currency, getCurrencies, getPrice } from './api';
 import './demo.scss';
 
@@ -114,19 +118,154 @@ const components = {
     news: News,
 };
 
+const headerComponents = {
+    default: (props: IDockviewPanelHeaderProps) => {
+        const onContextMenu = (event: React.MouseEvent) => {
+            event.preventDefault();
+            alert('context menu');
+        };
+        return <DockviewDefaultTab onContextMenu={onContextMenu} {...props} />;
+    },
+};
+
+import { v4 } from 'uuid';
+
+const Popover = (props: {
+    children: React.ReactNode;
+    position?: { x: number; y: number };
+    close: () => void;
+}) => {
+    const uuid = React.useMemo(() => v4(), []);
+
+    React.useEffect(() => {
+        const listener = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                props.close();
+            }
+        };
+        const listener2 = (event: MouseEvent) => {
+            let target = event.target;
+
+            while (target) {
+                if (target instanceof HTMLElement) {
+                    if (target.classList.contains(uuid)) {
+                        return;
+                    } else {
+                        target = target.parentElement;
+                    }
+                } else {
+                    target = undefined;
+                }
+            }
+
+            props.close();
+        };
+        window.addEventListener('keypress', listener);
+        window.addEventListener('mousedown', listener2);
+
+        return () => {
+            window.removeEventListener('keypress', listener);
+            window.removeEventListener('mousedown', listener2);
+        };
+    }, [props.close, uuid]);
+
+    if (!props.position) {
+        return;
+    }
+
+    return ReactDOM.createPortal(
+        <div
+            className={uuid}
+            style={{
+                position: 'absolute',
+                top: props.position.y,
+                left: props.position.x,
+                background: 'white',
+                border: '1px solid black',
+                zIndex: 99,
+                padding: '10px',
+            }}
+        >
+            {props.children}
+        </div>,
+        document.body
+    );
+};
+
+const Icon = (props: {
+    icon: string;
+    onClick?: (event: React.MouseEvent) => void;
+}) => {
+    return (
+        <div className="action" onClick={props.onClick}>
+            <span
+                style={{ fontSize: 'inherit' }}
+                className="material-symbols-outlined"
+            >
+                {props.icon}
+            </span>
+        </div>
+    );
+};
+
+const Button = () => {
+    const [position, setPosition] =
+        React.useState<{ x: number; y: number } | undefined>(undefined);
+
+    const close = () => setPosition(undefined);
+
+    const onClick = (event: React.MouseEvent) => {
+        setPosition({ x: event.pageX, y: event.pageY });
+    };
+
+    return (
+        <>
+            <Icon icon="more_vert" onClick={onClick} />
+            {position && (
+                <Popover position={position} close={close}>
+                    <div>hello</div>
+                </Popover>
+            )}
+        </>
+    );
+};
+
+const groupControlsComponents = {
+    panel_1: () => {
+        return <Icon icon="file_download" />;
+    },
+};
+
+const GroupControls = (props: IDockviewGroupControlProps) => {
+    const Component = React.useMemo(() => {
+        if (!props.isGroupActive || !props.activePanel) {
+            return null;
+        }
+
+        return groupControlsComponents[props.activePanel.id];
+    }, [props.isGroupActive, props.activePanel]);
+
+    return (
+        <div
+            className="group-control"
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '0px 8px',
+                height: '100%',
+                color: 'var(--dv-activegroup-visiblepanel-tab-color)',
+            }}
+        >
+            {props.isGroupActive && <Icon icon="star" />}
+            {Component && <Component />}
+            <Button />
+        </div>
+    );
+};
+
 export const DockviewDemo = () => {
     const onReady = (event: DockviewReadyEvent) => {
-        // event.api.addPanel({
-        //     id: 'currencies',
-        //     component: 'currencies',
-        //     title: 'Prices',
-        // });
-
-        // event.api.addPanel({
-        //     id: 'news',
-        //     component: 'news',
-        //     title: 'News',
-        // });
+        const d = localStorage.getItem('test');
 
         event.api.addPanel({
             id: 'panel_1',
@@ -175,10 +314,15 @@ export const DockviewDemo = () => {
             title: 'Panel 8',
             position: { referencePanel: 'panel_7', direction: 'within' },
         });
+
+        event.api.addEmptyGroup();
+
+        event.api.getPanel('panel_1').api.setActive();
     };
 
     return (
         <div
+            id="homepage-dockview-demo"
             style={{
                 height: '530px',
                 margin: '40px 0px',
@@ -190,6 +334,8 @@ export const DockviewDemo = () => {
             <div style={{ flexGrow: 1 }}>
                 <DockviewReact
                     components={components}
+                    defaultTabComponent={headerComponents.default}
+                    groupControlComponent={GroupControls}
                     onReady={onReady}
                     className="dockview-theme-abyss"
                 />
