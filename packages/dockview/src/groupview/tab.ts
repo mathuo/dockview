@@ -16,7 +16,6 @@ import { DragHandler } from '../dnd/abstractDragHandler';
 
 export enum MouseEventKind {
     CLICK = 'CLICK',
-    CONTEXT_MENU = 'CONTEXT_MENU',
 }
 
 export interface LayoutMouseEvent {
@@ -106,12 +105,6 @@ export class Tab extends CompositeDisposable implements ITab {
                 event.stopPropagation();
 
                 this._onChanged.fire({ kind: MouseEventKind.CLICK, event });
-            }),
-            addDisposableListener(this._element, 'contextmenu', (event) => {
-                this._onChanged.fire({
-                    kind: MouseEventKind.CONTEXT_MENU,
-                    event,
-                });
             })
         );
 

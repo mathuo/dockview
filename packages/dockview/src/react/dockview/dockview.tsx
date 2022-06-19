@@ -9,7 +9,6 @@ import { ReactPanelDeserialzier } from '../deserializer';
 import {
     DockviewDndOverlayEvent,
     GroupPanelFrameworkComponentFactory,
-    TabContextMenuEvent,
 } from '../../dockview/options';
 import { DockviewPanelApi } from '../../api/groupPanelApi';
 import { ReactPortalStore, usePortalsLifecycle } from '../react';
@@ -63,7 +62,6 @@ export interface IDockviewReactProps {
     watermarkComponent?: React.FunctionComponent<IWatermarkPanelProps>;
     onReady: (event: DockviewReadyEvent) => void;
     tabHeight?: number;
-    onTabContextMenu?: (event: TabContextMenuEvent) => void;
     onDidDrop?: (event: DockviewDropEvent) => void;
     showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
     hideBorders?: boolean;
@@ -236,24 +234,6 @@ export const DockviewReact = React.forwardRef(
                 frameworkTabComponents: props.tabComponents,
             });
         }, [props.tabComponents]);
-
-        React.useEffect(() => {
-            if (!props.onTabContextMenu || !dockviewRef.current) {
-                return () => {
-                    //noop
-                };
-            }
-
-            const disposable = dockviewRef.current.onTabContextMenu((event) => {
-                if (props.onTabContextMenu) {
-                    props.onTabContextMenu(event);
-                }
-            });
-
-            return () => {
-                disposable.dispose();
-            };
-        }, [props.onTabContextMenu]);
 
         React.useEffect(() => {
             if (!dockviewRef.current) {

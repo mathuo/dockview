@@ -1,4 +1,4 @@
-import { Emitter } from '../events';
+import { Emitter, Event } from '../events';
 import { GridviewPanelApiImpl, GridviewPanelApi } from './gridviewPanelApi';
 import { IDockviewPanel } from '../groupview/groupPanel';
 import { GroupPanel } from '../groupview/groupviewPanel';
@@ -21,6 +21,9 @@ export interface DockviewPanelApi extends Omit<GridviewPanelApi, 'setVisible'> {
     readonly isGroupActive: boolean;
     readonly title: string;
     readonly suppressClosable: boolean;
+    readonly onDidActiveGroupChange: Event<void>;
+    readonly onDidGroupChange: Event<void>;
+    readonly onDidSuppressClosableChange: Event<SuppressClosableEvent>;
     close(): void;
     setTitle(title: string): void;
 }
@@ -34,11 +37,10 @@ export class DockviewPanelApiImpl
     readonly _onDidTitleChange = new Emitter<TitleEvent>();
     readonly onDidTitleChange = this._onDidTitleChange.event;
 
-    readonly _titleChanged = new Emitter<TitleEvent>();
-    readonly titleChanged = this._titleChanged.event;
-
-    readonly _suppressClosableChanged = new Emitter<SuppressClosableEvent>();
-    readonly suppressClosableChanged = this._suppressClosableChanged.event;
+    readonly _onDidSuppressClosableChange =
+        new Emitter<SuppressClosableEvent>();
+    readonly onDidSuppressClosableChange =
+        this._onDidSuppressClosableChange.event;
 
     private readonly _onDidActiveGroupChange = new Emitter<void>();
     readonly onDidActiveGroupChange = this._onDidActiveGroupChange.event;
@@ -89,8 +91,7 @@ export class DockviewPanelApiImpl
         this.addDisposables(
             this.disposable,
             this._onDidTitleChange,
-            this._titleChanged,
-            this._suppressClosableChanged,
+            this._onDidSuppressClosableChange,
             this._onDidGroupChange,
             this._onDidActiveGroupChange
         );
