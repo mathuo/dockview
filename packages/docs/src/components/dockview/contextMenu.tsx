@@ -6,7 +6,6 @@ import {
     TabContextMenuEvent,
 } from 'dockview';
 import * as React from 'react';
-import './contextMenu.scss';
 
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
@@ -108,7 +107,7 @@ export const ContextMenuDockview = () => {
             components={components}
             tabComponents={tabComponents}
             onReady={onReady}
-            className="dockview-theme-dark"
+            className="dockview-theme-abyss"
             onTabContextMenu={onContextMenu}
         />
     );

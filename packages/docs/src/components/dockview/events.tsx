@@ -332,7 +332,7 @@ export const EventsDockview = () => {
                 <DockviewReact
                     components={components}
                     onReady={onReady}
-                    className="dockview-theme-dark"
+                    className="dockview-theme-abyss"
                 />
             </div>
 

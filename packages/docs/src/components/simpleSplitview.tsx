@@ -48,7 +48,7 @@ export const SimpleSplitview = (props: { proportional?: boolean }) => {
             proportionalLayout={props.proportional}
             onReady={onReady}
             orientation={Orientation.HORIZONTAL}
-            className="dockview-theme-dark"
+            className="dockview-theme-abyss"
         />
     );
 };

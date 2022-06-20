@@ -94,7 +94,7 @@ export const DragAndDropPaneview = () => {
                     components={components}
                     onReady={onReady}
                     onDidDrop={onDidDrop}
-                    className="dockview-theme-dark"
+                    className="dockview-theme-abyss"
                 />
             </div>
         </div>

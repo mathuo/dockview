@@ -110,7 +110,7 @@ export const SimpleDockview = () => {
         <DockviewReact
             components={components}
             onReady={onReady}
-            className="dockview-theme-dark"
+            className="dockview-theme-abyss"
         />
     );
 };

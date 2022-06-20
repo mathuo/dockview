@@ -1,0 +1,29 @@
+---
+slug: dockview-1.5.0-release
+title: Dockview 1.5.0
+tags: [release]
+---
+
+import Link from '@docusaurus/Link';
+
+# Release Notes
+
+## 🚀 Features
+
+-   Additional Themes [commit](https://github.com/mathuo/dockview/commit/1921e170e0b8275e8a10255f616119d36cff80cf)
+    -   `dockview-theme-abyss` and `dockview-theme-dracula`
+-   SVG Icons [#132](https://github.com/mathuo/dockview/pull/132)
+    -   Use inline SVG icons for the close and chevon icons to allow for easier customization and theming
+-   Dnd improvements [#136](https://github.com/mathuo/dockview/pull/136)
+    -   Components always behaviour independant of one another by default, there is no cross component dnd behaviour unless manually set by user through `onDidDrop` and `showDndOverlay` props.
+-   Default tab [#136](https://github.com/mathuo/dockview/pull/136)
+    -   Provide a default React tab implementation to allow for simple changes to tab renderer without rewritting the entire tab
+    -   Override the default tab in `ReactDockview` with the `defaultTabComponent` prop
+-   Group controls renderer [#138](https://github.com/mathuo/dockview/pull/138)
+    -   Provide the `groupControlComponent` prop in `ReactDockview` to create custom control components for groups. <Link to="../../docs/components/dockview/#group-controls-panel">Go</Link>
+
+## 🛠 Miscs
+
+-   Various doc enhancements @ [dockview.dev](https://dockview.dev)
+
+## 🔥 Breaking changes

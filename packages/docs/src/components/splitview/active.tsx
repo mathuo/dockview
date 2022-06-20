@@ -130,7 +130,7 @@ export const SplitviewExample1 = (props: { proportional?: boolean }) => {
                     proportionalLayout={props.proportional}
                     onReady={onReady}
                     orientation={Orientation.HORIZONTAL}
-                    className="dockview-theme-dark"
+                    className="dockview-theme-abyss"
                 />
             </div>
             <div style={{ height: '20px', display: 'flex' }}>
