@@ -4,19 +4,10 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Sun, 12 Jun 2022 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Thu, 26 May 2022 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
-        <item>
-            <title><![CDATA[Dockview 1.5.0]]></title>
-            <link>https://dockview.dev/blog/dockview-1.5.0-release</link>
-            <guid>dockview-1.5.0-release</guid>
-            <pubDate>Sun, 12 Jun 2022 00:00:00 GMT</pubDate>
-            <description><![CDATA[🚀 Features]]></description>
-            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_mojV" id="-features">🚀 Features<a class="hash-link" href="#-features" title="Direct link to heading">​</a></h2><ul><li>Additional Themes <a href="https://github.com/mathuo/dockview/commit/1921e170e0b8275e8a10255f616119d36cff80cf" target="_blank" rel="noopener noreferrer">commit</a><ul><li><code>dockview-theme-abyss</code> and <code>dockview-theme-dracula</code></li></ul></li><li>SVG Icons <a href="https://github.com/mathuo/dockview/pull/132" target="_blank" rel="noopener noreferrer">#132</a><ul><li>Use inline SVG icons for the close and chevon icons to allow for easier customization and theming</li></ul></li><li>Dnd improvements <a href="https://github.com/mathuo/dockview/pull/136" target="_blank" rel="noopener noreferrer">#136</a><ul><li>Components always behaviour independant of one another by default, there is no cross component dnd behaviour unless manually set by user through <code>onDidDrop</code> and <code>showDndOverlay</code> props.</li></ul></li><li>Default tab <a href="https://github.com/mathuo/dockview/pull/136" target="_blank" rel="noopener noreferrer">#136</a><ul><li>Provide a default React tab implementation to allow for simple changes to tab renderer without rewritting the entire tab</li><li>Override the default tab in <code>ReactDockview</code> with the <code>defaultTabComponent</code> prop</li></ul></li><li>Group controls renderer <a href="https://github.com/mathuo/dockview/pull/138" target="_blank" rel="noopener noreferrer">#138</a><ul><li>Provide the <code>groupControlComponent</code> prop in <code>ReactDockview</code> to create custom control components for groups. <a href="/docs/components/dockview/#group-controls-panel">Go</a></li></ul></li></ul><h2 class="anchor anchorWithStickyNavbar_mojV" id="-miscs">🛠 Miscs<a class="hash-link" href="#-miscs" title="Direct link to heading">​</a></h2><ul><li>Various doc enhancements @ <a href="https://dockview.dev" target="_blank" rel="noopener noreferrer">dockview.dev</a></li></ul><h2 class="anchor anchorWithStickyNavbar_mojV" id="-breaking-changes">🔥 Breaking changes<a class="hash-link" href="#-breaking-changes" title="Direct link to heading">​</a></h2>]]></content:encoded>
-            <category>release</category>
-        </item>
         <item>
             <title><![CDATA[Dockview 1.4.3]]></title>
             <link>https://dockview.dev/blog/dockview-1.4.3-release</link>
