@@ -28,7 +28,7 @@ export class DockviewGroupPanel
     private _suppressClosable: boolean;
 
     get params() {
-        return this._params?.params;
+        return this._params;
     }
 
     get title() {
