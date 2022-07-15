@@ -14,7 +14,6 @@ export interface IRenderable {
 
 export interface HeaderPartInitParameters {
     title: string;
-    suppressClosable?: boolean;
 }
 
 export interface GroupPanelPartInitParameters

@@ -40,11 +40,7 @@ export {
     GridviewPanelApi,
     GridConstraintChangeEvent,
 } from './api/gridviewPanelApi';
-export {
-    TitleEvent,
-    SuppressClosableEvent,
-    DockviewPanelApi,
-} from './api/groupPanelApi';
+export { TitleEvent, DockviewPanelApi } from './api/groupPanelApi';
 export {
     PanelSizeEvent,
     PanelConstraintChangeEvent,

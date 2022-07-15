@@ -144,10 +144,6 @@ export class TestPanel implements IDockviewPanel {
         return '';
     }
 
-    get suppressClosable() {
-        return false;
-    }
-
     get group() {
         return this._group!;
     }

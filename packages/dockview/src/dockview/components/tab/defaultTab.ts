@@ -81,14 +81,10 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         this.params = params;
         this._content.textContent = params.title;
 
-        if (!this.params.suppressClosable) {
-            addDisposableListener(this.action, 'click', (ev) => {
-                ev.preventDefault(); //
-                this.params.api.close();
-            });
-        } else {
-            this.action.classList.add('disable-close');
-        }
+        addDisposableListener(this.action, 'click', (ev) => {
+            ev.preventDefault(); //
+            this.params.api.close();
+        });
     }
 
     public updateParentGroup(group: GroupPanel, isPanelVisible: boolean) {

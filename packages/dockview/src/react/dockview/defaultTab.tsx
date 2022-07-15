@@ -29,7 +29,7 @@ export const DockviewDefaultTab: React.FunctionComponent<IDockviewDefaultTabProp
         const iconClassname = React.useMemo(() => {
             const cn = ['dockview-react-tab-action'];
             return cn.join(',');
-        }, [api.suppressClosable]);
+        }, []);
 
         return (
             <div {...rest} onClick={onClick} className="dockview-react-tab">

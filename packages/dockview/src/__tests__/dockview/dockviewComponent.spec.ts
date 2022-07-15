@@ -144,7 +144,6 @@ class TestGroupPanel implements IDockviewPanel {
     private _group: GroupPanel | undefined;
 
     readonly view: IGroupPanelView;
-    readonly suppressClosable: boolean = false;
     readonly api: DockviewPanelApi;
 
     constructor(
