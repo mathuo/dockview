@@ -112,4 +112,26 @@ describe('dockviewGroupPanel', () => {
 
         expect(view.dispose).toHaveBeenCalled();
     });
+
+    test('get params', () => {
+        const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
+            return {} as any;
+        });
+        const accessorMock = jest.fn<DockviewComponent, []>(() => {
+            return {} as any;
+        });
+        const groupMock = jest.fn<GroupPanel, []>(() => {
+            return {} as any;
+        });
+        const api = new dockviewApiMock();
+        const accessor = new accessorMock();
+        const group = new groupMock();
+        const cut = new DockviewGroupPanel('fake-id', accessor, api, group);
+
+        expect(cut.params).toEqual(undefined);
+
+        cut.update({ params: { params: { variableA: 'A', variableB: 'B' } } });
+
+        expect(cut.params).toEqual({ variableA: 'A', variableB: 'B' });
+    });
 });
