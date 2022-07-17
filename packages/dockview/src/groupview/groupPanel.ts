@@ -19,7 +19,6 @@ export interface IGroupPanelInitParameters
 export type GroupPanelUpdateEvent = PanelUpdateEvent<{
     params?: Parameters;
     title?: string;
-    suppressClosable?: boolean;
 }>;
 
 export interface IDockviewPanel extends IDisposable, IPanel {
@@ -27,7 +26,6 @@ export interface IDockviewPanel extends IDisposable, IPanel {
     readonly group: GroupPanel;
     readonly api: DockviewPanelApi;
     readonly title: string;
-    readonly suppressClosable: boolean;
     readonly params: Record<string, any> | undefined;
     updateParentGroup(group: GroupPanel, isGroupActive: boolean): void;
     init(params: IGroupPanelInitParameters): void;
@@ -40,5 +38,4 @@ export interface GroupviewPanelState {
     view?: any;
     title: string;
     params?: { [key: string]: any };
-    suppressClosable?: boolean;
 }

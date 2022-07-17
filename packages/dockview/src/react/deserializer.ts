@@ -19,7 +19,6 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
         const panelId = panelData.id;
         const params = panelData.params;
         const title = panelData.title;
-        const suppressClosable = panelData.suppressClosable;
         const viewData = panelData.view;
 
         let tab: ITabRenderer;
@@ -67,7 +66,6 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
         panel.init({
             view,
             title,
-            suppressClosable,
             params: params || {},
         });
 

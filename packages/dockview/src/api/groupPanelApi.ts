@@ -8,10 +8,6 @@ export interface TitleEvent {
     readonly title: string;
 }
 
-export interface SuppressClosableEvent {
-    readonly suppressClosable: boolean;
-}
-
 /*
  * omit visibility modifiers since the visibility of a single group doesn't make sense
  * because it belongs to a groupview
@@ -20,10 +16,8 @@ export interface DockviewPanelApi extends Omit<GridviewPanelApi, 'setVisible'> {
     readonly group: GroupPanel;
     readonly isGroupActive: boolean;
     readonly title: string;
-    readonly suppressClosable: boolean;
     readonly onDidActiveGroupChange: Event<void>;
     readonly onDidGroupChange: Event<void>;
-    readonly onDidSuppressClosableChange: Event<SuppressClosableEvent>;
     close(): void;
     setTitle(title: string): void;
 }
@@ -37,11 +31,6 @@ export class DockviewPanelApiImpl
     readonly _onDidTitleChange = new Emitter<TitleEvent>();
     readonly onDidTitleChange = this._onDidTitleChange.event;
 
-    readonly _onDidSuppressClosableChange =
-        new Emitter<SuppressClosableEvent>();
-    readonly onDidSuppressClosableChange =
-        this._onDidSuppressClosableChange.event;
-
     private readonly _onDidActiveGroupChange = new Emitter<void>();
     readonly onDidActiveGroupChange = this._onDidActiveGroupChange.event;
 
@@ -52,10 +41,6 @@ export class DockviewPanelApiImpl
 
     get title() {
         return this.panel.title;
-    }
-
-    get suppressClosable() {
-        return !!this.panel.suppressClosable;
     }
 
     get isGroupActive() {
@@ -91,7 +76,6 @@ export class DockviewPanelApiImpl
         this.addDisposables(
             this.disposable,
             this._onDidTitleChange,
-            this._onDidSuppressClosableChange,
             this._onDidGroupChange,
             this._onDidActiveGroupChange
         );

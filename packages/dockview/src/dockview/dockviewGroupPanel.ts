@@ -25,7 +25,6 @@ export class DockviewGroupPanel
     private _view?: IGroupPanelView;
 
     private _title: string;
-    private _suppressClosable: boolean;
 
     get params() {
         return this._params;
@@ -33,10 +32,6 @@ export class DockviewGroupPanel
 
     get title() {
         return this._title;
-    }
-
-    get suppressClosable() {
-        return this._suppressClosable;
     }
 
     get group(): GroupPanel {
@@ -54,7 +49,6 @@ export class DockviewGroupPanel
         group: GroupPanel
     ) {
         super();
-        this._suppressClosable = false;
         this._title = '';
         this._group = group;
 
@@ -72,7 +66,6 @@ export class DockviewGroupPanel
         this._view = params.view;
 
         this.setTitle(params.title);
-        this.setSuppressClosable(params.suppressClosable || false);
 
         this.view?.init({
             ...params,
@@ -93,7 +86,6 @@ export class DockviewGroupPanel
                 Object.keys(this._params || {}).length > 0
                     ? this._params
                     : undefined,
-            suppressClosable: this.suppressClosable || undefined,
             title: this.title,
         };
     }
@@ -108,30 +100,9 @@ export class DockviewGroupPanel
                 params: {
                     params: this._params,
                     title: this.title,
-                    suppressClosable: this.suppressClosable,
                 },
             });
             this.api._onDidTitleChange.fire({ title });
-        }
-    }
-
-    setSuppressClosable(suppressClosable: boolean) {
-        const didSuppressChangableClose =
-            suppressClosable !== this._params?.suppressClosable;
-
-        if (didSuppressChangableClose) {
-            this._suppressClosable = suppressClosable;
-
-            this.view?.update({
-                params: {
-                    params: this._params,
-                    title: this.title,
-                    suppressClosable: this.suppressClosable,
-                },
-            });
-            this.api._onDidSuppressClosableChange.fire({
-                suppressClosable: !!this.suppressClosable,
-            });
         }
     }
 
@@ -150,20 +121,10 @@ export class DockviewGroupPanel
             }
         }
 
-        if (typeof params.suppressClosable === 'boolean') {
-            if (params.suppressClosable !== this._suppressClosable) {
-                this._suppressClosable = params.suppressClosable;
-                this.api._onDidSuppressClosableChange.fire({
-                    suppressClosable: !!this.suppressClosable,
-                });
-            }
-        }
-
         this.view?.update({
             params: {
                 params: this._params,
                 title: this.title,
-                suppressClosable: this.suppressClosable,
             },
         });
     }

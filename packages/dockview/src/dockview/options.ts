@@ -76,7 +76,6 @@ export interface PanelOptions {
     params?: { [key: string]: any };
     id: string;
     title?: string;
-    suppressClosable?: boolean;
 }
 
 export interface AddPanelOptions

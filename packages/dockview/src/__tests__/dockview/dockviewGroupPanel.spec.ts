@@ -41,46 +41,6 @@ describe('dockviewGroupPanel', () => {
         disposable.dispose();
     });
 
-    test('update suppress closable', () => {
-        const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
-            return {} as any;
-        });
-        const accessorMock = jest.fn<DockviewComponent, []>(() => {
-            return {} as any;
-        });
-        const groupMock = jest.fn<GroupPanel, []>(() => {
-            return {} as any;
-        });
-        const api = new dockviewApiMock();
-        const accessor = new accessorMock();
-        const group = new groupMock();
-
-        const cut = new DockviewGroupPanel('fake-id', accessor, api, group);
-
-        let latestSuppressClosable: boolean | undefined = undefined;
-
-        const disposable = cut.api.onDidSuppressClosableChange((event) => {
-            latestSuppressClosable = event.suppressClosable;
-        });
-
-        expect(latestSuppressClosable).toBeFalsy();
-
-        cut.init({
-            title: 'new title',
-            suppressClosable: true,
-            params: {},
-            view: null,
-        });
-        expect(latestSuppressClosable).toBeTruthy();
-        expect(cut.suppressClosable).toBeTruthy();
-
-        cut.update({ params: { suppressClosable: false } });
-        expect(latestSuppressClosable).toBeFalsy();
-        expect(cut.suppressClosable).toBeFalsy();
-
-        disposable.dispose();
-    });
-
     test('dispose cleanup', () => {
         const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
             return {} as any;

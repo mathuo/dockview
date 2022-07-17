@@ -731,7 +731,6 @@ export class DockviewComponent
       panel.init({
           view,
           title: options.title || options.id,
-          suppressClosable: options?.suppressClosable,
           params: options?.params || {},
       });
 
