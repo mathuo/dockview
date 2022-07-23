@@ -1,0 +1,21 @@
+---
+slug: dockview-1.5.1-release
+title: Dockview 1.5.1
+tags: [release]
+---
+
+import Link from '@docusaurus/Link';
+
+# Release Notes
+
+## 🚀 Features
+
+## 🛠 Miscs
+
+-   Fix `.params` method on dockview panels to return the user provided panel params [#144](https://github.com/mathuo/dockview/pull/144)
+-   Various doc enhancements @ [dockview.dev](https://dockview.dev)
+
+## 🔥 Breaking changes
+
+-   Remove `onTabContextMenu` from `DockviewReact` to simplify library. As an alternative provide onContextMenu listeners in a custom tab. [#127](https://github.com/mathuo/dockview/pull/127)
+-   Remove `suppressClosable` flag for `DockviewReact` panels to simplify library. As an alternative manage the features of a tab such as it's ability to be closed using a custom tab [#146](https://github.com/mathuo/dockview/pull/146)
