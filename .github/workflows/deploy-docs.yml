@@ -21,15 +21,15 @@ jobs:
             - uses: actions/cache@v2
               with:
                   path: ~/.npm
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/package.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-node-
 
-            - run: yarn install
+            - run: npm install
             - run: lerna bootstrap
-            - run: yarn build
+            - run: npm build
               working-directory: packages/dockview
-            - run: yarn build
+            - run: npm build
               working-directory: packages/docs
             - run: npm run deploy-docs
               working-directory: packages/docs
