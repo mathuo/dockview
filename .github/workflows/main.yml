@@ -25,7 +25,8 @@ jobs:
 
             - run: npm install
             - run: npm run bootstrap
-            - run: npm run build
+              working-directory: packages/dockview
+            - run: npm build
             - run: npm run test:cov
             - name: SonarCloud Scan
               uses: SonarSource/sonarcloud-github-action@master
