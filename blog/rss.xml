@@ -4,10 +4,19 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Sun, 12 Jun 2022 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Sat, 23 Jul 2022 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 1.5.1]]></title>
+            <link>https://dockview.dev/blog/dockview-1.5.1-release</link>
+            <guid>dockview-1.5.1-release</guid>
+            <pubDate>Sat, 23 Jul 2022 00:00:00 GMT</pubDate>
+            <description><![CDATA[🚀 Features]]></description>
+            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_mojV" id="-features">🚀 Features<a class="hash-link" href="#-features" title="Direct link to heading">​</a></h2><h2 class="anchor anchorWithStickyNavbar_mojV" id="-miscs">🛠 Miscs<a class="hash-link" href="#-miscs" title="Direct link to heading">​</a></h2><ul><li>Fix <code>.params</code> method on dockview panels to return the user provided panel params <a href="https://github.com/mathuo/dockview/pull/144" target="_blank" rel="noopener noreferrer">#144</a></li><li>Various doc enhancements @ <a href="https://dockview.dev" target="_blank" rel="noopener noreferrer">dockview.dev</a></li></ul><h2 class="anchor anchorWithStickyNavbar_mojV" id="-breaking-changes">🔥 Breaking changes<a class="hash-link" href="#-breaking-changes" title="Direct link to heading">​</a></h2><ul><li>Remove <code>onTabContextMenu</code> from <code>DockviewReact</code> to simplify library. As an alternative provide onContextMenu listeners in a custom tab. <a href="https://github.com/mathuo/dockview/pull/127" target="_blank" rel="noopener noreferrer">#127</a></li><li>Remove <code>suppressClosable</code> flag for <code>DockviewReact</code> panels to simplify library. As an alternative manage the features of a tab such as it's ability to be closed using a custom tab <a href="https://github.com/mathuo/dockview/pull/146" target="_blank" rel="noopener noreferrer">#146</a></li></ul>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 1.5.0]]></title>
             <link>https://dockview.dev/blog/dockview-1.5.0-release</link>
