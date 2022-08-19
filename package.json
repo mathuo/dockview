@@ -1,12 +1,20 @@
 {
   "name": "dockview-monorepo-root",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "nohoist": [
+    "**/babel-jest",
+    "**/babel-jest/**"
+  ],
   "description": "Monorepo for https://github.com/mathuo/dockview",
   "scripts": {
     "test": "jest",
     "lint": "eslint packages/**/src/** --ext .ts,.tsx,.js,.jsx",
     "package": "node scripts/package.js",
     "package-all": "lerna run docs --scope dockview && node scripts/package.js",
+    "build": "lerna run build --scope dockview",
     "clean": "lerna run clean",
     "bootstrap": "lerna bootstrap",
     "test:cov": "jest --coverage",

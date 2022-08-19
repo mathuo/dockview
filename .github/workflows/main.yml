@@ -19,14 +19,13 @@ jobs:
             - uses: actions/cache@v2
               with:
                   path: ~/.npm
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/package.lock') }}
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-node-
 
-            - run: npm install
+            - run: yarn
             - run: npm run bootstrap
-              working-directory: packages/dockview
-            - run: npm build
+            - run: npm run build
             - run: npm run test:cov
             - name: SonarCloud Scan
               uses: SonarSource/sonarcloud-github-action@master
