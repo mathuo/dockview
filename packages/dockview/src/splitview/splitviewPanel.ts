@@ -31,8 +31,12 @@ export abstract class SplitviewPanel
 
     private _orientation?: Orientation;
 
-    private readonly _onDidChange = new Emitter<number | undefined>();
-    readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
+    private readonly _onDidChange = new Emitter<{
+        size?: number;
+        orthogonalSize?: number;
+    }>();
+    readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
+        this._onDidChange.event;
 
     get priority(): LayoutPriority | undefined {
         return this._priority;
@@ -108,7 +112,7 @@ export abstract class SplitviewPanel
                 this.updateConstraints();
             }),
             this.api.onDidSizeChange((event) => {
-                this._onDidChange.fire(event.size);
+                this._onDidChange.fire({ size: event.size });
             })
         );
     }

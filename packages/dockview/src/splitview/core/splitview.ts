@@ -51,7 +51,7 @@ export interface IBaseView {
 
 export interface IView extends IBaseView {
     readonly element: HTMLElement | DocumentFragment;
-    readonly onDidChange: Event<number | undefined>;
+    readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }>;
     layout(size: number, orthogonalSize: number): void;
     setVisible(visible: boolean): void;
 }
@@ -364,7 +364,7 @@ export class Splitview {
         }
 
         const disposable = view.onDidChange((newSize) =>
-            this.onDidChange(viewItem, newSize)
+            this.onDidChange(viewItem, newSize.size)
         );
 
         const dispose = () => {
