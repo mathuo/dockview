@@ -14,7 +14,10 @@ class Testview implements IView {
     private _orthogonalSize = 0;
     private _priority: LayoutPriority | undefined;
 
-    private readonly _onDidChange = new Emitter<number | undefined>();
+    private readonly _onDidChange = new Emitter<{
+        size?: number;
+        orthogonalSize?: number;
+    }>();
     readonly onDidChange = this._onDidChange.event;
 
     private readonly _onLayoutCalled = new Emitter<void>();
@@ -62,7 +65,7 @@ class Testview implements IView {
         this._onLayoutCalled.fire();
     }
 
-    fireChangeEvent(value: number | undefined) {
+    fireChangeEvent(value: { size?: number; orthogonalSize?: number }) {
         this._onDidChange.fire(value);
     }
 
@@ -288,17 +291,17 @@ describe('splitview', () => {
         expect(view1.size).toBe(100);
         expect(view2.size).toBe(100);
 
-        view1.fireChangeEvent(65);
+        view1.fireChangeEvent({ size: 65 });
 
         expect(view1.size).toBe(65);
         expect(view2.size).toBe(135);
 
-        view2.fireChangeEvent(75);
+        view2.fireChangeEvent({ size: 75 });
 
         expect(view1.size).toBe(125);
         expect(view2.size).toBe(75);
 
-        view2.fireChangeEvent(undefined);
+        view2.fireChangeEvent({});
 
         expect(view1.size).toBe(125);
         expect(view2.size).toBe(75);

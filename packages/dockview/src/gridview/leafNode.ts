@@ -13,8 +13,12 @@ import { IGridView } from './gridview';
 import { IDisposable } from '../lifecycle';
 
 export class LeafNode implements IView {
-    private readonly _onDidChange = new Emitter<number | undefined>();
-    readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
+    private readonly _onDidChange = new Emitter<{
+        size?: number;
+        orthogonalSize?: number;
+    }>();
+    readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
+        this._onDidChange.event;
     private _size: number;
     private _orthogonalSize: number;
     private _disposable: IDisposable;
@@ -102,13 +106,18 @@ export class LeafNode implements IView {
 
         this._disposable = this.view.onDidChange((event) => {
             if (event) {
-                this._onDidChange.fire(
-                    this.orientation === Orientation.VERTICAL
-                        ? event.width
-                        : event.height
-                );
+                this._onDidChange.fire({
+                    size:
+                        this.orientation === Orientation.VERTICAL
+                            ? event.width
+                            : event.height,
+                    orthogonalSize:
+                        this.orientation === Orientation.VERTICAL
+                            ? event.height
+                            : event.width,
+                });
             } else {
-                this._onDidChange.fire(undefined);
+                this._onDidChange.fire({});
             }
         });
     }
@@ -116,7 +125,7 @@ export class LeafNode implements IView {
     public setVisible(visible: boolean) {
         if (this.view.setVisible) {
             this.view.setVisible(visible);
-            this._onDidChange.fire(undefined);
+            this._onDidChange.fire({});
         }
     }
 

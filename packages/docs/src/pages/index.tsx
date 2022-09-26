@@ -67,8 +67,8 @@ export default function Home(): JSX.Element {
     const { siteConfig } = useDocusaurusContext();
     return (
         <Layout
-            title={`${siteConfig.title}`}
-            description="A zero dependency layout mananger for React."
+            title={`${siteConfig.tagline}`}
+            description={`${siteConfig.description}`}
         >
             <HomepageHeader2 />
             <main className="container">

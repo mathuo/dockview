@@ -24,8 +24,12 @@ export class BranchNode extends CompositeDisposable implements IView {
     private _size: number;
     public readonly children: Node[] = [];
 
-    private readonly _onDidChange = new Emitter<number | undefined>();
-    readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
+    private readonly _onDidChange = new Emitter<{
+        size?: number;
+        orthogonalSize?: number;
+    }>();
+    readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
+        this._onDidChange.event;
 
     get width(): number {
         return this.orientation === Orientation.HORIZONTAL
@@ -157,7 +161,7 @@ export class BranchNode extends CompositeDisposable implements IView {
         this.addDisposables(
             this._onDidChange,
             this.splitview.onDidSashEnd(() => {
-                this._onDidChange.fire(undefined);
+                this._onDidChange.fire({});
             })
         );
 
@@ -282,12 +286,12 @@ export class BranchNode extends CompositeDisposable implements IView {
 
         this._childrenDisposable = Event.any(
             ...this.children.map((c) => c.onDidChange)
-        )(() => {
+        )((e) => {
             /**
              * indicate a change has occured to allows any re-rendering but don't bubble
              * event because that was specific to this branch
              */
-            this._onDidChange.fire(undefined);
+            this._onDidChange.fire({ size: e.orthogonalSize });
         });
     }
 

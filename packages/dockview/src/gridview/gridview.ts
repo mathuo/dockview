@@ -269,8 +269,12 @@ export class Gridview implements IDisposable {
     public readonly element: HTMLElement;
     private disposable: MutableDisposable = new MutableDisposable();
 
-    private readonly _onDidChange = new Emitter<number | undefined>();
-    readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
+    private readonly _onDidChange = new Emitter<{
+        size?: number;
+        orthogonalSize?: number;
+    }>();
+    readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
+        this._onDidChange.event;
 
     public serialize() {
         const root = serializeBranchNode(this.getView(), this.orientation);

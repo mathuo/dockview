@@ -150,6 +150,32 @@ const MyComponent = (props: IDockviewPanelProps<{ title: string }>) => {
 
 ## Advanced Features
 
+### Resizing via API
+
+Each Dockview is comprised of a number of groups, each of which have a number of panels.
+Logically most people would want to resize a panel but practically this really translates to resizing the group to which the panel belongs.
+
+From the api you can access the panels group object (`props.group`) which exposes it's own api object (`props.groups.api`).
+This api is largly similar to the <Link to="./gridview/#gridview-panel-api">Gridview API</Link>.
+
+To resize an individual panel you could create a snippet similar to below.
+
+```tsx
+const onResizePanel = () => {
+    props.api.group.api.setSize({
+        height: 100,
+    });
+};
+```
+
+```tsx
+const onResizePanel = () => {
+    props.api.group.api.setSize({
+        width: 100,
+    });
+};
+```
+
 ### Locked group
 
 Locking a group will disable all drop events for this group ensuring a user can not add additional panels to the group.

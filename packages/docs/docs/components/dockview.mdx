@@ -12,6 +12,7 @@ import { EventsDockview } from '@site/src/components/dockview/events';
 import { ContextMenuDockview } from '@site/src/components/dockview/contextMenu';
 import { NestedDockview } from '@site/src/components/dockview/nested';
 import { CustomHeadersDockview } from '@site/src/components/dockview/customHeaders';
+import { ResizeDockview } from '@site/src/components/dockview/resize';
 import Link from '@docusaurus/Link';
 
 # Dockview
@@ -149,6 +150,36 @@ const MyComponent = (props: IDockviewPanelProps<{ title: string }>) => {
 | setTitle               | `(title: string): void`                                     |                 |
 
 ## Advanced Features
+
+### Resizing via API
+
+Each Dockview is comprised of a number of groups, each of which have a number of panels.
+Logically most people would want to resize a panel but practically this really translates to resizing the group to which the panel belongs.
+
+From the api you can access the panels group object (`props.group`) which exposes it's own api object (`props.groups.api`).
+This api is largly similar to the <Link to="./gridview/#gridview-panel-api">Gridview API</Link>.
+
+To resize an individual panel you could create a snippet similar to below.
+
+```tsx
+const onResizePanel = () => {
+    props.api.group.api.setSize({
+        height: 100,
+    });
+};
+```
+
+```tsx
+const onResizePanel = () => {
+    props.api.group.api.setSize({
+        width: 100,
+    });
+};
+```
+
+Here is a working example of resizing panels via these API methods.
+
+<ResizeDockview />
 
 ### Locked group
 

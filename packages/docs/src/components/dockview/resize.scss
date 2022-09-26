@@ -1,0 +1,23 @@
+.resize-panel {
+    padding: 10px;
+    color: white;
+
+    .resize-control {
+        display: flex;
+        height: 18px;
+        line-height: 18px;
+        font-size: 13px;
+
+        span {
+            width: 60px;
+        }
+
+        input {
+            width: 75px;
+        }
+
+        button {
+            width: 50px;
+        }
+    }
+}

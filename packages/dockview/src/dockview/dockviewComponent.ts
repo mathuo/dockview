@@ -697,6 +697,8 @@ export class DockviewComponent
                     this._onDidDrop.fire({ ...event, api: this._api, group: view });
                 }),
                 view.model.onDidAddPanel((event) => {
+
+
                   this._onDidAddPanel.fire(event.panel);
                 }),
                 view.model.onDidRemovePanel((event) => {

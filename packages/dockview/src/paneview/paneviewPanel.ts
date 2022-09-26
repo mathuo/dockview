@@ -69,8 +69,12 @@ export abstract class PaneviewPanel
         { replay: true }
     );
     onDidChangeExpansionState = this._onDidChangeExpansionState.event;
-    private readonly _onDidChange = new Emitter<number | undefined>();
-    readonly onDidChange: Event<number | undefined> = this._onDidChange.event;
+    private readonly _onDidChange = new Emitter<{
+        size?: number;
+        orthogonalSize?: number;
+    }>();
+    readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
+        this._onDidChange.event;
 
     private headerSize = 22;
     private _orthogonalSize = 0;
@@ -171,7 +175,7 @@ export abstract class PaneviewPanel
 
         this.addDisposables(
             this.api.onDidSizeChange((event) => {
-                this._onDidChange.fire(event.size);
+                this._onDidChange.fire({ size: event.size });
             }),
             addDisposableListener(
                 this.element,
@@ -243,7 +247,7 @@ export abstract class PaneviewPanel
             }, 200);
         }
 
-        this._onDidChange.fire(expanded ? this.width : undefined);
+        this._onDidChange.fire(expanded ? { size: this.width } : {});
         this._onDidChangeExpansionState.fire(expanded);
     }
 
