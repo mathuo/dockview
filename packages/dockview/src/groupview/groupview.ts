@@ -652,9 +652,8 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 }
             });
 
-            this.contentContainer.hide();
             this.tabsContainer.hide();
-            this.container.appendChild(this.watermark.element);
+            this.contentContainer.element.appendChild(this.watermark.element);
 
             this.watermark.updateParentGroup(this.parent, true);
         }
@@ -662,7 +661,6 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             this.watermark.element.remove();
             this.watermark.dispose();
             this.watermark = undefined;
-            this.contentContainer.show();
             this.tabsContainer.show();
         }
     }
