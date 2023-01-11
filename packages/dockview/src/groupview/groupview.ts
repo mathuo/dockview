@@ -1,5 +1,5 @@
 import { DockviewApi } from '../api/component.api';
-import { getPanelData, PanelTransfer } from '../dnd/dataTransfer';
+import { getGroupData, getPanelData, PanelTransfer } from '../dnd/dataTransfer';
 import { Droptarget, Position } from '../dnd/droptarget';
 import { DockviewComponent } from '../dockview/dockviewComponent';
 import { isAncestor, toggleClass } from '../dom';
@@ -38,7 +38,7 @@ export interface IGroupItem {
 
 interface GroupMoveEvent {
     groupId: string;
-    itemId: string;
+    itemId?: string;
     target: Position;
     index?: number;
 }
@@ -243,6 +243,16 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             canDisplayOverlay: (event, quadrant) => {
                 if (this.locked && !quadrant) {
                     return false;
+                }
+
+                const group = getGroupData();
+
+                if (
+                    group &&
+                    group.viewId === this.accessor.id &&
+                    group.groupId !== this.id
+                ) {
+                    return true;
                 }
 
                 const data = getPanelData();
@@ -685,6 +695,18 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         position: Position,
         index?: number
     ): void {
+        const groupData = getGroupData();
+
+        if (groupData) {
+            const { groupId } = groupData;
+            this._onMove.fire({
+                target: position,
+                groupId: groupId,
+                index,
+            });
+            return;
+        }
+
         const data = getPanelData();
 
         if (data) {

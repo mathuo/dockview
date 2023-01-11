@@ -14,12 +14,12 @@ export abstract class DragHandler extends CompositeDisposable {
 
     private iframes: HTMLElement[] = [];
 
-    constructor(private readonly el: HTMLElement) {
+    constructor(protected readonly el: HTMLElement) {
         super();
         this.configure();
     }
 
-    abstract getData(): IDisposable;
+    abstract getData(dataTransfer?: DataTransfer | null): IDisposable;
 
     private configure() {
         this.addDisposables(
@@ -37,7 +37,7 @@ export abstract class DragHandler extends CompositeDisposable {
                 this.el.classList.add('dragged');
                 setTimeout(() => this.el.classList.remove('dragged'), 0);
 
-                this.disposable.value = this.getData();
+                this.disposable.value = this.getData(event.dataTransfer);
 
                 if (event.dataTransfer) {
                     event.dataTransfer.effectAllowed = 'move';
