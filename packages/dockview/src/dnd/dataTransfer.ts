@@ -8,16 +8,7 @@ export class PanelTransfer extends TransferObject {
     constructor(
         public readonly viewId: string,
         public readonly groupId: string,
-        public readonly panelId: string
-    ) {
-        super();
-    }
-}
-
-export class GroupTransfer extends TransferObject {
-    constructor(
-        public readonly viewId: string,
-        public readonly groupId: string
+        public readonly panelId: string | null
     ) {
         super();
     }
@@ -85,17 +76,6 @@ export function getPanelData(): PanelTransfer | undefined {
     }
 
     return panelTransfer.getData(PanelTransfer.prototype)![0];
-}
-
-export function getGroupData(): GroupTransfer | undefined {
-    const panelTransfer = LocalSelectionTransfer.getInstance<GroupTransfer>();
-    const isPanelEvent = panelTransfer.hasData(GroupTransfer.prototype);
-
-    if (!isPanelEvent) {
-        return undefined;
-    }
-
-    return panelTransfer.getData(GroupTransfer.prototype)![0];
 }
 
 export function getPaneData(): PaneTransfer | undefined {

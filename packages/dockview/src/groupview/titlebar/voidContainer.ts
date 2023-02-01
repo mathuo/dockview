@@ -2,8 +2,8 @@ import { last } from '../../array';
 import { DragHandler } from '../../dnd/abstractDragHandler';
 import {
     getPanelData,
-    GroupTransfer,
     LocalSelectionTransfer,
+    PanelTransfer,
 } from '../../dnd/dataTransfer';
 import { Droptarget, DroptargetEvent } from '../../dnd/droptarget';
 import { addGhostImage } from '../../dnd/ghost';
@@ -15,7 +15,7 @@ import { GroupPanel } from '../groupviewPanel';
 
 class CustomDragHandler extends DragHandler {
     private readonly panelTransfer =
-        LocalSelectionTransfer.getInstance<GroupTransfer>();
+        LocalSelectionTransfer.getInstance<PanelTransfer>();
 
     constructor(
         element: HTMLElement,
@@ -27,8 +27,8 @@ class CustomDragHandler extends DragHandler {
 
     getData(dataTransfer: DataTransfer | null): IDisposable {
         this.panelTransfer.setData(
-            [new GroupTransfer(this.accessorId, this.group.id)],
-            GroupTransfer.prototype
+            [new PanelTransfer(this.accessorId, this.group.id, null)],
+            PanelTransfer.prototype
         );
 
         const style = window.getComputedStyle(this.el);
@@ -58,7 +58,7 @@ class CustomDragHandler extends DragHandler {
 
         return {
             dispose: () => {
-                this.panelTransfer.clearData(GroupTransfer.prototype);
+                this.panelTransfer.clearData(PanelTransfer.prototype);
             },
         };
     }
