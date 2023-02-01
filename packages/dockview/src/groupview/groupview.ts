@@ -1,5 +1,5 @@
 import { DockviewApi } from '../api/component.api';
-import { getGroupData, getPanelData, PanelTransfer } from '../dnd/dataTransfer';
+import { getPanelData, PanelTransfer } from '../dnd/dataTransfer';
 import { Droptarget, Position } from '../dnd/droptarget';
 import { DockviewComponent } from '../dockview/dockviewComponent';
 import { isAncestor, toggleClass } from '../dom';
@@ -247,17 +247,17 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                     return false;
                 }
 
-                const group = getGroupData();
+                const data = getPanelData();
 
                 if (
-                    group &&
-                    group.viewId === this.accessor.id &&
-                    group.groupId !== this.id
+                    data &&
+                    data.panelId === null &&
+                    data.viewId === this.accessor.id &&
+                    data.groupId !== this.id
                 ) {
+                    // prevent dropping on self for group dnd
                     return true;
                 }
-
-                const data = getPanelData();
 
                 if (data && data.viewId === this.accessor.id) {
                     const groupHasOnePanelAndIsActiveDragElement =
@@ -700,21 +700,19 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         position: Position,
         index?: number
     ): void {
-        const groupData = getGroupData();
-
-        if (groupData) {
-            const { groupId } = groupData;
-            this._onMove.fire({
-                target: position,
-                groupId: groupId,
-                index,
-            });
-            return;
-        }
-
         const data = getPanelData();
 
         if (data) {
+            if (data.panelId === null) {
+                const { groupId } = data;
+                this._onMove.fire({
+                    target: position,
+                    groupId: groupId,
+                    index,
+                });
+                return;
+            }
+
             const fromSameGroup =
                 this.tabsContainer.indexOf(data.panelId) !== -1;
 
