@@ -86,6 +86,7 @@ export interface AddPanelOptions
         direction?: Direction;
         referencePanel?: string;
     };
+    type?: 'tabular' | 'singular';
 }
 
 export interface AddGroupOptions {

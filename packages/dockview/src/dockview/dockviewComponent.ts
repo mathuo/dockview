@@ -3,8 +3,9 @@ import {
   SerializedGridObject,
   getGridLocation,
   ISerializedLeafNode,
+  orthogonal,
 } from '../gridview/gridview';
-import { Position } from '../dnd/droptarget';
+import { Droptarget, Position } from '../dnd/droptarget';
 import { tail, sequenceEquals } from '../array';
 import { GroupviewPanelState, IDockviewPanel } from '../groupview/groupPanel';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
@@ -40,6 +41,7 @@ import {
 } from '../groupview/groupview';
 import { GroupPanel } from '../groupview/groupviewPanel';
 import { DefaultGroupPanelView } from './defaultGroupPanelView';
+import { getPanelData } from '../dnd/dataTransfer';
 
 const nextGroupId = sequentialNumberGenerator();
 
@@ -223,6 +225,59 @@ export class DockviewComponent
       ) {
           this.options.watermarkComponent = Watermark;
       }
+
+
+      const dropTarget = new Droptarget(this.element, {
+        canDisplayOverlay:() => {
+          return true
+        },
+        acceptedTargetZones: ['top', 'bottom', 'left', 'right'],
+         overlayModel:{
+          units: 'pixels',
+          type: 'line',
+          directionalThreshold: 5,
+          cover: 0.1
+         }
+        }
+      )
+
+      this.addDisposables(
+        dropTarget,
+        dropTarget.onDrop((event) => {
+          const data = getPanelData();
+
+          if(!data) {
+            return;
+          }
+
+          switch(event.position) {
+            case Position.Top:
+            case Position.Bottom:
+              if(this.gridview.orientation === Orientation.HORIZONTAL) {
+                this.gridview.flipOrientation();
+              }
+              break;
+            case Position.Left:
+            case Position.Right:
+                if(this.gridview.orientation === Orientation.VERTICAL) {
+                  this.gridview.flipOrientation();
+                }
+                break;
+              default:
+                break
+          }
+
+          switch(event.position) {
+            case Position.Top:
+            case Position.Left:
+              this.createGroupAtLocation([0]);
+              break;
+            case Position.Bottom:
+            case Position.Right:
+              this.createGroupAtLocation([this.gridview.length]);
+          }
+        }
+      ));
 
       this._api = new DockviewApi(this);
   }
@@ -462,6 +517,11 @@ export class DockviewComponent
           }
       } else {
         const group = this.createGroupAtLocation();
+
+        if(options.type === 'singular') {
+          group.locked = true;
+        }
+
         panel = this.createPanel(options, group);
         group.model.openPanel(panel);
       }
@@ -575,8 +635,6 @@ export class DockviewComponent
 
 
       if(itemId === undefined) {
-
-
         if(sourceGroup) {
           if (!target || target === Position.Center) {
             const activePanel = sourceGroup.activePanel;

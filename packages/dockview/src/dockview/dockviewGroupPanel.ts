@@ -38,7 +38,7 @@ export class DockviewGroupPanel
         return this._group;
     }
 
-    get view() {
+    get view(): IGroupPanelView | undefined {
         return this._view;
     }
 

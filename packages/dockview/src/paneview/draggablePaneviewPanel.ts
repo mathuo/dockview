@@ -70,7 +70,8 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
         })(this.header);
 
         this.target = new Droptarget(this.element, {
-            validOverlays: 'vertical',
+            acceptedTargetZones: ['top', 'bottom'],
+            threshold: 50,
             canDisplayOverlay: (event) => {
                 const data = getPaneData();
 

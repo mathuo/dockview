@@ -10,6 +10,22 @@
         display: none;
     }
 
+    &.single-panel {
+      background-color: red !important;
+
+      .tabs-container {
+          flex-grow: 1;
+
+          .tab {
+            flex-grow: 1;
+          }
+      }
+
+      .void-container {
+        flex-grow: 0;
+      }
+    }
+
     .void-container {
         display: flex;
         flex-grow: 1;

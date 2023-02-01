@@ -276,6 +276,10 @@ export class Gridview implements IDisposable {
     readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
         this._onDidChange.event;
 
+    public get length(): number {
+        return this._root ? this._root.children.length : 0;
+    }
+
     public serialize() {
         const root = serializeBranchNode(this.getView(), this.orientation);
 
@@ -405,6 +409,35 @@ export class Gridview implements IDisposable {
 
         this._root = root;
         this.element.appendChild(this._root.element);
+        this.disposable.value = this._root.onDidChange((e) => {
+            this._onDidChange.fire(e);
+        });
+    }
+
+    /**
+     * If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node
+     * If the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node
+     */
+    public flipOrientation(): void {
+        if (!this._root) {
+            return;
+        }
+
+        const oldRoot = this.root;
+        oldRoot.element.remove();
+
+        this._root = new BranchNode(
+            orthogonal(oldRoot.orientation),
+            this.proportionalLayout,
+            this.styles,
+            this.root.orthogonalSize,
+            this.root.size
+        );
+
+        this._root.addChild(oldRoot, Sizing.Distribute, 0);
+
+        this.element.appendChild(this._root.element);
+
         this.disposable.value = this._root.onDidChange((e) => {
             this._onDidChange.fire(e);
         });

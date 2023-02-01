@@ -9,6 +9,7 @@ import { IDockviewPanel } from '../groupPanel';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { GroupPanel } from '../groupviewPanel';
 import { VoidContainer } from './voidContainer';
+import { toggleClass } from '../../dom';
 
 export interface TabDropIndexEvent {
     event: DragEvent;
@@ -145,6 +146,19 @@ export class TabsContainer
         this._element.className = 'tabs-and-actions-container';
 
         this.height = options.tabHeight;
+
+        this.addDisposables(
+            this.accessor.onDidAddPanel((e) => {
+                if (e.api.group === this.group) {
+                    toggleClass(this._element, 'single-panel', this.size === 1);
+                }
+            }),
+            this.accessor.onDidRemovePanel((e) => {
+                if (e.api.group === this.group) {
+                    toggleClass(this._element, 'single-panel', this.size === 1);
+                }
+            })
+        );
 
         this.actionContainer = document.createElement('div');
         this.actionContainer.className = 'action-container';

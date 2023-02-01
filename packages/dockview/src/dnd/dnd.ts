@@ -17,6 +17,8 @@ export class DragAndDropObserver extends CompositeDisposable {
     // repeadedly.
     private counter = 0;
 
+    private target: any;
+
     constructor(
         private element: HTMLElement,
         private callbacks: IDragAndDropObserverCallbacks
@@ -28,29 +30,55 @@ export class DragAndDropObserver extends CompositeDisposable {
 
     private registerListeners(): void {
         this.addDisposables(
-            addDisposableListener(this.element, 'dragenter', (e: DragEvent) => {
-                this.counter++;
+            addDisposableListener(
+                this.element,
+                'dragenter',
+                (e: DragEvent) => {
+                    this.counter++;
 
-                this.callbacks.onDragEnter(e);
-            })
+                    try {
+                        this.target = e.target;
+                        this.callbacks.onDragEnter(e);
+                    } catch (err) {
+                        console.error(err);
+                    }
+                },
+                true
+            )
         );
 
         this.addDisposables(
-            addDisposableListener(this.element, 'dragover', (e: DragEvent) => {
-                e.preventDefault(); // needed so that the drop event fires (https://stackoverflow.com/questions/21339924/drop-event-not-firing-in-chrome)
+            addDisposableListener(
+                this.element,
+                'dragover',
+                (e: DragEvent) => {
+                    e.preventDefault(); // needed so that the drop event fires (https://stackoverflow.com/questions/21339924/drop-event-not-firing-in-chrome)
 
-                if (this.callbacks.onDragOver) {
-                    this.callbacks.onDragOver(e);
-                }
-            })
+                    if (this.callbacks.onDragOver) {
+                        try {
+                            this.callbacks.onDragOver(e);
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    }
+                },
+                true
+            )
         );
 
         this.addDisposables(
             addDisposableListener(this.element, 'dragleave', (e: DragEvent) => {
                 this.counter--;
+                console.log('dragleave');
 
-                if (this.counter === 0) {
-                    this.callbacks.onDragLeave(e);
+                // if (this.counter === 0) {
+                if (this.target === e.target) {
+                    this.target = null;
+                    try {
+                        this.callbacks.onDragLeave(e);
+                    } catch (err) {
+                        console.error(err);
+                    }
                 }
             })
         );
@@ -58,14 +86,23 @@ export class DragAndDropObserver extends CompositeDisposable {
         this.addDisposables(
             addDisposableListener(this.element, 'dragend', (e: DragEvent) => {
                 this.counter = 0;
-                this.callbacks.onDragEnd(e);
+                this.target = null;
+                try {
+                    this.callbacks.onDragEnd(e);
+                } catch (err) {
+                    console.error(err);
+                }
             })
         );
 
         this.addDisposables(
             addDisposableListener(this.element, 'drop', (e: DragEvent) => {
                 this.counter = 0;
-                this.callbacks.onDrop(e);
+                try {
+                    this.callbacks.onDrop(e);
+                } catch (err) {
+                    console.error(err);
+                }
             })
         );
     }

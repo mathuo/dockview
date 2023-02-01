@@ -167,6 +167,8 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
     set locked(value: boolean) {
         this._locked = value;
+
+        toggleClass(this.container, 'locked-groupview', value);
     }
 
     get isActive(): boolean {
@@ -226,20 +228,20 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         private accessor: DockviewComponent,
         public id: string,
         private readonly options: GroupOptions,
-        private readonly parent: GroupPanel
+        private readonly groupPanel: GroupPanel
     ) {
         super();
 
         this.container.classList.add('groupview');
 
-        this.tabsContainer = new TabsContainer(this.accessor, this.parent, {
+        this.tabsContainer = new TabsContainer(this.accessor, this.groupPanel, {
             tabHeight: options.tabHeight,
         });
 
         this.contentContainer = new ContentContainer();
 
         this.dropTarget = new Droptarget(this.contentContainer.element, {
-            validOverlays: 'all',
+            acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             canDisplayOverlay: (event, quadrant) => {
                 if (this.locked && !quadrant) {
                     return false;
@@ -287,7 +289,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 this.handleDropEvent(event.event, Position.Center, event.index);
             }),
             this.contentContainer.onDidFocus(() => {
-                this.accessor.doSetGroupActive(this.parent, true);
+                this.accessor.doSetGroupActive(this.groupPanel, true);
             }),
             this.contentContainer.onDidBlur(() => {
                 // noop
@@ -316,12 +318,12 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         if (this.accessor.options.createGroupControlElement) {
             this._control = this.accessor.options.createGroupControlElement(
-                this.parent
+                this.groupPanel
             );
             this.addDisposables(this._control);
             this._control.init({
                 containerApi: new DockviewApi(this.accessor),
-                api: this.parent.api,
+                api: this.groupPanel.api,
             });
             this.tabsContainer.setActionElement(this._control.element);
         }
@@ -441,11 +443,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         const skipSetGroupActive = !!options.skipSetGroupActive;
 
         // ensure the group is updated before we fire any events
-        panel.updateParentGroup(this.parent, true);
+        panel.updateParentGroup(this.groupPanel, true);
 
         if (this._activePanel === panel) {
             if (!skipSetGroupActive) {
-                this.accessor.doSetGroupActive(this.parent);
+                this.accessor.doSetGroupActive(this.groupPanel);
             }
             return;
         }
@@ -457,7 +459,10 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
 
         if (!skipSetGroupActive) {
-            this.accessor.doSetGroupActive(this.parent, !!options.skipFocus);
+            this.accessor.doSetGroupActive(
+                this.groupPanel,
+                !!options.skipFocus
+            );
         }
 
         this.updateContainer();
@@ -486,7 +491,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 this.doClose(panel);
             }
         } else {
-            this.accessor.removeGroup(this.parent);
+            this.accessor.removeGroup(this.groupPanel);
         }
     }
 
@@ -643,7 +648,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         toggleClass(this.container, 'empty', this.isEmpty);
 
         this.panels.forEach((panel) =>
-            panel.updateParentGroup(this.parent, this.isActive)
+            panel.updateParentGroup(this.groupPanel, this.isActive)
         );
 
         if (this.isEmpty && !this.watermark) {
@@ -658,7 +663,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
             addDisposableListener(this.watermark.element, 'click', () => {
                 if (!this.isActive) {
-                    this.accessor.doSetGroupActive(this.parent);
+                    this.accessor.doSetGroupActive(this.groupPanel);
                 }
             });
 
@@ -666,7 +671,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             this.tabsContainer.hide();
             this.container.appendChild(this.watermark.element);
 
-            this.watermark.updateParentGroup(this.parent, true);
+            this.watermark.updateParentGroup(this.groupPanel, true);
         }
         if (!this.isEmpty && this.watermark) {
             this.watermark.element.remove();

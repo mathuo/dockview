@@ -105,7 +105,7 @@ export class VoidContainer extends CompositeDisposable {
         );
 
         this.voidDropTarget = new Droptarget(this._element, {
-            validOverlays: 'none',
+            acceptedTargetZones: ['center'],
             canDisplayOverlay: (event) => {
                 const data = getPanelData();
 
