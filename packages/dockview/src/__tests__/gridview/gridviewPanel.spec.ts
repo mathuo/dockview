@@ -4,7 +4,10 @@ import { GroupPanel } from '../../groupview/groupviewPanel';
 describe('gridviewPanel', () => {
     test('get panel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
-            return {} as any;
+            return {
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+            } as any;
         });
 
         const accessor = new accessorMock();

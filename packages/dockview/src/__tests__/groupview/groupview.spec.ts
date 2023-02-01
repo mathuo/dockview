@@ -221,6 +221,8 @@ describe('groupview', () => {
             id: 'dockview-1',
             removePanel: removePanelMock,
             removeGroup: removeGroupMock,
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
         }) as DockviewComponent;
 
         options = {
@@ -612,6 +614,8 @@ describe('groupview', () => {
                     showDndOverlay: jest.fn(),
                 },
                 getPanel: jest.fn(),
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
             };
         });
         const accessor = new accessorMock() as DockviewComponent;
@@ -667,6 +671,8 @@ describe('groupview', () => {
                 },
                 getPanel: jest.fn(),
                 doSetGroupActive: jest.fn(),
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
             };
         });
         const accessor = new accessorMock() as DockviewComponent;
@@ -729,6 +735,8 @@ describe('groupview', () => {
                 },
                 getPanel: jest.fn(),
                 doSetGroupActive: jest.fn(),
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
             };
         });
         const accessor = new accessorMock() as DockviewComponent;
@@ -792,6 +800,8 @@ describe('groupview', () => {
                 },
                 getPanel: jest.fn(),
                 doSetGroupActive: jest.fn(),
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
             };
         });
         const accessor = new accessorMock() as DockviewComponent;

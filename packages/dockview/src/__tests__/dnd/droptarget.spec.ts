@@ -2,15 +2,15 @@ import { Droptarget, Position } from '../../dnd/droptarget';
 import { fireEvent } from '@testing-library/dom';
 
 function createOffsetDragOverEvent(params: {
-    offsetX: number;
-    offsetY: number;
+    clientX: number;
+    clientY: number;
 }): Event {
     const event = new Event('dragover', {
         bubbles: true,
         cancelable: true,
     });
-    Object.defineProperty(event, 'offsetX', { get: () => params.offsetX });
-    Object.defineProperty(event, 'offsetY', { get: () => params.offsetY });
+    Object.defineProperty(event, 'clientX', { get: () => params.clientX });
+    Object.defineProperty(event, 'clientY', { get: () => params.clientY });
     return event;
 }
 
@@ -32,7 +32,7 @@ describe('droptarget', () => {
 
         droptarget = new Droptarget(element, {
             canDisplayOverlay: () => true,
-            validOverlays: 'none',
+            acceptedTargetZones: ['center'],
         });
 
         droptarget.onDrop((event) => {
@@ -54,7 +54,7 @@ describe('droptarget', () => {
 
         droptarget = new Droptarget(element, {
             canDisplayOverlay: () => true,
-            validOverlays: 'all',
+            acceptedTargetZones: ['top', 'left', 'right', 'bottom', 'center'],
         });
 
         droptarget.onDrop((event) => {
@@ -73,7 +73,10 @@ describe('droptarget', () => {
 
         fireEvent(
             target,
-            createOffsetDragOverEvent({ offsetX: 19, offsetY: 0 })
+            createOffsetDragOverEvent({
+                clientX: 19,
+                clientY: 0,
+            })
         );
 
         expect(position).toBeUndefined();
@@ -84,7 +87,7 @@ describe('droptarget', () => {
     test('default', () => {
         droptarget = new Droptarget(element, {
             canDisplayOverlay: () => true,
-            validOverlays: 'all',
+            acceptedTargetZones: ['top', 'left', 'right', 'bottom', 'center'],
         });
 
         expect(droptarget.state).toBeUndefined();
@@ -106,56 +109,91 @@ describe('droptarget', () => {
 
         fireEvent(
             target,
-            createOffsetDragOverEvent({ offsetX: 19, offsetY: 0 })
+            createOffsetDragOverEvent({ clientX: 19, clientY: 0 })
         );
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection.left'
+            '.drop-target > .drop-target-dropzone > .drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
         expect(droptarget.state).toBe(Position.Left);
+        expect(
+            (
+                element
+                    .getElementsByClassName('drop-target-selection')
+                    .item(0) as HTMLDivElement
+            ).style.transform
+        ).toBe('translateX(-25%) scaleX(0.5)');
 
         fireEvent(
             target,
-            createOffsetDragOverEvent({ offsetX: 40, offsetY: 19 })
+            createOffsetDragOverEvent({ clientX: 40, clientY: 19 })
         );
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection.top'
+            '.drop-target > .drop-target-dropzone > .drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
         expect(droptarget.state).toBe(Position.Top);
+        expect(
+            (
+                element
+                    .getElementsByClassName('drop-target-selection')
+                    .item(0) as HTMLDivElement
+            ).style.transform
+        ).toBe('translateY(-25%) scaleY(0.5)');
 
         fireEvent(
             target,
-            createOffsetDragOverEvent({ offsetX: 160, offsetY: 81 })
+            createOffsetDragOverEvent({ clientX: 160, clientY: 81 })
         );
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection.bottom'
+            '.drop-target > .drop-target-dropzone > .drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
         expect(droptarget.state).toBe(Position.Bottom);
+        expect(
+            (
+                element
+                    .getElementsByClassName('drop-target-selection')
+                    .item(0) as HTMLDivElement
+            ).style.transform
+        ).toBe('translateY(25%) scaleY(0.5)');
 
         fireEvent(
             target,
-            createOffsetDragOverEvent({ offsetX: 161, offsetY: 0 })
+            createOffsetDragOverEvent({ clientX: 161, clientY: 0 })
         );
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection.right'
+            '.drop-target > .drop-target-dropzone > .drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
         expect(droptarget.state).toBe(Position.Right);
+        expect(
+            (
+                element
+                    .getElementsByClassName('drop-target-selection')
+                    .item(0) as HTMLDivElement
+            ).style.transform
+        ).toBe('translateX(25%) scaleX(0.5)');
 
         fireEvent(
             target,
-            createOffsetDragOverEvent({ offsetX: 100, offsetY: 50 })
+            createOffsetDragOverEvent({ clientX: 100, clientY: 50 })
         );
         expect(droptarget.state).toBe(Position.Center);
+        expect(
+            (
+                element
+                    .getElementsByClassName('drop-target-selection')
+                    .item(0) as HTMLDivElement
+            ).style.transform
+        ).toBe('');
 
         fireEvent.dragLeave(target);
-        expect(droptarget.state).toBeUndefined();
+        expect(droptarget.state).toBe(Position.Center);
         viewQuery = element.querySelectorAll('.drop-target');
         expect(viewQuery.length).toBe(0);
     });

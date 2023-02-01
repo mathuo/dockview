@@ -232,14 +232,11 @@ export class DockviewComponent
           return true
         },
         acceptedTargetZones: ['top', 'bottom', 'left', 'right'],
-         overlayModel:{
-          units: 'pixels',
-          type: 'line',
-          directionalThreshold: 5,
-          cover: 0.1
-         }
+        overlayModel:{
+          activationSize: { type: 'pixels', value: 10 },
+          size: { type:'pixels', value: 20 }
         }
-      )
+      })
 
       this.addDisposables(
         dropTarget,
@@ -254,13 +251,17 @@ export class DockviewComponent
             case Position.Top:
             case Position.Bottom:
               if(this.gridview.orientation === Orientation.HORIZONTAL) {
-                this.gridview.flipOrientation();
+                // we need to add to a vertical splitview but the current root is a horizontal splitview.
+                // insert a vertical splitview at the root level and add the existing view as a child
+                this.gridview.insertOrthogonalSplitviewAtRoot();
               }
               break;
             case Position.Left:
             case Position.Right:
                 if(this.gridview.orientation === Orientation.VERTICAL) {
-                  this.gridview.flipOrientation();
+                  // we need to add to a horizontal splitview but the current root is a vertical splitview.
+                  // insert a horiziontal splitview at the root level and add the existing view as a child
+                  this.gridview.insertOrthogonalSplitviewAtRoot();
                 }
                 break;
               default:
@@ -270,11 +271,13 @@ export class DockviewComponent
           switch(event.position) {
             case Position.Top:
             case Position.Left:
-              this.createGroupAtLocation([0]);
+              const verticalGroup = this.createGroupAtLocation([0]); // insert into first position
+              this.moveGroupOrPanel(verticalGroup, data.groupId, data.panelId || undefined, Position.Center);
               break;
             case Position.Bottom:
             case Position.Right:
-              this.createGroupAtLocation([this.gridview.length]);
+              const horizontalGroup = this.createGroupAtLocation([this.gridview.length]); // insert into last position
+              this.moveGroupOrPanel(horizontalGroup, data.groupId, data.panelId || undefined, Position.Center);
           }
         }
       ));

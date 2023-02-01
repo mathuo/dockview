@@ -54,10 +54,11 @@ export class Droptarget extends CompositeDisposable {
             canDisplayOverlay: CanDisplayOverlay;
             acceptedTargetZones: DropTargetDirections[];
             overlayModel?: {
-                units?: 'pixels' | 'percentage';
-                type?: 'modal' | 'line';
-                cover?: number;
-                directionalThreshold?: number;
+                size?: { value: number; type: 'pixels' | 'percentage' };
+                activationSize?: {
+                    value: number;
+                    type: 'pixels' | 'percentage';
+                };
             };
         }
     ) {
@@ -122,14 +123,7 @@ export class Droptarget extends CompositeDisposable {
                         return;
                     }
 
-                    const isSmallX =
-                        this.options.overlayModel?.type === 'line' ||
-                        width < 100;
-                    const isSmallY =
-                        this.options.overlayModel?.type === 'line' ||
-                        height < 100;
-
-                    this.toggleClasses(quadrant, isSmallX, isSmallY);
+                    this.toggleClasses(quadrant, width, height);
 
                     this.setState(quadrant);
                 },
@@ -161,32 +155,49 @@ export class Droptarget extends CompositeDisposable {
 
     private toggleClasses(
         quadrant: Quadrant | null,
-        isSmallX: boolean,
-        isSmallY: boolean
+        width: number,
+        height: number
     ) {
         if (!this.overlay) {
             return;
         }
+
+        const isSmallX = width < 100;
+        const isSmallY = height < 100;
 
         const isLeft = quadrant === 'left';
         const isRight = quadrant === 'right';
         const isTop = quadrant === 'top';
         const isBottom = quadrant === 'bottom';
 
-        const size =
-            typeof this.options.overlayModel?.cover === 'number'
-                ? clamp(this.options.overlayModel?.cover, 0, 1)
-                : 0.5;
+        const rightClass = !isSmallX && isRight;
+        const leftClass = !isSmallX && isLeft;
+        const topClass = !isSmallY && isTop;
+        const bottomClass = !isSmallY && isBottom;
+
+        let size = 0.5;
+
+        if (this.options.overlayModel?.size?.type === 'percentage') {
+            size = clamp(this.options.overlayModel.size.value, 0, 100) / 100;
+        }
+
+        if (this.options.overlayModel?.size?.type === 'pixels') {
+            if (rightClass || leftClass) {
+                size =
+                    clamp(0, this.options.overlayModel.size.value, width) /
+                    width;
+            }
+            if (topClass || bottomClass) {
+                size =
+                    clamp(0, this.options.overlayModel.size.value, height) /
+                    height;
+            }
+        }
 
         const translate = (1 - size) / 2;
         const scale = size;
 
         let transform = '';
-
-        const rightClass = !isSmallX && isRight;
-        const leftClass = !isSmallX && isLeft;
-        const topClass = !isSmallY && isTop;
-        const bottomClass = !isSmallY && isBottom;
 
         if (rightClass) {
             transform = `translateX(${100 * translate}%) scaleX(${scale})`;
@@ -201,11 +212,6 @@ export class Droptarget extends CompositeDisposable {
         }
 
         this.overlay.style.transform = transform;
-
-        // toggleClass(this.overlay, 'right', !isSmallX && isRight);
-        // toggleClass(this.overlay, 'left', !isSmallX && isLeft);
-        // toggleClass(this.overlay, 'top', !isSmallY && isTop);
-        // toggleClass(this.overlay, 'bottom', !isSmallY && isBottom);
 
         toggleClass(this.overlay, 'small-right', isSmallX && isRight);
         toggleClass(this.overlay, 'small-left', isSmallX && isLeft);
@@ -240,20 +246,23 @@ export class Droptarget extends CompositeDisposable {
         width: number,
         height: number
     ): Quadrant | null | undefined {
-        if (
-            !this.options.overlayModel?.units ||
-            this.options.overlayModel?.units === 'percentage'
-        ) {
+        const isPercentage =
+            this.options.overlayModel?.activationSize === undefined ||
+            this.options.overlayModel?.activationSize?.type === 'percentage';
+
+        const value =
+            typeof this.options.overlayModel?.activationSize?.value === 'number'
+                ? this.options.overlayModel?.activationSize?.value
+                : 20;
+
+        if (isPercentage) {
             return calculateQuadrant_Percentage(
                 overlayType,
                 x,
                 y,
                 width,
                 height,
-                typeof this.options.overlayModel?.directionalThreshold ===
-                    'number'
-                    ? this.options.overlayModel?.directionalThreshold
-                    : 20
+                value
             );
         }
 
@@ -263,14 +272,11 @@ export class Droptarget extends CompositeDisposable {
             y,
             width,
             height,
-            typeof this.options.overlayModel?.directionalThreshold === 'number'
-                ? this.options.overlayModel?.directionalThreshold
-                : 20
+            value
         );
     }
 
     private removeDropTarget() {
-        console.log('remove');
         if (this.target) {
             this._state = undefined;
             this.element.removeChild(this.target);
@@ -305,36 +311,6 @@ function calculateQuadrant_Percentage(
         return 'bottom';
     }
 
-    // switch (overlayType) {
-    //     case 'all':
-    //     case 'nocenter':
-    //         if (xp < threshold) {
-    //             return 'left';
-    //         }
-    //         if (xp > 100 - threshold) {
-    //             return 'right';
-    //         }
-    //         if (yp < threshold) {
-    //             return 'top';
-    //         }
-    //         if (yp > 100 - threshold) {
-    //             return 'bottom';
-    //         }
-
-    //         break;
-    //     case 'vertical':
-    //         if (yp < 50) {
-    //             return 'top';
-    //         }
-    //         return 'bottom';
-
-    //     case 'horizontal':
-    //         if (xp < 50) {
-    //             return 'left';
-    //         }
-    //         return 'right';
-    // }
-
     if (!overlayType.includes('center')) {
         return undefined;
     }
@@ -362,35 +338,6 @@ function calculateQuadrant_Pixels(
     if (overlayType.includes('right') && y > height - threshold) {
         return 'bottom';
     }
-
-    // switch (overlayType) {
-    //     case 'all':
-    //     case 'nocenter':
-    //         if (x < threshold) {
-    //             return 'left';
-    //         }
-    //         if (x > width - threshold) {
-    //             return 'right';
-    //         }
-    //         if (y < threshold) {
-    //             return 'top';
-    //         }
-    //         if (y > height - threshold) {
-    //             return 'bottom';
-    //         }
-
-    //         break;
-    //     case 'vertical':
-    //         if (x < width / 2) {
-    //             return 'top';
-    //         }
-    //         return 'bottom';
-    //     case 'horizontal':
-    //         if (y < height / 2) {
-    //             return 'left';
-    //         }
-    //         return 'right';
-    // }
 
     if (!overlayType.includes('center')) {
         return undefined;

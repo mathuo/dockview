@@ -418,7 +418,7 @@ export class Gridview implements IDisposable {
      * If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node
      * If the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node
      */
-    public flipOrientation(): void {
+    public insertOrthogonalSplitviewAtRoot(): void {
         if (!this._root) {
             return;
         }
