@@ -302,8 +302,8 @@ describe('dockviewComponent', () => {
             component: 'default',
         });
 
-        const panel1 = dockview.getGroupPanel('panel1');
-        const panel2 = dockview.getGroupPanel('panel2');
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const panel2 = dockview.getGroupPanel('panel2')!;
         const group1 = panel1.group;
         dockview.moveGroupOrPanel(group1, group1.id, 'panel1', Position.Right);
         const group2 = panel1.group;
@@ -345,10 +345,10 @@ describe('dockviewComponent', () => {
             component: 'default',
         });
 
-        const panel1 = dockview.getGroupPanel('panel1');
-        const panel2 = dockview.getGroupPanel('panel2');
-        const panel3 = dockview.getGroupPanel('panel3');
-        const panel4 = dockview.getGroupPanel('panel4');
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const panel2 = dockview.getGroupPanel('panel2')!;
+        const panel3 = dockview.getGroupPanel('panel3')!;
+        const panel4 = dockview.getGroupPanel('panel4')!;
 
         expect(panel1.api.isActive).toBeFalsy();
         expect(panel2.api.isActive).toBeFalsy();
@@ -425,9 +425,8 @@ describe('dockviewComponent', () => {
         expect(dockview.size).toBe(1);
         expect(dockview.totalPanels).toBe(2);
 
-        const panel1 = dockview.getGroupPanel('panel1');
-        const panel2 = dockview.getGroupPanel('panel2');
-
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const panel2 = dockview.getGroupPanel('panel2')!;
         expect(panel1.group).toBe(panel2.group);
 
         const group = panel1.group;
@@ -489,7 +488,7 @@ describe('dockviewComponent', () => {
 
         expect(viewQuery.length).toBe(1);
 
-        const group = dockview.getGroupPanel('panel1').group;
+        const group = dockview.getGroupPanel('panel1')!.group;
         dockview.moveGroupOrPanel(group, group.id, 'panel1', Position.Right);
 
         viewQuery = container.querySelectorAll(
@@ -1515,6 +1514,53 @@ describe('dockviewComponent', () => {
         expect(panel2Spy).toBeCalledTimes(1);
     });
 
+    test('move entire group into another group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: { default: PanelContentPartTest },
+        });
+
+        dockview.layout(500, 1000);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            tabComponent: 'default',
+        });
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            tabComponent: 'default',
+            position: {
+                referencePanel: panel1,
+            },
+        });
+        const panel3 = dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            tabComponent: 'default',
+            position: {
+                referencePanel: panel1,
+                direction: 'right',
+            },
+        });
+
+        const panel1Spy = jest.spyOn(panel1.group, 'dispose');
+
+        expect(dockview.groups.length).toBe(2);
+
+        dockview.moveGroupOrPanel(
+            panel3.group,
+            panel1.group.id,
+            undefined,
+            Position.Center
+        );
+
+        expect(dockview.groups.length).toBe(1);
+        expect(panel1Spy).toBeCalledTimes(1);
+    });
+
     test('fromJSON events should still fire', () => {
         jest.useFakeTimers();
 
@@ -1634,8 +1680,6 @@ describe('dockviewComponent', () => {
         });
 
         jest.runAllTimers();
-
-        console.log(activePanel.map((_) => _?.id).join(' '));
 
         expect(addGroup.length).toBe(4);
         expect(removeGroup.length).toBe(0);

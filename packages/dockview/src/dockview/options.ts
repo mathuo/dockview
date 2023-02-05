@@ -78,20 +78,81 @@ export interface PanelOptions {
     title?: string;
 }
 
+type RelativePanel = {
+    direction?: Direction;
+    referencePanel: string | IDockviewPanel;
+};
+
+type RelativeGroup = {
+    direction?: Direction;
+    referenceGroup: string | GroupPanel;
+};
+
+type AbsolutePosition = {
+    direction: Omit<Direction, 'within'>;
+};
+
+export type AddPanelPositionOptions =
+    | RelativePanel
+    | RelativeGroup
+    | AbsolutePosition;
+
+export function isPanelOptionsWithPanel(
+    data: AddPanelPositionOptions
+): data is RelativePanel {
+    if ((data as RelativePanel).referencePanel) {
+        return true;
+    }
+    return false;
+}
+
+export function isPanelOptionsWithGroup(
+    data: AddPanelPositionOptions
+): data is RelativeGroup {
+    if ((data as RelativeGroup).referenceGroup) {
+        return true;
+    }
+    return false;
+}
+
 export interface AddPanelOptions
     extends Omit<PanelOptions, 'component' | 'tabComponent'> {
     component: string;
     tabComponent?: string;
-    position?: {
-        direction?: Direction;
-        referencePanel?: string;
-    };
-    type?: 'tabular' | 'singular';
+    position?: AddPanelPositionOptions;
 }
 
-export interface AddGroupOptions {
-    direction?: 'left' | 'right' | 'above' | 'below';
-    referencePanel: string;
+type AddGroupOptionsWithPanel = {
+    referencePanel: string | IDockviewPanel;
+    direction?: Omit<Direction, 'within'>;
+};
+
+type AddGroupOptionsWithGroup = {
+    referenceGroup: string | GroupPanel;
+    direction?: Omit<Direction, 'within'>;
+};
+
+export type AddGroupOptions =
+    | AddGroupOptionsWithGroup
+    | AddGroupOptionsWithPanel
+    | AbsolutePosition;
+
+export function isGroupOptionsWithPanel(
+    data: AddGroupOptions
+): data is AddGroupOptionsWithPanel {
+    if ((data as AddGroupOptionsWithPanel).referencePanel) {
+        return true;
+    }
+    return false;
+}
+
+export function isGroupOptionsWithGroup(
+    data: AddGroupOptions
+): data is AddGroupOptionsWithGroup {
+    if ((data as AddGroupOptionsWithGroup).referenceGroup) {
+        return true;
+    }
+    return false;
 }
 
 export interface MovementOptions2 {

@@ -3,6 +3,7 @@ import { Emitter, Event } from '../events';
 import { CompositeDisposable } from '../lifecycle';
 import { DragAndDropObserver } from './dnd';
 import { clamp } from '../math';
+import { Direction } from '../gridview/baseComponentGridview';
 
 export enum Position {
     Top = 'Top',
@@ -10,6 +11,23 @@ export enum Position {
     Bottom = 'Bottom',
     Right = 'Right',
     Center = 'Center',
+}
+
+export function directionToPosition(direction: Direction): Position {
+    switch (direction) {
+        case 'above':
+            return Position.Top;
+        case 'below':
+            return Position.Bottom;
+        case 'left':
+            return Position.Left;
+        case 'right':
+            return Position.Right;
+        case 'within':
+            return Position.Center;
+        default:
+            throw new Error(`invalid direction ${direction}`);
+    }
 }
 
 export type Quadrant = 'top' | 'bottom' | 'left' | 'right';
@@ -197,7 +215,7 @@ export class Droptarget extends CompositeDisposable {
         const translate = (1 - size) / 2;
         const scale = size;
 
-        let transform = '';
+        let transform: string;
 
         if (rightClass) {
             transform = `translateX(${100 * translate}%) scaleX(${scale})`;

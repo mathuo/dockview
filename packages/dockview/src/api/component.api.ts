@@ -325,6 +325,10 @@ export class GridviewApi implements CommonApi<SerializedGridview> {
 }
 
 export class DockviewApi implements CommonApi<SerializedDockview> {
+    get id(): string {
+        return this.component.id;
+    }
+
     get width(): number {
         return this.component.width;
     }
@@ -435,8 +439,8 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.addPanel(options);
     }
 
-    addEmptyGroup(options?: AddGroupOptions): void {
-        this.component.addEmptyGroup(options);
+    addGroup(options?: AddGroupOptions): IGroupviewPanel {
+        return this.component.addGroup(options);
     }
 
     moveToNext(options?: MovementOptions): void {

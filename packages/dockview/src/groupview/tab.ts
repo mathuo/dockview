@@ -111,7 +111,12 @@ export class Tab extends CompositeDisposable implements ITab {
         this.droptarget = new Droptarget(this._element, {
             acceptedTargetZones: ['center'],
             canDisplayOverlay: (event) => {
+                if (this.group.locked) {
+                    return false;
+                }
+
                 const data = getPanelData();
+
                 if (data && this.accessor.id === data.viewId) {
                     return this.panelId !== data.panelId;
                 }
