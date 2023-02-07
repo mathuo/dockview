@@ -15,6 +15,10 @@ const outputDir = join(__dirname, 'dist');
 function outputFile(format, isMinified, withStyles, isReact) {
     let filename = join(outputDir, name);
 
+    if (isReact) {
+        filename += '.react';
+    }
+
     if (format !== 'umd') {
         filename += `.${format}`;
     }
@@ -23,10 +27,6 @@ function outputFile(format, isMinified, withStyles, isReact) {
     }
     if (!withStyles) {
         filename += '.noStyle';
-    }
-
-    if (!isReact) {
-        filename += '.corejs';
     }
 
     return `${filename}.js`;
@@ -132,7 +132,7 @@ export default [
     // esm
     createBundle('esm', { withStyles: true, isMinified: false, isReact: true }),
     createBundle('esm', { withStyles: true, isMinified: true, isReact: true }),
-    // react extensions
+    // core bundles (no-react)
     createBundle('umd', {
         withStyles: true,
         isMinified: false,
