@@ -9,6 +9,7 @@ import { ReactPanelDeserialzier } from '../deserializer';
 import {
     DockviewDndOverlayEvent,
     GroupPanelFrameworkComponentFactory,
+    IGroupControlRenderer,
 } from '../../dockview/options';
 import { DockviewPanelApi } from '../../api/groupPanelApi';
 import { ReactPortalStore, usePortalsLifecycle } from '../react';
@@ -19,7 +20,6 @@ import { watchElementResize } from '../../dom';
 import { IContentRenderer, ITabRenderer } from '../../groupview/types';
 import {
     IDockviewGroupControlProps,
-    IGroupControlRenderer,
     ReactGroupControlsRendererPart,
 } from './groupControlsRenderer';
 import { GroupPanel } from '../../groupview/groupviewPanel';

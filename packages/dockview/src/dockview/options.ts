@@ -8,12 +8,17 @@ import {
     WatermarkConstructor,
     IWatermarkRenderer,
 } from '../groupview/types';
-import { GroupPanel } from '../groupview/groupviewPanel';
+import { GroupPanel, GroupviewPanelApi } from '../groupview/groupviewPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
 import { DockviewDropTargets } from '../groupview/dnd';
 import { PanelTransfer } from '../dnd/dataTransfer';
-import { IGroupControlRenderer } from '../react/dockview/groupControlsRenderer';
+import { IDisposable } from '../lifecycle';
+
+export interface IGroupControlRenderer extends IDisposable {
+    readonly element: HTMLElement;
+    init(params: { containerApi: DockviewApi; api: GroupviewPanelApi }): void;
+}
 
 export interface GroupPanelFrameworkComponentFactory {
     content: FrameworkFactory<IContentRenderer>;

@@ -18,11 +18,6 @@ export interface IDockviewGroupControlProps {
     isGroupActive: boolean;
 }
 
-export interface IGroupControlRenderer extends IDisposable {
-    readonly element: HTMLElement;
-    init(params: { containerApi: DockviewApi; api: GroupviewPanelApi }): void;
-}
-
 export class ReactGroupControlsRendererPart {
     private mutableDisposable = new MutableDisposable();
     private _element: HTMLElement;

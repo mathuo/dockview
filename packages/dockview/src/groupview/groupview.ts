@@ -14,7 +14,7 @@ import { ITabsContainer, TabsContainer } from './titlebar/tabsContainer';
 import { IWatermarkRenderer } from './types';
 import { GroupPanel } from './groupviewPanel';
 import { DockviewDropTargets } from './dnd';
-import { IGroupControlRenderer } from '../react/dockview/groupControlsRenderer';
+import { IGroupControlRenderer } from '../core';
 
 export interface DndService {
     canDisplayOverlay(
