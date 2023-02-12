@@ -3,7 +3,7 @@ import { DragHandler } from '../../dnd/abstractDragHandler';
 import { IDisposable } from '../../lifecycle';
 
 describe('abstractDragHandler', () => {
-    test('that className dragged is added to element after dragstart event', () => {
+    test('that className dv-dragged is added to element after dragstart event', () => {
         jest.useFakeTimers();
 
         const element = document.createElement('div');
@@ -26,13 +26,13 @@ describe('abstractDragHandler', () => {
             }
         })(element);
 
-        expect(element.classList.contains('dragged')).toBeFalsy();
+        expect(element.classList.contains('dv-dragged')).toBeFalsy();
 
         fireEvent.dragStart(element);
-        expect(element.classList.contains('dragged')).toBeTruthy();
+        expect(element.classList.contains('dv-dragged')).toBeTruthy();
 
         jest.runAllTimers();
-        expect(element.classList.contains('dragged')).toBeFalsy();
+        expect(element.classList.contains('dv-dragged')).toBeFalsy();
 
         handler.dispose();
     });

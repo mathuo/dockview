@@ -76,6 +76,7 @@ describe('tabsContainer', () => {
             return {
                 id: 'testgroupid',
                 model: groupView,
+                panels: [],
             };
         });
 
@@ -120,7 +121,7 @@ describe('tabsContainer', () => {
         ).toBe(1);
     });
 
-    test('that dropping the last tab should render no drop target', () => {
+    test('that dropping over the empty space should render a drop target', () => {
         const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
             return {
                 id: 'testcomponentid',
@@ -138,6 +139,7 @@ describe('tabsContainer', () => {
             return {
                 id: 'testgroupid',
                 model: groupView,
+                panels: [],
             };
         });
 
@@ -176,7 +178,7 @@ describe('tabsContainer', () => {
 
         expect(
             cut.element.getElementsByClassName('drop-target-dropzone').length
-        ).toBe(0);
+        ).toBe(1);
     });
 
     test('that dropping the first tab should render a drop target', () => {
@@ -197,6 +199,7 @@ describe('tabsContainer', () => {
             return {
                 id: 'testgroupid',
                 model: groupView,
+                panels: [],
             };
         });
 

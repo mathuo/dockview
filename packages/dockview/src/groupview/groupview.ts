@@ -38,7 +38,7 @@ export interface IGroupItem {
 
 interface GroupMoveEvent {
     groupId: string;
-    itemId: string;
+    itemId?: string;
     target: Position;
     index?: number;
 }
@@ -246,6 +246,16 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                 }
 
                 const data = getPanelData();
+
+                if (
+                    data &&
+                    data.panelId === null &&
+                    data.viewId === this.accessor.id &&
+                    data.groupId !== this.id
+                ) {
+                    // prevent dropping on self for group dnd
+                    return true;
+                }
 
                 if (data && data.viewId === this.accessor.id) {
                     const groupHasOnePanelAndIsActiveDragElement =
@@ -686,6 +696,18 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         const data = getPanelData();
 
         if (data) {
+            if (data.panelId === null) {
+                // this is a group move dnd event
+                const { groupId } = data;
+
+                this._onMove.fire({
+                    target: position,
+                    groupId: groupId,
+                    index,
+                });
+                return;
+            }
+
             const fromSameGroup =
                 this.tabsContainer.indexOf(data.panelId) !== -1;
 

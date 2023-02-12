@@ -31,7 +31,7 @@ import {
   toTarget,
 } from '../gridview/baseComponentGridview';
 import { DockviewApi } from '../api/component.api';
-import { Orientation } from '../splitview/core/splitview';
+import { Orientation, Sizing } from '../splitview/core/splitview';
 import { DefaultTab } from './components/tab/defaultTab';
 import {
   GroupOptions,
@@ -565,13 +565,21 @@ export class DockviewComponent
   moveGroupOrPanel(
       referenceGroup: GroupPanel,
       groupId: string,
-      itemId: string,
+      itemId: string | undefined,
       target: Position,
       index?: number
   ): void {
       const sourceGroup = groupId
           ? this._groups.get(groupId)?.value
           : undefined;
+
+
+      if(itemId === undefined) {
+        if(sourceGroup) {
+          this.moveGroup(sourceGroup, referenceGroup, target);
+        }
+        return;
+      }
 
       if (!target || target === Position.Center) {
           const groupItem: IDockviewPanel | undefined =
@@ -594,6 +602,7 @@ export class DockviewComponent
               referenceLocation,
               target
           );
+
 
           if (sourceGroup && sourceGroup.size < 2) {
               const [targetParentLocation, to] = tail(targetLocation);
@@ -640,10 +649,42 @@ export class DockviewComponent
                   target
               );
 
-              const group = this.createGroupAtLocation( dropLocation);
+              const group = this.createGroupAtLocation(dropLocation);
               group.model.openPanel(groupItem);
           }
       }
+  }
+
+  private moveGroup(sourceGroup: GroupPanel, referenceGroup: GroupPanel, target: Position): void {
+    if(sourceGroup) {
+      if (!target || target === Position.Center) {
+        const activePanel = sourceGroup.activePanel;
+        const panels = [...sourceGroup.panels].map(p => sourceGroup.model.removePanel(p.id));
+
+        if (sourceGroup?.model.size === 0) {
+          this.doRemoveGroup(sourceGroup);
+        }
+
+        for(const panel of panels) {
+          referenceGroup.model.openPanel(panel,{skipSetPanelActive:panel !== activePanel});
+        }
+      }
+      else {
+
+        this.gridview.removeView(getGridLocation(sourceGroup.element));
+
+        const referenceLocation = getGridLocation(referenceGroup.element);
+        const dropLocation = getRelativeLocation(
+          this.gridview.orientation,
+          referenceLocation,
+          target
+        );
+
+
+
+        this.gridview.addView(sourceGroup, Sizing.Distribute,  dropLocation);
+      }
+    }
   }
 
   override doSetGroupActive(
