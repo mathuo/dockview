@@ -10,7 +10,7 @@ export interface IDragAndDropObserverCallbacks {
 }
 
 export class DragAndDropObserver extends CompositeDisposable {
-    private target: any;
+    private target: EventTarget | null = null;
 
     constructor(
         private element: HTMLElement,

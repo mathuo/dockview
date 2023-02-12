@@ -82,6 +82,11 @@ export class Droptarget extends CompositeDisposable {
     ) {
         super();
 
+        // use a set to take advantage of #<set>.has
+        const acceptedTargetZonesSet = new Set(
+            this.options.acceptedTargetZones
+        );
+
         this.addDisposables(
             this._onDrop,
             new DragAndDropObserver(this.element, {
@@ -101,7 +106,7 @@ export class Droptarget extends CompositeDisposable {
                     const y = e.clientY - rect.top;
 
                     const quadrant = this.calculateQuadrant(
-                        this.options.acceptedTargetZones,
+                        acceptedTargetZonesSet,
                         x,
                         y,
                         width,
@@ -258,7 +263,7 @@ export class Droptarget extends CompositeDisposable {
     }
 
     private calculateQuadrant(
-        overlayType: DropTargetDirections[],
+        overlayType: Set<DropTargetDirections>,
         x: number,
         y: number,
         width: number,
@@ -306,7 +311,7 @@ export class Droptarget extends CompositeDisposable {
 }
 
 function calculateQuadrant_Percentage(
-    overlayType: DropTargetDirections[],
+    overlayType: Set<DropTargetDirections>,
     x: number,
     y: number,
     width: number,
@@ -316,20 +321,20 @@ function calculateQuadrant_Percentage(
     const xp = (100 * x) / width;
     const yp = (100 * y) / height;
 
-    if (overlayType.includes('left') && xp < threshold) {
+    if (overlayType.has('left') && xp < threshold) {
         return 'left';
     }
-    if (overlayType.includes('right') && xp > 100 - threshold) {
+    if (overlayType.has('right') && xp > 100 - threshold) {
         return 'right';
     }
-    if (overlayType.includes('top') && yp < threshold) {
+    if (overlayType.has('top') && yp < threshold) {
         return 'top';
     }
-    if (overlayType.includes('bottom') && yp > 100 - threshold) {
+    if (overlayType.has('bottom') && yp > 100 - threshold) {
         return 'bottom';
     }
 
-    if (!overlayType.includes('center')) {
+    if (!overlayType.has('center')) {
         return undefined;
     }
 
@@ -337,27 +342,27 @@ function calculateQuadrant_Percentage(
 }
 
 function calculateQuadrant_Pixels(
-    overlayType: DropTargetDirections[],
+    overlayType: Set<DropTargetDirections>,
     x: number,
     y: number,
     width: number,
     height: number,
     threshold: number
 ): Quadrant | null | undefined {
-    if (overlayType.includes('left') && x < threshold) {
+    if (overlayType.has('left') && x < threshold) {
         return 'left';
     }
-    if (overlayType.includes('right') && x > width - threshold) {
+    if (overlayType.has('right') && x > width - threshold) {
         return 'right';
     }
-    if (overlayType.includes('top') && y < threshold) {
+    if (overlayType.has('top') && y < threshold) {
         return 'top';
     }
-    if (overlayType.includes('right') && y > height - threshold) {
+    if (overlayType.has('right') && y > height - threshold) {
         return 'bottom';
     }
 
-    if (!overlayType.includes('center')) {
+    if (!overlayType.has('center')) {
         return undefined;
     }
 
