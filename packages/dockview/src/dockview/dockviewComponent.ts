@@ -43,7 +43,7 @@ import {
     GroupPanelViewState,
     GroupviewDropEvent,
 } from '../groupview/groupview';
-import { GroupPanel } from '../groupview/groupviewPanel';
+import { GroupPanel, IGroupviewPanel } from '../groupview/groupviewPanel';
 import { DefaultGroupPanelView } from './defaultGroupPanelView';
 import { getPanelData } from '../dnd/dataTransfer';
 
@@ -107,7 +107,7 @@ export interface IDockviewComponent extends IBaseGrid<GroupPanel> {
     getGroupPanel: (id: string) => IDockviewPanel | undefined;
     createWatermarkComponent(): IWatermarkRenderer;
     // lifecycle
-    addGroup(options?: AddGroupOptions): GroupPanel;
+    addGroup(options?: AddGroupOptions): IGroupviewPanel;
     closeAllGroups(): void;
     // events
     moveToNext(options?: MovementOptions): void;

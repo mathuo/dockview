@@ -6,7 +6,7 @@ import {
     PanelInitParameters,
     IPanel,
 } from '../panel/types';
-import { PanelApiImpl } from '../api/panelApi';
+import { PanelApi, PanelApiImpl } from '../api/panelApi';
 
 export interface BasePanelViewState {
     id: string;
@@ -14,7 +14,7 @@ export interface BasePanelViewState {
     params?: Record<string, any>;
 }
 
-export interface BasePanelViewExported<T extends PanelApiImpl> {
+export interface BasePanelViewExported<T extends PanelApi> {
     readonly id: string;
     readonly api: T;
     readonly width: number;

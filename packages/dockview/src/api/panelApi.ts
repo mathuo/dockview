@@ -1,5 +1,7 @@
 import { Emitter, Event } from '../events';
-import { CompositeDisposable } from '../lifecycle';
+import { BasePanelView } from '../gridview/basePanelView';
+import { CompositeDisposable, MutableDisposable } from '../lifecycle';
+import { IPanel, Parameters } from '../panel/types';
 
 export interface FocusEvent {
     readonly isFocused: boolean;
@@ -25,6 +27,7 @@ export interface PanelApi {
     readonly onDidActiveChange: Event<ActiveEvent>;
     setVisible(isVisible: boolean): void;
     setActive(): void;
+    updateParameters(parameters: Parameters): void;
     /**
      * The id of the panel that would have been assigned when the panel was created
      */
@@ -54,12 +57,17 @@ export interface PanelApi {
 /**
  * A core api implementation that should be used across all panel-like objects
  */
-export class PanelApiImpl extends CompositeDisposable implements PanelApi {
+export abstract class PanelApiImpl
+    extends CompositeDisposable
+    implements PanelApi
+{
     private _isFocused = false;
     private _isActive = false;
     private _isVisible = true;
     private _width = 0;
     private _height = 0;
+
+    private readonly panelUpdatesDisposable = new MutableDisposable();
 
     readonly _onDidDimensionChange = new Emitter<PanelDimensionChangeEvent>({
         replay: true,
@@ -94,6 +102,10 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
     readonly _onActiveChange = new Emitter<void>();
     readonly onActiveChange: Event<void> = this._onActiveChange.event;
     //
+    readonly _onUpdateParameters = new Emitter<Parameters>();
+    readonly onUpdateParameters: Event<Parameters> =
+        this._onUpdateParameters.event;
+    //
 
     get isFocused() {
         return this._isFocused;
@@ -118,6 +130,7 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
         super();
 
         this.addDisposables(
+            this.panelUpdatesDisposable,
             this._onDidDimensionChange,
             this._onDidChangeFocus,
             this._onDidVisibilityChange,
@@ -125,6 +138,7 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
             this._onFocusEvent,
             this._onActiveChange,
             this._onVisibilityChange,
+            this._onUpdateParameters,
             this.onDidFocusChange((event) => {
                 this._isFocused = event.isFocused;
             }),
@@ -141,12 +155,28 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
         );
     }
 
+    public initialize(panel: IPanel): void {
+        this.panelUpdatesDisposable.value = this._onUpdateParameters.event(
+            (parameters) => {
+                panel.update({
+                    params: {
+                        params: parameters,
+                    },
+                });
+            }
+        );
+    }
+
     setVisible(isVisible: boolean) {
         this._onVisibilityChange.fire({ isVisible });
     }
 
     setActive(): void {
         this._onActiveChange.fire();
+    }
+
+    updateParameters(parameters: Parameters): void {
+        this._onUpdateParameters.fire(parameters);
     }
 
     dispose() {

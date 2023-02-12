@@ -15,6 +15,7 @@ describe('tabsContainer', () => {
             return {
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
+                options: {},
             };
         });
         const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
@@ -34,7 +35,7 @@ describe('tabsContainer', () => {
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as GroupPanel;
 
-        const cut = new TabsContainer(accessor, groupPanel, {});
+        const cut = new TabsContainer(accessor, groupPanel);
 
         const emptySpace = cut.element
             .getElementsByClassName('void-container')
@@ -67,6 +68,7 @@ describe('tabsContainer', () => {
                 id: 'testcomponentid',
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
+                options: {},
             };
         });
         const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
@@ -88,7 +90,7 @@ describe('tabsContainer', () => {
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as GroupPanel;
 
-        const cut = new TabsContainer(accessor, groupPanel, {});
+        const cut = new TabsContainer(accessor, groupPanel);
 
         const emptySpace = cut.element
             .getElementsByClassName('void-container')
@@ -132,6 +134,7 @@ describe('tabsContainer', () => {
                 id: 'testcomponentid',
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
+                options: {},
             };
         });
         const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
@@ -153,7 +156,7 @@ describe('tabsContainer', () => {
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as GroupPanel;
 
-        const cut = new TabsContainer(accessor, groupPanel, {});
+        const cut = new TabsContainer(accessor, groupPanel);
 
         cut.openPanel(new TestPanel('panel1', jest.fn() as any));
         cut.openPanel(new TestPanel('panel2', jest.fn() as any));
@@ -194,6 +197,7 @@ describe('tabsContainer', () => {
                 id: 'testcomponentid',
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
+                options: {},
             };
         });
         const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
@@ -215,7 +219,7 @@ describe('tabsContainer', () => {
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as GroupPanel;
 
-        const cut = new TabsContainer(accessor, groupPanel, {});
+        const cut = new TabsContainer(accessor, groupPanel);
 
         cut.openPanel(new TestPanel('panel1', jest.fn() as any));
         cut.openPanel(new TestPanel('panel2', jest.fn() as any));
@@ -256,6 +260,7 @@ describe('tabsContainer', () => {
                 id: 'testcomponentid',
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
+                options: {},
             };
         });
         const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
@@ -276,7 +281,7 @@ describe('tabsContainer', () => {
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as GroupPanel;
 
-        const cut = new TabsContainer(accessor, groupPanel, {});
+        const cut = new TabsContainer(accessor, groupPanel);
 
         cut.openPanel(new TestPanel('panel1', jest.fn() as any));
         cut.openPanel(new TestPanel('panel2', jest.fn() as any));

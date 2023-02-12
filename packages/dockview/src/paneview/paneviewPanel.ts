@@ -164,6 +164,8 @@ export abstract class PaneviewPanel
     ) {
         super(id, component, new PaneviewPanelApiImpl(id));
         this.api.pane = this; // TODO cannot use 'this' before 'super'
+        this.api.initialize(this);
+
         this._isExpanded = isExpanded;
         this._headerVisible = isHeaderVisible;
 

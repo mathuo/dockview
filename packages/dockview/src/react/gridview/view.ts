@@ -1,4 +1,5 @@
 import { GridviewApi } from '../../api/component.api';
+import { GridviewPanelApiImpl } from '../../api/gridviewPanelApi';
 import {
     GridviewPanel,
     GridviewInitParameters,
@@ -14,7 +15,7 @@ export class ReactGridPanelView extends GridviewPanel {
         private readonly reactComponent: React.FunctionComponent<IGridviewPanelProps>,
         private readonly reactPortalStore: ReactPortalStore
     ) {
-        super(id, component);
+        super(id, component, new GridviewPanelApiImpl(id));
     }
 
     getComponent(): IFrameworkPart {

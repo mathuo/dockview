@@ -1,3 +1,4 @@
+import { GridviewPanelApiImpl } from '../../api/gridviewPanelApi';
 import { GridviewComponent } from '../../gridview/gridviewComponent';
 import { GridviewPanel } from '../../gridview/gridviewPanel';
 import { CompositeDisposable } from '../../lifecycle';
@@ -6,7 +7,9 @@ import { Orientation } from '../../splitview/core/splitview';
 
 class TestGridview extends GridviewPanel {
     constructor(id: string, componentName: string) {
-        super(id, componentName);
+        super(id, componentName, new GridviewPanelApiImpl(id));
+
+        this.api.initialize(this);
 
         this.element.id = id;
     }
@@ -65,7 +68,7 @@ describe('gridview', () => {
 
         expect(gridview.size).toBe(1);
 
-        const panel1 = gridview.getPanel('panel1');
+        const panel1 = gridview.getPanel('panel1')!;
 
         gridview.removePanel(panel1);
 
@@ -101,9 +104,9 @@ describe('gridview', () => {
             component: 'default',
         });
 
-        const panel1 = gridview.getPanel('panel1');
-        const panel2 = gridview.getPanel('panel2');
-        const panel3 = gridview.getPanel('panel3');
+        const panel1 = gridview.getPanel('panel1')!;
+        const panel2 = gridview.getPanel('panel2')!;
+        const panel3 = gridview.getPanel('panel3')!;
 
         expect(panel1.api.isActive).toBeFalsy();
         expect(panel2.api.isActive).toBeFalsy();
@@ -192,9 +195,9 @@ describe('gridview', () => {
         });
         gridview.layout(800, 400, true);
 
-        const panel1 = gridview.getPanel('panel_1');
-        const panel2 = gridview.getPanel('panel_2');
-        const panel3 = gridview.getPanel('panel_3');
+        const panel1 = gridview.getPanel('panel_1')!;
+        const panel2 = gridview.getPanel('panel_2')!;
+        const panel3 = gridview.getPanel('panel_3')!;
 
         expect(panel1?.api.isVisible).toBeTruthy();
         expect(panel1?.api.id).toBe('panel_1');
@@ -330,7 +333,7 @@ describe('gridview', () => {
             component: 'default',
         });
 
-        const panel1 = gridview.getPanel('panel_1');
+        const panel1 = gridview.getPanel('panel_1')!;
 
         expect(events).toEqual([
             {
@@ -349,7 +352,7 @@ describe('gridview', () => {
             component: 'default',
         });
 
-        const panel2 = gridview.getPanel('panel_2');
+        const panel2 = gridview.getPanel('panel_2')!;
 
         expect(events).toEqual([
             {
@@ -368,7 +371,7 @@ describe('gridview', () => {
             component: 'default',
         });
 
-        const panel3 = gridview.getPanel('panel_3');
+        const panel3 = gridview.getPanel('panel_3')!;
 
         expect(events).toEqual([
             {
@@ -1685,8 +1688,8 @@ describe('gridview', () => {
             component: 'default',
         });
 
-        const panel1 = gridview.getPanel('panel1');
-        const panel2 = gridview.getPanel('panel2');
+        const panel1 = gridview.getPanel('panel1')!;
+        const panel2 = gridview.getPanel('panel2')!;
 
         const panel1Spy = jest.spyOn(panel1, 'dispose');
         const panel2Spy = jest.spyOn(panel2, 'dispose');
@@ -1714,8 +1717,8 @@ describe('gridview', () => {
             component: 'default',
         });
 
-        const panel1 = gridview.getPanel('panel1');
-        const panel2 = gridview.getPanel('panel2');
+        const panel1 = gridview.getPanel('panel1')!;
+        const panel2 = gridview.getPanel('panel2')!;
 
         const panel1Spy = jest.spyOn(panel1, 'dispose');
         const panel2Spy = jest.spyOn(panel2, 'dispose');
@@ -1743,8 +1746,8 @@ describe('gridview', () => {
             component: 'default',
         });
 
-        const panel1 = gridview.getPanel('panel1');
-        const panel2 = gridview.getPanel('panel2');
+        const panel1 = gridview.getPanel('panel1')!;
+        const panel2 = gridview.getPanel('panel2')!;
 
         const panel1Spy = jest.spyOn(panel1, 'dispose');
         const panel2Spy = jest.spyOn(panel2, 'dispose');
