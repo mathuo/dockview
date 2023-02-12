@@ -31,6 +31,10 @@ enum GroupChangeKind2 {
 class Watermark implements IWatermarkRenderer {
     public readonly element = document.createElement('div');
 
+    constructor() {
+        this.element.className = `watermark-test-container`;
+    }
+
     get id() {
         return 'watermark-id';
     }
@@ -853,6 +857,73 @@ describe('groupview', () => {
 
         expect(
             element.getElementsByClassName('drop-target-dropzone').length
+        ).toBe(0);
+    });
+
+    test('that watermark is added', () => {
+        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
+            return {
+                canDisplayOverlay: jest.fn(),
+            };
+        });
+
+        const groupView = new groupviewMock() as Groupview;
+
+        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
+            return {
+                id: 'testgroupid',
+                model: groupView,
+            };
+        });
+
+        const container = document.createElement('div');
+
+        const cut = new Groupview(
+            container,
+            dockview,
+            'groupviewid',
+            {},
+            new groupPanelMock() as GroupPanel
+        );
+
+        cut.initialize();
+
+        expect(
+            container.getElementsByClassName('watermark-test-container').length
+        ).toBe(1);
+
+        cut.openPanel(new TestPanel('panel1', jest.fn() as any));
+
+        expect(
+            container.getElementsByClassName('watermark-test-container').length
+        ).toBe(0);
+        expect(
+            container.getElementsByClassName('tabs-and-actions-container')
+                .length
+        ).toBe(1);
+
+        cut.openPanel(new TestPanel('panel2', jest.fn() as any));
+
+        expect(
+            container.getElementsByClassName('watermark-test-container').length
+        ).toBe(0);
+
+        cut.removePanel('panel1');
+
+        expect(
+            container.getElementsByClassName('watermark-test-container').length
+        ).toBe(0);
+
+        cut.removePanel('panel2');
+
+        expect(
+            container.getElementsByClassName('watermark-test-container').length
+        ).toBe(1);
+
+        cut.openPanel(new TestPanel('panel1', jest.fn() as any));
+
+        expect(
+            container.getElementsByClassName('watermark-test-container').length
         ).toBe(0);
     });
 });
