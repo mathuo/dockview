@@ -575,38 +575,9 @@ export class DockviewComponent
 
 
       if(itemId === undefined) {
-
-
         if(sourceGroup) {
-          if (!target || target === Position.Center) {
-            const activePanel = sourceGroup.activePanel;
-            const panels = [...sourceGroup.panels].map(p => sourceGroup.model.removePanel(p.id));
-
-            if (sourceGroup?.model.size === 0) {
-              this.doRemoveGroup(sourceGroup);
-            }
-
-            for(const panel of panels) {
-              referenceGroup.model.openPanel(panel,{skipSetPanelActive:panel !== activePanel});
-            }
-          }
-          else {
-
-            this.gridview.removeView(getGridLocation(sourceGroup.element));
-
-            const referenceLocation = getGridLocation(referenceGroup.element);
-            const dropLocation = getRelativeLocation(
-              this.gridview.orientation,
-              referenceLocation,
-              target
-            );
-
-
-
-            this.gridview.addView(sourceGroup, Sizing.Distribute,  dropLocation);
-          }
+          this.moveGroup(sourceGroup, referenceGroup, target);
         }
-
         return;
       }
 
@@ -682,6 +653,38 @@ export class DockviewComponent
               group.model.openPanel(groupItem);
           }
       }
+  }
+
+  private moveGroup(sourceGroup: GroupPanel, referenceGroup: GroupPanel, target: Position): void {
+    if(sourceGroup) {
+      if (!target || target === Position.Center) {
+        const activePanel = sourceGroup.activePanel;
+        const panels = [...sourceGroup.panels].map(p => sourceGroup.model.removePanel(p.id));
+
+        if (sourceGroup?.model.size === 0) {
+          this.doRemoveGroup(sourceGroup);
+        }
+
+        for(const panel of panels) {
+          referenceGroup.model.openPanel(panel,{skipSetPanelActive:panel !== activePanel});
+        }
+      }
+      else {
+
+        this.gridview.removeView(getGridLocation(sourceGroup.element));
+
+        const referenceLocation = getGridLocation(referenceGroup.element);
+        const dropLocation = getRelativeLocation(
+          this.gridview.orientation,
+          referenceLocation,
+          target
+        );
+
+
+
+        this.gridview.addView(sourceGroup, Sizing.Distribute,  dropLocation);
+      }
+    }
   }
 
   override doSetGroupActive(
