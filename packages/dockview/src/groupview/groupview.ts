@@ -704,7 +704,9 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         if (data) {
             if (data.panelId === null) {
+                // this is a group move dnd event
                 const { groupId } = data;
+
                 this._onMove.fire({
                     target: position,
                     groupId: groupId,
