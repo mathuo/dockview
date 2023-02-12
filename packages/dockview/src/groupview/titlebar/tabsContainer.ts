@@ -4,7 +4,7 @@ import {
     IValueDisposable,
 } from '../../lifecycle';
 import { addDisposableListener, Emitter, Event } from '../../events';
-import { ITab, MouseEventKind, Tab } from '../tab';
+import { ITab, Tab } from '../tab';
 import { IDockviewPanel } from '../groupPanel';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { GroupPanel } from '../groupviewPanel';
@@ -256,17 +256,15 @@ export class TabsContainer
                     panel.id === this.group.model.activePanel?.id &&
                     this.group.model.isContentFocused;
 
-                const isLeftClick = event.event.button === 0;
+                const isLeftClick = event.button === 0;
 
-                if (!isLeftClick || event.event.defaultPrevented) {
+                if (!isLeftClick || event.defaultPrevented) {
                     return;
                 }
 
-                if (event.kind === MouseEventKind.CLICK) {
-                    this.group.model.openPanel(panel, {
-                        skipFocus: alreadyFocused,
-                    });
-                }
+                this.group.model.openPanel(panel, {
+                    skipFocus: alreadyFocused,
+                });
             }),
             tabToAdd.onDrop((event) => {
                 this._onDrop.fire({
