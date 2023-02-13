@@ -106,6 +106,14 @@ export class Tab extends CompositeDisposable implements ITab {
                 const data = getPanelData();
 
                 if (data && this.accessor.id === data.viewId) {
+                    if (
+                        data.panelId === null &&
+                        data.groupId === this.group.id
+                    ) {
+                        // don't allow group move to drop on self
+                        return false;
+                    }
+
                     return this.panelId !== data.panelId;
                 }
 

@@ -46,6 +46,14 @@ export class VoidContainer extends CompositeDisposable {
                 const data = getPanelData();
 
                 if (data && this.accessor.id === data.viewId) {
+                    if (
+                        data.panelId === null &&
+                        data.groupId === this.group.id
+                    ) {
+                        // don't allow group move to drop on self
+                        return false;
+                    }
+
                     // don't show the overlay if the tab being dragged is the last panel of this group
                     return last(this.group.panels)?.id !== data.panelId;
                 }

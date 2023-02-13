@@ -247,17 +247,12 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
                 const data = getPanelData();
 
-                if (
-                    data &&
-                    data.panelId === null &&
-                    data.viewId === this.accessor.id &&
-                    data.groupId !== this.id
-                ) {
-                    // prevent dropping on self for group dnd
-                    return true;
-                }
-
                 if (data && data.viewId === this.accessor.id) {
+                    if (data.panelId === null && data.groupId === this.id) {
+                        // don't allow group move to drop on self
+                        return false;
+                    }
+
                     const groupHasOnePanelAndIsActiveDragElement =
                         this._panels.length === 1 && data.groupId === this.id;
 
