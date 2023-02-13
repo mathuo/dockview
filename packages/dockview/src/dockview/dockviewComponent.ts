@@ -47,8 +47,6 @@ import { GroupPanel, IGroupviewPanel } from '../groupview/groupviewPanel';
 import { DefaultGroupPanelView } from './defaultGroupPanelView';
 import { getPanelData } from '../dnd/dataTransfer';
 
-const nextGroupId = sequentialNumberGenerator();
-
 export interface PanelReference {
     update: (event: { params: { [key: string]: any } }) => void;
     remove: () => void;
@@ -89,6 +87,7 @@ export interface IDockviewComponent extends IBaseGrid<GroupPanel> {
     readonly totalPanels: number;
     readonly panels: IDockviewPanel[];
     readonly onDidDrop: Event<DockviewDropEvent>;
+    readonly orientation: Orientation;
     tabHeight: number | undefined;
     deserializer: IPanelDeserializer | undefined;
     updateOptions(options: DockviewComponentUpdateOptions): void;
@@ -127,6 +126,7 @@ export class DockviewComponent
     extends BaseGrid<GroupPanel>
     implements IDockviewComponent
 {
+    private readonly nextGroupId = sequentialNumberGenerator();
     private _deserializer: IPanelDeserializer | undefined;
     private _api: DockviewApi;
     private _options: Exclude<DockviewComponentOptions, 'orientation'>;
@@ -149,6 +149,10 @@ export class DockviewComponent
     >();
     readonly onDidActivePanelChange: Event<IDockviewPanel | undefined> =
         this._onDidActivePanelChange.event;
+
+    get orientation(): Orientation {
+        return this.gridview.orientation;
+    }
 
     get totalPanels(): number {
         return this.panels.length;
@@ -841,9 +845,9 @@ export class DockviewComponent
         }
 
         if (!id) {
-            id = nextGroupId.next();
+            id = this.nextGroupId.next();
             while (this._groups.has(id)) {
-                id = nextGroupId.next();
+                id = this.nextGroupId.next();
             }
         }
 

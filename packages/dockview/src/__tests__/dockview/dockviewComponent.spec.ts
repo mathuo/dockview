@@ -32,7 +32,7 @@ class PanelContentPartTest implements IContentRenderer {
 
     isDisposed: boolean = false;
 
-    constructor(public readonly id: string, component: string) {
+    constructor(public readonly id: string, public readonly component: string) {
         this.element.classList.add(`testpanel-${id}`);
     }
 
@@ -53,7 +53,7 @@ class PanelContentPartTest implements IContentRenderer {
     }
 
     toJSON(): object {
-        return { id: this.id };
+        return { id: this.component };
     }
 
     focus(): void {
@@ -2017,4 +2017,379 @@ describe('dockviewComponent', () => {
     // load a layout with a default tab identifier when react default is present
 
     // load a layout with invialid panel identifier
+
+    test('orthogonal realigment #1', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+
+        expect(dockview.orientation).toBe(Orientation.HORIZONTAL);
+
+        dockview.fromJSON({
+            activeGroup: 'group-1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 500,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+            },
+        });
+
+        expect(dockview.orientation).toBe(Orientation.VERTICAL);
+
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            position: {
+                direction: 'left',
+            },
+        });
+
+        expect(dockview.orientation).toBe(Orientation.HORIZONTAL);
+
+        expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
+            activeGroup: '1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel2'],
+                                id: '1',
+                                activeView: 'panel2',
+                            },
+                            size: 500,
+                        },
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 1000,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.HORIZONTAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+                panel2: {
+                    id: 'panel2',
+                    view: { content: { id: 'default' } },
+                    title: 'panel2',
+                },
+            },
+            options: {},
+        });
+    });
+
+    test('orthogonal realigment #2', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+
+        expect(dockview.orientation).toBe(Orientation.HORIZONTAL);
+
+        dockview.fromJSON({
+            activeGroup: 'group-1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 500,
+                        },
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel2'],
+                                id: 'group-2',
+                                activeView: 'panel2',
+                            },
+                            size: 500,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+                panel2: {
+                    id: 'panel2',
+                    view: { content: { id: 'default' } },
+                    title: 'panel2',
+                },
+            },
+        });
+
+        expect(dockview.orientation).toBe(Orientation.VERTICAL);
+
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: {
+                direction: 'left',
+            },
+        });
+
+        expect(dockview.orientation).toBe(Orientation.HORIZONTAL);
+
+        expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
+            activeGroup: '1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel3'],
+                                id: '1',
+                                activeView: 'panel3',
+                            },
+                            size: 500,
+                        },
+                        {
+                            type: 'branch',
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    data: {
+                                        views: ['panel1'],
+                                        id: 'group-1',
+                                        activeView: 'panel1',
+                                    },
+                                    size: 500,
+                                },
+                                {
+                                    type: 'leaf',
+                                    data: {
+                                        views: ['panel2'],
+                                        id: 'group-2',
+                                        activeView: 'panel2',
+                                    },
+                                    size: 500,
+                                },
+                            ],
+                            size: 500,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.HORIZONTAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+
+                panel2: {
+                    id: 'panel2',
+                    view: { content: { id: 'default' } },
+                    title: 'panel2',
+                },
+                panel3: {
+                    id: 'panel3',
+                    view: { content: { id: 'default' } },
+                    title: 'panel3',
+                },
+            },
+            options: {},
+        });
+    });
+
+    test('orthogonal realigment #3', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+
+        expect(dockview.orientation).toBe(Orientation.HORIZONTAL);
+
+        dockview.fromJSON({
+            activeGroup: 'group-1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 500,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+            },
+        });
+
+        expect(dockview.orientation).toBe(Orientation.VERTICAL);
+
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            position: {
+                direction: 'above',
+            },
+        });
+
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: {
+                direction: 'below',
+            },
+        });
+
+        expect(dockview.orientation).toBe(Orientation.VERTICAL);
+
+        expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
+            activeGroup: '2',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel2'],
+                                id: '1',
+                                activeView: 'panel2',
+                            },
+                            size: 333,
+                        },
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 333,
+                        },
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel3'],
+                                id: '2',
+                                activeView: 'panel3',
+                            },
+                            size: 334,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+                panel2: {
+                    id: 'panel2',
+                    view: { content: { id: 'default' } },
+                    title: 'panel2',
+                },
+                panel3: {
+                    id: 'panel3',
+                    view: { content: { id: 'default' } },
+                    title: 'panel3',
+                },
+            },
+            options: {},
+        });
+    });
 });

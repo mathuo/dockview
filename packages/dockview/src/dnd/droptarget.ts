@@ -5,6 +5,10 @@ import { DragAndDropObserver } from './dnd';
 import { clamp } from '../math';
 import { Direction } from '../gridview/baseComponentGridview';
 
+function numberOrFallback(maybeNumber: any, fallback: number): number {
+    return typeof maybeNumber === 'number' ? maybeNumber : fallback;
+}
+
 export enum Position {
     Top = 'Top',
     Left = 'Left',
@@ -26,15 +30,15 @@ export function directionToPosition(direction: Direction): Position {
         case 'within':
             return Position.Center;
         default:
-            throw new Error(`invalid direction ${direction}`);
+            throw new Error(`invalid direction '${direction}'`);
     }
 }
 
 export type Quadrant = 'top' | 'bottom' | 'left' | 'right';
 
 export interface DroptargetEvent {
-    position: Position;
-    nativeEvent: DragEvent;
+    readonly position: Position;
+    readonly nativeEvent: DragEvent;
 }
 
 export type DropTargetDirections =
@@ -62,7 +66,7 @@ export class Droptarget extends CompositeDisposable {
     private readonly _onDrop = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDrop.event;
 
-    get state() {
+    get state(): Position | undefined {
         return this._state;
     }
 
@@ -172,7 +176,7 @@ export class Droptarget extends CompositeDisposable {
         );
     }
 
-    public dispose() {
+    public dispose(): void {
         this.removeDropTarget();
     }
 
@@ -180,7 +184,7 @@ export class Droptarget extends CompositeDisposable {
         quadrant: Quadrant | null,
         width: number,
         height: number
-    ) {
+    ): void {
         if (!this.overlay) {
             return;
         }
@@ -242,7 +246,7 @@ export class Droptarget extends CompositeDisposable {
         toggleClass(this.overlay, 'small-bottom', isSmallY && isBottom);
     }
 
-    private setState(quadrant: Quadrant | null) {
+    private setState(quadrant: Quadrant | null): void {
         switch (quadrant) {
             case 'top':
                 this._state = Position.Top;
@@ -273,13 +277,13 @@ export class Droptarget extends CompositeDisposable {
             this.options.overlayModel?.activationSize === undefined ||
             this.options.overlayModel?.activationSize?.type === 'percentage';
 
-        const value =
-            typeof this.options.overlayModel?.activationSize?.value === 'number'
-                ? this.options.overlayModel?.activationSize?.value
-                : 20;
+        const value = numberOrFallback(
+            this.options?.overlayModel?.activationSize?.value,
+            20
+        );
 
         if (isPercentage) {
-            return calculateQuadrant_Percentage(
+            return calculateQuadrantAsPercentage(
                 overlayType,
                 x,
                 y,
@@ -289,7 +293,7 @@ export class Droptarget extends CompositeDisposable {
             );
         }
 
-        return calculateQuadrant_Pixels(
+        return calculateQuadrantAsPixels(
             overlayType,
             x,
             y,
@@ -310,7 +314,7 @@ export class Droptarget extends CompositeDisposable {
     }
 }
 
-function calculateQuadrant_Percentage(
+export function calculateQuadrantAsPercentage(
     overlayType: Set<DropTargetDirections>,
     x: number,
     y: number,
@@ -341,7 +345,7 @@ function calculateQuadrant_Percentage(
     return null;
 }
 
-function calculateQuadrant_Pixels(
+export function calculateQuadrantAsPixels(
     overlayType: Set<DropTargetDirections>,
     x: number,
     y: number,
@@ -358,7 +362,7 @@ function calculateQuadrant_Pixels(
     if (overlayType.has('top') && y < threshold) {
         return 'top';
     }
-    if (overlayType.has('right') && y > height - threshold) {
+    if (overlayType.has('bottom') && y > height - threshold) {
         return 'bottom';
     }
 

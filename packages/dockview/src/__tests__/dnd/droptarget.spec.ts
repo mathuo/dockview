@@ -1,4 +1,12 @@
-import { Droptarget, Position } from '../../dnd/droptarget';
+import {
+    calculateQuadrantAsPercentage,
+    calculateQuadrantAsPixels,
+    directionToPosition,
+    Droptarget,
+    DropTargetDirections,
+    Position,
+    Quadrant,
+} from '../../dnd/droptarget';
 import { fireEvent } from '@testing-library/dom';
 
 function createOffsetDragOverEvent(params: {
@@ -25,6 +33,17 @@ describe('droptarget', () => {
             () => 100
         );
         jest.spyOn(element, 'clientWidth', 'get').mockImplementation(() => 200);
+    });
+
+    test('directionToPosition', () => {
+        expect(directionToPosition('above')).toBe(Position.Top);
+        expect(directionToPosition('below')).toBe(Position.Bottom);
+        expect(directionToPosition('left')).toBe(Position.Left);
+        expect(directionToPosition('right')).toBe(Position.Right);
+        expect(directionToPosition('within')).toBe(Position.Center);
+        expect(() => directionToPosition('bad_input' as any)).toThrow(
+            "invalid direction 'bad_input'"
+        );
     });
 
     test('non-directional', () => {
@@ -196,5 +215,117 @@ describe('droptarget', () => {
         expect(droptarget.state).toBe(Position.Center);
         viewQuery = element.querySelectorAll('.drop-target');
         expect(viewQuery.length).toBe(0);
+    });
+
+    describe('calculateQuadrantAsPercentage', () => {
+        test('variety of cases', () => {
+            const inputs: Array<{
+                directions: DropTargetDirections[];
+                x: number;
+                y: number;
+                result: Quadrant | null | undefined;
+            }> = [
+                { directions: ['left', 'right'], x: 19, y: 50, result: 'left' },
+                {
+                    directions: ['left', 'right'],
+                    x: 81,
+                    y: 50,
+                    result: 'right',
+                },
+                {
+                    directions: ['top', 'bottom'],
+                    x: 50,
+                    y: 19,
+                    result: 'top',
+                },
+                {
+                    directions: ['top', 'bottom'],
+                    x: 50,
+                    y: 81,
+                    result: 'bottom',
+                },
+                {
+                    directions: ['left', 'right', 'top', 'bottom', 'center'],
+                    x: 50,
+                    y: 50,
+                    result: null,
+                },
+                {
+                    directions: ['left', 'right', 'top', 'bottom'],
+                    x: 50,
+                    y: 50,
+                    result: undefined,
+                },
+            ];
+
+            for (const input of inputs) {
+                expect(
+                    calculateQuadrantAsPercentage(
+                        new Set(input.directions),
+                        input.x,
+                        input.y,
+                        100,
+                        100,
+                        20
+                    )
+                ).toBe(input.result);
+            }
+        });
+    });
+
+    describe('calculateQuadrantAsPixels', () => {
+        test('variety of cases', () => {
+            const inputs: Array<{
+                directions: DropTargetDirections[];
+                x: number;
+                y: number;
+                result: Quadrant | null | undefined;
+            }> = [
+                { directions: ['left', 'right'], x: 19, y: 50, result: 'left' },
+                {
+                    directions: ['left', 'right'],
+                    x: 81,
+                    y: 50,
+                    result: 'right',
+                },
+                {
+                    directions: ['top', 'bottom'],
+                    x: 50,
+                    y: 19,
+                    result: 'top',
+                },
+                {
+                    directions: ['top', 'bottom'],
+                    x: 50,
+                    y: 81,
+                    result: 'bottom',
+                },
+                {
+                    directions: ['left', 'right', 'top', 'bottom', 'center'],
+                    x: 50,
+                    y: 50,
+                    result: null,
+                },
+                {
+                    directions: ['left', 'right', 'top', 'bottom'],
+                    x: 50,
+                    y: 50,
+                    result: undefined,
+                },
+            ];
+
+            for (const input of inputs) {
+                expect(
+                    calculateQuadrantAsPixels(
+                        new Set(input.directions),
+                        input.x,
+                        input.y,
+                        100,
+                        100,
+                        20
+                    )
+                ).toBe(input.result);
+            }
+        });
     });
 });

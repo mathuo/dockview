@@ -434,7 +434,15 @@ export class Gridview implements IDisposable {
             this.root.size
         );
 
-        this._root.addChild(oldRoot, Sizing.Distribute, 0);
+        if (oldRoot.children.length === 1) {
+            // can remove one level of redundant branching if there is only a single child
+            const childReference = oldRoot.children[0];
+            oldRoot.removeChild(0); // remove to prevent disposal when disposing of unwanted root
+            oldRoot.dispose();
+            this._root.addChild(childReference, Sizing.Distribute, 0);
+        } else {
+            this._root.addChild(oldRoot, Sizing.Distribute, 0);
+        }
 
         this.element.appendChild(this._root.element);
 
