@@ -69,6 +69,7 @@ export interface IDockviewReactProps {
     disableAutoResizing?: boolean;
     defaultTabComponent?: React.FunctionComponent<IDockviewPanelHeaderProps>;
     groupControlComponent?: React.FunctionComponent<IDockviewGroupControlProps>;
+    singleTabMode?: 'fullwidth' | 'default';
 }
 
 export const DockviewReact = React.forwardRef(
@@ -161,6 +162,7 @@ export const DockviewReact = React.forwardRef(
                     props.groupControlComponent,
                     { addPortal }
                 ),
+                singleTabMode: props.singleTabMode,
             });
 
             domRef.current?.appendChild(dockview.element);

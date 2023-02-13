@@ -10,9 +10,7 @@
         display: none;
     }
 
-    &.single-panel {
-      background-color: red !important;
-
+    &.dv-single-tab.dv-full-width-single-tab {
       .tabs-container {
           flex-grow: 1;
 

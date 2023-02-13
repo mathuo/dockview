@@ -68,6 +68,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     defaultTabComponent?: string;
     showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
     createGroupControlElement?: (group: GroupPanel) => IGroupControlRenderer;
+    singleTabMode?: 'fullwidth' | 'default';
 }
 
 export interface PanelOptions {

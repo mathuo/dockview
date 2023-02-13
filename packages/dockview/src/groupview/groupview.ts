@@ -234,9 +234,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         this.container.classList.add('groupview');
 
-        this.tabsContainer = new TabsContainer(this.accessor, this.groupPanel, {
-            tabHeight: options.tabHeight,
-        });
+        this.tabsContainer = new TabsContainer(this.accessor, this.groupPanel);
 
         this.contentContainer = new ContentContainer();
 

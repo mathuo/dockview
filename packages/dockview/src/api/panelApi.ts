@@ -57,10 +57,7 @@ export interface PanelApi {
 /**
  * A core api implementation that should be used across all panel-like objects
  */
-export abstract class PanelApiImpl
-    extends CompositeDisposable
-    implements PanelApi
-{
+export class PanelApiImpl extends CompositeDisposable implements PanelApi {
     private _isFocused = false;
     private _isActive = false;
     private _isVisible = true;

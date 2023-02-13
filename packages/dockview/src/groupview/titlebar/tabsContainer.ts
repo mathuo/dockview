@@ -135,8 +135,7 @@ export class TabsContainer
 
     constructor(
         private readonly accessor: DockviewComponent,
-        private readonly group: GroupPanel,
-        readonly options: { tabHeight?: number }
+        private readonly group: GroupPanel
     ) {
         super();
 
@@ -145,17 +144,31 @@ export class TabsContainer
         this._element = document.createElement('div');
         this._element.className = 'tabs-and-actions-container';
 
-        this.height = options.tabHeight;
+        this.height = accessor.options.tabHeight;
+
+        toggleClass(
+            this._element,
+            'dv-full-width-single-tab',
+            this.accessor.options.singleTabMode === 'fullwidth'
+        );
 
         this.addDisposables(
             this.accessor.onDidAddPanel((e) => {
                 if (e.api.group === this.group) {
-                    toggleClass(this._element, 'single-panel', this.size === 1);
+                    toggleClass(
+                        this._element,
+                        'dv-single-tab',
+                        this.size === 1
+                    );
                 }
             }),
             this.accessor.onDidRemovePanel((e) => {
                 if (e.api.group === this.group) {
-                    toggleClass(this._element, 'single-panel', this.size === 1);
+                    toggleClass(
+                        this._element,
+                        'dv-single-tab',
+                        this.size === 1
+                    );
                 }
             })
         );
