@@ -1,6 +1,4 @@
 import { Emitter, Event } from '../events';
-import { GridviewPanel } from '../gridview/gridviewPanel';
-import { MutableDisposable } from '../lifecycle';
 import { IPanel } from '../panel/types';
 import { FunctionOrValue } from '../types';
 import { PanelApiImpl, PanelApi } from './panelApi';

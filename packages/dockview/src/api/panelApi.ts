@@ -1,5 +1,4 @@
 import { Emitter, Event } from '../events';
-import { BasePanelView } from '../gridview/basePanelView';
 import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { IPanel, Parameters } from '../panel/types';
 

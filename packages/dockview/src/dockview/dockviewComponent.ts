@@ -250,7 +250,12 @@ export class DockviewComponent
                     return;
                 }
 
-                this.move(event.position, data.groupId, data.panelId);
+                this.moveGroupOrPanel(
+                    this.orthogonalize(event.position),
+                    data.groupId,
+                    data.panelId || undefined,
+                    Position.Center
+                );
             })
         );
 
@@ -289,19 +294,6 @@ export class DockviewComponent
             default:
                 throw new Error(`unsupported position ${position}`);
         }
-    }
-
-    private move(
-        position: Position,
-        groupId: string,
-        panelId: string | null
-    ): void {
-        this.moveGroupOrPanel(
-            this.orthogonalize(position),
-            groupId,
-            panelId || undefined,
-            Position.Center
-        );
     }
 
     updateOptions(options: DockviewComponentUpdateOptions): void {

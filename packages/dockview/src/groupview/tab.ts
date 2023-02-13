@@ -8,7 +8,6 @@ import {
 import { toggleClass } from '../dom';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { ITabRenderer } from './types';
-import { IDockviewPanel } from './groupPanel';
 import { GroupPanel } from './groupviewPanel';
 import { DroptargetEvent, Droptarget } from '../dnd/droptarget';
 import { DockviewDropTargets } from './dnd';
