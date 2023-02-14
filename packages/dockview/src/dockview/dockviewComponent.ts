@@ -46,6 +46,7 @@ import {
 import { GroupPanel, IGroupviewPanel } from '../groupview/groupviewPanel';
 import { DefaultGroupPanelView } from './defaultGroupPanelView';
 import { getPanelData } from '../dnd/dataTransfer';
+import { DockviewDropTargets } from '../groupview/dnd';
 
 export interface PanelReference {
     update: (event: { params: { [key: string]: any } }) => void;
@@ -235,8 +236,26 @@ export class DockviewComponent
         }
 
         const dropTarget = new Droptarget(this.element, {
-            canDisplayOverlay: () => {
-                return true;
+            canDisplayOverlay: (event, position) => {
+                const data = getPanelData();
+
+                if (data) {
+                    if (data.viewId !== this.id) {
+                        return false;
+                    }
+                    return true;
+                }
+
+                if (this.options.showDndOverlay) {
+                    return this.options.showDndOverlay({
+                        nativeEvent: event,
+                        position: position,
+                        target: DockviewDropTargets.Edge,
+                        getData: getPanelData,
+                    });
+                }
+
+                return false;
             },
             acceptedTargetZones: ['top', 'bottom', 'left', 'right'],
             overlayModel: {
@@ -250,16 +269,14 @@ export class DockviewComponent
             dropTarget.onDrop((event) => {
                 const data = getPanelData();
 
-                if (!data) {
-                    return;
+                if (data) {
+                    this.moveGroupOrPanel(
+                        this.orthogonalize(event.position),
+                        data.groupId,
+                        data.panelId || undefined,
+                        'center'
+                    );
                 }
-
-                this.moveGroupOrPanel(
-                    this.orthogonalize(event.position),
-                    data.groupId,
-                    data.panelId || undefined,
-                    Position.Center
-                );
             })
         );
 
@@ -268,16 +285,16 @@ export class DockviewComponent
 
     private orthogonalize(position: Position): GroupPanel {
         switch (position) {
-            case Position.Top:
-            case Position.Bottom:
+            case 'top':
+            case 'bottom':
                 if (this.gridview.orientation === Orientation.HORIZONTAL) {
                     // we need to add to a vertical splitview but the current root is a horizontal splitview.
                     // insert a vertical splitview at the root level and add the existing view as a child
                     this.gridview.insertOrthogonalSplitviewAtRoot();
                 }
                 break;
-            case Position.Left:
-            case Position.Right:
+            case 'left':
+            case 'right':
                 if (this.gridview.orientation === Orientation.VERTICAL) {
                     // we need to add to a horizontal splitview but the current root is a vertical splitview.
                     // insert a horiziontal splitview at the root level and add the existing view as a child
@@ -289,11 +306,11 @@ export class DockviewComponent
         }
 
         switch (position) {
-            case Position.Top:
-            case Position.Left:
+            case 'top':
+            case 'left':
                 return this.createGroupAtLocation([0]); // insert into first position
-            case Position.Bottom:
-            case Position.Right:
+            case 'bottom':
+            case 'right':
                 return this.createGroupAtLocation([this.gridview.length]); // insert into last position
             default:
                 throw new Error(`unsupported position ${position}`);
@@ -543,7 +560,7 @@ export class DockviewComponent
             const target = toTarget(
                 <Direction>options.position?.direction || 'within'
             );
-            if (target === Position.Center) {
+            if (target === 'center') {
                 panel = this.createPanel(options, referenceGroup);
                 referenceGroup.model.openPanel(panel);
             } else {
@@ -703,7 +720,7 @@ export class DockviewComponent
             return;
         }
 
-        if (!target || target === Position.Center) {
+        if (!target || target === 'center') {
             const groupItem: IDockviewPanel | undefined =
                 sourceGroup?.model.removePanel(itemId) ||
                 this.panels.find((panel) => panel.id === itemId);
@@ -782,7 +799,7 @@ export class DockviewComponent
         target: Position
     ): void {
         if (sourceGroup) {
-            if (!target || target === Position.Center) {
+            if (!target || target === 'center') {
                 const activePanel = sourceGroup.activePanel;
                 const panels = [...sourceGroup.panels].map((p) =>
                     sourceGroup.model.removePanel(p.id)

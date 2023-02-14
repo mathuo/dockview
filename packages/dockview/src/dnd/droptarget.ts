@@ -9,44 +9,29 @@ function numberOrFallback(maybeNumber: any, fallback: number): number {
     return typeof maybeNumber === 'number' ? maybeNumber : fallback;
 }
 
-export enum Position {
-    Top = 'Top',
-    Left = 'Left',
-    Bottom = 'Bottom',
-    Right = 'Right',
-    Center = 'Center',
-}
-
 export function directionToPosition(direction: Direction): Position {
     switch (direction) {
         case 'above':
-            return Position.Top;
+            return 'top';
         case 'below':
-            return Position.Bottom;
+            return 'bottom';
         case 'left':
-            return Position.Left;
+            return 'left';
         case 'right':
-            return Position.Right;
+            return 'right';
         case 'within':
-            return Position.Center;
+            return 'center';
         default:
             throw new Error(`invalid direction '${direction}'`);
     }
 }
-
-export type Quadrant = 'top' | 'bottom' | 'left' | 'right';
 
 export interface DroptargetEvent {
     readonly position: Position;
     readonly nativeEvent: DragEvent;
 }
 
-export type DropTargetDirections =
-    | 'top'
-    | 'bottom'
-    | 'left'
-    | 'right'
-    | 'center';
+export type Position = 'top' | 'bottom' | 'left' | 'right' | 'center';
 
 function isBooleanValue(
     canDisplayOverlay: CanDisplayOverlay
@@ -56,7 +41,7 @@ function isBooleanValue(
 
 export type CanDisplayOverlay =
     | boolean
-    | ((dragEvent: DragEvent, state: Quadrant | null) => boolean);
+    | ((dragEvent: DragEvent, state: Position) => boolean);
 
 export class Droptarget extends CompositeDisposable {
     private target: HTMLElement | undefined;
@@ -74,7 +59,7 @@ export class Droptarget extends CompositeDisposable {
         private readonly element: HTMLElement,
         private readonly options: {
             canDisplayOverlay: CanDisplayOverlay;
-            acceptedTargetZones: DropTargetDirections[];
+            acceptedTargetZones: Position[];
             overlayModel?: {
                 size?: { value: number; type: 'pixels' | 'percentage' };
                 activationSize?: {
@@ -117,7 +102,7 @@ export class Droptarget extends CompositeDisposable {
                         height
                     );
 
-                    if (quadrant === undefined) {
+                    if (quadrant === null) {
                         this.removeDropTarget();
                         return;
                     }
@@ -135,7 +120,7 @@ export class Droptarget extends CompositeDisposable {
                         this.target.className = 'drop-target-dropzone';
                         this.overlay = document.createElement('div');
                         this.overlay.className = 'drop-target-selection';
-                        this._state = Position.Center;
+                        this._state = 'center';
                         this.target.appendChild(this.overlay);
 
                         this.element.classList.add('drop-target');
@@ -181,7 +166,7 @@ export class Droptarget extends CompositeDisposable {
     }
 
     private toggleClasses(
-        quadrant: Quadrant | null,
+        quadrant: Position,
         width: number,
         height: number
     ): void {
@@ -246,33 +231,33 @@ export class Droptarget extends CompositeDisposable {
         toggleClass(this.overlay, 'small-bottom', isSmallY && isBottom);
     }
 
-    private setState(quadrant: Quadrant | null): void {
+    private setState(quadrant: Position): void {
         switch (quadrant) {
             case 'top':
-                this._state = Position.Top;
+                this._state = 'top';
                 break;
             case 'left':
-                this._state = Position.Left;
+                this._state = 'left';
                 break;
             case 'bottom':
-                this._state = Position.Bottom;
+                this._state = 'bottom';
                 break;
             case 'right':
-                this._state = Position.Right;
+                this._state = 'right';
                 break;
-            default:
-                this._state = Position.Center;
+            case 'center':
+                this._state = 'center';
                 break;
         }
     }
 
     private calculateQuadrant(
-        overlayType: Set<DropTargetDirections>,
+        overlayType: Set<Position>,
         x: number,
         y: number,
         width: number,
         height: number
-    ): Quadrant | null | undefined {
+    ): Position | null {
         const isPercentage =
             this.options.overlayModel?.activationSize === undefined ||
             this.options.overlayModel?.activationSize?.type === 'percentage';
@@ -315,13 +300,13 @@ export class Droptarget extends CompositeDisposable {
 }
 
 export function calculateQuadrantAsPercentage(
-    overlayType: Set<DropTargetDirections>,
+    overlayType: Set<Position>,
     x: number,
     y: number,
     width: number,
     height: number,
     threshold: number
-): Quadrant | null | undefined {
+): Position | null {
     const xp = (100 * x) / width;
     const yp = (100 * y) / height;
 
@@ -339,20 +324,20 @@ export function calculateQuadrantAsPercentage(
     }
 
     if (!overlayType.has('center')) {
-        return undefined;
+        return null;
     }
 
-    return null;
+    return 'center';
 }
 
 export function calculateQuadrantAsPixels(
-    overlayType: Set<DropTargetDirections>,
+    overlayType: Set<Position>,
     x: number,
     y: number,
     width: number,
     height: number,
     threshold: number
-): Quadrant | null | undefined {
+): Position | null {
     if (overlayType.has('left') && x < threshold) {
         return 'left';
     }
@@ -367,8 +352,8 @@ export function calculateQuadrantAsPixels(
     }
 
     if (!overlayType.has('center')) {
-        return undefined;
+        return null;
     }
 
-    return null;
+    return 'center';
 }

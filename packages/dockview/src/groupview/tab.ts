@@ -98,7 +98,7 @@ export class Tab extends CompositeDisposable implements ITab {
 
         this.droptarget = new Droptarget(this._element, {
             acceptedTargetZones: ['center'],
-            canDisplayOverlay: (event) => {
+            canDisplayOverlay: (event, position) => {
                 if (this.group.locked) {
                     return false;
                 }
@@ -119,6 +119,7 @@ export class Tab extends CompositeDisposable implements ITab {
 
                 return this.group.model.canDisplayOverlay(
                     event,
+                    position,
                     DockviewDropTargets.Tab
                 );
             },

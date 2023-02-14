@@ -110,7 +110,11 @@ export interface IGroupview extends IDisposable, IGridPanelView {
         panel?: IDockviewPanel;
         suppressRoll?: boolean;
     }): void;
-    canDisplayOverlay(event: DragEvent, target: DockviewDropTargets): boolean;
+    canDisplayOverlay(
+        event: DragEvent,
+        position: Position,
+        target: DockviewDropTargets
+    ): boolean;
 }
 
 export class Groupview extends CompositeDisposable implements IGroupview {
@@ -240,17 +244,23 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         this.dropTarget = new Droptarget(this.contentContainer.element, {
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
-            canDisplayOverlay: (event, quadrant) => {
-                if (this.locked && !quadrant) {
+            canDisplayOverlay: (event, position) => {
+                if (this.locked && position === 'center') {
                     return false;
                 }
 
                 const data = getPanelData();
 
                 if (data && data.viewId === this.accessor.id) {
-                    if (data.panelId === null && data.groupId === this.id) {
-                        // don't allow group move to drop on self
-                        return false;
+                    if (data.groupId === this.id) {
+                        if (position === 'center') {
+                            // don't allow to drop on self for center position
+                            return false;
+                        }
+                        if (data.panelId === null) {
+                            // don't allow group move to drop anywhere on self
+                            return false;
+                        }
                     }
 
                     const groupHasOnePanelAndIsActiveDragElement =
@@ -259,7 +269,11 @@ export class Groupview extends CompositeDisposable implements IGroupview {
                     return !groupHasOnePanelAndIsActiveDragElement;
                 }
 
-                return this.canDisplayOverlay(event, DockviewDropTargets.Panel);
+                return this.canDisplayOverlay(
+                    event,
+                    position,
+                    DockviewDropTargets.Panel
+                );
             },
         });
 
@@ -279,7 +293,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
             this._onDidRemovePanel,
             this._onDidActivePanelChange,
             this.tabsContainer.onDrop((event) => {
-                this.handleDropEvent(event.event, Position.Center, event.index);
+                this.handleDropEvent(event.event, 'center', event.index);
             }),
             this.contentContainer.onDidFocus(() => {
                 this.accessor.doSetGroupActive(this.groupPanel, true);
@@ -673,13 +687,18 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
     }
 
-    canDisplayOverlay(event: DragEvent, target: DockviewDropTargets): boolean {
+    canDisplayOverlay(
+        event: DragEvent,
+        position: Position,
+        target: DockviewDropTargets
+    ): boolean {
         // custom overlay handler
         if (this.accessor.options.showDndOverlay) {
             return this.accessor.options.showDndOverlay({
                 nativeEvent: event,
                 target,
                 group: this.accessor.getPanel(this.id)!,
+                position,
                 getData: getPanelData,
             });
         }

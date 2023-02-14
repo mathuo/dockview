@@ -15,19 +15,19 @@ const nextLayoutId = sequentialNumberGenerator();
 
 export type Direction = 'left' | 'right' | 'above' | 'below' | 'within';
 
-export function toTarget(direction: Direction) {
+export function toTarget(direction: Direction): Position {
     switch (direction) {
         case 'left':
-            return Position.Left;
+            return 'left';
         case 'right':
-            return Position.Right;
+            return 'right';
         case 'above':
-            return Position.Top;
+            return 'top';
         case 'below':
-            return Position.Bottom;
+            return 'bottom';
         case 'within':
         default:
-            return Position.Center;
+            return 'center';
     }
 }
 

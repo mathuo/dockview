@@ -14,6 +14,7 @@ import { FrameworkFactory } from '../types';
 import { DockviewDropTargets } from '../groupview/dnd';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IGroupControlRenderer } from '../react/dockview/groupControlsRenderer';
+import { Position } from '../dnd/droptarget';
 
 export interface GroupPanelFrameworkComponentFactory {
     content: FrameworkFactory<IContentRenderer>;
@@ -54,7 +55,8 @@ export interface ViewFactoryData {
 export interface DockviewDndOverlayEvent {
     nativeEvent: DragEvent;
     target: DockviewDropTargets;
-    group: GroupPanel;
+    position: Position;
+    group?: GroupPanel;
     getData: () => PanelTransfer | undefined;
 }
 

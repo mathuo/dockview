@@ -253,9 +253,9 @@ describe('dockviewComponent', () => {
         const panel4 = dockview.getGroupPanel('panel4');
 
         const group1 = panel1!.group;
-        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', Position.Right);
+        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', 'right');
         const group2 = panel1!.group;
-        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', Position.Center);
+        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', 'center');
 
         expect(dockview.activeGroup).toBe(group2);
         expect(dockview.activeGroup!.model.activePanel).toBe(panel3);
@@ -305,9 +305,9 @@ describe('dockviewComponent', () => {
         const panel1 = dockview.getGroupPanel('panel1')!;
         const panel2 = dockview.getGroupPanel('panel2')!;
         const group1 = panel1.group;
-        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', Position.Right);
+        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', 'right');
         const group2 = panel1.group;
-        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', Position.Center);
+        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', 'center');
 
         expect(dockview.size).toBe(2);
         expect(dockview.totalPanels).toBe(4);
@@ -370,9 +370,9 @@ describe('dockviewComponent', () => {
         expect(panel4.api.isActive).toBeFalsy();
 
         const group1 = panel1.group;
-        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', Position.Right);
+        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', 'right');
         const group2 = panel1.group;
-        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', Position.Center);
+        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', 'center');
 
         expect(dockview.size).toBe(2);
         expect(panel1.group).toBe(panel3.group);
@@ -439,7 +439,7 @@ describe('dockviewComponent', () => {
         expect(group.model.indexOf(panel1)).toBe(0);
         expect(group.model.indexOf(panel2)).toBe(1);
 
-        dockview.moveGroupOrPanel(group, group.id, 'panel1', Position.Right);
+        dockview.moveGroupOrPanel(group, group.id, 'panel1', 'right');
 
         expect(dockview.size).toBe(2);
         expect(dockview.totalPanels).toBe(2);
@@ -489,7 +489,7 @@ describe('dockviewComponent', () => {
         expect(viewQuery.length).toBe(1);
 
         const group = dockview.getGroupPanel('panel1')!.group;
-        dockview.moveGroupOrPanel(group, group.id, 'panel1', Position.Right);
+        dockview.moveGroupOrPanel(group, group.id, 'panel1', 'right');
 
         viewQuery = container.querySelectorAll(
             '.branch-node > .split-view-container > .view-container > .view'
@@ -974,7 +974,7 @@ describe('dockviewComponent', () => {
             panel2.group!,
             panel5.group!.id,
             panel5.id,
-            Position.Center
+            'center'
         );
         expect(events).toEqual([
             { type: 'REMOVE_PANEL', panel: panel5 },
@@ -993,7 +993,7 @@ describe('dockviewComponent', () => {
             panel2.group!,
             panel4.group!.id,
             panel4.id,
-            Position.Center
+            'center'
         );
 
         expect(events).toEqual([
@@ -1313,7 +1313,7 @@ describe('dockviewComponent', () => {
             panel1.group,
             panel2.group.id,
             'panel2',
-            Position.Left
+            'left'
         );
 
         expect(panel1Spy).not.toHaveBeenCalled();
@@ -1354,7 +1354,7 @@ describe('dockviewComponent', () => {
             panel1.group,
             panel2.group.id,
             'panel2',
-            Position.Center
+            'center'
         );
 
         expect(panel1Spy).not.toHaveBeenCalled();
@@ -1393,7 +1393,7 @@ describe('dockviewComponent', () => {
             panel1.group,
             panel1.group.id,
             'panel1',
-            Position.Center,
+            'center',
             0
         );
 
@@ -1554,7 +1554,7 @@ describe('dockviewComponent', () => {
             panel3.group,
             panel1.group.id,
             undefined,
-            Position.Center
+            'center'
         );
 
         expect(dockview.groups.length).toBe(1);

@@ -4,7 +4,7 @@ import {
     LocalSelectionTransfer,
     PaneTransfer,
 } from '../dnd/dataTransfer';
-import { Droptarget, DroptargetEvent, Position } from '../dnd/droptarget';
+import { Droptarget, DroptargetEvent } from '../dnd/droptarget';
 import { Emitter } from '../events';
 import { IDisposable } from '../lifecycle';
 import { Orientation } from '../splitview/core/splitview';
@@ -142,16 +142,10 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
         const fromIndex = allPanels.indexOf(existingPanel);
         let toIndex = containerApi.panels.indexOf(this);
 
-        if (
-            event.position === Position.Left ||
-            event.position === Position.Top
-        ) {
+        if (event.position === 'left' || event.position === 'top') {
             toIndex = Math.max(0, toIndex - 1);
         }
-        if (
-            event.position === Position.Right ||
-            event.position === Position.Bottom
-        ) {
+        if (event.position === 'right' || event.position === 'bottom') {
             if (fromIndex > toIndex) {
                 toIndex++;
             }

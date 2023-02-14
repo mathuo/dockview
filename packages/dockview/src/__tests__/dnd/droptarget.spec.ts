@@ -3,9 +3,7 @@ import {
     calculateQuadrantAsPixels,
     directionToPosition,
     Droptarget,
-    DropTargetDirections,
     Position,
-    Quadrant,
 } from '../../dnd/droptarget';
 import { fireEvent } from '@testing-library/dom';
 
@@ -36,11 +34,11 @@ describe('droptarget', () => {
     });
 
     test('directionToPosition', () => {
-        expect(directionToPosition('above')).toBe(Position.Top);
-        expect(directionToPosition('below')).toBe(Position.Bottom);
-        expect(directionToPosition('left')).toBe(Position.Left);
-        expect(directionToPosition('right')).toBe(Position.Right);
-        expect(directionToPosition('within')).toBe(Position.Center);
+        expect(directionToPosition('above')).toBe('top');
+        expect(directionToPosition('below')).toBe('bottom');
+        expect(directionToPosition('left')).toBe('left');
+        expect(directionToPosition('right')).toBe('right');
+        expect(directionToPosition('within')).toBe('center');
         expect(() => directionToPosition('bad_input' as any)).toThrow(
             "invalid direction 'bad_input'"
         );
@@ -65,7 +63,7 @@ describe('droptarget', () => {
             '.drop-target-dropzone'
         ) as HTMLElement;
         fireEvent.drop(target);
-        expect(position).toBe(Position.Center);
+        expect(position).toBe('center');
     });
 
     test('drop', () => {
@@ -100,7 +98,7 @@ describe('droptarget', () => {
 
         expect(position).toBeUndefined();
         fireEvent.drop(target);
-        expect(position).toBe(Position.Left);
+        expect(position).toBe('left');
     });
 
     test('default', () => {
@@ -135,7 +133,7 @@ describe('droptarget', () => {
             '.drop-target > .drop-target-dropzone > .drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
-        expect(droptarget.state).toBe(Position.Left);
+        expect(droptarget.state).toBe('left');
         expect(
             (
                 element
@@ -153,7 +151,7 @@ describe('droptarget', () => {
             '.drop-target > .drop-target-dropzone > .drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
-        expect(droptarget.state).toBe(Position.Top);
+        expect(droptarget.state).toBe('top');
         expect(
             (
                 element
@@ -171,7 +169,7 @@ describe('droptarget', () => {
             '.drop-target > .drop-target-dropzone > .drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
-        expect(droptarget.state).toBe(Position.Bottom);
+        expect(droptarget.state).toBe('bottom');
         expect(
             (
                 element
@@ -189,7 +187,7 @@ describe('droptarget', () => {
             '.drop-target > .drop-target-dropzone > .drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
-        expect(droptarget.state).toBe(Position.Right);
+        expect(droptarget.state).toBe('right');
         expect(
             (
                 element
@@ -202,7 +200,7 @@ describe('droptarget', () => {
             target,
             createOffsetDragOverEvent({ clientX: 100, clientY: 50 })
         );
-        expect(droptarget.state).toBe(Position.Center);
+        expect(droptarget.state).toBe('center');
         expect(
             (
                 element
@@ -212,7 +210,7 @@ describe('droptarget', () => {
         ).toBe('');
 
         fireEvent.dragLeave(target);
-        expect(droptarget.state).toBe(Position.Center);
+        expect(droptarget.state).toBe('center');
         viewQuery = element.querySelectorAll('.drop-target');
         expect(viewQuery.length).toBe(0);
     });
@@ -220,10 +218,10 @@ describe('droptarget', () => {
     describe('calculateQuadrantAsPercentage', () => {
         test('variety of cases', () => {
             const inputs: Array<{
-                directions: DropTargetDirections[];
+                directions: Position[];
                 x: number;
                 y: number;
-                result: Quadrant | null | undefined;
+                result: Position | null;
             }> = [
                 { directions: ['left', 'right'], x: 19, y: 50, result: 'left' },
                 {
@@ -248,13 +246,13 @@ describe('droptarget', () => {
                     directions: ['left', 'right', 'top', 'bottom', 'center'],
                     x: 50,
                     y: 50,
-                    result: null,
+                    result: 'center',
                 },
                 {
                     directions: ['left', 'right', 'top', 'bottom'],
                     x: 50,
                     y: 50,
-                    result: undefined,
+                    result: null,
                 },
             ];
 
@@ -276,10 +274,10 @@ describe('droptarget', () => {
     describe('calculateQuadrantAsPixels', () => {
         test('variety of cases', () => {
             const inputs: Array<{
-                directions: DropTargetDirections[];
+                directions: Position[];
                 x: number;
                 y: number;
-                result: Quadrant | null | undefined;
+                result: Position | null;
             }> = [
                 { directions: ['left', 'right'], x: 19, y: 50, result: 'left' },
                 {
@@ -304,13 +302,13 @@ describe('droptarget', () => {
                     directions: ['left', 'right', 'top', 'bottom', 'center'],
                     x: 50,
                     y: 50,
-                    result: null,
+                    result: 'center',
                 },
                 {
                     directions: ['left', 'right', 'top', 'bottom'],
                     x: 50,
                     y: 50,
-                    result: undefined,
+                    result: null,
                 },
             ];
 

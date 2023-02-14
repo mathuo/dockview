@@ -42,7 +42,7 @@ export class VoidContainer extends CompositeDisposable {
 
         this.voidDropTarget = new Droptarget(this._element, {
             acceptedTargetZones: ['center'],
-            canDisplayOverlay: (event) => {
+            canDisplayOverlay: (event, position) => {
                 const data = getPanelData();
 
                 if (data && this.accessor.id === data.viewId) {
@@ -60,6 +60,7 @@ export class VoidContainer extends CompositeDisposable {
 
                 return group.model.canDisplayOverlay(
                     event,
+                    position,
                     DockviewDropTargets.Panel
                 );
             },

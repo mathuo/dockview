@@ -9,13 +9,13 @@ import {
     Orientation,
     Sizing,
 } from '../splitview/core/splitview';
-import { Position } from '../dnd/droptarget';
 import { tail } from '../array';
 import { LeafNode } from './leafNode';
 import { BranchNode } from './branchNode';
 import { Node } from './types';
 import { Emitter, Event } from '../events';
 import { IDisposable, MutableDisposable } from '../lifecycle';
+import { Position } from '../dnd/droptarget';
 
 function findLeaf(candiateNode: Node, last: boolean): LeafNode {
     if (candiateNode instanceof LeafNode) {
@@ -132,22 +132,19 @@ export function getRelativeLocation(
         const [rest, _index] = tail(location);
         let index = _index;
 
-        if (direction === Position.Right || direction === Position.Bottom) {
+        if (direction === 'right' || direction === 'bottom') {
             index += 1;
         }
 
         return [...rest, index];
     } else {
-        const index =
-            direction === Position.Right || direction === Position.Bottom
-                ? 1
-                : 0;
+        const index = direction === 'right' || direction === 'bottom' ? 1 : 0;
         return [...location, index];
     }
 }
 
 export function getDirectionOrientation(direction: Position): Orientation {
-    return direction === Position.Top || direction === Position.Bottom
+    return direction === 'top' || direction === 'bottom'
         ? Orientation.VERTICAL
         : Orientation.HORIZONTAL;
 }

@@ -730,7 +730,7 @@ describe('groupview', () => {
         ).toBe(0);
     });
 
-    test('that should allow drop when not dropping on self for same component id', () => {
+    test('that should not allow drop when dropping on self for same component id', () => {
         const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
             return {
                 id: 'testcomponentid',
@@ -792,7 +792,7 @@ describe('groupview', () => {
 
         expect(
             element.getElementsByClassName('drop-target-dropzone').length
-        ).toBe(1);
+        ).toBe(0);
     });
 
     test('that should not allow drop when not dropping for different component id', () => {
