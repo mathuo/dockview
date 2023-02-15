@@ -225,6 +225,8 @@ describe('groupview', () => {
             id: 'dockview-1',
             removePanel: removePanelMock,
             removeGroup: removeGroupMock,
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
         }) as DockviewComponent;
 
         options = {
@@ -616,6 +618,8 @@ describe('groupview', () => {
                     showDndOverlay: jest.fn(),
                 },
                 getPanel: jest.fn(),
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
             };
         });
         const accessor = new accessorMock() as DockviewComponent;
@@ -671,6 +675,8 @@ describe('groupview', () => {
                 },
                 getPanel: jest.fn(),
                 doSetGroupActive: jest.fn(),
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
             };
         });
         const accessor = new accessorMock() as DockviewComponent;
@@ -724,7 +730,7 @@ describe('groupview', () => {
         ).toBe(0);
     });
 
-    test('that should allow drop when not dropping on self for same component id', () => {
+    test('that should not allow drop when dropping on self for same component id', () => {
         const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
             return {
                 id: 'testcomponentid',
@@ -733,6 +739,8 @@ describe('groupview', () => {
                 },
                 getPanel: jest.fn(),
                 doSetGroupActive: jest.fn(),
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
             };
         });
         const accessor = new accessorMock() as DockviewComponent;
@@ -784,7 +792,7 @@ describe('groupview', () => {
 
         expect(
             element.getElementsByClassName('drop-target-dropzone').length
-        ).toBe(1);
+        ).toBe(0);
     });
 
     test('that should not allow drop when not dropping for different component id', () => {
@@ -796,6 +804,8 @@ describe('groupview', () => {
                 },
                 getPanel: jest.fn(),
                 doSetGroupActive: jest.fn(),
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
             };
         });
         const accessor = new accessorMock() as DockviewComponent;

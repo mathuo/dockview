@@ -4,11 +4,12 @@ import {
     IValueDisposable,
 } from '../../lifecycle';
 import { addDisposableListener, Emitter, Event } from '../../events';
-import { ITab, MouseEventKind, Tab } from '../tab';
+import { ITab, Tab } from '../tab';
 import { IDockviewPanel } from '../groupPanel';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { GroupPanel } from '../groupviewPanel';
 import { VoidContainer } from './voidContainer';
+import { toggleClass } from '../../dom';
 
 export interface TabDropIndexEvent {
     event: DragEvent;
@@ -134,8 +135,7 @@ export class TabsContainer
 
     constructor(
         private readonly accessor: DockviewComponent,
-        private readonly group: GroupPanel,
-        readonly options: { tabHeight?: number }
+        private readonly group: GroupPanel
     ) {
         super();
 
@@ -144,7 +144,34 @@ export class TabsContainer
         this._element = document.createElement('div');
         this._element.className = 'tabs-and-actions-container';
 
-        this.height = options.tabHeight;
+        this.height = accessor.options.tabHeight;
+
+        toggleClass(
+            this._element,
+            'dv-full-width-single-tab',
+            this.accessor.options.singleTabMode === 'fullwidth'
+        );
+
+        this.addDisposables(
+            this.accessor.onDidAddPanel((e) => {
+                if (e.api.group === this.group) {
+                    toggleClass(
+                        this._element,
+                        'dv-single-tab',
+                        this.size === 1
+                    );
+                }
+            }),
+            this.accessor.onDidRemovePanel((e) => {
+                if (e.api.group === this.group) {
+                    toggleClass(
+                        this._element,
+                        'dv-single-tab',
+                        this.size === 1
+                    );
+                }
+            })
+        );
 
         this.actionContainer = document.createElement('div');
         this.actionContainer.className = 'action-container';
@@ -242,17 +269,15 @@ export class TabsContainer
                     panel.id === this.group.model.activePanel?.id &&
                     this.group.model.isContentFocused;
 
-                const isLeftClick = event.event.button === 0;
+                const isLeftClick = event.button === 0;
 
-                if (!isLeftClick || event.event.defaultPrevented) {
+                if (!isLeftClick || event.defaultPrevented) {
                     return;
                 }
 
-                if (event.kind === MouseEventKind.CLICK) {
-                    this.group.model.openPanel(panel, {
-                        skipFocus: alreadyFocused,
-                    });
-                }
+                this.group.model.openPanel(panel, {
+                    skipFocus: alreadyFocused,
+                });
             }),
             tabToAdd.onDrop((event) => {
                 this._onDrop.fire({

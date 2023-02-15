@@ -9,13 +9,13 @@ import {
     Orientation,
     Sizing,
 } from '../splitview/core/splitview';
-import { Position } from '../dnd/droptarget';
 import { tail } from '../array';
 import { LeafNode } from './leafNode';
 import { BranchNode } from './branchNode';
 import { Node } from './types';
 import { Emitter, Event } from '../events';
 import { IDisposable, MutableDisposable } from '../lifecycle';
+import { Position } from '../dnd/droptarget';
 
 function findLeaf(candiateNode: Node, last: boolean): LeafNode {
     if (candiateNode instanceof LeafNode) {
@@ -132,22 +132,19 @@ export function getRelativeLocation(
         const [rest, _index] = tail(location);
         let index = _index;
 
-        if (direction === Position.Right || direction === Position.Bottom) {
+        if (direction === 'right' || direction === 'bottom') {
             index += 1;
         }
 
         return [...rest, index];
     } else {
-        const index =
-            direction === Position.Right || direction === Position.Bottom
-                ? 1
-                : 0;
+        const index = direction === 'right' || direction === 'bottom' ? 1 : 0;
         return [...location, index];
     }
 }
 
 export function getDirectionOrientation(direction: Position): Orientation {
-    return direction === Position.Top || direction === Position.Bottom
+    return direction === 'top' || direction === 'bottom'
         ? Orientation.VERTICAL
         : Orientation.HORIZONTAL;
 }
@@ -275,6 +272,10 @@ export class Gridview implements IDisposable {
     }>();
     readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
         this._onDidChange.event;
+
+    public get length(): number {
+        return this._root ? this._root.children.length : 0;
+    }
 
     public serialize() {
         const root = serializeBranchNode(this.getView(), this.orientation);
@@ -405,6 +406,43 @@ export class Gridview implements IDisposable {
 
         this._root = root;
         this.element.appendChild(this._root.element);
+        this.disposable.value = this._root.onDidChange((e) => {
+            this._onDidChange.fire(e);
+        });
+    }
+
+    /**
+     * If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node
+     * If the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node
+     */
+    public insertOrthogonalSplitviewAtRoot(): void {
+        if (!this._root) {
+            return;
+        }
+
+        const oldRoot = this.root;
+        oldRoot.element.remove();
+
+        this._root = new BranchNode(
+            orthogonal(oldRoot.orientation),
+            this.proportionalLayout,
+            this.styles,
+            this.root.orthogonalSize,
+            this.root.size
+        );
+
+        if (oldRoot.children.length === 1) {
+            // can remove one level of redundant branching if there is only a single child
+            const childReference = oldRoot.children[0];
+            oldRoot.removeChild(0); // remove to prevent disposal when disposing of unwanted root
+            oldRoot.dispose();
+            this._root.addChild(childReference, Sizing.Distribute, 0);
+        } else {
+            this._root.addChild(oldRoot, Sizing.Distribute, 0);
+        }
+
+        this.element.appendChild(this._root.element);
+
         this.disposable.value = this._root.onDidChange((e) => {
             this._onDidChange.fire(e);
         });

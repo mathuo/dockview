@@ -1,16 +1,22 @@
-import { Droptarget, Position } from '../../dnd/droptarget';
+import {
+    calculateQuadrantAsPercentage,
+    calculateQuadrantAsPixels,
+    directionToPosition,
+    Droptarget,
+    Position,
+} from '../../dnd/droptarget';
 import { fireEvent } from '@testing-library/dom';
 
 function createOffsetDragOverEvent(params: {
-    offsetX: number;
-    offsetY: number;
+    clientX: number;
+    clientY: number;
 }): Event {
     const event = new Event('dragover', {
         bubbles: true,
         cancelable: true,
     });
-    Object.defineProperty(event, 'offsetX', { get: () => params.offsetX });
-    Object.defineProperty(event, 'offsetY', { get: () => params.offsetY });
+    Object.defineProperty(event, 'clientX', { get: () => params.clientX });
+    Object.defineProperty(event, 'clientY', { get: () => params.clientY });
     return event;
 }
 
@@ -27,12 +33,23 @@ describe('droptarget', () => {
         jest.spyOn(element, 'clientWidth', 'get').mockImplementation(() => 200);
     });
 
+    test('directionToPosition', () => {
+        expect(directionToPosition('above')).toBe('top');
+        expect(directionToPosition('below')).toBe('bottom');
+        expect(directionToPosition('left')).toBe('left');
+        expect(directionToPosition('right')).toBe('right');
+        expect(directionToPosition('within')).toBe('center');
+        expect(() => directionToPosition('bad_input' as any)).toThrow(
+            "invalid direction 'bad_input'"
+        );
+    });
+
     test('non-directional', () => {
         let position: Position | undefined = undefined;
 
         droptarget = new Droptarget(element, {
             canDisplayOverlay: () => true,
-            validOverlays: 'none',
+            acceptedTargetZones: ['center'],
         });
 
         droptarget.onDrop((event) => {
@@ -46,7 +63,7 @@ describe('droptarget', () => {
             '.drop-target-dropzone'
         ) as HTMLElement;
         fireEvent.drop(target);
-        expect(position).toBe(Position.Center);
+        expect(position).toBe('center');
     });
 
     test('drop', () => {
@@ -54,7 +71,7 @@ describe('droptarget', () => {
 
         droptarget = new Droptarget(element, {
             canDisplayOverlay: () => true,
-            validOverlays: 'all',
+            acceptedTargetZones: ['top', 'left', 'right', 'bottom', 'center'],
         });
 
         droptarget.onDrop((event) => {
@@ -73,18 +90,21 @@ describe('droptarget', () => {
 
         fireEvent(
             target,
-            createOffsetDragOverEvent({ offsetX: 19, offsetY: 0 })
+            createOffsetDragOverEvent({
+                clientX: 19,
+                clientY: 0,
+            })
         );
 
         expect(position).toBeUndefined();
         fireEvent.drop(target);
-        expect(position).toBe(Position.Left);
+        expect(position).toBe('left');
     });
 
     test('default', () => {
         droptarget = new Droptarget(element, {
             canDisplayOverlay: () => true,
-            validOverlays: 'all',
+            acceptedTargetZones: ['top', 'left', 'right', 'bottom', 'center'],
         });
 
         expect(droptarget.state).toBeUndefined();
@@ -106,57 +126,204 @@ describe('droptarget', () => {
 
         fireEvent(
             target,
-            createOffsetDragOverEvent({ offsetX: 19, offsetY: 0 })
+            createOffsetDragOverEvent({ clientX: 19, clientY: 0 })
         );
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection.left'
+            '.drop-target > .drop-target-dropzone > .drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
-        expect(droptarget.state).toBe(Position.Left);
+        expect(droptarget.state).toBe('left');
+        expect(
+            (
+                element
+                    .getElementsByClassName('drop-target-selection')
+                    .item(0) as HTMLDivElement
+            ).style.transform
+        ).toBe('translateX(-25%) scaleX(0.5)');
 
         fireEvent(
             target,
-            createOffsetDragOverEvent({ offsetX: 40, offsetY: 19 })
+            createOffsetDragOverEvent({ clientX: 40, clientY: 19 })
         );
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection.top'
+            '.drop-target > .drop-target-dropzone > .drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
-        expect(droptarget.state).toBe(Position.Top);
+        expect(droptarget.state).toBe('top');
+        expect(
+            (
+                element
+                    .getElementsByClassName('drop-target-selection')
+                    .item(0) as HTMLDivElement
+            ).style.transform
+        ).toBe('translateY(-25%) scaleY(0.5)');
 
         fireEvent(
             target,
-            createOffsetDragOverEvent({ offsetX: 160, offsetY: 81 })
+            createOffsetDragOverEvent({ clientX: 160, clientY: 81 })
         );
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection.bottom'
+            '.drop-target > .drop-target-dropzone > .drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
-        expect(droptarget.state).toBe(Position.Bottom);
+        expect(droptarget.state).toBe('bottom');
+        expect(
+            (
+                element
+                    .getElementsByClassName('drop-target-selection')
+                    .item(0) as HTMLDivElement
+            ).style.transform
+        ).toBe('translateY(25%) scaleY(0.5)');
 
         fireEvent(
             target,
-            createOffsetDragOverEvent({ offsetX: 161, offsetY: 0 })
+            createOffsetDragOverEvent({ clientX: 161, clientY: 0 })
         );
 
         viewQuery = element.querySelectorAll(
-            '.drop-target > .drop-target-dropzone > .drop-target-selection.right'
+            '.drop-target > .drop-target-dropzone > .drop-target-selection'
         );
         expect(viewQuery.length).toBe(1);
-        expect(droptarget.state).toBe(Position.Right);
+        expect(droptarget.state).toBe('right');
+        expect(
+            (
+                element
+                    .getElementsByClassName('drop-target-selection')
+                    .item(0) as HTMLDivElement
+            ).style.transform
+        ).toBe('translateX(25%) scaleX(0.5)');
 
         fireEvent(
             target,
-            createOffsetDragOverEvent({ offsetX: 100, offsetY: 50 })
+            createOffsetDragOverEvent({ clientX: 100, clientY: 50 })
         );
-        expect(droptarget.state).toBe(Position.Center);
+        expect(droptarget.state).toBe('center');
+        expect(
+            (
+                element
+                    .getElementsByClassName('drop-target-selection')
+                    .item(0) as HTMLDivElement
+            ).style.transform
+        ).toBe('');
 
         fireEvent.dragLeave(target);
-        expect(droptarget.state).toBeUndefined();
+        expect(droptarget.state).toBe('center');
         viewQuery = element.querySelectorAll('.drop-target');
         expect(viewQuery.length).toBe(0);
+    });
+
+    describe('calculateQuadrantAsPercentage', () => {
+        test('variety of cases', () => {
+            const inputs: Array<{
+                directions: Position[];
+                x: number;
+                y: number;
+                result: Position | null;
+            }> = [
+                { directions: ['left', 'right'], x: 19, y: 50, result: 'left' },
+                {
+                    directions: ['left', 'right'],
+                    x: 81,
+                    y: 50,
+                    result: 'right',
+                },
+                {
+                    directions: ['top', 'bottom'],
+                    x: 50,
+                    y: 19,
+                    result: 'top',
+                },
+                {
+                    directions: ['top', 'bottom'],
+                    x: 50,
+                    y: 81,
+                    result: 'bottom',
+                },
+                {
+                    directions: ['left', 'right', 'top', 'bottom', 'center'],
+                    x: 50,
+                    y: 50,
+                    result: 'center',
+                },
+                {
+                    directions: ['left', 'right', 'top', 'bottom'],
+                    x: 50,
+                    y: 50,
+                    result: null,
+                },
+            ];
+
+            for (const input of inputs) {
+                expect(
+                    calculateQuadrantAsPercentage(
+                        new Set(input.directions),
+                        input.x,
+                        input.y,
+                        100,
+                        100,
+                        20
+                    )
+                ).toBe(input.result);
+            }
+        });
+    });
+
+    describe('calculateQuadrantAsPixels', () => {
+        test('variety of cases', () => {
+            const inputs: Array<{
+                directions: Position[];
+                x: number;
+                y: number;
+                result: Position | null;
+            }> = [
+                { directions: ['left', 'right'], x: 19, y: 50, result: 'left' },
+                {
+                    directions: ['left', 'right'],
+                    x: 81,
+                    y: 50,
+                    result: 'right',
+                },
+                {
+                    directions: ['top', 'bottom'],
+                    x: 50,
+                    y: 19,
+                    result: 'top',
+                },
+                {
+                    directions: ['top', 'bottom'],
+                    x: 50,
+                    y: 81,
+                    result: 'bottom',
+                },
+                {
+                    directions: ['left', 'right', 'top', 'bottom', 'center'],
+                    x: 50,
+                    y: 50,
+                    result: 'center',
+                },
+                {
+                    directions: ['left', 'right', 'top', 'bottom'],
+                    x: 50,
+                    y: 50,
+                    result: null,
+                },
+            ];
+
+            for (const input of inputs) {
+                expect(
+                    calculateQuadrantAsPixels(
+                        new Set(input.directions),
+                        input.x,
+                        input.y,
+                        100,
+                        100,
+                        20
+                    )
+                ).toBe(input.result);
+            }
+        });
     });
 });

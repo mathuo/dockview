@@ -6,16 +6,11 @@ export interface IDragAndDropObserverCallbacks {
     onDragLeave: (e: DragEvent) => void;
     onDrop: (e: DragEvent) => void;
     onDragEnd: (e: DragEvent) => void;
-
     onDragOver?: (e: DragEvent) => void;
 }
 
 export class DragAndDropObserver extends CompositeDisposable {
-    // A helper to fix issues with repeated DRAG_ENTER / DRAG_LEAVE
-    // calls see https://github.com/microsoft/vscode/issues/14470
-    // when the element has child elements where the events are fired
-    // repeadedly.
-    private counter = 0;
+    private target: EventTarget | null = null;
 
     constructor(
         private element: HTMLElement,
@@ -28,28 +23,37 @@ export class DragAndDropObserver extends CompositeDisposable {
 
     private registerListeners(): void {
         this.addDisposables(
-            addDisposableListener(this.element, 'dragenter', (e: DragEvent) => {
-                this.counter++;
-
-                this.callbacks.onDragEnter(e);
-            })
+            addDisposableListener(
+                this.element,
+                'dragenter',
+                (e: DragEvent) => {
+                    this.target = e.target;
+                    this.callbacks.onDragEnter(e);
+                },
+                true
+            )
         );
 
         this.addDisposables(
-            addDisposableListener(this.element, 'dragover', (e: DragEvent) => {
-                e.preventDefault(); // needed so that the drop event fires (https://stackoverflow.com/questions/21339924/drop-event-not-firing-in-chrome)
+            addDisposableListener(
+                this.element,
+                'dragover',
+                (e: DragEvent) => {
+                    e.preventDefault(); // needed so that the drop event fires (https://stackoverflow.com/questions/21339924/drop-event-not-firing-in-chrome)
 
-                if (this.callbacks.onDragOver) {
-                    this.callbacks.onDragOver(e);
-                }
-            })
+                    if (this.callbacks.onDragOver) {
+                        this.callbacks.onDragOver(e);
+                    }
+                },
+                true
+            )
         );
 
         this.addDisposables(
             addDisposableListener(this.element, 'dragleave', (e: DragEvent) => {
-                this.counter--;
+                if (this.target === e.target) {
+                    this.target = null;
 
-                if (this.counter === 0) {
                     this.callbacks.onDragLeave(e);
                 }
             })
@@ -57,14 +61,13 @@ export class DragAndDropObserver extends CompositeDisposable {
 
         this.addDisposables(
             addDisposableListener(this.element, 'dragend', (e: DragEvent) => {
-                this.counter = 0;
+                this.target = null;
                 this.callbacks.onDragEnd(e);
             })
         );
 
         this.addDisposables(
             addDisposableListener(this.element, 'drop', (e: DragEvent) => {
-                this.counter = 0;
                 this.callbacks.onDrop(e);
             })
         );

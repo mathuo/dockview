@@ -71,6 +71,9 @@ export class DockviewPanelApiImpl
 
     constructor(private panel: IDockviewPanel, group: GroupPanel) {
         super(panel.id);
+
+        this.initialize(panel);
+
         this._group = group;
 
         this.addDisposables(

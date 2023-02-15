@@ -10,7 +10,11 @@ describe('groupPanelApi', () => {
             title: 'test_title',
         };
 
-        const accessor: Partial<DockviewComponent> = {};
+        const accessor: Partial<DockviewComponent> = {
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
+            options: {},
+        };
         const groupViewPanel = new GroupPanel(
             <DockviewComponent>accessor,
             '',
@@ -44,7 +48,11 @@ describe('groupPanelApi', () => {
             id: 'test_id',
         };
 
-        const accessor: Partial<DockviewComponent> = {};
+        const accessor: Partial<DockviewComponent> = {
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
+            options: {},
+        };
         const groupViewPanel = new GroupPanel(
             <DockviewComponent>accessor,
             '',

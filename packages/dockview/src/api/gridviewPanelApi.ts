@@ -1,4 +1,5 @@
 import { Emitter, Event } from '../events';
+import { IPanel } from '../panel/types';
 import { FunctionOrValue } from '../types';
 import { PanelApiImpl, PanelApi } from './panelApi';
 
@@ -48,7 +49,7 @@ export class GridviewPanelApiImpl
     readonly onDidSizeChange: Event<SizeEvent> = this._onDidSizeChange.event;
     //
 
-    constructor(id: string) {
+    constructor(id: string, panel?: IPanel) {
         super(id);
 
         this.addDisposables(
@@ -56,6 +57,10 @@ export class GridviewPanelApiImpl
             this._onDidConstraintsChange,
             this._onDidSizeChange
         );
+
+        if (panel) {
+            this.initialize(panel);
+        }
     }
 
     public setConstraints(value: GridConstraintChangeEvent) {

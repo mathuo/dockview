@@ -19,22 +19,6 @@
             will-change: transform;
             pointer-events: none;
 
-            &.left {
-              transform: translateX(-25%) scaleX(0.5)
-            }
-
-            &.right {
-              transform: translateX(25%) scaleX(0.5)
-            }
-
-            &.top {
-              transform: translateY(-25%) scaleY(0.5);
-            }
-
-            &.bottom {
-              transform: translateY(25%) scaleY(0.5);
-            }
-
             &.small-top {
                 border-top: 1px solid var(--dv-drag-over-border-color);
             }

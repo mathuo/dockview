@@ -3,7 +3,6 @@ import {
     SerializedGridObject,
     getGridLocation,
 } from './gridview';
-import { Position } from '../dnd/droptarget';
 import { tail, sequenceEquals } from '../array';
 import { CompositeDisposable } from '../lifecycle';
 import { IPanelDeserializer } from '../dockview/deserializer';
@@ -25,6 +24,7 @@ import { BaseComponentOptions } from '../panel/types';
 import { Orientation, Sizing } from '../splitview/core/splitview';
 import { createComponent } from '../panel/componentFactory';
 import { Emitter, Event } from '../events';
+import { Position } from '../dnd/droptarget';
 
 export interface SerializedGridview {
     grid: {
@@ -265,7 +265,7 @@ export class GridviewComponent
         }
 
         const target = toTarget(options.direction);
-        if (target === Position.Center) {
+        if (target === 'center') {
             throw new Error(`${target} not supported as an option`);
         } else {
             const location = getGridLocation(referenceGroup.element);
@@ -294,7 +294,7 @@ export class GridviewComponent
             }
 
             const target = toTarget(options.position.direction);
-            if (target === Position.Center) {
+            if (target === 'center') {
                 throw new Error(`${target} not supported as an option`);
             } else {
                 const location = getGridLocation(referenceGroup.element);

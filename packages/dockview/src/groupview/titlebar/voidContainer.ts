@@ -41,17 +41,26 @@ export class VoidContainer extends CompositeDisposable {
         const handler = new GroupDragHandler(this._element, accessor.id, group);
 
         this.voidDropTarget = new Droptarget(this._element, {
-            validOverlays: 'none',
-            canDisplayOverlay: (event) => {
+            acceptedTargetZones: ['center'],
+            canDisplayOverlay: (event, position) => {
                 const data = getPanelData();
 
                 if (data && this.accessor.id === data.viewId) {
+                    if (
+                        data.panelId === null &&
+                        data.groupId === this.group.id
+                    ) {
+                        // don't allow group move to drop on self
+                        return false;
+                    }
+
                     // don't show the overlay if the tab being dragged is the last panel of this group
                     return last(this.group.panels)?.id !== data.panelId;
                 }
 
                 return group.model.canDisplayOverlay(
                     event,
+                    position,
                     DockviewDropTargets.Panel
                 );
             },
