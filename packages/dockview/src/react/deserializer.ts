@@ -1,6 +1,6 @@
 import { DockviewComponent } from '../dockview/dockviewComponent';
 import { GroupviewPanelState, IDockviewPanel } from '../groupview/groupPanel';
-import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
+import { DockviewPanel } from '../dockview/dockviewPanel';
 import { IPanelDeserializer } from '../dockview/deserializer';
 import { createComponent } from '../panel/componentFactory';
 import { DockviewApi } from '../api/component.api';
@@ -56,7 +56,7 @@ export class ReactPanelDeserialzier implements IPanelDeserializer {
             tab,
         });
 
-        const panel = new DockviewGroupPanel(
+        const panel = new DockviewPanel(
             panelId,
             this.layout,
             new DockviewApi(this.layout),

@@ -12,7 +12,7 @@ import { Parameters } from '../panel/types';
 import { IGroupPanelView } from './defaultGroupPanelView';
 import { DockviewComponent } from './dockviewComponent';
 
-export class DockviewGroupPanel
+export class DockviewPanel
     extends CompositeDisposable
     implements IDockviewPanel
 {

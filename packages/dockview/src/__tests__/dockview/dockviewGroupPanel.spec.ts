@@ -1,7 +1,7 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { DockviewApi } from '../../api/component.api';
 import { IGroupPanelView } from '../../dockview/defaultGroupPanelView';
-import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
+import { DockviewPanel } from '../../dockview/dockviewPanel';
 import { GroupPanel } from '../../groupview/groupviewPanel';
 
 describe('dockviewGroupPanel', () => {
@@ -20,7 +20,7 @@ describe('dockviewGroupPanel', () => {
         const api = new dockviewApiMock();
         const accessor = new accessorMock();
         const group = new groupMock();
-        const cut = new DockviewGroupPanel('fake-id', accessor, api, group);
+        const cut = new DockviewPanel('fake-id', accessor, api, group);
 
         let latestTitle: string | undefined = undefined;
 
@@ -55,7 +55,7 @@ describe('dockviewGroupPanel', () => {
         const accessor = new accessorMock();
         const group = new groupMock();
 
-        const cut = new DockviewGroupPanel('fake-id', accessor, api, group);
+        const cut = new DockviewPanel('fake-id', accessor, api, group);
 
         const viewMock = jest.fn<IGroupPanelView, []>(() => {
             return {
@@ -86,7 +86,7 @@ describe('dockviewGroupPanel', () => {
         const api = new dockviewApiMock();
         const accessor = new accessorMock();
         const group = new groupMock();
-        const cut = new DockviewGroupPanel('fake-id', accessor, api, group);
+        const cut = new DockviewPanel('fake-id', accessor, api, group);
 
         expect(cut.params).toEqual(undefined);
 

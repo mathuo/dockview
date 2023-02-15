@@ -7,7 +7,7 @@ import {
 import { directionToPosition, Droptarget, Position } from '../dnd/droptarget';
 import { tail, sequenceEquals } from '../array';
 import { GroupviewPanelState, IDockviewPanel } from '../groupview/groupPanel';
-import { DockviewGroupPanel } from './dockviewGroupPanel';
+import { DockviewPanel } from './dockviewPanel';
 import { CompositeDisposable } from '../lifecycle';
 import { Event, Emitter } from '../events';
 import { Watermark } from './components/watermark/watermark';
@@ -921,12 +921,7 @@ export class DockviewComponent
             ),
         });
 
-        const panel = new DockviewGroupPanel(
-            options.id,
-            this,
-            this._api,
-            group
-        );
+        const panel = new DockviewPanel(options.id, this, this._api, group);
         panel.init({
             view,
             title: options.title || options.id,
