@@ -56,22 +56,18 @@
   "author": "https://github.com/mathuo",
   "license": "MIT",
   "devDependencies": {
-    "@rollup/plugin-typescript": "^8.3.2",
-    "@testing-library/react": "^13.2.0",
-    "@types/react": "^18.0.9",
-    "@types/react-dom": "^18.0.3",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@testing-library/react": "^13.4.0",
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
     "cross-env": "^7.0.3",
-    "postcss": "^8.4.13",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "rimraf": "^3.0.2",
-    "rollup": "^2.72.1",
+    "postcss": "^8.4.21",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "rimraf": "^4.1.2",
+    "rollup": "^3.15.0",
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-terser": "^7.0.2",
-    "typedoc": "^0.22.15"
-  },
-  "peerDependencies": {
-    "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
-    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0"
+    "typedoc": "^0.23.25"
   }
 }

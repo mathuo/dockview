@@ -57,10 +57,10 @@ export interface DockviewReadyEvent {
 }
 
 export interface IDockviewReactProps {
+    onReady: (event: DockviewReadyEvent) => void;
     components: PanelCollection<IDockviewPanelProps>;
     tabComponents?: PanelCollection<IDockviewPanelHeaderProps>;
     watermarkComponent?: React.FunctionComponent<IWatermarkPanelProps>;
-    onReady: (event: DockviewReadyEvent) => void;
     tabHeight?: number;
     onDidDrop?: (event: DockviewDropEvent) => void;
     showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;

@@ -1,9 +1,9 @@
 /* eslint-disable */
 
-import { join } from 'path';
-import typescript from '@rollup/plugin-typescript';
-import { terser } from 'rollup-plugin-terser';
-import postcss from 'rollup-plugin-postcss';
+const { join } = require('path');
+const typescript = require('@rollup/plugin-typescript');
+const { terser } = require('rollup-plugin-terser');
+const postcss = require('rollup-plugin-postcss');
 
 const { name, version, homepage, license } = require('./package.json');
 const main = join(__dirname, './scripts/rollupEntryTarget.ts');
@@ -83,7 +83,7 @@ function createBundle(format, options) {
     };
 }
 
-export default [
+module.exports = [
     // amd
     createBundle('amd', { withStyles: false, isMinified: false }),
     createBundle('amd', { withStyles: true, isMinified: false }),
