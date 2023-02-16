@@ -13,7 +13,13 @@ import { ContextMenuDockview } from '@site/src/components/dockview/contextMenu';
 import { NestedDockview } from '@site/src/components/dockview/nested';
 import { CustomHeadersDockview } from '@site/src/components/dockview/customHeaders';
 import { ResizeDockview } from '@site/src/components/dockview/resize';
+import { DockviewGroupControl } from '@site/src/components/dockview/groupControl';
+import {
+    DockviewNative,
+    DockviewNative2,
+} from '@site/src/components/dockview/native';
 import Link from '@docusaurus/Link';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Dockview
 
@@ -43,17 +49,21 @@ You can create a Dockview through the use of the `ReactDockview` component.
 import { ReactDockview } from 'dockview';
 ```
 
-| Property            | Type                                 | Optional | Default | Description                                                  |
-| ------------------- | ------------------------------------ | -------- | ------- | ------------------------------------------------------------ |
-| onReady             | (event: SplitviewReadyEvent) => void | No       |         |                                                              |
-| components          | object                               | No       |         |                                                              |
-| tabComponents       | object                               | Yes      |         |                                                              |
-| watermarkComponent  | object                               | Yes      |         |                                                              |
-| hideBorders         | boolean                              | Yes      | false   |                                                              |
-| className           | string                               | Yes      | ''      |                                                              |
-| disableAutoResizing | boolean                              | Yes      | false   | See <Link to="../basics/#auto-resizing">Auto Resizing</Link> |
-| onDidDrop           | Event                                | Yes      | false   |                                                              |
-| showDndOverlay      | Event                                | Yes      | false   |                                                              |
+| Property              | Type                                 | Optional | Default   | Description                                                  |
+| --------------------- | ------------------------------------ | -------- | --------- | ------------------------------------------------------------ |
+| onReady               | (event: SplitviewReadyEvent) => void | No       |           |                                                              |
+| components            | object                               | No       |           |                                                              |
+| tabComponents         | object                               | Yes      |           |                                                              |
+| watermarkComponent    | object                               | Yes      |           |                                                              |
+| hideBorders           | boolean                              | Yes      | false     |                                                              |
+| className             | string                               | Yes      | ''        |                                                              |
+| disableAutoResizing   | boolean                              | Yes      | false     | See <Link to="../basics/#auto-resizing">Auto Resizing</Link> |
+| onDidDrop             | Event                                | Yes      | false     |                                                              |
+| showDndOverlay        | Event                                | Yes      | false     |                                                              |
+| defaultTabComponent   | object                               | Yes      |           |                                                              |
+| groupControlComponent | object                               | Yes      |           |                                                              |
+| tabHeight             | number                               | Yes      |           |                                                              |
+| singleTabMode         | 'fullwidth' \| 'default'             | Yes      | 'default' |                                                              |
 
 ## Dockview API
 
@@ -101,13 +111,13 @@ const onReady = (event: DockviewReadyEvent) => {
 |                        |                                                      |                                                          |
 | addPanel               | `addPanel(options: AddPanelOptions): IDockviewPanel` |                                                          |
 | getPanel               | `(id: string) \| IDockviewPanel \| undefined`        |                                                          |
-| addEmptyGroup          | `(options? AddGroupOptions): void`                   |                                                          |
+| addGroup               | `(options? AddGroupOptions): void`                   |                                                          |
 | closeAllGroups         | `(): void`                                           |                                                          |
 | removeGroup            | `(group: GroupPanel): void`                          |                                                          |
 | getGroup               | `(id: string): GroupPanel \| undefined`              |                                                          |
 |                        |                                                      |                                                          |
 | getTabHeight           | `(): number \| undefined`                            |                                                          |
-| setTabHeight           | `(hegiht: number \| undefined): void`                |                                                          |
+| setTabHeight           | `(height: number \| undefined): void`                |                                                          |
 | updateOptions          | `(options:SplitviewComponentUpdateOptions): void`    |                                                          |
 | focus                  | `(): void`                                           |                                                          |
 | layout                 | `(width: number, height:number): void`               | <Link to="../basics/#auto-resizing">Auto Resizing</Link> |
@@ -125,66 +135,139 @@ const MyComponent = (props: IDockviewPanelProps<{ title: string }>) => {
 };
 ```
 
-| Property               | Type                                                        | Description     |
-| ---------------------- | ----------------------------------------------------------- | --------------- |
-| id                     | `string`                                                    | Panel id        |
-| isFocused              | `boolean`                                                   | Is panel focsed |
-| isActive               | `boolean`                                                   | Is panel active |
-| width                  | `number`                                                    | Panel width     |
-| height                 | `number`                                                    | Panel height    |
-| onDidDimensionsChange  | `Event<PanelDimensionChangeEvent>`                          |                 |
-| onDidFocusChange       | `Event<FocusEvent>`                                         |                 |
-| onDidVisibilityChange  | `Event<VisibilityEvent>`                                    |                 |
-| onDidActiveChange      | `Event<ActiveEvent>`                                        |                 |
-| setActive              | `(): void`                                                  |                 |
-|                        |                                                             |                 |
-| onDidConstraintsChange | `onDidConstraintsChange: Event<PanelConstraintChangeEvent>` |                 |
-| setConstraints         | `(value: PanelConstraintChangeEvent2): void;`               |                 |
-| setSize                | `(event: SizeEvent): void`                                  |                 |
-|                        |                                                             |                 |
-| group                  | `GroupPanel                                                 | undefined`      |
-| isGroupActive          | `boolean`                                                   |                 |
-| title                  | `string`                                                    |                 |
-| suppressClosable       | `boolean`                                                   |                 |
-| close                  | `(): void`                                                  |                 |
-| setTitle               | `(title: string): void`                                     |                 |
+| Property               | Type                                                        | Description      |
+| ---------------------- | ----------------------------------------------------------- | ---------------- |
+| id                     | `string`                                                    | Panel id         |
+| isFocused              | `boolean`                                                   | Is panel focused |
+| isActive               | `boolean`                                                   | Is panel active  |
+| width                  | `number`                                                    | Panel width      |
+| height                 | `number`                                                    | Panel height     |
+| onDidDimensionsChange  | `Event<PanelDimensionChangeEvent>`                          |                  |
+| onDidFocusChange       | `Event<FocusEvent>`                                         |                  |
+| onDidVisibilityChange  | `Event<VisibilityEvent>`                                    |                  |
+| onDidActiveChange      | `Event<ActiveEvent>`                                        |                  |
+| setActive              | `(): void`                                                  |                  |
+|                        |                                                             |                  |
+| onDidConstraintsChange | `onDidConstraintsChange: Event<PanelConstraintChangeEvent>` |                  |
+| setConstraints         | `(value: PanelConstraintChangeEvent2): void;`               |                  |
+| setSize                | `(event: SizeEvent): void`                                  |                  |
+|                        |                                                             |                  |
+| group                  | `GroupPanel                                                 | undefined`       |
+| isGroupActive          | `boolean`                                                   |                  |
+| title                  | `string`                                                    |                  |
+| suppressClosable       | `boolean`                                                   |                  |
+| close                  | `(): void`                                                  |                  |
+| setTitle               | `(title: string): void`                                     |                  |
+
+## Essential Features
+
+### Add Panel
+
+Using the dockview API you can access the `addPanel` method which returns an instance of the created panel.
+The minimum method signature is:
+
+```ts
+const panel = api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+});
+```
+
+where `id` is the unique id of the panel and `component` is the implenentation which
+will be used to render the panel. You will have registered this using the `components` prop of the `DockviewReactComponent` component.
+
+You can optionally provide a `tabComponent` parameters to the `addPanel` method which will render the tab using a custom renderer.
+You will have registered this using the `tabComponents` prop of the `DockviewReactComponent` component.
+
+```ts
+const panel = api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    tabComponent: 'my_tab_component',
+});
+```
+
+You can pass properties to the panel using the `params` key.
+You can update these properties through the panels `api` object and its `updateParameters` method.
+
+```ts
+const panel = api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    params: {
+        myCustomKey: 'my_custom_value',
+    },
+});
+
+panel.api.updateParameters({
+    myCustomKey: 'my_custom_value',
+    myOtherCustomKey: 'my_other_custom_key',
+});
+```
+
+> Note `updateParameters` does not accept partial parameter updates, you should call it with the entire set of parameters
+> you want the panel to receive.
+
+Finally `addPanel` accepts a `position` object which tells dockview where to place the panel.
+
+-   This object optionally accepts either a `referencePanel` or `referenceGroup` which can be the associated id as a string
+    or the panel/group object reference.
+-   This object accepts a `direction` property which dictates where,
+    relative to the provided reference the new panel will be placed.
+
+> If neither a `referencePanel` or `referenceGroup` then the provided `direction` will be treated as absolute.
+
+> If no `direction` is provided the library will place the new panel in a pre-determined position.
+
+```ts
+const panel = api.addPanel({
+    id: 'panel_1',
+    component: 'default',
+});
+
+const panel2 = api.addPanel({
+    id: 'panel_2',
+    component: 'default',
+    position: {
+        referencePanel: panel1,
+        direction: 'right',
+    },
+});
+```
 
 ## Advanced Features
 
 ### Resizing via API
 
-Each Dockview is comprised of a number of groups, each of which have a number of panels.
-Logically most people would want to resize a panel but practically this really translates to resizing the group to which the panel belongs.
+Each Dockview contains of a number of groups and each group has a number of panels.
+Logically a user may want to resize a panel, but this translates to resizing the group which contains that panel.
 
-From the api you can access the panels group object (`props.group`) which exposes it's own api object (`props.groups.api`).
-This api is largly similar to the <Link to="./gridview/#gridview-panel-api">Gridview API</Link>.
-
-To resize an individual panel you could create a snippet similar to below.
-
-```tsx
-const onResizePanel = () => {
-    props.api.group.api.setSize({
-        height: 100,
-    });
-};
-```
+You can set the size of a panel using `props.api.setSize(...)`.
+You can also set the size of the group associated with the panel using `props.api.group.api.setSize(...)` although this isn't recommended
+due to the clunky syntax.
 
 ```tsx
-const onResizePanel = () => {
-    props.api.group.api.setSize({
-        width: 100,
-    });
-};
+// it's mandatory to provide either a height or a width, providing both is optional
+props.api.setSize({
+    height: 100,
+    width: 200,
+});
+
+// you could also resize the panels group, although not recommended it achieved the same result
+props.api.group.api.setSize({
+    height: 100,
+    width: 200,
+});
 ```
 
-Here is a working example of resizing panels via these API methods.
+You can see an example invoking both approaches below.
 
 <ResizeDockview />
 
 ### Locked group
 
-Locking a group will disable all drop events for this group ensuring a user can not add additional panels to the group.
-You can still add groups to a locked panel programatically using the API.
+Locking a group will disable all drop events for this group ensuring no additional panels can be added to the group through drop events.
+You can still add groups to a locked panel programatically using the API though.
 
 ```tsx
 panel.group.locked = true;
@@ -192,7 +275,7 @@ panel.group.locked = true;
 
 ### Group header
 
-You may wish to hide the header section of a group. This can achieved through setting the `hidden` variable on `panel.group.header`.
+You may wish to hide the header section of a group. This can achieved through the `hidden` variable on `panel.group.header`.
 
 ```tsx
 panel.group.header.hidden = true;
@@ -200,12 +283,10 @@ panel.group.header.hidden = true;
 
 ### Custom Tab Headers
 
-You can provide custom renderers for your tab headers.
+You can provide custom renderers for your tab headers for maximum customization.
 A default implementation of `DockviewDefaultTab` is provided should you only wish to attach minor
 changes and events that do not alter the default behaviour, for example to add a custom context menu event
 handler.
-
-You are also free to define a custom renderer entirely from scratch and not make use of the `DockviewDefaultTab` component.
 
 ```tsx title="Attaching a custom context menu event handlers to a custom header"
 import { IDockviewPanelHeaderProps, DockviewDefaultTab } from 'dockview';
@@ -219,7 +300,8 @@ const MyCustomheader = (props: IDockviewPanelHeaderProps) => {
 };
 ```
 
-To use a custom renderer you can must register a collection of tab components
+You are also free to define a custom renderer entirely from scratch and not make use of the `DockviewDefaultTab` component.
+To use a custom renderer you can must register a collection of tab components.
 
 ```tsx
 const tabComponents = {
@@ -233,7 +315,7 @@ return <DockviewReact tabComponents={tabComponents}  ... />;
 api.addPanel({
     id: 'panel_1',
     component: 'default',
-    tabComponent: 'myCustomHeader', // <--
+    tabComponent: 'myCustomHeader', // <-- your registered renderers
     title: 'Panel 1',
 });
 ```
@@ -246,26 +328,35 @@ You can also override the default tab renderer which will be used when no `tabCo
 
 As a simple example the below attachs a custom event handler for the context menu on all tabs as a default tab renderer
 
+The below example uses a custom tab renderer to reigster a popover when the user right clicked on a tab.
+This still makes use of the `DockviewDefaultTab` since it's only a minor change.
+
 <CustomHeadersDockview />
 
-### Rendering
+### Panel Rendering
 
-Although `DockviewReact` will only add those tabs that are visible to the DOM all associated React Components for each tab including those that
-are not initially visible will be created.
-This will mean that any hooks in those components will run and if you running expensive operations in the tabs you may end up doing a lot of initial
-work for what are hidden tabs.
+By default `DockviewReact` only adds to the DOM those panels that are visible,
+if a panel is not the active tab and not shown the contents of the hidden panel will be removed from the DOM.
 
-This is the default behaviour to ensure the greatest flexibility for the user but you can create a Higher-Order component wrapping your components that
-will ensure the component is only created if the tab is visible as below:
+However the React Components associated with each panel are only created once and will always exist for as long as the panel exists, hidden or not.
 
-```tsx
-import { PanelApi } from 'dockview';
+> For example this means that any hooks in those components will run whether the panel is visible or not which may lead to excessive background work depending
+> on the panels implementation.
+
+This is the default behaviour to ensure the greatest flexibility for the user but through the panels `props.api` you can listen to the visiblity state of the panel
+and write additional logic to optimize your application.
+
+For example if you wanted to unmount the React Components when the panel is not visible you could create a Higher-Order-Component that listens to the panels
+visiblity state and only renders the panel when visible.
+
+```tsx title="Only rendering the React Component when the panel is visible, otherwise rendering a null React Component"
+import { IDockviewPanelProps } from 'dockview';
 import * as React from 'react';
 
-function RenderWhenVisible<
-    T extends { api: Pick<PanelApi, 'isVisible' | 'onDidVisibilityChange'> }
->(component: React.FunctionComponent<T>) {
-    const HigherOrderComponent = (props: T) => {
+function RenderWhenVisible(
+    component: React.FunctionComponent<IDockviewPanelProps>
+) {
+    const HigherOrderComponent = (props: IDockviewPanelProps) => {
         const [visible, setVisible] = React.useState<boolean>(
             props.api.isVisible
         );
@@ -291,10 +382,10 @@ function RenderWhenVisible<
 ```
 
 ```tsx
-const component = RenderWhenVisible(MyComponent);
+const components = { default: RenderWhenVisible(MyComponent) };
 ```
 
-Through toggling the checkbox you can see that when you only render those panels which are visible the underling React component is destroyed when it becomes hidden and re-created when it becomes visible.
+Toggling the checkbox you can see that when you only render those panels which are visible the underling React component is destroyed when it becomes hidden and re-created when it becomes visible.
 
 <Checkbox />
 <div
@@ -310,7 +401,40 @@ Through toggling the checkbox you can see that when you only render those panels
 
 ### Drag And Drop
 
-The component exposes some method to help determine whether external drag events should be interacted with or not.
+#### Built-in behaviours
+
+Dockview supports a wide variety of built-in Drag and Drop possibilities.
+Below are some examples of the operations you can perform.
+
+<img style={{ width: '60%' }} src={useBaseUrl('/img/add_to_tab.svg')} />
+
+> Drag a tab onto another tab to place it inbetween existing tabs.
+
+<img style={{ width: '60%' }} src={useBaseUrl('/img/add_to_empty_space.svg')} />
+
+> Drag a tab to the right of the last tab to place it after the existing tabs.
+
+<img style={{ width: '60%' }} src={useBaseUrl('/img/add_to_group.svg')} />
+
+> Drag a group onto an existing group to merge the two groups.
+
+<div style={{ display: 'flex', justifyContent: 'space-around' }}>
+    <img style={{ width: '40%' }} src={useBaseUrl('/img/drop_positions.svg')} />
+    <img
+        style={{ width: '40%' }}
+        src={useBaseUrl('/img/magnet_drop_positions.svg')}
+    />
+</div>
+
+> Drag into the left/right/top/bottom target zone of a panel to create a new group in the selected direction.
+
+> Drag into the center of a panel to add to that group.
+
+> Drag to the edge of the dockview component to create a new group on the selected edge.
+
+#### Extended behaviours
+
+For interaction with the Drag events directly the component exposes some method to help determine whether external drag events should be interacted with or not.
 
 ```tsx
 /**
@@ -375,3 +499,51 @@ const Component: React.FunctionComponent<IDockviewGroupControlProps> = () => {
 
 return <DockviewReact {...props} groupControlComponent={Component} />;
 ```
+
+As a simple example the below uses the `groupControlComponent` to render a small control that indicates whether the group
+is active and which panel is active in that group.
+
+```tsx
+const GroupControlComponent = (props: IDockviewGroupControlProps) => {
+    const isGroupActive = props.isGroupActive;
+    const activePanel = props.activePanel;
+
+    return (
+        <div className="dockview-groupcontrol-demo">
+            <span
+                className="dockview-groupcontrol-demo-group-active"
+                style={{
+                    background: isGroupActive ? 'green' : 'red',
+                }}
+            >
+                {isGroupActive ? 'Group Active' : 'Group Inactive'}
+            </span>
+            <span className="dockview-groupcontrol-demo-active-panel">{`activePanel: ${
+                activePanel?.id || 'null'
+            }`}</span>
+        </div>
+    );
+};
+```
+
+<DockviewGroupControl />
+
+### Full width tabs
+
+`DockviewReactComponent` accepts the prop `singleTabMode`. If set `singleTabMode=fullwidth` then when there is only one tab in a group this tab will expand
+to the entire width of the group. For example:
+
+> This can be conmbined with <Link to="./dockview/#locked-group">Locked Groups</Link> to create an application that feels more like a Window Manager
+> rather than a collection of groups and tabs.
+
+```tsx
+<DockviewReactComponent singleTabMode="fullwidth" {...otherProps} />
+```
+
+<DockviewNative />
+
+### Example
+
+hello
+
+<DockviewNative2 />

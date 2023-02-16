@@ -11,7 +11,7 @@ type FeatureItem = {
 const FeatureList: FeatureItem[] = [
     {
         title: '',
-        Svg: require('@site/static/img/dockview_grid_2.svg').default,
+        Svg: require('@site/static/img/dockview_grid_3.svg').default,
         description: (
             <>
                 <div className="feature-banner">

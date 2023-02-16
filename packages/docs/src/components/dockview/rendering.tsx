@@ -13,10 +13,10 @@ const renderVisibleComponentsOnlyAtom = atom<boolean>({
     default: false,
 });
 
-function RenderWhenVisible<
-    T extends { api: Pick<PanelApi, 'isVisible' | 'onDidVisibilityChange'> }
->(component: React.FunctionComponent<T>) {
-    const HigherOrderComponent = (props: T) => {
+function RenderWhenVisible(
+    component: React.FunctionComponent<IDockviewPanelProps>
+) {
+    const HigherOrderComponent = (props: IDockviewPanelProps) => {
         const [visible, setVisible] = React.useState<boolean>(
             props.api.isVisible
         );
