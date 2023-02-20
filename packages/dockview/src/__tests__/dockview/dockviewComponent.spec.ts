@@ -13,16 +13,16 @@ import { CompositeDisposable } from '../../lifecycle';
 import {
     GroupPanelUpdateEvent,
     GroupviewPanelState,
-    IDockviewPanel,
     IGroupPanelInitParameters,
-} from '../../groupview/groupPanel';
+} from '../../groupview/types';
 import { IGroupPanelView } from '../../dockview/defaultGroupPanelView';
+import { DefaultTab } from '../../dockview/components/tab/defaultTab';
+import { Emitter } from '../../events';
+import { IDockviewPanel } from '../../dockview/dockviewPanel';
 import {
     DockviewPanelApi,
     DockviewPanelApiImpl,
-} from '../../api/groupPanelApi';
-import { DefaultTab } from '../../dockview/components/tab/defaultTab';
-import { Emitter } from '../../events';
+} from '../../api/dockviewPanelApi';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');

@@ -4,6 +4,7 @@ import { CompositeDisposable } from '../lifecycle';
 import { DragAndDropObserver } from './dnd';
 import { clamp } from '../math';
 import { Direction } from '../gridview/baseComponentGridview';
+import { isBooleanValue } from '../types';
 
 function numberOrFallback(maybeNumber: any, fallback: number): number {
     return typeof maybeNumber === 'number' ? maybeNumber : fallback;
@@ -32,12 +33,6 @@ export interface DroptargetEvent {
 }
 
 export type Position = 'top' | 'bottom' | 'left' | 'right' | 'center';
-
-function isBooleanValue(
-    canDisplayOverlay: CanDisplayOverlay
-): canDisplayOverlay is boolean {
-    return typeof canDisplayOverlay === 'boolean';
-}
 
 export type CanDisplayOverlay =
     | boolean
@@ -103,6 +98,7 @@ export class Droptarget extends CompositeDisposable {
                     );
 
                     if (quadrant === null) {
+                        // no drop target should be displayed
                         this.removeDropTarget();
                         return;
                     }
@@ -288,7 +284,7 @@ export class Droptarget extends CompositeDisposable {
         );
     }
 
-    private removeDropTarget() {
+    private removeDropTarget(): void {
         if (this.target) {
             this._state = undefined;
             this.element.removeChild(this.target);

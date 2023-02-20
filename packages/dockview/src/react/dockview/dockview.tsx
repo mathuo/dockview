@@ -10,7 +10,7 @@ import {
     DockviewDndOverlayEvent,
     GroupPanelFrameworkComponentFactory,
 } from '../../dockview/options';
-import { DockviewPanelApi } from '../../api/groupPanelApi';
+import { DockviewPanelApi } from '../../api/dockviewPanelApi';
 import { ReactPortalStore, usePortalsLifecycle } from '../react';
 import { DockviewApi } from '../../api/component.api';
 import { IWatermarkPanelProps, ReactWatermarkPart } from './reactWatermarkPart';

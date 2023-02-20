@@ -6,8 +6,8 @@ import {
 } from '../gridview/gridview';
 import { directionToPosition, Droptarget, Position } from '../dnd/droptarget';
 import { tail, sequenceEquals } from '../array';
-import { GroupviewPanelState, IDockviewPanel } from '../groupview/groupPanel';
-import { DockviewPanel } from './dockviewPanel';
+import { GroupviewPanelState } from '../groupview/types';
+import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
 import { CompositeDisposable } from '../lifecycle';
 import { Event, Emitter } from '../events';
 import { Watermark } from './components/watermark/watermark';

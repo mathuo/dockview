@@ -5,7 +5,7 @@ import {
 } from '../../lifecycle';
 import { Emitter, Event } from '../../events';
 import { trackFocus } from '../../dom';
-import { IDockviewPanel } from '../groupPanel';
+import { IDockviewPanel } from '../../dockview/dockviewPanel';
 
 export interface IContentContainer extends IDisposable {
     onDidFocus: Event<void>;

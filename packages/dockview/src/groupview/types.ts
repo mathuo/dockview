@@ -1,9 +1,15 @@
 import { IDockviewComponent } from '../dockview/dockviewComponent';
-import { DockviewPanelApi } from '../api/groupPanelApi';
-import { PanelInitParameters, IPanel } from '../panel/types';
+import { DockviewPanelApi } from '../api/dockviewPanelApi';
+import {
+    PanelInitParameters,
+    IPanel,
+    PanelUpdateEvent,
+    Parameters,
+} from '../panel/types';
 import { DockviewApi } from '../api/component.api';
 import { GroupPanel } from './groupviewPanel';
 import { Event } from '../events';
+import { IGroupPanelView } from '../dockview/defaultGroupPanelView';
 
 export interface IRenderable {
     id: string;
@@ -66,4 +72,22 @@ export interface PanelContentPartConstructor {
 
 export interface WatermarkConstructor {
     new (): IWatermarkRenderer;
+}
+
+export interface IGroupPanelInitParameters
+    extends PanelInitParameters,
+        HeaderPartInitParameters {
+    view: IGroupPanelView;
+}
+
+export type GroupPanelUpdateEvent = PanelUpdateEvent<{
+    params?: Parameters;
+    title?: string;
+}>;
+
+export interface GroupviewPanelState {
+    id: string;
+    view?: any;
+    title: string;
+    params?: { [key: string]: any };
 }

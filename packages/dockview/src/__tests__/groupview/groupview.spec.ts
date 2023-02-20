@@ -1,9 +1,8 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import {
     GroupviewPanelState,
-    IDockviewPanel,
     IGroupPanelInitParameters,
-} from '../../groupview/groupPanel';
+} from '../../groupview/types';
 import {
     GroupPanelPartInitParameters,
     IContentRenderer,
@@ -12,7 +11,6 @@ import {
 } from '../../groupview/types';
 import { PanelUpdateEvent } from '../../panel/types';
 import { GroupOptions, Groupview } from '../../groupview/groupview';
-import { DockviewPanelApi } from '../../api/groupPanelApi';
 import {
     DefaultGroupPanelView,
     IGroupPanelView,
@@ -21,6 +19,8 @@ import { GroupPanel } from '../../groupview/groupviewPanel';
 import { fireEvent } from '@testing-library/dom';
 import { LocalSelectionTransfer, PanelTransfer } from '../../dnd/dataTransfer';
 import { CompositeDisposable } from '../../lifecycle';
+import { DockviewPanelApi } from '../../api/dockviewPanelApi';
+import { IDockviewPanel } from '../../dockview/dockviewPanel';
 
 enum GroupChangeKind2 {
     ADD_PANEL,
