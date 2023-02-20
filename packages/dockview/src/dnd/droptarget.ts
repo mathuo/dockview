@@ -27,6 +27,23 @@ export function directionToPosition(direction: Direction): Position {
     }
 }
 
+export function positionToDirection(position: Position): Direction {
+    switch (position) {
+        case 'top':
+            return 'above';
+        case 'bottom':
+            return 'below';
+        case 'left':
+            return 'left';
+        case 'right':
+            return 'right';
+        case 'center':
+            return 'within';
+        default:
+            throw new Error(`invalid position '${position}'`);
+    }
+}
+
 export interface DroptargetEvent {
     readonly position: Position;
     readonly nativeEvent: DragEvent;

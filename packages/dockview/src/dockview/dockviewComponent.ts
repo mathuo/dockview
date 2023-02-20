@@ -80,7 +80,7 @@ export type DockviewComponentUpdateOptions = Pick<
 
 export interface DockviewDropEvent extends GroupviewDropEvent {
     api: DockviewApi;
-    group: GroupPanel;
+    group: GroupPanel | null;
 }
 
 export interface IDockviewComponent extends IBaseGrid<GroupPanel> {
@@ -276,6 +276,13 @@ export class DockviewComponent
                         data.panelId || undefined,
                         'center'
                     );
+                } else {
+                    this._onDidDrop.fire({
+                        ...event,
+                        api: this._api,
+                        group: null,
+                        getData: getPanelData,
+                    });
                 }
             })
         );
