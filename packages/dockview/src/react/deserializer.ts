@@ -1,6 +1,6 @@
 import { DockviewComponent } from '../dockview/dockviewComponent';
-import { GroupviewPanelState, IDockviewPanel } from '../groupview/groupPanel';
-import { DockviewPanel } from '../dockview/dockviewPanel';
+import { GroupviewPanelState } from '../groupview/types';
+import { DockviewPanel, IDockviewPanel } from '../dockview/dockviewPanel';
 import { IPanelDeserializer } from '../dockview/deserializer';
 import { createComponent } from '../panel/componentFactory';
 import { DockviewApi } from '../api/component.api';

@@ -15,7 +15,7 @@ import {
     SerializedGridview,
 } from '../gridview/gridviewComponent';
 import { IGridviewPanel } from '../gridview/gridviewPanel';
-import { IDockviewPanel } from '../groupview/groupPanel';
+
 import {
     AddPaneviewComponentOptions,
     SerializedPaneview,
@@ -33,6 +33,7 @@ import { ISplitviewPanel } from '../splitview/splitviewPanel';
 import { GroupPanel, IGroupviewPanel } from '../groupview/groupviewPanel';
 import { Emitter, Event } from '../events';
 import { PaneviewDropEvent } from '../react';
+import { IDockviewPanel } from '../dockview/dockviewPanel';
 
 export interface CommonApi<T = any> {
     readonly height: number;

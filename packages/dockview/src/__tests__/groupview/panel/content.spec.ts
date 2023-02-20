@@ -8,8 +8,8 @@ import {
 import { CompositeDisposable } from '../../../lifecycle';
 import { PanelUpdateEvent } from '../../../panel/types';
 import { IGroupPanelView } from '../../../dockview/defaultGroupPanelView';
-import { IDockviewPanel } from '../../../groupview/groupPanel';
 import { GroupPanel } from '../../../groupview/groupviewPanel';
+import { IDockviewPanel } from '../../../dockview/dockviewPanel';
 
 class TestContentRenderer
     extends CompositeDisposable

@@ -8,7 +8,7 @@ import {
     IDisposable,
     MutableDisposable,
 } from '../../lifecycle';
-import { IDockviewPanel } from '../../groupview/groupPanel';
+import { IDockviewPanel } from '../../dockview/dockviewPanel';
 
 export interface IDockviewGroupControlProps {
     api: GroupviewPanelApi;

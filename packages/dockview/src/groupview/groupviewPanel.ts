@@ -6,7 +6,7 @@ import {
 } from '../api/gridviewPanelApi';
 import { Groupview, GroupOptions, IHeader } from './groupview';
 import { GridviewPanel, IGridviewPanel } from '../gridview/gridviewPanel';
-import { IDockviewPanel } from './groupPanel';
+import { IDockviewPanel } from '../dockview/dockviewPanel';
 
 export interface IGroupviewPanel extends IGridviewPanel {
     model: Groupview;

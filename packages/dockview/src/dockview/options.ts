@@ -1,7 +1,6 @@
 import { DockviewApi } from '../api/component.api';
 import { Direction } from '../gridview/baseComponentGridview';
 import { IGridView } from '../gridview/gridview';
-import { IDockviewPanel } from '../groupview/groupPanel';
 import {
     IContentRenderer,
     ITabRenderer,
@@ -15,6 +14,7 @@ import { DockviewDropTargets } from '../groupview/dnd';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IGroupControlRenderer } from '../react/dockview/groupControlsRenderer';
 import { Position } from '../dnd/droptarget';
+import { IDockviewPanel } from './dockviewPanel';
 
 export interface GroupPanelFrameworkComponentFactory {
     content: FrameworkFactory<IContentRenderer>;
