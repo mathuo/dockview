@@ -4,6 +4,7 @@ import {
     DockviewReact,
     DockviewReadyEvent,
     IDockviewPanelProps,
+    positionToDirection,
 } from 'dockview';
 import * as React from 'react';
 
@@ -54,14 +55,12 @@ export const DndDockview = (props: { renderVisibleOnly: boolean }) => {
     };
 
     const onDidDrop = (event: DockviewDropEvent) => {
-        const { group } = event;
-
         event.api.addPanel({
             id: 'test',
             component: 'default',
             position: {
-                referencePanel: group.activePanel.id,
-                direction: 'within',
+                direction: positionToDirection(event.position),
+                referenceGroup: event.group,
             },
         });
     };
