@@ -1,6 +1,6 @@
+import { DockviewPanelApiImpl, TitleEvent } from '../../api/dockviewPanelApi';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { DockviewPanelApiImpl, TitleEvent } from '../../api/groupPanelApi';
-import { IDockviewPanel } from '../../groupview/groupPanel';
+import { IDockviewPanel } from '../../dockview/dockviewPanel';
 import { GroupPanel } from '../../groupview/groupviewPanel';
 
 describe('groupPanelApi', () => {

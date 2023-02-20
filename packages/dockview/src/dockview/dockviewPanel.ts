@@ -1,16 +1,34 @@
 import { DockviewApi } from '../api/component.api';
-import { DockviewPanelApiImpl } from '../api/groupPanelApi';
+import {
+    DockviewPanelApi,
+    DockviewPanelApiImpl,
+} from '../api/dockviewPanelApi';
 import {
     GroupPanelUpdateEvent,
     GroupviewPanelState,
-    IDockviewPanel,
     IGroupPanelInitParameters,
-} from '../groupview/groupPanel';
+} from '../groupview/types';
 import { GroupPanel } from '../groupview/groupviewPanel';
-import { CompositeDisposable, MutableDisposable } from '../lifecycle';
-import { Parameters } from '../panel/types';
+import {
+    CompositeDisposable,
+    IDisposable,
+    MutableDisposable,
+} from '../lifecycle';
+import { IPanel, Parameters } from '../panel/types';
 import { IGroupPanelView } from './defaultGroupPanelView';
 import { DockviewComponent } from './dockviewComponent';
+
+export interface IDockviewPanel extends IDisposable, IPanel {
+    readonly view?: IGroupPanelView;
+    readonly group: GroupPanel;
+    readonly api: DockviewPanelApi;
+    readonly title: string;
+    readonly params: Record<string, any> | undefined;
+    updateParentGroup(group: GroupPanel, isGroupActive: boolean): void;
+    init(params: IGroupPanelInitParameters): void;
+    toJSON(): GroupviewPanelState;
+    update(event: GroupPanelUpdateEvent): void;
+}
 
 export class DockviewPanel
     extends CompositeDisposable
@@ -26,11 +44,11 @@ export class DockviewPanel
 
     private _title: string;
 
-    get params() {
+    get params(): Parameters | undefined {
         return this._params;
     }
 
-    get title() {
+    get title(): string {
         return this._title;
     }
 
@@ -57,6 +75,11 @@ export class DockviewPanel
         this.addDisposables(
             this.api.onActiveChange(() => {
                 accessor.setActivePanel(this);
+            }),
+            this.api.onDidSizeChange((event) => {
+                // forward the resize event to the group since if you want to resize a panel
+                // you are actually just resizing the panels parent which is the group
+                this.group.api.setSize(event);
             })
         );
     }
@@ -74,7 +97,7 @@ export class DockviewPanel
         });
     }
 
-    focus() {
+    focus(): void {
         this.api._onFocusEvent.fire();
     }
 
@@ -90,7 +113,7 @@ export class DockviewPanel
         };
     }
 
-    setTitle(title: string) {
+    setTitle(title: string): void {
         const didTitleChange = title !== this._params?.title;
 
         if (didTitleChange) {
@@ -129,7 +152,7 @@ export class DockviewPanel
         });
     }
 
-    public updateParentGroup(group: GroupPanel, isGroupActive: boolean) {
+    public updateParentGroup(group: GroupPanel, isGroupActive: boolean): void {
         this._group = group;
         this.api.group = group;
 
@@ -148,7 +171,7 @@ export class DockviewPanel
         );
     }
 
-    public layout(width: number, height: number) {
+    public layout(width: number, height: number): void {
         // the obtain the correct dimensions of the content panel we must deduct the tab height
         this.api._onDidDimensionChange.fire({
             width,
@@ -158,7 +181,7 @@ export class DockviewPanel
         this.view?.layout(width, height);
     }
 
-    public dispose() {
+    public dispose(): void {
         this.api.dispose();
         this.mutableDisposable.dispose();
 

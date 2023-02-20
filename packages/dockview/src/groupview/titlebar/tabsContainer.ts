@@ -5,11 +5,11 @@ import {
 } from '../../lifecycle';
 import { addDisposableListener, Emitter, Event } from '../../events';
 import { ITab, Tab } from '../tab';
-import { IDockviewPanel } from '../groupPanel';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { GroupPanel } from '../groupviewPanel';
 import { VoidContainer } from './voidContainer';
 import { toggleClass } from '../../dom';
+import { IDockviewPanel } from '../../dockview/dockviewPanel';
 
 export interface TabDropIndexEvent {
     event: DragEvent;

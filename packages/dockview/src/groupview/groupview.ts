@@ -8,13 +8,13 @@ import { IGridPanelView } from '../gridview/baseComponentGridview';
 import { IViewSize } from '../gridview/gridview';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
-import { IDockviewPanel } from './groupPanel';
 import { ContentContainer, IContentContainer } from './panel/content';
 import { ITabsContainer, TabsContainer } from './titlebar/tabsContainer';
 import { IWatermarkRenderer } from './types';
 import { GroupPanel } from './groupviewPanel';
 import { DockviewDropTargets } from './dnd';
 import { IGroupControlRenderer } from '../react/dockview/groupControlsRenderer';
+import { IDockviewPanel } from '../dockview/dockviewPanel';
 
 export interface DndService {
     canDisplayOverlay(
