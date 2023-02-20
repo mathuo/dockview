@@ -27,7 +27,11 @@ export * from './react'; // TODO: should be conditional on whether user wants th
 
 export { Event } from './events';
 export { IDisposable } from './lifecycle';
-export { Position as DropTargetDirections } from './dnd/droptarget';
+export {
+    Position,
+    positionToDirection,
+    directionToPosition,
+} from './dnd/droptarget';
 export {
     FocusEvent,
     PanelDimensionChangeEvent,

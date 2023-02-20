@@ -4,6 +4,7 @@ import {
     directionToPosition,
     Droptarget,
     Position,
+    positionToDirection,
 } from '../../dnd/droptarget';
 import { fireEvent } from '@testing-library/dom';
 
@@ -41,6 +42,17 @@ describe('droptarget', () => {
         expect(directionToPosition('within')).toBe('center');
         expect(() => directionToPosition('bad_input' as any)).toThrow(
             "invalid direction 'bad_input'"
+        );
+    });
+
+    test('positionToDirection', () => {
+        expect(positionToDirection('top')).toBe('above');
+        expect(positionToDirection('bottom')).toBe('below');
+        expect(positionToDirection('left')).toBe('left');
+        expect(positionToDirection('right')).toBe('right');
+        expect(positionToDirection('center')).toBe('within');
+        expect(() => positionToDirection('bad_input' as any)).toThrow(
+            "invalid position 'bad_input'"
         );
     });
 
