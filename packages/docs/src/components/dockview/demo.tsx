@@ -316,7 +316,7 @@ export const DockviewDemo = () => {
             position: { referencePanel: 'panel_7', direction: 'within' },
         });
 
-        event.api.addEmptyGroup();
+        event.api.addGroup();
 
         event.api.getPanel('panel_1').api.setActive();
 
