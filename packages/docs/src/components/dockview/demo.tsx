@@ -209,9 +209,8 @@ const Icon = (props: {
 };
 
 const Button = () => {
-    const [position, setPosition] = React.useState<
-        { x: number; y: number } | undefined
-    >(undefined);
+    const [position, setPosition] =
+        React.useState<{ x: number; y: number } | undefined>(undefined);
 
     const close = () => setPosition(undefined);
 
@@ -320,15 +319,15 @@ export const DockviewDemo = () => {
 
         event.api.getPanel('panel_1').api.setActive();
 
-        setInterval(() => {
-            event.api.getPanel('panel_1').update({
-                params: {
-                    params: {
-                        title: Date.now().toString(),
-                    },
-                },
-            });
-        }, 1000);
+        // setInterval(() => {
+        //     event.api.getPanel('panel_1').update({
+        //         params: {
+        //             params: {
+        //                 title: Date.now().toString(),
+        //             },
+        //         },
+        //     });
+        // }, 1000);
     };
 
     return (

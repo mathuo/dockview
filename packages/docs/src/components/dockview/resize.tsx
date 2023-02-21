@@ -23,13 +23,24 @@ const Default = (props: IDockviewPanelProps) => {
                     step={1}
                 />
                 <button
+                    style={{ width: '100px' }}
                     onClick={() => {
                         props.api.group.api.setSize({
                             width,
                         });
                     }}
                 >
-                    Set
+                    Resize Group
+                </button>
+                <button
+                    style={{ width: '100px' }}
+                    onClick={() => {
+                        props.api.setSize({
+                            width,
+                        });
+                    }}
+                >
+                    Resize panel
                 </button>
             </div>
             <div className="resize-control">
@@ -42,13 +53,24 @@ const Default = (props: IDockviewPanelProps) => {
                     step={1}
                 />
                 <button
+                    style={{ width: '100px' }}
                     onClick={() => {
                         props.api.group.api.setSize({
                             height,
                         });
                     }}
                 >
-                    Set
+                    Resize Group
+                </button>
+                <button
+                    style={{ width: '100px' }}
+                    onClick={() => {
+                        props.api.setSize({
+                            height,
+                        });
+                    }}
+                >
+                    Resize Panel
                 </button>
             </div>
         </div>
