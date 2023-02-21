@@ -2,11 +2,22 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dockview.dev/blog</id>
     <title>Dockview Blog</title>
-    <updated>2022-10-04T00:00:00.000Z</updated>
+    <updated>2023-02-28T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dockview.dev/blog"/>
     <subtitle>Dockview Blog</subtitle>
     <icon>https://dockview.dev/img/dockview_logo.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Dockview 1.6.0]]></title>
+        <id>https://dockview.dev/blog/dockview-1.6.0-release</id>
+        <link href="https://dockview.dev/blog/dockview-1.6.0-release"/>
+        <updated>2023-02-28T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Please reference to docs @ dockview.dev.]]></summary>
+        <content type="html"><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev" target="_blank" rel="noopener noreferrer">dockview.dev</a>.
+If you feel anything is missing or unclear please let me know.</p><h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2><ul><li>magnetic dnd controls <a href="https://github.com/mathuo/dockview/pull/177" target="_blank" rel="noopener noreferrer">#177</a></li><li>group dnd <a href="https://github.com/mathuo/dockview/pull/171" target="_blank" rel="noopener noreferrer">#171</a></li><li>full width tabs <a href="https://github.com/mathuo/dockview/pull/177" target="_blank" rel="noopener noreferrer">#171</a></li><li>addPanel improvements</li><li>update parameters via panel.api.updateParameters</li><li>allow dnd on empty groups <a href="https://github.com/mathuo/dockview/pull/168" target="_blank" rel="noopener noreferrer">#168</a></li></ul><h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2><ul><li>Update dependencies including the dev dependencies for dockview and all dependencies for the docs website.
+<a href="https://github.com/mathuo/dockview/pull/180" target="_blank" rel="noopener noreferrer">#180</a></li><li>A variety of internal changes including file name changes</li><li>Improve internal dnd control logic to handle a wider variety of cases</li><li>Various doc enhancements @ <a href="https://dockview.dev" target="_blank" rel="noopener noreferrer">dockview.dev</a></li></ul><h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2><ul><li>addEmptyGroup renamed to addGroup</li></ul>]]></content>
+        <category label="release" term="release"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Dockview 1.5.2]]></title>
         <id>https://dockview.dev/blog/dockview-1.5.2-release</id>
