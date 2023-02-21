@@ -84,7 +84,7 @@ export const CustomHeadersDockview = () => {
             position: { referencePanel: 'panel_7', direction: 'within' },
         });
 
-        event.api.addEmptyGroup();
+        event.api.addGroup();
     };
 
     return (
