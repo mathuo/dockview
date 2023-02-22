@@ -85,7 +85,7 @@ export class DockviewPanelApiImpl
     }
 
     public setTitle(title: string): void {
-        this._onDidTitleChange.fire({ title });
+        this.panel.update({ params: { title } });
     }
 
     public close(): void {
