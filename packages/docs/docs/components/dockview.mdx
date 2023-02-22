@@ -14,6 +14,8 @@ import { NestedDockview } from '@site/src/components/dockview/nested';
 import { CustomHeadersDockview } from '@site/src/components/dockview/customHeaders';
 import { ResizeDockview } from '@site/src/components/dockview/resize';
 import { DockviewGroupControl } from '@site/src/components/dockview/groupControl';
+import { DockviewWatermark } from '@site/src/components/dockview/watermark';
+import { DockviewPersistance } from '@site/src/components/dockview/persistance';
 import {
     DockviewNative,
     DockviewNative2,
@@ -159,7 +161,173 @@ const MyComponent = (props: IDockviewPanelProps<{ title: string }>) => {
 | close                  | `(): void`                                                  |                  |
 | setTitle               | `(title: string): void`                                     |                  |
 
-## Essential Features
+## Layout Persistance
+
+Layouts are loaded and saved via to `fromJSON` and `toJSON` methods on the Dockview api.
+The api also exposes an event `onDidLayoutChange` you can listen on to determine when the layout has changed.
+Below are some snippets showing how you might load from and save to localStorage.
+
+```tsx title="Saving the layout state to localStorage"
+React.useEffect(() => {
+    if (!api) {
+        return;
+    }
+
+    const disposable = api.onDidLayoutChange(() => {
+        const layout = api.toJSON();
+
+        localStorage.setItem(
+            'dockview_persistance_layout',
+            JSON.stringify(layout)
+        );
+    });
+
+    return () => {
+        disposable.dispose();
+    };
+}, [api]);
+```
+
+```tsx title="Loading a layout from localStorage"
+const onReady = (event: DockviewReadyEvent) => {
+    const layoutString = localStorage.getItem('dockview_persistance_layout');
+
+    let success = false;
+
+    if (layoutString) {
+        try {
+            const layout = JSON.parse(layoutString);
+            event.api.fromJSON(layout);
+            success = true;
+        } catch (err) {
+            //
+        }
+    }
+
+    if (!success) {
+        // do something if there is no layout or there was a loading error
+    }
+};
+```
+
+Here is an example using the above code loading from and saving to localStorage.
+If you refresh the page you should notice your layout is loaded as you left it.
+
+<DockviewPersistance />
+
+## Resizing
+
+Each Dockview contains of a number of groups and each group has a number of panels.
+Logically a user may want to resize a panel, but this translates to resizing the group which contains that panel.
+
+You can set the size of a panel using `props.api.setSize(...)`.
+You can also set the size of the group associated with the panel using `props.api.group.api.setSize(...)` although this isn't recommended
+due to the clunky syntax.
+
+```tsx
+// it's mandatory to provide either a height or a width, providing both is optional
+props.api.setSize({
+    height: 100,
+    width: 200,
+});
+
+// you could also resize the panels group, although not recommended it achieved the same result
+props.api.group.api.setSize({
+    height: 100,
+    width: 200,
+});
+```
+
+You can see an example invoking both approaches below.
+
+<ResizeDockview />
+
+## Watermark
+
+When the dockview is empty you may want to display some fallback content, this is refered to as the `watermark`.
+By default there the watermark has no content but you can provide as a prop to `DockviewReact` a `watermarkComponent`
+which will be rendered when there are no panels or groups.
+
+<DockviewWatermark />
+
+## Drag And Drop
+
+### Built-in behaviours
+
+Dockview supports a wide variety of built-in Drag and Drop possibilities.
+Below are some examples of the operations you can perform.
+
+<img style={{ width: '60%' }} src={useBaseUrl('/img/add_to_tab.svg')} />
+
+> Drag a tab onto another tab to place it inbetween existing tabs.
+
+<img style={{ width: '60%' }} src={useBaseUrl('/img/add_to_empty_space.svg')} />
+
+> Drag a tab to the right of the last tab to place it after the existing tabs.
+
+<img style={{ width: '60%' }} src={useBaseUrl('/img/add_to_group.svg')} />
+
+> Drag a group onto an existing group to merge the two groups.
+
+<div style={{ display: 'flex', justifyContent: 'space-around' }}>
+    <img style={{ width: '40%' }} src={useBaseUrl('/img/drop_positions.svg')} />
+    <img
+        style={{ width: '40%' }}
+        src={useBaseUrl('/img/magnet_drop_positions.svg')}
+    />
+</div>
+
+> Drag into the left/right/top/bottom target zone of a panel to create a new group in the selected direction.
+
+> Drag into the center of a panel to add to that group.
+
+> Drag to the edge of the dockview component to create a new group on the selected edge.
+
+### Extended behaviours
+
+For interaction with the Drag events directly the component exposes some method to help determine whether external drag events should be interacted with or not.
+
+```tsx
+/**
+ * called when an ondrop event which does not originate from the dockview libray and
+ * passes the showDndOverlay condition occurs
+ **/
+const onDidDrop = (event: DockviewDropEvent) => {
+    const { group } = event;
+
+    event.api.addPanel({
+        id: 'test',
+        component: 'default',
+        position: {
+            referencePanel: group.activePanel.id,
+            direction: 'within',
+        },
+    });
+};
+
+/**
+ * called for drag over events which do not originate from the dockview library
+ * allowing the developer to decide where the overlay should be shown for a
+ * particular drag event
+ **/
+const showDndOverlay = (event: DockviewDndOverlayEvent) => {
+    return true;
+};
+
+return (
+    <DockviewReact
+        components={components}
+        onReady={onReady}
+        className="dockview-theme-abyss"
+        onDidDrop={onDidDrop}
+        showDndOverlay={showDndOverlay}
+    />
+);
+```
+
+<DndDockview />
+
+## Panels
 
 ### Add Panel
 
@@ -235,104 +403,6 @@ const panel2 = api.addPanel({
 });
 ```
 
-## Advanced Features
-
-### Resizing via API
-
-Each Dockview contains of a number of groups and each group has a number of panels.
-Logically a user may want to resize a panel, but this translates to resizing the group which contains that panel.
-
-You can set the size of a panel using `props.api.setSize(...)`.
-You can also set the size of the group associated with the panel using `props.api.group.api.setSize(...)` although this isn't recommended
-due to the clunky syntax.
-
-```tsx
-// it's mandatory to provide either a height or a width, providing both is optional
-props.api.setSize({
-    height: 100,
-    width: 200,
-});
-
-// you could also resize the panels group, although not recommended it achieved the same result
-props.api.group.api.setSize({
-    height: 100,
-    width: 200,
-});
-```
-
-You can see an example invoking both approaches below.
-
-<ResizeDockview />
-
-### Locked group
-
-Locking a group will disable all drop events for this group ensuring no additional panels can be added to the group through drop events.
-You can still add groups to a locked panel programatically using the API though.
-
-```tsx
-panel.group.locked = true;
-```
-
-### Group header
-
-You may wish to hide the header section of a group. This can achieved through the `hidden` variable on `panel.group.header`.
-
-```tsx
-panel.group.header.hidden = true;
-```
-
-### Custom Tab Headers
-
-You can provide custom renderers for your tab headers for maximum customization.
-A default implementation of `DockviewDefaultTab` is provided should you only wish to attach minor
-changes and events that do not alter the default behaviour, for example to add a custom context menu event
-handler.
-
-```tsx title="Attaching a custom context menu event handlers to a custom header"
-import { IDockviewPanelHeaderProps, DockviewDefaultTab } from 'dockview';
-
-const MyCustomheader = (props: IDockviewPanelHeaderProps) => {
-    const onContextMenu = (event: React.MouseEvent) => {
-        event.preventDefault();
-        alert('context menu');
-    };
-    return <DockviewDefaultTab onContextMenu={onContextMenu} {...props} />;
-};
-```
-
-You are also free to define a custom renderer entirely from scratch and not make use of the `DockviewDefaultTab` component.
-To use a custom renderer you can must register a collection of tab components.
-
-```tsx
-const tabComponents = {
-    myCustomHeader: MyCustomHeader,
-};
-
-return <DockviewReact tabComponents={tabComponents}  ... />;
-```
-
-```tsx
-api.addPanel({
-    id: 'panel_1',
-    component: 'default',
-    tabComponent: 'myCustomHeader', // <-- your registered renderers
-    title: 'Panel 1',
-});
-```
-
-You can also override the default tab renderer which will be used when no `tabComponent` is provided to the `addPanel` function.
-
-```tsx
-<DockviewReact defaultTabComponent={MyCustomHeader}  ... />;
-```
-
-As a simple example the below attachs a custom event handler for the context menu on all tabs as a default tab renderer
-
-The below example uses a custom tab renderer to reigster a popover when the user right clicked on a tab.
-This still makes use of the `DockviewDefaultTab` since it's only a minor change.
-
-<CustomHeadersDockview />
-
 ### Panel Rendering
 
 By default `DockviewReact` only adds to the DOM those panels that are visible,
@@ -399,93 +469,138 @@ Toggling the checkbox you can see that when you only render those panels which a
     <RenderingDockview renderVisibleOnly={false} />
 </div>
 
-### Drag And Drop
+## Headers
 
-#### Built-in behaviours
+### Custom Tab Headers
 
-Dockview supports a wide variety of built-in Drag and Drop possibilities.
-Below are some examples of the operations you can perform.
+You can provide custom renderers for your tab headers for maximum customization.
+A default implementation of `DockviewDefaultTab` is provided should you only wish to attach minor
+changes and events that do not alter the default behaviour, for example to add a custom context menu event
+handler.
 
-<img style={{ width: '60%' }} src={useBaseUrl('/img/add_to_tab.svg')} />
+```tsx title="Attaching a custom context menu event handlers to a custom header"
+import { IDockviewPanelHeaderProps, DockviewDefaultTab } from 'dockview';
 
-> Drag a tab onto another tab to place it inbetween existing tabs.
-
-<img style={{ width: '60%' }} src={useBaseUrl('/img/add_to_empty_space.svg')} />
-
-> Drag a tab to the right of the last tab to place it after the existing tabs.
-
-<img style={{ width: '60%' }} src={useBaseUrl('/img/add_to_group.svg')} />
-
-> Drag a group onto an existing group to merge the two groups.
-
-<div style={{ display: 'flex', justifyContent: 'space-around' }}>
-    <img style={{ width: '40%' }} src={useBaseUrl('/img/drop_positions.svg')} />
-    <img
-        style={{ width: '40%' }}
-        src={useBaseUrl('/img/magnet_drop_positions.svg')}
-    />
-</div>
-
-> Drag into the left/right/top/bottom target zone of a panel to create a new group in the selected direction.
-
-> Drag into the center of a panel to add to that group.
-
-> Drag to the edge of the dockview component to create a new group on the selected edge.
-
-#### Extended behaviours
-
-For interaction with the Drag events directly the component exposes some method to help determine whether external drag events should be interacted with or not.
-
-```tsx
-/**
- * called when an ondrop event which does not originate from the dockview libray and
- * passes the showDndOverlay condition occurs
- **/
-const onDidDrop = (event: DockviewDropEvent) => {
-    const { group } = event;
-
-    event.api.addPanel({
-        id: 'test',
-        component: 'default',
-        position: {
-            referencePanel: group.activePanel.id,
-            direction: 'within',
-        },
-    });
+const MyCustomheader = (props: IDockviewPanelHeaderProps) => {
+    const onContextMenu = (event: React.MouseEvent) => {
+        event.preventDefault();
+        alert('context menu');
+    };
+    return <DockviewDefaultTab onContextMenu={onContextMenu} {...props} />;
 };
-
-/**
- * called for drag over events which do not originate from the dockview library
- * allowing the developer to decide where the overlay should be shown for a
- * particular drag event
- **/
-const showDndOverlay = (event: DockviewDndOverlayEvent) => {
-    return true;
-};
-
-return (
-    <DockviewReact
-        components={components}
-        onReady={onReady}
-        className="dockview-theme-abyss"
-        onDidDrop={onDidDrop}
-        showDndOverlay={showDndOverlay}
-    />
-);
 ```
 
-<DndDockview />
+You are also free to define a custom renderer entirely from scratch and not make use of the `DockviewDefaultTab` component.
+To use a custom renderer you can must register a collection of tab components.
 
-### Events
+```tsx
+const tabComponents = {
+    myCustomHeader: MyCustomHeader,
+};
 
-<EventsDockview />
+return <DockviewReact tabComponents={tabComponents}  ... />;
+```
 
-### Nested Dockviews
+```tsx
+api.addPanel({
+    id: 'panel_1',
+    component: 'default',
+    tabComponent: 'myCustomHeader', // <-- your registered renderers
+    title: 'Panel 1',
+});
+```
 
-You can safely create multiple dockview instances within one page and nest dockviews within other dockviews.
-If you wish to interact with the drop event from one dockview instance in another dockview instance you can implement the `showDndOverlay` and `onDidDrop` props on `DockviewReact`.
+You can also override the default tab renderer which will be used when no `tabComponent` is provided to the `addPanel` function.
 
-<NestedDockview />
+```tsx
+<DockviewReact defaultTabComponent={MyCustomHeader}  ... />;
+```
+
+As a simple example the below attachs a custom event handler for the context menu on all tabs as a default tab renderer
+
+The below example uses a custom tab renderer to reigster a popover when the user right clicked on a tab.
+This still makes use of the `DockviewDefaultTab` since it's only a minor change.
+
+<CustomHeadersDockview />
+
+### Default Tab Title
+
+If you are using the default tab renderer you can set the title of a tab when creating it
+
+```tsx
+api.addPanel({
+    id: 'panel_1',
+    component: 'my_component',
+    title: 'my_custom_title', // <-- special param for title
+});
+```
+
+You can update the title through the panel api which can be accessed via `props.api` if you are inside the panel
+component or via `api.getPanel('panel1').api` if you are accessing from outside of the panel component.
+
+```tsx
+api.updateTitle('my_new_custom_title');
+```
+
+> Note this only works when using the default tab implementation.
+
+### Custom Tab Title
+
+If you are using a custom tab implementation you should pass variables through as a parameter and render them
+through your tab components implementation.
+
+```tsx title="Add a panel with custom parameters"
+api.addPanel({
+    id: 'panel_2',
+    component: 'my_component',
+    tabComponent: 'my_tab',
+    params: {
+        myTitle: 'Window 2', // <-- passing a variable to use as a title
+    },
+});
+```
+
+```tsx title="Accessing custom parameters from a custom tab renderer"
+const tabComponents = {
+    default: (props: IDockviewPanelHeaderProps<{ myTitle: string }>) => {
+        const title = props.params.myTitle; // <-- accessing my custom varaible
+        return <div>{/** tab implementation as chosen by developer */}</div>;
+    },
+};
+```
+
+### Hidden Headers
+
+You may wish to hide the header section of a group. This can achieved through the `hidden` variable on `panel.group.header`.
+
+```tsx
+panel.group.header.hidden = true;
+```
+
+### Full width tabs
+
+`DockviewReactComponent` accepts the prop `singleTabMode`. If set `singleTabMode=fullwidth` then when there is only one tab in a group this tab will expand
+to the entire width of the group. For example:
+
+> This can be conmbined with <Link to="./dockview/#locked-group">Locked Groups</Link> to create an application that feels more like a Window Manager
+> rather than a collection of groups and tabs.
+
+```tsx
+<DockviewReactComponent singleTabMode="fullwidth" {...otherProps} />
+```
+
+<DockviewNative />
+
+## Groups
+
+### Locked group
+
+Locking a group will disable all drop events for this group ensuring no additional panels can be added to the group through drop events.
+You can still add groups to a locked panel programatically using the API though.
+
+```tsx
+panel.group.locked = true;
+```
 
 ### Group Controls Panel
 
@@ -528,19 +643,18 @@ const GroupControlComponent = (props: IDockviewGroupControlProps) => {
 
 <DockviewGroupControl />
 
-### Full width tabs
+## Events
 
-`DockviewReactComponent` accepts the prop `singleTabMode`. If set `singleTabMode=fullwidth` then when there is only one tab in a group this tab will expand
-to the entire width of the group. For example:
+<EventsDockview />
 
-> This can be conmbined with <Link to="./dockview/#locked-group">Locked Groups</Link> to create an application that feels more like a Window Manager
-> rather than a collection of groups and tabs.
+## Advanced Examples
 
-```tsx
-<DockviewReactComponent singleTabMode="fullwidth" {...otherProps} />
-```
+### Nested Dockviews
 
-<DockviewNative />
+You can safely create multiple dockview instances within one page and nest dockviews within other dockviews.
+If you wish to interact with the drop event from one dockview instance in another dockview instance you can implement the `showDndOverlay` and `onDidDrop` props on `DockviewReact`.
+
+<NestedDockview />
 
 ### Example
 

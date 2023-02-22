@@ -1,4 +1,3 @@
-import {} from '@site/../dockview/dist/cjs/dnd/droptarget';
 import {
     DockviewReact,
     DockviewReadyEvent,

@@ -1,71 +1,13 @@
 import {
-    CanDisplayOverlay,
-    Droptarget,
-    DropTargetDirections,
-} from '@site/../dockview/dist/cjs/dnd/droptarget';
-import {
-    DockviewDndOverlayEvent,
-    DockviewDropEvent,
     DockviewReact,
     DockviewReadyEvent,
-    GridviewReact,
-    GridviewReadyEvent,
     IDockviewPanelProps,
-    IGridviewPanelProps,
     Position,
     Direction,
     IDockviewPanelHeaderProps,
 } from 'dockview';
 import * as React from 'react';
 import './native.scss';
-
-class CustomDndTraget {
-    private data: any;
-
-    static SINGLETON = new CustomDndTraget();
-
-    setData<T>(t: T): void {
-        this.data = t;
-    }
-
-    getData<T>(): T {
-        return this.data;
-    }
-
-    clearData(): void {
-        this.data = null;
-    }
-}
-
-type CustomDescriptor = {
-    type: 'CUSTOM';
-    id: string;
-};
-
-function isCustomDescriptor(obj: any): obj is CustomDescriptor {
-    return (
-        typeof obj === 'object' && (obj as CustomDescriptor).type === 'CUSTOM'
-    );
-}
-
-function convertPositionToDirection(position: Position): Direction {
-    switch (position) {
-        case Position.Left:
-            return 'left';
-
-        case Position.Right:
-            return 'right';
-
-        case Position.Bottom:
-            return 'below';
-
-        case Position.Top:
-            return 'above';
-
-        case Position.Center:
-            return 'within';
-    }
-}
 
 const components = {
     default: (props: IDockviewPanelProps<{ title: string; x?: number }>) => {
