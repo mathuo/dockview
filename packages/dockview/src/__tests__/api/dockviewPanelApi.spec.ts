@@ -1,46 +1,30 @@
 import { DockviewPanelApiImpl, TitleEvent } from '../../api/dockviewPanelApi';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { IDockviewPanel } from '../../dockview/dockviewPanel';
+import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
 import { GroupPanel } from '../../groupview/groupviewPanel';
 
 describe('groupPanelApi', () => {
     test('title', () => {
-        const groupPanel: Partial<IDockviewPanel> = {
-            id: 'test_id',
-            title: 'test_title',
-        };
-
-        const accessor: Partial<DockviewComponent> = {
-            onDidAddPanel: jest.fn(),
-            onDidRemovePanel: jest.fn(),
-            options: {},
-        };
-        const groupViewPanel = new GroupPanel(
-            <DockviewComponent>accessor,
-            '',
-            {}
-        );
-
-        const cut = new DockviewPanelApiImpl(
-            <IDockviewPanel>groupPanel,
-            <GroupPanel>groupViewPanel
-        );
-
-        let events: TitleEvent[] = [];
-
-        const disposable = cut.onDidTitleChange((event) => {
-            events.push(event);
+        const panelMock = jest.fn<DockviewPanel, []>(() => {
+            return {
+                update: jest.fn(),
+            } as any;
+        });
+        const groupMock = jest.fn<GroupPanel, []>(() => {
+            return {} as any;
         });
 
-        expect(events.length).toBe(0);
-        expect(cut.title).toBe('test_title');
+        const panel = new panelMock();
+        const group = new groupMock();
 
-        cut.setTitle('test_title_2');
-        expect(events.length).toBe(1);
-        expect(events[0]).toEqual({ title: 'test_title_2' });
-        expect(cut.title).toBe('test_title'); // title should remain unchanged
+        const cut = new DockviewPanelApiImpl(panel, group);
 
-        disposable.dispose();
+        cut.setTitle('test_title');
+
+        expect(panel.update).toBeCalledTimes(1);
+        expect(panel.update).toBeCalledWith({
+            params: { title: 'test_title' },
+        });
     });
 
     test('onDidGroupChange', () => {
