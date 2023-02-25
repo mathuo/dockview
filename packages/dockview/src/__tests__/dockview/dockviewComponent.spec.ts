@@ -7,7 +7,6 @@ import {
 import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/core/splitview';
 import { ReactPanelDeserialzier } from '../../react/deserializer';
-import { Position } from '../../dnd/droptarget';
 import { GroupPanel } from '../../groupview/groupviewPanel';
 import { CompositeDisposable } from '../../lifecycle';
 import {
@@ -459,7 +458,7 @@ describe('dockviewComponent', () => {
 
         await panel2.api.close();
 
-        expect(dockview.size).toBe(1); // watermark
+        expect(dockview.size).toBe(0);
         expect(dockview.totalPanels).toBe(0);
     });
 
@@ -1204,55 +1203,6 @@ describe('dockviewComponent', () => {
         panel1Again.api.close();
 
         expect(dockview.totalPanels).toBe(0);
-    });
-
-    test('last group is retained for watermark', () => {
-        const container = document.createElement('div');
-
-        const dockview = new DockviewComponent(container, {
-            components: { default: PanelContentPartTest },
-        });
-
-        dockview.layout(500, 1000);
-
-        const panel1 = dockview.addPanel({
-            id: 'panel1',
-            component: 'default',
-            tabComponent: 'default',
-        });
-
-        expect(dockview.size).toBe(1);
-        expect(dockview.totalPanels).toBe(1);
-
-        const group = panel1.group;
-
-        dockview.removePanel(panel1);
-
-        expect(group.model.hasWatermark).toBeTruthy();
-        expect(dockview.size).toBe(1);
-        expect(dockview.totalPanels).toBe(0);
-
-        const panel2 = dockview.addPanel({
-            id: 'panel2',
-            component: 'default',
-            tabComponent: 'default',
-        });
-
-        expect(group.model.hasWatermark).toBeFalsy();
-
-        const panel3 = dockview.addPanel({
-            id: 'panel3',
-            component: 'default',
-            tabComponent: 'default',
-        });
-
-        expect(dockview.size).toBe(1);
-        expect(dockview.totalPanels).toBe(2);
-
-        panel2.api.close();
-        expect(group.model.hasWatermark).toBeFalsy();
-        panel3.api.close();
-        expect(group.model.hasWatermark).toBeTruthy();
     });
 
     test('panel is disposed of when removed', () => {
@@ -2390,6 +2340,93 @@ describe('dockviewComponent', () => {
                 },
             },
             options: {},
+        });
+    });
+
+    test('that a empty component has no groups', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+
+        expect(dockview.groups.length).toBe(0);
+    });
+
+    test('that deserializing an empty layout has zero groups and a watermark', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+
+        expect(dockview.groups.length).toBe(0);
+
+        expect(
+            dockview.element.querySelectorAll('.dv-watermark-container').length
+        ).toBe(1);
+
+        dockview.fromJSON({
+            grid: {
+                orientation: Orientation.HORIZONTAL,
+                root: {
+                    type: 'branch',
+                    data: [],
+                },
+                height: 100,
+                width: 100,
+            },
+            panels: {},
+        });
+
+        expect(dockview.groups.length).toBe(0);
+
+        expect(
+            dockview.element.querySelectorAll('.dv-watermark-container').length
+        ).toBe(1);
+    });
+
+    test('empty', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+
+        expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
+            grid: {
+                height: 0,
+                width: 0,
+                orientation: Orientation.HORIZONTAL,
+                root: {
+                    data: [],
+                    type: 'branch',
+                    size: 0,
+                },
+            },
+            options: {},
+            panels: {},
         });
     });
 });
