@@ -712,7 +712,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     ): void {
         const data = getPanelData();
 
-        if (data) {
+        if (data && data.viewId === this.accessor.id) {
             if (data.panelId === null) {
                 // this is a group move dnd event
                 const { groupId } = data;

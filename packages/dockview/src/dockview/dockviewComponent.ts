@@ -131,6 +131,7 @@ export class DockviewComponent
     private _deserializer: IPanelDeserializer | undefined;
     private _api: DockviewApi;
     private _options: Exclude<DockviewComponentOptions, 'orientation'>;
+    private watermark: IWatermarkRenderer | null = null;
 
     private readonly _onDidDrop = new Emitter<DockviewDropEvent>();
     readonly onDidDrop: Event<DockviewDropEvent> = this._onDidDrop.event;
@@ -203,8 +204,16 @@ export class DockviewComponent
             styles: options.styles,
         });
 
+        this.element.classList.add('dv-dockview');
+
         this.addDisposables(
             this._onDidDrop,
+            Event.any(
+                this.onDidAddGroup,
+                this.onDidRemoveGroup
+            )(() => {
+                this.updateWatermark();
+            }),
             Event.any(
                 this.onDidAddPanel,
                 this.onDidRemovePanel,
@@ -288,6 +297,8 @@ export class DockviewComponent
         );
 
         this._api = new DockviewApi(this);
+
+        this.updateWatermark();
     }
 
     private orthogonalize(position: Position): GroupPanel {
@@ -421,7 +432,7 @@ export class DockviewComponent
         this.clear();
 
         if (!this.deserializer) {
-            throw new Error('invalid deserializer');
+            throw new Error('no deserializer provided');
         }
         const { grid, panels, options, activeGroup } = data;
 
@@ -429,8 +440,8 @@ export class DockviewComponent
             this.tabHeight = options.tabHeight;
         }
 
-        if (!this.deserializer) {
-            throw new Error('no deserializer provided');
+        if (grid.root.type !== 'branch' || !Array.isArray(grid.root.data)) {
+            throw new Error('root must be of type branch');
         }
 
         this.gridview.deserialize(grid, {
@@ -610,13 +621,7 @@ export class DockviewComponent
 
         panel.dispose();
 
-        const retainGroupForWatermark = this.size === 1;
-
-        if (
-            !retainGroupForWatermark &&
-            group.size === 0 &&
-            options.removeEmptyGroup
-        ) {
+        if (group.size === 0 && options.removeEmptyGroup) {
             this.removeGroup(group);
         }
     }
@@ -635,7 +640,32 @@ export class DockviewComponent
         );
     }
 
-    addGroup(options: AddGroupOptions): GroupPanel {
+    private updateWatermark(): void {
+        if (this.groups.length === 0) {
+            if (!this.watermark) {
+                this.watermark = this.createWatermarkComponent();
+
+                this.watermark.init({
+                    containerApi: new DockviewApi(this),
+                    params: {},
+                    title: '',
+                    api: null as any,
+                });
+
+                const watermarkContainer = document.createElement('div');
+                watermarkContainer.className = 'dv-watermark-container';
+                watermarkContainer.appendChild(this.watermark.element);
+
+                this.element.appendChild(watermarkContainer);
+            }
+        } else if (this.watermark) {
+            this.watermark.element.parentElement!.remove();
+            this.watermark.dispose();
+            this.watermark = null;
+        }
+    }
+
+    addGroup(options?: AddGroupOptions): GroupPanel {
         const group = this.createGroup();
 
         if (options) {
