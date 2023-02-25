@@ -1,4 +1,5 @@
 import {
+    DockviewApi,
     DockviewReact,
     DockviewReadyEvent,
     IDockviewPanelProps,
@@ -33,6 +34,8 @@ const counter = (() => {
 })();
 
 const Watermark = (props: IWatermarkPanelProps) => {
+    const isGroup = props.containerApi.groups.length > 0;
+
     const addPanel = () => {
         props.containerApi.addPanel({
             id: counter.next().toString(),
@@ -63,12 +66,25 @@ const Watermark = (props: IWatermarkPanelProps) => {
                 <span>
                     <button onClick={addPanel}>Add New Panel</button>
                 </span>
+                {isGroup && (
+                    <span>
+                        <button
+                            onClick={() => {
+                                props.close();
+                            }}
+                        >
+                            Close Group
+                        </button>
+                    </span>
+                )}
             </div>
         </div>
     );
 };
 
 export const DockviewWatermark = () => {
+    const [api, setApi] = React.useState<DockviewApi>();
+
     const onReady = (event: DockviewReadyEvent) => {
         // event.api.addPanel({
         //     id: 'panel_1',
@@ -84,6 +100,16 @@ export const DockviewWatermark = () => {
             },
             panels: {},
         });
+
+        setApi(event.api);
+    };
+
+    const onClick = () => {
+        if (!api) {
+            return;
+        }
+
+        api.addGroup();
     };
 
     return (
@@ -94,6 +120,9 @@ export const DockviewWatermark = () => {
                 flexDirection: 'column',
             }}
         >
+            <div>
+                <button onClick={onClick}>Add Empty Group</button>
+            </div>
             <DockviewReact
                 onReady={onReady}
                 components={components}
