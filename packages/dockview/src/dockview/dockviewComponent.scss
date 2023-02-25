@@ -1,3 +1,16 @@
+.dv-dockview {
+  position: relative;
+  background-color: var(--dv-group-view-background-color);
+
+  .dv-watermark-container {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+  }
+}
+
 .groupview {
     &.active-group {
         > .tabs-and-actions-container > .tabs-container > .tab {
