@@ -19,7 +19,7 @@ export interface IRenderable {
 }
 
 export interface HeaderPartInitParameters {
-    title: string;
+    title?: string;
 }
 
 export interface GroupPanelPartInitParameters
@@ -88,6 +88,6 @@ export type GroupPanelUpdateEvent = PanelUpdateEvent<{
 export interface GroupviewPanelState {
     id: string;
     view?: any;
-    title: string;
+    title?: string;
     params?: { [key: string]: any };
 }
