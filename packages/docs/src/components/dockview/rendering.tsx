@@ -2,7 +2,6 @@ import {
     DockviewReact,
     DockviewReadyEvent,
     IDockviewPanelProps,
-    PanelApi,
 } from 'dockview';
 import * as React from 'react';
 
