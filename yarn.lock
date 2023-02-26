@@ -5481,11 +5481,6 @@ dns-packet@^5.2.2:
   dependencies:
     "@leichtgewicht/ip-codec" "^2.0.1"
 
-dockview@0.0.0-experimental-4ff77d46-20230221:
-  version "0.0.0-experimental-4ff77d46-20230221"
-  resolved "https://registry.yarnpkg.com/dockview/-/dockview-0.0.0-experimental-4ff77d46-20230221.tgz#45b23ed4184ab2ba3728e9f8fdd482b8c7b7523d"
-  integrity sha512-EzdqR/OFhw/danue95j3rOzswUxRod+HuKm0VbJvVbKyHUIZhrHWXCCCHEH3QbT9olmYk/piEuspzkn1MgcB/g==
-
 doctrine@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/doctrine/-/doctrine-3.0.0.tgz"
