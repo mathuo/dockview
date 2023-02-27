@@ -1,4 +1,4 @@
-import { Paneview, PaneviewApi } from '../core';
+import { PaneviewApi } from '../api/component.api';
 import { DragHandler } from '../dnd/abstractDragHandler';
 import {
     getPaneData,

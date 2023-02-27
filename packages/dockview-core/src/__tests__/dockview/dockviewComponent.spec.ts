@@ -6,7 +6,6 @@ import {
 } from '../../groupview/types';
 import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/core/splitview';
-import { ReactPanelDeserialzier } from '../../react/deserializer';
 import { GroupPanel } from '../../groupview/groupviewPanel';
 import { CompositeDisposable } from '../../lifecycle';
 import {
@@ -22,6 +21,7 @@ import {
     DockviewPanelApi,
     DockviewPanelApiImpl,
 } from '../../api/dockviewPanelApi';
+import { DefaultDockviewDeserialzier } from '../../dockview/deserializer';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -512,7 +512,7 @@ describe('dockviewComponent', () => {
     test('serialization', () => {
         dockview.layout(1000, 1000);
 
-        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.deserializer = new DefaultDockviewDeserialzier(dockview);
         dockview.fromJSON({
             activeGroup: 'group-1',
             grid: {
@@ -1038,7 +1038,7 @@ describe('dockviewComponent', () => {
             fromJSON: (panelData: GroupviewPanelState): IDockviewPanel => {
                 return new TestGroupPanel(
                     panelData.id,
-                    panelData.title,
+                    panelData.title || '',
                     dockview
                 );
             },
@@ -1427,7 +1427,7 @@ describe('dockviewComponent', () => {
                 default: PanelContentPartTest,
             },
         });
-        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.deserializer = new DefaultDockviewDeserialzier(dockview);
 
         dockview.layout(500, 1000);
 
@@ -1552,7 +1552,7 @@ describe('dockviewComponent', () => {
             })
         );
 
-        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.deserializer = new DefaultDockviewDeserialzier(dockview);
         dockview.fromJSON({
             activeGroup: 'group-1',
             grid: {
@@ -1686,7 +1686,7 @@ describe('dockviewComponent', () => {
                 default: PanelContentPartTest,
             },
         });
-        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.deserializer = new DefaultDockviewDeserialzier(dockview);
         dockview.fromJSON({
             activeGroup: 'group-1',
             grid: {
@@ -1778,7 +1778,7 @@ describe('dockviewComponent', () => {
                 test_tab_id: PanelTabPartTest,
             },
         });
-        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.deserializer = new DefaultDockviewDeserialzier(dockview);
         dockview.fromJSON({
             activeGroup: 'group-1',
             grid: {
@@ -1890,7 +1890,7 @@ describe('dockviewComponent', () => {
                 test_tab_id: PanelTabPartTest,
             },
         });
-        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.deserializer = new DefaultDockviewDeserialzier(dockview);
         dockview.fromJSON({
             activeGroup: 'group-1',
             grid: {
@@ -1980,7 +1980,7 @@ describe('dockviewComponent', () => {
             },
             orientation: Orientation.HORIZONTAL,
         });
-        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.deserializer = new DefaultDockviewDeserialzier(dockview);
 
         expect(dockview.orientation).toBe(Orientation.HORIZONTAL);
 
@@ -2086,7 +2086,7 @@ describe('dockviewComponent', () => {
             },
             orientation: Orientation.HORIZONTAL,
         });
-        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.deserializer = new DefaultDockviewDeserialzier(dockview);
 
         expect(dockview.orientation).toBe(Orientation.HORIZONTAL);
 
@@ -2227,7 +2227,7 @@ describe('dockviewComponent', () => {
             },
             orientation: Orientation.HORIZONTAL,
         });
-        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.deserializer = new DefaultDockviewDeserialzier(dockview);
 
         expect(dockview.orientation).toBe(Orientation.HORIZONTAL);
 
@@ -2355,7 +2355,7 @@ describe('dockviewComponent', () => {
             },
             orientation: Orientation.HORIZONTAL,
         });
-        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.deserializer = new DefaultDockviewDeserialzier(dockview);
 
         expect(dockview.groups.length).toBe(0);
     });
@@ -2372,7 +2372,7 @@ describe('dockviewComponent', () => {
             },
             orientation: Orientation.HORIZONTAL,
         });
-        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.deserializer = new DefaultDockviewDeserialzier(dockview);
 
         expect(dockview.groups.length).toBe(0);
 
@@ -2412,7 +2412,7 @@ describe('dockviewComponent', () => {
             },
             orientation: Orientation.HORIZONTAL,
         });
-        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+        dockview.deserializer = new DefaultDockviewDeserialzier(dockview);
 
         expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
             grid: {

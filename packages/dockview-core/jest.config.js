@@ -6,22 +6,22 @@ console.log('loaded');
 
 module.exports = {
     ...baseConfig,
-    roots: ['<rootDir>/packages/dockview'],
-    modulePaths: ['<rootDir>/packages/dockview/src'],
+    roots: ['<rootDir>/packages/dockview-core'],
+    modulePaths: ['<rootDir>/packages/dockview-core/src'],
     displayName: { name, color: 'blue' },
     rootDir: '../../',
     collectCoverageFrom: [
-        '<rootDir>/packages/dockview/src/**/*.{js,jsx,ts,tsx}',
+        '<rootDir>/packages/dockview-core/src/**/*.{js,jsx,ts,tsx}',
     ],
     setupFiles: [
-        '<rootDir>/packages/dockview/src/__tests__/__mocks__/resizeObserver.js',
+        '<rootDir>/packages/dockview-core/src/__tests__/__mocks__/resizeObserver.js',
     ],
     coveragePathIgnorePatterns: ['/node_modules/'],
     modulePathIgnorePatterns: [
-        '<rootDir>/packages/dockview/src/__tests__/__mocks__',
-        '<rootDir>/packages/dockview/src/__tests__/__test_utils__',
+        '<rootDir>/packages/dockview-core/src/__tests__/__mocks__',
+        '<rootDir>/packages/dockview-core/src/__tests__/__test_utils__',
     ],
-    coverageDirectory: '<rootDir>/packages/dockview/coverage/',
+    coverageDirectory: '<rootDir>/packages/dockview-core/coverage/',
     testResultsProcessor: 'jest-sonar-reporter',
     testEnvironment: 'jsdom',
 };

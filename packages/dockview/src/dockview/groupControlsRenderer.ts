@@ -2,8 +2,8 @@ import * as React from 'react';
 import { ReactPart, ReactPortalStore } from '../react';
 import {
     IDockviewPanel,
-    CompositeDisposable,
-    MutableDisposable,
+    DockviewCompositeDisposable,
+    DockviewMutableDisposable,
     DockviewApi,
     GroupPanel,
     GroupviewPanelApi,
@@ -19,7 +19,7 @@ export interface IDockviewGroupControlProps {
 }
 
 export class ReactGroupControlsRendererPart {
-    private mutableDisposable = new MutableDisposable();
+    private mutableDisposable = new DockviewMutableDisposable();
     private _element: HTMLElement;
     private _part?: ReactPart<IDockviewGroupControlProps>;
 
@@ -52,7 +52,7 @@ export class ReactGroupControlsRendererPart {
         containerApi: DockviewApi;
         api: GroupviewPanelApi;
     }): void {
-        this.mutableDisposable.value = new CompositeDisposable(
+        this.mutableDisposable.value = new DockviewCompositeDisposable(
             this._group.model.onDidAddPanel(() => {
                 this.updatePanels();
             }),

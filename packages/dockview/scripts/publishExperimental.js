@@ -49,6 +49,7 @@ function formatDate() {
 }
 
 package.version = `0.0.0-experimental-${result}-${formatDate()}`;
+package.dependencies['dockview-core'] = package.version;
 package.scripts = {};
 
 fs.writeFileSync(

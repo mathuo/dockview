@@ -3,10 +3,10 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     ITabRenderer,
+    GroupPanelUpdateEvent,
 } from '../groupview/types';
 import { GroupPanel } from '../groupview/groupviewPanel';
 import { IDisposable } from '../lifecycle';
-import { GroupPanelUpdateEvent } from '../groupview/types';
 
 export interface IGroupPanelView extends IDisposable {
     readonly content: IContentRenderer;

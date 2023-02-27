@@ -12,10 +12,10 @@ import {
     watchElementResize,
     GroupPanel,
     DEFAULT_TAB_IDENTIFIER,
+    DefaultDockviewDeserialzier,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
-import { ReactPanelDeserialzier } from '../deserializer';
 
 import { ReactPortalStore, usePortalsLifecycle } from '../react';
 import { IWatermarkPanelProps, ReactWatermarkPart } from './reactWatermarkPart';
@@ -166,7 +166,7 @@ export const DockviewReact = React.forwardRef(
             });
 
             domRef.current?.appendChild(dockview.element);
-            dockview.deserializer = new ReactPanelDeserialzier(dockview);
+            dockview.deserializer = new DefaultDockviewDeserialzier(dockview);
 
             const { clientWidth, clientHeight } = domRef.current!;
             dockview.layout(clientWidth, clientHeight);

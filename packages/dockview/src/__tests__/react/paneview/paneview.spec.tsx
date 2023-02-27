@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { render } from '@testing-library/react';
-import { PaneviewApi } from '../../../api/component.api';
+import { PaneviewApi } from 'dockview-core';
 import {
     IPaneviewPanelProps,
     PaneviewReact,
     PaneviewReadyEvent,
-} from '../../../react/paneview/paneview';
-import { PanelCollection } from '../../../react/types';
+} from '../../../paneview/paneview';
+import { PanelCollection } from '../../../types';
 import { setMockRefElement } from '../../__test_utils__/utils';
 
 describe('gridview react', () => {

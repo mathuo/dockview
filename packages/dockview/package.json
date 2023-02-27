@@ -59,6 +59,7 @@
     "dockview-core": "^1.6.0"
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-typescript": "^11.0.0",
     "@testing-library/react": "^13.4.0",
     "@types/react": "^18.0.28",

@@ -14,7 +14,7 @@ import { IWatermarkRenderer } from './types';
 import { GroupPanel } from './groupviewPanel';
 import { DockviewDropTargets } from './dnd';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
-import { IGroupControlRenderer } from '../core';
+import { IGroupControlRenderer } from '../dockview/options';
 
 export interface DndService {
     canDisplayOverlay(

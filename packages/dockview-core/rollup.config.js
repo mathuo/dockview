@@ -6,18 +6,12 @@ const { terser } = require('rollup-plugin-terser');
 const postcss = require('rollup-plugin-postcss');
 
 const { name, version, homepage, license } = require('./package.json');
-const reactMain = join(__dirname, './scripts/rollupEntryTarget-react.ts');
-const reactMainNoStyles = join(__dirname, './src/index.ts');
-const main = join(__dirname, './scripts/rollupEntryTarget-core.ts');
-const mainNoStyles = join(__dirname, './src/core.ts');
+const main = join(__dirname, './scripts/rollupEntryTarget.ts');
+const mainNoStyles = join(__dirname, './src/index.ts');
 const outputDir = join(__dirname, 'dist');
 
-function outputFile(format, isMinified, withStyles, isReact) {
+function outputFile(format, isMinified, withStyles) {
     let filename = join(outputDir, name);
-
-    if (isReact) {
-        filename += '.react';
-    }
 
     if (format !== 'umd') {
         filename += `.${format}`;
@@ -33,13 +27,13 @@ function outputFile(format, isMinified, withStyles, isReact) {
 }
 
 function getInput(options) {
-    const { withStyles, isReact } = options;
+    const { withStyles } = options;
 
     if (withStyles) {
-        return isReact ? reactMain : main;
+        return main;
     }
 
-    return isReact ? reactMainNoStyles : mainNoStyles;
+    return mainNoStyles;
 }
 
 function createBundle(format, options) {
@@ -84,58 +78,28 @@ function createBundle(format, options) {
         output['name'] = name;
     }
 
-    if (isReact) {
-        // TODO: should be conditional on whether user wants the React wrappers
-        external.push('react', 'react-dom');
-
-        if (format === 'umd') {
-            // TODO: should be conditional on whether user wants the React wrappers
-            output.globals['react'] = 'React';
-            output.globals['react-dom'] = 'ReactDOM';
-        }
-    }
-
     return {
         input,
         output,
         plugins,
         external,
-        // manualChunks(id) {
-        //     if (id.includes('src/react/')) {
-        //         return 'react';
-        //     }
-        // },
     };
 }
 
 module.exports = [
     // amd
-    createBundle('amd', {
-        withStyles: false,
-        isMinified: false,
-        isReact: true,
-    }),
-    createBundle('amd', { withStyles: true, isMinified: false, isReact: true }),
-    createBundle('amd', { withStyles: false, isMinified: true, isReact: true }),
-    createBundle('amd', { withStyles: true, isMinified: true, isReact: true }),
+    createBundle('amd', { withStyles: false, isMinified: false }),
+    createBundle('amd', { withStyles: true, isMinified: false }),
+    createBundle('amd', { withStyles: false, isMinified: true }),
+    createBundle('amd', { withStyles: true, isMinified: true }),
     // umd
-    createBundle('umd', {
-        withStyles: false,
-        isMinified: false,
-        isReact: true,
-    }),
-    createBundle('umd', { withStyles: true, isMinified: false, isReact: true }),
-    createBundle('umd', { withStyles: false, isMinified: true, isReact: true }),
-    createBundle('umd', { withStyles: true, isMinified: true, isReact: true }),
+    createBundle('umd', { withStyles: false, isMinified: false }),
+    createBundle('umd', { withStyles: true, isMinified: false }),
+    createBundle('umd', { withStyles: false, isMinified: true }),
+    createBundle('umd', { withStyles: true, isMinified: true }),
     // cjs
-    createBundle('cjs', { withStyles: true, isMinified: false, isReact: true }),
+    createBundle('cjs', { withStyles: true, isMinified: false }),
     // esm
-    createBundle('esm', { withStyles: true, isMinified: false, isReact: true }),
-    createBundle('esm', { withStyles: true, isMinified: true, isReact: true }),
-    // core bundles (no-react)
-    createBundle('umd', {
-        withStyles: true,
-        isMinified: false,
-        isReact: false,
-    }),
+    createBundle('esm', { withStyles: true, isMinified: false }),
+    createBundle('esm', { withStyles: true, isMinified: true }),
 ];

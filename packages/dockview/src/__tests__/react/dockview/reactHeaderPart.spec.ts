@@ -1,5 +1,5 @@
-import { DEFAULT_TAB_IDENTIFIER } from '../../../dockview/components/tab/defaultTab';
-import { ReactPanelHeaderPart } from '../../../react/dockview/reactHeaderPart';
+import { DEFAULT_TAB_IDENTIFIER } from 'dockview-core';
+import { ReactPanelHeaderPart } from '../../../dockview/reactHeaderPart';
 
 describe('reactHeaderPart', () => {
     test('that tab id is present in toJSON when not the default tab', () => {

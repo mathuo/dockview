@@ -1,13 +1,9 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {
-    IFrameworkPart,
-    sequentialNumberGenerator,
-    IDisposable,
-} from 'dockview-core';
+import { IFrameworkPart, IDockviewDisposable } from 'dockview-core';
 
 export interface ReactPortalStore {
-    addPortal: (portal: React.ReactPortal) => IDisposable;
+    addPortal: (portal: React.ReactPortal) => IDockviewDisposable;
 }
 
 interface IPanelWrapperProps {
@@ -60,7 +56,10 @@ ReactComponentBridge.displayName = 'DockviewReactJsBridge';
  * require a key property like any other React element rendered in an array
  * to prevent excessive re-rendering
  */
-const uniquePortalKeyGenerator = sequentialNumberGenerator();
+const uniquePortalKeyGenerator = (() => {
+    let value = 1;
+    return { next: () => `dockview_react_portal_key_${(value++).toString()}` };
+})();
 
 export const ReactPartContext = React.createContext<{}>({});
 
@@ -69,7 +68,10 @@ export class ReactPart<P extends object, C extends object = {}>
 {
     private _initialProps: Record<string, any> = {};
     private componentInstance?: IPanelWrapperRef;
-    private ref?: { portal: React.ReactPortal; disposable: IDisposable };
+    private ref?: {
+        portal: React.ReactPortal;
+        disposable: IDockviewDisposable;
+    };
     private disposed = false;
 
     constructor(
@@ -156,7 +158,7 @@ export class ReactPart<P extends object, C extends object = {}>
 
 type PortalLifecycleHook = () => [
     React.ReactPortal[],
-    (portal: React.ReactPortal) => IDisposable
+    (portal: React.ReactPortal) => IDockviewDisposable
 ];
 
 /**
