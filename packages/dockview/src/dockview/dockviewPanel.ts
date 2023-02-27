@@ -9,11 +9,7 @@ import {
     IGroupPanelInitParameters,
 } from '../groupview/types';
 import { GroupPanel } from '../groupview/groupviewPanel';
-import {
-    CompositeDisposable,
-    IDisposable,
-    MutableDisposable,
-} from '../lifecycle';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { IPanel, Parameters } from '../panel/types';
 import { IGroupPanelView } from './defaultGroupPanelView';
 import { DockviewComponent } from './dockviewComponent';
@@ -34,8 +30,6 @@ export class DockviewPanel
     extends CompositeDisposable
     implements IDockviewPanel
 {
-    private readonly mutableDisposable = new MutableDisposable();
-
     readonly api: DockviewPanelApiImpl;
     private _group: GroupPanel;
     private _params?: Parameters;
@@ -88,7 +82,9 @@ export class DockviewPanel
         this._params = params.params;
         this._view = params.view;
 
-        this.setTitle(params.title);
+        if (typeof params.title === 'string') {
+            this.setTitle(params.title);
+        }
 
         this.view?.init({
             ...params,
@@ -183,7 +179,6 @@ export class DockviewPanel
 
     public dispose(): void {
         this.api.dispose();
-        this.mutableDisposable.dispose();
 
         this.view?.dispose();
     }

@@ -79,7 +79,8 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
 
     public init(params: GroupPanelPartInitParameters) {
         this.params = params;
-        this._content.textContent = params.title;
+        this._content.textContent =
+            typeof params.title === 'string' ? params.title : this.id;
 
         addDisposableListener(this.action, 'click', (ev) => {
             ev.preventDefault(); //
@@ -106,7 +107,10 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
 
     private render() {
         if (this._content.textContent !== this.params.title) {
-            this._content.textContent = this.params.title;
+            this._content.textContent =
+                typeof this.params.title === 'string'
+                    ? this.params.title
+                    : this.id;
         }
     }
 }
