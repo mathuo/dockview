@@ -38,7 +38,6 @@ export * from './dockview/options';
 export * from './dockview/dockviewPanel';
 export * from './dockview/components/tab/defaultTab';
 export * from './dockview/deserializer';
-export * from './dockview/defaultGroupPanelView';
 
 export * from './dockview/dockviewComponent';
 export * from './gridview/gridviewComponent';

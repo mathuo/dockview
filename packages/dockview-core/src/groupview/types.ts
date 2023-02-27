@@ -53,6 +53,7 @@ export interface IContentRenderer extends IPanel {
     readonly onDidBlur?: Event<void>;
     updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void;
     init(parameters: GroupPanelContentPartInitParameters): void;
+    layout(width: number, height: number): void;
 }
 
 // watermark component
