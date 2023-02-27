@@ -1,0 +1,75 @@
+import * as React from 'react';
+
+import { ReactPart, ReactPortalStore } from '../react';
+import { IGroupPanelBaseProps } from './dockview';
+import {
+    DEFAULT_TAB_IDENTIFIER,
+    PanelUpdateEvent,
+    GroupPanel,
+    ITabRenderer,
+    GroupPanelPartInitParameters,
+} from 'dockview-core';
+
+export class ReactPanelHeaderPart implements ITabRenderer {
+    private _element: HTMLElement;
+    private part?: ReactPart<IGroupPanelBaseProps>;
+
+    get element() {
+        return this._element;
+    }
+
+    constructor(
+        public readonly id: string,
+        private readonly component: React.FunctionComponent<IGroupPanelBaseProps>,
+        private readonly reactPortalStore: ReactPortalStore
+    ) {
+        this._element = document.createElement('div');
+        this._element.className = 'dockview-react-part';
+    }
+
+    focus() {
+        //noop
+    }
+
+    public init(parameters: GroupPanelPartInitParameters): void {
+        this.part = new ReactPart(
+            this.element,
+            this.reactPortalStore,
+            this.component,
+            {
+                params: parameters.params,
+                api: parameters.api,
+                containerApi: parameters.containerApi,
+            }
+        );
+    }
+
+    public update(event: PanelUpdateEvent) {
+        this.part?.update(event.params);
+    }
+
+    public toJSON() {
+        if (this.id === DEFAULT_TAB_IDENTIFIER) {
+            return {};
+        }
+
+        return {
+            id: this.id,
+        };
+    }
+
+    public layout(_width: number, _height: number) {
+        // noop - retrieval from api
+    }
+
+    public updateParentGroup(
+        _group: GroupPanel,
+        _isPanelVisible: boolean
+    ): void {
+        // noop - retrieval from api
+    }
+
+    public dispose() {
+        this.part?.dispose();
+    }
+}

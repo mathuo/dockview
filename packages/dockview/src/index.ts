@@ -1,2 +1,11 @@
-export * from './core';
-export * from './react'; // TODO: should be conditional on whether user wants the React wrappers
+export * from 'dockview-core';
+
+export * from './dockview/dockview';
+export * from './dockview/defaultTab';
+export * from './splitview/splitview';
+export * from './gridview/gridview';
+export { IDockviewGroupControlProps } from './dockview/groupControlsRenderer';
+export { IWatermarkPanelProps } from './dockview/reactWatermarkPart';
+export * from './paneview/paneview';
+export * from './types';
+export * from './react';
