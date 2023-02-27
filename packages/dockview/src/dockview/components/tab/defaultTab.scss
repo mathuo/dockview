@@ -1,4 +1,4 @@
-.dragged {
+.dv-dragged {
     transform: translate3d(
         0px,
         0px,
@@ -9,7 +9,7 @@
 .tab {
     flex-shrink: 0;
 
-    &.dragging {
+    &.dv-tab-dragging {
         .tab-action {
             background-color: var(--dv-activegroup-visiblepanel-tab-color);
         }

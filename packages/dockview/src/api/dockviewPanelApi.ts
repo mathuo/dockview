@@ -1,8 +1,8 @@
 import { Emitter, Event } from '../events';
 import { GridviewPanelApiImpl, GridviewPanelApi } from './gridviewPanelApi';
-import { IDockviewPanel } from '../groupview/groupPanel';
 import { GroupPanel } from '../groupview/groupviewPanel';
 import { MutableDisposable } from '../lifecycle';
+import { IDockviewPanel } from '../dockview/dockviewPanel';
 
 export interface TitleEvent {
     readonly title: string;
@@ -37,13 +37,13 @@ export class DockviewPanelApiImpl
     private readonly _onDidGroupChange = new Emitter<void>();
     readonly onDidGroupChange = this._onDidGroupChange.event;
 
-    private disposable = new MutableDisposable();
+    private readonly disposable = new MutableDisposable();
 
-    get title() {
+    get title(): string {
         return this.panel.title;
     }
 
-    get isGroupActive() {
+    get isGroupActive(): boolean {
         return !!this.group?.isActive;
     }
 
@@ -71,6 +71,9 @@ export class DockviewPanelApiImpl
 
     constructor(private panel: IDockviewPanel, group: GroupPanel) {
         super(panel.id);
+
+        this.initialize(panel);
+
         this._group = group;
 
         this.addDisposables(
@@ -81,14 +84,11 @@ export class DockviewPanelApiImpl
         );
     }
 
-    public setTitle(title: string) {
-        this._onDidTitleChange.fire({ title });
+    public setTitle(title: string): void {
+        this.panel.update({ params: { title } });
     }
 
     public close(): void {
-        if (!this.group) {
-            throw new Error(`panel ${this.id} has no group`);
-        }
-        return this.group.model.closePanel(this.panel);
+        this.group.model.closePanel(this.panel);
     }
 }

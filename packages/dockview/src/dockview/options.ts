@@ -1,7 +1,6 @@
 import { DockviewApi } from '../api/component.api';
 import { Direction } from '../gridview/baseComponentGridview';
 import { IGridView } from '../gridview/gridview';
-import { IDockviewPanel } from '../groupview/groupPanel';
 import {
     IContentRenderer,
     ITabRenderer,
@@ -14,6 +13,8 @@ import { FrameworkFactory } from '../types';
 import { DockviewDropTargets } from '../groupview/dnd';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
+import { Position } from '../dnd/droptarget';
+import { IDockviewPanel } from './dockviewPanel';
 
 export interface IGroupControlRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -59,7 +60,8 @@ export interface ViewFactoryData {
 export interface DockviewDndOverlayEvent {
     nativeEvent: DragEvent;
     target: DockviewDropTargets;
-    group: GroupPanel;
+    position: Position;
+    group?: GroupPanel;
     getData: () => PanelTransfer | undefined;
 }
 
@@ -73,6 +75,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     defaultTabComponent?: string;
     showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
     createGroupControlElement?: (group: GroupPanel) => IGroupControlRenderer;
+    singleTabMode?: 'fullwidth' | 'default';
 }
 
 export interface PanelOptions {
@@ -83,19 +86,81 @@ export interface PanelOptions {
     title?: string;
 }
 
+type RelativePanel = {
+    direction?: Direction;
+    referencePanel: string | IDockviewPanel;
+};
+
+type RelativeGroup = {
+    direction?: Direction;
+    referenceGroup: string | GroupPanel;
+};
+
+type AbsolutePosition = {
+    direction: Omit<Direction, 'within'>;
+};
+
+export type AddPanelPositionOptions =
+    | RelativePanel
+    | RelativeGroup
+    | AbsolutePosition;
+
+export function isPanelOptionsWithPanel(
+    data: AddPanelPositionOptions
+): data is RelativePanel {
+    if ((data as RelativePanel).referencePanel) {
+        return true;
+    }
+    return false;
+}
+
+export function isPanelOptionsWithGroup(
+    data: AddPanelPositionOptions
+): data is RelativeGroup {
+    if ((data as RelativeGroup).referenceGroup) {
+        return true;
+    }
+    return false;
+}
+
 export interface AddPanelOptions
     extends Omit<PanelOptions, 'component' | 'tabComponent'> {
     component: string;
     tabComponent?: string;
-    position?: {
-        direction?: Direction;
-        referencePanel?: string;
-    };
+    position?: AddPanelPositionOptions;
 }
 
-export interface AddGroupOptions {
-    direction?: 'left' | 'right' | 'above' | 'below';
-    referencePanel: string;
+type AddGroupOptionsWithPanel = {
+    referencePanel: string | IDockviewPanel;
+    direction?: Omit<Direction, 'within'>;
+};
+
+type AddGroupOptionsWithGroup = {
+    referenceGroup: string | GroupPanel;
+    direction?: Omit<Direction, 'within'>;
+};
+
+export type AddGroupOptions =
+    | AddGroupOptionsWithGroup
+    | AddGroupOptionsWithPanel
+    | AbsolutePosition;
+
+export function isGroupOptionsWithPanel(
+    data: AddGroupOptions
+): data is AddGroupOptionsWithPanel {
+    if ((data as AddGroupOptionsWithPanel).referencePanel) {
+        return true;
+    }
+    return false;
+}
+
+export function isGroupOptionsWithGroup(
+    data: AddGroupOptions
+): data is AddGroupOptionsWithGroup {
+    if ((data as AddGroupOptionsWithGroup).referenceGroup) {
+        return true;
+    }
+    return false;
 }
 
 export interface MovementOptions2 {

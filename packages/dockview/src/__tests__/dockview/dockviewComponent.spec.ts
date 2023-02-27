@@ -7,22 +7,21 @@ import {
 import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/core/splitview';
 import { ReactPanelDeserialzier } from '../../react/deserializer';
-import { Position } from '../../dnd/droptarget';
 import { GroupPanel } from '../../groupview/groupviewPanel';
 import { CompositeDisposable } from '../../lifecycle';
 import {
     GroupPanelUpdateEvent,
     GroupviewPanelState,
-    IDockviewPanel,
     IGroupPanelInitParameters,
-} from '../../groupview/groupPanel';
+} from '../../groupview/types';
 import { IGroupPanelView } from '../../dockview/defaultGroupPanelView';
+import { DefaultTab } from '../../dockview/components/tab/defaultTab';
+import { Emitter } from '../../events';
+import { IDockviewPanel } from '../../dockview/dockviewPanel';
 import {
     DockviewPanelApi,
     DockviewPanelApiImpl,
-} from '../../api/groupPanelApi';
-import { DefaultTab } from '../../dockview/components/tab/defaultTab';
-import { Emitter } from '../../events';
+} from '../../api/dockviewPanelApi';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -32,7 +31,7 @@ class PanelContentPartTest implements IContentRenderer {
 
     isDisposed: boolean = false;
 
-    constructor(public readonly id: string, component: string) {
+    constructor(public readonly id: string, public readonly component: string) {
         this.element.classList.add(`testpanel-${id}`);
     }
 
@@ -53,7 +52,7 @@ class PanelContentPartTest implements IContentRenderer {
     }
 
     toJSON(): object {
-        return { id: this.id };
+        return { id: this.component };
     }
 
     focus(): void {
@@ -253,9 +252,9 @@ describe('dockviewComponent', () => {
         const panel4 = dockview.getGroupPanel('panel4');
 
         const group1 = panel1!.group;
-        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', Position.Right);
+        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', 'right');
         const group2 = panel1!.group;
-        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', Position.Center);
+        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', 'center');
 
         expect(dockview.activeGroup).toBe(group2);
         expect(dockview.activeGroup!.model.activePanel).toBe(panel3);
@@ -302,12 +301,12 @@ describe('dockviewComponent', () => {
             component: 'default',
         });
 
-        const panel1 = dockview.getGroupPanel('panel1');
-        const panel2 = dockview.getGroupPanel('panel2');
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const panel2 = dockview.getGroupPanel('panel2')!;
         const group1 = panel1.group;
-        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', Position.Right);
+        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', 'right');
         const group2 = panel1.group;
-        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', Position.Center);
+        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', 'center');
 
         expect(dockview.size).toBe(2);
         expect(dockview.totalPanels).toBe(4);
@@ -345,10 +344,10 @@ describe('dockviewComponent', () => {
             component: 'default',
         });
 
-        const panel1 = dockview.getGroupPanel('panel1');
-        const panel2 = dockview.getGroupPanel('panel2');
-        const panel3 = dockview.getGroupPanel('panel3');
-        const panel4 = dockview.getGroupPanel('panel4');
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const panel2 = dockview.getGroupPanel('panel2')!;
+        const panel3 = dockview.getGroupPanel('panel3')!;
+        const panel4 = dockview.getGroupPanel('panel4')!;
 
         expect(panel1.api.isActive).toBeFalsy();
         expect(panel2.api.isActive).toBeFalsy();
@@ -370,9 +369,9 @@ describe('dockviewComponent', () => {
         expect(panel4.api.isActive).toBeFalsy();
 
         const group1 = panel1.group;
-        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', Position.Right);
+        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', 'right');
         const group2 = panel1.group;
-        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', Position.Center);
+        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', 'center');
 
         expect(dockview.size).toBe(2);
         expect(panel1.group).toBe(panel3.group);
@@ -425,9 +424,8 @@ describe('dockviewComponent', () => {
         expect(dockview.size).toBe(1);
         expect(dockview.totalPanels).toBe(2);
 
-        const panel1 = dockview.getGroupPanel('panel1');
-        const panel2 = dockview.getGroupPanel('panel2');
-
+        const panel1 = dockview.getGroupPanel('panel1')!;
+        const panel2 = dockview.getGroupPanel('panel2')!;
         expect(panel1.group).toBe(panel2.group);
 
         const group = panel1.group;
@@ -440,7 +438,7 @@ describe('dockviewComponent', () => {
         expect(group.model.indexOf(panel1)).toBe(0);
         expect(group.model.indexOf(panel2)).toBe(1);
 
-        dockview.moveGroupOrPanel(group, group.id, 'panel1', Position.Right);
+        dockview.moveGroupOrPanel(group, group.id, 'panel1', 'right');
 
         expect(dockview.size).toBe(2);
         expect(dockview.totalPanels).toBe(2);
@@ -460,7 +458,7 @@ describe('dockviewComponent', () => {
 
         await panel2.api.close();
 
-        expect(dockview.size).toBe(1); // watermark
+        expect(dockview.size).toBe(0);
         expect(dockview.totalPanels).toBe(0);
     });
 
@@ -489,8 +487,8 @@ describe('dockviewComponent', () => {
 
         expect(viewQuery.length).toBe(1);
 
-        const group = dockview.getGroupPanel('panel1').group;
-        dockview.moveGroupOrPanel(group, group.id, 'panel1', Position.Right);
+        const group = dockview.getGroupPanel('panel1')!.group;
+        dockview.moveGroupOrPanel(group, group.id, 'panel1', 'right');
 
         viewQuery = container.querySelectorAll(
             '.branch-node > .split-view-container > .view-container > .view'
@@ -975,7 +973,7 @@ describe('dockviewComponent', () => {
             panel2.group!,
             panel5.group!.id,
             panel5.id,
-            Position.Center
+            'center'
         );
         expect(events).toEqual([
             { type: 'REMOVE_PANEL', panel: panel5 },
@@ -994,7 +992,7 @@ describe('dockviewComponent', () => {
             panel2.group!,
             panel4.group!.id,
             panel4.id,
-            Position.Center
+            'center'
         );
 
         expect(events).toEqual([
@@ -1207,55 +1205,6 @@ describe('dockviewComponent', () => {
         expect(dockview.totalPanels).toBe(0);
     });
 
-    test('last group is retained for watermark', () => {
-        const container = document.createElement('div');
-
-        const dockview = new DockviewComponent(container, {
-            components: { default: PanelContentPartTest },
-        });
-
-        dockview.layout(500, 1000);
-
-        const panel1 = dockview.addPanel({
-            id: 'panel1',
-            component: 'default',
-            tabComponent: 'default',
-        });
-
-        expect(dockview.size).toBe(1);
-        expect(dockview.totalPanels).toBe(1);
-
-        const group = panel1.group;
-
-        dockview.removePanel(panel1);
-
-        expect(group.model.hasWatermark).toBeTruthy();
-        expect(dockview.size).toBe(1);
-        expect(dockview.totalPanels).toBe(0);
-
-        const panel2 = dockview.addPanel({
-            id: 'panel2',
-            component: 'default',
-            tabComponent: 'default',
-        });
-
-        expect(group.model.hasWatermark).toBeFalsy();
-
-        const panel3 = dockview.addPanel({
-            id: 'panel3',
-            component: 'default',
-            tabComponent: 'default',
-        });
-
-        expect(dockview.size).toBe(1);
-        expect(dockview.totalPanels).toBe(2);
-
-        panel2.api.close();
-        expect(group.model.hasWatermark).toBeFalsy();
-        panel3.api.close();
-        expect(group.model.hasWatermark).toBeTruthy();
-    });
-
     test('panel is disposed of when removed', () => {
         const container = document.createElement('div');
 
@@ -1314,7 +1263,7 @@ describe('dockviewComponent', () => {
             panel1.group,
             panel2.group.id,
             'panel2',
-            Position.Left
+            'left'
         );
 
         expect(panel1Spy).not.toHaveBeenCalled();
@@ -1355,7 +1304,7 @@ describe('dockviewComponent', () => {
             panel1.group,
             panel2.group.id,
             'panel2',
-            Position.Center
+            'center'
         );
 
         expect(panel1Spy).not.toHaveBeenCalled();
@@ -1394,7 +1343,7 @@ describe('dockviewComponent', () => {
             panel1.group,
             panel1.group.id,
             'panel1',
-            Position.Center,
+            'center',
             0
         );
 
@@ -1513,6 +1462,53 @@ describe('dockviewComponent', () => {
         expect(groupSpy).toBeCalledTimes(1);
         expect(panel1Spy).toBeCalledTimes(1);
         expect(panel2Spy).toBeCalledTimes(1);
+    });
+
+    test('move entire group into another group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: { default: PanelContentPartTest },
+        });
+
+        dockview.layout(500, 1000);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            tabComponent: 'default',
+        });
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            tabComponent: 'default',
+            position: {
+                referencePanel: panel1,
+            },
+        });
+        const panel3 = dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            tabComponent: 'default',
+            position: {
+                referencePanel: panel1,
+                direction: 'right',
+            },
+        });
+
+        const panel1Spy = jest.spyOn(panel1.group, 'dispose');
+
+        expect(dockview.groups.length).toBe(2);
+
+        dockview.moveGroupOrPanel(
+            panel3.group,
+            panel1.group.id,
+            undefined,
+            'center'
+        );
+
+        expect(dockview.groups.length).toBe(1);
+        expect(panel1Spy).toBeCalledTimes(1);
     });
 
     test('fromJSON events should still fire', () => {
@@ -1634,8 +1630,6 @@ describe('dockviewComponent', () => {
         });
 
         jest.runAllTimers();
-
-        console.log(activePanel.map((_) => _?.id).join(' '));
 
         expect(addGroup.length).toBe(4);
         expect(removeGroup.length).toBe(0);
@@ -1973,4 +1967,466 @@ describe('dockviewComponent', () => {
     // load a layout with a default tab identifier when react default is present
 
     // load a layout with invialid panel identifier
+
+    test('orthogonal realigment #1', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+
+        expect(dockview.orientation).toBe(Orientation.HORIZONTAL);
+
+        dockview.fromJSON({
+            activeGroup: 'group-1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 500,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+            },
+        });
+
+        expect(dockview.orientation).toBe(Orientation.VERTICAL);
+
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            position: {
+                direction: 'left',
+            },
+        });
+
+        expect(dockview.orientation).toBe(Orientation.HORIZONTAL);
+
+        expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
+            activeGroup: '1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel2'],
+                                id: '1',
+                                activeView: 'panel2',
+                            },
+                            size: 500,
+                        },
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 1000,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.HORIZONTAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+                panel2: {
+                    id: 'panel2',
+                    view: { content: { id: 'default' } },
+                    title: 'panel2',
+                },
+            },
+            options: {},
+        });
+    });
+
+    test('orthogonal realigment #2', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+
+        expect(dockview.orientation).toBe(Orientation.HORIZONTAL);
+
+        dockview.fromJSON({
+            activeGroup: 'group-1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 500,
+                        },
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel2'],
+                                id: 'group-2',
+                                activeView: 'panel2',
+                            },
+                            size: 500,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+                panel2: {
+                    id: 'panel2',
+                    view: { content: { id: 'default' } },
+                    title: 'panel2',
+                },
+            },
+        });
+
+        expect(dockview.orientation).toBe(Orientation.VERTICAL);
+
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: {
+                direction: 'left',
+            },
+        });
+
+        expect(dockview.orientation).toBe(Orientation.HORIZONTAL);
+
+        expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
+            activeGroup: '1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel3'],
+                                id: '1',
+                                activeView: 'panel3',
+                            },
+                            size: 500,
+                        },
+                        {
+                            type: 'branch',
+                            data: [
+                                {
+                                    type: 'leaf',
+                                    data: {
+                                        views: ['panel1'],
+                                        id: 'group-1',
+                                        activeView: 'panel1',
+                                    },
+                                    size: 500,
+                                },
+                                {
+                                    type: 'leaf',
+                                    data: {
+                                        views: ['panel2'],
+                                        id: 'group-2',
+                                        activeView: 'panel2',
+                                    },
+                                    size: 500,
+                                },
+                            ],
+                            size: 500,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.HORIZONTAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+
+                panel2: {
+                    id: 'panel2',
+                    view: { content: { id: 'default' } },
+                    title: 'panel2',
+                },
+                panel3: {
+                    id: 'panel3',
+                    view: { content: { id: 'default' } },
+                    title: 'panel3',
+                },
+            },
+            options: {},
+        });
+    });
+
+    test('orthogonal realigment #3', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+
+        expect(dockview.orientation).toBe(Orientation.HORIZONTAL);
+
+        dockview.fromJSON({
+            activeGroup: 'group-1',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 500,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+            },
+        });
+
+        expect(dockview.orientation).toBe(Orientation.VERTICAL);
+
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            position: {
+                direction: 'above',
+            },
+        });
+
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: {
+                direction: 'below',
+            },
+        });
+
+        expect(dockview.orientation).toBe(Orientation.VERTICAL);
+
+        expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
+            activeGroup: '2',
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel2'],
+                                id: '1',
+                                activeView: 'panel2',
+                            },
+                            size: 333,
+                        },
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1'],
+                                id: 'group-1',
+                                activeView: 'panel1',
+                            },
+                            size: 333,
+                        },
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel3'],
+                                id: '2',
+                                activeView: 'panel3',
+                            },
+                            size: 334,
+                        },
+                    ],
+                    size: 1000,
+                },
+                height: 1000,
+                width: 1000,
+                orientation: Orientation.VERTICAL,
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    view: { content: { id: 'default' } },
+                    title: 'panel1',
+                },
+                panel2: {
+                    id: 'panel2',
+                    view: { content: { id: 'default' } },
+                    title: 'panel2',
+                },
+                panel3: {
+                    id: 'panel3',
+                    view: { content: { id: 'default' } },
+                    title: 'panel3',
+                },
+            },
+            options: {},
+        });
+    });
+
+    test('that a empty component has no groups', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+
+        expect(dockview.groups.length).toBe(0);
+    });
+
+    test('that deserializing an empty layout has zero groups and a watermark', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+
+        expect(dockview.groups.length).toBe(0);
+
+        expect(
+            dockview.element.querySelectorAll('.dv-watermark-container').length
+        ).toBe(1);
+
+        dockview.fromJSON({
+            grid: {
+                orientation: Orientation.HORIZONTAL,
+                root: {
+                    type: 'branch',
+                    data: [],
+                },
+                height: 100,
+                width: 100,
+            },
+            panels: {},
+        });
+
+        expect(dockview.groups.length).toBe(0);
+
+        expect(
+            dockview.element.querySelectorAll('.dv-watermark-container').length
+        ).toBe(1);
+    });
+
+    test('empty', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent(container, {
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+        dockview.deserializer = new ReactPanelDeserialzier(dockview);
+
+        expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
+            grid: {
+                height: 0,
+                width: 0,
+                orientation: Orientation.HORIZONTAL,
+                root: {
+                    data: [],
+                    type: 'branch',
+                    size: 0,
+                },
+            },
+            options: {},
+            panels: {},
+        });
+    });
 });

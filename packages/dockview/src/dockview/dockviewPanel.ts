@@ -1,23 +1,35 @@
 import { DockviewApi } from '../api/component.api';
-import { DockviewPanelApiImpl } from '../api/groupPanelApi';
+import {
+    DockviewPanelApi,
+    DockviewPanelApiImpl,
+} from '../api/dockviewPanelApi';
 import {
     GroupPanelUpdateEvent,
     GroupviewPanelState,
-    IDockviewPanel,
     IGroupPanelInitParameters,
-} from '../groupview/groupPanel';
+} from '../groupview/types';
 import { GroupPanel } from '../groupview/groupviewPanel';
-import { CompositeDisposable, MutableDisposable } from '../lifecycle';
-import { Parameters } from '../panel/types';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
+import { IPanel, Parameters } from '../panel/types';
 import { IGroupPanelView } from './defaultGroupPanelView';
 import { DockviewComponent } from './dockviewComponent';
 
-export class DockviewGroupPanel
+export interface IDockviewPanel extends IDisposable, IPanel {
+    readonly view?: IGroupPanelView;
+    readonly group: GroupPanel;
+    readonly api: DockviewPanelApi;
+    readonly title: string;
+    readonly params: Record<string, any> | undefined;
+    updateParentGroup(group: GroupPanel, isGroupActive: boolean): void;
+    init(params: IGroupPanelInitParameters): void;
+    toJSON(): GroupviewPanelState;
+    update(event: GroupPanelUpdateEvent): void;
+}
+
+export class DockviewPanel
     extends CompositeDisposable
     implements IDockviewPanel
 {
-    private readonly mutableDisposable = new MutableDisposable();
-
     readonly api: DockviewPanelApiImpl;
     private _group: GroupPanel;
     private _params?: Parameters;
@@ -26,11 +38,11 @@ export class DockviewGroupPanel
 
     private _title: string;
 
-    get params() {
+    get params(): Parameters | undefined {
         return this._params;
     }
 
-    get title() {
+    get title(): string {
         return this._title;
     }
 
@@ -38,7 +50,7 @@ export class DockviewGroupPanel
         return this._group;
     }
 
-    get view() {
+    get view(): IGroupPanelView | undefined {
         return this._view;
     }
 
@@ -57,6 +69,11 @@ export class DockviewGroupPanel
         this.addDisposables(
             this.api.onActiveChange(() => {
                 accessor.setActivePanel(this);
+            }),
+            this.api.onDidSizeChange((event) => {
+                // forward the resize event to the group since if you want to resize a panel
+                // you are actually just resizing the panels parent which is the group
+                this.group.api.setSize(event);
             })
         );
     }
@@ -65,7 +82,9 @@ export class DockviewGroupPanel
         this._params = params.params;
         this._view = params.view;
 
-        this.setTitle(params.title);
+        if (typeof params.title === 'string') {
+            this.setTitle(params.title);
+        }
 
         this.view?.init({
             ...params,
@@ -74,7 +93,7 @@ export class DockviewGroupPanel
         });
     }
 
-    focus() {
+    focus(): void {
         this.api._onFocusEvent.fire();
     }
 
@@ -90,7 +109,7 @@ export class DockviewGroupPanel
         };
     }
 
-    setTitle(title: string) {
+    setTitle(title: string): void {
         const didTitleChange = title !== this._params?.title;
 
         if (didTitleChange) {
@@ -129,7 +148,7 @@ export class DockviewGroupPanel
         });
     }
 
-    public updateParentGroup(group: GroupPanel, isGroupActive: boolean) {
+    public updateParentGroup(group: GroupPanel, isGroupActive: boolean): void {
         this._group = group;
         this.api.group = group;
 
@@ -148,7 +167,7 @@ export class DockviewGroupPanel
         );
     }
 
-    public layout(width: number, height: number) {
+    public layout(width: number, height: number): void {
         // the obtain the correct dimensions of the content panel we must deduct the tab height
         this.api._onDidDimensionChange.fire({
             width,
@@ -158,9 +177,8 @@ export class DockviewGroupPanel
         this.view?.layout(width, height);
     }
 
-    public dispose() {
+    public dispose(): void {
         this.api.dispose();
-        this.mutableDisposable.dispose();
 
         this.view?.dispose();
     }

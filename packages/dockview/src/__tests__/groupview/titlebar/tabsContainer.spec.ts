@@ -12,7 +12,11 @@ import { TestPanel } from '../groupview.spec';
 describe('tabsContainer', () => {
     test('that an external event does not render a drop target and calls through to the group mode', () => {
         const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {};
+            return {
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                options: {},
+            };
         });
         const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
             return {
@@ -31,7 +35,7 @@ describe('tabsContainer', () => {
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as GroupPanel;
 
-        const cut = new TabsContainer(accessor, groupPanel, {});
+        const cut = new TabsContainer(accessor, groupPanel);
 
         const emptySpace = cut.element
             .getElementsByClassName('void-container')
@@ -62,6 +66,9 @@ describe('tabsContainer', () => {
         const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
             return {
                 id: 'testcomponentid',
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                options: {},
             };
         });
         const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
@@ -76,13 +83,14 @@ describe('tabsContainer', () => {
             return {
                 id: 'testgroupid',
                 model: groupView,
+                panels: [],
             };
         });
 
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as GroupPanel;
 
-        const cut = new TabsContainer(accessor, groupPanel, {});
+        const cut = new TabsContainer(accessor, groupPanel);
 
         const emptySpace = cut.element
             .getElementsByClassName('void-container')
@@ -120,10 +128,13 @@ describe('tabsContainer', () => {
         ).toBe(1);
     });
 
-    test('that dropping the last tab should render no drop target', () => {
+    test('that dropping over the empty space should render a drop target', () => {
         const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
             return {
                 id: 'testcomponentid',
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                options: {},
             };
         });
         const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
@@ -138,13 +149,14 @@ describe('tabsContainer', () => {
             return {
                 id: 'testgroupid',
                 model: groupView,
+                panels: [],
             };
         });
 
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as GroupPanel;
 
-        const cut = new TabsContainer(accessor, groupPanel, {});
+        const cut = new TabsContainer(accessor, groupPanel);
 
         cut.openPanel(new TestPanel('panel1', jest.fn() as any));
         cut.openPanel(new TestPanel('panel2', jest.fn() as any));
@@ -176,13 +188,16 @@ describe('tabsContainer', () => {
 
         expect(
             cut.element.getElementsByClassName('drop-target-dropzone').length
-        ).toBe(0);
+        ).toBe(1);
     });
 
     test('that dropping the first tab should render a drop target', () => {
         const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
             return {
                 id: 'testcomponentid',
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                options: {},
             };
         });
         const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
@@ -197,13 +212,14 @@ describe('tabsContainer', () => {
             return {
                 id: 'testgroupid',
                 model: groupView,
+                panels: [],
             };
         });
 
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as GroupPanel;
 
-        const cut = new TabsContainer(accessor, groupPanel, {});
+        const cut = new TabsContainer(accessor, groupPanel);
 
         cut.openPanel(new TestPanel('panel1', jest.fn() as any));
         cut.openPanel(new TestPanel('panel2', jest.fn() as any));
@@ -242,6 +258,9 @@ describe('tabsContainer', () => {
         const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
             return {
                 id: 'testcomponentid',
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                options: {},
             };
         });
         const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
@@ -262,7 +281,7 @@ describe('tabsContainer', () => {
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as GroupPanel;
 
-        const cut = new TabsContainer(accessor, groupPanel, {});
+        const cut = new TabsContainer(accessor, groupPanel);
 
         cut.openPanel(new TestPanel('panel1', jest.fn() as any));
         cut.openPanel(new TestPanel('panel2', jest.fn() as any));

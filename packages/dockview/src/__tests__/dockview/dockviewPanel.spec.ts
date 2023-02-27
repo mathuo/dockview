@@ -1,10 +1,10 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { DockviewApi } from '../../api/component.api';
 import { IGroupPanelView } from '../../dockview/defaultGroupPanelView';
-import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
+import { DockviewPanel } from '../../dockview/dockviewPanel';
 import { GroupPanel } from '../../groupview/groupviewPanel';
 
-describe('dockviewGroupPanel', () => {
+describe('dockviewPanel', () => {
     test('update title', () => {
         const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
             return {
@@ -20,7 +20,7 @@ describe('dockviewGroupPanel', () => {
         const api = new dockviewApiMock();
         const accessor = new accessorMock();
         const group = new groupMock();
-        const cut = new DockviewGroupPanel('fake-id', accessor, api, group);
+        const cut = new DockviewPanel('fake-id', accessor, api, group);
 
         let latestTitle: string | undefined = undefined;
 
@@ -55,7 +55,7 @@ describe('dockviewGroupPanel', () => {
         const accessor = new accessorMock();
         const group = new groupMock();
 
-        const cut = new DockviewGroupPanel('fake-id', accessor, api, group);
+        const cut = new DockviewPanel('fake-id', accessor, api, group);
 
         const viewMock = jest.fn<IGroupPanelView, []>(() => {
             return {
@@ -86,12 +86,37 @@ describe('dockviewGroupPanel', () => {
         const api = new dockviewApiMock();
         const accessor = new accessorMock();
         const group = new groupMock();
-        const cut = new DockviewGroupPanel('fake-id', accessor, api, group);
+        const cut = new DockviewPanel('fake-id', accessor, api, group);
 
         expect(cut.params).toEqual(undefined);
 
         cut.update({ params: { params: { variableA: 'A', variableB: 'B' } } });
 
         expect(cut.params).toEqual({ variableA: 'A', variableB: 'B' });
+    });
+
+    test('setSize propagates to underlying group', () => {
+        const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
+            return {} as any;
+        });
+        const accessorMock = jest.fn<DockviewComponent, []>(() => {
+            return {} as any;
+        });
+        const groupMock = jest.fn<GroupPanel, []>(() => {
+            return {
+                api: {
+                    setSize: jest.fn(),
+                },
+            } as any;
+        });
+        const api = new dockviewApiMock();
+        const accessor = new accessorMock();
+        const group = new groupMock();
+        const cut = new DockviewPanel('fake-id', accessor, api, group);
+
+        cut.api.setSize({ height: 123, width: 456 });
+
+        expect(group.api.setSize).toBeCalledWith({ height: 123, width: 456 });
+        expect(group.api.setSize).toBeCalledTimes(1);
     });
 });

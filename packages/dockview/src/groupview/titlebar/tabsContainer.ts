@@ -4,14 +4,12 @@ import {
     IValueDisposable,
 } from '../../lifecycle';
 import { addDisposableListener, Emitter, Event } from '../../events';
-import { ITab, MouseEventKind, Tab } from '../tab';
-import { last } from '../../array';
-import { IDockviewPanel } from '../groupPanel';
+import { ITab, Tab } from '../tab';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { getPanelData } from '../../dnd/dataTransfer';
 import { GroupPanel } from '../groupviewPanel';
-import { Droptarget } from '../../dnd/droptarget';
-import { DockviewDropTargets } from '../dnd';
+import { VoidContainer } from './voidContainer';
+import { toggleClass } from '../../dom';
+import { IDockviewPanel } from '../../dockview/dockviewPanel';
 
 export interface TabDropIndexEvent {
     event: DragEvent;
@@ -44,10 +42,8 @@ export class TabsContainer
 {
     private readonly _element: HTMLElement;
     private readonly tabContainer: HTMLElement;
-    private readonly voidContainer: HTMLElement;
     private readonly actionContainer: HTMLElement;
-
-    private readonly voidDropTarget: Droptarget;
+    private readonly voidContainer: VoidContainer;
 
     private tabs: IValueDisposable<ITab>[] = [];
     private selectedIndex = -1;
@@ -138,9 +134,8 @@ export class TabsContainer
     }
 
     constructor(
-        private accessor: DockviewComponent,
-        private group: GroupPanel,
-        options: { tabHeight?: number }
+        private readonly accessor: DockviewComponent,
+        private readonly group: GroupPanel
     ) {
         super();
 
@@ -149,7 +144,34 @@ export class TabsContainer
         this._element = document.createElement('div');
         this._element.className = 'tabs-and-actions-container';
 
-        this.height = options.tabHeight;
+        this.height = accessor.options.tabHeight;
+
+        toggleClass(
+            this._element,
+            'dv-full-width-single-tab',
+            this.accessor.options.singleTabMode === 'fullwidth'
+        );
+
+        this.addDisposables(
+            this.accessor.onDidAddPanel((e) => {
+                if (e.api.group === this.group) {
+                    toggleClass(
+                        this._element,
+                        'dv-single-tab',
+                        this.size === 1
+                    );
+                }
+            }),
+            this.accessor.onDidRemovePanel((e) => {
+                if (e.api.group === this.group) {
+                    toggleClass(
+                        this._element,
+                        'dv-single-tab',
+                        this.size === 1
+                    );
+                }
+            })
+        );
 
         this.actionContainer = document.createElement('div');
         this.actionContainer.className = 'action-container';
@@ -157,38 +179,20 @@ export class TabsContainer
         this.tabContainer = document.createElement('div');
         this.tabContainer.className = 'tabs-container';
 
-        this.voidContainer = document.createElement('div');
-        this.voidContainer.className = 'void-container';
+        this.voidContainer = new VoidContainer(this.accessor, this.group);
 
         this._element.appendChild(this.tabContainer);
-        this._element.appendChild(this.voidContainer);
+        this._element.appendChild(this.voidContainer.element);
         this._element.appendChild(this.actionContainer);
 
-        this.voidDropTarget = new Droptarget(this.voidContainer, {
-            validOverlays: 'none',
-            canDisplayOverlay: (event) => {
-                const data = getPanelData();
-
-                if (data && this.accessor.id === data.viewId) {
-                    // don't show the overlay if the tab being dragged is the last panel of this group
-                    return last(this.tabs)?.value.panelId !== data.panelId;
-                }
-
-                return group.model.canDisplayOverlay(
-                    event,
-                    DockviewDropTargets.Panel
-                );
-            },
-        });
-
         this.addDisposables(
-            this.voidDropTarget.onDrop((event) => {
+            this.voidContainer,
+            this.voidContainer.onDrop((event) => {
                 this._onDrop.fire({
                     event: event.nativeEvent,
                     index: this.tabs.length,
                 });
             }),
-            this.voidDropTarget,
             addDisposableListener(this.tabContainer, 'mousedown', (event) => {
                 if (event.defaultPrevented) {
                     return;
@@ -265,17 +269,15 @@ export class TabsContainer
                     panel.id === this.group.model.activePanel?.id &&
                     this.group.model.isContentFocused;
 
-                const isLeftClick = event.event.button === 0;
+                const isLeftClick = event.button === 0;
 
-                if (!isLeftClick || event.event.defaultPrevented) {
+                if (!isLeftClick || event.defaultPrevented) {
                     return;
                 }
 
-                if (event.kind === MouseEventKind.CLICK) {
-                    this.group.model.openPanel(panel, {
-                        skipFocus: alreadyFocused,
-                    });
-                }
+                this.group.model.openPanel(panel, {
+                    skipFocus: alreadyFocused,
+                });
             }),
             tabToAdd.onDrop((event) => {
                 this._onDrop.fire({

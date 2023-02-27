@@ -11,7 +11,7 @@ import {
     GroupPanelFrameworkComponentFactory,
     IGroupControlRenderer,
 } from '../../dockview/options';
-import { DockviewPanelApi } from '../../api/groupPanelApi';
+import { DockviewPanelApi } from '../../api/dockviewPanelApi';
 import { ReactPortalStore, usePortalsLifecycle } from '../react';
 import { DockviewApi } from '../../api/component.api';
 import { IWatermarkPanelProps, ReactWatermarkPart } from './reactWatermarkPart';
@@ -57,10 +57,10 @@ export interface DockviewReadyEvent {
 }
 
 export interface IDockviewReactProps {
+    onReady: (event: DockviewReadyEvent) => void;
     components: PanelCollection<IDockviewPanelProps>;
     tabComponents?: PanelCollection<IDockviewPanelHeaderProps>;
     watermarkComponent?: React.FunctionComponent<IWatermarkPanelProps>;
-    onReady: (event: DockviewReadyEvent) => void;
     tabHeight?: number;
     onDidDrop?: (event: DockviewDropEvent) => void;
     showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
@@ -69,6 +69,7 @@ export interface IDockviewReactProps {
     disableAutoResizing?: boolean;
     defaultTabComponent?: React.FunctionComponent<IDockviewPanelHeaderProps>;
     groupControlComponent?: React.FunctionComponent<IDockviewGroupControlProps>;
+    singleTabMode?: 'fullwidth' | 'default';
 }
 
 export const DockviewReact = React.forwardRef(
@@ -161,6 +162,7 @@ export const DockviewReact = React.forwardRef(
                     props.groupControlComponent,
                     { addPortal }
                 ),
+                singleTabMode: props.singleTabMode,
             });
 
             domRef.current?.appendChild(dockview.element);

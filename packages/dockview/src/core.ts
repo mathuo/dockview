@@ -21,11 +21,17 @@ export { PaneviewComponentOptions } from './paneview/options';
 export * from './gridview/gridviewPanel';
 export * from './splitview/splitviewPanel';
 export * from './paneview/paneviewPanel';
-export * from './groupview/groupPanel';
+export * from './groupview/types';
+
+export * from './react'; // TODO: should be conditional on whether user wants the React wrappers
 
 export { Event } from './events';
 export { IDisposable } from './lifecycle';
-export { Position, Droptarget } from './dnd/droptarget';
+export {
+    Position,
+    positionToDirection,
+    directionToPosition,
+} from './dnd/droptarget';
 export {
     FocusEvent,
     PanelDimensionChangeEvent,
@@ -38,7 +44,7 @@ export {
     GridviewPanelApi,
     GridConstraintChangeEvent,
 } from './api/gridviewPanelApi';
-export { TitleEvent, DockviewPanelApi } from './api/groupPanelApi';
+export { TitleEvent, DockviewPanelApi } from './api/dockviewPanelApi';
 export {
     PanelSizeEvent,
     PanelConstraintChangeEvent,

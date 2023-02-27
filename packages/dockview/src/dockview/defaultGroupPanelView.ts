@@ -6,7 +6,7 @@ import {
 } from '../groupview/types';
 import { GroupPanel } from '../groupview/groupviewPanel';
 import { IDisposable } from '../lifecycle';
-import { GroupPanelUpdateEvent } from '../groupview/groupPanel';
+import { GroupPanelUpdateEvent } from '../groupview/types';
 
 export interface IGroupPanelView extends IDisposable {
     readonly content: IContentRenderer;

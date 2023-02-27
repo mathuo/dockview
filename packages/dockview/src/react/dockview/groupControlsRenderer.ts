@@ -3,12 +3,8 @@ import { ReactPart, ReactPortalStore } from '../react';
 import { PanelUpdateEvent } from '../../panel/types';
 import { GroupPanel, GroupviewPanelApi } from '../../groupview/groupviewPanel';
 import { DockviewApi } from '../../api/component.api';
-import {
-    CompositeDisposable,
-    IDisposable,
-    MutableDisposable,
-} from '../../lifecycle';
-import { IDockviewPanel } from '../../groupview/groupPanel';
+import { CompositeDisposable, MutableDisposable } from '../../lifecycle';
+import { IDockviewPanel } from '../../dockview/dockviewPanel';
 
 export interface IDockviewGroupControlProps {
     api: GroupviewPanelApi;

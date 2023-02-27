@@ -15,7 +15,7 @@ import {
     SerializedGridview,
 } from '../gridview/gridviewComponent';
 import { IGridviewPanel } from '../gridview/gridviewPanel';
-import { IDockviewPanel } from '../groupview/groupPanel';
+
 import {
     AddPaneviewComponentOptions,
     SerializedPaneview,
@@ -33,6 +33,7 @@ import { ISplitviewPanel } from '../splitview/splitviewPanel';
 import { GroupPanel, IGroupviewPanel } from '../groupview/groupviewPanel';
 import { Emitter, Event } from '../events';
 import { PaneviewDropEvent } from '../react';
+import { IDockviewPanel } from '../dockview/dockviewPanel';
 
 export interface CommonApi<T = any> {
     readonly height: number;
@@ -325,6 +326,10 @@ export class GridviewApi implements CommonApi<SerializedGridview> {
 }
 
 export class DockviewApi implements CommonApi<SerializedDockview> {
+    get id(): string {
+        return this.component.id;
+    }
+
     get width(): number {
         return this.component.width;
     }
@@ -435,8 +440,8 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.addPanel(options);
     }
 
-    addEmptyGroup(options?: AddGroupOptions): void {
-        this.component.addEmptyGroup(options);
+    addGroup(options?: AddGroupOptions): IGroupviewPanel {
+        return this.component.addGroup(options);
     }
 
     moveToNext(options?: MovementOptions): void {

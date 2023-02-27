@@ -1,13 +1,14 @@
-.custom-dragging {
-    height: 24px;
-    line-height: 24px;
-    font-size: 11px;
-    width: 100px;
-    background-color: dodgerblue;
-    color: ghostwhite;
-    border-radius: 11px;
+.dv-dockview {
+  position: relative;
+  background-color: var(--dv-group-view-background-color);
+
+  .dv-watermark-container {
     position: absolute;
-    padding-left: 10px;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+  }
 }
 
 .groupview {
@@ -50,7 +51,7 @@
  * therefore we also set some stylings for the dragging event
  **/
 .tab {
-    &.dragging {
+    &.dv-tab-dragging {
         background-color: var(
             --dv-activegroup-visiblepanel-tab-background-color
         );

@@ -7,3 +7,7 @@ export interface FrameworkFactory<T> {
 }
 
 export type FunctionOrValue<T> = (() => T) | T;
+
+export function isBooleanValue(value: any): value is boolean {
+    return typeof value === 'boolean';
+}
