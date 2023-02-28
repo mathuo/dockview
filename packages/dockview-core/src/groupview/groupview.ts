@@ -77,7 +77,7 @@ export interface IHeader {
     height: number | undefined;
 }
 
-export interface IGroupview extends IDisposable, IGridPanelView {
+export interface IGroupview extends IGridPanelView {
     readonly isActive: boolean;
     readonly size: number;
     readonly panels: IDockviewPanel[];
@@ -427,7 +427,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
 
     focus(): void {
-        this._activePanel?.focus();
+        this._activePanel?.focus?.();
     }
 
     public openPanel(
@@ -525,7 +525,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     ): void {
         if (!force && this.isActive === isGroupActive) {
             if (!skipFocus) {
-                this._activePanel?.focus();
+                this._activePanel?.focus?.();
             }
             return;
         }
@@ -545,7 +545,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         if (isGroupActive) {
             if (!skipFocus) {
-                this._activePanel?.focus();
+                this._activePanel?.focus?.();
             }
         }
     }

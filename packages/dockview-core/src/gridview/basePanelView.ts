@@ -40,15 +40,15 @@ export abstract class BasePanelView<T extends PanelApiImpl>
      */
     protected abstract getComponent(): IFrameworkPart;
 
-    get element() {
+    get element(): HTMLElement {
         return this._element;
     }
 
-    get width() {
+    get width(): number {
         return this._width;
     }
 
-    get height() {
+    get height(): number {
         return this._height;
     }
 
@@ -83,11 +83,11 @@ export abstract class BasePanelView<T extends PanelApiImpl>
         );
     }
 
-    focus() {
+    focus(): void {
         this.api._onFocusEvent.fire();
     }
 
-    layout(width: number, height: number) {
+    layout(width: number, height: number): void {
         this._width = width;
         this._height = height;
         this.api._onDidDimensionChange.fire({ width, height });
@@ -104,7 +104,7 @@ export abstract class BasePanelView<T extends PanelApiImpl>
         this.part = this.getComponent();
     }
 
-    update(event: PanelUpdateEvent) {
+    update(event: PanelUpdateEvent): void {
         this._params = {
             ...this._params,
             params: {
@@ -125,7 +125,7 @@ export abstract class BasePanelView<T extends PanelApiImpl>
         };
     }
 
-    dispose() {
+    dispose(): void {
         super.dispose();
 
         this.api.dispose();

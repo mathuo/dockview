@@ -950,13 +950,16 @@ export class DockviewComponent
         options: AddPanelOptions,
         group: GroupPanel
     ): IDockviewPanel {
-        const view = new DefaultGroupPanelView({
-            content: this.createContentComponent(options.id, options.component),
-            tab: this.createTabComponent(
-                options.id,
-                options.tabComponent || this.options.defaultTabComponent
-            ),
-        });
+        const contentComponent = options.component;
+        const tabComponent =
+            options.tabComponent || this.options.defaultTabComponent;
+
+        const view = new DefaultGroupPanelView(
+            this,
+            options.id,
+            contentComponent,
+            tabComponent
+        );
 
         const panel = new DockviewPanel(options.id, this, this._api, group);
         panel.init({
@@ -966,33 +969,6 @@ export class DockviewComponent
         });
 
         return panel;
-    }
-
-    private createContentComponent(
-        id: string,
-        componentName: string
-    ): IContentRenderer {
-        return createComponent(
-            id,
-            componentName,
-            this.options.components || {},
-            this.options.frameworkComponents,
-            this.options.frameworkComponentFactory?.content
-        );
-    }
-
-    private createTabComponent(
-        id: string,
-        componentName?: string
-    ): ITabRenderer {
-        return createComponent(
-            id,
-            componentName,
-            this.options.tabComponents || {},
-            this.options.frameworkTabComponents,
-            this.options.frameworkComponentFactory?.tab,
-            () => new DefaultTab()
-        );
     }
 
     private createGroupAtLocation(location: number[] = [0]): GroupPanel {

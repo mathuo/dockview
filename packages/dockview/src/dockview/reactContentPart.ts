@@ -52,12 +52,6 @@ export class ReactPanelContentPart implements IContentRenderer {
         );
     }
 
-    public toJSON() {
-        return {
-            id: this.id,
-        };
-    }
-
     public update(event: PanelUpdateEvent) {
         this.part?.update(event.params);
     }

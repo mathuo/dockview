@@ -9,7 +9,11 @@ import {
 import { DockviewApi } from '../api/component.api';
 import { GroupPanel } from './groupviewPanel';
 import { Event } from '../events';
-import { IGroupPanelView } from '../dockview/defaultGroupPanelView';
+import {
+    IGroupPanelView,
+    SerializedGroupPanelView,
+} from '../dockview/defaultGroupPanelView';
+import { Optional } from '../types';
 
 export interface IRenderable {
     id: string;
@@ -19,7 +23,7 @@ export interface IRenderable {
 }
 
 export interface HeaderPartInitParameters {
-    title?: string;
+    title: string;
 }
 
 export interface GroupPanelPartInitParameters
@@ -40,20 +44,28 @@ export interface IWatermarkRenderer extends IPanel {
     updateParentGroup(group: GroupPanel, visible: boolean): void;
 }
 
-export interface ITabRenderer extends IPanel {
+export interface ITabRenderer
+    extends Optional<
+        Omit<IPanel, 'id'>,
+        'dispose' | 'update' | 'layout' | 'toJSON'
+    > {
     readonly element: HTMLElement;
     init(parameters: GroupPanelPartInitParameters): void;
-    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void;
+    onGroupChange?(group: GroupPanel): void;
+    onPanelVisibleChange?(isPanelVisible: boolean): void;
 }
 
-export interface IContentRenderer extends IPanel {
+export interface IContentRenderer
+    extends Optional<
+        Omit<IPanel, 'id'>,
+        'dispose' | 'update' | 'layout' | 'toJSON'
+    > {
     readonly element: HTMLElement;
-    readonly actions?: HTMLElement;
     readonly onDidFocus?: Event<void>;
     readonly onDidBlur?: Event<void>;
-    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void;
     init(parameters: GroupPanelContentPartInitParameters): void;
-    layout(width: number, height: number): void;
+    onGroupChange?(group: GroupPanel): void;
+    onPanelVisibleChange?(isPanelVisible: boolean): void;
 }
 
 // watermark component
@@ -88,7 +100,9 @@ export type GroupPanelUpdateEvent = PanelUpdateEvent<{
 
 export interface GroupviewPanelState {
     id: string;
-    view?: any;
+    contentComponent?: string;
+    tabComponent?: string;
     title?: string;
     params?: { [key: string]: any };
+    view?: SerializedGroupPanelView; // depreciated
 }

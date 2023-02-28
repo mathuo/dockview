@@ -74,9 +74,8 @@ export class ContentContainer
         const disposable = new CompositeDisposable();
 
         if (this.panel.view) {
-            const _onDidFocus: Event<void> =
-                this.panel.view.content.onDidFocus!;
-            const _onDidBlur: Event<void> = this.panel.view.content.onDidBlur!;
+            const _onDidFocus = this.panel.view.content.onDidFocus;
+            const _onDidBlur = this.panel.view.content.onDidBlur;
 
             const { onDidFocus, onDidBlur } = trackFocus(this._element);
 

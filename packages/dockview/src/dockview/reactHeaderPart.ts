@@ -2,7 +2,6 @@ import * as React from 'react';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IGroupPanelBaseProps } from './dockview';
 import {
-    DEFAULT_TAB_IDENTIFIER,
     PanelUpdateEvent,
     GroupPanel,
     ITabRenderer,
@@ -45,16 +44,6 @@ export class ReactPanelHeaderPart implements ITabRenderer {
 
     public update(event: PanelUpdateEvent) {
         this.part?.update(event.params);
-    }
-
-    public toJSON() {
-        if (this.id === DEFAULT_TAB_IDENTIFIER) {
-            return {};
-        }
-
-        return {
-            id: this.id,
-        };
     }
 
     public layout(_width: number, _height: number) {

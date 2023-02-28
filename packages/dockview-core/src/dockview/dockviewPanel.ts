@@ -12,7 +12,7 @@ import { GroupPanel } from '../groupview/groupviewPanel';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { IPanel, Parameters } from '../panel/types';
 import { IGroupPanelView } from './defaultGroupPanelView';
-import { DockviewComponent } from './dockviewComponent';
+import { IDockviewComponent } from './dockviewComponent';
 
 export interface IDockviewPanel extends IDisposable, IPanel {
     readonly view?: IGroupPanelView;
@@ -56,7 +56,7 @@ export class DockviewPanel
 
     constructor(
         public readonly id: string,
-        accessor: DockviewComponent,
+        accessor: IDockviewComponent,
         private readonly containerApi: DockviewApi,
         group: GroupPanel
     ) {
@@ -82,9 +82,7 @@ export class DockviewPanel
         this._params = params.params;
         this._view = params.view;
 
-        if (typeof params.title === 'string') {
-            this.setTitle(params.title);
-        }
+        this.setTitle(params.title);
 
         this.view?.init({
             ...params,
@@ -100,7 +98,8 @@ export class DockviewPanel
     public toJSON(): GroupviewPanelState {
         return <GroupviewPanelState>{
             id: this.id,
-            view: this.view!.toJSON(),
+            contentComponent: this.view?.contentComponent,
+            tabComponent: this.view?.tabComponent,
             params:
                 Object.keys(this._params || {}).length > 0
                     ? this._params
@@ -133,11 +132,9 @@ export class DockviewPanel
             ...event.params.params,
         };
 
-        if (typeof params.title === 'string') {
-            if (params.title !== this.title) {
-                this._title = params.title;
-                this.api._onDidTitleChange.fire({ title: this.title });
-            }
+        if (params.title !== this.title) {
+            this._title = params.title;
+            this.api._onDidTitleChange.fire({ title: this.title });
         }
 
         this.view?.update({

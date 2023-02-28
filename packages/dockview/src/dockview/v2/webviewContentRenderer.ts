@@ -32,10 +32,6 @@ export class WebviewContentRenderer implements IContentRenderer {
         this.parameters = parameters;
     }
 
-    public toJSON() {
-        return {};
-    }
-
     public update(params: PanelUpdateEvent) {
         if (this.parameters) {
             this.parameters.params = params.params;
