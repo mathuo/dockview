@@ -44,7 +44,7 @@ import {
     GroupviewDropEvent,
 } from '../groupview/groupview';
 import { GroupPanel, IGroupviewPanel } from '../groupview/groupviewPanel';
-import { DefaultGroupPanelView } from './defaultGroupPanelView';
+import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
 import { DockviewDropTargets } from '../groupview/dnd';
 
@@ -660,7 +660,7 @@ export class DockviewComponent
             }
         } else if (this.watermark) {
             this.watermark.element.parentElement!.remove();
-            this.watermark.dispose();
+            this.watermark.dispose?.();
             this.watermark = null;
         }
     }
@@ -954,16 +954,21 @@ export class DockviewComponent
         const tabComponent =
             options.tabComponent || this.options.defaultTabComponent;
 
-        const view = new DefaultGroupPanelView(
+        const view = new DockviewPanelModel(
             this,
             options.id,
             contentComponent,
             tabComponent
         );
 
-        const panel = new DockviewPanel(options.id, this, this._api, group);
+        const panel = new DockviewPanel(
+            options.id,
+            this,
+            this._api,
+            group,
+            view
+        );
         panel.init({
-            view,
             title: options.title || options.id,
             params: options?.params || {},
         });

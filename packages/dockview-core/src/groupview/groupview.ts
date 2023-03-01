@@ -681,7 +681,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
         if (!this.isEmpty && this.watermark) {
             this.watermark.element.remove();
-            this.watermark.dispose();
+            this.watermark.dispose?.();
             this.watermark = undefined;
             this.tabsContainer.show();
         }
@@ -760,7 +760,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     public dispose(): void {
         super.dispose();
 
-        this.watermark?.dispose();
+        this.watermark?.dispose?.();
 
         for (const panel of this.panels) {
             panel.dispose();

@@ -10,17 +10,10 @@ import { DockviewApi } from '../api/component.api';
 import { GroupPanel } from './groupviewPanel';
 import { Event } from '../events';
 import {
-    IGroupPanelView,
+    IDockviewPanelModel,
     SerializedGroupPanelView,
-} from '../dockview/defaultGroupPanelView';
+} from '../dockview/dockviewPanelModel';
 import { Optional } from '../types';
-
-export interface IRenderable {
-    id: string;
-    element: HTMLElement;
-    onDidFocus?: Event<void>;
-    onDidBlur?: Event<void>;
-}
 
 export interface HeaderPartInitParameters {
     title: string;
@@ -38,7 +31,11 @@ export interface GroupPanelContentPartInitParameters
     tab: ITabRenderer;
 }
 
-export interface IWatermarkRenderer extends IPanel {
+export interface IWatermarkRenderer
+    extends Optional<
+        Omit<IPanel, 'id'>,
+        'dispose' | 'update' | 'layout' | 'toJSON'
+    > {
     readonly element: HTMLElement;
     init: (params: GroupPanelPartInitParameters) => void;
     updateParentGroup(group: GroupPanel, visible: boolean): void;
@@ -76,13 +73,6 @@ export interface WatermarkPartInitParameters {
 
 // constructors
 
-export interface PanelHeaderPartConstructor {
-    new (): ITabRenderer;
-}
-export interface PanelContentPartConstructor {
-    new (): IContentRenderer;
-}
-
 export interface WatermarkConstructor {
     new (): IWatermarkRenderer;
 }
@@ -90,7 +80,7 @@ export interface WatermarkConstructor {
 export interface IGroupPanelInitParameters
     extends PanelInitParameters,
         HeaderPartInitParameters {
-    view: IGroupPanelView;
+    //
 }
 
 export type GroupPanelUpdateEvent = PanelUpdateEvent<{
@@ -104,5 +94,5 @@ export interface GroupviewPanelState {
     tabComponent?: string;
     title?: string;
     params?: { [key: string]: any };
-    view?: SerializedGroupPanelView; // depreciated
+    view: SerializedGroupPanelView; // depreciated
 }

@@ -1,8 +1,8 @@
-import { DefaultGroupPanelView } from '../../dockview/defaultGroupPanelView';
+import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { GroupPanel } from '../../groupview/groupviewPanel';
 import { IContentRenderer, ITabRenderer } from '../../groupview/types';
 
-describe('defaultGroupPanelView', () => {
+describe('dockviewGroupPanel', () => {
     test('that dispose is called on content and tab renderers when present', () => {
         const contentMock = jest.fn<IContentRenderer, []>(() => {
             const partial: Partial<IContentRenderer> = {
@@ -23,7 +23,7 @@ describe('defaultGroupPanelView', () => {
         const content = new contentMock();
         const tab = new tabMock();
 
-        const cut = new DefaultGroupPanelView({
+        const cut = new DockviewGroupPanel({
             content,
             tab,
             contentComponent: 'contentComponent',
@@ -55,7 +55,7 @@ describe('defaultGroupPanelView', () => {
         const content = new contentMock();
         const tab = new tabMock();
 
-        const cut = new DefaultGroupPanelView({
+        const cut = new DockviewGroupPanel({
             content,
             tab,
             contentComponent: 'contentComponent',
@@ -91,7 +91,7 @@ describe('defaultGroupPanelView', () => {
         const content = new contentMock();
         const tab = new tabMock();
 
-        let cut = new DefaultGroupPanelView({
+        let cut = new DockviewGroupPanel({
             content,
             tab,
             contentComponent: 'contentComponent',

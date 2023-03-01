@@ -50,7 +50,6 @@ export * from './splitview/splitviewPanel';
 export * from './paneview/paneviewPanel';
 export * from './groupview/types';
 
-export { Event } from './events';
 export {
     Position,
     positionToDirection,

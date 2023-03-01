@@ -18,8 +18,8 @@ export class Watermark
     private group: GroupPanel | undefined;
     private params: GroupPanelPartInitParameters | undefined;
 
-    get id() {
-        return 'watermark';
+    get element() {
+        return this._element;
     }
 
     constructor() {
@@ -67,10 +67,6 @@ export class Watermark
         // noop
     }
 
-    toJSON() {
-        return {};
-    }
-
     layout(_width: number, _height: number) {
         // noop
     }
@@ -92,8 +88,8 @@ export class Watermark
         this.render();
     }
 
-    get element() {
-        return this._element;
+    dispose() {
+        super.dispose();
     }
 
     private render() {
@@ -101,9 +97,5 @@ export class Watermark
             this.params && this.params.containerApi.size <= 1
         );
         toggleClass(this.element, 'has-actions', isOneGroup);
-    }
-
-    dispose() {
-        super.dispose();
     }
 }

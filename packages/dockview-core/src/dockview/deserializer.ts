@@ -4,7 +4,7 @@ import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
 import { IDockviewComponent } from './dockviewComponent';
 import { createComponent } from '../panel/componentFactory';
 import { DefaultTab } from './components/tab/defaultTab';
-import { DefaultGroupPanelView } from './defaultGroupPanelView';
+import { DockviewPanelModel } from './dockviewPanelModel';
 import { DockviewApi } from '../api/component.api';
 
 export interface IPanelDeserializer {
@@ -54,7 +54,7 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
             tab = new DefaultTab();
         }
 
-        const view = new DefaultGroupPanelView(
+        const view = new DockviewPanelModel(
             this.layout,
             panelId,
             contentComponent,
@@ -65,11 +65,11 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
             panelId,
             this.layout,
             new DockviewApi(this.layout),
-            group
+            group,
+            view
         );
 
         panel.init({
-            view,
             title: title || panelId,
             params: params || {},
         });

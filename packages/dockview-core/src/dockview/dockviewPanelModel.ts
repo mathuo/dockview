@@ -15,7 +15,7 @@ export interface SerializedGroupPanelView {
     content: { id: string };
 }
 
-export interface IGroupPanelView extends IDisposable {
+export interface IDockviewPanelModel extends IDisposable {
     readonly contentComponent: string;
     readonly tabComponent?: string;
     readonly content: IContentRenderer;
@@ -26,7 +26,7 @@ export interface IGroupPanelView extends IDisposable {
     updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void;
 }
 
-export class DefaultGroupPanelView implements IGroupPanelView {
+export class DockviewPanelModel implements IDockviewPanelModel {
     private readonly _content: IContentRenderer;
     private readonly _tab: ITabRenderer;
 

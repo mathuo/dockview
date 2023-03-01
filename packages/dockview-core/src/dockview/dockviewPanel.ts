@@ -11,11 +11,11 @@ import {
 import { GroupPanel } from '../groupview/groupviewPanel';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { IPanel, Parameters } from '../panel/types';
-import { IGroupPanelView } from './defaultGroupPanelView';
+import { IDockviewPanelModel } from './dockviewPanelModel';
 import { IDockviewComponent } from './dockviewComponent';
 
 export interface IDockviewPanel extends IDisposable, IPanel {
-    readonly view?: IGroupPanelView;
+    readonly view: IDockviewPanelModel;
     readonly group: GroupPanel;
     readonly api: DockviewPanelApi;
     readonly title: string;
@@ -34,8 +34,6 @@ export class DockviewPanel
     private _group: GroupPanel;
     private _params?: Parameters;
 
-    private _view?: IGroupPanelView;
-
     private _title: string;
 
     get params(): Parameters | undefined {
@@ -50,15 +48,12 @@ export class DockviewPanel
         return this._group;
     }
 
-    get view(): IGroupPanelView | undefined {
-        return this._view;
-    }
-
     constructor(
         public readonly id: string,
         accessor: IDockviewComponent,
         private readonly containerApi: DockviewApi,
-        group: GroupPanel
+        group: GroupPanel,
+        readonly view: IDockviewPanelModel
     ) {
         super();
         this._title = '';
@@ -80,7 +75,6 @@ export class DockviewPanel
 
     public init(params: IGroupPanelInitParameters): void {
         this._params = params.params;
-        this._view = params.view;
 
         this.setTitle(params.title);
 
@@ -98,8 +92,8 @@ export class DockviewPanel
     public toJSON(): GroupviewPanelState {
         return <GroupviewPanelState>{
             id: this.id,
-            contentComponent: this.view?.contentComponent,
-            tabComponent: this.view?.tabComponent,
+            contentComponent: this.view.contentComponent,
+            tabComponent: this.view.tabComponent,
             params:
                 Object.keys(this._params || {}).length > 0
                     ? this._params
