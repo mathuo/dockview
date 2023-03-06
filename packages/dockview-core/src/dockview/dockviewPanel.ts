@@ -8,7 +8,7 @@ import {
     GroupviewPanelState,
     IGroupPanelInitParameters,
 } from '../groupview/types';
-import { GroupPanel } from '../groupview/groupviewPanel';
+import { DockviewGroupPanel } from '../groupview/dockviewGroupPanel';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { IPanel, Parameters } from '../panel/types';
 import { IDockviewPanelModel } from './dockviewPanelModel';
@@ -16,11 +16,11 @@ import { IDockviewComponent } from './dockviewComponent';
 
 export interface IDockviewPanel extends IDisposable, IPanel {
     readonly view: IDockviewPanelModel;
-    readonly group: GroupPanel;
+    readonly group: DockviewGroupPanel;
     readonly api: DockviewPanelApi;
     readonly title: string;
     readonly params: Record<string, any> | undefined;
-    updateParentGroup(group: GroupPanel, isGroupActive: boolean): void;
+    updateParentGroup(group: DockviewGroupPanel, isGroupActive: boolean): void;
     init(params: IGroupPanelInitParameters): void;
     toJSON(): GroupviewPanelState;
     update(event: GroupPanelUpdateEvent): void;
@@ -31,7 +31,7 @@ export class DockviewPanel
     implements IDockviewPanel
 {
     readonly api: DockviewPanelApiImpl;
-    private _group: GroupPanel;
+    private _group: DockviewGroupPanel;
     private _params?: Parameters;
 
     private _title: string;
@@ -44,7 +44,7 @@ export class DockviewPanel
         return this._title;
     }
 
-    get group(): GroupPanel {
+    get group(): DockviewGroupPanel {
         return this._group;
     }
 
@@ -52,7 +52,7 @@ export class DockviewPanel
         public readonly id: string,
         accessor: IDockviewComponent,
         private readonly containerApi: DockviewApi,
-        group: GroupPanel,
+        group: DockviewGroupPanel,
         readonly view: IDockviewPanelModel
     ) {
         super();
@@ -139,7 +139,10 @@ export class DockviewPanel
         });
     }
 
-    public updateParentGroup(group: GroupPanel, isGroupActive: boolean): void {
+    public updateParentGroup(
+        group: DockviewGroupPanel,
+        isGroupActive: boolean
+    ): void {
         this._group = group;
         this.api.group = group;
 

@@ -7,7 +7,6 @@ import {
 } from '../../../groupview/types';
 import { CompositeDisposable } from '../../../lifecycle';
 import { PanelUpdateEvent } from '../../../panel/types';
-import { GroupPanel } from '../../../groupview/groupviewPanel';
 import { IDockviewPanel } from '../../../dockview/dockviewPanel';
 import { IDockviewPanelModel } from '../../../dockview/dockviewPanelModel';
 
@@ -25,10 +24,6 @@ class TestContentRenderer
     constructor(public id: string) {
         super();
         this.element = document.createElement('div');
-    }
-
-    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void {
-        //
     }
 
     init(parameters: GroupPanelContentPartInitParameters): void {

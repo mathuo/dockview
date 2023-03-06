@@ -23,7 +23,7 @@ export * from './splitview/core/options';
 
 export * from './paneview/paneview';
 export * from './gridview/gridview';
-export * from './groupview/groupview';
+export * from './groupview/dockviewGroupPanelModel';
 export * from './gridview/baseComponentGridview';
 
 export * from './paneview/draggablePaneviewPanel';
@@ -32,7 +32,7 @@ export * from './groupview/panel/content';
 export * from './groupview/tab';
 export * from './groupview/dnd';
 export * from './groupview/types';
-export * from './groupview/groupviewPanel';
+export * from './groupview/dockviewGroupPanel';
 
 export * from './dockview/options';
 export * from './dockview/dockviewPanel';

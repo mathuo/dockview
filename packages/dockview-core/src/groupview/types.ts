@@ -7,7 +7,7 @@ import {
     Parameters,
 } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
-import { GroupPanel } from './groupviewPanel';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { Event } from '../events';
 import {
     IDockviewPanelModel,
@@ -38,7 +38,7 @@ export interface IWatermarkRenderer
     > {
     readonly element: HTMLElement;
     init: (params: GroupPanelPartInitParameters) => void;
-    updateParentGroup(group: GroupPanel, visible: boolean): void;
+    updateParentGroup(group: DockviewGroupPanel, visible: boolean): void;
 }
 
 export interface ITabRenderer
@@ -48,7 +48,7 @@ export interface ITabRenderer
     > {
     readonly element: HTMLElement;
     init(parameters: GroupPanelPartInitParameters): void;
-    onGroupChange?(group: GroupPanel): void;
+    onGroupChange?(group: DockviewGroupPanel): void;
     onPanelVisibleChange?(isPanelVisible: boolean): void;
 }
 
@@ -61,7 +61,7 @@ export interface IContentRenderer
     readonly onDidFocus?: Event<void>;
     readonly onDidBlur?: Event<void>;
     init(parameters: GroupPanelContentPartInitParameters): void;
-    onGroupChange?(group: GroupPanel): void;
+    onGroupChange?(group: DockviewGroupPanel): void;
     onPanelVisibleChange?(isPanelVisible: boolean): void;
 }
 

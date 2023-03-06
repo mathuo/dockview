@@ -11,19 +11,19 @@ import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
 import { ContentContainer, IContentContainer } from './panel/content';
 import { ITabsContainer, TabsContainer } from './titlebar/tabsContainer';
 import { IWatermarkRenderer } from './types';
-import { GroupPanel } from './groupviewPanel';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewDropTargets } from './dnd';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { IGroupControlRenderer } from '../dockview/options';
 
 export interface DndService {
     canDisplayOverlay(
-        group: IGroupview,
+        group: IDockviewGroupPanelModel,
         event: DragEvent,
         target: DockviewDropTargets
     ): boolean;
     onDrop(
-        group: IGroupview,
+        group: IDockviewGroupPanelModel,
         event: DragEvent,
         position: Position,
         index?: number
@@ -77,7 +77,7 @@ export interface IHeader {
     height: number | undefined;
 }
 
-export interface IGroupview extends IGridPanelView {
+export interface IDockviewGroupPanelModel extends IGridPanelView {
     readonly isActive: boolean;
     readonly size: number;
     readonly panels: IDockviewPanel[];
@@ -117,7 +117,10 @@ export interface IGroupview extends IGridPanelView {
     ): boolean;
 }
 
-export class Groupview extends CompositeDisposable implements IGroupview {
+export class DockviewGroupPanelModel
+    extends CompositeDisposable
+    implements IDockviewGroupPanelModel
+{
     private readonly tabsContainer: ITabsContainer;
     private readonly contentContainer: IContentContainer;
     private readonly dropTarget: Droptarget;
@@ -232,7 +235,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         private accessor: DockviewComponent,
         public id: string,
         private readonly options: GroupOptions,
-        private readonly groupPanel: GroupPanel
+        private readonly groupPanel: DockviewGroupPanel
     ) {
         super();
 

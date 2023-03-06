@@ -1,5 +1,5 @@
 import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
-import { GroupPanel } from '../../groupview/groupviewPanel';
+import { DockviewGroupPanel } from '../../groupview/dockviewGroupPanel';
 import {
     GroupPanelPartInitParameters,
     GroupPanelUpdateEvent,
@@ -29,7 +29,10 @@ export class DockviewPanelModelMock implements IDockviewPanelModel {
         //
     }
 
-    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void {
+    updateParentGroup(
+        group: DockviewGroupPanel,
+        isPanelVisible: boolean
+    ): void {
         //
     }
 

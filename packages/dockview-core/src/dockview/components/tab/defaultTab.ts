@@ -5,7 +5,7 @@ import {
 } from '../../../groupview/types';
 import { addDisposableListener } from '../../../events';
 import { PanelUpdateEvent } from '../../../panel/types';
-import { GroupPanel } from '../../../groupview/groupviewPanel';
+import { DockviewGroupPanel } from '../../../groupview/dockviewGroupPanel';
 import { createCloseButton } from '../../../svg';
 
 export class DefaultTab extends CompositeDisposable implements ITabRenderer {
@@ -77,7 +77,10 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         });
     }
 
-    public updateParentGroup(group: GroupPanel, isPanelVisible: boolean) {
+    public updateParentGroup(
+        group: DockviewGroupPanel,
+        isPanelVisible: boolean
+    ) {
         const changed =
             this._isPanelVisible !== isPanelVisible ||
             this._isGroupActive !== group.isActive;

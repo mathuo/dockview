@@ -8,7 +8,7 @@ import {
 import { toggleClass } from '../dom';
 import { IDockviewComponent } from '../dockview/dockviewComponent';
 import { ITabRenderer } from './types';
-import { GroupPanel } from './groupviewPanel';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DroptargetEvent, Droptarget } from '../dnd/droptarget';
 import { DockviewDropTargets } from './dnd';
 import { DragHandler } from '../dnd/abstractDragHandler';
@@ -40,7 +40,7 @@ export class Tab extends CompositeDisposable implements ITab {
     constructor(
         public readonly panelId: string,
         private readonly accessor: IDockviewComponent,
-        private readonly group: GroupPanel
+        private readonly group: DockviewGroupPanel
     ) {
         super();
 

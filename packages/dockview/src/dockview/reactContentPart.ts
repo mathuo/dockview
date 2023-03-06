@@ -3,7 +3,7 @@ import { ReactPart, ReactPortalStore } from '../react';
 import { IDockviewPanelProps } from '../dockview/dockview';
 import {
     DockviewEmitter,
-    Event,
+    DockviewEvent,
     GroupPanel,
     PanelUpdateEvent,
     IContentRenderer,
@@ -17,10 +17,10 @@ export class ReactPanelContentPart implements IContentRenderer {
     private _group: GroupPanel | undefined;
 
     private readonly _onDidFocus = new DockviewEmitter<void>();
-    readonly onDidFocus: Event<void> = this._onDidFocus.event;
+    readonly onDidFocus: DockviewEvent<void> = this._onDidFocus.event;
 
     private readonly _onDidBlur = new DockviewEmitter<void>();
-    readonly onDidBlur: Event<void> = this._onDidBlur.event;
+    readonly onDidBlur: DockviewEvent<void> = this._onDidBlur.event;
 
     get element(): HTMLElement {
         return this._element;

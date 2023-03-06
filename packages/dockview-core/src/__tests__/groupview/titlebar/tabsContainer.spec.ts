@@ -1,13 +1,13 @@
 import { DockviewComponent } from '../../../dockview/dockviewComponent';
-import { GroupPanel } from '../../../groupview/groupviewPanel';
 import { TabsContainer } from '../../../groupview/titlebar/tabsContainer';
 import { fireEvent } from '@testing-library/dom';
-import { Groupview } from '../../../groupview/groupview';
 import {
     LocalSelectionTransfer,
     PanelTransfer,
 } from '../../../dnd/dataTransfer';
-import { TestPanel } from '../groupview.spec';
+import { TestPanel } from '../dockviewGroupPanelModel.spec';
+import { DockviewGroupPanelModel } from '../../../groupview/dockviewGroupPanelModel';
+import { DockviewGroupPanel } from '../../../groupview/dockviewGroupPanel';
 
 describe('tabsContainer', () => {
     test('that an external event does not render a drop target and calls through to the group mode', () => {
@@ -18,22 +18,24 @@ describe('tabsContainer', () => {
                 options: {},
             };
         });
-        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
-            return {
-                canDisplayOverlay: jest.fn(),
-            };
-        });
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    canDisplayOverlay: jest.fn(),
+                };
+            }
+        );
 
-        const groupView = new groupviewMock() as Groupview;
+        const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
                 model: groupView,
             };
         });
 
         const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as GroupPanel;
+        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
         const cut = new TabsContainer(accessor, groupPanel);
 
@@ -71,15 +73,17 @@ describe('tabsContainer', () => {
                 options: {},
             };
         });
-        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
-            return {
-                canDisplayOverlay: jest.fn(),
-            };
-        });
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    canDisplayOverlay: jest.fn(),
+                };
+            }
+        );
 
-        const groupView = new groupviewMock() as Groupview;
+        const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
                 id: 'testgroupid',
                 model: groupView,
@@ -88,7 +92,7 @@ describe('tabsContainer', () => {
         });
 
         const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as GroupPanel;
+        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
         const cut = new TabsContainer(accessor, groupPanel);
 
@@ -137,15 +141,17 @@ describe('tabsContainer', () => {
                 options: {},
             };
         });
-        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
-            return {
-                canDisplayOverlay: jest.fn(),
-            };
-        });
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    canDisplayOverlay: jest.fn(),
+                };
+            }
+        );
 
-        const groupView = new groupviewMock() as Groupview;
+        const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
                 id: 'testgroupid',
                 model: groupView,
@@ -154,7 +160,7 @@ describe('tabsContainer', () => {
         });
 
         const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as GroupPanel;
+        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
         const cut = new TabsContainer(accessor, groupPanel);
 
@@ -200,15 +206,17 @@ describe('tabsContainer', () => {
                 options: {},
             };
         });
-        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
-            return {
-                canDisplayOverlay: jest.fn(),
-            };
-        });
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    canDisplayOverlay: jest.fn(),
+                };
+            }
+        );
 
-        const groupView = new groupviewMock() as Groupview;
+        const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
                 id: 'testgroupid',
                 model: groupView,
@@ -217,7 +225,7 @@ describe('tabsContainer', () => {
         });
 
         const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as GroupPanel;
+        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
         const cut = new TabsContainer(accessor, groupPanel);
 
@@ -263,15 +271,17 @@ describe('tabsContainer', () => {
                 options: {},
             };
         });
-        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
-            return {
-                canDisplayOverlay: jest.fn(),
-            };
-        });
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    canDisplayOverlay: jest.fn(),
+                };
+            }
+        );
 
-        const groupView = new groupviewMock() as Groupview;
+        const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
                 id: 'testgroupid',
                 model: groupView,
@@ -279,7 +289,7 @@ describe('tabsContainer', () => {
         });
 
         const accessor = new accessorMock() as DockviewComponent;
-        const groupPanel = new groupPanelMock() as GroupPanel;
+        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
         const cut = new TabsContainer(accessor, groupPanel);
 

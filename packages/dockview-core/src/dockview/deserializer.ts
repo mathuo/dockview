@@ -1,5 +1,5 @@
 import { GroupviewPanelState, ITabRenderer } from '../groupview/types';
-import { GroupPanel } from '../groupview/groupviewPanel';
+import { DockviewGroupPanel } from '../groupview/dockviewGroupPanel';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
 import { IDockviewComponent } from './dockviewComponent';
 import { createComponent } from '../panel/componentFactory';
@@ -8,7 +8,10 @@ import { DockviewPanelModel } from './dockviewPanelModel';
 import { DockviewApi } from '../api/component.api';
 
 export interface IPanelDeserializer {
-    fromJSON(panelData: GroupviewPanelState, group: GroupPanel): IDockviewPanel;
+    fromJSON(
+        panelData: GroupviewPanelState,
+        group: DockviewGroupPanel
+    ): IDockviewPanel;
 }
 
 export class DefaultDockviewDeserialzier implements IPanelDeserializer {
@@ -16,7 +19,7 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
 
     public fromJSON(
         panelData: GroupviewPanelState,
-        group: GroupPanel
+        group: DockviewGroupPanel
     ): IDockviewPanel {
         const panelId = panelData.id;
         const params = panelData.params;

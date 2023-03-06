@@ -6,7 +6,7 @@ import {
 import { addDisposableListener, Emitter, Event } from '../../events';
 import { ITab, Tab } from '../tab';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { GroupPanel } from '../groupviewPanel';
+import { DockviewGroupPanel } from '../dockviewGroupPanel';
 import { VoidContainer } from './voidContainer';
 import { toggleClass } from '../../dom';
 import { IDockviewPanel } from '../../dockview/dockviewPanel';
@@ -135,7 +135,7 @@ export class TabsContainer
 
     constructor(
         private readonly accessor: DockviewComponent,
-        private readonly group: GroupPanel
+        private readonly group: DockviewGroupPanel
     ) {
         super();
 

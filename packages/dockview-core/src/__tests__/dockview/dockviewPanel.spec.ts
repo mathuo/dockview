@@ -1,8 +1,8 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { DockviewApi } from '../../api/component.api';
 import { DockviewPanel } from '../../dockview/dockviewPanel';
-import { GroupPanel } from '../../groupview/groupviewPanel';
 import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
+import { DockviewGroupPanel } from '../../groupview/dockviewGroupPanel';
 
 describe('dockviewPanel', () => {
     test('update title', () => {
@@ -14,7 +14,7 @@ describe('dockviewPanel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
-        const groupMock = jest.fn<GroupPanel, []>(() => {
+        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
             return {} as any;
         });
         const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
@@ -57,7 +57,7 @@ describe('dockviewPanel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
-        const groupMock = jest.fn<GroupPanel, []>(() => {
+        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
             return {} as any;
         });
         const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
@@ -89,7 +89,7 @@ describe('dockviewPanel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
-        const groupMock = jest.fn<GroupPanel, []>(() => {
+        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
             return {} as any;
         });
         const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
@@ -121,7 +121,7 @@ describe('dockviewPanel', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return {} as any;
         });
-        const groupMock = jest.fn<GroupPanel, []>(() => {
+        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
             return {
                 api: {
                     setSize: jest.fn(),

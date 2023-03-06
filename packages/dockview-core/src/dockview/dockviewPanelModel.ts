@@ -5,7 +5,7 @@ import {
     ITabRenderer,
     GroupPanelUpdateEvent,
 } from '../groupview/types';
-import { GroupPanel } from '../groupview/groupviewPanel';
+import { DockviewGroupPanel } from '../groupview/dockviewGroupPanel';
 import { IDisposable } from '../lifecycle';
 import { createComponent } from '../panel/componentFactory';
 import { IDockviewComponent } from './dockviewComponent';
@@ -23,14 +23,14 @@ export interface IDockviewPanelModel extends IDisposable {
     update(event: GroupPanelUpdateEvent): void;
     layout(width: number, height: number): void;
     init(params: GroupPanelPartInitParameters): void;
-    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void;
+    updateParentGroup(group: DockviewGroupPanel, isPanelVisible: boolean): void;
 }
 
 export class DockviewPanelModel implements IDockviewPanelModel {
     private readonly _content: IContentRenderer;
     private readonly _tab: ITabRenderer;
 
-    private _group: GroupPanel | null = null;
+    private _group: DockviewGroupPanel | null = null;
     private _isPanelVisible: boolean | null = null;
 
     get content(): IContentRenderer {
@@ -57,7 +57,10 @@ export class DockviewPanelModel implements IDockviewPanelModel {
         this.tab.init(params);
     }
 
-    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void {
+    updateParentGroup(
+        group: DockviewGroupPanel,
+        isPanelVisible: boolean
+    ): void {
         if (group !== this._group) {
             this._group = group;
             if (this._content.onGroupChange) {

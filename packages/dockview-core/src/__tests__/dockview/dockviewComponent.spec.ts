@@ -6,7 +6,6 @@ import {
 } from '../../groupview/types';
 import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/core/splitview';
-import { GroupPanel } from '../../groupview/groupviewPanel';
 import { CompositeDisposable } from '../../lifecycle';
 import {
     GroupPanelUpdateEvent,
@@ -23,6 +22,7 @@ import { DefaultDockviewDeserialzier } from '../../dockview/deserializer';
 import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
 import { DockviewPanelModelMock } from '../__mocks__/mockDockviewPanelMode';
 import { DefaultTab } from '../../dockview/components/tab/defaultTab';
+import { DockviewGroupPanel } from '../../groupview/dockviewGroupPanel';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -34,10 +34,6 @@ class PanelContentPartTest implements IContentRenderer {
 
     constructor(public readonly id: string, public readonly component: string) {
         this.element.classList.add(`testpanel-${id}`);
-    }
-
-    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void {
-        //noop
     }
 
     init(parameters: GroupPanelPartInitParameters): void {
@@ -78,10 +74,6 @@ class PanelTabPartTest implements ITabRenderer {
         this.element.className = `panel-tab-part-${id}`;
     }
 
-    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void {
-        //noop
-    }
-
     init(parameters: GroupPanelPartInitParameters): void {
         //noop
     }
@@ -105,7 +97,7 @@ class PanelTabPartTest implements ITabRenderer {
 }
 
 class TestGroupPanel implements IDockviewPanel {
-    private _group: GroupPanel | undefined;
+    private _group: DockviewGroupPanel | undefined;
 
     readonly api: DockviewPanelApi;
     readonly view: IDockviewPanelModel;
@@ -116,7 +108,7 @@ class TestGroupPanel implements IDockviewPanel {
         accessor: DockviewComponent
     ) {
         this.api = new DockviewPanelApiImpl(this, this._group!);
-        this._group = new GroupPanel(accessor, id, {});
+        this._group = new DockviewGroupPanel(accessor, id, {});
         this.view = new DockviewPanelModelMock(
             'component',
             new PanelContentPartTest(id, 'component'),
@@ -128,11 +120,11 @@ class TestGroupPanel implements IDockviewPanel {
     get params(): Record<string, any> {
         return {};
     }
-    get group(): GroupPanel {
+    get group(): DockviewGroupPanel {
         return this._group!;
     }
 
-    updateParentGroup(group: GroupPanel, isGroupActive: boolean): void {
+    updateParentGroup(group: DockviewGroupPanel, isGroupActive: boolean): void {
         this._group = group;
     }
 
@@ -838,7 +830,7 @@ describe('dockviewComponent', () => {
 
         let events: {
             panel?: IDockviewPanel;
-            group?: GroupPanel | undefined;
+            group?: DockviewGroupPanel | undefined;
             type: string;
         }[] = [];
 
@@ -1028,7 +1020,7 @@ describe('dockviewComponent', () => {
             position: { referencePanel: 'panel2', direction: 'below' },
         });
 
-        const removedGroups: GroupPanel[] = [];
+        const removedGroups: DockviewGroupPanel[] = [];
         const removedPanels: IDockviewPanel[] = [];
 
         const disposable = new CompositeDisposable(
@@ -1481,9 +1473,9 @@ describe('dockviewComponent', () => {
 
         dockview.layout(1000, 1000);
 
-        let addGroup: GroupPanel[] = [];
-        let removeGroup: GroupPanel[] = [];
-        let activeGroup: (GroupPanel | undefined)[] = [];
+        let addGroup: DockviewGroupPanel[] = [];
+        let removeGroup: DockviewGroupPanel[] = [];
+        let activeGroup: (DockviewGroupPanel | undefined)[] = [];
         let addPanel: IDockviewPanel[] = [];
         let removePanel: IDockviewPanel[] = [];
         let activePanel: (IDockviewPanel | undefined)[] = [];
