@@ -1,4 +1,4 @@
-import { DockviewGroupPanel } from '../groupview/dockviewGroupPanel';
+import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
 import { IDisposable } from '../lifecycle';
 import { DragHandler } from './abstractDragHandler';
 import { LocalSelectionTransfer, PanelTransfer } from './dataTransfer';

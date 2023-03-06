@@ -11,11 +11,10 @@ import { CompositeDisposable } from '../lifecycle';
 import { Event, Emitter } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import {
-    IContentRenderer,
-    ITabRenderer,
     IWatermarkRenderer,
     GroupviewPanelState,
-} from '../groupview/types';
+    DockviewDropTargets,
+} from './types';
 import { sequentialNumberGenerator } from '../math';
 import { IPanelDeserializer } from './deserializer';
 import { createComponent } from '../panel/componentFactory';
@@ -37,19 +36,14 @@ import {
 } from '../gridview/baseComponentGridview';
 import { DockviewApi } from '../api/component.api';
 import { Orientation, Sizing } from '../splitview/core/splitview';
-import { DefaultTab } from './components/tab/defaultTab';
 import {
     GroupOptions,
     GroupPanelViewState,
     GroupviewDropEvent,
-} from '../groupview/dockviewGroupPanelModel';
-import {
-    DockviewGroupPanel,
-    IDockviewGroupPanel,
-} from '../groupview/dockviewGroupPanel';
+} from './dockviewGroupPanelModel';
+import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
-import { DockviewDropTargets } from '../groupview/dnd';
 
 export interface PanelReference {
     update: (event: { params: { [key: string]: any } }) => void;

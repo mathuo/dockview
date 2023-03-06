@@ -12,7 +12,7 @@ import { Direction } from '../gridview/baseComponentGridview';
 import {
     AddComponentOptions,
     IGridviewComponent,
-    SerializedGridview,
+    SerializedGridviewComponent,
 } from '../gridview/gridviewComponent';
 import { IGridviewPanel } from '../gridview/gridviewPanel';
 
@@ -33,7 +33,7 @@ import { ISplitviewPanel } from '../splitview/splitviewPanel';
 import {
     DockviewGroupPanel,
     IDockviewGroupPanel,
-} from '../groupview/dockviewGroupPanel';
+} from '../dockview/dockviewGroupPanel';
 import { Emitter, Event } from '../events';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { PaneviewDropEvent } from '../paneview/draggablePaneviewPanel';
@@ -229,7 +229,7 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
     }
 }
 
-export class GridviewApi implements CommonApi<SerializedGridview> {
+export class GridviewApi implements CommonApi<SerializedGridviewComponent> {
     get minimumHeight(): number {
         return this.component.minimumHeight;
     }
@@ -315,11 +315,11 @@ export class GridviewApi implements CommonApi<SerializedGridview> {
         return this.component.getPanel(id);
     }
 
-    fromJSON(data: SerializedGridview): void {
+    fromJSON(data: SerializedGridviewComponent): void {
         return this.component.fromJSON(data);
     }
 
-    toJSON(): SerializedGridview {
+    toJSON(): SerializedGridviewComponent {
         return this.component.toJSON();
     }
 

@@ -3,15 +3,13 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     ITabRenderer,
-} from '../../groupview/types';
-import { PanelUpdateEvent } from '../../panel/types';
-import { Orientation } from '../../splitview/core/splitview';
-import { CompositeDisposable } from '../../lifecycle';
-import {
     GroupPanelUpdateEvent,
     GroupviewPanelState,
     IGroupPanelInitParameters,
-} from '../../groupview/types';
+} from '../../dockview/types';
+import { PanelUpdateEvent } from '../../panel/types';
+import { Orientation } from '../../splitview/core/splitview';
+import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
 import { IDockviewPanel } from '../../dockview/dockviewPanel';
 import {
@@ -22,7 +20,7 @@ import { DefaultDockviewDeserialzier } from '../../dockview/deserializer';
 import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
 import { DockviewPanelModelMock } from '../__mocks__/mockDockviewPanelMode';
 import { DefaultTab } from '../../dockview/components/tab/defaultTab';
-import { DockviewGroupPanel } from '../../groupview/dockviewGroupPanel';
+import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');

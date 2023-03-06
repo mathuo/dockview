@@ -1,13 +1,13 @@
 import { DockviewComponent } from '../../../dockview/dockviewComponent';
-import { TabsContainer } from '../../../groupview/titlebar/tabsContainer';
+import { TabsContainer } from '../../../dockview/components/titlebar/tabsContainer';
 import { fireEvent } from '@testing-library/dom';
 import {
     LocalSelectionTransfer,
     PanelTransfer,
 } from '../../../dnd/dataTransfer';
 import { TestPanel } from '../dockviewGroupPanelModel.spec';
-import { DockviewGroupPanelModel } from '../../../groupview/dockviewGroupPanelModel';
-import { DockviewGroupPanel } from '../../../groupview/dockviewGroupPanel';
+import { DockviewGroupPanelModel } from '../../../dockview/dockviewGroupPanelModel';
+import { DockviewGroupPanel } from '../../../dockview/dockviewGroupPanel';
 
 describe('tabsContainer', () => {
     test('that an external event does not render a drop target and calls through to the group mode', () => {

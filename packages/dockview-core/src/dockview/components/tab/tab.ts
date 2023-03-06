@@ -1,17 +1,16 @@
-import { addDisposableListener, Emitter, Event } from '../events';
-import { CompositeDisposable, IDisposable } from '../lifecycle';
+import { addDisposableListener, Emitter, Event } from '../../../events';
+import { CompositeDisposable, IDisposable } from '../../../lifecycle';
 import {
     getPanelData,
     LocalSelectionTransfer,
     PanelTransfer,
-} from '../dnd/dataTransfer';
-import { toggleClass } from '../dom';
-import { IDockviewComponent } from '../dockview/dockviewComponent';
-import { ITabRenderer } from './types';
-import { DockviewGroupPanel } from './dockviewGroupPanel';
-import { DroptargetEvent, Droptarget } from '../dnd/droptarget';
-import { DockviewDropTargets } from './dnd';
-import { DragHandler } from '../dnd/abstractDragHandler';
+} from '../../../dnd/dataTransfer';
+import { toggleClass } from '../../../dom';
+import { IDockviewComponent } from '../../dockviewComponent';
+import { DockviewDropTargets, ITabRenderer } from '../../types';
+import { DockviewGroupPanel } from '../../dockviewGroupPanel';
+import { DroptargetEvent, Droptarget } from '../../../dnd/droptarget';
+import { DragHandler } from '../../../dnd/abstractDragHandler';
 
 export interface ITab {
     readonly panelId: string;

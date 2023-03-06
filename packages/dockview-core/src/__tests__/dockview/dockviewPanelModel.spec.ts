@@ -3,7 +3,7 @@ import {
     IDockviewComponent,
 } from '../../dockview/dockviewComponent';
 import { DockviewPanelModel } from '../../dockview/dockviewPanelModel';
-import { IContentRenderer, ITabRenderer } from '../../groupview/types';
+import { IContentRenderer, ITabRenderer } from '../../dockview/types';
 
 describe('dockviewGroupPanel', () => {
     test('that dispose is called on content and tab renderers when present', () => {

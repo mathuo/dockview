@@ -1,6 +1,6 @@
 import { Emitter, Event } from '../events';
 import { GridviewPanelApiImpl, GridviewPanelApi } from './gridviewPanelApi';
-import { DockviewGroupPanel } from '../groupview/dockviewGroupPanel';
+import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
 import { MutableDisposable } from '../lifecycle';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 

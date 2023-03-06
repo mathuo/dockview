@@ -62,11 +62,11 @@ export abstract class GridviewPanel
         return this._priority;
     }
 
-    get snap() {
+    get snap(): boolean {
         return this._snap;
     }
 
-    get minimumWidth() {
+    get minimumWidth(): number {
         const width =
             typeof this._minimumWidth === 'function'
                 ? this._minimumWidth()
@@ -80,7 +80,7 @@ export abstract class GridviewPanel
         return width;
     }
 
-    get minimumHeight() {
+    get minimumHeight(): number {
         const height =
             typeof this._minimumHeight === 'function'
                 ? this._minimumHeight()
@@ -94,7 +94,7 @@ export abstract class GridviewPanel
         return height;
     }
 
-    get maximumHeight() {
+    get maximumHeight(): number {
         const height =
             typeof this._maximumHeight === 'function'
                 ? this._maximumHeight()
@@ -108,7 +108,7 @@ export abstract class GridviewPanel
         return height;
     }
 
-    get maximumWidth() {
+    get maximumWidth(): number {
         const width =
             typeof this._maximumWidth === 'function'
                 ? this._maximumWidth()
@@ -122,7 +122,7 @@ export abstract class GridviewPanel
         return width;
     }
 
-    get isActive() {
+    get isActive(): boolean {
         return this.api.isActive;
     }
 
@@ -177,11 +177,11 @@ export abstract class GridviewPanel
         );
     }
 
-    setVisible(isVisible: boolean) {
+    setVisible(isVisible: boolean): void {
         this.api._onDidVisibilityChange.fire({ isVisible });
     }
 
-    setActive(isActive: boolean) {
+    setActive(isActive: boolean): void {
         this.api._onDidActiveChange.fire({ isActive });
     }
 
@@ -209,7 +209,7 @@ export abstract class GridviewPanel
         }
     }
 
-    private updateConstraints() {
+    private updateConstraints(): void {
         this.api._onDidConstraintsChange.fire({
             minimumWidth: this._evaluatedMinimumWidth,
             maximumWidth: this._evaluatedMaximumWidth,

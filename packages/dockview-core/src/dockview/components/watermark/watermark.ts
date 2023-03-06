@@ -1,12 +1,9 @@
-import {
-    GroupPanelPartInitParameters,
-    IWatermarkRenderer,
-} from '../../../groupview/types';
+import { GroupPanelPartInitParameters, IWatermarkRenderer } from '../../types';
 import { ActionContainer } from '../../../actionbar/actionsContainer';
 import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
 import { CompositeDisposable } from '../../../lifecycle';
-import { DockviewGroupPanel } from '../../../groupview/dockviewGroupPanel';
+import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { PanelUpdateEvent } from '../../../panel/types';
 import { createCloseButton } from '../../../svg';
 

@@ -1,4 +1,4 @@
-import { IDockviewComponent } from '../dockview/dockviewComponent';
+import { IDockviewComponent } from './dockviewComponent';
 import { DockviewPanelApi } from '../api/dockviewPanelApi';
 import {
     PanelInitParameters,
@@ -7,13 +7,16 @@ import {
     Parameters,
 } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
-import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { Event } from '../events';
-import {
-    IDockviewPanelModel,
-    SerializedGroupPanelView,
-} from '../dockview/dockviewPanelModel';
 import { Optional } from '../types';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
+
+export enum DockviewDropTargets {
+    Tab,
+    Panel,
+    TabContainer,
+    Edge,
+}
 
 export interface HeaderPartInitParameters {
     title: string;
@@ -94,5 +97,4 @@ export interface GroupviewPanelState {
     tabComponent?: string;
     title?: string;
     params?: { [key: string]: any };
-    view?: SerializedGroupPanelView; // depreciated
 }

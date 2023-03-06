@@ -2,6 +2,7 @@ import {
     getRelativeLocation,
     SerializedGridObject,
     getGridLocation,
+    SerializedGridview,
 } from './gridview';
 import { tail, sequenceEquals } from '../array';
 import { CompositeDisposable } from '../lifecycle';
@@ -26,13 +27,8 @@ import { createComponent } from '../panel/componentFactory';
 import { Emitter, Event } from '../events';
 import { Position } from '../dnd/droptarget';
 
-export interface SerializedGridview {
-    grid: {
-        height: number;
-        width: number;
-        orientation: Orientation;
-        root: SerializedGridObject<GridPanelViewState>;
-    };
+export interface SerializedGridviewComponent {
+    grid: SerializedGridview<GridPanelViewState>;
     activePanel?: string;
 }
 
@@ -64,8 +60,8 @@ export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
     addPanel(options: AddComponentOptions): IGridviewPanel;
     removePanel(panel: IGridviewPanel, sizing?: Sizing): void;
     focus(): void;
-    fromJSON(serializedGridview: SerializedGridview): void;
-    toJSON(): SerializedGridview;
+    fromJSON(serializedGridview: SerializedGridviewComponent): void;
+    toJSON(): SerializedGridviewComponent;
     movePanel(
         panel: IGridviewPanel,
         options: { direction: Direction; reference: string; size?: number }
@@ -84,7 +80,7 @@ export class GridviewComponent
     private readonly _onDidLayoutfromJSON = new Emitter<void>();
     readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutfromJSON.event;
 
-    get orientation() {
+    get orientation(): Orientation {
         return this.gridview.orientation;
     }
 
@@ -92,7 +88,7 @@ export class GridviewComponent
         this.gridview.orientation = value;
     }
 
-    get options() {
+    get options(): GridviewComponentOptions {
         return this._options;
     }
 
@@ -135,7 +131,7 @@ export class GridviewComponent
         this.layout(this.gridview.width, this.gridview.height, true);
     }
 
-    removePanel(panel: GridviewPanel) {
+    removePanel(panel: GridviewPanel): void {
         this.removeGroup(panel);
     }
 
@@ -144,7 +140,7 @@ export class GridviewComponent
      *
      * @returns A JSON respresentation of the layout
      */
-    public toJSON(): SerializedGridview {
+    public toJSON(): SerializedGridviewComponent {
         const data = this.gridview.serialize() as {
             height: number;
             width: number;
@@ -168,11 +164,11 @@ export class GridviewComponent
         });
     }
 
-    focus() {
+    focus(): void {
         this.activeGroup?.focus();
     }
 
-    public fromJSON(serializedGridview: SerializedGridview) {
+    public fromJSON(serializedGridview: SerializedGridviewComponent): void {
         this.clear();
 
         const { grid, activePanel } = serializedGridview;
@@ -339,7 +335,7 @@ export class GridviewComponent
         return view;
     }
 
-    private registerPanel(panel: GridviewPanel) {
+    private registerPanel(panel: GridviewPanel): void {
         const disposable = new CompositeDisposable(
             panel.api.onDidFocusChange((event) => {
                 if (!event.isFocused) {
@@ -366,7 +362,7 @@ export class GridviewComponent
         referenceGroup: IGridPanelComponentView,
         groupId: string,
         target: Position
-    ) {
+    ): void {
         const sourceGroup = this.getPanel(groupId);
 
         if (!sourceGroup) {
@@ -411,11 +407,11 @@ export class GridviewComponent
         this.doAddGroup(targetGroup, location);
     }
 
-    removeGroup(group: GridviewPanel) {
+    removeGroup(group: GridviewPanel): void {
         super.removeGroup(group);
     }
 
-    public dispose() {
+    public dispose(): void {
         super.dispose();
 
         this._onDidLayoutfromJSON.dispose();

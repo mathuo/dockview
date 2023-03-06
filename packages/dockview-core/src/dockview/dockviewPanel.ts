@@ -7,8 +7,8 @@ import {
     GroupPanelUpdateEvent,
     GroupviewPanelState,
     IGroupPanelInitParameters,
-} from '../groupview/types';
-import { DockviewGroupPanel } from '../groupview/dockviewGroupPanel';
+} from './types';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { IPanel, Parameters } from '../panel/types';
 import { IDockviewPanelModel } from './dockviewPanelModel';

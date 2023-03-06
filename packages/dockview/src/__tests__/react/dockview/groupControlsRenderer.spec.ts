@@ -1,26 +1,32 @@
-import { GroupPanel, GroupviewPanelApi, Groupview } from 'dockview-core';
+import {
+    DockviewGroupPanel,
+    DockviewGroupPanelApi,
+    DockviewGroupPanelModel,
+} from 'dockview-core';
 import { ReactGroupControlsRendererPart } from '../../../dockview/groupControlsRenderer';
 
 describe('groupControlsRenderer', () => {
     test('#1', () => {
-        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
-            return {
-                onDidAddPanel: jest.fn(),
-                onDidRemovePanel: jest.fn(),
-                onDidActivePanelChange: jest.fn(),
-            };
-        });
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    onDidAddPanel: jest.fn(),
+                    onDidRemovePanel: jest.fn(),
+                    onDidActivePanelChange: jest.fn(),
+                };
+            }
+        );
 
-        const groupview = new groupviewMock() as Groupview;
+        const groupview = new groupviewMock() as DockviewGroupPanelModel;
 
-        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
-                api: {} as GroupviewPanelApi as any,
+                api: {} as DockviewGroupPanelApi as any,
                 model: groupview,
             };
         });
 
-        const groupPanel = new groupPanelMock() as GroupPanel;
+        const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
         const cut = new ReactGroupControlsRendererPart(
             jest.fn(),

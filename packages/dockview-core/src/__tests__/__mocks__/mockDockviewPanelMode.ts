@@ -1,11 +1,11 @@
 import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
-import { DockviewGroupPanel } from '../../groupview/dockviewGroupPanel';
+import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import {
     GroupPanelPartInitParameters,
     GroupPanelUpdateEvent,
     IContentRenderer,
     ITabRenderer,
-} from '../../groupview/types';
+} from '../../dockview/types';
 
 export class DockviewPanelModelMock implements IDockviewPanelModel {
     constructor(

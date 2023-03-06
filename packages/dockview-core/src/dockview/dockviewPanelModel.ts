@@ -4,16 +4,11 @@ import {
     IContentRenderer,
     ITabRenderer,
     GroupPanelUpdateEvent,
-} from '../groupview/types';
-import { DockviewGroupPanel } from '../groupview/dockviewGroupPanel';
+} from './types';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDisposable } from '../lifecycle';
 import { createComponent } from '../panel/componentFactory';
 import { IDockviewComponent } from './dockviewComponent';
-
-export interface SerializedGroupPanelView {
-    tab?: { id: string };
-    content: { id: string };
-}
 
 export interface IDockviewPanelModel extends IDisposable {
     readonly contentComponent: string;

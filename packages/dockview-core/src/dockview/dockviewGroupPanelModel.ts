@@ -1,20 +1,25 @@
 import { DockviewApi } from '../api/component.api';
 import { getPanelData, PanelTransfer } from '../dnd/dataTransfer';
 import { Droptarget, Position } from '../dnd/droptarget';
-import { DockviewComponent } from '../dockview/dockviewComponent';
+import { DockviewComponent } from './dockviewComponent';
 import { isAncestor, toggleClass } from '../dom';
 import { addDisposableListener, Emitter, Event } from '../events';
 import { IGridPanelView } from '../gridview/baseComponentGridview';
 import { IViewSize } from '../gridview/gridview';
-import { CompositeDisposable, IDisposable } from '../lifecycle';
+import { CompositeDisposable } from '../lifecycle';
 import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
-import { ContentContainer, IContentContainer } from './panel/content';
-import { ITabsContainer, TabsContainer } from './titlebar/tabsContainer';
-import { IWatermarkRenderer } from './types';
+import {
+    ContentContainer,
+    IContentContainer,
+} from './components/panel/content';
+import {
+    ITabsContainer,
+    TabsContainer,
+} from './components/titlebar/tabsContainer';
+import { DockviewDropTargets, IWatermarkRenderer } from './types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
-import { DockviewDropTargets } from './dnd';
-import { IDockviewPanel } from '../dockview/dockviewPanel';
-import { IGroupControlRenderer } from '../dockview/options';
+import { IDockviewPanel } from './dockviewPanel';
+import { IGroupControlRenderer } from './options';
 
 export interface DndService {
     canDisplayOverlay(

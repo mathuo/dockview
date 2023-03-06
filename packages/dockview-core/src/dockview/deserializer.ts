@@ -1,5 +1,5 @@
-import { GroupviewPanelState, ITabRenderer } from '../groupview/types';
-import { DockviewGroupPanel } from '../groupview/dockviewGroupPanel';
+import { GroupviewPanelState, ITabRenderer } from './types';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
 import { IDockviewComponent } from './dockviewComponent';
 import { createComponent } from '../panel/componentFactory';
@@ -14,6 +14,14 @@ export interface IPanelDeserializer {
     ): IDockviewPanel;
 }
 
+// depreciated
+interface LegacyState extends GroupviewPanelState {
+    view?: {
+        tab?: { id: string };
+        content: { id: string };
+    };
+}
+
 export class DefaultDockviewDeserialzier implements IPanelDeserializer {
     constructor(private readonly layout: IDockviewComponent) {}
 
@@ -24,9 +32,8 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
         const panelId = panelData.id;
         const params = panelData.params;
         const title = panelData.title;
-        const viewData = panelData.view!;
 
-        let tab: ITabRenderer;
+        const viewData = (panelData as LegacyState).view!;
 
         const contentComponent = viewData
             ? viewData.content.id
@@ -34,6 +41,8 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
         const tabComponent = viewData
             ? viewData.tab?.id
             : panelData.tabComponent;
+
+        let tab: ITabRenderer;
 
         if (tabComponent) {
             tab = createComponent(

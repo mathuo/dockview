@@ -2,14 +2,14 @@ import {
     IDisposable,
     CompositeDisposable,
     IValueDisposable,
-} from '../../lifecycle';
-import { addDisposableListener, Emitter, Event } from '../../events';
-import { ITab, Tab } from '../tab';
-import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { DockviewGroupPanel } from '../dockviewGroupPanel';
+} from '../../../lifecycle';
+import { addDisposableListener, Emitter, Event } from '../../../events';
+import { ITab, Tab } from '../tab/tab';
+import { DockviewComponent } from '../../dockviewComponent';
+import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { VoidContainer } from './voidContainer';
-import { toggleClass } from '../../dom';
-import { IDockviewPanel } from '../../dockview/dockviewPanel';
+import { toggleClass } from '../../../dom';
+import { IDockviewPanel } from '../../dockviewPanel';
 
 export interface TabDropIndexEvent {
     event: DragEvent;

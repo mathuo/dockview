@@ -6,14 +6,14 @@ import {
     ITabRenderer,
     WatermarkConstructor,
     IWatermarkRenderer,
-} from '../groupview/types';
+    DockviewDropTargets,
+} from './types';
 import {
     DockviewGroupPanel,
     DockviewGroupPanelApi,
-} from '../groupview/dockviewGroupPanel';
+} from './dockviewGroupPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
-import { DockviewDropTargets } from '../groupview/dnd';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
 import { Position } from '../dnd/droptarget';

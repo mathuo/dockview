@@ -43,7 +43,7 @@ export class LeafNode implements IView {
         return this.view.priority;
     }
 
-    get snap() {
+    get snap(): boolean | undefined {
         return this.view.snap;
     }
 
@@ -71,25 +71,25 @@ export class LeafNode implements IView {
             : this.maximumHeight;
     }
 
-    get orthogonalSize() {
+    get orthogonalSize(): number {
         return this._orthogonalSize;
     }
 
-    get size() {
+    get size(): number {
         return this._size;
     }
 
-    get element() {
+    get element(): HTMLElement {
         return this.view.element;
     }
 
-    get width() {
+    get width(): number {
         return this.orientation === Orientation.HORIZONTAL
             ? this.orthogonalSize
             : this.size;
     }
 
-    get height() {
+    get height(): number {
         return this.orientation === Orientation.HORIZONTAL
             ? this.size
             : this.orthogonalSize;
@@ -122,21 +122,21 @@ export class LeafNode implements IView {
         });
     }
 
-    public setVisible(visible: boolean) {
+    public setVisible(visible: boolean): void {
         if (this.view.setVisible) {
             this.view.setVisible(visible);
             this._onDidChange.fire({});
         }
     }
 
-    public layout(size: number, orthogonalSize: number) {
+    public layout(size: number, orthogonalSize: number): void {
         this._size = size;
         this._orthogonalSize = orthogonalSize;
 
         this.view.layout(this.width, this.height);
     }
 
-    public dispose() {
+    public dispose(): void {
         this._onDidChange.dispose();
         this._disposable.dispose();
     }

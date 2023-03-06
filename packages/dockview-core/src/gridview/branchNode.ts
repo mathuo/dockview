@@ -22,6 +22,8 @@ export class BranchNode extends CompositeDisposable implements IView {
     private splitview: Splitview;
     private _orthogonalSize: number;
     private _size: number;
+    private _childrenDisposable: IDisposable = Disposable.NONE;
+
     public readonly children: Node[] = [];
 
     private readonly _onDidChange = new Emitter<{
@@ -61,11 +63,11 @@ export class BranchNode extends CompositeDisposable implements IView {
         return this.splitview.maximumSize;
     }
 
-    get orthogonalSize() {
+    get orthogonalSize(): number {
         return this._orthogonalSize;
     }
 
-    get size() {
+    get size(): number {
         return this._size;
     }
 
@@ -168,7 +170,7 @@ export class BranchNode extends CompositeDisposable implements IView {
         this.setupChildrenEvents();
     }
 
-    setVisible(visible: boolean) {
+    setVisible(visible: boolean): void {
         for (const child of this.children) {
             child.setVisible(visible);
         }
@@ -258,7 +260,7 @@ export class BranchNode extends CompositeDisposable implements IView {
         return this.splitview.getViewCachedVisibleSize(index);
     }
 
-    public removeChild(index: number, sizing?: Sizing) {
+    public removeChild(index: number, sizing?: Sizing): void {
         if (index < 0 || index >= this.children.length) {
             throw new Error('Invalid index');
         }
@@ -279,9 +281,7 @@ export class BranchNode extends CompositeDisposable implements IView {
         return child;
     }
 
-    private _childrenDisposable: IDisposable = Disposable.NONE;
-
-    private setupChildrenEvents() {
+    private setupChildrenEvents(): void {
         this._childrenDisposable.dispose();
 
         this._childrenDisposable = Event.any(
@@ -295,7 +295,7 @@ export class BranchNode extends CompositeDisposable implements IView {
         });
     }
 
-    public dispose() {
+    public dispose(): void {
         super.dispose();
         this._childrenDisposable.dispose();
         this.children.forEach((child) => child.dispose());

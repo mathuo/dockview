@@ -1,9 +1,9 @@
 import { fireEvent } from '@testing-library/dom';
 import { LocalSelectionTransfer, PanelTransfer } from '../../dnd/dataTransfer';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { DockviewGroupPanel } from '../../groupview/dockviewGroupPanel';
-import { DockviewGroupPanelModel } from '../../groupview/dockviewGroupPanelModel';
-import { Tab } from '../../groupview/tab';
+import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
+import { DockviewGroupPanelModel } from '../../dockview/dockviewGroupPanelModel';
+import { Tab } from '../../dockview/components/tab/tab';
 
 describe('tab', () => {
     test('that empty tab has inactive-tab class', () => {

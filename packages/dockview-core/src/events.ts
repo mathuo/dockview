@@ -5,7 +5,7 @@ export interface Event<T> {
 }
 
 export interface EmitterOptions {
-    replay?: boolean;
+    readonly replay?: boolean;
 }
 
 export namespace Event {
@@ -35,7 +35,7 @@ export class Emitter<T> implements IDisposable {
 
     constructor(private readonly options?: EmitterOptions) {}
 
-    get event() {
+    get event(): Event<T> {
         if (!this._event) {
             this._event = (listener: (e: T) => void): IDisposable => {
                 if (this.options?.replay && this._last !== undefined) {
@@ -57,14 +57,14 @@ export class Emitter<T> implements IDisposable {
         return this._event;
     }
 
-    public fire(e: T) {
+    public fire(e: T): void {
         this._last = e;
         for (const listener of this._listeners) {
             listener(e);
         }
     }
 
-    public dispose() {
+    public dispose(): void {
         this._listeners = [];
         this._disposed = true;
     }

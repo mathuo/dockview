@@ -1,11 +1,8 @@
 import { CompositeDisposable } from '../../../lifecycle';
-import {
-    ITabRenderer,
-    GroupPanelPartInitParameters,
-} from '../../../groupview/types';
+import { ITabRenderer, GroupPanelPartInitParameters } from '../../types';
 import { addDisposableListener } from '../../../events';
 import { PanelUpdateEvent } from '../../../panel/types';
-import { DockviewGroupPanel } from '../../../groupview/dockviewGroupPanel';
+import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { createCloseButton } from '../../../svg';
 
 export class DefaultTab extends CompositeDisposable implements ITabRenderer {

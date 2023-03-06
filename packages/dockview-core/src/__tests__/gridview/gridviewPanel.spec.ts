@@ -1,5 +1,5 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { DockviewGroupPanel } from '../../groupview/dockviewGroupPanel';
+import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
 describe('gridviewPanel', () => {
     test('get panel', () => {

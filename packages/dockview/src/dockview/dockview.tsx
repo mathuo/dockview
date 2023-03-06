@@ -10,7 +10,7 @@ import {
     IContentRenderer,
     ITabRenderer,
     watchElementResize,
-    GroupPanel,
+    DockviewGroupPanel,
     DefaultDockviewDeserialzier,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
@@ -27,9 +27,9 @@ import {
 function createGroupControlElement(
     component: React.FunctionComponent<IDockviewGroupControlProps> | undefined,
     store: ReactPortalStore
-): ((groupPanel: GroupPanel) => IGroupControlRenderer) | undefined {
+): ((groupPanel: DockviewGroupPanel) => IGroupControlRenderer) | undefined {
     return component
-        ? (groupPanel: GroupPanel) => {
+        ? (groupPanel: DockviewGroupPanel) => {
               return new ReactGroupControlsRendererPart(
                   component,
                   store,

@@ -2,7 +2,7 @@ import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { DockviewApi } from '../../api/component.api';
 import { DockviewPanel } from '../../dockview/dockviewPanel';
 import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
-import { DockviewGroupPanel } from '../../groupview/dockviewGroupPanel';
+import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
 describe('dockviewPanel', () => {
     test('update title', () => {

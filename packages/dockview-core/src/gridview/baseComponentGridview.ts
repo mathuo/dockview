@@ -92,40 +92,40 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     protected readonly _bufferOnDidLayoutChange = new TickDelayedEvent();
 
-    get id() {
+    get id(): string {
         return this._id;
     }
 
-    get element() {
+    get element(): HTMLElement {
         return this._element;
     }
 
-    get size() {
+    get size(): number {
         return this._groups.size;
     }
 
-    get groups() {
+    get groups(): T[] {
         return Array.from(this._groups.values()).map((_) => _.value);
     }
 
-    get width() {
+    get width(): number {
         return this.gridview.width;
     }
 
-    get height() {
+    get height(): number {
         return this.gridview.height;
     }
 
-    get minimumHeight() {
+    get minimumHeight(): number {
         return this.gridview.minimumHeight;
     }
-    get maximumHeight() {
+    get maximumHeight(): number {
         return this.gridview.maximumHeight;
     }
-    get minimumWidth() {
+    get minimumWidth(): number {
         return this.gridview.minimumWidth;
     }
-    get maximumWidth() {
+    get maximumWidth(): number {
         return this.gridview.maximumWidth;
     }
 
@@ -176,16 +176,20 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     public abstract clear(): void;
 
-    public setVisible(panel: T, visible: boolean) {
+    public setVisible(panel: T, visible: boolean): void {
         this.gridview.setViewVisible(getGridLocation(panel.element), visible);
         this._onDidLayoutChange.fire();
     }
 
-    public isVisible(panel: T) {
+    public isVisible(panel: T): boolean {
         return this.gridview.isViewVisible(getGridLocation(panel.element));
     }
 
-    protected doAddGroup(group: T, location: number[] = [0], size?: number) {
+    protected doAddGroup(
+        group: T,
+        location: number[] = [0],
+        size?: number
+    ): void {
         this.gridview.addView(group, size ?? Sizing.Distribute, location);
 
         this._onDidAddGroup.fire(group);
@@ -196,7 +200,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
     protected doRemoveGroup(
         group: T,
         options?: { skipActive?: boolean; skipDispose?: boolean }
-    ) {
+    ): T {
         if (!this._groups.has(group.id)) {
             throw new Error('invalid operation');
         }
@@ -228,7 +232,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         return this._groups.get(id)?.value;
     }
 
-    public doSetGroupActive(group: T | undefined, skipFocus?: boolean) {
+    public doSetGroupActive(group: T | undefined, skipFocus?: boolean): void {
         if (this._activeGroup === group) {
             return;
         }
@@ -251,11 +255,11 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this._onDidActiveGroupChange.fire(group);
     }
 
-    public removeGroup(group: T) {
+    public removeGroup(group: T): void {
         this.doRemoveGroup(group);
     }
 
-    public moveToNext(options?: MovementOptions2) {
+    public moveToNext(options?: MovementOptions2): void {
         if (!options) {
             options = {};
         }
@@ -271,7 +275,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.doSetGroupActive(next as T);
     }
 
-    public moveToPrevious(options?: MovementOptions2) {
+    public moveToPrevious(options?: MovementOptions2): void {
         if (!options) {
             options = {};
         }

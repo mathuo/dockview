@@ -25,7 +25,10 @@ export function watchElementResize(
     };
 }
 
-export const removeClasses = (element: HTMLElement, ...classes: string[]) => {
+export const removeClasses = (
+    element: HTMLElement,
+    ...classes: string[]
+): void => {
     for (const classname of classes) {
         if (element.classList.contains(classname)) {
             element.classList.remove(classname);
@@ -33,7 +36,10 @@ export const removeClasses = (element: HTMLElement, ...classes: string[]) => {
     }
 };
 
-export const addClasses = (element: HTMLElement, ...classes: string[]) => {
+export const addClasses = (
+    element: HTMLElement,
+    ...classes: string[]
+): void => {
     for (const classname of classes) {
         if (!element.classList.contains(classname)) {
             element.classList.add(classname);
@@ -45,7 +51,7 @@ export const toggleClass = (
     element: HTMLElement,
     className: string,
     isToggled: boolean
-) => {
+): void => {
     const hasClass = element.classList.contains(className);
     if (isToggled && !hasClass) {
         element.classList.add(className);
@@ -74,8 +80,8 @@ export function getElementsByTagName(tag: string): HTMLElement[] {
 }
 
 export interface IFocusTracker extends IDisposable {
-    onDidFocus: Event<void>;
-    onDidBlur: Event<void>;
+    readonly onDidFocus: Event<void>;
+    readonly onDidBlur: Event<void>;
     refreshState?(): void;
 }
 
@@ -153,11 +159,11 @@ class FocusTracker extends CompositeDisposable implements IFocusTracker {
         }
     }
 
-    refreshState() {
+    refreshState(): void {
         this._refreshStateHandler();
     }
 
-    public dispose() {
+    public dispose(): void {
         super.dispose();
 
         this._onDidBlur.dispose();

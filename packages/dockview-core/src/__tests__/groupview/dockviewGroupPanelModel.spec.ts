@@ -3,18 +3,16 @@ import {
     GroupPanelUpdateEvent,
     GroupviewPanelState,
     IGroupPanelInitParameters,
-} from '../../groupview/types';
-import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     ITabRenderer,
     IWatermarkRenderer,
-} from '../../groupview/types';
+} from '../../dockview/types';
 import { PanelUpdateEvent } from '../../panel/types';
 import {
     DockviewGroupPanelModel,
     GroupOptions,
-} from '../../groupview/dockviewGroupPanelModel';
+} from '../../dockview/dockviewGroupPanelModel';
 import { fireEvent } from '@testing-library/dom';
 import { LocalSelectionTransfer, PanelTransfer } from '../../dnd/dataTransfer';
 import { CompositeDisposable } from '../../lifecycle';
@@ -24,7 +22,7 @@ import {
     IDockviewPanelModel,
     DockviewPanelModel,
 } from '../../dockview/dockviewPanelModel';
-import { DockviewGroupPanel } from '../../groupview/dockviewGroupPanel';
+import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
 enum GroupChangeKind2 {
     ADD_PANEL,
