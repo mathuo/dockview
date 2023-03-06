@@ -1,5 +1,8 @@
-import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
-import { GroupPanel } from '../../groupview/groupviewPanel';
+import {
+    DockviewComponent,
+    IDockviewComponent,
+} from '../../dockview/dockviewComponent';
+import { DockviewPanelModel } from '../../dockview/dockviewPanelModel';
 import { IContentRenderer, ITabRenderer } from '../../groupview/types';
 
 describe('dockviewGroupPanel', () => {
@@ -20,19 +23,30 @@ describe('dockviewGroupPanel', () => {
             return partial as IContentRenderer;
         });
 
-        const content = new contentMock();
-        const tab = new tabMock();
-
-        const cut = new DockviewGroupPanel({
-            content,
-            tab,
-            contentComponent: 'contentComponent',
+        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
+            return {
+                options: {
+                    components: {
+                        contentComponent: contentMock,
+                    },
+                    tabComponents: {
+                        tabComponent: tabMock,
+                    },
+                },
+            };
         });
+
+        const cut = new DockviewPanelModel(
+            <IDockviewComponent>new accessorMock(),
+            'id',
+            'contentComponent',
+            'tabComponent'
+        );
 
         cut.dispose();
 
-        expect(content.dispose).toHaveBeenCalled();
-        expect(tab.dispose).toHaveBeenCalled();
+        expect(cut.content.dispose).toHaveBeenCalled();
+        expect(cut.tab.dispose).toHaveBeenCalled();
     });
 
     test('that update is called on content and tab renderers when present', () => {
@@ -52,24 +66,34 @@ describe('dockviewGroupPanel', () => {
             return partial as IContentRenderer;
         });
 
-        const content = new contentMock();
-        const tab = new tabMock();
-
-        const cut = new DockviewGroupPanel({
-            content,
-            tab,
-            contentComponent: 'contentComponent',
+        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
+            return {
+                options: {
+                    components: {
+                        contentComponent: contentMock,
+                    },
+                    tabComponents: {
+                        tabComponent: tabMock,
+                    },
+                },
+            };
         });
+        const cut = new DockviewPanelModel(
+            <IDockviewComponent>new accessorMock(),
+            'id',
+            'contentComponent',
+            'tabComponent'
+        );
 
         cut.update({
             params: {},
         });
 
-        expect(content.update).toHaveBeenCalled();
-        expect(tab.update).toHaveBeenCalled();
+        expect(cut.content.update).toHaveBeenCalled();
+        expect(cut.tab.update).toHaveBeenCalled();
     });
 
-    test('test1', () => {
+    test('that events are fired', () => {
         const contentMock = jest.fn<IContentRenderer, []>(() => {
             const partial: Partial<IContentRenderer> = {
                 element: document.createElement('div'),
@@ -88,44 +112,60 @@ describe('dockviewGroupPanel', () => {
             return partial as IContentRenderer;
         });
 
-        const content = new contentMock();
-        const tab = new tabMock();
-
-        let cut = new DockviewGroupPanel({
-            content,
-            tab,
-            contentComponent: 'contentComponent',
+        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
+            return {
+                options: {
+                    components: {
+                        contentComponent: contentMock,
+                    },
+                    tabComponents: {
+                        tabComponent: tabMock,
+                    },
+                },
+            };
         });
+        const cut = new DockviewPanelModel(
+            <IDockviewComponent>new accessorMock(),
+            'id',
+            'contentComponent',
+            'tabComponent'
+        );
 
         const group1 = jest.fn() as any;
         const group2 = jest.fn() as any;
-        cut.updateParentGroup(group1 as GroupPanel, false);
+        cut.updateParentGroup(group1, false);
 
-        expect(content.onGroupChange).toHaveBeenNthCalledWith(1, group1);
-        expect(tab.onGroupChange).toHaveBeenNthCalledWith(1, group1);
-        expect(content.onPanelVisibleChange).toHaveBeenNthCalledWith(1, false);
-        expect(tab.onPanelVisibleChange).toHaveBeenNthCalledWith(1, false);
-        expect(content.onGroupChange).toHaveBeenCalledTimes(1);
-        expect(tab.onGroupChange).toHaveBeenCalledTimes(1);
-        expect(content.onPanelVisibleChange).toHaveBeenCalledTimes(1);
-        expect(tab.onPanelVisibleChange).toHaveBeenCalledTimes(1);
+        expect(cut.content.onGroupChange).toHaveBeenNthCalledWith(1, group1);
+        expect(cut.tab.onGroupChange).toHaveBeenNthCalledWith(1, group1);
+        expect(cut.content.onPanelVisibleChange).toHaveBeenNthCalledWith(
+            1,
+            false
+        );
+        expect(cut.tab.onPanelVisibleChange).toHaveBeenNthCalledWith(1, false);
+        expect(cut.content.onGroupChange).toHaveBeenCalledTimes(1);
+        expect(cut.tab.onGroupChange).toHaveBeenCalledTimes(1);
+        expect(cut.content.onPanelVisibleChange).toHaveBeenCalledTimes(1);
+        expect(cut.tab.onPanelVisibleChange).toHaveBeenCalledTimes(1);
 
-        cut.updateParentGroup(group1 as GroupPanel, true);
+        cut.updateParentGroup(group1, true);
 
-        expect(content.onPanelVisibleChange).toHaveBeenNthCalledWith(2, true);
-        expect(tab.onPanelVisibleChange).toHaveBeenNthCalledWith(2, true);
-        expect(content.onGroupChange).toHaveBeenCalledTimes(1);
-        expect(tab.onGroupChange).toHaveBeenCalledTimes(1);
-        expect(content.onPanelVisibleChange).toHaveBeenCalledTimes(2);
-        expect(tab.onPanelVisibleChange).toHaveBeenCalledTimes(2);
+        expect(cut.content.onPanelVisibleChange).toHaveBeenNthCalledWith(
+            2,
+            true
+        );
+        expect(cut.tab.onPanelVisibleChange).toHaveBeenNthCalledWith(2, true);
+        expect(cut.content.onGroupChange).toHaveBeenCalledTimes(1);
+        expect(cut.tab.onGroupChange).toHaveBeenCalledTimes(1);
+        expect(cut.content.onPanelVisibleChange).toHaveBeenCalledTimes(2);
+        expect(cut.tab.onPanelVisibleChange).toHaveBeenCalledTimes(2);
 
-        cut.updateParentGroup(group2 as GroupPanel, true);
+        cut.updateParentGroup(group2, true);
 
-        expect(content.onGroupChange).toHaveBeenNthCalledWith(2, group2);
-        expect(tab.onGroupChange).toHaveBeenNthCalledWith(2, group2);
-        expect(content.onGroupChange).toHaveBeenCalledTimes(2);
-        expect(tab.onGroupChange).toHaveBeenCalledTimes(2);
-        expect(content.onPanelVisibleChange).toHaveBeenCalledTimes(2);
-        expect(tab.onPanelVisibleChange).toHaveBeenCalledTimes(2);
+        expect(cut.content.onGroupChange).toHaveBeenNthCalledWith(2, group2);
+        expect(cut.tab.onGroupChange).toHaveBeenNthCalledWith(2, group2);
+        expect(cut.content.onGroupChange).toHaveBeenCalledTimes(2);
+        expect(cut.tab.onGroupChange).toHaveBeenCalledTimes(2);
+        expect(cut.content.onPanelVisibleChange).toHaveBeenCalledTimes(2);
+        expect(cut.tab.onPanelVisibleChange).toHaveBeenCalledTimes(2);
     });
 });

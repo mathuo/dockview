@@ -7,9 +7,9 @@ import {
 } from '../../../groupview/types';
 import { CompositeDisposable } from '../../../lifecycle';
 import { PanelUpdateEvent } from '../../../panel/types';
-import { IGroupPanelView } from '../../../dockview/defaultGroupPanelView';
 import { GroupPanel } from '../../../groupview/groupviewPanel';
 import { IDockviewPanel } from '../../../dockview/dockviewPanel';
+import { IDockviewPanelModel } from '../../../dockview/dockviewPanelModel';
 
 class TestContentRenderer
     extends CompositeDisposable
@@ -77,7 +77,7 @@ describe('contentContainer', () => {
         const panel = {
             view: {
                 content: contentRenderer,
-            } as Partial<IGroupPanelView>,
+            } as Partial<IDockviewPanelModel>,
         } as Partial<IDockviewPanel>;
 
         cut.openPanel(panel as IDockviewPanel);
@@ -111,7 +111,7 @@ describe('contentContainer', () => {
         const panel2 = {
             view: {
                 content: contentRenderer2,
-            } as Partial<IGroupPanelView>,
+            } as Partial<IDockviewPanelModel>,
         } as Partial<IDockviewPanel>;
 
         cut.openPanel(panel2 as IDockviewPanel);

@@ -1,5 +1,6 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import {
+    GroupPanelUpdateEvent,
     GroupviewPanelState,
     IGroupPanelInitParameters,
 } from '../../groupview/types';
@@ -11,21 +12,53 @@ import {
 } from '../../groupview/types';
 import { PanelUpdateEvent } from '../../panel/types';
 import { GroupOptions, Groupview } from '../../groupview/groupview';
-import {
-    DefaultGroupPanelView,
-    IGroupPanelView,
-} from '../../dockview/defaultGroupPanelView';
 import { GroupPanel } from '../../groupview/groupviewPanel';
 import { fireEvent } from '@testing-library/dom';
 import { LocalSelectionTransfer, PanelTransfer } from '../../dnd/dataTransfer';
 import { CompositeDisposable } from '../../lifecycle';
 import { DockviewPanelApi } from '../../api/dockviewPanelApi';
 import { IDockviewPanel } from '../../dockview/dockviewPanel';
+import {
+    IDockviewPanelModel,
+    DockviewPanelModel,
+} from '../../dockview/dockviewPanelModel';
 
 enum GroupChangeKind2 {
     ADD_PANEL,
     REMOVE_PANEL,
     PANEL_ACTIVE,
+}
+
+class TestModel implements IDockviewPanelModel {
+    readonly content: IContentRenderer;
+    readonly contentComponent: string;
+    readonly tab: ITabRenderer;
+
+    constructor(id: string) {
+        this.content = new TestHeaderPart(id);
+        this.contentComponent = id;
+        this.tab = new TestContentPart(id);
+    }
+
+    update(event: GroupPanelUpdateEvent): void {
+        //
+    }
+
+    layout(width: number, height: number): void {
+        //
+    }
+
+    init(params: GroupPanelPartInitParameters): void {
+        //
+    }
+
+    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void {
+        //
+    }
+
+    dispose(): void {
+        //
+    }
 }
 
 class Watermark implements IWatermarkRenderer {
@@ -140,9 +173,9 @@ class TestHeaderPart implements ITabRenderer {
 }
 
 export class TestPanel implements IDockviewPanel {
-    private _view: IGroupPanelView | undefined;
     private _group: GroupPanel | undefined;
     private _params: IGroupPanelInitParameters;
+    readonly view: IDockviewPanelModel;
 
     get title() {
         return '';
@@ -152,28 +185,19 @@ export class TestPanel implements IDockviewPanel {
         return this._group!;
     }
 
-    get view() {
-        return this._view;
-    }
-
     get params(): Record<string, any> {
         return {};
     }
 
     constructor(public readonly id: string, public api: DockviewPanelApi) {
+        this.view = new TestModel(id);
         this.init({
-            view: new DefaultGroupPanelView({
-                tab: new TestHeaderPart(id),
-                content: new TestContentPart(id),
-            }),
             title: `${id}`,
             params: {},
         });
     }
 
     init(params: IGroupPanelInitParameters) {
-        this._view = params.view;
-
         this._params = params;
     }
 
@@ -196,7 +220,6 @@ export class TestPanel implements IDockviewPanel {
     toJSON(): GroupviewPanelState {
         return {
             id: this.id,
-            view: this._view?.toJSON(),
             title: this._params?.title,
         };
     }
@@ -234,31 +257,6 @@ describe('groupview', () => {
         };
         groupview = new GroupPanel(dockview, 'groupview-1', options);
         groupview.initialize();
-    });
-
-    test('serialized layout shows active panel', () => {
-        const panel1 = new TestPanel('panel1', jest.fn() as any);
-        const panel2 = new TestPanel('panel2', jest.fn() as any);
-        const panel3 = new TestPanel('panel3', jest.fn() as any);
-
-        const groupview2 = new GroupPanel(dockview, 'groupview-2', {
-            tabHeight: 25,
-            panels: [panel1, panel2, panel3],
-            activePanel: panel2,
-        });
-        groupview2.initialize();
-
-        expect(groupview2.model.activePanel).toBe(panel2);
-
-        expect(
-            groupview2.element.querySelector('.content-part-panel1')
-        ).toBeFalsy();
-        expect(
-            groupview2.element.querySelector('.content-part-panel2')
-        ).toBeTruthy();
-        expect(
-            groupview2.element.querySelector('.content-part-panel3')
-        ).toBeFalsy();
     });
 
     test('panel events are captured during de-serialization', () => {

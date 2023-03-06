@@ -94,5 +94,5 @@ export interface GroupviewPanelState {
     tabComponent?: string;
     title?: string;
     params?: { [key: string]: any };
-    view: SerializedGroupPanelView; // depreciated
+    view?: SerializedGroupPanelView; // depreciated
 }

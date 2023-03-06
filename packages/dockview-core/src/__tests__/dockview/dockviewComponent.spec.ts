@@ -13,8 +13,6 @@ import {
     GroupviewPanelState,
     IGroupPanelInitParameters,
 } from '../../groupview/types';
-import { IGroupPanelView } from '../../dockview/defaultGroupPanelView';
-import { DefaultTab } from '../../dockview/components/tab/defaultTab';
 import { Emitter } from '../../events';
 import { IDockviewPanel } from '../../dockview/dockviewPanel';
 import {
@@ -22,6 +20,9 @@ import {
     DockviewPanelApiImpl,
 } from '../../api/dockviewPanelApi';
 import { DefaultDockviewDeserialzier } from '../../dockview/deserializer';
+import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
+import { DockviewPanelModelMock } from '../__mocks__/mockDockviewPanelMode';
+import { DefaultTab } from '../../dockview/components/tab/defaultTab';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -93,10 +94,6 @@ class PanelTabPartTest implements ITabRenderer {
         //noop
     }
 
-    toJSON(): object {
-        return { id: this.id };
-    }
-
     focus(): void {
         //noop
     }
@@ -107,43 +104,11 @@ class PanelTabPartTest implements ITabRenderer {
     }
 }
 
-class TestGroupPanelView implements IGroupPanelView {
-    readonly tab: ITabRenderer = new DefaultTab();
-
-    constructor(public readonly content: IContentRenderer) {
-        //
-    }
-
-    update(event: GroupPanelUpdateEvent): void {
-        //
-    }
-
-    layout(width: number, height: number): void {
-        //
-    }
-
-    init(params: GroupPanelPartInitParameters): void {
-        //
-    }
-
-    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void {
-        //
-    }
-
-    toJSON(): {} {
-        return {};
-    }
-
-    dispose(): void {
-        //
-    }
-}
-
 class TestGroupPanel implements IDockviewPanel {
     private _group: GroupPanel | undefined;
 
-    readonly view: IGroupPanelView;
     readonly api: DockviewPanelApi;
+    readonly view: IDockviewPanelModel;
 
     constructor(
         public readonly id: string,
@@ -152,8 +117,11 @@ class TestGroupPanel implements IDockviewPanel {
     ) {
         this.api = new DockviewPanelApiImpl(this, this._group!);
         this._group = new GroupPanel(accessor, id, {});
-        this.view = new TestGroupPanelView(
-            new PanelContentPartTest(id, 'component')
+        this.view = new DockviewPanelModelMock(
+            'component',
+            new PanelContentPartTest(id, 'component'),
+            'tabComponent',
+            new DefaultTab()
         );
     }
 
@@ -562,27 +530,27 @@ describe('dockviewComponent', () => {
             panels: {
                 panel1: {
                     id: 'panel1',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel1',
                 },
                 panel2: {
                     id: 'panel2',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel2',
                 },
                 panel3: {
                     id: 'panel3',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel3',
                 },
                 panel4: {
                     id: 'panel4',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel4',
                 },
                 panel5: {
                     id: 'panel5',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel5',
                 },
             },
@@ -647,27 +615,27 @@ describe('dockviewComponent', () => {
             panels: {
                 panel1: {
                     id: 'panel1',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel1',
                 },
                 panel2: {
                     id: 'panel2',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel2',
                 },
                 panel3: {
                     id: 'panel3',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel3',
                 },
                 panel4: {
                     id: 'panel4',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel4',
                 },
                 panel5: {
                     id: 'panel5',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel5',
                 },
             },
@@ -1098,17 +1066,14 @@ describe('dockviewComponent', () => {
                 view_1: {
                     id: 'view_1',
                     title: 'view_1_title',
-                    view: {},
                 },
                 view_2: {
                     id: 'view_2',
                     title: 'view_2_title',
-                    view: {},
                 },
                 view_3: {
                     id: 'view_3',
                     title: 'view_3_title',
-                    view: {},
                 },
             },
             options: {},
@@ -1602,27 +1567,27 @@ describe('dockviewComponent', () => {
             panels: {
                 panel1: {
                     id: 'panel1',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel1',
                 },
                 panel2: {
                     id: 'panel2',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel2',
                 },
                 panel3: {
                     id: 'panel3',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel3',
                 },
                 panel4: {
                     id: 'panel4',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel4',
                 },
                 panel5: {
                     id: 'panel5',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel5',
                 },
             },
@@ -1736,30 +1701,28 @@ describe('dockviewComponent', () => {
             panels: {
                 panel1: {
                     id: 'panel1',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel1',
                 },
                 panel2: {
                     id: 'panel2',
-                    view: {
-                        content: { id: 'default' },
-                        tab: { id: '__non__existant_tab__' },
-                    },
+                    contentComponent: 'default',
+                    tabComponent: '__non__existant_tab__',
                     title: 'panel2',
                 },
                 panel3: {
                     id: 'panel3',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel3',
                 },
                 panel4: {
                     id: 'panel4',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel4',
                 },
                 panel5: {
                     id: 'panel5',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel5',
                 },
             },
@@ -1863,15 +1826,13 @@ describe('dockviewComponent', () => {
             panels: {
                 panel1: {
                     id: 'panel1',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel1',
                 },
                 panel2: {
                     id: 'panel2',
-                    view: {
-                        content: { id: 'default' },
-                        tab: { id: 'test_tab_id' },
-                    },
+                    contentComponent: 'default',
+                    tabComponent: 'test_tab_id',
                     title: 'panel2',
                 },
             },
@@ -1926,20 +1887,18 @@ describe('dockviewComponent', () => {
             panels: {
                 panel1: {
                     id: 'panel1',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel1',
                 },
                 panel2: {
                     id: 'panel2',
-                    view: {
-                        content: { id: 'default' },
-                        tab: { id: 'test_tab_id' },
-                    },
+                    contentComponent: 'default',
+                    tabComponent: 'test_tab_id',
                     title: 'panel2',
                 },
                 panel3: {
                     id: 'panel3',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel3',
                 },
             },
@@ -1959,7 +1918,7 @@ describe('dockviewComponent', () => {
         expect(viewQuery2.length).toBe(1);
 
         const viewQuery3 = group.element.querySelectorAll(
-            '.groupview > .tabs-and-actions-container > .tabs-container > .tab > .panel-tab-part-test_tab_id'
+            '.groupview > .tabs-and-actions-container > .tabs-container > .tab > .panel-tab-part-panel2'
         );
         expect(viewQuery3.length).toBe(1);
     });
@@ -2009,7 +1968,7 @@ describe('dockviewComponent', () => {
             panels: {
                 panel1: {
                     id: 'panel1',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel1',
                 },
             },
@@ -2061,12 +2020,12 @@ describe('dockviewComponent', () => {
             panels: {
                 panel1: {
                     id: 'panel1',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel1',
                 },
                 panel2: {
                     id: 'panel2',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel2',
                 },
             },
@@ -2124,12 +2083,12 @@ describe('dockviewComponent', () => {
             panels: {
                 panel1: {
                     id: 'panel1',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel1',
                 },
                 panel2: {
                     id: 'panel2',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel2',
                 },
             },
@@ -2196,18 +2155,18 @@ describe('dockviewComponent', () => {
             panels: {
                 panel1: {
                     id: 'panel1',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel1',
                 },
 
                 panel2: {
                     id: 'panel2',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel2',
                 },
                 panel3: {
                     id: 'panel3',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel3',
                 },
             },
@@ -2256,7 +2215,7 @@ describe('dockviewComponent', () => {
             panels: {
                 panel1: {
                     id: 'panel1',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel1',
                 },
             },
@@ -2325,17 +2284,17 @@ describe('dockviewComponent', () => {
             panels: {
                 panel1: {
                     id: 'panel1',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel1',
                 },
                 panel2: {
                     id: 'panel2',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel2',
                 },
                 panel3: {
                     id: 'panel3',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
                     title: 'panel3',
                 },
             },
