@@ -1,13 +1,12 @@
 import * as React from 'react';
 import { render } from '@testing-library/react';
-import { SplitviewApi } from '../../../api/component.api';
+import { SplitviewApi, Orientation } from 'dockview-core';
 import {
     ISplitviewPanelProps,
     SplitviewReact,
     SplitviewReadyEvent,
-} from '../../../react/splitview/splitview';
-import { PanelCollection } from '../../../react/types';
-import { Orientation } from '../../../splitview/core/splitview';
+} from '../../../splitview/splitview';
+import { PanelCollection } from '../../../types';
 import { setMockRefElement } from '../../__test_utils__/utils';
 
 describe('splitview react', () => {

@@ -1,13 +1,12 @@
 import * as React from 'react';
 import { render } from '@testing-library/react';
-import { GridviewApi } from '../../../api/component.api';
+import { GridviewApi, Orientation } from 'dockview-core';
 import {
     IGridviewPanelProps,
     GridviewReact,
     GridviewReadyEvent,
-} from '../../../react/gridview/gridview';
-import { PanelCollection } from '../../../react/types';
-import { Orientation } from '../../../splitview/core/splitview';
+} from '../../../gridview/gridview';
+import { PanelCollection } from '../../../types';
 import { setMockRefElement } from '../../__test_utils__/utils';
 
 describe('gridview react', () => {

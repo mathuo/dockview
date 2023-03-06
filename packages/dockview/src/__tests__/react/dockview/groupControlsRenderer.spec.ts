@@ -1,9 +1,5 @@
-import { Groupview } from '../../../groupview/groupview';
-import {
-    GroupPanel,
-    GroupviewPanelApi,
-} from '../../../groupview/groupviewPanel';
-import { ReactGroupControlsRendererPart } from '../../../react/dockview/groupControlsRenderer';
+import { GroupPanel, GroupviewPanelApi, Groupview } from 'dockview-core';
+import { ReactGroupControlsRendererPart } from '../../../dockview/groupControlsRenderer';
 
 describe('groupControlsRenderer', () => {
     test('#1', () => {

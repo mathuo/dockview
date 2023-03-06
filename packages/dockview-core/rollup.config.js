@@ -4,7 +4,6 @@ const { join } = require('path');
 const typescript = require('@rollup/plugin-typescript');
 const { terser } = require('rollup-plugin-terser');
 const postcss = require('rollup-plugin-postcss');
-const nodeResolve = require('@rollup/plugin-node-resolve');
 
 const { name, version, homepage, license } = require('./package.json');
 const main = join(__dirname, './scripts/rollupEntryTarget.ts');
@@ -38,9 +37,9 @@ function getInput(options) {
 }
 
 function createBundle(format, options) {
-    const { withStyles, isMinified } = options;
+    const { withStyles, isMinified, isReact } = options;
     const input = getInput(options);
-    const file = outputFile(format, isMinified, withStyles);
+    const file = outputFile(format, isMinified, withStyles, isReact);
 
     const external = [];
 
@@ -59,9 +58,6 @@ function createBundle(format, options) {
     };
 
     const plugins = [
-        nodeResolve({
-            include: ['node_modules/dockview-core/**'],
-        }),
         typescript({
             tsconfig: 'tsconfig.esm.json',
             incremental: false,
@@ -80,13 +76,6 @@ function createBundle(format, options) {
 
     if (format === 'umd') {
         output['name'] = name;
-    }
-
-    external.push('react', 'react-dom');
-
-    if (format === 'umd') {
-        output.globals['react'] = 'React';
-        output.globals['react-dom'] = 'ReactDOM';
     }
 
     return {
