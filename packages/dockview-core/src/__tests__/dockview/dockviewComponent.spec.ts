@@ -93,66 +93,6 @@ class PanelTabPartTest implements ITabRenderer {
     }
 }
 
-class TestGroupPanel implements IDockviewPanel {
-    private _group: DockviewGroupPanel | undefined;
-
-    readonly api: DockviewPanelApi;
-    readonly view: IDockviewPanelModel;
-
-    constructor(
-        public readonly id: string,
-        public readonly title: string,
-        accessor: DockviewComponent
-    ) {
-        this.api = new DockviewPanelApiImpl(this, this._group!);
-        this._group = new DockviewGroupPanel(accessor, id, {});
-        this.view = new DockviewPanelModelMock(
-            'component',
-            new PanelContentPartTest(id, 'component'),
-            'tabComponent',
-            new DefaultTab()
-        );
-    }
-
-    get params(): Record<string, any> {
-        return {};
-    }
-    get group(): DockviewGroupPanel {
-        return this._group!;
-    }
-
-    updateParentGroup(group: DockviewGroupPanel, isGroupActive: boolean): void {
-        this._group = group;
-    }
-
-    init(params: IGroupPanelInitParameters): void {
-        //
-    }
-
-    layout(width: number, height: number): void {
-        //
-    }
-
-    focus(): void {
-        //
-    }
-
-    toJSON(): GroupviewPanelState {
-        return {
-            id: this.id,
-            title: this.title,
-        };
-    }
-
-    update(event: GroupPanelUpdateEvent): void {
-        //
-    }
-
-    dispose(): void {
-        //
-    }
-}
-
 describe('dockviewComponent', () => {
     let container: HTMLElement;
     let dockview: DockviewComponent;
@@ -990,15 +930,6 @@ describe('dockviewComponent', () => {
 
     test('#1', () => {
         dockview.layout(500, 500);
-        dockview.deserializer = {
-            fromJSON: (panelData: GroupviewPanelState): IDockviewPanel => {
-                return new TestGroupPanel(
-                    panelData.id,
-                    panelData.title || '',
-                    dockview
-                );
-            },
-        };
 
         const panel1 = dockview.addPanel({
             id: 'panel1',
@@ -1053,14 +984,17 @@ describe('dockviewComponent', () => {
             panels: {
                 view_1: {
                     id: 'view_1',
+                    contentComponent: 'default',
                     title: 'view_1_title',
                 },
                 view_2: {
                     id: 'view_2',
+                    contentComponent: 'default',
                     title: 'view_2_title',
                 },
                 view_3: {
                     id: 'view_3',
+                    contentComponent: 'default',
                     title: 'view_3_title',
                 },
             },
