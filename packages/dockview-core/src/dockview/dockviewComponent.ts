@@ -16,7 +16,7 @@ import {
     DockviewDropTargets,
 } from './types';
 import { sequentialNumberGenerator } from '../math';
-import { IPanelDeserializer } from './deserializer';
+import { DefaultDockviewDeserialzier } from './deserializer';
 import { createComponent } from '../panel/componentFactory';
 import {
     AddGroupOptions,
@@ -87,7 +87,6 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidDrop: Event<DockviewDropEvent>;
     readonly orientation: Orientation;
     tabHeight: number | undefined;
-    deserializer: IPanelDeserializer | undefined;
     updateOptions(options: DockviewComponentUpdateOptions): void;
     moveGroupOrPanel(
         referenceGroup: DockviewGroupPanel,
@@ -125,8 +124,8 @@ export class DockviewComponent
     implements IDockviewComponent
 {
     private readonly nextGroupId = sequentialNumberGenerator();
-    private _deserializer: IPanelDeserializer | undefined;
-    private _api: DockviewApi;
+    private readonly _deserializer = new DefaultDockviewDeserialzier(this);
+    private readonly _api: DockviewApi;
     private _options: Exclude<DockviewComponentOptions, 'orientation'>;
     private watermark: IWatermarkRenderer | null = null;
 
@@ -159,14 +158,6 @@ export class DockviewComponent
 
     get panels(): IDockviewPanel[] {
         return this.groups.flatMap((group) => group.panels);
-    }
-
-    get deserializer(): IPanelDeserializer | undefined {
-        return this._deserializer;
-    }
-
-    set deserializer(value: IPanelDeserializer | undefined) {
-        this._deserializer = value;
     }
 
     get options(): DockviewComponentOptions {
@@ -428,9 +419,6 @@ export class DockviewComponent
     fromJSON(data: SerializedDockview): void {
         this.clear();
 
-        if (!this.deserializer) {
-            throw new Error('no deserializer provided');
-        }
         const { grid, panels, options, activeGroup } = data;
 
         if (typeof options?.tabHeight === 'number') {
@@ -454,7 +442,7 @@ export class DockviewComponent
                 this._onDidAddGroup.fire(group);
 
                 for (const child of views) {
-                    const panel = this.deserializer!.fromJSON(
+                    const panel = this._deserializer.fromJSON(
                         panels[child],
                         group
                     );
