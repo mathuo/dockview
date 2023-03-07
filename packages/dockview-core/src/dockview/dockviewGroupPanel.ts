@@ -87,7 +87,7 @@ export class DockviewGroupPanel
         );
     }
 
-    initialize() {
+    initialize(): void {
         this._model.initialize();
     }
 
@@ -106,6 +106,7 @@ export class DockviewGroupPanel
     }
 
     toJSON(): any {
+        // TODO fix typing
         return this.model.toJSON();
     }
 }

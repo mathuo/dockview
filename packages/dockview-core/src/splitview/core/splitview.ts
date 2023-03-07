@@ -105,6 +105,8 @@ export class Splitview {
     private contentSize = 0;
     private _proportions: number[] | undefined = undefined;
     private proportionalLayout: boolean;
+    private _startSnappingEnabled = true;
+    private _endSnappingEnabled = true;
 
     private readonly _onDidSashEnd = new Emitter<void>();
     readonly onDidSashEnd = this._onDidSashEnd.event;
@@ -113,7 +115,7 @@ export class Splitview {
     private readonly _onDidRemoveView = new Emitter<IView>();
     readonly onDidRemoveView = this._onDidRemoveView.event;
 
-    get size() {
+    get size(): number {
         return this._size;
     }
 
@@ -121,7 +123,7 @@ export class Splitview {
         this._size = value;
     }
 
-    get orthogonalSize() {
+    get orthogonalSize(): number {
         return this._orthogonalSize;
     }
 
@@ -129,15 +131,15 @@ export class Splitview {
         this._orthogonalSize = value;
     }
 
-    public get length() {
+    public get length(): number {
         return this.views.length;
     }
 
-    public get proportions() {
+    public get proportions(): number[] | undefined {
         return this._proportions ? [...this._proportions] : undefined;
     }
 
-    get orientation() {
+    get orientation(): Orientation {
         return this._orientation;
     }
 
@@ -166,10 +168,10 @@ export class Splitview {
             : this.views.reduce((r, item) => r + item.maximumSize, 0);
     }
 
-    private _startSnappingEnabled = true;
     get startSnappingEnabled(): boolean {
         return this._startSnappingEnabled;
     }
+
     set startSnappingEnabled(startSnappingEnabled: boolean) {
         if (this._startSnappingEnabled === startSnappingEnabled) {
             return;
@@ -179,10 +181,10 @@ export class Splitview {
         this.updateSashEnablement();
     }
 
-    private _endSnappingEnabled = true;
     get endSnappingEnabled(): boolean {
         return this._endSnappingEnabled;
     }
+
     set endSnappingEnabled(endSnappingEnabled: boolean) {
         if (this._endSnappingEnabled === endSnappingEnabled) {
             return;
@@ -321,7 +323,7 @@ export class Splitview {
         this.relayout(lowPriorityIndexes, highPriorityIndexes);
     }
 
-    public getViews<T extends IView>() {
+    public getViews<T extends IView>(): T[] {
         return this.views.map((x) => x.view as T);
     }
 
@@ -345,7 +347,7 @@ export class Splitview {
         size: number | Sizing = { type: 'distribute' },
         index: number = this.views.length,
         skipLayout?: boolean
-    ) {
+    ): void {
         const container = document.createElement('div');
         container.className = 'view';
 
@@ -622,7 +624,7 @@ export class Splitview {
         return viewItem.cachedVisibleSize;
     }
 
-    public moveView(from: number, to: number) {
+    public moveView(from: number, to: number): void {
         const cachedVisibleSize = this.getViewCachedVisibleSize(from);
         const sizing =
             typeof cachedVisibleSize === 'undefined'
@@ -632,7 +634,7 @@ export class Splitview {
         this.addView(view, sizing, to);
     }
 
-    public layout(size: number, orthogonalSize: number) {
+    public layout(size: number, orthogonalSize: number): void {
         const previousSize = Math.max(this.size, this.contentSize);
         this.size = size;
         this.orthogonalSize = orthogonalSize;
@@ -672,7 +674,7 @@ export class Splitview {
     private relayout(
         lowPriorityIndexes?: number[],
         highPriorityIndexes?: number[]
-    ) {
+    ): void {
         const contentSize = this.views.reduce((r, i) => r + i.size, 0);
 
         this.resize(
@@ -687,7 +689,7 @@ export class Splitview {
         this.saveProportions();
     }
 
-    private distributeEmptySpace(lowPriorityIndex?: number) {
+    private distributeEmptySpace(lowPriorityIndex?: number): void {
         const contentSize = this.views.reduce((r, i) => r + i.size, 0);
         let emptyDelta = this.size - contentSize;
 
@@ -733,7 +735,7 @@ export class Splitview {
         }
     }
 
-    private layoutViews() {
+    private layoutViews(): void {
         this.contentSize = this.views.reduce((r, i) => r + i.size, 0);
         let sum = 0;
         const x: number[] = [];
@@ -875,7 +877,7 @@ export class Splitview {
         }
     }
 
-    private updateSash(sash: ISashItem, state: SashState) {
+    private updateSash(sash: ISashItem, state: SashState): void {
         toggleClass(sash.container, 'disabled', state === SashState.DISABLED);
         toggleClass(sash.container, 'enabled', state === SashState.ENABLED);
         toggleClass(sash.container, 'maximum', state === SashState.MAXIMUM);
@@ -1011,19 +1013,19 @@ export class Splitview {
         return delta;
     };
 
-    private createViewContainer() {
+    private createViewContainer(): HTMLElement {
         const element = document.createElement('div');
         element.className = 'view-container';
         return element;
     }
 
-    private createSashContainer() {
+    private createSashContainer(): HTMLElement {
         const element = document.createElement('div');
         element.className = 'sash-container';
         return element;
     }
 
-    private createContainer() {
+    private createContainer(): HTMLElement {
         const element = document.createElement('div');
         const orientationClassname =
             this._orientation === Orientation.HORIZONTAL
@@ -1033,7 +1035,7 @@ export class Splitview {
         return element;
     }
 
-    public dispose() {
+    public dispose(): void {
         this._onDidSashEnd.dispose();
         this._onDidAddView.dispose();
         this._onDidRemoveView.dispose();

@@ -25,30 +25,30 @@ export class Paneview extends CompositeDisposable implements IDisposable {
     private readonly _onDidChange = new Emitter<void>();
     readonly onDidChange: Event<void> = this._onDidChange.event;
 
-    get onDidAddView() {
+    get onDidAddView(): Event<PaneviewPanel> {
         return <Event<PaneviewPanel>>this.splitview.onDidAddView;
     }
-    get onDidRemoveView() {
+    get onDidRemoveView(): Event<PaneviewPanel> {
         return <Event<PaneviewPanel>>this.splitview.onDidRemoveView;
     }
 
-    get minimumSize() {
+    get minimumSize(): number {
         return this.splitview.minimumSize;
     }
 
-    get maximumSize() {
+    get maximumSize(): number {
         return this.splitview.maximumSize;
     }
 
-    get orientation() {
+    get orientation(): Orientation {
         return this.splitview.orientation;
     }
 
-    get size() {
+    get size(): number {
         return this.splitview.size;
     }
 
-    get orthogonalSize() {
+    get orthogonalSize(): number {
         return this.splitview.orthogonalSize;
     }
 
@@ -113,7 +113,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         size?: number | Sizing,
         index = this.splitview.length,
         skipLayout = false
-    ) {
+    ): void {
         const disposable = pane.onDidChangeExpansionState(() => {
             this.setupAnimation();
             this._onDidChange.fire(undefined);
@@ -134,7 +134,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         this.splitview.addView(pane, size, index, skipLayout);
     }
 
-    getViewSize(index: number) {
+    getViewSize(index: number): number {
         return this.splitview.getViewSize(index);
     }
 
@@ -145,7 +145,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
     public removePane(
         index: number,
         options: { skipDispose: boolean } = { skipDispose: false }
-    ) {
+    ): PaneItem {
         const paneItem = this.paneItems.splice(index, 1)[0];
         this.splitview.removeView(index);
 
@@ -157,7 +157,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         return paneItem;
     }
 
-    public moveView(from: number, to: number) {
+    public moveView(from: number, to: number): void {
         if (from === to) {
             return;
         }
@@ -176,7 +176,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         this.splitview.layout(size, orthogonalSize);
     }
 
-    private setupAnimation() {
+    private setupAnimation(): void {
         if (this.skipAnimation) {
             return;
         }
@@ -194,7 +194,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         }, 200);
     }
 
-    public dispose() {
+    public dispose(): void {
         super.dispose();
 
         if (this.animationTimer) {

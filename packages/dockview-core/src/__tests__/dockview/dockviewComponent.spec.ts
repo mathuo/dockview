@@ -1767,15 +1767,14 @@ describe('dockviewComponent', () => {
             panels: {
                 panel1: {
                     id: 'panel1',
-                    view: { content: { id: 'default' } },
+                    contentComponent: 'default',
+
                     title: 'panel1',
                 },
                 panel2: {
                     id: 'panel2',
-                    view: {
-                        content: { id: 'default' },
-                        tab: { id: 'test_tab_id' },
-                    },
+                    contentComponent: 'default',
+                    tabComponent: 'test_tab_id',
                     title: 'panel2',
                 },
             },

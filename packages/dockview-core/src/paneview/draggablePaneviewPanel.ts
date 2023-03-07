@@ -45,7 +45,7 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
         }
     }
 
-    private initDragFeatures() {
+    private initDragFeatures(): void {
         if (!this.header) {
             return;
         }
@@ -110,7 +110,7 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
         );
     }
 
-    private onDrop(event: DroptargetEvent) {
+    private onDrop(event: DroptargetEvent): void {
         const data = getPaneData();
 
         if (!data || data.viewId !== this.accessor.id) {
