@@ -23,16 +23,15 @@ export * from './splitview/core/options';
 
 export * from './paneview/paneview';
 export * from './gridview/gridview';
-export * from './groupview/groupview';
+export * from './dockview/dockviewGroupPanelModel';
 export * from './gridview/baseComponentGridview';
 
 export * from './paneview/draggablePaneviewPanel';
 
-export * from './groupview/panel/content';
-export * from './groupview/tab';
-export * from './groupview/dnd';
-export * from './groupview/types';
-export * from './groupview/groupviewPanel';
+export * from './dockview/components/panel/content';
+export * from './dockview/components/tab/tab';
+export * from './dockview/types';
+export * from './dockview/dockviewGroupPanel';
 
 export * from './dockview/options';
 export * from './dockview/dockviewPanel';
@@ -48,9 +47,8 @@ export { PaneviewComponentOptions } from './paneview/options';
 export * from './gridview/gridviewPanel';
 export * from './splitview/splitviewPanel';
 export * from './paneview/paneviewPanel';
-export * from './groupview/types';
+export * from './dockview/types';
 
-export { Event } from './events';
 export {
     Position,
     positionToDirection,

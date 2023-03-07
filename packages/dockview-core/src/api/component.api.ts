@@ -12,7 +12,7 @@ import { Direction } from '../gridview/baseComponentGridview';
 import {
     AddComponentOptions,
     IGridviewComponent,
-    SerializedGridview,
+    SerializedGridviewComponent,
 } from '../gridview/gridviewComponent';
 import { IGridviewPanel } from '../gridview/gridviewPanel';
 
@@ -30,7 +30,10 @@ import {
 } from '../splitview/splitviewComponent';
 import { IView, Orientation, Sizing } from '../splitview/core/splitview';
 import { ISplitviewPanel } from '../splitview/splitviewPanel';
-import { GroupPanel, IGroupviewPanel } from '../groupview/groupviewPanel';
+import {
+    DockviewGroupPanel,
+    IDockviewGroupPanel,
+} from '../dockview/dockviewGroupPanel';
 import { Emitter, Event } from '../events';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { PaneviewDropEvent } from '../paneview/draggablePaneviewPanel';
@@ -226,7 +229,7 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
     }
 }
 
-export class GridviewApi implements CommonApi<SerializedGridview> {
+export class GridviewApi implements CommonApi<SerializedGridviewComponent> {
     get minimumHeight(): number {
         return this.component.minimumHeight;
     }
@@ -312,11 +315,11 @@ export class GridviewApi implements CommonApi<SerializedGridview> {
         return this.component.getPanel(id);
     }
 
-    fromJSON(data: SerializedGridview): void {
+    fromJSON(data: SerializedGridviewComponent): void {
         return this.component.fromJSON(data);
     }
 
-    toJSON(): SerializedGridview {
+    toJSON(): SerializedGridviewComponent {
         return this.component.toJSON();
     }
 
@@ -362,15 +365,15 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.totalPanels;
     }
 
-    get onDidActiveGroupChange(): Event<GroupPanel | undefined> {
+    get onDidActiveGroupChange(): Event<DockviewGroupPanel | undefined> {
         return this.component.onDidActiveGroupChange;
     }
 
-    get onDidAddGroup(): Event<GroupPanel> {
+    get onDidAddGroup(): Event<DockviewGroupPanel> {
         return this.component.onDidAddGroup;
     }
 
-    get onDidRemoveGroup(): Event<GroupPanel> {
+    get onDidRemoveGroup(): Event<DockviewGroupPanel> {
         return this.component.onDidRemoveGroup;
     }
 
@@ -402,7 +405,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.panels;
     }
 
-    get groups(): GroupPanel[] {
+    get groups(): DockviewGroupPanel[] {
         return this.component.groups;
     }
 
@@ -410,7 +413,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.activePanel;
     }
 
-    get activeGroup(): GroupPanel | undefined {
+    get activeGroup(): DockviewGroupPanel | undefined {
         return this.component.activeGroup;
     }
 
@@ -440,7 +443,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.addPanel(options);
     }
 
-    addGroup(options?: AddGroupOptions): IGroupviewPanel {
+    addGroup(options?: AddGroupOptions): IDockviewGroupPanel {
         return this.component.addGroup(options);
     }
 
@@ -456,11 +459,11 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.closeAllGroups();
     }
 
-    removeGroup(group: IGroupviewPanel): void {
-        this.component.removeGroup(<GroupPanel>group);
+    removeGroup(group: IDockviewGroupPanel): void {
+        this.component.removeGroup(<DockviewGroupPanel>group);
     }
 
-    getGroup(id: string): GroupPanel | undefined {
+    getGroup(id: string): DockviewGroupPanel | undefined {
         return this.component.getPanel(id);
     }
 

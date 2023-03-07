@@ -1,15 +1,14 @@
 import { fireEvent } from '@testing-library/dom';
 import { Emitter, Event } from '../../../events';
-import { ContentContainer } from '../../../groupview/panel/content';
+import { ContentContainer } from '../../../dockview/components/panel/content';
 import {
     GroupPanelContentPartInitParameters,
     IContentRenderer,
-} from '../../../groupview/types';
+} from '../../../dockview/types';
 import { CompositeDisposable } from '../../../lifecycle';
 import { PanelUpdateEvent } from '../../../panel/types';
-import { IGroupPanelView } from '../../../dockview/defaultGroupPanelView';
-import { GroupPanel } from '../../../groupview/groupviewPanel';
 import { IDockviewPanel } from '../../../dockview/dockviewPanel';
+import { IDockviewPanelModel } from '../../../dockview/dockviewPanelModel';
 
 class TestContentRenderer
     extends CompositeDisposable
@@ -25,10 +24,6 @@ class TestContentRenderer
     constructor(public id: string) {
         super();
         this.element = document.createElement('div');
-    }
-
-    updateParentGroup(group: GroupPanel, isPanelVisible: boolean): void {
-        //
     }
 
     init(parameters: GroupPanelContentPartInitParameters): void {
@@ -77,7 +72,7 @@ describe('contentContainer', () => {
         const panel = {
             view: {
                 content: contentRenderer,
-            } as Partial<IGroupPanelView>,
+            } as Partial<IDockviewPanelModel>,
         } as Partial<IDockviewPanel>;
 
         cut.openPanel(panel as IDockviewPanel);
@@ -111,7 +106,7 @@ describe('contentContainer', () => {
         const panel2 = {
             view: {
                 content: contentRenderer2,
-            } as Partial<IGroupPanelView>,
+            } as Partial<IDockviewPanelModel>,
         } as Partial<IDockviewPanel>;
 
         cut.openPanel(panel2 as IDockviewPanel);

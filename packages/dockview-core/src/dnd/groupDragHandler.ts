@@ -1,4 +1,4 @@
-import { GroupPanel } from '../groupview/groupviewPanel';
+import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
 import { IDisposable } from '../lifecycle';
 import { DragHandler } from './abstractDragHandler';
 import { LocalSelectionTransfer, PanelTransfer } from './dataTransfer';
@@ -11,7 +11,7 @@ export class GroupDragHandler extends DragHandler {
     constructor(
         element: HTMLElement,
         private readonly accessorId: string,
-        private readonly group: GroupPanel
+        private readonly group: DockviewGroupPanel
     ) {
         super(element);
     }

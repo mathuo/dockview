@@ -1,12 +1,9 @@
-import {
-    GroupPanelPartInitParameters,
-    IWatermarkRenderer,
-} from '../../../groupview/types';
+import { GroupPanelPartInitParameters, IWatermarkRenderer } from '../../types';
 import { ActionContainer } from '../../../actionbar/actionsContainer';
 import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
 import { CompositeDisposable } from '../../../lifecycle';
-import { GroupPanel } from '../../../groupview/groupviewPanel';
+import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { PanelUpdateEvent } from '../../../panel/types';
 import { createCloseButton } from '../../../svg';
 
@@ -15,11 +12,11 @@ export class Watermark
     implements IWatermarkRenderer
 {
     private _element: HTMLElement;
-    private group: GroupPanel | undefined;
+    private group: DockviewGroupPanel | undefined;
     private params: GroupPanelPartInitParameters | undefined;
 
-    get id() {
-        return 'watermark';
+    get element() {
+        return this._element;
     }
 
     constructor() {
@@ -67,10 +64,6 @@ export class Watermark
         // noop
     }
 
-    toJSON() {
-        return {};
-    }
-
     layout(_width: number, _height: number) {
         // noop
     }
@@ -87,13 +80,13 @@ export class Watermark
         this.render();
     }
 
-    updateParentGroup(group: GroupPanel, _visible: boolean): void {
+    updateParentGroup(group: DockviewGroupPanel, _visible: boolean): void {
         this.group = group;
         this.render();
     }
 
-    get element() {
-        return this._element;
+    dispose() {
+        super.dispose();
     }
 
     private render() {
@@ -101,9 +94,5 @@ export class Watermark
             this.params && this.params.containerApi.size <= 1
         );
         toggleClass(this.element, 'has-actions', isOneGroup);
-    }
-
-    dispose() {
-        super.dispose();
     }
 }

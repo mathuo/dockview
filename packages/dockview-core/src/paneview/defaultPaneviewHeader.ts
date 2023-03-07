@@ -18,7 +18,7 @@ export class DefaultHeader
     private readonly _expander: HTMLElement;
     private apiRef: { api: PaneviewPanelApiImpl | null } = { api: null };
 
-    get element() {
+    get element(): HTMLElement {
         return this._element;
     }
 
@@ -42,7 +42,7 @@ export class DefaultHeader
         );
     }
 
-    init(params: PanePanelInitParameter & { api: PaneviewPanelApiImpl }) {
+    init(params: PanePanelInitParameter & { api: PaneviewPanelApiImpl }): void {
         this.apiRef.api = params.api;
 
         this._content.textContent = params.title;
@@ -54,7 +54,7 @@ export class DefaultHeader
         });
     }
 
-    private updateIcon() {
+    private updateIcon(): void {
         const isExpanded = !!this.apiRef.api?.isExpanded;
         toggleClass(this._expander, 'collapsed', !isExpanded);
 
@@ -75,11 +75,11 @@ export class DefaultHeader
         }
     }
 
-    update(_params: PanelUpdateEvent) {
+    update(_params: PanelUpdateEvent): void {
         //
     }
 
-    dispose() {
+    dispose(): void {
         this.disposable.dispose();
         super.dispose();
     }

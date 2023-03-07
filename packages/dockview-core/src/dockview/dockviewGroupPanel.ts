@@ -1,29 +1,31 @@
 import { IFrameworkPart } from '../panel/types';
 import { DockviewComponent } from '../dockview/dockviewComponent';
+import { GridviewPanelApi } from '../api/gridviewPanelApi';
 import {
-    GridviewPanelApi,
-    GridviewPanelApiImpl,
-} from '../api/gridviewPanelApi';
-import { Groupview, GroupOptions, IHeader } from './groupview';
+    DockviewGroupPanelModel,
+    GroupOptions,
+    IHeader,
+} from './dockviewGroupPanelModel';
 import { GridviewPanel, IGridviewPanel } from '../gridview/gridviewPanel';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 
-export interface IGroupviewPanel extends IGridviewPanel {
-    model: Groupview;
+export interface IDockviewGroupPanel extends IGridviewPanel {
+    model: DockviewGroupPanelModel;
     locked: boolean;
     readonly size: number;
     readonly panels: IDockviewPanel[];
     readonly activePanel: IDockviewPanel | undefined;
 }
 
-export type IGroupviewPanelPublic = IGroupviewPanel;
+export type IDockviewGroupPanelPublic = IDockviewGroupPanel;
 
-export type GroupviewPanelApi = GridviewPanelApi;
+export type DockviewGroupPanelApi = GridviewPanelApi;
 
-class GroupviewApi extends GridviewPanelApiImpl implements GroupviewPanelApi {}
-
-export class GroupPanel extends GridviewPanel implements IGroupviewPanel {
-    private readonly _model: Groupview;
+export class DockviewGroupPanel
+    extends GridviewPanel
+    implements IDockviewGroupPanel
+{
+    private readonly _model: DockviewGroupPanelModel;
 
     get panels(): IDockviewPanel[] {
         return this._model.panels;
@@ -37,7 +39,7 @@ export class GroupPanel extends GridviewPanel implements IGroupviewPanel {
         return this._model.size;
     }
 
-    get model(): Groupview {
+    get model(): DockviewGroupPanelModel {
         return this._model;
     }
 
@@ -76,10 +78,16 @@ export class GroupPanel extends GridviewPanel implements IGroupviewPanel {
     ) {
         super(id, 'groupview_default');
 
-        this._model = new Groupview(this.element, accessor, id, options, this);
+        this._model = new DockviewGroupPanelModel(
+            this.element,
+            accessor,
+            id,
+            options,
+            this
+        );
     }
 
-    initialize() {
+    initialize(): void {
         this._model.initialize();
     }
 
@@ -98,6 +106,7 @@ export class GroupPanel extends GridviewPanel implements IGroupviewPanel {
     }
 
     toJSON(): any {
+        // TODO fix typing
         return this.model.toJSON();
     }
 }

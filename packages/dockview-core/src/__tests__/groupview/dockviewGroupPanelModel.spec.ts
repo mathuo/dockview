@@ -1,31 +1,68 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import {
+    GroupPanelUpdateEvent,
     GroupviewPanelState,
     IGroupPanelInitParameters,
-} from '../../groupview/types';
-import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     ITabRenderer,
     IWatermarkRenderer,
-} from '../../groupview/types';
+} from '../../dockview/types';
 import { PanelUpdateEvent } from '../../panel/types';
-import { GroupOptions, Groupview } from '../../groupview/groupview';
 import {
-    DefaultGroupPanelView,
-    IGroupPanelView,
-} from '../../dockview/defaultGroupPanelView';
-import { GroupPanel } from '../../groupview/groupviewPanel';
+    DockviewGroupPanelModel,
+    GroupOptions,
+} from '../../dockview/dockviewGroupPanelModel';
 import { fireEvent } from '@testing-library/dom';
 import { LocalSelectionTransfer, PanelTransfer } from '../../dnd/dataTransfer';
 import { CompositeDisposable } from '../../lifecycle';
 import { DockviewPanelApi } from '../../api/dockviewPanelApi';
 import { IDockviewPanel } from '../../dockview/dockviewPanel';
+import {
+    IDockviewPanelModel,
+    DockviewPanelModel,
+} from '../../dockview/dockviewPanelModel';
+import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
 enum GroupChangeKind2 {
     ADD_PANEL,
     REMOVE_PANEL,
     PANEL_ACTIVE,
+}
+
+class TestModel implements IDockviewPanelModel {
+    readonly content: IContentRenderer;
+    readonly contentComponent: string;
+    readonly tab: ITabRenderer;
+
+    constructor(id: string) {
+        this.content = new TestHeaderPart(id);
+        this.contentComponent = id;
+        this.tab = new TestContentPart(id);
+    }
+
+    update(event: GroupPanelUpdateEvent): void {
+        //
+    }
+
+    layout(width: number, height: number): void {
+        //
+    }
+
+    init(params: GroupPanelPartInitParameters): void {
+        //
+    }
+
+    updateParentGroup(
+        group: DockviewGroupPanel,
+        isPanelVisible: boolean
+    ): void {
+        //
+    }
+
+    dispose(): void {
+        //
+    }
 }
 
 class Watermark implements IWatermarkRenderer {
@@ -87,10 +124,6 @@ class TestContentPart implements IContentRenderer {
         //void
     }
 
-    updateParentGroup(group: GroupPanel, isPanelVisible: boolean) {
-        //noop
-    }
-
     focus() {
         //noop
     }
@@ -122,10 +155,6 @@ class TestHeaderPart implements ITabRenderer {
         //void
     }
 
-    updateParentGroup(group: GroupPanel, isPanelVisible: boolean) {
-        //noop
-    }
-
     focus() {
         //noop
     }
@@ -140,9 +169,9 @@ class TestHeaderPart implements ITabRenderer {
 }
 
 export class TestPanel implements IDockviewPanel {
-    private _view: IGroupPanelView | undefined;
-    private _group: GroupPanel | undefined;
+    private _group: DockviewGroupPanel | undefined;
     private _params: IGroupPanelInitParameters;
+    readonly view: IDockviewPanelModel;
 
     get title() {
         return '';
@@ -152,33 +181,24 @@ export class TestPanel implements IDockviewPanel {
         return this._group!;
     }
 
-    get view() {
-        return this._view;
-    }
-
     get params(): Record<string, any> {
         return {};
     }
 
     constructor(public readonly id: string, public api: DockviewPanelApi) {
+        this.view = new TestModel(id);
         this.init({
-            view: new DefaultGroupPanelView({
-                tab: new TestHeaderPart(id),
-                content: new TestContentPart(id),
-            }),
             title: `${id}`,
             params: {},
         });
     }
 
     init(params: IGroupPanelInitParameters) {
-        this._view = params.view;
-
         this._params = params;
     }
 
-    updateParentGroup(group: GroupPanel, isGroupActive: boolean) {
-        this._group = group;
+    updateParentGroup(group: DockviewGroupPanel, isGroupActive: boolean): void {
+        //
     }
 
     layout(width: number, height: number) {
@@ -196,7 +216,6 @@ export class TestPanel implements IDockviewPanel {
     toJSON(): GroupviewPanelState {
         return {
             id: this.id,
-            view: this._view?.toJSON(),
             title: this._params?.title,
         };
     }
@@ -207,7 +226,7 @@ export class TestPanel implements IDockviewPanel {
 }
 
 describe('groupview', () => {
-    let groupview: GroupPanel;
+    let groupview: DockviewGroupPanel;
     let dockview: DockviewComponent;
     let options: GroupOptions;
 
@@ -232,33 +251,8 @@ describe('groupview', () => {
         options = {
             tabHeight: 30,
         };
-        groupview = new GroupPanel(dockview, 'groupview-1', options);
+        groupview = new DockviewGroupPanel(dockview, 'groupview-1', options);
         groupview.initialize();
-    });
-
-    test('serialized layout shows active panel', () => {
-        const panel1 = new TestPanel('panel1', jest.fn() as any);
-        const panel2 = new TestPanel('panel2', jest.fn() as any);
-        const panel3 = new TestPanel('panel3', jest.fn() as any);
-
-        const groupview2 = new GroupPanel(dockview, 'groupview-2', {
-            tabHeight: 25,
-            panels: [panel1, panel2, panel3],
-            activePanel: panel2,
-        });
-        groupview2.initialize();
-
-        expect(groupview2.model.activePanel).toBe(panel2);
-
-        expect(
-            groupview2.element.querySelector('.content-part-panel1')
-        ).toBeFalsy();
-        expect(
-            groupview2.element.querySelector('.content-part-panel2')
-        ).toBeTruthy();
-        expect(
-            groupview2.element.querySelector('.content-part-panel3')
-        ).toBeFalsy();
     });
 
     test('panel events are captured during de-serialization', () => {
@@ -266,7 +260,7 @@ describe('groupview', () => {
         const panel2 = new TestPanel('panel2', jest.fn() as any);
         const panel3 = new TestPanel('panel3', jest.fn() as any);
 
-        const groupview2 = new GroupPanel(dockview, 'groupview-2', {
+        const groupview2 = new DockviewGroupPanel(dockview, 'groupview-2', {
             tabHeight: 25,
             panels: [panel1, panel2, panel3],
             activePanel: panel2,
@@ -520,7 +514,7 @@ describe('groupview', () => {
             }
         );
 
-        const cut = new Groupview(
+        const cut = new DockviewGroupPanelModel(
             document.createElement('div'),
             dockviewComponent,
             'id',
@@ -545,7 +539,7 @@ describe('groupview', () => {
             }
         );
 
-        const cut = new Groupview(
+        const cut = new DockviewGroupPanelModel(
             document.createElement('div'),
             dockviewComponent,
             'id',
@@ -576,7 +570,7 @@ describe('groupview', () => {
         );
 
         const groupviewContainer = document.createElement('div');
-        const cut = new Groupview(
+        const cut = new DockviewGroupPanelModel(
             groupviewContainer,
             dockviewComponent,
             'id',
@@ -623,28 +617,32 @@ describe('groupview', () => {
             };
         });
         const accessor = new accessorMock() as DockviewComponent;
-        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
-            return {
-                canDisplayOverlay: jest.fn(),
-            };
-        });
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    canDisplayOverlay: jest.fn(),
+                };
+            }
+        );
 
-        const groupView = new groupviewMock() as Groupview;
+        const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
-            return {
-                id: 'testgroupid',
-                model: groupView,
-            };
-        });
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    id: 'testgroupid',
+                    model: groupView,
+                };
+            }
+        );
 
         const container = document.createElement('div');
-        const cut = new Groupview(
+        const cut = new DockviewGroupPanelModel(
             container,
             accessor,
             'groupviewid',
             {},
-            new groupPanelMock() as GroupPanel
+            new groupPanelMock() as DockviewGroupPanel
         );
 
         const element = container
@@ -680,15 +678,17 @@ describe('groupview', () => {
             };
         });
         const accessor = new accessorMock() as DockviewComponent;
-        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
-            return {
-                canDisplayOverlay: jest.fn(),
-            };
-        });
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    canDisplayOverlay: jest.fn(),
+                };
+            }
+        );
 
-        const groupView = new groupviewMock() as Groupview;
+        const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
                 id: 'testgroupid',
                 model: groupView,
@@ -696,12 +696,12 @@ describe('groupview', () => {
         });
 
         const container = document.createElement('div');
-        const cut = new Groupview(
+        const cut = new DockviewGroupPanelModel(
             container,
             accessor,
             'groupviewid',
             {},
-            new groupPanelMock() as GroupPanel
+            new groupPanelMock() as DockviewGroupPanel
         );
 
         cut.openPanel(new TestPanel('panel1', jest.fn() as any));
@@ -744,15 +744,17 @@ describe('groupview', () => {
             };
         });
         const accessor = new accessorMock() as DockviewComponent;
-        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
-            return {
-                canDisplayOverlay: jest.fn(),
-            };
-        });
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    canDisplayOverlay: jest.fn(),
+                };
+            }
+        );
 
-        const groupView = new groupviewMock() as Groupview;
+        const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
                 id: 'testgroupid',
                 model: groupView,
@@ -760,12 +762,12 @@ describe('groupview', () => {
         });
 
         const container = document.createElement('div');
-        const cut = new Groupview(
+        const cut = new DockviewGroupPanelModel(
             container,
             accessor,
             'groupviewid',
             {},
-            new groupPanelMock() as GroupPanel
+            new groupPanelMock() as DockviewGroupPanel
         );
 
         cut.openPanel(new TestPanel('panel1', jest.fn() as any));
@@ -809,15 +811,17 @@ describe('groupview', () => {
             };
         });
         const accessor = new accessorMock() as DockviewComponent;
-        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
-            return {
-                canDisplayOverlay: jest.fn(),
-            };
-        });
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    canDisplayOverlay: jest.fn(),
+                };
+            }
+        );
 
-        const groupView = new groupviewMock() as Groupview;
+        const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
                 id: 'testgroupid',
                 model: groupView,
@@ -825,12 +829,12 @@ describe('groupview', () => {
         });
 
         const container = document.createElement('div');
-        const cut = new Groupview(
+        const cut = new DockviewGroupPanelModel(
             container,
             accessor,
             'groupviewid',
             {},
-            new groupPanelMock() as GroupPanel
+            new groupPanelMock() as DockviewGroupPanel
         );
 
         cut.openPanel(new TestPanel('panel1', jest.fn() as any));
@@ -861,15 +865,17 @@ describe('groupview', () => {
     });
 
     test('that watermark is added', () => {
-        const groupviewMock = jest.fn<Partial<Groupview>, []>(() => {
-            return {
-                canDisplayOverlay: jest.fn(),
-            };
-        });
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    canDisplayOverlay: jest.fn(),
+                };
+            }
+        );
 
-        const groupView = new groupviewMock() as Groupview;
+        const groupView = new groupviewMock() as DockviewGroupPanelModel;
 
-        const groupPanelMock = jest.fn<Partial<GroupPanel>, []>(() => {
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
             return {
                 id: 'testgroupid',
                 model: groupView,
@@ -878,12 +884,12 @@ describe('groupview', () => {
 
         const container = document.createElement('div');
 
-        const cut = new Groupview(
+        const cut = new DockviewGroupPanelModel(
             container,
             dockview,
             'groupviewid',
             {},
-            new groupPanelMock() as GroupPanel
+            new groupPanelMock() as DockviewGroupPanel
         );
 
         cut.initialize();

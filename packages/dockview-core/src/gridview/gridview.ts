@@ -261,6 +261,14 @@ export interface INodeDescriptor {
 export interface IViewDeserializer {
     fromJSON: (data: ISerializedLeafNode) => IGridView;
 }
+
+export interface SerializedGridview<T> {
+    root: SerializedGridObject<T>;
+    width: number;
+    height: number;
+    orientation: Orientation;
+}
+
 export class Gridview implements IDisposable {
     private _root: BranchNode | undefined;
     public readonly element: HTMLElement;
@@ -277,7 +285,41 @@ export class Gridview implements IDisposable {
         return this._root ? this._root.children.length : 0;
     }
 
-    public serialize() {
+    public get orientation(): Orientation {
+        return this.root.orientation;
+    }
+
+    public set orientation(orientation: Orientation) {
+        if (this.root.orientation === orientation) {
+            return;
+        }
+
+        const { size, orthogonalSize } = this.root;
+        this.root = flipNode(this.root, orthogonalSize, size);
+        this.root.layout(size, orthogonalSize);
+    }
+
+    get width(): number {
+        return this.root.width;
+    }
+    get height(): number {
+        return this.root.height;
+    }
+
+    get minimumWidth(): number {
+        return this.root.minimumWidth;
+    }
+    get minimumHeight(): number {
+        return this.root.minimumHeight;
+    }
+    get maximumWidth(): number {
+        return this.root.maximumHeight;
+    }
+    get maximumHeight(): number {
+        return this.root.maximumHeight;
+    }
+
+    public serialize(): SerializedGridview<any> {
         const root = serializeBranchNode(this.getView(), this.orientation);
 
         return {
@@ -288,7 +330,7 @@ export class Gridview implements IDisposable {
         };
     }
 
-    public dispose() {
+    public dispose(): void {
         this.disposable.dispose();
         this._onDidChange.dispose();
         this.root.dispose();
@@ -296,7 +338,7 @@ export class Gridview implements IDisposable {
         this.element.remove();
     }
 
-    public clear() {
+    public clear(): void {
         const orientation = this.root.orientation;
         this.root = new BranchNode(
             orientation,
@@ -307,7 +349,7 @@ export class Gridview implements IDisposable {
         );
     }
 
-    public deserialize(json: any, deserializer: IViewDeserializer) {
+    public deserialize(json: any, deserializer: IViewDeserializer): void {
         const orientation = json.orientation;
         const height =
             orientation === Orientation.VERTICAL ? json.height : json.width;
@@ -378,20 +420,6 @@ export class Gridview implements IDisposable {
         return result;
     }
 
-    public get orientation() {
-        return this.root.orientation;
-    }
-
-    public set orientation(orientation: Orientation) {
-        if (this.root.orientation === orientation) {
-            return;
-        }
-
-        const { size, orthogonalSize } = this.root;
-        this.root = flipNode(this.root, orthogonalSize, size);
-        this.root.layout(size, orthogonalSize);
-    }
-
     private get root(): BranchNode {
         return this._root!;
     }
@@ -448,11 +476,11 @@ export class Gridview implements IDisposable {
         });
     }
 
-    public next(location: number[]) {
+    public next(location: number[]): LeafNode {
         return this.progmaticSelect(location);
     }
 
-    public previous(location: number[]) {
+    public previous(location: number[]): LeafNode {
         return this.progmaticSelect(location, true);
     }
 
@@ -492,7 +520,7 @@ export class Gridview implements IDisposable {
         return { box, children };
     }
 
-    private progmaticSelect(location: number[], reverse = false) {
+    private progmaticSelect(location: number[], reverse = false): LeafNode {
         const [path, node] = this.getNode(location);
 
         if (!(node instanceof LeafNode)) {
@@ -511,26 +539,6 @@ export class Gridview implements IDisposable {
         }
 
         return findLeaf(this.root, reverse);
-    }
-
-    get width(): number {
-        return this.root.width;
-    }
-    get height(): number {
-        return this.root.height;
-    }
-
-    get minimumWidth(): number {
-        return this.root.minimumWidth;
-    }
-    get minimumHeight(): number {
-        return this.root.minimumHeight;
-    }
-    get maximumWidth(): number {
-        return this.root.maximumHeight;
-    }
-    get maximumHeight(): number {
-        return this.root.maximumHeight;
     }
 
     constructor(
@@ -581,7 +589,11 @@ export class Gridview implements IDisposable {
         parent.moveChild(from, to);
     }
 
-    public addView(view: IGridView, size: number | Sizing, location: number[]) {
+    public addView(
+        view: IGridView,
+        size: number | Sizing,
+        location: number[]
+    ): void {
         const [rest, index] = tail(location);
 
         const [pathToParent, parent] = this.getNode(rest);
@@ -636,7 +648,7 @@ export class Gridview implements IDisposable {
         }
     }
 
-    public remove(view: IGridView, sizing?: Sizing) {
+    public remove(view: IGridView, sizing?: Sizing): IGridView {
         const location = getGridLocation(view.element);
         return this.removeView(location, sizing);
     }
@@ -721,7 +733,7 @@ export class Gridview implements IDisposable {
         return node.view;
     }
 
-    public layout(width: number, height: number) {
+    public layout(width: number, height: number): void {
         const [size, orthogonalSize] =
             this.root.orientation === Orientation.HORIZONTAL
                 ? [height, width]

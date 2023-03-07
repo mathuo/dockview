@@ -6,11 +6,14 @@ import {
     ITabRenderer,
     WatermarkConstructor,
     IWatermarkRenderer,
-} from '../groupview/types';
-import { GroupPanel, GroupviewPanelApi } from '../groupview/groupviewPanel';
+    DockviewDropTargets,
+} from './types';
+import {
+    DockviewGroupPanel,
+    DockviewGroupPanelApi,
+} from './dockviewGroupPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
 import { FrameworkFactory } from '../types';
-import { DockviewDropTargets } from '../groupview/dnd';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
 import { Position } from '../dnd/droptarget';
@@ -18,7 +21,10 @@ import { IDockviewPanel } from './dockviewPanel';
 
 export interface IGroupControlRenderer extends IDisposable {
     readonly element: HTMLElement;
-    init(params: { containerApi: DockviewApi; api: GroupviewPanelApi }): void;
+    init(params: {
+        containerApi: DockviewApi;
+        api: DockviewGroupPanelApi;
+    }): void;
 }
 
 export interface GroupPanelFrameworkComponentFactory {
@@ -61,7 +67,7 @@ export interface DockviewDndOverlayEvent {
     nativeEvent: DragEvent;
     target: DockviewDropTargets;
     position: Position;
-    group?: GroupPanel;
+    group?: DockviewGroupPanel;
     getData: () => PanelTransfer | undefined;
 }
 
@@ -74,7 +80,9 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     styles?: ISplitviewStyles;
     defaultTabComponent?: string;
     showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
-    createGroupControlElement?: (group: GroupPanel) => IGroupControlRenderer;
+    createGroupControlElement?: (
+        group: DockviewGroupPanel
+    ) => IGroupControlRenderer;
     singleTabMode?: 'fullwidth' | 'default';
 }
 
@@ -93,7 +101,7 @@ type RelativePanel = {
 
 type RelativeGroup = {
     direction?: Direction;
-    referenceGroup: string | GroupPanel;
+    referenceGroup: string | DockviewGroupPanel;
 };
 
 type AbsolutePosition = {
@@ -136,7 +144,7 @@ type AddGroupOptionsWithPanel = {
 };
 
 type AddGroupOptionsWithGroup = {
-    referenceGroup: string | GroupPanel;
+    referenceGroup: string | DockviewGroupPanel;
     direction?: Omit<Direction, 'within'>;
 };
 
@@ -169,5 +177,5 @@ export interface MovementOptions2 {
 
 export interface MovementOptions extends MovementOptions2 {
     includePanel?: boolean;
-    group?: GroupPanel;
+    group?: DockviewGroupPanel;
 }

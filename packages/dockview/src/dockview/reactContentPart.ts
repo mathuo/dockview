@@ -3,8 +3,8 @@ import { ReactPart, ReactPortalStore } from '../react';
 import { IDockviewPanelProps } from '../dockview/dockview';
 import {
     DockviewEmitter,
-    Event,
-    GroupPanel,
+    DockviewEvent,
+    DockviewGroupPanel,
     PanelUpdateEvent,
     IContentRenderer,
     GroupPanelContentPartInitParameters,
@@ -14,13 +14,13 @@ export class ReactPanelContentPart implements IContentRenderer {
     private _element: HTMLElement;
     private part?: ReactPart<IDockviewPanelProps>;
     //
-    private _group: GroupPanel | undefined;
+    private _group: DockviewGroupPanel | undefined;
 
     private readonly _onDidFocus = new DockviewEmitter<void>();
-    readonly onDidFocus: Event<void> = this._onDidFocus.event;
+    readonly onDidFocus: DockviewEvent<void> = this._onDidFocus.event;
 
     private readonly _onDidBlur = new DockviewEmitter<void>();
-    readonly onDidBlur: Event<void> = this._onDidBlur.event;
+    readonly onDidBlur: DockviewEvent<void> = this._onDidBlur.event;
 
     get element(): HTMLElement {
         return this._element;
@@ -35,7 +35,7 @@ export class ReactPanelContentPart implements IContentRenderer {
         this._element.className = 'dockview-react-part';
     }
 
-    focus() {
+    focus(): void {
         // TODO
     }
 
@@ -52,18 +52,12 @@ export class ReactPanelContentPart implements IContentRenderer {
         );
     }
 
-    public toJSON() {
-        return {
-            id: this.id,
-        };
-    }
-
     public update(event: PanelUpdateEvent) {
         this.part?.update(event.params);
     }
 
     public updateParentGroup(
-        group: GroupPanel,
+        group: DockviewGroupPanel,
         _isPanelVisible: boolean
     ): void {
         this._group = group;
@@ -73,7 +67,7 @@ export class ReactPanelContentPart implements IContentRenderer {
         // noop
     }
 
-    public dispose() {
+    public dispose(): void {
         this._onDidFocus.dispose();
         this._onDidBlur.dispose();
         this.part?.dispose();

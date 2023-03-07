@@ -1,7 +1,7 @@
 import { DockviewPanelApiImpl, TitleEvent } from '../../api/dockviewPanelApi';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
-import { GroupPanel } from '../../groupview/groupviewPanel';
+import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
 describe('groupPanelApi', () => {
     test('title', () => {
@@ -10,7 +10,7 @@ describe('groupPanelApi', () => {
                 update: jest.fn(),
             } as any;
         });
-        const groupMock = jest.fn<GroupPanel, []>(() => {
+        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
             return {} as any;
         });
 
@@ -37,7 +37,7 @@ describe('groupPanelApi', () => {
             onDidRemovePanel: jest.fn(),
             options: {},
         };
-        const groupViewPanel = new GroupPanel(
+        const groupViewPanel = new DockviewGroupPanel(
             <DockviewComponent>accessor,
             '',
             {}
@@ -45,7 +45,7 @@ describe('groupPanelApi', () => {
 
         const cut = new DockviewPanelApiImpl(
             <IDockviewPanel>groupPanel,
-            <GroupPanel>groupViewPanel
+            <DockviewGroupPanel>groupViewPanel
         );
 
         let events = 0;
@@ -57,7 +57,7 @@ describe('groupPanelApi', () => {
         expect(events).toBe(0);
         expect(cut.group).toBe(groupViewPanel);
 
-        const groupViewPanel2 = new GroupPanel(
+        const groupViewPanel2 = new DockviewGroupPanel(
             <DockviewComponent>accessor,
             '',
             {}

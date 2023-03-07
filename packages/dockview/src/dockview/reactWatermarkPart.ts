@@ -3,7 +3,7 @@ import { ReactPart, ReactPortalStore } from '../react';
 import { IGroupPanelBaseProps } from './dockview';
 import {
     PanelUpdateEvent,
-    GroupPanel,
+    DockviewGroupPanel,
     GroupPanelPartInitParameters,
     IWatermarkRenderer,
 } from 'dockview-core';
@@ -15,12 +15,12 @@ export interface IWatermarkPanelProps extends IGroupPanelBaseProps {
 export class ReactWatermarkPart implements IWatermarkRenderer {
     private _element: HTMLElement;
     private part?: ReactPart<IWatermarkPanelProps>;
-    private _groupRef: { value: GroupPanel | undefined } = {
+    private _groupRef: { value: DockviewGroupPanel | undefined } = {
         value: undefined,
     };
     private parameters: GroupPanelPartInitParameters | undefined;
 
-    get element() {
+    get element(): HTMLElement {
         return this._element;
     }
 
@@ -55,11 +55,11 @@ export class ReactWatermarkPart implements IWatermarkRenderer {
         );
     }
 
-    focus() {
+    focus(): void {
         // noop
     }
 
-    update(params: PanelUpdateEvent) {
+    update(params: PanelUpdateEvent): void {
         if (this.parameters) {
             this.parameters.params = params.params;
         }
@@ -67,22 +67,19 @@ export class ReactWatermarkPart implements IWatermarkRenderer {
         this.part?.update({ params: this.parameters?.params || {} });
     }
 
-    toJSON() {
-        return {
-            id: this.id,
-        };
-    }
-
-    layout(_width: number, _height: number) {
+    layout(_width: number, _height: number): void {
         // noop - retrieval from api
     }
 
-    updateParentGroup(group: GroupPanel, _isPanelVisible: boolean): void {
+    updateParentGroup(
+        group: DockviewGroupPanel,
+        _isPanelVisible: boolean
+    ): void {
         // noop - retrieval from api
         this._groupRef.value = group;
     }
 
-    dispose() {
+    dispose(): void {
         this.part?.dispose();
     }
 }

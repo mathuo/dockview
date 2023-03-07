@@ -1,7 +1,7 @@
 import {
     GroupPanelPartInitParameters,
     IContentRenderer,
-    GroupPanel,
+    DockviewGroupPanel,
     HostedContainer,
     PanelUpdateEvent,
 } from 'dockview-core';
@@ -24,7 +24,7 @@ export class WebviewContentRenderer implements IContentRenderer {
         this._element.style.width = '100%';
     }
 
-    focus() {
+    focus(): void {
         // noop
     }
 
@@ -32,18 +32,14 @@ export class WebviewContentRenderer implements IContentRenderer {
         this.parameters = parameters;
     }
 
-    public toJSON() {
-        return {};
-    }
-
-    public update(params: PanelUpdateEvent) {
+    public update(params: PanelUpdateEvent): void {
         if (this.parameters) {
             this.parameters.params = params.params;
         }
     }
 
     public updateParentGroup(
-        _group: GroupPanel,
+        _group: DockviewGroupPanel,
         _isPanelVisible: boolean
     ): void {
         //
@@ -53,7 +49,7 @@ export class WebviewContentRenderer implements IContentRenderer {
         this._hostedContainer.layout(this._element);
     }
 
-    public dispose() {
+    public dispose(): void {
         //
     }
 }

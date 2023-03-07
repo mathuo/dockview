@@ -3,8 +3,8 @@ export interface IDisposable {
 }
 
 export interface IValueDisposable<T> {
-    value: T;
-    disposable: IDisposable;
+    readonly value: T;
+    readonly disposable: IDisposable;
 }
 
 export namespace Disposable {
@@ -26,11 +26,11 @@ export class CompositeDisposable {
         this.disposables = args;
     }
 
-    public addDisposables(...args: IDisposable[]) {
+    public addDisposables(...args: IDisposable[]): void {
         args.forEach((arg) => this.disposables.push(arg));
     }
 
-    public dispose() {
+    public dispose(): void {
         this.disposables.forEach((arg) => arg.dispose());
     }
 }
@@ -45,7 +45,7 @@ export class MutableDisposable implements IDisposable {
         this._disposable = disposable;
     }
 
-    public dispose() {
+    public dispose(): void {
         if (this._disposable) {
             this._disposable.dispose();
             this._disposable = Disposable.NONE;

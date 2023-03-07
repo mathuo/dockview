@@ -1,29 +1,34 @@
 import { DockviewApi } from '../api/component.api';
 import { getPanelData, PanelTransfer } from '../dnd/dataTransfer';
 import { Droptarget, Position } from '../dnd/droptarget';
-import { DockviewComponent } from '../dockview/dockviewComponent';
+import { DockviewComponent } from './dockviewComponent';
 import { isAncestor, toggleClass } from '../dom';
 import { addDisposableListener, Emitter, Event } from '../events';
 import { IGridPanelView } from '../gridview/baseComponentGridview';
 import { IViewSize } from '../gridview/gridview';
-import { CompositeDisposable, IDisposable } from '../lifecycle';
+import { CompositeDisposable } from '../lifecycle';
 import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
-import { ContentContainer, IContentContainer } from './panel/content';
-import { ITabsContainer, TabsContainer } from './titlebar/tabsContainer';
-import { IWatermarkRenderer } from './types';
-import { GroupPanel } from './groupviewPanel';
-import { DockviewDropTargets } from './dnd';
-import { IDockviewPanel } from '../dockview/dockviewPanel';
-import { IGroupControlRenderer } from '../dockview/options';
+import {
+    ContentContainer,
+    IContentContainer,
+} from './components/panel/content';
+import {
+    ITabsContainer,
+    TabsContainer,
+} from './components/titlebar/tabsContainer';
+import { DockviewDropTargets, IWatermarkRenderer } from './types';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
+import { IDockviewPanel } from './dockviewPanel';
+import { IGroupControlRenderer } from './options';
 
 export interface DndService {
     canDisplayOverlay(
-        group: IGroupview,
+        group: IDockviewGroupPanelModel,
         event: DragEvent,
         target: DockviewDropTargets
     ): boolean;
     onDrop(
-        group: IGroupview,
+        group: IDockviewGroupPanelModel,
         event: DragEvent,
         position: Position,
         index?: number
@@ -77,7 +82,7 @@ export interface IHeader {
     height: number | undefined;
 }
 
-export interface IGroupview extends IDisposable, IGridPanelView {
+export interface IDockviewGroupPanelModel extends IGridPanelView {
     readonly isActive: boolean;
     readonly size: number;
     readonly panels: IDockviewPanel[];
@@ -117,7 +122,10 @@ export interface IGroupview extends IDisposable, IGridPanelView {
     ): boolean;
 }
 
-export class Groupview extends CompositeDisposable implements IGroupview {
+export class DockviewGroupPanelModel
+    extends CompositeDisposable
+    implements IDockviewGroupPanelModel
+{
     private readonly tabsContainer: ITabsContainer;
     private readonly contentContainer: IContentContainer;
     private readonly dropTarget: Droptarget;
@@ -232,7 +240,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         private accessor: DockviewComponent,
         public id: string,
         private readonly options: GroupOptions,
-        private readonly groupPanel: GroupPanel
+        private readonly groupPanel: DockviewGroupPanel
     ) {
         super();
 
@@ -427,7 +435,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     }
 
     focus(): void {
-        this._activePanel?.focus();
+        this._activePanel?.focus?.();
     }
 
     public openPanel(
@@ -525,7 +533,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     ): void {
         if (!force && this.isActive === isGroupActive) {
             if (!skipFocus) {
-                this._activePanel?.focus();
+                this._activePanel?.focus?.();
             }
             return;
         }
@@ -545,7 +553,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
 
         if (isGroupActive) {
             if (!skipFocus) {
-                this._activePanel?.focus();
+                this._activePanel?.focus?.();
             }
         }
     }
@@ -681,7 +689,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
         }
         if (!this.isEmpty && this.watermark) {
             this.watermark.element.remove();
-            this.watermark.dispose();
+            this.watermark.dispose?.();
             this.watermark = undefined;
             this.tabsContainer.show();
         }
@@ -760,7 +768,7 @@ export class Groupview extends CompositeDisposable implements IGroupview {
     public dispose(): void {
         super.dispose();
 
-        this.watermark?.dispose();
+        this.watermark?.dispose?.();
 
         for (const panel of this.panels) {
             panel.dispose();

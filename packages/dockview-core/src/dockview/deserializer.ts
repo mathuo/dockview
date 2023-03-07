@@ -1,34 +1,53 @@
-import { GroupviewPanelState, ITabRenderer } from '../groupview/types';
-import { GroupPanel } from '../groupview/groupviewPanel';
+import { GroupviewPanelState, ITabRenderer } from './types';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { DockviewComponent } from './dockviewComponent';
+import { IDockviewComponent } from './dockviewComponent';
 import { createComponent } from '../panel/componentFactory';
 import { DefaultTab } from './components/tab/defaultTab';
-import { DefaultGroupPanelView } from './defaultGroupPanelView';
+import { DockviewPanelModel } from './dockviewPanelModel';
 import { DockviewApi } from '../api/component.api';
 
 export interface IPanelDeserializer {
-    fromJSON(panelData: GroupviewPanelState, group: GroupPanel): IDockviewPanel;
+    fromJSON(
+        panelData: GroupviewPanelState,
+        group: DockviewGroupPanel
+    ): IDockviewPanel;
+}
+
+// depreciated
+interface LegacyState extends GroupviewPanelState {
+    view?: {
+        tab?: { id: string };
+        content: { id: string };
+    };
 }
 
 export class DefaultDockviewDeserialzier implements IPanelDeserializer {
-    constructor(private readonly layout: DockviewComponent) {}
+    constructor(private readonly layout: IDockviewComponent) {}
 
     public fromJSON(
         panelData: GroupviewPanelState,
-        group: GroupPanel
+        group: DockviewGroupPanel
     ): IDockviewPanel {
         const panelId = panelData.id;
         const params = panelData.params;
         const title = panelData.title;
-        const viewData = panelData.view;
+
+        const viewData = (panelData as LegacyState).view!;
+
+        const contentComponent = viewData
+            ? viewData.content.id
+            : panelData.contentComponent || 'unknown';
+        const tabComponent = viewData
+            ? viewData.tab?.id
+            : panelData.tabComponent;
 
         let tab: ITabRenderer;
 
-        if (viewData.tab?.id) {
+        if (tabComponent) {
             tab = createComponent(
-                viewData.tab.id,
-                viewData.tab.id,
+                panelId,
+                tabComponent,
                 this.layout.options.tabComponents,
                 this.layout.options.frameworkTabComponents,
                 this.layout.options.frameworkComponentFactory?.tab,
@@ -36,7 +55,7 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
             );
         } else if (this.layout.options.defaultTabComponent) {
             tab = createComponent(
-                this.layout.options.defaultTabComponent,
+                panelId,
                 this.layout.options.defaultTabComponent,
                 this.layout.options.tabComponents,
                 this.layout.options.frameworkTabComponents,
@@ -47,27 +66,23 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
             tab = new DefaultTab();
         }
 
-        const view = new DefaultGroupPanelView({
-            content: createComponent(
-                viewData.content.id,
-                viewData.content.id,
-                this.layout.options.components,
-                this.layout.options.frameworkComponents,
-                this.layout.options.frameworkComponentFactory?.content
-            ),
-            tab,
-        });
+        const view = new DockviewPanelModel(
+            this.layout,
+            panelId,
+            contentComponent,
+            tabComponent
+        );
 
         const panel = new DockviewPanel(
             panelId,
             this.layout,
             new DockviewApi(this.layout),
-            group
+            group,
+            view
         );
 
         panel.init({
-            view,
-            title,
+            title: title || panelId,
             params: params || {},
         });
 

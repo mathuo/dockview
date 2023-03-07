@@ -1,14 +1,9 @@
 import { CompositeDisposable } from '../../../lifecycle';
-import {
-    ITabRenderer,
-    GroupPanelPartInitParameters,
-} from '../../../groupview/types';
+import { ITabRenderer, GroupPanelPartInitParameters } from '../../types';
 import { addDisposableListener } from '../../../events';
 import { PanelUpdateEvent } from '../../../panel/types';
-import { GroupPanel } from '../../../groupview/groupviewPanel';
+import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { createCloseButton } from '../../../svg';
-
-export const DEFAULT_TAB_IDENTIFIER = '__default__tab__';
 
 export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     private _element: HTMLElement;
@@ -24,10 +19,6 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
 
     get element() {
         return this._element;
-    }
-
-    get id() {
-        return DEFAULT_TAB_IDENTIFIER;
     }
 
     constructor() {
@@ -69,18 +60,13 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         this.render();
     }
 
-    public toJSON() {
-        return { id: this.id };
-    }
-
     focus() {
         //noop
     }
 
     public init(params: GroupPanelPartInitParameters) {
         this.params = params;
-        this._content.textContent =
-            typeof params.title === 'string' ? params.title : this.id;
+        this._content.textContent = params.title;
 
         addDisposableListener(this.action, 'click', (ev) => {
             ev.preventDefault(); //
@@ -88,7 +74,10 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         });
     }
 
-    public updateParentGroup(group: GroupPanel, isPanelVisible: boolean) {
+    public updateParentGroup(
+        group: DockviewGroupPanel,
+        isPanelVisible: boolean
+    ) {
         const changed =
             this._isPanelVisible !== isPanelVisible ||
             this._isGroupActive !== group.isActive;
@@ -107,10 +96,7 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
 
     private render() {
         if (this._content.textContent !== this.params.title) {
-            this._content.textContent =
-                typeof this.params.title === 'string'
-                    ? this.params.title
-                    : this.id;
+            this._content.textContent = this.params.title;
         }
     }
 }

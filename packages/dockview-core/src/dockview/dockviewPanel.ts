@@ -7,20 +7,20 @@ import {
     GroupPanelUpdateEvent,
     GroupviewPanelState,
     IGroupPanelInitParameters,
-} from '../groupview/types';
-import { GroupPanel } from '../groupview/groupviewPanel';
+} from './types';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { IPanel, Parameters } from '../panel/types';
-import { IGroupPanelView } from './defaultGroupPanelView';
-import { DockviewComponent } from './dockviewComponent';
+import { IDockviewPanelModel } from './dockviewPanelModel';
+import { IDockviewComponent } from './dockviewComponent';
 
 export interface IDockviewPanel extends IDisposable, IPanel {
-    readonly view?: IGroupPanelView;
-    readonly group: GroupPanel;
+    readonly view: IDockviewPanelModel;
+    readonly group: DockviewGroupPanel;
     readonly api: DockviewPanelApi;
     readonly title: string;
     readonly params: Record<string, any> | undefined;
-    updateParentGroup(group: GroupPanel, isGroupActive: boolean): void;
+    updateParentGroup(group: DockviewGroupPanel, isGroupActive: boolean): void;
     init(params: IGroupPanelInitParameters): void;
     toJSON(): GroupviewPanelState;
     update(event: GroupPanelUpdateEvent): void;
@@ -31,10 +31,8 @@ export class DockviewPanel
     implements IDockviewPanel
 {
     readonly api: DockviewPanelApiImpl;
-    private _group: GroupPanel;
+    private _group: DockviewGroupPanel;
     private _params?: Parameters;
-
-    private _view?: IGroupPanelView;
 
     private _title: string;
 
@@ -46,19 +44,16 @@ export class DockviewPanel
         return this._title;
     }
 
-    get group(): GroupPanel {
+    get group(): DockviewGroupPanel {
         return this._group;
-    }
-
-    get view(): IGroupPanelView | undefined {
-        return this._view;
     }
 
     constructor(
         public readonly id: string,
-        accessor: DockviewComponent,
+        accessor: IDockviewComponent,
         private readonly containerApi: DockviewApi,
-        group: GroupPanel
+        group: DockviewGroupPanel,
+        readonly view: IDockviewPanelModel
     ) {
         super();
         this._title = '';
@@ -80,11 +75,8 @@ export class DockviewPanel
 
     public init(params: IGroupPanelInitParameters): void {
         this._params = params.params;
-        this._view = params.view;
 
-        if (typeof params.title === 'string') {
-            this.setTitle(params.title);
-        }
+        this.setTitle(params.title);
 
         this.view?.init({
             ...params,
@@ -100,7 +92,8 @@ export class DockviewPanel
     public toJSON(): GroupviewPanelState {
         return <GroupviewPanelState>{
             id: this.id,
-            view: this.view!.toJSON(),
+            contentComponent: this.view.contentComponent,
+            tabComponent: this.view.tabComponent,
             params:
                 Object.keys(this._params || {}).length > 0
                     ? this._params
@@ -133,11 +126,9 @@ export class DockviewPanel
             ...event.params.params,
         };
 
-        if (typeof params.title === 'string') {
-            if (params.title !== this.title) {
-                this._title = params.title;
-                this.api._onDidTitleChange.fire({ title: this.title });
-            }
+        if (params.title !== this.title) {
+            this._title = params.title;
+            this.api._onDidTitleChange.fire({ title: this.title });
         }
 
         this.view?.update({
@@ -148,7 +139,10 @@ export class DockviewPanel
         });
     }
 
-    public updateParentGroup(group: GroupPanel, isGroupActive: boolean): void {
+    public updateParentGroup(
+        group: DockviewGroupPanel,
+        isGroupActive: boolean
+    ): void {
         this._group = group;
         this.api.group = group;
 

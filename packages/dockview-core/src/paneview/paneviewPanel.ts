@@ -96,7 +96,7 @@ export abstract class PaneviewPanel
         this._orientation = value;
     }
 
-    get orientation() {
+    get orientation(): Orientation {
         return this._orientation;
     }
 
@@ -116,11 +116,11 @@ export abstract class PaneviewPanel
         return headerSize + maximumBodySize;
     }
 
-    get size() {
+    get size(): number {
         return this._size;
     }
 
-    get orthogonalSize() {
+    get orthogonalSize(): number {
         return this._orthogonalSize;
     }
 
@@ -128,7 +128,7 @@ export abstract class PaneviewPanel
         this._orthogonalSize = size;
     }
 
-    get minimumBodySize() {
+    get minimumBodySize(): number {
         return this._minimumBodySize;
     }
 
@@ -136,7 +136,7 @@ export abstract class PaneviewPanel
         this._minimumBodySize = typeof value === 'number' ? value : 0;
     }
 
-    get maximumBodySize() {
+    get maximumBodySize(): number {
         return this._maximumBodySize;
     }
 
@@ -217,11 +217,11 @@ export abstract class PaneviewPanel
         this.renderOnce();
     }
 
-    setVisible(isVisible: boolean) {
+    setVisible(isVisible: boolean): void {
         this.api._onDidVisibilityChange.fire({ isVisible });
     }
 
-    setActive(isActive: boolean) {
+    setActive(isActive: boolean): void {
         this.api._onDidActiveChange.fire({ isActive });
     }
 
@@ -253,7 +253,7 @@ export abstract class PaneviewPanel
         this._onDidChangeExpansionState.fire(expanded);
     }
 
-    layout(size: number, orthogonalSize: number) {
+    layout(size: number, orthogonalSize: number): void {
         this._size = size;
         this._orthogonalSize = orthogonalSize;
         const [width, height] =
@@ -299,7 +299,7 @@ export abstract class PaneviewPanel
         };
     }
 
-    private renderOnce() {
+    private renderOnce(): void {
         this.header = document.createElement('div');
         this.header.tabIndex = 0;
 

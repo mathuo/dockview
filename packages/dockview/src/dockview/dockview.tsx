@@ -10,8 +10,7 @@ import {
     IContentRenderer,
     ITabRenderer,
     watchElementResize,
-    GroupPanel,
-    DEFAULT_TAB_IDENTIFIER,
+    DockviewGroupPanel,
     DefaultDockviewDeserialzier,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
@@ -28,9 +27,9 @@ import {
 function createGroupControlElement(
     component: React.FunctionComponent<IDockviewGroupControlProps> | undefined,
     store: ReactPortalStore
-): ((groupPanel: GroupPanel) => IGroupControlRenderer) | undefined {
+): ((groupPanel: DockviewGroupPanel) => IGroupControlRenderer) | undefined {
     return component
-        ? (groupPanel: GroupPanel) => {
+        ? (groupPanel: DockviewGroupPanel) => {
               return new ReactGroupControlsRendererPart(
                   component,
                   store,
@@ -71,6 +70,8 @@ export interface IDockviewReactProps {
     groupControlComponent?: React.FunctionComponent<IDockviewGroupControlProps>;
     singleTabMode?: 'fullwidth' | 'default';
 }
+
+const DEFAULT_REACT_TAB = 'props.defaultTabComponent';
 
 export const DockviewReact = React.forwardRef(
     (props: IDockviewReactProps, ref: React.ForwardedRef<HTMLDivElement>) => {
@@ -144,16 +145,22 @@ export const DockviewReact = React.forwardRef(
 
             const element = document.createElement('div');
 
+            const frameworkTabComponents = props.tabComponents || {};
+
+            if (props.defaultTabComponent) {
+                frameworkTabComponents[DEFAULT_REACT_TAB] =
+                    props.defaultTabComponent;
+            }
+
             const dockview = new DockviewComponent(element, {
                 frameworkComponentFactory: factory,
                 frameworkComponents: props.components,
-                frameworkTabComponents: {
-                    ...(props.tabComponents || {}),
-                    [DEFAULT_TAB_IDENTIFIER]: props.defaultTabComponent,
-                },
+                frameworkTabComponents,
                 tabHeight: props.tabHeight,
                 watermarkFrameworkComponent: props.watermarkComponent,
-                defaultTabComponent: DEFAULT_TAB_IDENTIFIER,
+                defaultTabComponent: props.defaultTabComponent
+                    ? DEFAULT_REACT_TAB
+                    : undefined,
                 styles: props.hideBorders
                     ? { separatorBorder: 'transparent' }
                     : undefined,
@@ -241,12 +248,19 @@ export const DockviewReact = React.forwardRef(
             if (!dockviewRef.current) {
                 return;
             }
+
+            const frameworkTabComponents = props.tabComponents || {};
+
+            if (props.defaultTabComponent) {
+                frameworkTabComponents[DEFAULT_REACT_TAB] =
+                    props.defaultTabComponent;
+            }
+
             dockviewRef.current.updateOptions({
-                defaultTabComponent: DEFAULT_TAB_IDENTIFIER,
-                frameworkTabComponents: {
-                    ...(props.tabComponents || {}),
-                    [DEFAULT_TAB_IDENTIFIER]: props.defaultTabComponent,
-                },
+                defaultTabComponent: props.defaultTabComponent
+                    ? DEFAULT_REACT_TAB
+                    : undefined,
+                frameworkTabComponents,
             });
         }, [props.defaultTabComponent]);
 

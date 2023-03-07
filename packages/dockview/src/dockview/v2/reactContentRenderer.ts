@@ -1,9 +1,10 @@
 import {
     GroupPanelPartInitParameters,
     IContentRenderer,
-    GroupPanel,
+    DockviewGroupPanel,
     HostedContainer,
     PanelUpdateEvent,
+    DockviewEvent,
 } from 'dockview-core';
 import { ReactPart, ReactPortalStore } from '../../react';
 import { IDockviewPanelProps } from '../dockview';
@@ -13,7 +14,7 @@ export class ReactContentRenderer implements IContentRenderer {
 
     private _element: HTMLElement;
     private part?: ReactPart<IDockviewPanelProps>;
-    private _group: GroupPanel | undefined;
+    private _group: DockviewGroupPanel | undefined;
 
     private parameters: GroupPanelPartInitParameters | undefined;
 
@@ -21,11 +22,11 @@ export class ReactContentRenderer implements IContentRenderer {
         return this._element;
     }
 
-    get onDidBlur() {
+    get onDidBlur(): DockviewEvent<void> {
         return this._hostedContainer.onDidBlur;
     }
 
-    get onDidFocus() {
+    get onDidFocus(): DockviewEvent<void> {
         return this._hostedContainer.onDidFocus;
     }
 
@@ -46,7 +47,7 @@ export class ReactContentRenderer implements IContentRenderer {
         this._element.style.width = '100%';
     }
 
-    focus() {
+    focus(): void {
         // noop
     }
 
@@ -74,13 +75,7 @@ export class ReactContentRenderer implements IContentRenderer {
         );
     }
 
-    public toJSON() {
-        return {
-            id: this.id,
-        };
-    }
-
-    public update(params: PanelUpdateEvent) {
+    public update(params: PanelUpdateEvent): void {
         if (this.parameters) {
             this.parameters.params = params.params;
         }
@@ -89,7 +84,7 @@ export class ReactContentRenderer implements IContentRenderer {
     }
 
     public updateParentGroup(
-        group: GroupPanel,
+        group: DockviewGroupPanel,
         _isPanelVisible: boolean
     ): void {
         this._group = group;
@@ -99,7 +94,7 @@ export class ReactContentRenderer implements IContentRenderer {
         this._hostedContainer.layout(this.element);
     }
 
-    public dispose() {
+    public dispose(): void {
         this.part?.dispose();
     }
 }

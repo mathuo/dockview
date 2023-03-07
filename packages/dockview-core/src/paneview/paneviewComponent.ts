@@ -175,25 +175,25 @@ export class PaneviewComponent
         );
     }
 
-    get paneview() {
+    get paneview(): Paneview {
         return this._paneview;
     }
 
-    get minimumSize() {
+    get minimumSize(): number {
         return this.paneview.minimumSize;
     }
 
-    get maximumSize() {
+    get maximumSize(): number {
         return this.paneview.maximumSize;
     }
 
-    get height() {
+    get height(): number {
         return this.paneview.orientation === Orientation.HORIZONTAL
             ? this.paneview.orthogonalSize
             : this.paneview.size;
     }
 
-    get width() {
+    get width(): number {
         return this.paneview.orientation === Orientation.HORIZONTAL
             ? this.paneview.size
             : this.paneview.orthogonalSize;
@@ -234,8 +234,8 @@ export class PaneviewComponent
         this.addDisposables(this._disposable);
     }
 
-    focus() {
-        //
+    focus(): void {
+        //noop
     }
 
     updateOptions(options: Partial<PaneviewComponentOptions>): void {
@@ -311,7 +311,7 @@ export class PaneviewComponent
         return view;
     }
 
-    removePanel(panel: PaneviewPanel) {
+    removePanel(panel: PaneviewPanel): void {
         const views = this.panels;
         const index = views.findIndex((_) => _ === panel);
         this.paneview.removePane(index);
@@ -462,7 +462,7 @@ export class PaneviewComponent
         this.paneview.dispose();
     }
 
-    private doAddPanel(panel: PaneFramework) {
+    private doAddPanel(panel: PaneFramework): void {
         const disposable = panel.onDidDrop((event) => {
             this._onDidDrop.fire(event);
         });
@@ -470,7 +470,7 @@ export class PaneviewComponent
         this._viewDisposables.set(panel.id, disposable);
     }
 
-    private doRemovePanel(panel: PaneviewPanel) {
+    private doRemovePanel(panel: PaneviewPanel): void {
         const disposable = this._viewDisposables.get(panel.id);
 
         if (disposable) {

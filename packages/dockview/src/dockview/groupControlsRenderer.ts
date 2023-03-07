@@ -5,13 +5,13 @@ import {
     DockviewCompositeDisposable,
     DockviewMutableDisposable,
     DockviewApi,
-    GroupPanel,
-    GroupviewPanelApi,
+    DockviewGroupPanel,
+    DockviewGroupPanelApi,
     PanelUpdateEvent,
 } from 'dockview-core';
 
 export interface IDockviewGroupControlProps {
-    api: GroupviewPanelApi;
+    api: DockviewGroupPanelApi;
     containerApi: DockviewApi;
     panels: IDockviewPanel[];
     activePanel: IDockviewPanel | undefined;
@@ -31,26 +31,26 @@ export class ReactGroupControlsRendererPart {
         return this._part;
     }
 
-    get group(): GroupPanel {
+    get group(): DockviewGroupPanel {
         return this._group;
     }
 
     constructor(
         private readonly component: React.FunctionComponent<IDockviewGroupControlProps>,
         private readonly reactPortalStore: ReactPortalStore,
-        private readonly _group: GroupPanel
+        private readonly _group: DockviewGroupPanel
     ) {
         this._element = document.createElement('div');
         this._element.className = 'dockview-react-part';
     }
 
-    focus() {
+    focus(): void {
         // TODO
     }
 
     public init(parameters: {
         containerApi: DockviewApi;
-        api: GroupviewPanelApi;
+        api: DockviewGroupPanelApi;
     }): void {
         this.mutableDisposable.value = new DockviewCompositeDisposable(
             this._group.model.onDidAddPanel(() => {
@@ -81,20 +81,20 @@ export class ReactGroupControlsRendererPart {
         );
     }
 
-    public update(event: PanelUpdateEvent) {
+    public update(event: PanelUpdateEvent): void {
         this._part?.update(event.params);
     }
 
-    public dispose() {
+    public dispose(): void {
         this.mutableDisposable.dispose();
         this._part?.dispose();
     }
 
-    private updatePanels() {
+    private updatePanels(): void {
         this.update({ params: { panels: this._group.model.panels } });
     }
 
-    private updateActivePanel() {
+    private updateActivePanel(): void {
         this.update({
             params: {
                 activePanel: this._group.model.activePanel,
@@ -102,7 +102,7 @@ export class ReactGroupControlsRendererPart {
         });
     }
 
-    private updateGroupActive() {
+    private updateGroupActive(): void {
         this.update({
             params: {
                 isGroupActive: this._group.api.isActive,

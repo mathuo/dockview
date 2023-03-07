@@ -4,6 +4,8 @@ import { IView, LayoutPriority } from './splitview';
 
 export class ViewItem {
     private _size: number;
+    private _cachedVisibleSize: number | undefined = undefined;
+
     set size(size: number) {
         this._size = size;
     }
@@ -12,38 +14,12 @@ export class ViewItem {
         return this._size;
     }
 
-    private _cachedVisibleSize: number | undefined = undefined;
     get cachedVisibleSize(): number | undefined {
         return this._cachedVisibleSize;
     }
 
     get visible(): boolean {
         return typeof this._cachedVisibleSize === 'undefined';
-    }
-
-    setVisible(visible: boolean, size?: number): void {
-        if (visible === this.visible) {
-            return;
-        }
-
-        if (visible) {
-            this.size = clamp(
-                this._cachedVisibleSize ?? 0,
-                this.viewMinimumSize,
-                this.viewMaximumSize
-            );
-            this._cachedVisibleSize = undefined;
-        } else {
-            this._cachedVisibleSize =
-                typeof size === 'number' ? size : this.size;
-            this.size = 0;
-        }
-
-        this.container.classList.toggle('visible', visible);
-
-        if (this.view.setVisible) {
-            this.view.setVisible(visible);
-        }
     }
 
     get minimumSize(): number {
@@ -87,12 +63,30 @@ export class ViewItem {
         }
     }
 
-    // layout(offset: number, layoutContext: TLayoutContext | undefined): void {
-    //     this.layoutContainer(offset);
-    //     this.view.layout(this.size, offset, layoutContext);
-    // }
+    setVisible(visible: boolean, size?: number): void {
+        if (visible === this.visible) {
+            return;
+        }
 
-    // abstract layoutContainer(offset: number): void;
+        if (visible) {
+            this.size = clamp(
+                this._cachedVisibleSize ?? 0,
+                this.viewMinimumSize,
+                this.viewMaximumSize
+            );
+            this._cachedVisibleSize = undefined;
+        } else {
+            this._cachedVisibleSize =
+                typeof size === 'number' ? size : this.size;
+            this.size = 0;
+        }
+
+        this.container.classList.toggle('visible', visible);
+
+        if (this.view.setVisible) {
+            this.view.setVisible(visible);
+        }
+    }
 
     dispose(): IView {
         this.disposable.dispose();

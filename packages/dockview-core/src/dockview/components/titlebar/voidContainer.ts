@@ -1,12 +1,12 @@
-import { last } from '../../array';
-import { getPanelData } from '../../dnd/dataTransfer';
-import { Droptarget, DroptargetEvent } from '../../dnd/droptarget';
-import { GroupDragHandler } from '../../dnd/groupDragHandler';
-import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { addDisposableListener, Emitter, Event } from '../../events';
-import { CompositeDisposable } from '../../lifecycle';
-import { DockviewDropTargets } from '../dnd';
-import { GroupPanel } from '../groupviewPanel';
+import { last } from '../../../array';
+import { getPanelData } from '../../../dnd/dataTransfer';
+import { Droptarget, DroptargetEvent } from '../../../dnd/droptarget';
+import { GroupDragHandler } from '../../../dnd/groupDragHandler';
+import { DockviewComponent } from '../../dockviewComponent';
+import { addDisposableListener, Emitter, Event } from '../../../events';
+import { CompositeDisposable } from '../../../lifecycle';
+import { DockviewGroupPanel } from '../../dockviewGroupPanel';
+import { DockviewDropTargets } from '../../types';
 
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;
@@ -21,7 +21,7 @@ export class VoidContainer extends CompositeDisposable {
 
     constructor(
         private readonly accessor: DockviewComponent,
-        private readonly group: GroupPanel
+        private readonly group: DockviewGroupPanel
     ) {
         super();
 

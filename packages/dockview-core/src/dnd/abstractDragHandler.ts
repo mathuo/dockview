@@ -21,7 +21,7 @@ export abstract class DragHandler extends CompositeDisposable {
 
     abstract getData(dataTransfer?: DataTransfer | null): IDisposable;
 
-    private configure() {
+    private configure(): void {
         this.addDisposables(
             this._onDragStart,
             addDisposableListener(this.el, 'dragstart', (event) => {

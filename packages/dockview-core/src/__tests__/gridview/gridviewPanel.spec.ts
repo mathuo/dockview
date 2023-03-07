@@ -1,5 +1,5 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
-import { GroupPanel } from '../../groupview/groupviewPanel';
+import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
 describe('gridviewPanel', () => {
     test('get panel', () => {
@@ -13,7 +13,7 @@ describe('gridviewPanel', () => {
 
         const accessor = new accessorMock();
 
-        const cut = new GroupPanel(accessor, 'id', {});
+        const cut = new DockviewGroupPanel(accessor, 'id', {});
 
         expect(cut.params).toEqual(undefined);
 

@@ -2,9 +2,8 @@ import * as React from 'react';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IGroupPanelBaseProps } from './dockview';
 import {
-    DEFAULT_TAB_IDENTIFIER,
     PanelUpdateEvent,
-    GroupPanel,
+    DockviewGroupPanel,
     ITabRenderer,
     GroupPanelPartInitParameters,
 } from 'dockview-core';
@@ -13,7 +12,7 @@ export class ReactPanelHeaderPart implements ITabRenderer {
     private _element: HTMLElement;
     private part?: ReactPart<IGroupPanelBaseProps>;
 
-    get element() {
+    get element(): HTMLElement {
         return this._element;
     }
 
@@ -26,7 +25,7 @@ export class ReactPanelHeaderPart implements ITabRenderer {
         this._element.className = 'dockview-react-part';
     }
 
-    focus() {
+    focus(): void {
         //noop
     }
 
@@ -43,32 +42,22 @@ export class ReactPanelHeaderPart implements ITabRenderer {
         );
     }
 
-    public update(event: PanelUpdateEvent) {
+    public update(event: PanelUpdateEvent): void {
         this.part?.update(event.params);
     }
 
-    public toJSON() {
-        if (this.id === DEFAULT_TAB_IDENTIFIER) {
-            return {};
-        }
-
-        return {
-            id: this.id,
-        };
-    }
-
-    public layout(_width: number, _height: number) {
+    public layout(_width: number, _height: number): void {
         // noop - retrieval from api
     }
 
     public updateParentGroup(
-        _group: GroupPanel,
+        _group: DockviewGroupPanel,
         _isPanelVisible: boolean
     ): void {
         // noop - retrieval from api
     }
 
-    public dispose() {
+    public dispose(): void {
         this.part?.dispose();
     }
 }
