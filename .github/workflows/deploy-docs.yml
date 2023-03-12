@@ -28,6 +28,8 @@ jobs:
             - run: yarn install
             - run: lerna bootstrap
             - run: npm run build
+              working-directory: packages/dockview-core
+            - run: npm run build
               working-directory: packages/dockview
             - run: npm run build
               working-directory: packages/docs

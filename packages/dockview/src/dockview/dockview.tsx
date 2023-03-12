@@ -11,7 +11,6 @@ import {
     ITabRenderer,
     watchElementResize,
     DockviewGroupPanel,
-    DefaultDockviewDeserialzier,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
@@ -173,7 +172,6 @@ export const DockviewReact = React.forwardRef(
             });
 
             domRef.current?.appendChild(dockview.element);
-            dockview.deserializer = new DefaultDockviewDeserialzier(dockview);
 
             const { clientWidth, clientHeight } = domRef.current!;
             dockview.layout(clientWidth, clientHeight);
