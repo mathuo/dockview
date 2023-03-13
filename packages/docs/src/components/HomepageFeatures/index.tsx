@@ -16,7 +16,7 @@ const FeatureList: FeatureItem[] = [
             <>
                 <div className="feature-banner">
                     <h3 className="feature-banner-header">
-                        Serialziable Layouts
+                        Serializable Layouts
                     </h3>
                     <p className="feature-banner-content">
                         Add and remove panels using the provided api or use the
