@@ -27,17 +27,8 @@ jobs:
             - run: npm run bootstrap
             - run: npm run build
             - run: npm run test:cov
-            - name: SonarCloud Scan 1
+            - name: SonarCloud Scan
               uses: SonarSource/sonarcloud-github-action@master
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-              with:
-                  projectBaseDir: packages/dockview-core/
-            - name: SonarCloud Scan 2
-              uses: SonarSource/sonarcloud-github-action@master
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
-                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-              with:
-                  projectBaseDir: packages/dockview/
