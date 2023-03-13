@@ -1,4 +1,4 @@
-import { addClasses } from '../dom';
+import { addClasses, removeClasses } from '../dom';
 
 export function addGhostImage(
     dataTransfer: DataTransfer,
@@ -11,6 +11,7 @@ export function addGhostImage(
     dataTransfer.setDragImage(ghostElement, 0, 0);
 
     setTimeout(() => {
+        removeClasses(ghostElement, 'dv-dragged');
         ghostElement.remove();
     }, 0);
 }
