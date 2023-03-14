@@ -1,5 +1,5 @@
-import { IDisposable } from '../../lifecycle';
-import { clamp } from '../../math';
+import { IDisposable } from '../lifecycle';
+import { clamp } from '../math';
 import { IView, LayoutPriority } from './splitview';
 
 export class ViewItem {

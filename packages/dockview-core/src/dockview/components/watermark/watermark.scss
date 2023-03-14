@@ -4,7 +4,7 @@
 
     &.has-actions {
         .watermark-title {
-            .actions-bar {
+            .actions-container {
                 display: none;
             }
         }
@@ -17,5 +17,29 @@
     }
     .watermark-content {
         flex-grow: 1;
+    }
+
+    .actions-container {
+        display: flex;
+        align-items: center;
+        padding: 0px 8px;
+        // padding: 0px;
+        // margin: 0px;
+        // justify-content: flex-end;
+
+        .close-action {
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            cursor: pointer;
+            color: var(--dv-activegroup-hiddenpanel-tab-color);
+
+            &:hover {
+                border-radius: 2px;
+                background-color: var(--dv-icon-hover-background-color);
+            }
+        }
     }
 }

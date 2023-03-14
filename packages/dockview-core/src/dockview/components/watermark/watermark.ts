@@ -1,5 +1,4 @@
 import { GroupPanelPartInitParameters, IWatermarkRenderer } from '../../types';
-import { ActionContainer } from '../../../actionbar/actionsContainer';
 import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
 import { CompositeDisposable } from '../../../lifecycle';
@@ -36,15 +35,17 @@ export class Watermark
         this._element.appendChild(title);
         this._element.appendChild(content);
 
-        const actions = new ActionContainer();
-        title.appendChild(emptySpace);
-        title.appendChild(actions.element);
+        const actionsContainer = document.createElement('div');
+        actionsContainer.className = 'actions-container';
 
         const closeAnchor = document.createElement('div');
         closeAnchor.className = 'close-action';
         closeAnchor.appendChild(createCloseButton());
 
-        actions.add(closeAnchor);
+        actionsContainer.appendChild(closeAnchor);
+
+        title.appendChild(emptySpace);
+        title.appendChild(actionsContainer);
 
         this.addDisposables(
             addDisposableListener(closeAnchor, 'click', (ev) => {

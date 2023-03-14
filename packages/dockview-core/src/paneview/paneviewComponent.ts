@@ -6,11 +6,7 @@ import {
     IDisposable,
     MutableDisposable,
 } from '../lifecycle';
-import {
-    LayoutPriority,
-    Orientation,
-    Sizing,
-} from '../splitview/core/splitview';
+import { LayoutPriority, Orientation, Sizing } from '../splitview/splitview';
 import { PaneviewComponentOptions } from './options';
 import { Paneview } from './paneview';
 import {

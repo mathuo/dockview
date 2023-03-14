@@ -1,5 +1,5 @@
 import { Gridview } from '../../gridview/gridview';
-import { Orientation } from '../../splitview/core/splitview';
+import { Orientation } from '../../splitview/splitview';
 
 describe('gridview', () => {
     let container: HTMLElement;

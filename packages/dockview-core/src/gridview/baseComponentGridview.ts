@@ -3,11 +3,7 @@ import { getGridLocation, Gridview, IGridView } from './gridview';
 import { Position } from '../dnd/droptarget';
 import { CompositeDisposable, IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
-import {
-    ISplitviewStyles,
-    Orientation,
-    Sizing,
-} from '../splitview/core/splitview';
+import { ISplitviewStyles, Orientation, Sizing } from '../splitview/splitview';
 import { IPanel } from '../panel/types';
 import { MovementOptions2 } from '../dockview/options';
 

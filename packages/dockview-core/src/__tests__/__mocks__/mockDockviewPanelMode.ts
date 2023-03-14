@@ -29,13 +29,6 @@ export class DockviewPanelModelMock implements IDockviewPanelModel {
         //
     }
 
-    updateParentGroup(
-        group: DockviewGroupPanel,
-        isPanelVisible: boolean
-    ): void {
-        //
-    }
-
     dispose(): void {
         //
     }

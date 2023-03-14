@@ -44,7 +44,6 @@
     "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
     "gulp-dart-sass": "^1.0.2",
-    "jest": "^29.4.3",
     "jest-environment-jsdom": "^29.4.3",
     "jest-sonar-reporter": "^2.0.0",
     "jsdom": "^21.1.0",
@@ -61,5 +60,9 @@
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.11.1"
+  },
+  "dependencies": {
+    "jest": "^29.5.0",
+    "ts-node": "^10.9.1"
   }
 }

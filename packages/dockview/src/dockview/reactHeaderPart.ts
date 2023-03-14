@@ -3,7 +3,6 @@ import { ReactPart, ReactPortalStore } from '../react';
 import { IGroupPanelBaseProps } from './dockview';
 import {
     PanelUpdateEvent,
-    DockviewGroupPanel,
     ITabRenderer,
     GroupPanelPartInitParameters,
 } from 'dockview-core';
@@ -47,13 +46,6 @@ export class ReactPanelHeaderPart implements ITabRenderer {
     }
 
     public layout(_width: number, _height: number): void {
-        // noop - retrieval from api
-    }
-
-    public updateParentGroup(
-        _group: DockviewGroupPanel,
-        _isPanelVisible: boolean
-    ): void {
         // noop - retrieval from api
     }
 

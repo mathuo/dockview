@@ -8,7 +8,7 @@ import {
     LayoutPriority,
     Orientation,
     Sizing,
-} from '../splitview/core/splitview';
+} from '../splitview/splitview';
 import { tail } from '../array';
 import { LeafNode } from './leafNode';
 import { BranchNode } from './branchNode';

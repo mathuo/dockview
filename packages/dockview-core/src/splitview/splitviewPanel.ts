@@ -1,10 +1,10 @@
-import { ISerializableView, PanelViewInitParameters } from './core/options';
+import { ISerializableView, PanelViewInitParameters } from './options';
 import {
     BasePanelView,
     BasePanelViewExported,
 } from '../gridview/basePanelView';
 import { SplitviewPanelApiImpl } from '../api/splitviewPanelApi';
-import { LayoutPriority, Orientation } from './core/splitview';
+import { LayoutPriority, Orientation } from './splitview';
 import { FunctionOrValue } from '../types';
 import { Emitter, Event } from '../events';
 

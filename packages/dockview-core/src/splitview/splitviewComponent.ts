@@ -10,8 +10,8 @@ import {
     Orientation,
     Sizing,
     Splitview,
-} from './core/splitview';
-import { SplitviewComponentOptions } from './core/options';
+} from './splitview';
+import { SplitviewComponentOptions } from './options';
 import { BaseComponentOptions } from '../panel/types';
 import { Emitter, Event } from '../events';
 import { SplitviewPanel, ISplitviewPanel } from './splitviewPanel';

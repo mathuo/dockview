@@ -155,7 +155,7 @@ export class DockviewPanel
             isVisible: isPanelVisible,
         });
 
-        this.view?.updateParentGroup(
+        this.view.updateParentGroup(
             this._group,
             this._group.model.isPanelActive(this)
         );

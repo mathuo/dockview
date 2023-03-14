@@ -28,7 +28,7 @@ import {
     SerializedSplitview,
     SplitviewComponentUpdateOptions,
 } from '../splitview/splitviewComponent';
-import { IView, Orientation, Sizing } from '../splitview/core/splitview';
+import { IView, Orientation, Sizing } from '../splitview/splitview';
 import { ISplitviewPanel } from '../splitview/splitviewPanel';
 import {
     DockviewGroupPanel,

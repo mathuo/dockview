@@ -3,11 +3,7 @@
  * https://github.com/microsoft/vscode/tree/main/src/vs/base/browser/ui/grid
  *--------------------------------------------------------------------------------------------*/
 
-import {
-    IView,
-    LayoutPriority,
-    Orientation,
-} from '../splitview/core/splitview';
+import { IView, LayoutPriority, Orientation } from '../splitview/splitview';
 import { Emitter, Event } from '../events';
 import { IGridView } from './gridview';
 import { IDisposable } from '../lifecycle';

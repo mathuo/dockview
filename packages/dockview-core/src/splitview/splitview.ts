@@ -8,10 +8,10 @@ import {
     addClasses,
     toggleClass,
     getElementsByTagName,
-} from '../../dom';
-import { clamp } from '../../math';
-import { Event, Emitter } from '../../events';
-import { pushToStart, pushToEnd, range, firstIndex } from '../../array';
+} from '../dom';
+import { clamp } from '../math';
+import { Event, Emitter } from '../events';
+import { pushToStart, pushToEnd, range, firstIndex } from '../array';
 import { ViewItem } from './viewItem';
 
 export enum Orientation {

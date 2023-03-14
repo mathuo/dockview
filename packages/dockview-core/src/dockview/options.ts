@@ -12,7 +12,7 @@ import {
     DockviewGroupPanel,
     DockviewGroupPanelApi,
 } from './dockviewGroupPanel';
-import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
+import { ISplitviewStyles, Orientation } from '../splitview/splitview';
 import { FrameworkFactory } from '../types';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';

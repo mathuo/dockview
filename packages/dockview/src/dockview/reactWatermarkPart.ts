@@ -15,9 +15,6 @@ export interface IWatermarkPanelProps extends IGroupPanelBaseProps {
 export class ReactWatermarkPart implements IWatermarkRenderer {
     private _element: HTMLElement;
     private part?: ReactPart<IWatermarkPanelProps>;
-    private _groupRef: { value: DockviewGroupPanel | undefined } = {
-        value: undefined,
-    };
     private parameters: GroupPanelPartInitParameters | undefined;
 
     get element(): HTMLElement {
@@ -45,11 +42,7 @@ export class ReactWatermarkPart implements IWatermarkRenderer {
                 api: parameters.api,
                 containerApi: parameters.containerApi,
                 close: () => {
-                    if (this._groupRef.value) {
-                        parameters.containerApi.removeGroup(
-                            this._groupRef.value
-                        );
-                    }
+                    parameters.containerApi.removeGroup(parameters.api.group);
                 },
             }
         );
@@ -72,11 +65,10 @@ export class ReactWatermarkPart implements IWatermarkRenderer {
     }
 
     updateParentGroup(
-        group: DockviewGroupPanel,
+        _group: DockviewGroupPanel,
         _isPanelVisible: boolean
     ): void {
-        // noop - retrieval from api
-        this._groupRef.value = group;
+        // noop
     }
 
     dispose(): void {

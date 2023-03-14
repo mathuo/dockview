@@ -13,7 +13,7 @@ import {
     GridviewPanelApi,
     GridviewPanelApiImpl,
 } from '../api/gridviewPanelApi';
-import { LayoutPriority } from '../splitview/core/splitview';
+import { LayoutPriority } from '../splitview/splitview';
 import { Emitter, Event } from '../events';
 import { IViewSize } from './gridview';
 

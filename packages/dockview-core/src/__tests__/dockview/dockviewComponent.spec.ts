@@ -8,7 +8,7 @@ import {
     IGroupPanelInitParameters,
 } from '../../dockview/types';
 import { PanelUpdateEvent } from '../../panel/types';
-import { Orientation } from '../../splitview/core/splitview';
+import { Orientation } from '../../splitview/splitview';
 import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
 import { IDockviewPanel } from '../../dockview/dockviewPanel';

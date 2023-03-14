@@ -1,5 +1,5 @@
 import { GridviewPanel } from './gridviewPanel';
-import { ISplitviewStyles, Orientation } from '../splitview/core/splitview';
+import { ISplitviewStyles, Orientation } from '../splitview/splitview';
 import { FrameworkFactory } from '../types';
 
 export interface GridviewComponentOptions {

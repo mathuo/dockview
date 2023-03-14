@@ -10,7 +10,7 @@ import {
     Sizing,
     LayoutPriority,
     ISplitviewStyles,
-} from '../splitview/core/splitview';
+} from '../splitview/splitview';
 import { Emitter, Event } from '../events';
 import { INodeDescriptor } from './gridview';
 import { LeafNode } from './leafNode';

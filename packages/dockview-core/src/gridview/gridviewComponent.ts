@@ -22,7 +22,7 @@ import {
     IGridviewPanel,
 } from './gridviewPanel';
 import { BaseComponentOptions } from '../panel/types';
-import { Orientation, Sizing } from '../splitview/core/splitview';
+import { Orientation, Sizing } from '../splitview/splitview';
 import { createComponent } from '../panel/componentFactory';
 import { Emitter, Event } from '../events';
 import { Position } from '../dnd/droptarget';

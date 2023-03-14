@@ -14,7 +14,7 @@ import {
     PanelUpdateEvent,
     Parameters,
 } from '../panel/types';
-import { IView, Orientation } from '../splitview/core/splitview';
+import { IView, Orientation } from '../splitview/splitview';
 
 export interface PanePanelViewState extends BasePanelViewState {
     headerComponent?: string;

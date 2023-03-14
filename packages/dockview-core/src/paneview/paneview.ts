@@ -3,7 +3,7 @@ import {
     Orientation,
     ISplitViewDescriptor,
     Sizing,
-} from '../splitview/core/splitview';
+} from '../splitview/splitview';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { Emitter, Event } from '../events';
 import { addClasses, removeClasses } from '../dom';

@@ -5,7 +5,7 @@ import {
     IPaneHeaderPart,
     PaneviewPanel,
 } from '../../paneview/paneviewPanel';
-import { Orientation } from '../../splitview/core/splitview';
+import { Orientation } from '../../splitview/splitview';
 
 class TestPanel extends PaneviewPanel {
     protected getBodyComponent(): IPaneBodyPart {

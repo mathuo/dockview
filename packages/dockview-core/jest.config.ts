@@ -1,14 +1,10 @@
-const { name } = require('./package');
+import { JestConfigWithTsJest } from 'ts-jest';
 
-const baseConfig = require('../../jest.config.base');
-
-console.log('loaded');
-
-module.exports = {
-    ...baseConfig,
+const config: JestConfigWithTsJest = {
+    preset: 'ts-jest',
     roots: ['<rootDir>/packages/dockview-core'],
     modulePaths: ['<rootDir>/packages/dockview-core/src'],
-    displayName: { name, color: 'blue' },
+    displayName: { name: 'dockview-core', color: 'blue' },
     rootDir: '../../',
     collectCoverageFrom: [
         '<rootDir>/packages/dockview-core/src/**/*.{js,jsx,ts,tsx}',
@@ -25,3 +21,5 @@ module.exports = {
     testResultsProcessor: 'jest-sonar-reporter',
     testEnvironment: 'jsdom',
 };
+
+export default config;

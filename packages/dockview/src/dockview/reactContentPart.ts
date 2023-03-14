@@ -4,7 +4,6 @@ import { IDockviewPanelProps } from '../dockview/dockview';
 import {
     DockviewEmitter,
     DockviewEvent,
-    DockviewGroupPanel,
     PanelUpdateEvent,
     IContentRenderer,
     GroupPanelContentPartInitParameters,
@@ -13,8 +12,6 @@ import {
 export class ReactPanelContentPart implements IContentRenderer {
     private _element: HTMLElement;
     private part?: ReactPart<IDockviewPanelProps>;
-    //
-    private _group: DockviewGroupPanel | undefined;
 
     private readonly _onDidFocus = new DockviewEmitter<void>();
     readonly onDidFocus: DockviewEvent<void> = this._onDidFocus.event;
@@ -54,13 +51,6 @@ export class ReactPanelContentPart implements IContentRenderer {
 
     public update(event: PanelUpdateEvent) {
         this.part?.update(event.params);
-    }
-
-    public updateParentGroup(
-        group: DockviewGroupPanel,
-        _isPanelVisible: boolean
-    ): void {
-        this._group = group;
     }
 
     public layout(_width: number, _height: number): void {
