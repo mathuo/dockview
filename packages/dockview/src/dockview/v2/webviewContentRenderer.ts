@@ -9,7 +9,6 @@ import {
 export class WebviewContentRenderer implements IContentRenderer {
     private _hostedContainer: HostedContainer;
     private _element: HTMLElement;
-
     private parameters: GroupPanelPartInitParameters | undefined;
 
     get element(): HTMLElement {
@@ -36,13 +35,6 @@ export class WebviewContentRenderer implements IContentRenderer {
         if (this.parameters) {
             this.parameters.params = params.params;
         }
-    }
-
-    public updateParentGroup(
-        _group: DockviewGroupPanel,
-        _isPanelVisible: boolean
-    ): void {
-        //
     }
 
     public layout(_width: number, _height: number): void {

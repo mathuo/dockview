@@ -50,13 +50,6 @@ export class ReactPanelHeaderPart implements ITabRenderer {
         // noop - retrieval from api
     }
 
-    public updateParentGroup(
-        _group: DockviewGroupPanel,
-        _isPanelVisible: boolean
-    ): void {
-        // noop - retrieval from api
-    }
-
     public dispose(): void {
         this.part?.dispose();
     }

@@ -7,9 +7,6 @@ import { createCloseButton } from '../../../svg';
 
 export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     private _element: HTMLElement;
-
-    private _isPanelVisible = false;
-    private _isGroupActive = false;
     private _content: HTMLElement;
     private _actionContainer: HTMLElement;
     private _list: HTMLElement;
@@ -17,7 +14,7 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
     //
     private params: GroupPanelPartInitParameters = {} as any;
 
-    get element() {
+    get element(): HTMLElement {
         return this._element;
     }
 
@@ -55,16 +52,16 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         this.render();
     }
 
-    public update(event: PanelUpdateEvent) {
+    public update(event: PanelUpdateEvent): void {
         this.params = { ...this.params, ...event.params };
         this.render();
     }
 
-    focus() {
+    focus(): void {
         //noop
     }
 
-    public init(params: GroupPanelPartInitParameters) {
+    public init(params: GroupPanelPartInitParameters): void {
         this.params = params;
         this._content.textContent = params.title;
 
@@ -74,27 +71,19 @@ export class DefaultTab extends CompositeDisposable implements ITabRenderer {
         });
     }
 
-    public updateParentGroup(
-        group: DockviewGroupPanel,
-        isPanelVisible: boolean
-    ) {
-        const changed =
-            this._isPanelVisible !== isPanelVisible ||
-            this._isGroupActive !== group.isActive;
-
-        this._isPanelVisible = isPanelVisible;
-        this._isGroupActive = group.isActive;
-
-        if (changed) {
-            this.render();
-        }
+    onGroupChange(_group: DockviewGroupPanel): void {
+        this.render();
     }
 
-    public layout(_width: number, _height: number) {
+    onPanelVisibleChange(_isPanelVisible: boolean): void {
+        this.render();
+    }
+
+    public layout(_width: number, _height: number): void {
         // noop
     }
 
-    private render() {
+    private render(): void {
         if (this._content.textContent !== this.params.title) {
             this._content.textContent = this.params.title;
         }

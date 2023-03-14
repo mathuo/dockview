@@ -11,11 +11,8 @@ import { IDockviewPanelProps } from '../dockview';
 
 export class ReactContentRenderer implements IContentRenderer {
     private _hostedContainer: HostedContainer;
-
     private _element: HTMLElement;
     private part?: ReactPart<IDockviewPanelProps>;
-    private _group: DockviewGroupPanel | undefined;
-
     private parameters: GroupPanelPartInitParameters | undefined;
 
     get element(): HTMLElement {
@@ -81,13 +78,6 @@ export class ReactContentRenderer implements IContentRenderer {
         }
 
         this.part?.update(params.params);
-    }
-
-    public updateParentGroup(
-        group: DockviewGroupPanel,
-        _isPanelVisible: boolean
-    ): void {
-        this._group = group;
     }
 
     public layout(_width: number, _height: number): void {
