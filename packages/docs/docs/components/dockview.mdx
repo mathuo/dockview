@@ -2,7 +2,7 @@
 description: Dockview Documentation
 ---
 
-import { SimpleDockview } from '@site/src/components/simpleDockview';
+import { Container } from '@site/src/components/container';
 import {
     RenderingDockview,
     Checkbox,
@@ -12,10 +12,7 @@ import { EventsDockview } from '@site/src/components/dockview/events';
 import { ContextMenuDockview } from '@site/src/components/dockview/contextMenu';
 import { NestedDockview } from '@site/src/components/dockview/nested';
 import { CustomHeadersDockview } from '@site/src/components/dockview/customHeaders';
-import { ResizeDockview } from '@site/src/components/dockview/resize';
 import { DockviewGroupControl } from '@site/src/components/dockview/groupControl';
-import { DockviewWatermark } from '@site/src/components/dockview/watermark';
-import { DockviewPersistance } from '@site/src/components/dockview/persistance';
 import {
     DockviewNative,
     DockviewNative2,
@@ -23,22 +20,20 @@ import {
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
+import DockviewPersistance from '@site/sandboxes/layout-persistance/src/app';
+import SimpleDockview from '@site/sandboxes/simple-dockview/src/app';
+import ResizeDockview from '@site/sandboxes/resize-dockview/src/app';
+import DockviewWatermark from '@site/sandboxes/watermark-dockview/src/app';
+
 # Dockview
 
 ## Introduction
 
 Dockview is an abstraction built on top of [Gridviews](./gridview) where each view is a container of many tabbed panels.
 
-<div
-    style={{
-        height: '300px',
-        backgroundColor: 'rgb(30,30,30)',
-        color: 'white',
-        margin: '20px 0px',
-    }}
->
+<Container>
     <SimpleDockview />
-</div>
+</Container>
 
 You can access the panels associated group through the `panel.group` variable.
 The group will always be defined and will change if a panel is moved into another group.
@@ -213,7 +208,9 @@ const onReady = (event: DockviewReadyEvent) => {
 Here is an example using the above code loading from and saving to localStorage.
 If you refresh the page you should notice your layout is loaded as you left it.
 
-<DockviewPersistance />
+<Container>
+    <DockviewPersistance />
+</Container>
 
 ## Resizing
 
@@ -240,7 +237,9 @@ props.api.group.api.setSize({
 
 You can see an example invoking both approaches below.
 
-<ResizeDockview />
+<Container>
+    <ResizeDockview />
+</Container>
 
 ## Watermark
 
@@ -661,3 +660,9 @@ If you wish to interact with the drop event from one dockview instance in anothe
 hello
 
 <DockviewNative2 />
+
+hello 2
+
+<div style={{ height: '400px', width: '100%' }}>
+    <App />
+</div>

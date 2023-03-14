@@ -1,0 +1,10 @@
+{
+  "packages": [
+    "packages/dockview-core",
+    "packages/dockview"
+  ],
+  "sandboxes": [
+    "/packages/docs/sandboxes/layout-persistance"
+  ],
+  "node": "16"
+}
