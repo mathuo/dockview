@@ -35,7 +35,7 @@ import {
     toTarget,
 } from '../gridview/baseComponentGridview';
 import { DockviewApi } from '../api/component.api';
-import { Orientation, Sizing } from '../splitview/core/splitview';
+import { Orientation, Sizing } from '../splitview/splitview';
 import {
     GroupOptions,
     GroupPanelViewState,

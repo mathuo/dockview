@@ -4,7 +4,6 @@ import { IDockviewPanelProps } from '../dockview/dockview';
 import {
     DockviewEmitter,
     DockviewEvent,
-    DockviewGroupPanel,
     PanelUpdateEvent,
     IContentRenderer,
     GroupPanelContentPartInitParameters,

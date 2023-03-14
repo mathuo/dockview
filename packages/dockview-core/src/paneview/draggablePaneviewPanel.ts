@@ -8,7 +8,7 @@ import {
 import { Droptarget, DroptargetEvent } from '../dnd/droptarget';
 import { Emitter } from '../events';
 import { IDisposable } from '../lifecycle';
-import { Orientation } from '../splitview/core/splitview';
+import { Orientation } from '../splitview/splitview';
 import { IPaneviewComponent } from './paneviewComponent';
 import {
     IPaneviewPanel,

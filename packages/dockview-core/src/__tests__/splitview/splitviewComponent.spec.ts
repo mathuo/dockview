@@ -1,6 +1,6 @@
 import { PanelDimensionChangeEvent } from '../../api/panelApi';
 import { CompositeDisposable } from '../../lifecycle';
-import { Orientation } from '../../splitview/core/splitview';
+import { Orientation } from '../../splitview/splitview';
 import { SplitviewComponent } from '../../splitview/splitviewComponent';
 import { SplitviewPanel } from '../../splitview/splitviewPanel';
 

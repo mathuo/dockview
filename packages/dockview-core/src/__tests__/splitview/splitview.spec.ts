@@ -1,12 +1,12 @@
-import { Emitter } from '../../../events';
-import { CompositeDisposable } from '../../../lifecycle';
+import { Emitter } from '../../events';
+import { CompositeDisposable } from '../../lifecycle';
 import {
     IView,
     LayoutPriority,
     Orientation,
     Sizing,
     Splitview,
-} from '../../../splitview/core/splitview';
+} from '../../splitview/splitview';
 
 class Testview implements IView {
     private _element: HTMLElement = document.createElement('div');

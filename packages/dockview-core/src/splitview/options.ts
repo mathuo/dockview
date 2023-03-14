@@ -1,8 +1,8 @@
-import { IPanel, PanelInitParameters } from '../../panel/types';
+import { IPanel, PanelInitParameters } from '../panel/types';
 import { IView, SplitViewOptions, LayoutPriority } from './splitview';
-import { FrameworkFactory } from '../../types';
-import { SplitviewPanel } from '../splitviewPanel';
-import { SplitviewComponent } from '../splitviewComponent';
+import { FrameworkFactory } from '../types';
+import { SplitviewPanel } from './splitviewPanel';
+import { SplitviewComponent } from './splitviewComponent';
 
 export interface PanelViewInitParameters extends PanelInitParameters {
     minimumSize?: number;

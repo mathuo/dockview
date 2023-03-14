@@ -1,5 +1,5 @@
 import { IDisposable } from '../lifecycle';
-import { LayoutPriority } from '../splitview/core/splitview';
+import { LayoutPriority } from '../splitview/splitview';
 
 /**
  * A key-value object of anything that is a valid JavaScript Object.

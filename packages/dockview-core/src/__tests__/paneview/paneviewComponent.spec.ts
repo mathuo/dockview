@@ -8,7 +8,7 @@ import {
     IPaneHeaderPart,
     PanePanelComponentInitParameter,
 } from '../../paneview/paneviewPanel';
-import { Orientation } from '../../splitview/core/splitview';
+import { Orientation } from '../../splitview/splitview';
 
 class TestPanel extends PaneviewPanel {
     constructor(id: string, component: string) {

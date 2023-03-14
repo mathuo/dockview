@@ -18,8 +18,8 @@ export {
 export * from './panel/types';
 export * from './panel/componentFactory';
 
-export * from './splitview/core/splitview';
-export * from './splitview/core/options';
+export * from './splitview/splitview';
+export * from './splitview/options';
 
 export * from './paneview/paneview';
 export * from './gridview/gridview';

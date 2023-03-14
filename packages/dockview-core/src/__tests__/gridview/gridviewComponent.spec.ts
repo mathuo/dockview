@@ -2,7 +2,7 @@ import { GridviewComponent } from '../../gridview/gridviewComponent';
 import { GridviewPanel } from '../../gridview/gridviewPanel';
 import { CompositeDisposable } from '../../lifecycle';
 import { IFrameworkPart } from '../../panel/types';
-import { Orientation } from '../../splitview/core/splitview';
+import { Orientation } from '../../splitview/splitview';
 
 class TestGridview extends GridviewPanel {
     constructor(id: string, componentName: string) {

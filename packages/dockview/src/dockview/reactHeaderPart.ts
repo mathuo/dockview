@@ -3,7 +3,6 @@ import { ReactPart, ReactPortalStore } from '../react';
 import { IGroupPanelBaseProps } from './dockview';
 import {
     PanelUpdateEvent,
-    DockviewGroupPanel,
     ITabRenderer,
     GroupPanelPartInitParameters,
 } from 'dockview-core';

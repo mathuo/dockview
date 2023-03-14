@@ -11,7 +11,7 @@ import {
     PanelUpdateEvent,
     Parameters,
 } from '../../panel/types';
-import { LayoutPriority, Orientation } from '../../splitview/core/splitview';
+import { LayoutPriority, Orientation } from '../../splitview/splitview';
 
 class TestPanel implements IGridPanelView {
     _onDidChange = new Emitter<IViewSize | undefined>();
