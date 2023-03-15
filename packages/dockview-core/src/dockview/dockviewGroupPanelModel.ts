@@ -670,9 +670,7 @@ export class DockviewGroupPanelModel
             const watermark = this.accessor.createWatermarkComponent();
             watermark.init({
                 containerApi: new DockviewApi(this.accessor),
-                params: {},
-                title: '',
-                api: null as any,
+                group: this.groupPanel,
             });
             this.watermark = watermark;
 

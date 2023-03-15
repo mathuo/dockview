@@ -9,7 +9,7 @@ import {
 import { DockviewApi } from '../api/component.api';
 import { Event } from '../events';
 import { Optional } from '../types';
-import { DockviewGroupPanel } from './dockviewGroupPanel';
+import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
 
 export enum DockviewDropTargets {
     Tab,
@@ -34,13 +34,18 @@ export interface GroupPanelContentPartInitParameters
     tab: ITabRenderer;
 }
 
+export interface WatermarkRendererInitParameters {
+    containerApi: DockviewApi;
+    group?: IDockviewGroupPanel;
+}
+
 export interface IWatermarkRenderer
     extends Optional<
-        Omit<IPanel, 'id'>,
+        Omit<IPanel, 'id' | 'init'>,
         'dispose' | 'update' | 'layout' | 'toJSON'
     > {
     readonly element: HTMLElement;
-    init: (params: GroupPanelPartInitParameters) => void;
+    init: (params: WatermarkRendererInitParameters) => void;
     updateParentGroup(group: DockviewGroupPanel, visible: boolean): void;
 }
 

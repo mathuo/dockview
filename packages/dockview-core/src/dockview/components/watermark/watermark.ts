@@ -1,4 +1,8 @@
-import { GroupPanelPartInitParameters, IWatermarkRenderer } from '../../types';
+import {
+    GroupPanelPartInitParameters,
+    IWatermarkRenderer,
+    WatermarkRendererInitParameters,
+} from '../../types';
 import { addDisposableListener } from '../../../events';
 import { toggleClass } from '../../../dom';
 import { CompositeDisposable } from '../../../lifecycle';
@@ -69,15 +73,7 @@ export class Watermark
         // noop
     }
 
-    init(params: GroupPanelPartInitParameters) {
-        this.params = params;
-
-        this.addDisposables(
-            this.params.containerApi.onDidLayoutChange(() => {
-                this.render();
-            })
-        );
-
+    init(_params: WatermarkRendererInitParameters) {
         this.render();
     }
 
