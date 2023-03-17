@@ -1,0 +1,37 @@
+.codesandbox-button {
+    display: flex;
+    align-items: center;
+    padding: 0px 4px;
+    border-radius: 4px;
+
+    .codesandbox-button-pretext {
+        padding: 0px 4px;
+    }
+
+    .codesandbox-button-content {
+        display: flex;
+        align-items: center;
+    }
+
+    &:hover {
+        cursor: pointer;
+        background-color: rgb(37, 37, 37);
+
+        .codesandbox-button-content {
+            color: rgb(237, 255, 165);
+            text-decoration: none;
+        }
+
+        .codesandbox-button-pretext {
+            color: rgb(245, 245, 245);
+        }
+    }
+}
+
+.dockview-svg {
+    display: inline-block;
+    fill: currentcolor;
+    line-height: 1;
+    stroke: currentcolor;
+    stroke-width: 0;
+}

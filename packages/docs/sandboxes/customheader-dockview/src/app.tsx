@@ -31,7 +31,7 @@ const headerComponents = {
     },
 };
 
-export const CustomHeadersDockview = () => {
+const CustomHeadersDockview = () => {
     const onReady = (event: DockviewReadyEvent) => {
         const d = localStorage.getItem('test');
 
@@ -88,20 +88,13 @@ export const CustomHeadersDockview = () => {
     };
 
     return (
-        <div
-            style={{
-                height: '500px',
-                margin: '40px 0px',
-                display: 'flex',
-                flexDirection: 'column',
-            }}
-        >
-            <DockviewReact
-                components={components}
-                defaultTabComponent={headerComponents.default}
-                onReady={onReady}
-                className="dockview-theme-abyss"
-            />
-        </div>
+        <DockviewReact
+            components={components}
+            defaultTabComponent={headerComponents.default}
+            onReady={onReady}
+            className="dockview-theme-abyss"
+        />
     );
 };
+
+export default CustomHeadersDockview;

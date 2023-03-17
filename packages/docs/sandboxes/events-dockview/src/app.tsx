@@ -6,7 +6,7 @@ import {
     IDockviewPanelProps,
 } from 'dockview';
 import * as React from 'react';
-import { Console, Line } from '../console/console';
+import { Console, Line } from './console';
 
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
@@ -14,7 +14,7 @@ const components = {
     },
 };
 
-export const EventsDockview = () => {
+const EventsDockview = () => {
     const [lines, setLines] = React.useState<Line[]>([]);
     const [checked, setChecked] = React.useState<boolean>(false);
 
@@ -312,7 +312,13 @@ export const EventsDockview = () => {
     };
 
     return (
-        <>
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+            }}
+        >
             <label>
                 <input
                     type="checkbox"
@@ -321,22 +327,18 @@ export const EventsDockview = () => {
                 />
                 <span>{'fromJSON'}</span>
             </label>
-            <div
-                style={{
-                    height: '300px',
-                    backgroundColor: 'rgb(30,30,30)',
-                    color: 'white',
-                    margin: '20px 0px',
-                }}
-            >
+            <div style={{ flexGrow: 1 }}>
                 <DockviewReact
                     components={components}
                     onReady={onReady}
                     className="dockview-theme-abyss"
                 />
             </div>
-
-            <Console lines={lines} />
-        </>
+            <div style={{ flexGrow: 1 }}>
+                <Console lines={lines} />
+            </div>
+        </div>
     );
 };
+
+export default EventsDockview;

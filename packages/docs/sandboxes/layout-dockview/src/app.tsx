@@ -102,17 +102,25 @@ export const DockviewPersistance = () => {
             style={{
                 display: 'flex',
                 flexDirection: 'column',
+                height: '100%',
             }}
         >
-            <div>
+            <div style={{ height: '25px' }}>
                 <button onClick={clearLayout}>Reset Layout</button>
             </div>
-            <DockviewReact
-                onReady={onReady}
-                components={components}
-                watermarkComponent={Watermark}
-                className="dockview-theme-abyss"
-            />
+            <div
+                style={{
+                    flexGrow: 1,
+                    overflow: 'hidden',
+                }}
+            >
+                <DockviewReact
+                    onReady={onReady}
+                    components={components}
+                    watermarkComponent={Watermark}
+                    className="dockview-theme-abyss"
+                />
+            </div>
         </div>
     );
 };

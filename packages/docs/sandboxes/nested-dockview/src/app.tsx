@@ -6,7 +6,7 @@ import {
     IDockviewPanelProps,
 } from 'dockview';
 import * as React from 'react';
-import './nested.scss';
+import './app.scss';
 
 const InnerDockview = () => {
     const onReady = (event: DockviewReadyEvent) => {
@@ -52,7 +52,7 @@ const components = {
     innerDockview: InnerDockview,
 };
 
-export const NestedDockview = () => {
+const NestedDockview = () => {
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
             id: 'panel_1',
@@ -82,20 +82,14 @@ export const NestedDockview = () => {
     };
 
     return (
-        <div
-            style={{
-                height: '500px',
-                display: 'flex',
-                flexDirection: 'column',
-            }}
-        >
-            <DockviewReact
-                onReady={onReady}
-                components={components}
-                className="dockview-theme-abyss"
-                showDndOverlay={showDndOverlay}
-                onDidDrop={onDidDrop}
-            />
-        </div>
+        <DockviewReact
+            onReady={onReady}
+            components={components}
+            className="dockview-theme-abyss"
+            showDndOverlay={showDndOverlay}
+            onDidDrop={onDidDrop}
+        />
     );
 };
+
+export default NestedDockview;

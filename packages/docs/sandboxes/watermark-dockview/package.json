@@ -1,11 +1,8 @@
 {
-  "name": "layout-persistance",
-  "description": "Using interpolations & CSS 3D create a flip card effect",
+  "name": "watermark-dockview",
+  "description": "",
   "keywords": [
-    "css",
-    "3D",
-    "useSpring",
-    "interpolation"
+    "dockview"
   ],
   "version": "1.0.0",
   "main": "src/index.tsx",

@@ -5,7 +5,7 @@ import {
     IDockviewPanelProps,
 } from 'dockview';
 import * as React from 'react';
-import './groupControl.scss';
+import './app.scss';
 
 const components = {
     default: (props: IDockviewPanelProps<{ title: string; x?: number }>) => {
@@ -47,7 +47,7 @@ const GroupControlComponent = (props: IDockviewGroupControlProps) => {
     );
 };
 
-export const DockviewGroupControl = () => {
+const DockviewGroupControl = () => {
     const onReady = (event: DockviewReadyEvent) => {
         const panel1 = event.api.addPanel({
             id: 'panel_1',
@@ -84,19 +84,13 @@ export const DockviewGroupControl = () => {
     };
 
     return (
-        <div
-            style={{
-                height: '500px',
-                display: 'flex',
-                flexDirection: 'column',
-            }}
-        >
-            <DockviewReact
-                onReady={onReady}
-                components={components}
-                groupControlComponent={GroupControlComponent}
-                className="dockview-theme-abyss"
-            />
-        </div>
+        <DockviewReact
+            onReady={onReady}
+            components={components}
+            groupControlComponent={GroupControlComponent}
+            className="dockview-theme-abyss"
+        />
     );
 };
+
+export default DockviewGroupControl;

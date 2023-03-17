@@ -7,12 +7,7 @@ import {
     RenderingDockview,
     Checkbox,
 } from '@site/src/components/dockview/rendering';
-import { DndDockview } from '@site/src/components/dockview/dnd';
-import { EventsDockview } from '@site/src/components/dockview/events';
-import { ContextMenuDockview } from '@site/src/components/dockview/contextMenu';
-import { NestedDockview } from '@site/src/components/dockview/nested';
-import { CustomHeadersDockview } from '@site/src/components/dockview/customHeaders';
-import { DockviewGroupControl } from '@site/src/components/dockview/groupControl';
+
 import {
     DockviewNative,
     DockviewNative2,
@@ -20,10 +15,16 @@ import {
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-import DockviewPersistance from '@site/sandboxes/layout-persistance/src/app';
+import DockviewPersistance from '@site/sandboxes/layout-dockview/src/app';
 import SimpleDockview from '@site/sandboxes/simple-dockview/src/app';
 import ResizeDockview from '@site/sandboxes/resize-dockview/src/app';
 import DockviewWatermark from '@site/sandboxes/watermark-dockview/src/app';
+import DockviewConstraints from '@site/sandboxes/constraints-dockview/src/app';
+import DndDockview from '@site/sandboxes/dnd-dockview/src/app';
+import NestedDockview from '@site/sandboxes/nested-dockview/src/app';
+import EventsDockview from '@site/sandboxes/events-dockview/src/app';
+import DockviewGroupControl from '@site/sandboxes/groupcontrol-dockview/src/app';
+import CustomHeadersDockview from '@site/sandboxes/customheader-dockview/src/app';
 
 # Dockview
 
@@ -247,7 +248,9 @@ When the dockview is empty you may want to display some fallback content, this i
 By default there the watermark has no content but you can provide as a prop to `DockviewReact` a `watermarkComponent`
 which will be rendered when there are no panels or groups.
 
-<DockviewWatermark />
+<Container>
+    <DockviewWatermark />
+</Container>
 
 ## Drag And Drop
 
@@ -324,7 +327,9 @@ return (
 );
 ```
 
-<DndDockview />
+<Container>
+    <DndDockview />
+</Container>
 
 ## Panels
 
@@ -515,12 +520,14 @@ You can also override the default tab renderer which will be used when no `tabCo
 <DockviewReact defaultTabComponent={MyCustomHeader}  ... />;
 ```
 
-As a simple example the below attachs a custom event handler for the context menu on all tabs as a default tab renderer
+As a simple example the below attaches a custom event handler for the context menu on all tabs as a default tab renderer
 
 The below example uses a custom tab renderer to reigster a popover when the user right clicked on a tab.
 This still makes use of the `DockviewDefaultTab` since it's only a minor change.
 
-<CustomHeadersDockview />
+<Container>
+    <CustomHeadersDockview />
+</Container>
 
 ### Default Tab Title
 
@@ -640,11 +647,15 @@ const GroupControlComponent = (props: IDockviewGroupControlProps) => {
 };
 ```
 
-<DockviewGroupControl />
+<Container>
+    <DockviewGroupControl />
+</Container>
 
 ## Events
 
-<EventsDockview />
+<Container height={600}>
+    <EventsDockview />
+</Container>
 
 ## Advanced Examples
 
@@ -653,7 +664,9 @@ const GroupControlComponent = (props: IDockviewGroupControlProps) => {
 You can safely create multiple dockview instances within one page and nest dockviews within other dockviews.
 If you wish to interact with the drop event from one dockview instance in another dockview instance you can implement the `showDndOverlay` and `onDidDrop` props on `DockviewReact`.
 
-<NestedDockview />
+<Container>
+    <NestedDockview />
+</Container>
 
 ### Example
 
@@ -666,3 +679,9 @@ hello 2
 <div style={{ height: '400px', width: '100%' }}>
     <App />
 </div>
+
+## Contraints
+
+<Container>
+    <DockviewConstraints />
+</Container>

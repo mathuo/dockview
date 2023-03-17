@@ -18,7 +18,7 @@ const components = {
     },
 };
 
-export const DndDockview = (props: { renderVisibleOnly: boolean }) => {
+const DndDockview = (props: { renderVisibleOnly: boolean }) => {
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
             id: 'panel_1',
@@ -60,7 +60,7 @@ export const DndDockview = (props: { renderVisibleOnly: boolean }) => {
             component: 'default',
             position: {
                 direction: positionToDirection(event.position),
-                referenceGroup: event.group,
+                referenceGroup: event.group || undefined,
             },
         });
     };
@@ -70,7 +70,13 @@ export const DndDockview = (props: { renderVisibleOnly: boolean }) => {
     };
 
     return (
-        <>
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+            }}
+        >
             <div
                 style={{
                     backgroundColor: 'orange',
@@ -83,22 +89,16 @@ export const DndDockview = (props: { renderVisibleOnly: boolean }) => {
             >
                 Drag me
             </div>
-            <div
-                style={{
-                    height: '300px',
-                    backgroundColor: 'rgb(30,30,30)',
-                    color: 'white',
-                    margin: '20px 0px',
-                }}
-            >
-                <DockviewReact
-                    components={components}
-                    onReady={onReady}
-                    className="dockview-theme-abyss"
-                    onDidDrop={onDidDrop}
-                    showDndOverlay={showDndOverlay}
-                />
-            </div>
-        </>
+
+            <DockviewReact
+                components={components}
+                onReady={onReady}
+                className="dockview-theme-abyss"
+                onDidDrop={onDidDrop}
+                showDndOverlay={showDndOverlay}
+            />
+        </div>
     );
 };
+
+export default DndDockview;
