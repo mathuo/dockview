@@ -114,9 +114,9 @@ const DockviewWatermark = () => {
     return (
         <div
             style={{
-                height: '500px',
                 display: 'flex',
                 flexDirection: 'column',
+                height: '100%',
             }}
         >
             <div>
