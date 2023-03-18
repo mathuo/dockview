@@ -4,13 +4,14 @@ import { GridviewPanelApi } from '../api/gridviewPanelApi';
 import {
     DockviewGroupPanelModel,
     GroupOptions,
+    IDockviewGroupPanelModel,
     IHeader,
 } from './dockviewGroupPanelModel';
 import { GridviewPanel, IGridviewPanel } from '../gridview/gridviewPanel';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 
 export interface IDockviewGroupPanel extends IGridviewPanel {
-    model: DockviewGroupPanelModel;
+    model: IDockviewGroupPanelModel;
     locked: boolean;
     readonly size: number;
     readonly panels: IDockviewPanel[];
@@ -25,7 +26,7 @@ export class DockviewGroupPanel
     extends GridviewPanel
     implements IDockviewGroupPanel
 {
-    private readonly _model: DockviewGroupPanelModel;
+    private readonly _model: IDockviewGroupPanelModel;
 
     get panels(): IDockviewPanel[] {
         return this._model.panels;
@@ -39,24 +40,8 @@ export class DockviewGroupPanel
         return this._model.size;
     }
 
-    get model(): DockviewGroupPanelModel {
+    get model(): IDockviewGroupPanelModel {
         return this._model;
-    }
-
-    get minimumHeight(): number {
-        return this._model.minimumHeight;
-    }
-
-    get maximumHeight(): number {
-        return this._model.maximumHeight;
-    }
-
-    get minimumWidth(): number {
-        return this._model.minimumWidth;
-    }
-
-    get maximumWidth(): number {
-        return this._model.maximumWidth;
     }
 
     get locked(): boolean {

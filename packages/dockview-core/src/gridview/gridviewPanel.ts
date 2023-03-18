@@ -47,8 +47,8 @@ export abstract class GridviewPanel
     private _evaluatedMinimumHeight = 0;
     private _evaluatedMaximumHeight = Number.MAX_SAFE_INTEGER;
 
-    private _minimumWidth: FunctionOrValue<number> = 0;
-    private _minimumHeight: FunctionOrValue<number> = 0;
+    private _minimumWidth: FunctionOrValue<number> = 100;
+    private _minimumHeight: FunctionOrValue<number> = 100;
     private _maximumWidth: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
     private _maximumHeight: FunctionOrValue<number> = Number.MAX_SAFE_INTEGER;
     private _priority?: LayoutPriority;
