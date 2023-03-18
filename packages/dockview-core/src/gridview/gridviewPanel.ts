@@ -126,8 +126,30 @@ export abstract class GridviewPanel
         return this.api.isActive;
     }
 
-    constructor(id: string, component: string) {
+    constructor(
+        id: string,
+        component: string,
+        options?: {
+            minimumWidth?: number;
+            maximumWidth?: number;
+            minimumHeight?: number;
+            maximumHeight?: number;
+        }
+    ) {
         super(id, component, new GridviewPanelApiImpl(id));
+
+        if (typeof options?.minimumWidth === 'number') {
+            this._minimumWidth = options.minimumWidth;
+        }
+        if (typeof options?.maximumWidth === 'number') {
+            this._maximumWidth = options.maximumWidth;
+        }
+        if (typeof options?.minimumHeight === 'number') {
+            this._minimumHeight = options.minimumHeight;
+        }
+        if (typeof options?.maximumHeight === 'number') {
+            this._maximumHeight = options.maximumHeight;
+        }
 
         this.api.initialize(this); // TODO: required to by-pass 'super before this' requirement
 

@@ -12,7 +12,11 @@ export interface TitleEvent {
  * omit visibility modifiers since the visibility of a single group doesn't make sense
  * because it belongs to a groupview
  */
-export interface DockviewPanelApi extends Omit<GridviewPanelApi, 'setVisible'> {
+export interface DockviewPanelApi
+    extends Omit<
+        GridviewPanelApi,
+        'setVisible' | 'onDidConstraintsChange' | 'setConstraints'
+    > {
     readonly group: DockviewGroupPanel;
     readonly isGroupActive: boolean;
     readonly title: string;

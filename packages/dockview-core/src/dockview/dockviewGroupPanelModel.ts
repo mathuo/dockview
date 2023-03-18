@@ -4,10 +4,9 @@ import { Droptarget, Position } from '../dnd/droptarget';
 import { DockviewComponent } from './dockviewComponent';
 import { isAncestor, toggleClass } from '../dom';
 import { addDisposableListener, Emitter, Event } from '../events';
-import { IGridPanelView } from '../gridview/baseComponentGridview';
 import { IViewSize } from '../gridview/gridview';
 import { CompositeDisposable } from '../lifecycle';
-import { PanelInitParameters, PanelUpdateEvent } from '../panel/types';
+import { IPanel, PanelInitParameters, PanelUpdateEvent } from '../panel/types';
 import {
     ContentContainer,
     IContentContainer,
@@ -82,7 +81,7 @@ export interface IHeader {
     height: number | undefined;
 }
 
-export interface IDockviewGroupPanelModel extends IGridPanelView {
+export interface IDockviewGroupPanelModel extends IPanel {
     readonly isActive: boolean;
     readonly size: number;
     readonly panels: IDockviewPanel[];
@@ -95,13 +94,20 @@ export interface IDockviewGroupPanelModel extends IGridPanelView {
     readonly onDidActivePanelChange: Event<GroupviewChangeEvent>;
     readonly onMove: Event<GroupMoveEvent>;
     locked: boolean;
+    setActive(isActive: boolean): void;
+    initialize(): void;
     // state
     isPanelActive: (panel: IDockviewPanel) => boolean;
     indexOf(panel: IDockviewPanel): number;
     // panel lifecycle
     openPanel(
         panel: IDockviewPanel,
-        options?: { index?: number; skipFocus?: boolean }
+        options?: {
+            index?: number;
+            skipFocus?: boolean;
+            skipSetPanelActive?: boolean;
+            skipSetGroupActive?: boolean;
+        }
     ): void;
     closePanel(panel: IDockviewPanel): void;
     closeAllPanels(): void;
@@ -197,22 +203,6 @@ export class DockviewGroupPanelModel
 
     get isEmpty(): boolean {
         return this._panels.length === 0;
-    }
-
-    get minimumHeight(): number {
-        return 100;
-    }
-
-    get maximumHeight(): number {
-        return Number.MAX_SAFE_INTEGER;
-    }
-
-    get minimumWidth(): number {
-        return 100;
-    }
-
-    get maximumWidth(): number {
-        return Number.MAX_SAFE_INTEGER;
     }
 
     get hasWatermark(): boolean {
