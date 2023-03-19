@@ -50,6 +50,39 @@ describe('dockviewPanel', () => {
         disposable.dispose();
     });
 
+    test('that .setTitle updates the title', () => {
+        const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
+            return {
+                onDidActiveChange: jest.fn(),
+            } as any;
+        });
+        const accessorMock = jest.fn<DockviewComponent, []>(() => {
+            return {} as any;
+        });
+        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
+            return {} as any;
+        });
+        const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
+            return {
+                update: jest.fn(),
+                init: jest.fn(),
+            };
+        });
+
+        const api = new dockviewApiMock();
+        const accessor = new accessorMock();
+        const group = new groupMock();
+        const model = <IDockviewPanelModel>new panelModelMock();
+
+        const cut = new DockviewPanel('fake-id', accessor, api, group, model);
+
+        cut.init({ title: 'myTitle', params: {} });
+        expect(cut.title).toBe('myTitle');
+
+        cut.setTitle('newTitle');
+        expect(cut.title).toBe('newTitle');
+    });
+
     test('dispose cleanup', () => {
         const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
             return {} as any;
