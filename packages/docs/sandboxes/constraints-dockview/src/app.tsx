@@ -71,7 +71,7 @@ const App = () => {
     const [api, setApi] = React.useState<DockviewApi>();
 
     const onReady = (event: DockviewReadyEvent) => {
-        event.api.addPanel({
+        const panel = event.api.addPanel({
             id: 'panel_1',
             component: 'default',
         });

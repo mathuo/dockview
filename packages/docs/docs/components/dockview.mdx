@@ -656,7 +656,25 @@ const GroupControlComponent = (props: IDockviewGroupControlProps) => {
     <DockviewGroupControl />
 </Container>
 
+### Constraints
+
+You may wish to specify a minimum or maximum height or width for a group which can be done through the group api.
+
+```tsx
+api.group.api.setConstraints(...)
+```
+
+> Constraints are currently only supported for groups and not individual panels.
+> If you specific a constraint on a group and move a panel within that group to another group it will no
+> longer be subject to those constraints since those constraints were on the group and not on the individual panel.
+
+<Container>
+    <DockviewConstraints />
+</Container>
+
 ## Events
+
+A simple example showing events fired by `dockviewz that can be interacted with.
 
 <Container height={600}>
     <EventsDockview />
@@ -684,9 +702,3 @@ hello 2
 <div style={{ height: '400px', width: '100%' }}>
     <App />
 </div>
-
-## Contraints
-
-<Container>
-    <DockviewConstraints />
-</Container>
