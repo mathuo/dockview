@@ -22,7 +22,7 @@
     "build": "npm run build:ci && npm run build:modulefiles",
     "clean": "rimraf dist/ .build/",
     "docs": "typedoc",
-    "prepack": "npm run rebuild && npm run test",
+    "prepublishOnly": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
     "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview",
     "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview --coverage",

@@ -1,0 +1,19 @@
+{
+  "packages": [
+    "packages/dockview-core",
+    "packages/dockview"
+  ],
+  "sandboxes": [
+    "/packages/docs/sandboxes/constraints-dockview",
+    "/packages/docs/sandboxes/customheader-dockview",
+    "/packages/docs/sandboxes/dnd-dockview",
+    "/packages/docs/sandboxes/events-dockview",
+    "/packages/docs/sandboxes/groupcontol-dockview",
+    "/packages/docs/sandboxes/layout-dockview",
+    "/packages/docs/sandboxes/nested-dockview",
+    "/packages/docs/sandboxes/resize-dockview",
+    "/packages/docs/sandboxes/simple-dockview",
+    "/packages/docs/sandboxes/watermark-dockview"
+  ],
+  "node": "16"
+}

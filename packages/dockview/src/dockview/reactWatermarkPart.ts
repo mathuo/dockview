@@ -6,9 +6,14 @@ import {
     DockviewGroupPanel,
     GroupPanelPartInitParameters,
     IWatermarkRenderer,
+    WatermarkRendererInitParameters,
+    DockviewApi,
+    IDockviewGroupPanel,
 } from 'dockview-core';
 
-export interface IWatermarkPanelProps extends IGroupPanelBaseProps {
+export interface IWatermarkPanelProps {
+    containerApi: DockviewApi;
+    group?: IDockviewGroupPanel;
     close: () => void;
 }
 
@@ -30,19 +35,18 @@ export class ReactWatermarkPart implements IWatermarkRenderer {
         this._element.className = 'dockview-react-part';
     }
 
-    init(parameters: GroupPanelPartInitParameters): void {
-        this.parameters = parameters;
-
+    init(parameters: WatermarkRendererInitParameters): void {
         this.part = new ReactPart(
             this.element,
             this.reactPortalStore,
             this.component,
             {
-                params: parameters.params,
-                api: parameters.api,
+                group: parameters.group,
                 containerApi: parameters.containerApi,
                 close: () => {
-                    parameters.containerApi.removeGroup(parameters.api.group);
+                    if (parameters.group) {
+                        parameters.containerApi.removeGroup(parameters.group);
+                    }
                 },
             }
         );

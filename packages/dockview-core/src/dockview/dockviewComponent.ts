@@ -632,9 +632,6 @@ export class DockviewComponent
 
                 this.watermark.init({
                     containerApi: new DockviewApi(this),
-                    params: {},
-                    title: '',
-                    api: null as any,
                 });
 
                 const watermarkContainer = document.createElement('div');

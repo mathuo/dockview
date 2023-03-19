@@ -1,0 +1,27 @@
+.console-container {
+    background-color: black;
+    color: white;
+    padding-left: 8px;
+    max-height: 200px;
+    overflow-y: scroll;
+    overflow-x: auto;
+
+    .console-line {
+        height: 20px;
+        line-height: 20px;
+        font-size: 13px;
+        border-bottom: 1px solid rgb(30, 30, 30);
+        display: flex;
+        padding-left: 4px;
+
+        .console-line-timestamp {
+            color: lightgray;
+            padding-right: 4px;
+        }
+
+        .console-line-text {
+            padding: 0px 4px;
+            flex-grow: 1;
+        }
+    }
+}
