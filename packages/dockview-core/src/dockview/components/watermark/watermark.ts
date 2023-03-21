@@ -18,7 +18,7 @@ export class Watermark
     private group: DockviewGroupPanel | undefined;
     private params: GroupPanelPartInitParameters | undefined;
 
-    get element() {
+    get element(): HTMLElement {
         return this._element;
     }
 
@@ -61,19 +61,19 @@ export class Watermark
         );
     }
 
-    update(_event: PanelUpdateEvent) {
+    update(_event: PanelUpdateEvent): void {
         // noop
     }
 
-    focus() {
+    focus(): void {
         // noop
     }
 
-    layout(_width: number, _height: number) {
+    layout(_width: number, _height: number): void {
         // noop
     }
 
-    init(_params: WatermarkRendererInitParameters) {
+    init(_params: WatermarkRendererInitParameters): void {
         this.render();
     }
 
@@ -82,11 +82,11 @@ export class Watermark
         this.render();
     }
 
-    dispose() {
+    dispose(): void {
         super.dispose();
     }
 
-    private render() {
+    private render(): void {
         const isOneGroup = !!(
             this.params && this.params.containerApi.size <= 1
         );

@@ -32,7 +32,7 @@ export class ContentContainer
     private readonly _onDidBlur = new Emitter<void>();
     readonly onDidBlur: Event<void> = this._onDidBlur.event;
 
-    get element() {
+    get element(): HTMLElement {
         return this._element;
     }
 
@@ -51,15 +51,15 @@ export class ContentContainer
         // 4) register mouseMove events (if no buttons are present we take this as a dragEnd event)
     }
 
-    show() {
+    show(): void {
         this.element.style.display = '';
     }
 
-    hide() {
+    hide(): void {
         this.element.style.display = 'none';
     }
 
-    public openPanel(panel: IDockviewPanel) {
+    public openPanel(panel: IDockviewPanel): void {
         if (this.panel === panel) {
             return;
         }
@@ -105,14 +105,14 @@ export class ContentContainer
         // noop
     }
 
-    public closePanel() {
+    public closePanel(): void {
         if (this.panel?.view?.content?.element) {
             this._element.removeChild(this.panel.view.content.element);
             this.panel = undefined;
         }
     }
 
-    public dispose() {
+    public dispose(): void {
         this.disposable.dispose();
         super.dispose();
     }

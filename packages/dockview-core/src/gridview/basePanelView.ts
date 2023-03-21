@@ -9,9 +9,9 @@ import {
 import { PanelApi, PanelApiImpl } from '../api/panelApi';
 
 export interface BasePanelViewState {
-    id: string;
-    component: string;
-    params?: Record<string, any>;
+    readonly id: string;
+    readonly component: string;
+    readonly params?: Record<string, any>;
 }
 
 export interface BasePanelViewExported<T extends PanelApi> {
@@ -35,9 +35,7 @@ export abstract class BasePanelView<T extends PanelApiImpl>
     protected part?: IFrameworkPart;
     protected _params?: PanelInitParameters;
 
-    /**
-     * Provide an IFrameworkPart that will determine the rendered UI of this view piece.
-     */
+    // provide an IFrameworkPart that will determine the rendered UI of this view piece.
     protected abstract getComponent(): IFrameworkPart;
 
     get element(): HTMLElement {

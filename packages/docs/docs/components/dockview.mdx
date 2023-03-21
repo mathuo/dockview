@@ -24,6 +24,7 @@ import CustomHeadersDockview from '@site/sandboxes/customheader-dockview/src/app
 import DockviewNative from '@site/sandboxes/fullwidthtab-dockview/src/app';
 import DockviewNative2 from '@site/sandboxes/nativeapp-dockview/src/app';
 import DockviewSetTitle from '@site/sandboxes/updatetitle-dockview/src/app';
+// import { attach as attachDockviewVanilla } from '@site/sandboxes/vanilla-dockview/src/app';
 
 # Dockview
 
@@ -656,6 +657,22 @@ const GroupControlComponent = (props: IDockviewGroupControlProps) => {
     <DockviewGroupControl />
 </Container>
 
+### Constraints
+
+You may wish to specify a minimum or maximum height or width for a group which can be done through the group api.
+
+```tsx
+api.group.api.setConstraints(...)
+```
+
+> Constraints are currently only supported for groups and not individual panels.
+> If you specific a constraint on a group and move a panel within that group to another group it will no
+> longer be subject to those constraints since those constraints were on the group and not on the individual panel.
+
+<Container height={500}>
+    <DockviewConstraints />
+</Container>
+
 ## Events
 
 <Container height={600}>
@@ -685,8 +702,14 @@ hello 2
     <App />
 </div>
 
-## Contraints
+<!-- ## VanillaJS
 
-<Container>
-    <DockviewConstraints />
-</Container>
+> Note: This section is experimental and support for Vanilla JS is a work in progress.
+
+The `dockview` package contains `ReactJS` wrappers for the core library.
+The core library is published as an independant package under the name `dockview-core` which you can install standalone.
+
+> When using `dockview` there is no need to also install `dockview-core`.
+> `dockview-core` is a dependency of `dockview` and automatically installed during the installation process of `dockview` via `npm install dockview`.
+
+<Container injectVanillaJS={attachDockviewVanilla} /> -->

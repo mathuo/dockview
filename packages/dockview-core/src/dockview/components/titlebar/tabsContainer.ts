@@ -12,7 +12,7 @@ import { toggleClass } from '../../../dom';
 import { IDockviewPanel } from '../../dockviewPanel';
 
 export interface TabDropIndexEvent {
-    event: DragEvent;
+    readonly event: DragEvent;
     readonly index: number;
 }
 
@@ -23,7 +23,6 @@ export interface ITabsContainer extends IDisposable {
     height: number | undefined;
     delete: (id: string) => void;
     indexOf: (id: string) => number;
-    at: (index: number) => ITab;
     onDrop: Event<TabDropIndexEvent>;
     setActive: (isGroupActive: boolean) => void;
     setActivePanel: (panel: IDockviewPanel) => void;
@@ -55,11 +54,11 @@ export class TabsContainer
     private readonly _onDrop = new Emitter<TabDropIndexEvent>();
     readonly onDrop: Event<TabDropIndexEvent> = this._onDrop.event;
 
-    get panels() {
+    get panels(): string[] {
         return this.tabs.map((_) => _.value.panelId);
     }
 
-    get size() {
+    get size(): number {
         return this.tabs.length;
     }
 
@@ -114,19 +113,15 @@ export class TabsContainer
         }
     }
 
-    public get element() {
+    get element(): HTMLElement {
         return this._element;
     }
 
-    public isActive(tab: ITab) {
+    public isActive(tab: ITab): boolean {
         return (
             this.selectedIndex > -1 &&
             this.tabs[this.selectedIndex].value === tab
         );
-    }
-
-    public at(index: number) {
-        return this.tabs[index]?.value;
     }
 
     public indexOf(id: string): number {
@@ -214,7 +209,7 @@ export class TabsContainer
     private addTab(
         tab: IValueDisposable<ITab>,
         index: number = this.tabs.length
-    ) {
+    ): void {
         if (index < 0 || index > this.tabs.length) {
             throw new Error('invalid location');
         }
@@ -235,7 +230,7 @@ export class TabsContainer
         }
     }
 
-    public delete(id: string) {
+    public delete(id: string): void {
         const index = this.tabs.findIndex((tab) => tab.value.panelId === id);
 
         const tabToRemove = this.tabs.splice(index, 1)[0];
@@ -246,14 +241,17 @@ export class TabsContainer
         value.element.remove();
     }
 
-    public setActivePanel(panel: IDockviewPanel) {
+    public setActivePanel(panel: IDockviewPanel): void {
         this.tabs.forEach((tab) => {
             const isActivePanel = panel.id === tab.value.panelId;
             tab.value.setActive(isActivePanel);
         });
     }
 
-    public openPanel(panel: IDockviewPanel, index: number = this.tabs.length) {
+    public openPanel(
+        panel: IDockviewPanel,
+        index: number = this.tabs.length
+    ): void {
         if (this.tabs.find((tab) => tab.value.panelId === panel.id)) {
             return;
         }
@@ -292,11 +290,11 @@ export class TabsContainer
         this.addTab(value, index);
     }
 
-    public closePanel(panel: IDockviewPanel) {
+    public closePanel(panel: IDockviewPanel): void {
         this.delete(panel.id);
     }
 
-    public dispose() {
+    public dispose(): void {
         super.dispose();
 
         this.tabs.forEach((tab) => {

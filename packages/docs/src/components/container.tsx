@@ -30,12 +30,24 @@ export const CreateCloseButton = () =>
     });
 
 export const Container = (props: {
-    children: React.ReactNode;
+    children?: React.ReactNode;
     height?: number;
+    injectVanillaJS?: (parent: HTMLElement) => void;
 }) => {
+    const ref = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        if (!props.injectVanillaJS) {
+            return;
+        }
+
+        props.injectVanillaJS(ref.current);
+    }, [props.injectVanillaJS]);
+
     return (
         <>
             <div
+                ref={ref}
                 style={{
                     height: props.height ? `${props.height}px` : '300px',
                 }}

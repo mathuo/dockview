@@ -3,7 +3,6 @@ import {
     last,
     pushToEnd,
     pushToStart,
-    range,
     sequenceEquals,
     tail,
 } from '../array';
@@ -35,12 +34,6 @@ describe('array', () => {
         expect(arr1).toEqual([3, 1, 2, 4]);
         pushToStart(arr1, 5);
         expect(arr1).toEqual([3, 1, 2, 4]);
-    });
-
-    test('range', () => {
-        expect(range(0, 5)).toEqual([0, 1, 2, 3, 4]);
-        expect(range(5, 0)).toEqual([5, 4, 3, 2, 1]);
-        expect(range(5)).toEqual([0, 1, 2, 3, 4]);
     });
 
     test('firstIndex', () => {
