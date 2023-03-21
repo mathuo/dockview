@@ -9,39 +9,14 @@ import {
 import * as React from 'react';
 
 const components = {
-    default: (props: IDockviewPanelProps<{ title: string }>) => {
+    default: (props: IDockviewPanelProps) => {
         const [contraints, setContraints] =
             React.useState<GridConstraintChangeEvent | null>(null);
 
         React.useEffect(() => {
-            props.api.group.api.setConstraints({
-                maximumHeight: 200,
-                maximumWidth: 200,
+            props.api.group.api.onDidConstraintsChange((event) => {
+                setContraints(event);
             });
-        }, []);
-
-        React.useEffect(() => {
-            const disposable1 = new DockviewMutableDisposable();
-
-            const disposable = props.api.onDidGroupChange(() => {
-                disposable1.value = props.api.group.api.onDidConstraintsChange(
-                    (event) => {
-                        setContraints(event);
-                    }
-                );
-            });
-
-            setContraints({
-                maximumHeight: props.api.group.maximumHeight,
-                minimumHeight: props.api.group.minimumHeight,
-                maximumWidth: props.api.group.maximumWidth,
-                minimumWidth: props.api.group.minimumWidth,
-            });
-
-            return () => {
-                disposable1.dispose();
-                disposable.dispose();
-            };
         }, []);
 
         return (
@@ -53,13 +28,64 @@ const components = {
                     color: 'white',
                 }}
             >
-                <span> {props.params.title}</span>
                 {contraints && (
-                    <div>
-                        <div>{`minHeight=${contraints.minimumHeight}`}</div>
-                        <div>{`maxHeight=${contraints.maximumHeight}`}</div>
-                        <div>{`minWidth=${contraints.minimumWidth}`}</div>
-                        <div>{`maxWidth=${contraints.maximumWidth}`}</div>
+                    <div style={{ fontSize: '13px' }}>
+                        {typeof contraints.maximumHeight === 'number' && (
+                            <div
+                                style={{
+                                    border: '1px solid grey',
+                                    margin: '2px',
+                                    padding: '1px',
+                                }}
+                            >
+                                <span
+                                    style={{ color: 'grey' }}
+                                >{`Maximum Height: `}</span>
+                                <span>{`${contraints.maximumHeight}px`}</span>
+                            </div>
+                        )}
+                        {typeof contraints.minimumHeight === 'number' && (
+                            <div
+                                style={{
+                                    border: '1px solid grey',
+                                    margin: '2px',
+                                    padding: '1px',
+                                }}
+                            >
+                                <span
+                                    style={{ color: 'grey' }}
+                                >{`Minimum Height: `}</span>
+                                <span>{`${contraints.minimumHeight}px`}</span>
+                            </div>
+                        )}
+                        {typeof contraints.maximumWidth === 'number' && (
+                            <div
+                                style={{
+                                    border: '1px solid grey',
+                                    margin: '2px',
+                                    padding: '1px',
+                                }}
+                            >
+                                <span
+                                    style={{ color: 'grey' }}
+                                >{`Maximum Width: `}</span>
+                                <span>{`${contraints.maximumWidth}px`}</span>
+                            </div>
+                        )}
+                        {typeof contraints.minimumWidth === 'number' && (
+                            <div
+                                style={{
+                                    border: '1px solid grey',
+                                    margin: '2px',
+                                    padding: '1px',
+                                }}
+                            >
+                                <span
+                                    style={{ color: 'grey' }}
+                                >{`Minimum Width: `}</span>
+                                <span>{`${contraints.minimumWidth}px`}</span>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
@@ -71,19 +97,40 @@ const App = () => {
     const [api, setApi] = React.useState<DockviewApi>();
 
     const onReady = (event: DockviewReadyEvent) => {
-        const panel = event.api.addPanel({
+        const panel1 = event.api.addPanel({
             id: 'panel_1',
             component: 'default',
         });
 
-        event.api.addPanel({
+        const panel2 = event.api.addPanel({
             id: 'panel_2',
             component: 'default',
+            position: {
+                referencePanel: panel1,
+                direction: 'right',
+            },
         });
 
-        event.api.addPanel({
+        const panel3 = event.api.addPanel({
             id: 'panel_3',
             component: 'default',
+            position: {
+                referencePanel: panel2,
+                direction: 'right',
+            },
+        });
+
+        const panel4 = event.api.addPanel({
+            id: 'panel_4',
+            component: 'default',
+            position: {
+                direction: 'below',
+            },
+        });
+
+        panel2.api.group.api.setConstraints({
+            maximumWidth: 300,
+            maximumHeight: 300,
         });
     };
 
