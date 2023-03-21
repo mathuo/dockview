@@ -15,7 +15,7 @@ export class VoidContainer extends CompositeDisposable {
     private readonly _onDrop = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDrop.event;
 
-    get element() {
+    get element(): HTMLElement {
         return this._element;
     }
 

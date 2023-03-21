@@ -11,7 +11,8 @@ import {
 } from '../dom';
 import { clamp } from '../math';
 import { Event, Emitter } from '../events';
-import { pushToStart, pushToEnd, range, firstIndex } from '../array';
+import { pushToStart, pushToEnd, firstIndex } from '../array';
+import { range } from '../math';
 import { ViewItem } from './viewItem';
 
 export enum Orientation {

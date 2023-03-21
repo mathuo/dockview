@@ -13,11 +13,11 @@ import {
     DockviewGroupPanelApi,
 } from './dockviewGroupPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/splitview';
-import { FrameworkFactory } from '../types';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
 import { Position } from '../dnd/droptarget';
 import { IDockviewPanel } from './dockviewPanel';
+import { FrameworkFactory } from '../panel/componentFactory';
 
 export interface IGroupControlRenderer extends IDisposable {
     readonly element: HTMLElement;

@@ -16,7 +16,7 @@ export class ReactPanelView extends SplitviewPanel {
         super(id, component);
     }
 
-    getComponent() {
+    getComponent(): ReactPart<ISplitviewPanelProps> {
         return new ReactPart(
             this.element,
             this.reactPortalStore,
