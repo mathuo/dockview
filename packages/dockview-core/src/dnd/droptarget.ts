@@ -55,8 +55,8 @@ export type CanDisplayOverlay =
     | ((dragEvent: DragEvent, state: Position) => boolean);
 
 export class Droptarget extends CompositeDisposable {
-    private target: HTMLElement | undefined;
-    private overlay: HTMLElement | undefined;
+    private targetElement: HTMLElement | undefined;
+    private overlayElement: HTMLElement | undefined;
     private _state: Position | undefined;
 
     private readonly _onDrop = new Emitter<DroptargetEvent>();
@@ -127,23 +127,23 @@ export class Droptarget extends CompositeDisposable {
                         return;
                     }
 
-                    if (!this.target) {
-                        this.target = document.createElement('div');
-                        this.target.className = 'drop-target-dropzone';
-                        this.overlay = document.createElement('div');
-                        this.overlay.className = 'drop-target-selection';
+                    if (!this.targetElement) {
+                        this.targetElement = document.createElement('div');
+                        this.targetElement.className = 'drop-target-dropzone';
+                        this.overlayElement = document.createElement('div');
+                        this.overlayElement.className = 'drop-target-selection';
                         this._state = 'center';
-                        this.target.appendChild(this.overlay);
+                        this.targetElement.appendChild(this.overlayElement);
 
                         this.element.classList.add('drop-target');
-                        this.element.append(this.target);
+                        this.element.append(this.targetElement);
                     }
 
                     if (this.options.acceptedTargetZones.length === 0) {
                         return;
                     }
 
-                    if (!this.target || !this.overlay) {
+                    if (!this.targetElement || !this.overlayElement) {
                         return;
                     }
 
@@ -159,13 +159,15 @@ export class Droptarget extends CompositeDisposable {
                 },
                 onDrop: (e) => {
                     e.preventDefault();
-                    e.stopPropagation();
 
                     const state = this._state;
 
                     this.removeDropTarget();
 
                     if (state) {
+                        // only stop the propagation of the event if we are dealing with it
+                        // which is only when the target has state
+                        e.stopPropagation();
                         this._onDrop.fire({ position: state, nativeEvent: e });
                     }
                 },
@@ -182,7 +184,7 @@ export class Droptarget extends CompositeDisposable {
         width: number,
         height: number
     ): void {
-        if (!this.overlay) {
+        if (!this.overlayElement) {
             return;
         }
 
@@ -235,12 +237,12 @@ export class Droptarget extends CompositeDisposable {
             transform = '';
         }
 
-        this.overlay.style.transform = transform;
+        this.overlayElement.style.transform = transform;
 
-        toggleClass(this.overlay, 'small-right', isSmallX && isRight);
-        toggleClass(this.overlay, 'small-left', isSmallX && isLeft);
-        toggleClass(this.overlay, 'small-top', isSmallY && isTop);
-        toggleClass(this.overlay, 'small-bottom', isSmallY && isBottom);
+        toggleClass(this.overlayElement, 'small-right', isSmallX && isRight);
+        toggleClass(this.overlayElement, 'small-left', isSmallX && isLeft);
+        toggleClass(this.overlayElement, 'small-top', isSmallY && isTop);
+        toggleClass(this.overlayElement, 'small-bottom', isSmallY && isBottom);
     }
 
     private setState(quadrant: Position): void {
@@ -301,11 +303,11 @@ export class Droptarget extends CompositeDisposable {
     }
 
     private removeDropTarget(): void {
-        if (this.target) {
+        if (this.targetElement) {
             this._state = undefined;
-            this.element.removeChild(this.target);
-            this.target = undefined;
-            this.overlay = undefined;
+            this.element.removeChild(this.targetElement);
+            this.targetElement = undefined;
+            this.overlayElement = undefined;
             this.element.classList.remove('drop-target');
         }
     }
