@@ -1,6 +1,8 @@
-import useBaseUrl from '@docusaurus/useBaseUrl';
 import * as React from 'react';
 import './container.scss';
+
+const BASE_SANDBOX_URL =
+    'https://codesandbox.io/s/github/mathuo/dockview/tree/master/packages/docs/sandboxes';
 
 const createSvgElementFromPath = (params: {
     height: string;
@@ -33,8 +35,16 @@ export const Container = (props: {
     children?: React.ReactNode;
     height?: number;
     injectVanillaJS?: (parent: HTMLElement) => void;
+    sandboxId?: string;
 }) => {
     const ref = React.useRef<HTMLDivElement>(null);
+
+    const url = React.useMemo(() => {
+        if (!props.sandboxId) {
+            return '';
+        }
+        return `${BASE_SANDBOX_URL}/${props.sandboxId}`;
+    }, [props.sandboxId]);
 
     React.useEffect(() => {
         if (!props.injectVanillaJS) {
@@ -64,24 +74,29 @@ export const Container = (props: {
             >
                 <span style={{ flexGrow: 1 }} />
 
-                <span
-                    className="codesandbox-button"
-                    style={{ display: 'flex', alignItems: 'center' }}
-                >
-                    <span className="codesandbox-button-pretext">{`Open in `}</span>
-                    <a
-                        href="https://www.google.com"
-                        target={'_blank'}
-                        className="codesandbox-button-content"
+                {url && (
+                    <span
+                        className="codesandbox-button"
+                        style={{ display: 'flex', alignItems: 'center' }}
                     >
-                        <span
-                            style={{ fontWeight: 'bold', paddingRight: '4px' }}
+                        <span className="codesandbox-button-pretext">{`Open in `}</span>
+                        <a
+                            href={url}
+                            target={'_blank'}
+                            className="codesandbox-button-content"
                         >
-                            CodeSandbox
-                        </span>
-                        <CreateCloseButton />
-                    </a>
-                </span>
+                            <span
+                                style={{
+                                    fontWeight: 'bold',
+                                    paddingRight: '4px',
+                                }}
+                            >
+                                CodeSandbox
+                            </span>
+                            <CreateCloseButton />
+                        </a>
+                    </span>
+                )}
                 {/* <span
                     style={{ fontSize: '16px' }}
                     className="material-symbols-outlined"
