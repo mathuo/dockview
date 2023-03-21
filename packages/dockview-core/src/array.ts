@@ -47,27 +47,6 @@ export function pushToEnd<T>(arr: T[], value: T): void {
     }
 }
 
-export const range = (from: number, to?: number): number[] => {
-    const result: number[] = [];
-
-    if (typeof to !== 'number') {
-        to = from;
-        from = 0;
-    }
-
-    if (from <= to) {
-        for (let i = from; i < to; i++) {
-            result.push(i);
-        }
-    } else {
-        for (let i = from; i > to; i--) {
-            result.push(i);
-        }
-    }
-
-    return result;
-};
-
 export function firstIndex<T>(
     array: T[] | ReadonlyArray<T>,
     fn: (item: T) => boolean

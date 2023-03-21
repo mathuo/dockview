@@ -1,4 +1,6 @@
-import { FrameworkFactory } from '../types';
+export interface FrameworkFactory<T> {
+    createComponent: (id: string, componentId: string, component: any) => T;
+}
 
 export function createComponent<T>(
     id: string,

@@ -1,4 +1,4 @@
-import { FrameworkFactory } from '../types';
+import { FrameworkFactory } from '../panel/componentFactory';
 import { PaneviewDndOverlayEvent } from './paneviewComponent';
 import { IPaneBodyPart, IPaneHeaderPart, PaneviewPanel } from './paneviewPanel';
 

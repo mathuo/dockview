@@ -4,7 +4,6 @@ import { CompositeDisposable } from '../lifecycle';
 import { DragAndDropObserver } from './dnd';
 import { clamp } from '../math';
 import { Direction } from '../gridview/baseComponentGridview';
-import { isBooleanValue } from '../types';
 
 function numberOrFallback(maybeNumber: any, fallback: number): number {
     return typeof maybeNumber === 'number' ? maybeNumber : fallback;
@@ -120,7 +119,7 @@ export class Droptarget extends CompositeDisposable {
                         return;
                     }
 
-                    if (isBooleanValue(this.options.canDisplayOverlay)) {
+                    if (typeof this.options.canDisplayOverlay === 'boolean') {
                         if (!this.options.canDisplayOverlay) {
                             return;
                         }

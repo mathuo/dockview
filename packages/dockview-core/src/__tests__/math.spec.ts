@@ -1,4 +1,4 @@
-import { clamp } from '../math';
+import { clamp, range } from '../math';
 
 describe('math', () => {
     describe('clamp', () => {
@@ -13,5 +13,11 @@ describe('math', () => {
                 '50 > 40 is an invalid condition'
             );
         });
+    });
+
+    test('range', () => {
+        expect(range(0, 5)).toEqual([0, 1, 2, 3, 4]);
+        expect(range(5, 0)).toEqual([5, 4, 3, 2, 1]);
+        expect(range(5)).toEqual([0, 1, 2, 3, 4]);
     });
 });
