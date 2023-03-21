@@ -1,5 +1,3 @@
-export * from './hostedContainer';
-
 export * from './dnd/dataTransfer';
 
 export { watchElementResize } from './dom';
