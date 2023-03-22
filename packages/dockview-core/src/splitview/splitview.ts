@@ -9,10 +9,9 @@ import {
     toggleClass,
     getElementsByTagName,
 } from '../dom';
-import { clamp } from '../math';
 import { Event, Emitter } from '../events';
 import { pushToStart, pushToEnd, firstIndex } from '../array';
-import { range } from '../math';
+import { range, clamp } from '../math';
 import { ViewItem } from './viewItem';
 
 export enum Orientation {

@@ -182,49 +182,49 @@ const EventsDockview = () => {
                 panels: {
                     panel_1: {
                         id: 'panel_1',
-                        view: { content: { id: 'default' } },
+                        contentComponent: 'default',
                         params: { title: 'Panel 1' },
                         title: 'panel_1',
                     },
                     panel_2: {
                         id: 'panel_2',
-                        view: { content: { id: 'default' } },
+                        contentComponent: 'default',
                         params: { title: 'Panel 2' },
                         title: 'panel_2',
                     },
                     panel_3: {
                         id: 'panel_3',
-                        view: { content: { id: 'default' } },
+                        contentComponent: 'default',
                         params: { title: 'Panel 3' },
                         title: 'panel_3',
                     },
                     panel_4: {
                         id: 'panel_4',
-                        view: { content: { id: 'default' } },
+                        contentComponent: 'default',
                         params: { title: 'Panel 4' },
                         title: 'panel_4',
                     },
                     panel_5: {
                         id: 'panel_5',
-                        view: { content: { id: 'default' } },
+                        contentComponent: 'default',
                         params: { title: 'Panel 5' },
                         title: 'panel_5',
                     },
                     panel_6: {
                         id: 'panel_6',
-                        view: { content: { id: 'default' } },
+                        contentComponent: 'default',
                         params: { title: 'Panel 6' },
                         title: 'panel_6',
                     },
                     panel_8: {
                         id: 'panel_8',
-                        view: { content: { id: 'default' } },
+                        contentComponent: 'default',
                         params: { title: 'Panel 8' },
                         title: 'panel_8',
                     },
                     panel_7: {
                         id: 'panel_7',
-                        view: { content: { id: 'default' } },
+                        contentComponent: 'default',
                         params: { title: 'Panel 7' },
                         title: 'panel_7',
                     },
@@ -334,7 +334,7 @@ const EventsDockview = () => {
                     className="dockview-theme-abyss"
                 />
             </div>
-            <div style={{ flexGrow: 1 }}>
+            <div style={{ flexGrow: 1, paddingTop: '5px' }}>
                 <Console lines={lines} />
             </div>
         </div>

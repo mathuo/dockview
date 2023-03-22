@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { ReactPart, ReactPortalStore } from '../react';
-import { IGroupPanelBaseProps } from './dockview';
 import {
     PanelUpdateEvent,
     DockviewGroupPanel,

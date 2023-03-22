@@ -32,7 +32,7 @@ import DockviewSetTitle from '@site/sandboxes/updatetitle-dockview/src/app';
 
 Dockview is an abstraction built on top of [Gridviews](./gridview) where each view is a container of many tabbed panels.
 
-<Container>
+<Container sandboxId="simple-dockview">
     <SimpleDockview />
 </Container>
 
@@ -209,7 +209,7 @@ const onReady = (event: DockviewReadyEvent) => {
 Here is an example using the above code loading from and saving to localStorage.
 If you refresh the page you should notice your layout is loaded as you left it.
 
-<Container>
+<Container sandboxId="layout-dockview">
     <DockviewPersistance />
 </Container>
 
@@ -238,7 +238,7 @@ props.api.group.api.setSize({
 
 You can see an example invoking both approaches below.
 
-<Container>
+<Container sandboxId="resize-dockview">
     <ResizeDockview />
 </Container>
 
@@ -248,7 +248,7 @@ When the dockview is empty you may want to display some fallback content, this i
 By default there the watermark has no content but you can provide as a prop to `DockviewReact` a `watermarkComponent`
 which will be rendered when there are no panels or groups.
 
-<Container>
+<Container sandboxId="watermark-dockview">
     <DockviewWatermark />
 </Container>
 
@@ -327,7 +327,7 @@ return (
 );
 ```
 
-<Container>
+<Container sandboxId="dnd-dockview">
     <DndDockview />
 </Container>
 
@@ -525,7 +525,7 @@ As a simple example the below attaches a custom event handler for the context me
 The below example uses a custom tab renderer to reigster a popover when the user right clicked on a tab.
 This still makes use of the `DockviewDefaultTab` since it's only a minor change.
 
-<Container>
+<Container sandboxId="customheader-dockview">
     <CustomHeadersDockview />
 </Container>
 
@@ -550,7 +550,7 @@ api.setTitle('my_new_custom_title');
 
 > Note this only works when using the default tab implementation.
 
-<Container>
+<Container sandboxId="updatetitle-dockview">
     <DockviewSetTitle />
 </Container>
 
@@ -599,7 +599,7 @@ to the entire width of the group. For example:
 <DockviewReactComponent singleTabMode="fullwidth" {...otherProps} />
 ```
 
-<Container>
+<Container sandboxId="fullwidthtab-dockview">
     <DockviewNative />
 </Container>
 
@@ -653,7 +653,7 @@ const GroupControlComponent = (props: IDockviewGroupControlProps) => {
 };
 ```
 
-<Container>
+<Container sandboxId="groupcontrol-dockview">
     <DockviewGroupControl />
 </Container>
 
@@ -669,13 +669,15 @@ api.group.api.setConstraints(...)
 > If you specific a constraint on a group and move a panel within that group to another group it will no
 > longer be subject to those constraints since those constraints were on the group and not on the individual panel.
 
-<Container height={500}>
+<Container height={500} sandboxId="constraints-dockview">
     <DockviewConstraints />
 </Container>
 
 ## Events
 
-<Container height={600}>
+A simple example showing events fired by `dockviewz that can be interacted with.
+
+<Container height={600} sandboxId="events-dockview">
     <EventsDockview />
 </Container>
 
@@ -686,7 +688,7 @@ api.group.api.setConstraints(...)
 You can safely create multiple dockview instances within one page and nest dockviews within other dockviews.
 If you wish to interact with the drop event from one dockview instance in another dockview instance you can implement the `showDndOverlay` and `onDidDrop` props on `DockviewReact`.
 
-<Container>
+<Container sandboxId="nested-dockview">
     <NestedDockview />
 </Container>
 
