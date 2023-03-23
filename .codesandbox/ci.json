@@ -8,11 +8,15 @@
     "/packages/docs/sandboxes/customheader-dockview",
     "/packages/docs/sandboxes/dnd-dockview",
     "/packages/docs/sandboxes/events-dockview",
+    "/packages/docs/sandboxes/externaldnd-dockview",
+    "/packages/docs/sandboxes/fullwidthtab-dockview",
     "/packages/docs/sandboxes/groupcontol-dockview",
     "/packages/docs/sandboxes/layout-dockview",
+    "/packages/docs/sandboxes/nativeapp-dockview",
     "/packages/docs/sandboxes/nested-dockview",
     "/packages/docs/sandboxes/resize-dockview",
     "/packages/docs/sandboxes/simple-dockview",
+    "/packages/docs/sandboxes/updatetitle-dockview",
     "/packages/docs/sandboxes/watermark-dockview"
   ],
   "node": "16"
