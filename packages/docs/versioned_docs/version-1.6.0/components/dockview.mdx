@@ -2,10 +2,6 @@
 description: Dockview Documentation
 ---
 
-import {
-    RenderingDockview,
-    Checkbox,
-} from '@site/src/components/dockview/rendering';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
@@ -20,6 +16,7 @@ import DockviewWatermark from '@site/sandboxes/watermark-dockview/src/app';
 import CustomHeadersDockview from '@site/sandboxes/customheader-dockview/src/app';
 import DockviewNative from '@site/sandboxes/fullwidthtab-dockview/src/app';
 import DockviewNative2 from '@site/sandboxes/nativeapp-dockview/src/app';
+import RenderingDockview from '@site/sandboxes/rendering-dockview/src/app';
 
 # Dockview
 
@@ -455,17 +452,9 @@ const components = { default: RenderWhenVisible(MyComponent) };
 
 Toggling the checkbox you can see that when you only render those panels which are visible the underling React component is destroyed when it becomes hidden and re-created when it becomes visible.
 
-<Checkbox />
-<div
-    style={{
-        height: '300px',
-        backgroundColor: 'rgb(30,30,30)',
-        color: 'white',
-        margin: '20px 0px',
-    }}
->
+<Container>
     <RenderingDockview renderVisibleOnly={false} />
-</div>
+</Container>
 
 ## Headers
 

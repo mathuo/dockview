@@ -2,11 +2,7 @@
 description: Dockview Documentation
 ---
 
-import { Container } from '@site/src/components/container';
-import {
-    RenderingDockview,
-    Checkbox,
-} from '@site/src/components/dockview/rendering';
+import { Container } from '@site/src/components/ui/container';
 
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
@@ -24,6 +20,7 @@ import CustomHeadersDockview from '@site/sandboxes/customheader-dockview/src/app
 import DockviewNative from '@site/sandboxes/fullwidthtab-dockview/src/app';
 import DockviewNative2 from '@site/sandboxes/nativeapp-dockview/src/app';
 import DockviewSetTitle from '@site/sandboxes/updatetitle-dockview/src/app';
+import RenderingDockview from '@site/sandboxes/rendering-dockview/src/app';
 // import { attach as attachDockviewVanilla } from '@site/sandboxes/vanilla-dockview/src/app';
 
 # Dockview
@@ -41,10 +38,10 @@ The group will always be defined and will change if a panel is moved into anothe
 
 ## DockviewReact Component
 
-You can create a Dockview through the use of the `ReactDockview` component.
+You can create a Dockview through the use of the `DockviewReact` component.
 
 ```tsx
-import { ReactDockview } from 'dockview';
+import { DockviewReact } from 'dockview';
 ```
 
 | Property              | Type                                 | Optional | Default   | Description                                                  |
@@ -461,17 +458,9 @@ const components = { default: RenderWhenVisible(MyComponent) };
 
 Toggling the checkbox you can see that when you only render those panels which are visible the underling React component is destroyed when it becomes hidden and re-created when it becomes visible.
 
-<Checkbox />
-<div
-    style={{
-        height: '300px',
-        backgroundColor: 'rgb(30,30,30)',
-        color: 'white',
-        margin: '20px 0px',
-    }}
->
+<Container sandboxId="rendering-dockview">
     <RenderingDockview renderVisibleOnly={false} />
-</div>
+</Container>
 
 ## Headers
 

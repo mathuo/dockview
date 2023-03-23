@@ -19,6 +19,13 @@ const components = {
             });
         }, []);
 
+        const onClick = () => {
+            props.api.group.api.setConstraints({
+                maximumWidth: 300,
+                maximumHeight: 300,
+            });
+        };
+
         return (
             <div
                 style={{
@@ -28,6 +35,7 @@ const components = {
                     color: 'white',
                 }}
             >
+                <button onClick={onClick}>Set</button>
                 {contraints && (
                     <div style={{ fontSize: '13px' }}>
                         {typeof contraints.maximumHeight === 'number' && (
@@ -126,11 +134,6 @@ const App = () => {
             position: {
                 direction: 'below',
             },
-        });
-
-        panel2.api.group.api.setConstraints({
-            maximumWidth: 300,
-            maximumHeight: 300,
         });
     };
 

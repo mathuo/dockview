@@ -89,7 +89,22 @@ const components = {
     ),
 };
 
-export const RenderingDockview = (props: { renderVisibleOnly: boolean }) => {
+const Checkbox = () => {
+    const [render, setRender] = useRecoilState(renderVisibleComponentsOnlyAtom);
+
+    return (
+        <label>
+            Render only when visible
+            <input
+                type="checkbox"
+                checked={render}
+                onChange={(e) => setRender(e.target.checked)}
+            />
+        </label>
+    );
+};
+
+const RenderingDockview = (props: { renderVisibleOnly: boolean }) => {
     const [render, setRender] = useRecoilState(renderVisibleComponentsOnlyAtom);
 
     React.useEffect(
@@ -133,25 +148,23 @@ export const RenderingDockview = (props: { renderVisibleOnly: boolean }) => {
     };
 
     return (
-        <DockviewReact
-            components={components}
-            onReady={onReady}
-            className="dockview-theme-abyss"
-        />
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+            }}
+        >
+            <Checkbox />
+            <div style={{ flexGrow: 1, color: 'white' }}>
+                <DockviewReact
+                    components={components}
+                    onReady={onReady}
+                    className="dockview-theme-abyss"
+                />
+            </div>
+        </div>
     );
 };
 
-export const Checkbox = () => {
-    const [render, setRender] = useRecoilState(renderVisibleComponentsOnlyAtom);
-
-    return (
-        <label>
-            Render only when visible
-            <input
-                type="checkbox"
-                checked={render}
-                onChange={(e) => setRender(e.target.checked)}
-            />
-        </label>
-    );
-};
+export default RenderingDockview;

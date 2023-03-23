@@ -6,7 +6,7 @@ import {
     PaneviewDndOverlayEvent,
 } from 'dockview';
 import * as React from 'react';
-import { Console, Line } from '../console/console';
+import { Console, Line } from '../ui/console/console';
 import './sideBySide.scss';
 
 const components = {
