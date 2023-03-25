@@ -8,114 +8,12 @@ import {
 } from 'dockview';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { CURRENCIES, Currency, getCurrencies, getPrice } from './api';
-import './demo.scss';
-
-const CurrencyRow = (props: { currency: Currency }) => {
-    const [price, setPrice] = React.useState<number>();
-
-    React.useEffect(() => {
-        getPrice(props.currency.id, 'USD').then((result) => {
-            setPrice(Number(result.data.amount));
-        });
-    }, [props.currency]);
-
-    return (
-        <>
-            <div>{props.currency.id}</div>
-            <div>{`${typeof price === 'number' ? `$${price}` : '-'}`}</div>
-        </>
-    );
-};
-
-const Currencies = () => {
-    const [currencies, setCurrencies] = React.useState<Currency[]>([]);
-
-    React.useEffect(() => {
-        Promise.all(CURRENCIES.map(getCurrencies)).then((results) => {
-            setCurrencies(results.filter(Boolean));
-        });
-    }, []);
-
-    return (
-        <div
-            style={{
-                height: '100%',
-                overflow: 'auto',
-                margin: '10px',
-            }}
-        >
-            <div
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: '50px 100px',
-                    justifyItems: 'start',
-                }}
-            >
-                {currencies.map((currency) => (
-                    <CurrencyRow key={currency.id} currency={currency} />
-                ))}
-            </div>
-        </div>
-    );
-};
-
-import axios from 'axios';
-import { BrowserHeader } from '../browserHeader';
-
-type Article = {
-    id: 15255;
-    title: string;
-    url: string;
-    imageUrl: string;
-    newsSite: string;
-    summary: string;
-    publishedAt: string;
-    updatedAt: string;
-    featured: boolean;
-    launches: any[];
-    events: any[];
-};
-
-async function getStories(): Promise<Article[]> {
-    const response = await axios.get<Article[]>(
-        'https://api.spaceflightnewsapi.net/v3/articles'
-    );
-
-    return response.data;
-}
-
-const News = () => {
-    const [stories, setStories] = React.useState<Article[]>([]);
-
-    React.useEffect(() => {
-        getStories().then(setStories);
-    }, []);
-
-    return (
-        <div className="news-panel">
-            {stories.map((story) => {
-                return (
-                    <div className="story">
-                        <div className="metadata">
-                            <span>{story.title}</span>
-                        </div>
-                        <div className="link">
-                            <a href={story.url}>{story.url.substring(0, 10)}</a>
-                        </div>
-                    </div>
-                );
-            })}
-        </div>
-    );
-};
+import './app.scss';
 
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
         return <div style={{ padding: '20px' }}>{props.params.title}</div>;
     },
-    currencies: Currencies,
-    news: News,
 };
 
 const headerComponents = {
@@ -154,7 +52,7 @@ const Popover = (props: {
                         target = target.parentElement;
                     }
                 } else {
-                    target = undefined;
+                    target = null;
                 }
             }
 
@@ -170,7 +68,7 @@ const Popover = (props: {
     }, [props.close, uuid]);
 
     if (!props.position) {
-        return;
+        return null;
     }
 
     return ReactDOM.createPortal(
@@ -209,8 +107,9 @@ const Icon = (props: {
 };
 
 const Button = () => {
-    const [position, setPosition] =
-        React.useState<{ x: number; y: number } | undefined>(undefined);
+    const [position, setPosition] = React.useState<
+        { x: number; y: number } | undefined
+    >(undefined);
 
     const close = () => setPosition(undefined);
 
@@ -263,10 +162,8 @@ const GroupControls = (props: IDockviewGroupControlProps) => {
     );
 };
 
-export const DockviewDemo = () => {
+const DockviewDemo = () => {
     const onReady = (event: DockviewReadyEvent) => {
-        const d = localStorage.getItem('test');
-
         event.api.addPanel({
             id: 'panel_1',
             component: 'default',
@@ -317,39 +214,18 @@ export const DockviewDemo = () => {
 
         event.api.addGroup();
 
-        event.api.getPanel('panel_1').api.setActive();
-
-        // setInterval(() => {
-        //     event.api.getPanel('panel_1').update({
-        //         params: {
-        //             params: {
-        //                 title: Date.now().toString(),
-        //             },
-        //         },
-        //     });
-        // }, 1000);
+        event.api.getPanel('panel_1')!.api.setActive();
     };
 
     return (
-        <div
-            id="homepage-dockview-demo"
-            style={{
-                height: '530px',
-                margin: '40px 0px',
-                display: 'flex',
-                flexDirection: 'column',
-            }}
-        >
-            <BrowserHeader />
-            <div style={{ flexGrow: 1 }}>
-                <DockviewReact
-                    components={components}
-                    defaultTabComponent={headerComponents.default}
-                    groupControlComponent={GroupControls}
-                    onReady={onReady}
-                    className="dockview-theme-abyss"
-                />
-            </div>
-        </div>
+        <DockviewReact
+            components={components}
+            defaultTabComponent={headerComponents.default}
+            groupControlComponent={GroupControls}
+            onReady={onReady}
+            className="dockview-theme-abyss"
+        />
     );
 };
+
+export default DockviewDemo;

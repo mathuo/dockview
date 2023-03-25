@@ -5,10 +5,12 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './index.module.css';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
-import { DockviewDemo } from '../components/dockview/demo';
 import useBaseUrl from '@docusaurus/useBaseUrl';
+import DockviewDemo from '@site/sandboxes/demo-dockview/src/app';
+import DockviewDemo2 from '@site/sandboxes/dockview-app/src/app';
+import { Container } from '../components/ui/container';
+import { BrowserHeader } from '../components/ui/browserHeader';
 import './index.scss';
-import { DockviewDemo2 } from '../components/dockview/demo2';
 
 function HomepageHeader() {
     const { siteConfig } = useDocusaurusContext();
@@ -91,8 +93,18 @@ export default function Home(): JSX.Element {
                         Dockview Live Demos
                     </span>
                 </div>
-                <DockviewDemo />
-                <DockviewDemo2 />
+                <div style={{ padding: '20px' }}>
+                    <BrowserHeader />
+                    <Container height={500} sandboxId="demo-dockview">
+                        <DockviewDemo />
+                    </Container>
+                </div>
+                <div style={{ padding: '20px' }}>
+                    <BrowserHeader />
+                    <Container height={500} sandboxId="dockview-app">
+                        <DockviewDemo2 />
+                    </Container>
+                </div>
             </main>
         </Layout>
     );

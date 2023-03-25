@@ -6,7 +6,7 @@ import {
     GridviewApi,
 } from 'dockview';
 import * as React from 'react';
-import { Console, Line } from '../console/console';
+import { Console, Line } from '../ui/console/console';
 
 const components = {
     default: (props: IGridviewPanelProps<{ title: string }>) => {

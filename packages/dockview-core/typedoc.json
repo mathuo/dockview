@@ -1,7 +1,7 @@
 {
-    "out": "typedocs",
-    "entryPoints": ["./src/index.ts"],
-    "exclude": ["**/_test/**/*.*", "**/index.ts"],
-    "excludeExternals": true,
-    "excludePrivate": true
+  "out": "typedocs",
+  "entryPoints": ["./src/index.ts"],
+  "exclude": ["**/_test/**/*.*", "**/index.ts"],
+  "excludeExternals": true,
+  "excludePrivate": true
 }

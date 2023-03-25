@@ -2,24 +2,26 @@
 description: Dockview Documentation
 ---
 
-import {
-    RenderingDockview,
-    Checkbox,
-} from '@site/src/components/dockview/rendering';
+import { Container } from '@site/src/components/ui/container';
+
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 import DockviewPersistance from '@site/sandboxes/layout-dockview/src/app';
 import SimpleDockview from '@site/sandboxes/simple-dockview/src/app';
 import ResizeDockview from '@site/sandboxes/resize-dockview/src/app';
+import DockviewWatermark from '@site/sandboxes/watermark-dockview/src/app';
+import DockviewConstraints from '@site/sandboxes/constraints-dockview/src/app';
+import DndDockview from '@site/sandboxes/dnd-dockview/src/app';
 import NestedDockview from '@site/sandboxes/nested-dockview/src/app';
 import EventsDockview from '@site/sandboxes/events-dockview/src/app';
-import DndDockview from '@site/sandboxes/dnd-dockview/src/app';
 import DockviewGroupControl from '@site/sandboxes/groupcontrol-dockview/src/app';
-import DockviewWatermark from '@site/sandboxes/watermark-dockview/src/app';
 import CustomHeadersDockview from '@site/sandboxes/customheader-dockview/src/app';
 import DockviewNative from '@site/sandboxes/fullwidthtab-dockview/src/app';
 import DockviewNative2 from '@site/sandboxes/nativeapp-dockview/src/app';
+import DockviewSetTitle from '@site/sandboxes/updatetitle-dockview/src/app';
+import RenderingDockview from '@site/sandboxes/rendering-dockview/src/app';
+// import { attach as attachDockviewVanilla } from '@site/sandboxes/vanilla-dockview/src/app';
 
 # Dockview
 
@@ -27,26 +29,19 @@ import DockviewNative2 from '@site/sandboxes/nativeapp-dockview/src/app';
 
 Dockview is an abstraction built on top of [Gridviews](./gridview) where each view is a container of many tabbed panels.
 
-<div
-    style={{
-        height: '300px',
-        backgroundColor: 'rgb(30,30,30)',
-        color: 'white',
-        margin: '20px 0px',
-    }}
->
+<Container sandboxId="simple-dockview">
     <SimpleDockview />
-</div>
+</Container>
 
 You can access the panels associated group through the `panel.group` variable.
 The group will always be defined and will change if a panel is moved into another group.
 
 ## DockviewReact Component
 
-You can create a Dockview through the use of the `ReactDockview` component.
+You can create a Dockview through the use of the `DockviewReact` component.
 
 ```tsx
-import { ReactDockview } from 'dockview';
+import { DockviewReact } from 'dockview';
 ```
 
 | Property              | Type                                 | Optional | Default   | Description                                                  |
@@ -211,7 +206,9 @@ const onReady = (event: DockviewReadyEvent) => {
 Here is an example using the above code loading from and saving to localStorage.
 If you refresh the page you should notice your layout is loaded as you left it.
 
-<DockviewPersistance />
+<Container sandboxId="layout-dockview">
+    <DockviewPersistance />
+</Container>
 
 ## Resizing
 
@@ -238,7 +235,9 @@ props.api.group.api.setSize({
 
 You can see an example invoking both approaches below.
 
-<ResizeDockview />
+<Container sandboxId="resize-dockview">
+    <ResizeDockview />
+</Container>
 
 ## Watermark
 
@@ -246,7 +245,9 @@ When the dockview is empty you may want to display some fallback content, this i
 By default there the watermark has no content but you can provide as a prop to `DockviewReact` a `watermarkComponent`
 which will be rendered when there are no panels or groups.
 
-<DockviewWatermark />
+<Container sandboxId="watermark-dockview">
+    <DockviewWatermark />
+</Container>
 
 ## Drag And Drop
 
@@ -323,7 +324,9 @@ return (
 );
 ```
 
-<DndDockview />
+<Container sandboxId="dnd-dockview">
+    <DndDockview />
+</Container>
 
 ## Panels
 
@@ -455,17 +458,9 @@ const components = { default: RenderWhenVisible(MyComponent) };
 
 Toggling the checkbox you can see that when you only render those panels which are visible the underling React component is destroyed when it becomes hidden and re-created when it becomes visible.
 
-<Checkbox />
-<div
-    style={{
-        height: '300px',
-        backgroundColor: 'rgb(30,30,30)',
-        color: 'white',
-        margin: '20px 0px',
-    }}
->
+<Container sandboxId="rendering-dockview">
     <RenderingDockview renderVisibleOnly={false} />
-</div>
+</Container>
 
 ## Headers
 
@@ -514,12 +509,14 @@ You can also override the default tab renderer which will be used when no `tabCo
 <DockviewReact defaultTabComponent={MyCustomHeader}  ... />;
 ```
 
-As a simple example the below attachs a custom event handler for the context menu on all tabs as a default tab renderer
+As a simple example the below attaches a custom event handler for the context menu on all tabs as a default tab renderer
 
 The below example uses a custom tab renderer to reigster a popover when the user right clicked on a tab.
 This still makes use of the `DockviewDefaultTab` since it's only a minor change.
 
-<CustomHeadersDockview />
+<Container sandboxId="customheader-dockview">
+    <CustomHeadersDockview />
+</Container>
 
 ### Default Tab Title
 
@@ -537,10 +534,14 @@ You can update the title through the panel api which can be accessed via `props.
 component or via `api.getPanel('panel1').api` if you are accessing from outside of the panel component.
 
 ```tsx
-api.updateTitle('my_new_custom_title');
+api.setTitle('my_new_custom_title');
 ```
 
 > Note this only works when using the default tab implementation.
+
+<Container sandboxId="updatetitle-dockview">
+    <DockviewSetTitle />
+</Container>
 
 ### Custom Tab Title
 
@@ -587,7 +588,9 @@ to the entire width of the group. For example:
 <DockviewReactComponent singleTabMode="fullwidth" {...otherProps} />
 ```
 
-<DockviewNative />
+<Container sandboxId="fullwidthtab-dockview">
+    <DockviewNative />
+</Container>
 
 ## Groups
 
@@ -639,11 +642,33 @@ const GroupControlComponent = (props: IDockviewGroupControlProps) => {
 };
 ```
 
-<DockviewGroupControl />
+<Container sandboxId="groupcontrol-dockview">
+    <DockviewGroupControl />
+</Container>
+
+### Constraints
+
+You may wish to specify a minimum or maximum height or width for a group which can be done through the group api.
+
+```tsx
+api.group.api.setConstraints(...)
+```
+
+> Constraints are currently only supported for groups and not individual panels.
+> If you specific a constraint on a group and move a panel within that group to another group it will no
+> longer be subject to those constraints since those constraints were on the group and not on the individual panel.
+
+<Container height={500} sandboxId="constraints-dockview">
+    <DockviewConstraints />
+</Container>
 
 ## Events
 
-<EventsDockview />
+A simple example showing events fired by `dockviewz that can be interacted with.
+
+<Container height={600} sandboxId="events-dockview">
+    <EventsDockview />
+</Container>
 
 ## Advanced Examples
 
@@ -652,10 +677,30 @@ const GroupControlComponent = (props: IDockviewGroupControlProps) => {
 You can safely create multiple dockview instances within one page and nest dockviews within other dockviews.
 If you wish to interact with the drop event from one dockview instance in another dockview instance you can implement the `showDndOverlay` and `onDidDrop` props on `DockviewReact`.
 
-<NestedDockview />
+<Container sandboxId="nested-dockview">
+    <NestedDockview />
+</Container>
 
 ### Example
 
 hello
 
 <DockviewNative2 />
+
+hello 2
+
+<div style={{ height: '400px', width: '100%' }}>
+    <App />
+</div>
+
+<!-- ## VanillaJS
+
+> Note: This section is experimental and support for Vanilla JS is a work in progress.
+
+The `dockview` package contains `ReactJS` wrappers for the core library.
+The core library is published as an independant package under the name `dockview-core` which you can install standalone.
+
+> When using `dockview` there is no need to also install `dockview-core`.
+> `dockview-core` is a dependency of `dockview` and automatically installed during the installation process of `dockview` via `npm install dockview`.
+
+<Container injectVanillaJS={attachDockviewVanilla} /> -->

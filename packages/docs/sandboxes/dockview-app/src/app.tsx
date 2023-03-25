@@ -7,8 +7,6 @@ import {
     PaneviewReadyEvent,
 } from 'dockview';
 import * as React from 'react';
-import { BrowserHeader } from '../browserHeader';
-import './demo2.scss';
 
 const paneComponents = {
     default: (props: IPaneviewPanelProps) => {
@@ -71,17 +69,11 @@ const components = {
             });
         };
 
-        return (
-            <PaneviewReact
-                onReady={onReady}
-                components={paneComponents}
-                className="paneview-background"
-            />
-        );
+        return <PaneviewReact onReady={onReady} components={paneComponents} />;
     },
 };
 
-export const DockviewDemo2 = () => {
+const DockviewDemo2 = () => {
     const onReady = (event: GridviewReadyEvent) => {
         event.api.addPanel({
             id: 'panes',
@@ -116,22 +108,12 @@ export const DockviewDemo2 = () => {
     };
 
     return (
-        <div
-            style={{
-                height: '530px',
-                margin: '40px 0px',
-                display: 'flex',
-                flexDirection: 'column',
-            }}
-        >
-            <BrowserHeader />
-            <div style={{ flexGrow: 1 }}>
-                <GridviewReact
-                    onReady={onReady}
-                    components={components}
-                    className="dockview-theme-abyss"
-                />
-            </div>
-        </div>
+        <GridviewReact
+            onReady={onReady}
+            components={components}
+            className="dockview-theme-abyss"
+        />
     );
 };
+
+export default DockviewDemo2;

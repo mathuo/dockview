@@ -6,7 +6,9 @@
   "sandboxes": [
     "/packages/docs/sandboxes/constraints-dockview",
     "/packages/docs/sandboxes/customheader-dockview",
+    "/packages/docs/sandboxes/demo-dockview",
     "/packages/docs/sandboxes/dnd-dockview",
+    "/packages/docs/sandboxes/dockview-app",
     "/packages/docs/sandboxes/events-dockview",
     "/packages/docs/sandboxes/externaldnd-dockview",
     "/packages/docs/sandboxes/fullwidthtab-dockview",
