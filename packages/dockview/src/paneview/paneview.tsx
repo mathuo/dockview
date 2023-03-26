@@ -5,7 +5,6 @@ import {
     IPaneviewComponent,
     PaneviewDndOverlayEvent,
     PaneviewApi,
-    watchElementResize,
     PaneviewDropEvent,
 } from 'dockview-core';
 import { usePortalsLifecycle } from '../react';
@@ -43,23 +42,6 @@ export const PaneviewReact = React.forwardRef(
         React.useImperativeHandle(ref, () => domRef.current!, []);
 
         React.useEffect(() => {
-            if (props.disableAutoResizing) {
-                return () => {
-                    //
-                };
-            }
-
-            const watcher = watchElementResize(domRef.current!, (entry) => {
-                const { width, height } = entry.contentRect;
-                paneviewRef.current?.layout(width, height);
-            });
-
-            return () => {
-                watcher.dispose();
-            };
-        }, [props.disableAutoResizing]);
-
-        React.useEffect(() => {
             const createComponent = (
                 id: string,
                 _componentId: string,
@@ -69,7 +51,8 @@ export const PaneviewReact = React.forwardRef(
                     addPortal,
                 });
 
-            const paneview = new PaneviewComponent(domRef.current!, {
+            const paneview = new PaneviewComponent({
+                parentElement: domRef.current!,
                 frameworkComponents: props.components,
                 components: {},
                 headerComponents: {},

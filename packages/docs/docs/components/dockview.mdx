@@ -22,8 +22,8 @@ import DockviewNative2 from '@site/sandboxes/nativeapp-dockview/src/app';
 import DockviewSetTitle from '@site/sandboxes/updatetitle-dockview/src/app';
 import RenderingDockview from '@site/sandboxes/rendering-dockview/src/app';
 import DockviewExternalDnd from '@site/sandboxes/externaldnd-dockview/src/app';
-// import { attach as attachDockviewVanilla } from '@site/sandboxes/vanilla-dockview/src/app';
 import DockviewResizeContainer from '@site/sandboxes/resizeContainer-dockview/src/app';
+import { attach as attachDockviewVanilla } from '@site/sandboxes/vanilla-dockview/src/app';
 
 # Dockview
 
@@ -713,7 +713,7 @@ hello 2
     <App />
 </div>
 
-<!-- ## VanillaJS
+## VanillaJS
 
 > Note: This section is experimental and support for Vanilla JS is a work in progress.
 
@@ -723,4 +723,4 @@ The core library is published as an independant package under the name `dockview
 > When using `dockview` there is no need to also install `dockview-core`.
 > `dockview-core` is a dependency of `dockview` and automatically installed during the installation process of `dockview` via `npm install dockview`.
 
-<Container injectVanillaJS={attachDockviewVanilla} /> -->
+<Container injectVanillaJS={attachDockviewVanilla} />

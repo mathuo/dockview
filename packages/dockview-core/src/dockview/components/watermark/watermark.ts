@@ -1,5 +1,4 @@
 import {
-    GroupPanelPartInitParameters,
     IWatermarkRenderer,
     WatermarkRendererInitParameters,
 } from '../../types';
@@ -9,14 +8,15 @@ import { CompositeDisposable } from '../../../lifecycle';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { PanelUpdateEvent } from '../../../panel/types';
 import { createCloseButton } from '../../../svg';
+import { DockviewApi } from '../../../api/component.api';
 
 export class Watermark
     extends CompositeDisposable
     implements IWatermarkRenderer
 {
     private _element: HTMLElement;
-    private group: DockviewGroupPanel | undefined;
-    private params: GroupPanelPartInitParameters | undefined;
+    private _group: DockviewGroupPanel | undefined;
+    private _api: DockviewApi | undefined;
 
     get element(): HTMLElement {
         return this._element;
@@ -54,8 +54,8 @@ export class Watermark
         this.addDisposables(
             addDisposableListener(closeAnchor, 'click', (ev) => {
                 ev.preventDefault();
-                if (this.group) {
-                    this.params?.containerApi.removeGroup(this.group);
+                if (this._group) {
+                    this._api?.removeGroup(this._group);
                 }
             })
         );
@@ -74,11 +74,12 @@ export class Watermark
     }
 
     init(_params: WatermarkRendererInitParameters): void {
+        this._api = _params.containerApi;
         this.render();
     }
 
     updateParentGroup(group: DockviewGroupPanel, _visible: boolean): void {
-        this.group = group;
+        this._group = group;
         this.render();
     }
 
@@ -87,9 +88,7 @@ export class Watermark
     }
 
     private render(): void {
-        const isOneGroup = !!(
-            this.params && this.params.containerApi.size <= 1
-        );
+        const isOneGroup = !!(this._api && this._api.size <= 1);
         toggleClass(this.element, 'has-actions', isOneGroup);
     }
 }

@@ -1,11 +1,12 @@
 import { Emitter, Event, TickDelayedEvent } from '../events';
 import { getGridLocation, Gridview, IGridView } from './gridview';
 import { Position } from '../dnd/droptarget';
-import { CompositeDisposable, IValueDisposable } from '../lifecycle';
+import { IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
 import { ISplitviewStyles, Orientation, Sizing } from '../splitview/splitview';
 import { IPanel } from '../panel/types';
 import { MovementOptions2 } from '../dockview/options';
+import { Resizable } from '../resizable';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -31,6 +32,7 @@ export interface BaseGridOptions {
     readonly proportionalLayout: boolean;
     readonly orientation: Orientation;
     readonly styles?: ISplitviewStyles;
+    readonly parentElement?: HTMLElement;
 }
 
 export interface IGridPanelView extends IGridView, IPanel {
@@ -64,7 +66,7 @@ export interface IBaseGrid<T extends IGridPanelView> {
 }
 
 export abstract class BaseGrid<T extends IGridPanelView>
-    extends CompositeDisposable
+    extends Resizable
     implements IBaseGrid<T>
 {
     private readonly _id = nextLayoutId.next();
@@ -90,10 +92,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     get id(): string {
         return this._id;
-    }
-
-    get element(): HTMLElement {
-        return this._element;
     }
 
     get size(): number {
@@ -129,11 +127,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
         return this._activeGroup;
     }
 
-    constructor(
-        private readonly _element: HTMLElement,
-        options: BaseGridOptions
-    ) {
-        super();
+    constructor(options: BaseGridOptions) {
+        super(options.parentElement);
 
         this.gridview = new Gridview(
             !!options.proportionalLayout,
@@ -295,8 +290,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
             return;
         }
 
-        this.element.style.height = `${height}px`;
-        this.element.style.width = `${width}px`;
+        this.gridview.element.style.height = `${height}px`;
+        this.gridview.element.style.width = `${width}px`;
 
         this.gridview.layout(width, height);
     }

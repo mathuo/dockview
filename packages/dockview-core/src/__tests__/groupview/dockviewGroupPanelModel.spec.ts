@@ -490,7 +490,8 @@ describe('groupview', () => {
     });
 
     test('that group is set on panel during onDidAddPanel event', () => {
-        const cut = new DockviewComponent(document.createElement('div'), {
+        const cut = new DockviewComponent({
+            parentElement: document.createElement('div'),
             components: {
                 component: TestContentPart,
             },
@@ -505,14 +506,12 @@ describe('groupview', () => {
     });
 
     test('toJSON() default', () => {
-        const dockviewComponent = new DockviewComponent(
-            document.createElement('div'),
-            {
-                components: {
-                    component: TestContentPart,
-                },
-            }
-        );
+        const dockviewComponent = new DockviewComponent({
+            parentElement: document.createElement('div'),
+            components: {
+                component: TestContentPart,
+            },
+        });
 
         const cut = new DockviewGroupPanelModel(
             document.createElement('div'),
@@ -530,14 +529,12 @@ describe('groupview', () => {
     });
 
     test('toJSON() locked and hideHeader', () => {
-        const dockviewComponent = new DockviewComponent(
-            document.createElement('div'),
-            {
-                components: {
-                    component: TestContentPart,
-                },
-            }
-        );
+        const dockviewComponent = new DockviewComponent({
+            parentElement: document.createElement('div'),
+            components: {
+                component: TestContentPart,
+            },
+        });
 
         const cut = new DockviewGroupPanelModel(
             document.createElement('div'),
@@ -560,14 +557,12 @@ describe('groupview', () => {
     });
 
     test("that openPanel with skipSetActive doesn't set panel to active", () => {
-        const dockviewComponent = new DockviewComponent(
-            document.createElement('div'),
-            {
-                components: {
-                    component: TestContentPart,
-                },
-            }
-        );
+        const dockviewComponent = new DockviewComponent({
+            parentElement: document.createElement('div'),
+            components: {
+                component: TestContentPart,
+            },
+        });
 
         const groupviewContainer = document.createElement('div');
         const cut = new DockviewGroupPanelModel(

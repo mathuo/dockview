@@ -17,6 +17,11 @@ export namespace Disposable {
 
 export class CompositeDisposable {
     private readonly disposables: IDisposable[];
+    private _isDisposed = false;
+
+    protected get isDisposed(): boolean {
+        return this._isDisposed;
+    }
 
     public static from(...args: IDisposable[]): CompositeDisposable {
         return new CompositeDisposable(...args);
@@ -32,6 +37,8 @@ export class CompositeDisposable {
 
     public dispose(): void {
         this.disposables.forEach((arg) => arg.dispose());
+
+        this._isDisposed = true;
     }
 }
 
