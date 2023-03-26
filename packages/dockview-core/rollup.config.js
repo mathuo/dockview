@@ -2,7 +2,7 @@
 
 const { join } = require('path');
 const typescript = require('@rollup/plugin-typescript');
-const { terser } = require('rollup-plugin-terser');
+const terser = require('@rollup/plugin-terser');
 const postcss = require('rollup-plugin-postcss');
 
 const { name, version, homepage, license } = require('./package.json');
@@ -60,10 +60,6 @@ function createBundle(format, options) {
     const plugins = [
         typescript({
             tsconfig: 'tsconfig.esm.json',
-            incremental: false,
-            tsBuildInfoFile: undefined,
-            outDir: undefined,
-            declaration: false,
         }),
     ];
 

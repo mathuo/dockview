@@ -12,6 +12,7 @@
         "allowUnreachableCode": false,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
+        "declarationMap": true,
         "lib": [
           "ES2015",
           "ES2016.Array.Include",
