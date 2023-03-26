@@ -9,7 +9,6 @@ import {
     DockviewApi,
     IContentRenderer,
     ITabRenderer,
-    watchElementResize,
     DockviewGroupPanel,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
@@ -81,23 +80,12 @@ export const DockviewReact = React.forwardRef(
         React.useImperativeHandle(ref, () => domRef.current!, []);
 
         React.useEffect(() => {
-            if (props.disableAutoResizing) {
+            if (!domRef.current) {
                 return () => {
-                    //
+                    // noop
                 };
             }
 
-            const watcher = watchElementResize(domRef.current!, (entry) => {
-                const { width, height } = entry.contentRect;
-                dockviewRef.current?.layout(width, height);
-            });
-
-            return () => {
-                watcher.dispose();
-            };
-        }, [props.disableAutoResizing]);
-
-        React.useEffect(() => {
             const factory: GroupPanelFrameworkComponentFactory = {
                 content: {
                     createComponent: (
@@ -142,8 +130,6 @@ export const DockviewReact = React.forwardRef(
                 },
             };
 
-            const element = document.createElement('div');
-
             const frameworkTabComponents = props.tabComponents || {};
 
             if (props.defaultTabComponent) {
@@ -151,7 +137,8 @@ export const DockviewReact = React.forwardRef(
                     props.defaultTabComponent;
             }
 
-            const dockview = new DockviewComponent(element, {
+            const dockview = new DockviewComponent({
+                parentElement: domRef.current,
                 frameworkComponentFactory: factory,
                 frameworkComponents: props.components,
                 frameworkTabComponents,
@@ -171,9 +158,7 @@ export const DockviewReact = React.forwardRef(
                 singleTabMode: props.singleTabMode,
             });
 
-            domRef.current?.appendChild(dockview.element);
-
-            const { clientWidth, clientHeight } = domRef.current!;
+            const { clientWidth, clientHeight } = domRef.current;
             dockview.layout(clientWidth, clientHeight);
 
             if (props.onReady) {
@@ -184,7 +169,6 @@ export const DockviewReact = React.forwardRef(
 
             return () => {
                 dockview.dispose();
-                element.remove();
             };
         }, []);
 

@@ -25,22 +25,17 @@ export function attach(parent: HTMLElement): {
 } {
     const element = document.createElement('div');
     element.className = 'dockview-theme-abyss';
-    parent.appendChild(element);
+    element.style.height = '100%';
+    element.style.width = '100%';
 
-    const dockview = new DockviewComponent(element, {
+    const dockview = new DockviewComponent({
         components: {
             default: DefaultPanel,
         },
+        parentElement: element,
     });
 
-    const observer = new ResizeObserver((entires) => {
-        const firstEntry = entires[0];
-
-        const { width, height } = firstEntry.contentRect;
-        dockview.layout(width, height);
-    });
-
-    observer.observe(parent);
+    parent.appendChild(element);
 
     const panel1 = dockview.addPanel({
         id: 'panel_1',
@@ -78,9 +73,6 @@ export function attach(parent: HTMLElement): {
 
     return {
         dispose: () => {
-            observer.unobserve(element);
-            observer.disconnect();
-
             dockview.dispose();
             element.remove();
         },

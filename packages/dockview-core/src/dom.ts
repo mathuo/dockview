@@ -11,8 +11,15 @@ export function watchElementResize(
     cb: (entry: ResizeObserverEntry) => void
 ): IDisposable {
     const observer = new ResizeObserver((entires) => {
-        const firstEntry = entires[0];
-        cb(firstEntry);
+        /**
+         * Fast browser window resize produces Error: ResizeObserver loop limit exceeded.
+         * The error isn't visible in browser console, doesn't affect functionality, but degrades performance.
+         * See https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded/58701523#58701523
+         */
+        requestAnimationFrame(() => {
+            const firstEntry = entires[0];
+            cb(firstEntry);
+        });
     });
 
     observer.observe(element);

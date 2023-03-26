@@ -16,6 +16,7 @@ import { BaseComponentOptions } from '../panel/types';
 import { Emitter, Event } from '../events';
 import { SplitviewPanel, ISplitviewPanel } from './splitviewPanel';
 import { createComponent } from '../panel/componentFactory';
+import { Resizable } from '../resizable';
 
 export interface SerializedSplitviewPanelData {
     id: string;
@@ -79,7 +80,7 @@ export interface ISplitviewComponent extends IDisposable {
  * A high-level implementation of splitview that works using 'panels'
  */
 export class SplitviewComponent
-    extends CompositeDisposable
+    extends Resizable
     implements ISplitviewComponent
 {
     private _disposable = new MutableDisposable();
@@ -154,11 +155,8 @@ export class SplitviewComponent
             : this.splitview.orthogonalSize;
     }
 
-    constructor(
-        private readonly element: HTMLElement,
-        options: SplitviewComponentOptions
-    ) {
-        super();
+    constructor(options: SplitviewComponentOptions) {
+        super(options.parentElement);
 
         this._options = options;
 

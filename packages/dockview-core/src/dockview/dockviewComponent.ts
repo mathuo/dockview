@@ -185,11 +185,12 @@ export class DockviewComponent
         return this.options.tabHeight;
     }
 
-    constructor(element: HTMLElement, options: DockviewComponentOptions) {
-        super(element, {
+    constructor(options: DockviewComponentOptions) {
+        super({
             proportionalLayout: true,
             orientation: options.orientation || Orientation.HORIZONTAL,
             styles: options.styles,
+            parentElement: options.parentElement,
         });
 
         this.element.classList.add('dv-dockview');

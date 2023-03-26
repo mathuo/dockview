@@ -48,4 +48,20 @@ describe('lifecycle', () => {
         expect(d3.dispose).toHaveBeenCalledTimes(1);
         expect(d4.dispose).toHaveBeenCalledTimes(1);
     });
+
+    test('that isDisposed=true once CompositeDisposable is disposed', () => {
+        class Test extends CompositeDisposable {
+            checkIsDisposed(): boolean {
+                return this.isDisposed;
+            }
+        }
+
+        const cut = new Test();
+
+        expect(cut.checkIsDisposed()).toBeFalsy();
+
+        cut.dispose();
+
+        expect(cut.checkIsDisposed()).toBeTruthy();
+    });
 });

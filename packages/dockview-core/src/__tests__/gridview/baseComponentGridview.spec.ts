@@ -70,8 +70,8 @@ class TestPanel implements IGridPanelView {
 }
 
 class ClassUnderTest extends BaseGrid<TestPanel> {
-    constructor(element: HTMLElement, options: BaseGridOptions) {
-        super(element, options);
+    constructor(options: BaseGridOptions) {
+        super(options);
     }
 
     doRemoveGroup(
@@ -108,7 +108,8 @@ class ClassUnderTest extends BaseGrid<TestPanel> {
 
 describe('baseComponentGridview', () => {
     test('can add group', () => {
-        const cut = new ClassUnderTest(document.createElement('div'), {
+        const cut = new ClassUnderTest({
+            parentElement: document.createElement('div'),
             orientation: Orientation.HORIZONTAL,
             proportionalLayout: true,
         });

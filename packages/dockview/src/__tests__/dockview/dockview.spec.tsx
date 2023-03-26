@@ -33,11 +33,13 @@ describe('gridview react', () => {
     });
 
     test('is sized to container', () => {
-        setMockRefElement({
-            clientHeight: 450,
-            clientWidth: 650,
-            appendChild: jest.fn(),
-        });
+        const el = document.createElement('div');
+
+        jest.spyOn(el, 'clientHeight', 'get').mockReturnValue(450);
+        jest.spyOn(el, 'clientWidth', 'get').mockReturnValue(650);
+
+        setMockRefElement(el);
+
         let api: DockviewApi | undefined;
 
         const onReady = (event: DockviewReadyEvent) => {

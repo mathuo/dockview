@@ -84,6 +84,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
         group: DockviewGroupPanel
     ) => IGroupControlRenderer;
     singleTabMode?: 'fullwidth' | 'default';
+    parentElement?: HTMLElement;
 }
 
 export interface PanelOptions {

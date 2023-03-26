@@ -22,6 +22,7 @@ import {
 import { DefaultHeader } from './defaultPaneviewHeader';
 import { sequentialNumberGenerator } from '../math';
 import { PaneTransfer } from '../dnd/dataTransfer';
+import { Resizable } from '../resizable';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -126,10 +127,7 @@ export interface IPaneviewComponent extends IDisposable {
     clear(): void;
 }
 
-export class PaneviewComponent
-    extends CompositeDisposable
-    implements IPaneviewComponent
-{
+export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     private readonly _id = nextLayoutId.next();
     private _options: PaneviewComponentOptions;
     private _disposable = new MutableDisposable();
@@ -199,11 +197,8 @@ export class PaneviewComponent
         return this._options;
     }
 
-    constructor(
-        private element: HTMLElement,
-        options: PaneviewComponentOptions
-    ) {
-        super();
+    constructor(options: PaneviewComponentOptions) {
+        super(options.parentElement);
 
         this.addDisposables(
             this._onDidLayoutChange,

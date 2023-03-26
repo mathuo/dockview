@@ -26,4 +26,5 @@ export interface SplitviewComponentOptions extends SplitViewOptions {
         [componentName: string]: any;
     };
     frameworkWrapper?: FrameworkFactory<SplitviewPanel>;
+    parentElement?: HTMLElement;
 }

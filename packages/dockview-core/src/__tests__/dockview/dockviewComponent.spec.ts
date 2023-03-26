@@ -3,22 +3,12 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     ITabRenderer,
-    GroupPanelUpdateEvent,
-    GroupviewPanelState,
-    IGroupPanelInitParameters,
 } from '../../dockview/types';
 import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/splitview';
 import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
 import { IDockviewPanel } from '../../dockview/dockviewPanel';
-import {
-    DockviewPanelApi,
-    DockviewPanelApiImpl,
-} from '../../api/dockviewPanelApi';
-import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
-import { DockviewPanelModelMock } from '../__mocks__/mockDockviewPanelMode';
-import { DefaultTab } from '../../dockview/components/tab/defaultTab';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
 class PanelContentPartTest implements IContentRenderer {
@@ -100,7 +90,8 @@ describe('dockviewComponent', () => {
     beforeEach(() => {
         container = document.createElement('div');
 
-        dockview = new DockviewComponent(container, {
+        dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
@@ -1037,7 +1028,8 @@ describe('dockviewComponent', () => {
     test('panel is disposed of when closed', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: { default: PanelContentPartTest },
         });
 
@@ -1061,7 +1053,8 @@ describe('dockviewComponent', () => {
     test('can add panel of same id if already removed', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: { default: PanelContentPartTest },
         });
 
@@ -1095,7 +1088,8 @@ describe('dockviewComponent', () => {
     test('panel is disposed of when removed', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: { default: PanelContentPartTest },
         });
 
@@ -1119,7 +1113,8 @@ describe('dockviewComponent', () => {
     test('panel is not disposed of when moved to a new group', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
@@ -1160,7 +1155,8 @@ describe('dockviewComponent', () => {
     test('panel is not disposed of when moved within another group', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
@@ -1201,7 +1197,8 @@ describe('dockviewComponent', () => {
     test('panel is not disposed of when moved within another group', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
@@ -1241,7 +1238,8 @@ describe('dockviewComponent', () => {
     test('panel is disposed of when group is disposed', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
@@ -1275,7 +1273,8 @@ describe('dockviewComponent', () => {
     test('panel is disposed of when component is disposed', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
@@ -1309,7 +1308,8 @@ describe('dockviewComponent', () => {
     test('panel is disposed of when from JSON is called', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
@@ -1353,7 +1353,8 @@ describe('dockviewComponent', () => {
     test('move entire group into another group', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: { default: PanelContentPartTest },
         });
 
@@ -1566,7 +1567,8 @@ describe('dockviewComponent', () => {
     test('load a layout with a non-existant tab id', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
@@ -1652,7 +1654,8 @@ describe('dockviewComponent', () => {
     test('load and persist layout with custom tab header', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
@@ -1760,7 +1763,8 @@ describe('dockviewComponent', () => {
     test('#2', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
@@ -1846,7 +1850,8 @@ describe('dockviewComponent', () => {
     test('orthogonal realigment #1', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
@@ -1951,7 +1956,8 @@ describe('dockviewComponent', () => {
     test('orthogonal realigment #2', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
@@ -2091,7 +2097,8 @@ describe('dockviewComponent', () => {
     test('orthogonal realigment #3', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
@@ -2218,7 +2225,8 @@ describe('dockviewComponent', () => {
     test('that a empty component has no groups', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
@@ -2234,7 +2242,8 @@ describe('dockviewComponent', () => {
     test('that deserializing an empty layout has zero groups and a watermark', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
@@ -2273,7 +2282,8 @@ describe('dockviewComponent', () => {
     test('empty', () => {
         const container = document.createElement('div');
 
-        const dockview = new DockviewComponent(container, {
+        const dockview = new DockviewComponent({
+            parentElement: container,
             components: {
                 default: PanelContentPartTest,
             },
