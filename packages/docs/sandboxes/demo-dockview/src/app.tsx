@@ -8,6 +8,7 @@ import {
 } from 'dockview';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { v4 } from 'uuid';
 import './app.scss';
 
 const components = {
@@ -25,8 +26,6 @@ const headerComponents = {
         return <DockviewDefaultTab onContextMenu={onContextMenu} {...props} />;
     },
 };
-
-import { v4 } from 'uuid';
 
 const Popover = (props: {
     children: React.ReactNode;
