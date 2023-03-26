@@ -5,7 +5,6 @@ import {
     ISplitviewComponent,
     SplitviewComponent,
     Orientation,
-    watchElementResize,
 } from 'dockview-core';
 import { usePortalsLifecycle } from '../react';
 import { PanelCollection, PanelParameters } from '../types';
@@ -40,24 +39,8 @@ export const SplitviewReact = React.forwardRef(
         React.useImperativeHandle(ref, () => domRef.current!, []);
 
         React.useEffect(() => {
-            if (props.disableAutoResizing) {
-                return () => {
-                    //
-                };
-            }
-
-            const watcher = watchElementResize(domRef.current!, (entry) => {
-                const { width, height } = entry.contentRect;
-                splitviewRef.current?.layout(width, height);
-            });
-
-            return () => {
-                watcher.dispose();
-            };
-        }, [props.disableAutoResizing]);
-
-        React.useEffect(() => {
-            const splitview = new SplitviewComponent(domRef.current!, {
+            const splitview = new SplitviewComponent({
+                parentElement: domRef.current!,
                 orientation: props.orientation || Orientation.HORIZONTAL,
                 frameworkComponents: props.components,
                 frameworkWrapper: {

@@ -5,7 +5,6 @@ import {
     GridviewPanelApi,
     Orientation,
     GridviewApi,
-    watchElementResize,
 } from 'dockview-core';
 import { ReactGridPanelView } from './view';
 import { usePortalsLifecycle } from '../react';
@@ -40,26 +39,14 @@ export const GridviewReact = React.forwardRef(
         React.useImperativeHandle(ref, () => domRef.current!, []);
 
         React.useEffect(() => {
-            if (props.disableAutoResizing) {
+            if (!domRef.current) {
                 return () => {
-                    //
+                    // noop
                 };
             }
 
-            const watcher = watchElementResize(domRef.current!, (entry) => {
-                const { width, height } = entry.contentRect;
-                gridviewRef.current?.layout(width, height);
-            });
-
-            return () => {
-                watcher.dispose();
-            };
-        }, [props.disableAutoResizing]);
-
-        React.useEffect(() => {
-            const element = document.createElement('div');
-
-            const gridview = new GridviewComponent(element, {
+            const gridview = new GridviewComponent({
+                parentElement: domRef.current,
                 proportionalLayout:
                     typeof props.proportionalLayout === 'boolean'
                         ? props.proportionalLayout
@@ -83,9 +70,7 @@ export const GridviewReact = React.forwardRef(
                     : undefined,
             });
 
-            domRef.current?.appendChild(gridview.element);
-
-            const { clientWidth, clientHeight } = domRef.current!;
+            const { clientWidth, clientHeight } = domRef.current;
             gridview.layout(clientWidth, clientHeight);
 
             if (props.onReady) {
@@ -96,7 +81,6 @@ export const GridviewReact = React.forwardRef(
 
             return () => {
                 gridview.dispose();
-                element.remove();
             };
         }, []);
 

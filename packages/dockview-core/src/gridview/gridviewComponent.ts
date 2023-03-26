@@ -100,8 +100,9 @@ export class GridviewComponent
         this._deserializer = value;
     }
 
-    constructor(element: HTMLElement, options: GridviewComponentOptions) {
-        super(element, {
+    constructor(options: GridviewComponentOptions) {
+        super({
+            parentElement: options.parentElement,
             proportionalLayout: options.proportionalLayout,
             orientation: options.orientation,
             styles: options.styles,

@@ -16,4 +16,5 @@ export interface GridviewComponentOptions {
     frameworkComponentFactory?: FrameworkFactory<GridviewPanel>;
     tabHeight?: number;
     styles?: ISplitviewStyles;
+    parentElement?: HTMLElement;
 }

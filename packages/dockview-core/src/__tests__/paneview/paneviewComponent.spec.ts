@@ -71,7 +71,8 @@ describe('componentPaneview', () => {
     test('vertical panels', () => {
         const disposables = new CompositeDisposable();
 
-        const paneview = new PaneviewComponent(container, {
+        const paneview = new PaneviewComponent({
+            parentElement: container,
             components: {
                 testPanel: TestPanel,
             },
@@ -141,7 +142,8 @@ describe('componentPaneview', () => {
     });
 
     test('serialization', () => {
-        const paneview = new PaneviewComponent(container, {
+        const paneview = new PaneviewComponent({
+            parentElement: container,
             components: {
                 testPanel: TestPanel,
             },
@@ -249,7 +251,8 @@ describe('componentPaneview', () => {
     });
 
     test('toJSON shouldnt fire any layout events', () => {
-        const paneview = new PaneviewComponent(container, {
+        const paneview = new PaneviewComponent({
+            parentElement: container,
             components: {
                 testPanel: TestPanel,
             },
@@ -280,7 +283,8 @@ describe('componentPaneview', () => {
     test('dispose of paneviewComponent', () => {
         expect(container.childNodes.length).toBe(0);
 
-        const paneview = new PaneviewComponent(container, {
+        const paneview = new PaneviewComponent({
+            parentElement: container,
             components: {
                 testPanel: TestPanel,
             },
@@ -307,7 +311,8 @@ describe('componentPaneview', () => {
     });
 
     test('panel is disposed of when component is disposed', () => {
-        const paneview = new PaneviewComponent(container, {
+        const paneview = new PaneviewComponent({
+            parentElement: container,
             components: {
                 testPanel: TestPanel,
             },
@@ -326,8 +331,8 @@ describe('componentPaneview', () => {
             title: 'Panel 2',
         });
 
-        const panel1 = paneview.getPanel('panel1');
-        const panel2 = paneview.getPanel('panel2');
+        const panel1 = paneview.getPanel('panel1')!;
+        const panel2 = paneview.getPanel('panel2')!;
 
         const panel1Spy = jest.spyOn(panel1, 'dispose');
         const panel2Spy = jest.spyOn(panel2, 'dispose');
@@ -339,7 +344,8 @@ describe('componentPaneview', () => {
     });
 
     test('panel is disposed of when removed', () => {
-        const paneview = new PaneviewComponent(container, {
+        const paneview = new PaneviewComponent({
+            parentElement: container,
             components: {
                 testPanel: TestPanel,
             },
@@ -358,8 +364,8 @@ describe('componentPaneview', () => {
             title: 'Panel 2',
         });
 
-        const panel1 = paneview.getPanel('panel1');
-        const panel2 = paneview.getPanel('panel2');
+        const panel1 = paneview.getPanel('panel1')!;
+        const panel2 = paneview.getPanel('panel2')!;
 
         const panel1Spy = jest.spyOn(panel1, 'dispose');
         const panel2Spy = jest.spyOn(panel2, 'dispose');
@@ -371,7 +377,8 @@ describe('componentPaneview', () => {
     });
 
     test('panel is disposed of when fromJSON is called', () => {
-        const paneview = new PaneviewComponent(container, {
+        const paneview = new PaneviewComponent({
+            parentElement: container,
             components: {
                 testPanel: TestPanel,
             },
@@ -390,8 +397,8 @@ describe('componentPaneview', () => {
             title: 'Panel 2',
         });
 
-        const panel1 = paneview.getPanel('panel1');
-        const panel2 = paneview.getPanel('panel2');
+        const panel1 = paneview.getPanel('panel1')!;
+        const panel2 = paneview.getPanel('panel2')!;
 
         const panel1Spy = jest.spyOn(panel1, 'dispose');
         const panel2Spy = jest.spyOn(panel2, 'dispose');

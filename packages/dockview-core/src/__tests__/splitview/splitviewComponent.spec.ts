@@ -26,7 +26,8 @@ describe('componentSplitview', () => {
     });
 
     test('remove panel', () => {
-        const splitview = new SplitviewComponent(container, {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
             orientation: Orientation.VERTICAL,
             components: {
                 testPanel: TestPanel,
@@ -38,9 +39,9 @@ describe('componentSplitview', () => {
         splitview.addPanel({ id: 'panel2', component: 'testPanel' });
         splitview.addPanel({ id: 'panel3', component: 'testPanel' });
 
-        const panel1 = splitview.getPanel('panel1');
-        const panel2 = splitview.getPanel('panel2');
-        const panel3 = splitview.getPanel('panel3');
+        const panel1 = splitview.getPanel('panel1')!;
+        const panel2 = splitview.getPanel('panel2')!;
+        const panel3 = splitview.getPanel('panel3')!;
 
         expect(panel1.api.isActive).toBeFalsy();
         expect(panel2.api.isActive).toBeFalsy();
@@ -61,7 +62,8 @@ describe('componentSplitview', () => {
     });
 
     test('horizontal dimensions', () => {
-        const splitview = new SplitviewComponent(container, {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
             orientation: Orientation.HORIZONTAL,
             components: {
                 testPanel: TestPanel,
@@ -74,7 +76,8 @@ describe('componentSplitview', () => {
     });
 
     test('vertical dimensions', () => {
-        const splitview = new SplitviewComponent(container, {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
             orientation: Orientation.VERTICAL,
             components: {
                 testPanel: TestPanel,
@@ -87,7 +90,8 @@ describe('componentSplitview', () => {
     });
 
     test('api resize', () => {
-        const splitview = new SplitviewComponent(container, {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
             orientation: Orientation.VERTICAL,
             components: {
                 testPanel: TestPanel,
@@ -99,9 +103,9 @@ describe('componentSplitview', () => {
         splitview.addPanel({ id: 'panel2', component: 'testPanel' });
         splitview.addPanel({ id: 'panel3', component: 'testPanel' });
 
-        const panel1 = splitview.getPanel('panel1');
-        const panel2 = splitview.getPanel('panel2');
-        const panel3 = splitview.getPanel('panel3');
+        const panel1 = splitview.getPanel('panel1')!;
+        const panel2 = splitview.getPanel('panel2')!;
+        const panel3 = splitview.getPanel('panel3')!;
 
         expect(panel1.width).toBe(400);
         expect(panel1.height).toBe(200);
@@ -139,7 +143,8 @@ describe('componentSplitview', () => {
     });
 
     test('api', () => {
-        const splitview = new SplitviewComponent(container, {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
             orientation: Orientation.HORIZONTAL,
             components: {
                 testPanel: TestPanel,
@@ -180,7 +185,8 @@ describe('componentSplitview', () => {
     test('vertical panels', () => {
         const disposables = new CompositeDisposable();
 
-        const splitview = new SplitviewComponent(container, {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
             orientation: Orientation.VERTICAL,
             components: {
                 testPanel: TestPanel,
@@ -229,7 +235,8 @@ describe('componentSplitview', () => {
     test('horizontal panels', () => {
         const disposables = new CompositeDisposable();
 
-        const splitview = new SplitviewComponent(container, {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
             orientation: Orientation.HORIZONTAL,
             components: {
                 testPanel: TestPanel,
@@ -276,7 +283,8 @@ describe('componentSplitview', () => {
     });
 
     test('serialization', () => {
-        const splitview = new SplitviewComponent(container, {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
             orientation: Orientation.VERTICAL,
             components: {
                 testPanel: TestPanel,
@@ -330,7 +338,8 @@ describe('componentSplitview', () => {
     });
 
     test('toJSON shouldnt fire any layout events', () => {
-        const splitview = new SplitviewComponent(container, {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
             orientation: Orientation.HORIZONTAL,
             components: {
                 testPanel: TestPanel,
@@ -361,7 +370,8 @@ describe('componentSplitview', () => {
     test('dispose of splitviewComponent', () => {
         expect(container.childNodes.length).toBe(0);
 
-        const splitview = new SplitviewComponent(container, {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
             orientation: Orientation.HORIZONTAL,
             components: {
                 testPanel: TestPanel,
@@ -387,7 +397,8 @@ describe('componentSplitview', () => {
     });
 
     test('panel is disposed of when component is disposed', () => {
-        const splitview = new SplitviewComponent(container, {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
             orientation: Orientation.HORIZONTAL,
             components: {
                 default: TestPanel,
@@ -405,8 +416,8 @@ describe('componentSplitview', () => {
             component: 'default',
         });
 
-        const panel1 = splitview.getPanel('panel1');
-        const panel2 = splitview.getPanel('panel2');
+        const panel1 = splitview.getPanel('panel1')!;
+        const panel2 = splitview.getPanel('panel2')!;
 
         const panel1Spy = jest.spyOn(panel1, 'dispose');
         const panel2Spy = jest.spyOn(panel2, 'dispose');
@@ -418,7 +429,8 @@ describe('componentSplitview', () => {
     });
 
     test('panel is disposed of when removed', () => {
-        const splitview = new SplitviewComponent(container, {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
             orientation: Orientation.HORIZONTAL,
             components: {
                 default: TestPanel,
@@ -436,8 +448,8 @@ describe('componentSplitview', () => {
             component: 'default',
         });
 
-        const panel1 = splitview.getPanel('panel1');
-        const panel2 = splitview.getPanel('panel2');
+        const panel1 = splitview.getPanel('panel1')!;
+        const panel2 = splitview.getPanel('panel2')!;
 
         const panel1Spy = jest.spyOn(panel1, 'dispose');
         const panel2Spy = jest.spyOn(panel2, 'dispose');
@@ -449,7 +461,8 @@ describe('componentSplitview', () => {
     });
 
     test('panel is disposed of when fromJSON is called', () => {
-        const splitview = new SplitviewComponent(container, {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
             orientation: Orientation.HORIZONTAL,
             components: {
                 default: TestPanel,
@@ -467,8 +480,8 @@ describe('componentSplitview', () => {
             component: 'default',
         });
 
-        const panel1 = splitview.getPanel('panel1');
-        const panel2 = splitview.getPanel('panel2');
+        const panel1 = splitview.getPanel('panel1')!;
+        const panel2 = splitview.getPanel('panel2')!;
 
         const panel1Spy = jest.spyOn(panel1, 'dispose');
         const panel2Spy = jest.spyOn(panel2, 'dispose');

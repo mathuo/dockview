@@ -33,7 +33,8 @@ describe('gridview', () => {
     });
 
     test('added views are visible by default', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -52,7 +53,8 @@ describe('gridview', () => {
     });
 
     test('remove panel', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -82,7 +84,8 @@ describe('gridview', () => {
     });
 
     test('active panel', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -142,7 +145,8 @@ describe('gridview', () => {
     });
 
     test('deserialize and serialize a layout', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -269,7 +273,8 @@ describe('gridview', () => {
     });
 
     test('toJSON shouldnt fire any layout events', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -305,7 +310,8 @@ describe('gridview', () => {
     });
 
     test('gridview events', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -428,7 +434,8 @@ describe('gridview', () => {
     test('dispose of gridviewComponent', () => {
         expect(container.childNodes.length).toBe(0);
 
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -457,7 +464,8 @@ describe('gridview', () => {
     });
 
     test('#1/VERTICAL', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: true,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -513,7 +521,8 @@ describe('gridview', () => {
     });
 
     test('#2/HORIZONTAL', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
             components: { default: TestGridview },
@@ -571,7 +580,8 @@ describe('gridview', () => {
     });
 
     test('#3/HORIZONTAL', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
             components: { default: TestGridview },
@@ -647,7 +657,8 @@ describe('gridview', () => {
     });
 
     test('#4/HORIZONTAL', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
             components: { default: TestGridview },
@@ -741,7 +752,8 @@ describe('gridview', () => {
     });
 
     test('#5/VERTICAL', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: true,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -835,7 +847,8 @@ describe('gridview', () => {
     });
 
     test('#5/VERTICAL/proportional/false', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -928,7 +941,8 @@ describe('gridview', () => {
     });
 
     test('#6/VERTICAL', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: true,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -1052,7 +1066,8 @@ describe('gridview', () => {
     });
 
     test('#7/VERTICAL layout first', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: true,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -1176,7 +1191,8 @@ describe('gridview', () => {
     });
 
     test('#8/VERTICAL layout after', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: true,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -1299,7 +1315,8 @@ describe('gridview', () => {
     });
 
     test('#9/HORIZONTAL', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
             components: { default: TestGridview },
@@ -1421,7 +1438,8 @@ describe('gridview', () => {
     });
 
     test('#9/HORIZONTAL/proportional/false', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: false,
             orientation: Orientation.HORIZONTAL,
             components: { default: TestGridview },
@@ -1543,7 +1561,8 @@ describe('gridview', () => {
     });
 
     test('#10/HORIZONTAL scale x:1.5 y:2', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
             components: { default: TestGridview },
@@ -1670,7 +1689,8 @@ describe('gridview', () => {
     });
 
     test('panel is disposed of when component is disposed', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -1700,7 +1720,8 @@ describe('gridview', () => {
     });
 
     test('panel is disposed of when removed', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -1729,7 +1750,8 @@ describe('gridview', () => {
     });
 
     test('panel is disposed of when fromJSON is called', () => {
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: false,
             orientation: Orientation.VERTICAL,
             components: { default: TestGridview },
@@ -1767,7 +1789,8 @@ describe('gridview', () => {
     test('fromJSON  events should still fire', () => {
         jest.useFakeTimers();
 
-        const gridview = new GridviewComponent(container, {
+        const gridview = new GridviewComponent({
+            parentElement: container,
             proportionalLayout: true,
             orientation: Orientation.HORIZONTAL,
             components: { default: TestGridview },
