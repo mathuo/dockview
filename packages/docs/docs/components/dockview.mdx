@@ -22,6 +22,7 @@ import DockviewNative2 from '@site/sandboxes/nativeapp-dockview/src/app';
 import DockviewSetTitle from '@site/sandboxes/updatetitle-dockview/src/app';
 import RenderingDockview from '@site/sandboxes/rendering-dockview/src/app';
 import DockviewExternalDnd from '@site/sandboxes/externaldnd-dockview/src/app';
+import DockviewResizeContainer from '@site/sandboxes/resizeContainer-dockview/src/app';
 import { attach as attachDockviewVanilla } from '@site/sandboxes/vanilla-dockview/src/app';
 
 # Dockview
@@ -213,6 +214,8 @@ If you refresh the page you should notice your layout is loaded as you left it.
 
 ## Resizing
 
+### Panel Resizing
+
 Each Dockview contains of a number of groups and each group has a number of panels.
 Logically a user may want to resize a panel, but this translates to resizing the group which contains that panel.
 
@@ -238,6 +241,14 @@ You can see an example invoking both approaches below.
 
 <Container sandboxId="resize-dockview">
     <ResizeDockview />
+</Container>
+
+### Container Resizing
+
+The component will automatically resize to it's container.
+
+<Container sandboxId="resizeContainer-dockview">
+    <DockviewResizeContainer />
 </Container>
 
 ## Watermark
