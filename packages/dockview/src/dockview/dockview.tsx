@@ -43,8 +43,9 @@ export interface IGroupPanelBaseProps<T extends {} = Record<string, any>>
     containerApi: DockviewApi;
 }
 
-export type IDockviewPanelHeaderProps<T extends {} = Record<string, any>> =
-    IGroupPanelBaseProps<T>;
+export type IDockviewPanelHeaderProps<
+    T extends { [index: string]: any } = any
+> = IGroupPanelBaseProps<T>;
 
 export type IDockviewPanelProps<T extends { [index: string]: any } = any> =
     IGroupPanelBaseProps<T>;
