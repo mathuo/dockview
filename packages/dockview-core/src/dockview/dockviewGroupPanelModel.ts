@@ -56,7 +56,6 @@ export interface GroupOptions extends CoreGroupOptions {
     readonly panels?: IDockviewPanel[];
     readonly activePanel?: IDockviewPanel;
     readonly id?: string;
-    tabHeight?: number;
 }
 
 export interface GroupPanelViewState extends CoreGroupOptions {
@@ -78,7 +77,6 @@ export interface GroupviewDropEvent {
 
 export interface IHeader {
     hidden: boolean;
-    height: number | undefined;
 }
 
 export interface IDockviewGroupPanelModel extends IPanel {

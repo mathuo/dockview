@@ -237,6 +237,8 @@ describe('groupview', () => {
         removePanelMock = jest.fn();
         removeGroupMock = jest.fn();
 
+        options = {};
+
         dockview = (<Partial<DockviewComponent>>{
             options: {},
             createWatermarkComponent: () => new Watermark(),
@@ -248,9 +250,6 @@ describe('groupview', () => {
             onDidRemovePanel: jest.fn(),
         }) as DockviewComponent;
 
-        options = {
-            tabHeight: 30,
-        };
         groupview = new DockviewGroupPanel(dockview, 'groupview-1', options);
         groupview.initialize();
     });
@@ -261,7 +260,6 @@ describe('groupview', () => {
         const panel3 = new TestPanel('panel3', jest.fn() as any);
 
         const groupview2 = new DockviewGroupPanel(dockview, 'groupview-2', {
-            tabHeight: 25,
             panels: [panel1, panel2, panel3],
             activePanel: panel2,
         });

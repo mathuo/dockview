@@ -419,14 +419,6 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     constructor(private readonly component: IDockviewComponent) {}
 
-    getTabHeight(): number | undefined {
-        return this.component.tabHeight;
-    }
-
-    setTabHeight(height: number | undefined): void {
-        this.component.tabHeight = height;
-    }
-
     focus(): void {
         this.component.focus();
     }

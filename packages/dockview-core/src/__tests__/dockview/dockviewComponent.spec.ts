@@ -473,7 +473,6 @@ describe('dockviewComponent', () => {
                     title: 'panel5',
                 },
             },
-            options: { tabHeight: 25 },
         });
 
         expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
@@ -558,7 +557,6 @@ describe('dockviewComponent', () => {
                     title: 'panel5',
                 },
             },
-            options: { tabHeight: 25 },
         });
     });
 
@@ -989,7 +987,6 @@ describe('dockviewComponent', () => {
                     title: 'view_3_title',
                 },
             },
-            options: {},
         });
 
         expect(removedGroups.length).toBe(2);
@@ -1512,7 +1509,6 @@ describe('dockviewComponent', () => {
                     title: 'panel5',
                 },
             },
-            options: { tabHeight: 25 },
         });
 
         jest.runAllTimers();
@@ -1547,7 +1543,6 @@ describe('dockviewComponent', () => {
                 orientation: Orientation.VERTICAL,
             },
             panels: {},
-            options: { tabHeight: 25 },
         });
 
         jest.runAllTimers();
@@ -1647,7 +1642,6 @@ describe('dockviewComponent', () => {
                     title: 'panel5',
                 },
             },
-            options: { tabHeight: 25 },
         });
     });
 
@@ -1709,7 +1703,6 @@ describe('dockviewComponent', () => {
                     title: 'panel2',
                 },
             },
-            options: { tabHeight: 25 },
         });
 
         expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
@@ -1756,7 +1749,6 @@ describe('dockviewComponent', () => {
                     title: 'panel2',
                 },
             },
-            options: { tabHeight: 25 },
         });
     });
 
@@ -1822,7 +1814,6 @@ describe('dockviewComponent', () => {
                     title: 'panel3',
                 },
             },
-            options: { tabHeight: 25 },
         });
 
         const group = dockview.getGroupPanel('panel2')!.api.group;
@@ -1949,7 +1940,6 @@ describe('dockviewComponent', () => {
                     title: 'panel2',
                 },
             },
-            options: {},
         });
     });
 
@@ -2090,7 +2080,6 @@ describe('dockviewComponent', () => {
                     title: 'panel3',
                 },
             },
-            options: {},
         });
     });
 
@@ -2218,7 +2207,6 @@ describe('dockviewComponent', () => {
                     title: 'panel3',
                 },
             },
-            options: {},
         });
     });
 
@@ -2304,7 +2292,6 @@ describe('dockviewComponent', () => {
                     size: 0,
                 },
             },
-            options: {},
             panels: {},
         });
     });
