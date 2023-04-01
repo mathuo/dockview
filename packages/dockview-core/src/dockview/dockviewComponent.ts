@@ -44,6 +44,7 @@ import {
 import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
+import { Overlay } from '../dnd/overlay';
 
 export interface PanelReference {
     update: (event: { params: { [key: string]: any } }) => void;
@@ -117,6 +118,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidAddPanel: Event<IDockviewPanel>;
     readonly onDidLayoutFromJSON: Event<void>;
     readonly onDidActivePanelChange: Event<IDockviewPanel | undefined>;
+    addFloating(): void;
 }
 
 export class DockviewComponent
@@ -288,6 +290,8 @@ export class DockviewComponent
         this._api = new DockviewApi(this);
 
         this.updateWatermark();
+
+        this.element.style.position = 'relative';
     }
 
     private orthogonalize(position: Position): DockviewGroupPanel {
@@ -983,5 +987,61 @@ export class DockviewComponent
         this._onDidAddPanel.dispose();
         this._onDidRemovePanel.dispose();
         this._onDidLayoutFromJSON.dispose();
+    }
+
+    //
+
+    addFloating() {
+        const parentDockview = this;
+
+        const floatingDockview = new DockviewComponent({
+            ...this.options,
+            parentElement: undefined,
+            showDndOverlay: (event) => {
+                const data = event.getData();
+
+                if (data && data.viewId === parentDockview.id) {
+                    return true;
+                }
+
+                return false;
+            },
+        });
+
+        floatingDockview.onDidDrop((event) => {
+            const data = event.getData();
+
+            if (!data || data.viewId !== parentDockview.id) {
+                return;
+            }
+
+            if (data.panelId === null) {
+                const group = parentDockview.removeGroup(
+                    parentDockview.getPanel(data.groupId)!
+                );
+            } else {
+                const panel = parentDockview.removePanel(
+                    parentDockview.getGroupPanel(data.panelId)!
+                );
+
+                parentDockview.moveGroupOrPanel()
+            }
+        });
+
+        floatingDockview.addPanel({
+            id: '__test__',
+            component: 'default',
+        });
+        floatingDockview.addPanel({
+            id: '__test__2__',
+            component: 'default',
+        });
+
+        const overlay = new Overlay(this.element, floatingDockview.element, {
+            height: 300,
+            width: 300,
+            left: 100,
+            top: 100,
+        });
     }
 }

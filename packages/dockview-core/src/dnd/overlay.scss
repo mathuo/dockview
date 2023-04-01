@@ -1,0 +1,106 @@
+.dv-resize-container {
+    position: absolute;
+    z-index: 9998;
+
+    background-color: white;
+
+    &.dv-resize-container-dragging {
+        opacity: 0.2;
+    }
+
+    .dv-resize-handle-top {
+        height: 4px;
+        width: calc(100% - 8px);
+        left: 4px;
+        top: -2px;
+        z-index: 9999;
+        position: absolute;
+        cursor: ns-resize;
+
+        background-color: red;
+    }
+
+    .dv-resize-handle-bottom {
+        height: 4px;
+        width: calc(100% - 8px);
+        left: 4px;
+        bottom: -2px;
+        z-index: 9999;
+        position: absolute;
+        cursor: ns-resize;
+
+        background-color: green;
+    }
+
+    .dv-resize-handle-left {
+        height: calc(100% - 8px);
+        width: 4px;
+        left: -2px;
+        top: 4px;
+        z-index: 9999;
+        position: absolute;
+        cursor: ew-resize;
+
+        background-color: yellow;
+    }
+
+    .dv-resize-handle-right {
+        height: calc(100% - 8px);
+        width: 4px;
+        right: -2px;
+        top: 4px;
+        z-index: 9999;
+        position: absolute;
+        cursor: ew-resize;
+
+        background-color: blue;
+    }
+
+    .dv-resize-handle-topleft {
+        height: 4px;
+        width: 4px;
+        top: -2px;
+        left: -2px;
+        z-index: 9999;
+        position: absolute;
+        cursor: nw-resize;
+
+        background-color: cyan;
+    }
+
+    .dv-resize-handle-topright {
+        height: 4px;
+        width: 4px;
+        right: -2px;
+        top: -2px;
+        z-index: 9999;
+        position: absolute;
+        cursor: ne-resize;
+
+        background-color: cyan;
+    }
+
+    .dv-resize-handle-bottomleft {
+        height: 4px;
+        width: 4px;
+        left: -2px;
+        bottom: -2px;
+        z-index: 9999;
+        position: absolute;
+        cursor: sw-resize;
+
+        background-color: cyan;
+    }
+
+    .dv-resize-handle-bottomright {
+        height: 4px;
+        width: 4px;
+        right: -2px;
+        bottom: -2px;
+        z-index: 9999;
+        position: absolute;
+        cursor: se-resize;
+
+        background-color: cyan;
+    }
+}
