@@ -1,9 +1,9 @@
 {
-  "compilerOptions": {
-    "types": ["@types/node"],
-    "noEmit": true,
-    "allowJs": true
-  },
-  "extends": "./module-build/tsconfig.esm.json",
-  "include": ["tests/**/*.ts", "tools/**/*.ts", ".eslintrc.js"]
+    "compilerOptions": {
+        "types": ["@types/node"],
+        "noEmit": true,
+        "allowJs": true
+    },
+    "extends": "./tsconfig.base.json",
+    "include": ["tests/**/*.ts", "tools/**/*.ts", ".eslintrc.js"]
 }

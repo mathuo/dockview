@@ -56,6 +56,7 @@ function createBundle(format, options) {
             ` * @license ${license}`,
             ` */`,
         ].join('\n'),
+        sourcemap: true,
     };
 
     const plugins = [
