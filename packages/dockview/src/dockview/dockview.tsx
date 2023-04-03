@@ -37,14 +37,15 @@ function createGroupControlElement(
         : undefined;
 }
 
-export interface IGroupPanelBaseProps<T extends {} = Record<string, any>>
+export interface IGroupPanelBaseProps<T extends { [index: string]: any } = any>
     extends PanelParameters<T> {
     api: DockviewPanelApi;
     containerApi: DockviewApi;
 }
 
-export type IDockviewPanelHeaderProps<T extends {} = Record<string, any>> =
-    IGroupPanelBaseProps<T>;
+export type IDockviewPanelHeaderProps<
+    T extends { [index: string]: any } = any
+> = IGroupPanelBaseProps<T>;
 
 export type IDockviewPanelProps<T extends { [index: string]: any } = any> =
     IGroupPanelBaseProps<T>;
