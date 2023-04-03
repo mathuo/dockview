@@ -78,7 +78,7 @@ export class DockviewPanel
 
         this.setTitle(params.title);
 
-        this.view?.init({
+        this.view.init({
             ...params,
             api: this.api,
             containerApi: this.containerApi,
@@ -165,15 +165,14 @@ export class DockviewPanel
         // the obtain the correct dimensions of the content panel we must deduct the tab height
         this.api._onDidDimensionChange.fire({
             width,
-            height: height - (this.group.model.header.height || 0),
+            height: height,
         });
 
-        this.view?.layout(width, height);
+        this.view.layout(width, height);
     }
 
     public dispose(): void {
         this.api.dispose();
-
-        this.view?.dispose();
+        this.view.dispose();
     }
 }

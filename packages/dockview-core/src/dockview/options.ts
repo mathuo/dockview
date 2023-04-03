@@ -75,7 +75,6 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     watermarkComponent?: WatermarkConstructor;
     watermarkFrameworkComponent?: any;
     frameworkComponentFactory?: GroupPanelFrameworkComponentFactory;
-    tabHeight?: number;
     orientation?: Orientation;
     styles?: ISplitviewStyles;
     defaultTabComponent?: string;

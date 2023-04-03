@@ -59,7 +59,6 @@ import { DockviewReact } from 'dockview';
 | showDndOverlay        | Event                                | Yes      | false     |                                                              |
 | defaultTabComponent   | object                               | Yes      |           |                                                              |
 | groupControlComponent | object                               | Yes      |           |                                                              |
-| tabHeight             | number                               | Yes      |           |                                                              |
 | singleTabMode         | 'fullwidth' \| 'default'             | Yes      | 'default' |                                                              |
 
 ## Dockview API
@@ -113,8 +112,6 @@ const onReady = (event: DockviewReadyEvent) => {
 | removeGroup            | `(group: GroupPanel): void`                          |                                                          |
 | getGroup               | `(id: string): GroupPanel \| undefined`              |                                                          |
 |                        |                                                      |                                                          |
-| getTabHeight           | `(): number \| undefined`                            |                                                          |
-| setTabHeight           | `(height: number \| undefined): void`                |                                                          |
 | updateOptions          | `(options:SplitviewComponentUpdateOptions): void`    |                                                          |
 | focus                  | `(): void`                                           |                                                          |
 | layout                 | `(width: number, height:number): void`               | <Link to="../basics/#auto-resizing">Auto Resizing</Link> |

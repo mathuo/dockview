@@ -20,7 +20,6 @@ export interface ITabsContainer extends IDisposable {
     readonly element: HTMLElement;
     readonly panels: string[];
     readonly size: number;
-    height: number | undefined;
     delete: (id: string) => void;
     indexOf: (id: string) => number;
     onDrop: Event<TabDropIndexEvent>;
@@ -48,7 +47,6 @@ export class TabsContainer
     private selectedIndex = -1;
     private actions: HTMLElement | undefined;
 
-    private _height: number | undefined;
     private _hidden = false;
 
     private readonly _onDrop = new Emitter<TabDropIndexEvent>();
@@ -60,24 +58,6 @@ export class TabsContainer
 
     get size(): number {
         return this.tabs.length;
-    }
-
-    get height(): number | undefined {
-        return this._height;
-    }
-
-    set height(value: number | undefined) {
-        this._height = value;
-        if (typeof value !== 'number') {
-            this.element.style.removeProperty(
-                '--dv-tabs-and-actions-container-height'
-            );
-        } else {
-            this.element.style.setProperty(
-                '--dv-tabs-and-actions-container-height',
-                `${value}px`
-            );
-        }
     }
 
     get hidden(): boolean {
@@ -138,8 +118,6 @@ export class TabsContainer
 
         this._element = document.createElement('div');
         this._element.className = 'tabs-and-actions-container';
-
-        this.height = accessor.options.tabHeight;
 
         toggleClass(
             this._element,
