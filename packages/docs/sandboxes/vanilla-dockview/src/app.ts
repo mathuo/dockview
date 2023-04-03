@@ -2,7 +2,7 @@ import {
     DockviewComponent,
     IContentRenderer,
     IGroupPanelInitParameters,
-} from 'dockview';
+} from 'dockview-core';
 
 class DefaultPanel implements IContentRenderer {
     private _element: HTMLElement;
