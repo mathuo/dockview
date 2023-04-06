@@ -47,7 +47,7 @@ import { DockviewReact } from 'dockview';
 ```
 
 | Property              | Type                                 | Optional | Default   | Description                                                  |
-| --------------------- | ------------------------------------ | -------- | --------- | ------------------------------------------------------------ | --- |
+| --------------------- | ------------------------------------ | -------- | --------- | ------------------------------------------------------------ |
 | onReady               | (event: SplitviewReadyEvent) => void | No       |           |                                                              |
 | components            | object                               | No       |           |                                                              |
 | tabComponents         | object                               | Yes      |           |                                                              |
@@ -58,7 +58,7 @@ import { DockviewReact } from 'dockview';
 | onDidDrop             | Event                                | Yes      | false     |                                                              |
 | showDndOverlay        | Event                                | Yes      | false     |                                                              |
 | defaultTabComponent   | object                               | Yes      |           |                                                              |
-| groupControlComponent | object                               | Yes      |           |                                                              |     |
+| groupControlComponent | object                               | Yes      |           |                                                              |
 | singleTabMode         | 'fullwidth' \| 'default'             | Yes      | 'default' |                                                              |
 
 ## Dockview API
@@ -720,4 +720,7 @@ The core library is published as an independant package under the name `dockview
 > When using `dockview` there is no need to also install `dockview-core`.
 > `dockview-core` is a dependency of `dockview` and automatically installed during the installation process of `dockview` via `npm install dockview`.
 
-<Container injectVanillaJS={attachDockviewVanilla} />
+<Container
+    sandboxId="vanilla-dockview"
+    injectVanillaJS={attachDockviewVanilla}
+/>
