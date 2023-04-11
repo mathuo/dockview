@@ -1919,7 +1919,7 @@ describe('dockviewComponent', () => {
                                 id: 'group-1',
                                 activeView: 'panel1',
                             },
-                            size: 1000,
+                            size: 500,
                         },
                     ],
                     size: 1000,
