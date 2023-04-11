@@ -1,8 +1,10 @@
 name: Deploy Docs
 
-on:
-    schedule:
-        - cron: '0 3 * * *' # every day at 3 am UTC
+# on:
+#     schedule:
+#         - cron: '0 3 * * *' # every day at 3 am UTC
+
+on: [push]
 
 jobs:
     deploy-nightly-demo-app:
