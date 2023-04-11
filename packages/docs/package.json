@@ -1,6 +1,6 @@
 {
   "name": "dockview-docs",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
@@ -23,7 +23,7 @@
     "@minoru/react-dnd-treeview": "^3.4.3",
     "axios": "^1.3.3",
     "clsx": "^1.2.1",
-    "dockview": "^1.7.0",
+    "dockview": "^1.7.1",
     "prism-react-renderer": "^1.3.5",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
