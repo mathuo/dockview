@@ -464,7 +464,22 @@ export class Gridview implements IDisposable {
             const childReference = oldRoot.children[0];
             oldRoot.removeChild(0); // remove to prevent disposal when disposing of unwanted root
             oldRoot.dispose();
-            this._root.addChild(childReference, Sizing.Distribute, 0);
+
+            this._root.addChild(
+                /**
+                 * the child node will have the same orientation as the new root since
+                 * we are removing the inbetween node.
+                 * the entire 'tree' must be flipped recursively to ensure that the orientation
+                 * flips at each level
+                 */
+                flipNode(
+                    childReference,
+                    childReference.orthogonalSize,
+                    childReference.size
+                ),
+                Sizing.Distribute,
+                0
+            );
         } else {
             this._root.addChild(oldRoot, Sizing.Distribute, 0);
         }
