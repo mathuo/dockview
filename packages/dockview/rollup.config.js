@@ -56,7 +56,6 @@ function createBundle(format, options) {
             ` * @license ${license}`,
             ` */`,
         ].join('\n'),
-        sourcemap: true,
     };
 
     const plugins = [
@@ -65,6 +64,7 @@ function createBundle(format, options) {
         }),
         typescript({
             tsconfig: 'tsconfig.esm.json',
+            sourceMap: false,
         }),
     ];
 

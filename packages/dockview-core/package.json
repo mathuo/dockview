@@ -20,7 +20,7 @@
     "build:esm": "cross-env ../../node_modules/.bin/tsc --project ./tsconfig.esm.json --extendedDiagnostics",
     "build:modulefiles": "rollup -c",
     "build": "npm run build:ci && npm run build:modulefiles",
-    "clean": "rimraf dist/ .build/",
+    "clean": "rimraf dist/ .build/ .rollup.cache/",
     "prepublishOnly": "npm run rebuild && npm run test",
     "docs": "typedoc",
     "rebuild": "npm run clean && npm run build",
