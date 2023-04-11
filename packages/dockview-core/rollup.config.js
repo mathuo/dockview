@@ -57,10 +57,13 @@ function createBundle(format, options) {
         ].join('\n'),
     };
 
+
     const plugins = [
         typescript({
             tsconfig: 'tsconfig.esm.json',
-            sourceMap: false,
+            compilerOptions: {
+                declaration: false,
+            },
         }),
     ];
 
