@@ -4,27 +4,39 @@ import {
 } from '../../dockview/dockviewComponent';
 import { DockviewPanelModel } from '../../dockview/dockviewPanelModel';
 import { IContentRenderer, ITabRenderer } from '../../dockview/types';
+import { GroupPanelFrameworkComponentFactory } from '../../dockview/options';
+import { DefaultTab } from '../../dockview/components/tab/defaultTab';
 
 describe('dockviewGroupPanel', () => {
-    test('that dispose is called on content and tab renderers when present', () => {
-        const contentMock = jest.fn<IContentRenderer, []>(() => {
+    let contentMock: jest.Mock<IContentRenderer>;
+    let tabMock: jest.Mock<ITabRenderer>;
+    let accessorMock: jest.Mock<IDockviewComponent>;
+
+    beforeEach(() => {
+        contentMock = jest.fn<IContentRenderer, []>(() => {
             const partial: Partial<IContentRenderer> = {
                 element: document.createElement('div'),
                 dispose: jest.fn(),
+                update: jest.fn(),
+                onGroupChange: jest.fn(),
+                onPanelVisibleChange: jest.fn(),
             };
             return partial as IContentRenderer;
         });
 
-        const tabMock = jest.fn<ITabRenderer, []>(() => {
+        tabMock = jest.fn<ITabRenderer, []>(() => {
             const partial: Partial<IContentRenderer> = {
                 element: document.createElement('div'),
                 dispose: jest.fn(),
+                update: jest.fn(),
+                onGroupChange: jest.fn(),
+                onPanelVisibleChange: jest.fn(),
             };
             return partial as IContentRenderer;
         });
 
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
+        accessorMock = jest.fn<DockviewComponent, []>(() => {
+            const partial: Partial<DockviewComponent> = {
                 options: {
                     components: {
                         contentComponent: contentMock,
@@ -34,8 +46,12 @@ describe('dockviewGroupPanel', () => {
                     },
                 },
             };
-        });
 
+            return partial as DockviewComponent;
+        });
+    });
+
+    test('that dispose is called on content and tab renderers when present', () => {
         const cut = new DockviewPanelModel(
             <IDockviewComponent>new accessorMock(),
             'id',
@@ -50,34 +66,6 @@ describe('dockviewGroupPanel', () => {
     });
 
     test('that update is called on content and tab renderers when present', () => {
-        const contentMock = jest.fn<IContentRenderer, []>(() => {
-            const partial: Partial<IContentRenderer> = {
-                element: document.createElement('div'),
-                update: jest.fn(),
-            };
-            return partial as IContentRenderer;
-        });
-
-        const tabMock = jest.fn<ITabRenderer, []>(() => {
-            const partial: Partial<IContentRenderer> = {
-                element: document.createElement('div'),
-                update: jest.fn(),
-            };
-            return partial as IContentRenderer;
-        });
-
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                options: {
-                    components: {
-                        contentComponent: contentMock,
-                    },
-                    tabComponents: {
-                        tabComponent: tabMock,
-                    },
-                },
-            };
-        });
         const cut = new DockviewPanelModel(
             <IDockviewComponent>new accessorMock(),
             'id',
@@ -94,36 +82,6 @@ describe('dockviewGroupPanel', () => {
     });
 
     test('that events are fired', () => {
-        const contentMock = jest.fn<IContentRenderer, []>(() => {
-            const partial: Partial<IContentRenderer> = {
-                element: document.createElement('div'),
-                onGroupChange: jest.fn(),
-                onPanelVisibleChange: jest.fn(),
-            };
-            return partial as IContentRenderer;
-        });
-
-        const tabMock = jest.fn<ITabRenderer, []>(() => {
-            const partial: Partial<IContentRenderer> = {
-                element: document.createElement('div'),
-                onGroupChange: jest.fn(),
-                onPanelVisibleChange: jest.fn(),
-            };
-            return partial as IContentRenderer;
-        });
-
-        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
-            return {
-                options: {
-                    components: {
-                        contentComponent: contentMock,
-                    },
-                    tabComponents: {
-                        tabComponent: tabMock,
-                    },
-                },
-            };
-        });
         const cut = new DockviewPanelModel(
             <IDockviewComponent>new accessorMock(),
             'id',
@@ -167,5 +125,177 @@ describe('dockviewGroupPanel', () => {
         expect(cut.tab.onGroupChange).toHaveBeenCalledTimes(2);
         expect(cut.content.onPanelVisibleChange).toHaveBeenCalledTimes(2);
         expect(cut.tab.onPanelVisibleChange).toHaveBeenCalledTimes(2);
+    });
+
+    test('that the default tab is created', () => {
+        accessorMock = jest.fn<DockviewComponent, []>(() => {
+            const partial: Partial<DockviewComponent> = {
+                options: {
+                    components: {
+                        contentComponent: contentMock,
+                    },
+                    tabComponents: {
+                        tabComponent: jest
+                            .fn()
+                            .mockImplementation(() => tabMock),
+                    },
+                },
+            };
+
+            return partial as DockviewComponent;
+        });
+
+        const cut = new DockviewPanelModel(
+            <IDockviewComponent>new accessorMock(),
+            'id',
+            'contentComponent',
+            'tabComponent'
+        );
+
+        expect(cut.tab).toEqual(tabMock);
+    });
+
+    test('that the provided default tab is chosen when no implementation is provided', () => {
+        accessorMock = jest.fn<DockviewComponent, []>(() => {
+            const partial: Partial<DockviewComponent> = {
+                options: {
+                    components: {
+                        contentComponent: contentMock,
+                    },
+                    tabComponents: {
+                        tabComponent: jest
+                            .fn()
+                            .mockImplementation(() => tabMock),
+                    },
+                    defaultTabComponent: 'tabComponent',
+                },
+            };
+
+            return partial as DockviewComponent;
+        });
+
+        const cut = new DockviewPanelModel(
+            <IDockviewComponent>new accessorMock(),
+            'id',
+            'contentComponent'
+        );
+
+        expect(cut.tab).toEqual(tabMock);
+    });
+
+    test('that the framework tab is created when provided tab is a framework tab', () => {
+        const tab = jest.fn();
+        const tabFactory = jest.fn().mockImplementation(() => tab);
+
+        accessorMock = jest.fn<DockviewComponent, []>(() => {
+            const partial: Partial<DockviewComponent> = {
+                options: {
+                    components: {
+                        contentComponent: contentMock,
+                    },
+                    frameworkTabComponents: {
+                        tabComponent: tabMock,
+                    },
+                    frameworkComponentFactory: (<
+                        Partial<GroupPanelFrameworkComponentFactory>
+                    >{
+                        tab: { createComponent: tabFactory },
+                    }) as GroupPanelFrameworkComponentFactory,
+                },
+            };
+
+            return partial as DockviewComponent;
+        });
+
+        const cut = new DockviewPanelModel(
+            <IDockviewComponent>new accessorMock(),
+            'id',
+            'contentComponent',
+            'tabComponent'
+        );
+
+        expect(tabFactory).toHaveBeenCalledWith('id', 'tabComponent', tabMock);
+        expect(cut.tab).toEqual(tab);
+    });
+
+    test('that is library default tab instance is created when no alternative exists', () => {
+        accessorMock = jest.fn<DockviewComponent, []>(() => {
+            const partial: Partial<DockviewComponent> = {
+                options: {
+                    components: {
+                        contentComponent: contentMock,
+                    },
+                },
+            };
+
+            return partial as DockviewComponent;
+        });
+
+        const cut = new DockviewPanelModel(
+            <IDockviewComponent>new accessorMock(),
+            'id',
+            'contentComponent'
+        );
+
+        expect(cut.tab instanceof DefaultTab).toBeTruthy();
+    });
+
+    test('that the default content is created', () => {
+        accessorMock = jest.fn<DockviewComponent, []>(() => {
+            const partial: Partial<DockviewComponent> = {
+                options: {
+                    components: {
+                        contentComponent: jest.fn().mockImplementation(() => {
+                            return contentMock;
+                        }),
+                    },
+                },
+            };
+
+            return partial as DockviewComponent;
+        });
+
+        const cut = new DockviewPanelModel(
+            <IDockviewComponent>new accessorMock(),
+            'id',
+            'contentComponent'
+        );
+
+        expect(cut.content).toEqual(contentMock);
+    });
+
+    test('that the framework content is created', () => {
+        const content = jest.fn();
+        const contentFactory = jest.fn().mockImplementation(() => content);
+
+        accessorMock = jest.fn<DockviewComponent, []>(() => {
+            const partial: Partial<DockviewComponent> = {
+                options: {
+                    frameworkComponents: {
+                        contentComponent: contentMock,
+                    },
+                    frameworkComponentFactory: (<
+                        Partial<GroupPanelFrameworkComponentFactory>
+                    >{
+                        content: { createComponent: contentFactory },
+                    }) as GroupPanelFrameworkComponentFactory,
+                },
+            };
+
+            return partial as DockviewComponent;
+        });
+
+        const cut = new DockviewPanelModel(
+            <IDockviewComponent>new accessorMock(),
+            'id',
+            'contentComponent'
+        );
+
+        expect(contentFactory).toHaveBeenCalledWith(
+            'id',
+            'contentComponent',
+            contentMock
+        );
+        expect(cut.content).toEqual(content);
     });
 });
