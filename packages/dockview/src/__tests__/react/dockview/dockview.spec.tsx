@@ -47,7 +47,7 @@ describe('dockview', () => {
 
         render(<DockviewReact components={components} onReady={onReady} />);
 
-        expect(api.width).toBe(650);
-        expect(api.height).toBe(450);
+        expect(api!.width).toBe(650);
+        expect(api!.height).toBe(450);
     });
 });

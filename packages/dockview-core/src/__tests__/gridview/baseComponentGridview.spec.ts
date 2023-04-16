@@ -114,7 +114,7 @@ describe('baseComponentGridview', () => {
             proportionalLayout: true,
         });
 
-        const events: TestPanel[] = [];
+        const events: (TestPanel | undefined)[] = [];
 
         const disposable = new CompositeDisposable(
             cut.onDidAddGroup((event) => {
