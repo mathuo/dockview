@@ -8,6 +8,7 @@ import {
     IWatermarkRenderer,
     DockviewDropTargets,
 } from './types';
+import { Parameters } from '../panel/types';
 import {
     DockviewGroupPanel,
     DockviewGroupPanelApi,
@@ -86,10 +87,10 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     parentElement?: HTMLElement;
 }
 
-export interface PanelOptions {
+export interface PanelOptions<P extends object = Parameters> {
     component: string;
     tabComponent?: string;
-    params?: { [key: string]: any };
+    params?: P;
     id: string;
     title?: string;
 }
@@ -131,8 +132,8 @@ export function isPanelOptionsWithGroup(
     return false;
 }
 
-export interface AddPanelOptions
-    extends Omit<PanelOptions, 'component' | 'tabComponent'> {
+export interface AddPanelOptions<P extends object = Parameters>
+    extends Omit<PanelOptions<P>, 'component' | 'tabComponent'> {
     component: string;
     tabComponent?: string;
     position?: AddPanelPositionOptions;

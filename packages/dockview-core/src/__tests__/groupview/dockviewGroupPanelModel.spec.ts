@@ -1,4 +1,4 @@
-import { DockviewComponent } from '../../dockview/dockviewComponent';
+import {DockviewComponent} from '../../dockview/dockviewComponent';
 import {
     GroupPanelUpdateEvent,
     GroupviewPanelState,
@@ -8,7 +8,7 @@ import {
     ITabRenderer,
     IWatermarkRenderer,
 } from '../../dockview/types';
-import { PanelUpdateEvent } from '../../panel/types';
+import { PanelUpdateEvent, Parameters } from '../../panel/types';
 import {
     DockviewGroupPanelModel,
     GroupOptions,
@@ -179,7 +179,7 @@ export class TestPanel implements IDockviewPanel {
         return this._group!;
     }
 
-    get params(): Record<string, any> {
+    get params(): Parameters {
         return {};
     }
 

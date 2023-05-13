@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { IFrameworkPart, IDockviewDisposable } from 'dockview-core';
+import { IFrameworkPart, IDockviewDisposable, Parameters } from 'dockview-core';
 
 export interface ReactPortalStore {
     addPortal: (portal: React.ReactPortal) => IDockviewDisposable;
@@ -66,7 +66,7 @@ export const ReactPartContext = React.createContext<{}>({});
 export class ReactPart<P extends object, C extends object = {}>
     implements IFrameworkPart
 {
-    private _initialProps: Record<string, any> = {};
+    private _initialProps: Parameters = {};
     private componentInstance?: IPanelWrapperRef;
     private ref?: {
         portal: React.ReactPortal;

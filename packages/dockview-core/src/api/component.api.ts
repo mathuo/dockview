@@ -8,6 +8,7 @@ import {
     AddPanelOptions,
     MovementOptions,
 } from '../dockview/options';
+import { Parameters } from '../panel/types';
 import { Direction } from '../gridview/baseComponentGridview';
 import {
     AddComponentOptions,
@@ -431,7 +432,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         this.component.layout(width, height, force);
     }
 
-    addPanel(options: AddPanelOptions): IDockviewPanel {
+    addPanel<P extends object = Parameters>(options: AddPanelOptions<P>): IDockviewPanel {
         return this.component.addPanel(options);
     }
 

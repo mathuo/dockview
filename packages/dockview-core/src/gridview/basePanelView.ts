@@ -5,13 +5,14 @@ import {
     PanelUpdateEvent,
     PanelInitParameters,
     IPanel,
+    Parameters,
 } from '../panel/types';
 import { PanelApi, PanelApiImpl } from '../api/panelApi';
 
 export interface BasePanelViewState {
     readonly id: string;
     readonly component: string;
-    readonly params?: Record<string, any>;
+    readonly params?: Parameters;
 }
 
 export interface BasePanelViewExported<T extends PanelApi> {
@@ -19,7 +20,7 @@ export interface BasePanelViewExported<T extends PanelApi> {
     readonly api: T;
     readonly width: number;
     readonly height: number;
-    readonly params: Record<string, any> | undefined;
+    readonly params: Parameters | undefined;
     focus(): void;
     toJSON(): object;
     update(event: PanelUpdateEvent): void;
@@ -50,7 +51,7 @@ export abstract class BasePanelView<T extends PanelApiImpl>
         return this._height;
     }
 
-    get params(): Record<string, any> | undefined {
+    get params(): Parameters | undefined {
         return this._params?.params;
     }
 
