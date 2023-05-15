@@ -1,4 +1,5 @@
 import { PanelDimensionChangeEvent } from '../../api/panelApi';
+import { Emitter } from '../../events';
 import { CompositeDisposable } from '../../lifecycle';
 import { Orientation } from '../../splitview/splitview';
 import { SplitviewComponent } from '../../splitview/splitviewComponent';
@@ -23,6 +24,45 @@ describe('componentSplitview', () => {
     beforeEach(() => {
         container = document.createElement('div');
         container.className = 'container';
+    });
+
+    test('event leakage', () => {
+        Emitter.setLeakageMonitorEnabled(true);
+
+        const splitview = new SplitviewComponent({
+            parentElement: container,
+            orientation: Orientation.VERTICAL,
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+        splitview.layout(600, 400);
+
+        const panel1 = splitview.addPanel({
+            id: 'panel1',
+            component: 'testPanel',
+        });
+        const panel2 = splitview.addPanel({
+            id: 'panel2',
+            component: 'testPanel',
+        });
+
+        splitview.movePanel(0, 1);
+
+        splitview.removePanel(panel1);
+
+        splitview.dispose();
+
+        if (Emitter.MEMORY_LEAK_WATCHER.size > 0) {
+            for (const entry of Array.from(
+                Emitter.MEMORY_LEAK_WATCHER.events
+            )) {
+                console.log(entry[1]);
+            }
+            throw new Error('not all listeners disposed');
+        }
+
+        Emitter.setLeakageMonitorEnabled(false);
     });
 
     test('remove panel', () => {

@@ -68,16 +68,17 @@ export abstract class BasePanelView<T extends PanelApiImpl>
         this._element.style.width = '100%';
         this._element.style.overflow = 'hidden';
 
-        const { onDidFocus, onDidBlur } = trackFocus(this._element);
+        const focusTracker = trackFocus(this._element);
 
         this.addDisposables(
             this.api,
-            onDidFocus(() => {
+            focusTracker.onDidFocus(() => {
                 this.api._onDidChangeFocus.fire({ isFocused: true });
             }),
-            onDidBlur(() => {
+            focusTracker.onDidBlur(() => {
                 this.api._onDidChangeFocus.fire({ isFocused: false });
-            })
+            }),
+            focusTracker
         );
     }
 
@@ -124,9 +125,9 @@ export abstract class BasePanelView<T extends PanelApiImpl>
     }
 
     dispose(): void {
-        super.dispose();
-
         this.api.dispose();
         this.part?.dispose();
+
+        super.dispose();
     }
 }

@@ -16,6 +16,9 @@ export abstract class DragHandler extends CompositeDisposable {
 
     constructor(protected readonly el: HTMLElement) {
         super();
+
+        this.addDisposables(this._onDragStart);
+
         this.configure();
     }
 
