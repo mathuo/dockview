@@ -13,6 +13,7 @@ import { Event, Emitter } from '../events';
 import { pushToStart, pushToEnd, firstIndex } from '../array';
 import { range, clamp } from '../math';
 import { ViewItem } from './viewItem';
+import { IDisposable } from '../lifecycle';
 
 export enum Orientation {
     HORIZONTAL = 'HORIZONTAL',
@@ -42,7 +43,7 @@ export enum LayoutPriority {
     Normal = 'normal',
 }
 
-export interface IBaseView {
+export interface IBaseView extends IDisposable {
     minimumSize: number;
     maximumSize: number;
     snap?: boolean;
@@ -97,7 +98,7 @@ export class Splitview {
     private element: HTMLElement;
     private viewContainer: HTMLElement;
     private sashContainer: HTMLElement;
-    private views: ViewItem[] = [];
+    private viewItems: ViewItem[] = [];
     private sashes: ISashItem[] = [];
     private _orientation: Orientation;
     private _size = 0;
@@ -132,7 +133,7 @@ export class Splitview {
     }
 
     public get length(): number {
-        return this.views.length;
+        return this.viewItems.length;
     }
 
     public get proportions(): number[] | undefined {
@@ -159,13 +160,13 @@ export class Splitview {
     }
 
     get minimumSize(): number {
-        return this.views.reduce((r, item) => r + item.minimumSize, 0);
+        return this.viewItems.reduce((r, item) => r + item.minimumSize, 0);
     }
 
     get maximumSize(): number {
         return this.length === 0
             ? Number.POSITIVE_INFINITY
-            : this.views.reduce((r, item) => r + item.maximumSize, 0);
+            : this.viewItems.reduce((r, item) => r + item.maximumSize, 0);
     }
 
     get startSnappingEnabled(): boolean {
@@ -240,7 +241,7 @@ export class Splitview {
             });
 
             // Initialize content size and proportions for first layout
-            this.contentSize = this.views.reduce((r, i) => r + i.size, 0);
+            this.contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
             this.saveProportions();
         }
     }
@@ -261,22 +262,22 @@ export class Splitview {
     }
 
     isViewVisible(index: number): boolean {
-        if (index < 0 || index >= this.views.length) {
+        if (index < 0 || index >= this.viewItems.length) {
             throw new Error('Index out of bounds');
         }
 
-        const viewItem = this.views[index];
+        const viewItem = this.viewItems[index];
         return viewItem.visible;
     }
 
     setViewVisible(index: number, visible: boolean): void {
-        if (index < 0 || index >= this.views.length) {
+        if (index < 0 || index >= this.viewItems.length) {
             throw new Error('Index out of bounds');
         }
 
         toggleClass(this.container, 'visible', visible);
 
-        const viewItem = this.views[index];
+        const viewItem = this.viewItems[index];
 
         toggleClass(this.container, 'visible', visible);
 
@@ -288,30 +289,30 @@ export class Splitview {
     }
 
     getViewSize(index: number): number {
-        if (index < 0 || index >= this.views.length) {
+        if (index < 0 || index >= this.viewItems.length) {
             return -1;
         }
 
-        return this.views[index].size;
+        return this.viewItems[index].size;
     }
 
     resizeView(index: number, size: number): void {
-        if (index < 0 || index >= this.views.length) {
+        if (index < 0 || index >= this.viewItems.length) {
             return;
         }
 
-        const indexes = range(this.views.length).filter((i) => i !== index);
+        const indexes = range(this.viewItems.length).filter((i) => i !== index);
         const lowPriorityIndexes = [
             ...indexes.filter(
-                (i) => this.views[i].priority === LayoutPriority.Low
+                (i) => this.viewItems[i].priority === LayoutPriority.Low
             ),
             index,
         ];
         const highPriorityIndexes = indexes.filter(
-            (i) => this.views[i].priority === LayoutPriority.High
+            (i) => this.viewItems[i].priority === LayoutPriority.High
         );
 
-        const item = this.views[index];
+        const item = this.viewItems[index];
         size = Math.round(size);
         size = clamp(
             size,
@@ -324,13 +325,13 @@ export class Splitview {
     }
 
     public getViews<T extends IView>(): T[] {
-        return this.views.map((x) => x.view as T);
+        return this.viewItems.map((x) => x.view as T);
     }
 
     private onDidChange(item: ViewItem, size: number | undefined): void {
-        const index = this.views.indexOf(item);
+        const index = this.viewItems.indexOf(item);
 
-        if (index < 0 || index >= this.views.length) {
+        if (index < 0 || index >= this.viewItems.length) {
             return;
         }
 
@@ -345,7 +346,7 @@ export class Splitview {
     public addView(
         view: IView,
         size: number | Sizing = { type: 'distribute' },
-        index: number = this.views.length,
+        index: number = this.viewItems.length,
         skipLayout?: boolean
     ): void {
         const container = document.createElement('div');
@@ -369,14 +370,14 @@ export class Splitview {
             this.onDidChange(viewItem, newSize.size)
         );
 
-        const dispose = () => {
-            disposable?.dispose();
-            this.viewContainer.removeChild(container);
-        };
+        const viewItem = new ViewItem(container, view, viewSize, {
+            dispose: () => {
+                disposable.dispose();
+                this.viewContainer.removeChild(container);
+            },
+        });
 
-        const viewItem = new ViewItem(container, view, viewSize, { dispose });
-
-        if (index === this.views.length) {
+        if (index === this.viewItems.length) {
             this.viewContainer.appendChild(container);
         } else {
             this.viewContainer.insertBefore(
@@ -385,15 +386,15 @@ export class Splitview {
             );
         }
 
-        this.views.splice(index, 0, viewItem);
+        this.viewItems.splice(index, 0, viewItem);
 
-        if (this.views.length > 1) {
+        if (this.viewItems.length > 1) {
             //add sash
             const sash = document.createElement('div');
             sash.className = 'sash';
 
             const onStart = (event: MouseEvent) => {
-                for (const item of this.views) {
+                for (const item of this.viewItems) {
                     item.enabled = false;
                 }
 
@@ -417,19 +418,20 @@ export class Splitview {
                 );
 
                 //
-                const sizes = this.views.map((x) => x.size);
+                const sizes = this.viewItems.map((x) => x.size);
 
                 //
                 let snapBefore: ISashDragSnapState | undefined;
                 let snapAfter: ISashDragSnapState | undefined;
                 const upIndexes = range(sashIndex, -1);
-                const downIndexes = range(sashIndex + 1, this.views.length);
+                const downIndexes = range(sashIndex + 1, this.viewItems.length);
                 const minDeltaUp = upIndexes.reduce(
-                    (r, i) => r + (this.views[i].minimumSize - sizes[i]),
+                    (r, i) => r + (this.viewItems[i].minimumSize - sizes[i]),
                     0
                 );
                 const maxDeltaUp = upIndexes.reduce(
-                    (r, i) => r + (this.views[i].viewMaximumSize - sizes[i]),
+                    (r, i) =>
+                        r + (this.viewItems[i].viewMaximumSize - sizes[i]),
                     0
                 );
                 const maxDeltaDown =
@@ -437,7 +439,8 @@ export class Splitview {
                         ? Number.POSITIVE_INFINITY
                         : downIndexes.reduce(
                               (r, i) =>
-                                  r + (sizes[i] - this.views[i].minimumSize),
+                                  r +
+                                  (sizes[i] - this.viewItems[i].minimumSize),
                               0
                           );
                 const minDeltaDown =
@@ -446,7 +449,8 @@ export class Splitview {
                         : downIndexes.reduce(
                               (r, i) =>
                                   r +
-                                  (sizes[i] - this.views[i].viewMaximumSize),
+                                  (sizes[i] -
+                                      this.viewItems[i].viewMaximumSize),
                               0
                           );
                 const minDelta = Math.max(minDeltaUp, minDeltaDown);
@@ -454,7 +458,7 @@ export class Splitview {
                 const snapBeforeIndex = this.findFirstSnapIndex(upIndexes);
                 const snapAfterIndex = this.findFirstSnapIndex(downIndexes);
                 if (typeof snapBeforeIndex === 'number') {
-                    const snappedViewItem = this.views[snapBeforeIndex];
+                    const snappedViewItem = this.viewItems[snapBeforeIndex];
                     const halfSize = Math.floor(
                         snappedViewItem.viewMinimumSize / 2
                     );
@@ -469,7 +473,7 @@ export class Splitview {
                 }
 
                 if (typeof snapAfterIndex === 'number') {
-                    const snappedViewItem = this.views[snapAfterIndex];
+                    const snappedViewItem = this.viewItems[snapAfterIndex];
                     const halfSize = Math.floor(
                         snappedViewItem.viewMinimumSize / 2
                     );
@@ -507,7 +511,7 @@ export class Splitview {
                 };
 
                 const end = () => {
-                    for (const item of this.views) {
+                    for (const item of this.viewItems) {
                         item.enabled = true;
                     }
 
@@ -562,7 +566,7 @@ export class Splitview {
         const flexibleViewItems: ViewItem[] = [];
         let flexibleSize = 0;
 
-        for (const item of this.views) {
+        for (const item of this.viewItems) {
             if (item.maximumSize - item.minimumSize > 0) {
                 flexibleViewItems.push(item);
                 flexibleSize += item.size;
@@ -575,12 +579,12 @@ export class Splitview {
             item.size = clamp(size, item.minimumSize, item.maximumSize);
         }
 
-        const indexes = range(this.views.length);
+        const indexes = range(this.viewItems.length);
         const lowPriorityIndexes = indexes.filter(
-            (i) => this.views[i].priority === LayoutPriority.Low
+            (i) => this.viewItems[i].priority === LayoutPriority.Low
         );
         const highPriorityIndexes = indexes.filter(
-            (i) => this.views[i].priority === LayoutPriority.High
+            (i) => this.viewItems[i].priority === LayoutPriority.High
         );
 
         this.relayout(lowPriorityIndexes, highPriorityIndexes);
@@ -592,11 +596,11 @@ export class Splitview {
         skipLayout = false
     ): IView {
         // Remove view
-        const viewItem = this.views.splice(index, 1)[0];
+        const viewItem = this.viewItems.splice(index, 1)[0];
         viewItem.dispose();
 
         // Remove sash
-        if (this.views.length >= 1) {
+        if (this.viewItems.length >= 1) {
             const sashIndex = Math.max(index - 1, 0);
             const sashItem = this.sashes.splice(sashIndex, 1)[0];
             sashItem.disposable();
@@ -616,11 +620,11 @@ export class Splitview {
     }
 
     getViewCachedVisibleSize(index: number): number | undefined {
-        if (index < 0 || index >= this.views.length) {
+        if (index < 0 || index >= this.viewItems.length) {
             throw new Error('Index out of bounds');
         }
 
-        const viewItem = this.views[index];
+        const viewItem = this.viewItems[index];
         return viewItem.cachedVisibleSize;
     }
 
@@ -640,24 +644,24 @@ export class Splitview {
         this.orthogonalSize = orthogonalSize;
 
         if (!this.proportions) {
-            const indexes = range(this.views.length);
+            const indexes = range(this.viewItems.length);
             const lowPriorityIndexes = indexes.filter(
-                (i) => this.views[i].priority === LayoutPriority.Low
+                (i) => this.viewItems[i].priority === LayoutPriority.Low
             );
             const highPriorityIndexes = indexes.filter(
-                (i) => this.views[i].priority === LayoutPriority.High
+                (i) => this.viewItems[i].priority === LayoutPriority.High
             );
 
             this.resize(
-                this.views.length - 1,
+                this.viewItems.length - 1,
                 size - previousSize,
                 undefined,
                 lowPriorityIndexes,
                 highPriorityIndexes
             );
         } else {
-            for (let i = 0; i < this.views.length; i++) {
-                const item = this.views[i];
+            for (let i = 0; i < this.viewItems.length; i++) {
+                const item = this.viewItems[i];
 
                 item.size = clamp(
                     Math.round(this.proportions[i] * size),
@@ -675,10 +679,10 @@ export class Splitview {
         lowPriorityIndexes?: number[],
         highPriorityIndexes?: number[]
     ): void {
-        const contentSize = this.views.reduce((r, i) => r + i.size, 0);
+        const contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
 
         this.resize(
-            this.views.length - 1,
+            this.viewItems.length - 1,
             this._size - contentSize,
             undefined,
             lowPriorityIndexes,
@@ -690,15 +694,15 @@ export class Splitview {
     }
 
     private distributeEmptySpace(lowPriorityIndex?: number): void {
-        const contentSize = this.views.reduce((r, i) => r + i.size, 0);
+        const contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
         let emptyDelta = this.size - contentSize;
 
-        const indexes = range(this.views.length - 1, -1);
+        const indexes = range(this.viewItems.length - 1, -1);
         const lowPriorityIndexes = indexes.filter(
-            (i) => this.views[i].priority === LayoutPriority.Low
+            (i) => this.viewItems[i].priority === LayoutPriority.Low
         );
         const highPriorityIndexes = indexes.filter(
-            (i) => this.views[i].priority === LayoutPriority.High
+            (i) => this.viewItems[i].priority === LayoutPriority.High
         );
 
         for (const index of highPriorityIndexes) {
@@ -714,7 +718,7 @@ export class Splitview {
         }
 
         for (let i = 0; emptyDelta !== 0 && i < indexes.length; i++) {
-            const item = this.views[indexes[i]];
+            const item = this.viewItems[indexes[i]];
             const size = clamp(
                 item.size + emptyDelta,
                 item.minimumSize,
@@ -729,21 +733,21 @@ export class Splitview {
 
     private saveProportions(): void {
         if (this.proportionalLayout && this.contentSize > 0) {
-            this._proportions = this.views.map(
+            this._proportions = this.viewItems.map(
                 (i) => i.size / this.contentSize
             );
         }
     }
 
     private layoutViews(): void {
-        this.contentSize = this.views.reduce((r, i) => r + i.size, 0);
+        this.contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
         let sum = 0;
         const x: number[] = [];
 
         this.updateSashEnablement();
 
-        for (let i = 0; i < this.views.length - 1; i++) {
-            sum += this.views[i].size;
+        for (let i = 0; i < this.viewItems.length - 1; i++) {
+            sum += this.viewItems[i].size;
             x.push(sum);
 
             const offset = Math.min(Math.max(0, sum - 2), this.size - 4);
@@ -757,7 +761,7 @@ export class Splitview {
                 this.sashes[i].container.style.top = `${offset}px`;
             }
         }
-        this.views.forEach((view, i) => {
+        this.viewItems.forEach((view, i) => {
             if (this._orientation === Orientation.HORIZONTAL) {
                 view.container.style.width = `${view.size}px`;
                 view.container.style.left = i == 0 ? '0px' : `${x[i - 1]}px`;
@@ -778,7 +782,7 @@ export class Splitview {
     private findFirstSnapIndex(indexes: number[]): number | undefined {
         // visible views first
         for (const index of indexes) {
-            const viewItem = this.views[index];
+            const viewItem = this.viewItems[index];
 
             if (!viewItem.visible) {
                 continue;
@@ -791,7 +795,7 @@ export class Splitview {
 
         // then, hidden views
         for (const index of indexes) {
-            const viewItem = this.views[index];
+            const viewItem = this.viewItems[index];
 
             if (
                 viewItem.visible &&
@@ -810,16 +814,16 @@ export class Splitview {
 
     private updateSashEnablement(): void {
         let previous = false;
-        const collapsesDown = this.views.map(
+        const collapsesDown = this.viewItems.map(
             (i) => (previous = i.size - i.minimumSize > 0 || previous)
         );
 
         previous = false;
-        const expandsDown = this.views.map(
+        const expandsDown = this.viewItems.map(
             (i) => (previous = i.maximumSize - i.size > 0 || previous)
         );
 
-        const reverseViews = [...this.views].reverse();
+        const reverseViews = [...this.viewItems].reverse();
         previous = false;
         const collapsesUp = reverseViews
             .map((i) => (previous = i.size - i.minimumSize > 0 || previous))
@@ -833,7 +837,7 @@ export class Splitview {
         let position = 0;
         for (let index = 0; index < this.sashes.length; index++) {
             const sash = this.sashes[index];
-            const viewItem = this.views[index];
+            const viewItem = this.viewItems[index];
             position += viewItem.size;
 
             const min = !(collapsesDown[index] && expandsUp[index + 1]);
@@ -841,16 +845,16 @@ export class Splitview {
 
             if (min && max) {
                 const upIndexes = range(index, -1);
-                const downIndexes = range(index + 1, this.views.length);
+                const downIndexes = range(index + 1, this.viewItems.length);
                 const snapBeforeIndex = this.findFirstSnapIndex(upIndexes);
                 const snapAfterIndex = this.findFirstSnapIndex(downIndexes);
 
                 const snappedBefore =
                     typeof snapBeforeIndex === 'number' &&
-                    !this.views[snapBeforeIndex].visible;
+                    !this.viewItems[snapBeforeIndex].visible;
                 const snappedAfter =
                     typeof snapAfterIndex === 'number' &&
-                    !this.views[snapAfterIndex].visible;
+                    !this.viewItems[snapAfterIndex].visible;
 
                 if (
                     snappedBefore &&
@@ -887,7 +891,7 @@ export class Splitview {
     private resize = (
         index: number,
         delta: number,
-        sizes: number[] = this.views.map((x) => x.size),
+        sizes: number[] = this.viewItems.map((x) => x.size),
         lowPriorityIndexes?: number[],
         highPriorityIndexes?: number[],
         overloadMinDelta: number = Number.NEGATIVE_INFINITY,
@@ -895,12 +899,12 @@ export class Splitview {
         snapBefore?: ISashDragSnapState,
         snapAfter?: ISashDragSnapState
     ): number => {
-        if (index < 0 || index > this.views.length) {
+        if (index < 0 || index > this.viewItems.length) {
             return 0;
         }
 
         const upIndexes = range(index, -1);
-        const downIndexes = range(index + 1, this.views.length);
+        const downIndexes = range(index + 1, this.viewItems.length);
         //
         if (highPriorityIndexes) {
             for (const i of highPriorityIndexes) {
@@ -916,18 +920,18 @@ export class Splitview {
             }
         }
         //
-        const upItems = upIndexes.map((i) => this.views[i]);
+        const upItems = upIndexes.map((i) => this.viewItems[i]);
         const upSizes = upIndexes.map((i) => sizes[i]);
         //
-        const downItems = downIndexes.map((i) => this.views[i]);
+        const downItems = downIndexes.map((i) => this.viewItems[i]);
         const downSizes = downIndexes.map((i) => sizes[i]);
         //
         const minDeltaUp = upIndexes.reduce(
-            (_, i) => _ + this.views[i].minimumSize - sizes[i],
+            (_, i) => _ + this.viewItems[i].minimumSize - sizes[i],
             0
         );
         const maxDeltaUp = upIndexes.reduce(
-            (_, i) => _ + this.views[i].maximumSize - sizes[i],
+            (_, i) => _ + this.viewItems[i].maximumSize - sizes[i],
             0
         );
         //
@@ -935,7 +939,7 @@ export class Splitview {
             downIndexes.length === 0
                 ? Number.POSITIVE_INFINITY
                 : downIndexes.reduce(
-                      (_, i) => _ + sizes[i] - this.views[i].minimumSize,
+                      (_, i) => _ + sizes[i] - this.viewItems[i].minimumSize,
 
                       0
                   );
@@ -943,7 +947,7 @@ export class Splitview {
             downIndexes.length === 0
                 ? Number.NEGATIVE_INFINITY
                 : downIndexes.reduce(
-                      (_, i) => _ + sizes[i] - this.views[i].maximumSize,
+                      (_, i) => _ + sizes[i] - this.viewItems[i].maximumSize,
                       0
                   );
         //
@@ -952,14 +956,14 @@ export class Splitview {
         //
         let snapped = false;
         if (snapBefore) {
-            const snapView = this.views[snapBefore.index];
+            const snapView = this.viewItems[snapBefore.index];
             const visible = delta >= snapBefore.limitDelta;
             snapped = visible !== snapView.visible;
             snapView.setVisible(visible, snapBefore.size);
         }
 
         if (!snapped && snapAfter) {
-            const snapView = this.views[snapAfter.index];
+            const snapView = this.viewItems[snapAfter.index];
             const visible = delta < snapAfter.limitDelta;
             snapped = visible !== snapView.visible;
             snapView.setVisible(visible, snapAfter.size);
@@ -1045,6 +1049,10 @@ export class Splitview {
                 this.element.removeChild(this.element);
                 break;
             }
+        }
+
+        for (const viewItem of this.viewItems) {
+            viewItem.dispose();
         }
 
         this.element.remove();

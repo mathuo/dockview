@@ -108,7 +108,7 @@ export class DockviewPanel
         if (didTitleChange) {
             this._title = title;
 
-            this.view?.update({
+            this.view.update({
                 params: {
                     params: this._params,
                     title: this.title,

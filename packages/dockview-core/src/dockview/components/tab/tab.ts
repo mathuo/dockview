@@ -12,7 +12,7 @@ import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DroptargetEvent, Droptarget } from '../../../dnd/droptarget';
 import { DragHandler } from '../../../dnd/abstractDragHandler';
 
-export interface ITab {
+export interface ITab extends IDisposable {
     readonly panelId: string;
     readonly element: HTMLElement;
     setContent: (element: ITabRenderer) => void;
@@ -43,8 +43,6 @@ export class Tab extends CompositeDisposable implements ITab {
     ) {
         super();
 
-        this.addDisposables(this._onChanged, this._onDropped);
-
         this._element = document.createElement('div');
         this._element.className = 'tab';
         this._element.tabIndex = 0;
@@ -53,6 +51,8 @@ export class Tab extends CompositeDisposable implements ITab {
         toggleClass(this.element, 'inactive-tab', true);
 
         this.addDisposables(
+            this._onChanged,
+            this._onDropped,
             new (class Handler extends DragHandler {
                 private readonly panelTransfer =
                     LocalSelectionTransfer.getInstance<PanelTransfer>();
@@ -70,10 +70,6 @@ export class Tab extends CompositeDisposable implements ITab {
                             );
                         },
                     };
-                }
-
-                public dispose(): void {
-                    //
                 }
             })(this._element)
         );
@@ -127,7 +123,8 @@ export class Tab extends CompositeDisposable implements ITab {
         this.addDisposables(
             this.droptarget.onDrop((event) => {
                 this._onDropped.fire(event);
-            })
+            }),
+            this.droptarget
         );
     }
 
@@ -146,6 +143,5 @@ export class Tab extends CompositeDisposable implements ITab {
 
     public dispose(): void {
         super.dispose();
-        this.droptarget.dispose();
     }
 }

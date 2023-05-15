@@ -585,8 +585,15 @@ describe('splitview', () => {
 
         expect(container.childNodes.length).toBeGreaterThan(0);
 
-        splitview.dispose();
+        let anyEvents = false;
+        const listener = splitview.onDidRemoveView((e) => {
+            anyEvents = true; // disposing of the splitview shouldn't fire onDidRemoveView events
+        });
 
+        splitview.dispose();
+        listener.dispose();
+
+        expect(anyEvents).toBeFalsy();
         expect(container.childNodes.length).toBe(0);
     });
 });
