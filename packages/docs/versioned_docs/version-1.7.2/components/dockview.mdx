@@ -24,7 +24,7 @@ import RenderingDockview from '@site/sandboxes/rendering-dockview/src/app';
 import DockviewExternalDnd from '@site/sandboxes/externaldnd-dockview/src/app';
 import DockviewResizeContainer from '@site/sandboxes/resizecontainer-dockview/src/app';
 import DockviewTabheight from '@site/sandboxes/tabheight-dockview/src/app';
-import { attach as attachDockviewVanilla } from '@site/sandboxes/vanilla-dockview/src/app';
+import { attach as attachDockviewVanilla } from '@site/sandboxes/javascript/vanilla-dockview/src/app';
 
 # Dockview
 
@@ -728,6 +728,6 @@ The core library is published as an independant package under the name `dockview
 > `dockview-core` is a dependency of `dockview` and automatically installed during the installation process of `dockview` via `npm install dockview`.
 
 <Container
-    sandboxId="vanilla-dockview"
+    sandboxId="javascript/vanilla-dockview"
     injectVanillaJS={attachDockviewVanilla}
 />
