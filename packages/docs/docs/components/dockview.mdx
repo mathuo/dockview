@@ -30,6 +30,8 @@ import DockviewTabheight from '@site/sandboxes/tabheight-dockview/src/app';
 
 import { attach as attachDockviewVanilla } from '@site/sandboxes/javascript/vanilla-dockview/src/app';
 import { attach as attachSimpleDockview } from '@site/sandboxes/javascript/simple-dockview/src/app';
+import { attach as attachTabHeightDockview } from '@site/sandboxes/javascript/tabheight-dockview/src/app';
+import { attach as attachNativeDockview } from '@site/sandboxes/javascript/fullwidthtab-dockview/src/app';
 
 # Dockview
 
@@ -617,17 +619,21 @@ to the entire width of the group. For example:
 <DockviewReactComponent singleTabMode="fullwidth" {...otherProps} />
 ```
 
-<Container sandboxId="fullwidthtab-dockview">
-    <DockviewNative />
-</Container>
+<MultiFrameworkContainer
+    sandboxId="fullwidthtab-dockview"
+    react={DockviewNative}
+    typescript={attachNativeDockview}
+/>
 
 ### Tab Height
 
 Tab height can be controlled through CSS.
 
-<Container sandboxId="tabheight-dockview">
-    <DockviewTabheight />
-</Container>
+<MultiFrameworkContainer
+    sandboxId="tabheight-dockview"
+    react={DockviewTabheight}
+    typescript={attachTabHeightDockview}
+/>
 
 ## Groups
 

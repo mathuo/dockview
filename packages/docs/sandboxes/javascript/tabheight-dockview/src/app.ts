@@ -5,6 +5,7 @@ import {
     PanelUpdateEvent,
     Parameters,
 } from 'dockview-core';
+import './app.scss';
 
 class DefaultPanel implements IContentRenderer {
     private _element: HTMLElement;
@@ -32,7 +33,7 @@ export function attach(parent: HTMLElement): {
     dispose: () => void;
 } {
     const element = document.createElement('div');
-    element.className = 'dockview-theme-abyss';
+    element.className = 'dockview-theme-abyss  skinny-tabs';
     element.style.height = '100%';
     element.style.width = '100%';
 
@@ -48,16 +49,13 @@ export function attach(parent: HTMLElement): {
     const { clientWidth, clientHeight } = parent;
     dockview.layout(clientWidth, clientHeight);
 
-    const panel = dockview.addPanel({
+    dockview.addPanel({
         id: 'panel_1',
         component: 'default',
         params: {
             title: 'Panel 1',
         },
     });
-
-    panel.group.locked = true;
-    panel.group.header.hidden = true;
 
     dockview.addPanel({
         id: 'panel_2',
@@ -73,6 +71,7 @@ export function attach(parent: HTMLElement): {
         params: {
             title: 'Panel 3',
         },
+        position: { referencePanel: 'panel_1', direction: 'right' },
     });
 
     dockview.addPanel({
@@ -81,16 +80,16 @@ export function attach(parent: HTMLElement): {
         params: {
             title: 'Panel 4',
         },
-        position: { referencePanel: 'panel_1', direction: 'right' },
+        position: { referencePanel: 'panel_3', direction: 'right' },
     });
 
-    const panel5 = dockview.addPanel({
+    dockview.addPanel({
         id: 'panel_5',
         component: 'default',
         params: {
             title: 'Panel 5',
         },
-        position: { referencePanel: 'panel_3', direction: 'right' },
+        position: { referencePanel: 'panel_4', direction: 'below' },
     });
 
     dockview.addPanel({
@@ -99,16 +98,7 @@ export function attach(parent: HTMLElement): {
         params: {
             title: 'Panel 6',
         },
-        position: { referencePanel: 'panel_5', direction: 'below' },
-    });
-
-    dockview.addPanel({
-        id: 'panel_7',
-        component: 'default',
-        params: {
-            title: 'Panel 7',
-        },
-        position: { referencePanel: 'panel_6', direction: 'right' },
+        position: { referencePanel: 'panel_5', direction: 'right' },
     });
 
     return {
