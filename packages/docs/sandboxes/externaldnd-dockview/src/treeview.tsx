@@ -50,7 +50,6 @@ const SampleData = [
 const TreeComponent = () => {
     const [treeData, setTreeData] = useState(SampleData);
     const handleDrop = (newTreeData: any) => {
-        console.log('handleDrop');
         setTreeData(newTreeData);
     };
     return (

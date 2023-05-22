@@ -13,3 +13,4 @@ test-report.xml
 *.code-workspace
 yarn-error.log
 /build
+docs/

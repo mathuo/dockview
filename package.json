@@ -19,7 +19,9 @@
     "bootstrap": "lerna bootstrap",
     "test:cov": "jest --coverage",
     "version-beta-build": "lerna version prerelease --preid beta",
-    "publish-app": "lerna publish"
+    "publish-app": "lerna publish",
+    "docs": "typedoc",
+    "package-docs": "node scripts/package-docs.js"
   },
   "repository": {
     "type": "git",
@@ -56,6 +58,7 @@
     "ts-jest": "^29.0.5",
     "ts-loader": "^9.4.2",
     "tslib": "^2.5.0",
+    "typedoc": "^0.24.7",
     "typescript": "^4.9.5",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1",
