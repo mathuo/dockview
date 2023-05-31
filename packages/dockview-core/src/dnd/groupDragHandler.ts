@@ -16,6 +16,13 @@ export class GroupDragHandler extends DragHandler {
         super(element);
     }
 
+    override isCancelled(_event: DragEvent): boolean {
+        if (this.group.model.isFloating) {
+            return true;
+        }
+        return false;
+    }
+
     getData(dataTransfer: DataTransfer | null): IDisposable {
         this.panelTransfer.setData(
             [new PanelTransfer(this.accessorId, this.group.id, null)],

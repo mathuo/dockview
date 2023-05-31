@@ -138,6 +138,7 @@ export class DockviewGroupPanelModel
     private _isGroupActive = false;
     private _locked = false;
     private _control: IGroupControlRenderer | undefined;
+    private _isFloating = false;
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
 
@@ -223,6 +224,20 @@ export class DockviewGroupPanelModel
         );
     }
 
+    get isFloating(): boolean {
+        return this._isFloating;
+    }
+
+    set isFloating(value: boolean) {
+        this._isFloating = value;
+
+        this.dropTarget.setTargetZones(
+            value ? ['center'] : ['top', 'bottom', 'left', 'right', 'center']
+        );
+
+        toggleClass(this.container, 'dv-groupview-floating', value);
+    }
+
     constructor(
         private readonly container: HTMLElement,
         private accessor: DockviewComponent,
@@ -232,7 +247,7 @@ export class DockviewGroupPanelModel
     ) {
         super();
 
-        this.container.classList.add('groupview');
+        toggleClass(this.container, 'groupview', true);
 
         this.tabsContainer = new TabsContainer(this.accessor, this.groupPanel);
 

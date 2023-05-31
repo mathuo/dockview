@@ -26,7 +26,7 @@ export class DockviewGroupPanel
     extends GridviewPanel
     implements IDockviewGroupPanel
 {
-    private readonly _model: IDockviewGroupPanelModel;
+    private readonly _model: DockviewGroupPanelModel;
 
     get panels(): IDockviewPanel[] {
         return this._model.panels;
@@ -40,7 +40,7 @@ export class DockviewGroupPanel
         return this._model.size;
     }
 
-    get model(): IDockviewGroupPanelModel {
+    get model(): DockviewGroupPanelModel {
         return this._model;
     }
 

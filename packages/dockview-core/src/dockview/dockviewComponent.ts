@@ -5,9 +5,9 @@ import {
     ISerializedLeafNode,
 } from '../gridview/gridview';
 import { directionToPosition, Droptarget, Position } from '../dnd/droptarget';
-import { tail, sequenceEquals } from '../array';
+import { tail, sequenceEquals, remove } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { CompositeDisposable } from '../lifecycle';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { Event, Emitter } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import {
@@ -45,6 +45,7 @@ import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
 import { Overlay } from '../dnd/overlay';
+import { toggleClass } from '../dom';
 
 export interface PanelReference {
     update: (event: { params: { [key: string]: any } }) => void;
@@ -116,7 +117,10 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidAddPanel: Event<IDockviewPanel>;
     readonly onDidLayoutFromJSON: Event<void>;
     readonly onDidActivePanelChange: Event<IDockviewPanel | undefined>;
-    addFloating(): void;
+    addFloating(
+        item: DockviewPanel | DockviewGroupPanel,
+        coord?: { x: number; y: number }
+    ): void;
 }
 
 export class DockviewComponent
@@ -147,6 +151,12 @@ export class DockviewComponent
     >();
     readonly onDidActivePanelChange: Event<IDockviewPanel | undefined> =
         this._onDidActivePanelChange.event;
+
+    private readonly floatingGroups: {
+        instance: DockviewGroupPanel;
+        disposable: IDisposable;
+        render: () => void;
+    }[] = [];
 
     get orientation(): Orientation {
         return this.gridview.orientation;
@@ -182,7 +192,7 @@ export class DockviewComponent
             parentElement: options.parentElement,
         });
 
-        this.element.classList.add('dv-dockview');
+        toggleClass(this.gridview.element, 'dv-dockview', true);
 
         this.addDisposables(
             this._onDidDrop,
@@ -277,8 +287,68 @@ export class DockviewComponent
         this._api = new DockviewApi(this);
 
         this.updateWatermark();
+    }
 
-        this.element.style.position = 'relative';
+    addFloating(
+        item: DockviewPanel | DockviewGroupPanel,
+        coord?: { x: number; y: number }
+    ): void {
+        let group: DockviewGroupPanel;
+
+        if (item instanceof DockviewPanel) {
+            group = this.createGroup();
+
+            this.removePanel(item, {
+                removeEmptyGroup: true,
+                skipDispose: true,
+            });
+
+            group.model.openPanel(item);
+        } else {
+            group = item;
+            this.doRemoveGroup(item, { skipDispose: true });
+        }
+
+        group.model.isFloating = true;
+
+        const { left, top } = this.element.getBoundingClientRect();
+
+        const overlayLeft =
+            typeof coord?.x === 'number' ? Math.max(coord.x - left, 0) : 100;
+        const overlayTop =
+            typeof coord?.y === 'number' ? Math.max(0, coord.y - top) : 100;
+
+        const overlay = new Overlay({
+            container: this.gridview.element,
+            content: group.element,
+            height: 300,
+            width: 300,
+            left: overlayLeft,
+            top: overlayTop,
+            minX: 100,
+            minY: 100,
+        });
+
+        const el = group.element.querySelector('#dv-group-float-drag-handle');
+
+        if (el) {
+            overlay.setupDrag(true, el as HTMLElement);
+        }
+
+        const instance = {
+            instance: group,
+            render: () => {
+                overlay.renderWithinBoundaryConditions();
+            },
+            disposable: new CompositeDisposable(overlay, {
+                dispose: () => {
+                    group.model.isFloating = false;
+                    remove(this.floatingGroups, instance);
+                },
+            }),
+        };
+
+        this.floatingGroups.push(instance);
     }
 
     private orthogonalize(position: Position): DockviewGroupPanel {
@@ -327,6 +397,20 @@ export class DockviewComponent
         }
 
         this.layout(this.gridview.width, this.gridview.height, true);
+    }
+
+    override layout(
+        width: number,
+        height: number,
+        forceResize?: boolean | undefined
+    ): void {
+        super.layout(width, height, forceResize);
+
+        if (this.floatingGroups) {
+            for (const floating of this.floatingGroups) {
+                floating.render();
+            }
+        }
     }
 
     focus(): void {
@@ -477,7 +561,7 @@ export class DockviewComponent
 
         for (const group of groups) {
             // remove the group will automatically remove the panels
-            this.removeGroup(group, true);
+            this.removeGroup(group, { skipActive: true });
         }
 
         if (hasActiveGroup) {
@@ -591,7 +675,9 @@ export class DockviewComponent
 
         group.model.removePanel(panel);
 
-        panel.dispose();
+        if (!options.skipDispose) {
+            panel.dispose();
+        }
 
         if (group.size === 0 && options.removeEmptyGroup) {
             this.removeGroup(group);
@@ -625,7 +711,7 @@ export class DockviewComponent
                 watermarkContainer.className = 'dv-watermark-container';
                 watermarkContainer.appendChild(this.watermark.element);
 
-                this.element.appendChild(watermarkContainer);
+                this.gridview.element.appendChild(watermarkContainer);
             }
         } else if (this.watermark) {
             this.watermark.element.parentElement!.remove();
@@ -695,17 +781,49 @@ export class DockviewComponent
         }
     }
 
-    removeGroup(group: DockviewGroupPanel, skipActive = false): void {
+    removeGroup(
+        group: DockviewGroupPanel,
+        options?:
+            | {
+                  skipActive?: boolean | undefined;
+                  skipDispose?: boolean | undefined;
+              }
+            | undefined
+    ): void {
         const panels = [...group.panels]; // reassign since group panels will mutate
 
         for (const panel of panels) {
             this.removePanel(panel, {
                 removeEmptyGroup: false,
-                skipDispose: false,
+                skipDispose: options?.skipDispose ?? false,
             });
         }
 
-        super.doRemoveGroup(group, { skipActive });
+        this.doRemoveGroup(group, options);
+    }
+
+    protected override doRemoveGroup(
+        group: DockviewGroupPanel,
+        options?:
+            | {
+                  skipActive?: boolean | undefined;
+                  skipDispose?: boolean | undefined;
+              }
+            | undefined
+    ): DockviewGroupPanel {
+        const floatingGroup = this.floatingGroups.find(
+            (_) => _.instance === group
+        );
+
+        if (floatingGroup) {
+            if (!options?.skipDispose) {
+                floatingGroup.instance.dispose();
+            }
+            floatingGroup.disposable.dispose();
+            return floatingGroup.instance;
+        }
+
+        return super.doRemoveGroup(group, options);
     }
 
     moveGroupOrPanel(
@@ -721,7 +839,7 @@ export class DockviewComponent
 
         if (itemId === undefined) {
             if (sourceGroup) {
-              this.moveGroup(sourceGroup, referenceGroup, target);
+                this.moveGroup(sourceGroup, referenceGroup, target);
             }
             return;
         }
@@ -750,34 +868,44 @@ export class DockviewComponent
 
             if (sourceGroup && sourceGroup.size < 2) {
                 const [targetParentLocation, to] = tail(targetLocation);
-                const sourceLocation = getGridLocation(sourceGroup.element);
-                const [sourceParentLocation, from] = tail(sourceLocation);
 
-                if (
-                    sequenceEquals(sourceParentLocation, targetParentLocation)
-                ) {
-                    // special case when 'swapping' two views within same grid location
-                    // if a group has one tab - we are essentially moving the 'group'
-                    // which is equivalent to swapping two views in this case
-                    this.gridview.moveView(sourceParentLocation, from, to);
-                } else {
-                    // source group will become empty so delete the group
-                    const targetGroup = this.doRemoveGroup(sourceGroup, {
-                        skipActive: true,
-                        skipDispose: true,
-                    });
+                const isFloating = this.floatingGroups.find(
+                    (x) => x.instance === sourceGroup
+                );
 
-                    // after deleting the group we need to re-evaulate the ref location
-                    const updatedReferenceLocation = getGridLocation(
-                        referenceGroup.element
-                    );
-                    const location = getRelativeLocation(
-                        this.gridview.orientation,
-                        updatedReferenceLocation,
-                        target
-                    );
-                    this.doAddGroup(targetGroup, location);
+                if (!isFloating) {
+                    const sourceLocation = getGridLocation(sourceGroup.element);
+                    const [sourceParentLocation, from] = tail(sourceLocation);
+
+                    if (
+                        sequenceEquals(
+                            sourceParentLocation,
+                            targetParentLocation
+                        )
+                    ) {
+                        // special case when 'swapping' two views within same grid location
+                        // if a group has one tab - we are essentially moving the 'group'
+                        // which is equivalent to swapping two views in this case
+                        this.gridview.moveView(sourceParentLocation, from, to);
+                    }
                 }
+
+                // source group will become empty so delete the group
+                const targetGroup = this.doRemoveGroup(sourceGroup, {
+                    skipActive: true,
+                    skipDispose: true,
+                });
+
+                // after deleting the group we need to re-evaulate the ref location
+                const updatedReferenceLocation = getGridLocation(
+                    referenceGroup.element
+                );
+                const location = getRelativeLocation(
+                    this.gridview.orientation,
+                    updatedReferenceLocation,
+                    target
+                );
+                this.doAddGroup(targetGroup, location);
             } else {
                 const groupItem: IDockviewPanel | undefined =
                     sourceGroup?.model.removePanel(itemId) ||
@@ -821,7 +949,17 @@ export class DockviewComponent
                     });
                 }
             } else {
-                this.gridview.removeView(getGridLocation(sourceGroup.element));
+                const floatingGroup = this.floatingGroups.find(
+                    (x) => x.instance === sourceGroup
+                );
+
+                if (floatingGroup) {
+                    floatingGroup.disposable.dispose();
+                } else {
+                    this.gridview.removeView(
+                        getGridLocation(sourceGroup.element)
+                    );
+                }
 
                 const referenceLocation = getGridLocation(
                     referenceGroup.element
@@ -962,61 +1100,5 @@ export class DockviewComponent
         this._onDidAddPanel.dispose();
         this._onDidRemovePanel.dispose();
         this._onDidLayoutFromJSON.dispose();
-    }
-
-    //
-
-    addFloating() {
-        const parentDockview = this;
-
-        const floatingDockview = new DockviewComponent({
-            ...this.options,
-            parentElement: undefined,
-            showDndOverlay: (event) => {
-                const data = event.getData();
-
-                if (data && data.viewId === parentDockview.id) {
-                    return true;
-                }
-
-                return false;
-            },
-        });
-
-        floatingDockview.onDidDrop((event) => {
-            const data = event.getData();
-
-            if (!data || data.viewId !== parentDockview.id) {
-                return;
-            }
-
-            if (data.panelId === null) {
-                const group = parentDockview.removeGroup(
-                    parentDockview.getPanel(data.groupId)!
-                );
-            } else {
-                const panel = parentDockview.removePanel(
-                    parentDockview.getGroupPanel(data.panelId)!
-                );
-
-                parentDockview.moveGroupOrPanel()
-            }
-        });
-
-        floatingDockview.addPanel({
-            id: '__test__',
-            component: 'default',
-        });
-        floatingDockview.addPanel({
-            id: '__test__2__',
-            component: 'default',
-        });
-
-        const overlay = new Overlay(this.element, floatingDockview.element, {
-            height: 300,
-            width: 300,
-            left: 100,
-            top: 100,
-        });
     }
 }

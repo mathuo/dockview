@@ -11,6 +11,28 @@ import * as ReactDOM from 'react-dom';
 import { v4 } from 'uuid';
 import './app.scss';
 
+function useLocalStorageItem(key: string, defaultValue: string): string {
+    const [item, setItem] = React.useState<string | null>(
+        localStorage.getItem(key)
+    );
+
+    React.useEffect(() => {
+        const listener = (event: StorageEvent) => {
+            setItem(localStorage.getItem(key));
+        };
+
+        window.addEventListener('storage', listener);
+
+        setItem(localStorage.getItem(key));
+
+        return () => {
+            window.removeEventListener('storage', listener);
+        };
+    }, [key]);
+
+    return item === null ? defaultValue : item;
+}
+
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
         return <div style={{ padding: '20px' }}>{props.params.title}</div>;
@@ -196,8 +218,8 @@ const DockviewDemo = () => {
             title: 'Panel 6',
             position: { referencePanel: 'panel_4', direction: 'below' },
         });
-        panel6.group.locked = true;
-        panel6.group.header.hidden = true;
+        // panel6.group.locked = true;
+        // panel6.group.header.hidden = true;
         event.api.addPanel({
             id: 'panel_7',
             component: 'default',
@@ -211,10 +233,15 @@ const DockviewDemo = () => {
             position: { referencePanel: 'panel_7', direction: 'within' },
         });
 
-        event.api.addGroup();
+        // event.api.addGroup();
 
         event.api.getPanel('panel_1')!.api.setActive();
     };
+
+    const theme = useLocalStorageItem(
+        'dv-theme-class-name',
+        'dockview-theme-abyss'
+    );
 
     return (
         <DockviewReact
@@ -222,7 +249,7 @@ const DockviewDemo = () => {
             defaultTabComponent={headerComponents.default}
             groupControlComponent={GroupControls}
             onReady={onReady}
-            className="dockview-theme-abyss"
+            className={theme}
         />
     );
 };

@@ -58,6 +58,7 @@ export class Droptarget extends CompositeDisposable {
     private targetElement: HTMLElement | undefined;
     private overlayElement: HTMLElement | undefined;
     private _state: Position | undefined;
+    private _acceptedTargetZonesSet: Set<Position>;
 
     private readonly _onDrop = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDrop.event;
@@ -83,7 +84,7 @@ export class Droptarget extends CompositeDisposable {
         super();
 
         // use a set to take advantage of #<set>.has
-        const acceptedTargetZonesSet = new Set(
+        this._acceptedTargetZonesSet = new Set(
             this.options.acceptedTargetZones
         );
 
@@ -106,7 +107,7 @@ export class Droptarget extends CompositeDisposable {
                     const y = e.clientY - rect.top;
 
                     const quadrant = this.calculateQuadrant(
-                        acceptedTargetZonesSet,
+                        this._acceptedTargetZonesSet,
                         x,
                         y,
                         width,
@@ -173,6 +174,10 @@ export class Droptarget extends CompositeDisposable {
                 },
             })
         );
+    }
+
+    setTargetZones(acceptedTargetZones: Position[]): void {
+        this._acceptedTargetZonesSet = new Set(acceptedTargetZones);
     }
 
     public dispose(): void {

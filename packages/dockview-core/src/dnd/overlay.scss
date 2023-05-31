@@ -1,11 +1,43 @@
+.dv-debug {
+    .dv-resize-container {
+        .dv-resize-handle-top {
+            background-color: red;
+        }
+
+        .dv-resize-handle-bottom {
+            background-color: green;
+        }
+
+        .dv-resize-handle-left {
+            background-color: yellow;
+        }
+
+        .dv-resize-handle-right {
+            background-color: blue;
+        }
+
+        .dv-resize-handle-topleft,
+        .dv-resize-handle-topright,
+        .dv-resize-handle-bottomleft,
+        .dv-resize-handle-bottomright {
+            background-color: cyan;
+        }
+    }
+}
+
 .dv-resize-container {
     position: absolute;
-    z-index: 9998;
+    z-index: 9997;
 
-    background-color: white;
+    &.dv-resize-container-priority {
+        z-index: 9998;
+    }
+
+    border: 1px solid var(--dv-tab-divider-color);
+    box-shadow: var(--dv-floating-box-shadow);
 
     &.dv-resize-container-dragging {
-        opacity: 0.2;
+        opacity: 0.5;
     }
 
     .dv-resize-handle-top {
@@ -16,8 +48,6 @@
         z-index: 9999;
         position: absolute;
         cursor: ns-resize;
-
-        background-color: red;
     }
 
     .dv-resize-handle-bottom {
@@ -28,8 +58,6 @@
         z-index: 9999;
         position: absolute;
         cursor: ns-resize;
-
-        background-color: green;
     }
 
     .dv-resize-handle-left {
@@ -40,8 +68,6 @@
         z-index: 9999;
         position: absolute;
         cursor: ew-resize;
-
-        background-color: yellow;
     }
 
     .dv-resize-handle-right {
@@ -52,8 +78,6 @@
         z-index: 9999;
         position: absolute;
         cursor: ew-resize;
-
-        background-color: blue;
     }
 
     .dv-resize-handle-topleft {
@@ -64,8 +88,6 @@
         z-index: 9999;
         position: absolute;
         cursor: nw-resize;
-
-        background-color: cyan;
     }
 
     .dv-resize-handle-topright {
@@ -76,8 +98,6 @@
         z-index: 9999;
         position: absolute;
         cursor: ne-resize;
-
-        background-color: cyan;
     }
 
     .dv-resize-handle-bottomleft {
@@ -88,8 +108,6 @@
         z-index: 9999;
         position: absolute;
         cursor: sw-resize;
-
-        background-color: cyan;
     }
 
     .dv-resize-handle-bottomright {
@@ -100,7 +118,5 @@
         z-index: 9999;
         position: absolute;
         cursor: se-resize;
-
-        background-color: cyan;
     }
 }

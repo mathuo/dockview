@@ -7,6 +7,7 @@
     --dv-drag-over-border-color: white;
     --dv-tabs-container-scrollbar-color: #888;
     --dv-icon-hover-background-color: rgba(90, 93, 94, 0.31);
+    --dv-floating-box-shadow: 8px 8px 8px 0px rgba(83, 89, 93, 0.5);
 }
 
 @mixin dockview-theme-dark-mixin {
@@ -224,4 +225,125 @@
 
 .dockview-theme-dracula {
     @include dockview-theme-dracula-mixin();
+}
+
+@mixin dockview-design-replit-mixin {
+    &.dv-dockview {
+        padding: 3px;
+    }
+
+    .view:has(> .groupview) {
+        padding: 3px;
+    }
+
+    .dv-resize-container:has(> .groupview) {
+        border-radius: 8px;
+    }
+
+    .groupview {
+        overflow: hidden;
+        border-radius: 10px;
+
+        .tabs-and-actions-container {
+            .tab {
+                margin: 4px;
+                border-radius: 8px;
+
+                .dockview-svg {
+                    height: 8px;
+                    width: 8px;
+                }
+
+                &:hover {
+                    background-color: #e4e5e6 !important;
+                }
+            }
+            border-bottom: 1px solid rgba(128, 128, 128, 0.35);
+        }
+
+        .content-container {
+            background-color: #fcfcfc;
+        }
+
+        &.active-group {
+            border: 1px solid rgba(128, 128, 128, 0.35);
+        }
+
+        &.inactive-group {
+            border: 1px solid transparent;
+        }
+    }
+
+    .vertical > .sash-container > .sash {
+        &::after {
+            content: '';
+            height: 4px;
+            width: 40px;
+            border-radius: 2px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--dv-separator-handle-background-color);
+            position: absolute;
+        }
+
+        &:hover {
+            &::after {
+                background-color: var(
+                    --dv-separator-handle-hover-background-color
+                );
+            }
+        }
+    }
+
+    .horizontal > .sash-container > .sash {
+        &::after {
+            content: '';
+            height: 40px;
+            width: 4px;
+            border-radius: 2px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--dv-separator-handle-background-color);
+            position: absolute;
+        }
+
+        &:hover {
+            &::after {
+                background-color: var(
+                    --dv-separator-handle-hover-background-color
+                );
+            }
+        }
+    }
+}
+
+.dockview-theme-replit {
+    @include dockview-theme-core-mixin();
+    @include dockview-design-replit-mixin();
+    //
+    --dv-group-view-background-color: #ebeced;
+    //
+    --dv-tabs-and-actions-container-background-color: #fcfcfc;
+    //
+    --dv-activegroup-visiblepanel-tab-background-color: #f0f1f2;
+    --dv-activegroup-hiddenpanel-tab-background-color: ##fcfcfc;
+    --dv-inactivegroup-visiblepanel-tab-background-color: #f0f1f2;
+    --dv-inactivegroup-hiddenpanel-tab-background-color: #fcfcfc;
+    --dv-tab-divider-color: transparent;
+    //
+    --dv-activegroup-visiblepanel-tab-color: rgb(51, 51, 51);
+    --dv-activegroup-hiddenpanel-tab-color: rgb(51, 51, 51);
+    --dv-inactivegroup-visiblepanel-tab-color: rgb(51, 51, 51);
+    --dv-inactivegroup-hiddenpanel-tab-color: rgb(51, 51, 51);
+    //
+    --dv-separator-border: transparent;
+    --dv-paneview-header-border-color: rgb(51, 51, 51);
+
+    --dv-background-color: #ebeced;
+
+    /////
+    --dv-separator-handle-background-color: #cfd1d3;
+    --dv-separator-handle-hover-background-color: #babbbb;
 }

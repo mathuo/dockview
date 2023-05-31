@@ -329,10 +329,6 @@ export class GridviewApi implements CommonApi<SerializedGridviewComponent> {
 }
 
 export class DockviewApi implements CommonApi<SerializedDockview> {
-    addFloating() {
-        return this.component.addFloating();
-    }
-
     get id(): string {
         return this.component.id;
     }

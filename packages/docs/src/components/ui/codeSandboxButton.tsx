@@ -1,5 +1,6 @@
 import * as React from 'react';
 import './codeSandboxButton.scss';
+import { ThemePicker } from './container';
 
 const BASE_SANDBOX_URL =
     'https://codesandbox.io/s/github/mathuo/dockview/tree/master/packages/docs/sandboxes';
@@ -40,26 +41,29 @@ export const CodeSandboxButton = (props: { id: string }) => {
     }, [props.id]);
 
     return (
-        <span
-            className="codesandbox-button"
-            style={{ display: 'flex', alignItems: 'center' }}
-        >
-            <span className="codesandbox-button-pretext">{`Open in `}</span>
-            <a
-                href={url}
-                target={'_blank'}
-                className="codesandbox-button-content"
+        <>
+            <ThemePicker />
+            <span
+                className="codesandbox-button"
+                style={{ display: 'flex', alignItems: 'center' }}
             >
-                <span
-                    style={{
-                        fontWeight: 'bold',
-                        paddingRight: '4px',
-                    }}
+                <span className="codesandbox-button-pretext">{`Open in `}</span>
+                <a
+                    href={url}
+                    target={'_blank'}
+                    className="codesandbox-button-content"
                 >
-                    CodeSandbox
-                </span>
-                <CloseButton />
-            </a>
-        </span>
+                    <span
+                        style={{
+                            fontWeight: 'bold',
+                            paddingRight: '4px',
+                        }}
+                    >
+                        CodeSandbox
+                    </span>
+                    <CloseButton />
+                </a>
+            </span>
+        </>
     );
 };

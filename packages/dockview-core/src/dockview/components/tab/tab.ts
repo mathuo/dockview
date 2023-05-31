@@ -11,6 +11,7 @@ import { DockviewDropTargets, ITabRenderer } from '../../types';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DroptargetEvent, Droptarget } from '../../../dnd/droptarget';
 import { DragHandler } from '../../../dnd/abstractDragHandler';
+import { DockviewPanel } from '../../dockviewPanel';
 
 export interface ITab {
     readonly panelId: string;
@@ -80,6 +81,19 @@ export class Tab extends CompositeDisposable implements ITab {
 
         this.addDisposables(
             addDisposableListener(this._element, 'mousedown', (event) => {
+                if (event.shiftKey) {
+                    event.preventDefault();
+
+                    const panel = this.accessor.getGroupPanel(this.panelId);
+
+                    const { top, left } = this.element.getBoundingClientRect();
+
+                    this.accessor.addFloating(panel as DockviewPanel, {
+                        x: left,
+                        y: top,
+                    });
+                }
+
                 if (event.defaultPrevented) {
                     return;
                 }
