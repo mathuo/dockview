@@ -18,7 +18,7 @@ describe('react', () => {
 
             render(<TestWrapper onReady={onReady} component={Component} />);
 
-            expect(api).toBeTruthy();
+            expect(api!).toBeTruthy();
 
             expect(screen.getByTestId('valueA').textContent).toBe('stringA');
             expect(screen.getByTestId('valueB').textContent).toBe('42');
@@ -60,7 +60,7 @@ const TestWrapper = (props: {
 
     React.useEffect(() => {
         const cut = new ReactPart<TestInterface>(
-            ref.current,
+            ref.current!,
             {
                 addPortal: (portal: React.ReactPortal) => {
                     setPortal((_) => [..._, portal]);

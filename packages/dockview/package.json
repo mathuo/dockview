@@ -1,6 +1,6 @@
 {
   "name": "dockview",
-  "version": "1.7.0",
+  "version": "1.7.2",
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support",
   "main": "./dist/cjs/index.js",
   "types": "./dist/cjs/index.d.ts",
@@ -20,7 +20,7 @@
     "build:esm": "cross-env ../../node_modules/.bin/tsc --project ./tsconfig.esm.json --extendedDiagnostics",
     "build:modulefiles": "rollup -c",
     "build": "npm run build:ci && npm run build:modulefiles",
-    "clean": "rimraf dist/ .build/",
+    "clean": "rimraf dist/ .build/ .rollup.cache/",
     "docs": "typedoc",
     "prepublishOnly": "npm run rebuild && npm run test",
     "rebuild": "npm run clean && npm run build",
@@ -56,7 +56,7 @@
   "author": "https://github.com/mathuo",
   "license": "MIT",
   "dependencies": {
-    "dockview-core": "^1.7.0"
+    "dockview-core": "^1.7.2"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.1",
@@ -71,7 +71,6 @@
     "react-dom": "^18.2.0",
     "rimraf": "^4.1.2",
     "rollup": "^3.15.0",
-    "rollup-plugin-postcss": "^4.0.2",
-    "typedoc": "^0.23.25"
+    "rollup-plugin-postcss": "^4.0.2"
   }
 }

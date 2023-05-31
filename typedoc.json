@@ -1,0 +1,7 @@
+{
+    "entryPoints": ["packages/dockview", "packages/dockview-core"],
+    "name": "Dockview",
+    "entryPointStrategy": "packages",
+    "includeVersion": true,
+    "logLevel": "Verbose"
+}

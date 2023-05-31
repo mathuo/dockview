@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 export function setMockRefElement(node: Partial<HTMLElement>): void {
     const mockRef = {
         get current() {
@@ -10,5 +8,5 @@ export function setMockRefElement(node: Partial<HTMLElement>): void {
         },
     };
 
-    jest.spyOn(React, 'useRef').mockReturnValueOnce(mockRef);
+    jest.spyOn(require('react'), 'useRef').mockReturnValueOnce(mockRef);
 }

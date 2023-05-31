@@ -20,6 +20,14 @@ const config: JestConfigWithTsJest = {
     coverageDirectory: '<rootDir>/packages/dockview-core/coverage/',
     testResultsProcessor: 'jest-sonar-reporter',
     testEnvironment: 'jsdom',
+    transform: {
+        '^.+\\.tsx?$': [
+            'ts-jest',
+            {
+                tsconfig: '<rootDir>/tsconfig.test.json',
+            },
+        ],
+    },
 };
 
 export default config;

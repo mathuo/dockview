@@ -18,6 +18,29 @@ const components = {
     },
 };
 
+const DraggableElement = () => (
+    <span
+        tabIndex={-1}
+        onDragStart={(event) => {
+            if (event.dataTransfer) {
+                event.dataTransfer.effectAllowed = 'move';
+
+                event.dataTransfer.setData('text/plain', 'nothing');
+            }
+        }}
+        style={{
+            backgroundColor: 'orange',
+            padding: '0px 8px',
+            borderRadius: '4px',
+            width: '100px',
+            cursor: 'pointer',
+        }}
+        draggable={true}
+    >
+        Drag me
+    </span>
+);
+
 const DndDockview = (props: { renderVisibleOnly: boolean }) => {
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
@@ -77,19 +100,9 @@ const DndDockview = (props: { renderVisibleOnly: boolean }) => {
                 height: '100%',
             }}
         >
-            <div
-                style={{
-                    backgroundColor: 'orange',
-                    padding: '0px 8px',
-                    borderRadius: '4px',
-                    width: '100px',
-                    cursor: 'pointer',
-                }}
-                draggable={true}
-            >
-                Drag me
+            <div style={{ margin: '2px 0px' }}>
+                <DraggableElement />
             </div>
-
             <DockviewReact
                 components={components}
                 onReady={onReady}

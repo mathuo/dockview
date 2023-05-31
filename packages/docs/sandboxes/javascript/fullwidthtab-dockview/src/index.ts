@@ -1,5 +1,5 @@
 import './styles.css';
-import 'dockview/dist/styles/dockview.css';
+import 'dockview-core/dist/styles/dockview.css';
 
 import { attach } from './app';
 

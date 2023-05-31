@@ -37,7 +37,7 @@ function createGroupControlElement(
         : undefined;
 }
 
-export interface IGroupPanelBaseProps<T extends {} = Record<string, any>>
+export interface IGroupPanelBaseProps<T extends { [index: string]: any } = any>
     extends PanelParameters<T> {
     api: DockviewPanelApi;
     containerApi: DockviewApi;
@@ -59,7 +59,6 @@ export interface IDockviewReactProps {
     components: PanelCollection<IDockviewPanelProps>;
     tabComponents?: PanelCollection<IDockviewPanelHeaderProps>;
     watermarkComponent?: React.FunctionComponent<IWatermarkPanelProps>;
-    tabHeight?: number;
     onDidDrop?: (event: DockviewDropEvent) => void;
     showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
     hideBorders?: boolean;
@@ -143,7 +142,6 @@ export const DockviewReact = React.forwardRef(
                 frameworkComponentFactory: factory,
                 frameworkComponents: props.components,
                 frameworkTabComponents,
-                tabHeight: props.tabHeight,
                 watermarkFrameworkComponent: props.watermarkComponent,
                 defaultTabComponent: props.defaultTabComponent
                     ? DEFAULT_REACT_TAB

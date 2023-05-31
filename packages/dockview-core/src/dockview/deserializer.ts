@@ -1,9 +1,7 @@
-import { GroupviewPanelState, ITabRenderer } from './types';
+import { GroupviewPanelState } from './types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
 import { IDockviewComponent } from './dockviewComponent';
-import { createComponent } from '../panel/componentFactory';
-import { DefaultTab } from './components/tab/defaultTab';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { DockviewApi } from '../api/component.api';
 
@@ -14,7 +12,7 @@ export interface IPanelDeserializer {
     ): IDockviewPanel;
 }
 
-// depreciated
+// @depreciated
 interface LegacyState extends GroupviewPanelState {
     view?: {
         tab?: { id: string };
@@ -41,30 +39,6 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
         const tabComponent = viewData
             ? viewData.tab?.id
             : panelData.tabComponent;
-
-        let tab: ITabRenderer;
-
-        if (tabComponent) {
-            tab = createComponent(
-                panelId,
-                tabComponent,
-                this.layout.options.tabComponents,
-                this.layout.options.frameworkTabComponents,
-                this.layout.options.frameworkComponentFactory?.tab,
-                () => new DefaultTab()
-            );
-        } else if (this.layout.options.defaultTabComponent) {
-            tab = createComponent(
-                panelId,
-                this.layout.options.defaultTabComponent,
-                this.layout.options.tabComponents,
-                this.layout.options.frameworkTabComponents,
-                this.layout.options.frameworkComponentFactory?.tab,
-                () => new DefaultTab()
-            );
-        } else {
-            tab = new DefaultTab();
-        }
 
         const view = new DockviewPanelModel(
             this.layout,

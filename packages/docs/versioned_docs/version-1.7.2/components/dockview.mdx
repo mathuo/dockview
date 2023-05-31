@@ -23,7 +23,8 @@ import DockviewSetTitle from '@site/sandboxes/updatetitle-dockview/src/app';
 import RenderingDockview from '@site/sandboxes/rendering-dockview/src/app';
 import DockviewExternalDnd from '@site/sandboxes/externaldnd-dockview/src/app';
 import DockviewResizeContainer from '@site/sandboxes/resizecontainer-dockview/src/app';
-import { attach as attachDockviewVanilla } from '@site/sandboxes/vanilla-dockview/src/app';
+import DockviewTabheight from '@site/sandboxes/tabheight-dockview/src/app';
+import { attach as attachDockviewVanilla } from '@site/sandboxes/javascript/vanilla-dockview/src/app';
 
 # Dockview
 
@@ -59,7 +60,6 @@ import { DockviewReact } from 'dockview';
 | showDndOverlay        | Event                                | Yes      | false     |                                                              |
 | defaultTabComponent   | object                               | Yes      |           |                                                              |
 | groupControlComponent | object                               | Yes      |           |                                                              |
-| tabHeight             | number                               | Yes      |           |                                                              |
 | singleTabMode         | 'fullwidth' \| 'default'             | Yes      | 'default' |                                                              |
 
 ## Dockview API
@@ -113,8 +113,6 @@ const onReady = (event: DockviewReadyEvent) => {
 | removeGroup            | `(group: GroupPanel): void`                          |                                                          |
 | getGroup               | `(id: string): GroupPanel \| undefined`              |                                                          |
 |                        |                                                      |                                                          |
-| getTabHeight           | `(): number \| undefined`                            |                                                          |
-| setTabHeight           | `(height: number \| undefined): void`                |                                                          |
 | updateOptions          | `(options:SplitviewComponentUpdateOptions): void`    |                                                          |
 | focus                  | `(): void`                                           |                                                          |
 | layout                 | `(width: number, height:number): void`               | <Link to="../basics/#auto-resizing">Auto Resizing</Link> |
@@ -612,6 +610,12 @@ to the entire width of the group. For example:
     <DockviewNative />
 </Container>
 
+### Tab Height
+
+<Container sandboxId="tabheight-dockview">
+    <DockviewTabheight />
+</Container>
+
 ## Groups
 
 ### Locked group
@@ -723,4 +727,7 @@ The core library is published as an independant package under the name `dockview
 > When using `dockview` there is no need to also install `dockview-core`.
 > `dockview-core` is a dependency of `dockview` and automatically installed during the installation process of `dockview` via `npm install dockview`.
 
-<Container injectVanillaJS={attachDockviewVanilla} />
+<Container
+    sandboxId="javascript/vanilla-dockview"
+    injectVanillaJS={attachDockviewVanilla}
+/>

@@ -27,7 +27,7 @@ const config: JestConfigWithTsJest = {
         '^.+\\.tsx?$': [
             'ts-jest',
             {
-                tsconfig,
+                tsconfig: '<rootDir>/tsconfig.test.json',
             },
         ],
     },

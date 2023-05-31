@@ -60,7 +60,6 @@ export interface SerializedDockview {
     };
     panels: { [key: string]: GroupviewPanelState };
     activeGroup?: string;
-    options?: { tabHeight?: number };
 }
 
 export type DockviewComponentUpdateOptions = Pick<
@@ -87,7 +86,6 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly panels: IDockviewPanel[];
     readonly onDidDrop: Event<DockviewDropEvent>;
     readonly orientation: Orientation;
-    tabHeight: number | undefined;
     updateOptions(options: DockviewComponentUpdateOptions): void;
     moveGroupOrPanel(
         referenceGroup: DockviewGroupPanel,
@@ -174,17 +172,6 @@ export class DockviewComponent
         }
 
         return activeGroup.activePanel;
-    }
-
-    set tabHeight(height: number | undefined) {
-        this.options.tabHeight = height;
-        this._groups.forEach((value) => {
-            value.value.model.header.height = height;
-        });
-    }
-
-    get tabHeight(): number | undefined {
-        return this.options.tabHeight;
     }
 
     constructor(options: DockviewComponentOptions) {
@@ -417,18 +404,13 @@ export class DockviewComponent
             grid: data,
             panels,
             activeGroup: this.activeGroup?.id,
-            options: { tabHeight: this.tabHeight },
         };
     }
 
     fromJSON(data: SerializedDockview): void {
         this.clear();
 
-        const { grid, panels, options, activeGroup } = data;
-
-        if (typeof options?.tabHeight === 'number') {
-            this.tabHeight = options.tabHeight;
-        }
+        const { grid, panels, activeGroup } = data;
 
         if (grid.root.type !== 'branch' || !Array.isArray(grid.root.data)) {
             throw new Error('root must be of type branch');
@@ -739,7 +721,7 @@ export class DockviewComponent
 
         if (itemId === undefined) {
             if (sourceGroup) {
-                this.moveGroup(sourceGroup, referenceGroup, target);
+              this.moveGroup(sourceGroup, referenceGroup, target);
             }
             return;
         }
@@ -873,10 +855,7 @@ export class DockviewComponent
 
     createGroup(options?: GroupOptions): DockviewGroupPanel {
         if (!options) {
-            options = { tabHeight: this.tabHeight };
-        }
-        if (typeof options.tabHeight !== 'number') {
-            options.tabHeight = this.tabHeight;
+            options = {};
         }
 
         let id = options?.id;
@@ -928,10 +907,6 @@ export class DockviewComponent
         // TODO: must be called after the above listeners have been setup,
         // not an ideal pattern
         view.initialize();
-
-        if (typeof this.options.tabHeight === 'number') {
-            view.model.header.height = this.options.tabHeight;
-        }
 
         return view;
     }

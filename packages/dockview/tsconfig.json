@@ -1,13 +1,10 @@
 {
-    "extends": "../../module-build/tsconfig.json",
+    "extends": "../../tsconfig.base.json",
     "compilerOptions": {
         "outDir": "dist/cjs",
         "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.cjs",
         "jsx": "react",
         "rootDir": "src"
-    },
-    "paths": {
-      "dockview-core": "../dockview-core"
     },
     "include": ["src"],
     "exclude": ["**/node_modules", "src/__tests__"]

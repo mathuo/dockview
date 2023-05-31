@@ -43,8 +43,7 @@ export class DockviewPanelModel implements IDockviewPanelModel {
         readonly tabComponent?: string
     ) {
         this._content = this.createContentComponent(this.id, contentComponent);
-        this._tab =
-            this.createTabComponent(this.id, tabComponent) ?? new DefaultTab();
+        this._tab = this.createTabComponent(this.id, tabComponent);
     }
 
     init(params: GroupPanelPartInitParameters): void {
@@ -108,13 +107,26 @@ export class DockviewPanelModel implements IDockviewPanelModel {
         id: string,
         componentName?: string
     ): ITabRenderer {
-        return createComponent(
-            id,
-            componentName,
-            this.accessor.options.tabComponents || {},
-            this.accessor.options.frameworkTabComponents,
-            this.accessor.options.frameworkComponentFactory?.tab,
-            () => new DefaultTab()
-        );
+        if (componentName) {
+            return createComponent(
+                id,
+                componentName,
+                this.accessor.options.tabComponents,
+                this.accessor.options.frameworkTabComponents,
+                this.accessor.options.frameworkComponentFactory?.tab,
+                () => new DefaultTab()
+            );
+        } else if (this.accessor.options.defaultTabComponent) {
+            return createComponent(
+                id,
+                this.accessor.options.defaultTabComponent,
+                this.accessor.options.tabComponents,
+                this.accessor.options.frameworkTabComponents,
+                this.accessor.options.frameworkComponentFactory?.tab,
+                () => new DefaultTab()
+            );
+        } else {
+            return new DefaultTab();
+        }
     }
 }

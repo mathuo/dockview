@@ -18,11 +18,9 @@ import { LocalSelectionTransfer, PanelTransfer } from '../../dnd/dataTransfer';
 import { CompositeDisposable } from '../../lifecycle';
 import { DockviewPanelApi } from '../../api/dockviewPanelApi';
 import { IDockviewPanel } from '../../dockview/dockviewPanel';
-import {
-    IDockviewPanelModel,
-    DockviewPanelModel,
-} from '../../dockview/dockviewPanelModel';
+import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
+import { WatermarkRendererInitParameters } from '../../dockview/types';
 
 enum GroupChangeKind2 {
     ADD_PANEL,
@@ -76,7 +74,7 @@ class Watermark implements IWatermarkRenderer {
         return 'watermark-id';
     }
 
-    init(params: GroupPanelPartInitParameters) {
+    init(params: WatermarkRendererInitParameters) {
         //
     }
 
@@ -170,7 +168,7 @@ class TestHeaderPart implements ITabRenderer {
 
 export class TestPanel implements IDockviewPanel {
     private _group: DockviewGroupPanel | undefined;
-    private _params: IGroupPanelInitParameters;
+    private _params: IGroupPanelInitParameters | undefined;
     readonly view: IDockviewPanelModel;
 
     get title() {
@@ -237,6 +235,8 @@ describe('groupview', () => {
         removePanelMock = jest.fn();
         removeGroupMock = jest.fn();
 
+        options = {};
+
         dockview = (<Partial<DockviewComponent>>{
             options: {},
             createWatermarkComponent: () => new Watermark(),
@@ -248,9 +248,6 @@ describe('groupview', () => {
             onDidRemovePanel: jest.fn(),
         }) as DockviewComponent;
 
-        options = {
-            tabHeight: 30,
-        };
         groupview = new DockviewGroupPanel(dockview, 'groupview-1', options);
         groupview.initialize();
     });
@@ -261,7 +258,6 @@ describe('groupview', () => {
         const panel3 = new TestPanel('panel3', jest.fn() as any);
 
         const groupview2 = new DockviewGroupPanel(dockview, 'groupview-2', {
-            tabHeight: 25,
             panels: [panel1, panel2, panel3],
             activePanel: panel2,
         });
@@ -518,7 +514,7 @@ describe('groupview', () => {
             dockviewComponent,
             'id',
             {},
-            null
+            null as any
         );
 
         expect(cut.toJSON()).toEqual({
@@ -541,7 +537,7 @@ describe('groupview', () => {
             dockviewComponent,
             'id',
             {},
-            null
+            null as any
         );
 
         cut.locked = true;
@@ -570,25 +566,25 @@ describe('groupview', () => {
             dockviewComponent,
             'id',
             {},
-            null
+            null as any
         );
         const contentContainer = groupviewContainer
             .getElementsByClassName('content-container')
             .item(0)!.childNodes;
 
-        const panel1 = new TestPanel('id_1', null);
+        const panel1 = new TestPanel('id_1', null as any);
 
         cut.openPanel(panel1);
         expect(contentContainer.length).toBe(1);
         expect(contentContainer.item(0)).toBe(panel1.view.content.element);
 
-        const panel2 = new TestPanel('id_2', null);
+        const panel2 = new TestPanel('id_2', null as any);
 
         cut.openPanel(panel2);
         expect(contentContainer.length).toBe(1);
         expect(contentContainer.item(0)).toBe(panel2.view.content.element);
 
-        const panel3 = new TestPanel('id_2', null);
+        const panel3 = new TestPanel('id_2', null as any);
 
         cut.openPanel(panel3, { skipSetPanelActive: true });
         expect(contentContainer.length).toBe(1);

@@ -1,5 +1,5 @@
 {
-    "extends": "../../module-build/tsconfig.json",
+    "extends": "../../tsconfig.base.json",
     "compilerOptions": {
         "outDir": "dist/cjs",
         "tsBuildInfoFile": ".build/tsconfig.tsbuildinfo.cjs",

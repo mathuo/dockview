@@ -53,19 +53,16 @@ const MyComponent = (props: ISplitviewPanelProps<{ title: string }>) => {
         const disposable = props.api.onDidActiveChange((event) => {
             console.log(`is panel active: ${event.isActive}`);
         });
-
         return () => {
             disposable.dispose(); // remember to dispose of any subscriptions
         };
     }, [props.api]);
-
     const addAnotherPanel = React.useCallback(() => {
         props.containerApi.addPanel({
             id: 'another_id',
             component: 'anotherComponent',
         });
     }, [props.containerApi]);
-
     return (
         <div>
             <span>{`My first panel has the title: ${props.params.title}`}</span>
@@ -98,7 +95,6 @@ React.useEffect(() => {
     const disposable = api.onDidFocusChange(() => {
         // write some code
     });
-
     return () => {
         disposable.dispose();
     };
