@@ -19,7 +19,7 @@ import { Position } from '../dnd/droptarget';
 import { IDockviewPanel } from './dockviewPanel';
 import { FrameworkFactory } from '../panel/componentFactory';
 
-export interface IGroupControlRenderer extends IDisposable {
+export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
     init(params: {
         containerApi: DockviewApi;
@@ -81,10 +81,10 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
     createRightHeaderActionsElement?: (
         group: DockviewGroupPanel
-    ) => IGroupControlRenderer;
+    ) => IHeaderActionsRenderer;
     createLeftHeaderActionsElement?: (
         group: DockviewGroupPanel
-    ) => IGroupControlRenderer;
+    ) => IHeaderActionsRenderer;
     singleTabMode?: 'fullwidth' | 'default';
     parentElement?: HTMLElement;
 }

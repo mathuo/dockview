@@ -1,7 +1,7 @@
 import {
     DockviewReact,
     DockviewReadyEvent,
-    IDockviewGroupControlProps,
+    IDockviewHeaderActionsProps,
     IDockviewPanelProps,
 } from 'dockview';
 import * as React from 'react';
@@ -26,7 +26,7 @@ const components = {
     },
 };
 
-const RightHeaderActions = (props: IDockviewGroupControlProps) => {
+const RightHeaderActions = (props: IDockviewHeaderActionsProps) => {
     const isGroupActive = props.isGroupActive;
 
     return (
@@ -43,7 +43,7 @@ const RightHeaderActions = (props: IDockviewGroupControlProps) => {
     );
 };
 
-const LeftHeaderActions = (props: IDockviewGroupControlProps) => {
+const LeftHeaderActions = (props: IDockviewHeaderActionsProps) => {
     const activePanel = props.activePanel;
 
     return (

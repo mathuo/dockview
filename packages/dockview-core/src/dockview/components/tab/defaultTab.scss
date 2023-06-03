@@ -46,5 +46,30 @@
             padding: 0px 8px;
             flex-grow: 1;
         }
+
+        .action-container {
+            text-align: right;
+            display: flex;
+
+            .tab-list {
+                display: flex;
+                padding: 0px;
+                margin: 0px;
+                justify-content: flex-end;
+
+                .tab-action {
+                    padding: 4px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-sizing: border-box;
+
+                    &:hover {
+                        border-radius: 2px;
+                        background-color: var(--dv-icon-hover-background-color);
+                    }
+                }
+            }
+        }
     }
 }

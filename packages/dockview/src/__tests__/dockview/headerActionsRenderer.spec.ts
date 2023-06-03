@@ -3,9 +3,9 @@ import {
     DockviewGroupPanelApi,
     DockviewGroupPanelModel,
 } from 'dockview-core';
-import { ReactGroupControlsRendererPart } from '../../dockview/groupControlsRenderer';
+import { ReactHeaderActionsRendererPart } from '../../dockview/headerActionsRenderer';
 
-describe('groupControlsRenderer', () => {
+describe('headerActionsRenderer', () => {
     test('#1', () => {
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
             () => {
@@ -28,7 +28,7 @@ describe('groupControlsRenderer', () => {
 
         const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
-        const cut = new ReactGroupControlsRendererPart(
+        const cut = new ReactHeaderActionsRendererPart(
             jest.fn(),
             {
                 addPortal: jest.fn(),

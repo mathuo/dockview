@@ -1,14 +1,14 @@
 import { fireEvent } from '@testing-library/dom';
-import { Emitter, Event } from '../../../events';
-import { ContentContainer } from '../../../dockview/components/panel/content';
+import { Emitter, Event } from '../../../../events';
+import { ContentContainer } from '../../../../dockview/components/panel/content';
 import {
     GroupPanelContentPartInitParameters,
     IContentRenderer,
-} from '../../../dockview/types';
-import { CompositeDisposable } from '../../../lifecycle';
-import { PanelUpdateEvent } from '../../../panel/types';
-import { IDockviewPanel } from '../../../dockview/dockviewPanel';
-import { IDockviewPanelModel } from '../../../dockview/dockviewPanelModel';
+} from '../../../../dockview/types';
+import { CompositeDisposable } from '../../../../lifecycle';
+import { PanelUpdateEvent } from '../../../../panel/types';
+import { IDockviewPanel } from '../../../../dockview/dockviewPanel';
+import { IDockviewPanelModel } from '../../../../dockview/dockviewPanelModel';
 
 class TestContentRenderer
     extends CompositeDisposable
