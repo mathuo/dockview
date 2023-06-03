@@ -28,7 +28,6 @@ const components = {
 
 const RightHeaderActions = (props: IDockviewGroupControlProps) => {
     const isGroupActive = props.isGroupActive;
-    const activePanel = props.activePanel;
 
     return (
         <div className="dockview-groupcontrol-demo">
@@ -40,6 +39,15 @@ const RightHeaderActions = (props: IDockviewGroupControlProps) => {
             >
                 {isGroupActive ? 'Group Active' : 'Group Inactive'}
             </span>
+        </div>
+    );
+};
+
+const LeftHeaderActions = (props: IDockviewGroupControlProps) => {
+    const activePanel = props.activePanel;
+
+    return (
+        <div className="dockview-groupcontrol-demo">
             <span className="dockview-groupcontrol-demo-active-panel">{`activePanel: ${
                 activePanel?.id || 'null'
             }`}</span>
@@ -87,6 +95,7 @@ const DockviewGroupControl = () => {
         <DockviewReact
             onReady={onReady}
             components={components}
+            leftHeaderActionsComponent={LeftHeaderActions}
             rightHeaderActionsComponent={RightHeaderActions}
             className="dockview-theme-abyss"
         />

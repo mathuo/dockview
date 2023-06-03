@@ -649,22 +649,22 @@ panel.group.locked = true;
 
 ### Group Controls Panel
 
-`DockviewReact` accepts a prop `groupControlComponent` which expects a React component whos props are `IDockviewGroupControlProps`.
-This control will be rendered inside the header bar on the right hand side for each group of tabs.
+`DockviewReact` accepts `leftHeaderActionsComponent` and `rightHeaderActionsComponent` which expect a React component with props `IDockviewGroupControlProps`.
+These controls are rendered of the left and right side of the space to the right of the tabs in the header bar.
 
 ```tsx
 const Component: React.FunctionComponent<IDockviewGroupControlProps> = () => {
     return <div>{'...'}</div>;
 };
 
-return <DockviewReact {...props} groupControlComponent={Component} />;
+return <DockviewReact {...props} leftHeaderActionsComponent={Component} rightHeaderActionsComponent={...} />;
 ```
 
 As a simple example the below uses the `groupControlComponent` to render a small control that indicates whether the group
 is active and which panel is active in that group.
 
 ```tsx
-const GroupControlComponent = (props: IDockviewGroupControlProps) => {
+const RightHeaderActionsComponent = (props: IDockviewGroupControlProps) => {
     const isGroupActive = props.isGroupActive;
     const activePanel = props.activePanel;
 
