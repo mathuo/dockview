@@ -79,7 +79,10 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     styles?: ISplitviewStyles;
     defaultTabComponent?: string;
     showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
-    createGroupControlElement?: (
+    createRightHeaderActionsElement?: (
+        group: DockviewGroupPanel
+    ) => IGroupControlRenderer;
+    createLeftHeaderActionsElement?: (
         group: DockviewGroupPanel
     ) => IGroupControlRenderer;
     singleTabMode?: 'fullwidth' | 'default';

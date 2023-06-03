@@ -65,7 +65,8 @@ export interface IDockviewReactProps {
     className?: string;
     disableAutoResizing?: boolean;
     defaultTabComponent?: React.FunctionComponent<IDockviewPanelHeaderProps>;
-    groupControlComponent?: React.FunctionComponent<IDockviewGroupControlProps>;
+    rightHeaderActionsComponent?: React.FunctionComponent<IDockviewGroupControlProps>;
+    leftHeaderActionsComponent?: React.FunctionComponent<IDockviewGroupControlProps>;
     singleTabMode?: 'fullwidth' | 'default';
 }
 
@@ -150,10 +151,15 @@ export const DockviewReact = React.forwardRef(
                     ? { separatorBorder: 'transparent' }
                     : undefined,
                 showDndOverlay: props.showDndOverlay,
-                createGroupControlElement: createGroupControlElement(
-                    props.groupControlComponent,
+                createLeftHeaderActionsElement: createGroupControlElement(
+                    props.leftHeaderActionsComponent,
                     { addPortal }
                 ),
+                createRightHeaderActionsElement: createGroupControlElement(
+                    props.rightHeaderActionsComponent,
+                    { addPortal }
+                ),
+
                 singleTabMode: props.singleTabMode,
             });
 
@@ -250,12 +256,24 @@ export const DockviewReact = React.forwardRef(
                 return;
             }
             dockviewRef.current.updateOptions({
-                createGroupControlElement: createGroupControlElement(
-                    props.groupControlComponent,
+                createRightHeaderActionsElement: createGroupControlElement(
+                    props.rightHeaderActionsComponent,
                     { addPortal }
                 ),
             });
-        }, [props.groupControlComponent]);
+        }, [props.rightHeaderActionsComponent]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+            dockviewRef.current.updateOptions({
+                createLeftHeaderActionsElement: createGroupControlElement(
+                    props.leftHeaderActionsComponent,
+                    { addPortal }
+                ),
+            });
+        }, [props.leftHeaderActionsComponent]);
 
         return (
             <div

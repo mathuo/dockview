@@ -71,7 +71,8 @@ export type DockviewComponentUpdateOptions = Pick<
     | 'showDndOverlay'
     | 'watermarkFrameworkComponent'
     | 'defaultTabComponent'
-    | 'createGroupControlElement'
+    | 'createLeftHeaderActionsElement'
+    | 'createRightHeaderActionsElement'
 >;
 
 export interface DockviewDropEvent extends GroupviewDropEvent {
@@ -717,7 +718,7 @@ export class DockviewComponent
 
         if (itemId === undefined) {
             if (sourceGroup) {
-              this.moveGroup(sourceGroup, referenceGroup, target);
+                this.moveGroup(sourceGroup, referenceGroup, target);
             }
             return;
         }

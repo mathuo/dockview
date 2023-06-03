@@ -138,6 +138,7 @@ export class DockviewGroupPanelModel
     private _isGroupActive = false;
     private _locked = false;
     private _control: IGroupControlRenderer | undefined;
+    private _lhs: IGroupControlRenderer | undefined;
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
 
@@ -319,16 +320,29 @@ export class DockviewGroupPanelModel
         this.setActive(this.isActive, true, true);
         this.updateContainer();
 
-        if (this.accessor.options.createGroupControlElement) {
-            this._control = this.accessor.options.createGroupControlElement(
-                this.groupPanel
-            );
+        if (this.accessor.options.createRightHeaderActionsElement) {
+            this._control =
+                this.accessor.options.createRightHeaderActionsElement(
+                    this.groupPanel
+                );
             this.addDisposables(this._control);
             this._control.init({
                 containerApi: new DockviewApi(this.accessor),
                 api: this.groupPanel.api,
             });
-            this.tabsContainer.setActionElement(this._control.element);
+            this.tabsContainer.setRightActionsElement(this._control.element);
+        }
+
+        if (this.accessor.options.createLeftHeaderActionsElement) {
+            this._lhs = this.accessor.options.createLeftHeaderActionsElement(
+                this.groupPanel
+            );
+            this.addDisposables(this._lhs);
+            this._lhs.init({
+                containerApi: new DockviewApi(this.accessor),
+                api: this.groupPanel.api,
+            });
+            this.tabsContainer.setLeftActionsElement(this._lhs.element);
         }
     }
 
@@ -511,7 +525,7 @@ export class DockviewGroupPanelModel
     }
 
     updateActions(element: HTMLElement | undefined): void {
-        this.tabsContainer.setActionElement(element);
+        this.tabsContainer.setRightActionsElement(element);
     }
 
     public setActive(

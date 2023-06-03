@@ -26,7 +26,7 @@ const components = {
     },
 };
 
-const GroupControlComponent = (props: IDockviewGroupControlProps) => {
+const RightHeaderActions = (props: IDockviewGroupControlProps) => {
     const isGroupActive = props.isGroupActive;
     const activePanel = props.activePanel;
 
@@ -87,7 +87,7 @@ const DockviewGroupControl = () => {
         <DockviewReact
             onReady={onReady}
             components={components}
-            groupControlComponent={GroupControlComponent}
+            rightHeaderActionsComponent={RightHeaderActions}
             className="dockview-theme-abyss"
         />
     );
