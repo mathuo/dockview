@@ -2295,4 +2295,91 @@ describe('dockviewComponent', () => {
             panels: {},
         });
     });
+
+    test('that title and params.title do not conflict', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(100, 100);
+
+        dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+            title: 'Panel 1',
+            params: {
+                title: 'Panel 1',
+            },
+        });
+
+        dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+            title: 'Panel 2',
+        });
+
+        dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            params: {
+                title: 'Panel 3',
+            },
+        });
+
+        expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
+            grid: {
+                root: {
+                    type: 'branch',
+                    data: [
+                        {
+                            type: 'leaf',
+                            data: {
+                                views: ['panel1', 'panel2', 'panel3'],
+                                activeView: 'panel3',
+                                id: '1',
+                            },
+                            size: 100,
+                        },
+                    ],
+                    size: 100,
+                },
+                width: 100,
+                height: 100,
+                orientation: 'HORIZONTAL',
+            },
+            panels: {
+                panel1: {
+                    id: 'panel1',
+                    contentComponent: 'default',
+                    params: {
+                        title: 'Panel 1',
+                    },
+                    title: 'Panel 1',
+                },
+                panel2: {
+                    id: 'panel2',
+                    contentComponent: 'default',
+                    title: 'Panel 2',
+                },
+                panel3: {
+                    id: 'panel3',
+                    contentComponent: 'default',
+                    params: {
+                        title: 'Panel 3',
+                    },
+                    title: 'panel3',
+                },
+            },
+            activeGroup: '1',
+        });
+    });
 });
