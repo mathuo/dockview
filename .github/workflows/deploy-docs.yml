@@ -33,8 +33,10 @@ jobs:
               working-directory: packages/dockview
             - run: npm run build
               working-directory: packages/docs
-            - run: npm run deploy-docs
-              working-directory: packages/docs
+            - run: npm run docs
+              working-directory: .
+            - run: npm run package-docs
+              working-directory: .
             - name: Deploy 🚀
               uses: JamesIves/github-pages-deploy-action@3.7.1
               with:

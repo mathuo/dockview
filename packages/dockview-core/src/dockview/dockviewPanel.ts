@@ -18,7 +18,7 @@ export interface IDockviewPanel extends IDisposable, IPanel {
     readonly view: IDockviewPanelModel;
     readonly group: DockviewGroupPanel;
     readonly api: DockviewPanelApi;
-    readonly title: string;
+    readonly title: string | undefined;
     readonly params: Record<string, any> | undefined;
     updateParentGroup(group: DockviewGroupPanel, isGroupActive: boolean): void;
     init(params: IGroupPanelInitParameters): void;
@@ -34,13 +34,13 @@ export class DockviewPanel
     private _group: DockviewGroupPanel;
     private _params?: Parameters;
 
-    private _title: string;
+    private _title: string | undefined;
 
     get params(): Parameters | undefined {
         return this._params;
     }
 
-    get title(): string {
+    get title(): string | undefined {
         return this._title;
     }
 
@@ -56,7 +56,6 @@ export class DockviewPanel
         readonly view: IDockviewPanelModel
     ) {
         super();
-        this._title = '';
         this._group = group;
 
         this.api = new DockviewPanelApiImpl(this, this._group);
@@ -76,13 +75,13 @@ export class DockviewPanel
     public init(params: IGroupPanelInitParameters): void {
         this._params = params.params;
 
-        this.setTitle(params.title);
-
         this.view.init({
             ...params,
             api: this.api,
             containerApi: this.containerApi,
         });
+
+        this.setTitle(params.title);
     }
 
     focus(): void {
@@ -103,7 +102,7 @@ export class DockviewPanel
     }
 
     setTitle(title: string): void {
-        const didTitleChange = title !== this._params?.title;
+        const didTitleChange = title !== this.title;
 
         if (didTitleChange) {
             this._title = title;
@@ -128,10 +127,10 @@ export class DockviewPanel
 
         if (params.title !== this.title) {
             this._title = params.title;
-            this.api._onDidTitleChange.fire({ title: this.title });
+            this.api._onDidTitleChange.fire({ title: params.title });
         }
 
-        this.view?.update({
+        this.view.update({
             params: {
                 params: this._params,
                 title: this.title,

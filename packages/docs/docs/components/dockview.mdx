@@ -2,7 +2,10 @@
 description: Dockview Documentation
 ---
 
-import { Container } from '@site/src/components/ui/container';
+import {
+    Container,
+    MultiFrameworkContainer,
+} from '@site/src/components/ui/container';
 
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
@@ -24,7 +27,11 @@ import RenderingDockview from '@site/sandboxes/rendering-dockview/src/app';
 import DockviewExternalDnd from '@site/sandboxes/externaldnd-dockview/src/app';
 import DockviewResizeContainer from '@site/sandboxes/resizecontainer-dockview/src/app';
 import DockviewTabheight from '@site/sandboxes/tabheight-dockview/src/app';
-import { attach as attachDockviewVanilla } from '@site/sandboxes/vanilla-dockview/src/app';
+
+import { attach as attachDockviewVanilla } from '@site/sandboxes/javascript/vanilla-dockview/src/app';
+import { attach as attachSimpleDockview } from '@site/sandboxes/javascript/simple-dockview/src/app';
+import { attach as attachTabHeightDockview } from '@site/sandboxes/javascript/tabheight-dockview/src/app';
+import { attach as attachNativeDockview } from '@site/sandboxes/javascript/fullwidthtab-dockview/src/app';
 
 # Dockview
 
@@ -32,12 +39,16 @@ import { attach as attachDockviewVanilla } from '@site/sandboxes/vanilla-dockvie
 
 Dockview is an abstraction built on top of [Gridviews](./gridview) where each view is a container of many tabbed panels.
 
-<Container sandboxId="simple-dockview">
-    <SimpleDockview />
-</Container>
+<MultiFrameworkContainer
+    sandboxId="simple-dockview"
+    react={SimpleDockview}
+    typescript={attachSimpleDockview}
+/>
 
-You can access the panels associated group through the `panel.group` variable.
-The group will always be defined and will change if a panel is moved into another group.
+<br />
+
+> You can access the panels associated group through the `panel.group` variable.
+> The group will always be defined and will change if a panel is moved into another group.
 
 ## DockviewReact Component
 
@@ -608,17 +619,21 @@ to the entire width of the group. For example:
 <DockviewReactComponent singleTabMode="fullwidth" {...otherProps} />
 ```
 
-<Container sandboxId="fullwidthtab-dockview">
-    <DockviewNative />
-</Container>
+<MultiFrameworkContainer
+    sandboxId="fullwidthtab-dockview"
+    react={DockviewNative}
+    typescript={attachNativeDockview}
+/>
 
 ### Tab Height
 
 Tab height can be controlled through CSS.
 
-<Container sandboxId="tabheight-dockview">
-    <DockviewTabheight />
-</Container>
+<MultiFrameworkContainer
+    sandboxId="tabheight-dockview"
+    react={DockviewTabheight}
+    typescript={attachTabHeightDockview}
+/>
 
 ## Groups
 
@@ -709,19 +724,11 @@ If you wish to interact with the drop event from one dockview instance in anothe
     <NestedDockview />
 </Container>
 
-### Example
-
-hello
+### Window-like mananger with tabs
 
 <DockviewNative2 />
 
-hello 2
-
-<div style={{ height: '400px', width: '100%' }}>
-    <App />
-</div>
-
-## VanillaJS
+## Vanilla JS
 
 > Note: This section is experimental and support for Vanilla JS is a work in progress.
 
@@ -732,6 +739,6 @@ The core library is published as an independant package under the name `dockview
 > `dockview-core` is a dependency of `dockview` and automatically installed during the installation process of `dockview` via `npm install dockview`.
 
 <Container
-    sandboxId="vanilla-dockview"
+    sandboxId="typescript/vanilla-dockview"
     injectVanillaJS={attachDockviewVanilla}
 />

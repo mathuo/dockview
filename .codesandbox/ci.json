@@ -22,8 +22,11 @@
     "/packages/docs/sandboxes/simple-dockview",
     "/packages/docs/sandboxes/tabheight-dockview",
     "/packages/docs/sandboxes/updatetitle-dockview",
-    "/packages/docs/sandboxes/vanilla-dockview",
-    "/packages/docs/sandboxes/watermark-dockview"
+    "/packages/docs/sandboxes/watermark-dockview",
+    "/packages/docs/sandboxes/javascript/fullwidthtab-dockview",
+    "/packages/docs/sandboxes/javascript/simple-dockview",
+    "/packages/docs/sandboxes/javascript/tabheight-dockview",
+    "/packages/docs/sandboxes/javascript/vanilla-dockview"
   ],
   "node": "16"
 }
