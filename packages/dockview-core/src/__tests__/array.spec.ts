@@ -3,6 +3,7 @@ import {
     last,
     pushToEnd,
     pushToStart,
+    remove,
     sequenceEquals,
     tail,
 } from '../array';
@@ -46,5 +47,23 @@ describe('array', () => {
         expect(sequenceEquals([1, 2, 3, 4], [4, 3, 2, 1])).toBeFalsy();
         expect(sequenceEquals([1, 2, 3, 4], [1, 2, 3])).toBeFalsy();
         expect(sequenceEquals([1, 2, 3, 4], [1, 2, 3, 4, 5])).toBeFalsy();
+    });
+
+    test('remove', () => {
+        const arr1 = [1, 2, 3, 4];
+        remove(arr1, 2);
+        expect(arr1).toEqual([1, 3, 4]);
+
+        const arr2 = [1, 2, 2, 3, 4];
+        remove(arr2, 2);
+        expect(arr2).toEqual([1, 2, 3, 4]);
+
+        const arr3 = [1];
+        remove(arr3, 2);
+        expect(arr3).toEqual([1]);
+        remove(arr3, 1);
+        expect(arr3).toEqual([]);
+        remove(arr3, 1);
+        expect(arr3).toEqual([]);
     });
 });
