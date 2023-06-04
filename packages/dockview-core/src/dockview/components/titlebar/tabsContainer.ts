@@ -237,6 +237,7 @@ export class TabsContainer
         const { value, disposable } = tabToRemove;
 
         disposable.dispose();
+        value.dispose();
         value.element.remove();
     }
 
@@ -296,9 +297,11 @@ export class TabsContainer
     public dispose(): void {
         super.dispose();
 
-        this.tabs.forEach((tab) => {
-            tab.disposable.dispose();
-        });
+        for (const { value, disposable } of this.tabs) {
+            disposable.dispose();
+            value.dispose();
+        }
+
         this.tabs = [];
     }
 }

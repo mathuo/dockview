@@ -111,6 +111,8 @@ class FocusTracker extends CompositeDisposable implements IFocusTracker {
     constructor(element: HTMLElement | Window) {
         super();
 
+        this.addDisposables(this._onDidFocus, this._onDidBlur);
+
         let hasFocus = isAncestor(document.activeElement, <HTMLElement>element);
         let loosingFocus = false;
 
@@ -168,12 +170,5 @@ class FocusTracker extends CompositeDisposable implements IFocusTracker {
 
     refreshState(): void {
         this._refreshStateHandler();
-    }
-
-    public dispose(): void {
-        super.dispose();
-
-        this._onDidBlur.dispose();
-        this._onDidFocus.dispose();
     }
 }

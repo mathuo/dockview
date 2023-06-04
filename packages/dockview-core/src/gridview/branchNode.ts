@@ -260,13 +260,13 @@ export class BranchNode extends CompositeDisposable implements IView {
         return this.splitview.getViewCachedVisibleSize(index);
     }
 
-    public removeChild(index: number, sizing?: Sizing): void {
+    public removeChild(index: number, sizing?: Sizing): Node {
         if (index < 0 || index >= this.children.length) {
             throw new Error('Invalid index');
         }
 
         this.splitview.removeView(index, sizing);
-        this._removeChild(index);
+        return this._removeChild(index);
     }
 
     private _addChild(node: Node, index: number): void {
@@ -296,9 +296,10 @@ export class BranchNode extends CompositeDisposable implements IView {
     }
 
     public dispose(): void {
-        super.dispose();
         this._childrenDisposable.dispose();
-        this.children.forEach((child) => child.dispose());
         this.splitview.dispose();
+        this.children.forEach((child) => child.dispose());
+
+        super.dispose();
     }
 }
