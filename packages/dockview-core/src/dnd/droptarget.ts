@@ -177,6 +177,7 @@ export class Droptarget extends CompositeDisposable {
 
     public dispose(): void {
         this.removeDropTarget();
+        super.dispose();
     }
 
     private toggleClasses(
