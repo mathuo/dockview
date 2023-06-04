@@ -1,7 +1,6 @@
 import {
     CompositeDisposable,
     IDisposable,
-    IValueDisposable,
     MutableDisposable,
 } from '../lifecycle';
 import {
@@ -83,10 +82,10 @@ export class SplitviewComponent
     extends Resizable
     implements ISplitviewComponent
 {
-    private _disposable = new MutableDisposable();
+    private _splitviewChangeDisposable = new MutableDisposable();
     private _splitview!: Splitview;
     private _activePanel: SplitviewPanel | undefined;
-    private _panels = new Map<string, IValueDisposable<SplitviewPanel>>();
+    private _panels = new Map<string, IDisposable>();
     private _options: SplitviewComponentOptions;
 
     private readonly _onDidLayoutfromJSON = new Emitter<void>();
@@ -124,7 +123,7 @@ export class SplitviewComponent
     set splitview(value: Splitview) {
         this._splitview = value;
 
-        this._disposable.value = new CompositeDisposable(
+        this._splitviewChangeDisposable.value = new CompositeDisposable(
             this._splitview.onDidSashEnd(() => {
                 this._onDidLayoutChange.fire(undefined);
             }),
@@ -170,7 +169,6 @@ export class SplitviewComponent
         this.splitview = new Splitview(this.element, options);
 
         this.addDisposables(
-            this._disposable,
             this._onDidAddView,
             this._onDidLayoutfromJSON,
             this._onDidRemoveView,
@@ -226,19 +224,19 @@ export class SplitviewComponent
     }
 
     removePanel(panel: SplitviewPanel, sizing?: Sizing): void {
-        const disposable = this._panels.get(panel.id);
+        const item = this._panels.get(panel.id);
 
-        if (!disposable) {
+        if (!item) {
             throw new Error(`unknown splitview panel ${panel.id}`);
         }
 
-        disposable.disposable.dispose();
-        disposable.value.dispose();
+        item.dispose();
 
         this._panels.delete(panel.id);
 
         const index = this.panels.findIndex((_) => _ === panel);
-        this.splitview.removeView(index, sizing);
+        const removedView = this.splitview.removeView(index, sizing);
+        removedView.dispose();
 
         const panels = this.panels;
         if (panels.length > 0) {
@@ -250,7 +248,7 @@ export class SplitviewComponent
         return this.panels.find((view) => view.id === id);
     }
 
-    addPanel(options: AddSplitviewComponentOptions): ISplitviewPanel {
+    addPanel(options: AddSplitviewComponentOptions): SplitviewPanel {
         if (this._panels.has(options.id)) {
             throw new Error(`panel ${options.id} already exists`);
         }
@@ -308,7 +306,7 @@ export class SplitviewComponent
             this.setActive(view, true);
         });
 
-        this._panels.set(view.id, { disposable, value: view });
+        this._panels.set(view.id, disposable);
     }
 
     toJSON(): SerializedSplitview {
@@ -404,22 +402,33 @@ export class SplitviewComponent
     }
 
     clear(): void {
-        for (const [_, value] of this._panels.entries()) {
-            value.disposable.dispose();
-            value.value.dispose();
+        for (const disposable of this._panels.values()) {
+            disposable.dispose();
         }
+
         this._panels.clear();
-        this.splitview.dispose();
+
+        while (this.splitview.length > 0) {
+            const view = this.splitview.removeView(0, Sizing.Distribute, true);
+            view.dispose();
+        }
     }
 
     dispose(): void {
-        for (const [_, value] of this._panels.entries()) {
-            value.disposable.dispose();
-            value.value.dispose();
+        for (const disposable of this._panels.values()) {
+            disposable.dispose();
         }
+
         this._panels.clear();
 
+        const views = this.splitview.getViews();
+
+        this._splitviewChangeDisposable.dispose();
         this.splitview.dispose();
+
+        for (const view of views) {
+            view.dispose();
+        }
 
         super.dispose();
     }

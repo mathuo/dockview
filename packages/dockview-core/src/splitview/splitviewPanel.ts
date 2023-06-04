@@ -7,6 +7,7 @@ import { SplitviewPanelApiImpl } from '../api/splitviewPanelApi';
 import { LayoutPriority, Orientation } from './splitview';
 import { FunctionOrValue } from '../types';
 import { Emitter, Event } from '../events';
+import { CompositeDisposable } from '../lifecycle';
 
 export interface ISplitviewPanel
     extends BasePanelViewExported<SplitviewPanelApiImpl> {

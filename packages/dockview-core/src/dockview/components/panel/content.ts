@@ -77,11 +77,12 @@ export class ContentContainer
             const _onDidFocus = this.panel.view.content.onDidFocus;
             const _onDidBlur = this.panel.view.content.onDidBlur;
 
-            const { onDidFocus, onDidBlur } = trackFocus(this._element);
+            const focusTracker = trackFocus(this._element);
 
             disposable.addDisposables(
-                onDidFocus(() => this._onDidFocus.fire()),
-                onDidBlur(() => this._onDidBlur.fire())
+                focusTracker,
+                focusTracker.onDidFocus(() => this._onDidFocus.fire()),
+                focusTracker.onDidBlur(() => this._onDidBlur.fire())
             );
 
             if (_onDidFocus) {

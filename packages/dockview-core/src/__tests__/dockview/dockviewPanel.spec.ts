@@ -37,7 +37,7 @@ describe('dockviewPanel', () => {
             latestTitle = event.title;
         });
 
-        expect(cut.title).toBe('');
+        expect(cut.title).toBeUndefined();
 
         cut.init({ title: 'new title', params: {} });
         expect(latestTitle).toBe('new title');

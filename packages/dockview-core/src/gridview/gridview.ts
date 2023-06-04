@@ -462,7 +462,8 @@ export class Gridview implements IDisposable {
         if (oldRoot.children.length === 1) {
             // can remove one level of redundant branching if there is only a single child
             const childReference = oldRoot.children[0];
-            oldRoot.removeChild(0); // remove to prevent disposal when disposing of unwanted root
+            const child = oldRoot.removeChild(0); // remove to prevent disposal when disposing of unwanted root
+            child.dispose();
             oldRoot.dispose();
 
             this._root.addChild(
@@ -632,7 +633,8 @@ export class Gridview implements IDisposable {
                 newSiblingSize = Sizing.Invisible(newSiblingCachedVisibleSize);
             }
 
-            grandParent.removeChild(parentIndex);
+            const child = grandParent.removeChild(parentIndex);
+            child.dispose();
 
             const newParent = new BranchNode(
                 parent.orientation,
@@ -682,14 +684,18 @@ export class Gridview implements IDisposable {
             throw new Error('Invalid location');
         }
 
-        parent.removeChild(index, sizing);
+        const view = node.view;
+        node.dispose(); // dispose of node
+
+        const child = parent.removeChild(index, sizing);
+        child.dispose();
 
         if (parent.children.length === 0) {
-            return node.view;
+            return view;
         }
 
         if (parent.children.length > 1) {
-            return node.view;
+            return view;
         }
 
         const sibling = parent.children[0];
@@ -698,25 +704,28 @@ export class Gridview implements IDisposable {
             // parent is root
 
             if (sibling instanceof LeafNode) {
-                return node.view;
+                return view;
             }
 
             // we must promote sibling to be the new root
-            parent.removeChild(0, sizing);
+            const child = parent.removeChild(0, sizing);
+            child.dispose();
             this.root = sibling;
-            return node.view;
+            return view;
         }
 
         const [grandParent, ..._] = [...pathToParent].reverse();
         const [parentIndex, ...__] = [...rest].reverse();
 
         const isSiblingVisible = parent.isChildVisible(0);
-        parent.removeChild(0, sizing);
+        const childNode = parent.removeChild(0, sizing);
+        childNode.dispose();
 
         const sizes = grandParent.children.map((_size, i) =>
             grandParent.getChildSize(i)
         );
-        grandParent.removeChild(parentIndex, sizing);
+        const parentNode = grandParent.removeChild(parentIndex, sizing);
+        parentNode.dispose();
 
         if (sibling instanceof BranchNode) {
             sizes.splice(
@@ -745,7 +754,7 @@ export class Gridview implements IDisposable {
             grandParent.resizeChild(i, sizes[i]);
         }
 
-        return node.view;
+        return view;
     }
 
     public layout(width: number, height: number): void {

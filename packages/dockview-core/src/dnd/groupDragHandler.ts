@@ -60,8 +60,4 @@ export class GroupDragHandler extends DragHandler {
             },
         };
     }
-
-    public dispose(): void {
-        //
-    }
 }
