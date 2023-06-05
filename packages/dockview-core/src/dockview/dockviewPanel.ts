@@ -3,14 +3,10 @@ import {
     DockviewPanelApi,
     DockviewPanelApiImpl,
 } from '../api/dockviewPanelApi';
-import {
-    GroupPanelUpdateEvent,
-    GroupviewPanelState,
-    IGroupPanelInitParameters,
-} from './types';
+import { GroupviewPanelState, IGroupPanelInitParameters } from './types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
-import { IPanel, Parameters } from '../panel/types';
+import { IPanel, PanelUpdateEvent, Parameters } from '../panel/types';
 import { IDockviewPanelModel } from './dockviewPanelModel';
 import { IDockviewComponent } from './dockviewComponent';
 
@@ -23,7 +19,8 @@ export interface IDockviewPanel extends IDisposable, IPanel {
     updateParentGroup(group: DockviewGroupPanel, isGroupActive: boolean): void;
     init(params: IGroupPanelInitParameters): void;
     toJSON(): GroupviewPanelState;
-    update(event: GroupPanelUpdateEvent): void;
+    setTitle(title: string): void;
+    update(event: PanelUpdateEvent): void;
 }
 
 export class DockviewPanel
@@ -117,19 +114,24 @@ export class DockviewPanel
         }
     }
 
-    public update(event: GroupPanelUpdateEvent): void {
-        const params = event.params as IGroupPanelInitParameters;
-
+    public update(event: PanelUpdateEvent): void {
+        // merge the new parameters with the existing parameters
         this._params = {
             ...(this._params || {}),
-            ...event.params.params,
+            ...event.params,
         };
 
-        if (params.title !== this.title) {
-            this._title = params.title;
-            this.api._onDidTitleChange.fire({ title: params.title });
+        /**
+         * delete new keys that have a value of undefined,
+         * allow values of null
+         */
+        for (const key of Object.keys(event.params)) {
+            if (event.params[key] === undefined) {
+                delete this._params[key];
+            }
         }
 
+        // update the view with the updated props
         this.view.update({
             params: {
                 params: this._params,

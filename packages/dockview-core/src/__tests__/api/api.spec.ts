@@ -1,4 +1,5 @@
 import { PanelApiImpl } from '../../api/panelApi';
+import { IPanel } from '../../panel/types';
 
 describe('api', () => {
     let api: PanelApiImpl;
@@ -7,7 +8,23 @@ describe('api', () => {
         api = new PanelApiImpl('dummy_id');
     });
 
-    it('should update isFcoused getter', () => {
+    test('updateParameters', () => {
+        const panel = {
+            update: jest.fn(),
+        } as Partial<IPanel>;
+
+        api.initialize(panel as IPanel);
+
+        expect(panel.update).toHaveBeenCalledTimes(0);
+
+        api.updateParameters({ keyA: 'valueA' });
+        expect(panel.update).toHaveBeenCalledTimes(1);
+        expect(panel.update).toHaveBeenCalledWith({
+            params: { keyA: 'valueA' },
+        });
+    });
+
+    test('should update isFcoused getter', () => {
         expect(api.isFocused).toBeFalsy();
 
         api._onDidChangeFocus.fire({ isFocused: true });
@@ -17,7 +34,7 @@ describe('api', () => {
         expect(api.isFocused).toBeFalsy();
     });
 
-    it('should update isActive getter', () => {
+    test('should update isActive getter', () => {
         expect(api.isFocused).toBeFalsy();
 
         api._onDidActiveChange.fire({ isActive: true });
@@ -27,7 +44,7 @@ describe('api', () => {
         expect(api.isActive).toBeFalsy();
     });
 
-    it('should update isActive getter', () => {
+    test('should update isActive getter', () => {
         expect(api.isVisible).toBeTruthy();
 
         api._onDidVisibilityChange.fire({ isVisible: false });
@@ -37,7 +54,7 @@ describe('api', () => {
         expect(api.isVisible).toBeTruthy();
     });
 
-    it('should update width and height getter', () => {
+    test('should update width and height getter', () => {
         expect(api.height).toBe(0);
         expect(api.width).toBe(0);
 

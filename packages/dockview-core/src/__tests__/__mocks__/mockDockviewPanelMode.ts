@@ -2,10 +2,10 @@ import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import {
     GroupPanelPartInitParameters,
-    GroupPanelUpdateEvent,
     IContentRenderer,
     ITabRenderer,
 } from '../../dockview/types';
+import { PanelUpdateEvent } from '../../panel/types';
 
 export class DockviewPanelModelMock implements IDockviewPanelModel {
     constructor(
@@ -21,7 +21,14 @@ export class DockviewPanelModelMock implements IDockviewPanelModel {
         //
     }
 
-    update(event: GroupPanelUpdateEvent): void {
+    updateParentGroup(
+        group: DockviewGroupPanel,
+        isPanelVisible: boolean
+    ): void {
+        //
+    }
+
+    update(event: PanelUpdateEvent): void {
         //
     }
 

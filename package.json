@@ -35,6 +35,7 @@
   "homepage": "https://github.com/mathuo/dockview#readme",
   "devDependencies": {
     "@testing-library/dom": "^8.20.0",
+    "@testing-library/jest-dom": "^5.16.5",
     "@types/jest": "^29.4.0",
     "@typescript-eslint/eslint-plugin": "^5.52.0",
     "@typescript-eslint/parser": "^5.52.0",
@@ -58,8 +59,8 @@
     "style-loader": "^3.3.1",
     "ts-jest": "^29.0.5",
     "ts-loader": "^9.4.2",
-    "tslib": "^2.5.0",
     "ts-node": "^10.9.1",
+    "tslib": "^2.5.0",
     "typedoc": "^0.24.7",
     "typescript": "^4.9.5",
     "webpack": "^5.75.0",

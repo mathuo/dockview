@@ -1,4 +1,4 @@
-import { DockviewPanelApiImpl, TitleEvent } from '../../api/dockviewPanelApi';
+import { DockviewPanelApiImpl } from '../../api/dockviewPanelApi';
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
@@ -8,6 +8,7 @@ describe('groupPanelApi', () => {
         const panelMock = jest.fn<DockviewPanel, []>(() => {
             return {
                 update: jest.fn(),
+                setTitle: jest.fn(),
             } as any;
         });
         const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
@@ -20,11 +21,38 @@ describe('groupPanelApi', () => {
         const cut = new DockviewPanelApiImpl(panel, group);
 
         cut.setTitle('test_title');
+        expect(panel.setTitle).toBeCalledTimes(1);
+        expect(panel.setTitle).toBeCalledWith('test_title');
+    });
 
-        expect(panel.update).toBeCalledTimes(1);
-        expect(panel.update).toBeCalledWith({
-            params: { title: 'test_title' },
+    test('updateParameters', () => {
+        const groupPanel: Partial<IDockviewPanel> = {
+            id: 'test_id',
+            update: jest.fn(),
+        };
+
+        const accessor: Partial<DockviewComponent> = {
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
+            options: {},
+        };
+        const groupViewPanel = new DockviewGroupPanel(
+            <DockviewComponent>accessor,
+            '',
+            {}
+        );
+
+        const cut = new DockviewPanelApiImpl(
+            <IDockviewPanel>groupPanel,
+            <DockviewGroupPanel>groupViewPanel
+        );
+
+        cut.updateParameters({ keyA: 'valueA' });
+
+        expect(groupPanel.update).toHaveBeenCalledWith({
+            params: { keyA: 'valueA' },
         });
+        expect(groupPanel.update).toHaveBeenCalledTimes(1);
     });
 
     test('onDidGroupChange', () => {
