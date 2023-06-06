@@ -1,6 +1,5 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import {
-    GroupPanelUpdateEvent,
     GroupviewPanelState,
     IGroupPanelInitParameters,
     GroupPanelPartInitParameters,
@@ -39,7 +38,7 @@ class TestModel implements IDockviewPanelModel {
         this.tab = new TestContentPart(id);
     }
 
-    update(event: GroupPanelUpdateEvent): void {
+    update(event: PanelUpdateEvent): void {
         //
     }
 
@@ -201,6 +200,10 @@ export class TestPanel implements IDockviewPanel {
 
     layout(width: number, height: number) {
         //noop
+    }
+
+    setTitle(title: string): void {
+        //
     }
 
     update(event: PanelUpdateEvent) {

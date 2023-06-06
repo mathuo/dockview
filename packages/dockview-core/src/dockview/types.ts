@@ -1,11 +1,6 @@
 import { IDockviewComponent } from './dockviewComponent';
 import { DockviewPanelApi } from '../api/dockviewPanelApi';
-import {
-    PanelInitParameters,
-    IPanel,
-    PanelUpdateEvent,
-    Parameters,
-} from '../panel/types';
+import { PanelInitParameters, IPanel } from '../panel/types';
 import { DockviewApi } from '../api/component.api';
 import { Event } from '../events';
 import { Optional } from '../types';
@@ -90,11 +85,6 @@ export interface IGroupPanelInitParameters
         HeaderPartInitParameters {
     //
 }
-
-export type GroupPanelUpdateEvent = PanelUpdateEvent<{
-    params?: Parameters;
-    title?: string;
-}>;
 
 export interface GroupviewPanelState {
     id: string;

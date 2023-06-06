@@ -2,6 +2,10 @@ import { Emitter, Event } from '../events';
 
 describe('events', () => {
     describe('emitter', () => {
+        it('debug mode is off', () => {
+            expect(Emitter.ENABLE_TRACKING).toBeFalsy();
+        });
+
         it('should emit values', () => {
             const emitter = new Emitter<number>();
             let value: number | undefined = undefined;

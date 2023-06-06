@@ -15,6 +15,7 @@ const config: JestConfigWithTsJest = {
     setupFiles: [
         '<rootDir>/packages/dockview/src/__tests__/__mocks__/resizeObserver.js',
     ],
+    setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
     coveragePathIgnorePatterns: ['/node_modules/'],
     modulePathIgnorePatterns: [
         '<rootDir>/packages/dockview/src/__tests__/__mocks__',
