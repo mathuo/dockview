@@ -393,8 +393,8 @@ export class Splitview {
             const sash = document.createElement('div');
             sash.className = 'sash';
 
-            const onStart = (startEvent: MouseEvent | TouchEvent) => {
-                const event = startEvent.touches ? startEvent.touches[0] : startEvent
+            const onStart = (nativeEvent: MouseEvent | TouchEvent) => {
+                const event as MouseEvent = nativeEvent instanceof TouchEvent ? nativeEvent.touches[0] : nativeEvent
                 for (const item of this.viewItems) {
                     item.enabled = false;
                 }
@@ -489,11 +489,12 @@ export class Splitview {
                 }
                 //
 
-                const mousemove = (mousemoveEvent: MouseEvent | TouchEvent) => {
+                const mousemove = (nativeMoveEvent: MouseEvent | TouchEvent) => {
+                    const moveEvent as MouseEvent = nativeMoveEvent instanceof TouchEvent ? nativeMoveEvent.touches[0] : nativeMoveEvent
                     const current =
                         this._orientation === Orientation.HORIZONTAL
-                            ? mousemoveEvent.clientX
-                            : mousemoveEvent.clientY;
+                            ? moveEvent.clientX
+                            : moveEvent.clientY;
                     const delta = current - start;
 
                     this.resize(
