@@ -393,7 +393,7 @@ export class Splitview {
             const sash = document.createElement('div');
             sash.className = 'sash';
 
-            const onStart = (startEvent: MouseEvent) => {
+            const onStart = (startEvent: MouseEvent | TouchEvent) => {
                 const event = startEvent.touches ? startEvent.touches[0] : startEvent
                 for (const item of this.viewItems) {
                     item.enabled = false;
@@ -489,7 +489,7 @@ export class Splitview {
                 }
                 //
 
-                const mousemove = (mousemoveEvent: MouseEvent) => {
+                const mousemove = (mousemoveEvent: MouseEvent | TouchEvent) => {
                     const current =
                         this._orientation === Orientation.HORIZONTAL
                             ? mousemoveEvent.clientX
