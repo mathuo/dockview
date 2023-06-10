@@ -393,7 +393,8 @@ export class Splitview {
             const sash = document.createElement('div');
             sash.className = 'sash';
 
-            const onStart = (event: MouseEvent) => {
+            const onStart = (startEvent: MouseEvent) => {
+                const event = startEvent.touches ? startEvent.touches[0] : startEvent
                 for (const item of this.viewItems) {
                     item.enabled = false;
                 }
@@ -524,16 +525,24 @@ export class Splitview {
                     document.removeEventListener('mousemove', mousemove);
                     document.removeEventListener('mouseup', end);
                     document.removeEventListener('mouseend', end);
+                    document.removeEventListener("touchmove", mousemove);
+                    document.removeEventListener("touchend", end);
+                    document.removeEventListener("touchcancel", end);
 
                     this._onDidSashEnd.fire(undefined);
+                    return true // Consume, otherwise Monaco complains
                 };
 
                 document.addEventListener('mousemove', mousemove);
                 document.addEventListener('mouseup', end);
                 document.addEventListener('mouseend', end);
+                document.addEventListener("touchmove", mousemove);
+                document.addEventListener("touchend", end);
+                document.addEventListener("touchcancel", end);
             };
 
             sash.addEventListener('mousedown', onStart);
+            sash.addEventListener("touchstart", onStart);
 
             const sashItem: ISashItem = {
                 container: sash,
