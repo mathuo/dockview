@@ -540,6 +540,7 @@ export class Splitview {
                 document.addEventListener("touchmove", mousemove);
                 document.addEventListener("touchend", end);
                 document.addEventListener("touchcancel", end);
+                return true // consume pull to refresh gesture
             };
 
             sash.addEventListener('mousedown', onStart);
