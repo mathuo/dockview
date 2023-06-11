@@ -684,18 +684,14 @@ export class Gridview implements IDisposable {
             throw new Error('Invalid location');
         }
 
-        const view = node.view;
-        node.dispose(); // dispose of node
-
-        const child = parent.removeChild(index, sizing);
-        child.dispose();
+        parent.removeChild(index, sizing);
 
         if (parent.children.length === 0) {
-            return view;
+            return node.view;
         }
 
         if (parent.children.length > 1) {
-            return view;
+            return node.view;
         }
 
         const sibling = parent.children[0];
@@ -704,28 +700,25 @@ export class Gridview implements IDisposable {
             // parent is root
 
             if (sibling instanceof LeafNode) {
-                return view;
+                return node.view;
             }
 
             // we must promote sibling to be the new root
-            const child = parent.removeChild(0, sizing);
-            child.dispose();
+            parent.removeChild(0, sizing);
             this.root = sibling;
-            return view;
+            return node.view;
         }
 
         const [grandParent, ..._] = [...pathToParent].reverse();
         const [parentIndex, ...__] = [...rest].reverse();
 
         const isSiblingVisible = parent.isChildVisible(0);
-        const childNode = parent.removeChild(0, sizing);
-        childNode.dispose();
+        parent.removeChild(0, sizing);
 
         const sizes = grandParent.children.map((_size, i) =>
             grandParent.getChildSize(i)
         );
-        const parentNode = grandParent.removeChild(parentIndex, sizing);
-        parentNode.dispose();
+        grandParent.removeChild(parentIndex, sizing);
 
         if (sibling instanceof BranchNode) {
             sizes.splice(
@@ -754,7 +747,7 @@ export class Gridview implements IDisposable {
             grandParent.resizeChild(i, sizes[i]);
         }
 
-        return view;
+        return node.view;
     }
 
     public layout(width: number, height: number): void {
