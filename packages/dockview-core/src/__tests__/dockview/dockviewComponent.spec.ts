@@ -100,67 +100,67 @@ describe('dockviewComponent', () => {
         });
     });
 
-    // test('event leakage', () => {
-    //     Emitter.setLeakageMonitorEnabled(true);
+    test('event leakage', () => {
+        Emitter.setLeakageMonitorEnabled(true);
 
-    //     dockview = new DockviewComponent({
-    //         parentElement: container,
-    //         components: {
-    //             default: PanelContentPartTest,
-    //         },
-    //     });
+        dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+        });
 
-    //     dockview.layout(500, 1000);
+        dockview.layout(500, 1000);
 
-    //     dockview.addPanel({
-    //         id: 'panel1',
-    //         component: 'default',
-    //     });
+        dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
 
-    //     const panel2 = dockview.addPanel({
-    //         id: 'panel2',
-    //         component: 'default',
-    //     });
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
 
-    //     dockview.removePanel(panel2);
+        dockview.removePanel(panel2);
 
-    //     const panel3 = dockview.addPanel({
-    //         id: 'panel3',
-    //         component: 'default',
-    //         position: {
-    //             direction: 'right',
-    //             referencePanel: 'panel1',
-    //         },
-    //     });
+        const panel3 = dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+            position: {
+                direction: 'right',
+                referencePanel: 'panel1',
+            },
+        });
 
-    //     const panel4 = dockview.addPanel({
-    //         id: 'panel4',
-    //         component: 'default',
-    //         position: {
-    //             direction: 'above',
-    //         },
-    //     });
+        const panel4 = dockview.addPanel({
+            id: 'panel4',
+            component: 'default',
+            position: {
+                direction: 'above',
+            },
+        });
 
-    //     dockview.moveGroupOrPanel(
-    //         panel4.group,
-    //         panel3.group.id,
-    //         panel3.id,
-    //         'center'
-    //     );
+        dockview.moveGroupOrPanel(
+            panel4.group,
+            panel3.group.id,
+            panel3.id,
+            'center'
+        );
 
-    //     dockview.dispose();
+        dockview.dispose();
 
-    //     if (Emitter.MEMORY_LEAK_WATCHER.size > 0) {
-    //         for (const entry of Array.from(
-    //             Emitter.MEMORY_LEAK_WATCHER.events
-    //         )) {
-    //             console.log('disposal', entry[1]);
-    //         }
-    //         throw new Error('not all listeners disposed');
-    //     }
+        if (Emitter.MEMORY_LEAK_WATCHER.size > 0) {
+            for (const entry of Array.from(
+                Emitter.MEMORY_LEAK_WATCHER.events
+            )) {
+                console.log('disposal', entry[1]);
+            }
+            throw new Error('not all listeners disposed');
+        }
 
-    //     Emitter.setLeakageMonitorEnabled(false);
-    // });
+        Emitter.setLeakageMonitorEnabled(false);
+    });
 
     test('duplicate panel', () => {
         dockview.layout(500, 1000);
@@ -2449,7 +2449,7 @@ describe('dockviewComponent', () => {
         });
     });
 
-    test('check', () => {
+    test('check dockview component is rendering to the DOM as expected', () => {
         const container = document.createElement('div');
 
         const dockview = new DockviewComponent({
@@ -2470,15 +2470,21 @@ describe('dockviewComponent', () => {
             component: 'default',
         });
 
+        expect(dockview.element.querySelectorAll('.view').length).toBe(1);
+
         const panel2 = dockview.addPanel({
             id: 'panel2',
             component: 'default',
         });
 
+        expect(dockview.element.querySelectorAll('.view').length).toBe(1);
+
         const panel3 = dockview.addPanel({
             id: 'panel3',
             component: 'default',
         });
+
+        expect(dockview.element.querySelectorAll('.view').length).toBe(1);
 
         dockview.moveGroupOrPanel(
             panel3.group,
@@ -2488,6 +2494,7 @@ describe('dockviewComponent', () => {
         );
 
         expect(dockview.groups.length).toBe(2);
+        expect(dockview.element.querySelectorAll('.view').length).toBe(2);
 
         dockview.moveGroupOrPanel(
             panel3.group,
@@ -2497,6 +2504,7 @@ describe('dockviewComponent', () => {
         );
 
         expect(dockview.groups.length).toBe(3);
+        expect(dockview.element.querySelectorAll('.view').length).toBe(4);
 
         dockview.moveGroupOrPanel(
             panel2.group,
@@ -2507,7 +2515,6 @@ describe('dockviewComponent', () => {
 
         expect(dockview.groups.length).toBe(2);
 
-        const viewQuery = container.querySelectorAll('.split-view-container');
-        expect(viewQuery).toBeTruthy();
+        expect(dockview.element.querySelectorAll('.view').length).toBe(2);
     });
 });
