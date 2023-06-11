@@ -646,4 +646,62 @@ describe('splitview', () => {
         // expect no additional resizes
         expect([view1.size, view2.size]).toEqual([225, 175]);
     });
+
+    test('dnd: touch events to move sash', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: false,
+        });
+        splitview.layout(400, 500);
+
+        const view1 = new Testview(0, 1000);
+        const view2 = new Testview(0, 1000);
+
+        splitview.addView(view1);
+        splitview.addView(view2);
+
+        const sashElement = container
+            .getElementsByClassName('sash')
+            .item(0) as HTMLElement;
+
+        // validate the expected state before drag
+        expect([view1.size, view2.size]).toEqual([200, 200]);
+        expect(sashElement).toBeTruthy();
+        expect(view1.element.parentElement!.style.pointerEvents).toBe('');
+        expect(view2.element.parentElement!.style.pointerEvents).toBe('');
+
+        // start the drag event
+        fireEvent.touchStart(sashElement, {
+            touches: [{ clientX: 50, clientY: 100 }],
+        });
+
+        // during a sash drag the views should have pointer-events disabled
+        expect(view1.element.parentElement!.style.pointerEvents).toBe('none');
+        expect(view2.element.parentElement!.style.pointerEvents).toBe('none');
+
+        // expect a delta move of 70 - 50 = 20
+        fireEvent.touchMove(document, {
+            touches: [{ clientX: 70, clientY: 110 }],
+        });
+        expect([view1.size, view2.size]).toEqual([220, 180]);
+
+        // expect a delta move of 75 - 70 = 5
+        fireEvent.touchMove(document, {
+            touches: [{ clientX: 75, clientY: 110 }],
+        });
+        expect([view1.size, view2.size]).toEqual([225, 175]);
+
+        // end the drag event
+        fireEvent.touchEnd(document);
+
+        // expect pointer-eventes on views to be restored
+        expect(view1.element.parentElement!.style.pointerEvents).toBe('');
+        expect(view2.element.parentElement!.style.pointerEvents).toBe('');
+
+        fireEvent.touchMove(document, {
+            touches: [{ clientX: 100, clientY: 100 }],
+        });
+        // expect no additional resizes
+        expect([view1.size, view2.size]).toEqual([225, 175]);
+    });
 });
