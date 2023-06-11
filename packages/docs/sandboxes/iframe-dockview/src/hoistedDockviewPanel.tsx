@@ -2,28 +2,6 @@ import { IDockviewPanelProps } from 'dockview';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-// watch an element for resize
-function watchElementResize(
-    element: HTMLElement,
-    cb: (entry: ResizeObserverEntry) => void
-): { dispose: () => void } {
-    const observer = new ResizeObserver((entires) => {
-        requestAnimationFrame(() => {
-            const firstEntry = entires[0];
-            cb(firstEntry);
-        });
-    });
-
-    observer.observe(element);
-
-    return {
-        dispose: () => {
-            observer.unobserve(element);
-            observer.disconnect();
-        },
-    };
-}
-
 // get absolute position of element allowing for scroll position
 function getDomNodePagePosition(domNode: HTMLElement): {
     left: number;
@@ -51,47 +29,27 @@ export const HoistedDockviewPanel = <T extends object>(
         const ref = React.useRef<HTMLDivElement>(null);
         const innerRef = React.useRef<HTMLDivElement>(null);
 
-        React.useEffect(() => {
+        const positionHoistedPanel = () => {
             if (!ref.current || !innerRef.current) {
                 return;
             }
 
-            const positionHoistedPanel = () => {
-                if (!ref.current || !innerRef.current) {
-                    return;
-                }
+            const { left, top, height, width } = getDomNodePagePosition(
+                ref.current.parentElement! // use the parent element to determine our size
+            );
 
-                const { left, top, height, width } = getDomNodePagePosition(
-                    ref.current.parentElement! // use the parent element to determine our size
-                );
-
-                innerRef.current.style.left = `${left}px`;
-                innerRef.current.style.top = `${top}px`;
-                innerRef.current.style.height = `${height}px`;
-                innerRef.current.style.width = `${width}px`;
-            };
-
-            const observer = watchElementResize(ref.current, (callback) => {
-                if (!ref.current || !innerRef.current) {
-                    return;
-                }
-
-                positionHoistedPanel(); // since the dockview-panel has changed we must re-position the hoisted element
-            });
-
-            positionHoistedPanel(); // initial-paint because a resize may not yet have occured
-
-            return () => {
-                observer.dispose(); // cleanup
-            };
-        }, []);
+            innerRef.current.style.left = `${left}px`;
+            innerRef.current.style.top = `${top}px`;
+            innerRef.current.style.height = `${height}px`;
+            innerRef.current.style.width = `${width}px`;
+        };
 
         React.useEffect(() => {
             if (!innerRef.current) {
                 return;
             }
 
-            const disposable = props.api.onDidVisibilityChange((event) => {
+            const disposable1 = props.api.onDidVisibilityChange((event) => {
                 if (!innerRef.current) {
                     return;
                 }
@@ -99,10 +57,15 @@ export const HoistedDockviewPanel = <T extends object>(
                 toggleVisibility(innerRef.current, event.isVisible); // subsequent checks of visibility
             });
 
-            toggleVisibility(innerRef.current, props.api.isVisible); // initial check of visibility
+            const disposable2 = props.api.onDidDimensionsChange(() => {
+                positionHoistedPanel();
+            });
+
+            positionHoistedPanel();
 
             return () => {
-                disposable.dispose(); // cleanup
+                disposable1.dispose(); // cleanup
+                disposable2.dispose();
             };
         }, [props.api]);
 
