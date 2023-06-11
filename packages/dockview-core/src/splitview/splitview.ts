@@ -523,14 +523,12 @@ export class Splitview {
 
                     document.removeEventListener('mousemove', mousemove);
                     document.removeEventListener('mouseup', end);
-                    document.removeEventListener('mouseend', end);
 
                     this._onDidSashEnd.fire(undefined);
                 };
 
                 document.addEventListener('mousemove', mousemove);
                 document.addEventListener('mouseup', end);
-                document.addEventListener('mouseend', end);
             };
 
             sash.addEventListener('mousedown', onStart);
