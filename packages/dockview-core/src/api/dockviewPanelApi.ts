@@ -89,7 +89,7 @@ export class DockviewPanelApiImpl
     }
 
     public setTitle(title: string): void {
-        this.panel.update({ params: { title } });
+        this.panel.setTitle(title);
     }
 
     public close(): void {

@@ -3,19 +3,19 @@ import {
     GroupPanelPartInitParameters,
     IContentRenderer,
     ITabRenderer,
-    GroupPanelUpdateEvent,
 } from './types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDisposable } from '../lifecycle';
 import { createComponent } from '../panel/componentFactory';
 import { IDockviewComponent } from './dockviewComponent';
+import { PanelUpdateEvent } from '../panel/types';
 
 export interface IDockviewPanelModel extends IDisposable {
     readonly contentComponent: string;
     readonly tabComponent?: string;
     readonly content: IContentRenderer;
     readonly tab?: ITabRenderer;
-    update(event: GroupPanelUpdateEvent): void;
+    update(event: PanelUpdateEvent): void;
     layout(width: number, height: number): void;
     init(params: GroupPanelPartInitParameters): void;
     updateParentGroup(group: DockviewGroupPanel, isPanelVisible: boolean): void;
@@ -80,7 +80,7 @@ export class DockviewPanelModel implements IDockviewPanelModel {
         this.content.layout?.(width, height);
     }
 
-    update(event: GroupPanelUpdateEvent): void {
+    update(event: PanelUpdateEvent): void {
         this.content.update?.(event);
         this.tab.update?.(event);
     }

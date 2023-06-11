@@ -155,9 +155,7 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
         this.panelUpdatesDisposable.value = this._onUpdateParameters.event(
             (parameters) => {
                 panel.update({
-                    params: {
-                        params: parameters,
-                    },
+                    params: parameters,
                 });
             }
         );

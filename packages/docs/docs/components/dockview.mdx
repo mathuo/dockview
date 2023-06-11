@@ -436,6 +436,40 @@ const panel2 = api.addPanel({
 });
 ```
 
+### Update Panel
+
+You can programatically update the `params` passed through to the panel through the panal api using `api.updateParameters`.
+
+```ts
+const panel = api.addPanel({
+    id: 'panel_1',
+    component: 'default',
+    params: {
+        keyA: 'valueA',
+    },
+});
+
+// ...
+
+panel.api.updateParameters({
+    keyB: 'valueB',
+});
+
+// ...
+
+panel.api.updateParameters({
+    keyA: 'anotherValueA',
+});
+```
+
+To delete a parameter you should pass a value of `undefined` for the key.
+
+```ts
+panel.api.updateParameters({
+    keyA: undefined, // this will delete 'keyA'.
+});
+```
+
 ### Panel Rendering
 
 By default `DockviewReact` only adds to the DOM those panels that are visible,
