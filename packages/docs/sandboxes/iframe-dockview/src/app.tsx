@@ -12,10 +12,10 @@ const components = {
             return (
                 <iframe
                     style={{
+                        pointerEvents: 'none',
                         border: 'none',
                         width: '100%',
                         height: '100%',
-                        pointerEvents: 'auto',
                     }}
                     src="https://dockview.dev"
                 />
