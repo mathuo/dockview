@@ -527,7 +527,6 @@ export class Splitview {
                     document.removeEventListener('mouseup', end);
                     document.removeEventListener("touchmove", mousemove);
                     document.removeEventListener("touchend", end);
-                    document.removeEventListener("touchcancel", end);
 
                     this._onDidSashEnd.fire(undefined);
                     return true // Consume, otherwise Monaco complains
@@ -537,8 +536,6 @@ export class Splitview {
                 document.addEventListener('mouseup', end);
                 document.addEventListener("touchmove", mousemove);
                 document.addEventListener("touchend", end);
-                document.addEventListener("touchcancel", end);
-                return true // consume pull to refresh gesture
             };
 
             sash.addEventListener('mousedown', onStart);
