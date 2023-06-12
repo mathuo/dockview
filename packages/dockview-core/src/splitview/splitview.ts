@@ -512,7 +512,7 @@ export class Splitview {
                     this.layoutViews();
                 };
 
-                const end = () => {
+                const end = (endEvent) => {
                     for (const item of this.viewItems) {
                         item.enabled = true;
                     }
@@ -529,7 +529,7 @@ export class Splitview {
                     document.removeEventListener("touchend", end);
 
                     this._onDidSashEnd.fire(undefined);
-                    return true // Consume, otherwise Monaco complains
+                    endEvent.preventDefault() // Consume, otherwise Monaco complains
                 };
 
                 document.addEventListener('mousemove', mousemove);
