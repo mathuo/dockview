@@ -525,7 +525,6 @@ export class Splitview {
 
                     document.removeEventListener('mousemove', mousemove);
                     document.removeEventListener('mouseup', end);
-                    document.removeEventListener('mouseend', end);
                     document.removeEventListener("touchmove", mousemove);
                     document.removeEventListener("touchend", end);
                     document.removeEventListener("touchcancel", end);
@@ -536,7 +535,6 @@ export class Splitview {
 
                 document.addEventListener('mousemove', mousemove);
                 document.addEventListener('mouseup', end);
-                document.addEventListener('mouseend', end);
                 document.addEventListener("touchmove", mousemove);
                 document.addEventListener("touchend", end);
                 document.addEventListener("touchcancel", end);

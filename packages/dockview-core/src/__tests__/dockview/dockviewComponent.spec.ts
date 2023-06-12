@@ -2448,4 +2448,73 @@ describe('dockviewComponent', () => {
             activeGroup: '1',
         });
     });
+
+    test('check dockview component is rendering to the DOM as expected', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(100, 100);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel1',
+            component: 'default',
+        });
+
+        expect(dockview.element.querySelectorAll('.view').length).toBe(1);
+
+        const panel2 = dockview.addPanel({
+            id: 'panel2',
+            component: 'default',
+        });
+
+        expect(dockview.element.querySelectorAll('.view').length).toBe(1);
+
+        const panel3 = dockview.addPanel({
+            id: 'panel3',
+            component: 'default',
+        });
+
+        expect(dockview.element.querySelectorAll('.view').length).toBe(1);
+
+        dockview.moveGroupOrPanel(
+            panel3.group,
+            panel3.group.id,
+            panel3.id,
+            'right'
+        );
+
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.element.querySelectorAll('.view').length).toBe(2);
+
+        dockview.moveGroupOrPanel(
+            panel3.group,
+            panel2.group.id,
+            panel2.id,
+            'bottom'
+        );
+
+        expect(dockview.groups.length).toBe(3);
+        expect(dockview.element.querySelectorAll('.view').length).toBe(4);
+
+        dockview.moveGroupOrPanel(
+            panel2.group,
+            panel1.group.id,
+            panel1.id,
+            'center'
+        );
+
+        expect(dockview.groups.length).toBe(2);
+
+        expect(dockview.element.querySelectorAll('.view').length).toBe(2);
+    });
 });
