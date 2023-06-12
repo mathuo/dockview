@@ -393,8 +393,16 @@ export class Splitview {
             const sash = document.createElement('div');
             sash.className = 'sash';
 
-            const onStart = (nativeEvent: MouseEvent | TouchEvent) => {
-                const event = nativeEvent instanceof TouchEvent ? nativeEvent.touches[0] : nativeEvent;
+            const onTouchStart = (event: TouchEvent) => {
+                const touch = event.touches[0];
+                onStart(touch);
+            };
+
+            const onMouseDown = (event: MouseEvent) => {
+                onStart(event);
+            };
+
+            const onStart = (event: { clientX: number; clientY: number }) => {
                 for (const item of this.viewItems) {
                     item.enabled = false;
                 }
@@ -487,14 +495,24 @@ export class Splitview {
                         size: snappedViewItem.size,
                     };
                 }
-                //
 
-                const mousemove = (nativeMoveEvent: MouseEvent | TouchEvent) => {
-                    const moveEvent = nativeMoveEvent instanceof TouchEvent ? nativeMoveEvent.touches[0] : nativeMoveEvent;
+                const onMouseMove = (event: MouseEvent) => {
+                    reposition(event);
+                };
+
+                const onTouchMove = (event: TouchEvent) => {
+                    const touch = event.touches[0];
+                    reposition(touch);
+                };
+
+                const reposition = (event: {
+                    clientX: number;
+                    clientY: number;
+                }) => {
                     const current =
                         this._orientation === Orientation.HORIZONTAL
-                            ? moveEvent.clientX
-                            : moveEvent.clientY;
+                            ? event.clientX
+                            : event.clientY;
                     const delta = current - start;
 
                     this.resize(
@@ -523,26 +541,24 @@ export class Splitview {
 
                     this.saveProportions();
 
-                    document.removeEventListener('mousemove', mousemove);
+                    document.removeEventListener('mousemove', onMouseMove);
                     document.removeEventListener('mouseup', end);
-                    document.removeEventListener("touchmove", mousemove);
-                    document.removeEventListener("touchend", end);
-                    document.removeEventListener("touchcancel", end);
+                    document.removeEventListener('touchmove', onTouchMove);
+                    document.removeEventListener('touchend', end);
+                    document.removeEventListener('touchcancel', end);
 
                     this._onDidSashEnd.fire(undefined);
-                    return true // Consume, otherwise Monaco complains
                 };
 
-                document.addEventListener('mousemove', mousemove);
+                document.addEventListener('mousemove', onMouseMove);
                 document.addEventListener('mouseup', end);
-                document.addEventListener("touchmove", mousemove);
-                document.addEventListener("touchend", end);
-                document.addEventListener("touchcancel", end);
-                return true // consume pull to refresh gesture
+                document.addEventListener('touchmove', onTouchMove);
+                document.addEventListener('touchend', end);
+                document.addEventListener('touchcancel', end);
             };
 
-            sash.addEventListener('mousedown', onStart);
-            sash.addEventListener("touchstart", onStart);
+            sash.addEventListener('mousedown', onMouseDown);
+            sash.addEventListener('touchstart', onTouchStart);
 
             const sashItem: ISashItem = {
                 container: sash,
