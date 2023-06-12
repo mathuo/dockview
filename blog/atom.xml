@@ -2,16 +2,25 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dockview.dev/blog</id>
     <title>Dockview Blog</title>
-    <updated>2023-06-14T00:00:00.000Z</updated>
+    <updated>2023-06-11T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dockview.dev/blog"/>
     <subtitle>Dockview Blog</subtitle>
     <icon>https://dockview.dev/img/dockview_logo.ico</icon>
     <entry>
+        <title type="html"><![CDATA[Dockview 1.7.5]]></title>
+        <id>https://dockview.dev/blog/dockview-1.7.5-release</id>
+        <link href="https://dockview.dev/blog/dockview-1.7.5-release"/>
+        <updated>2023-06-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Please reference to docs @ dockview.dev.]]></summary>
+        <content type="html"><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p><h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2><h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2><ul><li>Fix <a href="https://github.com/mathuo/dockview/issues/255" target="_blank" rel="noopener noreferrer">#255</a></li></ul><h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
+        <category label="release" term="release"/>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[Dockview 1.7.4]]></title>
         <id>https://dockview.dev/blog/dockview-1.7.4-release</id>
         <link href="https://dockview.dev/blog/dockview-1.7.4-release"/>
-        <updated>2023-06-14T00:00:00.000Z</updated>
+        <updated>2023-06-10T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[Please reference to docs @ dockview.dev.]]></summary>
         <content type="html"><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p><h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2><ul><li>Improvements and tests added to the panel <code>api.updateParameters(...)</code> method <a href="https://github.com/mathuo/dockview/pull/265" target="_blank" rel="noopener noreferrer">#265</a></li></ul><h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2><ul><li>Fix bug associated with overidding panel titles when using <code>api.updateParameters(...)</code> <a href="https://github.com/mathuo/dockview/pull/265" target="_blank" rel="noopener noreferrer">#265</a></li><li>Cleanup listeners and disposables after use <a href="https://github.com/mathuo/dockview/pull/257" target="_blank" rel="noopener noreferrer">#257</a></li></ul><h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content>
         <category label="release" term="release"/>
