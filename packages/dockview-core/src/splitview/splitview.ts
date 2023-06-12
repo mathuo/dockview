@@ -393,7 +393,8 @@ export class Splitview {
             const sash = document.createElement('div');
             sash.className = 'sash';
 
-            const onStart = (event: MouseEvent) => {
+            const onStart = (nativeEvent: MouseEvent | TouchEvent) => {
+                const event = nativeEvent instanceof TouchEvent ? nativeEvent.touches[0] : nativeEvent;
                 for (const item of this.viewItems) {
                     item.enabled = false;
                 }
@@ -488,11 +489,12 @@ export class Splitview {
                 }
                 //
 
-                const mousemove = (mousemoveEvent: MouseEvent) => {
+                const mousemove = (nativeMoveEvent: MouseEvent | TouchEvent) => {
+                    const moveEvent = nativeMoveEvent instanceof TouchEvent ? nativeMoveEvent.touches[0] : nativeMoveEvent;
                     const current =
                         this._orientation === Orientation.HORIZONTAL
-                            ? mousemoveEvent.clientX
-                            : mousemoveEvent.clientY;
+                            ? moveEvent.clientX
+                            : moveEvent.clientY;
                     const delta = current - start;
 
                     this.resize(
@@ -523,15 +525,24 @@ export class Splitview {
 
                     document.removeEventListener('mousemove', mousemove);
                     document.removeEventListener('mouseup', end);
+                    document.removeEventListener("touchmove", mousemove);
+                    document.removeEventListener("touchend", end);
+                    document.removeEventListener("touchcancel", end);
 
                     this._onDidSashEnd.fire(undefined);
+                    return true // Consume, otherwise Monaco complains
                 };
 
                 document.addEventListener('mousemove', mousemove);
                 document.addEventListener('mouseup', end);
+                document.addEventListener("touchmove", mousemove);
+                document.addEventListener("touchend", end);
+                document.addEventListener("touchcancel", end);
+                return true // consume pull to refresh gesture
             };
 
             sash.addEventListener('mousedown', onStart);
+            sash.addEventListener("touchstart", onStart);
 
             const sashItem: ISashItem = {
                 container: sash,
