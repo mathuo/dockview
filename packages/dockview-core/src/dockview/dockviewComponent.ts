@@ -28,7 +28,6 @@ import {
     isPanelOptionsWithPanel,
     MovementOptions,
 } from './options';
-import { Parameters } from '../panel/types';
 import {
     BaseGrid,
     Direction,
@@ -45,6 +44,7 @@ import {
 import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
+import { Parameters } from '../panel/types';
 
 export interface PanelReference {
     update: (event: { params: { [key: string]: any } }) => void;
@@ -97,7 +97,9 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     doSetGroupActive: (group: DockviewGroupPanel, skipFocus?: boolean) => void;
     removeGroup: (group: DockviewGroupPanel) => void;
     options: DockviewComponentOptions;
-    addPanel<P extends object = Parameters>(options: AddPanelOptions<P>): IDockviewPanel;
+    addPanel<T extends object = Parameters>(
+        options: AddPanelOptions<T>
+    ): IDockviewPanel;
     removePanel(panel: IDockviewPanel): void;
     getGroupPanel: (id: string) => IDockviewPanel | undefined;
     createWatermarkComponent(): IWatermarkRenderer;
@@ -496,7 +498,9 @@ export class DockviewComponent
         }
     }
 
-    addPanel<P extends object = Parameters>(options: AddPanelOptions<P>): IDockviewPanel {
+    addPanel<T extends object = Parameters>(
+        options: AddPanelOptions<T>
+    ): IDockviewPanel {
         if (this.panels.find((_) => _.id === options.id)) {
             throw new Error(`panel with id ${options.id} already exists`);
         }
@@ -914,8 +918,8 @@ export class DockviewComponent
         return view;
     }
 
-    private createPanel<P extends object = Parameters>(
-        options: AddPanelOptions<P>,
+    private createPanel(
+        options: AddPanelOptions,
         group: DockviewGroupPanel
     ): IDockviewPanel {
         const contentComponent = options.component;

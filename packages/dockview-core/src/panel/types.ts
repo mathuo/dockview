@@ -29,10 +29,10 @@ export interface IFrameworkPart extends IDisposable {
     update(params: Parameters): void;
 }
 
-export interface BaseComponentOptions {
+export interface BaseComponentOptions<T extends object = Parameters> {
     id: string;
     component: string;
-    params?: Parameters;
+    params?: T;
     snap?: boolean;
     priority?: LayoutPriority;
     size?: number;
