@@ -143,10 +143,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.addDisposables(
             this.gridview.onDidChange(() => {
                 this._bufferOnDidLayoutChange.fire();
-            })
-        );
-
-        this.addDisposables(
+            }),
             Event.any(
                 this.onDidAddGroup,
                 this.onDidRemoveGroup,
@@ -297,8 +294,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
     }
 
     public dispose(): void {
-        super.dispose();
-
         this._onDidActiveGroupChange.dispose();
         this._onDidAddGroup.dispose();
         this._onDidRemoveGroup.dispose();
@@ -309,5 +304,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
         }
 
         this.gridview.dispose();
+
+        super.dispose();
     }
 }

@@ -1,8 +1,11 @@
 const fs = require('fs-extra');
 const path = require('path');
 
-const output = path.join(__dirname, '../');
+const output = path.join(__dirname, '../build');
 
-const docsDir = path.join(__dirname, '../docs/build');
+const websiteDir = path.join(__dirname, '../packages/docs/build');
 
-fs.copySync(docsDir, path.join(output, 'docs'));
+const docsDir = path.join(__dirname, '../docs');
+
+fs.copySync(websiteDir, output);
+fs.copySync(docsDir, path.join(output, 'typedocs'));

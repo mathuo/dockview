@@ -24,24 +24,76 @@ export namespace Event {
     };
 }
 
-// dumb event emitter with better typings than nodes event emitter
-// https://github.com/microsoft/vscode/blob/master/src/vs/base/common/event.ts
+class LeakageMonitor {
+    readonly events = new Map<Event<any>, Stacktrace>();
+
+    get size(): number {
+        return this.events.size;
+    }
+
+    add<T>(event: Event<T>, stacktrace: Stacktrace): void {
+        this.events.set(event, stacktrace);
+    }
+
+    delete<T>(event: Event<T>): void {
+        this.events.delete(event);
+    }
+
+    clear(): void {
+        this.events.clear();
+    }
+}
+
+class Stacktrace {
+    static create(): Stacktrace {
+        return new Stacktrace(new Error().stack ?? '');
+    }
+
+    private constructor(readonly value: string) {}
+
+    print(): void {
+        console.warn(this.value);
+    }
+}
+
+class Listener<T> {
+    constructor(
+        readonly callback: (t: T) => void,
+        readonly stacktrace: Stacktrace | undefined
+    ) {}
+}
+
+// relatively simple event emitter taken from https://github.com/microsoft/vscode/blob/master/src/vs/base/common/event.ts
 export class Emitter<T> implements IDisposable {
     private _event?: Event<T>;
 
     private _last?: T;
-    private _listeners: Array<(e: T) => any> = [];
+    private _listeners: Listener<any>[] = [];
     private _disposed = false;
+
+    static ENABLE_TRACKING = false;
+    static readonly MEMORY_LEAK_WATCHER = new LeakageMonitor();
+
+    static setLeakageMonitorEnabled(isEnabled: boolean) {
+        if (isEnabled !== Emitter.ENABLE_TRACKING) {
+            Emitter.MEMORY_LEAK_WATCHER.clear();
+        }
+        Emitter.ENABLE_TRACKING = isEnabled;
+    }
 
     constructor(private readonly options?: EmitterOptions) {}
 
     get event(): Event<T> {
         if (!this._event) {
-            this._event = (listener: (e: T) => void): IDisposable => {
+            this._event = (callback: (e: T) => void): IDisposable => {
                 if (this.options?.replay && this._last !== undefined) {
-                    listener(this._last);
+                    callback(this._last);
                 }
 
+                const listener = new Listener(
+                    callback,
+                    Emitter.ENABLE_TRACKING ? Stacktrace.create() : undefined
+                );
                 this._listeners.push(listener);
 
                 return {
@@ -49,10 +101,22 @@ export class Emitter<T> implements IDisposable {
                         const index = this._listeners.indexOf(listener);
                         if (index > -1) {
                             this._listeners.splice(index, 1);
+                        } else if (Emitter.ENABLE_TRACKING) {
+                            // console.warn(
+                            //     `Listener already disposed`,
+                            //     Stacktrace.create().print()
+                            // );
                         }
                     },
                 };
             };
+
+            if (Emitter.ENABLE_TRACKING) {
+                Emitter.MEMORY_LEAK_WATCHER.add(
+                    this._event,
+                    Stacktrace.create()
+                );
+            }
         }
         return this._event;
     }
@@ -60,13 +124,31 @@ export class Emitter<T> implements IDisposable {
     public fire(e: T): void {
         this._last = e;
         for (const listener of this._listeners) {
-            listener(e);
+            listener.callback(e);
         }
     }
 
     public dispose(): void {
-        this._listeners = [];
-        this._disposed = true;
+        if (!this._disposed) {
+            this._disposed = true;
+
+            if (this._listeners.length > 0) {
+                if (Emitter.ENABLE_TRACKING) {
+                    queueMicrotask(() => {
+                        // don't check until stack of execution is completed to allow for out-of-order disposals within the same execution block
+                        for (const listener of this._listeners) {
+                            console.warn(listener.stacktrace?.print());
+                        }
+                    });
+                }
+
+                this._listeners = [];
+            }
+
+            if (Emitter.ENABLE_TRACKING && this._event) {
+                Emitter.MEMORY_LEAK_WATCHER.delete(this._event);
+            }
+        }
     }
 }
 
@@ -80,7 +162,7 @@ export function addDisposableWindowListener<K extends keyof WindowEventMap>(
 
     return {
         dispose: () => {
-            element.removeEventListener(type, listener);
+            element.removeEventListener(type, listener, options);
         },
     };
 }
@@ -95,7 +177,7 @@ export function addDisposableListener<K extends keyof HTMLElementEventMap>(
 
     return {
         dispose: () => {
-            element.removeEventListener(type, listener);
+            element.removeEventListener(type, listener, options);
         },
     };
 }

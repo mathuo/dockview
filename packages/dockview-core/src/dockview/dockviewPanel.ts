@@ -3,14 +3,10 @@ import {
     DockviewPanelApi,
     DockviewPanelApiImpl,
 } from '../api/dockviewPanelApi';
-import {
-    GroupPanelUpdateEvent,
-    GroupviewPanelState,
-    IGroupPanelInitParameters,
-} from './types';
+import { GroupviewPanelState, IGroupPanelInitParameters } from './types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
-import { IPanel, Parameters } from '../panel/types';
+import { IPanel, PanelUpdateEvent, Parameters } from '../panel/types';
 import { IDockviewPanelModel } from './dockviewPanelModel';
 import { IDockviewComponent } from './dockviewComponent';
 
@@ -23,7 +19,8 @@ export interface IDockviewPanel extends IDisposable, IPanel {
     updateParentGroup(group: DockviewGroupPanel, isGroupActive: boolean): void;
     init(params: IGroupPanelInitParameters): void;
     toJSON(): GroupviewPanelState;
-    update(event: GroupPanelUpdateEvent): void;
+    setTitle(title: string): void;
+    update(event: PanelUpdateEvent): void;
 }
 
 export class DockviewPanel
@@ -34,13 +31,13 @@ export class DockviewPanel
     private _group: DockviewGroupPanel;
     private _params?: Parameters;
 
-    private _title: string;
+    private _title: string | undefined;
 
     get params(): Parameters | undefined {
         return this._params;
     }
 
-    get title(): string {
+    get title(): string | undefined {
         return this._title;
     }
 
@@ -56,7 +53,6 @@ export class DockviewPanel
         readonly view: IDockviewPanelModel
     ) {
         super();
-        this._title = '';
         this._group = group;
 
         this.api = new DockviewPanelApiImpl(this, this._group);
@@ -76,13 +72,13 @@ export class DockviewPanel
     public init(params: IGroupPanelInitParameters): void {
         this._params = params.params;
 
-        this.setTitle(params.title);
-
         this.view.init({
             ...params,
             api: this.api,
             containerApi: this.containerApi,
         });
+
+        this.setTitle(params.title);
     }
 
     focus(): void {
@@ -103,12 +99,12 @@ export class DockviewPanel
     }
 
     setTitle(title: string): void {
-        const didTitleChange = title !== this._params?.title;
+        const didTitleChange = title !== this.title;
 
         if (didTitleChange) {
             this._title = title;
 
-            this.view?.update({
+            this.view.update({
                 params: {
                     params: this._params,
                     title: this.title,
@@ -118,20 +114,25 @@ export class DockviewPanel
         }
     }
 
-    public update(event: GroupPanelUpdateEvent): void {
-        const params = event.params as IGroupPanelInitParameters;
-
+    public update(event: PanelUpdateEvent): void {
+        // merge the new parameters with the existing parameters
         this._params = {
             ...(this._params || {}),
-            ...event.params.params,
+            ...event.params,
         };
 
-        if (params.title !== this.title) {
-            this._title = params.title;
-            this.api._onDidTitleChange.fire({ title: this.title });
+        /**
+         * delete new keys that have a value of undefined,
+         * allow values of null
+         */
+        for (const key of Object.keys(event.params)) {
+            if (event.params[key] === undefined) {
+                delete this._params[key];
+            }
         }
 
-        this.view?.update({
+        // update the view with the updated props
+        this.view.update({
             params: {
                 params: this._params,
                 title: this.title,

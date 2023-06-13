@@ -1,0 +1,11 @@
+{
+    "files": [],
+    "references": [
+        {
+            "path": "./packages/dockview"
+        },
+        {
+            "path": "./packages/dockview-core"
+        }
+    ]
+}

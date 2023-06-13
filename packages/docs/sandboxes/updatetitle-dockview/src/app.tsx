@@ -6,10 +6,8 @@ import {
 import * as React from 'react';
 
 const components = {
-    default: (
-        props: IDockviewPanelProps<{ title: string; myValue: string }>
-    ) => {
-        const [title, setTitle] = React.useState<string>(props.params.title);
+    default: (props: IDockviewPanelProps<{ myValue: string }>) => {
+        const [title, setTitle] = React.useState<string>(props.api.title);
 
         const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             setTitle(event.target.value);
@@ -27,6 +25,7 @@ const components = {
                 </div>
                 <input value={title} onChange={onChange} />
                 <button onClick={onClick}>Change</button>
+                {JSON.stringify(Object.keys(props.params))}
             </div>
         );
     },
@@ -44,7 +43,6 @@ export const App: React.FC = () => {
             id: 'panel_2',
             component: 'default',
             title: 'Panel 2',
-
             position: { referencePanel: panel },
         });
 
@@ -60,7 +58,6 @@ export const App: React.FC = () => {
             id: 'panel_4',
             component: 'default',
             title: 'Panel 4',
-
             position: { referencePanel: panel3 },
         });
     };

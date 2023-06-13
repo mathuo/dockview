@@ -462,7 +462,8 @@ export class Gridview implements IDisposable {
         if (oldRoot.children.length === 1) {
             // can remove one level of redundant branching if there is only a single child
             const childReference = oldRoot.children[0];
-            oldRoot.removeChild(0); // remove to prevent disposal when disposing of unwanted root
+            const child = oldRoot.removeChild(0); // remove to prevent disposal when disposing of unwanted root
+            child.dispose();
             oldRoot.dispose();
 
             this._root.addChild(
@@ -632,7 +633,8 @@ export class Gridview implements IDisposable {
                 newSiblingSize = Sizing.Invisible(newSiblingCachedVisibleSize);
             }
 
-            grandParent.removeChild(parentIndex);
+            const child = grandParent.removeChild(parentIndex);
+            child.dispose();
 
             const newParent = new BranchNode(
                 parent.orientation,
@@ -676,60 +678,82 @@ export class Gridview implements IDisposable {
             throw new Error('Invalid location');
         }
 
-        const node = parent.children[index];
+        const nodeToRemove = parent.children[index];
 
-        if (!(node instanceof LeafNode)) {
+        if (!(nodeToRemove instanceof LeafNode)) {
             throw new Error('Invalid location');
         }
 
         parent.removeChild(index, sizing);
+        nodeToRemove.dispose();
 
-        if (parent.children.length === 0) {
-            return node.view;
+        if (parent.children.length !== 1) {
+            return nodeToRemove.view;
         }
 
-        if (parent.children.length > 1) {
-            return node.view;
-        }
+        // if the parent has only one child and we know the parent is a BranchNode we can make the tree
+        // more efficiently spaced by replacing the parent BranchNode with the child.
+        // if that child is a LeafNode then we simply replace the BranchNode with the child otherwise if the child
+        // is a BranchNode too we should spread it's children into the grandparent.
 
+        // refer to the remaining child as the sibling
         const sibling = parent.children[0];
 
         if (pathToParent.length === 0) {
-            // parent is root
+            // if the parent is root
 
             if (sibling instanceof LeafNode) {
-                return node.view;
+                // if the sibling is a leaf node no action is required
+                return nodeToRemove.view;
             }
 
-            // we must promote sibling to be the new root
+            // otherwise the sibling is a branch node. since the parent is the root and the root has only one child
+            // which is a branch node we can just set this branch node to be the new root node
+
+            // for good housekeeping we'll removing the sibling from it's existing tree
             parent.removeChild(0, sizing);
+
+            // and set that sibling node to be root
             this.root = sibling;
-            return node.view;
+
+            return nodeToRemove.view;
         }
+
+        // otherwise the parent is apart of a large sub-tree
 
         const [grandParent, ..._] = [...pathToParent].reverse();
         const [parentIndex, ...__] = [...rest].reverse();
 
         const isSiblingVisible = parent.isChildVisible(0);
+
+        // either way we need to remove the sibling from it's existing tree
         parent.removeChild(0, sizing);
 
+        // note the sizes of all of the grandparents children
         const sizes = grandParent.children.map((_size, i) =>
             grandParent.getChildSize(i)
         );
-        grandParent.removeChild(parentIndex, sizing);
+
+        // remove the parent from the grandparent since we are moving the sibling to take the parents place
+        // this parent is no longer used and can be disposed of
+        grandParent.removeChild(parentIndex, sizing).dispose();
 
         if (sibling instanceof BranchNode) {
+            // replace the parent with the siblings children
             sizes.splice(
                 parentIndex,
                 1,
                 ...sibling.children.map((c) => c.size)
             );
 
+            // and add those siblings to the grandparent
             for (let i = 0; i < sibling.children.length; i++) {
                 const child = sibling.children[i];
                 grandParent.addChild(child, child.size, parentIndex + i);
             }
         } else {
+            // otherwise create a new leaf node and add that to the grandparent
+
             const newSibling = new LeafNode(
                 sibling.view,
                 orthogonal(sibling.orientation),
@@ -738,14 +762,19 @@ export class Gridview implements IDisposable {
             const siblingSizing = isSiblingVisible
                 ? sibling.orthogonalSize
                 : Sizing.Invisible(sibling.orthogonalSize);
+
             grandParent.addChild(newSibling, siblingSizing, parentIndex);
         }
 
+        // the containing node of the sibling is no longer required and can be disposed of
+        sibling.dispose();
+
+        // resize everything
         for (let i = 0; i < sizes.length; i++) {
             grandParent.resizeChild(i, sizes[i]);
         }
 
-        return node.view;
+        return nodeToRemove.view;
     }
 
     public layout(width: number, height: number): void {

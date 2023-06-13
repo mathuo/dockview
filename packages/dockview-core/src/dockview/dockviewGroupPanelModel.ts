@@ -282,12 +282,6 @@ export class DockviewGroupPanelModel
         this.locked = !!options.locked;
 
         this.addDisposables(
-            this._onMove,
-            this._onDidChange,
-            this._onDidDrop,
-            this._onDidAddPanel,
-            this._onDidRemovePanel,
-            this._onDidActivePanelChange,
             this.tabsContainer.onDrop((event) => {
                 this.handleDropEvent(event.event, 'center', event.index);
             }),
@@ -299,7 +293,13 @@ export class DockviewGroupPanelModel
             }),
             this.dropTarget.onDrop((event) => {
                 this.handleDropEvent(event.nativeEvent, event.position);
-            })
+            }),
+            this._onMove,
+            this._onDidChange,
+            this._onDidDrop,
+            this._onDidAddPanel,
+            this._onDidRemovePanel,
+            this._onDidActivePanelChange
         );
     }
 

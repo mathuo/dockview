@@ -126,15 +126,6 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
         super();
 
         this.addDisposables(
-            this.panelUpdatesDisposable,
-            this._onDidDimensionChange,
-            this._onDidChangeFocus,
-            this._onDidVisibilityChange,
-            this._onDidActiveChange,
-            this._onFocusEvent,
-            this._onActiveChange,
-            this._onVisibilityChange,
-            this._onUpdateParameters,
             this.onDidFocusChange((event) => {
                 this._isFocused = event.isFocused;
             }),
@@ -147,7 +138,16 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
             this.onDidDimensionsChange((event) => {
                 this._width = event.width;
                 this._height = event.height;
-            })
+            }),
+            this.panelUpdatesDisposable,
+            this._onDidDimensionChange,
+            this._onDidChangeFocus,
+            this._onDidVisibilityChange,
+            this._onDidActiveChange,
+            this._onFocusEvent,
+            this._onActiveChange,
+            this._onVisibilityChange,
+            this._onUpdateParameters
         );
     }
 
@@ -155,9 +155,7 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
         this.panelUpdatesDisposable.value = this._onUpdateParameters.event(
             (parameters) => {
                 panel.update({
-                    params: {
-                        params: parameters,
-                    },
+                    params: parameters,
                 });
             }
         );

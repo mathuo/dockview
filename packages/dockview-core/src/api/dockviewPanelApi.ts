@@ -19,7 +19,7 @@ export interface DockviewPanelApi
     > {
     readonly group: DockviewGroupPanel;
     readonly isGroupActive: boolean;
-    readonly title: string;
+    readonly title: string | undefined;
     readonly onDidActiveGroupChange: Event<void>;
     readonly onDidGroupChange: Event<void>;
     close(): void;
@@ -43,7 +43,7 @@ export class DockviewPanelApiImpl
 
     private readonly disposable = new MutableDisposable();
 
-    get title(): string {
+    get title(): string | undefined {
         return this.panel.title;
     }
 
@@ -89,7 +89,7 @@ export class DockviewPanelApiImpl
     }
 
     public setTitle(title: string): void {
-        this.panel.update({ params: { title } });
+        this.panel.setTitle(title);
     }
 
     public close(): void {

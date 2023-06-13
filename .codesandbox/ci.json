@@ -13,6 +13,7 @@
     "/packages/docs/sandboxes/externaldnd-dockview",
     "/packages/docs/sandboxes/fullwidthtab-dockview",
     "/packages/docs/sandboxes/groupcontol-dockview",
+    "/packages/docs/sandboxes/iframe-dockview",
     "/packages/docs/sandboxes/layout-dockview",
     "/packages/docs/sandboxes/nativeapp-dockview",
     "/packages/docs/sandboxes/nested-dockview",
@@ -22,8 +23,11 @@
     "/packages/docs/sandboxes/simple-dockview",
     "/packages/docs/sandboxes/tabheight-dockview",
     "/packages/docs/sandboxes/updatetitle-dockview",
-    "/packages/docs/sandboxes/vanilla-dockview",
-    "/packages/docs/sandboxes/watermark-dockview"
+    "/packages/docs/sandboxes/watermark-dockview",
+    "/packages/docs/sandboxes/javascript/fullwidthtab-dockview",
+    "/packages/docs/sandboxes/javascript/simple-dockview",
+    "/packages/docs/sandboxes/javascript/tabheight-dockview",
+    "/packages/docs/sandboxes/javascript/vanilla-dockview"
   ],
   "node": "16"
 }

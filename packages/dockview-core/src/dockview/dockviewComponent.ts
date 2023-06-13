@@ -251,7 +251,6 @@ export class DockviewComponent
         });
 
         this.addDisposables(
-            dropTarget,
             dropTarget.onDrop((event) => {
                 const data = getPanelData();
 
@@ -270,7 +269,8 @@ export class DockviewComponent
                         getData: getPanelData,
                     });
                 }
-            })
+            }),
+            dropTarget
         );
 
         this._api = new DockviewApi(this);
@@ -706,43 +706,49 @@ export class DockviewComponent
     }
 
     moveGroupOrPanel(
-        referenceGroup: DockviewGroupPanel,
-        groupId: string,
-        itemId: string | undefined,
-        target: Position,
-        index?: number
+        destinationGroup: DockviewGroupPanel,
+        sourceGroupId: string,
+        sourceItemId: string | undefined,
+        destinationTarget: Position,
+        destinationIndex?: number
     ): void {
-        const sourceGroup = groupId
-            ? this._groups.get(groupId)?.value
+        const sourceGroup = sourceGroupId
+            ? this._groups.get(sourceGroupId)?.value
             : undefined;
 
-        if (itemId === undefined) {
+        if (sourceItemId === undefined) {
             if (sourceGroup) {
-              this.moveGroup(sourceGroup, referenceGroup, target);
+                this.moveGroup(
+                    sourceGroup,
+                    destinationGroup,
+                    destinationTarget
+                );
             }
             return;
         }
 
-        if (!target || target === 'center') {
+        if (!destinationTarget || destinationTarget === 'center') {
             const groupItem: IDockviewPanel | undefined =
-                sourceGroup?.model.removePanel(itemId) ||
-                this.panels.find((panel) => panel.id === itemId);
+                sourceGroup?.model.removePanel(sourceItemId) ||
+                this.panels.find((panel) => panel.id === sourceItemId);
 
             if (!groupItem) {
-                throw new Error(`No panel with id ${itemId}`);
+                throw new Error(`No panel with id ${sourceItemId}`);
             }
 
             if (sourceGroup?.model.size === 0) {
                 this.doRemoveGroup(sourceGroup);
             }
 
-            referenceGroup.model.openPanel(groupItem, { index });
+            destinationGroup.model.openPanel(groupItem, {
+                index: destinationIndex,
+            });
         } else {
-            const referenceLocation = getGridLocation(referenceGroup.element);
+            const referenceLocation = getGridLocation(destinationGroup.element);
             const targetLocation = getRelativeLocation(
                 this.gridview.orientation,
                 referenceLocation,
-                target
+                destinationTarget
             );
 
             if (sourceGroup && sourceGroup.size < 2) {
@@ -766,28 +772,28 @@ export class DockviewComponent
 
                     // after deleting the group we need to re-evaulate the ref location
                     const updatedReferenceLocation = getGridLocation(
-                        referenceGroup.element
+                        destinationGroup.element
                     );
                     const location = getRelativeLocation(
                         this.gridview.orientation,
                         updatedReferenceLocation,
-                        target
+                        destinationTarget
                     );
                     this.doAddGroup(targetGroup, location);
                 }
             } else {
                 const groupItem: IDockviewPanel | undefined =
-                    sourceGroup?.model.removePanel(itemId) ||
-                    this.panels.find((panel) => panel.id === itemId);
+                    sourceGroup?.model.removePanel(sourceItemId) ||
+                    this.panels.find((panel) => panel.id === sourceItemId);
 
                 if (!groupItem) {
-                    throw new Error(`No panel with id ${itemId}`);
+                    throw new Error(`No panel with id ${sourceItemId}`);
                 }
 
                 const dropLocation = getRelativeLocation(
                     this.gridview.orientation,
                     referenceLocation,
-                    target
+                    destinationTarget
                 );
 
                 const group = this.createGroupAtLocation(dropLocation);
@@ -953,11 +959,11 @@ export class DockviewComponent
     }
 
     public dispose(): void {
-        super.dispose();
-
         this._onDidActivePanelChange.dispose();
         this._onDidAddPanel.dispose();
         this._onDidRemovePanel.dispose();
         this._onDidLayoutFromJSON.dispose();
+
+        super.dispose();
     }
 }

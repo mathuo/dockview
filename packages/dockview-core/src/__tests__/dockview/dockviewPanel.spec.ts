@@ -37,13 +37,13 @@ describe('dockviewPanel', () => {
             latestTitle = event.title;
         });
 
-        expect(cut.title).toBe('');
+        expect(cut.title).toBeUndefined();
 
         cut.init({ title: 'new title', params: {} });
         expect(latestTitle).toBe('new title');
         expect(cut.title).toBe('new title');
 
-        cut.update({ params: { title: 'another title' } });
+        cut.setTitle('another title');
         expect(latestTitle).toBe('another title');
         expect(cut.title).toBe('another title');
 
@@ -81,6 +81,9 @@ describe('dockviewPanel', () => {
 
         cut.setTitle('newTitle');
         expect(cut.title).toBe('newTitle');
+
+        cut.api.setTitle('new title 2');
+        expect(cut.title).toBe('new title 2');
     });
 
     test('dispose cleanup', () => {
@@ -142,7 +145,7 @@ describe('dockviewPanel', () => {
 
         expect(cut.params).toEqual(undefined);
 
-        cut.update({ params: { params: { variableA: 'A', variableB: 'B' } } });
+        cut.update({ params: { variableA: 'A', variableB: 'B' } });
 
         expect(cut.params).toEqual({ variableA: 'A', variableB: 'B' });
     });
@@ -180,5 +183,68 @@ describe('dockviewPanel', () => {
 
         expect(group.api.setSize).toBeCalledWith({ height: 123, width: 456 });
         expect(group.api.setSize).toBeCalledTimes(1);
+    });
+
+    test('updateParameter', () => {
+        const dockviewApiMock = jest.fn<DockviewApi, []>(() => {
+            return {} as any;
+        });
+        const accessorMock = jest.fn<DockviewComponent, []>(() => {
+            return {} as any;
+        });
+        const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
+            return {} as any;
+        });
+        const panelModelMock = jest.fn<Partial<IDockviewPanelModel>, []>(() => {
+            return {
+                update: jest.fn(),
+                init: jest.fn(),
+                dispose: jest.fn(),
+            };
+        });
+
+        const api = new dockviewApiMock();
+        const accessor = new accessorMock();
+        const group = new groupMock();
+        const model = <IDockviewPanelModel>new panelModelMock();
+
+        const cut = new DockviewPanel('fake-id', accessor, api, group, model);
+
+        cut.init({ params: { a: '1', b: '2' }, title: 'A title' });
+        expect(cut.params).toEqual({ a: '1', b: '2' });
+
+        // update 'a' and add 'c'
+        cut.update({ params: { a: '-1', c: '3' } });
+        expect(cut.params).toEqual({ a: '-1', b: '2', c: '3' });
+
+        cut.update({ params: { d: '4', e: '5', f: '6' } });
+        expect(cut.params).toEqual({
+            a: '-1',
+            b: '2',
+            c: '3',
+            d: '4',
+            e: '5',
+            f: '6',
+        });
+
+        cut.update({
+            params: {
+                d: '',
+                e: null,
+                f: undefined,
+                g: '',
+                h: null,
+                i: undefined,
+            },
+        });
+        expect(cut.params).toEqual({
+            a: '-1',
+            b: '2',
+            c: '3',
+            d: '',
+            e: null,
+            g: '',
+            h: null,
+        });
     });
 });
