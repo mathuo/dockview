@@ -14,8 +14,8 @@ export interface IDockviewPanel extends IDisposable, IPanel {
     readonly view: IDockviewPanelModel;
     readonly group: DockviewGroupPanel;
     readonly api: DockviewPanelApi;
-    readonly title: string | undefined;
-    readonly params: Record<string, any> | undefined;
+    readonly title: string;
+    readonly params: Parameters | undefined;
     updateParentGroup(group: DockviewGroupPanel, isGroupActive: boolean): void;
     init(params: IGroupPanelInitParameters): void;
     toJSON(): GroupviewPanelState;
