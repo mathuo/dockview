@@ -393,7 +393,17 @@ export class Splitview {
             const sash = document.createElement('div');
             sash.className = 'sash';
 
-            const onStart = (event: MouseEvent) => {
+            const onTouchStart = (event: TouchEvent) => {
+                event.preventDefault();
+                const touch = event.touches[0];
+                onStart(touch);
+            };
+
+            const onMouseDown = (event: MouseEvent) => {
+                onStart(event);
+            };
+
+            const onStart = (event: { clientX: number; clientY: number }) => {
                 for (const item of this.viewItems) {
                     item.enabled = false;
                 }
@@ -486,13 +496,25 @@ export class Splitview {
                         size: snappedViewItem.size,
                     };
                 }
-                //
 
-                const mousemove = (mousemoveEvent: MouseEvent) => {
+                const onMouseMove = (event: MouseEvent) => {
+                    reposition(event);
+                };
+
+                const onTouchMove = (event: TouchEvent) => {
+                    event.preventDefault();
+                    const touch = event.touches[0];
+                    reposition(touch);
+                };
+
+                const reposition = (event: {
+                    clientX: number;
+                    clientY: number;
+                }) => {
                     const current =
                         this._orientation === Orientation.HORIZONTAL
-                            ? mousemoveEvent.clientX
-                            : mousemoveEvent.clientY;
+                            ? event.clientX
+                            : event.clientY;
                     const delta = current - start;
 
                     this.resize(
@@ -521,22 +543,30 @@ export class Splitview {
 
                     this.saveProportions();
 
-                    document.removeEventListener('mousemove', mousemove);
+                    document.removeEventListener('mousemove', onMouseMove);
                     document.removeEventListener('mouseup', end);
+                    document.removeEventListener('touchmove', onTouchMove);
+                    document.removeEventListener('touchend', end);
+                    document.removeEventListener('touchcancel', end);
 
                     this._onDidSashEnd.fire(undefined);
                 };
 
-                document.addEventListener('mousemove', mousemove);
+                document.addEventListener('mousemove', onMouseMove);
                 document.addEventListener('mouseup', end);
+                document.addEventListener('touchmove', onTouchMove);
+                document.addEventListener('touchend', end);
+                document.addEventListener('touchcancel', end);
             };
 
-            sash.addEventListener('mousedown', onStart);
+            sash.addEventListener('mousedown', onMouseDown);
+            sash.addEventListener('touchstart', onTouchStart);
 
             const sashItem: ISashItem = {
                 container: sash,
                 disposable: () => {
                     sash.removeEventListener('mousedown', onStart);
+                    sash.removeEventListener('touchstart', onTouchStart);
                     this.sashContainer.removeChild(sash);
                 },
             };
