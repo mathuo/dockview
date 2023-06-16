@@ -408,4 +408,85 @@ describe('componentPaneview', () => {
         expect(panel1Spy).toHaveBeenCalledTimes(1);
         expect(panel2Spy).toHaveBeenCalledTimes(1);
     });
+
+    test('that fromJSON layouts are resized to the current dimensions', async () => {
+        const paneview = new PaneviewComponent({
+            parentElement: container,
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+
+        paneview.layout(400, 600);
+
+        paneview.fromJSON({
+            size: 6,
+            views: [
+                {
+                    size: 1,
+                    data: {
+                        id: 'panel1',
+                        component: 'testPanel',
+                        title: 'Panel 1',
+                    },
+                    expanded: true,
+                },
+                {
+                    size: 2,
+                    data: {
+                        id: 'panel2',
+                        component: 'testPanel',
+                        title: 'Panel 2',
+                    },
+                    expanded: true,
+                },
+                {
+                    size: 3,
+                    data: {
+                        id: 'panel3',
+                        component: 'testPanel',
+                        title: 'Panel 3',
+                    },
+                    expanded: true,
+                },
+            ],
+        });
+
+        // heights slightly differ because header height isn't accounted for
+        expect(JSON.parse(JSON.stringify(paneview.toJSON()))).toEqual({
+            size: 600,
+            views: [
+                {
+                    size: 122,
+                    data: {
+                        id: 'panel1',
+                        component: 'testPanel',
+                        title: 'Panel 1',
+                    },
+                    expanded: true,
+                    minimumSize: 100,
+                },
+                {
+                    size: 122,
+                    data: {
+                        id: 'panel2',
+                        component: 'testPanel',
+                        title: 'Panel 2',
+                    },
+                    expanded: true,
+                    minimumSize: 100,
+                },
+                {
+                    size: 356,
+                    data: {
+                        id: 'panel3',
+                        component: 'testPanel',
+                        title: 'Panel 3',
+                    },
+                    expanded: true,
+                    minimumSize: 100,
+                },
+            ],
+        });
+    });
 });

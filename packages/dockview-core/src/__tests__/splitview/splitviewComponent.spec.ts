@@ -330,7 +330,7 @@ describe('componentSplitview', () => {
                 testPanel: TestPanel,
             },
         });
-        splitview.layout(600, 400);
+        splitview.layout(400, 6);
 
         splitview.fromJSON({
             views: [
@@ -534,5 +534,58 @@ describe('componentSplitview', () => {
 
         expect(panel1Spy).toHaveBeenCalledTimes(1);
         expect(panel2Spy).toHaveBeenCalledTimes(1);
+    });
+
+    test('that fromJSON layouts are resized to the current dimensions', async () => {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
+            orientation: Orientation.VERTICAL,
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+        splitview.layout(400, 600);
+
+        splitview.fromJSON({
+            views: [
+                {
+                    size: 1,
+                    data: { id: 'panel1', component: 'testPanel' },
+                    snap: false,
+                },
+                {
+                    size: 2,
+                    data: { id: 'panel2', component: 'testPanel' },
+                    snap: true,
+                },
+                { size: 3, data: { id: 'panel3', component: 'testPanel' } },
+            ],
+            size: 6,
+            orientation: Orientation.VERTICAL,
+            activeView: 'panel1',
+        });
+
+        expect(JSON.parse(JSON.stringify(splitview.toJSON()))).toEqual({
+            views: [
+                {
+                    size: 100,
+                    data: { id: 'panel1', component: 'testPanel' },
+                    snap: false,
+                },
+                {
+                    size: 200,
+                    data: { id: 'panel2', component: 'testPanel' },
+                    snap: true,
+                },
+                {
+                    size: 300,
+                    data: { id: 'panel3', component: 'testPanel' },
+                    snap: false,
+                },
+            ],
+            size: 600,
+            orientation: Orientation.VERTICAL,
+            activeView: 'panel1',
+        });
     });
 });
