@@ -394,7 +394,6 @@ export class Splitview {
             sash.className = 'sash';
 
             const onTouchStart = (event: TouchEvent) => {
-                event.preventDefault();
                 const touch = event.touches[0];
                 onStart(touch, true);
             };
@@ -527,13 +526,11 @@ export class Splitview {
                 };
 
                 const onTouchMove = (event: TouchEvent) => {
-                    event.preventDefault();
                     const touch = event.touches[0];
                     mousemove(touch);
                 };
 
                 const onTouchEnd = (event: TouchEvent) => {
-                    event.preventDefault();
                     end();
                 };
 
