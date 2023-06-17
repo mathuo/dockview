@@ -498,7 +498,6 @@ export class Splitview {
                         size: snappedViewItem.size,
                     };
                 }
-                //
 
                 const mousemove = (mousemoveEvent: {
                     clientX: number;
@@ -506,8 +505,8 @@ export class Splitview {
                 }) => {
                     const current =
                         this._orientation === Orientation.HORIZONTAL
-                            ? mousemoveEvent.clientX
-                            : mousemoveEvent.clientY;
+                            ? event.clientX
+                            : event.clientY;
                     const delta = current - start;
 
                     this.resize(
