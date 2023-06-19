@@ -599,7 +599,7 @@ describe('splitview', () => {
         expect(container.childNodes.length).toBe(0);
     });
 
-    test('dnd: mouse events to move sash', () => {
+    test('dnd: pointer events to move sash', () => {
         const splitview = new Splitview(container, {
             orientation: Orientation.HORIZONTAL,
             proportionalLayout: false,
@@ -629,107 +629,51 @@ describe('splitview', () => {
         expect(view2.element.parentElement!.style.pointerEvents).toBe('');
 
         // start the drag event
-        fireEvent.mouseDown(sashElement, { clientX: 50, clientY: 100 });
-
-        expect(addEventListenerSpy).toBeCalledTimes(5);
-
-        // during a sash drag the views should have pointer-events disabled
-        expect(view1.element.parentElement!.style.pointerEvents).toBe('none');
-        expect(view2.element.parentElement!.style.pointerEvents).toBe('none');
-
-        // expect a delta move of 70 - 50 = 20
-        fireEvent.mouseMove(document, { clientX: 70, clientY: 110 });
-        expect([view1.size, view2.size]).toEqual([220, 180]);
-
-        // expect a delta move of 75 - 70 = 5
-        fireEvent.mouseMove(document, { clientX: 75, clientY: 110 });
-        expect([view1.size, view2.size]).toEqual([225, 175]);
-
-        // end the drag event
-        fireEvent.mouseUp(document);
-
-        expect(removeEventListenerSpy).toBeCalledTimes(5);
-
-        // expect pointer-eventes on views to be restored
-        expect(view1.element.parentElement!.style.pointerEvents).toBe('');
-        expect(view2.element.parentElement!.style.pointerEvents).toBe('');
-
-        fireEvent.mouseMove(document, { clientX: 100, clientY: 100 });
-        // expect no additional resizes
-        expect([view1.size, view2.size]).toEqual([225, 175]);
-        // expect no additional document listeners
-        expect(addEventListenerSpy).toBeCalledTimes(5);
-        expect(removeEventListenerSpy).toBeCalledTimes(5);
-    });
-
-    test('dnd: touch events to move sash', () => {
-        const splitview = new Splitview(container, {
-            orientation: Orientation.HORIZONTAL,
-            proportionalLayout: false,
-        });
-        splitview.layout(400, 500);
-
-        const view1 = new Testview(0, 1000);
-        const view2 = new Testview(0, 1000);
-
-        splitview.addView(view1);
-        splitview.addView(view2);
-
-        const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
-        const removeEventListenerSpy = jest.spyOn(
-            document,
-            'removeEventListener'
+        fireEvent(
+            sashElement,
+            new MouseEvent('pointerdown', { clientX: 50, clientY: 100 })
         );
 
-        const sashElement = container
-            .getElementsByClassName('sash')
-            .item(0) as HTMLElement;
-
-        // validate the expected state before drag
-        expect([view1.size, view2.size]).toEqual([200, 200]);
-        expect(sashElement).toBeTruthy();
-        expect(view1.element.parentElement!.style.pointerEvents).toBe('');
-        expect(view2.element.parentElement!.style.pointerEvents).toBe('');
-
-        // start the drag event
-        fireEvent.touchStart(sashElement, {
-            touches: [{ clientX: 50, clientY: 100 }],
-        });
-
-        expect(addEventListenerSpy).toBeCalledTimes(5);
+        expect(addEventListenerSpy).toBeCalledTimes(3);
 
         // during a sash drag the views should have pointer-events disabled
         expect(view1.element.parentElement!.style.pointerEvents).toBe('none');
         expect(view2.element.parentElement!.style.pointerEvents).toBe('none');
 
         // expect a delta move of 70 - 50 = 20
-        fireEvent.touchMove(document, {
-            touches: [{ clientX: 70, clientY: 110 }],
-        });
+        fireEvent(
+            document,
+            new MouseEvent('pointermove', { clientX: 70, clientY: 110 })
+        );
         expect([view1.size, view2.size]).toEqual([220, 180]);
 
         // expect a delta move of 75 - 70 = 5
-        fireEvent.touchMove(document, {
-            touches: [{ clientX: 75, clientY: 110 }],
-        });
+        fireEvent(
+            document,
+            new MouseEvent('pointermove', { clientX: 75, clientY: 110 })
+        );
         expect([view1.size, view2.size]).toEqual([225, 175]);
 
         // end the drag event
-        fireEvent.touchEnd(document);
+        fireEvent(
+            document,
+            new MouseEvent('pointerup', { clientX: 70, clientY: 110 })
+        );
 
-        expect(removeEventListenerSpy).toBeCalledTimes(5);
+        expect(removeEventListenerSpy).toBeCalledTimes(3);
 
         // expect pointer-eventes on views to be restored
         expect(view1.element.parentElement!.style.pointerEvents).toBe('');
         expect(view2.element.parentElement!.style.pointerEvents).toBe('');
 
-        fireEvent.touchMove(document, {
-            touches: [{ clientX: 100, clientY: 100 }],
-        });
+        fireEvent(
+            document,
+            new MouseEvent('pointermove', { clientX: 100, clientY: 100 })
+        );
         // expect no additional resizes
         expect([view1.size, view2.size]).toEqual([225, 175]);
         // expect no additional document listeners
-        expect(addEventListenerSpy).toBeCalledTimes(5);
-        expect(removeEventListenerSpy).toBeCalledTimes(5);
+        expect(addEventListenerSpy).toBeCalledTimes(3);
+        expect(removeEventListenerSpy).toBeCalledTimes(3);
     });
 });
