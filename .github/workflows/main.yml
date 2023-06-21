@@ -7,7 +7,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
               # might be required for sonar to work correctly
               with:
                   fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
@@ -16,7 +16,7 @@ jobs:
               with:
                   node-version: '16.x'
 
-            - uses: actions/cache@v2
+            - uses: actions/cache@v3
               with:
                   path: ~/.npm
                   key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}

@@ -393,7 +393,7 @@ export class Splitview {
             const sash = document.createElement('div');
             sash.className = 'sash';
 
-            const onStart = (event: MouseEvent) => {
+            const onPointerStart = (event: PointerEvent) => {
                 for (const item of this.viewItems) {
                     item.enabled = false;
                 }
@@ -486,13 +486,12 @@ export class Splitview {
                         size: snappedViewItem.size,
                     };
                 }
-                //
 
-                const mousemove = (mousemoveEvent: MouseEvent) => {
+                const onPointerMove = (event: PointerEvent) => {
                     const current =
                         this._orientation === Orientation.HORIZONTAL
-                            ? mousemoveEvent.clientX
-                            : mousemoveEvent.clientY;
+                            ? event.clientX
+                            : event.clientY;
                     const delta = current - start;
 
                     this.resize(
@@ -521,24 +520,24 @@ export class Splitview {
 
                     this.saveProportions();
 
-                    document.removeEventListener('mousemove', mousemove);
-                    document.removeEventListener('mouseup', end);
-                    document.removeEventListener('mouseend', end);
+                    document.removeEventListener('pointermove', onPointerMove);
+                    document.removeEventListener('pointerup', end);
+                    document.removeEventListener('pointercancel', end);
 
                     this._onDidSashEnd.fire(undefined);
                 };
 
-                document.addEventListener('mousemove', mousemove);
-                document.addEventListener('mouseup', end);
-                document.addEventListener('mouseend', end);
+                document.addEventListener('pointermove', onPointerMove);
+                document.addEventListener('pointerup', end);
+                document.addEventListener('pointercancel', end);
             };
 
-            sash.addEventListener('mousedown', onStart);
+            sash.addEventListener('pointerdown', onPointerStart);
 
             const sashItem: ISashItem = {
                 container: sash,
                 disposable: () => {
-                    sash.removeEventListener('mousedown', onStart);
+                    sash.removeEventListener('pointerdown', onPointerStart);
                     this.sashContainer.removeChild(sash);
                 },
             };

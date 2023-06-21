@@ -162,7 +162,7 @@ export function addDisposableWindowListener<K extends keyof WindowEventMap>(
 
     return {
         dispose: () => {
-            element.removeEventListener(type, listener);
+            element.removeEventListener(type, listener, options);
         },
     };
 }
@@ -177,7 +177,7 @@ export function addDisposableListener<K extends keyof HTMLElementEventMap>(
 
     return {
         dispose: () => {
-            element.removeEventListener(type, listener);
+            element.removeEventListener(type, listener, options);
         },
     };
 }
