@@ -17,7 +17,7 @@ export class GroupDragHandler extends DragHandler {
     }
 
     override isCancelled(_event: DragEvent): boolean {
-        if (this.group.model.isFloating) {
+        if (this.group.model.isFloating && !_event.shiftKey) {
             return true;
         }
         return false;

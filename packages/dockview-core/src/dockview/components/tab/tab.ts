@@ -6,12 +6,11 @@ import {
     PanelTransfer,
 } from '../../../dnd/dataTransfer';
 import { toggleClass } from '../../../dom';
-import { IDockviewComponent } from '../../dockviewComponent';
+import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewDropTargets, ITabRenderer } from '../../types';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DroptargetEvent, Droptarget } from '../../../dnd/droptarget';
 import { DragHandler } from '../../../dnd/abstractDragHandler';
-import { DockviewPanel } from '../../dockviewPanel';
 
 export interface ITab extends IDisposable {
     readonly panelId: string;
@@ -39,7 +38,7 @@ export class Tab extends CompositeDisposable implements ITab {
 
     constructor(
         public readonly panelId: string,
-        private readonly accessor: IDockviewComponent,
+        private readonly accessor: DockviewComponent,
         private readonly group: DockviewGroupPanel
     ) {
         super();
@@ -77,22 +76,10 @@ export class Tab extends CompositeDisposable implements ITab {
 
         this.addDisposables(
             addDisposableListener(this._element, 'mousedown', (event) => {
-                if (event.shiftKey) {
-                    event.preventDefault();
-
-                    const panel = this.accessor.getGroupPanel(this.panelId);
-
-                    const { top, left } = this.element.getBoundingClientRect();
-
-                    this.accessor.addFloating(panel as DockviewPanel, {
-                        x: left,
-                        y: top,
-                    });
-                }
-
                 if (event.defaultPrevented) {
                     return;
                 }
+
                 /**
                  * TODO: alternative to stopPropagation
                  *

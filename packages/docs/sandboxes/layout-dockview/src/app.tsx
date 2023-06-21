@@ -71,7 +71,7 @@ export const DockviewPersistance = () => {
                 event.api.fromJSON(layout);
                 success = true;
             } catch (err) {
-                //
+                console.error(err);
             }
         }
 

@@ -9,7 +9,7 @@ import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { VoidContainer } from './voidContainer';
 import { toggleClass } from '../../../dom';
-import { IDockviewPanel } from '../../dockviewPanel';
+import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
 
 export interface TabDropIndexEvent {
     readonly event: DragEvent;
@@ -187,6 +187,26 @@ export class TabsContainer
                     index: this.tabs.length,
                 });
             }),
+            addDisposableListener(
+                this.voidContainer.element,
+                'mousedown',
+                (event) => {
+                    if (event.shiftKey && !this.group.model.isFloating) {
+                        event.preventDefault();
+
+                        const { top, left } =
+                            this.element.getBoundingClientRect();
+                        const { top: rootTop, left: rootLeft } =
+                            this.accessor.element.getBoundingClientRect();
+
+                        this.accessor.addFloatingGroup(this.group, {
+                            x: left - rootLeft + 20,
+                            y: top - rootTop + 20,
+                        });
+                        event.preventDefault();
+                    }
+                }
+            ),
             addDisposableListener(this.tabContainer, 'mousedown', (event) => {
                 if (event.defaultPrevented) {
                     return;
@@ -263,6 +283,23 @@ export class TabsContainer
 
         const disposable = CompositeDisposable.from(
             tabToAdd.onChanged((event) => {
+                if (event.shiftKey) {
+                    event.preventDefault();
+
+                    const panel = this.accessor.getGroupPanel(tabToAdd.panelId);
+
+                    const { top, left } =
+                        tabToAdd.element.getBoundingClientRect();
+                    const { top: rootTop, left: rootLeft } =
+                        this.accessor.element.getBoundingClientRect();
+
+                    this.accessor.addFloatingGroup(panel as DockviewPanel, {
+                        x: left - rootLeft,
+                        y: top - rootTop,
+                    });
+                    return;
+                }
+
                 const alreadyFocused =
                     panel.id === this.group.model.activePanel?.id &&
                     this.group.model.isContentFocused;

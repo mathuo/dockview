@@ -4,6 +4,7 @@ import { GridviewPanelApi } from '../api/gridviewPanelApi';
 import {
     DockviewGroupPanelModel,
     GroupOptions,
+    GroupPanelViewState,
     IDockviewGroupPanelModel,
     IHeader,
 } from './dockviewGroupPanelModel';
@@ -94,7 +95,6 @@ export class DockviewGroupPanel
     }
 
     toJSON(): any {
-        // TODO fix typing
         return this.model.toJSON();
     }
 }

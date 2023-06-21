@@ -69,16 +69,6 @@ export class VoidContainer extends CompositeDisposable {
 
         this.addDisposables(
             handler,
-            addDisposableListener(this._element, 'mousedown', (event) => {
-                if (event.shiftKey && !this.group.model.isFloating) {
-                    event.preventDefault();
-                    this.accessor.addFloating(this.group, {
-                        x: event.clientX + 20,
-                        y: event.clientY + 20,
-                    });
-                }
-            }),
-
             this.voidDropTarget.onDrop((event) => {
                 this._onDrop.fire(event);
             }),
