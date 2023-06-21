@@ -18,6 +18,7 @@ import { IDisposable } from '../lifecycle';
 import { Position } from '../dnd/droptarget';
 import { IDockviewPanel } from './dockviewPanel';
 import { FrameworkFactory } from '../panel/componentFactory';
+import { Optional } from '../types';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -134,12 +135,32 @@ export function isPanelOptionsWithGroup(
     return false;
 }
 
-export interface AddPanelOptions
-    extends Omit<PanelOptions, 'component' | 'tabComponent'> {
+type AddPanelFloatingGroupUnion = {
+    floating:
+        | {
+              height?: number;
+              width?: number;
+              x?: number;
+              y?: number;
+          }
+        | true;
+    position: never;
+};
+
+type AddPanelPositionUnion = {
+    floating: false | never;
+    position: AddPanelPositionOptions;
+};
+
+type AddPanelOptionsUnion = AddPanelFloatingGroupUnion | AddPanelPositionUnion;
+
+export type AddPanelOptions = Omit<
+    PanelOptions,
+    'component' | 'tabComponent'
+> & {
     component: string;
     tabComponent?: string;
-    position?: AddPanelPositionOptions;
-}
+} & Partial<AddPanelOptionsUnion>;
 
 type AddGroupOptionsWithPanel = {
     referencePanel: string | IDockviewPanel;

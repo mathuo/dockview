@@ -39,13 +39,15 @@ const config = {
         'docusaurus-plugin-sass',
         (context, options) => {
             return {
-                name: 'webpack',
+                name: 'custom-webpack',
                 configureWebpack: (config, isServer, utils) => {
                     return {
                         // externals: ['react', 'react-dom'],
                         devtool: 'source-map',
                         resolve: {
+                            ...config.resolve,
                             alias: {
+                                ...config.resolve.alias,
                                 react: path.join(
                                     __dirname,
                                     '../../node_modules',
@@ -56,9 +58,6 @@ const config = {
                                     '../../node_modules',
                                     'react-dom'
                                 ),
-                            },
-                            fallback: {
-                                timers: false,
                             },
                         },
                     };

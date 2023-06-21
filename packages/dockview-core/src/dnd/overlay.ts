@@ -1,5 +1,10 @@
 import { toggleClass } from '../dom';
-import { addDisposableListener, addDisposableWindowListener } from '../events';
+import {
+    Emitter,
+    Event,
+    addDisposableListener,
+    addDisposableWindowListener,
+} from '../events';
 import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { clamp } from '../math';
 
@@ -21,6 +26,9 @@ const bringElementToFront = (() => {
 export class Overlay extends CompositeDisposable {
     private _element: HTMLElement = document.createElement('div');
 
+    private readonly _onDidChange = new Emitter<void>();
+    readonly onDidChange: Event<void> = this._onDidChange.event;
+
     constructor(
         private readonly options: {
             height: number;
@@ -34,6 +42,8 @@ export class Overlay extends CompositeDisposable {
         }
     ) {
         super();
+
+        this.addDisposables(this._onDidChange);
 
         this.setupOverlay();
         // this.setupDrag(true,this._element);
@@ -50,6 +60,18 @@ export class Overlay extends CompositeDisposable {
         this.options.container.appendChild(this._element);
 
         // this.renderWithinBoundaryConditions();
+    }
+
+    toJSON(): { top: number; left: number; height: number; width: number } {
+        const container = this.options.container.getBoundingClientRect();
+        const element = this._element.getBoundingClientRect();
+
+        return {
+            top: element.top - container.top,
+            left: element.left - container.left,
+            width: element.width,
+            height: element.height,
+        };
     }
 
     private setupResize(
@@ -216,6 +238,7 @@ export class Overlay extends CompositeDisposable {
                     }),
                     addDisposableWindowListener(window, 'mouseup', () => {
                         move.dispose();
+                        this._onDidChange.fire();
                     })
                 );
             })
@@ -296,24 +319,37 @@ export class Overlay extends CompositeDisposable {
                     );
 
                     move.dispose();
+                    this._onDidChange.fire();
                 })
             );
         };
 
         this.addDisposables(
             move,
-            addDisposableListener(dragTarget, 'mousedown', (_) => {
-                if (_.defaultPrevented) {
+            addDisposableListener(dragTarget, 'mousedown', (event) => {
+                if (
+                    // event.shiftKey ||
+                    event.defaultPrevented
+                ) {
+                    event.preventDefault();
                     return;
                 }
 
                 track();
             }),
-            addDisposableListener(this.options.content, 'mousedown', (_) => {
-                if (_.shiftKey) {
-                    track();
+            addDisposableListener(
+                this.options.content,
+                'mousedown',
+                (event) => {
+                    if (event.defaultPrevented) {
+                        return;
+                    }
+
+                    if (event.shiftKey) {
+                        track();
+                    }
                 }
-            }),
+            ),
             addDisposableListener(
                 this.options.content,
                 'mousedown',
@@ -324,28 +360,31 @@ export class Overlay extends CompositeDisposable {
             )
         );
 
+        bringElementToFront(this._element);
+
         if (connect) {
             track();
         }
     }
 
     renderWithinBoundaryConditions(): void {
-        const rect = this.options.container.getBoundingClientRect();
-        const rect2 = this._element.getBoundingClientRect();
+        const containerRect = this.options.container.getBoundingClientRect();
+        const overlayRect = this._element.getBoundingClientRect();
+
+        const xOffset = Math.max(0, overlayRect.width - this.options.minX);
+        const yOffset = Math.max(0, overlayRect.height - this.options.minY);
 
         const left = clamp(
-            Math.max(this.options.left, 0),
-            0,
-            Math.max(0, rect.width - rect2.width)
+            this.options.left,
+            -xOffset,
+            Math.max(0, containerRect.width - overlayRect.width + xOffset)
         );
 
         const top = clamp(
-            Math.max(this.options.top, 0),
-            0,
-            Math.max(0, rect.height - rect2.height)
+            this.options.top,
+            -yOffset,
+            Math.max(0, containerRect.height - overlayRect.height + yOffset)
         );
-
-        console.log(new Error().stack);
 
         this._element.style.left = `${left}px`;
         this._element.style.top = `${top}px`;

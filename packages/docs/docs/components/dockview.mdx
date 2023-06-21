@@ -28,6 +28,7 @@ import DockviewExternalDnd from '@site/sandboxes/externaldnd-dockview/src/app';
 import DockviewResizeContainer from '@site/sandboxes/resizecontainer-dockview/src/app';
 import DockviewTabheight from '@site/sandboxes/tabheight-dockview/src/app';
 import DockviewWithIFrames from '@site/sandboxes/iframe-dockview/src/app';
+import DockviewFloating from '@site/sandboxes/floatinggroup-dockview/src/app';
 
 import { attach as attachDockviewVanilla } from '@site/sandboxes/javascript/vanilla-dockview/src/app';
 import { attach as attachSimpleDockview } from '@site/sandboxes/javascript/simple-dockview/src/app';
@@ -359,6 +360,15 @@ any drag and drop logic for other controls.
 
 <Container>
     <DockviewExternalDnd />
+</Container>
+
+## Floating Groups
+
+Dockview has built-in support for floating groups. Each floating container can contain a single group with many panels
+and you can have as many floating containers as needed. You cannot dock multiple groups together in the same floating container.
+
+<Container height={600} sandboxId="floatinggroup-dockview">
+    <DockviewFloating />
 </Container>
 
 ## Panels

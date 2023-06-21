@@ -8,7 +8,7 @@ import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/splitview';
 import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
-import { IDockviewPanel } from '../../dockview/dockviewPanel';
+import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
 class PanelContentPartTest implements IContentRenderer {
@@ -2618,5 +2618,33 @@ describe('dockviewComponent', () => {
                 },
             },
         });
+    });
+
+    test('floating: group is removed', async () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        expect(dockview.groups.length).toBe(0);
+        const panel = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+            floating: true,
+        });
+        expect(dockview.groups.length).toBe(1);
+
+        dockview.removePanel(panel);
+        expect(dockview.groups.length).toBe(0);
     });
 });

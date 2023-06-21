@@ -251,8 +251,6 @@ export const EventsGridview = () => {
             },
         });
 
-        console.log('sdf');
-
         api.addPanel({
             id: 'panel_4',
             component: 'default',
