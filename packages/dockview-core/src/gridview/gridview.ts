@@ -371,8 +371,7 @@ export class Gridview implements IDisposable {
             root,
             orientation,
             deserializer,
-            orthogonalSize,
-            true
+            orthogonalSize
         ) as BranchNode;
     }
 
@@ -380,8 +379,7 @@ export class Gridview implements IDisposable {
         node: ISerializedNode,
         orientation: Orientation,
         deserializer: IViewDeserializer,
-        orthogonalSize: number,
-        isRoot = false
+        orthogonalSize: number
     ): Node {
         let result: Node;
         if (node.type === 'branch') {
@@ -398,14 +396,12 @@ export class Gridview implements IDisposable {
                 } as INodeDescriptor;
             });
 
-            // HORIZONTAL => height=orthogonalsize width=size
-            // VERTICAL => height=size width=orthogonalsize
             result = new BranchNode(
                 orientation,
                 this.proportionalLayout,
                 this.styles,
-                isRoot ? orthogonalSize : node.size,
-                isRoot ? node.size : orthogonalSize,
+                orthogonalSize, // <- size - flips at each depth
+                node.size, // <- orthogonal size - flips at each depth
                 children
             );
         } else {
