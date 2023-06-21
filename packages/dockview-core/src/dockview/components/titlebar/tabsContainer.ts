@@ -28,7 +28,8 @@ export interface ITabsContainer extends IDisposable {
     isActive: (tab: ITab) => boolean;
     closePanel: (panel: IDockviewPanel) => void;
     openPanel: (panel: IDockviewPanel, index?: number) => void;
-    setActionElement(element: HTMLElement | undefined): void;
+    setRightActionsElement(element: HTMLElement | undefined): void;
+    setLeftActionsElement(element: HTMLElement | undefined): void;
     hidden: boolean;
     show(): void;
     hide(): void;
@@ -40,12 +41,14 @@ export class TabsContainer
 {
     private readonly _element: HTMLElement;
     private readonly tabContainer: HTMLElement;
-    private readonly actionContainer: HTMLElement;
+    private readonly rightActionsContainer: HTMLElement;
+    private readonly leftActionsContainer: HTMLElement;
     private readonly voidContainer: VoidContainer;
 
     private tabs: IValueDisposable<ITab>[] = [];
     private selectedIndex = -1;
-    private actions: HTMLElement | undefined;
+    private rightActions: HTMLElement | undefined;
+    private leftActions: HTMLElement | undefined;
 
     private _hidden = false;
 
@@ -79,17 +82,31 @@ export class TabsContainer
         this._element.style.display = 'none';
     }
 
-    setActionElement(element: HTMLElement | undefined): void {
-        if (this.actions === element) {
+    setRightActionsElement(element: HTMLElement | undefined): void {
+        if (this.rightActions === element) {
             return;
         }
-        if (this.actions) {
-            this.actions.remove();
-            this.actions = undefined;
+        if (this.rightActions) {
+            this.rightActions.remove();
+            this.rightActions = undefined;
         }
         if (element) {
-            this.actionContainer.appendChild(element);
-            this.actions = element;
+            this.rightActionsContainer.appendChild(element);
+            this.rightActions = element;
+        }
+    }
+
+    setLeftActionsElement(element: HTMLElement | undefined): void {
+        if (this.leftActions === element) {
+            return;
+        }
+        if (this.leftActions) {
+            this.leftActions.remove();
+            this.leftActions = undefined;
+        }
+        if (element) {
+            this.leftActionsContainer.appendChild(element);
+            this.leftActions = element;
         }
     }
 
@@ -146,8 +163,11 @@ export class TabsContainer
             })
         );
 
-        this.actionContainer = document.createElement('div');
-        this.actionContainer.className = 'action-container';
+        this.rightActionsContainer = document.createElement('div');
+        this.rightActionsContainer.className = 'right-actions-container';
+
+        this.leftActionsContainer = document.createElement('div');
+        this.leftActionsContainer.className = 'left-actions-container';
 
         this.tabContainer = document.createElement('div');
         this.tabContainer.className = 'tabs-container';
@@ -155,8 +175,9 @@ export class TabsContainer
         this.voidContainer = new VoidContainer(this.accessor, this.group);
 
         this._element.appendChild(this.tabContainer);
+        this._element.appendChild(this.leftActionsContainer);
         this._element.appendChild(this.voidContainer.element);
-        this._element.appendChild(this.actionContainer);
+        this._element.appendChild(this.rightActionsContainer);
 
         this.addDisposables(
             this.voidContainer,

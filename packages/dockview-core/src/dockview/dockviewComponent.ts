@@ -71,7 +71,8 @@ export type DockviewComponentUpdateOptions = Pick<
     | 'showDndOverlay'
     | 'watermarkFrameworkComponent'
     | 'defaultTabComponent'
-    | 'createGroupControlElement'
+    | 'createLeftHeaderActionsElement'
+    | 'createRightHeaderActionsElement'
 >;
 
 export interface DockviewDropEvent extends GroupviewDropEvent {

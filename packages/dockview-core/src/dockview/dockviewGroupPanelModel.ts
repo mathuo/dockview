@@ -18,7 +18,7 @@ import {
 import { DockviewDropTargets, IWatermarkRenderer } from './types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
-import { IGroupControlRenderer } from './options';
+import { IHeaderActionsRenderer } from './options';
 
 export interface DndService {
     canDisplayOverlay(
@@ -137,7 +137,8 @@ export class DockviewGroupPanelModel
     private watermark?: IWatermarkRenderer;
     private _isGroupActive = false;
     private _locked = false;
-    private _control: IGroupControlRenderer | undefined;
+    private _rightHeaderActions: IHeaderActionsRenderer | undefined;
+    private _leftHeaderActions: IHeaderActionsRenderer | undefined;
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
 
@@ -319,16 +320,34 @@ export class DockviewGroupPanelModel
         this.setActive(this.isActive, true, true);
         this.updateContainer();
 
-        if (this.accessor.options.createGroupControlElement) {
-            this._control = this.accessor.options.createGroupControlElement(
-                this.groupPanel
-            );
-            this.addDisposables(this._control);
-            this._control.init({
+        if (this.accessor.options.createRightHeaderActionsElement) {
+            this._rightHeaderActions =
+                this.accessor.options.createRightHeaderActionsElement(
+                    this.groupPanel
+                );
+            this.addDisposables(this._rightHeaderActions);
+            this._rightHeaderActions.init({
                 containerApi: new DockviewApi(this.accessor),
                 api: this.groupPanel.api,
             });
-            this.tabsContainer.setActionElement(this._control.element);
+            this.tabsContainer.setRightActionsElement(
+                this._rightHeaderActions.element
+            );
+        }
+
+        if (this.accessor.options.createLeftHeaderActionsElement) {
+            this._leftHeaderActions =
+                this.accessor.options.createLeftHeaderActionsElement(
+                    this.groupPanel
+                );
+            this.addDisposables(this._leftHeaderActions);
+            this._leftHeaderActions.init({
+                containerApi: new DockviewApi(this.accessor),
+                api: this.groupPanel.api,
+            });
+            this.tabsContainer.setLeftActionsElement(
+                this._leftHeaderActions.element
+            );
         }
     }
 
@@ -511,7 +530,7 @@ export class DockviewGroupPanelModel
     }
 
     updateActions(element: HTMLElement | undefined): void {
-        this.tabsContainer.setActionElement(element);
+        this.tabsContainer.setRightActionsElement(element);
     }
 
     public setActive(

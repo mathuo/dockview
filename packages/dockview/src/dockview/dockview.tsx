@@ -4,12 +4,12 @@ import {
     DockviewDropEvent,
     DockviewDndOverlayEvent,
     GroupPanelFrameworkComponentFactory,
-    IGroupControlRenderer,
     DockviewPanelApi,
     DockviewApi,
     IContentRenderer,
     ITabRenderer,
     DockviewGroupPanel,
+    IHeaderActionsRenderer,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
@@ -18,17 +18,17 @@ import { ReactPortalStore, usePortalsLifecycle } from '../react';
 import { IWatermarkPanelProps, ReactWatermarkPart } from './reactWatermarkPart';
 import { PanelCollection, PanelParameters } from '../types';
 import {
-    IDockviewGroupControlProps,
-    ReactGroupControlsRendererPart,
-} from './groupControlsRenderer';
+    IDockviewHeaderActionsProps,
+    ReactHeaderActionsRendererPart,
+} from './headerActionsRenderer';
 
 function createGroupControlElement(
-    component: React.FunctionComponent<IDockviewGroupControlProps> | undefined,
+    component: React.FunctionComponent<IDockviewHeaderActionsProps> | undefined,
     store: ReactPortalStore
-): ((groupPanel: DockviewGroupPanel) => IGroupControlRenderer) | undefined {
+): ((groupPanel: DockviewGroupPanel) => IHeaderActionsRenderer) | undefined {
     return component
         ? (groupPanel: DockviewGroupPanel) => {
-              return new ReactGroupControlsRendererPart(
+              return new ReactHeaderActionsRendererPart(
                   component,
                   store,
                   groupPanel
@@ -65,7 +65,8 @@ export interface IDockviewReactProps {
     className?: string;
     disableAutoResizing?: boolean;
     defaultTabComponent?: React.FunctionComponent<IDockviewPanelHeaderProps>;
-    groupControlComponent?: React.FunctionComponent<IDockviewGroupControlProps>;
+    rightHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
+    leftHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     singleTabMode?: 'fullwidth' | 'default';
 }
 
@@ -150,10 +151,15 @@ export const DockviewReact = React.forwardRef(
                     ? { separatorBorder: 'transparent' }
                     : undefined,
                 showDndOverlay: props.showDndOverlay,
-                createGroupControlElement: createGroupControlElement(
-                    props.groupControlComponent,
+                createLeftHeaderActionsElement: createGroupControlElement(
+                    props.leftHeaderActionsComponent,
                     { addPortal }
                 ),
+                createRightHeaderActionsElement: createGroupControlElement(
+                    props.rightHeaderActionsComponent,
+                    { addPortal }
+                ),
+
                 singleTabMode: props.singleTabMode,
             });
 
@@ -250,12 +256,24 @@ export const DockviewReact = React.forwardRef(
                 return;
             }
             dockviewRef.current.updateOptions({
-                createGroupControlElement: createGroupControlElement(
-                    props.groupControlComponent,
+                createRightHeaderActionsElement: createGroupControlElement(
+                    props.rightHeaderActionsComponent,
                     { addPortal }
                 ),
             });
-        }, [props.groupControlComponent]);
+        }, [props.rightHeaderActionsComponent]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+            dockviewRef.current.updateOptions({
+                createLeftHeaderActionsElement: createGroupControlElement(
+                    props.leftHeaderActionsComponent,
+                    { addPortal }
+                ),
+            });
+        }, [props.leftHeaderActionsComponent]);
 
         return (
             <div
