@@ -7,7 +7,7 @@ import {
     Sizing,
     Splitview,
 } from '../../splitview/splitview';
-
+import { fireEvent } from '@testing-library/dom';
 class Testview implements IView {
     private _element: HTMLElement = document.createElement('div');
     private _size = 0;
@@ -84,6 +84,8 @@ describe('splitview', () => {
     beforeEach(() => {
         container = document.createElement('div');
         container.className = 'container';
+
+        jest.clearAllMocks();
     });
 
     test('vertical splitview', () => {
@@ -595,5 +597,83 @@ describe('splitview', () => {
 
         expect(anyEvents).toBeFalsy();
         expect(container.childNodes.length).toBe(0);
+    });
+
+    test('dnd: pointer events to move sash', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: false,
+        });
+        splitview.layout(400, 500);
+
+        const view1 = new Testview(0, 1000);
+        const view2 = new Testview(0, 1000);
+
+        splitview.addView(view1);
+        splitview.addView(view2);
+
+        const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
+        const removeEventListenerSpy = jest.spyOn(
+            document,
+            'removeEventListener'
+        );
+
+        const sashElement = container
+            .getElementsByClassName('sash')
+            .item(0) as HTMLElement;
+
+        // validate the expected state before drag
+        expect([view1.size, view2.size]).toEqual([200, 200]);
+        expect(sashElement).toBeTruthy();
+        expect(view1.element.parentElement!.style.pointerEvents).toBe('');
+        expect(view2.element.parentElement!.style.pointerEvents).toBe('');
+
+        // start the drag event
+        fireEvent(
+            sashElement,
+            new MouseEvent('pointerdown', { clientX: 50, clientY: 100 })
+        );
+
+        expect(addEventListenerSpy).toBeCalledTimes(3);
+
+        // during a sash drag the views should have pointer-events disabled
+        expect(view1.element.parentElement!.style.pointerEvents).toBe('none');
+        expect(view2.element.parentElement!.style.pointerEvents).toBe('none');
+
+        // expect a delta move of 70 - 50 = 20
+        fireEvent(
+            document,
+            new MouseEvent('pointermove', { clientX: 70, clientY: 110 })
+        );
+        expect([view1.size, view2.size]).toEqual([220, 180]);
+
+        // expect a delta move of 75 - 70 = 5
+        fireEvent(
+            document,
+            new MouseEvent('pointermove', { clientX: 75, clientY: 110 })
+        );
+        expect([view1.size, view2.size]).toEqual([225, 175]);
+
+        // end the drag event
+        fireEvent(
+            document,
+            new MouseEvent('pointerup', { clientX: 70, clientY: 110 })
+        );
+
+        expect(removeEventListenerSpy).toBeCalledTimes(3);
+
+        // expect pointer-eventes on views to be restored
+        expect(view1.element.parentElement!.style.pointerEvents).toBe('');
+        expect(view2.element.parentElement!.style.pointerEvents).toBe('');
+
+        fireEvent(
+            document,
+            new MouseEvent('pointermove', { clientX: 100, clientY: 100 })
+        );
+        // expect no additional resizes
+        expect([view1.size, view2.size]).toEqual([225, 175]);
+        // expect no additional document listeners
+        expect(addEventListenerSpy).toBeCalledTimes(3);
+        expect(removeEventListenerSpy).toBeCalledTimes(3);
     });
 });

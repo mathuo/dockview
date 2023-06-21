@@ -102,10 +102,10 @@ export class Emitter<T> implements IDisposable {
                         if (index > -1) {
                             this._listeners.splice(index, 1);
                         } else if (Emitter.ENABLE_TRACKING) {
-                            console.warn(
-                                `Listener already disposed`,
-                                Stacktrace.create().print()
-                            );
+                            // console.warn(
+                            //     `Listener already disposed`,
+                            //     Stacktrace.create().print()
+                            // );
                         }
                     },
                 };
@@ -162,7 +162,7 @@ export function addDisposableWindowListener<K extends keyof WindowEventMap>(
 
     return {
         dispose: () => {
-            element.removeEventListener(type, listener);
+            element.removeEventListener(type, listener, options);
         },
     };
 }
@@ -177,7 +177,7 @@ export function addDisposableListener<K extends keyof HTMLElementEventMap>(
 
     return {
         dispose: () => {
-            element.removeEventListener(type, listener);
+            element.removeEventListener(type, listener, options);
         },
     };
 }

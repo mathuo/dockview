@@ -10,24 +10,25 @@ import {
     PanelUpdateEvent,
 } from 'dockview-core';
 
-export interface IDockviewGroupControlProps {
+export interface IDockviewHeaderActionsProps {
     api: DockviewGroupPanelApi;
     containerApi: DockviewApi;
     panels: IDockviewPanel[];
     activePanel: IDockviewPanel | undefined;
     isGroupActive: boolean;
+    group: DockviewGroupPanel;
 }
 
-export class ReactGroupControlsRendererPart {
+export class ReactHeaderActionsRendererPart {
     private mutableDisposable = new DockviewMutableDisposable();
     private _element: HTMLElement;
-    private _part?: ReactPart<IDockviewGroupControlProps>;
+    private _part?: ReactPart<IDockviewHeaderActionsProps>;
 
     get element(): HTMLElement {
         return this._element;
     }
 
-    get part(): ReactPart<IDockviewGroupControlProps> | undefined {
+    get part(): ReactPart<IDockviewHeaderActionsProps> | undefined {
         return this._part;
     }
 
@@ -36,7 +37,7 @@ export class ReactGroupControlsRendererPart {
     }
 
     constructor(
-        private readonly component: React.FunctionComponent<IDockviewGroupControlProps>,
+        private readonly component: React.FunctionComponent<IDockviewHeaderActionsProps>,
         private readonly reactPortalStore: ReactPortalStore,
         private readonly _group: DockviewGroupPanel
     ) {
@@ -77,6 +78,7 @@ export class ReactGroupControlsRendererPart {
                 panels: this._group.model.panels,
                 activePanel: this._group.model.activePanel,
                 isGroupActive: this._group.api.isActive,
+                group: this._group,
             }
         );
     }

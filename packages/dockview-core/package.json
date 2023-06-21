@@ -1,6 +1,6 @@
 {
   "name": "dockview-core",
-  "version": "1.7.3",
+  "version": "1.7.6",
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support",
   "main": "./dist/cjs/index.js",
   "types": "./dist/cjs/index.d.ts",

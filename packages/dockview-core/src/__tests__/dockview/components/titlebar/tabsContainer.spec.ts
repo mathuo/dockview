@@ -1,13 +1,13 @@
-import { DockviewComponent } from '../../../dockview/dockviewComponent';
-import { TabsContainer } from '../../../dockview/components/titlebar/tabsContainer';
-import { fireEvent } from '@testing-library/dom';
 import {
     LocalSelectionTransfer,
     PanelTransfer,
-} from '../../../dnd/dataTransfer';
-import { TestPanel } from '../dockviewGroupPanelModel.spec';
-import { DockviewGroupPanelModel } from '../../../dockview/dockviewGroupPanelModel';
-import { DockviewGroupPanel } from '../../../dockview/dockviewGroupPanel';
+} from '../../../../dnd/dataTransfer';
+import { TabsContainer } from '../../../../dockview/components/titlebar/tabsContainer';
+import { DockviewComponent } from '../../../../dockview/dockviewComponent';
+import { DockviewGroupPanel } from '../../../../dockview/dockviewGroupPanel';
+import { DockviewGroupPanelModel } from '../../../../dockview/dockviewGroupPanelModel';
+import { fireEvent } from '@testing-library/dom';
+import { TestPanel } from '../../dockviewGroupPanelModel.spec';
 
 describe('tabsContainer', () => {
     test('that an external event does not render a drop target and calls through to the group mode', () => {
@@ -330,5 +330,137 @@ describe('tabsContainer', () => {
         expect(
             cut.element.getElementsByClassName('drop-target-dropzone').length
         ).toBe(0);
+    });
+
+    test('left actions', () => {
+        const accessorMock = jest.fn<DockviewComponent, []>(() => {
+            return (<Partial<DockviewComponent>>{
+                options: {},
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+            }) as DockviewComponent;
+        });
+
+        const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+            return (<Partial<DockviewGroupPanel>>{}) as DockviewGroupPanel;
+        });
+
+        const accessor = new accessorMock();
+        const groupPanel = new groupPanelMock();
+
+        const cut = new TabsContainer(accessor, groupPanel);
+
+        let query = cut.element.querySelectorAll(
+            '.tabs-and-actions-container > .left-actions-container'
+        );
+
+        expect(query.length).toBe(1);
+        expect(query[0].children.length).toBe(0);
+
+        // add left action
+
+        const left = document.createElement('div');
+        left.className = 'test-left-actions-element';
+        cut.setLeftActionsElement(left);
+
+        query = cut.element.querySelectorAll(
+            '.tabs-and-actions-container > .left-actions-container'
+        );
+        expect(query.length).toBe(1);
+        expect(query[0].children.item(0)?.className).toBe(
+            'test-left-actions-element'
+        );
+        expect(query[0].children.length).toBe(1);
+
+        // add left action
+
+        const left2 = document.createElement('div');
+        left2.className = 'test-left-actions-element-2';
+        cut.setLeftActionsElement(left2);
+
+        query = cut.element.querySelectorAll(
+            '.tabs-and-actions-container > .left-actions-container'
+        );
+        expect(query.length).toBe(1);
+        expect(query[0].children.item(0)?.className).toBe(
+            'test-left-actions-element-2'
+        );
+        expect(query[0].children.length).toBe(1);
+
+        // remove left action
+
+        cut.setLeftActionsElement(undefined);
+        query = cut.element.querySelectorAll(
+            '.tabs-and-actions-container > .left-actions-container'
+        );
+
+        expect(query.length).toBe(1);
+        expect(query[0].children.length).toBe(0);
+    });
+
+    test('right actions', () => {
+        const accessorMock = jest.fn<DockviewComponent, []>(() => {
+            return (<Partial<DockviewComponent>>{
+                options: {},
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+            }) as DockviewComponent;
+        });
+
+        const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+            return (<Partial<DockviewGroupPanel>>{}) as DockviewGroupPanel;
+        });
+
+        const accessor = new accessorMock();
+        const groupPanel = new groupPanelMock();
+
+        const cut = new TabsContainer(accessor, groupPanel);
+
+        let query = cut.element.querySelectorAll(
+            '.tabs-and-actions-container > .right-actions-container'
+        );
+
+        expect(query.length).toBe(1);
+        expect(query[0].children.length).toBe(0);
+
+        // add right action
+
+        const right = document.createElement('div');
+        right.className = 'test-right-actions-element';
+        cut.setRightActionsElement(right);
+
+        query = cut.element.querySelectorAll(
+            '.tabs-and-actions-container > .right-actions-container'
+        );
+        expect(query.length).toBe(1);
+        expect(query[0].children.item(0)?.className).toBe(
+            'test-right-actions-element'
+        );
+        expect(query[0].children.length).toBe(1);
+
+        // add right action
+
+        const right2 = document.createElement('div');
+        right2.className = 'test-right-actions-element-2';
+        cut.setRightActionsElement(right2);
+
+        query = cut.element.querySelectorAll(
+            '.tabs-and-actions-container > .right-actions-container'
+        );
+        expect(query.length).toBe(1);
+        expect(query[0].children.item(0)?.className).toBe(
+            'test-right-actions-element-2'
+        );
+        expect(query[0].children.length).toBe(1);
+
+        // remove right action
+
+        cut.setRightActionsElement(undefined);
+        query = cut.element.querySelectorAll(
+            '.tabs-and-actions-container > .right-actions-container'
+        );
+
+        expect(query.length).toBe(1);
+        expect(query[0].children.length).toBe(0);
     });
 });

@@ -73,7 +73,8 @@ export type DockviewComponentUpdateOptions = Pick<
     | 'showDndOverlay'
     | 'watermarkFrameworkComponent'
     | 'defaultTabComponent'
-    | 'createGroupControlElement'
+    | 'createLeftHeaderActionsElement'
+    | 'createRightHeaderActionsElement'
 >;
 
 export interface DockviewDropEvent extends GroupviewDropEvent {
@@ -500,6 +501,10 @@ export class DockviewComponent
             throw new Error('root must be of type branch');
         }
 
+        // take note of the existing dimensions
+        const width = this.width;
+        const height = this.height;
+
         this.gridview.deserialize(grid, {
             fromJSON: (node: ISerializedLeafNode<GroupPanelViewState>) => {
                 const { id, locked, hideHeader, views, activeView } = node.data;
@@ -541,14 +546,14 @@ export class DockviewComponent
             },
         });
 
+        this.layout(width, height);
+
         if (typeof activeGroup === 'string') {
             const panel = this.getPanel(activeGroup);
             if (panel) {
                 this.doSetGroupActive(panel);
             }
         }
-
-        this.gridview.layout(this.width, this.height);
 
         this._onDidLayoutFromJSON.fire();
     }

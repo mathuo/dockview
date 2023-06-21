@@ -1,7 +1,16 @@
-import { Emitter, Event } from '../events';
+import {
+    Emitter,
+    Event,
+    addDisposableListener,
+    addDisposableWindowListener,
+} from '../events';
 
 describe('events', () => {
     describe('emitter', () => {
+        it('debug mode is off', () => {
+            expect(Emitter.ENABLE_TRACKING).toBeFalsy();
+        });
+
         it('should emit values', () => {
             const emitter = new Emitter<number>();
             let value: number | undefined = undefined;
@@ -96,5 +105,139 @@ describe('events', () => {
 
         emitter3.fire(3);
         expect(value).toBe(3);
+    });
+
+    it('addDisposableWindowListener with capture options', () => {
+        const element = {
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+        };
+
+        const handler = jest.fn();
+
+        const disposable = addDisposableWindowListener(
+            element as any,
+            'mousedown',
+            handler,
+            true
+        );
+
+        expect(element.addEventListener).toBeCalledTimes(1);
+        expect(element.addEventListener).toHaveBeenCalledWith(
+            'mousedown',
+            handler,
+            true
+        );
+        expect(element.removeEventListener).toBeCalledTimes(0);
+
+        disposable.dispose();
+
+        expect(element.addEventListener).toBeCalledTimes(1);
+        expect(element.removeEventListener).toBeCalledTimes(1);
+        expect(element.removeEventListener).toBeCalledWith(
+            'mousedown',
+            handler,
+            true
+        );
+    });
+
+    it('addDisposableWindowListener without capture options', () => {
+        const element = {
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+        };
+
+        const handler = jest.fn();
+
+        const disposable = addDisposableWindowListener(
+            element as any,
+            'mousedown',
+            handler
+        );
+
+        expect(element.addEventListener).toBeCalledTimes(1);
+        expect(element.addEventListener).toHaveBeenCalledWith(
+            'mousedown',
+            handler,
+            undefined
+        );
+        expect(element.removeEventListener).toBeCalledTimes(0);
+
+        disposable.dispose();
+
+        expect(element.addEventListener).toBeCalledTimes(1);
+        expect(element.removeEventListener).toBeCalledTimes(1);
+        expect(element.removeEventListener).toBeCalledWith(
+            'mousedown',
+            handler,
+            undefined
+        );
+    });
+
+    it('addDisposableListener with capture options', () => {
+        const element = {
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+        };
+
+        const handler = jest.fn();
+
+        const disposable = addDisposableListener(
+            element as any,
+            'mousedown',
+            handler,
+            true
+        );
+
+        expect(element.addEventListener).toBeCalledTimes(1);
+        expect(element.addEventListener).toHaveBeenCalledWith(
+            'mousedown',
+            handler,
+            true
+        );
+        expect(element.removeEventListener).toBeCalledTimes(0);
+
+        disposable.dispose();
+
+        expect(element.addEventListener).toBeCalledTimes(1);
+        expect(element.removeEventListener).toBeCalledTimes(1);
+        expect(element.removeEventListener).toBeCalledWith(
+            'mousedown',
+            handler,
+            true
+        );
+    });
+
+    it('addDisposableListener without capture options', () => {
+        const element = {
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+        };
+
+        const handler = jest.fn();
+
+        const disposable = addDisposableListener(
+            element as any,
+            'mousedown',
+            handler
+        );
+
+        expect(element.addEventListener).toBeCalledTimes(1);
+        expect(element.addEventListener).toHaveBeenCalledWith(
+            'mousedown',
+            handler,
+            undefined
+        );
+        expect(element.removeEventListener).toBeCalledTimes(0);
+
+        disposable.dispose();
+
+        expect(element.addEventListener).toBeCalledTimes(1);
+        expect(element.removeEventListener).toBeCalledTimes(1);
+        expect(element.removeEventListener).toBeCalledWith(
+            'mousedown',
+            handler,
+            undefined
+        );
     });
 });

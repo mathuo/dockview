@@ -7,17 +7,20 @@ import {
 } from '../lifecycle';
 
 export abstract class DragHandler extends CompositeDisposable {
-    private readonly disposable = new MutableDisposable();
+    private readonly dataDisposable = new MutableDisposable();
+    private readonly pointerEventsDisposable = new MutableDisposable();
 
     private readonly _onDragStart = new Emitter<void>();
     readonly onDragStart = this._onDragStart.event;
 
-    private iframes: HTMLElement[] = [];
-
     constructor(protected readonly el: HTMLElement) {
         super();
 
-        this.addDisposables(this._onDragStart);
+        this.addDisposables(
+            this._onDragStart,
+            this.dataDisposable,
+            this.pointerEventsDisposable
+        );
 
         this.configure();
     }
@@ -32,24 +35,32 @@ export abstract class DragHandler extends CompositeDisposable {
         this.addDisposables(
             this._onDragStart,
             addDisposableListener(this.el, 'dragstart', (event) => {
-                if (this.isCancelled(event)) {
-                    event.preventDefault();
-                    return;
-                }
+              if (this.isCancelled(event)) {
+                event.preventDefault();
+                return;
+              }
 
-                this.disposable.value = this.getData(event.dataTransfer);
-
-                this.iframes = [
+                const iframes = [
                     ...getElementsByTagName('iframe'),
                     ...getElementsByTagName('webview'),
                 ];
 
-                for (const iframe of this.iframes) {
+                this.pointerEventsDisposable.value = {
+                    dispose: () => {
+                        for (const iframe of iframes) {
+                            iframe.style.pointerEvents = 'auto';
+                        }
+                    },
+                };
+
+                for (const iframe of iframes) {
                     iframe.style.pointerEvents = 'none';
                 }
 
                 this.el.classList.add('dv-dragged');
                 setTimeout(() => this.el.classList.remove('dv-dragged'), 0);
+
+                this.dataDisposable.value = this.getData(event.dataTransfer);
 
                 if (event.dataTransfer) {
                     event.dataTransfer.effectAllowed = 'move';
@@ -70,12 +81,8 @@ export abstract class DragHandler extends CompositeDisposable {
                 }
             }),
             addDisposableListener(this.el, 'dragend', () => {
-                for (const iframe of this.iframes) {
-                    iframe.style.pointerEvents = 'auto';
-                }
-                this.iframes = [];
-
-                this.disposable.dispose();
+                this.pointerEventsDisposable.dispose();
+                this.dataDisposable.dispose();
             })
         );
     }

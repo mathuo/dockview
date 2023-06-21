@@ -104,6 +104,7 @@ export abstract class BasePanelView<T extends PanelApiImpl>
     }
 
     update(event: PanelUpdateEvent): void {
+        // merge the new parameters with the existing parameters
         this._params = {
             ...this._params,
             params: {
@@ -111,6 +112,18 @@ export abstract class BasePanelView<T extends PanelApiImpl>
                 ...event.params,
             },
         };
+
+        /**
+         * delete new keys that have a value of undefined,
+         * allow values of null
+         */
+        for (const key of Object.keys(event.params)) {
+            if (event.params[key] === undefined) {
+                delete this._params.params[key];
+            }
+        }
+
+        // update the view with the updated props
         this.part?.update({ params: this._params.params });
     }
 
