@@ -54,6 +54,17 @@ export type CanDisplayOverlay =
     | boolean
     | ((dragEvent: DragEvent, state: Position) => boolean);
 
+const eventMarkTag = 'dv_droptarget_marked';
+
+function markEvent(event: DragEvent): void {
+    (event as any)[eventMarkTag] = true;
+}
+
+function isEventMarked(event: DragEvent) {
+    const value = (event as any)[eventMarkTag];
+    return typeof value === 'boolean' && value;
+}
+
 export class Droptarget extends CompositeDisposable {
     private targetElement: HTMLElement | undefined;
     private overlayElement: HTMLElement | undefined;
@@ -114,7 +125,7 @@ export class Droptarget extends CompositeDisposable {
                         height
                     );
 
-                    if (quadrant === null) {
+                    if (isEventMarked(e) || quadrant === null) {
                         // no drop target should be displayed
                         this.removeDropTarget();
                         return;
@@ -127,6 +138,8 @@ export class Droptarget extends CompositeDisposable {
                     } else if (!this.options.canDisplayOverlay(e, quadrant)) {
                         return;
                     }
+
+                    markEvent(e);
 
                     if (!this.targetElement) {
                         this.targetElement = document.createElement('div');
