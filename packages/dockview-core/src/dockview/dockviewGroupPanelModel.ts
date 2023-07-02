@@ -792,6 +792,7 @@ export class DockviewGroupPanelModel
     public dispose(): void {
         super.dispose();
 
+        this.watermark?.element.remove();
         this.watermark?.dispose?.();
 
         for (const panel of this.panels) {

@@ -2647,4 +2647,992 @@ describe('dockviewComponent', () => {
         dockview.removePanel(panel);
         expect(dockview.groups.length).toBe(0);
     });
+
+    test('floating: move a floating group of one tab to a new fixed group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            floating: true,
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(2);
+
+        dockview.moveGroupOrPanel(
+            panel1.group,
+            panel2.group.id,
+            undefined,
+            'right'
+        );
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(2);
+    });
+
+    test('floating: move a floating group of one tab to an existing fixed group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            floating: true,
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(2);
+
+        dockview.moveGroupOrPanel(
+            panel1.group,
+            panel2.group.id,
+            undefined,
+            'center'
+        );
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(dockview.groups.length).toBe(1);
+        expect(dockview.panels.length).toBe(2);
+    });
+
+    test('floating: move a floating group of one tab to an existing floating group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            floating: true,
+        });
+
+        const panel3 = dockview.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            floating: true,
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(3);
+        expect(dockview.panels.length).toBe(3);
+
+        dockview.moveGroupOrPanel(
+            panel2.group,
+            panel3.group.id,
+            undefined,
+            'center'
+        );
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(3);
+    });
+
+    test('floating: move a floating group of many tabs to a new fixed group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            floating: true,
+        });
+
+        const panel3 = dockview.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            position: { referencePanel: panel2 },
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(3);
+
+        dockview.moveGroupOrPanel(
+            panel1.group,
+            panel2.group.id,
+            undefined,
+            'right'
+        );
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(panel3.group.model.isFloating).toBeFalsy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(3);
+    });
+
+    test('floating: move a floating group of many tabs to an existing fixed group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            floating: true,
+        });
+
+        const panel3 = dockview.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            position: { referencePanel: panel2 },
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(3);
+
+        dockview.moveGroupOrPanel(
+            panel1.group,
+            panel2.group.id,
+            undefined,
+            'center'
+        );
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(panel3.group.model.isFloating).toBeFalsy();
+        expect(dockview.groups.length).toBe(1);
+        expect(dockview.panels.length).toBe(3);
+    });
+
+    test('floating: move a floating group of many tabs to an existing floating group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            floating: true,
+        });
+
+        const panel3 = dockview.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            position: { referencePanel: panel2 },
+        });
+
+        const panel4 = dockview.addPanel({
+            id: 'panel_4',
+            component: 'default',
+            floating: true,
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(panel4.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(3);
+        expect(dockview.panels.length).toBe(4);
+
+        dockview.moveGroupOrPanel(
+            panel4.group,
+            panel2.group.id,
+            undefined,
+            'center'
+        );
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(panel4.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(4);
+    });
+
+    test('floating: move a floating tab of one tab to a new fixed group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            floating: true,
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(2);
+
+        dockview.moveGroupOrPanel(
+            panel1.group,
+            panel2.group.id,
+            panel2.id,
+            'right'
+        );
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(2);
+    });
+
+    test('floating: move a floating tab of one tab to an existing fixed group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            floating: true,
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(2);
+
+        dockview.moveGroupOrPanel(
+            panel1.group,
+            panel2.group.id,
+            panel2.id,
+            'center'
+        );
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(dockview.groups.length).toBe(1);
+        expect(dockview.panels.length).toBe(2);
+    });
+
+    test('floating: move a floating tab of one tab to an existing floating group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            floating: true,
+        });
+
+        const panel3 = dockview.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            floating: true,
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(3);
+        expect(dockview.panels.length).toBe(3);
+
+        dockview.moveGroupOrPanel(
+            panel2.group,
+            panel3.group.id,
+            panel3.id,
+            'center'
+        );
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(3);
+    });
+
+    test('floating: move a floating tab of many tabs to a new fixed group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            floating: true,
+        });
+
+        const panel3 = dockview.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            position: { referencePanel: panel2 },
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(3);
+
+        dockview.moveGroupOrPanel(
+            panel1.group,
+            panel2.group.id,
+            panel2.id,
+            'right'
+        );
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(3);
+        expect(dockview.panels.length).toBe(3);
+    });
+
+    test('floating: move a floating tab of many tabs to an existing fixed group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            floating: true,
+        });
+
+        const panel3 = dockview.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            position: { referencePanel: panel2 },
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(3);
+
+        dockview.moveGroupOrPanel(
+            panel1.group,
+            panel2.group.id,
+            panel2.id,
+            'center'
+        );
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(3);
+    });
+
+    test('floating: move a floating tab of many tabs to an existing floating group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            floating: true,
+        });
+
+        const panel3 = dockview.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            position: { referencePanel: panel2 },
+        });
+
+        const panel4 = dockview.addPanel({
+            id: 'panel_4',
+            component: 'default',
+            floating: true,
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(panel4.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(3);
+        expect(dockview.panels.length).toBe(4);
+
+        dockview.moveGroupOrPanel(
+            panel4.group,
+            panel2.group.id,
+            panel2.id,
+            'center'
+        );
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(panel4.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(3);
+        expect(dockview.panels.length).toBe(4);
+    });
+
+    test('floating: move a fixed tab of one tab to an existing floating group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+
+        const panel3 = dockview.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            floating: true,
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(3);
+        expect(dockview.panels.length).toBe(3);
+
+        dockview.moveGroupOrPanel(
+            panel3.group,
+            panel1.group.id,
+            panel1.id,
+            'center'
+        );
+
+        expect(panel1.group.model.isFloating).toBeTruthy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(3);
+    });
+
+    test('floating: move a fixed tab of many tabs to an existing floating group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+        });
+
+        const panel3 = dockview.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            floating: true,
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(3);
+
+        dockview.moveGroupOrPanel(
+            panel3.group,
+            panel1.group.id,
+            panel1.id,
+            'center'
+        );
+
+        expect(panel1.group.model.isFloating).toBeTruthy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(3);
+    });
+
+    test('floating: move a fixed group of one tab to an existing floating group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+
+        const panel3 = dockview.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            floating: true,
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(3);
+        expect(dockview.panels.length).toBe(3);
+
+        dockview.moveGroupOrPanel(
+            panel3.group,
+            panel1.group.id,
+            undefined,
+            'center'
+        );
+
+        expect(panel1.group.model.isFloating).toBeTruthy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(3);
+    });
+
+    test('floating: move a fixed group of many tabs to an existing floating group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+        });
+
+        const panel3 = dockview.addPanel({
+            id: 'panel_3',
+            component: 'default',
+            floating: true,
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(3);
+
+        dockview.moveGroupOrPanel(
+            panel3.group,
+            panel1.group.id,
+            undefined,
+            'center'
+        );
+
+        expect(panel1.group.model.isFloating).toBeTruthy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(panel3.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(1);
+        expect(dockview.panels.length).toBe(3);
+    });
+
+    test('floating: move a fixed tab of one tab to a new floating group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(2);
+
+        dockview.addFloatingGroup(panel2);
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(2);
+    });
+
+    test('floating: move a fixed tab of many tabs to a new floating group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(dockview.groups.length).toBe(1);
+        expect(dockview.panels.length).toBe(2);
+
+        dockview.addFloatingGroup(panel2);
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(2);
+    });
+
+    test('floating: move a fixed group of one tab to a new floating group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(2);
+
+        dockview.addFloatingGroup(panel2.group);
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(2);
+    });
+
+    test('floating: move a fixed group of many tabs to a new floating group', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+        });
+
+        expect(panel1.group.model.isFloating).toBeFalsy();
+        expect(panel2.group.model.isFloating).toBeFalsy();
+        expect(dockview.groups.length).toBe(1);
+        expect(dockview.panels.length).toBe(2);
+
+        dockview.addFloatingGroup(panel2.group);
+
+        expect(panel1.group.model.isFloating).toBeTruthy();
+        expect(panel2.group.model.isFloating).toBeTruthy();
+        expect(dockview.groups.length).toBe(1);
+        expect(dockview.panels.length).toBe(2);
+    });
 });

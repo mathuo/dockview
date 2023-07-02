@@ -13,10 +13,10 @@ const bringElementToFront = (() => {
 
     function pushToTop(element: HTMLElement) {
         if (previous !== element && previous !== null) {
-            toggleClass(previous, 'dv-resize-container-priority', false);
+            toggleClass(previous, 'dv-bring-to-front', false);
         }
 
-        toggleClass(element, 'dv-resize-container-priority', true);
+        toggleClass(element, 'dv-bring-to-front', true);
         previous = element;
     }
 
@@ -46,7 +46,6 @@ export class Overlay extends CompositeDisposable {
         this.addDisposables(this._onDidChange);
 
         this.setupOverlay();
-        // this.setupDrag(true,this._element);
         this.setupResize('top');
         this.setupResize('bottom');
         this.setupResize('left');
@@ -58,8 +57,6 @@ export class Overlay extends CompositeDisposable {
 
         this._element.appendChild(this.options.content);
         this.options.container.appendChild(this._element);
-
-        // this.renderWithinBoundaryConditions();
     }
 
     toJSON(): { top: number; left: number; height: number; width: number } {
@@ -250,11 +247,14 @@ export class Overlay extends CompositeDisposable {
         this._element.style.width = `${this.options.width}px`;
         this._element.style.left = `${this.options.left}px`;
         this._element.style.top = `${this.options.top}px`;
-        //
+
         this._element.className = 'dv-resize-container';
     }
 
-    setupDrag(connect: boolean, dragTarget: HTMLElement): void {
+    setupDrag(
+        dragTarget: HTMLElement,
+        options: { inDragMode: boolean } = { inDragMode: false }
+    ): void {
         const move = new MutableDisposable();
 
         const track = () => {
@@ -327,10 +327,7 @@ export class Overlay extends CompositeDisposable {
         this.addDisposables(
             move,
             addDisposableListener(dragTarget, 'mousedown', (event) => {
-                if (
-                    // event.shiftKey ||
-                    event.defaultPrevented
-                ) {
+                if (event.defaultPrevented) {
                     event.preventDefault();
                     return;
                 }
@@ -362,7 +359,7 @@ export class Overlay extends CompositeDisposable {
 
         bringElementToFront(this._element);
 
-        if (connect) {
+        if (options.inDragMode) {
             track();
         }
     }

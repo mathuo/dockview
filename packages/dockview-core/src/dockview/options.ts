@@ -18,7 +18,6 @@ import { IDisposable } from '../lifecycle';
 import { Position } from '../dnd/droptarget';
 import { IDockviewPanel } from './dockviewPanel';
 import { FrameworkFactory } from '../panel/componentFactory';
-import { Optional } from '../types';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -88,6 +87,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     ) => IHeaderActionsRenderer;
     singleTabMode?: 'fullwidth' | 'default';
     parentElement?: HTMLElement;
+    disableFloatingGroups?: boolean;
 }
 
 export interface PanelOptions {

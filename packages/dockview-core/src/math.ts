@@ -5,7 +5,7 @@ export const clamp = (value: number, min: number, max: number): number => {
     return Math.min(max, Math.max(value, min));
 };
 
-export const sequentialNumberGenerator = () => {
+export const sequentialNumberGenerator = (): { next: () => string } => {
     let value = 1;
     return { next: () => (value++).toString() };
 };

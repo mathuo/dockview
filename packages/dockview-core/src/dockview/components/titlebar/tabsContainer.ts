@@ -191,7 +191,7 @@ export class TabsContainer
                 this.voidContainer.element,
                 'mousedown',
                 (event) => {
-                    if (event.shiftKey && !this.group.model.isFloating) {
+                    if (event.shiftKey && !this.group.isFloating) {
                         event.preventDefault();
 
                         const { top, left } =
@@ -203,7 +203,6 @@ export class TabsContainer
                             x: left - rootLeft + 20,
                             y: top - rootTop + 20,
                         });
-                        event.preventDefault();
                     }
                 }
             ),

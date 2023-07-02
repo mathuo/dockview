@@ -4,7 +4,6 @@ import { GridviewPanelApi } from '../api/gridviewPanelApi';
 import {
     DockviewGroupPanelModel,
     GroupOptions,
-    GroupPanelViewState,
     IDockviewGroupPanelModel,
     IHeader,
 } from './dockviewGroupPanelModel';
@@ -51,6 +50,10 @@ export class DockviewGroupPanel
 
     set locked(value: boolean) {
         this._model.locked = value;
+    }
+
+    get isFloating(): boolean {
+        return this._model.isFloating;
     }
 
     get header(): IHeader {

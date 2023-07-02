@@ -8,6 +8,7 @@ import { DockviewGroupPanel } from '../../../../dockview/dockviewGroupPanel';
 import { DockviewGroupPanelModel } from '../../../../dockview/dockviewGroupPanelModel';
 import { fireEvent } from '@testing-library/dom';
 import { TestPanel } from '../../dockviewGroupPanelModel.spec';
+import { IDockviewPanel } from '../../../../dockview/dockviewPanel';
 
 describe('tabsContainer', () => {
     test('that an external event does not render a drop target and calls through to the group mode', () => {
@@ -462,5 +463,166 @@ describe('tabsContainer', () => {
 
         expect(query.length).toBe(1);
         expect(query[0].children.length).toBe(0);
+    });
+
+    test('that a tab will become floating when clicked if not floating and shift is selected', () => {
+        const accessorMock = jest.fn<DockviewComponent, []>(() => {
+            return (<Partial<DockviewComponent>>{
+                options: {},
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                element: document.createElement('div'),
+                addFloatingGroup: jest.fn(),
+            }) as DockviewComponent;
+        });
+
+        const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+            return (<Partial<DockviewGroupPanel>>{
+                isFloating: false,
+            }) as DockviewGroupPanel;
+        });
+
+        const accessor = new accessorMock();
+        const groupPanel = new groupPanelMock();
+
+        const cut = new TabsContainer(accessor, groupPanel);
+
+        const container = cut.element.querySelector('.void-container')!;
+        expect(container).toBeTruthy();
+
+        jest.spyOn(cut.element, 'getBoundingClientRect').mockImplementation(
+            () => {
+                return { top: 50, left: 100, width: 0, height: 0 } as any;
+            }
+        );
+        jest.spyOn(
+            accessor.element,
+            'getBoundingClientRect'
+        ).mockImplementation(() => {
+            return { top: 10, left: 20, width: 0, height: 0 } as any;
+        });
+
+        const event = new KeyboardEvent('mousedown', { shiftKey: true });
+        const eventPreventDefaultSpy = jest.spyOn(event, 'preventDefault');
+        fireEvent(container, event);
+
+        expect(accessor.addFloatingGroup).toBeCalledWith(groupPanel, {
+            x: 100,
+            y: 60,
+        });
+        expect(accessor.addFloatingGroup).toBeCalledTimes(1);
+        expect(eventPreventDefaultSpy).toBeCalledTimes(1);
+
+        const event2 = new KeyboardEvent('mousedown', { shiftKey: false });
+        const eventPreventDefaultSpy2 = jest.spyOn(event2, 'preventDefault');
+        fireEvent(container, event2);
+
+        expect(accessor.addFloatingGroup).toBeCalledTimes(1);
+        expect(eventPreventDefaultSpy2).toBeCalledTimes(0);
+    });
+
+    test('that a tab that is already floating cannot be floated again', () => {
+        const accessorMock = jest.fn<DockviewComponent, []>(() => {
+            return (<Partial<DockviewComponent>>{
+                options: {},
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                element: document.createElement('div'),
+                addFloatingGroup: jest.fn(),
+            }) as DockviewComponent;
+        });
+
+        const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+            return (<Partial<DockviewGroupPanel>>{
+                isFloating: true,
+            }) as DockviewGroupPanel;
+        });
+
+        const accessor = new accessorMock();
+        const groupPanel = new groupPanelMock();
+
+        const cut = new TabsContainer(accessor, groupPanel);
+
+        const container = cut.element.querySelector('.void-container')!;
+        expect(container).toBeTruthy();
+
+        jest.spyOn(cut.element, 'getBoundingClientRect').mockImplementation(
+            () => {
+                return { top: 50, left: 100, width: 0, height: 0 } as any;
+            }
+        );
+        jest.spyOn(
+            accessor.element,
+            'getBoundingClientRect'
+        ).mockImplementation(() => {
+            return { top: 10, left: 20, width: 0, height: 0 } as any;
+        });
+
+        const event = new KeyboardEvent('mousedown', { shiftKey: true });
+        const eventPreventDefaultSpy = jest.spyOn(event, 'preventDefault');
+        fireEvent(container, event);
+
+        expect(accessor.addFloatingGroup).toBeCalledTimes(0);
+        expect(eventPreventDefaultSpy).toBeCalledTimes(0);
+
+        const event2 = new KeyboardEvent('mousedown', { shiftKey: false });
+        const eventPreventDefaultSpy2 = jest.spyOn(event2, 'preventDefault');
+        fireEvent(container, event2);
+
+        expect(accessor.addFloatingGroup).toBeCalledTimes(0);
+        expect(eventPreventDefaultSpy2).toBeCalledTimes(0);
+    });
+
+    test('that selecting a tab which shift down will move that tab into a new floating group', () => {
+        const accessorMock = jest.fn<DockviewComponent, []>(() => {
+            return (<Partial<DockviewComponent>>{
+                options: {},
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                element: document.createElement('div'),
+                addFloatingGroup: jest.fn(),
+                getGroupPanel: jest.fn(),
+            }) as DockviewComponent;
+        });
+
+        const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+            return (<Partial<DockviewGroupPanel>>{
+                isFloating: true,
+            }) as DockviewGroupPanel;
+        });
+
+        const accessor = new accessorMock();
+        const groupPanel = new groupPanelMock();
+
+        const cut = new TabsContainer(accessor, groupPanel);
+
+        const panelMock = jest.fn<IDockviewPanel, []>(() => {
+            const partial: Partial<IDockviewPanel> = {
+                id: 'test_id',
+
+                view: {
+                    tab: {
+                        element: document.createElement('div'),
+                    } as any,
+                    content: {
+                        element: document.createElement('div'),
+                    } as any,
+                } as any,
+            };
+            return partial as IDockviewPanel;
+        });
+        const panel = new panelMock();
+
+        cut.openPanel(panel);
+
+        const el = cut.element.querySelector('.tab')!;
+        expect(el).toBeTruthy();
+
+        const event = new KeyboardEvent('mousedown', { shiftKey: true });
+        const preventDefaultSpy = jest.spyOn(event, 'preventDefault');
+        fireEvent(el, event);
+
+        expect(preventDefaultSpy).toBeCalledTimes(1);
+        expect(accessor.addFloatingGroup).toBeCalledTimes(1);
     });
 });

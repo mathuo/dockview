@@ -74,7 +74,7 @@ export class Emitter<T> implements IDisposable {
     static ENABLE_TRACKING = false;
     static readonly MEMORY_LEAK_WATCHER = new LeakageMonitor();
 
-    static setLeakageMonitorEnabled(isEnabled: boolean) {
+    static setLeakageMonitorEnabled(isEnabled: boolean): void {
         if (isEnabled !== Emitter.ENABLE_TRACKING) {
             Emitter.MEMORY_LEAK_WATCHER.clear();
         }

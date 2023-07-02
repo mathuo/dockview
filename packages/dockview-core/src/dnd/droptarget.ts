@@ -54,17 +54,6 @@ export type CanDisplayOverlay =
     | boolean
     | ((dragEvent: DragEvent, state: Position) => boolean);
 
-const eventMarkTag = 'dv_droptarget_marked';
-
-function markEvent(event: DragEvent): void {
-    (event as any)[eventMarkTag] = true;
-}
-
-function isEventMarked(event: DragEvent) {
-    const value = (event as any)[eventMarkTag];
-    return typeof value === 'boolean' && value;
-}
-
 export class Droptarget extends CompositeDisposable {
     private targetElement: HTMLElement | undefined;
     private overlayElement: HTMLElement | undefined;
@@ -73,6 +62,8 @@ export class Droptarget extends CompositeDisposable {
 
     private readonly _onDrop = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDrop.event;
+
+    private static USED_EVENT_ID = '__dockview_droptarget_event_is_used__';
 
     get state(): Position | undefined {
         return this._state;
@@ -125,7 +116,12 @@ export class Droptarget extends CompositeDisposable {
                         height
                     );
 
-                    if (isEventMarked(e) || quadrant === null) {
+                    /**
+                     * If the event has already been used by another DropTarget instance
+                     * then don't show a second drop target, only one target should be
+                     * active at any one time
+                     */
+                    if (this.isAlreadyUsed(e) || quadrant === null) {
                         // no drop target should be displayed
                         this.removeDropTarget();
                         return;
@@ -139,7 +135,7 @@ export class Droptarget extends CompositeDisposable {
                         return;
                     }
 
-                    markEvent(e);
+                    this.markAsUsed(e);
 
                     if (!this.targetElement) {
                         this.targetElement = document.createElement('div');
@@ -193,9 +189,24 @@ export class Droptarget extends CompositeDisposable {
         this._acceptedTargetZonesSet = new Set(acceptedTargetZones);
     }
 
-    public dispose(): void {
+    dispose(): void {
         this.removeDropTarget();
         super.dispose();
+    }
+
+    /**
+     * Add a property to the event object for other potential listeners to check
+     */
+    private markAsUsed(event: DragEvent): void {
+        (event as any)[Droptarget.USED_EVENT_ID] = true;
+    }
+
+    /**
+     * Check is the event has already been used by another instance od DropTarget
+     */
+    private isAlreadyUsed(event: DragEvent): boolean {
+        const value = (event as any)[Droptarget.USED_EVENT_ID];
+        return typeof value === 'boolean' && value;
     }
 
     private toggleClasses(

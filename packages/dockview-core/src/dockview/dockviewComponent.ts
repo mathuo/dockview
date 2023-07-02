@@ -125,7 +125,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidLayoutFromJSON: Event<void>;
     readonly onDidActivePanelChange: Event<IDockviewPanel | undefined>;
     addFloatingGroup(
-        item: DockviewPanel | DockviewGroupPanel,
+        item: IDockviewPanel | DockviewGroupPanel,
         coord?: { x: number; y: number }
     ): void;
 }
@@ -299,7 +299,7 @@ export class DockviewComponent
     addFloatingGroup(
         item: DockviewPanel | DockviewGroupPanel,
         coord?: { x?: number; y?: number; height?: number; width?: number },
-        options?: { skipRemoveGroup: boolean; connect: boolean }
+        options?: { skipRemoveGroup: boolean; inDragMode: boolean }
     ): void {
         let group: DockviewGroupPanel;
 
@@ -326,8 +326,6 @@ export class DockviewComponent
 
         group.model.isFloating = true;
 
-        const { left, top } = this.element.getBoundingClientRect();
-
         const overlayLeft =
             typeof coord?.x === 'number' ? Math.max(coord.x, 0) : 100;
         const overlayTop =
@@ -347,10 +345,12 @@ export class DockviewComponent
         const el = group.element.querySelector('#dv-group-float-drag-handle');
 
         if (el) {
-            overlay.setupDrag(
-                typeof options?.connect === 'boolean' ? options.connect : true,
-                el as HTMLElement
-            );
+            overlay.setupDrag(el as HTMLElement, {
+                inDragMode:
+                    typeof options?.inDragMode === 'boolean'
+                        ? options.inDragMode
+                        : true,
+            });
         }
 
         const instance = {
@@ -582,13 +582,11 @@ export class DockviewComponent
 
         this.layout(width, height);
 
-        const serializedFloatingGroups = data.floatingGroups || [];
+        const serializedFloatingGroups = data.floatingGroups ?? [];
 
         for (const serializedFloatingGroup of serializedFloatingGroups) {
             const { data, position } = serializedFloatingGroup;
             const group = createGroupFromSerializedState(data);
-
-            const { left, top } = this.element.getBoundingClientRect();
 
             this.addFloatingGroup(
                 group,
@@ -598,7 +596,7 @@ export class DockviewComponent
                     height: position.height,
                     width: position.width,
                 },
-                { skipRemoveGroup: true, connect: false }
+                { skipRemoveGroup: true, inDragMode: false }
             );
         }
 
@@ -646,7 +644,7 @@ export class DockviewComponent
         }
     }
 
-    addPanel(options: AddPanelOptions): IDockviewPanel {
+    addPanel(options: AddPanelOptions): DockviewPanel {
         if (this.panels.find((_) => _.id === options.id)) {
             throw new Error(`panel with id ${options.id} already exists`);
         }
@@ -697,7 +695,7 @@ export class DockviewComponent
             referenceGroup = this.activeGroup;
         }
 
-        let panel: IDockviewPanel;
+        let panel: DockviewPanel;
 
         if (referenceGroup) {
             const target = toTarget(
@@ -716,7 +714,7 @@ export class DockviewComponent
                         : {};
 
                 this.addFloatingGroup(group, o, {
-                    connect: false,
+                    inDragMode: false,
                     skipRemoveGroup: true,
                 });
             } else if (referenceGroup.model.isFloating || target === 'center') {
@@ -745,7 +743,7 @@ export class DockviewComponent
                     : {};
 
             this.addFloatingGroup(group, o, {
-                connect: false,
+                inDragMode: false,
                 skipRemoveGroup: true,
             });
         } else {
@@ -886,8 +884,8 @@ export class DockviewComponent
         group: DockviewGroupPanel,
         options?:
             | {
-                  skipActive?: boolean | undefined;
-                  skipDispose?: boolean | undefined;
+                  skipActive?: boolean;
+                  skipDispose?: boolean;
               }
             | undefined
     ): void {
@@ -907,8 +905,8 @@ export class DockviewComponent
         group: DockviewGroupPanel,
         options?:
             | {
-                  skipActive?: boolean | undefined;
-                  skipDispose?: boolean | undefined;
+                  skipActive?: boolean;
+                  skipDispose?: boolean;
               }
             | undefined
     ): DockviewGroupPanel {
@@ -1161,7 +1159,7 @@ export class DockviewComponent
     private createPanel(
         options: AddPanelOptions,
         group: DockviewGroupPanel
-    ): IDockviewPanel {
+    ): DockviewPanel {
         const contentComponent = options.component;
         const tabComponent =
             options.tabComponent || this.options.defaultTabComponent;

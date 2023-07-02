@@ -367,6 +367,24 @@ any drag and drop logic for other controls.
 Dockview has built-in support for floating groups. Each floating container can contain a single group with many panels
 and you can have as many floating containers as needed. You cannot dock multiple groups together in the same floating container.
 
+Floating groups can be interacted with whilst holding the `shift` key activating the `event.shiftKey` boolean property on `KeyboardEvent` events.
+
+> Float an existing tab by holding `shift` whilst interacting with the tab
+
+<img style={{ width: '60%' }} src={useBaseUrl('/img/float_add.svg')} />
+
+> Move a floating tab by holding `shift` whilst moving the cursor or dragging the empty
+> header space
+
+<img style={{ width: '60%' }} src={useBaseUrl('/img/float_move.svg')} />
+
+> Move an entire floating group by holding `shift` whilst dragging the empty header space
+
+<img style={{ width: '60%' }} src={useBaseUrl('/img/float_group.svg')} />
+
+Floating groups can be programatically added through the dockview `api` method `api.addFloatingGroup(...)` and you can check whether
+a group is floating via the `group.isFloating` property. See examples for full code.
+
 <Container height={600} sandboxId="floatinggroup-dockview">
     <DockviewFloating />
 </Container>
