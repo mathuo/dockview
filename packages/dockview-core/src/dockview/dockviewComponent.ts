@@ -247,6 +247,13 @@ export class DockviewComponent
                     if (data.viewId !== this.id) {
                         return false;
                     }
+
+                    if (position === 'center') {
+                        // center drop target is only allowed if there are no panels in the grid
+                        // floating panels are allowed
+                        return this.gridview.length === 0;
+                    }
+
                     return true;
                 }
 
@@ -261,7 +268,7 @@ export class DockviewComponent
 
                 return false;
             },
-            acceptedTargetZones: ['top', 'bottom', 'left', 'right'],
+            acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             overlayModel: {
                 activationSize: { type: 'pixels', value: 10 },
                 size: { type: 'pixels', value: 20 },
@@ -399,6 +406,7 @@ export class DockviewComponent
         switch (position) {
             case 'top':
             case 'left':
+            case 'center':
                 return this.createGroupAtLocation([0]); // insert into first position
             case 'bottom':
             case 'right':
