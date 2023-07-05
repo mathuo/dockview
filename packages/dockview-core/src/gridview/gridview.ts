@@ -455,6 +455,9 @@ export class Gridview implements IDisposable {
             this.root.size
         );
 
+        if (oldRoot.children.length === 0) {
+            // no data so no need to add anything back in
+        } else
         if (oldRoot.children.length === 1) {
             // can remove one level of redundant branching if there is only a single child
             const childReference = oldRoot.children[0];
