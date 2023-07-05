@@ -95,6 +95,11 @@ export class Droptarget extends CompositeDisposable {
             new DragAndDropObserver(this.element, {
                 onDragEnter: () => undefined,
                 onDragOver: (e) => {
+                    if (this._acceptedTargetZonesSet.size === 0) {
+                        this.removeDropTarget();
+                        return;
+                    }
+
                     const width = this.element.clientWidth;
                     const height = this.element.clientHeight;
 
@@ -129,9 +134,11 @@ export class Droptarget extends CompositeDisposable {
 
                     if (typeof this.options.canDisplayOverlay === 'boolean') {
                         if (!this.options.canDisplayOverlay) {
+                            this.removeDropTarget();
                             return;
                         }
                     } else if (!this.options.canDisplayOverlay(e, quadrant)) {
+                        this.removeDropTarget();
                         return;
                     }
 
@@ -147,14 +154,6 @@ export class Droptarget extends CompositeDisposable {
 
                         this.element.classList.add('drop-target');
                         this.element.append(this.targetElement);
-                    }
-
-                    if (this.options.acceptedTargetZones.length === 0) {
-                        return;
-                    }
-
-                    if (!this.targetElement || !this.overlayElement) {
-                        return;
                     }
 
                     this.toggleClasses(quadrant, width, height);
