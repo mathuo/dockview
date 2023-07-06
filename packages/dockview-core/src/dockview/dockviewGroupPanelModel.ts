@@ -261,11 +261,11 @@ export class DockviewGroupPanelModel
                     return false;
                 }
 
-                if (event.shiftKey && !this.isFloating) {
+                const data = getPanelData();
+
+                if (!data && event.shiftKey && !this.isFloating) {
                     return false;
                 }
-
-                const data = getPanelData();
 
                 if (data && data.viewId === this.accessor.id) {
                     if (data.groupId === this.id) {

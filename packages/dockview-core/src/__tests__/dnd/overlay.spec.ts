@@ -13,8 +13,46 @@ describe('overlay', () => {
             width: 100,
             left: 10,
             top: 20,
-            minX: 0,
-            minY: 0,
+            minimumInViewportWidth: 0,
+            minimumInViewportHeight: 0,
+            container,
+            content,
+        });
+
+        jest.spyOn(
+            container.childNodes.item(0) as HTMLElement,
+            'getBoundingClientRect'
+        ).mockImplementation(() => {
+            return { left: 80, top: 100, width: 40, height: 50 } as any;
+        });
+        jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
+            () => {
+                return { left: 20, top: 30, width: 100, height: 100 } as any;
+            }
+        );
+
+        expect(cut.toJSON()).toEqual({
+            top: 70,
+            left: 60,
+            width: 40,
+            height: 50,
+        });
+    });
+
+    test('#1', () => {
+        const container = document.createElement('div');
+        const content = document.createElement('div');
+
+        document.body.appendChild(container);
+        container.appendChild(content);
+
+        const cut = new Overlay({
+            height: 200,
+            width: 100,
+            left: -1000,
+            top: -1000,
+            minimumInViewportWidth: 0,
+            minimumInViewportHeight: 0,
             container,
             content,
         });
@@ -48,8 +86,8 @@ describe('overlay', () => {
             width: 500,
             left: 100,
             top: 200,
-            minX: 0,
-            minY: 0,
+            minimumInViewportWidth: 0,
+            minimumInViewportHeight: 0,
             container,
             content,
         });

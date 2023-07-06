@@ -8,7 +8,7 @@ import { PanelUpdateEvent } from '../../panel/types';
 import { Orientation } from '../../splitview/splitview';
 import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
-import { DockviewPanel, IDockviewPanel } from '../../dockview/dockviewPanel';
+import { IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
 class PanelContentPartTest implements IContentRenderer {

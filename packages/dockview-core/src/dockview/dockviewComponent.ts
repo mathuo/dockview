@@ -345,8 +345,8 @@ export class DockviewComponent
             width: coord?.width ?? 300,
             left: overlayLeft,
             top: overlayTop,
-            minX: 100,
-            minY: 100,
+            minimumInViewportWidth: 100,
+            minimumInViewportHeight: 100,
         });
 
         const el = group.element.querySelector('#dv-group-float-drag-handle');
@@ -439,6 +439,7 @@ export class DockviewComponent
 
         if (this.floatingGroups) {
             for (const floating of this.floatingGroups) {
+                // ensure floting groups stay within visible boundaries
                 floating.overlay.renderWithinBoundaryConditions();
             }
         }
@@ -588,7 +589,7 @@ export class DockviewComponent
             },
         });
 
-        this.layout(width, height);
+        this.layout(width, height, true);
 
         const serializedFloatingGroups = data.floatingGroups ?? [];
 

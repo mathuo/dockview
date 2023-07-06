@@ -1,4 +1,4 @@
-import { toggleClass } from '../dom';
+import { quasiDefaultPrevented, toggleClass } from '../dom';
 import {
     Emitter,
     Event,
@@ -7,6 +7,7 @@ import {
 } from '../events';
 import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { clamp } from '../math';
+import { getPaneData, getPanelData } from './dataTransfer';
 
 const bringElementToFront = (() => {
     let previous: HTMLElement | null = null;
@@ -29,6 +30,9 @@ export class Overlay extends CompositeDisposable {
     private readonly _onDidChange = new Emitter<void>();
     readonly onDidChange: Event<void> = this._onDidChange.event;
 
+    private static MINIMUM_HEIGHT = 20;
+    private static MINIMUM_WIDTH = 20;
+
     constructor(
         private readonly options: {
             height: number;
@@ -37,8 +41,8 @@ export class Overlay extends CompositeDisposable {
             top: number;
             container: HTMLElement;
             content: HTMLElement;
-            minX: number;
-            minY: number;
+            minimumInViewportWidth: number;
+            minimumInViewportHeight: number;
         }
     ) {
         super();
@@ -57,6 +61,9 @@ export class Overlay extends CompositeDisposable {
 
         this._element.appendChild(this.options.content);
         this.options.container.appendChild(this._element);
+
+        // if input bad resize within acceptable boundaries
+        this.renderWithinBoundaryConditions();
     }
 
     toJSON(): { top: number; left: number; height: number; width: number } {
@@ -93,7 +100,7 @@ export class Overlay extends CompositeDisposable {
             addDisposableListener(resizeHandleElement, 'mousedown', (e) => {
                 e.preventDefault();
 
-                let offset: {
+                let startPosition: {
                     originalY: number;
                     originalHeight: number;
                     originalX: number;
@@ -102,19 +109,21 @@ export class Overlay extends CompositeDisposable {
 
                 move.value = new CompositeDisposable(
                     addDisposableWindowListener(window, 'mousemove', (e) => {
-                        const rect =
+                        const containerRect =
                             this.options.container.getBoundingClientRect();
-                        const y = e.clientY - rect.top;
-                        const x = e.clientX - rect.left;
+                        const overlayRect =
+                            this._element.getBoundingClientRect();
 
-                        const rect2 = this._element.getBoundingClientRect();
+                        const y = e.clientY - containerRect.top;
+                        const x = e.clientX - containerRect.left;
 
-                        if (offset === null) {
-                            offset = {
+                        if (startPosition === null) {
+                            // record the initial dimensions since as all subsequence moves are relative to this
+                            startPosition = {
                                 originalY: y,
-                                originalHeight: rect2.height,
+                                originalHeight: overlayRect.height,
                                 originalX: x,
-                                originalWidth: rect2.width,
+                                originalWidth: overlayRect.width,
                             };
                         }
 
@@ -123,37 +132,36 @@ export class Overlay extends CompositeDisposable {
                         let left: number | null = null;
                         let width: number | null = null;
 
-                        const MIN_HEIGHT = 20;
-                        const MIN_WIDTH = 20;
-
                         function moveTop() {
                             top = clamp(
                                 y,
                                 0,
                                 Math.max(
                                     0,
-                                    offset!.originalY +
-                                        offset!.originalHeight -
-                                        MIN_HEIGHT
+                                    startPosition!.originalY +
+                                        startPosition!.originalHeight -
+                                        Overlay.MINIMUM_HEIGHT
                                 )
                             );
                             height =
-                                offset!.originalY +
-                                offset!.originalHeight -
+                                startPosition!.originalY +
+                                startPosition!.originalHeight -
                                 top;
                         }
 
                         function moveBottom() {
-                            top = offset!.originalY - offset!.originalHeight;
+                            top =
+                                startPosition!.originalY -
+                                startPosition!.originalHeight;
 
                             height = clamp(
                                 y - top,
-                                MIN_HEIGHT,
+                                Overlay.MINIMUM_HEIGHT,
                                 Math.max(
                                     0,
-                                    rect.height -
-                                        offset!.originalY +
-                                        offset!.originalHeight
+                                    containerRect.height -
+                                        startPosition!.originalY +
+                                        startPosition!.originalHeight
                                 )
                             );
                         }
@@ -164,27 +172,29 @@ export class Overlay extends CompositeDisposable {
                                 0,
                                 Math.max(
                                     0,
-                                    offset!.originalX +
-                                        offset!.originalWidth -
-                                        MIN_WIDTH
+                                    startPosition!.originalX +
+                                        startPosition!.originalWidth -
+                                        Overlay.MINIMUM_WIDTH
                                 )
                             );
                             width =
-                                offset!.originalX +
-                                offset!.originalWidth -
+                                startPosition!.originalX +
+                                startPosition!.originalWidth -
                                 left;
                         }
 
                         function moveRight() {
-                            left = offset!.originalX - offset!.originalWidth;
+                            left =
+                                startPosition!.originalX -
+                                startPosition!.originalWidth;
                             width = clamp(
                                 x - left,
-                                MIN_WIDTH,
+                                Overlay.MINIMUM_WIDTH,
                                 Math.max(
                                     0,
-                                    rect.width -
-                                        offset!.originalX +
-                                        offset!.originalWidth
+                                    containerRect.width -
+                                        startPosition!.originalX +
+                                        startPosition!.originalWidth
                                 )
                             );
                         }
@@ -283,11 +293,12 @@ export class Overlay extends CompositeDisposable {
 
                     const xOffset = Math.max(
                         0,
-                        overlayRect.width - this.options.minX
+                        overlayRect.width - this.options.minimumInViewportWidth
                     );
                     const yOffset = Math.max(
                         0,
-                        overlayRect.height - this.options.minY
+                        overlayRect.height -
+                            this.options.minimumInViewportHeight
                     );
 
                     const left = clamp(
@@ -332,6 +343,12 @@ export class Overlay extends CompositeDisposable {
                     return;
                 }
 
+                // if somebody has marked this event then treat as a defaultPrevented
+                // without actually calling event.preventDefault()
+                if (quasiDefaultPrevented(event)) {
+                    return;
+                }
+
                 track();
             }),
             addDisposableListener(
@@ -339,6 +356,12 @@ export class Overlay extends CompositeDisposable {
                 'mousedown',
                 (event) => {
                     if (event.defaultPrevented) {
+                        return;
+                    }
+
+                    // if somebody has marked this event then treat as a defaultPrevented
+                    // without actually calling event.preventDefault()
+                    if (quasiDefaultPrevented(event)) {
                         return;
                     }
 
@@ -368,8 +391,17 @@ export class Overlay extends CompositeDisposable {
         const containerRect = this.options.container.getBoundingClientRect();
         const overlayRect = this._element.getBoundingClientRect();
 
-        const xOffset = Math.max(0, overlayRect.width - this.options.minX);
-        const yOffset = Math.max(0, overlayRect.height - this.options.minY);
+        // a minimum width of minimumViewportWidth must be inside the viewport
+        const xOffset = Math.max(
+            0,
+            overlayRect.width - this.options.minimumInViewportWidth
+        );
+
+        // a minimum height of minimumViewportHeight must be inside the viewport
+        const yOffset = Math.max(
+            0,
+            overlayRect.height - this.options.minimumInViewportHeight
+        );
 
         const left = clamp(
             this.options.left,

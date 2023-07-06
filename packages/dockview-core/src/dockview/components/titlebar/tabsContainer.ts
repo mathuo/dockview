@@ -191,7 +191,14 @@ export class TabsContainer
                 this.voidContainer.element,
                 'mousedown',
                 (event) => {
-                    if (event.shiftKey && !this.group.isFloating) {
+                    const isFloatingGroupsEnabled =
+                        !this.accessor.options.disableFloatingGroups;
+
+                    if (
+                        isFloatingGroupsEnabled &&
+                        event.shiftKey &&
+                        !this.group.isFloating
+                    ) {
                         event.preventDefault();
 
                         const { top, left } =
@@ -282,7 +289,10 @@ export class TabsContainer
 
         const disposable = CompositeDisposable.from(
             tabToAdd.onChanged((event) => {
-                if (event.shiftKey) {
+                const isFloatingGroupsEnabled =
+                    !this.accessor.options.disableFloatingGroups;
+
+                if (isFloatingGroupsEnabled && event.shiftKey) {
                     event.preventDefault();
 
                     const panel = this.accessor.getGroupPanel(tabToAdd.panelId);

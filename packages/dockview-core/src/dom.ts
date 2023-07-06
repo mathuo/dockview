@@ -1,5 +1,5 @@
 import {
-    Event,
+    Event as DockviewEvent,
     Emitter,
     addDisposableListener,
     addDisposableWindowListener,
@@ -87,8 +87,8 @@ export function getElementsByTagName(tag: string): HTMLElement[] {
 }
 
 export interface IFocusTracker extends IDisposable {
-    readonly onDidFocus: Event<void>;
-    readonly onDidBlur: Event<void>;
+    readonly onDidFocus: DockviewEvent<void>;
+    readonly onDidBlur: DockviewEvent<void>;
     refreshState?(): void;
 }
 
@@ -101,10 +101,10 @@ export function trackFocus(element: HTMLElement | Window): IFocusTracker {
  */
 class FocusTracker extends CompositeDisposable implements IFocusTracker {
     private readonly _onDidFocus = new Emitter<void>();
-    public readonly onDidFocus: Event<void> = this._onDidFocus.event;
+    public readonly onDidFocus: DockviewEvent<void> = this._onDidFocus.event;
 
     private readonly _onDidBlur = new Emitter<void>();
-    public readonly onDidBlur: Event<void> = this._onDidBlur.event;
+    public readonly onDidBlur: DockviewEvent<void> = this._onDidBlur.event;
 
     private _refreshStateHandler: () => void;
 
@@ -171,4 +171,17 @@ class FocusTracker extends CompositeDisposable implements IFocusTracker {
     refreshState(): void {
         this._refreshStateHandler();
     }
+}
+
+// quasi: apparently, but not really; seemingly
+const QUASI_PREVENT_DEFAULT_KEY = 'dv-quasiPreventDefault';
+
+// mark an event directly for other listeners to check
+export function quasiPreventDefault(event: Event): void {
+    (event as any)[QUASI_PREVENT_DEFAULT_KEY] = true;
+}
+
+// check if this event has been marked
+export function quasiDefaultPrevented(event: Event): boolean {
+    return (event as any)[QUASI_PREVENT_DEFAULT_KEY];
 }
