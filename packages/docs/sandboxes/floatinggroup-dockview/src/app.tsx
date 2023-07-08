@@ -190,7 +190,7 @@ export const DockviewPersistance = () => {
                         addFloatingPanel2(api!);
                     }}
                 >
-                    Add Layout
+                    Add Floating Group
                 </button>
             </div>
             <div
