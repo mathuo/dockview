@@ -237,6 +237,10 @@ export class DockviewGroupPanelModel
         );
 
         toggleClass(this.container, 'dv-groupview-floating', value);
+
+        this.groupPanel.api._onDidFloatingStateChange.fire({
+            isFloating: this.isFloating,
+        });
     }
 
     constructor(

@@ -1,7 +1,5 @@
 export * from './dnd/dataTransfer';
 
-export { watchElementResize } from './dom';
-
 /**
  * Events, Emitters and Disposables are very common concepts that most codebases will contain.
  * We export them with a 'Dockview' prefix here to prevent accidental use by others.
@@ -71,6 +69,10 @@ export {
     SplitviewPanelApi,
 } from './api/splitviewPanelApi';
 export { ExpansionEvent, PaneviewPanelApi } from './api/paneviewPanelApi';
+export {
+    DockviewGroupPanelApi,
+    DockviewGroupPanelFloatingChangeEvent,
+} from './api/dockviewGroupPanelApi';
 export {
     CommonApi,
     SplitviewApi,

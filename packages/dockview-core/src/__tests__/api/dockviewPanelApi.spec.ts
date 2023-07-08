@@ -5,6 +5,12 @@ import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 
 describe('groupPanelApi', () => {
     test('title', () => {
+        const accessor: Partial<DockviewComponent> = {
+            onDidAddPanel: jest.fn(),
+            onDidRemovePanel: jest.fn(),
+            options: {},
+        };
+
         const panelMock = jest.fn<DockviewPanel, []>(() => {
             return {
                 update: jest.fn(),
@@ -18,7 +24,11 @@ describe('groupPanelApi', () => {
         const panel = new panelMock();
         const group = new groupMock();
 
-        const cut = new DockviewPanelApiImpl(panel, group);
+        const cut = new DockviewPanelApiImpl(
+            panel,
+            group,
+            <DockviewComponent>accessor
+        );
 
         cut.setTitle('test_title');
         expect(panel.setTitle).toBeCalledTimes(1);
@@ -44,7 +54,8 @@ describe('groupPanelApi', () => {
 
         const cut = new DockviewPanelApiImpl(
             <IDockviewPanel>groupPanel,
-            <DockviewGroupPanel>groupViewPanel
+            <DockviewGroupPanel>groupViewPanel,
+            <DockviewComponent>accessor
         );
 
         cut.updateParameters({ keyA: 'valueA' });
@@ -73,7 +84,8 @@ describe('groupPanelApi', () => {
 
         const cut = new DockviewPanelApiImpl(
             <IDockviewPanel>groupPanel,
-            <DockviewGroupPanel>groupViewPanel
+            <DockviewGroupPanel>groupViewPanel,
+            <DockviewComponent>accessor
         );
 
         let events = 0;

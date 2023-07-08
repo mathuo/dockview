@@ -7,7 +7,6 @@ import {
 } from '../events';
 import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { clamp } from '../math';
-import { getPaneData, getPanelData } from './dataTransfer';
 
 const bringElementToFront = (() => {
     let previous: HTMLElement | null = null;
@@ -66,6 +65,30 @@ export class Overlay extends CompositeDisposable {
         this.renderWithinBoundaryConditions();
     }
 
+    setBounds(
+        bounds: Partial<{
+            height: number;
+            width: number;
+            top: number;
+            left: number;
+        }>
+    ): void {
+        if (typeof bounds.height === 'number') {
+            this._element.style.height = `${bounds.height}px`;
+        }
+        if (typeof bounds.width === 'number') {
+            this._element.style.width = `${bounds.width}px`;
+        }
+        if (typeof bounds.top === 'number') {
+            this._element.style.top = `${bounds.top}px`;
+        }
+        if (typeof bounds.left === 'number') {
+            this._element.style.left = `${bounds.left}px`;
+        }
+
+        this.renderWithinBoundaryConditions();
+    }
+
     toJSON(): { top: number; left: number; height: number; width: number } {
         const container = this.options.container.getBoundingClientRect();
         const element = this._element.getBoundingClientRect();
@@ -76,6 +99,173 @@ export class Overlay extends CompositeDisposable {
             width: element.width,
             height: element.height,
         };
+    }
+
+    renderWithinBoundaryConditions(): void {
+        const containerRect = this.options.container.getBoundingClientRect();
+        const overlayRect = this._element.getBoundingClientRect();
+
+        // a minimum width of minimumViewportWidth must be inside the viewport
+        const xOffset = Math.max(
+            0,
+            overlayRect.width - this.options.minimumInViewportWidth
+        );
+
+        // a minimum height of minimumViewportHeight must be inside the viewport
+        const yOffset = Math.max(
+            0,
+            overlayRect.height - this.options.minimumInViewportHeight
+        );
+
+        const left = clamp(
+            overlayRect.left - containerRect.left,
+            -xOffset,
+            Math.max(0, containerRect.width - overlayRect.width + xOffset)
+        );
+
+        const top = clamp(
+            overlayRect.top - containerRect.top,
+            -yOffset,
+            Math.max(0, containerRect.height - overlayRect.height + yOffset)
+        );
+
+        this._element.style.left = `${left}px`;
+        this._element.style.top = `${top}px`;
+    }
+
+    setupDrag(
+        dragTarget: HTMLElement,
+        options: { inDragMode: boolean } = { inDragMode: false }
+    ): void {
+        const move = new MutableDisposable();
+
+        const track = () => {
+            let offset: { x: number; y: number } | null = null;
+
+            move.value = new CompositeDisposable(
+                addDisposableWindowListener(window, 'mousemove', (e) => {
+                    const containerRect =
+                        this.options.container.getBoundingClientRect();
+                    const x = e.clientX - containerRect.left;
+                    const y = e.clientY - containerRect.top;
+
+                    toggleClass(
+                        this._element,
+                        'dv-resize-container-dragging',
+                        true
+                    );
+
+                    const overlayRect = this._element.getBoundingClientRect();
+                    if (offset === null) {
+                        offset = {
+                            x: e.clientX - overlayRect.left,
+                            y: e.clientY - overlayRect.top,
+                        };
+                    }
+
+                    const xOffset = Math.max(
+                        0,
+                        overlayRect.width - this.options.minimumInViewportWidth
+                    );
+                    const yOffset = Math.max(
+                        0,
+                        overlayRect.height -
+                            this.options.minimumInViewportHeight
+                    );
+
+                    const left = clamp(
+                        x - offset.x,
+                        -xOffset,
+                        Math.max(
+                            0,
+                            containerRect.width - overlayRect.width + xOffset
+                        )
+                    );
+
+                    const top = clamp(
+                        y - offset.y,
+                        -yOffset,
+                        Math.max(
+                            0,
+                            containerRect.height - overlayRect.height + yOffset
+                        )
+                    );
+
+                    this._element.style.left = `${left}px`;
+                    this._element.style.top = `${top}px`;
+                }),
+                addDisposableWindowListener(window, 'mouseup', () => {
+                    toggleClass(
+                        this._element,
+                        'dv-resize-container-dragging',
+                        false
+                    );
+
+                    move.dispose();
+                    this._onDidChange.fire();
+                })
+            );
+        };
+
+        this.addDisposables(
+            move,
+            addDisposableListener(dragTarget, 'mousedown', (event) => {
+                if (event.defaultPrevented) {
+                    event.preventDefault();
+                    return;
+                }
+
+                // if somebody has marked this event then treat as a defaultPrevented
+                // without actually calling event.preventDefault()
+                if (quasiDefaultPrevented(event)) {
+                    return;
+                }
+
+                track();
+            }),
+            addDisposableListener(
+                this.options.content,
+                'mousedown',
+                (event) => {
+                    if (event.defaultPrevented) {
+                        return;
+                    }
+
+                    // if somebody has marked this event then treat as a defaultPrevented
+                    // without actually calling event.preventDefault()
+                    if (quasiDefaultPrevented(event)) {
+                        return;
+                    }
+
+                    if (event.shiftKey) {
+                        track();
+                    }
+                }
+            ),
+            addDisposableListener(
+                this.options.content,
+                'mousedown',
+                () => {
+                    bringElementToFront(this._element);
+                },
+                true
+            )
+        );
+
+        bringElementToFront(this._element);
+
+        if (options.inDragMode) {
+            track();
+        }
+    }
+
+    private setupOverlay(): void {
+        this._element.style.height = `${this.options.height}px`;
+        this._element.style.width = `${this.options.width}px`;
+        this._element.style.left = `${this.options.left}px`;
+        this._element.style.top = `${this.options.top}px`;
+
+        this._element.className = 'dv-resize-container';
     }
 
     private setupResize(
@@ -250,173 +440,6 @@ export class Overlay extends CompositeDisposable {
                 );
             })
         );
-    }
-
-    private setupOverlay(): void {
-        this._element.style.height = `${this.options.height}px`;
-        this._element.style.width = `${this.options.width}px`;
-        this._element.style.left = `${this.options.left}px`;
-        this._element.style.top = `${this.options.top}px`;
-
-        this._element.className = 'dv-resize-container';
-    }
-
-    setupDrag(
-        dragTarget: HTMLElement,
-        options: { inDragMode: boolean } = { inDragMode: false }
-    ): void {
-        const move = new MutableDisposable();
-
-        const track = () => {
-            let offset: { x: number; y: number } | null = null;
-
-            move.value = new CompositeDisposable(
-                addDisposableWindowListener(window, 'mousemove', (e) => {
-                    const containerRect =
-                        this.options.container.getBoundingClientRect();
-                    const x = e.clientX - containerRect.left;
-                    const y = e.clientY - containerRect.top;
-
-                    toggleClass(
-                        this._element,
-                        'dv-resize-container-dragging',
-                        true
-                    );
-
-                    const overlayRect = this._element.getBoundingClientRect();
-                    if (offset === null) {
-                        offset = {
-                            x: e.clientX - overlayRect.left,
-                            y: e.clientY - overlayRect.top,
-                        };
-                    }
-
-                    const xOffset = Math.max(
-                        0,
-                        overlayRect.width - this.options.minimumInViewportWidth
-                    );
-                    const yOffset = Math.max(
-                        0,
-                        overlayRect.height -
-                            this.options.minimumInViewportHeight
-                    );
-
-                    const left = clamp(
-                        x - offset.x,
-                        -xOffset,
-                        Math.max(
-                            0,
-                            containerRect.width - overlayRect.width + xOffset
-                        )
-                    );
-
-                    const top = clamp(
-                        y - offset.y,
-                        -yOffset,
-                        Math.max(
-                            0,
-                            containerRect.height - overlayRect.height + yOffset
-                        )
-                    );
-
-                    this._element.style.left = `${left}px`;
-                    this._element.style.top = `${top}px`;
-                }),
-                addDisposableWindowListener(window, 'mouseup', () => {
-                    toggleClass(
-                        this._element,
-                        'dv-resize-container-dragging',
-                        false
-                    );
-
-                    move.dispose();
-                    this._onDidChange.fire();
-                })
-            );
-        };
-
-        this.addDisposables(
-            move,
-            addDisposableListener(dragTarget, 'mousedown', (event) => {
-                if (event.defaultPrevented) {
-                    event.preventDefault();
-                    return;
-                }
-
-                // if somebody has marked this event then treat as a defaultPrevented
-                // without actually calling event.preventDefault()
-                if (quasiDefaultPrevented(event)) {
-                    return;
-                }
-
-                track();
-            }),
-            addDisposableListener(
-                this.options.content,
-                'mousedown',
-                (event) => {
-                    if (event.defaultPrevented) {
-                        return;
-                    }
-
-                    // if somebody has marked this event then treat as a defaultPrevented
-                    // without actually calling event.preventDefault()
-                    if (quasiDefaultPrevented(event)) {
-                        return;
-                    }
-
-                    if (event.shiftKey) {
-                        track();
-                    }
-                }
-            ),
-            addDisposableListener(
-                this.options.content,
-                'mousedown',
-                () => {
-                    bringElementToFront(this._element);
-                },
-                true
-            )
-        );
-
-        bringElementToFront(this._element);
-
-        if (options.inDragMode) {
-            track();
-        }
-    }
-
-    renderWithinBoundaryConditions(): void {
-        const containerRect = this.options.container.getBoundingClientRect();
-        const overlayRect = this._element.getBoundingClientRect();
-
-        // a minimum width of minimumViewportWidth must be inside the viewport
-        const xOffset = Math.max(
-            0,
-            overlayRect.width - this.options.minimumInViewportWidth
-        );
-
-        // a minimum height of minimumViewportHeight must be inside the viewport
-        const yOffset = Math.max(
-            0,
-            overlayRect.height - this.options.minimumInViewportHeight
-        );
-
-        const left = clamp(
-            this.options.left,
-            -xOffset,
-            Math.max(0, containerRect.width - overlayRect.width + xOffset)
-        );
-
-        const top = clamp(
-            this.options.top,
-            -yOffset,
-            Math.max(0, containerRect.height - overlayRect.height + yOffset)
-        );
-
-        this._element.style.left = `${left}px`;
-        this._element.style.top = `${top}px`;
     }
 
     override dispose(): void {

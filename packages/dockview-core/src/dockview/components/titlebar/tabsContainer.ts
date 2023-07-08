@@ -197,7 +197,7 @@ export class TabsContainer
                     if (
                         isFloatingGroupsEnabled &&
                         event.shiftKey &&
-                        !this.group.isFloating
+                        !this.group.api.isFloating
                     ) {
                         event.preventDefault();
 
@@ -206,10 +206,14 @@ export class TabsContainer
                         const { top: rootTop, left: rootLeft } =
                             this.accessor.element.getBoundingClientRect();
 
-                        this.accessor.addFloatingGroup(this.group, {
-                            x: left - rootLeft + 20,
-                            y: top - rootTop + 20,
-                        });
+                        this.accessor.addFloatingGroup(
+                            this.group,
+                            {
+                                x: left - rootLeft + 20,
+                                y: top - rootTop + 20,
+                            },
+                            { inDragMode: true }
+                        );
                     }
                 }
             ),
@@ -302,10 +306,14 @@ export class TabsContainer
                     const { top: rootTop, left: rootLeft } =
                         this.accessor.element.getBoundingClientRect();
 
-                    this.accessor.addFloatingGroup(panel as DockviewPanel, {
-                        x: left - rootLeft,
-                        y: top - rootTop,
-                    });
+                    this.accessor.addFloatingGroup(
+                        panel as DockviewPanel,
+                        {
+                            x: left - rootLeft,
+                            y: top - rootTop,
+                        },
+                        { inDragMode: true }
+                    );
                     return;
                 }
 

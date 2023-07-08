@@ -1,7 +1,7 @@
 import { GroupviewPanelState } from './types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { IDockviewComponent } from './dockviewComponent';
+import { DockviewComponent } from './dockviewComponent';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { DockviewApi } from '../api/component.api';
 
@@ -21,7 +21,7 @@ interface LegacyState extends GroupviewPanelState {
 }
 
 export class DefaultDockviewDeserialzier implements IPanelDeserializer {
-    constructor(private readonly layout: IDockviewComponent) {}
+    constructor(private readonly layout: DockviewComponent) {}
 
     public fromJSON(
         panelData: GroupviewPanelState,

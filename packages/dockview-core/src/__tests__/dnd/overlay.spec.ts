@@ -39,7 +39,7 @@ describe('overlay', () => {
         });
     });
 
-    test('#1', () => {
+    test('that out-of-bounds dimensions are fixed', () => {
         const container = document.createElement('div');
         const content = document.createElement('div');
 
@@ -75,6 +75,46 @@ describe('overlay', () => {
             width: 40,
             height: 50,
         });
+    });
+
+    test('setBounds', () => {
+        const container = document.createElement('div');
+        const content = document.createElement('div');
+
+        document.body.appendChild(container);
+        container.appendChild(content);
+
+        const cut = new Overlay({
+            height: 1000,
+            width: 1000,
+            left: 0,
+            top: 0,
+            minimumInViewportWidth: 0,
+            minimumInViewportHeight: 0,
+            container,
+            content,
+        });
+
+        const element: HTMLElement = container.querySelector(
+            '.dv-resize-container'
+        )!;
+        expect(element).toBeTruthy();
+
+        jest.spyOn(element, 'getBoundingClientRect').mockImplementation(() => {
+            return { left: 300, top: 400, width: 1000, height: 1000 } as any;
+        });
+        jest.spyOn(container, 'getBoundingClientRect').mockImplementation(
+            () => {
+                return { left: 0, top: 0, width: 1000, height: 1000 } as any;
+            }
+        );
+
+        cut.setBounds({ height: 100, width: 200, left: 300, top: 400 });
+
+        expect(element.style.height).toBe('100px');
+        expect(element.style.width).toBe('200px');
+        expect(element.style.left).toBe('300px');
+        expect(element.style.top).toBe('400px');
     });
 
     test('that the resize handles are added', () => {

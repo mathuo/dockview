@@ -77,6 +77,28 @@ const themes = [
     'dockview-theme-replit',
 ];
 
+function useLocalStorageItem(key: string, defaultValue: string): string {
+    const [item, setItem] = React.useState<string | null>(
+        localStorage.getItem(key)
+    );
+
+    React.useEffect(() => {
+        const listener = (event: StorageEvent) => {
+            setItem(localStorage.getItem(key));
+        };
+
+        window.addEventListener('storage', listener);
+
+        setItem(localStorage.getItem(key));
+
+        return () => {
+            window.removeEventListener('storage', listener);
+        };
+    }, [key]);
+
+    return item === null ? defaultValue : item;
+}
+
 export const ThemePicker = () => {
     const [theme, setTheme] = React.useState<string>(
         localStorage.getItem('dv-theme-class-name') || themes[0]
@@ -123,6 +145,11 @@ export const MultiFrameworkContainer = (props: {
     const [framework, setFramework] = React.useState<string>('React');
 
     const [animation, setAnimation] = React.useState<boolean>(false);
+
+    const theme = useLocalStorageItem(
+        'dv-theme-class-name',
+        'dockview-theme-abyss'
+    );
 
     React.useEffect(() => {
         setAnimation(true);
@@ -182,7 +209,7 @@ export const MultiFrameworkContainer = (props: {
                         <Spinner />
                     </div>
                 )}
-                {framework === 'React' && <props.react />}
+                {framework === 'React' && <props.react theme={theme} />}
             </div>
             <div
                 style={{
@@ -226,7 +253,6 @@ export const MultiFrameworkContainer = (props: {
                     </select>
                 </div>
                 <span style={{ flexGrow: 1 }} />
-                <ThemePicker />
                 <CodeSandboxButton id={sandboxId} />
             </div>
         </>

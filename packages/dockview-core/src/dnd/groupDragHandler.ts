@@ -23,11 +23,11 @@ export class GroupDragHandler extends DragHandler {
                 'mousedown',
                 (e) => {
                     if (e.shiftKey) {
-                      /**
-                       * You cannot call e.preventDefault() because that will prevent drag events from firing
-                       * but we also need to stop any group overlay drag events from occuring
-                       * Use a custom event marker that can be checked by the overlay drag events
-                       */
+                        /**
+                         * You cannot call e.preventDefault() because that will prevent drag events from firing
+                         * but we also need to stop any group overlay drag events from occuring
+                         * Use a custom event marker that can be checked by the overlay drag events
+                         */
                         quasiPreventDefault(e);
                     }
                 },
@@ -37,7 +37,7 @@ export class GroupDragHandler extends DragHandler {
     }
 
     override isCancelled(_event: DragEvent): boolean {
-        if (this.group.isFloating && !_event.shiftKey) {
+        if (this.group.api.isFloating && !_event.shiftKey) {
             return true;
         }
         return false;

@@ -8,16 +8,14 @@ import {
     IWatermarkRenderer,
     DockviewDropTargets,
 } from './types';
-import {
-    DockviewGroupPanel,
-    DockviewGroupPanelApi,
-} from './dockviewGroupPanel';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/splitview';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
 import { Position } from '../dnd/droptarget';
 import { IDockviewPanel } from './dockviewPanel';
 import { FrameworkFactory } from '../panel/componentFactory';
+import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;

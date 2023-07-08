@@ -478,7 +478,7 @@ describe('tabsContainer', () => {
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
-                isFloating: false,
+                api: { isFloating: false } as any,
             }) as DockviewGroupPanel;
         });
 
@@ -506,10 +506,14 @@ describe('tabsContainer', () => {
         const eventPreventDefaultSpy = jest.spyOn(event, 'preventDefault');
         fireEvent(container, event);
 
-        expect(accessor.addFloatingGroup).toBeCalledWith(groupPanel, {
-            x: 100,
-            y: 60,
-        });
+        expect(accessor.addFloatingGroup).toBeCalledWith(
+            groupPanel,
+            {
+                x: 100,
+                y: 60,
+            },
+            { inDragMode: true }
+        );
         expect(accessor.addFloatingGroup).toBeCalledTimes(1);
         expect(eventPreventDefaultSpy).toBeCalledTimes(1);
 
@@ -534,7 +538,7 @@ describe('tabsContainer', () => {
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
-                isFloating: true,
+                api: { isFloating: true } as any,
             }) as DockviewGroupPanel;
         });
 
@@ -587,7 +591,7 @@ describe('tabsContainer', () => {
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
-                isFloating: true,
+                api: { isFloating: true } as any,
             }) as DockviewGroupPanel;
         });
 

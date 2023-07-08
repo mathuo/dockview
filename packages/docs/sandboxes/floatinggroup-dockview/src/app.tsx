@@ -1,11 +1,14 @@
 import {
     DockviewApi,
+    DockviewGroupPanel,
     DockviewReact,
     DockviewReadyEvent,
+    IDockviewHeaderActionsProps,
     IDockviewPanelProps,
     SerializedDockview,
 } from 'dockview';
 import * as React from 'react';
+import { Icon } from './utils';
 
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
@@ -68,12 +71,11 @@ function loadDefaultLayout(api: DockviewApi) {
 
 let panelCount = 0;
 
-function addFloatingPanel(api: DockviewApi) {
+function addPanel(api: DockviewApi) {
     api.addPanel({
         id: (++panelCount).toString(),
         title: `Tab ${panelCount}`,
         component: 'default',
-        floating: true,
     });
 }
 
@@ -203,9 +205,56 @@ export const DockviewPersistance = () => {
                     onReady={onReady}
                     components={components}
                     watermarkComponent={Watermark}
+                    leftHeaderActionsComponent={LeftComponent}
+                    rightHeaderActionsComponent={RightComponent}
                     className="dockview-theme-abyss"
                 />
             </div>
+        </div>
+    );
+};
+
+const LeftComponent = (props: IDockviewHeaderActionsProps) => {
+    const onClick = () => {
+        addPanel(props.containerApi);
+    };
+    return (
+        <div style={{ height: '100%', color: 'white', padding: '0px 4px' }}>
+            <Icon onClick={onClick} icon={'add'} />
+        </div>
+    );
+};
+
+const RightComponent = (props: IDockviewHeaderActionsProps) => {
+    const [floating, setFloating] = React.useState<boolean>(
+        props.api.isFloating
+    );
+
+    React.useEffect(() => {
+        const disposable = props.group.api.onDidFloatingStateChange((event) => [
+            setFloating(event.isFloating),
+        ]);
+
+        return () => {
+            disposable.dispose();
+        };
+    }, [props.group.api]);
+
+    const onClick = () => {
+        if (floating) {
+            const group = props.containerApi.addGroup();
+            props.group.api.moveTo({ group });
+        } else {
+            props.containerApi.addFloatingGroup(props.group);
+        }
+    };
+
+    return (
+        <div style={{ height: '100%', color: 'white', padding: '0px 4px' }}>
+            <Icon
+                onClick={onClick}
+                icon={floating ? 'jump_to_element' : 'back_to_tab'}
+            />
         </div>
     );
 };

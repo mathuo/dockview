@@ -11,28 +11,6 @@ import * as ReactDOM from 'react-dom';
 import { v4 } from 'uuid';
 import './app.scss';
 
-function useLocalStorageItem(key: string, defaultValue: string): string {
-    const [item, setItem] = React.useState<string | null>(
-        localStorage.getItem(key)
-    );
-
-    React.useEffect(() => {
-        const listener = (event: StorageEvent) => {
-            setItem(localStorage.getItem(key));
-        };
-
-        window.addEventListener('storage', listener);
-
-        setItem(localStorage.getItem(key));
-
-        return () => {
-            window.removeEventListener('storage', listener);
-        };
-    }, [key]);
-
-    return item === null ? defaultValue : item;
-}
-
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
         return <div style={{ padding: '20px' }}>{props.params.title}</div>;
@@ -213,7 +191,7 @@ const LeftControls = (props: IDockviewHeaderActionsProps) => {
     );
 };
 
-const DockviewDemo = () => {
+const DockviewDemo = (props: { theme?: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
             id: 'panel_1',
@@ -264,11 +242,6 @@ const DockviewDemo = () => {
         event.api.getPanel('panel_1')!.api.setActive();
     };
 
-    const theme = useLocalStorageItem(
-        'dv-theme-class-name',
-        'dockview-theme-abyss'
-    );
-
     return (
         <DockviewReact
             components={components}
@@ -276,7 +249,7 @@ const DockviewDemo = () => {
             rightHeaderActionsComponent={RightControls}
             leftHeaderActionsComponent={LeftControls}
             onReady={onReady}
-            className={theme}
+            className={props.theme || 'dockview-theme-abyss'}
         />
     );
 };

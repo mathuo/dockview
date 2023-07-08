@@ -7,7 +7,7 @@ import {
 import { directionToPosition, Droptarget, Position } from '../dnd/droptarget';
 import { tail, sequenceEquals, remove } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { CompositeDisposable, IDisposable } from '../lifecycle';
+import { CompositeDisposable } from '../lifecycle';
 import { Event, Emitter } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import {
@@ -41,11 +41,15 @@ import {
     GroupPanelViewState,
     GroupviewDropEvent,
 } from './dockviewGroupPanelModel';
-import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
 import { Overlay } from '../dnd/overlay';
 import { toggleClass } from '../dom';
+import {
+    DockviewFloatingGroupPanel,
+    IDockviewFloatingGroupPanel,
+} from './dockviewFloatingGroupPanel';
 
 export interface PanelReference {
     update: (event: { params: { [key: string]: any } }) => void;
@@ -92,6 +96,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly activePanel: IDockviewPanel | undefined;
     readonly totalPanels: number;
     readonly panels: IDockviewPanel[];
+    readonly floatingGroups: IDockviewFloatingGroupPanel[];
     readonly onDidDrop: Event<DockviewDropEvent>;
     readonly orientation: Orientation;
     updateOptions(options: DockviewComponentUpdateOptions): void;
@@ -110,7 +115,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     getGroupPanel: (id: string) => IDockviewPanel | undefined;
     createWatermarkComponent(): IWatermarkRenderer;
     // lifecycle
-    addGroup(options?: AddGroupOptions): IDockviewGroupPanel;
+    addGroup(options?: AddGroupOptions): DockviewGroupPanel;
     closeAllGroups(): void;
     // events
     moveToNext(options?: MovementOptions): void;
@@ -159,11 +164,7 @@ export class DockviewComponent
     readonly onDidActivePanelChange: Event<IDockviewPanel | undefined> =
         this._onDidActivePanelChange.event;
 
-    private readonly floatingGroups: {
-        instance: DockviewGroupPanel;
-        disposable: IDisposable;
-        overlay: Overlay;
-    }[] = [];
+    readonly floatingGroups: DockviewFloatingGroupPanel[] = [];
 
     get orientation(): Orientation {
         return this.gridview.orientation;
@@ -306,7 +307,7 @@ export class DockviewComponent
     addFloatingGroup(
         item: DockviewPanel | DockviewGroupPanel,
         coord?: { x?: number; y?: number; height?: number; width?: number },
-        options?: { skipRemoveGroup: boolean; inDragMode: boolean }
+        options?: { skipRemoveGroup?: boolean; inDragMode: boolean }
     ): void {
         let group: DockviewGroupPanel;
 
@@ -356,29 +357,30 @@ export class DockviewComponent
                 inDragMode:
                     typeof options?.inDragMode === 'boolean'
                         ? options.inDragMode
-                        : true,
+                        : false,
             });
         }
 
-        const instance = {
-            instance: group,
+        const floatingGroupPanel = new DockviewFloatingGroupPanel(
+            group,
+            overlay
+        );
 
-            overlay,
-            disposable: new CompositeDisposable(
-                overlay,
-                overlay.onDidChange(() => {
-                    this._bufferOnDidLayoutChange.fire();
-                }),
-                {
-                    dispose: () => {
-                        group.model.isFloating = false;
-                        remove(this.floatingGroups, instance);
-                    },
-                }
-            ),
-        };
+        floatingGroupPanel.addDisposables(
+            overlay.onDidChange(() => {
+                this._bufferOnDidLayoutChange.fire();
+            }),
+            {
+                dispose: () => {
+                    group.model.isFloating = false;
+                    remove(this.floatingGroups, floatingGroupPanel);
+                    this.updateWatermark();
+                },
+            }
+        );
 
-        this.floatingGroups.push(instance);
+        this.floatingGroups.push(floatingGroupPanel);
+        this.updateWatermark();
     }
 
     private orthogonalize(position: Position): DockviewGroupPanel {
@@ -519,7 +521,7 @@ export class DockviewComponent
         const floats: SerializedFloatingGroup[] = this.floatingGroups.map(
             (floatingGroup) => {
                 return {
-                    data: floatingGroup.instance.toJSON() as GroupPanelViewState,
+                    data: floatingGroup.group.toJSON() as GroupPanelViewState,
                     position: floatingGroup.overlay.toJSON(),
                 };
             }
@@ -726,7 +728,7 @@ export class DockviewComponent
                     inDragMode: false,
                     skipRemoveGroup: true,
                 });
-            } else if (referenceGroup.model.isFloating || target === 'center') {
+            } else if (referenceGroup.api.isFloating || target === 'center') {
                 panel = this.createPanel(options, referenceGroup);
                 referenceGroup.model.openPanel(panel);
             } else {
@@ -807,7 +809,7 @@ export class DockviewComponent
     }
 
     private updateWatermark(): void {
-        if (this.groups.filter((x) => !x.model.isFloating).length === 0) {
+        if (this.groups.filter((x) => !x.api.isFloating).length === 0) {
             if (!this.watermark) {
                 this.watermark = this.createWatermarkComponent();
 
@@ -920,17 +922,17 @@ export class DockviewComponent
             | undefined
     ): DockviewGroupPanel {
         const floatingGroup = this.floatingGroups.find(
-            (_) => _.instance === group
+            (_) => _.group === group
         );
 
         if (floatingGroup) {
             if (!options?.skipDispose) {
-                floatingGroup.instance.dispose();
+                floatingGroup.group.dispose();
                 this._groups.delete(group.id);
             }
-            floatingGroup.disposable.dispose();
+            floatingGroup.dispose();
 
-            return floatingGroup.instance;
+            return floatingGroup.group;
         }
 
         return super.doRemoveGroup(group, options);
@@ -986,7 +988,7 @@ export class DockviewComponent
                 const [targetParentLocation, to] = tail(targetLocation);
 
                 const isFloating = this.floatingGroups.find(
-                    (x) => x.instance === sourceGroup
+                    (x) => x.group === sourceGroup
                 );
 
                 if (!isFloating) {
@@ -1066,11 +1068,11 @@ export class DockviewComponent
                 }
             } else {
                 const floatingGroup = this.floatingGroups.find(
-                    (x) => x.instance === sourceGroup
+                    (x) => x.group === sourceGroup
                 );
 
                 if (floatingGroup) {
-                    floatingGroup.disposable.dispose();
+                    floatingGroup.dispose();
                 } else {
                     this.gridview.removeView(
                         getGridLocation(sourceGroup.element)

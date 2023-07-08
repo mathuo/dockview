@@ -1,6 +1,5 @@
 import { IFrameworkPart } from '../panel/types';
 import { DockviewComponent } from '../dockview/dockviewComponent';
-import { GridviewPanelApi } from '../api/gridviewPanelApi';
 import {
     DockviewGroupPanelModel,
     GroupOptions,
@@ -9,8 +8,13 @@ import {
 } from './dockviewGroupPanelModel';
 import { GridviewPanel, IGridviewPanel } from '../gridview/gridviewPanel';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
+import {
+    DockviewGroupPanelApi,
+    DockviewGroupPanelApiImpl,
+} from '../api/dockviewGroupPanelApi';
 
-export interface IDockviewGroupPanel extends IGridviewPanel {
+export interface IDockviewGroupPanel
+    extends IGridviewPanel<DockviewGroupPanelApi> {
     model: IDockviewGroupPanelModel;
     locked: boolean;
     readonly size: number;
@@ -20,10 +24,8 @@ export interface IDockviewGroupPanel extends IGridviewPanel {
 
 export type IDockviewGroupPanelPublic = IDockviewGroupPanel;
 
-export type DockviewGroupPanelApi = GridviewPanelApi;
-
 export class DockviewGroupPanel
-    extends GridviewPanel
+    extends GridviewPanel<DockviewGroupPanelApiImpl>
     implements IDockviewGroupPanel
 {
     private readonly _model: DockviewGroupPanelModel;
@@ -52,10 +54,6 @@ export class DockviewGroupPanel
         this._model.locked = value;
     }
 
-    get isFloating(): boolean {
-        return this._model.isFloating;
-    }
-
     get header(): IHeader {
         return this._model.header;
     }
@@ -65,10 +63,17 @@ export class DockviewGroupPanel
         id: string,
         options: GroupOptions
     ) {
-        super(id, 'groupview_default', {
-            minimumHeight: 100,
-            minimumWidth: 100,
-        });
+        super(
+            id,
+            'groupview_default',
+            {
+                minimumHeight: 100,
+                minimumWidth: 100,
+            },
+            new DockviewGroupPanelApiImpl(id, accessor)
+        );
+
+        this.api.initialize(this); // cannot use 'this' after after 'super' call
 
         this._model = new DockviewGroupPanelModel(
             this.element,

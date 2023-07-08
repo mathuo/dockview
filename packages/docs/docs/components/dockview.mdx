@@ -383,7 +383,7 @@ Floating groups can be interacted with whilst holding the `shift` key activating
 <img style={{ width: '60%' }} src={useBaseUrl('/img/float_group.svg')} />
 
 Floating groups can be programatically added through the dockview `api` method `api.addFloatingGroup(...)` and you can check whether
-a group is floating via the `group.isFloating` property. See examples for full code.
+a group is floating via the `group.api.isFloating` property. See examples for full code.
 
 <Container height={600} sandboxId="floatinggroup-dockview">
     <DockviewFloating />
@@ -497,6 +497,21 @@ To delete a parameter you should pass a value of `undefined` for the key.
 panel.api.updateParameters({
     keyA: undefined, // this will delete 'keyA'.
 });
+```
+
+### Move panel
+
+You can programatically move a panel using the panel `api`.
+
+```ts
+panel.api.moveTo({ group, position, index });
+```
+
+An equivalent method for moving groups is avaliable on the group `api`.
+
+```ts
+const group = panel.api.group;
+group.api.moveTo({ group, position });
 ```
 
 ### Panel Rendering
