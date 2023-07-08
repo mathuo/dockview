@@ -2046,7 +2046,7 @@ describe('gridview', () => {
         });
     });
 
-    test('that a deep layout with fromJSON dimensions identical to the current dimensions loads', async () => {
+    test('that a deep HORIZONTAL layout with fromJSON dimensions identical to the current dimensions loads', async () => {
         const container = document.createElement('div');
 
         const gridview = new GridviewComponent({
@@ -2056,12 +2056,12 @@ describe('gridview', () => {
             components: { default: TestGridview },
         });
 
-        gridview.layout(5000, 5000);
+        gridview.layout(6000, 5000);
 
         gridview.fromJSON({
             grid: {
                 height: 5000,
-                width: 5000,
+                width: 6000,
                 orientation: Orientation.HORIZONTAL,
                 root: {
                     type: 'branch',
@@ -2069,7 +2069,7 @@ describe('gridview', () => {
                     data: [
                         {
                             type: 'leaf',
-                            size: 1000,
+                            size: 2000,
                             data: {
                                 id: 'panel_1',
                                 component: 'default',
@@ -2078,7 +2078,7 @@ describe('gridview', () => {
                         },
                         {
                             type: 'branch',
-                            size: 2000,
+                            size: 3000,
                             data: [
                                 {
                                     type: 'branch',
@@ -2095,7 +2095,7 @@ describe('gridview', () => {
                                         },
                                         {
                                             type: 'branch',
-                                            size: 1000,
+                                            size: 2000,
                                             data: [
                                                 {
                                                     type: 'leaf',
@@ -2132,7 +2132,7 @@ describe('gridview', () => {
                         },
                         {
                             type: 'leaf',
-                            size: 2000,
+                            size: 1000,
                             data: {
                                 id: 'panel_6',
                                 component: 'default',
@@ -2148,7 +2148,7 @@ describe('gridview', () => {
         expect(JSON.parse(JSON.stringify(gridview.toJSON()))).toEqual({
             grid: {
                 height: 5000,
-                width: 5000,
+                width: 6000,
                 orientation: Orientation.HORIZONTAL,
                 root: {
                     type: 'branch',
@@ -2156,7 +2156,7 @@ describe('gridview', () => {
                     data: [
                         {
                             type: 'leaf',
-                            size: 1000,
+                            size: 2000,
                             data: {
                                 id: 'panel_1',
                                 component: 'default',
@@ -2165,7 +2165,7 @@ describe('gridview', () => {
                         },
                         {
                             type: 'branch',
-                            size: 2000,
+                            size: 3000,
                             data: [
                                 {
                                     type: 'branch',
@@ -2182,7 +2182,7 @@ describe('gridview', () => {
                                         },
                                         {
                                             type: 'branch',
-                                            size: 1000,
+                                            size: 2000,
                                             data: [
                                                 {
                                                     type: 'leaf',
@@ -2219,7 +2219,372 @@ describe('gridview', () => {
                         },
                         {
                             type: 'leaf',
+                            size: 1000,
+                            data: {
+                                id: 'panel_6',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                    ],
+                },
+            },
+            activePanel: 'panel_1',
+        });
+
+        gridview.layout(6000, 5000, true);
+
+        expect(JSON.parse(JSON.stringify(gridview.toJSON()))).toEqual({
+            grid: {
+                height: 5000,
+                width: 6000,
+                orientation: Orientation.HORIZONTAL,
+                root: {
+                    type: 'branch',
+                    size: 5000,
+                    data: [
+                        {
+                            type: 'leaf',
                             size: 2000,
+                            data: {
+                                id: 'panel_1',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                        {
+                            type: 'branch',
+                            size: 3000,
+                            data: [
+                                {
+                                    type: 'branch',
+                                    size: 4000,
+                                    data: [
+                                        {
+                                            type: 'leaf',
+                                            size: 1000,
+                                            data: {
+                                                id: 'panel_2',
+                                                component: 'default',
+                                                snap: false,
+                                            },
+                                        },
+                                        {
+                                            type: 'branch',
+                                            size: 2000,
+                                            data: [
+                                                {
+                                                    type: 'leaf',
+                                                    size: 2000,
+                                                    data: {
+                                                        id: 'panel_3',
+                                                        component: 'default',
+                                                        snap: false,
+                                                    },
+                                                },
+                                                {
+                                                    type: 'leaf',
+                                                    size: 2000,
+                                                    data: {
+                                                        id: 'panel_4',
+                                                        component: 'default',
+                                                        snap: false,
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                                {
+                                    type: 'leaf',
+                                    size: 1000,
+                                    data: {
+                                        id: 'panel_5',
+                                        component: 'default',
+                                        snap: false,
+                                    },
+                                },
+                            ],
+                        },
+                        {
+                            type: 'leaf',
+                            size: 1000,
+                            data: {
+                                id: 'panel_6',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                    ],
+                },
+            },
+            activePanel: 'panel_1',
+        });
+    });
+
+    test('that a deep VERTICAL layout with fromJSON dimensions identical to the current dimensions loads', async () => {
+        const container = document.createElement('div');
+
+        const gridview = new GridviewComponent({
+            parentElement: container,
+            proportionalLayout: true,
+            orientation: Orientation.VERTICAL,
+            components: { default: TestGridview },
+        });
+
+        gridview.layout(5000, 6000);
+
+        gridview.fromJSON({
+            grid: {
+                height: 6000,
+                width: 5000,
+                orientation: Orientation.VERTICAL,
+                root: {
+                    type: 'branch',
+                    size: 5000,
+                    data: [
+                        {
+                            type: 'leaf',
+                            size: 2000,
+                            data: {
+                                id: 'panel_1',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                        {
+                            type: 'branch',
+                            size: 3000,
+                            data: [
+                                {
+                                    type: 'branch',
+                                    size: 4000,
+                                    data: [
+                                        {
+                                            type: 'leaf',
+                                            size: 1000,
+                                            data: {
+                                                id: 'panel_2',
+                                                component: 'default',
+                                                snap: false,
+                                            },
+                                        },
+                                        {
+                                            type: 'branch',
+                                            size: 2000,
+                                            data: [
+                                                {
+                                                    type: 'leaf',
+                                                    size: 2000,
+                                                    data: {
+                                                        id: 'panel_3',
+                                                        component: 'default',
+                                                        snap: false,
+                                                    },
+                                                },
+                                                {
+                                                    type: 'leaf',
+                                                    size: 2000,
+                                                    data: {
+                                                        id: 'panel_4',
+                                                        component: 'default',
+                                                        snap: false,
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                                {
+                                    type: 'leaf',
+                                    size: 1000,
+                                    data: {
+                                        id: 'panel_5',
+                                        component: 'default',
+                                        snap: false,
+                                    },
+                                },
+                            ],
+                        },
+                        {
+                            type: 'leaf',
+                            size: 1000,
+                            data: {
+                                id: 'panel_6',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                    ],
+                },
+            },
+            activePanel: 'panel_1',
+        });
+
+        expect(JSON.parse(JSON.stringify(gridview.toJSON()))).toEqual({
+            grid: {
+                height: 6000,
+                width: 5000,
+                orientation: Orientation.VERTICAL,
+                root: {
+                    type: 'branch',
+                    size: 5000,
+                    data: [
+                        {
+                            type: 'leaf',
+                            size: 2000,
+                            data: {
+                                id: 'panel_1',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                        {
+                            type: 'branch',
+                            size: 3000,
+                            data: [
+                                {
+                                    type: 'branch',
+                                    size: 4000,
+                                    data: [
+                                        {
+                                            type: 'leaf',
+                                            size: 1000,
+                                            data: {
+                                                id: 'panel_2',
+                                                component: 'default',
+                                                snap: false,
+                                            },
+                                        },
+                                        {
+                                            type: 'branch',
+                                            size: 2000,
+                                            data: [
+                                                {
+                                                    type: 'leaf',
+                                                    size: 2000,
+                                                    data: {
+                                                        id: 'panel_3',
+                                                        component: 'default',
+                                                        snap: false,
+                                                    },
+                                                },
+                                                {
+                                                    type: 'leaf',
+                                                    size: 2000,
+                                                    data: {
+                                                        id: 'panel_4',
+                                                        component: 'default',
+                                                        snap: false,
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                                {
+                                    type: 'leaf',
+                                    size: 1000,
+                                    data: {
+                                        id: 'panel_5',
+                                        component: 'default',
+                                        snap: false,
+                                    },
+                                },
+                            ],
+                        },
+                        {
+                            type: 'leaf',
+                            size: 1000,
+                            data: {
+                                id: 'panel_6',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                    ],
+                },
+            },
+            activePanel: 'panel_1',
+        });
+
+        gridview.layout(5000, 6000, true);
+
+        expect(JSON.parse(JSON.stringify(gridview.toJSON()))).toEqual({
+            grid: {
+                height: 6000,
+                width: 5000,
+                orientation: Orientation.VERTICAL,
+                root: {
+                    type: 'branch',
+                    size: 5000,
+                    data: [
+                        {
+                            type: 'leaf',
+                            size: 2000,
+                            data: {
+                                id: 'panel_1',
+                                component: 'default',
+                                snap: false,
+                            },
+                        },
+                        {
+                            type: 'branch',
+                            size: 3000,
+                            data: [
+                                {
+                                    type: 'branch',
+                                    size: 4000,
+                                    data: [
+                                        {
+                                            type: 'leaf',
+                                            size: 1000,
+                                            data: {
+                                                id: 'panel_2',
+                                                component: 'default',
+                                                snap: false,
+                                            },
+                                        },
+                                        {
+                                            type: 'branch',
+                                            size: 2000,
+                                            data: [
+                                                {
+                                                    type: 'leaf',
+                                                    size: 2000,
+                                                    data: {
+                                                        id: 'panel_3',
+                                                        component: 'default',
+                                                        snap: false,
+                                                    },
+                                                },
+                                                {
+                                                    type: 'leaf',
+                                                    size: 2000,
+                                                    data: {
+                                                        id: 'panel_4',
+                                                        component: 'default',
+                                                        snap: false,
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                                {
+                                    type: 'leaf',
+                                    size: 1000,
+                                    data: {
+                                        id: 'panel_5',
+                                        component: 'default',
+                                        snap: false,
+                                    },
+                                },
+                            ],
+                        },
+                        {
+                            type: 'leaf',
+                            size: 1000,
                             data: {
                                 id: 'panel_6',
                                 component: 'default',

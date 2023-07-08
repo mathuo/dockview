@@ -400,8 +400,9 @@ export class Gridview implements IDisposable {
                 orientation,
                 this.proportionalLayout,
                 this.styles,
-                orthogonalSize, // <- size - flips at each depth
                 node.size, // <- orthogonal size - flips at each depth
+                orthogonalSize, // <- size - flips at each depth
+
                 children
             );
         } else {
@@ -457,8 +458,7 @@ export class Gridview implements IDisposable {
 
         if (oldRoot.children.length === 0) {
             // no data so no need to add anything back in
-        } else
-        if (oldRoot.children.length === 1) {
+        } else if (oldRoot.children.length === 1) {
             // can remove one level of redundant branching if there is only a single child
             const childReference = oldRoot.children[0];
             const child = oldRoot.removeChild(0); // remove to prevent disposal when disposing of unwanted root
