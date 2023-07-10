@@ -435,6 +435,10 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.addPanel(options);
     }
 
+    removePanel(panel: IDockviewPanel): void {
+        this.component.removePanel(panel);
+    }
+
     addGroup(options?: AddGroupOptions): DockviewGroupPanel {
         return this.component.addGroup(options);
     }
