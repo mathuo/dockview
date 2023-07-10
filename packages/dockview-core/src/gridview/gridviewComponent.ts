@@ -219,7 +219,7 @@ export class GridviewComponent
             },
         });
 
-        this.layout(width, height);
+        this.layout(width, height, true);
 
         queue.forEach((f) => f());
 

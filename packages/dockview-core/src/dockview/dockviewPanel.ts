@@ -8,7 +8,7 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { IPanel, PanelUpdateEvent, Parameters } from '../panel/types';
 import { IDockviewPanelModel } from './dockviewPanelModel';
-import { IDockviewComponent } from './dockviewComponent';
+import { DockviewComponent } from './dockviewComponent';
 
 export interface IDockviewPanel extends IDisposable, IPanel {
     readonly view: IDockviewPanelModel;
@@ -47,7 +47,7 @@ export class DockviewPanel
 
     constructor(
         public readonly id: string,
-        accessor: IDockviewComponent,
+        accessor: DockviewComponent,
         private readonly containerApi: DockviewApi,
         group: DockviewGroupPanel,
         readonly view: IDockviewPanelModel
@@ -55,7 +55,7 @@ export class DockviewPanel
         super();
         this._group = group;
 
-        this.api = new DockviewPanelApiImpl(this, this._group);
+        this.api = new DockviewPanelApiImpl(this, this._group, accessor);
 
         this.addDisposables(
             this.api.onActiveChange(() => {

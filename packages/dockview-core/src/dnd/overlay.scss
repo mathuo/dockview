@@ -1,0 +1,122 @@
+.dv-debug {
+    .dv-resize-container {
+        .dv-resize-handle-top {
+            background-color: red;
+        }
+
+        .dv-resize-handle-bottom {
+            background-color: green;
+        }
+
+        .dv-resize-handle-left {
+            background-color: yellow;
+        }
+
+        .dv-resize-handle-right {
+            background-color: blue;
+        }
+
+        .dv-resize-handle-topleft,
+        .dv-resize-handle-topright,
+        .dv-resize-handle-bottomleft,
+        .dv-resize-handle-bottomright {
+            background-color: cyan;
+        }
+    }
+}
+
+.dv-resize-container {
+    position: absolute;
+    z-index: 997;
+
+    &.dv-bring-to-front {
+        z-index: 998;
+    }
+
+    border: 1px solid var(--dv-tab-divider-color);
+    box-shadow: var(--dv-floating-box-shadow);
+
+    &.dv-resize-container-dragging {
+        opacity: 0.5;
+    }
+
+    .dv-resize-handle-top {
+        height: 4px;
+        width: calc(100% - 8px);
+        left: 4px;
+        top: -2px;
+        z-index: 999;
+        position: absolute;
+        cursor: ns-resize;
+    }
+
+    .dv-resize-handle-bottom {
+        height: 4px;
+        width: calc(100% - 8px);
+        left: 4px;
+        bottom: -2px;
+        z-index: 999;
+        position: absolute;
+        cursor: ns-resize;
+    }
+
+    .dv-resize-handle-left {
+        height: calc(100% - 8px);
+        width: 4px;
+        left: -2px;
+        top: 4px;
+        z-index: 999;
+        position: absolute;
+        cursor: ew-resize;
+    }
+
+    .dv-resize-handle-right {
+        height: calc(100% - 8px);
+        width: 4px;
+        right: -2px;
+        top: 4px;
+        z-index: 999;
+        position: absolute;
+        cursor: ew-resize;
+    }
+
+    .dv-resize-handle-topleft {
+        height: 4px;
+        width: 4px;
+        top: -2px;
+        left: -2px;
+        z-index: 999;
+        position: absolute;
+        cursor: nw-resize;
+    }
+
+    .dv-resize-handle-topright {
+        height: 4px;
+        width: 4px;
+        right: -2px;
+        top: -2px;
+        z-index: 999;
+        position: absolute;
+        cursor: ne-resize;
+    }
+
+    .dv-resize-handle-bottomleft {
+        height: 4px;
+        width: 4px;
+        left: -2px;
+        bottom: -2px;
+        z-index: 999;
+        position: absolute;
+        cursor: sw-resize;
+    }
+
+    .dv-resize-handle-bottomright {
+        height: 4px;
+        width: 4px;
+        right: -2px;
+        bottom: -2px;
+        z-index: 999;
+        position: absolute;
+        cursor: se-resize;
+    }
+}

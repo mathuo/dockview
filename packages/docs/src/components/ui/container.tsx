@@ -69,6 +69,71 @@ const JavascriptIcon = (props: { height: number; width: number }) => {
     );
 };
 
+const themes = [
+    'dockview-theme-dark',
+    'dockview-theme-light',
+    'dockview-theme-vs',
+    'dockview-theme-dracula',
+    'dockview-theme-replit',
+];
+
+function useLocalStorageItem(key: string, defaultValue: string): string {
+    const [item, setItem] = React.useState<string | null>(
+        localStorage.getItem(key)
+    );
+
+    React.useEffect(() => {
+        const listener = (event: StorageEvent) => {
+            setItem(localStorage.getItem(key));
+        };
+
+        window.addEventListener('storage', listener);
+
+        setItem(localStorage.getItem(key));
+
+        return () => {
+            window.removeEventListener('storage', listener);
+        };
+    }, [key]);
+
+    return item === null ? defaultValue : item;
+}
+
+export const ThemePicker = () => {
+    const [theme, setTheme] = React.useState<string>(
+        localStorage.getItem('dv-theme-class-name') || themes[0]
+    );
+
+    React.useEffect(() => {
+        localStorage.setItem('dv-theme-class-name', theme);
+        window.dispatchEvent(new StorageEvent('storage'));
+    }, [theme]);
+
+    return (
+        <div
+            style={{
+                height: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '0px 0px 0px 4px',
+            }}
+        >
+            <span style={{ paddingRight: '4px' }}>{'Theme: '}</span>
+            <select
+                style={{ backgroundColor: 'inherit', color: 'inherit' }}
+                onChange={(e) => setTheme(e.target.value)}
+                value={theme}
+            >
+                {themes.map((theme) => (
+                    <option key={theme} value={theme}>
+                        {theme}
+                    </option>
+                ))}
+            </select>
+        </div>
+    );
+};
+
 export const MultiFrameworkContainer = (props: {
     react: React.FC;
     typescript: (parent: HTMLElement) => { dispose: () => void };
@@ -80,6 +145,11 @@ export const MultiFrameworkContainer = (props: {
     const [framework, setFramework] = React.useState<string>('React');
 
     const [animation, setAnimation] = React.useState<boolean>(false);
+
+    const theme = useLocalStorageItem(
+        'dv-theme-class-name',
+        'dockview-theme-abyss'
+    );
 
     React.useEffect(() => {
         setAnimation(true);
@@ -139,7 +209,7 @@ export const MultiFrameworkContainer = (props: {
                         <Spinner />
                     </div>
                 )}
-                {framework === 'React' && <props.react />}
+                {framework === 'React' && <props.react theme={theme} />}
             </div>
             <div
                 style={{

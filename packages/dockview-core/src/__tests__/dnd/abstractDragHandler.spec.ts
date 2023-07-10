@@ -118,4 +118,62 @@ describe('abstractDragHandler', () => {
         expect(webview.style.pointerEvents).toBe('auto');
         expect(span.style.pointerEvents).toBeFalsy();
     });
+
+    test('that .preventDefault() is called for cancelled events', () => {
+        const element = document.createElement('div');
+
+        const handler = new (class TestClass extends DragHandler {
+            constructor(el: HTMLElement) {
+                super(el);
+            }
+
+            protected isCancelled(_event: DragEvent): boolean {
+                return true;
+            }
+
+            getData(): IDisposable {
+                return {
+                    dispose: () => {
+                        // /
+                    },
+                };
+            }
+        })(element);
+
+        const event = new Event('dragstart');
+        const spy = jest.spyOn(event, 'preventDefault');
+        fireEvent(element, event);
+        expect(spy).toBeCalledTimes(1);
+
+        handler.dispose();
+    });
+
+    test('that .preventDefault() is not called for non-cancelled events', () => {
+        const element = document.createElement('div');
+
+        const handler = new (class TestClass extends DragHandler {
+            constructor(el: HTMLElement) {
+                super(el);
+            }
+
+            protected isCancelled(_event: DragEvent): boolean {
+                return false;
+            }
+
+            getData(): IDisposable {
+                return {
+                    dispose: () => {
+                        // /
+                    },
+                };
+            }
+        })(element);
+
+        const event = new Event('dragstart');
+        const spy = jest.spyOn(event, 'preventDefault');
+        fireEvent(element, event);
+        expect(spy).toBeCalledTimes(0);
+
+        handler.dispose();
+    });
 });

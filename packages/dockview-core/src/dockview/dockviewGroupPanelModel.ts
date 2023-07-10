@@ -137,6 +137,7 @@ export class DockviewGroupPanelModel
     private watermark?: IWatermarkRenderer;
     private _isGroupActive = false;
     private _locked = false;
+    private _isFloating = false;
     private _rightHeaderActions: IHeaderActionsRenderer | undefined;
     private _leftHeaderActions: IHeaderActionsRenderer | undefined;
 
@@ -224,6 +225,24 @@ export class DockviewGroupPanelModel
         );
     }
 
+    get isFloating(): boolean {
+        return this._isFloating;
+    }
+
+    set isFloating(value: boolean) {
+        this._isFloating = value;
+
+        this.dropTarget.setTargetZones(
+            value ? ['center'] : ['top', 'bottom', 'left', 'right', 'center']
+        );
+
+        toggleClass(this.container, 'dv-groupview-floating', value);
+
+        this.groupPanel.api._onDidFloatingStateChange.fire({
+            isFloating: this.isFloating,
+        });
+    }
+
     constructor(
         private readonly container: HTMLElement,
         private accessor: DockviewComponent,
@@ -233,7 +252,7 @@ export class DockviewGroupPanelModel
     ) {
         super();
 
-        this.container.classList.add('groupview');
+        toggleClass(this.container, 'groupview', true);
 
         this.tabsContainer = new TabsContainer(this.accessor, this.groupPanel);
 
@@ -247,6 +266,10 @@ export class DockviewGroupPanelModel
                 }
 
                 const data = getPanelData();
+
+                if (!data && event.shiftKey && !this.isFloating) {
+                    return false;
+                }
 
                 if (data && data.viewId === this.accessor.id) {
                     if (data.groupId === this.id) {
@@ -773,6 +796,7 @@ export class DockviewGroupPanelModel
     public dispose(): void {
         super.dispose();
 
+        this.watermark?.element.remove();
         this.watermark?.dispose?.();
 
         for (const panel of this.panels) {

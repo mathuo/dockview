@@ -28,6 +28,7 @@ export class VoidContainer extends CompositeDisposable {
         this._element = document.createElement('div');
 
         this._element.className = 'void-container';
+        this._element.id = 'dv-group-float-drag-handle';
         this._element.tabIndex = 0;
         this._element.draggable = true;
 

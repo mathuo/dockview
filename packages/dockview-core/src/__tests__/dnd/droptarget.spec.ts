@@ -34,6 +34,48 @@ describe('droptarget', () => {
         jest.spyOn(element, 'clientWidth', 'get').mockImplementation(() => 200);
     });
 
+    test('that dragover events are marked', () => {
+        droptarget = new Droptarget(element, {
+            canDisplayOverlay: () => true,
+            acceptedTargetZones: ['center'],
+        });
+
+        fireEvent.dragEnter(element);
+        const event = new Event('dragover');
+        fireEvent(element, event);
+
+        expect(
+            (event as any)['__dockview_droptarget_event_is_used__']
+        ).toBeTruthy();
+    });
+
+    test('that the drop target is removed when receiving a marked dragover event', () => {
+        let position: Position | undefined = undefined;
+
+        droptarget = new Droptarget(element, {
+            canDisplayOverlay: () => true,
+            acceptedTargetZones: ['center'],
+        });
+
+        droptarget.onDrop((event) => {
+            position = event.position;
+        });
+
+        fireEvent.dragEnter(element);
+        fireEvent.dragOver(element);
+
+        const target = element.querySelector(
+            '.drop-target-dropzone'
+        ) as HTMLElement;
+        fireEvent.drop(target);
+        expect(position).toBe('center');
+
+        const event = new Event('dragover');
+        (event as any)['__dockview_droptarget_event_is_used__'] = true;
+        fireEvent(element, event);
+        expect(element.querySelector('.drop-target-dropzone')).toBeNull();
+    });
+
     test('directionToPosition', () => {
         expect(directionToPosition('above')).toBe('top');
         expect(directionToPosition('below')).toBe('bottom');

@@ -191,7 +191,7 @@ const LeftControls = (props: IDockviewHeaderActionsProps) => {
     );
 };
 
-const DockviewDemo = () => {
+const DockviewDemo = (props: { theme?: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
             id: 'panel_1',
@@ -249,7 +249,7 @@ const DockviewDemo = () => {
             rightHeaderActionsComponent={RightControls}
             leftHeaderActionsComponent={LeftControls}
             onReady={onReady}
-            className="dockview-theme-abyss"
+            className={props.theme || 'dockview-theme-abyss'}
         />
     );
 };

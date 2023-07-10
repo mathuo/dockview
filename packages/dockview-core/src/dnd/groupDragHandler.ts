@@ -1,4 +1,6 @@
 import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
+import { quasiPreventDefault } from '../dom';
+import { addDisposableListener } from '../events';
 import { IDisposable } from '../lifecycle';
 import { DragHandler } from './abstractDragHandler';
 import { LocalSelectionTransfer, PanelTransfer } from './dataTransfer';
@@ -14,6 +16,31 @@ export class GroupDragHandler extends DragHandler {
         private readonly group: DockviewGroupPanel
     ) {
         super(element);
+
+        this.addDisposables(
+            addDisposableListener(
+                element,
+                'mousedown',
+                (e) => {
+                    if (e.shiftKey) {
+                        /**
+                         * You cannot call e.preventDefault() because that will prevent drag events from firing
+                         * but we also need to stop any group overlay drag events from occuring
+                         * Use a custom event marker that can be checked by the overlay drag events
+                         */
+                        quasiPreventDefault(e);
+                    }
+                },
+                true
+            )
+        );
+    }
+
+    override isCancelled(_event: DragEvent): boolean {
+        if (this.group.api.isFloating && !_event.shiftKey) {
+            return true;
+        }
+        return false;
     }
 
     getData(dataTransfer: DataTransfer | null): IDisposable {

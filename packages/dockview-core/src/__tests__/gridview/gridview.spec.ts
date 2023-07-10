@@ -690,4 +690,37 @@ describe('gridview', () => {
             gridview.element.querySelectorAll('.mock-grid-view').length
         ).toBe(4);
     });
+
+    test('that calling insertOrthogonalSplitviewAtRoot() for an empty view doesnt add any nodes', () => {
+        const gridview = new Gridview(
+            false,
+            { separatorBorder: '' },
+            Orientation.HORIZONTAL
+        );
+        gridview.layout(1000, 1000);
+
+        expect(gridview.serialize()).toEqual({
+            height: 1000,
+            orientation: 'HORIZONTAL',
+            root: {
+                data: [],
+                size: 1000,
+                type: 'branch',
+            },
+            width: 1000,
+        });
+
+        gridview.insertOrthogonalSplitviewAtRoot();
+
+        expect(gridview.serialize()).toEqual({
+            height: 1000,
+            orientation: 'VERTICAL',
+            root: {
+                data: [],
+                size: 1000,
+                type: 'branch',
+            },
+            width: 1000,
+        });
+    });
 });

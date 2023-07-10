@@ -28,6 +28,7 @@ import DockviewExternalDnd from '@site/sandboxes/externaldnd-dockview/src/app';
 import DockviewResizeContainer from '@site/sandboxes/resizecontainer-dockview/src/app';
 import DockviewTabheight from '@site/sandboxes/tabheight-dockview/src/app';
 import DockviewWithIFrames from '@site/sandboxes/iframe-dockview/src/app';
+import DockviewFloating from '@site/sandboxes/floatinggroup-dockview/src/app';
 
 import { attach as attachDockviewVanilla } from '@site/sandboxes/javascript/vanilla-dockview/src/app';
 import { attach as attachSimpleDockview } from '@site/sandboxes/javascript/simple-dockview/src/app';
@@ -361,6 +362,33 @@ any drag and drop logic for other controls.
     <DockviewExternalDnd />
 </Container>
 
+## Floating Groups
+
+Dockview has built-in support for floating groups. Each floating container can contain a single group with many panels
+and you can have as many floating containers as needed. You cannot dock multiple groups together in the same floating container.
+
+Floating groups can be interacted with whilst holding the `shift` key activating the `event.shiftKey` boolean property on `KeyboardEvent` events.
+
+> Float an existing tab by holding `shift` whilst interacting with the tab
+
+<img style={{ width: '60%' }} src={useBaseUrl('/img/float_add.svg')} />
+
+> Move a floating tab by holding `shift` whilst moving the cursor or dragging the empty
+> header space
+
+<img style={{ width: '60%' }} src={useBaseUrl('/img/float_move.svg')} />
+
+> Move an entire floating group by holding `shift` whilst dragging the empty header space
+
+<img style={{ width: '60%' }} src={useBaseUrl('/img/float_group.svg')} />
+
+Floating groups can be programatically added through the dockview `api` method `api.addFloatingGroup(...)` and you can check whether
+a group is floating via the `group.api.isFloating` property. See examples for full code.
+
+<Container height={600} sandboxId="floatinggroup-dockview">
+    <DockviewFloating />
+</Container>
+
 ## Panels
 
 ### Add Panel
@@ -469,6 +497,21 @@ To delete a parameter you should pass a value of `undefined` for the key.
 panel.api.updateParameters({
     keyA: undefined, // this will delete 'keyA'.
 });
+```
+
+### Move panel
+
+You can programatically move a panel using the panel `api`.
+
+```ts
+panel.api.moveTo({ group, position, index });
+```
+
+An equivalent method for moving groups is avaliable on the group `api`.
+
+```ts
+const group = panel.api.group;
+group.api.moveTo({ group, position });
 ```
 
 ### Panel Rendering

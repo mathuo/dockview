@@ -1,14 +1,15 @@
 .dv-dockview {
-  position: relative;
-  background-color: var(--dv-group-view-background-color);
+    position: relative;
+    background-color: var(--dv-group-view-background-color);
 
-  .dv-watermark-container {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    height: 100%;
-    width: 100%;
-  }
+    .dv-watermark-container {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        height: 100%;
+        width: 100%;
+        z-index: 1;
+    }
 }
 
 .groupview {

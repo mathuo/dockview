@@ -8,16 +8,14 @@ import {
     IWatermarkRenderer,
     DockviewDropTargets,
 } from './types';
-import {
-    DockviewGroupPanel,
-    DockviewGroupPanelApi,
-} from './dockviewGroupPanel';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/splitview';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
 import { Position } from '../dnd/droptarget';
 import { IDockviewPanel } from './dockviewPanel';
 import { FrameworkFactory } from '../panel/componentFactory';
+import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -87,6 +85,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     ) => IHeaderActionsRenderer;
     singleTabMode?: 'fullwidth' | 'default';
     parentElement?: HTMLElement;
+    disableFloatingGroups?: boolean;
 }
 
 export interface PanelOptions {
@@ -134,12 +133,32 @@ export function isPanelOptionsWithGroup(
     return false;
 }
 
-export interface AddPanelOptions
-    extends Omit<PanelOptions, 'component' | 'tabComponent'> {
+type AddPanelFloatingGroupUnion = {
+    floating:
+        | {
+              height?: number;
+              width?: number;
+              x?: number;
+              y?: number;
+          }
+        | true;
+    position: never;
+};
+
+type AddPanelPositionUnion = {
+    floating: false | never;
+    position: AddPanelPositionOptions;
+};
+
+type AddPanelOptionsUnion = AddPanelFloatingGroupUnion | AddPanelPositionUnion;
+
+export type AddPanelOptions = Omit<
+    PanelOptions,
+    'component' | 'tabComponent'
+> & {
     component: string;
     tabComponent?: string;
-    position?: AddPanelPositionOptions;
-}
+} & Partial<AddPanelOptionsUnion>;
 
 type AddGroupOptionsWithPanel = {
     referencePanel: string | IDockviewPanel;

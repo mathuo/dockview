@@ -247,8 +247,8 @@ describe('groupview', () => {
             id: 'dockview-1',
             removePanel: removePanelMock,
             removeGroup: removeGroupMock,
-            onDidAddPanel: jest.fn(),
-            onDidRemovePanel: jest.fn(),
+            onDidAddPanel: () => ({ dispose: jest.fn() }),
+            onDidRemovePanel: () => ({ dispose: jest.fn() }),
         }) as DockviewComponent;
 
         groupview = new DockviewGroupPanel(dockview, 'groupview-1', options);
@@ -855,6 +855,47 @@ describe('groupview', () => {
 
         expect(
             element.getElementsByClassName('drop-target-dropzone').length
+        ).toBe(0);
+    });
+
+    test('that the watermark is removed when dispose is called', () => {
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    canDisplayOverlay: jest.fn(),
+                };
+            }
+        );
+
+        const groupView = new groupviewMock() as DockviewGroupPanelModel;
+
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanel>, []>(() => {
+            return {
+                id: 'testgroupid',
+                model: groupView,
+            };
+        });
+
+        const container = document.createElement('div');
+
+        const cut = new DockviewGroupPanelModel(
+            container,
+            dockview,
+            'groupviewid',
+            {},
+            new groupPanelMock() as DockviewGroupPanel
+        );
+
+        cut.initialize();
+
+        expect(
+            container.getElementsByClassName('watermark-test-container').length
+        ).toBe(1);
+
+        cut.dispose();
+
+        expect(
+            container.getElementsByClassName('watermark-test-container').length
         ).toBe(0);
     });
 
