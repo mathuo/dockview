@@ -104,13 +104,8 @@ const Checkbox = () => {
     );
 };
 
-const RenderingDockview = (props: { renderVisibleOnly: boolean }) => {
+const RenderingDockview = (props: { theme?: string }) => {
     const [render, setRender] = useRecoilState(renderVisibleComponentsOnlyAtom);
-
-    React.useEffect(
-        () => setRender(props.renderVisibleOnly),
-        [props.renderVisibleOnly]
-    );
 
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
@@ -160,7 +155,7 @@ const RenderingDockview = (props: { renderVisibleOnly: boolean }) => {
                 <DockviewReact
                     components={components}
                     onReady={onReady}
-                    className="dockview-theme-abyss"
+                    className={`${props.theme || 'dockview-theme-abyss'}`}
                 />
             </div>
         </div>

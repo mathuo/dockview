@@ -127,7 +127,7 @@ const useLocalStorage = <T,>(
     ];
 };
 
-export const DockviewPersistance = () => {
+export const DockviewPersistance = (props: { theme?: string }) => {
     const [api, setApi] = React.useState<DockviewApi>();
     const [layout, setLayout] =
         useLocalStorage<SerializedDockview>('floating.layout');
@@ -207,7 +207,7 @@ export const DockviewPersistance = () => {
                     watermarkComponent={Watermark}
                     leftHeaderActionsComponent={LeftComponent}
                     rightHeaderActionsComponent={RightComponent}
-                    className="dockview-theme-abyss"
+                    className={`${props.theme || 'dockview-theme-abyss'}`}
                 />
             </div>
         </div>

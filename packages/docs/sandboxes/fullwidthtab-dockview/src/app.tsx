@@ -47,7 +47,7 @@ const tabComponents = {
     },
 };
 
-const DockviewNative = () => {
+const DockviewNative = (props: { theme?: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
         const panel1 = event.api.addPanel({
             id: 'panel_1',
@@ -91,7 +91,7 @@ const DockviewNative = () => {
             onReady={onReady}
             components={components}
             tabComponents={tabComponents}
-            className="dockview-theme-abyss"
+            className={`${props.theme || 'dockview-theme-abyss'}`}
             singleTabMode="fullwidth"
         />
     );

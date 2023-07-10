@@ -220,7 +220,7 @@ const DockviewDemo = (props: { theme?: string }) => {
             title: 'Panel 5',
             position: { referencePanel: 'panel_4', direction: 'within' },
         });
-        const panel6 = event.api.addPanel({
+        event.api.addPanel({
             id: 'panel_6',
             component: 'default',
             title: 'Panel 6',
@@ -237,6 +237,20 @@ const DockviewDemo = (props: { theme?: string }) => {
             component: 'default',
             title: 'Panel 8',
             position: { referencePanel: 'panel_7', direction: 'within' },
+        });
+
+        event.api.addPanel({
+            id: 'panel_9',
+            component: 'default',
+            title: 'Panel 9',
+            floating: { width: 450, height: 250 },
+        });
+
+        event.api.addPanel({
+            id: 'panel_10',
+            component: 'default',
+            title: 'Panel 10',
+            position: { referencePanel: 'panel_9' },
         });
 
         event.api.getPanel('panel_1')!.api.setActive();

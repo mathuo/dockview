@@ -1,22 +1,17 @@
 ---
 sidebar_position: 0
-description: A zero dependency layout manager built for React
+description: A zero dependency layout manager supporting ReactJS and Vanilla TypeScript
 ---
 
 import { SimpleSplitview } from '@site/src/components/simpleSplitview';
 import { SimpleGridview } from '@site/src/components/simpleGridview';
 import { SimplePaneview } from '@site/src/components/simplePaneview';
 import SimpleDockview from '@site/sandboxes/simple-dockview/src/app';
+import Link from '@docusaurus/Link';
 
 # Introduction
 
 **dockview** is a zero dependency layout manager that supports tab, grids and splitviews.
-
-## Features
-
--   Themable and customizable
--   Support for the serialization and deserialization of layouts
--   Drag and drop support
 
 ## Quick start
 
@@ -33,53 +28,11 @@ depending on your solution this might be:
 @import './node_modules/dockview/dist/styles/dockview.css';
 ```
 
-A dark and light theme are provided, one of these classes (or a custom theme) must be attached at any point above your components in the HTML tree. To cover the entire web page you might attach the class to the `body` component:
-
-```html
-<body classname="dockview-theme-abyss">
-    ...
-</body>
-<body classname="dockview-theme-light">
-    ...
-</body>
-```
-
 There are 4 components you may want to use:
 
-Splitview
-
-<div
-    style={{
-        height: '100px',
-        backgroundColor: 'rgb(30,30,30)',
-        color: 'white',
-        margin: '20px 0px',
-    }}
->
-    <SimpleSplitview />
-</div>
-
-<div
-    style={{
-        height: '300px',
-        backgroundColor: 'rgb(30,30,30)',
-        color: 'white',
-        margin: '20px 0px',
-    }}
->
-    <SimpleGridview />
-</div>
-
-<div
-    style={{
-        height: '300px',
-        backgroundColor: 'rgb(30,30,30)',
-        color: 'white',
-        margin: '20px 0px',
-    }}
->
-    <SimplePaneview />
-</div>
+<Link to="./components/dockview">
+    <h2>Dockview</h2>
+</Link>
 
 <div
     style={{
@@ -92,58 +45,47 @@ Splitview
     <SimpleDockview />
 </div>
 
-```tsx
-import {
-    DockviewReact,
-    DockviewReadyEvent,
-    PanelCollection,
-    IDockviewPanelProps,
-    IDockviewPanelHeaderProps,
-} from 'dockview';
+<Link to="./components/splitview">
+    <h2>Splitview</h2>
+</Link>
 
-const components: PanelCollection<IDockviewPanelProps> = {
-    default: (props: IDockviewPanelProps<{ someProps: string }>) => {
-        return <div>{props.params.someProps}</div>;
-    },
-};
+<div
+    style={{
+        height: '100px',
+        backgroundColor: 'rgb(30,30,30)',
+        color: 'white',
+        margin: '20px 0px',
+    }}
+>
+    <SimpleSplitview />
+</div>
 
-const headers: PanelCollection<IDockviewPanelHeaderProps> = {
-    customTab: (props: IDockviewPanelHeaderProps) => {
-        return (
-            <div>
-                <span>{props.api.title}</span>
-                <span onClick={() => props.api.close()}>{'[x]'}</span>
-            </div>
-        );
-    },
-};
+<Link to="./components/gridview">
+    <h2>Gridview</h2>
+</Link>
 
-const Component = () => {
-    const onReady = (event: DockviewReadyEvent) => {
-        event.api.addPanel({
-            id: 'panel1',
-            component: 'default',
-            tabComponent: 'customTab', // optional custom header
-            params: {
-                someProps: 'Hello',
-            },
-        });
-        event.api.addPanel({
-            id: 'panel2',
-            component: 'default',
-            params: {
-                someProps: 'World',
-            },
-            position: { referencePanel: 'panel1', direction: 'below' },
-        });
-    };
+<div
+    style={{
+        height: '300px',
+        backgroundColor: 'rgb(30,30,30)',
+        color: 'white',
+        margin: '20px 0px',
+    }}
+>
+    <SimpleGridview />
+</div>
 
-    return (
-        <DockviewReact
-            components={components}
-            tabComponents={headers} // optional headers renderer
-            onReady={onReady}
-        />
-    );
-};
-```
+<Link to="./components/paneview">
+    <h2>Paneview</h2>
+</Link>
+
+<div
+    style={{
+        height: '300px',
+        backgroundColor: 'rgb(30,30,30)',
+        color: 'white',
+        margin: '20px 0px',
+    }}
+>
+    <SimplePaneview />
+</div>

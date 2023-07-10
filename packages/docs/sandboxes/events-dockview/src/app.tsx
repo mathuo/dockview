@@ -14,7 +14,7 @@ const components = {
     },
 };
 
-const EventsDockview = () => {
+const EventsDockview = (props: { theme?: string }) => {
     const [lines, setLines] = React.useState<Line[]>([]);
     const [checked, setChecked] = React.useState<boolean>(false);
 
@@ -230,7 +230,6 @@ const EventsDockview = () => {
                     },
                 },
                 activeGroup: '80',
-                options: {},
             });
             return;
         }
@@ -331,7 +330,7 @@ const EventsDockview = () => {
                 <DockviewReact
                     components={components}
                     onReady={onReady}
-                    className="dockview-theme-abyss"
+                    className={`${props.theme || 'dockview-theme-abyss'}`}
                 />
             </div>
             <div style={{ flexGrow: 1, paddingTop: '5px' }}>

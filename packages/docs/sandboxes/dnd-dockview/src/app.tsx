@@ -41,7 +41,7 @@ const DraggableElement = () => (
     </span>
 );
 
-const DndDockview = (props: { renderVisibleOnly: boolean }) => {
+const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
             id: 'panel_1',
@@ -106,7 +106,7 @@ const DndDockview = (props: { renderVisibleOnly: boolean }) => {
             <DockviewReact
                 components={components}
                 onReady={onReady}
-                className="dockview-theme-abyss"
+                className={`${props.theme || 'dockview-theme-abyss'}`}
                 onDidDrop={onDidDrop}
                 showDndOverlay={showDndOverlay}
             />

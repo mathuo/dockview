@@ -7,7 +7,6 @@ import * as React from 'react';
 import TreeComponent from './treeview';
 import { getBackendOptions, MultiBackend } from '@minoru/react-dnd-treeview';
 import { DndProvider } from 'react-dnd';
-import './app.scss';
 
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
@@ -26,7 +25,7 @@ const components = {
     },
 };
 
-export const App: React.FC = () => {
+export const App: React.FC = (props: { theme?: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
         const panel = event.api.addPanel({
             id: 'panel_1',
@@ -97,7 +96,7 @@ export const App: React.FC = () => {
             <DockviewReact
                 components={components}
                 onReady={onReady}
-                className="dockview-theme-abyss externaldnd-dockview"
+                className={`${props.theme || 'dockview-theme-abyss'}`}
             />
         </DndProvider>
     );

@@ -81,7 +81,7 @@ const components = {
     default: Default,
 };
 
-const ResizeDockview = () => {
+const ResizeDockview = (props: { theme?: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
             id: 'panel_1',
@@ -117,7 +117,7 @@ const ResizeDockview = () => {
 
     return (
         <DockviewReact
-            className="dockview-theme-abyss"
+            className={`${props.theme || 'dockview-theme-abyss'}`}
             onReady={onReady}
             components={components}
         />
