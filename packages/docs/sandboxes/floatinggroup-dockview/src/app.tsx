@@ -132,6 +132,9 @@ export const DockviewPersistance = (props: { theme?: string }) => {
     const [layout, setLayout] =
         useLocalStorage<SerializedDockview>('floating.layout');
 
+    const [disableFloatingGroups, setDisableFloatingGroups] =
+        React.useState<boolean>(false);
+
     const load = (api: DockviewApi) => {
         api.clear();
         if (layout) {
@@ -194,6 +197,15 @@ export const DockviewPersistance = (props: { theme?: string }) => {
                 >
                     Add Floating Group
                 </button>
+                <button
+                    onClick={() => {
+                        setDisableFloatingGroups((x) => !x);
+                    }}
+                >
+                    {`${
+                        disableFloatingGroups ? 'Enable' : 'Disable'
+                    } floating groups`}
+                </button>
             </div>
             <div
                 style={{
@@ -207,6 +219,7 @@ export const DockviewPersistance = (props: { theme?: string }) => {
                     watermarkComponent={Watermark}
                     leftHeaderActionsComponent={LeftComponent}
                     rightHeaderActionsComponent={RightComponent}
+                    disableFloatingGroups={disableFloatingGroups}
                     className={`${props.theme || 'dockview-theme-abyss'}`}
                 />
             </div>
