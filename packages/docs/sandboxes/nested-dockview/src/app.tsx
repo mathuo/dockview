@@ -30,7 +30,7 @@ const InnerDockview = () => {
         <DockviewReact
             onReady={onReady}
             components={components}
-            className="dockview-theme-abyss nested-dockview"
+            className="nested-dockview"
         />
     );
 };
@@ -52,7 +52,7 @@ const components = {
     innerDockview: InnerDockview,
 };
 
-const NestedDockview = () => {
+const NestedDockview = (props: { theme?: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
             id: 'panel_1',
@@ -85,7 +85,7 @@ const NestedDockview = () => {
         <DockviewReact
             onReady={onReady}
             components={components}
-            className="dockview-theme-abyss"
+            className={`${props.theme || 'dockview-theme-abyss'}`}
             showDndOverlay={showDndOverlay}
             onDidDrop={onDidDrop}
         />

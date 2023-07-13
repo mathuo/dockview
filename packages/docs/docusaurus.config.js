@@ -11,7 +11,8 @@ console.log(`isCI: ${process.env.CI}`);
 /** @type {import('@docusaurus/types').Config} */
 const config = {
     title: 'Dockview',
-    tagline: 'A zero dependency layout manager built for React',
+    tagline:
+        'A zero dependency layout manager supporting ReactJS and Vanilla TypeScript',
     url: 'https://dockview.dev',
     baseUrl: process.env.CI ? `/` : '/',
     onBrokenLinks: 'throw',
@@ -140,6 +141,11 @@ const config = {
                         label: 'Docs',
                     },
                     { to: '/blog', label: 'Blog', position: 'left' },
+                    {
+                        to: 'https://dockview.dev/typedocs',
+                        label: 'TSDoc',
+                        position: 'left',
+                    },
                     {
                         type: 'docsVersionDropdown',
                         position: 'right',

@@ -48,9 +48,27 @@ const FeatureList: FeatureItem[] = [
     },
     {
         title: '',
-        Svg: require('@site/static/img/dockview_splash_2.svg').default,
+        Svg: require('@site/static/img/dockview_grid_4.svg').default,
         description: (
             <>
+                <div className="feature-banner">
+                    <h3 className="feature-banner-header">
+                        Rich Feature Control
+                    </h3>
+                    <p className="feature-banner-content">
+                        Customize header features to add additional icons and
+                        more as well as custom tab rendering.
+                    </p>
+                </div>
+                <div className="feature-banner">
+                    <h3 className="feature-banner-header">
+                        Floating Group Support
+                    </h3>
+                    <p className="feature-banner-content">
+                        Built-in support for floating groups with a supporting
+                        api for progmatic control.
+                    </p>
+                </div>
                 <div className="feature-banner">
                     <h3 className="feature-banner-header">Drag And Drop</h3>
                     <p className="feature-banner-content">
@@ -58,6 +76,14 @@ const FeatureList: FeatureItem[] = [
                         interacting with external drag events.
                     </p>
                 </div>
+            </>
+        ),
+    },
+    {
+        title: '',
+        Svg: require('@site/static/img/dockview_splash_2.svg').default,
+        description: (
+            <>
                 <div className="feature-banner">
                     <h3 className="feature-banner-header">Zero Dependencies</h3>
                     <p className="feature-banner-content">
@@ -72,6 +98,15 @@ const FeatureList: FeatureItem[] = [
                         All of the code is run through Sonarcloud Code Analysis,
                         which along with the source code and high test coverage
                         can be viewed from the Github page.
+                    </p>
+                </div>
+                <div className="feature-banner">
+                    <h3 className="feature-banner-header">
+                        React or Vanilla TypeScript
+                    </h3>
+                    <p className="feature-banner-content">
+                        Exposes native support for both ReactJS components and
+                        Vanilla TypeScript.
                     </p>
                 </div>
             </>

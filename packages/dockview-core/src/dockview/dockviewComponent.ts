@@ -85,6 +85,7 @@ export type DockviewComponentUpdateOptions = Pick<
     | 'defaultTabComponent'
     | 'createLeftHeaderActionsElement'
     | 'createRightHeaderActionsElement'
+    | 'disableFloatingGroups'
 >;
 
 export interface DockviewDropEvent extends GroupviewDropEvent {

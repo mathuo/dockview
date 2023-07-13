@@ -16,7 +16,7 @@ const components = {
     },
 };
 
-export const App: React.FC = () => {
+export const App: React.FC = (props: { theme?: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
             id: 'panel_1',
@@ -75,7 +75,7 @@ export const App: React.FC = () => {
         <DockviewReact
             components={components}
             onReady={onReady}
-            className="dockview-theme-abyss skinny-tabs"
+            className={`${props.theme || 'dockview-theme-abyss'} skinny-tabs`}
         />
     );
 };

@@ -73,7 +73,7 @@ const components = {
     },
 };
 
-const DockviewDemo2 = () => {
+const DockviewDemo2 = (props: { theme?: string }) => {
     const onReady = (event: GridviewReadyEvent) => {
         event.api.addPanel({
             id: 'panes',
@@ -111,7 +111,7 @@ const DockviewDemo2 = () => {
         <GridviewReact
             onReady={onReady}
             components={components}
-            className="dockview-theme-abyss"
+            className={`${props.theme || 'dockview-theme-abyss'}`}
         />
     );
 };

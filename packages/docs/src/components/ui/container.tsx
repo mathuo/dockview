@@ -3,6 +3,7 @@ import { CodeSandboxButton } from './codeSandboxButton';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import './container.scss';
 import { Spinner } from './spinner';
+import BrowserOnly from '@docusaurus/BrowserOnly';
 
 export const Container = (props: {
     children?: React.ReactNode;
@@ -21,27 +22,35 @@ export const Container = (props: {
     }, [props.injectVanillaJS]);
 
     return (
-        <>
-            <div
-                ref={ref}
-                style={{
-                    height: props.height ? `${props.height}px` : '300px',
-                }}
-            >
-                {props.children}
-            </div>
-            <div
-                style={{
-                    padding: '2px 0px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    fontSize: '14px',
-                }}
-            >
-                <span style={{ flexGrow: 1 }} />
-                {props.sandboxId && <CodeSandboxButton id={props.sandboxId} />}
-            </div>
-        </>
+        <BrowserOnly>
+            {() => (
+                <>
+                    <div
+                        ref={ref}
+                        style={{
+                            height: props.height
+                                ? `${props.height}px`
+                                : '300px',
+                        }}
+                    >
+                        {props.children}
+                    </div>
+                    <div
+                        style={{
+                            padding: '2px 0px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontSize: '14px',
+                        }}
+                    >
+                        <span style={{ flexGrow: 1 }} />
+                        {props.sandboxId && (
+                            <CodeSandboxButton id={props.sandboxId} />
+                        )}
+                    </div>
+                </>
+            )}
+        </BrowserOnly>
     );
 };
 
@@ -70,6 +79,7 @@ const JavascriptIcon = (props: { height: number; width: number }) => {
 };
 
 const themes = [
+    'dockview-theme-abyss',
     'dockview-theme-dark',
     'dockview-theme-light',
     'dockview-theme-vs',
@@ -134,9 +144,9 @@ export const ThemePicker = () => {
     );
 };
 
-export const MultiFrameworkContainer = (props: {
+export const MultiFrameworkContainer2 = (props: {
     react: React.FC;
-    typescript: (parent: HTMLElement) => { dispose: () => void };
+    typescript?: (parent: HTMLElement) => { dispose: () => void };
     sandboxId: string;
     height?: number;
 }) => {
@@ -229,32 +239,48 @@ export const MultiFrameworkContainer = (props: {
                         cursor: 'pointer',
                     }}
                 >
-                    {framework === 'React' ? (
-                        <ReactIcon height={16} width={16} />
-                    ) : (
-                        <JavascriptIcon height={16} width={16} />
+                    {props.typescript &&
+                        (framework === 'React' ? (
+                            <ReactIcon height={16} width={16} />
+                        ) : (
+                            <JavascriptIcon height={16} width={16} />
+                        ))}
+                    {props.typescript && (
+                        <select
+                            style={{
+                                border: 'none',
+                                fontWeight: 'bold',
+                                backgroundColor: 'inherit',
+                                cursor: 'inherit',
+                                color: 'inherit',
+                                height: '24px',
+                            }}
+                            onChange={(e) => {
+                                const target = e.target as HTMLSelectElement;
+                                setFramework(target.value);
+                            }}
+                        >
+                            <option value="React">{'React'}</option>
+                            <option value="Javascript">{'Javascript'}</option>
+                        </select>
                     )}
-                    <select
-                        style={{
-                            border: 'none',
-                            fontWeight: 'bold',
-                            backgroundColor: 'inherit',
-                            cursor: 'inherit',
-                            color: 'inherit',
-                            height: '24px',
-                        }}
-                        onChange={(e) => {
-                            const target = e.target as HTMLSelectElement;
-                            setFramework(target.value);
-                        }}
-                    >
-                        <option value="React">{'React'}</option>
-                        <option value="Javascript">{'Javascript'}</option>
-                    </select>
                 </div>
                 <span style={{ flexGrow: 1 }} />
                 <CodeSandboxButton id={sandboxId} />
             </div>
         </>
+    );
+};
+
+export const MultiFrameworkContainer = (props: {
+    react: React.FC;
+    typescript?: (parent: HTMLElement) => { dispose: () => void };
+    sandboxId: string;
+    height?: number;
+}) => {
+    return (
+        <BrowserOnly>
+            {() => <MultiFrameworkContainer2 {...props} />}
+        </BrowserOnly>
     );
 };

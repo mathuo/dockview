@@ -68,6 +68,7 @@ export interface IDockviewReactProps {
     rightHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     leftHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     singleTabMode?: 'fullwidth' | 'default';
+    disableFloatingGroups?: boolean;
 }
 
 const DEFAULT_REACT_TAB = 'props.defaultTabComponent';
@@ -159,8 +160,8 @@ export const DockviewReact = React.forwardRef(
                     props.rightHeaderActionsComponent,
                     { addPortal }
                 ),
-
                 singleTabMode: props.singleTabMode,
+                disableFloatingGroups: props.disableFloatingGroups,
             });
 
             const { clientWidth, clientHeight } = domRef.current;
@@ -230,6 +231,15 @@ export const DockviewReact = React.forwardRef(
                 frameworkTabComponents: props.tabComponents,
             });
         }, [props.tabComponents]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+            dockviewRef.current.updateOptions({
+                disableFloatingGroups: props.disableFloatingGroups,
+            });
+        }, [props.disableFloatingGroups]);
 
         React.useEffect(() => {
             if (!dockviewRef.current) {
