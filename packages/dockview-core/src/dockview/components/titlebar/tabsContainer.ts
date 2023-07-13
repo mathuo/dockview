@@ -296,7 +296,14 @@ export class TabsContainer
                 const isFloatingGroupsEnabled =
                     !this.accessor.options.disableFloatingGroups;
 
-                if (isFloatingGroupsEnabled && event.shiftKey) {
+                const isFloatingWithOnePanel =
+                    this.group.api.isFloating && this.size === 1;
+
+                if (
+                    isFloatingGroupsEnabled &&
+                    !isFloatingWithOnePanel &&
+                    event.shiftKey
+                ) {
                     event.preventDefault();
 
                     const panel = this.accessor.getGroupPanel(tabToAdd.panelId);

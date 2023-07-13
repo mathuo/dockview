@@ -577,7 +577,7 @@ describe('tabsContainer', () => {
         expect(eventPreventDefaultSpy2).toBeCalledTimes(0);
     });
 
-    test('that selecting a tab which shift down will move that tab into a new floating group', () => {
+    test('that selecting a tab with shift down will move that tab into a new floating group', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return (<Partial<DockviewComponent>>{
                 options: {},
@@ -592,6 +592,7 @@ describe('tabsContainer', () => {
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
                 api: { isFloating: true } as any,
+                model: {} as any,
             }) as DockviewGroupPanel;
         });
 
@@ -600,9 +601,9 @@ describe('tabsContainer', () => {
 
         const cut = new TabsContainer(accessor, groupPanel);
 
-        const panelMock = jest.fn<IDockviewPanel, []>(() => {
+        const panelMock = jest.fn<IDockviewPanel, [string]>((id: string) => {
             const partial: Partial<IDockviewPanel> = {
-                id: 'test_id',
+                id,
 
                 view: {
                     tab: {
@@ -615,8 +616,8 @@ describe('tabsContainer', () => {
             };
             return partial as IDockviewPanel;
         });
-        const panel = new panelMock();
 
+        const panel = new panelMock('test_id');
         cut.openPanel(panel);
 
         const el = cut.element.querySelector('.tab')!;
@@ -624,6 +625,14 @@ describe('tabsContainer', () => {
 
         const event = new KeyboardEvent('mousedown', { shiftKey: true });
         const preventDefaultSpy = jest.spyOn(event, 'preventDefault');
+        fireEvent(el, event);
+
+        // a floating group with a single tab shouldn't be eligible
+        expect(preventDefaultSpy).toBeCalledTimes(0);
+        expect(accessor.addFloatingGroup).toBeCalledTimes(0);
+
+        const panel2 = new panelMock('test_id_2');
+        cut.openPanel(panel2);
         fireEvent(el, event);
 
         expect(preventDefaultSpy).toBeCalledTimes(1);
