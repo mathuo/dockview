@@ -65,11 +65,6 @@ function createBundle(format, options) {
         }),
         typescript({
             tsconfig: 'tsconfig.esm.json',
-            sourcemap: true,
-            compilerOptions: {
-                declaration: false,
-                sourcemap: true,
-            },
         }),
     ];
 
