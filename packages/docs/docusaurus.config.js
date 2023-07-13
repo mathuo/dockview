@@ -45,6 +45,15 @@ const config = {
                     return {
                         // externals: ['react', 'react-dom'],
                         devtool: 'source-map',
+                        module: {
+                            rules: [
+                                {
+                                    test: /\.js$/,
+                                    enforce: 'pre',
+                                    use: ['source-map-loader'],
+                                },
+                            ],
+                        },
                         resolve: {
                             ...config.resolve,
                             alias: {
