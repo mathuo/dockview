@@ -1,7 +1,7 @@
 <div align="center">
 <h1>dockview</h1>
 
-<p>Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support written in TypeScript</p>
+<p>Zero dependency layout manager supporting tabs, groups, grids and splitviews with ReactJS support written in TypeScript</p>
 
 </div>
 

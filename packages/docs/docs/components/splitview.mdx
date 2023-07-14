@@ -85,15 +85,15 @@ import { ReactSplitview } from 'dockview';
 
 Using the `onReady` prop you can access to the component `api` and add panels either through deserialization or the individual addition of panels.
 
-| Property            | Type                                   | Optional | Default                  | Description                                                              |
-| ------------------- | -------------------------------------- | -------- | ------------------------ | ------------------------------------------------------------------------ |
-| onReady             | `(event: SplitviewReadyEvent) => void` | No       |                          | Function                                                                 |
-| components          | `Record<string, ISplitviewPanelProps>` | No       |                          | Panel renderers                                                          |
-| orientation         | `Orientation`                          | Yes      | `Orientation.HORIZONTAL` | Orientation of the Splitview                                             |
-| proportionalLayout  | `boolean`                              | Yes      | `true`                   | See <Link to="../basics/#proportional-layout">Proportional layout</Link> |
-| hideBorders         | `boolean`                              | Yes      | `false`                  | Hide the borders between panels                                          |
-| className           | `string`                               | Yes      | `''`                     | Attaches a classname                                                     |
-| disableAutoResizing | `boolean`                              | Yes      | `false`                  | See <Link to="../basics/#auto-resizing">Auto Resizing</Link>             |
+| Property            | Type                                   | Optional | Default                  | Description                     |
+| ------------------- | -------------------------------------- | -------- | ------------------------ | ------------------------------- |
+| onReady             | `(event: SplitviewReadyEvent) => void` | No       |                          | Function                        |
+| components          | `Record<string, ISplitviewPanelProps>` | No       |                          | Panel renderers                 |
+| orientation         | `Orientation`                          | Yes      | `Orientation.HORIZONTAL` | Orientation of the Splitview    |
+| proportionalLayout  | `boolean`                              | Yes      | `true`                   |                                 |
+| hideBorders         | `boolean`                              | Yes      | `false`                  | Hide the borders between panels |
+| className           | `string`                               | Yes      | `''`                     | Attaches a classname            |
+| disableAutoResizing | `boolean`                              | Yes      | `false`                  |                                 |
 
 ## Splitview API
 
@@ -135,9 +135,9 @@ const onReady = (event: SplitviewReadyEvent) => {
 |                     |                                                                    |
 | updateOptions       | `(options: SplitviewComponentUpdateOptions): void`                 |                                                                  |
 | focus               | `(): void`                                                         | Focus the active panel, if exists                                |
-| layout              | `(width: number, height:number): void`                             | See <Link to="../basics/#auto-resizing">Auto Resizing</Link>     |
-| fromJSON            | `(data: SerializedSplitview): void`                                | <Link to="../basics/#serialization">Serialization</Link>         |
-| toJSON              | `(): SerializedSplitview`                                          | <Link to="../basics/#serialization">Serialization</Link>         |
+| layout              | `(width: number, height:number): void`                             |                                                                  |
+| fromJSON            | `(data: SerializedSplitview): void`                                |                                                                  |
+| toJSON              | `(): SerializedSplitview`                                          |                                                                  |
 | clear               | `(): void`                                                         | Clears the current layout                                        |
 
 ## Splitview Panel API

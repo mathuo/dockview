@@ -2,6 +2,7 @@
   "label": "Components",
   "collapsible": true,
   "collapsed": false,
+  "position": 2,
   "link": {
     "type": "generated-index",
     "title": "Components"
