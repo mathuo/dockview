@@ -80,14 +80,6 @@ export class Tab extends CompositeDisposable implements ITab {
                     return;
                 }
 
-                /**
-                 * TODO: alternative to stopPropagation
-                 *
-                 * I need to stop the event propagation here since otherwise it'll be intercepted by event handlers
-                 * on the tabs-container. I cannot use event.preventDefault() since I need the on DragStart event to occur
-                 */
-                event.stopPropagation();
-
                 this._onChanged.fire(event);
             })
         );
