@@ -351,16 +351,12 @@ export class DockviewComponent
             minimumInViewportHeight: 100,
         });
 
-        const el = group.element.querySelector('#dv-group-float-drag-handle');
-
-        if (el) {
-            overlay.setupDrag(el as HTMLElement, {
-                inDragMode:
-                    typeof options?.inDragMode === 'boolean'
-                        ? options.inDragMode
-                        : false,
-            });
-        }
+        overlay.setupDrag(group.element, {
+            inDragMode:
+                typeof options?.inDragMode === 'boolean'
+                    ? options.inDragMode
+                    : false,
+        });
 
         const floatingGroupPanel = new DockviewFloatingGroupPanel(
             group,
