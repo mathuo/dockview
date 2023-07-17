@@ -351,7 +351,13 @@ export class DockviewComponent
             minimumInViewportHeight: 100,
         });
 
-        overlay.setupDrag(group.element, {
+        const el = group.element.querySelector('void-container');
+
+        if (!el) {
+            throw new Error('failed to find drag handle');
+        }
+
+        overlay.setupDrag(<HTMLElement>el, {
             inDragMode:
                 typeof options?.inDragMode === 'boolean'
                     ? options.inDragMode
