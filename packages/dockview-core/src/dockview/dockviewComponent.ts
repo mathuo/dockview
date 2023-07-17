@@ -351,7 +351,7 @@ export class DockviewComponent
             minimumInViewportHeight: 100,
         });
 
-        const el = group.element.querySelector('void-container');
+        const el = group.element.querySelector('.void-container');
 
         if (!el) {
             throw new Error('failed to find drag handle');
