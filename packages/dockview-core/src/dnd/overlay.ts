@@ -322,10 +322,15 @@ export class Overlay extends CompositeDisposable {
                         let left: number | null = null;
                         let width: number | null = null;
 
-                        function moveTop() {
+                        const minimumInViewportHeight =
+                            this.options.minimumInViewportHeight;
+                        const minimumInViewportWidth =
+                            this.options.minimumInViewportWidth;
+
+                        function moveTop(): void {
                             top = clamp(
                                 y,
-                                0,
+                                -minimumInViewportHeight,
                                 Math.max(
                                     0,
                                     startPosition!.originalY +
@@ -339,7 +344,7 @@ export class Overlay extends CompositeDisposable {
                                 top;
                         }
 
-                        function moveBottom() {
+                        function moveBottom(): void {
                             top =
                                 startPosition!.originalY -
                                 startPosition!.originalHeight;
@@ -351,15 +356,16 @@ export class Overlay extends CompositeDisposable {
                                     0,
                                     containerRect.height -
                                         startPosition!.originalY +
-                                        startPosition!.originalHeight
+                                        startPosition!.originalHeight +
+                                        minimumInViewportHeight
                                 )
                             );
                         }
 
-                        function moveLeft() {
+                        function moveLeft(): void {
                             left = clamp(
                                 x,
-                                0,
+                                -minimumInViewportWidth,
                                 Math.max(
                                     0,
                                     startPosition!.originalX +
@@ -373,7 +379,7 @@ export class Overlay extends CompositeDisposable {
                                 left;
                         }
 
-                        function moveRight() {
+                        function moveRight(): void {
                             left =
                                 startPosition!.originalX -
                                 startPosition!.originalWidth;
@@ -384,7 +390,8 @@ export class Overlay extends CompositeDisposable {
                                     0,
                                     containerRect.width -
                                         startPosition!.originalX +
-                                        startPosition!.originalWidth
+                                        startPosition!.originalWidth +
+                                        minimumInViewportWidth
                                 )
                             );
                         }
