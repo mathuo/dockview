@@ -3787,4 +3787,37 @@ describe('dockviewComponent', () => {
             dockview.element.querySelectorAll('.view-container > .view').length
         ).toBe(0);
     });
+
+    test('that api.setSize applies to the overlay for floating panels', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+            floating: true,
+        });
+
+        panel1.api.setSize({ height: 123, width: 256 });
+
+        const items = dockview.element.querySelectorAll('.dv-resize-container');
+        expect(items.length).toBe(1);
+
+        const el = items[0] as HTMLElement;
+
+        expect(el.style.height).toBe('123px');
+        expect(el.style.width).toBe('256px');
+    });
 });

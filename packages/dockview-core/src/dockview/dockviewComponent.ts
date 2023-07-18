@@ -373,6 +373,12 @@ export class DockviewComponent
             overlay.onDidChange(() => {
                 this._bufferOnDidLayoutChange.fire();
             }),
+            group.onDidChange((event) => {
+                overlay.setBounds({
+                    height: event?.height,
+                    width: event?.width,
+                });
+            }),
             {
                 dispose: () => {
                     group.model.isFloating = false;
