@@ -330,13 +330,18 @@ export class Overlay extends CompositeDisposable {
                         function moveTop(): void {
                             top = clamp(
                                 y,
-                                -minimumInViewportHeight,
-                                Math.max(
-                                    0,
-                                    startPosition!.originalY +
-                                        startPosition!.originalHeight -
-                                        Overlay.MINIMUM_HEIGHT
-                                )
+                                -Number.MAX_VALUE,
+                                startPosition!.originalY +
+                                    startPosition!.originalHeight >
+                                    containerRect.height
+                                    ? containerRect.height -
+                                          minimumInViewportHeight
+                                    : Math.max(
+                                          0,
+                                          startPosition!.originalY +
+                                              startPosition!.originalHeight -
+                                              Overlay.MINIMUM_HEIGHT
+                                      )
                             );
                             height =
                                 startPosition!.originalY +
@@ -351,28 +356,30 @@ export class Overlay extends CompositeDisposable {
 
                             height = clamp(
                                 y - top,
-                                Overlay.MINIMUM_HEIGHT,
-                                Math.max(
-                                    0,
-                                    containerRect.height -
-                                        startPosition!.originalY +
-                                        startPosition!.originalHeight +
-                                        minimumInViewportHeight
-                                )
+                                top < 0
+                                    ? -top + minimumInViewportHeight
+                                    : Overlay.MINIMUM_HEIGHT,
+                                Number.MAX_VALUE
                             );
                         }
 
                         function moveLeft(): void {
                             left = clamp(
                                 x,
-                                -minimumInViewportWidth,
-                                Math.max(
-                                    0,
-                                    startPosition!.originalX +
-                                        startPosition!.originalWidth -
-                                        Overlay.MINIMUM_WIDTH
-                                )
+                                -Number.MAX_VALUE,
+                                startPosition!.originalX +
+                                    startPosition!.originalWidth >
+                                    containerRect.width
+                                    ? containerRect.width -
+                                          minimumInViewportWidth
+                                    : Math.max(
+                                          0,
+                                          startPosition!.originalX +
+                                              startPosition!.originalWidth -
+                                              Overlay.MINIMUM_WIDTH
+                                      )
                             );
+
                             width =
                                 startPosition!.originalX +
                                 startPosition!.originalWidth -
@@ -383,16 +390,13 @@ export class Overlay extends CompositeDisposable {
                             left =
                                 startPosition!.originalX -
                                 startPosition!.originalWidth;
+
                             width = clamp(
                                 x - left,
-                                Overlay.MINIMUM_WIDTH,
-                                Math.max(
-                                    0,
-                                    containerRect.width -
-                                        startPosition!.originalX +
-                                        startPosition!.originalWidth +
-                                        minimumInViewportWidth
-                                )
+                                left < 0
+                                    ? -left + minimumInViewportWidth
+                                    : Overlay.MINIMUM_WIDTH,
+                                Number.MAX_VALUE
                             );
                         }
 
