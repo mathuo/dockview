@@ -1,4 +1,8 @@
-import { quasiDefaultPrevented, toggleClass } from '../dom';
+import {
+    getElementsByTagName,
+    quasiDefaultPrevented,
+    toggleClass,
+} from '../dom';
 import {
     Emitter,
     Event,
@@ -29,6 +33,9 @@ export class Overlay extends CompositeDisposable {
     private readonly _onDidChange = new Emitter<void>();
     readonly onDidChange: Event<void> = this._onDidChange.event;
 
+    private readonly _onDidChangeEnd = new Emitter<void>();
+    readonly onDidChangeEnd: Event<void> = this._onDidChangeEnd.event;
+
     private static MINIMUM_HEIGHT = 20;
     private static MINIMUM_WIDTH = 20;
 
@@ -46,9 +53,10 @@ export class Overlay extends CompositeDisposable {
     ) {
         super();
 
-        this.addDisposables(this._onDidChange);
+        this.addDisposables(this._onDidChange, this._onDidChangeEnd);
 
-        this.setupOverlay();
+        this._element.className = 'dv-resize-container';
+
         this.setupResize('top');
         this.setupResize('bottom');
         this.setupResize('left');
@@ -62,7 +70,12 @@ export class Overlay extends CompositeDisposable {
         this.options.container.appendChild(this._element);
 
         // if input bad resize within acceptable boundaries
-        this.renderWithinBoundaryConditions();
+        this.setBounds({
+            height: this.options.height,
+            width: this.options.width,
+            top: this.options.top,
+            left: this.options.left,
+        });
     }
 
     setBounds(
@@ -71,7 +84,7 @@ export class Overlay extends CompositeDisposable {
             width: number;
             top: number;
             left: number;
-        }>
+        }> = {}
     ): void {
         if (typeof bounds.height === 'number') {
             this._element.style.height = `${bounds.height}px`;
@@ -86,24 +99,10 @@ export class Overlay extends CompositeDisposable {
             this._element.style.left = `${bounds.left}px`;
         }
 
-        this.renderWithinBoundaryConditions();
-    }
-
-    toJSON(): { top: number; left: number; height: number; width: number } {
-        const container = this.options.container.getBoundingClientRect();
-        const element = this._element.getBoundingClientRect();
-
-        return {
-            top: element.top - container.top,
-            left: element.left - container.left,
-            width: element.width,
-            height: element.height,
-        };
-    }
-
-    renderWithinBoundaryConditions(): void {
         const containerRect = this.options.container.getBoundingClientRect();
         const overlayRect = this._element.getBoundingClientRect();
+
+        // region: ensure bounds within allowable limits
 
         // a minimum width of minimumViewportWidth must be inside the viewport
         const xOffset = Math.max(
@@ -131,6 +130,20 @@ export class Overlay extends CompositeDisposable {
 
         this._element.style.left = `${left}px`;
         this._element.style.top = `${top}px`;
+
+        this._onDidChange.fire();
+    }
+
+    toJSON(): { top: number; left: number; height: number; width: number } {
+        const container = this.options.container.getBoundingClientRect();
+        const element = this._element.getBoundingClientRect();
+
+        return {
+            top: element.top - container.top,
+            left: element.left - container.left,
+            width: element.width,
+            height: element.height,
+        };
     }
 
     setupDrag(
@@ -142,7 +155,23 @@ export class Overlay extends CompositeDisposable {
         const track = () => {
             let offset: { x: number; y: number } | null = null;
 
+            const iframes = [
+                ...getElementsByTagName('iframe'),
+                ...getElementsByTagName('webview'),
+            ];
+
+            for (const iframe of iframes) {
+                iframe.style.pointerEvents = 'none';
+            }
+
             move.value = new CompositeDisposable(
+                {
+                    dispose: () => {
+                        for (const iframe of iframes) {
+                            iframe.style.pointerEvents = 'auto';
+                        }
+                    },
+                },
                 addDisposableWindowListener(window, 'mousemove', (e) => {
                     const containerRect =
                         this.options.container.getBoundingClientRect();
@@ -191,8 +220,7 @@ export class Overlay extends CompositeDisposable {
                         )
                     );
 
-                    this._element.style.left = `${left}px`;
-                    this._element.style.top = `${top}px`;
+                    this.setBounds({ top, left });
                 }),
                 addDisposableWindowListener(window, 'mouseup', () => {
                     toggleClass(
@@ -202,7 +230,7 @@ export class Overlay extends CompositeDisposable {
                     );
 
                     move.dispose();
-                    this._onDidChange.fire();
+                    this._onDidChangeEnd.fire();
                 })
             );
         };
@@ -259,15 +287,6 @@ export class Overlay extends CompositeDisposable {
         }
     }
 
-    private setupOverlay(): void {
-        this._element.style.height = `${this.options.height}px`;
-        this._element.style.width = `${this.options.width}px`;
-        this._element.style.left = `${this.options.left}px`;
-        this._element.style.top = `${this.options.top}px`;
-
-        this._element.className = 'dv-resize-container';
-    }
-
     private setupResize(
         direction:
             | 'top'
@@ -297,6 +316,15 @@ export class Overlay extends CompositeDisposable {
                     originalWidth: number;
                 } | null = null;
 
+                const iframes = [
+                    ...getElementsByTagName('iframe'),
+                    ...getElementsByTagName('webview'),
+                ];
+
+                for (const iframe of iframes) {
+                    iframe.style.pointerEvents = 'none';
+                }
+
                 move.value = new CompositeDisposable(
                     addDisposableWindowListener(window, 'mousemove', (e) => {
                         const containerRect =
@@ -317,10 +345,10 @@ export class Overlay extends CompositeDisposable {
                             };
                         }
 
-                        let top: number | null = null;
-                        let height: number | null = null;
-                        let left: number | null = null;
-                        let width: number | null = null;
+                        let top: number | undefined = undefined;
+                        let height: number | undefined = undefined;
+                        let left: number | undefined = undefined;
+                        let width: number | undefined = undefined;
 
                         const minimumInViewportHeight =
                             this.options.minimumInViewportHeight;
@@ -431,22 +459,18 @@ export class Overlay extends CompositeDisposable {
                                 break;
                         }
 
-                        if (height !== null) {
-                            this._element.style.height = `${height}px`;
-                        }
-                        if (top !== null) {
-                            this._element.style.top = `${top}px`;
-                        }
-                        if (left !== null) {
-                            this._element.style.left = `${left}px`;
-                        }
-                        if (width !== null) {
-                            this._element.style.width = `${width}px`;
-                        }
+                        this.setBounds({ height, width, top, left });
                     }),
+                    {
+                        dispose: () => {
+                            for (const iframe of iframes) {
+                                iframe.style.pointerEvents = 'auto';
+                            }
+                        },
+                    },
                     addDisposableWindowListener(window, 'mouseup', () => {
                         move.dispose();
-                        this._onDidChange.fire();
+                        this._onDidChangeEnd.fire();
                     })
                 );
             })
