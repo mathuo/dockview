@@ -210,7 +210,6 @@ export const DockviewPersistance = (props: { theme?: string }) => {
             <div
                 style={{
                     flexGrow: 1,
-                    overflow: 'hidden',
                 }}
             >
                 <DockviewReact

@@ -78,6 +78,7 @@ export const HoistedDockviewPanel = <T extends object>(
                         style={{
                             position: 'absolute',
                             overflow: 'hidden',
+                            zIndex: 999,
                             pointerEvents: 'none', // prevent this wrapper contain stealing events
                         }}
                     >

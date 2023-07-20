@@ -45,7 +45,7 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
 import { Overlay } from '../dnd/overlay';
-import { toggleClass } from '../dom';
+import { toggleClass, watchElementResize } from '../dom';
 import {
     DockviewFloatingGroupPanel,
     IDockviewFloatingGroupPanel,
@@ -369,8 +369,19 @@ export class DockviewComponent
             overlay
         );
 
+        const disposable = watchElementResize(group.element, (entry) => {
+            const { width, height } = entry.contentRect;
+            group.layout(width, height); // let the group know it's size is changing so it can fire events to the panel
+        });
+
         floatingGroupPanel.addDisposables(
             overlay.onDidChange(() => {
+                // this is either a resize or a move
+                // to inform the panels .layout(...) the group with it's current size
+                // don't care about resize since the above watcher handles that
+                group.layout(group.height, group.width);
+            }),
+            overlay.onDidChangeEnd(() => {
                 this._bufferOnDidLayoutChange.fire();
             }),
             group.onDidChange((event) => {
@@ -381,6 +392,8 @@ export class DockviewComponent
             }),
             {
                 dispose: () => {
+                    disposable.dispose();
+
                     group.model.isFloating = false;
                     remove(this.floatingGroups, floatingGroupPanel);
                     this.updateWatermark();
@@ -451,7 +464,7 @@ export class DockviewComponent
         if (this.floatingGroups) {
             for (const floating of this.floatingGroups) {
                 // ensure floting groups stay within visible boundaries
-                floating.overlay.renderWithinBoundaryConditions();
+                floating.overlay.setBounds();
             }
         }
     }
@@ -621,7 +634,7 @@ export class DockviewComponent
         }
 
         for (const floatingGroup of this.floatingGroups) {
-            floatingGroup.overlay.renderWithinBoundaryConditions();
+            floatingGroup.overlay.setBounds();
         }
 
         if (typeof activeGroup === 'string') {
