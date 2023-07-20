@@ -96,7 +96,7 @@ describe('componentFactory', () => {
 
             expect(component).toHaveBeenCalled();
 
-            expect(componentResult instanceof component);
+            expect(componentResult instanceof component).toBeTruthy();
         });
     });
 });
