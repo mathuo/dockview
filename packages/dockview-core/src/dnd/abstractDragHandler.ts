@@ -25,7 +25,7 @@ export abstract class DragHandler extends CompositeDisposable {
         this.configure();
     }
 
-    abstract getData(dataTransfer?: DataTransfer | null): IDisposable;
+    abstract getData(event: DragEvent): IDisposable;
 
     protected isCancelled(_event: DragEvent): boolean {
         return false;
@@ -60,7 +60,7 @@ export abstract class DragHandler extends CompositeDisposable {
                 this.el.classList.add('dv-dragged');
                 setTimeout(() => this.el.classList.remove('dv-dragged'), 0);
 
-                this.dataDisposable.value = this.getData(event.dataTransfer);
+                this.dataDisposable.value = this.getData(event);
 
                 if (event.dataTransfer) {
                     event.dataTransfer.effectAllowed = 'move';

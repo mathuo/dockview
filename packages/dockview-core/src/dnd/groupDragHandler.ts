@@ -43,7 +43,9 @@ export class GroupDragHandler extends DragHandler {
         return false;
     }
 
-    getData(dataTransfer: DataTransfer | null): IDisposable {
+    getData(dragEvent: DragEvent): IDisposable {
+        const dataTransfer = dragEvent.dataTransfer;
+
         this.panelTransfer.setData(
             [new PanelTransfer(this.accessorId, this.group.id, null)],
             PanelTransfer.prototype
