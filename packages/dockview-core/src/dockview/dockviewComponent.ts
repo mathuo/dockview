@@ -260,7 +260,7 @@ export class DockviewComponent
                 }
 
                 if (this.options.showDndOverlay) {
-                    if (position === 'center') {
+                    if (position === 'center' && this.gridview.length !== 0) {
                         /**
                          * for external events only show the four-corner drag overlays, disable
                          * the center position so that external drag events can fall through to the group

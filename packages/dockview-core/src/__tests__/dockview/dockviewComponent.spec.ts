@@ -3824,7 +3824,7 @@ describe('dockviewComponent', () => {
         expect(el.style.width).toBe('256px');
     });
 
-    test('that external dnd events do not trigger the top-level center dnd target', () => {
+    test('that external dnd events do not trigger the top-level center dnd target unless empty', () => {
         const container = document.createElement('div');
 
         const showDndOverlay = jest.fn().mockReturnValue(true);
@@ -3847,7 +3847,7 @@ describe('dockviewComponent', () => {
             id: 'panel_1',
             component: 'default',
         });
-        dockview.addPanel({
+        const panel2 = dockview.addPanel({
             id: 'panel_2',
             component: 'default',
             position: { direction: 'right' },
@@ -3956,5 +3956,27 @@ describe('dockviewComponent', () => {
 
         // expect not to be called for center
         expect(showDndOverlay).toBeCalledTimes(4);
+
+        dockview.removePanel(panel1);
+        dockview.removePanel(panel2);
+
+        // center, but empty
+
+        const eventCenter2 = new KeyboardEvent('dragover');
+        Object.defineProperty(eventCenter2, 'clientX', {
+            get: () => 50,
+        });
+        Object.defineProperty(eventCenter2, 'clientY', {
+            get: () => 50,
+        });
+        fireEvent(dockview.element, eventCenter2);
+
+        expect(showDndOverlay).toHaveBeenCalledWith({
+            nativeEvent: eventTop,
+            position: 'center',
+            target: DockviewDropTargets.Edge,
+            getData: getPanelData,
+        });
+        expect(showDndOverlay).toBeCalledTimes(5);
     });
 });
