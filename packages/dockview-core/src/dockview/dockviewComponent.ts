@@ -260,6 +260,15 @@ export class DockviewComponent
                 }
 
                 if (this.options.showDndOverlay) {
+                    if (position === 'center') {
+                        /**
+                         * for external events only show the four-corner drag overlays, disable
+                         * the center position so that external drag events can fall through to the group
+                         * and panel drop target handlers
+                         */
+                        return false;
+                    }
+
                     return this.options.showDndOverlay({
                         nativeEvent: event,
                         position: position,
