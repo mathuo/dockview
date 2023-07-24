@@ -1157,6 +1157,9 @@ export class DockviewComponent
 
         if (!this._groups.has(view.id)) {
             const disposable = new CompositeDisposable(
+                view.model.onDragStart((event) => {
+                    this.onDragStart(event);
+                }),
                 view.model.onMove((event) => {
                     const { groupId, itemId, target, index } = event;
                     this.moveGroupOrPanel(view, groupId, itemId, target, index);

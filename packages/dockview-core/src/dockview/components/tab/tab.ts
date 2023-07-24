@@ -11,9 +11,37 @@ import { DockviewDropTargets, ITabRenderer } from '../../types';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DroptargetEvent, Droptarget } from '../../../dnd/droptarget';
 import { DragHandler } from '../../../dnd/abstractDragHandler';
+import { IDockviewPanel } from '../../dockviewPanel';
+
+class TabDragHandler extends DragHandler {
+    private readonly panelTransfer =
+        LocalSelectionTransfer.getInstance<PanelTransfer>();
+
+    constructor(
+        element: HTMLElement,
+        private readonly accessor: DockviewComponent,
+        private readonly group: DockviewGroupPanel,
+        private readonly panel: IDockviewPanel
+    ) {
+        super(element);
+    }
+
+    getData(): IDisposable {
+        this.panelTransfer.setData(
+            [new PanelTransfer(this.accessor.id, this.group.id, this.panel.id)],
+            PanelTransfer.prototype
+        );
+
+        return {
+            dispose: () => {
+                this.panelTransfer.clearData(PanelTransfer.prototype);
+            },
+        };
+    }
+}
 
 export interface ITab extends IDisposable {
-    readonly panelId: string;
+    readonly panel: IDockviewPanel;
     readonly element: HTMLElement;
     setContent: (element: ITabRenderer) => void;
     onChanged: Event<MouseEvent>;
@@ -24,7 +52,7 @@ export interface ITab extends IDisposable {
 export class Tab extends CompositeDisposable implements ITab {
     private readonly _element: HTMLElement;
     private readonly droptarget: Droptarget;
-    private content?: ITabRenderer;
+    private content: ITabRenderer | undefined = undefined;
 
     private readonly _onChanged = new Emitter<MouseEvent>();
     readonly onChanged: Event<MouseEvent> = this._onChanged.event;
@@ -32,12 +60,15 @@ export class Tab extends CompositeDisposable implements ITab {
     private readonly _onDropped = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDropped.event;
 
+    private readonly _onDragStart = new Emitter<DragEvent>();
+    readonly onDragStart = this._onDragStart.event;
+
     public get element(): HTMLElement {
         return this._element;
     }
 
     constructor(
-        public readonly panelId: string,
+        public readonly panel: IDockviewPanel,
         private readonly accessor: DockviewComponent,
         private readonly group: DockviewGroupPanel
     ) {
@@ -50,38 +81,11 @@ export class Tab extends CompositeDisposable implements ITab {
 
         toggleClass(this.element, 'inactive-tab', true);
 
-        this.addDisposables(
-            this._onChanged,
-            this._onDropped,
-            new (class Handler extends DragHandler {
-                private readonly panelTransfer =
-                    LocalSelectionTransfer.getInstance<PanelTransfer>();
-
-                getData(): IDisposable {
-                    this.panelTransfer.setData(
-                        [new PanelTransfer(accessor.id, group.id, panelId)],
-                        PanelTransfer.prototype
-                    );
-
-                    return {
-                        dispose: () => {
-                            this.panelTransfer.clearData(
-                                PanelTransfer.prototype
-                            );
-                        },
-                    };
-                }
-            })(this._element)
-        );
-
-        this.addDisposables(
-            addDisposableListener(this._element, 'mousedown', (event) => {
-                if (event.defaultPrevented) {
-                    return;
-                }
-
-                this._onChanged.fire(event);
-            })
+        const dragHandler = new TabDragHandler(
+            this._element,
+            this.accessor,
+            this.group,
+            this.panel
         );
 
         this.droptarget = new Droptarget(this._element, {
@@ -102,7 +106,7 @@ export class Tab extends CompositeDisposable implements ITab {
                         return false;
                     }
 
-                    return this.panelId !== data.panelId;
+                    return this.panel.id !== data.panelId;
                 }
 
                 return this.group.model.canDisplayOverlay(
@@ -114,6 +118,20 @@ export class Tab extends CompositeDisposable implements ITab {
         });
 
         this.addDisposables(
+            this._onChanged,
+            this._onDropped,
+            this._onDragStart,
+            dragHandler.onDragStart((event) => {
+                this._onDragStart.fire(event);
+            }),
+            dragHandler,
+            addDisposableListener(this._element, 'mousedown', (event) => {
+                if (event.defaultPrevented) {
+                    return;
+                }
+
+                this._onChanged.fire(event);
+            }),
             this.droptarget.onDrop((event) => {
                 this._onDropped.fire(event);
             }),
