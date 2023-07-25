@@ -8,6 +8,7 @@ import {
     AddPanelOptions,
     MovementOptions,
 } from '../dockview/options';
+import { Parameters } from '../panel/types';
 import { Direction } from '../gridview/baseComponentGridview';
 import {
     AddComponentOptions,
@@ -117,7 +118,7 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
         return this.component.layout(width, height);
     }
 
-    addPanel(options: AddSplitviewComponentOptions): ISplitviewPanel {
+    addPanel<T extends object = Parameters>(options: AddSplitviewComponentOptions<T>): ISplitviewPanel {
         return this.component.addPanel(options);
     }
 
@@ -212,7 +213,7 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
         this.component.layout(width, height);
     }
 
-    addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel {
+    addPanel<T extends object = Parameters>(options: AddPaneviewComponentOptions<T>): IPaneviewPanel {
         return this.component.addPanel(options);
     }
 
@@ -296,7 +297,7 @@ export class GridviewApi implements CommonApi<SerializedGridviewComponent> {
         this.component.layout(width, height, force);
     }
 
-    addPanel(options: AddComponentOptions): IGridviewPanel {
+    addPanel<T extends object = Parameters>(options: AddComponentOptions<T>): IGridviewPanel {
         return this.component.addPanel(options);
     }
 
@@ -431,7 +432,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         this.component.layout(width, height, force);
     }
 
-    addPanel(options: AddPanelOptions): IDockviewPanel {
+    addPanel<T extends object = Parameters>(options: AddPanelOptions<T>): IDockviewPanel {
         return this.component.addPanel(options);
     }
 

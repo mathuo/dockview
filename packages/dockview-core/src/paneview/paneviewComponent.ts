@@ -23,6 +23,7 @@ import { DefaultHeader } from './defaultPaneviewHeader';
 import { sequentialNumberGenerator } from '../math';
 import { PaneTransfer } from '../dnd/dataTransfer';
 import { Resizable } from '../resizable';
+import { Parameters } from '../panel/types';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -87,13 +88,11 @@ export class PaneFramework extends DraggablePaneviewPanel {
     }
 }
 
-export interface AddPaneviewComponentOptions {
+export interface AddPaneviewComponentOptions<T extends object = Parameters> {
     id: string;
     component: string;
     headerComponent?: string;
-    params?: {
-        [key: string]: any;
-    };
+    params?: T;
     minimumBodySize?: number;
     maximumBodySize?: number;
     isExpanded?: boolean;
@@ -115,7 +114,9 @@ export interface IPaneviewComponent extends IDisposable {
     readonly onDidDrop: Event<PaneviewDropEvent>;
     readonly onDidLayoutChange: Event<void>;
     readonly onDidLayoutFromJSON: Event<void>;
-    addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel;
+    addPanel<T extends object = Parameters>(
+        options: AddPaneviewComponentOptions<T>
+    ): IPaneviewPanel;
     layout(width: number, height: number): void;
     toJSON(): SerializedPaneview;
     fromJSON(serializedPaneview: SerializedPaneview): void;
@@ -233,7 +234,9 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
         this._options = { ...this.options, ...options };
     }
 
-    addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel {
+    addPanel<T extends object = Parameters>(
+        options: AddPaneviewComponentOptions<T>
+    ): IPaneviewPanel {
         const body = createComponent(
             options.id,
             options.component,

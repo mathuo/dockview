@@ -11,7 +11,7 @@ import {
     Splitview,
 } from './splitview';
 import { SplitviewComponentOptions } from './options';
-import { BaseComponentOptions } from '../panel/types';
+import { BaseComponentOptions, Parameters } from '../panel/types';
 import { Emitter, Event } from '../events';
 import { SplitviewPanel, ISplitviewPanel } from './splitviewPanel';
 import { createComponent } from '../panel/componentFactory';
@@ -39,7 +39,8 @@ export interface SerializedSplitview {
     views: SerializedSplitviewPanel[];
 }
 
-export interface AddSplitviewComponentOptions extends BaseComponentOptions {
+export interface AddSplitviewComponentOptions<T extends Parameters = Parameters>
+    extends BaseComponentOptions<T> {
     index?: number;
     minimumSize?: number;
     maximumSize?: number;
@@ -62,7 +63,9 @@ export interface ISplitviewComponent extends IDisposable {
     readonly onDidLayoutFromJSON: Event<void>;
     readonly panels: SplitviewPanel[];
     updateOptions(options: Partial<SplitviewComponentUpdateOptions>): void;
-    addPanel(options: AddSplitviewComponentOptions): ISplitviewPanel;
+    addPanel<T extends object = Parameters>(
+        options: AddSplitviewComponentOptions<T>
+    ): ISplitviewPanel;
     layout(width: number, height: number): void;
     onDidLayoutChange: Event<void>;
     toJSON(): SerializedSplitview;
@@ -248,7 +251,9 @@ export class SplitviewComponent
         return this.panels.find((view) => view.id === id);
     }
 
-    addPanel(options: AddSplitviewComponentOptions): SplitviewPanel {
+    addPanel<T extends object = Parameters>(
+        options: AddSplitviewComponentOptions<T>
+    ): SplitviewPanel {
         if (this._panels.has(options.id)) {
             throw new Error(`panel ${options.id} already exists`);
         }

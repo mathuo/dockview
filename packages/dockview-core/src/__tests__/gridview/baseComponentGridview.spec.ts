@@ -21,7 +21,7 @@ class TestPanel implements IGridPanelView {
         return true;
     }
 
-    get params(): Record<string, any> {
+    get params(): Parameters {
         return {};
     }
 

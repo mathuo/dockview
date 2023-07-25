@@ -44,6 +44,7 @@ import {
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
+import { Parameters } from '../panel/types';
 import { Overlay } from '../dnd/overlay';
 import { toggleClass, watchElementResize } from '../dom';
 import {
@@ -111,7 +112,9 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     doSetGroupActive: (group: DockviewGroupPanel, skipFocus?: boolean) => void;
     removeGroup: (group: DockviewGroupPanel) => void;
     options: DockviewComponentOptions;
-    addPanel(options: AddPanelOptions): IDockviewPanel;
+    addPanel<T extends object = Parameters>(
+        options: AddPanelOptions<T>
+    ): IDockviewPanel;
     removePanel(panel: IDockviewPanel): void;
     getGroupPanel: (id: string) => IDockviewPanel | undefined;
     createWatermarkComponent(): IWatermarkRenderer;
@@ -686,7 +689,9 @@ export class DockviewComponent
         }
     }
 
-    addPanel(options: AddPanelOptions): DockviewPanel {
+    addPanel<T extends object = Parameters>(
+        options: AddPanelOptions<T>
+    ): DockviewPanel {
         if (this.panels.find((_) => _.id === options.id)) {
             throw new Error(`panel with id ${options.id} already exists`);
         }
