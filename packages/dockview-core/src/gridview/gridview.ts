@@ -371,8 +371,7 @@ export class Gridview implements IDisposable {
             root,
             orientation,
             deserializer,
-            orthogonalSize,
-            true
+            orthogonalSize
         ) as BranchNode;
     }
 
@@ -380,8 +379,7 @@ export class Gridview implements IDisposable {
         node: ISerializedNode,
         orientation: Orientation,
         deserializer: IViewDeserializer,
-        orthogonalSize: number,
-        isRoot = false
+        orthogonalSize: number
     ): Node {
         let result: Node;
         if (node.type === 'branch') {
@@ -398,14 +396,13 @@ export class Gridview implements IDisposable {
                 } as INodeDescriptor;
             });
 
-            // HORIZONTAL => height=orthogonalsize width=size
-            // VERTICAL => height=size width=orthogonalsize
             result = new BranchNode(
                 orientation,
                 this.proportionalLayout,
                 this.styles,
-                isRoot ? orthogonalSize : node.size,
-                isRoot ? node.size : orthogonalSize,
+                node.size, // <- orthogonal size - flips at each depth
+                orthogonalSize, // <- size - flips at each depth
+
                 children
             );
         } else {
@@ -459,7 +456,9 @@ export class Gridview implements IDisposable {
             this.root.size
         );
 
-        if (oldRoot.children.length === 1) {
+        if (oldRoot.children.length === 0) {
+            // no data so no need to add anything back in
+        } else if (oldRoot.children.length === 1) {
             // can remove one level of redundant branching if there is only a single child
             const childReference = oldRoot.children[0];
             const child = oldRoot.removeChild(0); // remove to prevent disposal when disposing of unwanted root

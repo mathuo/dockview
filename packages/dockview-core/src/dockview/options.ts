@@ -9,18 +9,16 @@ import {
     DockviewDropTargets,
 } from './types';
 import { Parameters } from '../panel/types';
-import {
-    DockviewGroupPanel,
-    DockviewGroupPanelApi,
-} from './dockviewGroupPanel';
+import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/splitview';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
 import { Position } from '../dnd/droptarget';
 import { IDockviewPanel } from './dockviewPanel';
 import { FrameworkFactory } from '../panel/componentFactory';
+import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
 
-export interface IGroupControlRenderer extends IDisposable {
+export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
     init(params: {
         containerApi: DockviewApi;
@@ -80,11 +78,15 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     styles?: ISplitviewStyles;
     defaultTabComponent?: string;
     showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
-    createGroupControlElement?: (
+    createRightHeaderActionsElement?: (
         group: DockviewGroupPanel
-    ) => IGroupControlRenderer;
+    ) => IHeaderActionsRenderer;
+    createLeftHeaderActionsElement?: (
+        group: DockviewGroupPanel
+    ) => IHeaderActionsRenderer;
     singleTabMode?: 'fullwidth' | 'default';
     parentElement?: HTMLElement;
+    disableFloatingGroups?: boolean;
 }
 
 export interface PanelOptions<P extends object = Parameters> {
@@ -132,12 +134,32 @@ export function isPanelOptionsWithGroup(
     return false;
 }
 
-export interface AddPanelOptions<P extends object = Parameters>
-    extends Omit<PanelOptions<P>, 'component' | 'tabComponent'> {
+type AddPanelFloatingGroupUnion = {
+    floating:
+        | {
+              height?: number;
+              width?: number;
+              x?: number;
+              y?: number;
+          }
+        | true;
+    position: never;
+};
+
+type AddPanelPositionUnion = {
+    floating: false | never;
+    position: AddPanelPositionOptions;
+};
+
+type AddPanelOptionsUnion = AddPanelFloatingGroupUnion | AddPanelPositionUnion;
+
+export type AddPanelOptions<P extends object = Parameters> = Omit<
+    PanelOptions<P>,
+    'component' | 'tabComponent'
+> & {
     component: string;
     tabComponent?: string;
-    position?: AddPanelPositionOptions;
-}
+} & Partial<AddPanelOptionsUnion>;
 
 type AddGroupOptionsWithPanel = {
     referencePanel: string | IDockviewPanel;

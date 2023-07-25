@@ -3,6 +3,8 @@ import { GridviewPanelApiImpl, GridviewPanelApi } from './gridviewPanelApi';
 import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
 import { MutableDisposable } from '../lifecycle';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
+import { DockviewComponent } from '../dockview/dockviewComponent';
+import { Position } from '../dnd/droptarget';
 
 export interface TitleEvent {
     readonly title: string;
@@ -24,6 +26,11 @@ export interface DockviewPanelApi
     readonly onDidGroupChange: Event<void>;
     close(): void;
     setTitle(title: string): void;
+    moveTo(options: {
+        group: DockviewGroupPanel;
+        position?: Position;
+        index?: number;
+    }): void;
 }
 
 export class DockviewPanelApiImpl
@@ -73,7 +80,11 @@ export class DockviewPanelApiImpl
         return this._group;
     }
 
-    constructor(private panel: IDockviewPanel, group: DockviewGroupPanel) {
+    constructor(
+        private panel: IDockviewPanel,
+        group: DockviewGroupPanel,
+        private readonly accessor: DockviewComponent
+    ) {
         super(panel.id);
 
         this.initialize(panel);
@@ -88,11 +99,25 @@ export class DockviewPanelApiImpl
         );
     }
 
-    public setTitle(title: string): void {
+    moveTo(options: {
+        group: DockviewGroupPanel;
+        position?: Position;
+        index?: number;
+    }): void {
+        this.accessor.moveGroupOrPanel(
+            options.group,
+            this._group.id,
+            this.panel.id,
+            options.position ?? 'center',
+            options.index
+        );
+    }
+
+    setTitle(title: string): void {
         this.panel.setTitle(title);
     }
 
-    public close(): void {
+    close(): void {
         this.group.model.closePanel(this.panel);
     }
 }

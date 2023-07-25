@@ -27,6 +27,7 @@ Please see the website: https://dockview.dev
 -   Themable and customizable
 -   Serialization / deserialization support
 -   Tabular docking and Drag and Drop support
+-   Floating groups, customized header bars and tab
 -   Documentation and examples
 
 Want to inspect the latest deployment? Go to https://unpkg.com/browse/dockview@latest/

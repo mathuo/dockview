@@ -1,7 +1,7 @@
 <div align="center">
 <h1>dockview</h1>
 
-<p>Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support written in TypeScript</p>
+<p>Zero dependency layout manager supporting tabs, groups, grids and splitviews with ReactJS support written in TypeScript</p>
 
 </div>
 
@@ -25,6 +25,7 @@ Please see the website: https://dockview.dev
 -   Themable and customizable
 -   Serialization / deserialization support
 -   Tabular docking and Drag and Drop support
+-   Floating groups, customized header bars and tab
 -   Documentation and examples
 
 Want to inspect the latest deployment? Go to https://unpkg.com/browse/dockview@latest/

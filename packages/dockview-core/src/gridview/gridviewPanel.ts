@@ -28,8 +28,8 @@ export interface GridviewInitParameters extends PanelInitParameters {
     isVisible?: boolean;
 }
 
-export interface IGridviewPanel
-    extends BasePanelViewExported<GridviewPanelApi> {
+export interface IGridviewPanel<T extends GridviewPanelApi = GridviewPanelApi>
+    extends BasePanelViewExported<T> {
     readonly minimumWidth: number;
     readonly maximumWidth: number;
     readonly minimumHeight: number;
@@ -38,8 +38,10 @@ export interface IGridviewPanel
     readonly snap: boolean;
 }
 
-export abstract class GridviewPanel
-    extends BasePanelView<GridviewPanelApiImpl>
+export abstract class GridviewPanel<
+        T extends GridviewPanelApiImpl = GridviewPanelApiImpl
+    >
+    extends BasePanelView<T>
     implements IGridPanelComponentView, IGridviewPanel
 {
     private _evaluatedMinimumWidth = 0;
@@ -134,9 +136,10 @@ export abstract class GridviewPanel
             maximumWidth?: number;
             minimumHeight?: number;
             maximumHeight?: number;
-        }
+        },
+        api?: T
     ) {
-        super(id, component, new GridviewPanelApiImpl(id));
+        super(id, component, api ?? <T>new GridviewPanelApiImpl(id));
 
         if (typeof options?.minimumWidth === 'number') {
             this._minimumWidth = options.minimumWidth;

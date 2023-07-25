@@ -1,3 +1,24 @@
+.dv-debug {
+    .split-view-container {
+        .sash-container {
+            .sash {
+                &.enabled {
+                    background-color: black;
+                }
+                &.disabled {
+                    background-color: orange;
+                }
+                &.maximum {
+                    background-color: green;
+                }
+                &.minimum {
+                    background-color: red;
+                }
+            }
+        }
+    }
+}
+
 .split-view-container {
     position: relative;
     overflow: hidden;
@@ -11,22 +32,6 @@
             transition-timing-function: ease-out;
         }
     }
-
-    // debug
-    // .sash {
-    //   &.enabled {
-    //     background-color: black;
-    //   }
-    //   &.disabled {
-    //     background-color: orange;
-    //   }
-    //   &.maximum {
-    //     background-color: green;
-    //   }
-    //   &.minimum {
-    //     background-color: red;
-    //   }
-    // }
 
     &.horizontal {
         height: 100%;
@@ -106,6 +111,7 @@
             -webkit-user-select: none; // Safari
             -moz-user-select: none; // Firefox
             -ms-user-select: none; // IE 10 and IE 11
+            touch-action: none;
 
             &:active {
                 transition: background-color 0.1s ease-in-out;

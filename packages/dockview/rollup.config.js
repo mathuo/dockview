@@ -47,6 +47,7 @@ function createBundle(format, options) {
     const output = {
         file,
         format,
+        sourcemap: true,
         globals: {},
         banner: [
             `/**`,
@@ -64,9 +65,6 @@ function createBundle(format, options) {
         }),
         typescript({
             tsconfig: 'tsconfig.esm.json',
-            compilerOptions: {
-                declaration: false,
-            },
         }),
     ];
 

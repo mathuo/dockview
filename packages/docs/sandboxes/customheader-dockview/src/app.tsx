@@ -31,10 +31,8 @@ const headerComponents = {
     },
 };
 
-const CustomHeadersDockview = () => {
+const CustomHeadersDockview = (props: { theme?: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
-        const d = localStorage.getItem('test');
-
         event.api.addPanel({
             id: 'panel_1',
             component: 'default',
@@ -116,7 +114,7 @@ const CustomHeadersDockview = () => {
             components={components}
             defaultTabComponent={headerComponents.default}
             onReady={onReady}
-            className="dockview-theme-abyss"
+            className={`${props.theme || 'dockview-theme-abyss'}`}
         />
     );
 };

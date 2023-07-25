@@ -436,7 +436,11 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.addPanel(options);
     }
 
-    addGroup(options?: AddGroupOptions): IDockviewGroupPanel {
+    removePanel(panel: IDockviewPanel): void {
+        this.component.removePanel(panel);
+    }
+
+    addGroup(options?: AddGroupOptions): DockviewGroupPanel {
         return this.component.addGroup(options);
     }
 
@@ -458,6 +462,13 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     getGroup(id: string): DockviewGroupPanel | undefined {
         return this.component.getPanel(id);
+    }
+
+    addFloatingGroup(
+        item: IDockviewPanel | DockviewGroupPanel,
+        coord?: { x: number; y: number }
+    ): void {
+        return this.component.addFloatingGroup(item, coord);
     }
 
     fromJSON(data: SerializedDockview): void {

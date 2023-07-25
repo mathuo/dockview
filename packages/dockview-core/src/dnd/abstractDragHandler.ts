@@ -27,10 +27,19 @@ export abstract class DragHandler extends CompositeDisposable {
 
     abstract getData(dataTransfer?: DataTransfer | null): IDisposable;
 
+    protected isCancelled(_event: DragEvent): boolean {
+        return false;
+    }
+
     private configure(): void {
         this.addDisposables(
             this._onDragStart,
             addDisposableListener(this.el, 'dragstart', (event) => {
+                if (this.isCancelled(event)) {
+                    event.preventDefault();
+                    return;
+                }
+
                 const iframes = [
                     ...getElementsByTagName('iframe'),
                     ...getElementsByTagName('webview'),

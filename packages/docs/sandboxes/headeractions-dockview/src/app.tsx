@@ -1,7 +1,7 @@
 import {
     DockviewReact,
     DockviewReadyEvent,
-    IDockviewGroupControlProps,
+    IDockviewHeaderActionsProps,
     IDockviewPanelProps,
 } from 'dockview';
 import * as React from 'react';
@@ -26,9 +26,8 @@ const components = {
     },
 };
 
-const GroupControlComponent = (props: IDockviewGroupControlProps) => {
+const RightHeaderActions = (props: IDockviewHeaderActionsProps) => {
     const isGroupActive = props.isGroupActive;
-    const activePanel = props.activePanel;
 
     return (
         <div className="dockview-groupcontrol-demo">
@@ -40,6 +39,15 @@ const GroupControlComponent = (props: IDockviewGroupControlProps) => {
             >
                 {isGroupActive ? 'Group Active' : 'Group Inactive'}
             </span>
+        </div>
+    );
+};
+
+const LeftHeaderActions = (props: IDockviewHeaderActionsProps) => {
+    const activePanel = props.activePanel;
+
+    return (
+        <div className="dockview-groupcontrol-demo">
             <span className="dockview-groupcontrol-demo-active-panel">{`activePanel: ${
                 activePanel?.id || 'null'
             }`}</span>
@@ -47,7 +55,7 @@ const GroupControlComponent = (props: IDockviewGroupControlProps) => {
     );
 };
 
-const DockviewGroupControl = () => {
+const DockviewGroupControl = (props: { theme: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
         const panel1 = event.api.addPanel({
             id: 'panel_1',
@@ -87,8 +95,9 @@ const DockviewGroupControl = () => {
         <DockviewReact
             onReady={onReady}
             components={components}
-            groupControlComponent={GroupControlComponent}
-            className="dockview-theme-abyss"
+            leftHeaderActionsComponent={LeftHeaderActions}
+            rightHeaderActionsComponent={RightHeaderActions}
+            className={`${props.theme || 'dockview-theme-abyss'}`}
         />
     );
 };

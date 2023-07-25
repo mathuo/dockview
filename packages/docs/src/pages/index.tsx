@@ -8,9 +8,10 @@ import HomepageFeatures from '@site/src/components/HomepageFeatures';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import DockviewDemo from '@site/sandboxes/demo-dockview/src/app';
 import DockviewDemo2 from '@site/sandboxes/dockview-app/src/app';
-import { Container } from '../components/ui/container';
+import { MultiFrameworkContainer } from '../components/ui/container';
 import { BrowserHeader } from '../components/ui/browserHeader';
 import './index.scss';
+import { Introduction } from '../components/HomepageFeatures/introduction';
 
 function HomepageHeader() {
     const { siteConfig } = useDocusaurusContext();
@@ -74,37 +75,7 @@ export default function Home(): JSX.Element {
         >
             <HomepageHeader2 />
             <main className="container">
-                <HomepageFeatures />
-                <div
-                    id="live-demo"
-                    style={{
-                        height: '30px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        fontSize: '1.5em',
-                        fontWeight: 'bold',
-                    }}
-                >
-                    <img
-                        src={useBaseUrl('/img/dockview_logo.svg')}
-                        height={30}
-                    />
-                    <span style={{ paddingLeft: '8px' }}>
-                        Dockview Live Demos
-                    </span>
-                </div>
-                <div style={{ padding: '20px' }}>
-                    <BrowserHeader />
-                    <Container height={500} sandboxId="demo-dockview">
-                        <DockviewDemo />
-                    </Container>
-                </div>
-                <div style={{ padding: '20px' }}>
-                    <BrowserHeader />
-                    <Container height={500} sandboxId="dockview-app">
-                        <DockviewDemo2 />
-                    </Container>
-                </div>
+                <Introduction />
             </main>
         </Layout>
     );

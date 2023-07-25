@@ -363,6 +363,10 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
 
         const queue: Function[] = [];
 
+        // take note of the existing dimensions
+        const width = this.width;
+        const height = this.height;
+
         this.paneview = new Paneview(this.element, {
             orientation: Orientation.VERTICAL,
             descriptor: {
@@ -440,7 +444,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             },
         });
 
-        this.layout(this.width, this.height);
+        this.layout(width, height);
 
         queue.forEach((f) => f());
 

@@ -6,7 +6,7 @@ import {
     PanelTransfer,
 } from '../../../dnd/dataTransfer';
 import { toggleClass } from '../../../dom';
-import { IDockviewComponent } from '../../dockviewComponent';
+import { DockviewComponent } from '../../dockviewComponent';
 import { DockviewDropTargets, ITabRenderer } from '../../types';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DroptargetEvent, Droptarget } from '../../../dnd/droptarget';
@@ -38,7 +38,7 @@ export class Tab extends CompositeDisposable implements ITab {
 
     constructor(
         public readonly panelId: string,
-        private readonly accessor: IDockviewComponent,
+        private readonly accessor: DockviewComponent,
         private readonly group: DockviewGroupPanel
     ) {
         super();
@@ -79,13 +79,6 @@ export class Tab extends CompositeDisposable implements ITab {
                 if (event.defaultPrevented) {
                     return;
                 }
-                /**
-                 * TODO: alternative to stopPropagation
-                 *
-                 * I need to stop the event propagation here since otherwise it'll be intercepted by event handlers
-                 * on the tabs-container. I cannot use event.preventDefault() since I need the on DragStart event to occur
-                 */
-                event.stopPropagation();
 
                 this._onChanged.fire(event);
             })

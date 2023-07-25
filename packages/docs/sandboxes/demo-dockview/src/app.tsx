@@ -4,7 +4,7 @@ import {
     DockviewReadyEvent,
     IDockviewPanelHeaderProps,
     IDockviewPanelProps,
-    IDockviewGroupControlProps,
+    IDockviewHeaderActionsProps,
 } from 'dockview';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -134,7 +134,7 @@ const groupControlsComponents = {
     },
 };
 
-const GroupControls = (props: IDockviewGroupControlProps) => {
+const RightControls = (props: IDockviewHeaderActionsProps) => {
     const Component = React.useMemo(() => {
         if (!props.isGroupActive || !props.activePanel) {
             return null;
@@ -161,7 +161,37 @@ const GroupControls = (props: IDockviewGroupControlProps) => {
     );
 };
 
-const DockviewDemo = () => {
+let counter = 0;
+
+const LeftControls = (props: IDockviewHeaderActionsProps) => {
+    const onClick = () => {
+        props.containerApi.addPanel({
+            id: `id_${Date.now().toString()}`,
+            component: 'default',
+            title: `Tab ${counter++}`,
+            position: {
+                referenceGroup: props.group,
+            },
+        });
+    };
+
+    return (
+        <div
+            className="group-control"
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '0px 8px',
+                height: '100%',
+                color: 'var(--dv-activegroup-visiblepanel-tab-color)',
+            }}
+        >
+            <Icon onClick={onClick} icon="add" />
+        </div>
+    );
+};
+
+const DockviewDemo = (props: { theme?: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
             id: 'panel_1',
@@ -190,14 +220,12 @@ const DockviewDemo = () => {
             title: 'Panel 5',
             position: { referencePanel: 'panel_4', direction: 'within' },
         });
-        const panel6 = event.api.addPanel({
+        event.api.addPanel({
             id: 'panel_6',
             component: 'default',
             title: 'Panel 6',
             position: { referencePanel: 'panel_4', direction: 'below' },
         });
-        panel6.group.locked = true;
-        panel6.group.header.hidden = true;
         event.api.addPanel({
             id: 'panel_7',
             component: 'default',
@@ -211,7 +239,19 @@ const DockviewDemo = () => {
             position: { referencePanel: 'panel_7', direction: 'within' },
         });
 
-        event.api.addGroup();
+        event.api.addPanel({
+            id: 'panel_9',
+            component: 'default',
+            title: 'Panel 9',
+            floating: { width: 450, height: 250 },
+        });
+
+        event.api.addPanel({
+            id: 'panel_10',
+            component: 'default',
+            title: 'Panel 10',
+            position: { referencePanel: 'panel_9' },
+        });
 
         event.api.getPanel('panel_1')!.api.setActive();
     };
@@ -220,9 +260,10 @@ const DockviewDemo = () => {
         <DockviewReact
             components={components}
             defaultTabComponent={headerComponents.default}
-            groupControlComponent={GroupControls}
+            rightHeaderActionsComponent={RightControls}
+            leftHeaderActionsComponent={LeftControls}
             onReady={onReady}
-            className="dockview-theme-abyss"
+            className={props.theme || 'dockview-theme-abyss'}
         />
     );
 };

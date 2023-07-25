@@ -179,6 +179,10 @@ export class GridviewComponent
 
         const queue: Function[] = [];
 
+        // take note of the existing dimensions
+        const width = this.width;
+        const height = this.height;
+
         this.gridview.deserialize(grid, {
             fromJSON: (node) => {
                 const { data } = node;
@@ -218,7 +222,7 @@ export class GridviewComponent
             },
         });
 
-        this.layout(this.width, this.height, true);
+        this.layout(width, height, true);
 
         queue.forEach((f) => f());
 

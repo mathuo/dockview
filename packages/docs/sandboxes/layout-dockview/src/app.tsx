@@ -47,7 +47,7 @@ function loadDefaultLayout(api: DockviewApi) {
     });
 }
 
-export const DockviewPersistance = () => {
+export const DockviewPersistance = (props: { theme?: string }) => {
     const [api, setApi] = React.useState<DockviewApi>();
 
     const clearLayout = () => {
@@ -71,7 +71,7 @@ export const DockviewPersistance = () => {
                 event.api.fromJSON(layout);
                 success = true;
             } catch (err) {
-                //
+                console.error(err);
             }
         }
 
@@ -118,7 +118,7 @@ export const DockviewPersistance = () => {
                     onReady={onReady}
                     components={components}
                     watermarkComponent={Watermark}
-                    className="dockview-theme-abyss"
+                    className={`${props.theme || 'dockview-theme-abyss'}`}
                 />
             </div>
         </div>

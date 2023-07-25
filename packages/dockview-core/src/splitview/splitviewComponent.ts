@@ -342,6 +342,10 @@ export class SplitviewComponent
 
         const queue: Function[] = [];
 
+        // take note of the existing dimensions
+        const width = this.width;
+        const height = this.height;
+
         this.splitview = new Splitview(this.element, {
             orientation,
             proportionalLayout: this.options.proportionalLayout,
@@ -392,7 +396,7 @@ export class SplitviewComponent
             },
         });
 
-        this.layout(this.width, this.height);
+        this.layout(width, height);
 
         queue.forEach((f) => f());
 

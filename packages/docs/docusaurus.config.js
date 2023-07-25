@@ -11,7 +11,8 @@ console.log(`isCI: ${process.env.CI}`);
 /** @type {import('@docusaurus/types').Config} */
 const config = {
     title: 'Dockview',
-    tagline: 'A zero dependency layout manager built for React',
+    tagline:
+        'A zero dependency layout manager supporting ReactJS and Vanilla TypeScript',
     url: 'https://dockview.dev',
     baseUrl: process.env.CI ? `/` : '/',
     onBrokenLinks: 'throw',
@@ -39,13 +40,24 @@ const config = {
         'docusaurus-plugin-sass',
         (context, options) => {
             return {
-                name: 'webpack',
+                name: 'custom-webpack',
                 configureWebpack: (config, isServer, utils) => {
                     return {
                         // externals: ['react', 'react-dom'],
                         devtool: 'source-map',
+                        module: {
+                            rules: [
+                                {
+                                    test: /\.js$/,
+                                    enforce: 'pre',
+                                    use: ['source-map-loader'],
+                                },
+                            ],
+                        },
                         resolve: {
+                            ...config.resolve,
                             alias: {
+                                ...config.resolve.alias,
                                 react: path.join(
                                     __dirname,
                                     '../../node_modules',
@@ -56,9 +68,6 @@ const config = {
                                     '../../node_modules',
                                     'react-dom'
                                 ),
-                            },
-                            fallback: {
-                                timers: false,
                             },
                         },
                     };
@@ -141,6 +150,11 @@ const config = {
                         label: 'Docs',
                     },
                     { to: '/blog', label: 'Blog', position: 'left' },
+                    {
+                        to: 'https://dockview.dev/typedocs',
+                        label: 'TSDoc',
+                        position: 'left',
+                    },
                     {
                         type: 'docsVersionDropdown',
                         position: 'right',

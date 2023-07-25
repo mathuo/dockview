@@ -1,6 +1,5 @@
 import {
     DockviewApi,
-    DockviewMutableDisposable,
     DockviewReact,
     DockviewReadyEvent,
     GridConstraintChangeEvent,
@@ -101,7 +100,7 @@ const components = {
     },
 };
 
-const App = () => {
+const App = (props: { theme?: string }) => {
     const [api, setApi] = React.useState<DockviewApi>();
 
     const onReady = (event: DockviewReadyEvent) => {
@@ -141,7 +140,7 @@ const App = () => {
         <DockviewReact
             onReady={onReady}
             components={components}
-            className="dockview-theme-abyss "
+            className={`${props.theme || 'dockview-theme-abyss'}`}
         />
     );
 };
