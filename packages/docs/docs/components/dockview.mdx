@@ -26,6 +26,7 @@ import DockviewResizeContainer from '@site/sandboxes/resizecontainer-dockview/sr
 import DockviewTabheight from '@site/sandboxes/tabheight-dockview/src/app';
 import DockviewWithIFrames from '@site/sandboxes/iframe-dockview/src/app';
 import DockviewFloating from '@site/sandboxes/floatinggroup-dockview/src/app';
+import DockviewLockedGroup from '@site/sandboxes/lockedgroup-dockview/src/app';
 
 import { attach as attachDockviewVanilla } from '@site/sandboxes/javascript/vanilla-dockview/src/app';
 import { attach as attachSimpleDockview } from '@site/sandboxes/javascript/simple-dockview/src/app';
@@ -776,7 +777,19 @@ You can still add groups to a locked panel programatically using the API though.
 
 ```tsx
 panel.group.locked = true;
+
+// Or
+
+panel.group.locked = 'no-drop-target';
 ```
+
+Use `true` to keep drop zones top, right, bottom, left for the group. Use `no-drop-target` to disable all drop zones. For you to get a
+better understanding of what this means, try and drag the panels in the example below to the locked groups.
+
+<MultiFrameworkContainer
+    sandboxId="lockedgroup-dockview"
+    react={DockviewLockedGroup}
+/>
 
 ### Group Controls Panel
 
