@@ -12,6 +12,7 @@ import {
     IContentContainer,
 } from './components/panel/content';
 import {
+  GroupDragEvent,
     ITabsContainer,
     TabDragEvent,
     TabsContainer,
@@ -92,6 +93,8 @@ export interface IDockviewGroupPanelModel extends IPanel {
     readonly onDidRemovePanel: Event<GroupviewChangeEvent>;
     readonly onDidActivePanelChange: Event<GroupviewChangeEvent>;
     readonly onMove: Event<GroupMoveEvent>;
+    readonly onTabDragStart: Event<TabDragEvent>;
+    readonly onGroupDragStart: Event<GroupDragEvent>;
     locked: boolean;
     setActive(isActive: boolean): void;
     initialize(): void;
@@ -159,8 +162,12 @@ export class DockviewGroupPanelModel
     private readonly _onDidDrop = new Emitter<GroupviewDropEvent>();
     readonly onDidDrop: Event<GroupviewDropEvent> = this._onDidDrop.event;
 
-    private readonly _onDragStart = new Emitter<TabDragEvent>();
-    readonly onDragStart: Event<TabDragEvent> = this._onDragStart.event;
+    private readonly _onTabDragStart = new Emitter<TabDragEvent>();
+    readonly onTabDragStart: Event<TabDragEvent> = this._onTabDragStart.event;
+
+    private readonly _onGroupDragStart = new Emitter<GroupDragEvent>();
+    readonly onGroupDragStart: Event<GroupDragEvent> =
+        this._onGroupDragStart.event;
 
     private readonly _onDidAddPanel = new Emitter<GroupviewChangeEvent>();
     readonly onDidAddPanel: Event<GroupviewChangeEvent> =
@@ -310,8 +317,13 @@ export class DockviewGroupPanelModel
         this.locked = !!options.locked;
 
         this.addDisposables(
-            this.tabsContainer.onDragStart((event) => {
-                this._onDragStart.fire(event);
+            this._onTabDragStart,
+            this._onGroupDragStart,
+            this.tabsContainer.onTabDragStart((event) => {
+                this._onTabDragStart.fire(event);
+            }),
+            this.tabsContainer.onGroupDragStart((event) => {
+                this._onGroupDragStart.fire(event);
             }),
             this.tabsContainer.onDrop((event) => {
                 this.handleDropEvent(event.event, 'center', event.index);

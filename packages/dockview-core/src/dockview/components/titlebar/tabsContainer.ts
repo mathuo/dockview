@@ -18,7 +18,12 @@ export interface TabDropIndexEvent {
 
 export interface TabDragEvent {
     readonly nativeEvent: DragEvent;
-    readonly panel?: IDockviewPanel;
+    readonly panel: IDockviewPanel;
+}
+
+export interface GroupDragEvent {
+    readonly nativeEvent: DragEvent;
+    readonly group: DockviewGroupPanel;
 }
 
 export interface ITabsContainer extends IDisposable {
@@ -29,7 +34,8 @@ export interface ITabsContainer extends IDisposable {
     delete: (id: string) => void;
     indexOf: (id: string) => number;
     onDrop: Event<TabDropIndexEvent>;
-    onDragStart: Event<TabDragEvent>;
+    onTabDragStart: Event<TabDragEvent>;
+    onGroupDragStart: Event<GroupDragEvent>;
     setActive: (isGroupActive: boolean) => void;
     setActivePanel: (panel: IDockviewPanel) => void;
     isActive: (tab: ITab) => boolean;
@@ -61,8 +67,12 @@ export class TabsContainer
     private readonly _onDrop = new Emitter<TabDropIndexEvent>();
     readonly onDrop: Event<TabDropIndexEvent> = this._onDrop.event;
 
-    private readonly _onDragStart = new Emitter<TabDragEvent>();
-    readonly onDragStart: Event<TabDragEvent> = this._onDragStart.event;
+    private readonly _onTabDragStart = new Emitter<TabDragEvent>();
+    readonly onTabDragStart: Event<TabDragEvent> = this._onTabDragStart.event;
+
+    private readonly _onGroupDragStart = new Emitter<GroupDragEvent>();
+    readonly onGroupDragStart: Event<GroupDragEvent> =
+        this._onGroupDragStart.event;
 
     get panels(): string[] {
         return this.tabs.map((_) => _.value.panel.id);
@@ -140,7 +150,11 @@ export class TabsContainer
     ) {
         super();
 
-        this.addDisposables(this._onDrop, this._onDragStart);
+        this.addDisposables(
+            this._onDrop,
+            this._onTabDragStart,
+            this._onGroupDragStart
+        );
 
         this._element = document.createElement('div');
         this._element.className = 'tabs-and-actions-container';
@@ -190,6 +204,12 @@ export class TabsContainer
 
         this.addDisposables(
             this.voidContainer,
+            this.voidContainer.onDragStart((event) => {
+                this._onGroupDragStart.fire({
+                    nativeEvent: event,
+                    group: this.group,
+                });
+            }),
             this.voidContainer.onDrop((event) => {
                 this._onDrop.fire({
                     event: event.nativeEvent,
@@ -302,7 +322,7 @@ export class TabsContainer
 
         const disposable = new CompositeDisposable(
             tab.onDragStart((event) => {
-                this._onDragStart.fire({ nativeEvent: event, panel });
+                this._onTabDragStart.fire({ nativeEvent: event, panel });
             }),
             tab.onChanged((event) => {
                 const isFloatingGroupsEnabled =

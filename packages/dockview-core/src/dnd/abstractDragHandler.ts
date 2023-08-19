@@ -35,8 +35,6 @@ export abstract class DragHandler extends CompositeDisposable {
         this.addDisposables(
             this._onDragStart,
             addDisposableListener(this.el, 'dragstart', (event) => {
-                this._onDragStart.fire(event);
-
                 if (event.defaultPrevented || this.isCancelled(event)) {
                     event.preventDefault();
                     return;
@@ -63,6 +61,7 @@ export abstract class DragHandler extends CompositeDisposable {
                 setTimeout(() => this.el.classList.remove('dv-dragged'), 0);
 
                 this.dataDisposable.value = this.getData(event);
+                this._onDragStart.fire(event);
 
                 if (event.dataTransfer) {
                     event.dataTransfer.effectAllowed = 'move';

@@ -50,6 +50,10 @@ import {
     DockviewFloatingGroupPanel,
     IDockviewFloatingGroupPanel,
 } from './dockviewFloatingGroupPanel';
+import {
+    GroupDragEvent,
+    TabDragEvent,
+} from './components/titlebar/tabsContainer';
 
 export interface PanelReference {
     update: (event: { params: { [key: string]: any } }) => void;
@@ -130,6 +134,8 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly onDidAddPanel: Event<IDockviewPanel>;
     readonly onDidLayoutFromJSON: Event<void>;
     readonly onDidActivePanelChange: Event<IDockviewPanel | undefined>;
+    readonly onWillDragPanel: Event<TabDragEvent>;
+    readonly onWillDragGroup: Event<GroupDragEvent>;
     addFloatingGroup(
         item: IDockviewPanel | DockviewGroupPanel,
         coord?: { x: number; y: number }
@@ -145,6 +151,13 @@ export class DockviewComponent
     private readonly _api: DockviewApi;
     private _options: Exclude<DockviewComponentOptions, 'orientation'>;
     private watermark: IWatermarkRenderer | null = null;
+
+    readonly _onWillDragPanel = new Emitter<TabDragEvent>();
+    readonly onWillDragPanel: Event<TabDragEvent> = this._onWillDragPanel.event;
+
+    readonly _onWillDragGroup = new Emitter<GroupDragEvent>();
+    readonly onWillDragGroup: Event<GroupDragEvent> =
+        this._onWillDragGroup.event;
 
     private readonly _onDidDrop = new Emitter<DockviewDropEvent>();
     readonly onDidDrop: Event<DockviewDropEvent> = this._onDidDrop.event;
@@ -204,6 +217,12 @@ export class DockviewComponent
         toggleClass(this.gridview.element, 'dv-dockview', true);
 
         this.addDisposables(
+            this._onWillDragPanel,
+            this._onWillDragGroup,
+            this._onDidActivePanelChange,
+            this._onDidAddPanel,
+            this._onDidRemovePanel,
+            this._onDidLayoutFromJSON,
             this._onDidDrop,
             Event.any(
                 this.onDidAddGroup,
@@ -1157,8 +1176,11 @@ export class DockviewComponent
 
         if (!this._groups.has(view.id)) {
             const disposable = new CompositeDisposable(
-                view.model.onDragStart((event) => {
-                    this.onDragStart(event);
+                view.model.onTabDragStart((event) => {
+                    this._onWillDragPanel.fire(event);
+                }),
+                view.model.onGroupDragStart((event) => {
+                    this._onWillDragGroup.fire(event);
                 }),
                 view.model.onMove((event) => {
                     const { groupId, itemId, target, index } = event;
@@ -1234,14 +1256,5 @@ export class DockviewComponent
         return Array.from(this._groups.values()).find((group) =>
             group.value.model.containsPanel(panel)
         )?.value;
-    }
-
-    public dispose(): void {
-        this._onDidActivePanelChange.dispose();
-        this._onDidAddPanel.dispose();
-        this._onDidRemovePanel.dispose();
-        this._onDidLayoutFromJSON.dispose();
-
-        super.dispose();
     }
 }
