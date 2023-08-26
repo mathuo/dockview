@@ -87,6 +87,7 @@ export type DockviewComponentUpdateOptions = Pick<
     | 'createLeftHeaderActionsElement'
     | 'createRightHeaderActionsElement'
     | 'disableFloatingGroups'
+    | 'floatingGroupsPosition'
 >;
 
 export interface DockviewDropEvent extends GroupviewDropEvent {
@@ -359,8 +360,16 @@ export class DockviewComponent
             width: coord?.width ?? 300,
             left: overlayLeft,
             top: overlayTop,
-            minimumInViewportWidth: 100,
-            minimumInViewportHeight: 100,
+            minimumInViewportWidth:
+                this.options.floatingGroupsPosition === 'boundedWithinViewport'
+                    ? undefined
+                    : this.options.floatingGroupsPosition
+                          ?.minimumWidthWithinViewport ?? 100,
+            minimumInViewportHeight:
+                this.options.floatingGroupsPosition === 'boundedWithinViewport'
+                    ? undefined
+                    : this.options.floatingGroupsPosition
+                          ?.minimumHeightWithinViewport ?? 100,
         });
 
         const el = group.element.querySelector('.void-container');

@@ -87,6 +87,12 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     singleTabMode?: 'fullwidth' | 'default';
     parentElement?: HTMLElement;
     disableFloatingGroups?: boolean;
+    floatingGroupsPosition?:
+        | 'boundedWithinViewport'
+        | {
+              minimumHeightWithinViewport?: number;
+              minimumWidthWithinViewport?: number;
+          };
 }
 
 export interface PanelOptions<P extends object = Parameters> {
