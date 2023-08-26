@@ -10,7 +10,7 @@
             flex-grow: 1;
         }
 
-        .dockview-react-tab-action {
+        .dv-react-tab-close-btn {
             padding: 4px;
             display: flex;
             align-items: center;
@@ -25,7 +25,7 @@
     }
 
     &.inactive-tab:not(:hover) {
-        .dockview-react-tab-action {
+        .dv-react-tab-close-btn {
             visibility: hidden;
         }
     }
