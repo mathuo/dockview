@@ -44,6 +44,7 @@ import {
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
+import { Parameters } from '../panel/types';
 import { Overlay } from '../dnd/overlay';
 import { toggleClass, watchElementResize } from '../dom';
 import {
@@ -115,7 +116,9 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     doSetGroupActive: (group: DockviewGroupPanel, skipFocus?: boolean) => void;
     removeGroup: (group: DockviewGroupPanel) => void;
     options: DockviewComponentOptions;
-    addPanel(options: AddPanelOptions): IDockviewPanel;
+    addPanel<T extends object = Parameters>(
+        options: AddPanelOptions<T>
+    ): IDockviewPanel;
     removePanel(panel: IDockviewPanel): void;
     getGroupPanel: (id: string) => IDockviewPanel | undefined;
     createWatermarkComponent(): IWatermarkRenderer;
@@ -279,6 +282,15 @@ export class DockviewComponent
                 }
 
                 if (this.options.showDndOverlay) {
+                    if (position === 'center' && this.gridview.length !== 0) {
+                        /**
+                         * for external events only show the four-corner drag overlays, disable
+                         * the center position so that external drag events can fall through to the group
+                         * and panel drop target handlers
+                         */
+                        return false;
+                    }
+
                     return this.options.showDndOverlay({
                         nativeEvent: event,
                         position: position,
@@ -696,7 +708,9 @@ export class DockviewComponent
         }
     }
 
-    addPanel(options: AddPanelOptions): DockviewPanel {
+    addPanel<T extends object = Parameters>(
+        options: AddPanelOptions<T>
+    ): DockviewPanel {
         if (this.panels.find((_) => _.id === options.id)) {
             throw new Error(`panel with id ${options.id} already exists`);
         }

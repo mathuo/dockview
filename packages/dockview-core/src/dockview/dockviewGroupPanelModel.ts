@@ -50,7 +50,7 @@ interface GroupMoveEvent {
 }
 
 interface CoreGroupOptions {
-    locked?: boolean;
+    locked?: DockviewGroupPanelLocked;
     hideHeader?: boolean;
 }
 
@@ -81,6 +81,8 @@ export interface IHeader {
     hidden: boolean;
 }
 
+export type DockviewGroupPanelLocked = boolean | 'no-drop-target';
+
 export interface IDockviewGroupPanelModel extends IPanel {
     readonly isActive: boolean;
     readonly size: number;
@@ -93,9 +95,7 @@ export interface IDockviewGroupPanelModel extends IPanel {
     readonly onDidRemovePanel: Event<GroupviewChangeEvent>;
     readonly onDidActivePanelChange: Event<GroupviewChangeEvent>;
     readonly onMove: Event<GroupMoveEvent>;
-    readonly onTabDragStart: Event<TabDragEvent>;
-    readonly onGroupDragStart: Event<GroupDragEvent>;
-    locked: boolean;
+    locked: DockviewGroupPanelLocked;
     setActive(isActive: boolean): void;
     initialize(): void;
     // state
@@ -140,7 +140,7 @@ export class DockviewGroupPanelModel
     private _activePanel: IDockviewPanel | undefined;
     private watermark?: IWatermarkRenderer;
     private _isGroupActive = false;
-    private _locked = false;
+    private _locked: DockviewGroupPanelLocked = false;
     private _isFloating = false;
     private _rightHeaderActions: IHeaderActionsRenderer | undefined;
     private _leftHeaderActions: IHeaderActionsRenderer | undefined;
@@ -190,14 +190,18 @@ export class DockviewGroupPanelModel
         return this._activePanel;
     }
 
-    get locked(): boolean {
+    get locked(): DockviewGroupPanelLocked {
         return this._locked;
     }
 
-    set locked(value: boolean) {
+    set locked(value: DockviewGroupPanelLocked) {
         this._locked = value;
 
-        toggleClass(this.container, 'locked-groupview', value);
+        toggleClass(
+            this.container,
+            'locked-groupview',
+            value === 'no-drop-target' || value
+        );
     }
 
     get isActive(): boolean {
@@ -272,7 +276,10 @@ export class DockviewGroupPanelModel
         this.dropTarget = new Droptarget(this.contentContainer.element, {
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             canDisplayOverlay: (event, position) => {
-                if (this.locked && position === 'center') {
+                if (
+                    this.locked === 'no-drop-target' ||
+                    (this.locked && position === 'center')
+                ) {
                     return false;
                 }
 
@@ -314,7 +321,7 @@ export class DockviewGroupPanelModel
         );
 
         this.header.hidden = !!options.hideHeader;
-        this.locked = !!options.locked;
+        this.locked = options.locked || false;
 
         this.addDisposables(
             this._onTabDragStart,
@@ -404,8 +411,8 @@ export class DockviewGroupPanelModel
             id: this.id,
         };
 
-        if (this.locked) {
-            result.locked = true;
+        if (this.locked !== false) {
+            result.locked = this.locked;
         }
 
         if (this.header.hidden) {
@@ -765,6 +772,10 @@ export class DockviewGroupPanelModel
         position: Position,
         index?: number
     ): void {
+        if (this.locked === 'no-drop-target') {
+            return;
+        }
+
         const data = getPanelData();
 
         if (data && data.viewId === this.accessor.id) {

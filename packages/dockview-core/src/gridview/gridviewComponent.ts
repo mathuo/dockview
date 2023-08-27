@@ -21,7 +21,7 @@ import {
     GridPanelViewState,
     IGridviewPanel,
 } from './gridviewPanel';
-import { BaseComponentOptions } from '../panel/types';
+import { BaseComponentOptions, Parameters } from '../panel/types';
 import { Orientation, Sizing } from '../splitview/splitview';
 import { createComponent } from '../panel/componentFactory';
 import { Emitter, Event } from '../events';
@@ -32,7 +32,8 @@ export interface SerializedGridviewComponent {
     activePanel?: string;
 }
 
-export interface AddComponentOptions extends BaseComponentOptions {
+export interface AddComponentOptions<T extends object = Parameters>
+    extends BaseComponentOptions<T> {
     minimumWidth?: number;
     maximumWidth?: number;
     minimumHeight?: number;
@@ -57,7 +58,9 @@ export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
     readonly orientation: Orientation;
     readonly onDidLayoutFromJSON: Event<void>;
     updateOptions(options: Partial<GridviewComponentUpdateOptions>): void;
-    addPanel(options: AddComponentOptions): IGridviewPanel;
+    addPanel<T extends object = Parameters>(
+        options: AddComponentOptions<T>
+    ): IGridviewPanel;
     removePanel(panel: IGridviewPanel, sizing?: Sizing): void;
     focus(): void;
     fromJSON(serializedGridview: SerializedGridviewComponent): void;
@@ -280,7 +283,9 @@ export class GridviewComponent
         this.doAddGroup(removedPanel, relativeLocation, options.size);
     }
 
-    public addPanel(options: AddComponentOptions): IGridviewPanel {
+    public addPanel<T extends object = Parameters>(
+        options: AddComponentOptions<T>
+    ): IGridviewPanel {
         let relativeLocation: number[] = options.location || [0];
 
         if (options.position?.referencePanel) {

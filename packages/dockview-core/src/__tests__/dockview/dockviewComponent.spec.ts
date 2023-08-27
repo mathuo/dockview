@@ -1,5 +1,6 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import {
+    DockviewDropTargets,
     GroupPanelPartInitParameters,
     IContentRenderer,
     ITabRenderer,
@@ -10,6 +11,8 @@ import { CompositeDisposable } from '../../lifecycle';
 import { Emitter } from '../../events';
 import { IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
+import { fireEvent } from '@testing-library/dom';
+import { getPanelData } from '../../dnd/dataTransfer';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -3819,5 +3822,161 @@ describe('dockviewComponent', () => {
 
         expect(el.style.height).toBe('123px');
         expect(el.style.width).toBe('256px');
+    });
+
+    test('that external dnd events do not trigger the top-level center dnd target unless empty', () => {
+        const container = document.createElement('div');
+
+        const showDndOverlay = jest.fn().mockReturnValue(true);
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+            showDndOverlay: showDndOverlay,
+        });
+
+        dockview.layout(1000, 500);
+
+        const panel1 = dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+        const panel2 = dockview.addPanel({
+            id: 'panel_2',
+            component: 'default',
+            position: { direction: 'right' },
+        });
+
+        Object.defineProperty(dockview.element, 'clientWidth', {
+            get: () => 100,
+        });
+        Object.defineProperty(dockview.element, 'clientHeight', {
+            get: () => 100,
+        });
+
+        jest.spyOn(dockview.element, 'getBoundingClientRect').mockReturnValue({
+            left: 0,
+            top: 0,
+            width: 100,
+            height: 100,
+        } as any);
+
+        // left
+
+        const eventLeft = new KeyboardEvent('dragover');
+        Object.defineProperty(eventLeft, 'clientX', {
+            get: () => 0,
+        });
+        Object.defineProperty(eventLeft, 'clientY', {
+            get: () => 0,
+        });
+        fireEvent(dockview.element, eventLeft);
+
+        expect(showDndOverlay).toHaveBeenCalledWith({
+            nativeEvent: eventLeft,
+            position: 'left',
+            target: DockviewDropTargets.Edge,
+            getData: getPanelData,
+        });
+        expect(showDndOverlay).toBeCalledTimes(1);
+
+        // right
+
+        const eventRight = new KeyboardEvent('dragover');
+        Object.defineProperty(eventRight, 'clientX', {
+            get: () => 100,
+        });
+        Object.defineProperty(eventRight, 'clientY', {
+            get: () => 100,
+        });
+        fireEvent(dockview.element, eventRight);
+
+        expect(showDndOverlay).toHaveBeenCalledWith({
+            nativeEvent: eventRight,
+            position: 'right',
+            target: DockviewDropTargets.Edge,
+            getData: getPanelData,
+        });
+        expect(showDndOverlay).toBeCalledTimes(2);
+
+        // top
+
+        const eventTop = new KeyboardEvent('dragover');
+        Object.defineProperty(eventTop, 'clientX', {
+            get: () => 50,
+        });
+        Object.defineProperty(eventTop, 'clientY', {
+            get: () => 0,
+        });
+        fireEvent(dockview.element, eventTop);
+
+        expect(showDndOverlay).toHaveBeenCalledWith({
+            nativeEvent: eventTop,
+            position: 'top',
+            target: DockviewDropTargets.Edge,
+            getData: getPanelData,
+        });
+        expect(showDndOverlay).toBeCalledTimes(3);
+
+        // top
+
+        const eventBottom = new KeyboardEvent('dragover');
+        Object.defineProperty(eventBottom, 'clientX', {
+            get: () => 50,
+        });
+        Object.defineProperty(eventBottom, 'clientY', {
+            get: () => 100,
+        });
+        fireEvent(dockview.element, eventBottom);
+
+        expect(showDndOverlay).toHaveBeenCalledWith({
+            nativeEvent: eventBottom,
+            position: 'bottom',
+            target: DockviewDropTargets.Edge,
+            getData: getPanelData,
+        });
+        expect(showDndOverlay).toBeCalledTimes(4);
+
+        // center
+
+        const eventCenter = new KeyboardEvent('dragover');
+        Object.defineProperty(eventCenter, 'clientX', {
+            get: () => 50,
+        });
+        Object.defineProperty(eventCenter, 'clientY', {
+            get: () => 50,
+        });
+        fireEvent(dockview.element, eventCenter);
+
+        // expect not to be called for center
+        expect(showDndOverlay).toBeCalledTimes(4);
+
+        dockview.removePanel(panel1);
+        dockview.removePanel(panel2);
+
+        // center, but empty
+
+        const eventCenter2 = new KeyboardEvent('dragover');
+        Object.defineProperty(eventCenter2, 'clientX', {
+            get: () => 50,
+        });
+        Object.defineProperty(eventCenter2, 'clientY', {
+            get: () => 50,
+        });
+        fireEvent(dockview.element, eventCenter2);
+
+        expect(showDndOverlay).toHaveBeenCalledWith({
+            nativeEvent: eventTop,
+            position: 'center',
+            target: DockviewDropTargets.Edge,
+            getData: getPanelData,
+        });
+        expect(showDndOverlay).toBeCalledTimes(5);
     });
 });

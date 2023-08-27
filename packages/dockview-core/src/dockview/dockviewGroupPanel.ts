@@ -5,6 +5,7 @@ import {
     GroupOptions,
     IDockviewGroupPanelModel,
     IHeader,
+    DockviewGroupPanelLocked,
 } from './dockviewGroupPanelModel';
 import { GridviewPanel, IGridviewPanel } from '../gridview/gridviewPanel';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
@@ -16,7 +17,7 @@ import {
 export interface IDockviewGroupPanel
     extends IGridviewPanel<DockviewGroupPanelApi> {
     model: IDockviewGroupPanelModel;
-    locked: boolean;
+    locked: DockviewGroupPanelLocked;
     readonly size: number;
     readonly panels: IDockviewPanel[];
     readonly activePanel: IDockviewPanel | undefined;
@@ -46,11 +47,11 @@ export class DockviewGroupPanel
         return this._model;
     }
 
-    get locked(): boolean {
+    get locked(): DockviewGroupPanelLocked {
         return this._model.locked;
     }
 
-    set locked(value: boolean) {
+    set locked(value: DockviewGroupPanelLocked) {
         this._model.locked = value;
     }
 

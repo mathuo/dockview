@@ -8,6 +8,7 @@ import {
     IWatermarkRenderer,
     DockviewDropTargets,
 } from './types';
+import { Parameters } from '../panel/types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/splitview';
 import { PanelTransfer } from '../dnd/dataTransfer';
@@ -88,10 +89,10 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     disableFloatingGroups?: boolean;
 }
 
-export interface PanelOptions {
+export interface PanelOptions<P extends object = Parameters> {
     component: string;
     tabComponent?: string;
-    params?: { [key: string]: any };
+    params?: P;
     id: string;
     title?: string;
 }
@@ -152,8 +153,8 @@ type AddPanelPositionUnion = {
 
 type AddPanelOptionsUnion = AddPanelFloatingGroupUnion | AddPanelPositionUnion;
 
-export type AddPanelOptions = Omit<
-    PanelOptions,
+export type AddPanelOptions<P extends object = Parameters> = Omit<
+    PanelOptions<P>,
     'component' | 'tabComponent'
 > & {
     component: string;
