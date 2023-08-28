@@ -1,4 +1,4 @@
-import {DockviewComponent} from '../../dockview/dockviewComponent';
+import { DockviewComponent } from '../../dockview/dockviewComponent';
 import {
     GroupviewPanelState,
     IGroupPanelInitParameters,
@@ -20,6 +20,7 @@ import { IDockviewPanel } from '../../dockview/dockviewPanel';
 import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { WatermarkRendererInitParameters } from '../../dockview/types';
+import { createOffsetDragOverEvent } from '../__test_utils__/utils';
 
 enum GroupChangeKind2 {
     ADD_PANEL,
@@ -656,6 +657,97 @@ describe('groupview', () => {
         expect(
             element.getElementsByClassName('drop-target-dropzone').length
         ).toBe(0);
+    });
+
+    test('that the .locked behaviour is as', () => {
+        const accessorMock = jest.fn<Partial<DockviewComponent>, []>(() => {
+            return {
+                id: 'testcomponentid',
+                options: {
+                    showDndOverlay: () => true,
+                },
+                getPanel: jest.fn(),
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+            };
+        });
+        const accessor = new accessorMock() as DockviewComponent;
+        const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    canDisplayOverlay: jest.fn(),
+                };
+            }
+        );
+
+        const groupView = new groupviewMock() as DockviewGroupPanelModel;
+
+        const groupPanelMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
+            () => {
+                return {
+                    id: 'testgroupid',
+                    model: groupView,
+                };
+            }
+        );
+
+        const container = document.createElement('div');
+        const cut = new DockviewGroupPanelModel(
+            container,
+            accessor,
+            'groupviewid',
+            {},
+            new groupPanelMock() as DockviewGroupPanel
+        );
+
+        const element = container
+            .getElementsByClassName('content-container')
+            .item(0)!;
+
+        jest.spyOn(element, 'clientHeight', 'get').mockImplementation(
+            () => 100
+        );
+        jest.spyOn(element, 'clientWidth', 'get').mockImplementation(() => 100);
+
+        function run(value: number) {
+            fireEvent.dragEnter(element);
+            fireEvent(
+                element,
+                createOffsetDragOverEvent({ clientX: value, clientY: value })
+            );
+        }
+
+        // base case - not locked
+        cut.locked = false;
+        run(10);
+        expect(
+            element.getElementsByClassName('drop-target-dropzone').length
+        ).toBe(1);
+        fireEvent.dragEnd(element);
+
+        // special case - locked with no possible target
+        cut.locked = 'no-drop-target';
+        run(10);
+        expect(
+            element.getElementsByClassName('drop-target-dropzone').length
+        ).toBe(0);
+        fireEvent.dragEnd(element);
+
+        // standard locked - only show if not center target
+        cut.locked = true;
+        run(10);
+        expect(
+            element.getElementsByClassName('drop-target-dropzone').length
+        ).toBe(1);
+        fireEvent.dragEnd(element);
+
+        // standard locked but for center target - expect not shown
+        cut.locked = true;
+        run(25);
+        expect(
+            element.getElementsByClassName('drop-target-dropzone').length
+        ).toBe(0);
+        fireEvent.dragEnd(element);
     });
 
     test('that should not show drop target if dropping on self', () => {
