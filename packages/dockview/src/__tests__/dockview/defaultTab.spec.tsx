@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { DockviewDefaultTab } from '../../dockview/defaultTab';
 import * as React from 'react';
 import { fromPartial } from '@total-typescript/shoehorn';
@@ -56,5 +56,32 @@ describe('defaultTab', () => {
 
         const element = await screen.getByTestId('dockview-default-tab');
         expect(element.querySelector('.dv-react-tab-close-btn')).toBeTruthy();
+    });
+
+    test('that mouseDown on close button prevents panel becoming active', async () => {
+        const api = fromPartial<DockviewPanelApi>({
+            setActive: jest.fn(),
+        });
+        const containerApi = fromPartial<DockviewApi>({});
+        const params = {};
+
+        render(
+            <DockviewDefaultTab
+                api={api}
+                containerApi={containerApi}
+                params={params}
+            />
+        );
+
+        const element = await screen.getByTestId('dockview-default-tab');
+        const btn = element.querySelector(
+            '.dv-react-tab-close-btn'
+        ) as HTMLElement;
+
+        fireEvent.mouseDown(btn);
+        expect(api.setActive).toBeCalledTimes(0);
+
+        fireEvent.click(element);
+        expect(api.setActive).toBeCalledTimes(1);
     });
 });
