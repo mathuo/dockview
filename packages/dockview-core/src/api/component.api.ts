@@ -38,6 +38,10 @@ import {
 import { Emitter, Event } from '../events';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { PaneviewDropEvent } from '../paneview/draggablePaneviewPanel';
+import {
+    GroupDragEvent,
+    TabDragEvent,
+} from '../dockview/components/titlebar/tabsContainer';
 
 export interface CommonApi<T = any> {
     readonly height: number;
@@ -118,7 +122,9 @@ export class SplitviewApi implements CommonApi<SerializedSplitview> {
         return this.component.layout(width, height);
     }
 
-    addPanel<T extends object = Parameters>(options: AddSplitviewComponentOptions<T>): ISplitviewPanel {
+    addPanel<T extends object = Parameters>(
+        options: AddSplitviewComponentOptions<T>
+    ): ISplitviewPanel {
         return this.component.addPanel(options);
     }
 
@@ -213,7 +219,9 @@ export class PaneviewApi implements CommonApi<SerializedPaneview> {
         this.component.layout(width, height);
     }
 
-    addPanel<T extends object = Parameters>(options: AddPaneviewComponentOptions<T>): IPaneviewPanel {
+    addPanel<T extends object = Parameters>(
+        options: AddPaneviewComponentOptions<T>
+    ): IPaneviewPanel {
         return this.component.addPanel(options);
     }
 
@@ -297,7 +305,9 @@ export class GridviewApi implements CommonApi<SerializedGridviewComponent> {
         this.component.layout(width, height, force);
     }
 
-    addPanel<T extends object = Parameters>(options: AddComponentOptions<T>): IGridviewPanel {
+    addPanel<T extends object = Parameters>(
+        options: AddComponentOptions<T>
+    ): IGridviewPanel {
         return this.component.addPanel(options);
     }
 
@@ -402,6 +412,14 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.onDidDrop;
     }
 
+    get onWillDragGroup(): Event<GroupDragEvent> {
+        return this.component.onWillDragGroup;
+    }
+
+    get onWillDragPanel(): Event<TabDragEvent> {
+        return this.component.onWillDragPanel;
+    }
+
     get panels(): IDockviewPanel[] {
         return this.component.panels;
     }
@@ -432,7 +450,9 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         this.component.layout(width, height, force);
     }
 
-    addPanel<T extends object = Parameters>(options: AddPanelOptions<T>): IDockviewPanel {
+    addPanel<T extends object = Parameters>(
+        options: AddPanelOptions<T>
+    ): IDockviewPanel {
         return this.component.addPanel(options);
     }
 
