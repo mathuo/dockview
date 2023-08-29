@@ -16,14 +16,22 @@ export const DockviewDefaultTab: React.FunctionComponent<
 }) => {
     const onClose = React.useCallback(
         (event: React.MouseEvent<HTMLSpanElement>) => {
-            event.stopPropagation();
+            event.preventDefault();
             api.close();
         },
         [api]
     );
 
+    const onMouseDown = React.useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+    }, []);
+
     const onClick = React.useCallback(
         (event: React.MouseEvent<HTMLDivElement>) => {
+            if (event.defaultPrevented) {
+                return;
+            }
+
             api.setActive();
 
             if (rest.onClick) {
@@ -42,7 +50,11 @@ export const DockviewDefaultTab: React.FunctionComponent<
         >
             <span className="dockview-react-tab-title">{api.title}</span>
             {!hideClose && (
-                <div className="dv-react-tab-close-btn" onClick={onClose}>
+                <div
+                    className="dv-react-tab-close-btn"
+                    onMouseDown={onMouseDown}
+                    onClick={onClose}
+                >
                     <CloseButton />
                 </div>
             )}
