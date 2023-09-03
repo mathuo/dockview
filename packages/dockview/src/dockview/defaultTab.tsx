@@ -3,7 +3,10 @@ import * as React from 'react';
 import { CloseButton } from '../svg';
 
 export type IDockviewDefaultTabProps = IDockviewPanelHeaderProps &
-    React.DOMAttributes<HTMLDivElement> & { hideClose?: boolean };
+    React.DOMAttributes<HTMLDivElement> & {
+        hideClose?: boolean;
+        closeActionOverride?: () => void;
+    };
 
 export const DockviewDefaultTab: React.FunctionComponent<
     IDockviewDefaultTabProps
@@ -12,18 +15,32 @@ export const DockviewDefaultTab: React.FunctionComponent<
     containerApi: _containerApi,
     params: _params,
     hideClose,
+    closeActionOverride,
     ...rest
 }) => {
     const onClose = React.useCallback(
         (event: React.MouseEvent<HTMLSpanElement>) => {
-            event.stopPropagation();
-            api.close();
+            event.preventDefault();
+
+            if (closeActionOverride) {
+                closeActionOverride();
+            } else {
+                api.close();
+            }
         },
-        [api]
+        [api, closeActionOverride]
     );
+
+    const onMouseDown = React.useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+    }, []);
 
     const onClick = React.useCallback(
         (event: React.MouseEvent<HTMLDivElement>) => {
+            if (event.defaultPrevented) {
+                return;
+            }
+
             api.setActive();
 
             if (rest.onClick) {
@@ -42,7 +59,11 @@ export const DockviewDefaultTab: React.FunctionComponent<
         >
             <span className="dockview-react-tab-title">{api.title}</span>
             {!hideClose && (
-                <div className="dv-react-tab-close-btn" onClick={onClose}>
+                <div
+                    className="dv-react-tab-close-btn"
+                    onMouseDown={onMouseDown}
+                    onClick={onClose}
+                >
                     <CloseButton />
                 </div>
             )}

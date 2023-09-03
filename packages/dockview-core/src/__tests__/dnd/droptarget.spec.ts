@@ -7,19 +7,7 @@ import {
     positionToDirection,
 } from '../../dnd/droptarget';
 import { fireEvent } from '@testing-library/dom';
-
-function createOffsetDragOverEvent(params: {
-    clientX: number;
-    clientY: number;
-}): Event {
-    const event = new Event('dragover', {
-        bubbles: true,
-        cancelable: true,
-    });
-    Object.defineProperty(event, 'clientX', { get: () => params.clientX });
-    Object.defineProperty(event, 'clientY', { get: () => params.clientY });
-    return event;
-}
+import { createOffsetDragOverEvent } from '../__test_utils__/utils';
 
 describe('droptarget', () => {
     let element: HTMLElement;
