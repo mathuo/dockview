@@ -3,7 +3,10 @@ import * as React from 'react';
 import { CloseButton } from '../svg';
 
 export type IDockviewDefaultTabProps = IDockviewPanelHeaderProps &
-    React.DOMAttributes<HTMLDivElement> & { hideClose?: boolean };
+    React.DOMAttributes<HTMLDivElement> & {
+        hideClose?: boolean;
+        closeActionOverride?: () => void;
+    };
 
 export const DockviewDefaultTab: React.FunctionComponent<
     IDockviewDefaultTabProps
@@ -12,14 +15,20 @@ export const DockviewDefaultTab: React.FunctionComponent<
     containerApi: _containerApi,
     params: _params,
     hideClose,
+    closeActionOverride,
     ...rest
 }) => {
     const onClose = React.useCallback(
         (event: React.MouseEvent<HTMLSpanElement>) => {
             event.preventDefault();
-            api.close();
+
+            if (closeActionOverride) {
+                closeActionOverride();
+            } else {
+                api.close();
+            }
         },
-        [api]
+        [api, closeActionOverride]
     );
 
     const onMouseDown = React.useCallback((e: React.MouseEvent) => {
