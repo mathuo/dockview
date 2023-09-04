@@ -16,13 +16,26 @@ export interface TabDropIndexEvent {
     readonly index: number;
 }
 
+export interface TabDragEvent {
+    readonly nativeEvent: DragEvent;
+    readonly panel: IDockviewPanel;
+}
+
+export interface GroupDragEvent {
+    readonly nativeEvent: DragEvent;
+    readonly group: DockviewGroupPanel;
+}
+
 export interface ITabsContainer extends IDisposable {
     readonly element: HTMLElement;
     readonly panels: string[];
     readonly size: number;
+    hidden: boolean;
     delete: (id: string) => void;
     indexOf: (id: string) => number;
     onDrop: Event<TabDropIndexEvent>;
+    onTabDragStart: Event<TabDragEvent>;
+    onGroupDragStart: Event<GroupDragEvent>;
     setActive: (isGroupActive: boolean) => void;
     setActivePanel: (panel: IDockviewPanel) => void;
     isActive: (tab: ITab) => boolean;
@@ -30,7 +43,6 @@ export interface ITabsContainer extends IDisposable {
     openPanel: (panel: IDockviewPanel, index?: number) => void;
     setRightActionsElement(element: HTMLElement | undefined): void;
     setLeftActionsElement(element: HTMLElement | undefined): void;
-    hidden: boolean;
     show(): void;
     hide(): void;
 }
@@ -55,8 +67,15 @@ export class TabsContainer
     private readonly _onDrop = new Emitter<TabDropIndexEvent>();
     readonly onDrop: Event<TabDropIndexEvent> = this._onDrop.event;
 
+    private readonly _onTabDragStart = new Emitter<TabDragEvent>();
+    readonly onTabDragStart: Event<TabDragEvent> = this._onTabDragStart.event;
+
+    private readonly _onGroupDragStart = new Emitter<GroupDragEvent>();
+    readonly onGroupDragStart: Event<GroupDragEvent> =
+        this._onGroupDragStart.event;
+
     get panels(): string[] {
-        return this.tabs.map((_) => _.value.panelId);
+        return this.tabs.map((_) => _.value.panel.id);
     }
 
     get size(): number {
@@ -122,7 +141,7 @@ export class TabsContainer
     }
 
     public indexOf(id: string): number {
-        return this.tabs.findIndex((tab) => tab.value.panelId === id);
+        return this.tabs.findIndex((tab) => tab.value.panel.id === id);
     }
 
     constructor(
@@ -131,7 +150,11 @@ export class TabsContainer
     ) {
         super();
 
-        this.addDisposables(this._onDrop);
+        this.addDisposables(
+            this._onDrop,
+            this._onTabDragStart,
+            this._onGroupDragStart
+        );
 
         this._element = document.createElement('div');
         this._element.className = 'tabs-and-actions-container';
@@ -181,6 +204,12 @@ export class TabsContainer
 
         this.addDisposables(
             this.voidContainer,
+            this.voidContainer.onDragStart((event) => {
+                this._onGroupDragStart.fire({
+                    nativeEvent: event,
+                    group: this.group,
+                });
+            }),
             this.voidContainer.onDrop((event) => {
                 this._onDrop.fire({
                     event: event.nativeEvent,
@@ -260,7 +289,7 @@ export class TabsContainer
     }
 
     public delete(id: string): void {
-        const index = this.tabs.findIndex((tab) => tab.value.panelId === id);
+        const index = this.tabs.findIndex((tab) => tab.value.panel.id === id);
 
         const tabToRemove = this.tabs.splice(index, 1)[0];
 
@@ -273,7 +302,7 @@ export class TabsContainer
 
     public setActivePanel(panel: IDockviewPanel): void {
         this.tabs.forEach((tab) => {
-            const isActivePanel = panel.id === tab.value.panelId;
+            const isActivePanel = panel.id === tab.value.panel.id;
             tab.value.setActive(isActivePanel);
         });
     }
@@ -282,17 +311,20 @@ export class TabsContainer
         panel: IDockviewPanel,
         index: number = this.tabs.length
     ): void {
-        if (this.tabs.find((tab) => tab.value.panelId === panel.id)) {
+        if (this.tabs.find((tab) => tab.value.panel.id === panel.id)) {
             return;
         }
-        const tabToAdd = new Tab(panel.id, this.accessor, this.group);
+        const tab = new Tab(panel, this.accessor, this.group);
         if (!panel.view?.tab) {
             throw new Error('invalid header component');
         }
-        tabToAdd.setContent(panel.view.tab);
+        tab.setContent(panel.view.tab);
 
-        const disposable = CompositeDisposable.from(
-            tabToAdd.onChanged((event) => {
+        const disposable = new CompositeDisposable(
+            tab.onDragStart((event) => {
+                this._onTabDragStart.fire({ nativeEvent: event, panel });
+            }),
+            tab.onChanged((event) => {
                 const isFloatingGroupsEnabled =
                     !this.accessor.options.disableFloatingGroups;
 
@@ -306,10 +338,9 @@ export class TabsContainer
                 ) {
                     event.preventDefault();
 
-                    const panel = this.accessor.getGroupPanel(tabToAdd.panelId);
+                    const panel = this.accessor.getGroupPanel(tab.panel.id);
 
-                    const { top, left } =
-                        tabToAdd.element.getBoundingClientRect();
+                    const { top, left } = tab.element.getBoundingClientRect();
                     const { top: rootTop, left: rootLeft } =
                         this.accessor.element.getBoundingClientRect();
 
@@ -338,15 +369,15 @@ export class TabsContainer
                     skipFocus: alreadyFocused,
                 });
             }),
-            tabToAdd.onDrop((event) => {
+            tab.onDrop((event) => {
                 this._onDrop.fire({
                     event: event.nativeEvent,
-                    index: this.tabs.findIndex((x) => x.value === tabToAdd),
+                    index: this.tabs.findIndex((x) => x.value === tab),
                 });
             })
         );
 
-        const value: IValueDisposable<ITab> = { value: tabToAdd, disposable };
+        const value: IValueDisposable<ITab> = { value: tab, disposable };
 
         this.addTab(value, index);
     }

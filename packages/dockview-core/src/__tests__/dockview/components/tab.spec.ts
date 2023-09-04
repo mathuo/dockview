@@ -1,16 +1,24 @@
 import { fireEvent } from '@testing-library/dom';
-import { LocalSelectionTransfer, PanelTransfer } from '../../../dnd/dataTransfer';
+import {
+    LocalSelectionTransfer,
+    PanelTransfer,
+} from '../../../dnd/dataTransfer';
 import { DockviewComponent } from '../../../dockview/dockviewComponent';
 import { DockviewGroupPanel } from '../../../dockview/dockviewGroupPanel';
 import { DockviewGroupPanelModel } from '../../../dockview/dockviewGroupPanelModel';
 import { Tab } from '../../../dockview/components/tab/tab';
+import { IDockviewPanel } from '../../../dockview/dockviewPanel';
 
 describe('tab', () => {
     test('that empty tab has inactive-tab class', () => {
         const accessorMock = jest.fn();
         const groupMock = jest.fn();
 
-        const cut = new Tab('panelId', new accessorMock(), new groupMock());
+        const cut = new Tab(
+            { id: 'panelId' } as IDockviewPanel,
+            new accessorMock(),
+            new groupMock()
+        );
 
         expect(cut.element.className).toBe('tab inactive-tab');
     });
@@ -19,7 +27,11 @@ describe('tab', () => {
         const accessorMock = jest.fn();
         const groupMock = jest.fn();
 
-        const cut = new Tab('panelId', new accessorMock(), new groupMock());
+        const cut = new Tab(
+            { id: 'panelId' } as IDockviewPanel,
+            new accessorMock(),
+            new groupMock()
+        );
 
         cut.setActive(true);
         expect(cut.element.className).toBe('tab active-tab');
@@ -54,7 +66,11 @@ describe('tab', () => {
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
-        const cut = new Tab('panelId', accessor, groupPanel);
+        const cut = new Tab(
+            { id: 'panelId' } as IDockviewPanel,
+            accessor,
+            groupPanel
+        );
 
         jest.spyOn(cut.element, 'clientHeight', 'get').mockImplementation(
             () => 100
@@ -99,7 +115,11 @@ describe('tab', () => {
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
-        const cut = new Tab('panel1', accessor, groupPanel);
+        const cut = new Tab(
+            { id: 'panel1' } as IDockviewPanel,
+            accessor,
+            groupPanel
+        );
 
         jest.spyOn(cut.element, 'clientHeight', 'get').mockImplementation(
             () => 100
@@ -149,7 +169,11 @@ describe('tab', () => {
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
-        const cut = new Tab('panel1', accessor, groupPanel);
+        const cut = new Tab(
+            { id: 'panel1' } as IDockviewPanel,
+            accessor,
+            groupPanel
+        );
 
         jest.spyOn(cut.element, 'clientHeight', 'get').mockImplementation(
             () => 100
@@ -199,7 +223,11 @@ describe('tab', () => {
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
-        const cut = new Tab('panel1', accessor, groupPanel);
+        const cut = new Tab(
+            { id: 'panel1' } as IDockviewPanel,
+            accessor,
+            groupPanel
+        );
 
         jest.spyOn(cut.element, 'clientHeight', 'get').mockImplementation(
             () => 100
@@ -255,7 +283,11 @@ describe('tab', () => {
         const accessor = new accessorMock() as DockviewComponent;
         const groupPanel = new groupPanelMock() as DockviewGroupPanel;
 
-        const cut = new Tab('panel1', accessor, groupPanel);
+        const cut = new Tab(
+            { id: 'panel1' } as IDockviewPanel,
+            accessor,
+            groupPanel
+        );
 
         jest.spyOn(cut.element, 'clientHeight', 'get').mockImplementation(
             () => 100

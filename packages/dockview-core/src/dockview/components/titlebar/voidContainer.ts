@@ -15,6 +15,9 @@ export class VoidContainer extends CompositeDisposable {
     private readonly _onDrop = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDrop.event;
 
+    private readonly _onDragStart = new Emitter<DragEvent>();
+    readonly onDragStart = this._onDragStart.event;
+
     get element(): HTMLElement {
         return this._element;
     }
@@ -33,12 +36,13 @@ export class VoidContainer extends CompositeDisposable {
 
         this.addDisposables(
             this._onDrop,
+            this._onDragStart,
             addDisposableListener(this._element, 'click', () => {
                 this.accessor.doSetGroupActive(this.group);
             })
         );
 
-        const handler = new GroupDragHandler(this._element, accessor.id, group);
+        const handler = new GroupDragHandler(this._element, accessor, group);
 
         this.voidDropTarget = new Droptarget(this._element, {
             acceptedTargetZones: ['center'],
@@ -68,6 +72,9 @@ export class VoidContainer extends CompositeDisposable {
 
         this.addDisposables(
             handler,
+            handler.onDragStart((event) => {
+                this._onDragStart.fire(event);
+            }),
             this.voidDropTarget.onDrop((event) => {
                 this._onDrop.fire(event);
             }),
