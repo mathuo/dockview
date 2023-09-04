@@ -87,7 +87,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     singleTabMode?: 'fullwidth' | 'default';
     parentElement?: HTMLElement;
     disableFloatingGroups?: boolean;
-    floatingGroupsPosition?:
+    floatingGroupBounds?:
         | 'boundedWithinViewport'
         | {
               minimumHeightWithinViewport?: number;

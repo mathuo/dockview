@@ -40,6 +40,14 @@ export class Overlay extends CompositeDisposable {
     private static MINIMUM_HEIGHT = 20;
     private static MINIMUM_WIDTH = 20;
 
+    set minimumInViewportWidth(value: number | undefined) {
+        this.options.minimumInViewportWidth = value;
+    }
+
+    set minimumInViewportHeight(value: number | undefined) {
+        this.options.minimumInViewportHeight = value;
+    }
+
     constructor(
         private readonly options: {
             height: number;
@@ -109,7 +117,10 @@ export class Overlay extends CompositeDisposable {
         const xOffset = Math.max(0, this.getMinimumWidth(overlayRect.width));
 
         // a minimum height of minimumViewportHeight must be inside the viewport
-        const yOffset = Math.max(0, this.getMinimumHeight(overlayRect.height));
+        const yOffset =
+            typeof this.options.minimumInViewportHeight === 'number'
+                ? Math.max(0, this.getMinimumHeight(overlayRect.height))
+                : 0;
 
         const left = clamp(
             overlayRect.left - containerRect.left,
@@ -376,7 +387,9 @@ export class Overlay extends CompositeDisposable {
 
                             height = clamp(
                                 y - top,
-                                top < 0 && this.options.minimumInViewportHeight
+                                top < 0 &&
+                                    typeof this.options
+                                        .minimumInViewportHeight === 'number'
                                     ? -top +
                                           this.options.minimumInViewportHeight
                                     : Overlay.MINIMUM_HEIGHT,
@@ -413,7 +426,9 @@ export class Overlay extends CompositeDisposable {
 
                             width = clamp(
                                 x - left,
-                                left < 0 && this.options.minimumInViewportWidth
+                                left < 0 &&
+                                    typeof this.options
+                                        .minimumInViewportWidth === 'number'
                                     ? -left +
                                           this.options.minimumInViewportWidth
                                     : Overlay.MINIMUM_WIDTH,

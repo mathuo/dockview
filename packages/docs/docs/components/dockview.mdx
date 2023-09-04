@@ -401,6 +401,12 @@ Floating groups can be interacted with whilst holding the `shift` key activating
 Floating groups can be programatically added through the dockview `api` method `api.addFloatingGroup(...)` and you can check whether
 a group is floating via the `group.api.isFloating` property. See examples for full code.
 
+You can control the bounding box of floating groups through the optional `floatingGroupBounds` options:
+
+-   `boundedWithinViewport` will force the entire floating group to be bounded within the docks viewport.
+-   `{minimumHeightWithinViewport?: number, minimumWidthWithinViewport?: number}` sets the respective dimension minimums that must appears within the docks viewport
+-   If no options are provided the defaults of `100px` minimum height and width within the viewport are set.
+
 <MultiFrameworkContainer
     height={600}
     sandboxId="floatinggroup-dockview"

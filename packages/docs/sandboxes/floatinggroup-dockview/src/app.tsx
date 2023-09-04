@@ -155,6 +155,10 @@ export const DockviewPersistance = (props: { theme?: string }) => {
         setApi(event.api);
     };
 
+    const [options, setOptions] = React.useState<
+        'boundedWithinViewport' | undefined
+    >(undefined);
+
     return (
         <div
             style={{
@@ -199,6 +203,17 @@ export const DockviewPersistance = (props: { theme?: string }) => {
                 </button>
                 <button
                     onClick={() => {
+                        setOptions(
+                            options === undefined
+                                ? 'boundedWithinViewport'
+                                : undefined
+                        );
+                    }}
+                >
+                    {`Bounds: ${options ? 'Within' : 'Overflow'}`}
+                </button>
+                <button
+                    onClick={() => {
                         setDisableFloatingGroups((x) => !x);
                     }}
                 >
@@ -219,6 +234,7 @@ export const DockviewPersistance = (props: { theme?: string }) => {
                     leftHeaderActionsComponent={LeftComponent}
                     rightHeaderActionsComponent={RightComponent}
                     disableFloatingGroups={disableFloatingGroups}
+                    floatingGroupBounds={options}
                     className={`${props.theme || 'dockview-theme-abyss'}`}
                 />
             </div>
