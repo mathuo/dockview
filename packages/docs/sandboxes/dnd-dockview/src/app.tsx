@@ -38,7 +38,7 @@ const DraggableElement = () => (
         }}
         draggable={true}
     >
-        Drag me
+        Drag me into the dock
     </span>
 );
 
@@ -162,7 +162,17 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
         >
             <div style={{ margin: '2px 0px' }}>
                 <DraggableElement />
-                <div onDrop={onDrop}>Inspect Data Transfer</div>
+                <div
+                    style={{
+                        padding: '0px 4px',
+                        backgroundColor: 'black',
+                        borderRadius: '2px',
+                        color: 'white',
+                    }}
+                    onDrop={onDrop}
+                >
+                    Drop a tab or group here to inspect the attached metadata
+                </div>
             </div>
             <DockviewReact
                 components={components}

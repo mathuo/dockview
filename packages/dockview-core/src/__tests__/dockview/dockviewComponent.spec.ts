@@ -13,6 +13,10 @@ import { IDockviewPanel } from '../../dockview/dockviewPanel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { fireEvent } from '@testing-library/dom';
 import { getPanelData } from '../../dnd/dataTransfer';
+import {
+    GroupDragEvent,
+    TabDragEvent,
+} from '../../dockview/components/titlebar/tabsContainer';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -3978,5 +3982,85 @@ describe('dockviewComponent', () => {
             getData: getPanelData,
         });
         expect(showDndOverlay).toBeCalledTimes(5);
+    });
+
+    test('that dragging a tab triggers onWillDragPanel', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const tabDragEvents: TabDragEvent[] = [];
+        const groupDragEvents: GroupDragEvent[] = [];
+
+        dockview.onWillDragPanel((event) => {
+            tabDragEvents.push(event);
+        });
+        dockview.onWillDragGroup((event) => {
+            groupDragEvents.push(event);
+        });
+
+        const el = dockview.element.querySelector('.tab')!;
+        expect(el).toBeTruthy();
+
+        fireEvent.dragStart(el);
+
+        expect(tabDragEvents.length).toBe(1);
+        expect(groupDragEvents.length).toBe(0);
+    });
+
+    test('that dragging a group triggers onWillDragGroup', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        const tabDragEvents: TabDragEvent[] = [];
+        const groupDragEvents: GroupDragEvent[] = [];
+
+        dockview.onWillDragPanel((event) => {
+            tabDragEvents.push(event);
+        });
+        dockview.onWillDragGroup((event) => {
+            groupDragEvents.push(event);
+        });
+
+        const el = dockview.element.querySelector('.void-container')!;
+        expect(el).toBeTruthy();
+
+        fireEvent.dragStart(el);
+
+        expect(tabDragEvents.length).toBe(0);
+        expect(groupDragEvents.length).toBe(1);
     });
 });

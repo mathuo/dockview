@@ -155,10 +155,10 @@ export class DockviewComponent
     private _options: Exclude<DockviewComponentOptions, 'orientation'>;
     private watermark: IWatermarkRenderer | null = null;
 
-    readonly _onWillDragPanel = new Emitter<TabDragEvent>();
+    private readonly _onWillDragPanel = new Emitter<TabDragEvent>();
     readonly onWillDragPanel: Event<TabDragEvent> = this._onWillDragPanel.event;
 
-    readonly _onWillDragGroup = new Emitter<GroupDragEvent>();
+    private readonly _onWillDragGroup = new Emitter<GroupDragEvent>();
     readonly onWillDragGroup: Event<GroupDragEvent> =
         this._onWillDragGroup.event;
 
