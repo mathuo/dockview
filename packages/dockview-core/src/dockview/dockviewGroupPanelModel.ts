@@ -12,7 +12,9 @@ import {
     IContentContainer,
 } from './components/panel/content';
 import {
+  GroupDragEvent,
     ITabsContainer,
+    TabDragEvent,
     TabsContainer,
 } from './components/titlebar/tabsContainer';
 import { DockviewDropTargets, IWatermarkRenderer } from './types';
@@ -159,6 +161,13 @@ export class DockviewGroupPanelModel
 
     private readonly _onDidDrop = new Emitter<GroupviewDropEvent>();
     readonly onDidDrop: Event<GroupviewDropEvent> = this._onDidDrop.event;
+
+    private readonly _onTabDragStart = new Emitter<TabDragEvent>();
+    readonly onTabDragStart: Event<TabDragEvent> = this._onTabDragStart.event;
+
+    private readonly _onGroupDragStart = new Emitter<GroupDragEvent>();
+    readonly onGroupDragStart: Event<GroupDragEvent> =
+        this._onGroupDragStart.event;
 
     private readonly _onDidAddPanel = new Emitter<GroupviewChangeEvent>();
     readonly onDidAddPanel: Event<GroupviewChangeEvent> =
@@ -315,6 +324,14 @@ export class DockviewGroupPanelModel
         this.locked = options.locked || false;
 
         this.addDisposables(
+            this._onTabDragStart,
+            this._onGroupDragStart,
+            this.tabsContainer.onTabDragStart((event) => {
+                this._onTabDragStart.fire(event);
+            }),
+            this.tabsContainer.onGroupDragStart((event) => {
+                this._onGroupDragStart.fire(event);
+            }),
             this.tabsContainer.onDrop((event) => {
                 this.handleDropEvent(event.event, 'center', event.index);
             }),

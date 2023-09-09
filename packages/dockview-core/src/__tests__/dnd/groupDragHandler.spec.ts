@@ -2,6 +2,7 @@ import { fireEvent } from '@testing-library/dom';
 import { GroupDragHandler } from '../../dnd/groupDragHandler';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { LocalSelectionTransfer, PanelTransfer } from '../../dnd/dataTransfer';
+import { DockviewComponent } from '../../dockview/dockviewComponent';
 
 describe('groupDragHandler', () => {
     test('that the dnd transfer object is setup and torndown', () => {
@@ -16,7 +17,11 @@ describe('groupDragHandler', () => {
         });
         const group = new groupMock();
 
-        const cut = new GroupDragHandler(element, 'test_accessor_id', group);
+        const cut = new GroupDragHandler(
+            element,
+            { id: 'test_accessor_id' } as DockviewComponent,
+            group
+        );
 
         fireEvent.dragStart(element, new Event('dragstart'));
 
@@ -54,7 +59,11 @@ describe('groupDragHandler', () => {
         });
         const group = new groupMock();
 
-        const cut = new GroupDragHandler(element, 'accessor_id', group);
+        const cut = new GroupDragHandler(
+            element,
+            { id: 'accessor_id' } as DockviewComponent,
+            group
+        );
 
         const event = new KeyboardEvent('dragstart', { shiftKey: false });
 
@@ -82,7 +91,11 @@ describe('groupDragHandler', () => {
         });
         const group = new groupMock();
 
-        const cut = new GroupDragHandler(element, 'accessor_id', group);
+        const cut = new GroupDragHandler(
+            element,
+            { id: 'accessor_id' } as DockviewComponent,
+            group
+        );
 
         const event = new KeyboardEvent('dragstart', { shiftKey: false });
 

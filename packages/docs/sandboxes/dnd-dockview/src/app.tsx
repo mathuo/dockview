@@ -1,4 +1,5 @@
 import {
+    DockviewApi,
     DockviewDndOverlayEvent,
     DockviewDropEvent,
     DockviewReact,
@@ -37,13 +38,19 @@ const DraggableElement = () => (
         }}
         draggable={true}
     >
-        Drag me
+        Drag me into the dock
     </span>
 );
 
 const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
-    const onReady = (event: DockviewReadyEvent) => {
-        event.api.addPanel({
+    const [api, setApi] = React.useState<DockviewApi>();
+
+    React.useEffect(() => {
+        if (!api) {
+            return;
+        }
+
+        api.addPanel({
             id: 'panel_1',
             component: 'default',
             params: {
@@ -51,7 +58,7 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
             },
         });
 
-        event.api.addPanel({
+        api.addPanel({
             id: 'panel_2',
             component: 'default',
             params: {
@@ -59,7 +66,7 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
             },
         });
 
-        event.api.addPanel({
+        api.addPanel({
             id: 'panel_3',
             component: 'default',
             params: {
@@ -67,7 +74,7 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
             },
         });
 
-        event.api.addPanel({
+        api.addPanel({
             id: 'panel_4',
             component: 'default',
             params: {
@@ -75,6 +82,45 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
             },
             position: { referencePanel: 'panel_1', direction: 'right' },
         });
+
+        const panelDragDisposable = api.onWillDragPanel((event) => {
+            const dataTransfer = event.nativeEvent.dataTransfer;
+
+            if (dataTransfer) {
+                dataTransfer.setData(
+                    'text/plain',
+                    'Some custom panel data transfer data'
+                );
+                dataTransfer.setData(
+                    'text/json',
+                    '{text: "Some custom panel data transfer data"}'
+                );
+            }
+        });
+
+        const groupDragDisposable = api.onWillDragGroup((event) => {
+            const dataTransfer = event.nativeEvent.dataTransfer;
+
+            if (dataTransfer) {
+                dataTransfer.setData(
+                    'text/plain',
+                    'Some custom group data transfer data'
+                );
+                dataTransfer.setData(
+                    'text/json',
+                    '{text: "Some custom group data transfer data"}'
+                );
+            }
+        });
+
+        return () => {
+            panelDragDisposable.dispose();
+            groupDragDisposable.dispose();
+        };
+    }, [api]);
+
+    const onReady = (event: DockviewReadyEvent) => {
+        setApi(event.api);
     };
 
     const onDidDrop = (event: DockviewDropEvent) => {
@@ -92,6 +138,20 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
         return true;
     };
 
+    const onDrop = (event: React.DragEvent) => {
+        const dataTransfer = event.dataTransfer;
+
+        let text = 'The following dataTransfer data was found:\n';
+
+        for (let i = 0; i < dataTransfer.items.length; i++) {
+            const item = dataTransfer.items[i];
+            const value = dataTransfer.getData(item.type);
+            text += `type=${item.type},data=${value}\n`;
+        }
+
+        alert(text);
+    };
+
     return (
         <div
             style={{
@@ -102,6 +162,17 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
         >
             <div style={{ margin: '2px 0px' }}>
                 <DraggableElement />
+                <div
+                    style={{
+                        padding: '0px 4px',
+                        backgroundColor: 'black',
+                        borderRadius: '2px',
+                        color: 'white',
+                    }}
+                    onDrop={onDrop}
+                >
+                    Drop a tab or group here to inspect the attached metadata
+                </div>
             </div>
             <DockviewReact
                 components={components}

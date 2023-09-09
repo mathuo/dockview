@@ -23,10 +23,6 @@ export class CompositeDisposable {
         return this._isDisposed;
     }
 
-    public static from(...args: IDisposable[]): CompositeDisposable {
-        return new CompositeDisposable(...args);
-    }
-
     constructor(...args: IDisposable[]) {
         this._disposables = args;
     }

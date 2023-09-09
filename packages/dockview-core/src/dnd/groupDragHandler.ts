@@ -1,3 +1,4 @@
+import { DockviewComponent } from '../dockview/dockviewComponent';
 import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
 import { quasiPreventDefault } from '../dom';
 import { addDisposableListener } from '../events';
@@ -12,7 +13,7 @@ export class GroupDragHandler extends DragHandler {
 
     constructor(
         element: HTMLElement,
-        private readonly accessorId: string,
+        private readonly accessor: DockviewComponent,
         private readonly group: DockviewGroupPanel
     ) {
         super(element);
@@ -43,9 +44,11 @@ export class GroupDragHandler extends DragHandler {
         return false;
     }
 
-    getData(dataTransfer: DataTransfer | null): IDisposable {
+    getData(dragEvent: DragEvent): IDisposable {
+        const dataTransfer = dragEvent.dataTransfer;
+
         this.panelTransfer.setData(
-            [new PanelTransfer(this.accessorId, this.group.id, null)],
+            [new PanelTransfer(this.accessor.id, this.group.id, null)],
             PanelTransfer.prototype
         );
 
