@@ -489,7 +489,7 @@ export class DockviewComponent
             typeof options.orientation === 'string' &&
             this.gridview.orientation !== options.orientation;
         const hasFloatingGroupOptionsChanged =
-            typeof options.floatingGroupBounds !== undefined &&
+            options.floatingGroupBounds !== undefined &&
             options.floatingGroupBounds !== this.options.floatingGroupBounds;
 
         this._options = { ...this.options, ...options };
