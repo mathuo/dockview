@@ -1,3 +1,4 @@
+import { toHaveDescription } from '@testing-library/jest-dom/matchers';
 import {
     getElementsByTagName,
     quasiDefaultPrevented,
@@ -39,6 +40,14 @@ export class Overlay extends CompositeDisposable {
     private static MINIMUM_HEIGHT = 20;
     private static MINIMUM_WIDTH = 20;
 
+    set minimumInViewportWidth(value: number | undefined) {
+        this.options.minimumInViewportWidth = value;
+    }
+
+    set minimumInViewportHeight(value: number | undefined) {
+        this.options.minimumInViewportHeight = value;
+    }
+
     constructor(
         private readonly options: {
             height: number;
@@ -47,8 +56,8 @@ export class Overlay extends CompositeDisposable {
             top: number;
             container: HTMLElement;
             content: HTMLElement;
-            minimumInViewportWidth: number;
-            minimumInViewportHeight: number;
+            minimumInViewportWidth?: number;
+            minimumInViewportHeight?: number;
         }
     ) {
         super();
@@ -105,16 +114,13 @@ export class Overlay extends CompositeDisposable {
         // region: ensure bounds within allowable limits
 
         // a minimum width of minimumViewportWidth must be inside the viewport
-        const xOffset = Math.max(
-            0,
-            overlayRect.width - this.options.minimumInViewportWidth
-        );
+        const xOffset = Math.max(0, this.getMinimumWidth(overlayRect.width));
 
         // a minimum height of minimumViewportHeight must be inside the viewport
-        const yOffset = Math.max(
-            0,
-            overlayRect.height - this.options.minimumInViewportHeight
-        );
+        const yOffset =
+            typeof this.options.minimumInViewportHeight === 'number'
+                ? Math.max(0, this.getMinimumHeight(overlayRect.height))
+                : 0;
 
         const left = clamp(
             overlayRect.left - containerRect.left,
@@ -194,12 +200,13 @@ export class Overlay extends CompositeDisposable {
 
                     const xOffset = Math.max(
                         0,
-                        overlayRect.width - this.options.minimumInViewportWidth
+                        this.getMinimumWidth(overlayRect.width)
                     );
                     const yOffset = Math.max(
                         0,
-                        overlayRect.height -
-                            this.options.minimumInViewportHeight
+                        this.options.minimumInViewportHeight
+                            ? this.getMinimumHeight(overlayRect.height)
+                            : 0
                     );
 
                     const left = clamp(
@@ -350,20 +357,16 @@ export class Overlay extends CompositeDisposable {
                         let left: number | undefined = undefined;
                         let width: number | undefined = undefined;
 
-                        const minimumInViewportHeight =
-                            this.options.minimumInViewportHeight;
-                        const minimumInViewportWidth =
-                            this.options.minimumInViewportWidth;
-
-                        function moveTop(): void {
+                        const moveTop = () => {
                             top = clamp(
                                 y,
                                 -Number.MAX_VALUE,
                                 startPosition!.originalY +
                                     startPosition!.originalHeight >
                                     containerRect.height
-                                    ? containerRect.height -
-                                          minimumInViewportHeight
+                                    ? this.getMinimumHeight(
+                                          containerRect.height
+                                      )
                                     : Math.max(
                                           0,
                                           startPosition!.originalY +
@@ -375,31 +378,33 @@ export class Overlay extends CompositeDisposable {
                                 startPosition!.originalY +
                                 startPosition!.originalHeight -
                                 top;
-                        }
+                        };
 
-                        function moveBottom(): void {
+                        const moveBottom = () => {
                             top =
                                 startPosition!.originalY -
                                 startPosition!.originalHeight;
 
                             height = clamp(
                                 y - top,
-                                top < 0
-                                    ? -top + minimumInViewportHeight
+                                top < 0 &&
+                                    typeof this.options
+                                        .minimumInViewportHeight === 'number'
+                                    ? -top +
+                                          this.options.minimumInViewportHeight
                                     : Overlay.MINIMUM_HEIGHT,
                                 Number.MAX_VALUE
                             );
-                        }
+                        };
 
-                        function moveLeft(): void {
+                        const moveLeft = () => {
                             left = clamp(
                                 x,
                                 -Number.MAX_VALUE,
                                 startPosition!.originalX +
                                     startPosition!.originalWidth >
                                     containerRect.width
-                                    ? containerRect.width -
-                                          minimumInViewportWidth
+                                    ? this.getMinimumWidth(containerRect.width)
                                     : Math.max(
                                           0,
                                           startPosition!.originalX +
@@ -412,21 +417,24 @@ export class Overlay extends CompositeDisposable {
                                 startPosition!.originalX +
                                 startPosition!.originalWidth -
                                 left;
-                        }
+                        };
 
-                        function moveRight(): void {
+                        const moveRight = () => {
                             left =
                                 startPosition!.originalX -
                                 startPosition!.originalWidth;
 
                             width = clamp(
                                 x - left,
-                                left < 0
-                                    ? -left + minimumInViewportWidth
+                                left < 0 &&
+                                    typeof this.options
+                                        .minimumInViewportWidth === 'number'
+                                    ? -left +
+                                          this.options.minimumInViewportWidth
                                     : Overlay.MINIMUM_WIDTH,
                                 Number.MAX_VALUE
                             );
-                        }
+                        };
 
                         switch (direction) {
                             case 'top':
@@ -475,6 +483,20 @@ export class Overlay extends CompositeDisposable {
                 );
             })
         );
+    }
+
+    private getMinimumWidth(width: number) {
+        if (typeof this.options.minimumInViewportWidth === 'number') {
+            return width - this.options.minimumInViewportWidth;
+        }
+        return 0;
+    }
+
+    private getMinimumHeight(height: number) {
+        if (typeof this.options.minimumInViewportHeight === 'number') {
+            return height - this.options.minimumInViewportHeight;
+        }
+        return height;
     }
 
     override dispose(): void {

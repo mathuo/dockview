@@ -56,6 +56,8 @@ import {
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
 
+const DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE = 100;
+
 export interface PanelReference {
     update: (event: { params: { [key: string]: any } }) => void;
     remove: () => void;
@@ -91,6 +93,7 @@ export type DockviewComponentUpdateOptions = Pick<
     | 'createLeftHeaderActionsElement'
     | 'createRightHeaderActionsElement'
     | 'disableFloatingGroups'
+    | 'floatingGroupBounds'
 >;
 
 export interface DockviewDropEvent extends GroupviewDropEvent {
@@ -378,8 +381,18 @@ export class DockviewComponent
             width: coord?.width ?? 300,
             left: overlayLeft,
             top: overlayTop,
-            minimumInViewportWidth: 100,
-            minimumInViewportHeight: 100,
+            minimumInViewportWidth:
+                this.options.floatingGroupBounds === 'boundedWithinViewport'
+                    ? undefined
+                    : this.options.floatingGroupBounds
+                          ?.minimumWidthWithinViewport ??
+                      DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
+            minimumInViewportHeight:
+                this.options.floatingGroupBounds === 'boundedWithinViewport'
+                    ? undefined
+                    : this.options.floatingGroupBounds
+                          ?.minimumHeightWithinViewport ??
+                      DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
         });
 
         const el = group.element.querySelector('.void-container');
@@ -475,11 +488,38 @@ export class DockviewComponent
         const hasOrientationChanged =
             typeof options.orientation === 'string' &&
             this.gridview.orientation !== options.orientation;
+        const hasFloatingGroupOptionsChanged =
+            options.floatingGroupBounds !== undefined &&
+            options.floatingGroupBounds !== this.options.floatingGroupBounds;
 
         this._options = { ...this.options, ...options };
 
         if (hasOrientationChanged) {
             this.gridview.orientation = options.orientation!;
+        }
+
+        if (hasFloatingGroupOptionsChanged) {
+            for (const group of this.floatingGroups) {
+                switch (this.options.floatingGroupBounds) {
+                    case 'boundedWithinViewport':
+                        group.overlay.minimumInViewportHeight = undefined;
+                        group.overlay.minimumInViewportWidth = undefined;
+                        break;
+                    case undefined:
+                        group.overlay.minimumInViewportHeight =
+                            DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE;
+                        group.overlay.minimumInViewportWidth =
+                            DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE;
+                        break;
+                    default:
+                        group.overlay.minimumInViewportHeight =
+                            this.options.floatingGroupBounds?.minimumHeightWithinViewport;
+                        group.overlay.minimumInViewportWidth =
+                            this.options.floatingGroupBounds?.minimumWidthWithinViewport;
+                }
+
+                group.overlay.setBounds({});
+            }
         }
 
         this.layout(this.gridview.width, this.gridview.height, true);
