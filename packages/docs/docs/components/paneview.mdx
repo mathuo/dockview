@@ -2,7 +2,8 @@
 description: Paneview Documentation
 ---
 
-import { SimplePaneview } from '@site/src/components/simplePaneview';
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import SimplePaneview from '@site/sandboxes/simple-paneview/src/app';
 import { CustomHeaderPaneview } from '@site/src/components/paneview/customHeader';
 import { DragAndDropPaneview } from '@site/src/components/paneview/dragAndDrop';
 import { SideBySidePaneview } from '@site/src/components/paneview/sideBySide';
@@ -23,16 +24,7 @@ Paneview panels can be re-ordered by dragging and dropping the panel headers.
 
 # Introduction
 
-<div
-    style={{
-        height: '400px',
-        backgroundColor: 'rgb(30,30,30)',
-        color: 'white',
-        margin: '20px 0px',
-    }}
->
-    <SimplePaneview />
-</div>
+<MultiFrameworkContainer sandboxId="simple-paneview" react={SimplePaneview} />
 
 ```tsx title="Simple Paneview example"
 import {
