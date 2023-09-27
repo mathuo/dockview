@@ -191,6 +191,23 @@ const LeftControls = (props: IDockviewHeaderActionsProps) => {
     );
 };
 
+const PrefixHeaderControls = (props: IDockviewHeaderActionsProps) => {
+    return (
+        <div
+            className="group-control"
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '0px 8px',
+                height: '100%',
+                color: 'var(--dv-activegroup-visiblepanel-tab-color)',
+            }}
+        >
+            <Icon icon="Menu" />
+        </div>
+    );
+};
+
 const DockviewDemo = (props: { theme?: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
         event.api.addPanel({
@@ -262,6 +279,7 @@ const DockviewDemo = (props: { theme?: string }) => {
             defaultTabComponent={headerComponents.default}
             rightHeaderActionsComponent={RightControls}
             leftHeaderActionsComponent={LeftControls}
+            prefixHeaderActionsComponent={PrefixHeaderControls}
             onReady={onReady}
             className={props.theme || 'dockview-theme-abyss'}
         />

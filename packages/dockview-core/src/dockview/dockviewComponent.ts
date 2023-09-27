@@ -92,6 +92,7 @@ export type DockviewComponentUpdateOptions = Pick<
     | 'defaultTabComponent'
     | 'createLeftHeaderActionsElement'
     | 'createRightHeaderActionsElement'
+    | 'createPrefixHeaderActionsElement'
     | 'disableFloatingGroups'
     | 'floatingGroupBounds'
 >;
