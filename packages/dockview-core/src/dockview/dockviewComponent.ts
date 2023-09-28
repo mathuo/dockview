@@ -649,33 +649,65 @@ export class DockviewComponent
         const createGroupFromSerializedState = (data: GroupPanelViewState) => {
             const { id, locked, hideHeader, views, activeView } = data;
 
-            const group = this.createGroup({
-                id,
-                locked: !!locked,
-                hideHeader: !!hideHeader,
-            });
-
-            this._onDidAddGroup.fire(group);
-
-            for (const child of views) {
-                const panel = this._deserializer.fromJSON(panels[child], group);
-
-                const isActive =
-                    typeof activeView === 'string' && activeView === panel.id;
-
-                group.model.openPanel(panel, {
-                    skipSetPanelActive: !isActive,
-                    skipSetGroupActive: true,
-                });
+            if (typeof id !== 'string') {
+                throw new Error('group id must be of type string');
             }
 
-            if (!group.activePanel && group.panels.length > 0) {
-                group.model.openPanel(group.panels[group.panels.length - 1], {
-                    skipSetGroupActive: true,
-                });
-            }
+            let group: DockviewGroupPanel | undefined;
 
-            return group;
+            try {
+                group = this.createGroup({
+                    id,
+                    locked: !!locked,
+                    hideHeader: !!hideHeader,
+                });
+
+                this._onDidAddGroup.fire(group);
+
+                for (const child of views) {
+                    const panel = this._deserializer.fromJSON(
+                        panels[child],
+                        group
+                    );
+
+                    const isActive =
+                        typeof activeView === 'string' &&
+                        activeView === panel.id;
+
+                    group.model.openPanel(panel, {
+                        skipSetPanelActive: !isActive,
+                        skipSetGroupActive: true,
+                    });
+                }
+
+                if (!group.activePanel && group.panels.length > 0) {
+                    group.model.openPanel(
+                        group.panels[group.panels.length - 1],
+                        {
+                            skipSetGroupActive: true,
+                        }
+                    );
+                }
+
+                return group;
+            } catch (err) {
+                /**
+                 * This is an odd case... we have failed to deserialize a view but we have already created a group,
+                 * but we havn't registered that group with the gridview.
+                 * We cannot use the removeGroup method because the group has only been partially added, we must
+                 * manually dipose() of the view and remove it from being stored in the map.
+                 */
+                if (group) {
+                    group.dispose();
+                    this._groups.delete(group.id);
+                }
+
+                /**
+                 * re-throw the error becasue we don't actually want to catch it, we just
+                 * needed to do some clean-up before continuing.
+                 */
+                throw err;
+            }
         };
 
         this.gridview.deserialize(grid, {
