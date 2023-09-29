@@ -29,6 +29,16 @@ export abstract class Resizable extends CompositeDisposable {
                      */
                     return;
                 }
+
+                if (!document.body.contains(this._element)) {
+                    /**
+                     * since the event is dispatched through requestAnimationFrame there is a small chance
+                     * the component is no longer attached to the DOM, if that is the case the dimensions
+                     * are mostly likely all zero and meaningless. we should skip this case.
+                     */
+                    return;
+                }
+
                 const { width, height } = entry.contentRect;
                 this.layout(width, height);
             })
