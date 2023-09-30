@@ -109,16 +109,9 @@ const App = (props: { theme?: string }) => {
         if (event.ctrlKey) {
             if (event.code === 'ArrowLeft') {
                 const leftSidebarPanel = api.getPanel('left-sidebar-id');
-                const rightSidebarPanel = api.getPanel('right-sidebar-id');
-
-                // const width = rightSidebarPanel?.api.width;
 
                 if (leftSidebarPanel) {
                     leftSidebarPanel.api.setVisible(false);
-
-                    // if (rightSidebarPanel && typeof width === 'number') {
-                    //     rightSidebarPanel.api.setSize({ width });
-                    // }
                 }
             }
         }
@@ -128,7 +121,6 @@ const App = (props: { theme?: string }) => {
 
             if (leftSidebarPanel) {
                 leftSidebarPanel.api.setVisible(true);
-                // leftSidebarPanel.api.setSize({ width: 200 });
             }
         }
     };
