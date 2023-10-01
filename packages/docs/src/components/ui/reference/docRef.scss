@@ -1,0 +1,40 @@
+.doc-ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    display: table;
+    table-layout: fixed;
+
+    thead {
+        text-align: left;
+        background-color: inherit;
+
+        tr {
+            border: none;
+        }
+    }
+
+    overflow: hidden;
+
+    th,
+    td {
+        border: none;
+        padding: none;
+        text-align: left;
+    }
+
+    tr {
+        background-color: inherit !important;
+    }
+
+    .theme-code-block {
+        margin-bottom: unset;
+
+        pre {
+            box-sizing: border-box;
+            overflow: auto !important;
+            code {
+                padding: 8px;
+            }
+        }
+    }
+}
