@@ -84,6 +84,9 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     createLeftHeaderActionsElement?: (
         group: DockviewGroupPanel
     ) => IHeaderActionsRenderer;
+    createPrefixHeaderActionsElement?: (
+        group: DockviewGroupPanel
+    ) => IHeaderActionsRenderer;
     singleTabMode?: 'fullwidth' | 'default';
     parentElement?: HTMLElement;
     disableFloatingGroups?: boolean;
