@@ -1,0 +1,21 @@
+.keyboard-example-panel {
+    padding: 20px;
+    color: white;
+    font-size: 13px;
+
+    input {
+        &:focus {
+            outline: 1px solid dodgerblue;
+        }
+    }
+
+    .keyboard-example-description {
+        padding: 10px 0px;
+        .keyboard-example-shortcut {
+            background-color: lightblue;
+            color: black;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+    }
+}
