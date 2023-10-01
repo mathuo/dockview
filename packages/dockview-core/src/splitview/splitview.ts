@@ -37,10 +37,11 @@ export interface SplitViewOptions {
     readonly proportionalLayout?: boolean;
     readonly styles?: ISplitviewStyles;
 }
+
 export enum LayoutPriority {
-    Low = 'low',
-    High = 'high',
-    Normal = 'normal',
+    Low = 'low', // view is offered space last
+    High = 'high', // view is offered space first
+    Normal = 'normal', // view is offered space in view order
 }
 
 export interface IBaseView extends IDisposable {
@@ -340,7 +341,22 @@ export class Splitview {
 
         item.size = size;
 
-        this.relayout([index]);
+        const indexes = range(this.viewItems.length).filter((i) => i !== index);
+        const lowPriorityIndexes = [
+            ...indexes.filter(
+                (i) => this.viewItems[i].priority === LayoutPriority.Low
+            ),
+            index,
+        ];
+        const highPriorityIndexes = indexes.filter(
+            (i) => this.viewItems[i].priority === LayoutPriority.High
+        );
+
+        /**
+         * add this view we are changing to the low-index list since we have determined the size
+         * here and don't want it changed
+         */
+        this.relayout([...lowPriorityIndexes, index], highPriorityIndexes);
     }
 
     public addView(

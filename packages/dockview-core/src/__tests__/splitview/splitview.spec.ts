@@ -676,4 +676,100 @@ describe('splitview', () => {
         expect(addEventListenerSpy).toBeCalledTimes(3);
         expect(removeEventListenerSpy).toBeCalledTimes(3);
     });
+
+    test('setViewVisible', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: false,
+        });
+        splitview.layout(900, 500);
+
+        const view1 = new Testview(0, 1000);
+        const view2 = new Testview(0, 1000);
+        const view3 = new Testview(0, 1000);
+
+        splitview.addView(view1);
+        splitview.addView(view2);
+        splitview.addView(view3);
+
+        expect([view1.size, view2.size, view3.size]).toEqual([300, 300, 300]);
+
+        splitview.setViewVisible(0, false);
+        expect([view1.size, view2.size, view3.size]).toEqual([0, 300, 600]);
+
+        splitview.setViewVisible(0, true);
+        expect([view1.size, view2.size, view3.size]).toEqual([300, 300, 300]);
+    });
+
+    test('setViewVisible with one view having high layout priority', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: false,
+        });
+        splitview.layout(900, 500);
+
+        const view1 = new Testview(0, 1000);
+        const view2 = new Testview(0, 1000, LayoutPriority.High);
+        const view3 = new Testview(0, 1000);
+
+        splitview.addView(view1);
+        splitview.addView(view2);
+        splitview.addView(view3);
+
+        expect([view1.size, view2.size, view3.size]).toEqual([300, 300, 300]);
+
+        splitview.setViewVisible(0, false);
+        expect([view1.size, view2.size, view3.size]).toEqual([0, 600, 300]);
+
+        splitview.setViewVisible(0, true);
+        expect([view1.size, view2.size, view3.size]).toEqual([300, 300, 300]);
+    });
+
+    test('set view size', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: false,
+        });
+        splitview.layout(900, 500);
+
+        const view1 = new Testview(0, 1000);
+        const view2 = new Testview(0, 1000);
+        const view3 = new Testview(0, 1000);
+
+        splitview.addView(view1);
+        splitview.addView(view2);
+        splitview.addView(view3);
+
+        expect([view1.size, view2.size, view3.size]).toEqual([300, 300, 300]);
+
+        view1.fireChangeEvent({ size: 0 });
+        expect([view1.size, view2.size, view3.size]).toEqual([0, 300, 600]);
+
+        view1.fireChangeEvent({ size: 300 });
+        expect([view1.size, view2.size, view3.size]).toEqual([300, 300, 300]);
+    });
+
+    test('set view size with one view having high layout priority', () => {
+        const splitview = new Splitview(container, {
+            orientation: Orientation.HORIZONTAL,
+            proportionalLayout: false,
+        });
+        splitview.layout(900, 500);
+
+        const view1 = new Testview(0, 1000);
+        const view2 = new Testview(0, 1000, LayoutPriority.High);
+        const view3 = new Testview(0, 1000);
+
+        splitview.addView(view1);
+        splitview.addView(view2);
+        splitview.addView(view3);
+
+        expect([view1.size, view2.size, view3.size]).toEqual([300, 300, 300]);
+
+        view1.fireChangeEvent({ size: 0 });
+        expect([view1.size, view2.size, view3.size]).toEqual([0, 600, 300]);
+
+        view1.fireChangeEvent({ size: 300 });
+        expect([view1.size, view2.size, view3.size]).toEqual([300, 300, 300]);
+    });
 });
