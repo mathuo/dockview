@@ -27,6 +27,8 @@ import DockviewTabheight from '@site/sandboxes/tabheight-dockview/src/app';
 import DockviewWithIFrames from '@site/sandboxes/iframe-dockview/src/app';
 import DockviewFloating from '@site/sandboxes/floatinggroup-dockview/src/app';
 import DockviewLockedGroup from '@site/sandboxes/lockedgroup-dockview/src/app';
+import IDEExample from '@site/sandboxes/ide-example/src/app';
+import DockviewKeyboard from '@site/sandboxes/keyboard-dockview/src/app';
 
 import { DocRef, Markdown } from '@site/src/components/ui/reference/docRef';
 
@@ -755,8 +757,8 @@ better understanding of what this means, try and drag the panels in the example 
 
 ### Group Controls Panel
 
-`DockviewReact` accepts `leftHeaderActionsComponent` and `rightHeaderActionsComponent` which expect a React component with props `IDockviewHeaderActionsProps`.
-These controls are rendered of the left and right side of the space to the right of the tabs in the header bar.
+`DockviewReact` accepts `leftHeaderActionsComponent`, `rightHeaderActionsComponent` and `prefixHeaderActionsComponent` which expect a React component with props `IDockviewHeaderActionsProps`.
+These controls are rendered to left and right side of the space to the right of the tabs in the header bar as well as before the first tab in the case of the prefix header prop.
 
 ```tsx
 const Component: React.FunctionComponent<IDockviewHeaderActionsProps> = () => {
@@ -850,7 +852,23 @@ A simple example showing events fired by `dockviewz that can be interacted with.
     react={EventsDockview}
 />
 
-## Advanced Examples
+## Keyboard Navigation
+
+Keyboard shortcuts
+
+<MultiFrameworkContainer
+    height={600}
+    sandboxId="keyboard-dockview"
+    react={DockviewKeyboard}
+/>
+
+## Application with sidebars
+
+<MultiFrameworkContainer
+    height={600}
+    sandboxId="ide-example"
+    react={IDEExample}
+/>
 
 ### Nested Dockviews
 
