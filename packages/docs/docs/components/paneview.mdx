@@ -8,6 +8,7 @@ import { CustomHeaderPaneview } from '@site/src/components/paneview/customHeader
 import { DragAndDropPaneview } from '@site/src/components/paneview/dragAndDrop';
 import { SideBySidePaneview } from '@site/src/components/paneview/sideBySide';
 import Link from '@docusaurus/Link';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 # Paneview
 
@@ -98,15 +99,7 @@ You can create a Paneview through the use of the `ReactPaneview` component.
 import { ReactPaneview } from 'dockview';
 ```
 
-| Property            | Type                                 | Optional | Default | Description |
-| ------------------- | ------------------------------------ | -------- | ------- | ----------- |
-| onReady             | (event: SplitviewReadyEvent) => void | No       |         |             |
-| components          | object                               | No       |         |             |
-| headerComponents    | object                               | Yes      |         |             |
-| className           | string                               | Yes      | ''      |             |
-| disableAutoResizing | boolean                              | Yes      | false   |             |
-| disableDnd          | boolean                              | Yes      | false   |             |
-| onDidDrop           | Event                                | Yes      |         |             |
+<DocRef declaration="IPaneviewReactProps" />
 
 ## Paneview API
 
@@ -127,31 +120,7 @@ const onReady = (event: GridviewReadyEvent) => {
 };
 ```
 
-| Property            | Type                                                             | Description                                                                                     |
-| ------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| height              | `number`                                                         | Component pixel height                                                                          |
-| width               | `number`                                                         | Component pixel width                                                                           |
-| minimumSize         | `number`                                                         | The sum of the `minimumSize` property for each panel                                            |
-| maximumSize         | `number`                                                         | The sum of the `maximumSize` property for each panel                                            |
-| length              | `number`                                                         | Number of panels                                                                                |
-| panels              | `IPaneviewPanel[]`                                               | All panels                                                                                      |
-|                     |                                                                  |                                                                                                 |
-| onDidLayoutChange   | `Event<void>`                                                    | Fires on layout change                                                                          |
-| onDidLayoutFromJSON | `Event<void>`                                                    | Fires of layout change caused by a fromJSON deserialization call                                |
-| onDidAddView        | `Event<IPaneviewPanel>`                                          | Fires when a view is added                                                                      |
-| onDidRemoveView     | `Event<IPaneviewPanel>`                                          | Fires when a view is removed                                                                    |
-| onDidDrop           | `Event<PaneviewDropEvent`                                        | Fires on an external drop event (See <Link to="./paneview/#drag-and-drop">Drag and Drop</Link>) |
-|                     |                                                                  |                                                                                                 |
-| addPanel            | `addPanel(options: AddPaneviewComponentOptions): IPaneviewPanel` |                                                                                                 |
-| removePanel         | `(panel: IPaneviewPanel): void`                                  |                                                                                                 |
-| movePanel           | `(from: number, to: number): void`                               |                                                                                                 |
-| getPanel            | `(id:string): IPaneviewPanel \| undefined`                       |                                                                                                 |
-|                     |                                                                  |                                                                                                 |
-| focus               | `(): void`                                                       | Focus the active panel, if exists                                                               |
-| layout              | `(width: number, height:number): void`                           |                                                                                                 |
-| fromJSON            | `(data: SerializedPaneview): void`                               |                                                                                                 |
-| toJSON              | `(): SerializedPaneview`                                         |                                                                                                 |
-| clear               | `(): void`                                                       | Clears the current layout                                                                       |
+<DocRef declaration="PaneviewApi" />
 
 ## Paneview Panel API
 
@@ -163,25 +132,7 @@ const MyComponent = (props: IGridviewPanelProps<{ title: string }>) => {
 };
 ```
 
-| Property               | Type                                                        | Description      |
-| ---------------------- | ----------------------------------------------------------- | ---------------- |
-| id                     | `string`                                                    | Panel id         |
-| isFocused              | `boolean`                                                   | Is panel focsed  |
-| isActive               | `boolean`                                                   | Is panel active  |
-| isVisible              | `boolean`                                                   | Is panel visible |
-| width                  | `number`                                                    | Panel width      |
-| height                 | `number`                                                    | Panel height     |
-|                        |                                                             |
-| onDidDimensionsChange  | `Event<PanelDimensionChangeEvent>`                          |                  |
-| onDidFocusChange       | `Event<FocusEvent>`                                         |                  |
-| onDidVisibilityChange  | `Event<VisibilityEvent>`                                    |                  |
-| onDidActiveChange      | `Event<ActiveEvent>`                                        |                  |
-| onDidConstraintsChange | `onDidConstraintsChange: Event<PanelConstraintChangeEvent>` |                  |
-|                        |                                                             |
-| setVisible             | `(isVisible: boolean): void`                                |                  |
-| setActive              | `(): void`                                                  |                  |
-| setConstraints         | `(value: PanelConstraintChangeEvent2): void;`               |                  |
-| setSize                | `(event: SizeEvent): void`                                  |                  |
+<DocRef declaration="PaneviewPanelApi" />
 
 ## Advanced Features
 

@@ -1,0 +1,1278 @@
+{
+    "DockviewApi": [
+        {
+            "name": "activeGroup",
+            "signature": "DockviewGroupPanel | undefined",
+            "type": "accessor"
+        },
+        {
+            "name": "activePanel",
+            "signature": "IDockviewPanel | undefined",
+            "type": "accessor"
+        },
+        {
+            "name": "groups",
+            "signature": "DockviewGroupPanel[]",
+            "type": "accessor"
+        },
+        {
+            "name": "height",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "id",
+            "signature": "string",
+            "type": "accessor"
+        },
+        {
+            "name": "maximumHeight",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "maximumWidth",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "minimumHeight",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "minimumWidth",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidActiveGroupChange",
+            "signature": "Event<DockviewGroupPanel | undefined>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidActivePanelChange",
+            "signature": "Event<IDockviewPanel | undefined>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidAddGroup",
+            "signature": "Event<DockviewGroupPanel>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidAddPanel",
+            "signature": "Event<IDockviewPanel>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidDrop",
+            "signature": "Event<DockviewDropEvent>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidLayoutChange",
+            "signature": "Event<void>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidLayoutFromJSON",
+            "signature": "Event<void>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidRemoveGroup",
+            "signature": "Event<DockviewGroupPanel>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidRemovePanel",
+            "signature": "Event<IDockviewPanel>",
+            "type": "accessor"
+        },
+        {
+            "name": "onWillDragGroup",
+            "signature": "Event<GroupDragEvent>",
+            "type": "accessor"
+        },
+        {
+            "name": "onWillDragPanel",
+            "signature": "Event<TabDragEvent>",
+            "type": "accessor"
+        },
+        {
+            "name": "panels",
+            "signature": "IDockviewPanel[]",
+            "type": "accessor"
+        },
+        {
+            "name": "size",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "totalPanels",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "width",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "addFloatingGroup",
+            "signature": "(item: IDockviewPanel | DockviewGroupPanel, coord?: { x: number, y: number }): void",
+            "type": "method"
+        },
+        {
+            "name": "addGroup",
+            "signature": "(options?: AddGroupOptions): DockviewGroupPanel",
+            "type": "method"
+        },
+        {
+            "name": "addPanel",
+            "signature": "<T extends object = Parameters>(options: AddPanelOptions<T>): IDockviewPanel",
+            "type": "method"
+        },
+        {
+            "name": "clear",
+            "signature": "(): void",
+            "type": "method"
+        },
+        {
+            "name": "closeAllGroups",
+            "signature": "(): void",
+            "type": "method"
+        },
+        {
+            "name": "focus",
+            "signature": "(): void",
+            "type": "method"
+        },
+        {
+            "name": "fromJSON",
+            "signature": "(data: SerializedDockview): void",
+            "type": "method"
+        },
+        {
+            "name": "getGroup",
+            "signature": "(id: string): DockviewGroupPanel | undefined",
+            "type": "method"
+        },
+        {
+            "name": "getPanel",
+            "signature": "(id: string): IDockviewPanel | undefined",
+            "type": "method"
+        },
+        {
+            "name": "layout",
+            "signature": "(width: number, height: number, force: boolean = false): void",
+            "type": "method"
+        },
+        {
+            "name": "moveToNext",
+            "signature": "(options?: MovementOptions): void",
+            "type": "method"
+        },
+        {
+            "name": "moveToPrevious",
+            "signature": "(options?: MovementOptions): void",
+            "type": "method"
+        },
+        {
+            "name": "removeGroup",
+            "signature": "(group: IDockviewGroupPanel): void",
+            "type": "method"
+        },
+        {
+            "name": "removePanel",
+            "signature": "(panel: IDockviewPanel): void",
+            "type": "method"
+        },
+        {
+            "name": "toJSON",
+            "signature": "(): SerializedDockview",
+            "type": "method"
+        }
+    ],
+    "GridviewApi": [
+        {
+            "name": "height",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "maximumHeight",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "maximumWidth",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "minimumHeight",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "minimumWidth",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidActivePanelChange",
+            "signature": "Event<IGridviewPanel<GridviewPanelApi> | undefined>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidAddPanel",
+            "signature": "Event<IGridviewPanel<GridviewPanelApi>>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidLayoutChange",
+            "signature": "Event<void>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidLayoutFromJSON",
+            "signature": "Event<void>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidRemovePanel",
+            "signature": "Event<IGridviewPanel<GridviewPanelApi>>",
+            "type": "accessor"
+        },
+        {
+            "name": "orientation",
+            "signature": "Orientation",
+            "type": "accessor"
+        },
+        {
+            "name": "panels",
+            "signature": "IGridviewPanel<GridviewPanelApi>[]",
+            "type": "accessor"
+        },
+        {
+            "name": "width",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "addPanel",
+            "signature": "<T extends object = Parameters>(options: AddComponentOptions<T>): IGridviewPanel<GridviewPanelApi>",
+            "type": "method"
+        },
+        {
+            "name": "clear",
+            "signature": "(): void",
+            "type": "method"
+        },
+        {
+            "name": "focus",
+            "signature": "(): void",
+            "type": "method"
+        },
+        {
+            "name": "fromJSON",
+            "signature": "(data: SerializedGridviewComponent): void",
+            "type": "method"
+        },
+        {
+            "name": "getPanel",
+            "signature": "(id: string): IGridviewPanel<GridviewPanelApi> | undefined",
+            "type": "method"
+        },
+        {
+            "name": "layout",
+            "signature": "(width: number, height: number, force: boolean = false): void",
+            "type": "method"
+        },
+        {
+            "name": "movePanel",
+            "signature": "(panel: IGridviewPanel<GridviewPanelApi>, options: { direction: Direction, reference: string, size: number }): void",
+            "type": "method"
+        },
+        {
+            "name": "removePanel",
+            "signature": "(panel: IGridviewPanel<GridviewPanelApi>, sizing?: Sizing): void",
+            "type": "method"
+        },
+        {
+            "name": "toJSON",
+            "signature": "(): SerializedGridviewComponent",
+            "type": "method"
+        }
+    ],
+    "PaneviewApi": [
+        {
+            "name": "height",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "maximumSize",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "minimumSize",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidAddView",
+            "signature": "Event<IPaneviewPanel>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidDrop",
+            "signature": "Event<PaneviewDropEvent>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidLayoutChange",
+            "signature": "Event<void>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidLayoutFromJSON",
+            "signature": "Event<void>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidRemoveView",
+            "signature": "Event<IPaneviewPanel>",
+            "type": "accessor"
+        },
+        {
+            "name": "panels",
+            "signature": "IPaneviewPanel[]",
+            "type": "accessor"
+        },
+        {
+            "name": "width",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "addPanel",
+            "signature": "<T extends object = Parameters>(options: AddPaneviewComponentOptions<T>): IPaneviewPanel",
+            "type": "method"
+        },
+        {
+            "name": "clear",
+            "signature": "(): void",
+            "type": "method"
+        },
+        {
+            "name": "focus",
+            "signature": "(): void",
+            "type": "method"
+        },
+        {
+            "name": "fromJSON",
+            "signature": "(data: SerializedPaneview): void",
+            "type": "method"
+        },
+        {
+            "name": "getPanel",
+            "signature": "(id: string): IPaneviewPanel | undefined",
+            "type": "method"
+        },
+        {
+            "name": "layout",
+            "signature": "(width: number, height: number): void",
+            "type": "method"
+        },
+        {
+            "name": "movePanel",
+            "signature": "(from: number, to: number): void",
+            "type": "method"
+        },
+        {
+            "name": "removePanel",
+            "signature": "(panel: IPaneviewPanel): void",
+            "type": "method"
+        },
+        {
+            "name": "toJSON",
+            "signature": "(): SerializedPaneview",
+            "type": "method"
+        }
+    ],
+    "SplitviewApi": [
+        {
+            "name": "height",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "length",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "maximumSize",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "minimumSize",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidAddView",
+            "signature": "Event<IView>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidLayoutChange",
+            "signature": "Event<void>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidLayoutFromJSON",
+            "signature": "Event<void>",
+            "type": "accessor"
+        },
+        {
+            "name": "onDidRemoveView",
+            "signature": "Event<IView>",
+            "type": "accessor"
+        },
+        {
+            "name": "orientation",
+            "signature": "Orientation",
+            "type": "accessor"
+        },
+        {
+            "name": "panels",
+            "signature": "ISplitviewPanel[]",
+            "type": "accessor"
+        },
+        {
+            "name": "width",
+            "signature": "number",
+            "type": "accessor"
+        },
+        {
+            "name": "addPanel",
+            "signature": "<T extends object = Parameters>(options: AddSplitviewComponentOptions<T>): ISplitviewPanel",
+            "type": "method"
+        },
+        {
+            "name": "clear",
+            "signature": "(): void",
+            "type": "method"
+        },
+        {
+            "name": "focus",
+            "signature": "(): void",
+            "type": "method"
+        },
+        {
+            "name": "fromJSON",
+            "signature": "(data: SerializedSplitview): void",
+            "type": "method"
+        },
+        {
+            "name": "getPanel",
+            "signature": "(id: string): ISplitviewPanel | undefined",
+            "type": "method"
+        },
+        {
+            "name": "layout",
+            "signature": "(width: number, height: number): void",
+            "type": "method"
+        },
+        {
+            "name": "movePanel",
+            "signature": "(from: number, to: number): void",
+            "type": "method"
+        },
+        {
+            "name": "removePanel",
+            "signature": "(panel: ISplitviewPanel, sizing?: Sizing): void",
+            "type": "method"
+        },
+        {
+            "name": "toJSON",
+            "signature": "(): SerializedSplitview",
+            "type": "method"
+        },
+        {
+            "name": "updateOptions",
+            "signature": "(options: SplitviewComponentUpdateOptions): void",
+            "type": "method"
+        }
+    ],
+    "DockviewPanelApi": [
+        {
+            "name": "group",
+            "signature": "DockviewGroupPanel",
+            "type": "property"
+        },
+        {
+            "name": "height",
+            "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The panel height in pixels"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "id",
+            "signature": "string",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The id of the panel that would have been assigned when the panel was created"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "isActive",
+            "signature": "boolean",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Whether the panel is the actively selected panel"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "isFocused",
+            "signature": "boolean",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Whether the panel holds the current focus"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "isGroupActive",
+            "signature": "boolean",
+            "type": "property"
+        },
+        {
+            "name": "isVisible",
+            "signature": "boolean",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Whether the panel is visible"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "onDidActiveChange",
+            "signature": "Event<ActiveEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidActiveGroupChange",
+            "signature": "Event<void>",
+            "type": "property"
+        },
+        {
+            "name": "onDidDimensionsChange",
+            "signature": "Event<PanelDimensionChangeEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidFocusChange",
+            "signature": "Event<FocusEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidGroupChange",
+            "signature": "Event<void>",
+            "type": "property"
+        },
+        {
+            "name": "onDidVisibilityChange",
+            "signature": "Event<VisibilityEvent>",
+            "type": "property"
+        },
+        {
+            "name": "title",
+            "signature": "string | undefined",
+            "type": "property"
+        },
+        {
+            "name": "width",
+            "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The panel width in pixels"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "close",
+            "signature": "(): void",
+            "type": "method"
+        },
+        {
+            "name": "moveTo",
+            "signature": "(options: { group: DockviewGroupPanel, index: number, position: Position }): void",
+            "type": "method"
+        },
+        {
+            "name": "setActive",
+            "signature": "(): void",
+            "type": "method"
+        },
+        {
+            "name": "setSize",
+            "signature": "(event: SizeEvent): void",
+            "type": "method"
+        },
+        {
+            "name": "setTitle",
+            "signature": "(title: string): void",
+            "type": "method"
+        },
+        {
+            "name": "updateParameters",
+            "signature": "(parameters: Parameters): void",
+            "type": "method"
+        }
+    ],
+    "GridviewPanelApi": [
+        {
+            "name": "height",
+            "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The panel height in pixels"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "id",
+            "signature": "string",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The id of the panel that would have been assigned when the panel was created"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "isActive",
+            "signature": "boolean",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Whether the panel is the actively selected panel"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "isFocused",
+            "signature": "boolean",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Whether the panel holds the current focus"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "isVisible",
+            "signature": "boolean",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Whether the panel is visible"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "onDidActiveChange",
+            "signature": "Event<ActiveEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidConstraintsChange",
+            "signature": "Event<GridConstraintChangeEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidDimensionsChange",
+            "signature": "Event<PanelDimensionChangeEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidFocusChange",
+            "signature": "Event<FocusEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidVisibilityChange",
+            "signature": "Event<VisibilityEvent>",
+            "type": "property"
+        },
+        {
+            "name": "width",
+            "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The panel width in pixels"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "setActive",
+            "signature": "(): void",
+            "type": "method"
+        },
+        {
+            "name": "setConstraints",
+            "signature": "(value: GridConstraintChangeEvent2): void",
+            "type": "method"
+        },
+        {
+            "name": "setSize",
+            "signature": "(event: SizeEvent): void",
+            "type": "method"
+        },
+        {
+            "name": "setVisible",
+            "signature": "(isVisible: boolean): void",
+            "type": "method"
+        },
+        {
+            "name": "updateParameters",
+            "signature": "(parameters: Parameters): void",
+            "type": "method"
+        }
+    ],
+    "PaneviewPanelApi": [
+        {
+            "name": "height",
+            "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The panel height in pixels"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "id",
+            "signature": "string",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The id of the panel that would have been assigned when the panel was created"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "isActive",
+            "signature": "boolean",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Whether the panel is the actively selected panel"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "isExpanded",
+            "signature": "boolean",
+            "type": "property"
+        },
+        {
+            "name": "isFocused",
+            "signature": "boolean",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Whether the panel holds the current focus"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "isVisible",
+            "signature": "boolean",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Whether the panel is visible"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "onDidActiveChange",
+            "signature": "Event<ActiveEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidConstraintsChange",
+            "signature": "Event<PanelConstraintChangeEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidDimensionsChange",
+            "signature": "Event<PanelDimensionChangeEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidExpansionChange",
+            "signature": "Event<ExpansionEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidFocusChange",
+            "signature": "Event<FocusEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidVisibilityChange",
+            "signature": "Event<VisibilityEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onMouseEnter",
+            "signature": "Event<MouseEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onMouseLeave",
+            "signature": "Event<MouseEvent>",
+            "type": "property"
+        },
+        {
+            "name": "width",
+            "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The panel width in pixels"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "setActive",
+            "signature": "(): void",
+            "type": "method"
+        },
+        {
+            "name": "setConstraints",
+            "signature": "(value: PanelConstraintChangeEvent2): void",
+            "type": "method"
+        },
+        {
+            "name": "setExpanded",
+            "signature": "(isExpanded: boolean): void",
+            "type": "method"
+        },
+        {
+            "name": "setSize",
+            "signature": "(event: PanelSizeEvent): void",
+            "type": "method"
+        },
+        {
+            "name": "setVisible",
+            "signature": "(isVisible: boolean): void",
+            "type": "method"
+        },
+        {
+            "name": "updateParameters",
+            "signature": "(parameters: Parameters): void",
+            "type": "method"
+        }
+    ],
+    "SplitviewPanelApi": [
+        {
+            "name": "height",
+            "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The panel height in pixels"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "id",
+            "signature": "string",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The id of the panel that would have been assigned when the panel was created"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "isActive",
+            "signature": "boolean",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Whether the panel is the actively selected panel"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "isFocused",
+            "signature": "boolean",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Whether the panel holds the current focus"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "isVisible",
+            "signature": "boolean",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Whether the panel is visible"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "onDidActiveChange",
+            "signature": "Event<ActiveEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidConstraintsChange",
+            "signature": "Event<PanelConstraintChangeEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidDimensionsChange",
+            "signature": "Event<PanelDimensionChangeEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidFocusChange",
+            "signature": "Event<FocusEvent>",
+            "type": "property"
+        },
+        {
+            "name": "onDidVisibilityChange",
+            "signature": "Event<VisibilityEvent>",
+            "type": "property"
+        },
+        {
+            "name": "width",
+            "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The panel width in pixels"
+                    }
+                ]
+            },
+            "type": "property"
+        },
+        {
+            "name": "setActive",
+            "signature": "(): void",
+            "type": "method"
+        },
+        {
+            "name": "setConstraints",
+            "signature": "(value: PanelConstraintChangeEvent2): void",
+            "type": "method"
+        },
+        {
+            "name": "setSize",
+            "signature": "(event: PanelSizeEvent): void",
+            "type": "method"
+        },
+        {
+            "name": "setVisible",
+            "signature": "(isVisible: boolean): void",
+            "type": "method"
+        },
+        {
+            "name": "updateParameters",
+            "signature": "(parameters: Parameters): void",
+            "type": "method"
+        }
+    ],
+    "IDockviewReactProps": [
+        {
+            "name": "className",
+            "signature": "string",
+            "type": "property"
+        },
+        {
+            "name": "components",
+            "signature": "PanelCollection<IDockviewPanelProps<any>>",
+            "type": "property"
+        },
+        {
+            "name": "defaultTabComponent",
+            "signature": "FunctionComponent<IDockviewPanelHeaderProps<any>>",
+            "type": "property"
+        },
+        {
+            "name": "disableAutoResizing",
+            "signature": "boolean",
+            "type": "property"
+        },
+        {
+            "name": "disableFloatingGroups",
+            "signature": "boolean",
+            "type": "property"
+        },
+        {
+            "name": "floatingGroupBounds",
+            "signature": "{ minimumHeightWithinViewport: number, minimumWidthWithinViewport: number } | 'boundedWithinViewport'",
+            "type": "property"
+        },
+        {
+            "name": "hideBorders",
+            "signature": "boolean",
+            "type": "property"
+        },
+        {
+            "name": "leftHeaderActionsComponent",
+            "signature": "FunctionComponent<IDockviewHeaderActionsProps>",
+            "type": "property"
+        },
+        {
+            "name": "onDidDrop",
+            "signature": "(event: DockviewDropEvent): void",
+            "type": "property"
+        },
+        {
+            "name": "onReady",
+            "signature": "(event: DockviewReadyEvent): void",
+            "type": "property"
+        },
+        {
+            "name": "rightHeaderActionsComponent",
+            "signature": "FunctionComponent<IDockviewHeaderActionsProps>",
+            "type": "property"
+        },
+        {
+            "name": "showDndOverlay",
+            "signature": "(event: DockviewDndOverlayEvent): boolean",
+            "type": "property"
+        },
+        {
+            "name": "singleTabMode",
+            "signature": "'fullwidth' | 'default'",
+            "type": "property"
+        },
+        {
+            "name": "tabComponents",
+            "signature": "PanelCollection<IDockviewPanelHeaderProps<any>>",
+            "type": "property"
+        },
+        {
+            "name": "watermarkComponent",
+            "signature": "FunctionComponent<IWatermarkPanelProps>",
+            "type": "property"
+        }
+    ],
+    "IGridviewReactProps": [
+        {
+            "name": "className",
+            "signature": "string",
+            "type": "property"
+        },
+        {
+            "name": "components",
+            "signature": "PanelCollection<IGridviewPanelProps<any>>",
+            "type": "property"
+        },
+        {
+            "name": "disableAutoResizing",
+            "signature": "boolean",
+            "type": "property"
+        },
+        {
+            "name": "hideBorders",
+            "signature": "boolean",
+            "type": "property"
+        },
+        {
+            "name": "onReady",
+            "signature": "(event: GridviewReadyEvent): void",
+            "type": "property"
+        },
+        {
+            "name": "orientation",
+            "signature": "Orientation",
+            "type": "property"
+        },
+        {
+            "name": "proportionalLayout",
+            "signature": "boolean",
+            "type": "property"
+        }
+    ],
+    "IPaneviewReactProps": [
+        {
+            "name": "className",
+            "signature": "string",
+            "type": "property"
+        },
+        {
+            "name": "components",
+            "signature": "PanelCollection<IPaneviewPanelProps<any>>",
+            "type": "property"
+        },
+        {
+            "name": "disableAutoResizing",
+            "signature": "boolean",
+            "type": "property"
+        },
+        {
+            "name": "disableDnd",
+            "signature": "boolean",
+            "type": "property"
+        },
+        {
+            "name": "headerComponents",
+            "signature": "PanelCollection<IPaneviewPanelProps<any>>",
+            "type": "property"
+        },
+        {
+            "name": "onReady",
+            "signature": "(event: PaneviewReadyEvent): void",
+            "type": "property"
+        },
+        {
+            "name": "showDndOverlay",
+            "signature": "(event: PaneviewDndOverlayEvent): boolean",
+            "type": "property"
+        },
+        {
+            "name": "onDidDrop",
+            "signature": "(event: PaneviewDropEvent): void",
+            "type": "method"
+        }
+    ],
+    "ISplitviewReactProps": [
+        {
+            "name": "className",
+            "signature": "string",
+            "type": "property"
+        },
+        {
+            "name": "components",
+            "signature": "PanelCollection<ISplitviewPanelProps<any>>",
+            "type": "property"
+        },
+        {
+            "name": "disableAutoResizing",
+            "signature": "boolean",
+            "type": "property"
+        },
+        {
+            "name": "hideBorders",
+            "signature": "boolean",
+            "type": "property"
+        },
+        {
+            "name": "onReady",
+            "signature": "(event: SplitviewReadyEvent): void",
+            "type": "property"
+        },
+        {
+            "name": "orientation",
+            "signature": "Orientation",
+            "type": "property"
+        },
+        {
+            "name": "proportionalLayout",
+            "signature": "boolean",
+            "type": "property"
+        }
+    ]
+}
