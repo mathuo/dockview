@@ -12,7 +12,7 @@ import {
     IContentContainer,
 } from './components/panel/content';
 import {
-  GroupDragEvent,
+    GroupDragEvent,
     ITabsContainer,
     TabDragEvent,
     TabsContainer,
@@ -144,6 +144,7 @@ export class DockviewGroupPanelModel
     private _isFloating = false;
     private _rightHeaderActions: IHeaderActionsRenderer | undefined;
     private _leftHeaderActions: IHeaderActionsRenderer | undefined;
+    private _prefixHeaderActions: IHeaderActionsRenderer | undefined;
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
 
@@ -396,6 +397,21 @@ export class DockviewGroupPanelModel
             });
             this.tabsContainer.setLeftActionsElement(
                 this._leftHeaderActions.element
+            );
+        }
+
+        if (this.accessor.options.createPrefixHeaderActionsElement) {
+            this._prefixHeaderActions =
+                this.accessor.options.createPrefixHeaderActionsElement(
+                    this.groupPanel
+                );
+            this.addDisposables(this._prefixHeaderActions);
+            this._prefixHeaderActions.init({
+                containerApi: new DockviewApi(this.accessor),
+                api: this.groupPanel.api,
+            });
+            this.tabsContainer.setPrefixActionsElement(
+                this._prefixHeaderActions.element
             );
         }
     }

@@ -67,6 +67,7 @@ export interface IDockviewReactProps {
     defaultTabComponent?: React.FunctionComponent<IDockviewPanelHeaderProps>;
     rightHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     leftHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
+    prefixHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     singleTabMode?: 'fullwidth' | 'default';
     disableFloatingGroups?: boolean;
     floatingGroupBounds?:
@@ -164,6 +165,10 @@ export const DockviewReact = React.forwardRef(
                 ),
                 createRightHeaderActionsElement: createGroupControlElement(
                     props.rightHeaderActionsComponent,
+                    { addPortal }
+                ),
+                createPrefixHeaderActionsElement: createGroupControlElement(
+                    props.prefixHeaderActionsComponent,
                     { addPortal }
                 ),
                 singleTabMode: props.singleTabMode,
@@ -300,6 +305,18 @@ export const DockviewReact = React.forwardRef(
                 ),
             });
         }, [props.leftHeaderActionsComponent]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+            dockviewRef.current.updateOptions({
+                createPrefixHeaderActionsElement: createGroupControlElement(
+                    props.prefixHeaderActionsComponent,
+                    { addPortal }
+                ),
+            });
+        }, [props.prefixHeaderActionsComponent]);
 
         return (
             <div
