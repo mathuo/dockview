@@ -43,6 +43,7 @@ export interface ITabsContainer extends IDisposable {
     openPanel: (panel: IDockviewPanel, index?: number) => void;
     setRightActionsElement(element: HTMLElement | undefined): void;
     setLeftActionsElement(element: HTMLElement | undefined): void;
+    setPrefixActionsElement(element: HTMLElement | undefined): void;
     show(): void;
     hide(): void;
 }
@@ -55,12 +56,14 @@ export class TabsContainer
     private readonly tabContainer: HTMLElement;
     private readonly rightActionsContainer: HTMLElement;
     private readonly leftActionsContainer: HTMLElement;
+    private readonly preActionsContainer: HTMLElement;
     private readonly voidContainer: VoidContainer;
 
     private tabs: IValueDisposable<ITab>[] = [];
     private selectedIndex = -1;
     private rightActions: HTMLElement | undefined;
     private leftActions: HTMLElement | undefined;
+    private preActions: HTMLElement | undefined;
 
     private _hidden = false;
 
@@ -129,6 +132,20 @@ export class TabsContainer
         }
     }
 
+    setPrefixActionsElement(element: HTMLElement | undefined): void {
+        if (this.preActions === element) {
+            return;
+        }
+        if (this.preActions) {
+            this.preActions.remove();
+            this.preActions = undefined;
+        }
+        if (element) {
+            this.preActionsContainer.appendChild(element);
+            this.preActions = element;
+        }
+    }
+
     get element(): HTMLElement {
         return this._element;
     }
@@ -192,11 +209,15 @@ export class TabsContainer
         this.leftActionsContainer = document.createElement('div');
         this.leftActionsContainer.className = 'left-actions-container';
 
+        this.preActionsContainer = document.createElement('div');
+        this.preActionsContainer.className = 'pre-actions-container';
+
         this.tabContainer = document.createElement('div');
         this.tabContainer.className = 'tabs-container';
 
         this.voidContainer = new VoidContainer(this.accessor, this.group);
 
+        this._element.appendChild(this.preActionsContainer);
         this._element.appendChild(this.tabContainer);
         this._element.appendChild(this.leftActionsContainer);
         this._element.appendChild(this.voidContainer.element);

@@ -638,4 +638,214 @@ describe('tabsContainer', () => {
         expect(preventDefaultSpy).toBeCalledTimes(1);
         expect(accessor.addFloatingGroup).toBeCalledTimes(1);
     });
+
+    test('pre header actions', () => {
+        const accessorMock = jest.fn<DockviewComponent, []>(() => {
+            return (<Partial<DockviewComponent>>{
+                options: {},
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                element: document.createElement('div'),
+                addFloatingGroup: jest.fn(),
+                getGroupPanel: jest.fn(),
+            }) as DockviewComponent;
+        });
+
+        const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+            return (<Partial<DockviewGroupPanel>>{
+                api: { isFloating: true } as any,
+                model: {} as any,
+            }) as DockviewGroupPanel;
+        });
+
+        const accessor = new accessorMock();
+        const groupPanel = new groupPanelMock();
+
+        const cut = new TabsContainer(accessor, groupPanel);
+
+        const panelMock = jest.fn<IDockviewPanel, [string]>((id: string) => {
+            const partial: Partial<IDockviewPanel> = {
+                id,
+
+                view: {
+                    tab: {
+                        element: document.createElement('div'),
+                    } as any,
+                    content: {
+                        element: document.createElement('div'),
+                    } as any,
+                } as any,
+            };
+            return partial as IDockviewPanel;
+        });
+
+        const panel = new panelMock('test_id');
+        cut.openPanel(panel);
+
+        let result = cut.element.querySelector('.pre-actions-container');
+        expect(result).toBeTruthy();
+        expect(result!.childNodes.length).toBe(0);
+
+        const actions = document.createElement('div');
+        cut.setPrefixActionsElement(actions);
+
+        result = cut.element.querySelector('.pre-actions-container');
+        expect(result).toBeTruthy();
+        expect(result!.childNodes.length).toBe(1);
+        expect(result!.childNodes.item(0)).toBe(actions);
+
+        const updatedActions = document.createElement('div');
+        cut.setPrefixActionsElement(updatedActions);
+
+        result = cut.element.querySelector('.pre-actions-container');
+        expect(result).toBeTruthy();
+        expect(result!.childNodes.length).toBe(1);
+        expect(result!.childNodes.item(0)).toBe(updatedActions);
+
+        cut.setPrefixActionsElement(undefined);
+
+        result = cut.element.querySelector('.pre-actions-container');
+        expect(result).toBeTruthy();
+        expect(result!.childNodes.length).toBe(0);
+    });
+
+    test('left header actions', () => {
+        const accessorMock = jest.fn<DockviewComponent, []>(() => {
+            return (<Partial<DockviewComponent>>{
+                options: {},
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                element: document.createElement('div'),
+                addFloatingGroup: jest.fn(),
+                getGroupPanel: jest.fn(),
+            }) as DockviewComponent;
+        });
+
+        const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+            return (<Partial<DockviewGroupPanel>>{
+                api: { isFloating: true } as any,
+                model: {} as any,
+            }) as DockviewGroupPanel;
+        });
+
+        const accessor = new accessorMock();
+        const groupPanel = new groupPanelMock();
+
+        const cut = new TabsContainer(accessor, groupPanel);
+
+        const panelMock = jest.fn<IDockviewPanel, [string]>((id: string) => {
+            const partial: Partial<IDockviewPanel> = {
+                id,
+
+                view: {
+                    tab: {
+                        element: document.createElement('div'),
+                    } as any,
+                    content: {
+                        element: document.createElement('div'),
+                    } as any,
+                } as any,
+            };
+            return partial as IDockviewPanel;
+        });
+
+        const panel = new panelMock('test_id');
+        cut.openPanel(panel);
+
+        let result = cut.element.querySelector('.left-actions-container');
+        expect(result).toBeTruthy();
+        expect(result!.childNodes.length).toBe(0);
+
+        const actions = document.createElement('div');
+        cut.setLeftActionsElement(actions);
+
+        result = cut.element.querySelector('.left-actions-container');
+        expect(result).toBeTruthy();
+        expect(result!.childNodes.length).toBe(1);
+        expect(result!.childNodes.item(0)).toBe(actions);
+
+        const updatedActions = document.createElement('div');
+        cut.setLeftActionsElement(updatedActions);
+
+        result = cut.element.querySelector('.left-actions-container');
+        expect(result).toBeTruthy();
+        expect(result!.childNodes.length).toBe(1);
+        expect(result!.childNodes.item(0)).toBe(updatedActions);
+
+        cut.setLeftActionsElement(undefined);
+
+        result = cut.element.querySelector('.left-actions-container');
+        expect(result).toBeTruthy();
+        expect(result!.childNodes.length).toBe(0);
+    });
+
+    test('right header actions', () => {
+        const accessorMock = jest.fn<DockviewComponent, []>(() => {
+            return (<Partial<DockviewComponent>>{
+                options: {},
+                onDidAddPanel: jest.fn(),
+                onDidRemovePanel: jest.fn(),
+                element: document.createElement('div'),
+                addFloatingGroup: jest.fn(),
+                getGroupPanel: jest.fn(),
+            }) as DockviewComponent;
+        });
+
+        const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
+            return (<Partial<DockviewGroupPanel>>{
+                api: { isFloating: true } as any,
+                model: {} as any,
+            }) as DockviewGroupPanel;
+        });
+
+        const accessor = new accessorMock();
+        const groupPanel = new groupPanelMock();
+
+        const cut = new TabsContainer(accessor, groupPanel);
+
+        const panelMock = jest.fn<IDockviewPanel, [string]>((id: string) => {
+            const partial: Partial<IDockviewPanel> = {
+                id,
+
+                view: {
+                    tab: {
+                        element: document.createElement('div'),
+                    } as any,
+                    content: {
+                        element: document.createElement('div'),
+                    } as any,
+                } as any,
+            };
+            return partial as IDockviewPanel;
+        });
+
+        const panel = new panelMock('test_id');
+        cut.openPanel(panel);
+
+        let result = cut.element.querySelector('.right-actions-container');
+        expect(result).toBeTruthy();
+        expect(result!.childNodes.length).toBe(0);
+
+        const actions = document.createElement('div');
+        cut.setRightActionsElement(actions);
+
+        result = cut.element.querySelector('.right-actions-container');
+        expect(result).toBeTruthy();
+        expect(result!.childNodes.length).toBe(1);
+        expect(result!.childNodes.item(0)).toBe(actions);
+
+        const updatedActions = document.createElement('div');
+        cut.setRightActionsElement(updatedActions);
+
+        result = cut.element.querySelector('.right-actions-container');
+        expect(result).toBeTruthy();
+        expect(result!.childNodes.length).toBe(1);
+        expect(result!.childNodes.item(0)).toBe(updatedActions);
+
+        cut.setRightActionsElement(undefined);
+
+        result = cut.element.querySelector('.right-actions-container');
+        expect(result).toBeTruthy();
+        expect(result!.childNodes.length).toBe(0);
+    });
 });

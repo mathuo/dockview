@@ -4063,4 +4063,81 @@ describe('dockviewComponent', () => {
         expect(tabDragEvents.length).toBe(0);
         expect(groupDragEvents.length).toBe(1);
     });
+
+    test('that loading a corrupt layout throws an error and leaves a clean dockview behind', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                default: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        dockview.addPanel({
+            id: 'panel_1',
+            component: 'default',
+        });
+
+        expect(dockview.groups.length).toBe(1);
+        expect(dockview.panels.length).toBe(1);
+
+        expect(() => {
+            dockview.fromJSON({
+                grid: {
+                    root: {
+                        type: 'branch',
+                        data: [
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panelA'],
+                                    activeView: 'panelA',
+                                    id: '1',
+                                },
+                                size: 841,
+                            },
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panelB'],
+                                    activeView: 'panelB',
+                                    id: '2',
+                                },
+                                size: 842,
+                            },
+                        ],
+                        size: 530,
+                    },
+                    width: 1683,
+                    height: 530,
+                    orientation: Orientation.HORIZONTAL,
+                },
+                panels: {
+                    panelA: {
+                        id: 'panelA',
+                        contentComponent: 'somethingBad',
+                        title: 'Panel A',
+                    },
+                    panelB: {
+                        id: 'panelB',
+                        contentComponent: 'panelB',
+                        title: 'Panel B',
+                    },
+                },
+                activeGroup: '1',
+            });
+        }).toThrow(
+            "Cannot create 'panelA', no component 'somethingBad' provided"
+        );
+
+        expect(dockview.groups.length).toBe(0);
+        expect(dockview.panels.length).toBe(0);
+    });
 });
