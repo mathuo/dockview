@@ -177,60 +177,82 @@ export class GridviewComponent
 
         const { grid, activePanel } = serializedGridview;
 
-        const queue: Function[] = [];
+        try {
+            const queue: Function[] = [];
 
-        // take note of the existing dimensions
-        const width = this.width;
-        const height = this.height;
+            // take note of the existing dimensions
+            const width = this.width;
+            const height = this.height;
 
-        this.gridview.deserialize(grid, {
-            fromJSON: (node) => {
-                const { data } = node;
-                const view = createComponent(
-                    data.id,
-                    data.component,
-                    this.options.components || {},
-                    this.options.frameworkComponents || {},
-                    this.options.frameworkComponentFactory
-                        ? {
-                              createComponent:
-                                  this.options.frameworkComponentFactory
-                                      .createComponent,
-                          }
-                        : undefined
-                );
+            this.gridview.deserialize(grid, {
+                fromJSON: (node) => {
+                    const { data } = node;
+                    const view = createComponent(
+                        data.id,
+                        data.component,
+                        this.options.components || {},
+                        this.options.frameworkComponents || {},
+                        this.options.frameworkComponentFactory
+                            ? {
+                                  createComponent:
+                                      this.options.frameworkComponentFactory
+                                          .createComponent,
+                              }
+                            : undefined
+                    );
 
-                queue.push(() =>
-                    view.init({
-                        params: data.params,
-                        minimumWidth: data.minimumWidth,
-                        maximumWidth: data.maximumWidth,
-                        minimumHeight: data.minimumHeight,
-                        maximumHeight: data.maximumHeight,
-                        priority: data.priority,
-                        snap: !!data.snap,
-                        accessor: this,
-                        isVisible: node.visible,
-                    })
-                );
+                    queue.push(() =>
+                        view.init({
+                            params: data.params,
+                            minimumWidth: data.minimumWidth,
+                            maximumWidth: data.maximumWidth,
+                            minimumHeight: data.minimumHeight,
+                            maximumHeight: data.maximumHeight,
+                            priority: data.priority,
+                            snap: !!data.snap,
+                            accessor: this,
+                            isVisible: node.visible,
+                        })
+                    );
 
-                this._onDidAddGroup.fire(view);
+                    this._onDidAddGroup.fire(view);
 
-                this.registerPanel(view);
+                    this.registerPanel(view);
 
-                return view;
-            },
-        });
+                    return view;
+                },
+            });
 
-        this.layout(width, height, true);
+            this.layout(width, height, true);
 
-        queue.forEach((f) => f());
+            queue.forEach((f) => f());
 
-        if (typeof activePanel === 'string') {
-            const panel = this.getPanel(activePanel);
-            if (panel) {
-                this.doSetGroupActive(panel);
+            if (typeof activePanel === 'string') {
+                const panel = this.getPanel(activePanel);
+                if (panel) {
+                    this.doSetGroupActive(panel);
+                }
             }
+        } catch (err) {
+            /**
+             * To remove a group we cannot call this.removeGroup(...) since this makes assumptions about
+             * the underlying HTMLElement existing in the Gridview.
+             */
+            for (const group of this.groups) {
+                group.dispose();
+                this._groups.delete(group.id);
+                this._onDidRemoveGroup.fire(group);
+            }
+
+            // fires clean-up events and clears the underlying HTML gridview.
+            this.clear();
+
+            /**
+             * even though we have cleaned-up we still want to inform the caller of their error
+             * and we'll do this through re-throwing the original error since afterall you would
+             * expect trying to load a corrupted layout to result in an error and not silently fail...
+             */
+            throw err;
         }
 
         this._onDidLayoutfromJSON.fire();

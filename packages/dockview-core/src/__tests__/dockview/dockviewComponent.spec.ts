@@ -4064,13 +4064,14 @@ describe('dockviewComponent', () => {
         expect(groupDragEvents.length).toBe(1);
     });
 
-    test('that loading a corrupt layout throws an error and leaves a clean dockview behind', () => {
+    test('corrupt layout: bad inline view', () => {
         const container = document.createElement('div');
 
         const dockview = new DockviewComponent({
             parentElement: container,
             components: {
-                default: PanelContentPartTest,
+                panelA: PanelContentPartTest,
+                panelB: PanelContentPartTest,
             },
             tabComponents: {
                 test_tab_id: PanelTabPartTest,
@@ -4080,13 +4081,21 @@ describe('dockviewComponent', () => {
 
         dockview.layout(1000, 500);
 
+        let el = dockview.element.querySelector('.view-container');
+        expect(el).toBeTruthy();
+        expect(el!.childNodes.length).toBe(0);
+
         dockview.addPanel({
             id: 'panel_1',
-            component: 'default',
+            component: 'panelA',
         });
 
         expect(dockview.groups.length).toBe(1);
         expect(dockview.panels.length).toBe(1);
+
+        el = dockview.element.querySelector('.view-container');
+        expect(el).toBeTruthy();
+        expect(el!.childNodes.length).toBeGreaterThan(0);
 
         expect(() => {
             dockview.fromJSON({
@@ -4122,7 +4131,124 @@ describe('dockviewComponent', () => {
                 panels: {
                     panelA: {
                         id: 'panelA',
+                        contentComponent: 'panelA',
+                        title: 'Panel A',
+                    },
+                    panelB: {
+                        id: 'panelB',
                         contentComponent: 'somethingBad',
+                        title: 'Panel B',
+                    },
+                },
+                activeGroup: '1',
+            });
+        }).toThrow(
+            "Cannot create 'panelB', no component 'somethingBad' provided"
+        );
+
+        expect(dockview.groups.length).toBe(0);
+        expect(dockview.panels.length).toBe(0);
+
+        el = dockview.element.querySelector('.view-container');
+        expect(el).toBeTruthy();
+        expect(el!.childNodes.length).toBe(0);
+    });
+
+    test('corrupt layout: bad floating view', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                panelA: PanelContentPartTest,
+                panelB: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        dockview.layout(1000, 500);
+
+        let el = dockview.element.querySelector('.view-container');
+        expect(el).toBeTruthy();
+        expect(el!.childNodes.length).toBe(0);
+
+        dockview.addPanel({
+            id: 'panel_1',
+            component: 'panelA',
+        });
+
+        dockview.addPanel({
+            id: 'panel_2',
+            component: 'panelA',
+            floating: true,
+        });
+
+        expect(dockview.groups.length).toBe(2);
+        expect(dockview.panels.length).toBe(2);
+
+        el = dockview.element.querySelector('.dv-resize-container');
+        expect(el).toBeTruthy();
+
+        el = dockview.element.querySelector('.view-container');
+        expect(el).toBeTruthy();
+        expect(el!.childNodes.length).toBeGreaterThan(0);
+
+        expect(() => {
+            dockview.fromJSON({
+                grid: {
+                    root: {
+                        type: 'branch',
+                        data: [
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panelA'],
+                                    activeView: 'panelA',
+                                    id: '1',
+                                },
+                                size: 841,
+                            },
+                            {
+                                type: 'leaf',
+                                data: {
+                                    views: ['panelB'],
+                                    activeView: 'panelB',
+                                    id: '2',
+                                },
+                                size: 842,
+                            },
+                        ],
+                        size: 530,
+                    },
+                    width: 1683,
+                    height: 530,
+                    orientation: Orientation.HORIZONTAL,
+                },
+                floatingGroups: [
+                    {
+                        data: {
+                            views: ['panelB'],
+                            activeView: 'panelB',
+                            id: '3',
+                        },
+                        position: { left: 0, top: 0, height: 100, width: 100 },
+                    },
+                    {
+                        data: {
+                            views: ['panelC'],
+                            activeView: 'panelC',
+                            id: '4',
+                        },
+                        position: { left: 0, top: 0, height: 100, width: 100 },
+                    },
+                ],
+                panels: {
+                    panelA: {
+                        id: 'panelA',
+                        contentComponent: 'panelA',
                         title: 'Panel A',
                     },
                     panelB: {
@@ -4130,14 +4256,24 @@ describe('dockviewComponent', () => {
                         contentComponent: 'panelB',
                         title: 'Panel B',
                     },
+                    panelC: {
+                        id: 'panelC',
+                        contentComponent: 'panelC',
+                        title: 'Panel C',
+                    },
                 },
                 activeGroup: '1',
             });
-        }).toThrow(
-            "Cannot create 'panelA', no component 'somethingBad' provided"
-        );
+        }).toThrow("Cannot create 'panelC', no component 'panelC' provided");
 
         expect(dockview.groups.length).toBe(0);
         expect(dockview.panels.length).toBe(0);
+
+        el = dockview.element.querySelector('.dv-resize-container');
+        expect(el).toBeFalsy();
+
+        el = dockview.element.querySelector('.view-container');
+        expect(el).toBeTruthy();
+        expect(el!.childNodes.length).toBe(0);
     });
 });

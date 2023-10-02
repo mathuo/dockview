@@ -55,6 +55,7 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
+import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
 
 const DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE = 100;
 
@@ -78,6 +79,92 @@ export interface SerializedDockview {
     panels: Record<string, GroupviewPanelState>;
     activeGroup?: string;
     floatingGroups?: SerializedFloatingGroup[];
+}
+
+function typeValidate3(data: GroupPanelViewState, path: string): void {
+    if (typeof data.id !== 'string') {
+        throw new Error(`${path}.id must be a string`);
+    }
+
+    if (
+        typeof data.activeView !== 'string' ||
+        typeof data.activeView !== 'undefined'
+    ) {
+        throw new Error(`${path}.activeView must be a string of undefined`);
+    }
+}
+
+function typeValidate2(
+    data: SerializedGridObject<GroupPanelViewState>,
+    path: string
+): void {
+    if (typeof data.size !== 'number' && typeof data.size !== 'undefined') {
+        throw new Error(`${path}.size must be a number or undefined`);
+    }
+
+    if (
+        typeof data.visible !== 'boolean' &&
+        typeof data.visible !== 'undefined'
+    ) {
+        throw new Error(`${path}.visible must be a boolean or undefined`);
+    }
+
+    if (data.type === 'leaf') {
+        if (
+            typeof data.data !== 'object' ||
+            data.data === null ||
+            Array.isArray(data.data)
+        ) {
+            throw new Error('object must be a non-null object');
+        }
+
+        typeValidate3(data.data, `${path}.data`);
+    } else if (data.type === 'branch') {
+        if (!Array.isArray(data.data)) {
+            throw new Error(`${path}.data must be an array`);
+        }
+    } else {
+        throw new Error(`${path}.type must be onew of {'branch', 'leaf'}`);
+    }
+}
+
+function typeValidate(data: SerializedDockview): void {
+    if (typeof data !== 'object' || data === null) {
+        throw new Error('object must be a non-null object');
+    }
+
+    const { grid, panels, activeGroup, floatingGroups } = data;
+
+    if (typeof grid !== 'object' || grid === null) {
+        throw new Error("'.grid' must be a non-null object");
+    }
+
+    if (typeof grid.height !== 'number') {
+        throw new Error("'.grid.height' must be a number");
+    }
+
+    if (typeof grid.width !== 'number') {
+        throw new Error("'.grid.width' must be a number");
+    }
+
+    if (typeof grid.root !== 'object' || grid.root === null) {
+        throw new Error("'.grid.root' must be a non-null object");
+    }
+
+    if (grid.root.type !== 'branch') {
+        throw new Error(".grid.root.type must be of type 'branch'");
+    }
+
+    if (
+        grid.orientation !== Orientation.HORIZONTAL &&
+        grid.orientation !== Orientation.VERTICAL
+    ) {
+        throw new Error(
+            `'.grid.width' must be one of {${Orientation.HORIZONTAL}, ${Orientation.VERTICAL}}`
+        );
+    }
+
+    typeValidate2(grid.root, '.grid.root');
 }
 
 export type DockviewComponentUpdateOptions = Pick<
@@ -636,39 +723,55 @@ export class DockviewComponent
     fromJSON(data: SerializedDockview): void {
         this.clear();
 
+        if (typeof data !== 'object' || data === null) {
+            throw new Error('serialized layout must be a non-null object');
+        }
+
         const { grid, panels, activeGroup } = data;
 
         if (grid.root.type !== 'branch' || !Array.isArray(grid.root.data)) {
             throw new Error('root must be of type branch');
         }
 
-        // take note of the existing dimensions
-        const width = this.width;
-        const height = this.height;
+        try {
+            // take note of the existing dimensions
+            const width = this.width;
+            const height = this.height;
 
-        const createGroupFromSerializedState = (data: GroupPanelViewState) => {
-            const { id, locked, hideHeader, views, activeView } = data;
+            const createGroupFromSerializedState = (
+                data: GroupPanelViewState
+            ) => {
+                const { id, locked, hideHeader, views, activeView } = data;
 
-            if (typeof id !== 'string') {
-                throw new Error('group id must be of type string');
-            }
+                if (typeof id !== 'string') {
+                    throw new Error('group id must be of type string');
+                }
 
-            let group: DockviewGroupPanel | undefined;
-
-            try {
-                group = this.createGroup({
+                const group = this.createGroup({
                     id,
                     locked: !!locked,
                     hideHeader: !!hideHeader,
                 });
 
-                this._onDidAddGroup.fire(group);
+                const createdPanels: IDockviewPanel[] = [];
 
                 for (const child of views) {
+                    /**
+                     * Run the deserializer step seperately since this may fail to due corrupted external state.
+                     * In running this section first we avoid firing lots of 'add' events in the event of a failure
+                     * due to a corruption of input data.
+                     */
                     const panel = this._deserializer.fromJSON(
                         panels[child],
                         group
                     );
+                    createdPanels.push(panel);
+                }
+
+                this._onDidAddGroup.fire(group);
+
+                for (let i = 0; i < views.length; i++) {
+                    const panel = createdPanels[i];
 
                     const isActive =
                         typeof activeView === 'string' &&
@@ -690,61 +793,82 @@ export class DockviewComponent
                 }
 
                 return group;
-            } catch (err) {
-                /**
-                 * This is an odd case... we have failed to deserialize a view but we have already created a group,
-                 * but we havn't registered that group with the gridview.
-                 * We cannot use the removeGroup method because the group has only been partially added, we must
-                 * manually dipose() of the view and remove it from being stored in the map.
-                 */
-                if (group) {
-                    group.dispose();
-                    this._groups.delete(group.id);
-                }
+            };
 
-                /**
-                 * re-throw the error becasue we don't actually want to catch it, we just
-                 * needed to do some clean-up before continuing.
-                 */
-                throw err;
-            }
-        };
-
-        this.gridview.deserialize(grid, {
-            fromJSON: (node: ISerializedLeafNode<GroupPanelViewState>) => {
-                return createGroupFromSerializedState(node.data);
-            },
-        });
-
-        this.layout(width, height, true);
-
-        const serializedFloatingGroups = data.floatingGroups ?? [];
-
-        for (const serializedFloatingGroup of serializedFloatingGroups) {
-            const { data, position } = serializedFloatingGroup;
-            const group = createGroupFromSerializedState(data);
-
-            this.addFloatingGroup(
-                group,
-                {
-                    x: position.left,
-                    y: position.top,
-                    height: position.height,
-                    width: position.width,
+            this.gridview.deserialize(grid, {
+                fromJSON: (node: ISerializedLeafNode<GroupPanelViewState>) => {
+                    return createGroupFromSerializedState(node.data);
                 },
-                { skipRemoveGroup: true, inDragMode: false }
-            );
-        }
+            });
 
-        for (const floatingGroup of this.floatingGroups) {
-            floatingGroup.overlay.setBounds();
-        }
+            this.layout(width, height, true);
 
-        if (typeof activeGroup === 'string') {
-            const panel = this.getPanel(activeGroup);
-            if (panel) {
-                this.doSetGroupActive(panel);
+            const serializedFloatingGroups = data.floatingGroups ?? [];
+
+            for (const serializedFloatingGroup of serializedFloatingGroups) {
+                const { data, position } = serializedFloatingGroup;
+
+                const group = createGroupFromSerializedState(data);
+
+                this.addFloatingGroup(
+                    group,
+                    {
+                        x: position.left,
+                        y: position.top,
+                        height: position.height,
+                        width: position.width,
+                    },
+                    { skipRemoveGroup: true, inDragMode: false }
+                );
             }
+
+            for (const floatingGroup of this.floatingGroups) {
+                floatingGroup.overlay.setBounds();
+            }
+
+            if (typeof activeGroup === 'string') {
+                const panel = this.getPanel(activeGroup);
+                if (panel) {
+                    this.doSetGroupActive(panel);
+                }
+            }
+        } catch (err) {
+            /**
+             * Takes all the successfully created groups and remove all of their panels.
+             */
+            for (const group of this.groups) {
+                for (const panel of group.panels) {
+                    this.removePanel(panel, {
+                        removeEmptyGroup: false,
+                        skipDispose: false,
+                    });
+                }
+            }
+
+            /**
+             * To remove a group we cannot call this.removeGroup(...) since this makes assumptions about
+             * the underlying HTMLElement existing in the Gridview.
+             */
+            for (const group of this.groups) {
+                group.dispose();
+                this._groups.delete(group.id);
+                this._onDidRemoveGroup.fire(group);
+            }
+
+            // iterate over a reassigned array since original array will be modified
+            for (const floatingGroup of [...this.floatingGroups]) {
+                floatingGroup.dispose();
+            }
+
+            // fires clean-up events and clears the underlying HTML gridview.
+            this.clear();
+
+            /**
+             * even though we have cleaned-up we still want to inform the caller of their error
+             * and we'll do this through re-throwing the original error since afterall you would
+             * expect trying to load a corrupted layout to result in an error and not silently fail...
+             */
+            throw err;
         }
 
         this._onDidLayoutFromJSON.fire();
@@ -1051,11 +1175,11 @@ export class DockviewComponent
         const floatingGroup = this.floatingGroups.find(
             (_) => _.group === group
         );
-
         if (floatingGroup) {
             if (!options?.skipDispose) {
                 floatingGroup.group.dispose();
                 this._groups.delete(group.id);
+                // TODO: fire group removed event?
             }
             floatingGroup.dispose();
 
