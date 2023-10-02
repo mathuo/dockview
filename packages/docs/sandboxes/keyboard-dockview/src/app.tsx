@@ -22,16 +22,6 @@ const components = {
             };
         }, [props.api]);
 
-        React.useEffect(() => {
-            if (!active) {
-                return;
-            }
-
-            requestAnimationFrame(() => {
-                ref.current?.focus();
-            });
-        }, [active]);
-
         return (
             <div
                 className="keyboard-example-panel"
@@ -50,15 +40,6 @@ const components = {
                         {'Ctrl+ArrowRight'}
                     </span>
                     {' to nativgate between tabs.'}
-                </div>
-
-                <div style={{ padding: '10px 0px' }}>
-                    <div>
-                        {
-                            'This input box should take focus when the panel is active to demonsrate managed focus'
-                        }
-                        <input ref={ref} type="text" />
-                    </div>
                 </div>
 
                 <div>
