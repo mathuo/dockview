@@ -2597,4 +2597,84 @@ describe('gridview', () => {
             activePanel: 'panel_1',
         });
     });
+
+    test('that loading a corrupt layout throws an error and leaves a clean gridview behind', () => {
+        const gridview = new GridviewComponent({
+            parentElement: container,
+            proportionalLayout: true,
+            orientation: Orientation.HORIZONTAL,
+            components: { default: TestGridview },
+        });
+
+        let el = gridview.element.querySelector('.view-container');
+        expect(el).toBeTruthy();
+        expect(el!.childNodes.length).toBe(0);
+
+        expect(() => {
+            gridview.fromJSON({
+                grid: {
+                    height: 400,
+                    width: 800,
+                    orientation: Orientation.HORIZONTAL,
+                    root: {
+                        type: 'branch',
+                        size: 400,
+                        data: [
+                            {
+                                type: 'leaf',
+                                size: 200,
+                                data: {
+                                    id: 'panel_1',
+                                    component: 'default',
+                                    snap: false,
+                                },
+                            },
+                            {
+                                type: 'branch',
+                                size: 400,
+                                data: [
+                                    {
+                                        type: 'leaf',
+                                        size: 250,
+                                        data: {
+                                            id: 'panel_1',
+                                            component: 'default',
+                                            snap: false,
+                                        },
+                                    },
+                                    {
+                                        type: 'leaf',
+                                        size: 150,
+                                        data: {
+                                            id: 'panel_1',
+                                            component: 'somethingBad',
+                                            snap: false,
+                                        },
+                                    },
+                                ],
+                            },
+                            {
+                                type: 'leaf',
+                                size: 200,
+                                data: {
+                                    id: 'panel_1',
+                                    component: 'default',
+                                    snap: false,
+                                },
+                            },
+                        ],
+                    },
+                },
+                activePanel: 'panel_1',
+            });
+        }).toThrow(
+            "Cannot create 'panel_1', no component 'somethingBad' provided"
+        );
+
+        expect(gridview.groups.length).toBe(0);
+
+        el = gridview.element.querySelector('.view-container');
+        expect(el).toBeTruthy();
+        expect(el!.childNodes.length).toBe(0);
+    });
 });
