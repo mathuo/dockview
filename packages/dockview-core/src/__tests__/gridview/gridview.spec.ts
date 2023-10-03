@@ -4,6 +4,7 @@ import {
     Gridview,
     IGridView,
     IViewSize,
+    SerializedGridview,
     orthogonal,
 } from '../../gridview/gridview';
 import { Orientation, Sizing } from '../../splitview/splitview';
@@ -18,8 +19,9 @@ class MockGridview implements IGridView {
     >().event;
     element: HTMLElement = document.createElement('div');
 
-    constructor() {
+    constructor(private id?: string) {
         this.element.className = 'mock-grid-view';
+        this.element.id = `${id ?? ''}`;
     }
 
     layout(width: number, height: number): void {
@@ -27,6 +29,9 @@ class MockGridview implements IGridView {
     }
 
     toJSON(): object {
+        if (this.id) {
+            return { id: this.id };
+        }
         return {};
     }
 }
@@ -722,5 +727,37 @@ describe('gridview', () => {
             },
             width: 1000,
         });
+    });
+
+    test('re-structuring deep gridivew where a branchnode becomes of length one and is coverted to a leaf node', () => {
+        const gridview = new Gridview(
+            false,
+            { separatorBorder: '' },
+            Orientation.HORIZONTAL
+        );
+        gridview.layout(1000, 1000);
+
+        const view1 = new MockGridview('1');
+        const view2 = new MockGridview('2');
+        const view3 = new MockGridview('3');
+        const view4 = new MockGridview('4');
+        const view5 = new MockGridview('5');
+        const view6 = new MockGridview('6');
+
+        gridview.addView(view1, Sizing.Distribute, [0]);
+
+        gridview.addView(view2, Sizing.Distribute, [1]);
+        gridview.addView(view3, Sizing.Distribute, [1, 0]);
+        gridview.addView(view4, Sizing.Distribute, [1, 1, 0]);
+        gridview.addView(view5, Sizing.Distribute, [1, 1, 0, 0]);
+        gridview.addView(view6, Sizing.Distribute, [1, 1, 0, 0, 0]);
+
+        let el = gridview.element.querySelectorAll('.mock-grid-view');
+        expect(el.length).toBe(6);
+
+        gridview.remove(view2);
+
+        el = gridview.element.querySelectorAll('.mock-grid-view');
+        expect(el.length).toBe(5);
     });
 });
