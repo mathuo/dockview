@@ -78,7 +78,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
     private _onDidLayoutChange = new Emitter<void>();
     readonly onDidLayoutChange = this._onDidLayoutChange.event;
 
-    private readonly _onDidRemoveGroup = new Emitter<T>();
+    protected readonly _onDidRemoveGroup = new Emitter<T>();
     readonly onDidRemoveGroup: Event<T> = this._onDidRemoveGroup.event;
 
     protected readonly _onDidAddGroup = new Emitter<T>();
