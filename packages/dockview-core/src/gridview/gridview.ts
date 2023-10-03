@@ -750,6 +750,15 @@ export class Gridview implements IDisposable {
                 const child = sibling.children[i];
                 grandParent.addChild(child, child.size, parentIndex + i);
             }
+
+            /**
+             * clean down the branch node since we need to dipose of it and
+             * when .dispose() it called on a branch it will dispose of any
+             * views it is holding onto.
+             */
+            while (sibling.children.length > 0) {
+                sibling.removeChild(0);
+            }
         } else {
             // otherwise create a new leaf node and add that to the grandparent
 
