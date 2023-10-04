@@ -157,6 +157,7 @@ export class BranchNode extends CompositeDisposable implements IView {
                 orientation: this.orientation,
                 descriptor,
                 proportionalLayout,
+                styles,
             });
         }
 
