@@ -149,6 +149,7 @@ export const MultiFrameworkContainer2 = (props: {
     typescript?: (parent: HTMLElement) => { dispose: () => void };
     sandboxId: string;
     height?: number;
+    hideThemePicker?: boolean;
 }) => {
     const ref = React.useRef<HTMLDivElement>(null);
 
@@ -266,7 +267,10 @@ export const MultiFrameworkContainer2 = (props: {
                     )}
                 </div>
                 <span style={{ flexGrow: 1 }} />
-                <CodeSandboxButton id={sandboxId} />
+                <CodeSandboxButton
+                    id={sandboxId}
+                    hideThemePicker={props.hideThemePicker}
+                />
             </div>
         </>
     );
@@ -277,6 +281,7 @@ export const MultiFrameworkContainer = (props: {
     typescript?: (parent: HTMLElement) => { dispose: () => void };
     sandboxId: string;
     height?: number;
+    hideThemePicker?: boolean;
 }) => {
     return (
         <BrowserOnly>
