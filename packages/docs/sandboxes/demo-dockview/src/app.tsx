@@ -219,11 +219,13 @@ const DockviewDemo = (props: { theme?: string }) => {
             id: 'panel_2',
             component: 'default',
             title: 'Panel 2',
+            position: { referencePanel: 'panel_1', direction: 'right' },
         });
         event.api.addPanel({
             id: 'panel_3',
             component: 'default',
             title: 'Panel 3',
+            position: { referencePanel: 'panel_2', direction: 'below' },
         });
         event.api.addPanel({
             id: 'panel_4',
@@ -235,42 +237,18 @@ const DockviewDemo = (props: { theme?: string }) => {
             id: 'panel_5',
             component: 'default',
             title: 'Panel 5',
-            position: { referencePanel: 'panel_4', direction: 'within' },
+            position: { referencePanel: 'panel_3', direction: 'below' },
         });
         event.api.addPanel({
             id: 'panel_6',
             component: 'default',
             title: 'Panel 6',
-            position: { referencePanel: 'panel_4', direction: 'below' },
-        });
-        event.api.addPanel({
-            id: 'panel_7',
-            component: 'default',
-            title: 'Panel 7',
-            position: { referencePanel: 'panel_6', direction: 'right' },
-        });
-        event.api.addPanel({
-            id: 'panel_8',
-            component: 'default',
-            title: 'Panel 8',
-            position: { referencePanel: 'panel_7', direction: 'within' },
-        });
-
-        event.api.addPanel({
-            id: 'panel_9',
-            component: 'default',
-            title: 'Panel 9',
-            floating: { width: 450, height: 250 },
-        });
-
-        event.api.addPanel({
-            id: 'panel_10',
-            component: 'default',
-            title: 'Panel 10',
-            position: { referencePanel: 'panel_9' },
+            position: { referencePanel: 'panel_3', direction: 'right' },
         });
 
         event.api.getPanel('panel_1')!.api.setActive();
+
+        console.log(event.api.toJSON());
     };
 
     return (

@@ -14,3 +14,4 @@ test-report.xml
 yarn-error.log
 /build
 /docs/
+/generated/

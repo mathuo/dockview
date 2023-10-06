@@ -26,6 +26,10 @@ export * from './paneview/draggablePaneviewPanel';
 
 export * from './dockview/components/panel/content';
 export * from './dockview/components/tab/tab';
+export {
+    TabDragEvent,
+    GroupDragEvent,
+} from './dockview/components/titlebar/tabsContainer';
 export * from './dockview/types';
 export * from './dockview/dockviewGroupPanel';
 

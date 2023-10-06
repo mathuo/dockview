@@ -21,7 +21,8 @@
     "version-beta-build": "lerna version prerelease --preid beta",
     "publish-app": "lerna publish",
     "docs": "typedoc",
-    "package-docs": "node scripts/package-docs.js"
+    "package-docs": "node scripts/package-docs.js",
+    "generate-docs": "node scripts/docs.mjs"
   },
   "repository": {
     "type": "git",
@@ -68,5 +69,7 @@
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.11.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@microsoft/tsdoc": "^0.14.2"
+  }
 }

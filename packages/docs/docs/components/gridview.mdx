@@ -2,24 +2,27 @@
 description: Gridview Documentation
 ---
 
-import { SimpleGridview } from '@site/src/components/simpleGridview';
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import SimpleGridview from '@site/sandboxes/simple-gridview/src/app';
+import EditorGridview from '@site/sandboxes/editor-gridview/src/app';
+// import SimpleGridview from '@site/sandboxes/simple-gridview/src/app';
 import { EventsGridview } from '@site/src/components/gridview/events';
+// import IDEExample from '@site/sandboxes/ide-example/src/app';
 import Link from '@docusaurus/Link';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 # Gridview
 
+Gridview is a collection of nested splitviews and is the foundation for the [Dockview](./dockview) component.
+Gridview serves a purpose when you want only the nested splitviews with no tabs and no headers.
+
 ## Introduction
 
-<div
-    style={{
-        height: '300px',
-        backgroundColor: 'rgb(30,30,30)',
-        color: 'white',
-        margin: '20px 0px',
-    }}
->
-    <SimpleGridview />
-</div>
+<MultiFrameworkContainer
+    height={600}
+    sandboxId="simple-gridview"
+    react={SimpleGridview}
+/>
 
 ## GridviewReact Component
 
@@ -27,15 +30,7 @@ import Link from '@docusaurus/Link';
 import { ReactGridview } from 'dockview';
 ```
 
-| Property            | Type                                 | Optional | Default                | Description |
-| ------------------- | ------------------------------------ | -------- | ---------------------- | ----------- |
-| onReady             | (event: SplitviewReadyEvent) => void | No       |                        |             |
-| components          | object                               | No       |                        |             |
-| orientation         | Orientation                          | Yes      | Orientation.HORIZONTAL |             |
-| proportionalLayout  | boolean                              | Yes      | true                   |             |
-| hideBorders         | boolean                              | Yes      | false                  |             |
-| className           | string                               | Yes      | ''                     |             |
-| disableAutoResizing | boolean                              | Yes      | false                  | >           |
+<DocRef declaration="IGridviewReactProps" />
 
 ## Gridview API
 
@@ -53,35 +48,7 @@ const onReady = (event: GridviewReadyEvent) => {
 };
 ```
 
-| Property               | Type                                                                                              | Description                                                      |
-| ---------------------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| height                 | `number`                                                                                          | Component pixel height                                           |
-| width                  | `number`                                                                                          | Component pixel width                                            |
-| minimumHeight          | `number`                                                                                          |                                                                  |
-| maximumHeight          | `number`                                                                                          |                                                                  |
-| maximumWidth           | `number`                                                                                          |                                                                  |
-| maximumWidth           | `number`                                                                                          |                                                                  |
-| length                 | `number`                                                                                          | Number of panels                                                 |
-| panels                 | `ISplitviewPanel[]`                                                                               | all panels                                                       |
-| orientation            | `Orientation`                                                                                     |                                                                  |
-|                        |                                                                                                   |                                                                  |
-| onDidLayoutChange      | `Event<void>`                                                                                     | Fires on layout change                                           |
-| onDidLayoutFromJSON    | `Event<void>`                                                                                     | Fires of layout change caused by a fromJSON deserialization call |
-| onDidAddPanel          | `Event<IGridviewPanel>`                                                                           | Fires when a view is added                                       |
-| onDidRemovePanel       | `Event<IGridviewPanel>`                                                                           | Fires when a view is removed                                     |
-| onDidActivePanelChange | `Event<IGridviewPanel \| undefined>`                                                              | Fires when the active group changes                              |
-|                        |                                                                                                   |                                                                  |
-| addPanel               | `addPanel(options: AddComponentOptions): IGridviewPanel`                                          |                                                                  |
-| removePanel            | `(panel: IGridviewPanel, sizing?: Sizing): void`                                                  |                                                                  |
-| movePanel              | `(panel: IGridviewPanel, options: {direction: Direction, refernece:string, size?: number}): void` |                                                                  |
-| getPanel               | `(id: string) \| IGridviewPanel \| undefined`                                                     |                                                                  |
-|                        |                                                                                                   |                                                                  |
-| updateOptions          | `(options:SplitviewComponentUpdateOptions): void`                                                 |                                                                  |
-| focus                  | `(): void`                                                                                        | Focus the active panel, if exists                                |
-| layout                 | `(width: number, height:number): void`                                                            |                                                                  |
-| fromJSON               | `(data: SerializedGridview): void`                                                                |                                                                  |
-| toJSON                 | `(): SerializedGridview`                                                                          |                                                                  |
-| clear                  | `(): void`                                                                                        | Clears the current layout                                        |
+<DocRef declaration="GridviewApi" />
 
 ## Gridview Panel API
 
@@ -93,28 +60,176 @@ const MyComponent = (props: IGridviewPanelProps<{ title: string }>) => {
 };
 ```
 
-| Property               | Type                                                        | Description      |
-| ---------------------- | ----------------------------------------------------------- | ---------------- |
-| id                     | `string`                                                    | Panel id         |
-| isFocused              | `boolean`                                                   | Is panel focsed  |
-| isActive               | `boolean`                                                   | Is panel active  |
-| isVisible              | `boolean`                                                   | Is panel visible |
-| width                  | `number`                                                    | Panel width      |
-| height                 | `number`                                                    | Panel height     |
-|                        |                                                             |                  |
-| onDidDimensionsChange  | `Event<PanelDimensionChangeEvent>`                          |                  |
-| onDidFocusChange       | `Event<FocusEvent>`                                         |                  |
-| onDidVisibilityChange  | `Event<VisibilityEvent>`                                    |                  |
-| onDidActiveChange      | `Event<ActiveEvent>`                                        |                  |
-| onDidConstraintsChange | `onDidConstraintsChange: Event<PanelConstraintChangeEvent>` |                  |
-|                        |                                                             |                  |
-| setVisible             | `(isVisible: boolean): void`                                |                  |
-| setActive              | `(): void`                                                  |                  |
-| setConstraints         | `(value: PanelConstraintChangeEvent2): void;`               |                  |
-| setSize                | `(event: SizeEvent): void`                                  |                  |
+<DocRef declaration="GridviewPanelApi" />
+
+## Resizing
+
+### Panel Resizing
+
+You can set the size of a panel using `props.api.setSize(...)`.
+
+```tsx
+// it's mandatory to provide either a height or a width, providing both is optional
+props.api.setSize({
+    height: 100,
+    width: 200,
+});
+```
+
+You can update any constraints on the panel. All parameters are optional.
+
+```tsx
+props.api.setConstraints({
+    minimumHeight: 100,
+    maximumHeight: 1000
+    minimumWidth: 100,
+    maximumWidth: 1000
+});
+```
+
+You can hide a panel by setting it's visibility to `false`. Hidden panels retain their size
+at the point of being hidden, if made visible again they will try to resize to the remembered size.
+
+```tsx
+props.api.setVisible(false);
+```
+
+## Panels
+
+### Add Panel
+
+Using the gridview API you can access the `addPanel` method which returns an instance of the created panel.
+The minimum method signature is:
+
+```ts
+const panel = api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+});
+```
+
+where `id` is the unique id of the panel and `component` is the implenentation which
+will be used to render the panel. You will have registered this using the `components` prop of the `GridviewReactComponent` component.
+
+You can pass bounding constraints to limit the size of the panel.
+
+```ts
+const panel = api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    minimumHeight: 100,
+    maximumHeight: 1000,
+    minimumWidth: 100,
+    maximumWidth: 1000,
+});
+```
+
+You can pass a `snap` parameter which will hide the panel when an attempt is made to move it beyond a minimum width or height if one exists.
+
+```ts
+const panel = api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    minimumHeight: 100,
+    snap: true,
+});
+```
+
+You can pass a `priority` parameter which will keep the panel a certain priority when being resized. This is useful when you know you want this
+panel to always take the first available or last available space. The default is `LayoutPriority.Normal` which defers space allocations to the libraries discression.
+
+```ts
+const panel = api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    minimumHeight: 100,
+    priority: LayoutPriority.High,
+});
+```
+
+You can pass properties to the panel using the `params` key.
+You can update these properties through the panels `api` object and its `updateParameters` method.
+
+```ts
+const panel = api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    params: {
+        myCustomKey: 'my_custom_value',
+    },
+});
+```
+
+```tsx
+panel.api.updateParameters({
+    myCustomKey: 'my_custom_value',
+    myOtherCustomKey: 'my_other_custom_key',
+});
+```
+
+> Note `updateParameters` does not accept partial parameter updates, you should call it with the entire set of parameters
+> you want the panel to receive.
+
+Finally `addPanel` accepts a `position` object which tells dockview where to place the panel.
+
+-   This object accepts a `referencePanel` which can be the associated id as a string
+    or the panel object reference.
+-   This object accepts a `direction` property which dictates where,
+    relative to the provided reference the new panel will be placed.
+
+> If a `referencePanel` is not passed then the `direction` will be treated as absolute.
+
+> If no `direction` is provided the library will place the new panel in a pre-determined position.
+
+```ts
+const panel = api.addPanel({
+    id: 'panel_1',
+    component: 'default',
+});
+
+const panel2 = api.addPanel({
+    id: 'panel_2',
+    component: 'default',
+    position: {
+        referencePanel: panel1,
+        direction: 'right',
+    },
+});
+```
+
+> Note `updateParameters` does not accept partial parameter updates, you should call it with the entire set of parameters
+> you want the panel to receive.
+
+## Theme
+
+As well as importing the `dockview` stylesheet you must provide a class-based theme somewhere in your application. For example.
+
+```tsx
+// Providing a theme directly through the DockviewReact component props
+<GridviewReact className="dockview-theme-dark" />
+
+// Providing a theme somewhere in the DOM tree
+<div className="dockview-theme-dark">
+  <div>
+    {/**...  */}
+    <GridviewReact  />
+  </div>
+</div>
+```
+
+You can find more details on theming <Link to="../theme">here</Link>.
 
 ## Events
 
 `GridviewReact` exposes a number of events that the developer can listen to and below is a simple example with a log panel showing those events that occur.
 
 <EventsGridview />
+
+## Complex Example
+
+<MultiFrameworkContainer
+    height={600}
+    sandboxId="editor-gridview"
+    react={EditorGridview}
+    hideThemePicker={true}
+/>

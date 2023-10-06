@@ -1,0 +1,64 @@
+.ref-table {
+    font-size: 12px;
+    width: 100%;
+    border-collapse: collapse;
+
+    line-height: 20px;
+
+    button {
+        all: unset;
+    }
+
+    code {
+        padding: 0px 4px;
+        margin: 0px 4px;
+    }
+
+    .ref-table-icon {
+        cursor: pointer;
+    }
+
+    .ref-table-property {
+        width: 30%;
+    }
+
+    .ref-table-type {
+        width: 50%;
+    }
+
+    .ref-table-default {
+        width: 20%;
+    }
+
+    thead {
+        text-align: left;
+        background-color: inherit;
+
+        tr {
+            border: none;
+        }
+    }
+
+    th,
+    td {
+        border: none;
+        padding: none;
+    }
+
+    tr {
+        background-color: inherit !important;
+    }
+}
+
+.ref-table-popover {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+        hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+    animation-duration: 400ms;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+    background-color: var(--ifm-background-surface-color);
+    color: var(--ifm-font-color-base);
+}
