@@ -3,195 +3,539 @@
         {
             "name": "activeGroup",
             "signature": "DockviewGroupPanel | undefined",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Active group object."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "activePanel",
             "signature": "IDockviewPanel | undefined",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Active panel object."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "groups",
             "signature": "DockviewGroupPanel[]",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "All group objects."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "height",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Height of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "id",
             "signature": "string",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The unique identifier for this instance. Used to manage scope of Drag'n'Drop events."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "maximumHeight",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Maximum height of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "maximumWidth",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Maximum width of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "minimumHeight",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Minimum height of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "minimumWidth",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Minimum width of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidActiveGroupChange",
             "signature": "Event<DockviewGroupPanel | undefined>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when the active group changes. May be undefined if no group is active."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidActivePanelChange",
             "signature": "Event<IDockviewPanel | undefined>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when the active panel changes. May be undefined if no panel is active."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidAddGroup",
             "signature": "Event<DockviewGroupPanel>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when a group is added. May be called multiple times when moving groups."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidAddPanel",
             "signature": "Event<IDockviewPanel>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when a panel is added. May be called multiple times when moving panels."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidDrop",
             "signature": "Event<DockviewDropEvent>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when a Drag'n'Drop event occurs that the component was unable to handle. Exposed for custom Drag'n'Drop functionality."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidLayoutChange",
             "signature": "Event<void>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when any layout change occures, an aggregation of many events."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidLayoutFromJSON",
             "signature": "Event<void>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked after a layout is deserialzied using the "
+                    },
+                    {
+                        "kind": "code",
+                        "text": "`fromJSON`"
+                    },
+                    {
+                        "kind": "text",
+                        "text": " method."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidRemoveGroup",
             "signature": "Event<DockviewGroupPanel>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when a group is removed. May be called multiple times when moving groups."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidRemovePanel",
             "signature": "Event<IDockviewPanel>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when a panel is removed. May be called multiple times when moving panels."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onWillDragGroup",
             "signature": "Event<GroupDragEvent>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked before a group is dragged. Exposed for custom Drag'n'Drop functionality."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onWillDragPanel",
             "signature": "Event<TabDragEvent>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked before a panel is dragged. Exposed for custom Drag'n'Drop functionality."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "panels",
             "signature": "IDockviewPanel[]",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "All panel objects."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "size",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Total number of groups."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "totalPanels",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Total number of panels."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "width",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Width of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "addFloatingGroup",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Add a floating group"
+                    }
+                ]
+            },
             "signature": "(item: IDockviewPanel | DockviewGroupPanel, coord?: { x: number, y: number }): void",
             "type": "method"
         },
         {
             "name": "addGroup",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Add a group and return the created object."
+                    }
+                ]
+            },
             "signature": "(options?: AddGroupOptions): DockviewGroupPanel",
             "type": "method"
         },
         {
             "name": "addPanel",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Add a panel and return the created object."
+                    }
+                ]
+            },
             "signature": "<T extends object = Parameters>(options: AddPanelOptions<T>): IDockviewPanel",
             "type": "method"
         },
         {
             "name": "clear",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Reset the component back to an empty and default state."
+                    }
+                ]
+            },
             "signature": "(): void",
             "type": "method"
         },
         {
             "name": "closeAllGroups",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Close all groups and panels."
+                    }
+                ]
+            },
             "signature": "(): void",
             "type": "method"
         },
         {
             "name": "focus",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Focus the component. Will try to focus an active panel if one exists."
+                    }
+                ]
+            },
             "signature": "(): void",
             "type": "method"
         },
         {
             "name": "fromJSON",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Create a component from a serialized object."
+                    }
+                ]
+            },
             "signature": "(data: SerializedDockview): void",
             "type": "method"
         },
         {
             "name": "getGroup",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Get a group object given a "
+                    },
+                    {
+                        "kind": "code",
+                        "text": "`string`"
+                    },
+                    {
+                        "kind": "text",
+                        "text": " id. May return undefined."
+                    }
+                ]
+            },
             "signature": "(id: string): DockviewGroupPanel | undefined",
             "type": "method"
         },
         {
             "name": "getPanel",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Get a panel object given a "
+                    },
+                    {
+                        "kind": "code",
+                        "text": "`string`"
+                    },
+                    {
+                        "kind": "text",
+                        "text": " id. May return "
+                    },
+                    {
+                        "kind": "code",
+                        "text": "`undefined`"
+                    },
+                    {
+                        "kind": "text",
+                        "text": "."
+                    }
+                ]
+            },
             "signature": "(id: string): IDockviewPanel | undefined",
             "type": "method"
         },
         {
             "name": "layout",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Force resize the component to an exact width and height. Read about auto-resizing before using."
+                    }
+                ]
+            },
             "signature": "(width: number, height: number, force: boolean = false): void",
             "type": "method"
         },
         {
             "name": "moveToNext",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Move the focus progmatically to the next panel or group."
+                    }
+                ]
+            },
             "signature": "(options?: MovementOptions): void",
             "type": "method"
         },
         {
             "name": "moveToPrevious",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Move the focus progmatically to the previous panel or group."
+                    }
+                ]
+            },
             "signature": "(options?: MovementOptions): void",
             "type": "method"
         },
         {
             "name": "removeGroup",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Remove a group and any panels within the group."
+                    }
+                ]
+            },
             "signature": "(group: IDockviewGroupPanel): void",
             "type": "method"
         },
         {
             "name": "removePanel",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Remove a panel given the panel object."
+                    }
+                ]
+            },
             "signature": "(panel: IDockviewPanel): void",
             "type": "method"
         },
         {
             "name": "toJSON",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Create a serialized object of the current component."
+                    }
+                ]
+            },
             "signature": "(): SerializedDockview",
             "type": "method"
         }
@@ -200,110 +544,310 @@
         {
             "name": "height",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Height of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "maximumHeight",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Maximum height of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "maximumWidth",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Maximum width of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "minimumHeight",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Minimum height of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "minimumWidth",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Minimum width of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidActivePanelChange",
             "signature": "Event<IGridviewPanel<GridviewPanelApi> | undefined>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when the active panel changes. May be undefined if no panel is active."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidAddPanel",
             "signature": "Event<IGridviewPanel<GridviewPanelApi>>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when a panel is added. May be called multiple times when moving panels."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidLayoutChange",
             "signature": "Event<void>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when any layout change occures, an aggregation of many events."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidLayoutFromJSON",
             "signature": "Event<void>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked after a layout is deserialzied using the "
+                    },
+                    {
+                        "kind": "code",
+                        "text": "`fromJSON`"
+                    },
+                    {
+                        "kind": "text",
+                        "text": " method."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidRemovePanel",
             "signature": "Event<IGridviewPanel<GridviewPanelApi>>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when a panel is removed. May be called multiple times when moving panels."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "orientation",
             "signature": "Orientation",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Current orientation. Can be changed after initialization."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "panels",
             "signature": "IGridviewPanel<GridviewPanelApi>[]",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "All panel objects."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "width",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Width of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "addPanel",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Add a panel and return the created object."
+                    }
+                ]
+            },
             "signature": "<T extends object = Parameters>(options: AddComponentOptions<T>): IGridviewPanel<GridviewPanelApi>",
             "type": "method"
         },
         {
             "name": "clear",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Reset the component back to an empty and default state."
+                    }
+                ]
+            },
             "signature": "(): void",
             "type": "method"
         },
         {
             "name": "focus",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Focus the component. Will try to focus an active panel if one exists."
+                    }
+                ]
+            },
             "signature": "(): void",
             "type": "method"
         },
         {
             "name": "fromJSON",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Create a component from a serialized object."
+                    }
+                ]
+            },
             "signature": "(data: SerializedGridviewComponent): void",
             "type": "method"
         },
         {
             "name": "getPanel",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Get a panel object given a "
+                    },
+                    {
+                        "kind": "code",
+                        "text": "`string`"
+                    },
+                    {
+                        "kind": "text",
+                        "text": " id. May return "
+                    },
+                    {
+                        "kind": "code",
+                        "text": "`undefined`"
+                    },
+                    {
+                        "kind": "text",
+                        "text": "."
+                    }
+                ]
+            },
             "signature": "(id: string): IGridviewPanel<GridviewPanelApi> | undefined",
             "type": "method"
         },
         {
             "name": "layout",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Force resize the component to an exact width and height. Read about auto-resizing before using."
+                    }
+                ]
+            },
             "signature": "(width: number, height: number, force: boolean = false): void",
             "type": "method"
         },
         {
             "name": "movePanel",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Move a panel in a particular direction relative to another panel."
+                    }
+                ]
+            },
             "signature": "(panel: IGridviewPanel<GridviewPanelApi>, options: { direction: Direction, reference: string, size: number }): void",
             "type": "method"
         },
         {
             "name": "removePanel",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Remove a panel given the panel object."
+                    }
+                ]
+            },
             "signature": "(panel: IGridviewPanel<GridviewPanelApi>, sizing?: Sizing): void",
             "type": "method"
         },
         {
             "name": "toJSON",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Create a serialized object of the current component."
+                    }
+                ]
+            },
             "signature": "(): SerializedGridviewComponent",
             "type": "method"
         }
@@ -312,95 +856,271 @@
         {
             "name": "height",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Height of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "maximumSize",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The maximum size the component can reach where size is measured in the direction of orientation provided."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "minimumSize",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The minimum size  the component can reach where size is measured in the direction of orientation provided."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidAddView",
             "signature": "Event<IPaneviewPanel>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when a panel is added. May be called multiple times when moving panels."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidDrop",
             "signature": "Event<PaneviewDropEvent>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when a Drag'n'Drop event occurs that the component was unable to handle. Exposed for custom Drag'n'Drop functionality."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidLayoutChange",
             "signature": "Event<void>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when any layout change occures, an aggregation of many events."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidLayoutFromJSON",
             "signature": "Event<void>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked after a layout is deserialzied using the "
+                    },
+                    {
+                        "kind": "code",
+                        "text": "`fromJSON`"
+                    },
+                    {
+                        "kind": "text",
+                        "text": " method."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidRemoveView",
             "signature": "Event<IPaneviewPanel>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when a panel is removed. May be called multiple times when moving panels."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "panels",
             "signature": "IPaneviewPanel[]",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "All panel objects."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "width",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Width of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "addPanel",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Add a panel and return the created object."
+                    }
+                ]
+            },
             "signature": "<T extends object = Parameters>(options: AddPaneviewComponentOptions<T>): IPaneviewPanel",
             "type": "method"
         },
         {
             "name": "clear",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Reset the component back to an empty and default state."
+                    }
+                ]
+            },
             "signature": "(): void",
             "type": "method"
         },
         {
             "name": "focus",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Focus the component. Will try to focus an active panel if one exists."
+                    }
+                ]
+            },
             "signature": "(): void",
             "type": "method"
         },
         {
             "name": "fromJSON",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Create a component from a serialized object."
+                    }
+                ]
+            },
             "signature": "(data: SerializedPaneview): void",
             "type": "method"
         },
         {
             "name": "getPanel",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Get a panel object given a "
+                    },
+                    {
+                        "kind": "code",
+                        "text": "`string`"
+                    },
+                    {
+                        "kind": "text",
+                        "text": " id. May return "
+                    },
+                    {
+                        "kind": "code",
+                        "text": "`undefined`"
+                    },
+                    {
+                        "kind": "text",
+                        "text": "."
+                    }
+                ]
+            },
             "signature": "(id: string): IPaneviewPanel | undefined",
             "type": "method"
         },
         {
             "name": "layout",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Force resize the component to an exact width and height. Read about auto-resizing before using."
+                    }
+                ]
+            },
             "signature": "(width: number, height: number): void",
             "type": "method"
         },
         {
             "name": "movePanel",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Move a panel given it's current and desired index."
+                    }
+                ]
+            },
             "signature": "(from: number, to: number): void",
             "type": "method"
         },
         {
             "name": "removePanel",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Remove a panel given the panel object."
+                    }
+                ]
+            },
             "signature": "(panel: IPaneviewPanel): void",
             "type": "method"
         },
         {
             "name": "toJSON",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Create a serialized object of the current component."
+                    }
+                ]
+            },
             "signature": "(): SerializedPaneview",
             "type": "method"
         }
@@ -409,105 +1129,297 @@
         {
             "name": "height",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Height of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "length",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The current number of panels."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "maximumSize",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The maximum size the component can reach where size is measured in the direction of orientation provided."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "minimumSize",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The minimum size  the component can reach where size is measured in the direction of orientation provided."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidAddView",
             "signature": "Event<IView>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when a view is added."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidLayoutChange",
             "signature": "Event<void>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked whenever any aspect of the layout changes.\nIf listening to this event it may be worth debouncing ouputs."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidLayoutFromJSON",
             "signature": "Event<void>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked after a layout is loaded through the "
+                    },
+                    {
+                        "kind": "code",
+                        "text": "`fromJSON`"
+                    },
+                    {
+                        "kind": "text",
+                        "text": " method."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "onDidRemoveView",
             "signature": "Event<IView>",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Invoked when a view is removed."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "orientation",
             "signature": "Orientation",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The current orientation of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "panels",
             "signature": "ISplitviewPanel[]",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "The list of current panels."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "width",
             "signature": "number",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Width of the component."
+                    }
+                ]
+            },
             "type": "accessor"
         },
         {
             "name": "addPanel",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Add a new panel and return the created instance."
+                    }
+                ]
+            },
             "signature": "<T extends object = Parameters>(options: AddSplitviewComponentOptions<T>): ISplitviewPanel",
             "type": "method"
         },
         {
             "name": "clear",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Remove all panels and clear the component."
+                    }
+                ]
+            },
             "signature": "(): void",
             "type": "method"
         },
         {
             "name": "focus",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Focus the component."
+                    }
+                ]
+            },
             "signature": "(): void",
             "type": "method"
         },
         {
             "name": "fromJSON",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Deserialize a layout to built a splitivew."
+                    }
+                ]
+            },
             "signature": "(data: SerializedSplitview): void",
             "type": "method"
         },
         {
             "name": "getPanel",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Get the reference to a panel given it's "
+                    },
+                    {
+                        "kind": "code",
+                        "text": "`string`"
+                    },
+                    {
+                        "kind": "text",
+                        "text": " id."
+                    }
+                ]
+            },
             "signature": "(id: string): ISplitviewPanel | undefined",
             "type": "method"
         },
         {
             "name": "layout",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Layout the panel with a width and height."
+                    }
+                ]
+            },
             "signature": "(width: number, height: number): void",
             "type": "method"
         },
         {
             "name": "movePanel",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Move a panel given it's current and desired index."
+                    }
+                ]
+            },
             "signature": "(from: number, to: number): void",
             "type": "method"
         },
         {
             "name": "removePanel",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Removes an existing panel and optionally provide a "
+                    },
+                    {
+                        "kind": "code",
+                        "text": "`Sizing`"
+                    },
+                    {
+                        "kind": "text",
+                        "text": " method\nfor the subsequent resize."
+                    }
+                ]
+            },
             "signature": "(panel: ISplitviewPanel, sizing?: Sizing): void",
             "type": "method"
         },
         {
             "name": "toJSON",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Serialize a layout"
+                    }
+                ]
+            },
             "signature": "(): SerializedSplitview",
             "type": "method"
         },
         {
             "name": "updateOptions",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Update configuratable options."
+                    }
+                ]
+            },
             "signature": "(options: SplitviewComponentUpdateOptions): void",
             "type": "method"
         }
@@ -1131,6 +2043,11 @@
         {
             "name": "onReady",
             "signature": "(event: DockviewReadyEvent): void",
+            "type": "property"
+        },
+        {
+            "name": "prefixHeaderActionsComponent",
+            "signature": "FunctionComponent<IDockviewHeaderActionsProps>",
             "type": "property"
         },
         {

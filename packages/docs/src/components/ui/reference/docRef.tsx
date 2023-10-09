@@ -9,16 +9,64 @@ export interface DocRefProps {
 import docsJson from '../../../generated/api.output.json';
 
 type DocsContent = { kind: string; text: string; tag?: string };
+type DocsTag = { tag: string; content: DocsContent[] };
+type DocsComment = {
+    summary?: DocsContent[];
+    blockTags?: DocsTag[];
+};
 type DocsJson = {
     [index: string]: Array<{
         name: string;
         signature: string;
-        comment?: {
-            summary?: DocsContent[];
-            blockTags?: Array<{ tag: string; content: DocsContent }>;
-        };
+        comment?: DocsComment;
         type: string;
     }>;
+};
+
+export const Text = (props: { content: DocsContent[] }) => {
+    return (
+        <div className="doc-text">
+            {props.content.map((piece, i) => {
+                switch (piece.kind) {
+                    case 'text': {
+                        return <span key={i}>{piece.text}</span>;
+                    }
+                    case 'code':
+                        return (
+                            <code key={i}>
+                                {piece.text.substring(1, piece.text.length - 1)}
+                            </code>
+                        );
+                    default:
+                        throw new Error(`unhandled piece ${piece.kind}`);
+                }
+            })}
+        </div>
+    );
+};
+
+export const Tags = (props: { tags: DocsTag[] }) => {
+    return (
+        <div>
+            {props.tags.map((tag, i) => {
+                return (
+                    <div key={i}>
+                        <div>{tag.tag}</div>
+                        <Text content={tag.content} />
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
+export const Summary = (props: { summary: DocsComment }) => {
+    return (
+        <div>
+            <Text content={props.summary.summary ?? []} />
+            {/* <Tags tags={props.summary.blockTags ?? []} /> */}
+        </div>
+    );
 };
 
 export const Markdown = (props: { children: string }) => {
@@ -94,6 +142,13 @@ export const DocRef = (props: DocRefProps) => {
                                 >
                                     {/* <div>{'-'}</div> */}
                                     <div>
+                                        <div>
+                                            {doc.comment && (
+                                                <Summary
+                                                    summary={doc.comment}
+                                                />
+                                            )}
+                                        </div>
                                         <CodeBlock language="tsx">
                                             {doc.signature}
                                         </CodeBlock>

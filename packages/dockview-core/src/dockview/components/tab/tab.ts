@@ -24,6 +24,13 @@ class TabDragHandler extends DragHandler {
         private readonly panel: IDockviewPanel
     ) {
         super(element);
+
+        this.onDragStart((e) => {
+            this.accessor.removePanel(this.panel, {
+                skipDispose: true,
+                removeEmptyGroup: true,
+            });
+        });
     }
 
     getData(event: DragEvent): IDisposable {

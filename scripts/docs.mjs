@@ -288,11 +288,12 @@ function getFunction(
             };
         }
         case ReflectionKind.Method: {
-            const { signatures, comment } = method;
+            const { signatures } = method;
             if (signatures.length > 1) {
                 throw new Error(`signatures.length > 1`);
             }
-            const { name, parameters, type, typeParameter } = signatures[0];
+            const { name, parameters, type, typeParameter, comment } =
+                signatures[0];
 
             let _typeParameter = '';
 

@@ -6,6 +6,8 @@ import {
     MutableDisposable,
 } from '../lifecycle';
 
+const CLONE_ELEMENT = true;
+
 export abstract class DragHandler extends CompositeDisposable {
     private readonly dataDisposable = new MutableDisposable();
     private readonly pointerEventsDisposable = new MutableDisposable();
@@ -57,8 +59,24 @@ export abstract class DragHandler extends CompositeDisposable {
                     iframe.style.pointerEvents = 'none';
                 }
 
-                this.el.classList.add('dv-dragged');
-                setTimeout(() => this.el.classList.remove('dv-dragged'), 0);
+                if (CLONE_ELEMENT && event.dataTransfer) {
+                    const clone = this.el.cloneNode(true) as HTMLElement;
+                    const styles = window.getComputedStyle(this.el);
+                    clone.style.cssText = Object.values(styles)
+                        .map((key) => `${key}:${styles.getPropertyValue(key)}`)
+                        .join(';');
+                    clone.classList.add('dv-dragged');
+
+                    document.body.append(clone);
+                    setTimeout(() => {
+                        // clone.parentElement?.removeChild(clone);
+                    }, 0);
+
+                    event.dataTransfer.setDragImage(clone, 0, 0);
+                } else {
+                    this.el.classList.add('dv-dragged');
+                    setTimeout(() => this.el.classList.remove('dv-dragged'), 0);
+                }
 
                 this.dataDisposable.value = this.getData(event);
                 this._onDragStart.fire(event);

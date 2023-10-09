@@ -318,14 +318,17 @@ const EventsDockview = (props: { theme?: string }) => {
                 height: '100%',
             }}
         >
-            <label>
-                <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={(e) => setChecked(e.target.checked)}
-                />
-                <span>{'fromJSON'}</span>
-            </label>
+            <div>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(e) => setChecked(e.target.checked)}
+                    />
+                    <span>{'fromJSON'}</span>
+                </label>
+                <button onClick={() => setLines([])}>Clear logs</button>
+            </div>
             <div style={{ flexGrow: 1 }}>
                 <DockviewReact
                     components={components}
@@ -333,7 +336,7 @@ const EventsDockview = (props: { theme?: string }) => {
                     className={`${props.theme || 'dockview-theme-abyss'}`}
                 />
             </div>
-            <div style={{ flexGrow: 1, paddingTop: '5px' }}>
+            <div style={{ height: '200px', paddingTop: '5px' }}>
                 <Console lines={lines} />
             </div>
         </div>

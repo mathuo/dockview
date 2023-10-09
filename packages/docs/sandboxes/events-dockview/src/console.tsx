@@ -20,7 +20,7 @@ export interface IConsoleProps {
 }
 
 export const Console = (props: IConsoleProps) => {
-    const ref = React.useRef<HTMLDivElement>();
+    const ref = React.useRef<HTMLDivElement>(null);
 
     React.useLayoutEffect(() => {
         if (!ref.current) {
