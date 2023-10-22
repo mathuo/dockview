@@ -87,7 +87,7 @@ export abstract class PaneviewPanel
     private bodyPart?: IPaneHeaderPart;
     private headerPart?: IPaneBodyPart;
     private expandedSize = 0;
-    private animationTimer: any | undefined;
+    private animationTimer: any;
     private _orientation: Orientation;
 
     private _headerVisible: boolean;

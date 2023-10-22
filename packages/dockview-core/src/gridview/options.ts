@@ -1,14 +1,15 @@
 import { GridviewPanel } from './gridviewPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/splitview';
-import { FrameworkFactory } from '../panel/componentFactory';
+import {
+    ComponentConstructor,
+    FrameworkFactory,
+} from '../panel/componentFactory';
 
 export interface GridviewComponentOptions {
     proportionalLayout: boolean;
     orientation: Orientation;
     components?: {
-        [componentName: string]: {
-            new (id: string, componentName: string): GridviewPanel;
-        };
+        [componentName: string]: ComponentConstructor<GridviewPanel>;
     };
     frameworkComponents?: {
         [componentName: string]: any;

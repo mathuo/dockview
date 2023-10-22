@@ -2,7 +2,10 @@ import { IPanel, PanelInitParameters } from '../panel/types';
 import { IView, SplitViewOptions, LayoutPriority } from './splitview';
 import { SplitviewPanel } from './splitviewPanel';
 import { SplitviewComponent } from './splitviewComponent';
-import { FrameworkFactory } from '../panel/componentFactory';
+import {
+    ComponentConstructor,
+    FrameworkFactory,
+} from '../panel/componentFactory';
 
 export interface PanelViewInitParameters extends PanelInitParameters {
     minimumSize?: number;
@@ -18,9 +21,7 @@ export interface ISerializableView extends IView, IPanel {
 
 export interface SplitviewComponentOptions extends SplitViewOptions {
     components?: {
-        [componentName: string]: {
-            new (id: string, componentName: string): SplitviewPanel;
-        };
+        [componentName: string]: ComponentConstructor<SplitviewPanel>;
     };
     frameworkComponents?: {
         [componentName: string]: any;
