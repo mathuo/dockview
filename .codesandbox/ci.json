@@ -36,5 +36,5 @@
     "/packages/docs/sandboxes/javascript/tabheight-dockview",
     "/packages/docs/sandboxes/javascript/vanilla-dockview"
   ],
-  "node": "16"
+  "node": "18"
 }
