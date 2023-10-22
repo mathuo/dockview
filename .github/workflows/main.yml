@@ -24,7 +24,6 @@ jobs:
                       ${{ runner.os }}-node-
 
             - run: yarn
-            - run: npm run bootstrap
             - run: npm run build
             - run: npm run test:cov
             - name: SonarCloud Scan

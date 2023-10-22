@@ -8,7 +8,7 @@ const config: JestConfigWithTsJest = {
     collectCoverageFrom: ['<rootDir>/packages/*/src/**/*.{js,jsx,ts,tsx}'],
     coveragePathIgnorePatterns: [
         '/node_modules/',
-        '<rootDir>packages/*/src/__tests__/',
+        '<rootDir>/packages/*/src/__tests__/',
     ],
     coverageDirectory: 'coverage',
     testResultsProcessor: 'jest-sonar-reporter',

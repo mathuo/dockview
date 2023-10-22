@@ -2,35 +2,6 @@
   "name": "dockview-core",
   "version": "1.8.4",
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support",
-  "main": "./dist/cjs/index.js",
-  "types": "./dist/cjs/index.d.ts",
-  "module": "./dist/esm/index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mathuo/dockview.git"
-  },
-  "bugs": {
-    "url": "https://github.com/mathuo/dockview/issues"
-  },
-  "homepage": "https://github.com/mathuo/dockview",
-  "scripts": {
-    "build:package": "npm run build:cjs && npm run build:esm && npm run build:css",
-    "build:cjs": "cross-env ../../node_modules/.bin/tsc --project ./tsconfig.json --extendedDiagnostics",
-    "build:css": "gulp sass",
-    "build:esm": "cross-env ../../node_modules/.bin/tsc --project ./tsconfig.esm.json --extendedDiagnostics",
-    "build:bundles": "rollup -c",
-    "build": "npm run build:package && npm run build:bundles",
-    "clean": "rimraf dist/ .build/ .rollup.cache/",
-    "prepublishOnly": "npm run rebuild && npm run test",
-    "docs": "typedoc",
-    "rebuild": "npm run clean && npm run build",
-    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core",
-    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core --coverage"
-  },
-  "files": [
-    "dist",
-    "README.md"
-  ],
   "keywords": [
     "splitview",
     "split-view",
@@ -52,15 +23,34 @@
     "react",
     "react-component"
   ],
-  "author": "https://github.com/mathuo",
+  "homepage": "https://github.com/mathuo/dockview",
+  "bugs": {
+    "url": "https://github.com/mathuo/dockview/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mathuo/dockview.git"
+  },
   "license": "MIT",
-  "devDependencies": {
-    "@rollup/plugin-terser": "^0.4.0",
-    "@rollup/plugin-typescript": "^11.0.0",
-    "cross-env": "^7.0.3",
-    "postcss": "^8.4.21",
-    "rimraf": "^4.1.2",
-    "rollup": "^3.15.0",
-    "rollup-plugin-postcss": "^4.0.2"
+  "author": "https://github.com/mathuo",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "npm run build:package && npm run build:bundles",
+    "build:bundles": "rollup -c",
+    "build:cjs": "cross-env ../../node_modules/.bin/tsc --project ./tsconfig.json --extendedDiagnostics",
+    "build:css": "gulp sass",
+    "build:esm": "cross-env ../../node_modules/.bin/tsc --project ./tsconfig.esm.json --extendedDiagnostics",
+    "build:package": "npm run build:cjs && npm run build:esm && npm run build:css",
+    "clean": "rimraf dist/ .build/ .rollup.cache/",
+    "prepublishOnly": "npm run rebuild && npm run test",
+    "rebuild": "npm run clean && npm run build",
+    "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core",
+    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core --coverage"
   }
 }

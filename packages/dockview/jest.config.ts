@@ -1,7 +1,4 @@
 import { JestConfigWithTsJest } from 'ts-jest';
-import { join, normalize } from 'path';
-
-const tsconfig = normalize(join(__dirname, '..', '..', 'tsconfig.test.json'));
 
 const config: JestConfigWithTsJest = {
     preset: 'ts-jest',
@@ -15,7 +12,7 @@ const config: JestConfigWithTsJest = {
     setupFiles: [
         '<rootDir>/packages/dockview/src/__tests__/__mocks__/resizeObserver.js',
     ],
-    setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
+    setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
     coveragePathIgnorePatterns: ['/node_modules/'],
     modulePathIgnorePatterns: [
         '<rootDir>/packages/dockview/src/__tests__/__mocks__',
