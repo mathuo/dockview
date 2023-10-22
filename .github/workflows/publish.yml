@@ -1,0 +1,66 @@
+name: Publish Experimental Package to npmjs
+
+env:
+    NPM_CONFIG_PROVENANCE: true
+on:
+    workflow_dispatch:
+    release:
+        types: [published]
+jobs:
+    publish:
+        if: github.event_name == 'release'
+        runs-on: ubuntu-latest
+        env:
+            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        permissions:
+            id-token: write
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: '18.x'
+                  registry-url: 'https://registry.npmjs.org'
+
+            - uses: actions/cache@v3
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+
+            - run: yarn
+            - name: Publish dockview-core
+              run: npm publish --provenance
+              working-directory: packages/dockview-core
+            - name: Publish dockview
+              run: npm publish --provenance
+              working-directory: packages/dockview
+    publish-experimental:
+        if: github.event_name == 'workflow_dispatch'
+        runs-on: ubuntu-latest
+        env:
+            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        permissions:
+            id-token: write
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: '18.x'
+                  registry-url: 'https://registry.npmjs.org'
+
+            - uses: actions/cache@v3
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+
+            - run: yarn
+            - run: npm run set-experimental-versions
+            - name: Publish dockview-core
+              run: npm publish --provenance --tag experimental
+              working-directory: packages/dockview-core
+            - name: Publish dockview
+              run: npm publish --provenance --tag experimental
+              working-directory: packages/dockview
