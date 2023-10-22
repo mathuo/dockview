@@ -2677,4 +2677,27 @@ describe('gridview', () => {
         expect(el).toBeTruthy();
         expect(el!.childNodes.length).toBe(0);
     });
+
+    test('that disableAutoResizing is false by default', () => {
+        const gridview = new GridviewComponent({
+            parentElement: container,
+            proportionalLayout: true,
+            orientation: Orientation.HORIZONTAL,
+            components: { default: TestGridview },
+        });
+
+        expect(gridview.disableResizing).toBeFalsy();
+    });
+
+    test('that disableAutoResizing can be enabled', () => {
+        const gridview = new GridviewComponent({
+            parentElement: container,
+            proportionalLayout: true,
+            orientation: Orientation.HORIZONTAL,
+            components: { default: TestGridview },
+            disableAutoResizing: true,
+        });
+
+        expect(gridview.disableResizing).toBeTruthy();
+    });
 });

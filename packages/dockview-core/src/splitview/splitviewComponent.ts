@@ -158,7 +158,7 @@ export class SplitviewComponent
     }
 
     constructor(options: SplitviewComponentOptions) {
-        super(options.parentElement);
+        super(options.parentElement, options.disableAutoResizing);
 
         this._options = options;
 

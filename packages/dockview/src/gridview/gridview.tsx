@@ -47,6 +47,7 @@ export const GridviewReact = React.forwardRef(
 
             const gridview = new GridviewComponent({
                 parentElement: domRef.current,
+                disableAutoResizing: props.disableAutoResizing,
                 proportionalLayout:
                     typeof props.proportionalLayout === 'boolean'
                         ? props.proportionalLayout

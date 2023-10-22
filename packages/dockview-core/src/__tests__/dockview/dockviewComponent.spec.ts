@@ -4276,4 +4276,41 @@ describe('dockviewComponent', () => {
         expect(el).toBeTruthy();
         expect(el!.childNodes.length).toBe(0);
     });
+
+    test('that disableAutoResizing is false by default', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                panelA: PanelContentPartTest,
+                panelB: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+        });
+
+        expect(dockview.disableResizing).toBeFalsy();
+    });
+
+    test('that disableAutoResizing can be enabled', () => {
+        const container = document.createElement('div');
+
+        const dockview = new DockviewComponent({
+            parentElement: container,
+            components: {
+                panelA: PanelContentPartTest,
+                panelB: PanelContentPartTest,
+            },
+            tabComponents: {
+                test_tab_id: PanelTabPartTest,
+            },
+            orientation: Orientation.HORIZONTAL,
+            disableAutoResizing: true,
+        });
+
+        expect(dockview.disableResizing).toBeTruthy();
+    });
 });

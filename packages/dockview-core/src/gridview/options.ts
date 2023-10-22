@@ -3,6 +3,7 @@ import { ISplitviewStyles, Orientation } from '../splitview/splitview';
 import { FrameworkFactory } from '../panel/componentFactory';
 
 export interface GridviewComponentOptions {
+    disableAutoResizing?: boolean;
     proportionalLayout: boolean;
     orientation: Orientation;
     components?: {

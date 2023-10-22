@@ -199,7 +199,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
     }
 
     constructor(options: PaneviewComponentOptions) {
-        super(options.parentElement);
+        super(options.parentElement, options.disableAutoResizing);
 
         this.addDisposables(
             this._onDidLayoutChange,

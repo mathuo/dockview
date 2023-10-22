@@ -3,6 +3,7 @@ import { PaneviewDndOverlayEvent } from './paneviewComponent';
 import { IPaneBodyPart, IPaneHeaderPart, PaneviewPanel } from './paneviewPanel';
 
 export interface PaneviewComponentOptions {
+    disableAutoResizing?: boolean;
     components?: {
         [componentName: string]: {
             new (id: string, componentName: string): PaneviewPanel;

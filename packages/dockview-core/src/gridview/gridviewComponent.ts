@@ -109,6 +109,7 @@ export class GridviewComponent
             proportionalLayout: options.proportionalLayout,
             orientation: options.orientation,
             styles: options.styles,
+            disableAutoResizing: options.disableAutoResizing,
         });
 
         this._options = options;
