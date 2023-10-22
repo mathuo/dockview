@@ -25,8 +25,7 @@
     "docs": "typedoc",
     "rebuild": "npm run clean && npm run build",
     "test": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core",
-    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core --coverage",
-    "dev-publish": "node ./scripts/publishExperimental.js"
+    "test:cov": "cross-env ../../node_modules/.bin/jest --selectProjects dockview-core --coverage"
   },
   "files": [
     "dist",

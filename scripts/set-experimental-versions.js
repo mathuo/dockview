@@ -59,3 +59,13 @@ dockviewPackageJson.version = version;
 dockviewPackageJson.dependencies['dockview-core'] = dockviewPackageJson.version;
 
 fs.writeFileSync(dockviewPath, JSON.stringify(dockviewPackageJson, null, 4));
+
+// sanity check
+
+const dvCore = JSON.parse(fs.readFileSync(dockviewCorePath).toString());
+const dv = JSON.parse(fs.readFileSync(dockviewPath).toString());
+
+console.log(`dockview-core version: ${dvCore.version}`);
+console.log(
+    `dockview version: ${dv.version} dockview-core dependency version: ${dv.dependencies['dockview-core']}`
+);
