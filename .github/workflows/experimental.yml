@@ -1,4 +1,7 @@
 name: Publish Experimental Package to npmjs
+
+env:
+  NPM_CONFIG_PROVENANCE: true
 on:
     workflow_dispatch:
         # release:
@@ -6,11 +9,13 @@ on:
 jobs:
     build:
         runs-on: ubuntu-latest
+        permissions:
+          id-token: write
         steps:
             - uses: actions/checkout@v4
             - uses: actions/setup-node@v3
               with:
-                  node-version: '16.x'
+                  node-version: '18.x'
                   registry-url: 'https://registry.npmjs.org'
 
             - uses: actions/cache@v3
@@ -22,8 +27,13 @@ jobs:
 
             - run: yarn
             - run: npm run set-experimental-versions
-            - run: npm run build
-            - run: npm run test
-            - run: npm publish --tag experimental --dry-run
+            - name: Publish dockview-core
+              run: npm publish --provenance --tag experimental
+              working-directory: packages/dockview-core
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+            - name: Publish dockview
+              run: npm publish --provenance --tag experimental
+              working-directory: packages/dockview
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
