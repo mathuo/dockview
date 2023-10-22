@@ -22,8 +22,13 @@ jobs:
 
             - run: yarn
             - run: npm run set-experimental-versions
-            - run: npm run build
-            - run: npm run test
-            - run: npm publish --tag experimental --dry-run
+            - name: Publish dockview-core
+              run: npm publish --tag experimental
+              working-directory: packages/dockview-core
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+            - name: Publish dockview
+              run: npm publish --tag experimental
+              working-directory: packages/dockview
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
