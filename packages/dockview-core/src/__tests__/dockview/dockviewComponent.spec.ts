@@ -935,13 +935,13 @@ describe('dockviewComponent', () => {
             panel5.id,
             'center'
         );
+
         expect(events).toEqual([
             { type: 'REMOVE_PANEL', panel: panel5 },
             { type: 'ACTIVE_PANEL', panel: panel4 },
             { type: 'ADD_PANEL', panel: panel5 },
             { type: 'ACTIVE_PANEL', panel: panel5 },
             { type: 'ACTIVE_GROUP', group: panel2.group },
-            { type: 'ACTIVE_PANEL', panel: panel5 },
         ]);
 
         events = [];
@@ -961,6 +961,66 @@ describe('dockviewComponent', () => {
             { type: 'ADD_PANEL', panel: panel4 },
             { type: 'ACTIVE_PANEL', panel: panel4 },
         ]);
+
+        for (const panel of dockview.panels) {
+            panel.api.close();
+        }
+
+        events = [];
+
+        const panel6 = dockview.addPanel({
+            id: 'panel6',
+            component: 'default',
+            floating: true,
+        });
+        const panel6Group = panel6.group;
+
+        expect(events).toEqual([
+            { type: 'ADD_GROUP', group: panel6.group },
+            { type: 'ADD_PANEL', panel: panel6 },
+            { type: 'ACTIVE_PANEL', panel: panel6 },
+            { type: 'ACTIVE_GROUP', group: panel6.group },
+        ]);
+
+        events = [];
+
+        const panel7 = dockview.addPanel({
+            id: 'panel7',
+            component: 'default',
+            floating: true,
+        });
+        const panel7Group = panel7.group;
+
+        expect(events).toEqual([
+            { type: 'ADD_GROUP', group: panel7.group },
+            { type: 'ADD_PANEL', panel: panel7 },
+            { type: 'ACTIVE_PANEL', panel: panel7 },
+            { type: 'ACTIVE_GROUP', group: panel7.group },
+        ]);
+
+        expect(dockview.activePanel === panel7).toBeTruthy();
+
+        events = [];
+        panel7.api.close();
+
+        expect(events).toEqual([
+            { type: 'REMOVE_PANEL', panel: panel7 },
+            { type: 'REMOVE_GROUP', group: panel7Group },
+            { type: 'ACTIVE_GROUP', group: panel6.group },
+            { type: 'ACTIVE_PANEL', panel: panel6 },
+        ]);
+
+        events = [];
+        panel6.api.close();
+
+        expect(events).toEqual([
+            { type: 'REMOVE_PANEL', panel: panel6 },
+            { type: 'REMOVE_GROUP', group: panel6Group },
+            { type: 'ACTIVE_GROUP', group: undefined },
+        ]);
+
+        expect(dockview.size).toBe(0);
+        expect(dockview.totalPanels).toBe(0);
 
         disposable.dispose();
     });

@@ -661,7 +661,7 @@ export class DockviewComponent
 
         const location = getGridLocation(options.group.element);
         const next = <DockviewGroupPanel>this.gridview.next(location)?.view;
-        this.doSetGroupActive(next);
+        this.doSetGroupAndPanelActive(next);
     }
 
     moveToPrevious(options: MovementOptions = {}): void {
@@ -682,7 +682,7 @@ export class DockviewComponent
         const location = getGridLocation(options.group.element);
         const next = this.gridview.previous(location)?.view;
         if (next) {
-            this.doSetGroupActive(next as DockviewGroupPanel);
+            this.doSetGroupAndPanelActive(next as DockviewGroupPanel);
         }
     }
 
@@ -830,7 +830,7 @@ export class DockviewComponent
             if (typeof activeGroup === 'string') {
                 const panel = this.getPanel(activeGroup);
                 if (panel) {
-                    this.doSetGroupActive(panel);
+                    this.doSetGroupAndPanelActive(panel);
                 }
             }
         } catch (err) {
@@ -887,7 +887,7 @@ export class DockviewComponent
         }
 
         if (hasActiveGroup) {
-            this.doSetGroupActive(undefined);
+            this.doSetGroupAndPanelActive(undefined);
         }
 
         if (hasActivePanel) {
@@ -967,19 +967,20 @@ export class DockviewComponent
 
             if (options.floating) {
                 const group = this.createGroup();
-                panel = this.createPanel(options, group);
-                group.model.openPanel(panel);
-
                 const o =
                     typeof options.floating === 'object' &&
                     options.floating !== null
                         ? options.floating
                         : {};
-
                 this.addFloatingGroup(group, o, {
                     inDragMode: false,
                     skipRemoveGroup: true,
                 });
+
+                this._onDidAddGroup.fire(group);
+                panel = this.createPanel(options, group);
+                group.model.openPanel(panel);
+                this.doSetGroupAndPanelActive(group);
             } else if (referenceGroup.api.isFloating || target === 'center') {
                 panel = this.createPanel(options, referenceGroup);
                 referenceGroup.model.openPanel(panel);
@@ -996,19 +997,21 @@ export class DockviewComponent
             }
         } else if (options.floating) {
             const group = this.createGroup();
-            panel = this.createPanel(options, group);
-            group.model.openPanel(panel);
-
             const o =
                 typeof options.floating === 'object' &&
                 options.floating !== null
                     ? options.floating
                     : {};
-
             this.addFloatingGroup(group, o, {
                 inDragMode: false,
                 skipRemoveGroup: true,
             });
+
+            this._onDidAddGroup.fire(group);
+
+            panel = this.createPanel(options, group);
+            group.model.openPanel(panel);
+            this.doSetGroupAndPanelActive(group);
         } else {
             const group = this.createGroupAtLocation();
 
@@ -1161,7 +1164,13 @@ export class DockviewComponent
             });
         }
 
+        const activePanel = this.activePanel;
+
         this.doRemoveGroup(group, options);
+
+        if (this.activePanel !== activePanel) {
+            this._onDidActivePanelChange.fire(this.activePanel);
+        }
     }
 
     protected override doRemoveGroup(
@@ -1180,9 +1189,18 @@ export class DockviewComponent
             if (!options?.skipDispose) {
                 floatingGroup.group.dispose();
                 this._groups.delete(group.id);
-                // TODO: fire group removed event?
+                this._onDidRemoveGroup.fire(group);
             }
+
             floatingGroup.dispose();
+
+            if (!options?.skipActive && this._activeGroup === group) {
+                const groups = Array.from(this._groups.values());
+
+                this.doSetGroupActive(
+                    groups.length > 0 ? groups[0].value : undefined
+                );
+            }
 
             return floatingGroup.group;
         }
@@ -1349,14 +1367,14 @@ export class DockviewComponent
         }
     }
 
-    doSetGroupActive(
+    doSetGroupAndPanelActive(
         group: DockviewGroupPanel | undefined,
         skipFocus?: boolean
     ): void {
-        const isGroupAlreadyFocused = this._activeGroup === group;
+        const activePanel = this.activePanel;
         super.doSetGroupActive(group, skipFocus);
 
-        if (!isGroupAlreadyFocused && this._activeGroup?.activePanel) {
+        if (this._activeGroup?.activePanel !== activePanel) {
             this._onDidActivePanelChange.fire(this._activeGroup?.activePanel);
         }
     }
