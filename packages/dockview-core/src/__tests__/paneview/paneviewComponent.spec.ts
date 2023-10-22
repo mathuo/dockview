@@ -489,4 +489,27 @@ describe('componentPaneview', () => {
             ],
         });
     });
+
+    test('that disableAutoResizing is false by default', () => {
+        const paneview = new PaneviewComponent({
+            parentElement: container,
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+
+        expect(paneview.disableResizing).toBeFalsy();
+    });
+
+    test('that disableAutoResizing can be enabled', () => {
+        const paneview = new PaneviewComponent({
+            parentElement: container,
+            components: {
+                testPanel: TestPanel,
+            },
+            disableAutoResizing: true,
+        });
+
+        expect(paneview.disableResizing).toBeTruthy();
+    });
 });

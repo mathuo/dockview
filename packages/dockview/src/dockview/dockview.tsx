@@ -150,6 +150,7 @@ export const DockviewReact = React.forwardRef(
                 parentElement: domRef.current,
                 frameworkComponentFactory: factory,
                 frameworkComponents: props.components,
+                disableAutoResizing: props.disableAutoResizing,
                 frameworkTabComponents,
                 watermarkFrameworkComponent: props.watermarkComponent,
                 defaultTabComponent: props.defaultTabComponent

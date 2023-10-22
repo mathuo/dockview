@@ -33,6 +33,7 @@ export interface BaseGridOptions {
     readonly orientation: Orientation;
     readonly styles?: ISplitviewStyles;
     readonly parentElement?: HTMLElement;
+    readonly disableAutoResizing?: boolean;
 }
 
 export interface IGridPanelView extends IGridView, IPanel {
@@ -128,7 +129,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
     }
 
     constructor(options: BaseGridOptions) {
-        super(options.parentElement);
+        super(options.parentElement, options.disableAutoResizing);
 
         this.gridview = new Gridview(
             !!options.proportionalLayout,

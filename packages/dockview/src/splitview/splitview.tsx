@@ -41,6 +41,7 @@ export const SplitviewReact = React.forwardRef(
         React.useEffect(() => {
             const splitview = new SplitviewComponent({
                 parentElement: domRef.current!,
+                disableAutoResizing: props.disableAutoResizing,
                 orientation: props.orientation ?? Orientation.HORIZONTAL,
                 frameworkComponents: props.components,
                 frameworkWrapper: {

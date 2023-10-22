@@ -588,4 +588,29 @@ describe('componentSplitview', () => {
             activeView: 'panel1',
         });
     });
+
+    test('that disableAutoResizing is false by default', () => {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
+            orientation: Orientation.VERTICAL,
+            components: {
+                testPanel: TestPanel,
+            },
+        });
+
+        expect(splitview.disableResizing).toBeFalsy();
+    });
+
+    test('that disableAutoResizing can be enabled', () => {
+        const splitview = new SplitviewComponent({
+            parentElement: container,
+            orientation: Orientation.VERTICAL,
+            components: {
+                testPanel: TestPanel,
+            },
+            disableAutoResizing: true,
+        });
+
+        expect(splitview.disableResizing).toBeTruthy();
+    });
 });

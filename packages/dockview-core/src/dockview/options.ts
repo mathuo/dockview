@@ -71,6 +71,7 @@ export interface DockviewDndOverlayEvent {
 }
 
 export interface DockviewComponentOptions extends DockviewRenderFunctions {
+    disableAutoResizing?: boolean;
     watermarkComponent?: WatermarkConstructor;
     watermarkFrameworkComponent?: any;
     frameworkComponentFactory?: GroupPanelFrameworkComponentFactory;

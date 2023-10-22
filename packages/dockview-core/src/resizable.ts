@@ -3,13 +3,24 @@ import { CompositeDisposable } from './lifecycle';
 
 export abstract class Resizable extends CompositeDisposable {
     private readonly _element: HTMLElement;
+    private _disableResizing: boolean;
 
     get element(): HTMLElement {
         return this._element;
     }
 
-    constructor(parentElement?: HTMLElement) {
+    get disableResizing(): boolean {
+        return this._disableResizing;
+    }
+
+    set disableResizing(value: boolean) {
+        this._disableResizing = value;
+    }
+
+    constructor(parentElement?: HTMLElement, disableResizing = false) {
         super();
+
+        this._disableResizing = disableResizing;
 
         if (parentElement) {
             this._element = parentElement;
@@ -27,6 +38,10 @@ export abstract class Resizable extends CompositeDisposable {
                      * resize is delayed through requestAnimationFrame so there is a small chance
                      * the component has already been disposed of
                      */
+                    return;
+                }
+
+                if (this.disableResizing) {
                     return;
                 }
 

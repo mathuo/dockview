@@ -17,6 +17,7 @@ export interface ISerializableView extends IView, IPanel {
 }
 
 export interface SplitviewComponentOptions extends SplitViewOptions {
+    disableAutoResizing?: boolean;
     components?: {
         [componentName: string]: {
             new (id: string, componentName: string): SplitviewPanel;

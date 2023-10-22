@@ -305,6 +305,7 @@ export class DockviewComponent
             orientation: options.orientation ?? Orientation.HORIZONTAL,
             styles: options.styles,
             parentElement: options.parentElement,
+            disableAutoResizing: options.disableAutoResizing,
         });
 
         toggleClass(this.gridview.element, 'dv-dockview', true);

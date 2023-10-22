@@ -53,6 +53,7 @@ export const PaneviewReact = React.forwardRef(
 
             const paneview = new PaneviewComponent({
                 parentElement: domRef.current!,
+                disableAutoResizing: props.disableAutoResizing,
                 frameworkComponents: props.components,
                 components: {},
                 headerComponents: {},
