@@ -18,6 +18,7 @@
     "clean": "lerna run clean",
     "bootstrap": "lerna bootstrap",
     "test:cov": "jest --coverage",
+    "set-experimental-versions": "node scripts/set-experimental-versions",
     "version-beta-build": "lerna version prerelease --preid beta",
     "publish-app": "lerna publish",
     "docs": "typedoc",
