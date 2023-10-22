@@ -240,8 +240,8 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
         const body = createComponent(
             options.id,
             options.component,
-            this.options.components || {},
-            this.options.frameworkComponents || {},
+            this.options.components ?? {},
+            this.options.frameworkComponents ?? {},
             this.options.frameworkWrapper
                 ? {
                       createComponent:
@@ -256,7 +256,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             header = createComponent(
                 options.id,
                 options.headerComponent,
-                this.options.headerComponents || {},
+                this.options.headerComponents ?? {},
                 this.options.headerframeworkComponents,
                 this.options.frameworkWrapper
                     ? {
@@ -290,7 +290,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
             typeof options.index === 'number' ? options.index : undefined;
 
         view.init({
-            params: options.params || {},
+            params: options.params ?? {},
             minimumBodySize: options.minimumBodySize,
             maximumBodySize: options.maximumBodySize,
             isExpanded: options.isExpanded,
@@ -377,8 +377,8 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
                     const body = createComponent(
                         data.id,
                         data.component,
-                        this.options.components || {},
-                        this.options.frameworkComponents || {},
+                        this.options.components ?? {},
+                        this.options.frameworkComponents ?? {},
                         this.options.frameworkWrapper
                             ? {
                                   createComponent:
@@ -394,8 +394,8 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
                         header = createComponent(
                             data.id,
                             data.headerComponent,
-                            this.options.headerComponents || {},
-                            this.options.headerframeworkComponents || {},
+                            this.options.headerComponents ?? {},
+                            this.options.headerframeworkComponents ?? {},
                             this.options.frameworkWrapper
                                 ? {
                                       createComponent:
@@ -424,7 +424,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
 
                     queue.push(() => {
                         panel.init({
-                            params: data.params || {},
+                            params: data.params ?? {},
                             minimumBodySize: view.minimumSize,
                             maximumBodySize: view.maximumSize,
                             title: data.title,

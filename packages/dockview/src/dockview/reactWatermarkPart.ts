@@ -60,7 +60,7 @@ export class ReactWatermarkPart implements IWatermarkRenderer {
             this.parameters.params = params.params;
         }
 
-        this.part?.update({ params: this.parameters?.params || {} });
+        this.part?.update({ params: this.parameters?.params ?? {} });
     }
 
     layout(_width: number, _height: number): void {

@@ -51,7 +51,7 @@ export const GridviewReact = React.forwardRef(
                     typeof props.proportionalLayout === 'boolean'
                         ? props.proportionalLayout
                         : true,
-                orientation: props.orientation || Orientation.HORIZONTAL,
+                orientation: props.orientation ?? Orientation.HORIZONTAL,
                 frameworkComponents: props.components,
                 frameworkComponentFactory: {
                     createComponent: (id: string, componentId, component) => {

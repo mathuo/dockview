@@ -97,7 +97,7 @@ export class DockviewPanelModel implements IDockviewPanelModel {
         return createComponent(
             id,
             componentName,
-            this.accessor.options.components || {},
+            this.accessor.options.components ?? {},
             this.accessor.options.frameworkComponents,
             this.accessor.options.frameworkComponentFactory?.content
         );

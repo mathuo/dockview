@@ -190,8 +190,8 @@ export class GridviewComponent
                     const view = createComponent(
                         data.id,
                         data.component,
-                        this.options.components || {},
-                        this.options.frameworkComponents || {},
+                        this.options.components ?? {},
+                        this.options.frameworkComponents ?? {},
                         this.options.frameworkComponentFactory
                             ? {
                                   createComponent:
@@ -308,7 +308,7 @@ export class GridviewComponent
     public addPanel<T extends object = Parameters>(
         options: AddComponentOptions<T>
     ): IGridviewPanel {
-        let relativeLocation: number[] = options.location || [0];
+        let relativeLocation: number[] = options.location ?? [0];
 
         if (options.position?.referencePanel) {
             const referenceGroup = this._groups.get(
@@ -337,8 +337,8 @@ export class GridviewComponent
         const view = createComponent(
             options.id,
             options.component,
-            this.options.components || {},
-            this.options.frameworkComponents || {},
+            this.options.components ?? {},
+            this.options.frameworkComponents ?? {},
             this.options.frameworkComponentFactory
                 ? {
                       createComponent:
@@ -349,7 +349,7 @@ export class GridviewComponent
         );
 
         view.init({
-            params: options.params || {},
+            params: options.params ?? {},
             minimumWidth: options.minimumWidth,
             maximumWidth: options.maximumWidth,
             minimumHeight: options.minimumHeight,
