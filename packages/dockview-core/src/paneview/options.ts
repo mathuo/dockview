@@ -1,21 +1,20 @@
-import { FrameworkFactory } from '../panel/componentFactory';
+import {
+    ComponentConstructor,
+    FrameworkFactory,
+} from '../panel/componentFactory';
 import { PaneviewDndOverlayEvent } from './paneviewComponent';
 import { IPaneBodyPart, IPaneHeaderPart, PaneviewPanel } from './paneviewPanel';
 
 export interface PaneviewComponentOptions {
     disableAutoResizing?: boolean;
     components?: {
-        [componentName: string]: {
-            new (id: string, componentName: string): PaneviewPanel;
-        };
+        [componentName: string]: ComponentConstructor<PaneviewPanel>;
     };
     frameworkComponents?: {
         [componentName: string]: any;
     };
     headerComponents?: {
-        [componentName: string]: {
-            new (id: string, componentName: string): PaneviewPanel;
-        };
+        [componentName: string]: ComponentConstructor<PaneviewPanel>;
     };
     headerframeworkComponents?: {
         [componentName: string]: any;

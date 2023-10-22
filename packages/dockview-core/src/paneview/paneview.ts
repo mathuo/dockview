@@ -19,7 +19,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
     private splitview: Splitview;
     private paneItems: PaneItem[] = [];
     private _orientation: Orientation;
-    private animationTimer: any | undefined;
+    private animationTimer: any;
     private skipAnimation = false;
 
     private readonly _onDidChange = new Emitter<void>();

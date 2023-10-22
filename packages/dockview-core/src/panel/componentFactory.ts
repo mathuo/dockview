@@ -2,11 +2,15 @@ export interface FrameworkFactory<T> {
     createComponent: (id: string, componentId: string, component: any) => T;
 }
 
+export type ComponentConstructor<T> = {
+    new (id: string, component: string): T;
+};
+
 export function createComponent<T>(
     id: string,
     componentName?: string,
     components: {
-        [componentName: string]: { new (id: string, component: string): T };
+        [componentName: string]: ComponentConstructor<T>;
     } = {},
     frameworkComponents: {
         [componentName: string]: any;

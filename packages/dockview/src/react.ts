@@ -194,7 +194,7 @@ export const usePortalsLifecycle: PortalLifecycleHook = () => {
 
 // it does the job...
 export function isReactElement(
-    element: any | React.ReactElement
+    element: unknown
 ): element is React.ReactElement {
-    return element?.type;
+    return !!(element as React.ReactElement)?.type;
 }

@@ -274,7 +274,7 @@ export class SplitviewComponent
         view.orientation = this.splitview.orientation;
 
         view.init({
-            params: options.params || {},
+            params: options.params ?? {},
             minimumSize: options.minimumSize,
             maximumSize: options.maximumSize,
             snap: options.snap,

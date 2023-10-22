@@ -15,7 +15,10 @@ import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
 import { Position } from '../dnd/droptarget';
 import { IDockviewPanel } from './dockviewPanel';
-import { FrameworkFactory } from '../panel/componentFactory';
+import {
+    ComponentConstructor,
+    FrameworkFactory,
+} from '../panel/componentFactory';
 import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
 
 export interface IHeaderActionsRenderer extends IDisposable {
@@ -40,14 +43,10 @@ export interface TabContextMenuEvent {
 
 export interface DockviewRenderFunctions {
     tabComponents?: {
-        [componentName: string]: {
-            new (id: string, component: string): ITabRenderer;
-        };
+        [componentName: string]: ComponentConstructor<ITabRenderer>;
     };
     components?: {
-        [componentName: string]: {
-            new (id: string, component: string): IContentRenderer;
-        };
+        [componentName: string]: ComponentConstructor<IContentRenderer>;
     };
     frameworkTabComponents?: {
         [componentName: string]: any;
