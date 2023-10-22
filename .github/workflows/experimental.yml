@@ -1,0 +1,29 @@
+name: Publish Experimental Package to npmjs
+on:
+    workflow_dispatch:
+        # release:
+        #     types: [published]
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: '16.x'
+                  registry-url: 'https://registry.npmjs.org'
+
+            - uses: actions/cache@v3
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+
+            - run: yarn
+            - run: npm run set-experimental-verisons
+            - run: npm run build
+            - run: npm run test
+            - run: npm publish --tag experimental --dry-run
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
