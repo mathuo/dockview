@@ -322,7 +322,7 @@ export class DockviewGroupPanelModel
         );
 
         this.header.hidden = !!options.hideHeader;
-        this.locked = options.locked || false;
+        this.locked = options.locked ?? false;
 
         this.addDisposables(
             this._onTabDragStart,

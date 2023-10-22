@@ -261,8 +261,8 @@ export class SplitviewComponent
         const view = createComponent(
             options.id,
             options.component,
-            this.options.components || {},
-            this.options.frameworkComponents || {},
+            this.options.components ?? {},
+            this.options.frameworkComponents ?? {},
             this.options.frameworkWrapper
                 ? {
                       createComponent:
@@ -361,8 +361,8 @@ export class SplitviewComponent
                     const panel = createComponent(
                         data.id,
                         data.component,
-                        this.options.components || {},
-                        this.options.frameworkComponents || {},
+                        this.options.components ?? {},
+                        this.options.frameworkComponents ?? {},
                         this.options.frameworkWrapper
                             ? {
                                   createComponent:
@@ -374,7 +374,7 @@ export class SplitviewComponent
 
                     queue.push(() => {
                         panel.init({
-                            params: data.params || {},
+                            params: data.params ?? {},
                             minimumSize: data.minimumSize,
                             maximumSize: data.maximumSize,
                             snap: view.snap,

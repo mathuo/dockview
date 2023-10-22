@@ -1,4 +1,3 @@
-import { toHaveDescription } from '@testing-library/jest-dom/matchers';
 import {
     getElementsByTagName,
     quasiDefaultPrevented,

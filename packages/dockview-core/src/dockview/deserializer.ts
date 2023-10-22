@@ -35,7 +35,7 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
 
         const contentComponent = viewData
             ? viewData.content.id
-            : panelData.contentComponent || 'unknown';
+            : panelData.contentComponent ?? 'unknown';
         const tabComponent = viewData
             ? viewData.tab?.id
             : panelData.tabComponent;
@@ -56,8 +56,8 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
         );
 
         panel.init({
-            title: title || panelId,
-            params: params || {},
+            title: title ?? panelId,
+            params: params ?? {},
         });
 
         return panel;

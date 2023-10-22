@@ -23,7 +23,7 @@ export class ReactGridPanelView extends GridviewPanel {
             this.reactPortalStore,
             this.reactComponent,
             {
-                params: this._params?.params || {},
+                params: this._params?.params ?? {},
                 api: this.api,
                 containerApi: new GridviewApi(
                     (this._params as GridviewInitParameters).accessor

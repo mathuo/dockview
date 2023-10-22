@@ -117,7 +117,7 @@ export class DockviewPanel
     public update(event: PanelUpdateEvent): void {
         // merge the new parameters with the existing parameters
         this._params = {
-            ...(this._params || {}),
+            ...(this._params ?? {}),
             ...event.params,
         };
 

@@ -55,7 +55,6 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
-import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
 
 const DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE = 100;
 
@@ -303,7 +302,7 @@ export class DockviewComponent
     constructor(options: DockviewComponentOptions) {
         super({
             proportionalLayout: true,
-            orientation: options.orientation || Orientation.HORIZONTAL,
+            orientation: options.orientation ?? Orientation.HORIZONTAL,
             styles: options.styles,
             parentElement: options.parentElement,
         });
@@ -407,7 +406,7 @@ export class DockviewComponent
                     this.moveGroupOrPanel(
                         this.orthogonalize(event.position),
                         data.groupId,
-                        data.panelId || undefined,
+                        data.panelId ?? undefined,
                         'center'
                     );
                 } else {
@@ -1214,7 +1213,7 @@ export class DockviewComponent
 
         if (!destinationTarget || destinationTarget === 'center') {
             const groupItem: IDockviewPanel | undefined =
-                sourceGroup?.model.removePanel(sourceItemId) ||
+                sourceGroup?.model.removePanel(sourceItemId) ??
                 this.panels.find((panel) => panel.id === sourceItemId);
 
             if (!groupItem) {
@@ -1278,7 +1277,7 @@ export class DockviewComponent
                 this.doAddGroup(targetGroup, location);
             } else {
                 const groupItem: IDockviewPanel | undefined =
-                    sourceGroup?.model.removePanel(sourceItemId) ||
+                    sourceGroup?.model.removePanel(sourceItemId) ??
                     this.panels.find((panel) => panel.id === sourceItemId);
 
                 if (!groupItem) {
@@ -1431,7 +1430,7 @@ export class DockviewComponent
     ): DockviewPanel {
         const contentComponent = options.component;
         const tabComponent =
-            options.tabComponent || this.options.defaultTabComponent;
+            options.tabComponent ?? this.options.defaultTabComponent;
 
         const view = new DockviewPanelModel(
             this,
@@ -1448,8 +1447,8 @@ export class DockviewComponent
             view
         );
         panel.init({
-            title: options.title || options.id,
-            params: options?.params || {},
+            title: options.title ?? options.id,
+            params: options?.params ?? {},
         });
 
         return panel;
