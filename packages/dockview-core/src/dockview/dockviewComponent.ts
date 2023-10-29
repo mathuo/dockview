@@ -7,7 +7,7 @@ import {
 import { directionToPosition, Droptarget, Position } from '../dnd/droptarget';
 import { tail, sequenceEquals, remove } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { CompositeDisposable } from '../lifecycle';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { Event, Emitter } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import {
@@ -46,7 +46,11 @@ import { DockviewPanelModel } from './dockviewPanelModel';
 import { getPanelData } from '../dnd/dataTransfer';
 import { Parameters } from '../panel/types';
 import { Overlay } from '../dnd/overlay';
-import { toggleClass, watchElementResize } from '../dom';
+import {
+    FocusTrap as FocusRetainment,
+    toggleClass,
+    watchElementResize,
+} from '../dom';
 import {
     DockviewFloatingGroupPanel,
     IDockviewFloatingGroupPanel,
@@ -55,6 +59,7 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
+import { createCloseButton } from '../svg';
 
 const DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE = 100;
 

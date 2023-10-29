@@ -68,8 +68,8 @@ export class DockviewGroupPanel
             id,
             'groupview_default',
             {
-                minimumHeight: 100,
-                minimumWidth: 100,
+                minimumHeight: 0,
+                minimumWidth: 0,
             },
             new DockviewGroupPanelApiImpl(id, accessor)
         );

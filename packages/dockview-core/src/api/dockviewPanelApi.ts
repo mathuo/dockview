@@ -31,6 +31,7 @@ export interface DockviewPanelApi
         position?: Position;
         index?: number;
     }): void;
+    maximize(): void;
 }
 
 export class DockviewPanelApiImpl
@@ -119,5 +120,9 @@ export class DockviewPanelApiImpl
 
     close(): void {
         this.group.model.closePanel(this.panel);
+    }
+
+    maximize(): void {
+        this.accessor.maximizeGroup(this.panel.group);
     }
 }

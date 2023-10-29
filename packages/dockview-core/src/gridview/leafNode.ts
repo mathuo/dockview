@@ -121,7 +121,7 @@ export class LeafNode implements IView {
     public setVisible(visible: boolean): void {
         if (this.view.setVisible) {
             this.view.setVisible(visible);
-            this._onDidChange.fire({});
+            // this._onDidChange.fire({});
         }
     }
 

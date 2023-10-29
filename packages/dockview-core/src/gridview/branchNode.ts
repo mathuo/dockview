@@ -33,6 +33,10 @@ export class BranchNode extends CompositeDisposable implements IView {
     readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
         this._onDidChange.event;
 
+    private readonly _onDidVisibilityChange = new Emitter<boolean>();
+    readonly onDidVisibilityChange: Event<boolean> =
+        this._onDidVisibilityChange.event;
+
     get width(): number {
         return this.orientation === Orientation.HORIZONTAL
             ? this.size
@@ -48,11 +52,23 @@ export class BranchNode extends CompositeDisposable implements IView {
     get minimumSize(): number {
         return this.children.length === 0
             ? 0
-            : Math.max(...this.children.map((c) => c.minimumOrthogonalSize));
+            : Math.max(
+                  ...this.children.map((c, index) =>
+                      this.splitview.isViewVisible(index)
+                          ? c.minimumOrthogonalSize
+                          : 0
+                  )
+              );
     }
 
     get maximumSize(): number {
-        return Math.min(...this.children.map((c) => c.maximumOrthogonalSize));
+        return Math.min(
+            ...this.children.map((c, index) =>
+                this.splitview.isViewVisible(index)
+                    ? c.maximumOrthogonalSize
+                    : Number.POSITIVE_INFINITY
+            )
+        );
     }
 
     get minimumOrthogonalSize(): number {
@@ -163,6 +179,7 @@ export class BranchNode extends CompositeDisposable implements IView {
 
         this.addDisposables(
             this._onDidChange,
+            this._onDidVisibilityChange,
             this.splitview.onDidSashEnd(() => {
                 this._onDidChange.fire({});
             })
@@ -185,7 +202,7 @@ export class BranchNode extends CompositeDisposable implements IView {
         return this.splitview.isViewVisible(index);
     }
 
-    setChildVisible(index: number, visible: boolean): void {
+     setChildVisible(index: number, visible: boolean): void {
         if (index < 0 || index >= this.children.length) {
             throw new Error('Invalid index');
         }
@@ -194,7 +211,18 @@ export class BranchNode extends CompositeDisposable implements IView {
             return;
         }
 
+        const wereAllChildrenHidden = this.splitview.contentSize === 0;
         this.splitview.setViewVisible(index, visible);
+        const areAllChildrenHidden = this.splitview.contentSize === 0;
+
+        // If all children are hidden then the parent should hide the entire splitview
+        // If the entire splitview is hidden then the parent should show the splitview when a child is shown
+        if (
+            (visible && wereAllChildrenHidden) ||
+            (!visible && areAllChildrenHidden)
+        ) {
+            this._onDidVisibilityChange.fire(visible);
+        }
     }
 
     moveChild(from: number, to: number): void {
@@ -285,15 +313,23 @@ export class BranchNode extends CompositeDisposable implements IView {
     private setupChildrenEvents(): void {
         this._childrenDisposable.dispose();
 
-        this._childrenDisposable = Event.any(
-            ...this.children.map((c) => c.onDidChange)
-        )((e) => {
-            /**
-             * indicate a change has occured to allows any re-rendering but don't bubble
-             * event because that was specific to this branch
-             */
-            this._onDidChange.fire({ size: e.orthogonalSize });
-        });
+        this._childrenDisposable = new CompositeDisposable(
+            Event.any(...this.children.map((c) => c.onDidChange))((e) => {
+                /**
+                 * indicate a change has occured to allows any re-rendering but don't bubble
+                 * event because that was specific to this branch
+                 */
+                this._onDidChange.fire({ size: e.orthogonalSize });
+            }),
+            ...this.children.map((c, i) => {
+                if (c instanceof BranchNode) {
+                    return c.onDidVisibilityChange((visible) => {
+                        this.setChildVisible(i, visible);
+                    });
+                }
+                return Disposable.NONE;
+            })
+        );
     }
 
     public dispose(): void {

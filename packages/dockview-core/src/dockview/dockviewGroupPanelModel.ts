@@ -130,6 +130,8 @@ export interface IDockviewGroupPanelModel extends IPanel {
     ): boolean;
 }
 
+export type DockviewGroupMode = 'grid' | 'floating' | 'fullscreen' | 'popout';
+
 export class DockviewGroupPanelModel
     extends CompositeDisposable
     implements IDockviewGroupPanelModel
