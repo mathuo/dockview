@@ -1,4 +1,4 @@
-name: Publish Experimental Package to npmjs
+name: Publish to npm
 
 env:
     NPM_CONFIG_PROVENANCE: true
