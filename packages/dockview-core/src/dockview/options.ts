@@ -96,6 +96,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
               minimumHeightWithinViewport?: number;
               minimumWidthWithinViewport?: number;
           };
+    popoutUrl?: string;
 }
 
 export interface PanelOptions<P extends object = Parameters> {

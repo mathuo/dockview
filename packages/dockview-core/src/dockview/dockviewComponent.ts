@@ -7,7 +7,7 @@ import {
 import { directionToPosition, Droptarget, Position } from '../dnd/droptarget';
 import { tail, sequenceEquals, remove } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { CompositeDisposable } from '../lifecycle';
+import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { Event, Emitter } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import {
@@ -47,14 +47,40 @@ import { getPanelData } from '../dnd/dataTransfer';
 import { Parameters } from '../panel/types';
 import { Overlay } from '../dnd/overlay';
 import { toggleClass, watchElementResize } from '../dom';
-import {
-    DockviewFloatingGroupPanel,
-    IDockviewFloatingGroupPanel,
-} from './dockviewFloatingGroupPanel';
+import { DockviewFloatingGroupPanel } from './dockviewFloatingGroupPanel';
 import {
     GroupDragEvent,
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
+import { PopoutWindow } from '../popoutWindow';
+import { Box } from '../types';
+
+function getTheme(element: HTMLElement): string | undefined {
+    function toClassList(element: HTMLElement) {
+        const list: string[] = [];
+
+        for (let i = 0; i < element.classList.length; i++) {
+            list.push(element.classList.item(i)!);
+        }
+
+        return list;
+    }
+
+    let theme: string | undefined = undefined;
+    let parent: HTMLElement | null = element;
+
+    while (parent !== null) {
+        theme = toClassList(parent).find((cls) =>
+            cls.startsWith('dockview-theme-')
+        );
+        if (typeof theme === 'string') {
+            break;
+        }
+        parent = parent.parentElement;
+    }
+
+    return theme;
+}
 
 const DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE = 100;
 
@@ -65,7 +91,12 @@ export interface PanelReference {
 
 export interface SerializedFloatingGroup {
     data: GroupPanelViewState;
-    position: { height: number; width: number; left: number; top: number };
+    position: Box;
+}
+
+export interface SerializedPopoutGroup {
+    data: GroupPanelViewState;
+    position: Box | null;
 }
 
 export interface SerializedDockview {
@@ -78,6 +109,7 @@ export interface SerializedDockview {
     panels: Record<string, GroupviewPanelState>;
     activeGroup?: string;
     floatingGroups?: SerializedFloatingGroup[];
+    popoutGroups?: SerializedPopoutGroup[];
 }
 
 function typeValidate3(data: GroupPanelViewState, path: string): void {
@@ -188,11 +220,16 @@ export interface DockviewDropEvent extends GroupviewDropEvent {
     group: DockviewGroupPanel | null;
 }
 
+export interface DockviewPopoutGroupPanel {
+    window: PopoutWindow;
+    disposable: IDisposable;
+    group: DockviewGroupPanel;
+}
+
 export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly activePanel: IDockviewPanel | undefined;
     readonly totalPanels: number;
     readonly panels: IDockviewPanel[];
-    readonly floatingGroups: IDockviewFloatingGroupPanel[];
     readonly onDidDrop: Event<DockviewDropEvent>;
     readonly orientation: Orientation;
     updateOptions(options: DockviewComponentUpdateOptions): void;
@@ -233,6 +270,13 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
         item: IDockviewPanel | DockviewGroupPanel,
         coord?: { x: number; y: number }
     ): void;
+    addPopoutGroup(
+        item: IDockviewPanel | DockviewGroupPanel,
+        options?: {
+            skipRemoveGroup?: boolean;
+            position?: Box;
+        }
+    ): void;
 }
 
 export class DockviewComponent
@@ -271,7 +315,8 @@ export class DockviewComponent
     readonly onDidActivePanelChange: Event<IDockviewPanel | undefined> =
         this._onDidActivePanelChange.event;
 
-    readonly floatingGroups: DockviewFloatingGroupPanel[] = [];
+    private readonly _floatingGroups: DockviewFloatingGroupPanel[] = [];
+    private readonly _popoutGroups: DockviewPopoutGroupPanel[] = [];
 
     get orientation(): Orientation {
         return this.gridview.orientation;
@@ -427,6 +472,85 @@ export class DockviewComponent
         this.updateWatermark();
     }
 
+    addPopoutGroup(
+        item: DockviewPanel | DockviewGroupPanel,
+        options?: {
+            skipRemoveGroup?: boolean;
+            position?: Box;
+        }
+    ): void {
+        let group: DockviewGroupPanel;
+        const theme = getTheme(this.gridview.element);
+
+        let box: Box | undefined = options?.position;
+
+        if (item instanceof DockviewPanel) {
+            group = this.createGroup();
+
+            this.removePanel(item, {
+                removeEmptyGroup: true,
+                skipDispose: true,
+            });
+
+            group.model.openPanel(item);
+
+            if (!box) {
+                box = this.element.getBoundingClientRect();
+            }
+        } else {
+            group = item;
+
+            if (!box) {
+                box = group.element.getBoundingClientRect();
+            }
+
+            const skip =
+                typeof options?.skipRemoveGroup === 'boolean' &&
+                options.skipRemoveGroup;
+
+            if (!skip) {
+                this.doRemoveGroup(item, { skipDispose: true });
+            }
+        }
+
+        // const { top: boundingTop, left: boundingLeft } =
+        //     this.element.getBoundingClientRect();
+
+        const window = new PopoutWindow('test', theme ?? '', {
+            url: this.options.popoutUrl ?? 'popout.html',
+            left: box.left,
+            top: box.top,
+            width: box.width,
+            height: box.height,
+        });
+
+        const disposable = new CompositeDisposable();
+        const wrappedWindow = { window, disposable, group };
+
+        disposable.addDisposables(
+            window.onDidClose(() => {
+                group.model.location = 'grid';
+
+                remove(this._popoutGroups, wrappedWindow);
+
+                this.doAddGroup(group, [0]);
+            }),
+            {
+                dispose: () => {
+                    group.model.location = 'grid';
+                    remove(this._popoutGroups, wrappedWindow);
+                },
+            },
+            window
+        );
+
+        group.model.location = 'popout';
+
+        this._popoutGroups.push(wrappedWindow);
+
+        window.open(group.element);
+    }
+
     addFloatingGroup(
         item: DockviewPanel | DockviewGroupPanel,
         coord?: { x?: number; y?: number; height?: number; width?: number },
@@ -455,7 +579,7 @@ export class DockviewComponent
             }
         }
 
-        group.model.isFloating = true;
+        group.model.location = 'floating';
 
         const overlayLeft =
             typeof coord?.x === 'number' ? Math.max(coord.x, 0) : 100;
@@ -526,14 +650,14 @@ export class DockviewComponent
                 dispose: () => {
                     disposable.dispose();
 
-                    group.model.isFloating = false;
-                    remove(this.floatingGroups, floatingGroupPanel);
+                    group.model.location = 'grid';
+                    remove(this._floatingGroups, floatingGroupPanel);
                     this.updateWatermark();
                 },
             }
         );
 
-        this.floatingGroups.push(floatingGroupPanel);
+        this._floatingGroups.push(floatingGroupPanel);
         this.updateWatermark();
     }
 
@@ -587,7 +711,7 @@ export class DockviewComponent
         }
 
         if (hasFloatingGroupOptionsChanged) {
-            for (const group of this.floatingGroups) {
+            for (const group of this._floatingGroups) {
                 switch (this.options.floatingGroupBounds) {
                     case 'boundedWithinViewport':
                         group.overlay.minimumInViewportHeight = undefined;
@@ -620,8 +744,8 @@ export class DockviewComponent
     ): void {
         super.layout(width, height, forceResize);
 
-        if (this.floatingGroups) {
-            for (const floating of this.floatingGroups) {
+        if (this._floatingGroups) {
+            for (const floating of this._floatingGroups) {
                 // ensure floting groups stay within visible boundaries
                 floating.overlay.setBounds();
             }
@@ -699,11 +823,20 @@ export class DockviewComponent
             return collection;
         }, {} as { [key: string]: GroupviewPanelState });
 
-        const floats: SerializedFloatingGroup[] = this.floatingGroups.map(
-            (floatingGroup) => {
+        const floats: SerializedFloatingGroup[] = this._floatingGroups.map(
+            (group) => {
                 return {
-                    data: floatingGroup.group.toJSON() as GroupPanelViewState,
-                    position: floatingGroup.overlay.toJSON(),
+                    data: group.group.toJSON() as GroupPanelViewState,
+                    position: group.overlay.toJSON(),
+                };
+            }
+        );
+
+        const popoutGroups: SerializedPopoutGroup[] = this._popoutGroups.map(
+            (group) => {
+                return {
+                    data: group.group.toJSON() as GroupPanelViewState,
+                    position: group.window.dimensions(),
                 };
             }
         );
@@ -716,6 +849,10 @@ export class DockviewComponent
 
         if (floats.length > 0) {
             result.floatingGroups = floats;
+        }
+
+        if (popoutGroups.length > 0) {
+            result.popoutGroups = popoutGroups;
         }
 
         return result;
@@ -823,7 +960,20 @@ export class DockviewComponent
                 );
             }
 
-            for (const floatingGroup of this.floatingGroups) {
+            const serializedPopoutGroups = data.popoutGroups ?? [];
+
+            for (const serializedPopoutGroup of serializedPopoutGroups) {
+                const { data, position } = serializedPopoutGroup;
+
+                const group = createGroupFromSerializedState(data);
+
+                this.addPopoutGroup(group, {
+                    skipRemoveGroup: true,
+                    position: position ?? undefined,
+                });
+            }
+
+            for (const floatingGroup of this._floatingGroups) {
                 floatingGroup.overlay.setBounds();
             }
 
@@ -857,7 +1007,7 @@ export class DockviewComponent
             }
 
             // iterate over a reassigned array since original array will be modified
-            for (const floatingGroup of [...this.floatingGroups]) {
+            for (const floatingGroup of [...this._floatingGroups]) {
                 floatingGroup.dispose();
             }
 
@@ -981,7 +1131,10 @@ export class DockviewComponent
                 panel = this.createPanel(options, group);
                 group.model.openPanel(panel);
                 this.doSetGroupAndPanelActive(group);
-            } else if (referenceGroup.api.isFloating || target === 'center') {
+            } else if (
+                referenceGroup.api.location === 'floating' ||
+                target === 'center'
+            ) {
                 panel = this.createPanel(options, referenceGroup);
                 referenceGroup.model.openPanel(panel);
             } else {
@@ -1064,7 +1217,7 @@ export class DockviewComponent
     }
 
     private updateWatermark(): void {
-        if (this.groups.filter((x) => !x.api.isFloating).length === 0) {
+        if (this.groups.filter((x) => x.api.location === 'grid').length === 0) {
             if (!this.watermark) {
                 this.watermark = this.createWatermarkComponent();
 
@@ -1182,27 +1335,61 @@ export class DockviewComponent
               }
             | undefined
     ): DockviewGroupPanel {
-        const floatingGroup = this.floatingGroups.find(
-            (_) => _.group === group
-        );
-        if (floatingGroup) {
-            if (!options?.skipDispose) {
-                floatingGroup.group.dispose();
-                this._groups.delete(group.id);
-                this._onDidRemoveGroup.fire(group);
+        if (group.api.location === 'floating') {
+            const floatingGroup = this._floatingGroups.find(
+                (_) => _.group === group
+            );
+
+            if (floatingGroup) {
+                if (!options?.skipDispose) {
+                    floatingGroup.group.dispose();
+                    this._groups.delete(group.id);
+                    this._onDidRemoveGroup.fire(group);
+                }
+
+                remove(this._floatingGroups, floatingGroup);
+                floatingGroup.dispose();
+
+                if (!options?.skipActive && this._activeGroup === group) {
+                    const groups = Array.from(this._groups.values());
+
+                    this.doSetGroupActive(
+                        groups.length > 0 ? groups[0].value : undefined
+                    );
+                }
+
+                return floatingGroup.group;
             }
 
-            floatingGroup.dispose();
+            throw new Error('failed to find floating group');
+        }
 
-            if (!options?.skipActive && this._activeGroup === group) {
-                const groups = Array.from(this._groups.values());
+        if (group.api.location === 'popout') {
+            const selectedGroup = this._popoutGroups.find(
+                (_) => _.group === group
+            );
 
-                this.doSetGroupActive(
-                    groups.length > 0 ? groups[0].value : undefined
-                );
+            if (selectedGroup) {
+                if (!options?.skipDispose) {
+                    selectedGroup.group.dispose();
+                    this._groups.delete(group.id);
+                    this._onDidRemoveGroup.fire(group);
+                }
+
+                selectedGroup.disposable.dispose();
+
+                if (!options?.skipActive && this._activeGroup === group) {
+                    const groups = Array.from(this._groups.values());
+
+                    this.doSetGroupActive(
+                        groups.length > 0 ? groups[0].value : undefined
+                    );
+                }
+
+                return selectedGroup.group;
             }
 
-            return floatingGroup.group;
+            throw new Error('failed to find popout group');
         }
 
         return super.doRemoveGroup(group, options);
@@ -1257,11 +1444,7 @@ export class DockviewComponent
             if (sourceGroup && sourceGroup.size < 2) {
                 const [targetParentLocation, to] = tail(targetLocation);
 
-                const isFloating = this.floatingGroups.find(
-                    (x) => x.group === sourceGroup
-                );
-
-                if (!isFloating) {
+                if (sourceGroup.api.location === 'grid') {
                     const sourceLocation = getGridLocation(sourceGroup.element);
                     const [sourceParentLocation, from] = tail(sourceLocation);
 
@@ -1337,16 +1520,34 @@ export class DockviewComponent
                     });
                 }
             } else {
-                const floatingGroup = this.floatingGroups.find(
+                const floatingGroup = this._floatingGroups.find(
                     (x) => x.group === sourceGroup
                 );
 
-                if (floatingGroup) {
-                    floatingGroup.dispose();
-                } else {
-                    this.gridview.removeView(
-                        getGridLocation(sourceGroup.element)
-                    );
+                switch (sourceGroup.api.location) {
+                    case 'grid':
+                        this.gridview.removeView(
+                            getGridLocation(sourceGroup.element)
+                        );
+                        break;
+                    case 'floating':
+                        const floatingGroup = this._floatingGroups.find(
+                            (x) => x.group === sourceGroup
+                        );
+                        if (!floatingGroup) {
+                            throw new Error('failed to find floating group');
+                        }
+                        floatingGroup.dispose();
+                        break;
+                    case 'popout':
+                        const selectedGroup = this._popoutGroups.find(
+                            (x) => x.group === sourceGroup
+                        );
+                        if (!selectedGroup) {
+                            throw new Error('failed to find popout group');
+                        }
+                        selectedGroup.disposable.dispose();
+                        selectedGroup.window.dispose();
                 }
 
                 const referenceLocation = getGridLocation(

@@ -42,6 +42,7 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from '../dockview/components/titlebar/tabsContainer';
+import { Box } from '../types';
 
 export interface CommonApi<T = any> {
     readonly height: number;
@@ -803,5 +804,15 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     moveToPrevious(options?: MovementOptions): void {
         this.component.moveToPrevious(options);
+    }
+
+    addPopoutGroup(
+        item: IDockviewPanel | DockviewGroupPanel,
+        options?: {
+            skipRemoveGroup?: boolean;
+            position?: Box;
+        }
+    ): void {
+        this.component.addPopoutGroup(item, options);
     }
 }
