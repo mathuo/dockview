@@ -1,0 +1,47 @@
+{
+  "name": "dockview-angular",
+  "version": "1.8.5",
+  "description": "Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support",
+  "keywords": [
+    "splitview",
+    "split-view",
+    "gridview",
+    "grid-view",
+    "dockview",
+    "dock-view",
+    "grid",
+    "tabs",
+    "layout",
+    "layout manager",
+    "dock layout",
+    "dock",
+    "docking",
+    "splitter",
+    "drag-and-drop",
+    "drag",
+    "drop",
+    "react",
+    "react-component"
+  ],
+  "homepage": "https://github.com/mathuo/dockview",
+  "bugs": {
+    "url": "https://github.com/mathuo/dockview/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mathuo/dockview.git"
+  },
+  "license": "MIT",
+  "author": "https://github.com/mathuo",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "dockview-core": "^1.8.5"
+  }
+}
