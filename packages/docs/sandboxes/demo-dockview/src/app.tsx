@@ -5,15 +5,71 @@ import {
     IDockviewPanelHeaderProps,
     IDockviewPanelProps,
     IDockviewHeaderActionsProps,
+    DockviewPanelApi,
+    DockviewPanelRenderer,
 } from 'dockview';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { v4 } from 'uuid';
 import './app.scss';
 
+const useRenderer = (
+    api: DockviewPanelApi
+): [DockviewPanelRenderer, (value: DockviewPanelRenderer) => void] => {
+    const [mode, setMode] = React.useState<DockviewPanelRenderer>(api.renderer);
+
+    React.useEffect(() => {
+        const disposable = api.onDidRendererChange((event) => {
+            setMode(event.renderer);
+        });
+
+        return () => {
+            disposable.dispose();
+        };
+    }, []);
+
+    const _setMode = React.useCallback(
+        (mode: DockviewPanelRenderer) => {
+            api.setRenderer(mode);
+        },
+        [api]
+    );
+
+    return [mode, _setMode];
+};
+
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
-        return <div style={{ padding: '20px' }}>{props.params.title}</div>;
+        const [mode, setMode] = useRenderer(props.api);
+
+        return (
+            <div style={{ height: '100%', overflow: 'auto', color: 'white' }}>
+                <div
+                    style={{
+                        height: '1000px',
+                        padding: '20px',
+                        overflow: 'auto',
+                    }}
+                >
+                    <div>{props.api.title}</div>
+                    <input />
+                    <div>
+                        {mode}
+                        <button
+                            onClick={() => {
+                                setMode(
+                                    mode === 'destructive'
+                                        ? 'gready'
+                                        : 'destructive'
+                                );
+                            }}
+                        >
+                            Toggle render mode
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
     },
 };
 
@@ -233,18 +289,18 @@ const DockviewDemo = (props: { theme?: string }) => {
             title: 'Panel 4',
             position: { referencePanel: 'panel_3', direction: 'right' },
         });
-        event.api.addPanel({
-            id: 'panel_5',
-            component: 'default',
-            title: 'Panel 5',
-            position: { referencePanel: 'panel_3', direction: 'below' },
-        });
-        event.api.addPanel({
-            id: 'panel_6',
-            component: 'default',
-            title: 'Panel 6',
-            position: { referencePanel: 'panel_3', direction: 'right' },
-        });
+        // event.api.addPanel({
+        //     id: 'panel_5',
+        //     component: 'default',
+        //     title: 'Panel 5',
+        //     position: { referencePanel: 'panel_3', direction: 'below' },
+        // });
+        // event.api.addPanel({
+        //     id: 'panel_6',
+        //     component: 'default',
+        //     title: 'Panel 6',
+        //     position: { referencePanel: 'panel_3', direction: 'right' },
+        // });
 
         event.api.getPanel('panel_1')!.api.setActive();
 
@@ -260,6 +316,7 @@ const DockviewDemo = (props: { theme?: string }) => {
             prefixHeaderActionsComponent={PrefixHeaderControls}
             onReady={onReady}
             className={props.theme || 'dockview-theme-abyss'}
+            // debug={true}
         />
     );
 };

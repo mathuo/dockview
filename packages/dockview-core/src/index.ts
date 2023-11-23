@@ -49,6 +49,8 @@ export * from './splitview/splitviewPanel';
 export * from './paneview/paneviewPanel';
 export * from './dockview/types';
 
+export { DockviewPanelRenderer } from './dockview/components/greadyRenderContainer';
+
 export {
     Position,
     positionToDirection,
@@ -66,7 +68,11 @@ export {
     GridviewPanelApi,
     GridConstraintChangeEvent,
 } from './api/gridviewPanelApi';
-export { TitleEvent, DockviewPanelApi } from './api/dockviewPanelApi';
+export {
+    TitleEvent,
+    RendererChangedEvent,
+    DockviewPanelApi,
+} from './api/dockviewPanelApi';
 export {
     PanelSizeEvent,
     PanelConstraintChangeEvent,
