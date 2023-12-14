@@ -754,6 +754,8 @@ export class DockviewComponent
                     hideHeader: !!hideHeader,
                 });
 
+                group.remainIfEmpty = data.remainIfEmpty;
+
                 const createdPanels: IDockviewPanel[] = [];
 
                 for (const child of views) {
@@ -1044,7 +1046,7 @@ export class DockviewComponent
             panel.dispose();
         }
 
-        if (group.size === 0 && options.removeEmptyGroup) {
+        if (group.size === 0 && options.removeEmptyGroup && !group.remainIfEmpty) {
             this.removeGroup(group);
         }
     }

@@ -61,6 +61,7 @@ export interface GroupOptions extends CoreGroupOptions {
 }
 
 export interface GroupPanelViewState extends CoreGroupOptions {
+    remainIfEmpty?: boolean;
     views: string[];
     activeView?: string;
     id: string;

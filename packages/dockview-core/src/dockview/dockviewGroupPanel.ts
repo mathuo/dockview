@@ -59,6 +59,8 @@ export class DockviewGroupPanel
         return this._model.header;
     }
 
+    remainIfEmpty?: boolean
+
     constructor(
         accessor: DockviewComponent,
         id: string,
