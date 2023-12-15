@@ -28,6 +28,7 @@ import DockviewWithIFrames from '@site/sandboxes/iframe-dockview/src/app';
 import DockviewFloating from '@site/sandboxes/floatinggroup-dockview/src/app';
 import DockviewLockedGroup from '@site/sandboxes/lockedgroup-dockview/src/app';
 import DockviewKeyboard from '@site/sandboxes/keyboard-dockview/src/app';
+import DockviewRemainEmptyGroup from '@site/sandboxes/remain-emptygroup/src/app';
 
 import { DocRef, Markdown } from '@site/src/components/ui/reference/docRef';
 
@@ -814,6 +815,20 @@ api.group.api.setConstraints(...)
     height={500}
     sandboxId="constraints-dockview"
     react={DockviewConstraints}
+/>
+
+### Keep Empty Group
+
+Sometimes, you may want to keep the group when the last child of the group was removed. Just mark the group property `remainIfEmpty` to true.
+
+```tsx
+panel5.group.remainIfEmpty = true;
+```
+
+<MultiFrameworkContainer
+    height={500}
+    sandboxId="remain-emptygroup"
+    react={DockviewRemainEmptyGroup}
 />
 
 ## iFrames
