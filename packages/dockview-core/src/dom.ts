@@ -186,23 +186,17 @@ export function quasiDefaultPrevented(event: Event): boolean {
     return (event as any)[QUASI_PREVENT_DEFAULT_KEY];
 }
 
-export class FocusTrap {
-    private element: Element | null;
-
-    constructor() {
-        this.element = null;
-    }
-
-    retain(): void {
-        this.element = document.activeElement;
-    }
-
-    focus(): void {
-        if (
-            document.activeElement !== this.element &&
-            this.element?.parentElement
-        ) {
-            (this.element as HTMLElement)?.focus?.();
-        }
-    }
+export function getDomNodePagePosition(domNode: Element): {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+} {
+    const { left, top, width, height } = domNode.getBoundingClientRect();
+    return {
+        left: left + window.scrollX,
+        top: top + window.scrollY,
+        width: width,
+        height: height,
+    };
 }

@@ -9,6 +9,7 @@ import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { IPanel, PanelUpdateEvent, Parameters } from '../panel/types';
 import { IDockviewPanelModel } from './dockviewPanelModel';
 import { DockviewComponent } from './dockviewComponent';
+import { DockviewPanelRenderer } from './components/greadyRenderContainer';
 
 export interface IDockviewPanel extends IDisposable, IPanel {
     readonly view: IDockviewPanelModel;
@@ -28,10 +29,11 @@ export class DockviewPanel
     implements IDockviewPanel
 {
     readonly api: DockviewPanelApiImpl;
+
     private _group: DockviewGroupPanel;
     private _params?: Parameters;
-
     private _title: string | undefined;
+    private _renderer: DockviewPanelRenderer | undefined;
 
     get params(): Parameters | undefined {
         return this._params;
@@ -45,14 +47,20 @@ export class DockviewPanel
         return this._group;
     }
 
+    get renderer(): DockviewPanelRenderer {
+        return this._renderer ?? this.accessor.renderer;
+    }
+
     constructor(
         public readonly id: string,
-        accessor: DockviewComponent,
+        private readonly accessor: DockviewComponent,
         private readonly containerApi: DockviewApi,
         group: DockviewGroupPanel,
-        readonly view: IDockviewPanelModel
+        readonly view: IDockviewPanelModel,
+        options: { renderer?: DockviewPanelRenderer }
     ) {
         super();
+        this._renderer = options.renderer;
         this._group = group;
 
         this.api = new DockviewPanelApiImpl(this, this._group, accessor);
@@ -65,6 +73,9 @@ export class DockviewPanel
                 // forward the resize event to the group since if you want to resize a panel
                 // you are actually just resizing the panels parent which is the group
                 this.group.api.setSize(event);
+            }),
+            this.api.onDidRendererChange((event) => {
+                this.group.model.rerender(this);
             })
         );
     }
@@ -95,6 +106,7 @@ export class DockviewPanel
                     ? this._params
                     : undefined,
             title: this.title,
+            renderer: this._renderer,
         };
     }
 
@@ -111,6 +123,17 @@ export class DockviewPanel
                 },
             });
             this.api._onDidTitleChange.fire({ title });
+        }
+    }
+
+    setRenderer(renderer: DockviewPanelRenderer): void {
+        const didChange = renderer !== this.renderer;
+
+        if (didChange) {
+            this._renderer = renderer;
+            this.api._onDidRendererChange.fire({
+                renderer: renderer,
+            });
         }
     }
 

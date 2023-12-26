@@ -9,6 +9,7 @@ import { CompositeDisposable } from '../../../../lifecycle';
 import { PanelUpdateEvent } from '../../../../panel/types';
 import { IDockviewPanel } from '../../../../dockview/dockviewPanel';
 import { IDockviewPanelModel } from '../../../../dockview/dockviewPanelModel';
+import { DockviewComponent } from '../../../../dockview/dockviewComponent';
 
 class TestContentRenderer
     extends CompositeDisposable
@@ -56,7 +57,14 @@ describe('contentContainer', () => {
         let blur = 0;
 
         const disposable = new CompositeDisposable();
-        const cut = new ContentContainer();
+
+        const dockviewComponent = jest.fn<DockviewComponent, []>(() => {
+            return {
+                renderer: 'onlyWhenVisibile',
+            } as DockviewComponent;
+        });
+
+        const cut = new ContentContainer(dockviewComponent(), jest.fn() as any);
 
         disposable.addDisposables(
             cut.onDidFocus(() => {
@@ -73,6 +81,7 @@ describe('contentContainer', () => {
             view: {
                 content: contentRenderer,
             } as Partial<IDockviewPanelModel>,
+            api: { renderer: 'onlyWhenVisibile' },
         } as Partial<IDockviewPanel>;
 
         cut.openPanel(panel as IDockviewPanel);
@@ -107,6 +116,7 @@ describe('contentContainer', () => {
             view: {
                 content: contentRenderer2,
             } as Partial<IDockviewPanelModel>,
+            api: { renderer: 'onlyWhenVisibile' },
         } as Partial<IDockviewPanel>;
 
         cut.openPanel(panel2 as IDockviewPanel);

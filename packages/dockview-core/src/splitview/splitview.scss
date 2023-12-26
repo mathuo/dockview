@@ -113,12 +113,12 @@
             -ms-user-select: none; // IE 10 and IE 11
             touch-action: none;
 
-            &:active {
+            &:not(.disabled):active {
                 transition: background-color 0.1s ease-in-out;
                 background-color: var(--dv-active-sash-color, transparent);
             }
 
-            &:hover {
+            &:not(.disabled):hover {
                 background-color: var(--dv-active-sash-color, transparent);
                 transition: background-color 0.1s ease-in-out;
                 transition-delay: 0.5s;
