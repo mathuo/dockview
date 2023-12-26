@@ -84,7 +84,7 @@ export class PopoutWindow extends CompositeDisposable {
         };
 
         // prevent any default content from loading
-        externalWindow.document.body.replaceWith(document.createElement('div'));
+        // externalWindow.document.body.replaceWith(document.createElement('div'));
 
         disposable.addDisposables(
             addDisposableWindowListener(window, 'beforeunload', () => {

@@ -250,11 +250,6 @@ const LeftControls = (props: IDockviewHeaderActionsProps) => {
 const PrefixHeaderControls = (props: IDockviewHeaderActionsProps) => {
     return (
         <div
-            onClick={() => {
-                if (props.activePanel) {
-                    props.containerApi.addPopoutGroup(props.activePanel.group);
-                }
-            }}
             className="group-control"
             style={{
                 display: 'flex',

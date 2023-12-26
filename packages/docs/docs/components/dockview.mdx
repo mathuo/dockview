@@ -371,7 +371,23 @@ You can control the bounding box of floating groups through the optional `floati
     react={DockviewFloating}
 />
 
-## Popout Window
+## Popout Groups
+
+Dockview has built-in support for opening groups in new Windows.
+Each popout window can contain a single group with many panels and you can have as many popout
+windows as needed. You cannot dock multiple groups together in the same window.
+
+To open an existing group in a new window
+
+```tsx
+api.addPopoutGroup(group);
+```
+
+From within a panel you may say
+
+```tsx
+props.containerApi.addPopoutGroup(props.api.group);
+```
 
 <DockviewPopoutGroup/>
 

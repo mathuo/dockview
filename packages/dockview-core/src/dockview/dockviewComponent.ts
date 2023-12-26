@@ -58,6 +58,7 @@ import {
     GreadyRenderContainer,
     DockviewPanelRenderer,
 } from './components/greadyRenderContainer';
+import { DockviewPopoutGroupPanel } from './dockviewPopoutGroupPanel';
 
 function getTheme(element: HTMLElement): string | undefined {
     function toClassList(element: HTMLElement) {
@@ -224,12 +225,6 @@ export interface DockviewDropEvent extends GroupviewDropEvent {
     group: DockviewGroupPanel | null;
 }
 
-export interface DockviewPopoutGroupPanel {
-    window: PopoutWindow;
-    disposable: IDisposable;
-    group: DockviewGroupPanel;
-}
-
 export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly activePanel: IDockviewPanel | undefined;
     readonly totalPanels: number;
@@ -277,8 +272,8 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     addPopoutGroup(
         item: IDockviewPanel | DockviewGroupPanel,
         options?: {
-            skipRemoveGroup?: boolean;
             position?: Box;
+            popoutUrl?: string;
         }
     ): void;
 }
@@ -495,11 +490,10 @@ export class DockviewComponent
         options?: {
             skipRemoveGroup?: boolean;
             position?: Box;
+            popoutUrl?: string;
         }
     ): void {
         let group: DockviewGroupPanel;
-        const theme = getTheme(this.gridview.element);
-
         let box: Box | undefined = options?.position;
 
         if (item instanceof DockviewPanel) {
@@ -531,42 +525,31 @@ export class DockviewComponent
             }
         }
 
-        // const { top: boundingTop, left: boundingLeft } =
-        //     this.element.getBoundingClientRect();
+        const theme = getTheme(this.gridview.element);
 
-        const window = new PopoutWindow('test', theme ?? '', {
-            url: this.options.popoutUrl ?? 'popout.html',
-            left: box.left,
-            top: box.top,
-            width: box.width,
-            height: box.height,
+        const popoutWindow = new DockviewPopoutGroupPanel(group, {
+            className: theme ?? '',
+            popoutUrl: options?.popoutUrl ?? '/popout.html',
+            box: {
+                left: box.left,
+                top: box.top,
+                width: box.width,
+                height: box.height,
+            },
         });
 
-        const disposable = new CompositeDisposable();
-        const wrappedWindow = { window, disposable, group };
-
-        disposable.addDisposables(
-            window.onDidClose(() => {
-                group.model.location = 'grid';
-
-                remove(this._popoutGroups, wrappedWindow);
-
-                this.doAddGroup(group, [0]);
-            }),
+        popoutWindow.addDisposables(
             {
                 dispose: () => {
-                    group.model.location = 'grid';
-                    remove(this._popoutGroups, wrappedWindow);
+                    remove(this._popoutGroups, popoutWindow);
                 },
             },
-            window
+            popoutWindow.window.onDidClose(() => {
+                this.doAddGroup(group, [0]);
+            })
         );
 
-        group.model.location = 'popout';
-
-        this._popoutGroups.push(wrappedWindow);
-
-        window.open(group.element);
+        this._popoutGroups.push(popoutWindow);
     }
 
     addFloatingGroup(
@@ -1395,7 +1378,7 @@ export class DockviewComponent
                     this._onDidRemoveGroup.fire(group);
                 }
 
-                selectedGroup.disposable.dispose();
+                selectedGroup.dispose();
 
                 if (!options?.skipActive && this._activeGroup === group) {
                     const groups = Array.from(this._groups.values());
@@ -1539,10 +1522,6 @@ export class DockviewComponent
                     });
                 }
             } else {
-                const floatingGroup = this._floatingGroups.find(
-                    (x) => x.group === sourceGroup
-                );
-
                 switch (sourceGroup.api.location) {
                     case 'grid':
                         this.gridview.removeView(
@@ -1550,23 +1529,22 @@ export class DockviewComponent
                         );
                         break;
                     case 'floating':
-                        const floatingGroup = this._floatingGroups.find(
+                        const selectedFloatingGroup = this._floatingGroups.find(
                             (x) => x.group === sourceGroup
                         );
-                        if (!floatingGroup) {
+                        if (!selectedFloatingGroup) {
                             throw new Error('failed to find floating group');
                         }
-                        floatingGroup.dispose();
+                        selectedFloatingGroup.dispose();
                         break;
                     case 'popout':
-                        const selectedGroup = this._popoutGroups.find(
+                        const selectedPopoutGroup = this._popoutGroups.find(
                             (x) => x.group === sourceGroup
                         );
-                        if (!selectedGroup) {
+                        if (!selectedPopoutGroup) {
                             throw new Error('failed to find popout group');
                         }
-                        selectedGroup.disposable.dispose();
-                        selectedGroup.window.dispose();
+                        selectedPopoutGroup.dispose();
                 }
 
                 const referenceLocation = getGridLocation(

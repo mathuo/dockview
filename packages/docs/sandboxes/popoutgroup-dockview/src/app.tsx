@@ -50,7 +50,7 @@ function loadDefaultLayout(api: DockviewApi) {
         component: 'default',
     });
 
-    const panel4 = api.addPanel({
+    api.addPanel({
         id: 'panel_4',
         component: 'default',
     });
@@ -58,7 +58,7 @@ function loadDefaultLayout(api: DockviewApi) {
     api.addPanel({
         id: 'panel_5',
         component: 'default',
-        position: { referencePanel: panel4 },
+        position: { direction: 'right' },
     });
 
     api.addPanel({
@@ -213,13 +213,13 @@ const LeftComponent = (props: IDockviewHeaderActionsProps) => {
 };
 
 const RightComponent = (props: IDockviewHeaderActionsProps) => {
-    const [floating, setFloating] = React.useState<boolean>(
-        props.api.position === 'popout'
+    const [popout, setPopout] = React.useState<boolean>(
+        props.api.location === 'popout'
     );
 
     React.useEffect(() => {
         const disposable = props.group.api.onDidRenderPositionChange(
-            (event) => [setFloating(event.position === 'popout')]
+            (event) => [setPopout(event.location === 'popout')]
         );
 
         return () => {
@@ -228,7 +228,7 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
     }, [props.group.api]);
 
     const onClick = () => {
-        if (floating) {
+        if (popout) {
             const group = props.containerApi.addGroup();
             props.group.api.moveTo({ group });
         } else {
@@ -240,7 +240,7 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
         <div style={{ height: '100%', color: 'white', padding: '0px 4px' }}>
             <Icon
                 onClick={onClick}
-                icon={floating ? 'jump_to_element' : 'back_to_tab'}
+                icon={popout ? 'jump_to_element' : 'back_to_tab'}
             />
         </div>
     );

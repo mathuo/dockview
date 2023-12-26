@@ -806,11 +806,14 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         this.component.moveToPrevious(options);
     }
 
+    /**
+     * Add a popout group in a new Window
+     */
     addPopoutGroup(
         item: IDockviewPanel | DockviewGroupPanel,
         options?: {
-            skipRemoveGroup?: boolean;
             position?: Box;
+            popoutUrl?: string;
         }
     ): void {
         this.component.addPopoutGroup(item, options);
