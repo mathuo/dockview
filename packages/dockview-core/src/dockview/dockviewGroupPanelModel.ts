@@ -138,7 +138,7 @@ export class DockviewGroupPanelModel
 {
     private readonly tabsContainer: ITabsContainer;
     private readonly contentContainer: IContentContainer;
-    private readonly dropTarget: Droptarget;
+    // private readonly dropTarget: Droptarget;
     private _activePanel: IDockviewPanel | undefined;
     private watermark?: IWatermarkRenderer;
     private _isGroupActive = false;
@@ -256,7 +256,7 @@ export class DockviewGroupPanelModel
 
         switch (value) {
             case 'grid':
-                this.dropTarget.setTargetZones([
+                this.contentContainer.dropTarget.setTargetZones([
                     'top',
                     'bottom',
                     'left',
@@ -265,13 +265,16 @@ export class DockviewGroupPanelModel
                 ]);
                 break;
             case 'floating':
-                this.dropTarget.setTargetZones(['center']);
+                this.contentContainer.dropTarget.setTargetZones(['center']);
+        this.contentContainer.dropTarget.setTargetZones(
+            value ? ['center'] : ['top', 'bottom', 'left', 'right', 'center']
+        );
 
                 toggleClass(this.container, 'dv-groupview-floating', true);
 
                 break;
             case 'popout':
-                this.dropTarget.setTargetZones(['center']);
+                this.contentContainer.dropTarget.setTargetZones(['center']);
 
                 toggleClass(this.container, 'dv-groupview-popout', true);
 
@@ -296,49 +299,7 @@ export class DockviewGroupPanelModel
 
         this.tabsContainer = new TabsContainer(this.accessor, this.groupPanel);
 
-        this.contentContainer = new ContentContainer();
-
-        this.dropTarget = new Droptarget(this.contentContainer.element, {
-            acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
-            canDisplayOverlay: (event, position) => {
-                if (
-                    this.locked === 'no-drop-target' ||
-                    (this.locked && position === 'center')
-                ) {
-                    return false;
-                }
-
-                const data = getPanelData();
-
-                if (!data && event.shiftKey && this.location !== 'floating') {
-                    return false;
-                }
-
-                if (data && data.viewId === this.accessor.id) {
-                    if (data.groupId === this.id) {
-                        if (position === 'center') {
-                            // don't allow to drop on self for center position
-                            return false;
-                        }
-                        if (data.panelId === null) {
-                            // don't allow group move to drop anywhere on self
-                            return false;
-                        }
-                    }
-
-                    const groupHasOnePanelAndIsActiveDragElement =
-                        this._panels.length === 1 && data.groupId === this.id;
-
-                    return !groupHasOnePanelAndIsActiveDragElement;
-                }
-
-                return this.canDisplayOverlay(
-                    event,
-                    position,
-                    DockviewDropTargets.Panel
-                );
-            },
-        });
+        this.contentContainer = new ContentContainer(this.accessor, this);
 
         container.append(
             this.tabsContainer.element,
@@ -366,7 +327,7 @@ export class DockviewGroupPanelModel
             this.contentContainer.onDidBlur(() => {
                 // noop
             }),
-            this.dropTarget.onDrop((event) => {
+            this.contentContainer.dropTarget.onDrop((event) => {
                 this.handleDropEvent(event.nativeEvent, event.position);
             }),
             this._onMove,
@@ -438,6 +399,10 @@ export class DockviewGroupPanelModel
                 this._prefixHeaderActions.element
             );
         }
+    }
+
+    rerender(panel: IDockviewPanel): void {
+        this.contentContainer.renderPanel(panel);
     }
 
     public indexOf(panel: IDockviewPanel): number {
@@ -711,14 +676,14 @@ export class DockviewGroupPanelModel
         const existingPanel = this._panels.indexOf(panel);
         const hasExistingPanel = existingPanel > -1;
 
+        this.tabsContainer.show();
+        this.contentContainer.show();
+
         this.tabsContainer.openPanel(panel, index);
 
         if (!skipSetActive) {
             this.contentContainer.openPanel(panel);
         }
-
-        this.tabsContainer.show();
-        this.contentContainer.show();
 
         if (hasExistingPanel) {
             // TODO - need to ensure ordering hasn't changed and if it has need to re-order this.panels
@@ -873,7 +838,7 @@ export class DockviewGroupPanelModel
             panel.dispose();
         }
 
-        this.dropTarget.dispose();
+        // this.dropTarget.dispose();
         this.tabsContainer.dispose();
         this.contentContainer.dispose();
     }

@@ -217,3 +217,18 @@ export function addStyles(document: Document, styleSheetList: StyleSheetList) {
         }
     }
 }
+
+export function getDomNodePagePosition(domNode: Element): {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+} {
+    const { left, top, width, height } = domNode.getBoundingClientRect();
+    return {
+        left: left + window.scrollX,
+        top: top + window.scrollY,
+        width: width,
+        height: height,
+    };
+}

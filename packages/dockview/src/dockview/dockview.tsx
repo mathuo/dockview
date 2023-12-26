@@ -10,6 +10,7 @@ import {
     ITabRenderer,
     DockviewGroupPanel,
     IHeaderActionsRenderer,
+    DockviewPanelRenderer,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
@@ -76,6 +77,8 @@ export interface IDockviewReactProps {
               minimumHeightWithinViewport?: number;
               minimumWidthWithinViewport?: number;
           };
+    debug?: boolean;
+    defaultRenderer?: DockviewPanelRenderer;
 }
 
 const DEFAULT_REACT_TAB = 'props.defaultTabComponent';
@@ -175,6 +178,8 @@ export const DockviewReact = React.forwardRef(
                 singleTabMode: props.singleTabMode,
                 disableFloatingGroups: props.disableFloatingGroups,
                 floatingGroupBounds: props.floatingGroupBounds,
+                defaultRenderer: props.defaultRenderer,
+                debug: props.debug,
             });
 
             const { clientWidth, clientHeight } = domRef.current;

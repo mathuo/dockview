@@ -1,0 +1,16 @@
+.dv-render-overlay {
+    position: absolute;
+    z-index: 1;
+    height: 100%;
+
+    &.dv-render-overlay-float {
+        z-index: 999;
+    }
+}
+
+.dv-debug {
+    .dv-render-overlay {
+        outline: 1px solid red;
+        outline-offset: -1;
+    }
+}

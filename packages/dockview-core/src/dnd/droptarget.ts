@@ -63,6 +63,8 @@ export class Droptarget extends CompositeDisposable {
     private readonly _onDrop = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDrop.event;
 
+    readonly dnd: DragAndDropObserver;
+
     private static USED_EVENT_ID = '__dockview_droptarget_event_is_used__';
 
     get state(): Position | undefined {
@@ -90,98 +92,97 @@ export class Droptarget extends CompositeDisposable {
             this.options.acceptedTargetZones
         );
 
-        this.addDisposables(
-            this._onDrop,
-            new DragAndDropObserver(this.element, {
-                onDragEnter: () => undefined,
-                onDragOver: (e) => {
-                    if (this._acceptedTargetZonesSet.size === 0) {
+        this.dnd = new DragAndDropObserver(this.element, {
+            onDragEnter: () => undefined,
+            onDragOver: (e) => {
+                if (this._acceptedTargetZonesSet.size === 0) {
+                    this.removeDropTarget();
+                    return;
+                }
+
+                const width = this.element.clientWidth;
+                const height = this.element.clientHeight;
+
+                if (width === 0 || height === 0) {
+                    return; // avoid div!0
+                }
+
+                const rect = (
+                    e.currentTarget as HTMLElement
+                ).getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const quadrant = this.calculateQuadrant(
+                    this._acceptedTargetZonesSet,
+                    x,
+                    y,
+                    width,
+                    height
+                );
+
+                /**
+                 * If the event has already been used by another DropTarget instance
+                 * then don't show a second drop target, only one target should be
+                 * active at any one time
+                 */
+                if (this.isAlreadyUsed(e) || quadrant === null) {
+                    // no drop target should be displayed
+                    this.removeDropTarget();
+                    return;
+                }
+
+                if (typeof this.options.canDisplayOverlay === 'boolean') {
+                    if (!this.options.canDisplayOverlay) {
                         this.removeDropTarget();
                         return;
                     }
-
-                    const width = this.element.clientWidth;
-                    const height = this.element.clientHeight;
-
-                    if (width === 0 || height === 0) {
-                        return; // avoid div!0
-                    }
-
-                    const rect = (
-                        e.currentTarget as HTMLElement
-                    ).getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-
-                    const quadrant = this.calculateQuadrant(
-                        this._acceptedTargetZonesSet,
-                        x,
-                        y,
-                        width,
-                        height
-                    );
-
-                    /**
-                     * If the event has already been used by another DropTarget instance
-                     * then don't show a second drop target, only one target should be
-                     * active at any one time
-                     */
-                    if (this.isAlreadyUsed(e) || quadrant === null) {
-                        // no drop target should be displayed
-                        this.removeDropTarget();
-                        return;
-                    }
-
-                    if (typeof this.options.canDisplayOverlay === 'boolean') {
-                        if (!this.options.canDisplayOverlay) {
-                            this.removeDropTarget();
-                            return;
-                        }
-                    } else if (!this.options.canDisplayOverlay(e, quadrant)) {
-                        this.removeDropTarget();
-                        return;
-                    }
-
-                    this.markAsUsed(e);
-
-                    if (!this.targetElement) {
-                        this.targetElement = document.createElement('div');
-                        this.targetElement.className = 'drop-target-dropzone';
-                        this.overlayElement = document.createElement('div');
-                        this.overlayElement.className = 'drop-target-selection';
-                        this._state = 'center';
-                        this.targetElement.appendChild(this.overlayElement);
-
-                        this.element.classList.add('drop-target');
-                        this.element.append(this.targetElement);
-                    }
-
-                    this.toggleClasses(quadrant, width, height);
-
-                    this.setState(quadrant);
-                },
-                onDragLeave: () => {
+                } else if (!this.options.canDisplayOverlay(e, quadrant)) {
                     this.removeDropTarget();
-                },
-                onDragEnd: () => {
-                    this.removeDropTarget();
-                },
-                onDrop: (e) => {
-                    e.preventDefault();
+                    return;
+                }
 
-                    const state = this._state;
+                this.markAsUsed(e);
 
-                    this.removeDropTarget();
+                if (!this.targetElement) {
+                    this.targetElement = document.createElement('div');
+                    this.targetElement.className = 'drop-target-dropzone';
+                    this.overlayElement = document.createElement('div');
+                    this.overlayElement.className = 'drop-target-selection';
+                    this._state = 'center';
+                    this.targetElement.appendChild(this.overlayElement);
 
-                    if (state) {
-                        // only stop the propagation of the event if we are dealing with it
-                        // which is only when the target has state
-                        e.stopPropagation();
-                        this._onDrop.fire({ position: state, nativeEvent: e });
-                    }
-                },
-            })
-        );
+                    this.element.classList.add('drop-target');
+                    this.element.append(this.targetElement);
+                }
+
+                this.toggleClasses(quadrant, width, height);
+
+                this.setState(quadrant);
+            },
+            onDragLeave: () => {
+                this.removeDropTarget();
+            },
+            onDragEnd: () => {
+                this.removeDropTarget();
+            },
+            onDrop: (e) => {
+                e.preventDefault();
+
+                const state = this._state;
+
+                this.removeDropTarget();
+
+                if (state) {
+                    // only stop the propagation of the event if we are dealing with it
+                    // which is only when the target has state
+                    e.stopPropagation();
+                    this._onDrop.fire({ position: state, nativeEvent: e });
+                }
+            },
+        });
+
+        this.addDisposables(this._onDrop, this.dnd);
     }
 
     setTargetZones(acceptedTargetZones: Position[]): void {

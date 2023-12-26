@@ -29,8 +29,9 @@ import DockviewFloating from '@site/sandboxes/floatinggroup-dockview/src/app';
 import DockviewLockedGroup from '@site/sandboxes/lockedgroup-dockview/src/app';
 import DockviewKeyboard from '@site/sandboxes/keyboard-dockview/src/app';
 import DockviewPopoutGroup from '@site/sandboxes/popoutgroup-dockview/src/app';
+import DockviewRenderMode from '@site/sandboxes/rendermode-dockview/src/app';
 
-import { DocRef, Markdown } from '@site/src/components/ui/reference/docRef';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 import { attach as attachDockviewVanilla } from '@site/sandboxes/javascript/vanilla-dockview/src/app';
 import { attach as attachSimpleDockview } from '@site/sandboxes/javascript/simple-dockview/src/app';
@@ -820,6 +821,24 @@ api.group.api.setConstraints(...)
     height={500}
     sandboxId="constraints-dockview"
     react={DockviewConstraints}
+/>
+
+## Render Mode
+
+Dockview has two rendering modes `destructive` (default) and `gready`. A rendering mode can be defined through the `renderer` prop to `DockviewReact` or at an individual panel level when added where
+the panel declaration takes precedence if both are defined. Rendering modes defined at the panel level are persisted, those defined at the `DockviewReact` level are not persisted.
+
+destructive
+- Destructive mode is the default mode. In this mode when a panel is no longer visible through either it's visiblity being hidden or it not being the active panel within a group the panels HTMLElement is removed
+from the DOM and any DOM state such as scrollbar positions will be lost. If you are using any ResizeObservers to measure size this will result both zero height and width as the HTMLElement no longer belongs to the DOM.
+This design allows for maximum performance at some cost.
+- Gready mode. In this mode when panels become hidden the HTMLElement is not destroyed so all DOM state such as scrollbar positions will be maintained. This is implemented by rendering each panel as an absolutely positioned
+HTMLElement and hidden the HTMLElement with `display: none` when it should be hidden.
+
+<MultiFrameworkContainer
+    height={500}
+    sandboxId="rendermode-dockview"
+    react={DockviewRenderMode}
 />
 
 ## iFrames

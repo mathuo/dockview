@@ -21,7 +21,7 @@ interface LegacyState extends GroupviewPanelState {
 }
 
 export class DefaultDockviewDeserialzier implements IPanelDeserializer {
-    constructor(private readonly layout: DockviewComponent) {}
+    constructor(private readonly accessor: DockviewComponent) {}
 
     public fromJSON(
         panelData: GroupviewPanelState,
@@ -41,7 +41,7 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
             : panelData.tabComponent;
 
         const view = new DockviewPanelModel(
-            this.layout,
+            this.accessor,
             panelId,
             contentComponent,
             tabComponent
@@ -49,10 +49,13 @@ export class DefaultDockviewDeserialzier implements IPanelDeserializer {
 
         const panel = new DockviewPanel(
             panelId,
-            this.layout,
-            new DockviewApi(this.layout),
+            this.accessor,
+            new DockviewApi(this.accessor),
             group,
-            view
+            view,
+            {
+                renderer: panelData.renderer,
+            }
         );
 
         panel.init({

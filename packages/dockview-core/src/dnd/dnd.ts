@@ -21,14 +21,43 @@ export class DragAndDropObserver extends CompositeDisposable {
         this.registerListeners();
     }
 
+    onDragEnter(e: DragEvent): void {
+        this.target = e.target;
+        this.callbacks.onDragEnter(e);
+    }
+
+    onDragOver(e: DragEvent): void {
+        e.preventDefault(); // needed so that the drop event fires (https://stackoverflow.com/questions/21339924/drop-event-not-firing-in-chrome)
+
+        if (this.callbacks.onDragOver) {
+            this.callbacks.onDragOver(e);
+        }
+    }
+
+    onDragLeave(e: DragEvent): void {
+        if (this.target === e.target) {
+            this.target = null;
+
+            this.callbacks.onDragLeave(e);
+        }
+    }
+
+    onDragEnd(e: DragEvent): void {
+        this.target = null;
+        this.callbacks.onDragEnd(e);
+    }
+
+    onDrop(e: DragEvent): void {
+        this.callbacks.onDrop(e);
+    }
+
     private registerListeners(): void {
         this.addDisposables(
             addDisposableListener(
                 this.element,
                 'dragenter',
                 (e: DragEvent) => {
-                    this.target = e.target;
-                    this.callbacks.onDragEnter(e);
+                    this.onDragEnter(e);
                 },
                 true
             )
@@ -39,11 +68,7 @@ export class DragAndDropObserver extends CompositeDisposable {
                 this.element,
                 'dragover',
                 (e: DragEvent) => {
-                    e.preventDefault(); // needed so that the drop event fires (https://stackoverflow.com/questions/21339924/drop-event-not-firing-in-chrome)
-
-                    if (this.callbacks.onDragOver) {
-                        this.callbacks.onDragOver(e);
-                    }
+                    this.onDragOver(e);
                 },
                 true
             )
@@ -51,24 +76,19 @@ export class DragAndDropObserver extends CompositeDisposable {
 
         this.addDisposables(
             addDisposableListener(this.element, 'dragleave', (e: DragEvent) => {
-                if (this.target === e.target) {
-                    this.target = null;
-
-                    this.callbacks.onDragLeave(e);
-                }
+                this.onDragLeave(e);
             })
         );
 
         this.addDisposables(
             addDisposableListener(this.element, 'dragend', (e: DragEvent) => {
-                this.target = null;
-                this.callbacks.onDragEnd(e);
+                this.onDragEnd(e);
             })
         );
 
         this.addDisposables(
             addDisposableListener(this.element, 'drop', (e: DragEvent) => {
-                this.callbacks.onDrop(e);
+                this.onDrop(e);
             })
         );
     }

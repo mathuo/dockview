@@ -36,7 +36,7 @@ describe('groupPanelApi', () => {
     });
 
     test('updateParameters', () => {
-        const groupPanel: Partial<IDockviewPanel> = {
+        const groupPanel: Partial<DockviewPanel> = {
             id: 'test_id',
             update: jest.fn(),
         };
@@ -53,7 +53,7 @@ describe('groupPanelApi', () => {
         );
 
         const cut = new DockviewPanelApiImpl(
-            <IDockviewPanel>groupPanel,
+            <DockviewPanel>groupPanel,
             <DockviewGroupPanel>groupViewPanel,
             <DockviewComponent>accessor
         );
@@ -67,7 +67,7 @@ describe('groupPanelApi', () => {
     });
 
     test('onDidGroupChange', () => {
-        const groupPanel: Partial<IDockviewPanel> = {
+        const groupPanel: Partial<DockviewPanel> = {
             id: 'test_id',
         };
 
@@ -83,7 +83,7 @@ describe('groupPanelApi', () => {
         );
 
         const cut = new DockviewPanelApiImpl(
-            <IDockviewPanel>groupPanel,
+            <DockviewPanel>groupPanel,
             <DockviewGroupPanel>groupViewPanel,
             <DockviewComponent>accessor
         );

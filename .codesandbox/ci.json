@@ -23,6 +23,7 @@
     "/packages/docs/sandboxes/nativeapp-dockview",
     "/packages/docs/sandboxes/nested-dockview",
     "/packages/docs/sandboxes/rendering-dockview",
+    "/packages/docs/sandboxes/rendermode-dockview",
     "/packages/docs/sandboxes/resize-dockview",
     "/packages/docs/sandboxes/resizecontainer-dockview",
     "/packages/docs/sandboxes/simple-dockview",

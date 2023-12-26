@@ -112,8 +112,6 @@ const Container = () => {
             </div>
         </div>
     );
-
-    return <App />;
 };
 
 export default Container;
