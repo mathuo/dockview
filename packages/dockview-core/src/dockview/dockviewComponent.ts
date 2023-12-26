@@ -351,7 +351,7 @@ export class DockviewComponent
     }
 
     get renderer(): DockviewPanelRenderer {
-        return this.options.defaultRenderer ?? 'destructive';
+        return this.options.defaultRenderer ?? 'onlyWhenVisibile';
     }
 
     constructor(options: DockviewComponentOptions) {
