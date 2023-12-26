@@ -29,7 +29,9 @@ describe('dockviewPanel', () => {
         const group = new groupMock();
         const model = <IDockviewPanelModel>new panelModelMock();
 
-        const cut = new DockviewPanel('fake-id', accessor, api, group, model);
+        const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
+          renderer: 'destructive',
+        });
 
         let latestTitle: string | undefined = undefined;
 
@@ -74,7 +76,9 @@ describe('dockviewPanel', () => {
         const group = new groupMock();
         const model = <IDockviewPanelModel>new panelModelMock();
 
-        const cut = new DockviewPanel('fake-id', accessor, api, group, model);
+        const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
+          renderer: 'destructive',
+        });
 
         cut.init({ title: 'myTitle', params: {} });
         expect(cut.title).toBe('myTitle');
@@ -109,7 +113,9 @@ describe('dockviewPanel', () => {
         const group = new groupMock();
         const model = <IDockviewPanelModel>new panelModelMock();
 
-        const cut = new DockviewPanel('fake-id', accessor, api, group, model);
+        const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
+          renderer: 'destructive',
+        });
 
         cut.init({ params: {}, title: 'title' });
 
@@ -141,7 +147,9 @@ describe('dockviewPanel', () => {
         const group = new groupMock();
         const model = <IDockviewPanelModel>new panelModelMock();
 
-        const cut = new DockviewPanel('fake-id', accessor, api, group, model);
+        const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
+          renderer: 'destructive',
+        });
 
         expect(cut.params).toEqual(undefined);
 
@@ -177,7 +185,9 @@ describe('dockviewPanel', () => {
         const group = new groupMock();
         const model = <IDockviewPanelModel>new panelModelMock();
 
-        const cut = new DockviewPanel('fake-id', accessor, api, group, model);
+        const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
+          renderer: 'destructive',
+        });
 
         cut.api.setSize({ height: 123, width: 456 });
 
@@ -208,7 +218,9 @@ describe('dockviewPanel', () => {
         const group = new groupMock();
         const model = <IDockviewPanelModel>new panelModelMock();
 
-        const cut = new DockviewPanel('fake-id', accessor, api, group, model);
+        const cut = new DockviewPanel('fake-id', accessor, api, group, model, {
+          renderer: 'destructive',
+        });
 
         cut.init({ params: { a: '1', b: '2' }, title: 'A title' });
         expect(cut.params).toEqual({ a: '1', b: '2' });

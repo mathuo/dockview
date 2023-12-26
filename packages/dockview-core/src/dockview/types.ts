@@ -5,6 +5,7 @@ import { DockviewApi } from '../api/component.api';
 import { Event } from '../events';
 import { Optional } from '../types';
 import { DockviewGroupPanel, IDockviewGroupPanel } from './dockviewGroupPanel';
+import { DockviewPanelRenderer } from './components/greadyRenderContainer';
 
 export enum DockviewDropTargets {
     Tab,
@@ -91,5 +92,6 @@ export interface GroupviewPanelState {
     contentComponent?: string;
     tabComponent?: string;
     title?: string;
+    renderer?: DockviewPanelRenderer;
     params?: { [key: string]: any };
 }

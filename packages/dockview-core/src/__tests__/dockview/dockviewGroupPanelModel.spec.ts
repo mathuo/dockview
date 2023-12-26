@@ -257,9 +257,15 @@ describe('groupview', () => {
     });
 
     test('panel events are captured during de-serialization', () => {
-        const panel1 = new TestPanel('panel1', jest.fn() as any);
-        const panel2 = new TestPanel('panel2', jest.fn() as any);
-        const panel3 = new TestPanel('panel3', jest.fn() as any);
+        const panel1 = new TestPanel('panel1', {
+            renderer: 'destructive',
+        } as any);
+        const panel2 = new TestPanel('panel2', {
+            renderer: 'destructive',
+        } as any);
+        const panel3 = new TestPanel('panel3', {
+            renderer: 'destructive',
+        } as any);
 
         const groupview2 = new DockviewGroupPanel(dockview, 'groupview-2', {
             panels: [panel1, panel2, panel3],
@@ -343,9 +349,15 @@ describe('groupview', () => {
             })
         );
 
-        const panel1 = new TestPanel('panel1', jest.fn() as any);
-        const panel2 = new TestPanel('panel2', jest.fn() as any);
-        const panel3 = new TestPanel('panel3', jest.fn() as any);
+        const panel1 = new TestPanel('panel1', {
+            renderer: 'destructive',
+        } as any);
+        const panel2 = new TestPanel('panel2', {
+            renderer: 'destructive',
+        } as any);
+        const panel3 = new TestPanel('panel3', {
+            renderer: 'destructive',
+        } as any);
 
         expect(events.length).toBe(0);
 
@@ -423,9 +435,15 @@ describe('groupview', () => {
     });
 
     test('moveToPrevious and moveToNext', () => {
-        const panel1 = new TestPanel('panel1', jest.fn() as any);
-        const panel2 = new TestPanel('panel2', jest.fn() as any);
-        const panel3 = new TestPanel('panel3', jest.fn() as any);
+        const panel1 = new TestPanel('panel1', {
+            renderer: 'destructive',
+        } as any);
+        const panel2 = new TestPanel('panel2', {
+            renderer: 'destructive',
+        } as any);
+        const panel3 = new TestPanel('panel3', {
+            renderer: 'destructive',
+        } as any);
 
         groupview.model.openPanel(panel1);
         groupview.model.openPanel(panel2);
@@ -469,9 +487,15 @@ describe('groupview', () => {
     });
 
     test('closeAllPanels with panels', () => {
-        const panel1 = new TestPanel('panel1', jest.fn() as any);
-        const panel2 = new TestPanel('panel2', jest.fn() as any);
-        const panel3 = new TestPanel('panel3', jest.fn() as any);
+        const panel1 = new TestPanel('panel1', {
+            renderer: 'destructive',
+        } as any);
+        const panel2 = new TestPanel('panel2', {
+            renderer: 'destructive',
+        } as any);
+        const panel3 = new TestPanel('panel3', {
+            renderer: 'destructive',
+        } as any);
 
         groupview.model.openPanel(panel1);
         groupview.model.openPanel(panel2);
@@ -576,19 +600,25 @@ describe('groupview', () => {
             .getElementsByClassName('content-container')
             .item(0)!.childNodes;
 
-        const panel1 = new TestPanel('id_1', null as any);
+        const panel1 = new TestPanel('id_1', {
+            renderer: 'destructive',
+        } as any);
 
         cut.openPanel(panel1);
         expect(contentContainer.length).toBe(1);
         expect(contentContainer.item(0)).toBe(panel1.view.content.element);
 
-        const panel2 = new TestPanel('id_2', null as any);
+        const panel2 = new TestPanel('id_2', {
+            renderer: 'destructive',
+        } as any);
 
         cut.openPanel(panel2);
         expect(contentContainer.length).toBe(1);
         expect(contentContainer.item(0)).toBe(panel2.view.content.element);
 
-        const panel3 = new TestPanel('id_2', null as any);
+        const panel3 = new TestPanel('id_2', {
+            renderer: 'destructive',
+        } as any);
 
         cut.openPanel(panel3, { skipSetPanelActive: true });
         expect(contentContainer.length).toBe(1);
@@ -790,7 +820,11 @@ describe('groupview', () => {
             new groupPanelMock() as DockviewGroupPanel
         );
 
-        cut.openPanel(new TestPanel('panel1', jest.fn() as any));
+        cut.openPanel(
+            new TestPanel('panel1', {
+                renderer: 'destructive',
+            } as any)
+        );
 
         const element = container
             .getElementsByClassName('content-container')
@@ -856,8 +890,16 @@ describe('groupview', () => {
             new groupPanelMock() as DockviewGroupPanel
         );
 
-        cut.openPanel(new TestPanel('panel1', jest.fn() as any));
-        cut.openPanel(new TestPanel('panel2', jest.fn() as any));
+        cut.openPanel(
+            new TestPanel('panel1', {
+                renderer: 'destructive',
+            } as any)
+        );
+        cut.openPanel(
+            new TestPanel('panel2', {
+                renderer: 'destructive',
+            } as any)
+        );
 
         const element = container
             .getElementsByClassName('content-container')
@@ -923,8 +965,16 @@ describe('groupview', () => {
             new groupPanelMock() as DockviewGroupPanel
         );
 
-        cut.openPanel(new TestPanel('panel1', jest.fn() as any));
-        cut.openPanel(new TestPanel('panel2', jest.fn() as any));
+        cut.openPanel(
+            new TestPanel('panel1', {
+                renderer: 'destructive',
+            } as any)
+        );
+        cut.openPanel(
+            new TestPanel('panel2', {
+                renderer: 'destructive',
+            } as any)
+        );
 
         const element = container
             .getElementsByClassName('content-container')
@@ -1025,7 +1075,11 @@ describe('groupview', () => {
             container.getElementsByClassName('watermark-test-container').length
         ).toBe(1);
 
-        cut.openPanel(new TestPanel('panel1', jest.fn() as any));
+        cut.openPanel(
+            new TestPanel('panel1', {
+                renderer: 'destructive',
+            } as any)
+        );
 
         expect(
             container.getElementsByClassName('watermark-test-container').length
@@ -1035,7 +1089,11 @@ describe('groupview', () => {
                 .length
         ).toBe(1);
 
-        cut.openPanel(new TestPanel('panel2', jest.fn() as any));
+        cut.openPanel(
+            new TestPanel('panel2', {
+                renderer: 'destructive',
+            } as any)
+        );
 
         expect(
             container.getElementsByClassName('watermark-test-container').length
@@ -1053,7 +1111,11 @@ describe('groupview', () => {
             container.getElementsByClassName('watermark-test-container').length
         ).toBe(1);
 
-        cut.openPanel(new TestPanel('panel1', jest.fn() as any));
+        cut.openPanel(
+            new TestPanel('panel1', {
+                renderer: 'destructive',
+            } as any)
+        );
 
         expect(
             container.getElementsByClassName('watermark-test-container').length

@@ -20,6 +20,7 @@ import {
     FrameworkFactory,
 } from '../panel/componentFactory';
 import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
+import { DockviewPanelRenderer } from './components/greadyRenderContainer';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -96,6 +97,8 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
               minimumHeightWithinViewport?: number;
               minimumWidthWithinViewport?: number;
           };
+    defaultRenderer?: DockviewPanelRenderer;
+    debug?: boolean;
 }
 
 export interface PanelOptions<P extends object = Parameters> {
@@ -168,6 +171,7 @@ export type AddPanelOptions<P extends object = Parameters> = Omit<
 > & {
     component: string;
     tabComponent?: string;
+    renderer?: DockviewPanelRenderer;
 } & Partial<AddPanelOptionsUnion>;
 
 type AddGroupOptionsWithPanel = {
