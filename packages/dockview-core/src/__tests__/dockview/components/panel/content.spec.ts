@@ -60,7 +60,7 @@ describe('contentContainer', () => {
 
         const dockviewComponent = jest.fn<DockviewComponent, []>(() => {
             return {
-              renderer: 'destructive',
+                renderer: 'onlyWhenVisibile',
             } as DockviewComponent;
         });
 
@@ -81,7 +81,7 @@ describe('contentContainer', () => {
             view: {
                 content: contentRenderer,
             } as Partial<IDockviewPanelModel>,
-            api: { renderer: 'destructive' },
+            api: { renderer: 'onlyWhenVisibile' },
         } as Partial<IDockviewPanel>;
 
         cut.openPanel(panel as IDockviewPanel);
@@ -116,7 +116,7 @@ describe('contentContainer', () => {
             view: {
                 content: contentRenderer2,
             } as Partial<IDockviewPanelModel>,
-            api: { renderer: 'destructive' },
+            api: { renderer: 'onlyWhenVisibile' },
         } as Partial<IDockviewPanel>;
 
         cut.openPanel(panel2 as IDockviewPanel);

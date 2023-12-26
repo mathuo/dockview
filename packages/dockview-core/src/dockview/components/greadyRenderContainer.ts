@@ -4,7 +4,7 @@ import { getDomNodePagePosition, toggleClass } from '../../dom';
 import { CompositeDisposable, Disposable, IDisposable } from '../../lifecycle';
 import { IDockviewPanel } from '../dockviewPanel';
 
-export type DockviewPanelRenderer = 'destructive' | 'gready';
+export type DockviewPanelRenderer = 'onlyWhenVisibile' | 'always';
 
 export interface IRenderable {
     readonly element: HTMLElement;

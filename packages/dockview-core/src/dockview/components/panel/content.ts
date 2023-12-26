@@ -124,7 +124,7 @@ export class ContentContainer
         let container: HTMLElement;
 
         switch (panel.api.renderer) {
-            case 'destructive':
+            case 'onlyWhenVisibile':
                 this.accessor.greadyRenderContainer.remove(panel);
                 if (isActive) {
                     if (this.panel) {
@@ -135,7 +135,7 @@ export class ContentContainer
                 }
                 container = this._element;
                 break;
-            case 'gready':
+            case 'always':
                 if (
                     panel.view.content.element.parentElement === this._element
                 ) {
@@ -199,14 +199,14 @@ export class ContentContainer
         let container: HTMLElement;
 
         switch (renderer) {
-            case 'gready':
+            case 'always':
                 container =
                     this.accessor.greadyRenderContainer.setReferenceContentContainer(
                         panel,
                         this
                     );
                 break;
-            case 'destructive':
+            case 'onlyWhenVisibile':
                 this._element.appendChild(this.panel.view.content.element);
                 container = this._element;
                 break;
@@ -242,7 +242,7 @@ export class ContentContainer
 
     public closePanel(): void {
         if (this.panel) {
-            if (this.accessor.options.defaultRenderer === 'destructive') {
+            if (this.accessor.options.defaultRenderer === 'onlyWhenVisibile') {
                 this._element.removeChild(this.panel.view.content.element);
             }
             this.panel = undefined;
