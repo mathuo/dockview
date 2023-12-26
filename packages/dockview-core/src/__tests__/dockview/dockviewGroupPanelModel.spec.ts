@@ -258,13 +258,13 @@ describe('groupview', () => {
 
     test('panel events are captured during de-serialization', () => {
         const panel1 = new TestPanel('panel1', {
-            renderer: 'destructive',
+            renderer: 'onlyWhenVisibile',
         } as any);
         const panel2 = new TestPanel('panel2', {
-            renderer: 'destructive',
+            renderer: 'onlyWhenVisibile',
         } as any);
         const panel3 = new TestPanel('panel3', {
-            renderer: 'destructive',
+            renderer: 'onlyWhenVisibile',
         } as any);
 
         const groupview2 = new DockviewGroupPanel(dockview, 'groupview-2', {
@@ -350,13 +350,13 @@ describe('groupview', () => {
         );
 
         const panel1 = new TestPanel('panel1', {
-            renderer: 'destructive',
+            renderer: 'onlyWhenVisibile',
         } as any);
         const panel2 = new TestPanel('panel2', {
-            renderer: 'destructive',
+            renderer: 'onlyWhenVisibile',
         } as any);
         const panel3 = new TestPanel('panel3', {
-            renderer: 'destructive',
+            renderer: 'onlyWhenVisibile',
         } as any);
 
         expect(events.length).toBe(0);
@@ -436,13 +436,13 @@ describe('groupview', () => {
 
     test('moveToPrevious and moveToNext', () => {
         const panel1 = new TestPanel('panel1', {
-            renderer: 'destructive',
+            renderer: 'onlyWhenVisibile',
         } as any);
         const panel2 = new TestPanel('panel2', {
-            renderer: 'destructive',
+            renderer: 'onlyWhenVisibile',
         } as any);
         const panel3 = new TestPanel('panel3', {
-            renderer: 'destructive',
+            renderer: 'onlyWhenVisibile',
         } as any);
 
         groupview.model.openPanel(panel1);
@@ -488,13 +488,13 @@ describe('groupview', () => {
 
     test('closeAllPanels with panels', () => {
         const panel1 = new TestPanel('panel1', {
-            renderer: 'destructive',
+            renderer: 'onlyWhenVisibile',
         } as any);
         const panel2 = new TestPanel('panel2', {
-            renderer: 'destructive',
+            renderer: 'onlyWhenVisibile',
         } as any);
         const panel3 = new TestPanel('panel3', {
-            renderer: 'destructive',
+            renderer: 'onlyWhenVisibile',
         } as any);
 
         groupview.model.openPanel(panel1);
@@ -601,7 +601,7 @@ describe('groupview', () => {
             .item(0)!.childNodes;
 
         const panel1 = new TestPanel('id_1', {
-            renderer: 'destructive',
+            renderer: 'onlyWhenVisibile',
         } as any);
 
         cut.openPanel(panel1);
@@ -609,7 +609,7 @@ describe('groupview', () => {
         expect(contentContainer.item(0)).toBe(panel1.view.content.element);
 
         const panel2 = new TestPanel('id_2', {
-            renderer: 'destructive',
+            renderer: 'onlyWhenVisibile',
         } as any);
 
         cut.openPanel(panel2);
@@ -617,7 +617,7 @@ describe('groupview', () => {
         expect(contentContainer.item(0)).toBe(panel2.view.content.element);
 
         const panel3 = new TestPanel('id_2', {
-            renderer: 'destructive',
+            renderer: 'onlyWhenVisibile',
         } as any);
 
         cut.openPanel(panel3, { skipSetPanelActive: true });
@@ -822,7 +822,7 @@ describe('groupview', () => {
 
         cut.openPanel(
             new TestPanel('panel1', {
-                renderer: 'destructive',
+                renderer: 'onlyWhenVisibile',
             } as any)
         );
 
@@ -892,12 +892,12 @@ describe('groupview', () => {
 
         cut.openPanel(
             new TestPanel('panel1', {
-                renderer: 'destructive',
+                renderer: 'onlyWhenVisibile',
             } as any)
         );
         cut.openPanel(
             new TestPanel('panel2', {
-                renderer: 'destructive',
+                renderer: 'onlyWhenVisibile',
             } as any)
         );
 
@@ -967,12 +967,12 @@ describe('groupview', () => {
 
         cut.openPanel(
             new TestPanel('panel1', {
-                renderer: 'destructive',
+                renderer: 'onlyWhenVisibile',
             } as any)
         );
         cut.openPanel(
             new TestPanel('panel2', {
-                renderer: 'destructive',
+                renderer: 'onlyWhenVisibile',
             } as any)
         );
 
@@ -1077,7 +1077,7 @@ describe('groupview', () => {
 
         cut.openPanel(
             new TestPanel('panel1', {
-                renderer: 'destructive',
+                renderer: 'onlyWhenVisibile',
             } as any)
         );
 
@@ -1091,7 +1091,7 @@ describe('groupview', () => {
 
         cut.openPanel(
             new TestPanel('panel2', {
-                renderer: 'destructive',
+                renderer: 'onlyWhenVisibile',
             } as any)
         );
 
@@ -1113,7 +1113,7 @@ describe('groupview', () => {
 
         cut.openPanel(
             new TestPanel('panel1', {
-                renderer: 'destructive',
+                renderer: 'onlyWhenVisibile',
             } as any)
         );
 

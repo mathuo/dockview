@@ -55,9 +55,9 @@ const components = {
                         <button
                             onClick={() => {
                                 setMode(
-                                    mode === 'destructive'
-                                        ? 'gready'
-                                        : 'destructive'
+                                    mode === 'onlyWhenVisibile'
+                                        ? 'always'
+                                        : 'onlyWhenVisibile'
                                 );
                             }}
                         >
