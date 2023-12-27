@@ -27,7 +27,7 @@
 <ul class="tsd-hierarchy">
 <li><a href="../interfaces/dockview_core.IContentContainer.html" class="tsd-signature-type tsd-kind-interface">IContentContainer</a></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L21">dockview/components/panel/content.ts:21</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L30">dockview/components/panel/content.ts:30</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -42,7 +42,10 @@
 <div class="tsd-index-list"><a href="dockview_core.ContentContainer.html#_element" class="tsd-index-link tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>_element</span></a>
 <a href="dockview_core.ContentContainer.html#_onDidBlur" class="tsd-index-link tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>_on<wbr/>Did<wbr/>Blur</span></a>
 <a href="dockview_core.ContentContainer.html#_onDidFocus" class="tsd-index-link tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>_on<wbr/>Did<wbr/>Focus</span></a>
+<a href="dockview_core.ContentContainer.html#accessor" class="tsd-index-link tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>accessor</span></a>
 <a href="dockview_core.ContentContainer.html#disposable" class="tsd-index-link tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>disposable</span></a>
+<a href="dockview_core.ContentContainer.html#dropTarget" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>drop<wbr/>Target</span></a>
+<a href="dockview_core.ContentContainer.html#group" class="tsd-index-link tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>group</span></a>
 <a href="dockview_core.ContentContainer.html#onDidBlur" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>on<wbr/>Did<wbr/>Blur</span></a>
 <a href="dockview_core.ContentContainer.html#onDidFocus" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>on<wbr/>Did<wbr/>Focus</span></a>
 <a href="dockview_core.ContentContainer.html#panel" class="tsd-index-link tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>panel</span></a>
@@ -60,6 +63,7 @@
 <a href="dockview_core.ContentContainer.html#hide" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>hide</span></a>
 <a href="dockview_core.ContentContainer.html#layout" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>layout</span></a>
 <a href="dockview_core.ContentContainer.html#openPanel" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>open<wbr/>Panel</span></a>
+<a href="dockview_core.ContentContainer.html#renderPanel" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>render<wbr/>Panel</span></a>
 <a href="dockview_core.ContentContainer.html#show" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>show</span></a>
 </div></section></div></details></section></section>
 <section class="tsd-panel-group tsd-member-group">
@@ -67,51 +71,74 @@
 <section class="tsd-panel tsd-member"><a id="constructor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>constructor</span><a href="#constructor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="constructor.new_ContentContainer"><span class="tsd-kind-constructor-signature">new <wbr/>Content<wbr/>Container</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="dockview_core.ContentContainer.html" class="tsd-signature-type tsd-kind-class">ContentContainer</a><a href="#constructor.new_ContentContainer" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="constructor.new_ContentContainer"><span class="tsd-kind-constructor-signature">new <wbr/>Content<wbr/>Container</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">accessor</span>, <span class="tsd-kind-parameter">group</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="dockview_core.ContentContainer.html" class="tsd-signature-type tsd-kind-class">ContentContainer</a><a href="#constructor.new_ContentContainer" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">accessor</span>: <a href="dockview_core.DockviewComponent.html" class="tsd-signature-type tsd-kind-class">DockviewComponent</a></h5></li>
+<li>
+<h5><span class="tsd-kind-parameter">group</span>: <a href="dockview_core.DockviewGroupPanelModel.html" class="tsd-signature-type tsd-kind-class">DockviewGroupPanelModel</a></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="dockview_core.ContentContainer.html" class="tsd-signature-type tsd-kind-class">ContentContainer</a></h4><aside class="tsd-sources">
 <p>Overrides <a href="dockview_core.DockviewCompositeDisposable.html">DockviewCompositeDisposable</a>.<a href="dockview_core.DockviewCompositeDisposable.html#constructor">constructor</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L39">dockview/components/panel/content.ts:39</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L50">dockview/components/panel/content.ts:50</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="_element" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>_element</span><a href="#_element" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">_element</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">HTMLElement</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L25">dockview/components/panel/content.ts:25</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L34">dockview/components/panel/content.ts:34</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="_onDidBlur" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>_on<wbr/>Did<wbr/>Blur</span><a href="#_onDidBlur" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">_on<wbr/>Did<wbr/>Blur</span><span class="tsd-signature-symbol">:</span> <a href="dockview_core.DockviewEmitter.html" class="tsd-signature-type tsd-kind-class">DockviewEmitter</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L32">dockview/components/panel/content.ts:32</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L41">dockview/components/panel/content.ts:41</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="_onDidFocus" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>_on<wbr/>Did<wbr/>Focus</span><a href="#_onDidFocus" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">_on<wbr/>Did<wbr/>Focus</span><span class="tsd-signature-symbol">:</span> <a href="dockview_core.DockviewEmitter.html" class="tsd-signature-type tsd-kind-class">DockviewEmitter</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L29">dockview/components/panel/content.ts:29</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L38">dockview/components/panel/content.ts:38</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-private"><a id="accessor" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>accessor</span><a href="#accessor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">accessor</span><span class="tsd-signature-symbol">:</span> <a href="dockview_core.DockviewComponent.html" class="tsd-signature-type tsd-kind-class">DockviewComponent</a></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L51">dockview/components/panel/content.ts:51</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="disposable" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>disposable</span><a href="#disposable" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">disposable</span><span class="tsd-signature-symbol">:</span> <a href="dockview_core.DockviewMutableDisposable.html" class="tsd-signature-type tsd-kind-class">DockviewMutableDisposable</a><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L27">dockview/components/panel/content.ts:27</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L36">dockview/components/panel/content.ts:36</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="dropTarget" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>drop<wbr/>Target</span><a href="#dropTarget" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">drop<wbr/>Target</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">Droptarget</span></div><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/dockview_core.IContentContainer.html">IContentContainer</a>.<a href="../interfaces/dockview_core.IContentContainer.html#dropTarget">dropTarget</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L48">dockview/components/panel/content.ts:48</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-is-private"><a id="group" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>group</span><a href="#group" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">group</span><span class="tsd-signature-symbol">:</span> <a href="dockview_core.DockviewGroupPanelModel.html" class="tsd-signature-type tsd-kind-class">DockviewGroupPanelModel</a></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L52">dockview/components/panel/content.ts:52</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="onDidBlur" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>on<wbr/>Did<wbr/>Blur</span><a href="#onDidBlur" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">on<wbr/>Did<wbr/>Blur</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/dockview_core.DockviewEvent-1.html" class="tsd-signature-type tsd-kind-interface">DockviewEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/dockview_core.IContentContainer.html">IContentContainer</a>.<a href="../interfaces/dockview_core.IContentContainer.html#onDidBlur">onDidBlur</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L33">dockview/components/panel/content.ts:33</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L42">dockview/components/panel/content.ts:42</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="onDidFocus" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagReadonly">Readonly</code> <span>on<wbr/>Did<wbr/>Focus</span><a href="#onDidFocus" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">on<wbr/>Did<wbr/>Focus</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/dockview_core.DockviewEvent-1.html" class="tsd-signature-type tsd-kind-interface">DockviewEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/dockview_core.IContentContainer.html">IContentContainer</a>.<a href="../interfaces/dockview_core.IContentContainer.html#onDidFocus">onDidFocus</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L30">dockview/components/panel/content.ts:30</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L39">dockview/components/panel/content.ts:39</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="panel" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>panel</span><a href="#panel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">panel</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/dockview_core.IDockviewPanel.html" class="tsd-signature-type tsd-kind-interface">IDockviewPanel</a></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L26">dockview/components/panel/content.ts:26</a></li></ul></aside></section></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L35">dockview/components/panel/content.ts:35</a></li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Accessors</h2>
 <section class="tsd-panel tsd-member"><a id="element" class="tsd-anchor"></a>
@@ -122,7 +149,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">HTMLElement</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/dockview_core.IContentContainer.html">IContentContainer</a>.<a href="../interfaces/dockview_core.IContentContainer.html#element">element</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L35">dockview/components/panel/content.ts:35</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L44">dockview/components/panel/content.ts:44</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-protected tsd-is-inherited"><a id="isDisposed" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagProtected">Protected</code> <span>is<wbr/>Disposed</span><a href="#isDisposed" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-protected tsd-is-inherited">
@@ -131,7 +158,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
 <p>Inherited from CompositeDisposable.isDisposed</p>
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/lifecycle.ts#L22">lifecycle.ts:22</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/lifecycle.ts#L22">lifecycle.ts:22</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="addDisposables" class="tsd-anchor"></a>
@@ -147,7 +174,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Inherited from <a href="dockview_core.DockviewCompositeDisposable.html">DockviewCompositeDisposable</a>.<a href="dockview_core.DockviewCompositeDisposable.html#addDisposables">addDisposables</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/lifecycle.ts#L30">lifecycle.ts:30</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/lifecycle.ts#L30">lifecycle.ts:30</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="closePanel" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>close<wbr/>Panel</span><a href="#closePanel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -156,7 +183,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/dockview_core.IContentContainer.html">IContentContainer</a>.<a href="../interfaces/dockview_core.IContentContainer.html#closePanel">closePanel</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L109">dockview/components/panel/content.ts:109</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L243">dockview/components/panel/content.ts:243</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="dispose" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>dispose</span><a href="#dispose" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -166,7 +193,7 @@
 <p>Implementation of <a href="../interfaces/dockview_core.IContentContainer.html">IContentContainer</a>.<a href="../interfaces/dockview_core.IContentContainer.html#dispose">dispose</a></p>
 <p>Overrides <a href="dockview_core.DockviewCompositeDisposable.html">DockviewCompositeDisposable</a>.<a href="dockview_core.DockviewCompositeDisposable.html#dispose">dispose</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L116">dockview/components/panel/content.ts:116</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L252">dockview/components/panel/content.ts:252</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="hide" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>hide</span><a href="#hide" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -175,7 +202,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/dockview_core.IContentContainer.html">IContentContainer</a>.<a href="../interfaces/dockview_core.IContentContainer.html#hide">hide</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L58">dockview/components/panel/content.ts:58</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L117">dockview/components/panel/content.ts:117</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="layout" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>layout</span><a href="#layout" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -191,7 +218,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/dockview_core.IContentContainer.html">IContentContainer</a>.<a href="../interfaces/dockview_core.IContentContainer.html#layout">layout</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L105">dockview/components/panel/content.ts:105</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L239">dockview/components/panel/content.ts:239</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="openPanel" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>open<wbr/>Panel</span><a href="#openPanel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -205,7 +232,21 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/dockview_core.IContentContainer.html">IContentContainer</a>.<a href="../interfaces/dockview_core.IContentContainer.html#openPanel">openPanel</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L62">dockview/components/panel/content.ts:62</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L180">dockview/components/panel/content.ts:180</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member"><a id="renderPanel" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>render<wbr/>Panel</span><a href="#renderPanel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="tsd-signature tsd-anchor-link" id="renderPanel.renderPanel-1"><span class="tsd-kind-call-signature">render<wbr/>Panel</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">panel</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#renderPanel.renderPanel-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">panel</span>: <a href="../interfaces/dockview_core.IDockviewPanel.html" class="tsd-signature-type tsd-kind-interface">IDockviewPanel</a></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/dockview_core.IContentContainer.html">IContentContainer</a>.<a href="../interfaces/dockview_core.IContentContainer.html#renderPanel">renderPanel</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L121">dockview/components/panel/content.ts:121</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="show" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>show</span><a href="#show" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -214,7 +255,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/dockview_core.IContentContainer.html">IContentContainer</a>.<a href="../interfaces/dockview_core.IContentContainer.html#show">show</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/mathuo/dockview/blob/ef70ea2/packages/dockview-core/src/dockview/components/panel/content.ts#L54">dockview/components/panel/content.ts:54</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/mathuo/dockview/blob/343d42c/packages/dockview-core/src/dockview/components/panel/content.ts#L113">dockview/components/panel/content.ts:113</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -238,7 +279,10 @@
 <li><a href="#_element" class="tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>_element</span></a></li>
 <li><a href="#_onDidBlur" class="tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>_on<wbr/>Did<wbr/>Blur</span></a></li>
 <li><a href="#_onDidFocus" class="tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>_on<wbr/>Did<wbr/>Focus</span></a></li>
+<li><a href="#accessor" class="tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>accessor</span></a></li>
 <li><a href="#disposable" class="tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>disposable</span></a></li>
+<li><a href="#dropTarget" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>drop<wbr/>Target</span></a></li>
+<li><a href="#group" class="tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>group</span></a></li>
 <li><a href="#onDidBlur" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>on<wbr/>Did<wbr/>Blur</span></a></li>
 <li><a href="#onDidFocus" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>on<wbr/>Did<wbr/>Focus</span></a></li>
 <li><a href="#panel" class="tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>panel</span></a></li>
@@ -250,6 +294,7 @@
 <li><a href="#hide" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>hide</span></a></li>
 <li><a href="#layout" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>layout</span></a></li>
 <li><a href="#openPanel" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>open<wbr/>Panel</span></a></li>
+<li><a href="#renderPanel" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>render<wbr/>Panel</span></a></li>
 <li><a href="#show" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>show</span></a></li></ul></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../index.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1"></use></svg><span>Dockview</span></a>
