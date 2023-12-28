@@ -77,6 +77,7 @@ export interface IDockviewReactProps {
               minimumHeightWithinViewport?: number;
               minimumWidthWithinViewport?: number;
           };
+    isRtl?: boolean;
     debug?: boolean;
     defaultRenderer?: DockviewPanelRenderer;
 }
@@ -179,6 +180,7 @@ export const DockviewReact = React.forwardRef(
                 disableFloatingGroups: props.disableFloatingGroups,
                 floatingGroupBounds: props.floatingGroupBounds,
                 defaultRenderer: props.defaultRenderer,
+                isRtl: props.isRtl,
                 debug: props.debug,
             });
 

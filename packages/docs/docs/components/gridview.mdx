@@ -27,7 +27,7 @@ Gridview serves a purpose when you want only the nested splitviews with no tabs 
 ## GridviewReact Component
 
 ```tsx
-import { ReactGridview } from 'dockview';
+import { GridviewReact } from 'dockview';
 ```
 
 <DocRef declaration="IGridviewReactProps" />
@@ -232,4 +232,15 @@ You can find more details on theming <Link to="../theme">here</Link>.
     sandboxId="editor-gridview"
     react={EditorGridview}
     hideThemePicker={true}
+/>
+
+## RTL support
+
+You can set the gridview to RTL using the `isRtl` property.
+
+<MultiFrameworkContainer
+    height={600}
+    sandboxId="simple-gridview"
+    react={SimpleGridview}
+    isRtl={true}
 />

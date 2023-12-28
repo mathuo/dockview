@@ -7,6 +7,7 @@ import { ISplitviewStyles, Orientation, Sizing } from '../splitview/splitview';
 import { IPanel } from '../panel/types';
 import { MovementOptions2 } from '../dockview/options';
 import { Resizable } from '../resizable';
+import { toggleClass } from '../dom';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -34,6 +35,7 @@ export interface BaseGridOptions {
     readonly styles?: ISplitviewStyles;
     readonly parentElement?: HTMLElement;
     readonly disableAutoResizing?: boolean;
+    readonly isRtl?: boolean;
 }
 
 export interface IGridPanelView extends IGridView, IPanel {
@@ -136,6 +138,9 @@ export abstract class BaseGrid<T extends IGridPanelView>
             options.styles,
             options.orientation
         );
+
+        toggleClass(this.gridview.element, 'dv-rtl', options.isRtl === true);
+        toggleClass(this.gridview.element, 'dv-ltr', options.isRtl === false);
 
         this.element.appendChild(this.gridview.element);
 

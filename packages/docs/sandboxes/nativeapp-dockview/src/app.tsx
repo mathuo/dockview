@@ -25,7 +25,7 @@ const components = {
         );
     },
     isolatedApp: (
-        props: IDockviewPanelProps<{ title: string; x?: number }>
+        props: IDockviewPanelProps<{ title: string; isRtl?: boolean; x?: number }>
     ) => {
         const onReady = (event: DockviewReadyEvent) => {
             const panel1 = event.api.addPanel({
@@ -55,6 +55,7 @@ const components = {
                 onReady={onReady}
                 components={components}
                 tabComponents={tabComponents}
+                isRtl={props.params.isRtl}
                 className="dockview-theme-abyss"
             />
         );
@@ -82,7 +83,7 @@ const tabComponents = {
     },
 };
 
-const DockviewNative2 = (props: { theme?: string }) => {
+const DockviewNative2 = (props: { isRtl?: boolean; theme?: string; }) => {
     const onReady = (event: DockviewReadyEvent) => {
         const panel1 = event.api.addPanel({
             id: 'panel_1',
@@ -90,6 +91,7 @@ const DockviewNative2 = (props: { theme?: string }) => {
             tabComponent: 'default',
             params: {
                 title: 'Window 1',
+                isRtl: props.isRtl,
             },
         });
         panel1.group.locked = true;
@@ -100,6 +102,7 @@ const DockviewNative2 = (props: { theme?: string }) => {
             tabComponent: 'default',
             params: {
                 title: 'Window 2',
+                isRtl: props.isRtl,
             },
             position: {
                 direction: 'right',
@@ -113,6 +116,7 @@ const DockviewNative2 = (props: { theme?: string }) => {
             tabComponent: 'default',
             params: {
                 title: 'Window 3',
+                isRtl: props.isRtl,
             },
             position: {
                 direction: 'below',
@@ -133,6 +137,7 @@ const DockviewNative2 = (props: { theme?: string }) => {
                 onReady={onReady}
                 components={components}
                 tabComponents={tabComponents}
+                isRtl={props.isRtl}
                 className={`${props.theme || 'dockview-theme-abyss'}`}
                 singleTabMode="fullwidth"
             />

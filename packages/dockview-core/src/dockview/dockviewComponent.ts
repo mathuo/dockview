@@ -316,6 +316,7 @@ export class DockviewComponent
             styles: options.styles,
             parentElement: options.parentElement,
             disableAutoResizing: options.disableAutoResizing,
+            isRtl: options.isRtl,
         });
 
         const gready = document.createElement('div');
@@ -1007,7 +1008,8 @@ export class DockviewComponent
                 const relativeLocation = getRelativeLocation(
                     this.gridview.orientation,
                     location,
-                    target
+                    target,
+                    this.options.isRtl
                 );
                 const group = this.createGroupAtLocation(relativeLocation);
                 panel = this.createPanel(options, group);
@@ -1155,7 +1157,8 @@ export class DockviewComponent
             const relativeLocation = getRelativeLocation(
                 this.gridview.orientation,
                 location,
-                target
+                target,
+                this.options.isRtl
             );
             this.doAddGroup(group, relativeLocation);
             return group;
@@ -1270,7 +1273,8 @@ export class DockviewComponent
             const targetLocation = getRelativeLocation(
                 this.gridview.orientation,
                 referenceLocation,
-                destinationTarget
+                destinationTarget,
+                this.options.isRtl
             );
 
             if (sourceGroup && sourceGroup.size < 2) {
@@ -1310,7 +1314,8 @@ export class DockviewComponent
                 const location = getRelativeLocation(
                     this.gridview.orientation,
                     updatedReferenceLocation,
-                    destinationTarget
+                    destinationTarget,
+                    this.options.isRtl
                 );
                 this.doAddGroup(targetGroup, location);
             } else {
@@ -1325,7 +1330,8 @@ export class DockviewComponent
                 const dropLocation = getRelativeLocation(
                     this.gridview.orientation,
                     referenceLocation,
-                    destinationTarget
+                    destinationTarget,
+                    this.options.isRtl
                 );
 
                 const group = this.createGroupAtLocation(dropLocation);
@@ -1374,7 +1380,8 @@ export class DockviewComponent
                 const dropLocation = getRelativeLocation(
                     this.gridview.orientation,
                     referenceLocation,
-                    target
+                    target,
+                    this.options.isRtl
                 );
 
                 this.gridview.addView(

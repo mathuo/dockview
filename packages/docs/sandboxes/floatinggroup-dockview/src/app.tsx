@@ -127,7 +127,7 @@ const useLocalStorage = <T,>(
     ];
 };
 
-export const DockviewPersistance = (props: { theme?: string }) => {
+export const DockviewPersistance = (props: { isRtl?: boolean; theme?: string; }) => {
     const [api, setApi] = React.useState<DockviewApi>();
     const [layout, setLayout] =
         useLocalStorage<SerializedDockview>('floating.layout');
@@ -235,6 +235,7 @@ export const DockviewPersistance = (props: { theme?: string }) => {
                     rightHeaderActionsComponent={RightComponent}
                     disableFloatingGroups={disableFloatingGroups}
                     floatingGroupBounds={options}
+                    isRtl={props.isRtl}
                     className={`${props.theme || 'dockview-theme-abyss'}`}
                 />
             </div>

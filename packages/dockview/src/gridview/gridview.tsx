@@ -28,6 +28,7 @@ export interface IGridviewReactProps {
     className?: string;
     proportionalLayout?: boolean;
     disableAutoResizing?: boolean;
+    isRtl?: boolean;
 }
 
 export const GridviewReact = React.forwardRef(
@@ -69,6 +70,7 @@ export const GridviewReact = React.forwardRef(
                 styles: props.hideBorders
                     ? { separatorBorder: 'transparent' }
                     : undefined,
+                isRtl: props.isRtl,
             });
 
             const { clientWidth, clientHeight } = domRef.current;
