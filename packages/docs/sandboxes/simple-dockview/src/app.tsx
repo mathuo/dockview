@@ -15,7 +15,7 @@ const components = {
     },
 };
 
-export const App: React.FC = (props: { theme?: string }) => {
+export const App: React.FC = (props: { isRtl?: boolean; theme?: string; }) => {
     const onReady = (event: DockviewReadyEvent) => {
         const panel = event.api.addPanel({
             id: 'panel_1',
@@ -87,6 +87,7 @@ export const App: React.FC = (props: { theme?: string }) => {
     return (
         <DockviewReact
             components={components}
+            isRtl={props.isRtl}
             onReady={onReady}
             className={props.theme || 'dockview-theme-abyss'}
         />

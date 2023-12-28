@@ -2,4 +2,12 @@
 .branch-node {
     height: 100%;
     width: 100%;
+
+    &.dv-ltr {
+        direction: ltr;
+    }
+
+    &.dv-rtl {
+        direction: rtl;
+    }
 }

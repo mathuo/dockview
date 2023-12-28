@@ -110,6 +110,7 @@ export class GridviewComponent
             orientation: options.orientation,
             styles: options.styles,
             disableAutoResizing: options.disableAutoResizing,
+            isRtl: options.isRtl,
         });
 
         this._options = options;
@@ -299,7 +300,8 @@ export class GridviewComponent
             relativeLocation = getRelativeLocation(
                 this.gridview.orientation,
                 location,
-                target
+                target,
+                this.options.isRtl
             );
         }
 
@@ -330,7 +332,8 @@ export class GridviewComponent
                 relativeLocation = getRelativeLocation(
                     this.gridview.orientation,
                     location,
-                    target
+                    target,
+                    this.options.isRtl
                 );
             }
         }
@@ -406,7 +409,8 @@ export class GridviewComponent
         const targetLocation = getRelativeLocation(
             this.gridview.orientation,
             referenceLocation,
-            target
+            target,
+            this.options.isRtl
         );
 
         const [targetParentLocation, to] = tail(targetLocation);
@@ -435,7 +439,8 @@ export class GridviewComponent
         const location = getRelativeLocation(
             this.gridview.orientation,
             updatedReferenceLocation,
-            target
+            target,
+            this.options.isRtl
         );
         this.doAddGroup(targetGroup, location);
     }

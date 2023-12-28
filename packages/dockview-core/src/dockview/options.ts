@@ -98,6 +98,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
               minimumWidthWithinViewport?: number;
           };
     defaultRenderer?: DockviewPanelRenderer;
+    isRtl?: boolean;
     debug?: boolean;
 }
 

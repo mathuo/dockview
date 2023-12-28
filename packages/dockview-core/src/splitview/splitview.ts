@@ -8,6 +8,7 @@ import {
     addClasses,
     toggleClass,
     getElementsByTagName,
+    hasClassInTree,
 } from '../dom';
 import { Event, Emitter } from '../events';
 import { pushToStart, pushToEnd, firstIndex } from '../array';
@@ -36,6 +37,7 @@ export interface SplitViewOptions {
     readonly descriptor?: ISplitViewDescriptor;
     readonly proportionalLayout?: boolean;
     readonly styles?: ISplitviewStyles;
+    readonly isRtl?: boolean;
 }
 
 export enum LayoutPriority {
@@ -201,7 +203,7 @@ export class Splitview {
         options: SplitViewOptions
     ) {
         this._orientation = options.orientation;
-        this.element = this.createContainer();
+        this.element = this.createContainer(options.isRtl);
 
         this.proportionalLayout =
             options.proportionalLayout === undefined
@@ -756,6 +758,7 @@ export class Splitview {
 
     private layoutViews(): void {
         this.contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
+        const isRtl = hasClassInTree(this.element, 'dv-rtl');
         let sum = 0;
         const x: number[] = [];
 
@@ -768,18 +771,21 @@ export class Splitview {
             const offset = Math.min(Math.max(0, sum - 2), this.size - 4);
 
             if (this._orientation === Orientation.HORIZONTAL) {
-                this.sashes[i].container.style.left = `${offset}px`;
+                this.sashes[i].container.style.left = isRtl ? '' : `${offset}px`;
+                this.sashes[i].container.style.right = isRtl ? `${offset}px` : '';
                 this.sashes[i].container.style.top = `0px`;
             }
             if (this._orientation === Orientation.VERTICAL) {
-                this.sashes[i].container.style.left = `0px`;
+                this.sashes[i].container.style.left = isRtl ? '' : `0px`;
+                this.sashes[i].container.style.right = isRtl ? `0px` : '';
                 this.sashes[i].container.style.top = `${offset}px`;
             }
         }
         this.viewItems.forEach((view, i) => {
             if (this._orientation === Orientation.HORIZONTAL) {
                 view.container.style.width = `${view.size}px`;
-                view.container.style.left = i == 0 ? '0px' : `${x[i - 1]}px`;
+                view.container.style.left = isRtl ? '' : (i == 0 ? '0px' : `${x[i - 1]}px`);
+                view.container.style.right = isRtl ? (i == 0 ? '0px' : `${x[i - 1]}px`) : '';
                 view.container.style.top = '';
                 view.container.style.height = '';
             }
@@ -788,6 +794,7 @@ export class Splitview {
                 view.container.style.top = i == 0 ? '0px' : `${x[i - 1]}px`;
                 view.container.style.width = '';
                 view.container.style.left = '';
+                view.container.style.right = '';
             }
 
             view.view.layout(view.size, this._orthogonalSize);
@@ -918,8 +925,10 @@ export class Splitview {
             return 0;
         }
 
-        const upIndexes = range(index, -1);
-        const downIndexes = range(index + 1, this.viewItems.length);
+        const isHorizontal = this._orientation === Orientation.HORIZONTAL;
+        const isRtl = hasClassInTree(this.element, 'dv-rtl');
+        const upIndexes = isHorizontal && isRtl && this.viewItems.length > 1 ? range(index + 1, this.viewItems.length) : range(index, -1);
+        const downIndexes = isHorizontal && isRtl && this.viewItems.length > 1 ? range(index, -1) : range(index + 1, this.viewItems.length);
         //
         if (highPriorityIndexes) {
             for (const i of highPriorityIndexes) {
@@ -955,7 +964,6 @@ export class Splitview {
                 ? Number.POSITIVE_INFINITY
                 : downIndexes.reduce(
                       (_, i) => _ + sizes[i] - this.viewItems[i].minimumSize,
-
                       0
                   );
         const minDeltaDown =
@@ -1044,13 +1052,15 @@ export class Splitview {
         return element;
     }
 
-    private createContainer(): HTMLElement {
+    private createContainer(isRtl?: boolean): HTMLElement {
         const element = document.createElement('div');
         const orientationClassname =
             this._orientation === Orientation.HORIZONTAL
                 ? 'horizontal'
                 : 'vertical';
         element.className = `split-view-container ${orientationClassname}`;
+        toggleClass(element, 'dv-rtl', isRtl === true);
+        toggleClass(element, 'dv-ltr', isRtl === false);
         return element;
     }
 

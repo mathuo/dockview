@@ -349,6 +349,7 @@ export class SplitviewComponent
         this.splitview = new Splitview(this.element, {
             orientation,
             proportionalLayout: this.options.proportionalLayout,
+            isRtl: this.options.isRtl,
             descriptor: {
                 size,
                 views: views.map((view) => {
