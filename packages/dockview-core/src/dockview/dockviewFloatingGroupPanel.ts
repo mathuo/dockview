@@ -7,7 +7,7 @@ export interface IDockviewFloatingGroupPanel {
     position(
         bounds: Partial<{
             top: number;
-            left: number;
+            side: number;
             height: number;
             width: number;
         }>
@@ -27,7 +27,7 @@ export class DockviewFloatingGroupPanel
     position(
         bounds: Partial<{
             top: number;
-            left: number;
+            side: number;
             height: number;
             width: number;
         }>

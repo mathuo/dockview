@@ -146,14 +146,29 @@ export abstract class DraggablePaneviewPanel extends PaneviewPanel {
         const fromIndex = allPanels.indexOf(existingPanel);
         let toIndex = containerApi.panels.indexOf(this);
 
+        console.log('onDrop', this.accessor.options.isRtl, fromIndex, toIndex, event.position);
+
         if (event.position === 'left' || event.position === 'top') {
-            toIndex = Math.max(0, toIndex - 1);
+            if (this.accessor.options.isRtl) {
+                if (fromIndex > toIndex) {
+                    toIndex++;
+                }
+                toIndex = Math.min(allPanels.length - 1, toIndex);
+            }
+            else {
+                toIndex = Math.max(0, toIndex - 1);
+            }
         }
         if (event.position === 'right' || event.position === 'bottom') {
-            if (fromIndex > toIndex) {
-                toIndex++;
+            if (this.accessor.options.isRtl) {
+                toIndex = Math.max(0, toIndex - 1);
             }
-            toIndex = Math.min(allPanels.length - 1, toIndex);
+            else {
+                if (fromIndex > toIndex) {
+                    toIndex++;
+                }
+                toIndex = Math.min(allPanels.length - 1, toIndex);
+            }
         }
 
         containerApi.movePanel(fromIndex, toIndex);

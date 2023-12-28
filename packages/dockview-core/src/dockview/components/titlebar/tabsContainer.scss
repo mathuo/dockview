@@ -63,12 +63,19 @@
                 content: ' ';
                 position: absolute;
                 top: 0;
-                left: 0;
                 z-index: 5;
                 pointer-events: none;
                 background-color: var(--dv-tab-divider-color);
                 width: 1px;
                 height: 100%;
+
+                .dv-ltr & {
+                    left: 0;
+                }
+
+                .dv-rtl & {
+                    right: 0;
+                }
             }
         }
     }

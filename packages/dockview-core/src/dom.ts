@@ -186,15 +186,29 @@ export function quasiDefaultPrevented(event: Event): boolean {
     return (event as any)[QUASI_PREVENT_DEFAULT_KEY];
 }
 
+// Gets whether the given class exists in the element or its parent tree
+export function hasClassInTree(domNode: Element, className: string): boolean {
+    if (domNode.classList.contains(className)) {
+      return true;
+    }
+    if (domNode.parentElement) {
+      return hasClassInTree(domNode.parentElement, className);
+    }
+    return false;
+}
+
 export function getDomNodePagePosition(domNode: Element): {
-    left: number;
+    left?: number;
+    right?: number;
     top: number;
     width: number;
     height: number;
 } {
-    const { left, top, width, height } = domNode.getBoundingClientRect();
+    const isRtl = hasClassInTree(domNode, 'dv-rtl');
+    const { left, right, top, width, height } = domNode.getBoundingClientRect();
     return {
-        left: left + window.scrollX,
+        left: isRtl ? undefined : left + window.scrollX,
+        right: isRtl ? right + window.scrollX : undefined,
         top: top + window.scrollY,
         width: width,
         height: height,

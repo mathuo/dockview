@@ -27,6 +27,7 @@ export interface IPaneviewReactProps {
     components: PanelCollection<IPaneviewPanelProps>;
     headerComponents?: PanelCollection<IPaneviewPanelProps>;
     className?: string;
+    isRtl?: boolean;
     disableAutoResizing?: boolean;
     disableDnd?: boolean;
     showDndOverlay?: (event: PaneviewDndOverlayEvent) => boolean;
@@ -68,6 +69,7 @@ export const PaneviewReact = React.forwardRef(
                     },
                 },
                 showDndOverlay: props.showDndOverlay,
+                isRtl: props.isRtl,
             });
 
             const api = new PaneviewApi(paneview);

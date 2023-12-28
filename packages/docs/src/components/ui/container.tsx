@@ -149,6 +149,7 @@ export const MultiFrameworkContainer2 = (props: {
     typescript?: (parent: HTMLElement) => { dispose: () => void };
     sandboxId: string;
     height?: number;
+    isRtl?: boolean;
     hideThemePicker?: boolean;
 }) => {
     const ref = React.useRef<HTMLDivElement>(null);
@@ -220,7 +221,7 @@ export const MultiFrameworkContainer2 = (props: {
                         <Spinner />
                     </div>
                 )}
-                {framework === 'React' && <props.react theme={theme} />}
+                {framework === 'React' && <props.react isRtl={props.isRtl} theme={theme} />}
             </div>
             <div
                 style={{
@@ -281,6 +282,7 @@ export const MultiFrameworkContainer = (props: {
     typescript?: (parent: HTMLElement) => { dispose: () => void };
     sandboxId: string;
     height?: number;
+    isRtl?: boolean;
     hideThemePicker?: boolean;
 }) => {
     return (

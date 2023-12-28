@@ -93,10 +93,10 @@ SimplePaneview = () => {
 
 ## PaneviewReact Component
 
-You can create a Paneview through the use of the `ReactPaneview` component.
+You can create a Paneview through the use of the `PaneviewReact` component.
 
 ```tsx
-import { ReactPaneview } from 'dockview';
+import { PaneviewReact } from 'dockview';
 ```
 
 <DocRef declaration="IPaneviewReactProps" />
@@ -167,7 +167,7 @@ const onReady = (event: PaneviewReadyEvent) => {
 };
 ```
 
-This header must be defined in the collection of components provided to the `headerComponents` props for `ReactPaneivew`
+This header must be defined in the collection of components provided to the `headerComponents` props for `PaneviewReact`
 
 ```tsx
 import { IPaneviewPanelProps } from 'dockview';
@@ -226,3 +226,9 @@ If you wish to interact with the drop event from one paneview instance in anothe
 As an example see how dragging a header from one control to another will only trigger an interactable event for the developer if the checkbox is enabled.
 
 <SideBySidePaneview />
+
+## RTL support
+
+You can set the paneview to RTL using the `isRtl` property.
+
+<MultiFrameworkContainer sandboxId="simple-paneview" react={SimplePaneview} isRtl={true} />

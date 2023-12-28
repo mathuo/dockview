@@ -18,7 +18,7 @@ const components = {
     },
 };
 
-export const App: React.FC = (props: { theme?: string }) => {
+export const App: React.FC = (props: { isRtl?: boolean; theme?: string; }) => {
     const [api, setApi] = React.useState<GridviewApi>();
 
     const onReady = (event: GridviewReadyEvent) => {
@@ -135,6 +135,7 @@ export const App: React.FC = (props: { theme?: string }) => {
                     onReady={onReady}
                     // proportionalLayout={false}
                     orientation={Orientation.VERTICAL}
+                    isRtl={props.isRtl}
                     className={props.theme || 'dockview-theme-abyss'}
                 />
             </div>
