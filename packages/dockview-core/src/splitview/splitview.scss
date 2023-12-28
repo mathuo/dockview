@@ -25,6 +25,22 @@
     height: 100%;
     width: 100%;
 
+    &.dv-ltr {
+        direction: ltr;
+
+        &.separator-border .view:not(:first-child)::before {
+            left: 0;
+        }
+    }
+
+    &.dv-rtl {
+        direction: rtl;
+
+        &.separator-border .view:not(:first-child)::before {
+            right: 0;
+        }
+    }
+
     &.animation {
         .view,
         .sash {
@@ -145,7 +161,6 @@
             content: ' ';
             position: absolute;
             top: 0;
-            left: 0;
             z-index: 5;
             pointer-events: none;
             background-color: var(--dv-separator-border);

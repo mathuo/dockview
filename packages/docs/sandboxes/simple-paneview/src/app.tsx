@@ -61,7 +61,7 @@ const headerComponents = {
     myHeaderComponent: MyHeaderComponent,
 };
 
-export const App: React.FC = (props: { theme?: string }) => {
+export const App: React.FC = (props: { isRtl?: boolean; theme?: string; }) => {
     const onReady = (event: PaneviewReadyEvent) => {
         event.api.addPanel({
             id: 'panel_1',
@@ -96,6 +96,7 @@ export const App: React.FC = (props: { theme?: string }) => {
             components={components}
             headerComponents={headerComponents}
             onReady={onReady}
+            isRtl={props.isRtl}
             className={props.theme || 'dockview-theme-abyss'}
         />
     );

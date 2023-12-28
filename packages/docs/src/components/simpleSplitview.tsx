@@ -12,7 +12,7 @@ const components = {
     },
 };
 
-export const SimpleSplitview = (props: { proportional?: boolean }) => {
+export const SimpleSplitview = (props: { isRtl?: boolean; proportional?: boolean }) => {
     const onReady = (event: SplitviewReadyEvent) => {
         event.api.addPanel({
             id: 'panel_1',
@@ -48,6 +48,7 @@ export const SimpleSplitview = (props: { proportional?: boolean }) => {
             proportionalLayout={props.proportional}
             onReady={onReady}
             orientation={Orientation.HORIZONTAL}
+            isRtl={props.isRtl}
             className="dockview-theme-abyss"
         />
     );

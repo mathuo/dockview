@@ -251,15 +251,15 @@ export class TabsContainer
                     ) {
                         event.preventDefault();
 
-                        const { top, left } =
+                        const { top, left, right } =
                             this.element.getBoundingClientRect();
-                        const { top: rootTop, left: rootLeft } =
+                        const { top: rootTop, left: rootLeft, right: rootRight } =
                             this.accessor.element.getBoundingClientRect();
 
                         this.accessor.addFloatingGroup(
                             this.group,
                             {
-                                x: left - rootLeft + 20,
+                                x: (this.accessor.options.isRtl ? (right - rootRight) : (left - rootLeft)) + 20,
                                 y: top - rootTop + 20,
                             },
                             { inDragMode: true }
@@ -361,14 +361,14 @@ export class TabsContainer
 
                     const panel = this.accessor.getGroupPanel(tab.panel.id);
 
-                    const { top, left } = tab.element.getBoundingClientRect();
-                    const { top: rootTop, left: rootLeft } =
+                    const { top, left, right } = tab.element.getBoundingClientRect();
+                    const { top: rootTop, left: rootLeft, right: rootRight } =
                         this.accessor.element.getBoundingClientRect();
 
                     this.accessor.addFloatingGroup(
                         panel as DockviewPanel,
                         {
-                            x: left - rootLeft,
+                            x: (this.accessor.options.isRtl ? (right - rootRight) : (left - rootLeft)) + 20,
                             y: top - rootTop,
                         },
                         { inDragMode: true }

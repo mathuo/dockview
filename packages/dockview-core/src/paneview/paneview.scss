@@ -2,6 +2,18 @@
     height: 100%;
     width: 100%;
 
+    &.dv-ltr {
+        direction: ltr;
+    }
+
+    &.dv-rtl {
+        direction: rtl;
+
+        .view .default-header .dockview-pane-header-icon {
+            transform: scale(-1, 1);
+        }
+    }
+
     &.animated {
         .view {
             transition-duration: 0.15s;
@@ -38,8 +50,8 @@
             }
 
             > span {
-                padding-left: 8px;
                 flex-grow: 1;
+                padding-inline-start: 8px;
             }
         }
     }
@@ -70,7 +82,7 @@
                     position: absolute;
                     top: 0;
                     left: 0;
-                    width: 100%;
+                    right: 0;
                     height: 100%;
                     z-index: 5;
                     content: '';
@@ -96,7 +108,7 @@
                     position: absolute;
                     top: 0;
                     left: 0;
-                    width: 100%;
+                    right: 0;
                     height: 100%;
                     z-index: 5;
                     content: '';

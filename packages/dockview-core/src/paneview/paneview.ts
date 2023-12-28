@@ -6,7 +6,7 @@ import {
 } from '../splitview/splitview';
 import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { Emitter, Event } from '../events';
-import { addClasses, removeClasses } from '../dom';
+import { addClasses, removeClasses, toggleClass } from '../dom';
 import { PaneviewPanel } from './paneviewPanel';
 
 interface PaneItem {
@@ -54,7 +54,7 @@ export class Paneview extends CompositeDisposable implements IDisposable {
 
     constructor(
         container: HTMLElement,
-        options: { orientation: Orientation; descriptor?: ISplitViewDescriptor }
+        options: { orientation: Orientation; isRtl?: boolean; descriptor?: ISplitViewDescriptor }
     ) {
         super();
 
@@ -63,12 +63,16 @@ export class Paneview extends CompositeDisposable implements IDisposable {
         this.element = document.createElement('div');
         this.element.className = 'pane-container';
 
+        toggleClass(this.element, 'dv-rtl', options.isRtl === true);
+        toggleClass(this.element, 'dv-ltr', options.isRtl === false);
+
         container.appendChild(this.element);
 
         this.splitview = new Splitview(this.element, {
             orientation: this._orientation,
             proportionalLayout: false,
             descriptor: options.descriptor,
+            isRtl: options.isRtl,
         });
 
         // if we've added views from the descriptor we need to

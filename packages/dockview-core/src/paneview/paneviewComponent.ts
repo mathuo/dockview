@@ -24,6 +24,7 @@ import { sequentialNumberGenerator } from '../math';
 import { PaneTransfer } from '../dnd/dataTransfer';
 import { Resizable } from '../resizable';
 import { Parameters } from '../panel/types';
+import { toggleClass } from '../dom';
 
 const nextLayoutId = sequentialNumberGenerator();
 
@@ -221,6 +222,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
         this.paneview = new Paneview(this.element, {
             // only allow paneview in the vertical orientation for now
             orientation: Orientation.VERTICAL,
+            isRtl: options.isRtl,
         });
 
         this.addDisposables(this._disposable);
@@ -369,6 +371,7 @@ export class PaneviewComponent extends Resizable implements IPaneviewComponent {
 
         this.paneview = new Paneview(this.element, {
             orientation: Orientation.VERTICAL,
+            isRtl: this.options.isRtl,
             descriptor: {
                 size,
                 views: views.map((view) => {

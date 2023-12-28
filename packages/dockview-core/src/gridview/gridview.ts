@@ -123,7 +123,8 @@ export function getGridLocation(element: HTMLElement): number[] {
 export function getRelativeLocation(
     rootOrientation: Orientation,
     location: number[],
-    direction: Position
+    direction: Position,
+    isRtl?: boolean
 ): number[] {
     const orientation = getLocationOrientation(rootOrientation, location);
     const directionOrientation = getDirectionOrientation(direction);
@@ -132,13 +133,13 @@ export function getRelativeLocation(
         const [rest, _index] = tail(location);
         let index = _index;
 
-        if (direction === 'right' || direction === 'bottom') {
+        if ((isRtl ? direction === 'left' : direction === 'right') || direction === 'bottom') {
             index += 1;
         }
 
         return [...rest, index];
     } else {
-        const index = direction === 'right' || direction === 'bottom' ? 1 : 0;
+        const index = (isRtl ? direction === 'left' : direction === 'right') || direction === 'bottom' ? 1 : 0;
         return [...location, index];
     }
 }

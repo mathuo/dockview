@@ -890,3 +890,34 @@ If you wish to interact with the drop event from one dockview instance in anothe
 ### Window-like mananger with tabs
 
 <DockviewNative2 />
+
+## RTL support
+
+You can set the dockview to RTL using the `isRtl` property.
+
+<MultiFrameworkContainer
+    sandboxId="simple-dockview"
+    react={SimpleDockview}
+    isRtl={true}
+/>
+
+<MultiFrameworkContainer
+    sandboxId="watermark-dockview"
+    react={DockviewWatermark}
+    isRtl={true}
+/>
+
+<MultiFrameworkContainer
+    height={600}
+    sandboxId="floatinggroup-dockview"
+    react={DockviewFloating}
+    isRtl={true}
+/>
+
+<MultiFrameworkContainer
+    sandboxId="groupcontrol-dockview"
+    react={DockviewGroupControl}
+    isRtl={true}
+/>
+
+<DockviewNative2 isRtl={true} />

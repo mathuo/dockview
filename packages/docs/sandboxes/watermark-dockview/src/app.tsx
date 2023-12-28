@@ -81,7 +81,7 @@ const Watermark = (props: IWatermarkPanelProps) => {
     );
 };
 
-const DockviewWatermark = (props: { theme?: string }) => {
+const DockviewWatermark = (props: { isRtl?: boolean; theme?: string; }) => {
     const [api, setApi] = React.useState<DockviewApi>();
 
     const onReady = (event: DockviewReadyEvent) => {
@@ -126,6 +126,7 @@ const DockviewWatermark = (props: { theme?: string }) => {
                 onReady={onReady}
                 components={components}
                 watermarkComponent={Watermark}
+                isRtl={props.isRtl}
                 className={`${props.theme || 'dockview-theme-abyss'}`}
             />
         </div>

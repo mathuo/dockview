@@ -185,9 +185,9 @@
                         &::after {
                             position: absolute;
                             left: 0px;
+                            right: 0px;
                             top: 0px;
                             content: '';
-                            width: 100%;
                             height: 1px;
                             background-color: #94527e;
                             z-index: 999;
@@ -205,9 +205,9 @@
                         &::after {
                             position: absolute;
                             left: 0px;
+                            right: 0px;
                             bottom: 0px;
                             content: '';
-                            width: 100%;
                             height: 1px;
                             background-color: #5e3d5a;
                             z-index: 999;
