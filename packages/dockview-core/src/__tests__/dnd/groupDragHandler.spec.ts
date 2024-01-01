@@ -11,7 +11,7 @@ describe('groupDragHandler', () => {
         const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
             const partial: Partial<DockviewGroupPanel> = {
                 id: 'test_group_id',
-                api: { isFloating: false } as any,
+                api: { location: 'grid' } as any,
             };
             return partial as DockviewGroupPanel;
         });
@@ -48,12 +48,12 @@ describe('groupDragHandler', () => {
 
         cut.dispose();
     });
-    test('that the event is cancelled when isFloating and shiftKey=true', () => {
+    test('that the event is cancelled when floating and shiftKey=true', () => {
         const element = document.createElement('div');
 
         const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
             const partial: Partial<DockviewGroupPanel> = {
-                api: { isFloating: true } as any,
+                api: { location: 'floating' } as any,
             };
             return partial as DockviewGroupPanel;
         });
@@ -85,7 +85,7 @@ describe('groupDragHandler', () => {
 
         const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
             const partial: Partial<DockviewGroupPanel> = {
-                api: { isFloating: false } as any,
+                api: { location: 'grid' } as any,
             };
             return partial as DockviewGroupPanel;
         });

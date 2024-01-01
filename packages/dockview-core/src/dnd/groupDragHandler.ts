@@ -38,7 +38,7 @@ export class GroupDragHandler extends DragHandler {
     }
 
     override isCancelled(_event: DragEvent): boolean {
-        if (this.group.api.isFloating && !_event.shiftKey) {
+        if (this.group.api.location === 'floating' && !_event.shiftKey) {
             return true;
         }
         return false;

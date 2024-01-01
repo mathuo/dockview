@@ -2862,8 +2862,8 @@ describe('dockviewComponent', () => {
             floating: true,
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(2);
 
@@ -2874,8 +2874,8 @@ describe('dockviewComponent', () => {
             'right'
         );
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(2);
     });
@@ -2907,8 +2907,8 @@ describe('dockviewComponent', () => {
             floating: true,
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(2);
 
@@ -2919,8 +2919,8 @@ describe('dockviewComponent', () => {
             'center'
         );
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
         expect(dockview.groups.length).toBe(1);
         expect(dockview.panels.length).toBe(2);
     });
@@ -2958,9 +2958,9 @@ describe('dockviewComponent', () => {
             floating: true,
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(3);
         expect(dockview.panels.length).toBe(3);
 
@@ -2971,9 +2971,9 @@ describe('dockviewComponent', () => {
             'center'
         );
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(3);
     });
@@ -3011,9 +3011,9 @@ describe('dockviewComponent', () => {
             position: { referencePanel: panel2 },
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(3);
 
@@ -3024,9 +3024,9 @@ describe('dockviewComponent', () => {
             'right'
         );
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
-        expect(panel3.group.api.isFloating).toBeFalsy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
+        expect(panel3.group.api.location).toBe('grid');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(3);
     });
@@ -3064,9 +3064,9 @@ describe('dockviewComponent', () => {
             position: { referencePanel: panel2 },
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(3);
 
@@ -3077,9 +3077,9 @@ describe('dockviewComponent', () => {
             'center'
         );
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
-        expect(panel3.group.api.isFloating).toBeFalsy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
+        expect(panel3.group.api.location).toBe('grid');
         expect(dockview.groups.length).toBe(1);
         expect(dockview.panels.length).toBe(3);
     });
@@ -3123,10 +3123,10 @@ describe('dockviewComponent', () => {
             floating: true,
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
-        expect(panel4.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
+        expect(panel3.group.api.location).toBe('floating');
+        expect(panel4.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(3);
         expect(dockview.panels.length).toBe(4);
 
@@ -3137,10 +3137,10 @@ describe('dockviewComponent', () => {
             'center'
         );
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
-        expect(panel4.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
+        expect(panel3.group.api.location).toBe('floating');
+        expect(panel4.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(4);
     });
@@ -3172,8 +3172,8 @@ describe('dockviewComponent', () => {
             floating: true,
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(2);
 
@@ -3184,8 +3184,8 @@ describe('dockviewComponent', () => {
             'right'
         );
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(2);
     });
@@ -3217,8 +3217,8 @@ describe('dockviewComponent', () => {
             floating: true,
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(2);
 
@@ -3229,8 +3229,8 @@ describe('dockviewComponent', () => {
             'center'
         );
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
         expect(dockview.groups.length).toBe(1);
         expect(dockview.panels.length).toBe(2);
     });
@@ -3268,9 +3268,9 @@ describe('dockviewComponent', () => {
             floating: true,
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(3);
         expect(dockview.panels.length).toBe(3);
 
@@ -3281,9 +3281,9 @@ describe('dockviewComponent', () => {
             'center'
         );
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(3);
     });
@@ -3321,9 +3321,9 @@ describe('dockviewComponent', () => {
             position: { referencePanel: panel2 },
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(3);
 
@@ -3334,9 +3334,9 @@ describe('dockviewComponent', () => {
             'right'
         );
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(3);
         expect(dockview.panels.length).toBe(3);
     });
@@ -3374,9 +3374,9 @@ describe('dockviewComponent', () => {
             position: { referencePanel: panel2 },
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(3);
 
@@ -3387,9 +3387,9 @@ describe('dockviewComponent', () => {
             'center'
         );
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(3);
     });
@@ -3433,10 +3433,10 @@ describe('dockviewComponent', () => {
             floating: true,
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
-        expect(panel4.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
+        expect(panel3.group.api.location).toBe('floating');
+        expect(panel4.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(3);
         expect(dockview.panels.length).toBe(4);
 
@@ -3447,10 +3447,10 @@ describe('dockviewComponent', () => {
             'center'
         );
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
-        expect(panel4.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
+        expect(panel3.group.api.location).toBe('floating');
+        expect(panel4.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(3);
         expect(dockview.panels.length).toBe(4);
     });
@@ -3488,9 +3488,9 @@ describe('dockviewComponent', () => {
             floating: true,
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(3);
         expect(dockview.panels.length).toBe(3);
 
@@ -3501,9 +3501,9 @@ describe('dockviewComponent', () => {
             'center'
         );
 
-        expect(panel1.group.api.isFloating).toBeTruthy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('floating');
+        expect(panel2.group.api.location).toBe('grid');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(3);
     });
@@ -3540,9 +3540,9 @@ describe('dockviewComponent', () => {
             floating: true,
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(3);
 
@@ -3553,9 +3553,9 @@ describe('dockviewComponent', () => {
             'center'
         );
 
-        expect(panel1.group.api.isFloating).toBeTruthy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('floating');
+        expect(panel2.group.api.location).toBe('grid');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(3);
     });
@@ -3593,9 +3593,9 @@ describe('dockviewComponent', () => {
             floating: true,
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(3);
         expect(dockview.panels.length).toBe(3);
 
@@ -3606,9 +3606,9 @@ describe('dockviewComponent', () => {
             'center'
         );
 
-        expect(panel1.group.api.isFloating).toBeTruthy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('floating');
+        expect(panel2.group.api.location).toBe('grid');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(3);
     });
@@ -3645,9 +3645,9 @@ describe('dockviewComponent', () => {
             floating: true,
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(3);
 
@@ -3658,9 +3658,9 @@ describe('dockviewComponent', () => {
             'center'
         );
 
-        expect(panel1.group.api.isFloating).toBeTruthy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
-        expect(panel3.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('floating');
+        expect(panel2.group.api.location).toBe('floating');
+        expect(panel3.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(1);
         expect(dockview.panels.length).toBe(3);
     });
@@ -3692,15 +3692,15 @@ describe('dockviewComponent', () => {
             position: { direction: 'right' },
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(2);
 
         dockview.addFloatingGroup(panel2);
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(2);
     });
@@ -3731,15 +3731,15 @@ describe('dockviewComponent', () => {
             component: 'default',
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
         expect(dockview.groups.length).toBe(1);
         expect(dockview.panels.length).toBe(2);
 
         dockview.addFloatingGroup(panel2);
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(2);
     });
@@ -3771,15 +3771,15 @@ describe('dockviewComponent', () => {
             position: { direction: 'right' },
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(2);
 
         dockview.addFloatingGroup(panel2.group);
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(2);
         expect(dockview.panels.length).toBe(2);
     });
@@ -3810,15 +3810,15 @@ describe('dockviewComponent', () => {
             component: 'default',
         });
 
-        expect(panel1.group.api.isFloating).toBeFalsy();
-        expect(panel2.group.api.isFloating).toBeFalsy();
+        expect(panel1.group.api.location).toBe('grid');
+        expect(panel2.group.api.location).toBe('grid');
         expect(dockview.groups.length).toBe(1);
         expect(dockview.panels.length).toBe(2);
 
         dockview.addFloatingGroup(panel2.group);
 
-        expect(panel1.group.api.isFloating).toBeTruthy();
-        expect(panel2.group.api.isFloating).toBeTruthy();
+        expect(panel1.group.api.location).toBe('floating');
+        expect(panel2.group.api.location).toBe('floating');
         expect(dockview.groups.length).toBe(1);
         expect(dockview.panels.length).toBe(2);
     });

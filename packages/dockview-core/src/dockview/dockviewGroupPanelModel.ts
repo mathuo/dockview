@@ -130,6 +130,8 @@ export interface IDockviewGroupPanelModel extends IPanel {
     ): boolean;
 }
 
+export type DockviewGroupLocation = 'grid' | 'floating' | 'popout';
+
 export class DockviewGroupPanelModel
     extends CompositeDisposable
     implements IDockviewGroupPanelModel
@@ -141,10 +143,11 @@ export class DockviewGroupPanelModel
     private watermark?: IWatermarkRenderer;
     private _isGroupActive = false;
     private _locked: DockviewGroupPanelLocked = false;
-    private _isFloating = false;
     private _rightHeaderActions: IHeaderActionsRenderer | undefined;
     private _leftHeaderActions: IHeaderActionsRenderer | undefined;
     private _prefixHeaderActions: IHeaderActionsRenderer | undefined;
+
+    private _location: DockviewGroupLocation = 'grid';
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
 
@@ -241,21 +244,45 @@ export class DockviewGroupPanelModel
         );
     }
 
-    get isFloating(): boolean {
-        return this._isFloating;
+    get location(): DockviewGroupLocation {
+        return this._location;
     }
 
-    set isFloating(value: boolean) {
-        this._isFloating = value;
+    set location(value: DockviewGroupLocation) {
+        this._location = value;
 
+        toggleClass(this.container, 'dv-groupview-floating', false);
+        toggleClass(this.container, 'dv-groupview-popout', false);
+
+        switch (value) {
+            case 'grid':
+                this.contentContainer.dropTarget.setTargetZones([
+                    'top',
+                    'bottom',
+                    'left',
+                    'right',
+                    'center',
+                ]);
+                break;
+            case 'floating':
+                this.contentContainer.dropTarget.setTargetZones(['center']);
         this.contentContainer.dropTarget.setTargetZones(
             value ? ['center'] : ['top', 'bottom', 'left', 'right', 'center']
         );
 
-        toggleClass(this.container, 'dv-groupview-floating', value);
+                toggleClass(this.container, 'dv-groupview-floating', true);
 
-        this.groupPanel.api._onDidFloatingStateChange.fire({
-            isFloating: this.isFloating,
+                break;
+            case 'popout':
+                this.contentContainer.dropTarget.setTargetZones(['center']);
+
+                toggleClass(this.container, 'dv-groupview-popout', true);
+
+                break;
+        }
+
+        this.groupPanel.api._onDidRenderPositionChange.fire({
+            location: this.location,
         });
     }
 

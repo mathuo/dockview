@@ -247,7 +247,7 @@ export class TabsContainer
                     if (
                         isFloatingGroupsEnabled &&
                         event.shiftKey &&
-                        !this.group.api.isFloating
+                        this.group.api.location !== 'floating'
                     ) {
                         event.preventDefault();
 
@@ -350,7 +350,7 @@ export class TabsContainer
                     !this.accessor.options.disableFloatingGroups;
 
                 const isFloatingWithOnePanel =
-                    this.group.api.isFloating && this.size === 1;
+                    this.group.api.location === 'floating' && this.size === 1;
 
                 if (
                     isFloatingGroupsEnabled &&

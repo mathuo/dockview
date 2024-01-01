@@ -11,6 +11,7 @@ import {
 } from '../events';
 import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { clamp } from '../math';
+import { Box } from '../types';
 
 const bringElementToFront = (() => {
     let previous: HTMLElement | null = null;
@@ -48,11 +49,7 @@ export class Overlay extends CompositeDisposable {
     }
 
     constructor(
-        private readonly options: {
-            height: number;
-            width: number;
-            left: number;
-            top: number;
+        private readonly options: Box & {
             container: HTMLElement;
             content: HTMLElement;
             minimumInViewportWidth?: number;
@@ -86,14 +83,7 @@ export class Overlay extends CompositeDisposable {
         });
     }
 
-    setBounds(
-        bounds: Partial<{
-            height: number;
-            width: number;
-            top: number;
-            left: number;
-        }> = {}
-    ): void {
+    setBounds(bounds: Partial<Box> = {}): void {
         if (typeof bounds.height === 'number') {
             this._element.style.height = `${bounds.height}px`;
         }
@@ -139,7 +129,7 @@ export class Overlay extends CompositeDisposable {
         this._onDidChange.fire();
     }
 
-    toJSON(): { top: number; left: number; height: number; width: number } {
+    toJSON(): Box {
         const container = this.options.container.getBoundingClientRect();
         const element = this._element.getBoundingClientRect();
 
