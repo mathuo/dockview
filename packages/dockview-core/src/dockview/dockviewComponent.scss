@@ -11,35 +11,6 @@
         z-index: 1;
     }
 
-    .dv-fullscreen {
-        z-index: 9;
-        transition: all 0.25s ease-in-out;
-        // outline: 1px solid red;
-        position: absolute;
-    }
-
-    .dv-fullscreen-animate {
-        top: 0px !important;
-        left: 0px !important;
-        width: 100% !important;
-        height: 100% !important;
-    }
-
-    .dv-fullscreen-close-button {
-        position: absolute;
-        bottom: 0px;
-        right: 0px;
-        z-index: 999;
-        width: 20px;
-        height: 20px;
-        color: white;
-        background-color: black;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-    }
-
     .dv-gready-render-container {
         position: relative;
     }
