@@ -22,6 +22,27 @@ describe('defaultTab', () => {
         expect(element.querySelector('.dv-react-tab-close-btn')).toBeTruthy();
     });
 
+    test('that title is displayed', async () => {
+        const api = fromPartial<DockviewPanelApi>({
+            title: 'test_title',
+        });
+        const containerApi = fromPartial<DockviewApi>({});
+        const params = {};
+
+        render(
+            <DockviewDefaultTab
+                api={api}
+                containerApi={containerApi}
+                params={params}
+            />
+        );
+
+        const element = await screen.getByTestId('dockview-default-tab');
+        expect(
+            element.querySelector('.dockview-react-tab-title')?.textContent
+        ).toBe('test_title');
+    });
+
     test('has no close button when hideClose=true', async () => {
         const api = fromPartial<DockviewPanelApi>({});
         const containerApi = fromPartial<DockviewApi>({});
