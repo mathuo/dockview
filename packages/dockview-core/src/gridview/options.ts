@@ -17,5 +17,6 @@ export interface GridviewComponentOptions {
     };
     frameworkComponentFactory?: FrameworkFactory<GridviewPanel>;
     styles?: ISplitviewStyles;
+    isRtl?: boolean;
     parentElement?: HTMLElement;
 }

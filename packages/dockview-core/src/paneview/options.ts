@@ -26,4 +26,5 @@ export interface PaneviewComponentOptions {
     disableDnd?: boolean;
     showDndOverlay?: (event: PaneviewDndOverlayEvent) => boolean;
     parentElement?: HTMLElement;
+    isRtl?: boolean;
 }

@@ -2074,6 +2074,11 @@
             "name": "watermarkComponent",
             "signature": "FunctionComponent<IWatermarkPanelProps>",
             "type": "property"
+        },
+        {
+            "name": "isRtl",
+            "signature": "boolean",
+            "type": "property"
         }
     ],
     "IGridviewReactProps": [
@@ -2109,6 +2114,11 @@
         },
         {
             "name": "proportionalLayout",
+            "signature": "boolean",
+            "type": "property"
+        },
+        {
+            "name": "isRtl",
             "signature": "boolean",
             "type": "property"
         }
@@ -2153,6 +2163,11 @@
             "name": "onDidDrop",
             "signature": "(event: PaneviewDropEvent): void",
             "type": "method"
+        },
+        {
+            "name": "isRtl",
+            "signature": "boolean",
+            "type": "property"
         }
     ],
     "ISplitviewReactProps": [

@@ -1,6 +1,6 @@
 import { DragAndDropObserver } from '../../dnd/dnd';
 import { Droptarget } from '../../dnd/droptarget';
-import { getDomNodePagePosition, toggleClass } from '../../dom';
+import { getDomNodePagePosition, hasClassInTree, toggleClass } from '../../dom';
 import { CompositeDisposable, Disposable, IDisposable } from '../../lifecycle';
 import { IDockviewPanel } from '../dockviewPanel';
 
@@ -77,7 +77,9 @@ export class GreadyRenderContainer extends CompositeDisposable {
             // TODO propagate position to avoid getDomNodePagePosition calls
             const box = getDomNodePagePosition(referenceContainer.element);
             const box2 = getDomNodePagePosition(this.element);
-            focusContainer.style.left = `${box.left - box2.left}px`;
+            const isRtl = hasClassInTree(this.element, 'dv-rtl');
+            focusContainer.style.left = isRtl ? '' : `${(box.left || 0) - (box2.left || 0)}px`;
+            focusContainer.style.right = isRtl ? `${(box.right || 0) - (box2.right || 0)}px` : '';
             focusContainer.style.top = `${box.top - box2.top}px`;
             focusContainer.style.width = `${box.width}px`;
             focusContainer.style.height = `${box.height}px`;

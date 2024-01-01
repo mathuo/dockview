@@ -27,6 +27,7 @@ export interface ISplitviewReactProps {
     proportionalLayout?: boolean;
     hideBorders?: boolean;
     className?: string;
+    isRtl?: boolean;
     disableAutoResizing?: boolean;
 }
 
@@ -62,6 +63,7 @@ export const SplitviewReact = React.forwardRef(
                 styles: props.hideBorders
                     ? { separatorBorder: 'transparent' }
                     : undefined,
+                isRtl: props.isRtl,
             });
 
             const { clientWidth, clientHeight } = domRef.current!;

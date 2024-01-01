@@ -42,8 +42,8 @@
 
     .dv-resize-handle-top {
         height: 4px;
-        width: calc(100% - 8px);
         left: 4px;
+        right: 4px;
         top: -2px;
         z-index: 999;
         position: absolute;
@@ -52,8 +52,8 @@
 
     .dv-resize-handle-bottom {
         height: 4px;
-        width: calc(100% - 8px);
         left: 4px;
+        right: 4px;
         bottom: -2px;
         z-index: 999;
         position: absolute;
