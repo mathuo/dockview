@@ -186,6 +186,38 @@ export function quasiDefaultPrevented(event: Event): boolean {
     return (event as any)[QUASI_PREVENT_DEFAULT_KEY];
 }
 
+export function addStyles(document: Document, styleSheetList: StyleSheetList) {
+    const styleSheets = Array.from(styleSheetList);
+
+    for (const styleSheet of styleSheets) {
+        if (styleSheet.href) {
+            const link = document.createElement('link');
+            link.href = styleSheet.href;
+            link.type = styleSheet.type;
+            link.rel = 'stylesheet';
+            document.head.appendChild(link);
+        }
+
+        let cssTexts: string[] = [];
+
+        try {
+            if (styleSheet.cssRules) {
+                cssTexts = Array.from(styleSheet.cssRules).map(
+                    (rule) => rule.cssText
+                );
+            }
+        } catch (err) {
+            // security errors (lack of permissions), ignore
+        }
+
+        for (const rule of cssTexts) {
+            const style = document.createElement('style');
+            style.appendChild(document.createTextNode(rule));
+            document.head.appendChild(style);
+        }
+    }
+}
+
 export function getDomNodePagePosition(domNode: Element): {
     left: number;
     top: number;

@@ -1,38 +1,39 @@
 import { Position } from '../dnd/droptarget';
 import { DockviewComponent } from '../dockview/dockviewComponent';
 import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
+import { DockviewGroupLocation } from '../dockview/dockviewGroupPanelModel';
 import { Emitter, Event } from '../events';
 import { GridviewPanelApi, GridviewPanelApiImpl } from './gridviewPanelApi';
 
 export interface DockviewGroupPanelApi extends GridviewPanelApi {
-    readonly onDidFloatingStateChange: Event<DockviewGroupPanelFloatingChangeEvent>;
-    readonly isFloating: boolean;
+    readonly onDidRenderPositionChange: Event<DockviewGroupPanelFloatingChangeEvent>;
+    readonly location: DockviewGroupLocation;
     moveTo(options: { group: DockviewGroupPanel; position?: Position }): void;
 }
 
 export interface DockviewGroupPanelFloatingChangeEvent {
-    readonly isFloating: boolean;
+    readonly location: DockviewGroupLocation;
 }
 
 export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     private _group: DockviewGroupPanel | undefined;
 
-    readonly _onDidFloatingStateChange =
+    readonly _onDidRenderPositionChange =
         new Emitter<DockviewGroupPanelFloatingChangeEvent>();
-    readonly onDidFloatingStateChange: Event<DockviewGroupPanelFloatingChangeEvent> =
-        this._onDidFloatingStateChange.event;
+    readonly onDidRenderPositionChange: Event<DockviewGroupPanelFloatingChangeEvent> =
+        this._onDidRenderPositionChange.event;
 
-    get isFloating() {
+    get location(): DockviewGroupLocation {
         if (!this._group) {
             throw new Error(`DockviewGroupPanelApiImpl not initialized`);
         }
-        return this._group.model.isFloating;
+        return this._group.model.location;
     }
 
     constructor(id: string, private readonly accessor: DockviewComponent) {
         super(id);
 
-        this.addDisposables(this._onDidFloatingStateChange);
+        this.addDisposables(this._onDidRenderPositionChange);
     }
 
     moveTo(options: { group: DockviewGroupPanel; position?: Position }): void {

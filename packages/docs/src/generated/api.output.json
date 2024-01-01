@@ -360,6 +360,11 @@
             "type": "method"
         },
         {
+            "name": "addPopoutGroup",
+            "signature": "(item: IDockviewPanel | DockviewGroupPanel, options?: { position: Box, skipRemoveGroup: boolean }): void",
+            "type": "method"
+        },
+        {
             "name": "clear",
             "comment": {
                 "summary": [
@@ -1526,8 +1531,18 @@
             "type": "property"
         },
         {
+            "name": "onDidRendererChange",
+            "signature": "Event<RendererChangedEvent>",
+            "type": "property"
+        },
+        {
             "name": "onDidVisibilityChange",
             "signature": "Event<VisibilityEvent>",
+            "type": "property"
+        },
+        {
+            "name": "renderer",
+            "signature": "DockviewPanelRenderer",
             "type": "property"
         },
         {
@@ -1561,6 +1576,11 @@
         {
             "name": "setActive",
             "signature": "(): void",
+            "type": "method"
+        },
+        {
+            "name": "setRenderer",
+            "signature": "(renderer: DockviewPanelRenderer): void",
             "type": "method"
         },
         {
@@ -2003,6 +2023,16 @@
         {
             "name": "components",
             "signature": "PanelCollection<IDockviewPanelProps<any>>",
+            "type": "property"
+        },
+        {
+            "name": "debug",
+            "signature": "boolean",
+            "type": "property"
+        },
+        {
+            "name": "defaultRenderer",
+            "signature": "DockviewPanelRenderer",
             "type": "property"
         },
         {

@@ -76,7 +76,11 @@ export class ContentContainer
 
                 const data = getPanelData();
 
-                if (!data && event.shiftKey && !this.group.isFloating) {
+                if (
+                    !data &&
+                    event.shiftKey &&
+                    this.group.location !== 'floating'
+                ) {
                     return false;
                 }
 

@@ -85,7 +85,7 @@ export class GreadyRenderContainer extends CompositeDisposable {
             toggleClass(
                 focusContainer,
                 'dv-render-overlay-float',
-                panel.group.api.isFloating
+                panel.group.api.location === 'floating'
             );
         };
 
