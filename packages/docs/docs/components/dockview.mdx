@@ -389,7 +389,12 @@ From within a panel you may say
 props.containerApi.addPopoutGroup(props.api.group);
 ```
 
-<DockviewPopoutGroup/>
+<MultiFrameworkContainer
+    height={600}
+    sandboxId="popoutgroup-dockview"
+    react={DockviewPopoutGroup}
+/>
+
 
 
 ## Panels
@@ -911,4 +916,7 @@ If you wish to interact with the drop event from one dockview instance in anothe
 
 ### Window-like mananger with tabs
 
-<DockviewNative2 />
+
+<MultiFrameworkContainer sandboxId="nativeapp-dockview" react={DockviewNative2} />
+
+
