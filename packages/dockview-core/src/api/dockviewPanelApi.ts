@@ -2,7 +2,7 @@ import { Emitter, Event } from '../events';
 import { GridviewPanelApiImpl, GridviewPanelApi } from './gridviewPanelApi';
 import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
 import { MutableDisposable } from '../lifecycle';
-import { DockviewPanel, IDockviewPanel } from '../dockview/dockviewPanel';
+import { DockviewPanel } from '../dockview/dockviewPanel';
 import { DockviewComponent } from '../dockview/dockviewComponent';
 import { Position } from '../dnd/droptarget';
 import { DockviewPanelRenderer } from '../dockview/components/greadyRenderContainer';

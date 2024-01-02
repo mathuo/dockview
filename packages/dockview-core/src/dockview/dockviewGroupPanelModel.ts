@@ -1,6 +1,6 @@
 import { DockviewApi } from '../api/component.api';
 import { getPanelData, PanelTransfer } from '../dnd/dataTransfer';
-import { Droptarget, Position } from '../dnd/droptarget';
+import { Position } from '../dnd/droptarget';
 import { DockviewComponent } from './dockviewComponent';
 import { isAncestor, toggleClass } from '../dom';
 import { addDisposableListener, Emitter, Event } from '../events';
@@ -266,9 +266,11 @@ export class DockviewGroupPanelModel
                 break;
             case 'floating':
                 this.contentContainer.dropTarget.setTargetZones(['center']);
-        this.contentContainer.dropTarget.setTargetZones(
-            value ? ['center'] : ['top', 'bottom', 'left', 'right', 'center']
-        );
+                this.contentContainer.dropTarget.setTargetZones(
+                    value
+                        ? ['center']
+                        : ['top', 'bottom', 'left', 'right', 'center']
+                );
 
                 toggleClass(this.container, 'dv-groupview-floating', true);
 
@@ -838,7 +840,6 @@ export class DockviewGroupPanelModel
             panel.dispose();
         }
 
-        // this.dropTarget.dispose();
         this.tabsContainer.dispose();
         this.contentContainer.dispose();
     }

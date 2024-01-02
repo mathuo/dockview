@@ -7,7 +7,7 @@ import {
 import { directionToPosition, Droptarget, Position } from '../dnd/droptarget';
 import { tail, sequenceEquals, remove } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { CompositeDisposable, IDisposable } from '../lifecycle';
+import { CompositeDisposable } from '../lifecycle';
 import { Event, Emitter } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import {
@@ -52,7 +52,6 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
-import { PopoutWindow } from '../popoutWindow';
 import { Box } from '../types';
 import {
     GreadyRenderContainer,
@@ -1528,7 +1527,7 @@ export class DockviewComponent
                             getGridLocation(sourceGroup.element)
                         );
                         break;
-                    case 'floating':
+                    case 'floating': {
                         const selectedFloatingGroup = this._floatingGroups.find(
                             (x) => x.group === sourceGroup
                         );
@@ -1537,7 +1536,8 @@ export class DockviewComponent
                         }
                         selectedFloatingGroup.dispose();
                         break;
-                    case 'popout':
+                    }
+                    case 'popout': {
                         const selectedPopoutGroup = this._popoutGroups.find(
                             (x) => x.group === sourceGroup
                         );
@@ -1545,6 +1545,7 @@ export class DockviewComponent
                             throw new Error('failed to find popout group');
                         }
                         selectedPopoutGroup.dispose();
+                    }
                 }
 
                 const referenceLocation = getGridLocation(
