@@ -1,0 +1,1 @@
+{"version":3,"file":"assets/js/9ba71fdf.14c66874.js","mappings":"iKAEe,SAASA,IACpB,OAAOC,EAAAA,EAAAA,KAAA,OAAKC,UAAU,iBAC1B,C","sources":["webpack://dockview-docs/./src/pages/popout.tsx"],"sourcesContent":["import React from 'react';\n\nexport default function Popout() {\n    return <div className=\"popout-anchor\" />;\n}\n"],"names":["Popout","_jsx","className"],"sourceRoot":""}
