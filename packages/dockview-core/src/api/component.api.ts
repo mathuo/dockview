@@ -806,6 +806,22 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         this.component.moveToPrevious(options);
     }
 
+    maximizeGroup(panel: IDockviewPanel): void {
+        this.component.maximizeGroup(panel.group);
+    }
+
+    hasMaximizedGroup(): boolean {
+        return this.component.hasMaximizedGroup();
+    }
+
+    exitMaxmizedGroup(): void {
+        this.component.exitMaximizedGroup();
+    }
+
+    get onDidMaxmizedGroupChange(): Event<void> {
+        return this.component.onDidMaxmizedGroupChange;
+    }
+
     /**
      * Add a popout group in a new Window
      */

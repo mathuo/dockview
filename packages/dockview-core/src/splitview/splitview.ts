@@ -104,8 +104,8 @@ export class Splitview {
     private _orientation: Orientation;
     private _size = 0;
     private _orthogonalSize = 0;
-    private contentSize = 0;
-    private _proportions: number[] | undefined = undefined;
+    private _contentSize = 0;
+    private _proportions: (number | undefined)[] | undefined = undefined;
     private proportionalLayout: boolean;
     private _startSnappingEnabled = true;
     private _endSnappingEnabled = true;
@@ -116,6 +116,10 @@ export class Splitview {
     readonly onDidAddView = this._onDidAddView.event;
     private readonly _onDidRemoveView = new Emitter<IView>();
     readonly onDidRemoveView = this._onDidRemoveView.event;
+
+    get contentSize(): number {
+        return this._contentSize;
+    }
 
     get size(): number {
         return this._size;
@@ -137,7 +141,7 @@ export class Splitview {
         return this.viewItems.length;
     }
 
-    public get proportions(): number[] | undefined {
+    public get proportions(): (number | undefined)[] | undefined {
         return this._proportions ? [...this._proportions] : undefined;
     }
 
@@ -242,7 +246,7 @@ export class Splitview {
             });
 
             // Initialize content size and proportions for first layout
-            this.contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
+            this._contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
             this.saveProportions();
         }
     }
@@ -654,7 +658,7 @@ export class Splitview {
     }
 
     public layout(size: number, orthogonalSize: number): void {
-        const previousSize = Math.max(this.size, this.contentSize);
+        const previousSize = Math.max(this.size, this._contentSize);
         this.size = size;
         this.orthogonalSize = orthogonalSize;
 
@@ -675,14 +679,30 @@ export class Splitview {
                 highPriorityIndexes
             );
         } else {
+            let total = 0;
+
             for (let i = 0; i < this.viewItems.length; i++) {
                 const item = this.viewItems[i];
+                const proportion = this.proportions[i];
 
-                item.size = clamp(
-                    Math.round(this.proportions[i] * size),
-                    item.minimumSize,
-                    item.maximumSize
-                );
+                if (typeof proportion === 'number') {
+                    total += proportion;
+                } else {
+                    size -= item.size;
+                }
+            }
+
+            for (let i = 0; i < this.viewItems.length; i++) {
+                const item = this.viewItems[i];
+                const proportion = this.proportions[i];
+
+                if (typeof proportion === 'number' && total > 0) {
+                    item.size = clamp(
+                        Math.round((proportion * size) / total),
+                        item.minimumSize,
+                        item.maximumSize
+                    );
+                }
             }
         }
 
@@ -747,15 +767,15 @@ export class Splitview {
     }
 
     private saveProportions(): void {
-        if (this.proportionalLayout && this.contentSize > 0) {
-            this._proportions = this.viewItems.map(
-                (i) => i.size / this.contentSize
+        if (this.proportionalLayout && this._contentSize > 0) {
+            this._proportions = this.viewItems.map((i) =>
+                i.visible ? i.size / this._contentSize : undefined
             );
         }
     }
 
     private layoutViews(): void {
-        this.contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
+        this._contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
         let sum = 0;
         const x: number[] = [];
 
@@ -880,7 +900,7 @@ export class Splitview {
                 } else if (
                     snappedAfter &&
                     collapsesDown[index] &&
-                    (position < this.contentSize || this.endSnappingEnabled)
+                    (position < this._contentSize || this.endSnappingEnabled)
                 ) {
                     this.updateSash(sash, SashState.MAXIMUM);
                 } else {
