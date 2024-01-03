@@ -50,17 +50,15 @@ function loadDefaultLayout(api: DockviewApi) {
         component: 'default',
     });
 
-    const panel4 = api.addPanel({
+    api.addPanel({
         id: 'panel_4',
         component: 'default',
-        floating: true,
     });
 
     api.addPanel({
         id: 'panel_5',
         component: 'default',
-        floating: false,
-        position: { referencePanel: panel4 },
+        position: { direction: 'right' },
     });
 
     api.addPanel({
@@ -70,23 +68,6 @@ function loadDefaultLayout(api: DockviewApi) {
 }
 
 let panelCount = 0;
-
-function addPanel(api: DockviewApi) {
-    api.addPanel({
-        id: (++panelCount).toString(),
-        title: `Tab ${panelCount}`,
-        component: 'default',
-    });
-}
-
-function addFloatingPanel2(api: DockviewApi) {
-    api.addPanel({
-        id: (++panelCount).toString(),
-        title: `Tab ${panelCount}`,
-        component: 'default',
-        floating: { width: 250, height: 150, x: 50, y: 50 },
-    });
-}
 
 function safeParse<T>(value: any): T | null {
     try {
@@ -164,7 +145,7 @@ export const DockviewPersistance = (props: { theme?: string }) => {
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                height: '100%',
+                height: '400px',
             }}
         >
             <div style={{ height: '25px' }}>
@@ -194,33 +175,6 @@ export const DockviewPersistance = (props: { theme?: string }) => {
                 >
                     Clear
                 </button>
-                <button
-                    onClick={() => {
-                        addFloatingPanel2(api!);
-                    }}
-                >
-                    Add Floating Group
-                </button>
-                <button
-                    onClick={() => {
-                        setOptions(
-                            options === undefined
-                                ? 'boundedWithinViewport'
-                                : undefined
-                        );
-                    }}
-                >
-                    {`Bounds: ${options ? 'Within' : 'Overflow'}`}
-                </button>
-                <button
-                    onClick={() => {
-                        setDisableFloatingGroups((x) => !x);
-                    }}
-                >
-                    {`${
-                        disableFloatingGroups ? 'Enable' : 'Disable'
-                    } floating groups`}
-                </button>
             </div>
             <div
                 style={{
@@ -244,7 +198,12 @@ export const DockviewPersistance = (props: { theme?: string }) => {
 
 const LeftComponent = (props: IDockviewHeaderActionsProps) => {
     const onClick = () => {
-        addPanel(props.containerApi);
+        props.containerApi.addPanel({
+            id: (++panelCount).toString(),
+            title: `Tab ${panelCount}`,
+            component: 'default',
+            position: { referenceGroup: props.group },
+        });
     };
     return (
         <div style={{ height: '100%', color: 'white', padding: '0px 4px' }}>
@@ -254,15 +213,13 @@ const LeftComponent = (props: IDockviewHeaderActionsProps) => {
 };
 
 const RightComponent = (props: IDockviewHeaderActionsProps) => {
-    const [floating, setFloating] = React.useState<boolean>(
-        props.api.location === 'floating'
+    const [popout, setPopout] = React.useState<boolean>(
+        props.api.location === 'popout'
     );
 
     React.useEffect(() => {
         const disposable = props.group.api.onDidRenderPositionChange(
-            (event) => {
-                setFloating(event.location === 'floating');
-            }
+            (event) => [setPopout(event.location === 'popout')]
         );
 
         return () => {
@@ -271,11 +228,11 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
     }, [props.group.api]);
 
     const onClick = () => {
-        if (floating) {
+        if (popout) {
             const group = props.containerApi.addGroup();
             props.group.api.moveTo({ group });
         } else {
-            props.containerApi.addFloatingGroup(props.group);
+            props.containerApi.addPopoutGroup(props.group);
         }
     };
 
@@ -283,7 +240,7 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
         <div style={{ height: '100%', color: 'white', padding: '0px 4px' }}>
             <Icon
                 onClick={onClick}
-                icon={floating ? 'jump_to_element' : 'back_to_tab'}
+                icon={popout ? 'jump_to_element' : 'back_to_tab'}
             />
         </div>
     );

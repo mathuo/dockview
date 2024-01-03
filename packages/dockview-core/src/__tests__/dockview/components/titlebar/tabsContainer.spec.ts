@@ -478,7 +478,7 @@ describe('tabsContainer', () => {
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
-                api: { isFloating: false } as any,
+                api: { location: 'grid' } as any,
             }) as DockviewGroupPanel;
         });
 
@@ -538,7 +538,7 @@ describe('tabsContainer', () => {
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
-                api: { isFloating: true } as any,
+                api: { location: 'floating' } as any,
             }) as DockviewGroupPanel;
         });
 
@@ -591,7 +591,7 @@ describe('tabsContainer', () => {
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
-                api: { isFloating: true } as any,
+                api: { location: 'floating' } as any,
                 model: {} as any,
             }) as DockviewGroupPanel;
         });
@@ -653,7 +653,7 @@ describe('tabsContainer', () => {
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
-                api: { isFloating: true } as any,
+                api: { location: 'grid' } as any,
                 model: {} as any,
             }) as DockviewGroupPanel;
         });
@@ -723,7 +723,7 @@ describe('tabsContainer', () => {
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
-                api: { isFloating: true } as any,
+                api: { location: 'grid' } as any,
                 model: {} as any,
             }) as DockviewGroupPanel;
         });
@@ -793,7 +793,7 @@ describe('tabsContainer', () => {
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
-                api: { isFloating: true } as any,
+                api: { location: 'grid' } as any,
                 model: {} as any,
             }) as DockviewGroupPanel;
         });

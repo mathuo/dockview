@@ -2,7 +2,7 @@ import { Emitter, Event } from '../events';
 import { GridviewPanelApiImpl, GridviewPanelApi } from './gridviewPanelApi';
 import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
 import { MutableDisposable } from '../lifecycle';
-import { DockviewPanel, IDockviewPanel } from '../dockview/dockviewPanel';
+import { DockviewPanel } from '../dockview/dockviewPanel';
 import { DockviewComponent } from '../dockview/dockviewComponent';
 import { Position } from '../dnd/droptarget';
 import { DockviewPanelRenderer } from '../overlayRenderContainer';
@@ -15,13 +15,10 @@ export interface RendererChangedEvent {
     renderer: DockviewPanelRenderer;
 }
 
-/*
- * omit visibility modifiers since the visibility of a single group doesn't make sense
- * because it belongs to a groupview
- */
 export interface DockviewPanelApi
     extends Omit<
         GridviewPanelApi,
+        // omit properties that do not make sense here
         'setVisible' | 'onDidConstraintsChange' | 'setConstraints'
     > {
     readonly group: DockviewGroupPanel;
@@ -39,6 +36,9 @@ export interface DockviewPanelApi
         position?: Position;
         index?: number;
     }): void;
+    maximize(): void;
+    isMaximized(): boolean;
+    exitMaximized(): void;
 }
 
 export class DockviewPanelApiImpl
@@ -66,7 +66,7 @@ export class DockviewPanelApiImpl
     }
 
     get isGroupActive(): boolean {
-        return !!this.group?.isActive;
+        return this.group.isActive;
     }
 
     get renderer(): DockviewPanelRenderer {
@@ -139,5 +139,17 @@ export class DockviewPanelApiImpl
 
     close(): void {
         this.group.model.closePanel(this.panel);
+    }
+
+    maximize(): void {
+        this.group.api.maximize();
+    }
+
+    isMaximized(): boolean {
+        return this.group.api.isMaximized();
+    }
+
+    exitMaximized(): void {
+        this.group.api.exitMaximized();
     }
 }

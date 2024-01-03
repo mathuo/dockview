@@ -42,6 +42,7 @@ import {
     GroupDragEvent,
     TabDragEvent,
 } from '../dockview/components/titlebar/tabsContainer';
+import { Box } from '../types';
 
 export interface CommonApi<T = any> {
     readonly height: number;
@@ -803,5 +804,34 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
      */
     moveToPrevious(options?: MovementOptions): void {
         this.component.moveToPrevious(options);
+    }
+
+    maximizeGroup(panel: IDockviewPanel): void {
+        this.component.maximizeGroup(panel.group);
+    }
+
+    hasMaximizedGroup(): boolean {
+        return this.component.hasMaximizedGroup();
+    }
+
+    exitMaxmizedGroup(): void {
+        this.component.exitMaximizedGroup();
+    }
+
+    get onDidMaxmizedGroupChange(): Event<void> {
+        return this.component.onDidMaxmizedGroupChange;
+    }
+
+    /**
+     * Add a popout group in a new Window
+     */
+    addPopoutGroup(
+        item: IDockviewPanel | DockviewGroupPanel,
+        options?: {
+            position?: Box;
+            popoutUrl?: string;
+        }
+    ): void {
+        this.component.addPopoutGroup(item, options);
     }
 }

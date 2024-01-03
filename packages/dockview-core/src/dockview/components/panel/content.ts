@@ -1,6 +1,5 @@
 import {
     CompositeDisposable,
-    Disposable,
     IDisposable,
     MutableDisposable,
 } from '../../../lifecycle';
@@ -8,7 +7,6 @@ import { Emitter, Event } from '../../../events';
 import { trackFocus } from '../../../dom';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
-import { DragAndDropObserver } from '../../../dnd/dnd';
 import { Droptarget } from '../../../dnd/droptarget';
 import { DockviewGroupPanelModel } from '../../dockviewGroupPanelModel';
 import { getPanelData } from '../../../dnd/dataTransfer';
@@ -70,7 +68,11 @@ export class ContentContainer
 
                 const data = getPanelData();
 
-                if (!data && event.shiftKey && !this.group.isFloating) {
+                if (
+                    !data &&
+                    event.shiftKey &&
+                    this.group.location !== 'floating'
+                ) {
                     return false;
                 }
 

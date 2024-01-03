@@ -97,6 +97,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
               minimumHeightWithinViewport?: number;
               minimumWidthWithinViewport?: number;
           };
+    popoutUrl?: string;
     defaultRenderer?: DockviewPanelRenderer;
     debug?: boolean;
 }

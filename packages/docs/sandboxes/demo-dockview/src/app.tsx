@@ -109,29 +109,6 @@ const Icon = (props: {
     );
 };
 
-const Button = () => {
-    const [position, setPosition] = React.useState<
-        { x: number; y: number } | undefined
-    >(undefined);
-
-    const close = () => setPosition(undefined);
-
-    const onClick = (event: React.MouseEvent) => {
-        setPosition({ x: event.pageX, y: event.pageY });
-    };
-
-    return (
-        <>
-            <Icon icon="more_vert" onClick={onClick} />
-            {position && (
-                <Popover position={position} close={close}>
-                    <div>hello</div>
-                </Popover>
-            )}
-        </>
-    );
-};
-
 const groupControlsComponents = {
     panel_1: () => {
         return <Icon icon="file_download" />;
@@ -147,6 +124,34 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
         return groupControlsComponents[props.activePanel.id];
     }, [props.isGroupActive, props.activePanel]);
 
+    const [icon, setIcon] = React.useState<string>(
+        props.containerApi.hasMaximizedGroup()
+            ? 'collapse_content'
+            : 'expand_content'
+    );
+
+    React.useEffect(() => {
+        const disposable = props.containerApi.onDidMaxmizedGroupChange(() => {
+            setIcon(
+                props.containerApi.hasMaximizedGroup()
+                    ? 'collapse_content'
+                    : 'expand_content'
+            );
+        });
+
+        return () => {
+            disposable.dispose();
+        };
+    }, [props.containerApi]);
+
+    const onClick = () => {
+        if (props.containerApi.hasMaximizedGroup()) {
+            props.containerApi.exitMaxmizedGroup();
+        } else {
+            props.activePanel?.api.maximize();
+        }
+    };
+
     return (
         <div
             className="group-control"
@@ -160,7 +165,7 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
         >
             {props.isGroupActive && <Icon icon="star" />}
             {Component && <Component />}
-            <Button />
+            <Icon icon={icon} onClick={onClick} />
         </div>
     );
 };

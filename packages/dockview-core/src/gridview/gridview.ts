@@ -270,9 +270,11 @@ export interface SerializedGridview<T> {
 }
 
 export class Gridview implements IDisposable {
+    readonly element: HTMLElement;
+
     private _root: BranchNode | undefined;
-    public readonly element: HTMLElement;
-    private disposable: MutableDisposable = new MutableDisposable();
+    private _maximizedNode: LeafNode | undefined = undefined;
+    private readonly disposable: MutableDisposable = new MutableDisposable();
 
     private readonly _onDidChange = new Emitter<{
         size?: number;
@@ -280,6 +282,9 @@ export class Gridview implements IDisposable {
     }>();
     readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
         this._onDidChange.event;
+
+    private readonly _onDidMaxmizedNodeChange = new Emitter<void>();
+    readonly onDidMaxmizedNodeChange = this._onDidMaxmizedNodeChange.event;
 
     public get length(): number {
         return this._root ? this._root.children.length : 0;
@@ -302,6 +307,7 @@ export class Gridview implements IDisposable {
     get width(): number {
         return this.root.width;
     }
+
     get height(): number {
         return this.root.height;
     }
@@ -309,14 +315,81 @@ export class Gridview implements IDisposable {
     get minimumWidth(): number {
         return this.root.minimumWidth;
     }
+
     get minimumHeight(): number {
         return this.root.minimumHeight;
     }
+
     get maximumWidth(): number {
         return this.root.maximumHeight;
     }
+
     get maximumHeight(): number {
         return this.root.maximumHeight;
+    }
+
+    maximizedView(): IGridView | undefined {
+        return this._maximizedNode?.view;
+    }
+
+    hasMaximizedView(): boolean {
+        return this._maximizedNode !== undefined;
+    }
+
+    maximizeView(view: IGridView): void {
+        const location = getGridLocation(view.element);
+        const [_, node] = this.getNode(location);
+
+        if (!(node instanceof LeafNode)) {
+            return;
+        }
+
+        if (this._maximizedNode === node) {
+            return;
+        }
+
+        if (this.hasMaximizedView()) {
+            this.exitMaximizedView();
+        }
+
+        function hideAllViewsBut(parent: BranchNode, exclude: LeafNode): void {
+            for (let i = 0; i < parent.children.length; i++) {
+                const child = parent.children[i];
+                if (child instanceof LeafNode) {
+                    if (child !== exclude) {
+                        parent.setChildVisible(i, false);
+                    }
+                } else {
+                    hideAllViewsBut(child, exclude);
+                }
+            }
+        }
+
+        hideAllViewsBut(this.root, node);
+        this._maximizedNode = node;
+        this._onDidMaxmizedNodeChange.fire();
+    }
+
+    exitMaximizedView(): void {
+        if (!this._maximizedNode) {
+            return;
+        }
+
+        function showViewsInReverseOrder(parent: BranchNode): void {
+            for (let index = parent.children.length - 1; index >= 0; index--) {
+                const child = parent.children[index];
+                if (child instanceof LeafNode) {
+                    parent.setChildVisible(index, true);
+                } else {
+                    showViewsInReverseOrder(child);
+                }
+            }
+        }
+
+        showViewsInReverseOrder(this.root);
+
+        this._maximizedNode = undefined;
+        this._onDidMaxmizedNodeChange.fire();
     }
 
     public serialize(): SerializedGridview<any> {
@@ -333,6 +406,7 @@ export class Gridview implements IDisposable {
     public dispose(): void {
         this.disposable.dispose();
         this._onDidChange.dispose();
+        this._onDidMaxmizedNodeChange.dispose();
         this.root.dispose();
 
         this.element.remove();
@@ -584,6 +658,10 @@ export class Gridview implements IDisposable {
     }
 
     setViewVisible(location: number[], visible: boolean): void {
+        if (this.hasMaximizedView()) {
+            this.exitMaximizedView();
+        }
+
         const [rest, index] = tail(location);
         const [, parent] = this.getNode(rest);
 
@@ -595,6 +673,10 @@ export class Gridview implements IDisposable {
     }
 
     public moveView(parentLocation: number[], from: number, to: number): void {
+        if (this.hasMaximizedView()) {
+            this.exitMaximizedView();
+        }
+
         const [, parent] = this.getNode(parentLocation);
 
         if (!(parent instanceof BranchNode)) {
@@ -609,6 +691,10 @@ export class Gridview implements IDisposable {
         size: number | Sizing,
         location: number[]
     ): void {
+        if (this.hasMaximizedView()) {
+            this.exitMaximizedView();
+        }
+
         const [rest, index] = tail(location);
 
         const [pathToParent, parent] = this.getNode(rest);
@@ -670,6 +756,10 @@ export class Gridview implements IDisposable {
     }
 
     removeView(location: number[], sizing?: Sizing): IGridView {
+        if (this.hasMaximizedView()) {
+            this.exitMaximizedView();
+        }
+
         const [rest, index] = tail(location);
         const [pathToParent, parent] = this.getNode(rest);
 
