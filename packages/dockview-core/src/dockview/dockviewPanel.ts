@@ -9,7 +9,7 @@ import { CompositeDisposable, IDisposable } from '../lifecycle';
 import { IPanel, PanelUpdateEvent, Parameters } from '../panel/types';
 import { IDockviewPanelModel } from './dockviewPanelModel';
 import { DockviewComponent } from './dockviewComponent';
-import { DockviewPanelRenderer } from './components/greadyRenderContainer';
+import { DockviewPanelRenderer } from '../overlayRenderContainer';
 
 export interface IDockviewPanel extends IDisposable, IPanel {
     readonly view: IDockviewPanelModel;

@@ -5,7 +5,7 @@ import { MutableDisposable } from '../lifecycle';
 import { DockviewPanel, IDockviewPanel } from '../dockview/dockviewPanel';
 import { DockviewComponent } from '../dockview/dockviewComponent';
 import { Position } from '../dnd/droptarget';
-import { DockviewPanelRenderer } from '../dockview/components/greadyRenderContainer';
+import { DockviewPanelRenderer } from '../overlayRenderContainer';
 
 export interface TitleEvent {
     readonly title: string;
