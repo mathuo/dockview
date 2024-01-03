@@ -89,6 +89,14 @@ export class OverlayRenderContainer extends CompositeDisposable {
             );
         };
 
+        const visibilityChanged = () => {
+            if (panel.api.isVisible) {
+                resize();
+            }
+
+            focusContainer.style.display = panel.api.isVisible ? '' : 'none';
+        };
+
         const disposable = new CompositeDisposable(
             /**
              * since container is positioned absoutely we must explicitly forward
@@ -117,9 +125,13 @@ export class OverlayRenderContainer extends CompositeDisposable {
                  * the content is still maintained within the DOM hence DOM specific attributes
                  * such as scroll position are maintained when next made visible.
                  */
-                focusContainer.style.display = event.isVisible ? '' : 'none';
+                visibilityChanged();
             }),
             panel.api.onDidDimensionsChange(() => {
+                if (!panel.api.isVisible) {
+                    return;
+                }
+
                 resize();
             }),
             {
@@ -140,7 +152,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
              * calling the first resize as other size-altering events may still occur before
              * the end of the stack-frame.
              */
-            resize();
+            visibilityChanged();
         });
 
         this.map[panel.api.id].disposable = disposable;
