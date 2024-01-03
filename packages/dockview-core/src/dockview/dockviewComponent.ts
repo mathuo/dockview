@@ -58,6 +58,10 @@ import {
     DockviewPanelRenderer,
 } from './components/greadyRenderContainer';
 import { DockviewPopoutGroupPanel } from './dockviewPopoutGroupPanel';
+import {
+    DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
+    DEFAULT_FLOATING_GROUP_POSITION,
+} from '../constants';
 
 function getTheme(element: HTMLElement): string | undefined {
     function toClassList(element: HTMLElement) {
@@ -85,8 +89,6 @@ function getTheme(element: HTMLElement): string | undefined {
 
     return theme;
 }
-
-const DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE = 100;
 
 export interface PanelReference {
     update: (event: { params: { [key: string]: any } }) => void;
@@ -582,9 +584,13 @@ export class DockviewComponent
         group.model.location = 'floating';
 
         const overlayLeft =
-            typeof coord?.x === 'number' ? Math.max(coord.x, 0) : 100;
+            typeof coord?.x === 'number'
+                ? Math.max(coord.x, 0)
+                : DEFAULT_FLOATING_GROUP_POSITION.left;
         const overlayTop =
-            typeof coord?.y === 'number' ? Math.max(coord.y, 0) : 100;
+            typeof coord?.y === 'number'
+                ? Math.max(coord.y, 0)
+                : DEFAULT_FLOATING_GROUP_POSITION.top;
 
         const overlay = new Overlay({
             container: this.gridview.element,
