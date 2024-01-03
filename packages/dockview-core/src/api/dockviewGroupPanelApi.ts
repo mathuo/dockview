@@ -9,11 +9,17 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
     readonly onDidRenderPositionChange: Event<DockviewGroupPanelFloatingChangeEvent>;
     readonly location: DockviewGroupLocation;
     moveTo(options: { group: DockviewGroupPanel; position?: Position }): void;
+    maximize(): void;
+    isMaximized(): boolean;
+    exitMaximized(): void;
 }
 
 export interface DockviewGroupPanelFloatingChangeEvent {
     readonly location: DockviewGroupLocation;
 }
+
+// TODO find a better way to initialize and avoid needing null checks
+const NOT_INITIALIZED_MESSAGE = 'DockviewGroupPanelApiImpl not initialized';
 
 export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     private _group: DockviewGroupPanel | undefined;
@@ -25,7 +31,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
 
     get location(): DockviewGroupLocation {
         if (!this._group) {
-            throw new Error(`DockviewGroupPanelApiImpl not initialized`);
+            throw new Error(NOT_INITIALIZED_MESSAGE);
         }
         return this._group.model.location;
     }
@@ -38,7 +44,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
 
     moveTo(options: { group: DockviewGroupPanel; position?: Position }): void {
         if (!this._group) {
-            throw new Error(`DockviewGroupPanelApiImpl not initialized`);
+            throw new Error(NOT_INITIALIZED_MESSAGE);
         }
 
         this.accessor.moveGroupOrPanel(
@@ -47,6 +53,32 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             undefined,
             options.position ?? 'center'
         );
+    }
+
+    maximize(): void {
+        if (!this._group) {
+            throw new Error(NOT_INITIALIZED_MESSAGE);
+        }
+
+        this.accessor.maximizeGroup(this._group);
+    }
+
+    isMaximized(): boolean {
+        if (!this._group) {
+            throw new Error(NOT_INITIALIZED_MESSAGE);
+        }
+
+        return this.accessor.isMaximizedGroup(this._group);
+    }
+
+    exitMaximized(): void {
+        if (!this._group) {
+            throw new Error(NOT_INITIALIZED_MESSAGE);
+        }
+
+        if (this.isMaximized()) {
+            this.accessor.exitMaximizedGroup();
+        }
     }
 
     initialize(group: DockviewGroupPanel): void {

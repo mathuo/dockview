@@ -842,6 +842,11 @@ describe('gridview', () => {
         );
         gridview.layout(1000, 1000);
 
+        let counter = 0;
+        const subscription = gridview.onDidMaxmizedNodeChange(() => {
+            counter++;
+        });
+
         const view1 = new MockGridview('1');
         const view2 = new MockGridview('2');
         const view3 = new MockGridview('3');
@@ -891,18 +896,25 @@ describe('gridview', () => {
         // base case assertions
         assertLayout();
         expect(gridview.hasMaximizedView()).toBeFalsy();
+        expect(counter).toBe(0);
 
         /**
          * maximize each view individually and then return to the standard view
          * checking on each iteration that the original layout dimensions
          * are restored
          */
-        for (const view of views) {
+        for (let i = 0; i < views.length; i++) {
+            const view = views[i];
+
             gridview.maximizeView(view);
+            expect(counter).toBe(i * 2 + 1);
             expect(gridview.hasMaximizedView()).toBeTruthy();
             gridview.exitMaximizedView();
+            expect(counter).toBe(i * 2 + 2);
             assertLayout();
         }
+
+        subscription.dispose();
     });
 
     test('that maximizedView is exited when a views visibility is changed', () => {

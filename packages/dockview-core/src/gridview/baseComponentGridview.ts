@@ -65,6 +65,7 @@ export interface IBaseGrid<T extends IGridPanelView> {
     setVisible(panel: T, visible: boolean): void;
     isVisible(panel: T): boolean;
     maximizeGroup(panel: T): void;
+    isMaximizedGroup(panel: T): boolean;
     exitMaximizedGroup(): void;
     hasMaximizedGroup(): boolean;
     readonly onDidMaxmizedGroupChange: Event<void>;
@@ -180,6 +181,10 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     maximizeGroup(panel: T): void {
         this.gridview.maximizeView(panel);
+    }
+
+    isMaximizedGroup(panel: T): boolean {
+        return this.gridview.maximizedView() === panel;
     }
 
     exitMaximizedGroup(): void {

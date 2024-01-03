@@ -273,7 +273,7 @@ export class Gridview implements IDisposable {
     readonly element: HTMLElement;
 
     private _root: BranchNode | undefined;
-    private _maximizedNode: Node | undefined = undefined;
+    private _maximizedNode: LeafNode | undefined = undefined;
     private readonly disposable: MutableDisposable = new MutableDisposable();
 
     private readonly _onDidChange = new Emitter<{
@@ -307,6 +307,7 @@ export class Gridview implements IDisposable {
     get width(): number {
         return this.root.width;
     }
+
     get height(): number {
         return this.root.height;
     }
@@ -314,14 +315,21 @@ export class Gridview implements IDisposable {
     get minimumWidth(): number {
         return this.root.minimumWidth;
     }
+
     get minimumHeight(): number {
         return this.root.minimumHeight;
     }
+
     get maximumWidth(): number {
         return this.root.maximumHeight;
     }
+
     get maximumHeight(): number {
         return this.root.maximumHeight;
+    }
+
+    maximizedView(): IGridView | undefined {
+        return this._maximizedNode?.view;
     }
 
     hasMaximizedView(): boolean {
@@ -331,6 +339,10 @@ export class Gridview implements IDisposable {
     maximizeView(view: IGridView): void {
         const location = getGridLocation(view.element);
         const [_, node] = this.getNode(location);
+
+        if (!(node instanceof LeafNode)) {
+            return;
+        }
 
         if (this._maximizedNode === node) {
             return;
@@ -353,7 +365,7 @@ export class Gridview implements IDisposable {
             }
         }
 
-        hideAllViewsBut(this.root, node as LeafNode);
+        hideAllViewsBut(this.root, node);
         this._maximizedNode = node;
         this._onDidMaxmizedNodeChange.fire();
     }
