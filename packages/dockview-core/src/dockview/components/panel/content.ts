@@ -56,12 +56,6 @@ export class ContentContainer
 
         this.addDisposables(this._onDidFocus, this._onDidBlur);
 
-        // for hosted containers
-        // 1) register a drop target on the host
-        // 2) register window dragStart events to disable pointer events
-        // 3) register dragEnd events
-        // 4) register mouseMove events (if no buttons are present we take this as a dragEnd event)
-
         this.dropTarget = new Droptarget(this.element, {
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
             canDisplayOverlay: (event, position) => {
@@ -127,7 +121,7 @@ export class ContentContainer
 
         switch (panel.api.renderer) {
             case 'onlyWhenVisibile':
-                this.accessor.greadyRenderContainer.remove(panel);
+                this.accessor.overlayRenderContainer.remove(panel);
                 if (isActive) {
                     if (this.panel) {
                         this._element.appendChild(
@@ -144,7 +138,7 @@ export class ContentContainer
                     this._element.removeChild(panel.view.content.element);
                 }
                 container =
-                    this.accessor.greadyRenderContainer.setReferenceContentContainer(
+                    this.accessor.overlayRenderContainer.setReferenceContentContainer(
                         panel,
                         this
                     );
@@ -203,7 +197,7 @@ export class ContentContainer
         switch (renderer) {
             case 'always':
                 container =
-                    this.accessor.greadyRenderContainer.setReferenceContentContainer(
+                    this.accessor.overlayRenderContainer.setReferenceContentContainer(
                         panel,
                         this
                     );

@@ -20,7 +20,7 @@ import {
     FrameworkFactory,
 } from '../panel/componentFactory';
 import { DockviewGroupPanelApi } from '../api/dockviewGroupPanelApi';
-import { DockviewPanelRenderer } from './components/greadyRenderContainer';
+import { DockviewPanelRenderer } from '../overlayRenderContainer';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;

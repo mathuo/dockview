@@ -53,15 +53,12 @@ import {
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
 import { Box } from '../types';
-import {
-    GreadyRenderContainer,
-    DockviewPanelRenderer,
-} from './components/greadyRenderContainer';
 import { DockviewPopoutGroupPanel } from './dockviewPopoutGroupPanel';
 import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
     DEFAULT_FLOATING_GROUP_POSITION,
 } from '../constants';
+import { DockviewPanelRenderer, OverlayRenderContainer } from '../overlayRenderContainer';
 
 function getTheme(element: HTMLElement): string | undefined {
     function toClassList(element: HTMLElement) {
@@ -289,7 +286,7 @@ export class DockviewComponent
     private _options: Exclude<DockviewComponentOptions, 'orientation'>;
     private watermark: IWatermarkRenderer | null = null;
 
-    readonly greadyRenderContainer: GreadyRenderContainer;
+    readonly overlayRenderContainer: OverlayRenderContainer;
 
     private readonly _onWillDragPanel = new Emitter<TabDragEvent>();
     readonly onWillDragPanel: Event<TabDragEvent> = this._onWillDragPanel.event;
@@ -360,16 +357,16 @@ export class DockviewComponent
         });
 
         const gready = document.createElement('div');
-        gready.className = 'dv-gready-render-container';
+        gready.className = 'dv-overlay-render-container';
         this.gridview.element.appendChild(gready);
 
-        this.greadyRenderContainer = new GreadyRenderContainer(gready);
+        this.overlayRenderContainer = new OverlayRenderContainer(gready);
 
         toggleClass(this.gridview.element, 'dv-dockview', true);
         toggleClass(this.element, 'dv-debug', !!options.debug);
 
         this.addDisposables(
-            this.greadyRenderContainer,
+            this.overlayRenderContainer,
             this._onWillDragPanel,
             this._onWillDragGroup,
             this._onDidActivePanelChange,
@@ -1200,7 +1197,7 @@ export class DockviewComponent
         group.model.removePanel(panel);
 
         if (!options.skipDispose) {
-            this.greadyRenderContainer.remove(panel);
+            this.overlayRenderContainer.remove(panel);
             panel.dispose();
         }
 

@@ -49,7 +49,7 @@ export * from './splitview/splitviewPanel';
 export * from './paneview/paneviewPanel';
 export * from './dockview/types';
 
-export { DockviewPanelRenderer } from './dockview/components/greadyRenderContainer';
+export { DockviewPanelRenderer } from './overlayRenderContainer';
 
 export {
     Position,
