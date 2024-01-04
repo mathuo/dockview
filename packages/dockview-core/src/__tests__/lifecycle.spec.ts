@@ -1,4 +1,8 @@
-import { CompositeDisposable, MutableDisposable } from '../lifecycle';
+import {
+    CompositeDisposable,
+    Disposable,
+    MutableDisposable,
+} from '../lifecycle';
 
 describe('lifecycle', () => {
     test('mutable disposable', () => {
@@ -63,5 +67,17 @@ describe('lifecycle', () => {
         cut.dispose();
 
         expect(cut.checkIsDisposed()).toBeTruthy();
+    });
+
+    test('Disposable.from(...)', () => {
+        const func = jest.fn();
+
+        const disposable = Disposable.from(func);
+
+        expect(func).not.toHaveBeenCalled();
+
+        disposable.dispose();
+
+        expect(func).toHaveBeenCalledTimes(1);
     });
 });
