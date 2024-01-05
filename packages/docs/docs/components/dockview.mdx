@@ -377,11 +377,21 @@ Dockview has built-in support for opening groups in new Windows.
 Each popout window can contain a single group with many panels and you can have as many popout
 windows as needed. You cannot dock multiple groups together in the same window.
 
-To open an existing group in a new window
+Popout windows require your website to have a blank `.html` page that can be used, by default this is set to `/popout.html` but
+can be configured to match requirements.
 
-```tsx
-api.addPopoutGroup(group);
+```tsx title="Open new popout group from the component api"
+api.addPopoutGroup(
+  group,
+  // the second arguments (options) is optional
+  {
+    popoutUrl:"/popout.html",
+    box: { left: 0, top: 0, height: 200, width: 300 }
+  });
 ```
+
+> If you do not provide `options.popoutUrl` a default of `/popout.html` is used and if `options.box` is not provided
+the view will be places according to it's currently position.
 
 From within a panel you may say
 
