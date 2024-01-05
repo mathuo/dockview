@@ -145,7 +145,7 @@ export const DockviewPersistance = (props: { theme?: string }) => {
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                height: '400px',
+                height: '100%',
             }}
         >
             <div style={{ height: '25px' }}>

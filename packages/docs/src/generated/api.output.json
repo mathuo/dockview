@@ -2,7 +2,8 @@
     "DockviewApi": [
         {
             "name": "activeGroup",
-            "signature": "DockviewGroupPanel | undefined",
+            "code": "DockviewGroupPanel | undefined",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -10,12 +11,12 @@
                         "text": "Active group object."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "activePanel",
-            "signature": "IDockviewPanel | undefined",
+            "code": "IDockviewPanel | undefined",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -23,12 +24,12 @@
                         "text": "Active panel object."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "groups",
-            "signature": "DockviewGroupPanel[]",
+            "code": "DockviewGroupPanel[]",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -36,12 +37,12 @@
                         "text": "All group objects."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "height",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -49,12 +50,12 @@
                         "text": "Height of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "id",
-            "signature": "string",
+            "code": "string",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -62,12 +63,12 @@
                         "text": "The unique identifier for this instance. Used to manage scope of Drag'n'Drop events."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "maximumHeight",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -75,12 +76,12 @@
                         "text": "Maximum height of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "maximumWidth",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -88,12 +89,12 @@
                         "text": "Maximum width of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "minimumHeight",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -101,12 +102,12 @@
                         "text": "Minimum height of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "minimumWidth",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -114,12 +115,12 @@
                         "text": "Minimum width of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidActiveGroupChange",
-            "signature": "Event<DockviewGroupPanel | undefined>",
+            "code": "Event<DockviewGroupPanel | undefined>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -127,12 +128,12 @@
                         "text": "Invoked when the active group changes. May be undefined if no group is active."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidActivePanelChange",
-            "signature": "Event<IDockviewPanel | undefined>",
+            "code": "Event<IDockviewPanel | undefined>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -140,12 +141,12 @@
                         "text": "Invoked when the active panel changes. May be undefined if no panel is active."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidAddGroup",
-            "signature": "Event<DockviewGroupPanel>",
+            "code": "Event<DockviewGroupPanel>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -153,12 +154,12 @@
                         "text": "Invoked when a group is added. May be called multiple times when moving groups."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidAddPanel",
-            "signature": "Event<IDockviewPanel>",
+            "code": "Event<IDockviewPanel>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -166,12 +167,12 @@
                         "text": "Invoked when a panel is added. May be called multiple times when moving panels."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidDrop",
-            "signature": "Event<DockviewDropEvent>",
+            "code": "Event<DockviewDropEvent>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -179,12 +180,12 @@
                         "text": "Invoked when a Drag'n'Drop event occurs that the component was unable to handle. Exposed for custom Drag'n'Drop functionality."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidLayoutChange",
-            "signature": "Event<void>",
+            "code": "Event<void>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -192,12 +193,12 @@
                         "text": "Invoked when any layout change occures, an aggregation of many events."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidLayoutFromJSON",
-            "signature": "Event<void>",
+            "code": "Event<void>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -213,12 +214,17 @@
                         "text": " method."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
+        },
+        {
+            "name": "onDidMaxmizedGroupChange",
+            "code": "Event<void>",
+            "kind": "accessor"
         },
         {
             "name": "onDidRemoveGroup",
-            "signature": "Event<DockviewGroupPanel>",
+            "code": "Event<DockviewGroupPanel>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -226,12 +232,12 @@
                         "text": "Invoked when a group is removed. May be called multiple times when moving groups."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidRemovePanel",
-            "signature": "Event<IDockviewPanel>",
+            "code": "Event<IDockviewPanel>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -239,12 +245,12 @@
                         "text": "Invoked when a panel is removed. May be called multiple times when moving panels."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onWillDragGroup",
-            "signature": "Event<GroupDragEvent>",
+            "code": "Event<GroupDragEvent>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -252,12 +258,12 @@
                         "text": "Invoked before a group is dragged. Exposed for custom Drag'n'Drop functionality."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onWillDragPanel",
-            "signature": "Event<TabDragEvent>",
+            "code": "Event<TabDragEvent>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -265,12 +271,12 @@
                         "text": "Invoked before a panel is dragged. Exposed for custom Drag'n'Drop functionality."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "panels",
-            "signature": "IDockviewPanel[]",
+            "code": "IDockviewPanel[]",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -278,12 +284,12 @@
                         "text": "All panel objects."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "size",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -291,12 +297,12 @@
                         "text": "Total number of groups."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "totalPanels",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -304,12 +310,12 @@
                         "text": "Total number of panels."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "width",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -317,11 +323,12 @@
                         "text": "Width of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "addFloatingGroup",
+            "code": "(item: IDockviewPanel | DockviewGroupPanel, coord?: { x: number, y: number }): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -329,12 +336,12 @@
                         "text": "Add a floating group"
                     }
                 ]
-            },
-            "signature": "(item: IDockviewPanel | DockviewGroupPanel, coord?: { x: number, y: number }): void",
-            "type": "method"
+            }
         },
         {
             "name": "addGroup",
+            "code": "(options?: AddGroupOptions): DockviewGroupPanel",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -342,12 +349,12 @@
                         "text": "Add a group and return the created object."
                     }
                 ]
-            },
-            "signature": "(options?: AddGroupOptions): DockviewGroupPanel",
-            "type": "method"
+            }
         },
         {
             "name": "addPanel",
+            "code": "<T extends object = Parameters>(options: AddPanelOptions<T>): IDockviewPanel",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -355,12 +362,25 @@
                         "text": "Add a panel and return the created object."
                     }
                 ]
-            },
-            "signature": "<T extends object = Parameters>(options: AddPanelOptions<T>): IDockviewPanel",
-            "type": "method"
+            }
+        },
+        {
+            "name": "addPopoutGroup",
+            "code": "(item: IDockviewPanel | DockviewGroupPanel, options?: { popoutUrl?: string, position?: Box }): void",
+            "kind": "method",
+            "comment": {
+                "summary": [
+                    {
+                        "kind": "text",
+                        "text": "Add a popout group in a new Window"
+                    }
+                ]
+            }
         },
         {
             "name": "clear",
+            "code": "(): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -368,12 +388,12 @@
                         "text": "Reset the component back to an empty and default state."
                     }
                 ]
-            },
-            "signature": "(): void",
-            "type": "method"
+            }
         },
         {
             "name": "closeAllGroups",
+            "code": "(): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -381,12 +401,17 @@
                         "text": "Close all groups and panels."
                     }
                 ]
-            },
-            "signature": "(): void",
-            "type": "method"
+            }
+        },
+        {
+            "name": "exitMaxmizedGroup",
+            "code": "(): void",
+            "kind": "method"
         },
         {
             "name": "focus",
+            "code": "(): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -394,12 +419,12 @@
                         "text": "Focus the component. Will try to focus an active panel if one exists."
                     }
                 ]
-            },
-            "signature": "(): void",
-            "type": "method"
+            }
         },
         {
             "name": "fromJSON",
+            "code": "(data: SerializedDockview): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -407,12 +432,12 @@
                         "text": "Create a component from a serialized object."
                     }
                 ]
-            },
-            "signature": "(data: SerializedDockview): void",
-            "type": "method"
+            }
         },
         {
             "name": "getGroup",
+            "code": "(id: string): DockviewGroupPanel | undefined",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -428,12 +453,12 @@
                         "text": " id. May return undefined."
                     }
                 ]
-            },
-            "signature": "(id: string): DockviewGroupPanel | undefined",
-            "type": "method"
+            }
         },
         {
             "name": "getPanel",
+            "code": "(id: string): IDockviewPanel | undefined",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -457,12 +482,17 @@
                         "text": "."
                     }
                 ]
-            },
-            "signature": "(id: string): IDockviewPanel | undefined",
-            "type": "method"
+            }
+        },
+        {
+            "name": "hasMaximizedGroup",
+            "code": "(): boolean",
+            "kind": "method"
         },
         {
             "name": "layout",
+            "code": "(width: number, height: number, force: boolean): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -470,12 +500,17 @@
                         "text": "Force resize the component to an exact width and height. Read about auto-resizing before using."
                     }
                 ]
-            },
-            "signature": "(width: number, height: number, force: boolean = false): void",
-            "type": "method"
+            }
+        },
+        {
+            "name": "maximizeGroup",
+            "code": "(panel: IDockviewPanel): void",
+            "kind": "method"
         },
         {
             "name": "moveToNext",
+            "code": "(options?: MovementOptions): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -483,12 +518,12 @@
                         "text": "Move the focus progmatically to the next panel or group."
                     }
                 ]
-            },
-            "signature": "(options?: MovementOptions): void",
-            "type": "method"
+            }
         },
         {
             "name": "moveToPrevious",
+            "code": "(options?: MovementOptions): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -496,12 +531,12 @@
                         "text": "Move the focus progmatically to the previous panel or group."
                     }
                 ]
-            },
-            "signature": "(options?: MovementOptions): void",
-            "type": "method"
+            }
         },
         {
             "name": "removeGroup",
+            "code": "(group: IDockviewGroupPanel): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -509,12 +544,12 @@
                         "text": "Remove a group and any panels within the group."
                     }
                 ]
-            },
-            "signature": "(group: IDockviewGroupPanel): void",
-            "type": "method"
+            }
         },
         {
             "name": "removePanel",
+            "code": "(panel: IDockviewPanel): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -522,12 +557,12 @@
                         "text": "Remove a panel given the panel object."
                     }
                 ]
-            },
-            "signature": "(panel: IDockviewPanel): void",
-            "type": "method"
+            }
         },
         {
             "name": "toJSON",
+            "code": "(): SerializedDockview",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -535,15 +570,14 @@
                         "text": "Create a serialized object of the current component."
                     }
                 ]
-            },
-            "signature": "(): SerializedDockview",
-            "type": "method"
+            }
         }
     ],
     "GridviewApi": [
         {
             "name": "height",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -551,12 +585,12 @@
                         "text": "Height of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "maximumHeight",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -564,12 +598,12 @@
                         "text": "Maximum height of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "maximumWidth",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -577,12 +611,12 @@
                         "text": "Maximum width of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "minimumHeight",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -590,12 +624,12 @@
                         "text": "Minimum height of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "minimumWidth",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -603,12 +637,12 @@
                         "text": "Minimum width of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidActivePanelChange",
-            "signature": "Event<IGridviewPanel<GridviewPanelApi> | undefined>",
+            "code": "Event<IGridviewPanel<GridviewPanelApi> | undefined>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -616,12 +650,12 @@
                         "text": "Invoked when the active panel changes. May be undefined if no panel is active."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidAddPanel",
-            "signature": "Event<IGridviewPanel<GridviewPanelApi>>",
+            "code": "Event<IGridviewPanel<GridviewPanelApi>>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -629,12 +663,12 @@
                         "text": "Invoked when a panel is added. May be called multiple times when moving panels."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidLayoutChange",
-            "signature": "Event<void>",
+            "code": "Event<void>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -642,12 +676,12 @@
                         "text": "Invoked when any layout change occures, an aggregation of many events."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidLayoutFromJSON",
-            "signature": "Event<void>",
+            "code": "Event<void>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -663,12 +697,12 @@
                         "text": " method."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidRemovePanel",
-            "signature": "Event<IGridviewPanel<GridviewPanelApi>>",
+            "code": "Event<IGridviewPanel<GridviewPanelApi>>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -676,12 +710,12 @@
                         "text": "Invoked when a panel is removed. May be called multiple times when moving panels."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "orientation",
-            "signature": "Orientation",
+            "code": "Orientation",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -689,12 +723,12 @@
                         "text": "Current orientation. Can be changed after initialization."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "panels",
-            "signature": "IGridviewPanel<GridviewPanelApi>[]",
+            "code": "IGridviewPanel<GridviewPanelApi>[]",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -702,12 +736,12 @@
                         "text": "All panel objects."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "width",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -715,11 +749,12 @@
                         "text": "Width of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "addPanel",
+            "code": "<T extends object = Parameters>(options: AddComponentOptions<T>): IGridviewPanel<GridviewPanelApi>",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -727,12 +762,12 @@
                         "text": "Add a panel and return the created object."
                     }
                 ]
-            },
-            "signature": "<T extends object = Parameters>(options: AddComponentOptions<T>): IGridviewPanel<GridviewPanelApi>",
-            "type": "method"
+            }
         },
         {
             "name": "clear",
+            "code": "(): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -740,12 +775,12 @@
                         "text": "Reset the component back to an empty and default state."
                     }
                 ]
-            },
-            "signature": "(): void",
-            "type": "method"
+            }
         },
         {
             "name": "focus",
+            "code": "(): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -753,12 +788,12 @@
                         "text": "Focus the component. Will try to focus an active panel if one exists."
                     }
                 ]
-            },
-            "signature": "(): void",
-            "type": "method"
+            }
         },
         {
             "name": "fromJSON",
+            "code": "(data: SerializedGridviewComponent): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -766,12 +801,12 @@
                         "text": "Create a component from a serialized object."
                     }
                 ]
-            },
-            "signature": "(data: SerializedGridviewComponent): void",
-            "type": "method"
+            }
         },
         {
             "name": "getPanel",
+            "code": "(id: string): IGridviewPanel<GridviewPanelApi> | undefined",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -795,12 +830,12 @@
                         "text": "."
                     }
                 ]
-            },
-            "signature": "(id: string): IGridviewPanel<GridviewPanelApi> | undefined",
-            "type": "method"
+            }
         },
         {
             "name": "layout",
+            "code": "(width: number, height: number, force: boolean): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -808,12 +843,12 @@
                         "text": "Force resize the component to an exact width and height. Read about auto-resizing before using."
                     }
                 ]
-            },
-            "signature": "(width: number, height: number, force: boolean = false): void",
-            "type": "method"
+            }
         },
         {
             "name": "movePanel",
+            "code": "(panel: IGridviewPanel<GridviewPanelApi>, options: { direction: Direction, reference: string, size?: number }): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -821,12 +856,12 @@
                         "text": "Move a panel in a particular direction relative to another panel."
                     }
                 ]
-            },
-            "signature": "(panel: IGridviewPanel<GridviewPanelApi>, options: { direction: Direction, reference: string, size: number }): void",
-            "type": "method"
+            }
         },
         {
             "name": "removePanel",
+            "code": "(panel: IGridviewPanel<GridviewPanelApi>, sizing?: Sizing): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -834,12 +869,12 @@
                         "text": "Remove a panel given the panel object."
                     }
                 ]
-            },
-            "signature": "(panel: IGridviewPanel<GridviewPanelApi>, sizing?: Sizing): void",
-            "type": "method"
+            }
         },
         {
             "name": "toJSON",
+            "code": "(): SerializedGridviewComponent",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -847,15 +882,14 @@
                         "text": "Create a serialized object of the current component."
                     }
                 ]
-            },
-            "signature": "(): SerializedGridviewComponent",
-            "type": "method"
+            }
         }
     ],
     "PaneviewApi": [
         {
             "name": "height",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -863,12 +897,12 @@
                         "text": "Height of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "maximumSize",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -876,12 +910,12 @@
                         "text": "The maximum size the component can reach where size is measured in the direction of orientation provided."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "minimumSize",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -889,12 +923,12 @@
                         "text": "The minimum size  the component can reach where size is measured in the direction of orientation provided."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidAddView",
-            "signature": "Event<IPaneviewPanel>",
+            "code": "Event<IPaneviewPanel>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -902,12 +936,12 @@
                         "text": "Invoked when a panel is added. May be called multiple times when moving panels."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidDrop",
-            "signature": "Event<PaneviewDropEvent>",
+            "code": "Event<PaneviewDropEvent>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -915,12 +949,12 @@
                         "text": "Invoked when a Drag'n'Drop event occurs that the component was unable to handle. Exposed for custom Drag'n'Drop functionality."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidLayoutChange",
-            "signature": "Event<void>",
+            "code": "Event<void>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -928,12 +962,12 @@
                         "text": "Invoked when any layout change occures, an aggregation of many events."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidLayoutFromJSON",
-            "signature": "Event<void>",
+            "code": "Event<void>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -949,12 +983,12 @@
                         "text": " method."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidRemoveView",
-            "signature": "Event<IPaneviewPanel>",
+            "code": "Event<IPaneviewPanel>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -962,12 +996,12 @@
                         "text": "Invoked when a panel is removed. May be called multiple times when moving panels."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "panels",
-            "signature": "IPaneviewPanel[]",
+            "code": "IPaneviewPanel[]",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -975,12 +1009,12 @@
                         "text": "All panel objects."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "width",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -988,11 +1022,12 @@
                         "text": "Width of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "addPanel",
+            "code": "<T extends object = Parameters>(options: AddPaneviewComponentOptions<T>): IPaneviewPanel",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1000,12 +1035,12 @@
                         "text": "Add a panel and return the created object."
                     }
                 ]
-            },
-            "signature": "<T extends object = Parameters>(options: AddPaneviewComponentOptions<T>): IPaneviewPanel",
-            "type": "method"
+            }
         },
         {
             "name": "clear",
+            "code": "(): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1013,12 +1048,12 @@
                         "text": "Reset the component back to an empty and default state."
                     }
                 ]
-            },
-            "signature": "(): void",
-            "type": "method"
+            }
         },
         {
             "name": "focus",
+            "code": "(): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1026,12 +1061,12 @@
                         "text": "Focus the component. Will try to focus an active panel if one exists."
                     }
                 ]
-            },
-            "signature": "(): void",
-            "type": "method"
+            }
         },
         {
             "name": "fromJSON",
+            "code": "(data: SerializedPaneview): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1039,12 +1074,12 @@
                         "text": "Create a component from a serialized object."
                     }
                 ]
-            },
-            "signature": "(data: SerializedPaneview): void",
-            "type": "method"
+            }
         },
         {
             "name": "getPanel",
+            "code": "(id: string): IPaneviewPanel | undefined",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1068,12 +1103,12 @@
                         "text": "."
                     }
                 ]
-            },
-            "signature": "(id: string): IPaneviewPanel | undefined",
-            "type": "method"
+            }
         },
         {
             "name": "layout",
+            "code": "(width: number, height: number): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1081,12 +1116,12 @@
                         "text": "Force resize the component to an exact width and height. Read about auto-resizing before using."
                     }
                 ]
-            },
-            "signature": "(width: number, height: number): void",
-            "type": "method"
+            }
         },
         {
             "name": "movePanel",
+            "code": "(from: number, to: number): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1094,12 +1129,12 @@
                         "text": "Move a panel given it's current and desired index."
                     }
                 ]
-            },
-            "signature": "(from: number, to: number): void",
-            "type": "method"
+            }
         },
         {
             "name": "removePanel",
+            "code": "(panel: IPaneviewPanel): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1107,12 +1142,12 @@
                         "text": "Remove a panel given the panel object."
                     }
                 ]
-            },
-            "signature": "(panel: IPaneviewPanel): void",
-            "type": "method"
+            }
         },
         {
             "name": "toJSON",
+            "code": "(): SerializedPaneview",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1120,15 +1155,14 @@
                         "text": "Create a serialized object of the current component."
                     }
                 ]
-            },
-            "signature": "(): SerializedPaneview",
-            "type": "method"
+            }
         }
     ],
     "SplitviewApi": [
         {
             "name": "height",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -1136,12 +1170,12 @@
                         "text": "Height of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "length",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -1149,12 +1183,12 @@
                         "text": "The current number of panels."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "maximumSize",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -1162,12 +1196,12 @@
                         "text": "The maximum size the component can reach where size is measured in the direction of orientation provided."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "minimumSize",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -1175,12 +1209,12 @@
                         "text": "The minimum size  the component can reach where size is measured in the direction of orientation provided."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidAddView",
-            "signature": "Event<IView>",
+            "code": "Event<IView>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -1188,25 +1222,25 @@
                         "text": "Invoked when a view is added."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidLayoutChange",
-            "signature": "Event<void>",
+            "code": "Event<void>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
                         "kind": "text",
-                        "text": "Invoked whenever any aspect of the layout changes.\nIf listening to this event it may be worth debouncing ouputs."
+                        "text": "Invoked whenever any aspect of the layout changes.\r\nIf listening to this event it may be worth debouncing ouputs."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidLayoutFromJSON",
-            "signature": "Event<void>",
+            "code": "Event<void>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -1222,12 +1256,12 @@
                         "text": " method."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "onDidRemoveView",
-            "signature": "Event<IView>",
+            "code": "Event<IView>",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -1235,12 +1269,12 @@
                         "text": "Invoked when a view is removed."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "orientation",
-            "signature": "Orientation",
+            "code": "Orientation",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -1248,12 +1282,12 @@
                         "text": "The current orientation of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "panels",
-            "signature": "ISplitviewPanel[]",
+            "code": "ISplitviewPanel[]",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -1261,12 +1295,12 @@
                         "text": "The list of current panels."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "width",
-            "signature": "number",
+            "code": "number",
+            "kind": "accessor",
             "comment": {
                 "summary": [
                     {
@@ -1274,11 +1308,12 @@
                         "text": "Width of the component."
                     }
                 ]
-            },
-            "type": "accessor"
+            }
         },
         {
             "name": "addPanel",
+            "code": "<T extends object = Parameters>(options: AddSplitviewComponentOptions<T>): ISplitviewPanel",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1286,12 +1321,12 @@
                         "text": "Add a new panel and return the created instance."
                     }
                 ]
-            },
-            "signature": "<T extends object = Parameters>(options: AddSplitviewComponentOptions<T>): ISplitviewPanel",
-            "type": "method"
+            }
         },
         {
             "name": "clear",
+            "code": "(): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1299,12 +1334,12 @@
                         "text": "Remove all panels and clear the component."
                     }
                 ]
-            },
-            "signature": "(): void",
-            "type": "method"
+            }
         },
         {
             "name": "focus",
+            "code": "(): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1312,12 +1347,12 @@
                         "text": "Focus the component."
                     }
                 ]
-            },
-            "signature": "(): void",
-            "type": "method"
+            }
         },
         {
             "name": "fromJSON",
+            "code": "(data: SerializedSplitview): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1325,12 +1360,12 @@
                         "text": "Deserialize a layout to built a splitivew."
                     }
                 ]
-            },
-            "signature": "(data: SerializedSplitview): void",
-            "type": "method"
+            }
         },
         {
             "name": "getPanel",
+            "code": "(id: string): ISplitviewPanel | undefined",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1346,12 +1381,12 @@
                         "text": " id."
                     }
                 ]
-            },
-            "signature": "(id: string): ISplitviewPanel | undefined",
-            "type": "method"
+            }
         },
         {
             "name": "layout",
+            "code": "(width: number, height: number): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1359,12 +1394,12 @@
                         "text": "Layout the panel with a width and height."
                     }
                 ]
-            },
-            "signature": "(width: number, height: number): void",
-            "type": "method"
+            }
         },
         {
             "name": "movePanel",
+            "code": "(from: number, to: number): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1372,12 +1407,12 @@
                         "text": "Move a panel given it's current and desired index."
                     }
                 ]
-            },
-            "signature": "(from: number, to: number): void",
-            "type": "method"
+            }
         },
         {
             "name": "removePanel",
+            "code": "(panel: ISplitviewPanel, sizing?: Sizing): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1390,15 +1425,15 @@
                     },
                     {
                         "kind": "text",
-                        "text": " method\nfor the subsequent resize."
+                        "text": " method\r\nfor the subsequent resize."
                     }
                 ]
-            },
-            "signature": "(panel: ISplitviewPanel, sizing?: Sizing): void",
-            "type": "method"
+            }
         },
         {
             "name": "toJSON",
+            "code": "(): SerializedSplitview",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1406,12 +1441,12 @@
                         "text": "Serialize a layout"
                     }
                 ]
-            },
-            "signature": "(): SerializedSplitview",
-            "type": "method"
+            }
         },
         {
             "name": "updateOptions",
+            "code": "(options: SplitviewComponentUpdateOptions): void",
+            "kind": "method",
             "comment": {
                 "summary": [
                     {
@@ -1419,20 +1454,25 @@
                         "text": "Update configuratable options."
                     }
                 ]
-            },
-            "signature": "(options: SplitviewComponentUpdateOptions): void",
-            "type": "method"
+            }
         }
     ],
     "DockviewPanelApi": [
         {
             "name": "group",
-            "signature": "DockviewGroupPanel",
-            "type": "property"
+            "code": "DockviewGroupPanel",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "height",
-            "signature": "number",
+            "code": "number",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1440,12 +1480,15 @@
                         "text": "The panel height in pixels"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "id",
-            "signature": "string",
+            "code": "string",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1453,12 +1496,15 @@
                         "text": "The id of the panel that would have been assigned when the panel was created"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "isActive",
-            "signature": "boolean",
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1466,12 +1512,15 @@
                         "text": "Whether the panel is the actively selected panel"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "isFocused",
-            "signature": "boolean",
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1479,17 +1528,23 @@
                         "text": "Whether the panel holds the current focus"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "isGroupActive",
-            "signature": "boolean",
-            "type": "property"
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "isVisible",
-            "signature": "boolean",
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1497,47 +1552,87 @@
                         "text": "Whether the panel is visible"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "onDidActiveChange",
-            "signature": "Event<ActiveEvent>",
-            "type": "property"
+            "code": "Event<ActiveEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidActiveGroupChange",
-            "signature": "Event<void>",
-            "type": "property"
+            "code": "Event<void>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidDimensionsChange",
-            "signature": "Event<PanelDimensionChangeEvent>",
-            "type": "property"
+            "code": "Event<PanelDimensionChangeEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidFocusChange",
-            "signature": "Event<FocusEvent>",
-            "type": "property"
+            "code": "Event<FocusEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidGroupChange",
-            "signature": "Event<void>",
-            "type": "property"
+            "code": "Event<void>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
+        },
+        {
+            "name": "onDidRendererChange",
+            "code": "Event<RendererChangedEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidVisibilityChange",
-            "signature": "Event<VisibilityEvent>",
-            "type": "property"
+            "code": "Event<VisibilityEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
+        },
+        {
+            "name": "renderer",
+            "code": "DockviewPanelRenderer",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "title",
-            "signature": "string | undefined",
-            "type": "property"
+            "code": "string | undefined",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "width",
-            "signature": "number",
+            "code": "number",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1545,44 +1640,57 @@
                         "text": "The panel width in pixels"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "close",
-            "signature": "(): void",
-            "type": "method"
+            "code": "(): void",
+            "kind": "method"
+        },
+        {
+            "name": "maximize",
+            "code": "(): void",
+            "kind": "method"
         },
         {
             "name": "moveTo",
-            "signature": "(options: { group: DockviewGroupPanel, index: number, position: Position }): void",
-            "type": "method"
+            "code": "(options: { group: DockviewGroupPanel, index?: number, position?: Position }): void",
+            "kind": "method"
         },
         {
             "name": "setActive",
-            "signature": "(): void",
-            "type": "method"
+            "code": "(): void",
+            "kind": "method"
+        },
+        {
+            "name": "setRenderer",
+            "code": "(renderer: DockviewPanelRenderer): void",
+            "kind": "method"
         },
         {
             "name": "setSize",
-            "signature": "(event: SizeEvent): void",
-            "type": "method"
+            "code": "(event: SizeEvent): void",
+            "kind": "method"
         },
         {
             "name": "setTitle",
-            "signature": "(title: string): void",
-            "type": "method"
+            "code": "(title: string): void",
+            "kind": "method"
         },
         {
             "name": "updateParameters",
-            "signature": "(parameters: Parameters): void",
-            "type": "method"
+            "code": "(parameters: Parameters): void",
+            "kind": "method"
         }
     ],
     "GridviewPanelApi": [
         {
             "name": "height",
-            "signature": "number",
+            "code": "number",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1590,12 +1698,15 @@
                         "text": "The panel height in pixels"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "id",
-            "signature": "string",
+            "code": "string",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1603,12 +1714,15 @@
                         "text": "The id of the panel that would have been assigned when the panel was created"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "isActive",
-            "signature": "boolean",
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1616,12 +1730,15 @@
                         "text": "Whether the panel is the actively selected panel"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "isFocused",
-            "signature": "boolean",
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1629,12 +1746,15 @@
                         "text": "Whether the panel holds the current focus"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "isVisible",
-            "signature": "boolean",
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1642,37 +1762,55 @@
                         "text": "Whether the panel is visible"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "onDidActiveChange",
-            "signature": "Event<ActiveEvent>",
-            "type": "property"
+            "code": "Event<ActiveEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidConstraintsChange",
-            "signature": "Event<GridConstraintChangeEvent>",
-            "type": "property"
+            "code": "Event<GridConstraintChangeEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidDimensionsChange",
-            "signature": "Event<PanelDimensionChangeEvent>",
-            "type": "property"
+            "code": "Event<PanelDimensionChangeEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidFocusChange",
-            "signature": "Event<FocusEvent>",
-            "type": "property"
+            "code": "Event<FocusEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidVisibilityChange",
-            "signature": "Event<VisibilityEvent>",
-            "type": "property"
+            "code": "Event<VisibilityEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "width",
-            "signature": "number",
+            "code": "number",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1680,39 +1818,42 @@
                         "text": "The panel width in pixels"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "setActive",
-            "signature": "(): void",
-            "type": "method"
+            "code": "(): void",
+            "kind": "method"
         },
         {
             "name": "setConstraints",
-            "signature": "(value: GridConstraintChangeEvent2): void",
-            "type": "method"
+            "code": "(value: GridConstraintChangeEvent2): void",
+            "kind": "method"
         },
         {
             "name": "setSize",
-            "signature": "(event: SizeEvent): void",
-            "type": "method"
+            "code": "(event: SizeEvent): void",
+            "kind": "method"
         },
         {
             "name": "setVisible",
-            "signature": "(isVisible: boolean): void",
-            "type": "method"
+            "code": "(isVisible: boolean): void",
+            "kind": "method"
         },
         {
             "name": "updateParameters",
-            "signature": "(parameters: Parameters): void",
-            "type": "method"
+            "code": "(parameters: Parameters): void",
+            "kind": "method"
         }
     ],
     "PaneviewPanelApi": [
         {
             "name": "height",
-            "signature": "number",
+            "code": "number",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1720,12 +1861,15 @@
                         "text": "The panel height in pixels"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "id",
-            "signature": "string",
+            "code": "string",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1733,12 +1877,15 @@
                         "text": "The id of the panel that would have been assigned when the panel was created"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "isActive",
-            "signature": "boolean",
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1746,17 +1893,23 @@
                         "text": "Whether the panel is the actively selected panel"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "isExpanded",
-            "signature": "boolean",
-            "type": "property"
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "isFocused",
-            "signature": "boolean",
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1764,12 +1917,15 @@
                         "text": "Whether the panel holds the current focus"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "isVisible",
-            "signature": "boolean",
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1777,52 +1933,79 @@
                         "text": "Whether the panel is visible"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "onDidActiveChange",
-            "signature": "Event<ActiveEvent>",
-            "type": "property"
+            "code": "Event<ActiveEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidConstraintsChange",
-            "signature": "Event<PanelConstraintChangeEvent>",
-            "type": "property"
+            "code": "Event<PanelConstraintChangeEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidDimensionsChange",
-            "signature": "Event<PanelDimensionChangeEvent>",
-            "type": "property"
+            "code": "Event<PanelDimensionChangeEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidExpansionChange",
-            "signature": "Event<ExpansionEvent>",
-            "type": "property"
+            "code": "Event<ExpansionEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidFocusChange",
-            "signature": "Event<FocusEvent>",
-            "type": "property"
+            "code": "Event<FocusEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidVisibilityChange",
-            "signature": "Event<VisibilityEvent>",
-            "type": "property"
+            "code": "Event<VisibilityEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onMouseEnter",
-            "signature": "Event<MouseEvent>",
-            "type": "property"
+            "code": "Event<MouseEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onMouseLeave",
-            "signature": "Event<MouseEvent>",
-            "type": "property"
+            "code": "Event<MouseEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "width",
-            "signature": "number",
+            "code": "number",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1830,44 +2013,47 @@
                         "text": "The panel width in pixels"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "setActive",
-            "signature": "(): void",
-            "type": "method"
+            "code": "(): void",
+            "kind": "method"
         },
         {
             "name": "setConstraints",
-            "signature": "(value: PanelConstraintChangeEvent2): void",
-            "type": "method"
+            "code": "(value: PanelConstraintChangeEvent2): void",
+            "kind": "method"
         },
         {
             "name": "setExpanded",
-            "signature": "(isExpanded: boolean): void",
-            "type": "method"
+            "code": "(isExpanded: boolean): void",
+            "kind": "method"
         },
         {
             "name": "setSize",
-            "signature": "(event: PanelSizeEvent): void",
-            "type": "method"
+            "code": "(event: PanelSizeEvent): void",
+            "kind": "method"
         },
         {
             "name": "setVisible",
-            "signature": "(isVisible: boolean): void",
-            "type": "method"
+            "code": "(isVisible: boolean): void",
+            "kind": "method"
         },
         {
             "name": "updateParameters",
-            "signature": "(parameters: Parameters): void",
-            "type": "method"
+            "code": "(parameters: Parameters): void",
+            "kind": "method"
         }
     ],
     "SplitviewPanelApi": [
         {
             "name": "height",
-            "signature": "number",
+            "code": "number",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1875,12 +2061,15 @@
                         "text": "The panel height in pixels"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "id",
-            "signature": "string",
+            "code": "string",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1888,12 +2077,15 @@
                         "text": "The id of the panel that would have been assigned when the panel was created"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "isActive",
-            "signature": "boolean",
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1901,12 +2093,15 @@
                         "text": "Whether the panel is the actively selected panel"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "isFocused",
-            "signature": "boolean",
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1914,12 +2109,15 @@
                         "text": "Whether the panel holds the current focus"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "isVisible",
-            "signature": "boolean",
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1927,37 +2125,55 @@
                         "text": "Whether the panel is visible"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "onDidActiveChange",
-            "signature": "Event<ActiveEvent>",
-            "type": "property"
+            "code": "Event<ActiveEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidConstraintsChange",
-            "signature": "Event<PanelConstraintChangeEvent>",
-            "type": "property"
+            "code": "Event<PanelConstraintChangeEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidDimensionsChange",
-            "signature": "Event<PanelDimensionChangeEvent>",
-            "type": "property"
+            "code": "Event<PanelDimensionChangeEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidFocusChange",
-            "signature": "Event<FocusEvent>",
-            "type": "property"
+            "code": "Event<FocusEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "onDidVisibilityChange",
-            "signature": "Event<VisibilityEvent>",
-            "type": "property"
+            "code": "Event<VisibilityEvent>",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            }
         },
         {
             "name": "width",
-            "signature": "number",
+            "code": "number",
+            "kind": "property",
+            "flags": {
+                "isReadonly": true
+            },
             "comment": {
                 "summary": [
                     {
@@ -1965,231 +2181,341 @@
                         "text": "The panel width in pixels"
                     }
                 ]
-            },
-            "type": "property"
+            }
         },
         {
             "name": "setActive",
-            "signature": "(): void",
-            "type": "method"
+            "code": "(): void",
+            "kind": "method"
         },
         {
             "name": "setConstraints",
-            "signature": "(value: PanelConstraintChangeEvent2): void",
-            "type": "method"
+            "code": "(value: PanelConstraintChangeEvent2): void",
+            "kind": "method"
         },
         {
             "name": "setSize",
-            "signature": "(event: PanelSizeEvent): void",
-            "type": "method"
+            "code": "(event: PanelSizeEvent): void",
+            "kind": "method"
         },
         {
             "name": "setVisible",
-            "signature": "(isVisible: boolean): void",
-            "type": "method"
+            "code": "(isVisible: boolean): void",
+            "kind": "method"
         },
         {
             "name": "updateParameters",
-            "signature": "(parameters: Parameters): void",
-            "type": "method"
+            "code": "(parameters: Parameters): void",
+            "kind": "method"
         }
     ],
     "IDockviewReactProps": [
         {
             "name": "className",
-            "signature": "string",
-            "type": "property"
+            "code": "string",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "components",
-            "signature": "PanelCollection<IDockviewPanelProps<any>>",
-            "type": "property"
+            "code": "PanelCollection<IDockviewPanelProps<any>>",
+            "kind": "property",
+            "flags": {}
+        },
+        {
+            "name": "debug",
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
+        },
+        {
+            "name": "defaultRenderer",
+            "code": "DockviewPanelRenderer",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "defaultTabComponent",
-            "signature": "FunctionComponent<IDockviewPanelHeaderProps<any>>",
-            "type": "property"
+            "code": "React.FunctionComponent<IDockviewPanelHeaderProps<any>>",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "disableAutoResizing",
-            "signature": "boolean",
-            "type": "property"
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "disableFloatingGroups",
-            "signature": "boolean",
-            "type": "property"
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "floatingGroupBounds",
-            "signature": "{ minimumHeightWithinViewport: number, minimumWidthWithinViewport: number } | 'boundedWithinViewport'",
-            "type": "property"
+            "code": "{ minimumHeightWithinViewport?: number, minimumWidthWithinViewport?: number } | 'boundedWithinViewport'",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "hideBorders",
-            "signature": "boolean",
-            "type": "property"
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "leftHeaderActionsComponent",
-            "signature": "FunctionComponent<IDockviewHeaderActionsProps>",
-            "type": "property"
+            "code": "React.FunctionComponent<IDockviewHeaderActionsProps>",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "onDidDrop",
-            "signature": "(event: DockviewDropEvent): void",
-            "type": "property"
+            "code": "(event: DockviewDropEvent): void",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "onReady",
-            "signature": "(event: DockviewReadyEvent): void",
-            "type": "property"
+            "code": "(event: DockviewReadyEvent): void",
+            "kind": "property",
+            "flags": {}
         },
         {
             "name": "prefixHeaderActionsComponent",
-            "signature": "FunctionComponent<IDockviewHeaderActionsProps>",
-            "type": "property"
+            "code": "React.FunctionComponent<IDockviewHeaderActionsProps>",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "rightHeaderActionsComponent",
-            "signature": "FunctionComponent<IDockviewHeaderActionsProps>",
-            "type": "property"
+            "code": "React.FunctionComponent<IDockviewHeaderActionsProps>",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "showDndOverlay",
-            "signature": "(event: DockviewDndOverlayEvent): boolean",
-            "type": "property"
+            "code": "(event: DockviewDndOverlayEvent): boolean",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "singleTabMode",
-            "signature": "'fullwidth' | 'default'",
-            "type": "property"
+            "code": "'fullwidth' | 'default'",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "tabComponents",
-            "signature": "PanelCollection<IDockviewPanelHeaderProps<any>>",
-            "type": "property"
+            "code": "PanelCollection<IDockviewPanelHeaderProps<any>>",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "watermarkComponent",
-            "signature": "FunctionComponent<IWatermarkPanelProps>",
-            "type": "property"
+            "code": "React.FunctionComponent<IWatermarkPanelProps>",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         }
     ],
     "IGridviewReactProps": [
         {
             "name": "className",
-            "signature": "string",
-            "type": "property"
+            "code": "string",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "components",
-            "signature": "PanelCollection<IGridviewPanelProps<any>>",
-            "type": "property"
+            "code": "PanelCollection<IGridviewPanelProps<any>>",
+            "kind": "property",
+            "flags": {}
         },
         {
             "name": "disableAutoResizing",
-            "signature": "boolean",
-            "type": "property"
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "hideBorders",
-            "signature": "boolean",
-            "type": "property"
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "onReady",
-            "signature": "(event: GridviewReadyEvent): void",
-            "type": "property"
+            "code": "(event: GridviewReadyEvent): void",
+            "kind": "property",
+            "flags": {}
         },
         {
             "name": "orientation",
-            "signature": "Orientation",
-            "type": "property"
+            "code": "Orientation",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "proportionalLayout",
-            "signature": "boolean",
-            "type": "property"
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         }
     ],
     "IPaneviewReactProps": [
         {
             "name": "className",
-            "signature": "string",
-            "type": "property"
+            "code": "string",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "components",
-            "signature": "PanelCollection<IPaneviewPanelProps<any>>",
-            "type": "property"
+            "code": "PanelCollection<IPaneviewPanelProps<any>>",
+            "kind": "property",
+            "flags": {}
         },
         {
             "name": "disableAutoResizing",
-            "signature": "boolean",
-            "type": "property"
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "disableDnd",
-            "signature": "boolean",
-            "type": "property"
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "headerComponents",
-            "signature": "PanelCollection<IPaneviewPanelProps<any>>",
-            "type": "property"
+            "code": "PanelCollection<IPaneviewPanelProps<any>>",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "onReady",
-            "signature": "(event: PaneviewReadyEvent): void",
-            "type": "property"
+            "code": "(event: PaneviewReadyEvent): void",
+            "kind": "property",
+            "flags": {}
         },
         {
             "name": "showDndOverlay",
-            "signature": "(event: PaneviewDndOverlayEvent): boolean",
-            "type": "property"
+            "code": "(event: PaneviewDndOverlayEvent): boolean",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "onDidDrop",
-            "signature": "(event: PaneviewDropEvent): void",
-            "type": "method"
+            "code": "(event: PaneviewDropEvent): void",
+            "kind": "method"
         }
     ],
     "ISplitviewReactProps": [
         {
             "name": "className",
-            "signature": "string",
-            "type": "property"
+            "code": "string",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "components",
-            "signature": "PanelCollection<ISplitviewPanelProps<any>>",
-            "type": "property"
+            "code": "PanelCollection<ISplitviewPanelProps<any>>",
+            "kind": "property",
+            "flags": {}
         },
         {
             "name": "disableAutoResizing",
-            "signature": "boolean",
-            "type": "property"
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "hideBorders",
-            "signature": "boolean",
-            "type": "property"
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "onReady",
-            "signature": "(event: SplitviewReadyEvent): void",
-            "type": "property"
+            "code": "(event: SplitviewReadyEvent): void",
+            "kind": "property",
+            "flags": {}
         },
         {
             "name": "orientation",
-            "signature": "Orientation",
-            "type": "property"
+            "code": "Orientation",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         },
         {
             "name": "proportionalLayout",
-            "signature": "boolean",
-            "type": "property"
+            "code": "boolean",
+            "kind": "property",
+            "flags": {
+                "isOptional": true
+            }
         }
     ]
 }
