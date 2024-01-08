@@ -283,7 +283,7 @@ export class DockviewGroupPanelModel
                 break;
         }
 
-        this.groupPanel.api._onDidRenderPositionChange.fire({
+        this.groupPanel.api._onDidLocationChange.fire({
             location: this.location,
         });
     }

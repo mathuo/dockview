@@ -399,6 +399,17 @@ From within a panel you may say
 props.containerApi.addPopoutGroup(props.api.group);
 ```
 
+To programatically move the popout group back into the main grid you can use the `moveTo` method in many ways, one of the following would suffice
+
+```tsx
+// option 1: add absolutely to the right-side of the grid
+props.group.api.moveTo({position: 'right'});
+
+// option 2: create a new group and move the contents of the popout group to it
+const group = props.containerApi.addGroup();
+props.group.api.moveTo({ group });
+```
+
 <MultiFrameworkContainer
     height={600}
     sandboxId="popoutgroup-dockview"
