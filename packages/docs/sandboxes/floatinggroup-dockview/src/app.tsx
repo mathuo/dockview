@@ -259,7 +259,7 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
     );
 
     React.useEffect(() => {
-        const disposable = props.group.api.onDidRenderPositionChange(
+        const disposable = props.group.api.onDidLocationChange(
             (event) => {
                 setFloating(event.location === 'floating');
             }

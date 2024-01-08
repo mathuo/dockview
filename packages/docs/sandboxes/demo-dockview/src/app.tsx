@@ -109,7 +109,7 @@ const Icon = (props: {
     );
 };
 
-const groupControlsComponents = {
+const groupControlsComponents: Record<string, React.FC> = {
     panel_1: () => {
         return <Icon icon="file_download" />;
     },
@@ -130,6 +130,10 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
             : 'expand_content'
     );
 
+    const [popoutIcon, setPopoutIcon] = React.useState<string>(
+        props.api.location === 'popout' ? 'close_fullscreen' : 'open_in_new'
+    );
+
     React.useEffect(() => {
         const disposable = props.containerApi.onDidMaxmizedGroupChange(() => {
             setIcon(
@@ -139,8 +143,17 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
             );
         });
 
+        const disposable2 = props.api.onDidLocationChange(() => {
+            setPopoutIcon(
+                props.api.location === 'popout'
+                    ? 'close_fullscreen'
+                    : 'open_in_new'
+            );
+        });
+
         return () => {
             disposable.dispose();
+            disposable2.dispose();
         };
     }, [props.containerApi]);
 
@@ -149,6 +162,14 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
             props.containerApi.exitMaxmizedGroup();
         } else {
             props.activePanel?.api.maximize();
+        }
+    };
+
+    const onClick2 = () => {
+        if (props.api.location !== 'popout') {
+            props.containerApi.addPopoutGroup(props.group);
+        } else {
+            props.api.moveTo({ position: 'right' });
         }
     };
 
@@ -165,6 +186,7 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
         >
             {props.isGroupActive && <Icon icon="star" />}
             {Component && <Component />}
+            <Icon icon={popoutIcon} onClick={onClick2} />
             <Icon icon={icon} onClick={onClick} />
         </div>
     );
