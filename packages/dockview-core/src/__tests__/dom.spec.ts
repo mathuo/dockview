@@ -1,4 +1,8 @@
-import { quasiDefaultPrevented, quasiPreventDefault } from '../dom';
+import {
+    isInDocument,
+    quasiDefaultPrevented,
+    quasiPreventDefault,
+} from '../dom';
 
 describe('dom', () => {
     test('quasiPreventDefault', () => {
@@ -17,5 +21,28 @@ describe('dom', () => {
 
         (event as any)['dv-quasiPreventDefault'] = true;
         expect(quasiDefaultPrevented(event)).toBeTruthy();
+    });
+
+    test('isInDocument: DOM element', () => {
+        const el = document.createElement('div');
+
+        expect(isInDocument(el)).toBeFalsy();
+
+        document.body.appendChild(el);
+        expect(isInDocument(el)).toBeTruthy();
+    });
+
+    test('isInDocument: Shadow DOM element', () => {
+        const el = document.createElement('div');
+        document.body.appendChild(el);
+
+        const shadow = el.attachShadow({ mode: 'open' });
+
+        const el2 = document.createElement('div');
+        expect(isInDocument(el2)).toBeFalsy();
+
+        shadow.appendChild(el2);
+
+        expect(isInDocument(el2)).toBeTruthy();
     });
 });
