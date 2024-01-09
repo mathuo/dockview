@@ -232,3 +232,24 @@ export function getDomNodePagePosition(domNode: Element): {
         height: height,
     };
 }
+
+/**
+ * Check whether an element is in the DOM (including the Shadow DOM)
+ * @see https://terodox.tech/how-to-tell-if-an-element-is-in-the-dom-including-the-shadow-dom/
+ */
+export function isInDocument(element: Element): boolean {
+    let currentElement: Element | ParentNode = element;
+
+    while (currentElement && currentElement.parentNode) {
+        if (currentElement.parentNode === document) {
+            return true;
+        } else if (currentElement.parentNode instanceof DocumentFragment) {
+            // handle shadow DOMs
+            currentElement = (currentElement.parentNode as ShadowRoot).host;
+        } else {
+            currentElement = currentElement.parentNode;
+        }
+    }
+
+    return false;
+}
