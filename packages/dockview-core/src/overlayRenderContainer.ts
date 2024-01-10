@@ -1,7 +1,12 @@
 import { DragAndDropObserver } from './dnd/dnd';
 import { Droptarget } from './dnd/droptarget';
 import { getDomNodePagePosition, toggleClass } from './dom';
-import { CompositeDisposable, Disposable, IDisposable } from './lifecycle';
+import {
+    CompositeDisposable,
+    Disposable,
+    IDisposable,
+    MutableDisposable,
+} from './lifecycle';
 import { IDockviewPanel } from './dockview/dockviewPanel';
 
 export type DockviewPanelRenderer = 'onlyWhenVisibile' | 'always';
@@ -20,7 +25,12 @@ function createFocusableElement(): HTMLDivElement {
 export class OverlayRenderContainer extends CompositeDisposable {
     private readonly map: Record<
         string,
-        { disposable: IDisposable; element: HTMLElement }
+        {
+            panel: IDockviewPanel;
+            disposable: IDisposable;
+            destroy: IDisposable;
+            element: HTMLElement;
+        }
     > = {};
 
     get allIds(): string[] {
@@ -30,13 +40,14 @@ export class OverlayRenderContainer extends CompositeDisposable {
     constructor(private readonly element: HTMLElement) {
         super();
 
-        this.addDisposables({
-            dispose: () => {
+        this.addDisposables(
+            Disposable.from(() => {
                 for (const value of Object.values(this.map)) {
                     value.disposable.dispose();
+                    value.destroy.dispose();
                 }
-            },
-        });
+            })
+        );
     }
 
     remove(panel: IDockviewPanel): boolean {
@@ -57,12 +68,14 @@ export class OverlayRenderContainer extends CompositeDisposable {
             element.className = 'dv-render-overlay';
 
             this.map[panel.api.id] = {
+                panel,
                 disposable: Disposable.NONE,
+                destroy: Disposable.NONE,
+
                 element,
             };
         }
 
-        this.map[panel.api.id]?.disposable.dispose();
         const focusContainer = this.map[panel.api.id].element;
 
         if (panel.view.content.element.parentElement !== focusContainer) {
@@ -97,11 +110,17 @@ export class OverlayRenderContainer extends CompositeDisposable {
             focusContainer.style.display = panel.api.isVisible ? '' : 'none';
         };
 
+        const whenVisible = <T>(func: (event: T) => void) => {
+            return (event: T) => {
+                if (!panel.api.isVisible) {
+                    return;
+                }
+
+                func(event);
+            };
+        };
+
         const disposable = new CompositeDisposable(
-            /**
-             * since container is positioned absoutely we must explicitly forward
-             * the dnd events for the expect behaviours to continue to occur in terms of dnd
-             */
             new DragAndDropObserver(focusContainer, {
                 onDragEnd: (e) => {
                     referenceContainer.dropTarget.dnd.onDragEnd(e);
@@ -119,6 +138,10 @@ export class OverlayRenderContainer extends CompositeDisposable {
                     referenceContainer.dropTarget.dnd.onDragOver(e);
                 },
             }),
+            /**
+             * since container is positioned absoutely we must explicitly forward
+             * the dnd events for the expect behaviours to continue to occur in terms of dnd
+             */
             panel.api.onDidVisibilityChange((event) => {
                 /**
                  * Control the visibility of the content, however even when not visible (display: none)
@@ -133,14 +156,13 @@ export class OverlayRenderContainer extends CompositeDisposable {
                 }
 
                 resize();
-            }),
-            {
-                dispose: () => {
-                    focusContainer.removeChild(panel.view.content.element);
-                    this.element.removeChild(focusContainer);
-                },
-            }
+            })
         );
+
+        this.map[panel.api.id].destroy = Disposable.from(() => {
+            focusContainer.removeChild(panel.view.content.element);
+            this.element.removeChild(focusContainer);
+        });
 
         queueMicrotask(() => {
             if (this.isDisposed) {
@@ -155,6 +177,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
             visibilityChanged();
         });
 
+        this.map[panel.api.id].disposable.dispose();
         this.map[panel.api.id].disposable = disposable;
 
         return focusContainer;

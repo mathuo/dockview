@@ -178,58 +178,7 @@ export class ContentContainer
             return;
         }
 
-        const renderer = panel.api.renderer;
-
-        if (
-            this.panel &&
-            this.panel.view.content.element.parentElement === this._element
-        ) {
-            /**
-             * If the currently attached panel is mounted directly to the content then remove it
-             */
-            this._element.removeChild(this.panel.view.content.element);
-        }
-
-        this.panel = panel;
-
-        let container: HTMLElement;
-
-        switch (renderer) {
-            case 'always':
-                container =
-                    this.accessor.overlayRenderContainer.setReferenceContentContainer(
-                        panel,
-                        this
-                    );
-                break;
-            case 'onlyWhenVisibile':
-                this._element.appendChild(this.panel.view.content.element);
-                container = this._element;
-                break;
-        }
-
-        const _onDidFocus = this.panel.view.content.onDidFocus;
-        const _onDidBlur = this.panel.view.content.onDidBlur;
-
-        const disposable = new CompositeDisposable();
-        const focusTracker = trackFocus(container);
-
-        disposable.addDisposables(
-            focusTracker,
-            focusTracker.onDidFocus(() => this._onDidFocus.fire()),
-            focusTracker.onDidBlur(() => this._onDidBlur.fire())
-        );
-
-        if (_onDidFocus) {
-            disposable.addDisposables(
-                _onDidFocus(() => this._onDidFocus.fire())
-            );
-        }
-        if (_onDidBlur) {
-            disposable.addDisposables(_onDidBlur(() => this._onDidBlur.fire()));
-        }
-
-        this.disposable.value = disposable;
+        this.renderPanel(panel);
     }
 
     public layout(_width: number, _height: number): void {
