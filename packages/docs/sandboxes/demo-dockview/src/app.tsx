@@ -31,68 +31,6 @@ const headerComponents = {
     },
 };
 
-const Popover = (props: {
-    children: React.ReactNode;
-    position?: { x: number; y: number };
-    close: () => void;
-}) => {
-    const uuid = React.useMemo(() => v4(), []);
-
-    React.useEffect(() => {
-        const listener = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                props.close();
-            }
-        };
-        const listener2 = (event: MouseEvent) => {
-            let target = event.target;
-
-            while (target) {
-                if (target instanceof HTMLElement) {
-                    if (target.classList.contains(uuid)) {
-                        return;
-                    } else {
-                        target = target.parentElement;
-                    }
-                } else {
-                    target = null;
-                }
-            }
-
-            props.close();
-        };
-        window.addEventListener('keypress', listener);
-        window.addEventListener('mousedown', listener2);
-
-        return () => {
-            window.removeEventListener('keypress', listener);
-            window.removeEventListener('mousedown', listener2);
-        };
-    }, [props.close, uuid]);
-
-    if (!props.position) {
-        return null;
-    }
-
-    return ReactDOM.createPortal(
-        <div
-            className={uuid}
-            style={{
-                position: 'absolute',
-                top: props.position.y,
-                left: props.position.x,
-                background: 'white',
-                border: '1px solid black',
-                zIndex: 99,
-                padding: '10px',
-            }}
-        >
-            {props.children}
-        </div>,
-        document.body
-    );
-};
-
 const Icon = (props: {
     icon: string;
     onClick?: (event: React.MouseEvent) => void;
@@ -241,7 +179,7 @@ const PrefixHeaderControls = (props: IDockviewHeaderActionsProps) => {
 
 const DockviewDemo = (props: { theme?: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
-        event.api.addPanel({
+        const panel1 = event.api.addPanel({
             id: 'panel_1',
             component: 'default',
             title: 'Panel 1',
@@ -270,16 +208,8 @@ const DockviewDemo = (props: { theme?: string }) => {
             title: 'Panel 5',
             position: { referencePanel: 'panel_3', direction: 'below' },
         });
-        event.api.addPanel({
-            id: 'panel_6',
-            component: 'default',
-            title: 'Panel 6',
-            position: { referencePanel: 'panel_3', direction: 'right' },
-        });
 
-        event.api.getPanel('panel_1')!.api.setActive();
-
-        console.log(event.api.toJSON());
+        panel1.api.setActive();
     };
 
     return (
