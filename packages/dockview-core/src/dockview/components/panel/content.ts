@@ -22,7 +22,7 @@ export interface IContentContainer extends IDisposable {
     closePanel: () => void;
     show(): void;
     hide(): void;
-    renderPanel(panel: IDockviewPanel): void;
+    renderPanel(panel: IDockviewPanel, options: { asActive: boolean }): void;
 }
 
 export class ContentContainer
@@ -114,16 +114,33 @@ export class ContentContainer
         this.element.style.display = 'none';
     }
 
-    renderPanel(panel: IDockviewPanel): void {
-        const isActive = panel === this.group.activePanel;
+    renderPanel(
+        panel: IDockviewPanel,
+        options: { asActive: boolean } = { asActive: true }
+    ): void {
+        const doRender =
+            options.asActive ||
+            (this.panel && this.group.isPanelActive(this.panel));
+
+        if (
+            this.panel &&
+            this.panel.view.content.element.parentElement === this._element
+        ) {
+            /**
+             * If the currently attached panel is mounted directly to the content then remove it
+             */
+            this._element.removeChild(this.panel.view.content.element);
+        }
+
+        this.panel = panel;
 
         let container: HTMLElement;
 
         switch (panel.api.renderer) {
             case 'onlyWhenVisibile':
-                this.accessor.overlayRenderContainer.remove(panel);
-                if (isActive) {
-                    if (this.panel) {
+                this.accessor.overlayRenderContainer.detatch(panel);
+                if (this.panel) {
+                    if (doRender) {
                         this._element.appendChild(
                             this.panel.view.content.element
                         );
@@ -137,15 +154,14 @@ export class ContentContainer
                 ) {
                     this._element.removeChild(panel.view.content.element);
                 }
-                container =
-                    this.accessor.overlayRenderContainer.setReferenceContentContainer(
-                        panel,
-                        this
-                    );
+                container = this.accessor.overlayRenderContainer.attach({
+                    panel,
+                    referenceContainer: this,
+                });
                 break;
         }
 
-        if (isActive) {
+        if (doRender) {
             const _onDidFocus = panel.view.content.onDidFocus;
             const _onDidBlur = panel.view.content.onDidBlur;
 
@@ -178,58 +194,7 @@ export class ContentContainer
             return;
         }
 
-        const renderer = panel.api.renderer;
-
-        if (
-            this.panel &&
-            this.panel.view.content.element.parentElement === this._element
-        ) {
-            /**
-             * If the currently attached panel is mounted directly to the content then remove it
-             */
-            this._element.removeChild(this.panel.view.content.element);
-        }
-
-        this.panel = panel;
-
-        let container: HTMLElement;
-
-        switch (renderer) {
-            case 'always':
-                container =
-                    this.accessor.overlayRenderContainer.setReferenceContentContainer(
-                        panel,
-                        this
-                    );
-                break;
-            case 'onlyWhenVisibile':
-                this._element.appendChild(this.panel.view.content.element);
-                container = this._element;
-                break;
-        }
-
-        const _onDidFocus = this.panel.view.content.onDidFocus;
-        const _onDidBlur = this.panel.view.content.onDidBlur;
-
-        const disposable = new CompositeDisposable();
-        const focusTracker = trackFocus(container);
-
-        disposable.addDisposables(
-            focusTracker,
-            focusTracker.onDidFocus(() => this._onDidFocus.fire()),
-            focusTracker.onDidBlur(() => this._onDidBlur.fire())
-        );
-
-        if (_onDidFocus) {
-            disposable.addDisposables(
-                _onDidFocus(() => this._onDidFocus.fire())
-            );
-        }
-        if (_onDidBlur) {
-            disposable.addDisposables(_onDidBlur(() => this._onDidBlur.fire()));
-        }
-
-        this.disposable.value = disposable;
+        this.renderPanel(panel);
     }
 
     public layout(_width: number, _height: number): void {

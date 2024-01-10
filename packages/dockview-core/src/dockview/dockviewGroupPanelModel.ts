@@ -404,7 +404,7 @@ export class DockviewGroupPanelModel
     }
 
     rerender(panel: IDockviewPanel): void {
-        this.contentContainer.renderPanel(panel);
+        this.contentContainer.renderPanel(panel, { asActive: false });
     }
 
     public indexOf(panel: IDockviewPanel): number {
