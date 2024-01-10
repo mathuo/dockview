@@ -543,8 +543,8 @@ export class DockviewComponent
             className: theme ?? '',
             popoutUrl: options?.popoutUrl ?? '/popout.html',
             box: {
-                left: box.left,
-                top: box.top,
+                left: window.screenX + box.left,
+                top: window.screenY + box.top,
                 width: box.width,
                 height: box.height,
             },
