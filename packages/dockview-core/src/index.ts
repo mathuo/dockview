@@ -55,6 +55,8 @@ export {
     Position,
     positionToDirection,
     directionToPosition,
+    MeasuredValue,
+    DroptargetOverlayModel,
 } from './dnd/droptarget';
 export {
     FocusEvent,

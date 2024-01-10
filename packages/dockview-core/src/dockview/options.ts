@@ -13,7 +13,7 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { ISplitviewStyles, Orientation } from '../splitview/splitview';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
-import { Position } from '../dnd/droptarget';
+import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
 import { IDockviewPanel } from './dockviewPanel';
 import {
     ComponentConstructor,
@@ -100,6 +100,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     popoutUrl?: string;
     defaultRenderer?: DockviewPanelRenderer;
     debug?: boolean;
+    rootOverlayModel?: DroptargetOverlayModel;
 }
 
 export interface PanelOptions<P extends object = Parameters> {

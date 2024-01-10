@@ -5,10 +5,6 @@ import { DragAndDropObserver } from './dnd';
 import { clamp } from '../math';
 import { Direction } from '../gridview/baseComponentGridview';
 
-function numberOrFallback(maybeNumber: any, fallback: number): number {
-    return typeof maybeNumber === 'number' ? maybeNumber : fallback;
-}
-
 export function directionToPosition(direction: Direction): Position {
     switch (direction) {
         case 'above':
@@ -54,6 +50,26 @@ export type CanDisplayOverlay =
     | boolean
     | ((dragEvent: DragEvent, state: Position) => boolean);
 
+export type MeasuredValue = { value: number; type: 'pixels' | 'percentage' };
+
+export type DroptargetOverlayModel = {
+    size?: MeasuredValue;
+    activationSize?: MeasuredValue;
+};
+
+const DEFAULT_ACTIVATION_SIZE: MeasuredValue = {
+    value: 20,
+    type: 'percentage',
+};
+
+const DEFAULT_SIZE: MeasuredValue = {
+    value: 50,
+    type: 'percentage',
+};
+
+const SMALL_WIDTH_BOUNDARY = 100;
+const SMALL_HEIGHT_BOUNDARY = 100;
+
 export class Droptarget extends CompositeDisposable {
     private targetElement: HTMLElement | undefined;
     private overlayElement: HTMLElement | undefined;
@@ -76,13 +92,7 @@ export class Droptarget extends CompositeDisposable {
         private readonly options: {
             canDisplayOverlay: CanDisplayOverlay;
             acceptedTargetZones: Position[];
-            overlayModel?: {
-                size?: { value: number; type: 'pixels' | 'percentage' };
-                activationSize?: {
-                    value: number;
-                    type: 'pixels' | 'percentage';
-                };
-            };
+            overlayModel?: DroptargetOverlayModel;
         }
     ) {
         super();
@@ -158,7 +168,7 @@ export class Droptarget extends CompositeDisposable {
 
                 this.toggleClasses(quadrant, width, height);
 
-                this.setState(quadrant);
+                this._state = quadrant;
             },
             onDragLeave: () => {
                 this.removeDropTarget();
@@ -189,6 +199,10 @@ export class Droptarget extends CompositeDisposable {
         this._acceptedTargetZonesSet = new Set(acceptedTargetZones);
     }
 
+    setOverlayModel(model: DroptargetOverlayModel): void {
+        this.options.overlayModel = model;
+    }
+
     dispose(): void {
         this.removeDropTarget();
         super.dispose();
@@ -202,7 +216,7 @@ export class Droptarget extends CompositeDisposable {
     }
 
     /**
-     * Check is the event has already been used by another instance od DropTarget
+     * Check is the event has already been used by another instance of DropTarget
      */
     private isAlreadyUsed(event: DragEvent): boolean {
         const value = (event as any)[Droptarget.USED_EVENT_ID];
@@ -218,8 +232,8 @@ export class Droptarget extends CompositeDisposable {
             return;
         }
 
-        const isSmallX = width < 100;
-        const isSmallY = height < 100;
+        const isSmallX = width < SMALL_WIDTH_BOUNDARY;
+        const isSmallY = height < SMALL_HEIGHT_BOUNDARY;
 
         const isLeft = quadrant === 'left';
         const isRight = quadrant === 'right';
@@ -231,22 +245,18 @@ export class Droptarget extends CompositeDisposable {
         const topClass = !isSmallY && isTop;
         const bottomClass = !isSmallY && isBottom;
 
-        let size = 0.5;
+        let size = 1;
 
-        if (this.options.overlayModel?.size?.type === 'percentage') {
-            size = clamp(this.options.overlayModel.size.value, 0, 100) / 100;
-        }
+        const sizeOptions = this.options.overlayModel?.size ?? DEFAULT_SIZE;
 
-        if (this.options.overlayModel?.size?.type === 'pixels') {
+        if (sizeOptions.type === 'percentage') {
+            size = clamp(sizeOptions.value, 0, 100) / 100;
+        } else {
             if (rightClass || leftClass) {
-                size =
-                    clamp(0, this.options.overlayModel.size.value, width) /
-                    width;
+                size = clamp(0, sizeOptions.value, width) / width;
             }
             if (topClass || bottomClass) {
-                size =
-                    clamp(0, this.options.overlayModel.size.value, height) /
-                    height;
+                size = clamp(0, sizeOptions.value, height) / height;
             }
         }
 
@@ -275,26 +285,6 @@ export class Droptarget extends CompositeDisposable {
         toggleClass(this.overlayElement, 'small-bottom', isSmallY && isBottom);
     }
 
-    private setState(quadrant: Position): void {
-        switch (quadrant) {
-            case 'top':
-                this._state = 'top';
-                break;
-            case 'left':
-                this._state = 'left';
-                break;
-            case 'bottom':
-                this._state = 'bottom';
-                break;
-            case 'right':
-                this._state = 'right';
-                break;
-            case 'center':
-                this._state = 'center';
-                break;
-        }
-    }
-
     private calculateQuadrant(
         overlayType: Set<Position>,
         x: number,
@@ -302,14 +292,11 @@ export class Droptarget extends CompositeDisposable {
         width: number,
         height: number
     ): Position | null {
-        const isPercentage =
-            this.options.overlayModel?.activationSize === undefined ||
-            this.options.overlayModel?.activationSize?.type === 'percentage';
+        const activationSizeOptions =
+            this.options.overlayModel?.activationSize ??
+            DEFAULT_ACTIVATION_SIZE;
 
-        const value = numberOrFallback(
-            this.options?.overlayModel?.activationSize?.value,
-            20
-        );
+        const isPercentage = activationSizeOptions.type === 'percentage';
 
         if (isPercentage) {
             return calculateQuadrantAsPercentage(
@@ -318,7 +305,7 @@ export class Droptarget extends CompositeDisposable {
                 y,
                 width,
                 height,
-                value
+                activationSizeOptions.value
             );
         }
 
@@ -328,7 +315,7 @@ export class Droptarget extends CompositeDisposable {
             y,
             width,
             height,
-            value
+            activationSizeOptions.value
         );
     }
 
