@@ -1015,4 +1015,94 @@ describe('gridview', () => {
         gridview.removeView([1, 1]);
         expect(gridview.hasMaximizedView()).toBeFalsy();
     });
+
+    test('that maximizedView is cleared when layout is cleared', () => {
+        const gridview = new Gridview(
+            true,
+            { separatorBorder: '' },
+            Orientation.HORIZONTAL
+        );
+        gridview.layout(1000, 1000);
+
+        const view1 = new MockGridview('1');
+        const view2 = new MockGridview('2');
+        const view3 = new MockGridview('3');
+
+        gridview.addView(view1, Sizing.Distribute, [0]);
+        gridview.addView(view2, Sizing.Distribute, [1]);
+        gridview.addView(view3, Sizing.Distribute, [1, 1]);
+
+        expect(gridview.hasMaximizedView()).toBeFalsy();
+        gridview.maximizeView(view2);
+        expect(gridview.hasMaximizedView()).toBeTruthy();
+
+        gridview.clear();
+
+        expect(gridview.hasMaximizedView()).toBeFalsy();
+    });
+
+    test('that maximizedView is cleared when layout is disposed', () => {
+        const gridview = new Gridview(
+            true,
+            { separatorBorder: '' },
+            Orientation.HORIZONTAL
+        );
+        gridview.layout(1000, 1000);
+
+        const view1 = new MockGridview('1');
+        const view2 = new MockGridview('2');
+        const view3 = new MockGridview('3');
+
+        gridview.addView(view1, Sizing.Distribute, [0]);
+        gridview.addView(view2, Sizing.Distribute, [1]);
+        gridview.addView(view3, Sizing.Distribute, [1, 1]);
+
+        expect(gridview.hasMaximizedView()).toBeFalsy();
+        gridview.maximizeView(view2);
+        expect(gridview.hasMaximizedView()).toBeTruthy();
+
+        gridview.dispose();
+
+        expect(gridview.hasMaximizedView()).toBeFalsy();
+    });
+
+    test('that maximizedView is cleared when layout is reset', () => {
+        const gridview = new Gridview(
+            true,
+            { separatorBorder: '' },
+            Orientation.HORIZONTAL
+        );
+        gridview.layout(1000, 1000);
+
+        const view1 = new MockGridview('1');
+        const view2 = new MockGridview('2');
+        const view3 = new MockGridview('3');
+
+        gridview.addView(view1, Sizing.Distribute, [0]);
+        gridview.addView(view2, Sizing.Distribute, [1]);
+        gridview.addView(view3, Sizing.Distribute, [1, 1]);
+
+        expect(gridview.hasMaximizedView()).toBeFalsy();
+        gridview.maximizeView(view2);
+        expect(gridview.hasMaximizedView()).toBeTruthy();
+
+        gridview.deserialize(
+            {
+                height: 1000,
+                width: 1000,
+                root: {
+                    type: 'leaf',
+                    data: [],
+                },
+                orientation: Orientation.HORIZONTAL,
+            },
+            {
+                fromJSON: (data) => {
+                    return new MockGridview('');
+                },
+            }
+        );
+
+        expect(gridview.hasMaximizedView()).toBeFalsy();
+    });
 });

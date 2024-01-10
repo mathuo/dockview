@@ -416,7 +416,7 @@ export class Gridview implements IDisposable {
         this._onDidChange.dispose();
         this._onDidMaxmizedNodeChange.dispose();
         this.root.dispose();
-
+        this._maximizedNode = undefined;
         this.element.remove();
     }
 
@@ -512,6 +512,7 @@ export class Gridview implements IDisposable {
 
         if (oldRoot) {
             oldRoot.dispose();
+            this._maximizedNode = undefined;
             this.element.removeChild(oldRoot.element);
         }
 
