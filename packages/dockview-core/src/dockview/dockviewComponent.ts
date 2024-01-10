@@ -539,16 +539,20 @@ export class DockviewComponent
 
         const theme = getTheme(this.gridview.element);
 
-        const popoutWindow = new DockviewPopoutGroupPanel(group, {
-            className: theme ?? '',
-            popoutUrl: options?.popoutUrl ?? '/popout.html',
-            box: {
-                left: window.screenX + box.left,
-                top: window.screenY + box.top,
-                width: box.width,
-                height: box.height,
-            },
-        });
+        const popoutWindow = new DockviewPopoutGroupPanel(
+            `${this.id}-${group.id}`, // globally unique within dockview
+            group,
+            {
+                className: theme ?? '',
+                popoutUrl: options?.popoutUrl ?? '/popout.html',
+                box: {
+                    left: window.screenX + box.left,
+                    top: window.screenY + box.top,
+                    width: box.width,
+                    height: box.height,
+                },
+            }
+        );
 
         popoutWindow.addDisposables(
             {
