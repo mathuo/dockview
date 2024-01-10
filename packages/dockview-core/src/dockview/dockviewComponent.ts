@@ -7,7 +7,7 @@ import {
 import { directionToPosition, Droptarget, Position } from '../dnd/droptarget';
 import { tail, sequenceEquals, remove } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { CompositeDisposable } from '../lifecycle';
+import { CompositeDisposable, Disposable } from '../lifecycle';
 import { Event, Emitter } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import {
@@ -58,7 +58,10 @@ import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
     DEFAULT_FLOATING_GROUP_POSITION,
 } from '../constants';
-import { DockviewPanelRenderer, OverlayRenderContainer } from '../overlayRenderContainer';
+import {
+    DockviewPanelRenderer,
+    OverlayRenderContainer,
+} from '../overlayRenderContainer';
 
 function getTheme(element: HTMLElement): string | undefined {
     function toClassList(element: HTMLElement) {
@@ -386,6 +389,17 @@ export class DockviewComponent
                 this.onDidActivePanelChange
             )(() => {
                 this._bufferOnDidLayoutChange.fire();
+            }),
+            Disposable.from(() => {
+                // iterate over a copy of the array since .dispose() mutates the original array
+                for (const group of [...this._floatingGroups]) {
+                    group.dispose();
+                }
+
+                // iterate over a copy of the array since .dispose() mutates the original array
+                for (const group of [...this._popoutGroups]) {
+                    group.dispose();
+                }
             })
         );
 
@@ -525,16 +539,20 @@ export class DockviewComponent
 
         const theme = getTheme(this.gridview.element);
 
-        const popoutWindow = new DockviewPopoutGroupPanel(group, {
-            className: theme ?? '',
-            popoutUrl: options?.popoutUrl ?? '/popout.html',
-            box: {
-                left: box.left,
-                top: box.top,
-                width: box.width,
-                height: box.height,
-            },
-        });
+        const popoutWindow = new DockviewPopoutGroupPanel(
+            `${this.id}-${group.id}`, // globally unique within dockview
+            group,
+            {
+                className: theme ?? '',
+                popoutUrl: options?.popoutUrl ?? '/popout.html',
+                box: {
+                    left: window.screenX + box.left,
+                    top: window.screenY + box.top,
+                    width: box.width,
+                    height: box.height,
+                },
+            }
+        );
 
         popoutWindow.addDisposables(
             {

@@ -75,10 +75,7 @@ export class PopoutWindow extends CompositeDisposable {
 
         this._window = { value: externalWindow, disposable };
 
-        const grievingParent = content.parentElement;
-
         const cleanUp = () => {
-            grievingParent?.appendChild(content);
             this._onDidClose.fire();
             this._window = null;
         };

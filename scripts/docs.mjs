@@ -71,287 +71,149 @@ const declarations = [dockviewCore, dockview]
         item.children.filter((child) => DOCUMENT_LIST.includes(child.name))
     )
     .filter(Boolean);
-/**
- * #region parsing of TypeDoc output
- */
 
-function findType(type, packageName) {
-    if (EXPORT_REMAPPING[type]) {
-        type = EXPORT_REMAPPING[type];
+function parseTypeArguments(args) {
+    if (Array.isArray(args.typeArguments)) {
+        return `<${args.typeArguments.map(parseType).join(', ')}>`;
     }
-
-    const packageObject = content.children.find(
-        (child) => child.name === packageName
-    );
-
-    const typeObject = packageObject.children.find(
-        (child) => child.name === type
-    );
-
-    return getFunction(typeObject, [], { includeMetadata: false });
+    return '';
 }
 
-// minimal parsing logic, add cases as required
-function getType(type, metadata, options) {
-    switch (type.type) {
+function parseType(obj) {
+    switch (obj.type) {
         case 'union':
-            return {
-                signature: [...type.types]
-                    .reverse()
-                    .map((t) => getType(t, metadata, options).signature)
-                    .join(' | '),
-            };
+            return obj.types.map(parseType).reverse().join(' | ');
         case 'intrinsic':
-            return { signature: type.name };
-        case 'reference':
-            if (
-                options.includeMetadata &&
-                type.package &&
-                typeof type.target !== 'object'
-            ) {
-                metadata.push({ name: type.name, package: type.package });
-            }
-
-            if (Array.isArray(type.typeArguments)) {
-                return {
-                    signature: `${type.name}<${type.typeArguments
-                        .map((typeArgument) => {
-                            return getType(typeArgument, metadata, options)
-                                .signature;
-                        })
-                        .join(', ')}>`,
-                };
-            }
-
-            return { signature: `${type.name}` };
-        case 'array':
-            return {
-                signature: `${
-                    getType(type.elementType, metadata, options).signature
-                }[]`,
-            };
-        case 'reflection':
-            if (type.declaration.children) {
-                return {
-                    signature: `{ ${type.declaration.children
-                        .map(
-                            (child) =>
-                                `${child.name}: ${
-                                    getType(child.type, metadata, options)
-                                        .signature
-                                }`
-                        )
-                        .join(', ')} }`,
-                };
-            }
-
-            if (type.declaration.signatures) {
-                if (type.declaration.signatures.length > 1) {
-                    // code this case if it ever happens
-                    throw new Error(`unhandled signatures.length > 1`);
-                }
-
-                if (type.declaration.signatures[0].parameters) {
-                    let _parameters = '';
-                    const { parameters } = type.declaration.signatures[0];
-
-                    for (let i = 0; i < parameters.length; i++) {
-                        const { type, name, flags, defaultValue } =
-                            parameters[i];
-
-                        const isOptional = flags.isOptional === true;
-
-                        const { signature } = getType(type, metadata, options);
-
-                        _parameters += `${name}${
-                            isOptional ? '?' : ''
-                        }: ${signature}${
-                            defaultValue !== undefined
-                                ? ` = ${defaultValue}`
-                                : ''
-                        }`;
-
-                        if (i !== parameters.length - 1) {
-                            _parameters += ', ';
-                        }
-                    }
-
-                    return {
-                        signature: `(${_parameters}): ${
-                            getType(
-                                type.declaration.signatures[0].type,
-                                metadata,
-                                options
-                            ).signature
-                        }`,
-                    };
-                }
-
-                return {
-                    signature: getType(
-                        type.declaration.signatures[0].type,
-                        metadata,
-                        options
-                    ).signature,
-                };
-            }
-
-            if (type.declaration.indexSignature) {
-                let _parameters = '';
-                const { parameters } = type.declaration.indexSignature;
-
-                for (let i = 0; i < parameters.length; i++) {
-                    const { type, name, flags, defaultValue } = parameters[i];
-
-                    const isOptional = flags.isOptional === true;
-
-                    _parameters += `${name}${isOptional ? '?' : ''}: ${
-                        getType(type, metadata, options).signature
-                    }${defaultValue !== undefined ? ` = ${defaultValue}` : ''}`;
-
-                    if (i !== parameters.length - 1) {
-                        _parameters += ', ';
-                    }
-                }
-
-                return {
-                    signature: `{ [${parameters}]: ${getType(
-                        type.declaration.indexSignature.type,
-                        metadata,
-                        options
-                    )}}`,
-                };
-            }
-
-            throw new Error('unhandled case');
+            return obj.name;
         case 'literal':
-            return { signature: `'${type.value}'` };
+            return `'${obj.value}'`;
+        case 'reflection':
+            return parse(obj.declaration).code;
+        case 'reference':
+            return `${obj.qualifiedName ?? obj.name}${parseTypeArguments(obj)}`;
+        case 'array':
+            return `${parseType(obj.elementType)}[]`;
         default:
-            throw new Error(`unhandled type ${type.type}`);
+            throw new Error(`unhandled type ${obj.type}`);
     }
 }
 
-// minimal parsing logic, add cases as required
-function getFunction(
-    method,
-    metadata = [],
-    options = { includeMetadata: true }
-) {
-    switch (method.kind) {
-        case ReflectionKind.Accessor: {
-            const { getSignature, name } = method;
-            const { type, comment } = getSignature;
-            const metadata = [];
-            const { signature } = getType(type, metadata, options);
-            return {
-                name,
-                signature,
-                comment,
-                type: 'accessor',
-                metadata: metadata.length > 0 ? metadata : undefined,
-            };
-        }
-        case ReflectionKind.Property: {
-            const { type, name, comment } = method;
-            const metadata = [];
-            const { signature } = getType(type, metadata, options);
-            return {
-                name,
-                signature,
-                comment,
-                type: 'property',
-                metadata: metadata.length > 0 ? metadata : undefined,
-            };
-        }
-        case ReflectionKind.Interface: {
-            const { type, name, comment, children } = method;
+function parse(data) {
+    const { name, comment, flags } = data;
 
-            let signature = `interface ${name} {`;
+    let code = '';
 
-            if (children) {
-                for (const child of children) {
-                    signature += `\n\t${
-                        child.flags.isReadonly ? 'readonly ' : ''
-                    }${child.name}: ${
-                        getFunction(child, metadata, options).signature
-                    };`;
-                }
-            }
-            signature += `\n}`;
+    switch (data.kind) {
+        case ReflectionKind.Accessor: // 262144
+            const getSignature = parse(data.getSignature);
+            code += getSignature.code;
 
             return {
                 name,
-                signature,
-                comment,
-                type: 'interface',
-                metadata: metadata.length > 0 ? metadata : undefined,
+                code,
+                kind: 'accessor',
+                comment: getSignature.comment,
             };
-        }
-        case ReflectionKind.Method: {
-            const { signatures } = method;
-            if (signatures.length > 1) {
-                throw new Error(`signatures.length > 1`);
-            }
-            const { name, parameters, type, typeParameter, comment } =
-                signatures[0];
-
-            let _typeParameter = '';
-
-            if (Array.isArray(typeParameter)) {
-                for (let i = 0; i < typeParameter.length; i++) {
-                    const item = typeParameter[i];
-
-                    const { signature } = getType(item.type, metadata, options);
-
-                    _typeParameter += `<${item.name}`;
-                    if (item.type) {
-                        _typeParameter += ` extends ${signature}`;
-                    }
-                    if (item.default) {
-                        _typeParameter += ` = ${
-                            getType(item.default, metadata, options).signature
-                        }`;
-                    }
-                    _typeParameter += `>`;
-
-                    if (i !== typeParameter.length - 1) {
-                        _typeParameter += ', ';
-                    }
-                }
+        case ReflectionKind.Method: // 2048
+            if (data.signatures.length > 1) {
+                throw new Error('unhandled');
             }
 
-            let _parameters = '';
+            const signature = parse(data.signatures[0]);
 
-            if (Array.isArray(parameters)) {
-                for (let i = 0; i < parameters.length; i++) {
-                    const { type, name, flags, defaultValue } = parameters[i];
+            code += signature.code;
 
-                    const isOptional = flags.isOptional === true;
+            return { name, code, kind: 'method', comment: signature.comment };
+        case ReflectionKind.Property: // 1024
+            code += parseType(data.type);
 
-                    const { signature } = getType(type, metadata, options);
+            return { name, code, kind: 'property', flags, comment };
+        case ReflectionKind.Constructor: // 512
+            // don't care for constrcutors
+            return null;
+        case ReflectionKind.Parameter: // 32768
+            code += `${name}`;
 
-                    _parameters += `${name}${
-                        isOptional ? '?' : ''
-                    }: ${signature}${
-                        defaultValue !== undefined ? ` = ${defaultValue}` : ''
-                    }`;
-
-                    if (i !== parameters.length - 1) {
-                        _parameters += ', ';
-                    }
-                }
+            if (flags.isOptional) {
+                code += '?';
             }
+            code += ': ';
+
+            code += parseType(data.type);
+
+            return {
+                name,
+                code,
+            };
+        case ReflectionKind.TypeLiteral: // 65536
+            if (Array.isArray(data.children)) {
+                code += `{ `;
+                code += data.children
+                    .map((child) => {
+                        let code = `${child.name}`;
+
+                        if (child.flags.isOptional) {
+                            code += '?';
+                        }
+                        code += `: ${parse(child).code}`;
+                        return code;
+                    })
+                    .join(', ');
+                code += ` }`;
+            }
+
+            if (Array.isArray(data.signatures)) {
+                code += data.signatures
+                    .map((signature) => parse(signature).code)
+                    .join(', ');
+            }
+
+            return { name, code };
+        case ReflectionKind.CallSignature: // 4096
+            // don't care for constrcutors
+
+            if (Array.isArray(data.typeParameter)) {
+                code += `<${data.typeParameter.map((typeParameter) => {
+                    let type = `${typeParameter.name} extends ${parseType(
+                        typeParameter.type
+                    )}`;
+
+                    if (typeParameter.default) {
+                        type += ` = ${typeParameter.default.name}`;
+                    }
+
+                    return type;
+                })}>`;
+            }
+
+            code += '(';
+
+            if (Array.isArray(data.parameters)) {
+                code += `${data.parameters
+                    .map((parameter) => parse(parameter).code)
+                    .join(', ')}`;
+            }
+
+            code += '): ';
+
+            code += parseType(data.type);
 
             return {
                 name,
                 comment,
-                signature: `${_typeParameter}(${_parameters}): ${
-                    getType(type, metadata, options).signature
-                }`,
-                type: 'method',
-                metadata: metadata.length > 0 ? metadata : undefined,
+                code,
             };
-        }
+        case ReflectionKind.GetSignature: // 524288
+            code += parseType(data.type);
+
+            return {
+                name,
+                comment,
+                code,
+            };
+
+        default:
+            throw new Error(`unhandled kind ${data.kind}`);
     }
 }
 
@@ -371,23 +233,12 @@ function createDocument(declarations) {
                     continue;
                 }
 
-                const documentationPart = getFunction(child, [], {
-                    includeMetadata: false,
-                });
-
-                if (documentationPart) {
-                    if (documentationPart.metadata) {
-                        documentationPart.metadata = documentationPart.metadata
-                            .filter(({ name }) => !SKIP_DOC.includes(name))
-                            .map((item) => {
-                                return findType(item.name, item.package);
-                            });
-                    }
-
-                    documentation[name].push(documentationPart);
+                const output = parse(child);
+                if (output) {
+                    documentation[name].push(output);
                 }
             } catch (err) {
-                console.error('error', err, child);
+                console.error('error', err, JSON.stringify(child, null, 4));
                 process.exit(-1);
             }
         }

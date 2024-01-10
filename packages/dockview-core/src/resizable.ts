@@ -1,4 +1,4 @@
-import { watchElementResize } from './dom';
+import { isInDocument, watchElementResize } from './dom';
 import { CompositeDisposable } from './lifecycle';
 
 export abstract class Resizable extends CompositeDisposable {
@@ -45,7 +45,7 @@ export abstract class Resizable extends CompositeDisposable {
                     return;
                 }
 
-                if (!document.body.contains(this._element)) {
+                if (!isInDocument(this._element)) {
                     /**
                      * since the event is dispatched through requestAnimationFrame there is a small chance
                      * the component is no longer attached to the DOM, if that is the case the dimensions

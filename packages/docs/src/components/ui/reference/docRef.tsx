@@ -17,9 +17,9 @@ type DocsComment = {
 type DocsJson = {
     [index: string]: Array<{
         name: string;
-        signature: string;
+        code: string;
         comment?: DocsComment;
-        type: string;
+        kind: 'accessor' | 'property' | 'method';
     }>;
 };
 
@@ -150,7 +150,7 @@ export const DocRef = (props: DocRefProps) => {
                                             )}
                                         </div>
                                         <CodeBlock language="tsx">
-                                            {doc.signature}
+                                            {doc.code}
                                         </CodeBlock>
                                     </div>
                                 </th>

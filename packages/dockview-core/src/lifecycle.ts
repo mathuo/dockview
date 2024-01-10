@@ -13,6 +13,14 @@ export namespace Disposable {
             // noop
         },
     };
+
+    export function from(func: () => void): IDisposable {
+        return {
+            dispose: () => {
+                func();
+            },
+        };
+    }
 }
 
 export class CompositeDisposable {

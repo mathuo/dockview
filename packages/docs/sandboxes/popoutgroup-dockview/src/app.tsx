@@ -145,7 +145,7 @@ export const DockviewPersistance = (props: { theme?: string }) => {
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                height: '400px',
+                height: '100%',
             }}
         >
             <div style={{ height: '25px' }}>
@@ -218,7 +218,7 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
     );
 
     React.useEffect(() => {
-        const disposable = props.group.api.onDidRenderPositionChange(
+        const disposable = props.group.api.onDidLocationChange(
             (event) => [setPopout(event.location === 'popout')]
         );
 

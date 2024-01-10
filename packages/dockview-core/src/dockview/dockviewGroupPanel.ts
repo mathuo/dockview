@@ -14,6 +14,9 @@ import {
     DockviewGroupPanelApiImpl,
 } from '../api/dockviewGroupPanelApi';
 
+const MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH = 100;
+const MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT = 100;
+
 export interface IDockviewGroupPanel
     extends IGridviewPanel<DockviewGroupPanelApi> {
     model: IDockviewGroupPanelModel;
@@ -68,8 +71,8 @@ export class DockviewGroupPanel
             id,
             'groupview_default',
             {
-                minimumHeight: 0,
-                minimumWidth: 0,
+                minimumHeight: MINIMUM_DOCKVIEW_GROUP_PANEL_HEIGHT,
+                minimumWidth: MINIMUM_DOCKVIEW_GROUP_PANEL_WIDTH,
             },
             new DockviewGroupPanelApiImpl(id, accessor)
         );

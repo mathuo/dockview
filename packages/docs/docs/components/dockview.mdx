@@ -377,11 +377,21 @@ Dockview has built-in support for opening groups in new Windows.
 Each popout window can contain a single group with many panels and you can have as many popout
 windows as needed. You cannot dock multiple groups together in the same window.
 
-To open an existing group in a new window
+Popout windows require your website to have a blank `.html` page that can be used, by default this is set to `/popout.html` but
+can be configured to match requirements.
 
-```tsx
-api.addPopoutGroup(group);
+```tsx title="Open new popout group from the component api"
+api.addPopoutGroup(
+  group,
+  // the second arguments (options) is optional
+  {
+    popoutUrl:"/popout.html",
+    box: { left: 0, top: 0, height: 200, width: 300 }
+  });
 ```
+
+> If you do not provide `options.popoutUrl` a default of `/popout.html` is used and if `options.box` is not provided
+the view will be places according to it's currently position.
 
 From within a panel you may say
 
@@ -389,12 +399,22 @@ From within a panel you may say
 props.containerApi.addPopoutGroup(props.api.group);
 ```
 
+To programatically move the popout group back into the main grid you can use the `moveTo` method in many ways, one of the following would suffice
+
+```tsx
+// option 1: add absolutely to the right-side of the grid
+props.group.api.moveTo({position: 'right'});
+
+// option 2: create a new group and move the contents of the popout group to it
+const group = props.containerApi.addGroup();
+props.group.api.moveTo({ group });
+```
+
 <MultiFrameworkContainer
     height={600}
     sandboxId="popoutgroup-dockview"
     react={DockviewPopoutGroup}
 />
-
 
 ## Maximized Groups
 
@@ -563,18 +583,37 @@ api.removePanel(panel);
 
 ### Panel Rendering
 
+#### Render Mode
+
+Dockview has two rendering modes `onlyWhenVisible` (default) and `always`. A rendering mode can be defined through the `renderer` prop to `DockviewReact` or at an individual panel level when added where
+the panel declaration takes precedence if both are defined. Rendering modes defined at the panel level are persisted, those defined at the `DockviewReact` level are not persisted.
+
+- `onlyWhenVisible` mode is the default mode. In this mode when a panel is no longer visible through either it's visiblity being hidden or it not being the active panel within a group the panels HTMLElement is removed
+from the DOM and any DOM state such as scrollbar positions will be lost. If you are using any ResizeObservers to measure size this will result both zero height and width as the HTMLElement no longer belongs to the DOM.
+This design allows for maximum performance at some cost.
+- `always` mode. In this mode when panels become hidden the HTMLElement is not destroyed so all DOM state such as scrollbar positions will be maintained. This is implemented by rendering each panel as an absolutely positioned
+HTMLElement and hidden the HTMLElement with `display: none` when it should be hidden.
+
+<MultiFrameworkContainer
+    height={500}
+    sandboxId="rendermode-dockview"
+    react={DockviewRenderMode}
+/>
+
+####
+
 By default `DockviewReact` only adds to the DOM those panels that are visible,
 if a panel is not the active tab and not shown the contents of the hidden panel will be removed from the DOM.
 
-However the React Components associated with each panel are only created once and will always exist for as long as the panel exists, hidden or not.
+When a panel is in `onlyWhenVisible` render mode this only affects the contents within the DOM. The lifecycle of that panel instance is still maintained.
+The React Components associated with each panel are only created once and will always exist for as long as the panel exists, hidden or not.
 
-> For example this means that any hooks in those components will run whether the panel is visible or not which may lead to excessive background work depending
+> e.g. This means that any hooks in those components will run whether the panel is visible or not which may lead to excessive background work depending
 > on the panels implementation.
 
-This is the default behaviour to ensure the greatest flexibility for the user but through the panels `props.api` you can listen to the visiblity state of the panel
-and write additional logic to optimize your application.
+You can listen to the visiblity state of the panel and write additional logic to optimize your application if required, although this is an advanced case.
 
-For example if you wanted to unmount the React Components when the panel is not visible you could create a Higher-Order-Component that listens to the panels
+If you wanted to unmount the React Components when the panel is not visible you could create a Higher-Order-Component that listens to the panels
 visiblity state and only renders the panel when visible.
 
 ```tsx title="Only rendering the React Component when the panel is visible, otherwise rendering a null React Component"
@@ -614,6 +653,7 @@ const components = { default: RenderWhenVisible(MyComponent) };
 ```
 
 Toggling the checkbox you can see that when you only render those panels which are visible the underling React component is destroyed when it becomes hidden and re-created when it becomes visible.
+
 
 <MultiFrameworkContainer
     sandboxId="rendering-dockview"
@@ -851,23 +891,6 @@ api.group.api.setConstraints(...)
     react={DockviewConstraints}
 />
 
-## Render Mode
-
-Dockview has two rendering modes `destructive` (default) and `gready`. A rendering mode can be defined through the `renderer` prop to `DockviewReact` or at an individual panel level when added where
-the panel declaration takes precedence if both are defined. Rendering modes defined at the panel level are persisted, those defined at the `DockviewReact` level are not persisted.
-
-destructive
-- Destructive mode is the default mode. In this mode when a panel is no longer visible through either it's visiblity being hidden or it not being the active panel within a group the panels HTMLElement is removed
-from the DOM and any DOM state such as scrollbar positions will be lost. If you are using any ResizeObservers to measure size this will result both zero height and width as the HTMLElement no longer belongs to the DOM.
-This design allows for maximum performance at some cost.
-- Gready mode. In this mode when panels become hidden the HTMLElement is not destroyed so all DOM state such as scrollbar positions will be maintained. This is implemented by rendering each panel as an absolutely positioned
-HTMLElement and hidden the HTMLElement with `display: none` when it should be hidden.
-
-<MultiFrameworkContainer
-    height={500}
-    sandboxId="rendermode-dockview"
-    react={DockviewRenderMode}
-/>
 
 ## iFrames
 

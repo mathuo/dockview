@@ -109,7 +109,7 @@ const Icon = (props: {
     );
 };
 
-const groupControlsComponents = {
+const groupControlsComponents: Record<string, React.FC> = {
     panel_1: () => {
         return <Icon icon="file_download" />;
     },
@@ -124,33 +124,54 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
         return groupControlsComponents[props.activePanel.id];
     }, [props.isGroupActive, props.activePanel]);
 
-    const [icon, setIcon] = React.useState<string>(
-        props.containerApi.hasMaximizedGroup()
-            ? 'collapse_content'
-            : 'expand_content'
-    );
+    // const [icon, setIcon] = React.useState<string>(
+    //     props.containerApi.hasMaximizedGroup()
+    //         ? 'collapse_content'
+    //         : 'expand_content'
+    // );
 
-    React.useEffect(() => {
-        const disposable = props.containerApi.onDidMaxmizedGroupChange(() => {
-            setIcon(
-                props.containerApi.hasMaximizedGroup()
-                    ? 'collapse_content'
-                    : 'expand_content'
-            );
-        });
+    // const [popoutIcon, setPopoutIcon] = React.useState<string>(
+    //     props.api.location === 'popout' ? 'close_fullscreen' : 'open_in_new'
+    // );
 
-        return () => {
-            disposable.dispose();
-        };
-    }, [props.containerApi]);
+    // React.useEffect(() => {
+    //     const disposable = props.containerApi.onDidMaxmizedGroupChange(() => {
+    //         setIcon(
+    //             props.containerApi.hasMaximizedGroup()
+    //                 ? 'collapse_content'
+    //                 : 'expand_content'
+    //         );
+    //     });
 
-    const onClick = () => {
-        if (props.containerApi.hasMaximizedGroup()) {
-            props.containerApi.exitMaxmizedGroup();
-        } else {
-            props.activePanel?.api.maximize();
-        }
-    };
+    //     const disposable2 = props.api.onDidLocationChange(() => {
+    //         setPopoutIcon(
+    //             props.api.location === 'popout'
+    //                 ? 'close_fullscreen'
+    //                 : 'open_in_new'
+    //         );
+    //     });
+
+    //     return () => {
+    //         disposable.dispose();
+    //         disposable2.dispose();
+    //     };
+    // }, [props.containerApi]);
+
+    // const onClick = () => {
+    //     if (props.containerApi.hasMaximizedGroup()) {
+    //         props.containerApi.exitMaxmizedGroup();
+    //     } else {
+    //         props.activePanel?.api.maximize();
+    //     }
+    // };
+
+    // const onClick2 = () => {
+    //     if (props.api.location !== 'popout') {
+    //         props.containerApi.addPopoutGroup(props.group);
+    //     } else {
+    //         props.api.moveTo({ position: 'right' });
+    //     }
+    // };
 
     return (
         <div
@@ -165,7 +186,8 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
         >
             {props.isGroupActive && <Icon icon="star" />}
             {Component && <Component />}
-            <Icon icon={icon} onClick={onClick} />
+            {/* <Icon icon={popoutIcon} onClick={onClick2} />
+            <Icon icon={icon} onClick={onClick} /> */}
         </div>
     );
 };
