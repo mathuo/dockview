@@ -21,6 +21,7 @@ import { IDockviewPanelModel } from '../../dockview/dockviewPanelModel';
 import { DockviewGroupPanel } from '../../dockview/dockviewGroupPanel';
 import { WatermarkRendererInitParameters } from '../../dockview/types';
 import { createOffsetDragOverEvent } from '../__test_utils__/utils';
+import { OverlayRenderContainer } from '../../overlayRenderContainer';
 
 enum GroupChangeKind2 {
     ADD_PANEL,
@@ -227,7 +228,7 @@ export class TestPanel implements IDockviewPanel {
     }
 }
 
-describe('groupview', () => {
+describe('dockviewGroupPanelModel', () => {
     let groupview: DockviewGroupPanel;
     let dockview: DockviewComponent;
     let options: GroupOptions;
@@ -250,6 +251,9 @@ describe('groupview', () => {
             removeGroup: removeGroupMock,
             onDidAddPanel: () => ({ dispose: jest.fn() }),
             onDidRemovePanel: () => ({ dispose: jest.fn() }),
+            overlayRenderContainer: new OverlayRenderContainer(
+                document.createElement('div')
+            ),
         }) as DockviewComponent;
 
         groupview = new DockviewGroupPanel(dockview, 'groupview-1', options);
@@ -791,6 +795,9 @@ describe('groupview', () => {
                 doSetGroupActive: jest.fn(),
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
+                overlayRenderContainer: new OverlayRenderContainer(
+                    document.createElement('div')
+                ),
             };
         });
         const accessor = new accessorMock() as DockviewComponent;
@@ -861,6 +868,9 @@ describe('groupview', () => {
                 doSetGroupActive: jest.fn(),
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
+                overlayRenderContainer: new OverlayRenderContainer(
+                    document.createElement('div')
+                ),
             };
         });
         const accessor = new accessorMock() as DockviewComponent;
@@ -936,6 +946,9 @@ describe('groupview', () => {
                 doSetGroupActive: jest.fn(),
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
+                overlayRenderContainer: new OverlayRenderContainer(
+                    document.createElement('div')
+                ),
             };
         });
         const accessor = new accessorMock() as DockviewComponent;

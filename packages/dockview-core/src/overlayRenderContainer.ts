@@ -1,12 +1,7 @@
 import { DragAndDropObserver } from './dnd/dnd';
 import { Droptarget } from './dnd/droptarget';
 import { getDomNodePagePosition, toggleClass } from './dom';
-import {
-    CompositeDisposable,
-    Disposable,
-    IDisposable,
-    MutableDisposable,
-} from './lifecycle';
+import { CompositeDisposable, Disposable, IDisposable } from './lifecycle';
 import { IDockviewPanel } from './dockview/dockviewPanel';
 
 export type DockviewPanelRenderer = 'onlyWhenVisibile' | 'always';
@@ -33,10 +28,6 @@ export class OverlayRenderContainer extends CompositeDisposable {
         }
     > = {};
 
-    get allIds(): string[] {
-        return Object.keys(this.map);
-    }
-
     constructor(private readonly element: HTMLElement) {
         super();
 
@@ -50,7 +41,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
         );
     }
 
-    remove(panel: IDockviewPanel): boolean {
+    detatch(panel: IDockviewPanel): boolean {
         if (this.map[panel.api.id]) {
             this.map[panel.api.id].disposable.dispose();
             delete this.map[panel.api.id];
@@ -59,10 +50,12 @@ export class OverlayRenderContainer extends CompositeDisposable {
         return false;
     }
 
-    setReferenceContentContainer(
-        panel: IDockviewPanel,
-        referenceContainer: IRenderable
-    ): HTMLElement {
+    attach(options: {
+        panel: IDockviewPanel;
+        referenceContainer: IRenderable;
+    }): HTMLElement {
+        const { panel, referenceContainer } = options;
+
         if (!this.map[panel.api.id]) {
             const element = createFocusableElement();
             element.className = 'dv-render-overlay';
@@ -110,17 +103,14 @@ export class OverlayRenderContainer extends CompositeDisposable {
             focusContainer.style.display = panel.api.isVisible ? '' : 'none';
         };
 
-        const whenVisible = <T>(func: (event: T) => void) => {
-            return (event: T) => {
-                if (!panel.api.isVisible) {
-                    return;
-                }
-
-                func(event);
-            };
-        };
-
         const disposable = new CompositeDisposable(
+            /**
+             * since container is positioned absoutely we must explicitly forward
+             * the dnd events for the expect behaviours to continue to occur in terms of dnd
+             *
+             * the dnd observer does not need to be conditional on whether the panel is visible since
+             * non-visible panels are 'display: none' and in such case the dnd observer will not fire.
+             */
             new DragAndDropObserver(focusContainer, {
                 onDragEnd: (e) => {
                     referenceContainer.dropTarget.dnd.onDragEnd(e);
@@ -138,10 +128,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
                     referenceContainer.dropTarget.dnd.onDragOver(e);
                 },
             }),
-            /**
-             * since container is positioned absoutely we must explicitly forward
-             * the dnd events for the expect behaviours to continue to occur in terms of dnd
-             */
+
             panel.api.onDidVisibilityChange((event) => {
                 /**
                  * Control the visibility of the content, however even when not visible (display: none)
@@ -177,7 +164,9 @@ export class OverlayRenderContainer extends CompositeDisposable {
             visibilityChanged();
         });
 
+        // dispose of logic asoccciated with previous reference-container
         this.map[panel.api.id].disposable.dispose();
+        // and reset the disposable to the active reference-container
         this.map[panel.api.id].disposable = disposable;
 
         return focusContainer;

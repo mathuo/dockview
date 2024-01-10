@@ -10,6 +10,7 @@ import { PanelUpdateEvent } from '../../../../panel/types';
 import { IDockviewPanel } from '../../../../dockview/dockviewPanel';
 import { IDockviewPanelModel } from '../../../../dockview/dockviewPanelModel';
 import { DockviewComponent } from '../../../../dockview/dockviewComponent';
+import { OverlayRenderContainer } from '../../../../overlayRenderContainer';
 
 class TestContentRenderer
     extends CompositeDisposable
@@ -61,6 +62,9 @@ describe('contentContainer', () => {
         const dockviewComponent = jest.fn<DockviewComponent, []>(() => {
             return {
                 renderer: 'onlyWhenVisibile',
+                overlayRenderContainer: new OverlayRenderContainer(
+                    document.createElement('div')
+                ),
             } as DockviewComponent;
         });
 
