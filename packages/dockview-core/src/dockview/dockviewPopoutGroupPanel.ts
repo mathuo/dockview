@@ -7,6 +7,7 @@ export class DockviewPopoutGroupPanel extends CompositeDisposable {
     readonly window: PopoutWindow;
 
     constructor(
+        readonly id: string,
         readonly group: DockviewGroupPanel,
         private readonly options: {
             className: string;
@@ -16,7 +17,7 @@ export class DockviewPopoutGroupPanel extends CompositeDisposable {
     ) {
         super();
 
-        this.window = new PopoutWindow('test', options.className ?? '', {
+        this.window = new PopoutWindow(id, options.className ?? '', {
             url: this.options.popoutUrl,
             left: this.options.box.left,
             top: this.options.box.top,
