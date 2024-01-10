@@ -393,6 +393,14 @@ export class Gridview implements IDisposable {
     }
 
     public serialize(): SerializedGridview<any> {
+        if (this.hasMaximizedView()) {
+            /**
+             * do not persist maximized view state but we must first exit any maximized views
+             * before serialization to ensure the correct dimensions are persisted
+             */
+            this.exitMaximizedView();
+        }
+
         const root = serializeBranchNode(this.getView(), this.orientation);
 
         return {
@@ -423,10 +431,14 @@ export class Gridview implements IDisposable {
         );
     }
 
-    public deserialize(json: any, deserializer: IViewDeserializer): void {
+    public deserialize<T>(
+        json: SerializedGridview<T>,
+        deserializer: IViewDeserializer
+    ): void {
         const orientation = json.orientation;
         const height =
             orientation === Orientation.VERTICAL ? json.height : json.width;
+
         this._deserialize(
             json.root as ISerializedBranchNode,
             orientation,
