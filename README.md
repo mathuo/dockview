@@ -8,6 +8,7 @@
 ---
 
 [![npm version](https://badge.fury.io/js/dockview.svg)](https://www.npmjs.com/package/dockview)
+[![npm](https://img.shields.io/npm/dm/dockview)](https://www.npmjs.com/package/dockview)
 [![CI Build](https://github.com/mathuo/dockview/workflows/CI/badge.svg)](https://github.com/mathuo/dockview/actions?query=workflow%3ACI)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=coverage)](https://sonarcloud.io/summary/overall?id=mathuo_dockview)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=alert_status)](https://sonarcloud.io/summary/overall?id=mathuo_dockview)
@@ -23,14 +24,18 @@ Please see the website: https://dockview.dev
 
 -   Simple splitviews, nested splitviews (i.e. gridviews) supporting full layout managment with
     dockable and tabular views
--   Extensive API support at the component level and view level
+-   Extensive API
 -   Themable and customizable
 -   Serialization / deserialization support
 -   Tabular docking and Drag and Drop support
--   Floating groups, customized header bars and tab
+-   Supports Shadow DOMs
+-   Popout Windows and Floating Groups
+-   High test coverage
 -   Documentation and examples
+-   Verified builds through npm provenence,
+-   Public SonarCube code anaylsis reports
 
-Want to inspect the latest deployment? Go to https://unpkg.com/browse/dockview@latest/
+Want to verify our builds? Go [here](https://www.npmjs.com/package/dockview#Provenance).
 
 ## Quick start
 

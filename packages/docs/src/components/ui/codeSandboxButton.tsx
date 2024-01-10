@@ -54,6 +54,7 @@ export const CodeSandboxButton = (props: {
                 <a
                     href={url}
                     target={'_blank'}
+                    rel='noopener'
                     className="codesandbox-button-content"
                 >
                     <span
