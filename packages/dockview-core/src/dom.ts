@@ -240,7 +240,7 @@ export function getDomNodePagePosition(domNode: Element): {
 export function isInDocument(element: Element): boolean {
     let currentElement: Element | ParentNode = element;
 
-    while (currentElement && currentElement.parentNode) {
+    while (currentElement?.parentNode) {
         if (currentElement.parentNode === document) {
             return true;
         } else if (currentElement.parentNode instanceof DocumentFragment) {
