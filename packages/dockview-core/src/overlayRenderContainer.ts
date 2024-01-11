@@ -43,7 +43,9 @@ export class OverlayRenderContainer extends CompositeDisposable {
 
     detatch(panel: IDockviewPanel): boolean {
         if (this.map[panel.api.id]) {
-            this.map[panel.api.id].disposable.dispose();
+            const { disposable, destroy } = this.map[panel.api.id];
+            disposable.dispose();
+            destroy.dispose();
             delete this.map[panel.api.id];
             return true;
         }
