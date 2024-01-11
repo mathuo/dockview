@@ -3,10 +3,12 @@ sidebar_position: 0
 description: A zero dependency layout manager supporting ReactJS and Vanilla TypeScript
 ---
 
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+
 import { SimpleSplitview } from '@site/src/components/simpleSplitview';
 import { SimpleGridview } from '@site/src/components/simpleGridview';
 import { SimplePaneview } from '@site/src/components/simplePaneview';
-import SimpleDockview from '@site/sandboxes/simple-dockview/src/app';
+import DockviewDemo from '@site/sandboxes/demo-dockview/src/app';
 import Link from '@docusaurus/Link';
 
 # Introduction
@@ -34,16 +36,11 @@ There are 4 components you may want to use:
     <h2>Dockview</h2>
 </Link>
 
-<div
-    style={{
-        height: '300px',
-        backgroundColor: 'rgb(30,30,30)',
-        color: 'white',
-        margin: '20px 0px',
-    }}
->
-    <SimpleDockview />
-</div>
+<MultiFrameworkContainer
+  height={500}
+  sandboxId="demo-dockview"
+  react={DockviewDemo}
+/>
 
 <Link to="./components/splitview">
     <h2>Splitview</h2>

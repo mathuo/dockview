@@ -404,7 +404,7 @@ To programatically move the popout group back into the main grid you can use the
 
 ```tsx
 // option 1: add absolutely to the right-side of the grid
-props.group.api.moveTo({position: 'right'});
+props.group.api.moveTo({ position: 'right' });
 
 // option 2: create a new group and move the contents of the popout group to it
 const group = props.containerApi.addGroup();
@@ -419,10 +419,35 @@ props.group.api.moveTo({ group });
 
 ## Maximized Groups
 
-To maximize a group you can all
+To maximize a group from the component `api`:
 
 ```tsx
+// maximize a specified group
 api.maxmimizeGroup(group);
+
+// check whether a specific group is maximized
+const result: boolean = api.isMaximizedGroup(group);
+
+// if there is any maximized group exit the maximized state
+exitMaximizedGroup();
+
+// is there a maximized group
+const result: boolean = hasMaximizedGroup();
+```
+
+The following methods are available on both the panel and group `api` objects:
+
+> `api.<method>` is equivalent to `api.group.api.<method>` for all of these methods. The methods exist on the panel `api` object for convenience.
+
+```ts
+// maximize the group
+api.maximize();
+
+// is this group maximized (if another group is maximized this method will still return false)
+const result: boolean = api.isMaxmized();
+
+// exit only if this group is maximzied (if another group is maxmized this has no affect)
+api.exitMaximized();
 ```
 
 <MultiFrameworkContainer
@@ -675,9 +700,9 @@ Toggling the checkbox you can see that when you only render those panels which a
 You can provide custom renderers for your tab headers for maximum customization.
 A default implementation of `DockviewDefaultTab` is provided should you only wish to attach minor
 changes and events that do not alter the default behaviour, for example to add a custom context menu event
-handler.
+handler or to hide the close button.
 
-The `DockviewDefaulTab` component accepts a `hideClose` prop if you wish only to hide the close button.
+The `DockviewDefaultTab` component accepts a `hideClose` prop if you wish only to hide the close button.
 
 ```tsx title="Attaching a custom context menu event handlers to a custom header"
 import { IDockviewPanelHeaderProps, DockviewDefaultTab } from 'dockview';
@@ -687,7 +712,7 @@ const MyCustomheader = (props: IDockviewPanelHeaderProps) => {
         event.preventDefault();
         alert('context menu');
     };
-    return <DockviewDefaultTab onContextMenu={onContextMenu} {...props} />;
+    return <DockviewDefaultTab onContextMenu={onContextMenu} hideClose={true} {...props} />;
 };
 ```
 

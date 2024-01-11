@@ -1,7 +1,7 @@
 <div align="center">
 <h1>dockview</h1>
 
-<p>Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support written in TypeScript</p>
+<p>Zero dependency layout manager supporting tabs, groups, grids and splitviews with ReactJS support written in TypeScript</p>
 
 </div>
 
@@ -22,18 +22,18 @@ Please see the website: https://dockview.dev
 
 ## Features
 
--   Simple splitviews, nested splitviews (i.e. gridviews) supporting full layout managment with
-    dockable and tabular views
+-   Serialization / deserialization with full layout management
+-   Support for split-views, grid-views and 'dockable' views
+-   Themeable and customizable
+-   Tab and Group docking / Drag n' Drop
+-   Popout Windows
+-   Floating Groups
 -   Extensive API
--   Themable and customizable
--   Serialization / deserialization support
--   Tabular docking and Drag and Drop support
 -   Supports Shadow DOMs
--   Popout Windows and Floating Groups
 -   High test coverage
--   Documentation and examples
--   Verified builds through npm provenence,
--   Public SonarCube code anaylsis reports
+-   Documentation website with live examples
+-   Transparent builds and Code Analysis
+-   Security at mind - verifed publishing and builds through GitHub Actions
 
 Want to verify our builds? Go [here](https://www.npmjs.com/package/dockview#Provenance).
 

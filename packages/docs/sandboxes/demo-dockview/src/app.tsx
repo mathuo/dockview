@@ -33,10 +33,11 @@ const headerComponents = {
 
 const Icon = (props: {
     icon: string;
+    title?: string;
     onClick?: (event: React.MouseEvent) => void;
 }) => {
     return (
-        <div className="action" onClick={props.onClick}>
+        <div title={props.title} className="action" onClick={props.onClick}>
             <span
                 style={{ fontSize: 'inherit' }}
                 className="material-symbols-outlined"
@@ -62,31 +63,21 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
         return groupControlsComponents[props.activePanel.id];
     }, [props.isGroupActive, props.activePanel]);
 
-    const [icon, setIcon] = React.useState<string>(
+    const [isMaximized, setIsMaximized] = React.useState<boolean>(
         props.containerApi.hasMaximizedGroup()
-            ? 'collapse_content'
-            : 'expand_content'
     );
 
-    const [popoutIcon, setPopoutIcon] = React.useState<string>(
-        props.api.location === 'popout' ? 'close_fullscreen' : 'open_in_new'
+    const [isPopout, setIsPopout] = React.useState<boolean>(
+        props.api.location === 'popout'
     );
 
     React.useEffect(() => {
         const disposable = props.containerApi.onDidMaxmizedGroupChange(() => {
-            setIcon(
-                props.containerApi.hasMaximizedGroup()
-                    ? 'collapse_content'
-                    : 'expand_content'
-            );
+            setIsMaximized(props.containerApi.hasMaximizedGroup());
         });
 
         const disposable2 = props.api.onDidLocationChange(() => {
-            setPopoutIcon(
-                props.api.location === 'popout'
-                    ? 'close_fullscreen'
-                    : 'open_in_new'
-            );
+            setIsPopout(props.api.location === 'popout');
         });
 
         return () => {
@@ -124,8 +115,18 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
         >
             {props.isGroupActive && <Icon icon="star" />}
             {Component && <Component />}
-            <Icon icon={popoutIcon} onClick={onClick2} />
-            <Icon icon={icon} onClick={onClick} />
+            <Icon
+                title={isPopout ? 'Close Window' : 'Open In New Window'}
+                icon={isPopout ? 'close_fullscreen' : 'open_in_new'}
+                onClick={onClick2}
+            />
+            {!isPopout && (
+                <Icon
+                    title={isMaximized ? 'Minimize View' : 'Maximize View'}
+                    icon={isMaximized ? 'collapse_content' : 'expand_content'}
+                    onClick={onClick}
+                />
+            )}
         </div>
     );
 };
@@ -184,29 +185,54 @@ const DockviewDemo = (props: { theme?: string }) => {
             component: 'default',
             title: 'Panel 1',
         });
+
         event.api.addPanel({
             id: 'panel_2',
             component: 'default',
             title: 'Panel 2',
-            position: { referencePanel: 'panel_1', direction: 'right' },
+            position: { referencePanel: panel1 },
         });
+
         event.api.addPanel({
             id: 'panel_3',
             component: 'default',
             title: 'Panel 3',
-            position: { referencePanel: 'panel_2', direction: 'below' },
+            position: { referencePanel: panel1 },
         });
-        event.api.addPanel({
+
+        const panel4 = event.api.addPanel({
             id: 'panel_4',
             component: 'default',
             title: 'Panel 4',
-            position: { referencePanel: 'panel_3', direction: 'right' },
+            position: { referencePanel: panel1, direction: 'right' },
         });
-        event.api.addPanel({
+
+        const panel5 = event.api.addPanel({
             id: 'panel_5',
             component: 'default',
             title: 'Panel 5',
-            position: { referencePanel: 'panel_3', direction: 'below' },
+            position: { referencePanel: panel4 },
+        });
+
+        const panel6 = event.api.addPanel({
+            id: 'panel_6',
+            component: 'default',
+            title: 'Panel 6',
+            position: { referencePanel: panel5, direction: 'below' },
+        });
+
+        const panel7 = event.api.addPanel({
+            id: 'panel_7',
+            component: 'default',
+            title: 'Panel 7',
+            position: { referencePanel: panel6, direction: 'left' },
+        });
+
+        event.api.addPanel({
+            id: 'panel8',
+            component: 'default',
+            title: 'Panel 8',
+            position: { referencePanel: panel7, direction: 'below' },
         });
 
         panel1.api.setActive();

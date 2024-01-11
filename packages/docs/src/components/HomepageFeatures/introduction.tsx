@@ -26,7 +26,7 @@ export const Introduction = () => {
             <div style={{ padding: '20px' }}>
                 <BrowserHeader />
                 <MultiFrameworkContainer
-                    height={500}
+                    height={750}
                     sandboxId="demo-dockview"
                     react={DockviewDemo}
                 />
