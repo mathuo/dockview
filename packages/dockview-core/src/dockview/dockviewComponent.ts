@@ -558,6 +558,7 @@ export class DockviewComponent
             {
                 dispose: () => {
                     remove(this._popoutGroups, popoutWindow);
+                    this.updateWatermark();
                 },
             },
             popoutWindow.window.onDidClose(() => {
@@ -566,6 +567,7 @@ export class DockviewComponent
         );
 
         this._popoutGroups.push(popoutWindow);
+        this.updateWatermark();
     }
 
     addFloatingGroup(
