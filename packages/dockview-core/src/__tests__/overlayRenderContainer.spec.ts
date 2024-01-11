@@ -6,11 +6,22 @@ import { fromPartial } from '@total-typescript/shoehorn';
 import { Writable, exhaustMicrotaskQueue } from './__test_utils__/utils';
 
 describe('overlayRenderContainer', () => {
-    test('add a view that is not currently in the DOM', async () => {
-        const parentContainer = document.createElement('div');
+    let referenceContainer: IRenderable;
+    let parentContainer: HTMLElement;
+    let cut: OverlayRenderContainer;
 
-        const cut = new OverlayRenderContainer(parentContainer);
+    beforeEach(() => {
+        parentContainer = document.createElement('div');
 
+        referenceContainer = {
+            element: document.createElement('div'),
+            dropTarget: fromPartial<Droptarget>({}),
+        };
+
+        cut = new OverlayRenderContainer(parentContainer);
+    });
+
+    test('that attach(...) and detach(...) mutate the DOM as expected', () => {
         const panelContentEl = document.createElement('div');
 
         const onDidVisibilityChange = new Emitter<any>();
@@ -35,14 +46,41 @@ describe('overlayRenderContainer', () => {
             },
         });
 
-        const dropTarget = fromPartial<Droptarget>({});
+        cut.attach({ panel, referenceContainer });
 
-        const refContainerEl = document.createElement('div');
+        expect(panelContentEl.parentElement?.parentElement).toBe(
+            parentContainer
+        );
 
-        const referenceContainer: IRenderable = {
-            element: refContainerEl,
-            dropTarget,
-        };
+        cut.detatch(panel);
+
+        expect(panelContentEl.parentElement?.parentElement).toBeUndefined();
+    });
+
+    test('add a view that is not currently in the DOM', async () => {
+        const panelContentEl = document.createElement('div');
+
+        const onDidVisibilityChange = new Emitter<any>();
+        const onDidDimensionsChange = new Emitter<any>();
+
+        const panel = fromPartial<IDockviewPanel>({
+            api: {
+                id: 'test_panel_id',
+                onDidVisibilityChange: onDidVisibilityChange.event,
+                onDidDimensionsChange: onDidDimensionsChange.event,
+                isVisible: true,
+            },
+            view: {
+                content: {
+                    element: panelContentEl,
+                },
+            },
+            group: {
+                api: {
+                    location: 'grid',
+                },
+            },
+        });
 
         (parentContainer as jest.Mocked<HTMLDivElement>).getBoundingClientRect =
             jest
@@ -72,33 +110,34 @@ describe('overlayRenderContainer', () => {
                     })
                 );
 
-        (refContainerEl as jest.Mocked<HTMLDivElement>).getBoundingClientRect =
-            jest
-                .fn<DOMRect, []>()
-                .mockReturnValueOnce(
-                    fromPartial<DOMRect>({
-                        left: 150,
-                        top: 300,
-                        width: 100,
-                        height: 200,
-                    })
-                )
-                .mockReturnValueOnce(
-                    fromPartial<DOMRect>({
-                        left: 150,
-                        top: 300,
-                        width: 101,
-                        height: 201,
-                    })
-                )
-                .mockReturnValueOnce(
-                    fromPartial<DOMRect>({
-                        left: 150,
-                        top: 300,
-                        width: 100,
-                        height: 200,
-                    })
-                );
+        (
+            referenceContainer.element as jest.Mocked<HTMLDivElement>
+        ).getBoundingClientRect = jest
+            .fn<DOMRect, []>()
+            .mockReturnValueOnce(
+                fromPartial<DOMRect>({
+                    left: 150,
+                    top: 300,
+                    width: 100,
+                    height: 200,
+                })
+            )
+            .mockReturnValueOnce(
+                fromPartial<DOMRect>({
+                    left: 150,
+                    top: 300,
+                    width: 101,
+                    height: 201,
+                })
+            )
+            .mockReturnValueOnce(
+                fromPartial<DOMRect>({
+                    left: 150,
+                    top: 300,
+                    width: 100,
+                    height: 200,
+                })
+            );
 
         const container = cut.attach({ panel, referenceContainer });
 
@@ -113,7 +152,9 @@ describe('overlayRenderContainer', () => {
         expect(container.style.top).toBe('100px');
         expect(container.style.width).toBe('100px');
         expect(container.style.height).toBe('200px');
-        expect(refContainerEl.getBoundingClientRect).toHaveBeenCalledTimes(1);
+        expect(
+            referenceContainer.element.getBoundingClientRect
+        ).toHaveBeenCalledTimes(1);
 
         onDidDimensionsChange.fire({});
         expect(container.style.display).toBe('');
@@ -122,12 +163,16 @@ describe('overlayRenderContainer', () => {
         expect(container.style.top).toBe('99px');
         expect(container.style.width).toBe('101px');
         expect(container.style.height).toBe('201px');
-        expect(refContainerEl.getBoundingClientRect).toHaveBeenCalledTimes(2);
+        expect(
+            referenceContainer.element.getBoundingClientRect
+        ).toHaveBeenCalledTimes(2);
 
         (panel as Writable<IDockviewPanel>).api.isVisible = false;
         onDidVisibilityChange.fire({});
         expect(container.style.display).toBe('none');
-        expect(refContainerEl.getBoundingClientRect).toHaveBeenCalledTimes(2);
+        expect(
+            referenceContainer.element.getBoundingClientRect
+        ).toHaveBeenCalledTimes(2);
 
         (panel as Writable<IDockviewPanel>).api.isVisible = true;
         onDidVisibilityChange.fire({});
@@ -137,6 +182,8 @@ describe('overlayRenderContainer', () => {
         expect(container.style.top).toBe('100px');
         expect(container.style.width).toBe('100px');
         expect(container.style.height).toBe('200px');
-        expect(refContainerEl.getBoundingClientRect).toHaveBeenCalledTimes(3);
+        expect(
+            referenceContainer.element.getBoundingClientRect
+        ).toHaveBeenCalledTimes(3);
     });
 });
