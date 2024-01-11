@@ -100,10 +100,7 @@ describe('overlayRenderContainer', () => {
                     })
                 );
 
-        const container = cut.setReferenceContentContainer(
-            panel,
-            referenceContainer
-        );
+        const container = cut.attach({ panel, referenceContainer });
 
         await exhaustMicrotaskQueue();
 

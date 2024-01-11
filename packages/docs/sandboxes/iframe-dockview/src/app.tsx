@@ -7,21 +7,26 @@ import * as React from 'react';
 import { HoistedDockviewPanel } from './hoistedDockviewPanel';
 
 const components = {
-    iframeComponent: HoistedDockviewPanel(
-        (props: IDockviewPanelProps<{ color: string }>) => {
-            return (
-                <iframe
-                    style={{
-                        pointerEvents: 'none',
-                        border: 'none',
-                        width: '100%',
-                        height: '100%',
-                    }}
-                    src="https://dockview.dev"
-                />
-            );
-        }
-    ),
+    iframeComponent: (props: IDockviewPanelProps<{ color: string }>) => {
+        return (
+            <div style={{ height: '100%', overflow: 'auto' }}>
+                <div style={{ height: '1000px', color: 'white' }}>
+                    {props.api.title}
+                </div>
+            </div>
+        );
+        return (
+            <iframe
+                style={{
+                    // pointerEvents: 'none',
+                    // border: 'none',
+                    width: '100%',
+                    height: '100%',
+                }}
+                src="https://dockview.dev"
+            />
+        );
+    },
     basicComponent: () => {
         return (
             <div style={{ padding: '20px', color: 'white' }}>
@@ -36,11 +41,13 @@ export const App: React.FC = (props: { theme?: string }) => {
         event.api.addPanel({
             id: 'panel_1',
             component: 'iframeComponent',
+            renderer: 'always',
         });
 
         event.api.addPanel({
             id: 'panel_2',
             component: 'iframeComponent',
+            renderer: 'always',
         });
 
         event.api.addPanel({

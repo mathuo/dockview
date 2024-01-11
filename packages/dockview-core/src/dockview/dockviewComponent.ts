@@ -1215,7 +1215,7 @@ export class DockviewComponent
         group.model.removePanel(panel);
 
         if (!options.skipDispose) {
-            this.overlayRenderContainer.remove(panel);
+            this.overlayRenderContainer.detatch(panel);
             panel.dispose();
         }
 
