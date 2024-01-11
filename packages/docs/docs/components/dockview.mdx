@@ -908,16 +908,17 @@ iFrames required special attention because of a particular behaviour in how iFra
 
 You can find many examples of discussions on this. Two reputable forums for example are linked [here](https://bugzilla.mozilla.org/show_bug.cgi?id=254144) and [here](https://github.com/whatwg/html/issues/5484).
 
-The problem with iFrames and `dockview` is that when you hide or move a panel that panels DOM element may be moved within the DOM or removed from the DOM completely.
-If your panel contains an iFrame then that iFrame will reload after being re-positioned within the DOM tree and all state in that iFrame will most likely be lost.
+To ensure iFrames work as expected you should render them in panels with `renderer: 'always'` to ensure they are never removed from the DOM, alternatively set the defaultRenderer to `always`.
 
-`dockview` does not provide a built-in solution to this because it's too specific of a problem to include in the library.
-However the below example does show an implementation of a higher-order component `HoistedDockviewPanel`that you could use to work around this problems and make iFrames behave in `dockview`.
+> See the **Panel Rendering** section for more information of render modes.
 
-What the higher-order component is doing is to hoist the panels contents into a DOM element that is always present and then `position: absolute` that element to match the dimensions of it's linked panel.
-The visibility of these hoisted elements is then controlled through some exposed api methods to hide elements that shouldn't be currently shown.
-
-You should open this example in CodeSandbox using the provided link to understand the code and make use of this implemention if required.
+```tsx title="Example of a panel using an alternative renderer"
+api.addPanel({
+  id: 'my_panel_id',
+  component: 'my_component',
+  renderer: 'always',
+});
+        ```
 
 <MultiFrameworkContainer
     sandboxId="iframe-dockview"
