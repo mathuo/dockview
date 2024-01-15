@@ -213,28 +213,25 @@ const LeftComponent = (props: IDockviewHeaderActionsProps) => {
 };
 
 const RightComponent = (props: IDockviewHeaderActionsProps) => {
-    const [popout, setPopout] = React.useState<boolean>(
-        props.api.location === 'popout'
+    const [maximized, setMaximized] = React.useState<boolean>(
+        props.api.isMaximized()
     );
 
     React.useEffect(() => {
-        const disposable = props.group.api.onDidLocationChange((event) => [
-            setPopout(event.location === 'popout'),
-        ]);
+        const disposable = props.containerApi.onDidMaxmizedGroupChange(() => {
+            setMaximized(props.api.isMaximized());
+        });
 
         return () => {
             disposable.dispose();
         };
-    }, [props.group.api]);
+    }, [props.containerApi]);
 
     const onClick = () => {
-        if (popout) {
-            const group = props.containerApi.addGroup();
-            props.group.api.moveTo({ group });
+        if (maximized) {
+            props.api.exitMaximized();
         } else {
-            props.containerApi.addPopoutGroup(props.group, {
-                popoutUrl: '/popout/index.html',
-            });
+            props.api.maximize();
         }
     };
 
@@ -242,7 +239,7 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
         <div style={{ height: '100%', color: 'white', padding: '0px 4px' }}>
             <Icon
                 onClick={onClick}
-                icon={popout ? 'jump_to_element' : 'back_to_tab'}
+                icon={maximized ? 'jump_to_element' : 'back_to_tab'}
             />
         </div>
     );

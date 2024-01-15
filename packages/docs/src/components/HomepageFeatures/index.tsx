@@ -62,11 +62,11 @@ const FeatureList: FeatureItem[] = [
                 </div>
                 <div className="feature-banner">
                     <h3 className="feature-banner-header">
-                        Floating Group Support
+                        Floating and Popout Groups
                     </h3>
                     <p className="feature-banner-content">
-                        Built-in support for floating groups with a supporting
-                        api for progmatic control.
+                        Built-in support for floating groups and groups in new
+                        windows with a supporting api for progmatic control.
                     </p>
                 </div>
                 <div className="feature-banner">

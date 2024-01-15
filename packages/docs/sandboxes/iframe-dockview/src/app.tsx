@@ -1,25 +1,11 @@
-import {
-    DockviewReact,
-    DockviewReadyEvent,
-    IDockviewPanelProps,
-} from 'dockview';
+import { DockviewReact, DockviewReadyEvent } from 'dockview';
 import * as React from 'react';
-import { HoistedDockviewPanel } from './hoistedDockviewPanel';
 
 const components = {
-    iframeComponent: (props: IDockviewPanelProps<{ color: string }>) => {
-        return (
-            <div style={{ height: '100%', overflow: 'auto' }}>
-                <div style={{ height: '1000px', color: 'white' }}>
-                    {props.api.title}
-                </div>
-            </div>
-        );
+    iframeComponent: () => {
         return (
             <iframe
                 style={{
-                    // pointerEvents: 'none',
-                    // border: 'none',
                     width: '100%',
                     height: '100%',
                 }}
