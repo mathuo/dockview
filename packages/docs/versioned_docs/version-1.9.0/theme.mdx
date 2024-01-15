@@ -1,29 +1,31 @@
 ---
-sidebar_position: 3
+sidebar_position: 1
 description: Theming Dockview Components
 ---
-
-import { CustomCSSDockview } from '@site/src/components/dockview/customCss';
 
 # Theme
 
 ## Introduction
 
-`dockview` requires some css to work correctly.
-The css is exported as one file under [`dockview/dict/styles/dockview.css`](https://unpkg.com/browse/dockview@latest/dist/styles/dockview.css)
-and depending can be imported
+`dockview` requires some CSS to work correctly.
+The CSS is exported as one file under [`dockview/dict/styles/dockview.css`](https://unpkg.com/browse/dockview@latest/dist/styles/dockview.css)
+and should be imported at some point in your application
 
-```css
+```css title="Example import with .css file"
 @import './node_modules/dockview/dist/styles/dockview.css';
 ```
 
 ## Provided themes
 
-The following are provided as classes that you can attached to your components for themeing
+`dockview` comes with a number of themes which are all CSS classes and can be found [here](https://github.com/mathuo/dockview/blob/master/packages/dockview-core/src/theme.scss).
+To use a `dockview` theme the CSS must encapsulate the component. The current list of themes is:
 
--   `.dockview-theme-light`
--   `.dockview-theme-dark`
--   `.dockview-theme-abyss`
+-   `dockview-theme-dark`
+-   `dockview-theme-light`
+-   `dockview-theme-vs`
+-   `dockview-theme-abyss`
+-   `dockview-theme-dracula`
+-   `dockview-theme-replit`
 
 ## Customizing Theme
 
@@ -58,11 +60,16 @@ and are free to build your own themes based on these css properties.
 |                                                      |             |
 | --dv-separator-border                                |             |
 | --dv-paneview-header-border-color                    |             |
+|                                                      |             |
+| --dv-icon-hover-background-color                     |             |
+| --dv-floating-box-shadow                             |             |
+| --dv-active-sash-color                               |             |
+| --dv-background-color                                |             |
 
 You can further customise the theme through adjusting class properties but this is up you.
-As an example if you wanted to add a bottom border to the tab container for an active group in the `DockviewReact` component you could write:
+For example if you wanted to add a bottom border to the tab container for an active group in the `DockviewReact` component you could write:
 
-```css
+```css title="Additional CSS to show a bottom border on active groups"
 .groupview {
     &.active-group {
         > .tabs-and-actions-container {
@@ -76,14 +83,3 @@ As an example if you wanted to add a bottom border to the tab container for an a
     }
 }
 ```
-
-<div
-    style={{
-        height: '300px',
-        backgroundColor: 'rgb(30,30,30)',
-        color: 'white',
-        margin: '20px 0px',
-    }}
->
-    <CustomCSSDockview />
-</div>
