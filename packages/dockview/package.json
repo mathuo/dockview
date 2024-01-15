@@ -1,6 +1,6 @@
 {
   "name": "dockview",
-  "version": "1.8.5",
+  "version": "1.9.0",
   "description": "Zero dependency layout manager supporting tabs, grids and splitviews with ReactJS support",
   "keywords": [
     "splitview",
