@@ -218,9 +218,9 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
     );
 
     React.useEffect(() => {
-        const disposable = props.group.api.onDidLocationChange(
-            (event) => [setPopout(event.location === 'popout')]
-        );
+        const disposable = props.group.api.onDidLocationChange((event) => [
+            setPopout(event.location === 'popout'),
+        ]);
 
         return () => {
             disposable.dispose();
@@ -232,7 +232,9 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
             const group = props.containerApi.addGroup();
             props.group.api.moveTo({ group });
         } else {
-            props.containerApi.addPopoutGroup(props.group);
+            props.containerApi.addPopoutGroup(props.group, {
+                popoutUrl: '/popout/index.html',
+            });
         }
     };
 
