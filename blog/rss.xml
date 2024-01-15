@@ -4,7 +4,7 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Wed, 31 Jan 2024 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Mon, 15 Jan 2024 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
@@ -12,7 +12,7 @@
             <title><![CDATA[Dockview 1.9.0]]></title>
             <link>https://dockview.dev/blog/dockview-1.9.0-release</link>
             <guid>https://dockview.dev/blog/dockview-1.9.0-release</guid>
-            <pubDate>Wed, 31 Jan 2024 00:00:00 GMT</pubDate>
+            <pubDate>Mon, 15 Jan 2024 00:00:00 GMT</pubDate>
             <description><![CDATA[Please reference to docs @ dockview.dev.]]></description>
             <content:encoded><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.9.0-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
@@ -25,6 +25,9 @@
 </li>
 <li>
 <p>Advanced panel rendering configurations <a href="https://github.com/mathuo/dockview/issues/397" target="_blank" rel="noopener noreferrer">#397</a></p>
+</li>
+<li>
+<p>Support for rendering within Shadow DOM elements <a href="https://github.com/mathuo/dockview/issues/425" target="_blank" rel="noopener noreferrer">#425</a></p>
 </li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.9.0-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
