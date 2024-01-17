@@ -89,7 +89,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
         group: DockviewGroupPanel
     ) => IHeaderActionsRenderer;
     singleTabMode?: 'fullwidth' | 'default';
-    parentElement?: HTMLElement;
+    parentElement: HTMLElement;
     disableFloatingGroups?: boolean;
     floatingGroupBounds?:
         | 'boundedWithinViewport'

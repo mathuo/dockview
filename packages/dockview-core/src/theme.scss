@@ -12,6 +12,7 @@
 
 @mixin dockview-theme-dark-mixin {
     @include dockview-theme-core-mixin();
+
     //
     --dv-group-view-background-color: #1e1e1e;
     //
@@ -228,13 +229,7 @@
 }
 
 @mixin dockview-design-replit-mixin {
-    &.dv-dockview {
-        padding: 3px;
-    }
-
-    .view:has(> .groupview) {
-        padding: 3px;
-    }
+    --dv-group-gap-size: 3px;
 
     .dv-resize-container:has(> .groupview) {
         border-radius: 8px;

@@ -243,7 +243,7 @@ describe('dockviewGroupPanelModel', () => {
         options = {};
 
         dockview = (<Partial<DockviewComponent>>{
-            options: {},
+            options: { parentElement: document.createElement('div') },
             createWatermarkComponent: () => new Watermark(),
             doSetGroupActive: jest.fn(),
             id: 'dockview-1',
@@ -639,6 +639,7 @@ describe('dockviewGroupPanelModel', () => {
                 id: 'testcomponentid',
                 options: {
                     showDndOverlay: jest.fn(),
+                    parentElement: document.createElement('div'),
                 },
                 getPanel: jest.fn(),
                 onDidAddPanel: jest.fn(),
@@ -699,6 +700,7 @@ describe('dockviewGroupPanelModel', () => {
                 id: 'testcomponentid',
                 options: {
                     showDndOverlay: () => true,
+                    parentElement: document.createElement('div'),
                 },
                 getPanel: jest.fn(),
                 onDidAddPanel: jest.fn(),
@@ -790,6 +792,7 @@ describe('dockviewGroupPanelModel', () => {
                 id: 'testcomponentid',
                 options: {
                     showDndOverlay: jest.fn(),
+                    parentElement: document.createElement('div'),
                 },
                 getPanel: jest.fn(),
                 doSetGroupActive: jest.fn(),
@@ -863,6 +866,7 @@ describe('dockviewGroupPanelModel', () => {
                 id: 'testcomponentid',
                 options: {
                     showDndOverlay: jest.fn(),
+                    parentElement: document.createElement('div'),
                 },
                 getPanel: jest.fn(),
                 doSetGroupActive: jest.fn(),
@@ -941,6 +945,7 @@ describe('dockviewGroupPanelModel', () => {
                 id: 'testcomponentid',
                 options: {
                     showDndOverlay: jest.fn(),
+                    parentElement: document.createElement('div'),
                 },
                 getPanel: jest.fn(),
                 doSetGroupActive: jest.fn(),
