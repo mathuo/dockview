@@ -22,20 +22,28 @@
             will-change: transform;
             pointer-events: none;
 
-            &.small-top {
-                border-top: 1px solid var(--dv-drag-over-border-color);
+            &.dv-overlay-top {
+                &.dv-overlay-small-vertical {
+                    border-top: 1px solid var(--dv-drag-over-border-color);
+                }
             }
 
-            &.small-bottom {
-                border-bottom: 1px solid var(--dv-drag-over-border-color);
+            &.dv-overlay-bottom {
+                &.dv-overlay-small-vertical {
+                    border-bottom: 1px solid var(--dv-drag-over-border-color);
+                }
             }
 
-            &.small-left {
-                border-left: 1px solid var(--dv-drag-over-border-color);
+            &.dv-overlay-left {
+                &.dv-overlay-small-horizontal {
+                    border-left: 1px solid var(--dv-drag-over-border-color);
+                }
             }
 
-            &.small-right {
-                border-right: 1px solid var(--dv-drag-over-border-color);
+            &.dv-overlay-right {
+                &.dv-overlay-small-horizontal {
+                    border-right: 1px solid var(--dv-drag-over-border-color);
+                }
             }
         }
     }
