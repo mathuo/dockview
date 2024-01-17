@@ -1,6 +1,5 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import {
-    DockviewDropTargets,
     GroupPanelPartInitParameters,
     IContentRenderer,
     ITabRenderer,
@@ -2967,7 +2966,7 @@ describe('dockviewComponent', () => {
         expect(showDndOverlay).toHaveBeenCalledWith({
             nativeEvent: eventLeft,
             position: 'left',
-            target: DockviewDropTargets.Edge,
+            target: 'edge',
             getData: getPanelData,
         });
         expect(showDndOverlay).toBeCalledTimes(1);
@@ -2986,7 +2985,7 @@ describe('dockviewComponent', () => {
         expect(showDndOverlay).toHaveBeenCalledWith({
             nativeEvent: eventRight,
             position: 'right',
-            target: DockviewDropTargets.Edge,
+            target: 'edge',
             getData: getPanelData,
         });
         expect(showDndOverlay).toBeCalledTimes(2);
@@ -3005,7 +3004,7 @@ describe('dockviewComponent', () => {
         expect(showDndOverlay).toHaveBeenCalledWith({
             nativeEvent: eventTop,
             position: 'top',
-            target: DockviewDropTargets.Edge,
+            target: 'edge',
             getData: getPanelData,
         });
         expect(showDndOverlay).toBeCalledTimes(3);
@@ -3024,7 +3023,7 @@ describe('dockviewComponent', () => {
         expect(showDndOverlay).toHaveBeenCalledWith({
             nativeEvent: eventBottom,
             position: 'bottom',
-            target: DockviewDropTargets.Edge,
+            target: 'edge',
             getData: getPanelData,
         });
         expect(showDndOverlay).toBeCalledTimes(4);
@@ -3060,7 +3059,7 @@ describe('dockviewComponent', () => {
         expect(showDndOverlay).toHaveBeenCalledWith({
             nativeEvent: eventTop,
             position: 'center',
-            target: DockviewDropTargets.Edge,
+            target: 'edge',
             getData: getPanelData,
         });
         expect(showDndOverlay).toBeCalledTimes(5);

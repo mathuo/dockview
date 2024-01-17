@@ -22,26 +22,6 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
 import { IHeaderActionsRenderer } from './options';
 
-export interface DndService {
-    canDisplayOverlay(
-        group: IDockviewGroupPanelModel,
-        event: DragEvent,
-        target: DockviewDropTargets
-    ): boolean;
-    onDrop(
-        group: IDockviewGroupPanelModel,
-        event: DragEvent,
-        position: Position,
-        index?: number
-    ): void;
-}
-
-export interface IGroupItem {
-    id: string;
-    header: { element: HTMLElement };
-    body: { element: HTMLElement };
-}
-
 interface GroupMoveEvent {
     groupId: string;
     itemId?: string;
@@ -321,7 +301,12 @@ export class DockviewGroupPanelModel
                 this._onGroupDragStart.fire(event);
             }),
             this.tabsContainer.onDrop((event) => {
-                this.handleDropEvent(event.event, 'center', event.index);
+                this.handleDropEvent(
+                    'header',
+                    event.event,
+                    'center',
+                    event.index
+                );
             }),
             this.contentContainer.onDidFocus(() => {
                 this.accessor.doSetGroupActive(this.groupPanel, true);
@@ -330,7 +315,11 @@ export class DockviewGroupPanelModel
                 // noop
             }),
             this.contentContainer.dropTarget.onDrop((event) => {
-                this.handleDropEvent(event.nativeEvent, event.position);
+                this.handleDropEvent(
+                    'content',
+                    event.nativeEvent,
+                    event.position
+                );
             }),
             this._onMove,
             this._onDidChange,
@@ -775,6 +764,7 @@ export class DockviewGroupPanelModel
     }
 
     private handleDropEvent(
+        type: 'header' | 'content',
         event: DragEvent,
         position: Position,
         index?: number
@@ -783,6 +773,17 @@ export class DockviewGroupPanelModel
             return;
         }
 
+        function getKind(): 'tab' | 'header_space' | 'content' {
+            switch (type) {
+                case 'header':
+                    return typeof index === 'number' ? 'tab' : 'header_space';
+                case 'content':
+                    return 'content';
+            }
+        }
+
+        const kind = getKind();
+
         const data = getPanelData();
 
         if (data && data.viewId === this.accessor.id) {
@@ -790,6 +791,7 @@ export class DockviewGroupPanelModel
                 // this is a group move dnd event
                 const { groupId } = data;
 
+                // TODO: intercept
                 this._onMove.fire({
                     target: position,
                     groupId: groupId,
@@ -814,6 +816,7 @@ export class DockviewGroupPanelModel
                 }
             }
 
+            // TODO: intercept
             this._onMove.fire({
                 target: position,
                 groupId: data.groupId,

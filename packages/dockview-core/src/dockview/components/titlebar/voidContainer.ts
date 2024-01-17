@@ -6,7 +6,6 @@ import { DockviewComponent } from '../../dockviewComponent';
 import { addDisposableListener, Emitter, Event } from '../../../events';
 import { CompositeDisposable } from '../../../lifecycle';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
-import { DockviewDropTargets } from '../../types';
 
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;
@@ -62,11 +61,7 @@ export class VoidContainer extends CompositeDisposable {
                     return last(this.group.panels)?.id !== data.panelId;
                 }
 
-                return group.model.canDisplayOverlay(
-                    event,
-                    position,
-                    DockviewDropTargets.Panel
-                );
+                return group.model.canDisplayOverlay(event, position, 'panel');
             },
         });
 

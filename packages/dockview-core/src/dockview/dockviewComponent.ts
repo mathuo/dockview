@@ -10,11 +10,7 @@ import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
 import { CompositeDisposable, Disposable } from '../lifecycle';
 import { Event, Emitter } from '../events';
 import { Watermark } from './components/watermark/watermark';
-import {
-    IWatermarkRenderer,
-    GroupviewPanelState,
-    DockviewDropTargets,
-} from './types';
+import { IWatermarkRenderer, GroupviewPanelState } from './types';
 import { sequentialNumberGenerator } from '../math';
 import { DefaultDockviewDeserialzier } from './deserializer';
 import { createComponent } from '../panel/componentFactory';
@@ -455,7 +451,7 @@ export class DockviewComponent
                     return this.options.showDndOverlay({
                         nativeEvent: event,
                         position: position,
-                        target: DockviewDropTargets.Edge,
+                        target: 'edge',
                         getData: getPanelData,
                     });
                 }

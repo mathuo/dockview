@@ -7,7 +7,7 @@ import {
 } from '../../../dnd/dataTransfer';
 import { toggleClass } from '../../../dom';
 import { DockviewComponent } from '../../dockviewComponent';
-import { DockviewDropTargets, ITabRenderer } from '../../types';
+import { ITabRenderer } from '../../types';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { DroptargetEvent, Droptarget } from '../../../dnd/droptarget';
 import { DragHandler } from '../../../dnd/abstractDragHandler';
@@ -112,7 +112,7 @@ export class Tab extends CompositeDisposable implements ITab {
                 return this.group.model.canDisplayOverlay(
                     event,
                     position,
-                    DockviewDropTargets.Tab
+                    'tab'
                 );
             },
         });
