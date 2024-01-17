@@ -17,7 +17,7 @@
 
     > .content-container {
         flex-grow: 1;
-        overflow: hidden;
+        min-height: 0;
         outline: none;
     }
 }

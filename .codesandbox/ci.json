@@ -28,6 +28,7 @@
     "/packages/docs/sandboxes/rendermode-dockview",
     "/packages/docs/sandboxes/resize-dockview",
     "/packages/docs/sandboxes/resizecontainer-dockview",
+    "/packages/docs/sandboxes/scrollbars-dockview",
     "/packages/docs/sandboxes/simple-dockview",
     "/packages/docs/sandboxes/simple-gridview",
     "/packages/docs/sandboxes/simple-paneview",
