@@ -11,6 +11,7 @@ import {
     DockviewGroupPanel,
     IHeaderActionsRenderer,
     DockviewPanelRenderer,
+    DroptargetOverlayModel,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
@@ -79,6 +80,7 @@ export interface IDockviewReactProps {
           };
     debug?: boolean;
     defaultRenderer?: DockviewPanelRenderer;
+    rootOverlayModel?: DroptargetOverlayModel;
 }
 
 const DEFAULT_REACT_TAB = 'props.defaultTabComponent';
@@ -180,6 +182,7 @@ export const DockviewReact = React.forwardRef(
                 floatingGroupBounds: props.floatingGroupBounds,
                 defaultRenderer: props.defaultRenderer,
                 debug: props.debug,
+                rootOverlayModel: props.rootOverlayModel,
             });
 
             const { clientWidth, clientHeight } = domRef.current;
@@ -311,6 +314,15 @@ export const DockviewReact = React.forwardRef(
                 ),
             });
         }, [props.leftHeaderActionsComponent]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+            dockviewRef.current.updateOptions({
+                rootOverlayModel: props.rootOverlayModel,
+            });
+        }, [props.rootOverlayModel]);
 
         React.useEffect(() => {
             if (!dockviewRef.current) {

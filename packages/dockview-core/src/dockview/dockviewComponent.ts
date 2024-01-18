@@ -4,7 +4,12 @@ import {
     getGridLocation,
     ISerializedLeafNode,
 } from '../gridview/gridview';
-import { directionToPosition, Droptarget, Position } from '../dnd/droptarget';
+import {
+    directionToPosition,
+    Droptarget,
+    DroptargetOverlayModel,
+    Position,
+} from '../dnd/droptarget';
 import { tail, sequenceEquals, remove } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
 import { CompositeDisposable, Disposable } from '../lifecycle';
@@ -58,6 +63,11 @@ import {
     DockviewPanelRenderer,
     OverlayRenderContainer,
 } from '../overlayRenderContainer';
+
+const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
+    activationSize: { type: 'pixels', value: 10 },
+    size: { type: 'pixels', value: 20 },
+};
 
 function getTheme(element: HTMLElement): string | undefined {
     function toClassList(element: HTMLElement) {
@@ -215,6 +225,7 @@ export type DockviewComponentUpdateOptions = Pick<
     | 'createPrefixHeaderActionsElement'
     | 'disableFloatingGroups'
     | 'floatingGroupBounds'
+    | 'rootOverlayModel'
 >;
 
 export interface DockviewDropEvent extends GroupviewDropEvent {
@@ -315,6 +326,7 @@ export class DockviewComponent
 
     private readonly _floatingGroups: DockviewFloatingGroupPanel[] = [];
     private readonly _popoutGroups: DockviewPopoutGroupPanel[] = [];
+    private readonly _rootDropTarget: Droptarget;
 
     get orientation(): Orientation {
         return this.gridview.orientation;
@@ -420,7 +432,7 @@ export class DockviewComponent
             this.options.watermarkComponent = Watermark;
         }
 
-        const dropTarget = new Droptarget(this.element, {
+        this._rootDropTarget = new Droptarget(this.element, {
             canDisplayOverlay: (event, position) => {
                 const data = getPanelData();
 
@@ -459,14 +471,12 @@ export class DockviewComponent
                 return false;
             },
             acceptedTargetZones: ['top', 'bottom', 'left', 'right', 'center'],
-            overlayModel: {
-                activationSize: { type: 'pixels', value: 10 },
-                size: { type: 'pixels', value: 20 },
-            },
+            overlayModel:
+                this.options.rootOverlayModel ?? DEFAULT_ROOT_OVERLAY_MODEL,
         });
 
         this.addDisposables(
-            dropTarget.onDrop((event) => {
+            this._rootDropTarget.onDrop((event) => {
                 const data = getPanelData();
 
                 if (data) {
@@ -485,7 +495,7 @@ export class DockviewComponent
                     });
                 }
             }),
-            dropTarget
+            this._rootDropTarget
         );
 
         this._api = new DockviewApi(this);
@@ -716,20 +726,24 @@ export class DockviewComponent
     }
 
     updateOptions(options: DockviewComponentUpdateOptions): void {
-        const hasOrientationChanged =
+        const changed_orientation =
             typeof options.orientation === 'string' &&
             this.gridview.orientation !== options.orientation;
-        const hasFloatingGroupOptionsChanged =
+        const changed_floatingGroupBounds =
             options.floatingGroupBounds !== undefined &&
             options.floatingGroupBounds !== this.options.floatingGroupBounds;
 
+        const changed_rootOverlayOptions =
+            options.rootOverlayModel !== undefined &&
+            options.rootOverlayModel !== this.options.rootOverlayModel;
+
         this._options = { ...this.options, ...options };
 
-        if (hasOrientationChanged) {
+        if (changed_orientation) {
             this.gridview.orientation = options.orientation!;
         }
 
-        if (hasFloatingGroupOptionsChanged) {
+        if (changed_floatingGroupBounds) {
             for (const group of this._floatingGroups) {
                 switch (this.options.floatingGroupBounds) {
                     case 'boundedWithinViewport':
@@ -751,6 +765,10 @@ export class DockviewComponent
 
                 group.overlay.setBounds({});
             }
+        }
+
+        if (changed_rootOverlayOptions) {
+            this._rootDropTarget.setOverlayModel(options.rootOverlayModel!);
         }
 
         this.layout(this.gridview.width, this.gridview.height, true);
