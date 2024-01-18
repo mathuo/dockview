@@ -45,6 +45,22 @@ export abstract class Resizable extends CompositeDisposable {
                     return;
                 }
 
+                if (!this._element.offsetParent) {
+                    /**
+                     * offsetParent === null is equivalent to display: none being set on the element or one
+                     * of it's parents. In the display: none case the size will become (0, 0) which we do
+                     * not want to propagate.
+                     *
+                     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent
+                     *
+                     * You could use checkVisibility() but at the time of writing it's not supported across
+                     * all Browsers
+                     *
+                     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/checkVisibility
+                     */
+                    return;
+                }
+
                 if (!isInDocument(this._element)) {
                     /**
                      * since the event is dispatched through requestAnimationFrame there is a small chance
