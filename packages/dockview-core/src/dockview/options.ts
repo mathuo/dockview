@@ -101,6 +101,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     defaultRenderer?: DockviewPanelRenderer;
     debug?: boolean;
     rootOverlayModel?: DroptargetOverlayModel;
+    disableDnd?: boolean;
 }
 
 export interface PanelOptions<P extends object = Parameters> {

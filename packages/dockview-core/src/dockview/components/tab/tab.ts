@@ -9,7 +9,12 @@ import { toggleClass } from '../../../dom';
 import { DockviewComponent } from '../../dockviewComponent';
 import { ITabRenderer } from '../../types';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
-import { DroptargetEvent, Droptarget } from '../../../dnd/droptarget';
+import {
+    DroptargetEvent,
+    Droptarget,
+    Position,
+    WillShowOverlayEvent,
+} from '../../../dnd/droptarget';
 import { DragHandler } from '../../../dnd/abstractDragHandler';
 import { IDockviewPanel } from '../../dockviewPanel';
 
@@ -40,18 +45,9 @@ class TabDragHandler extends DragHandler {
     }
 }
 
-export interface ITab extends IDisposable {
-    readonly panel: IDockviewPanel;
-    readonly element: HTMLElement;
-    setContent: (element: ITabRenderer) => void;
-    onChanged: Event<MouseEvent>;
-    onDrop: Event<DroptargetEvent>;
-    setActive(isActive: boolean): void;
-}
-
-export class Tab extends CompositeDisposable implements ITab {
+export class Tab extends CompositeDisposable {
     private readonly _element: HTMLElement;
-    private readonly droptarget: Droptarget;
+    private readonly dropTarget: Droptarget;
     private content: ITabRenderer | undefined = undefined;
 
     private readonly _onChanged = new Emitter<MouseEvent>();
@@ -62,6 +58,8 @@ export class Tab extends CompositeDisposable implements ITab {
 
     private readonly _onDragStart = new Emitter<DragEvent>();
     readonly onDragStart = this._onDragStart.event;
+
+    readonly onWillShowOverlay: Event<WillShowOverlayEvent>;
 
     public get element(): HTMLElement {
         return this._element;
@@ -88,7 +86,7 @@ export class Tab extends CompositeDisposable implements ITab {
             this.panel
         );
 
-        this.droptarget = new Droptarget(this._element, {
+        this.dropTarget = new Droptarget(this._element, {
             acceptedTargetZones: ['center'],
             canDisplayOverlay: (event, position) => {
                 if (this.group.locked) {
@@ -117,6 +115,8 @@ export class Tab extends CompositeDisposable implements ITab {
             },
         });
 
+        this.onWillShowOverlay = this.dropTarget.onWillShowOverlay;
+
         this.addDisposables(
             this._onChanged,
             this._onDropped,
@@ -132,10 +132,10 @@ export class Tab extends CompositeDisposable implements ITab {
 
                 this._onChanged.fire(event);
             }),
-            this.droptarget.onDrop((event) => {
+            this.dropTarget.onDrop((event) => {
                 this._onDropped.fire(event);
             }),
-            this.droptarget
+            this.dropTarget
         );
     }
 
