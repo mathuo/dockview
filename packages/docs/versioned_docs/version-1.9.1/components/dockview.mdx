@@ -31,6 +31,7 @@ import DockviewKeyboard from '@site/sandboxes/keyboard-dockview/src/app';
 import DockviewPopoutGroup from '@site/sandboxes/popoutgroup-dockview/src/app';
 import DockviewMaximizeGroup from '@site/sandboxes/maximizegroup-dockview/src/app';
 import DockviewRenderMode from '@site/sandboxes/rendermode-dockview/src/app';
+import DockviewScrollbars from '@site/sandboxes/scrollbars-dockview/src/app';
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
@@ -196,6 +197,22 @@ If you refresh the page you should notice your layout is loaded as you left it.
     react={DockviewPersistance}
 />
 
+## Scrollbars
+
+Scrollbars will appear if the contents of your view has a fixed height. If you are using a relative height such
+as *100%* you will need to define an inner container with the appropiate `overflow` value to allow scrollbars to appear.
+
+The following container three views:
+- **Panel 1**: Sets `height: 100%` and no scrollbar appears even, the content is clipped.
+- **Panel 2**: Sets `height: 2000px` and a scrollbar does appear since a fixed height has been used.
+- **Panel 3**: Sets `height: 100%` and defines an inner component with `overflow: auto` to enable the scrollbars.
+
+
+<MultiFrameworkContainer
+    sandboxId="scrollbars-dockview"
+    react={DockviewScrollbars}
+/>
+
 ## Resizing
 
 ### Panel Resizing
@@ -246,6 +263,18 @@ which will be rendered when there are no panels or groups.
 />
 
 ## Drag And Drop
+
+You can override the conditions of the far edge overlays through the `rootOverlayModel` prop.
+
+```tsx
+<DockviewReact
+  {...props}
+   rootOverlayModel={{
+    size: { value: 100, type: 'pixels' },
+    activationSize: { value: 5, type: 'percentage' },
+  }}
+  />
+```
 
 ### Built-in behaviours
 

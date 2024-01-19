@@ -264,6 +264,18 @@ which will be rendered when there are no panels or groups.
 
 ## Drag And Drop
 
+You can override the conditions of the far edge overlays through the `rootOverlayModel` prop.
+
+```tsx
+<DockviewReact
+  {...props}
+   rootOverlayModel={{
+    size: { value: 100, type: 'pixels' },
+    activationSize: { value: 5, type: 'percentage' },
+  }}
+  />
+```
+
 ### Built-in behaviours
 
 Dockview supports a wide variety of built-in Drag and Drop possibilities.

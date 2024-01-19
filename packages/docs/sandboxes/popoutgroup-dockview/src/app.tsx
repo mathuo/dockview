@@ -1,6 +1,5 @@
 import {
     DockviewApi,
-    DockviewGroupPanel,
     DockviewReact,
     DockviewReadyEvent,
     IDockviewHeaderActionsProps,
@@ -25,14 +24,6 @@ const components = {
         );
     },
 };
-
-const counter = (() => {
-    let i = 0;
-
-    return {
-        next: () => ++i,
-    };
-})();
 
 function loadDefaultLayout(api: DockviewApi) {
     api.addPanel({

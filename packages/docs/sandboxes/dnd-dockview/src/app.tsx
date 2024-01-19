@@ -180,6 +180,10 @@ const DndDockview = (props: { renderVisibleOnly: boolean; theme?: string }) => {
                 className={`${props.theme || 'dockview-theme-abyss'}`}
                 onDidDrop={onDidDrop}
                 showDndOverlay={showDndOverlay}
+                rootOverlayModel={{
+                    size: { value: 100, type: 'pixels' },
+                    activationSize: { value: 5, type: 'percentage' },
+                }}
             />
         </div>
     );
