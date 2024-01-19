@@ -25,6 +25,12 @@
     height: 100%;
     width: 100%;
 
+    &.dv-splitview-locked {
+        & > .sash-container > .sash {
+            pointer-events: none;
+        }
+    }
+
     &.animation {
         .view,
         .sash {

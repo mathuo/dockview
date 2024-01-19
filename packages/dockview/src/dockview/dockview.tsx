@@ -81,6 +81,7 @@ export interface IDockviewReactProps {
     debug?: boolean;
     defaultRenderer?: DockviewPanelRenderer;
     rootOverlayModel?: DroptargetOverlayModel;
+    locked?: boolean;
 }
 
 const DEFAULT_REACT_TAB = 'props.defaultTabComponent';
@@ -183,6 +184,7 @@ export const DockviewReact = React.forwardRef(
                 defaultRenderer: props.defaultRenderer,
                 debug: props.debug,
                 rootOverlayModel: props.rootOverlayModel,
+                locked: props.locked,
             });
 
             const { clientWidth, clientHeight } = domRef.current;
@@ -198,6 +200,14 @@ export const DockviewReact = React.forwardRef(
                 dockview.dispose();
             };
         }, []);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+
+            dockviewRef.current.locked = !!props.locked;
+        }, [props.locked]);
 
         React.useEffect(() => {
             if (!dockviewRef.current) {

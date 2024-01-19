@@ -369,6 +369,7 @@ export class DockviewComponent
             styles: options.styles,
             parentElement: options.parentElement,
             disableAutoResizing: options.disableAutoResizing,
+            locked: options.locked,
         });
 
         const gready = document.createElement('div');

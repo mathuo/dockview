@@ -34,6 +34,7 @@ export interface BaseGridOptions {
     readonly styles?: ISplitviewStyles;
     readonly parentElement?: HTMLElement;
     readonly disableAutoResizing?: boolean;
+    readonly locked?: boolean;
 }
 
 export interface IGridPanelView extends IGridView, IPanel {
@@ -133,6 +134,14 @@ export abstract class BaseGrid<T extends IGridPanelView>
         return this._activeGroup;
     }
 
+    get locked(): boolean {
+        return this.gridview.locked;
+    }
+
+    set locked(value: boolean) {
+        this.gridview.locked = value;
+    }
+
     constructor(options: BaseGridOptions) {
         super(options.parentElement, options.disableAutoResizing);
 
@@ -141,6 +150,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
             options.styles,
             options.orientation
         );
+
+        this.gridview.locked = !!options.locked;
 
         this.element.appendChild(this.gridview.element);
 
