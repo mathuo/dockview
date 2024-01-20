@@ -4,10 +4,33 @@
         <title>Dockview Blog</title>
         <link>https://dockview.dev/blog</link>
         <description>Dockview Blog</description>
-        <lastBuildDate>Mon, 15 Jan 2024 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Sat, 20 Jan 2024 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Dockview 1.9.1]]></title>
+            <link>https://dockview.dev/blog/dockview-1.9.1-release</link>
+            <guid>https://dockview.dev/blog/dockview-1.9.1-release</guid>
+            <pubDate>Sat, 20 Jan 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Please reference to docs @ dockview.dev.]]></description>
+            <content:encoded><![CDATA[<p>Please reference to docs @ <a href="https://dockview.dev/" target="_blank" rel="noopener noreferrer">dockview.dev</a>.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.9.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
+<ul>
+<li>
+<p>Drop target overlay classnames <a href="https://github.com/mathuo/dockview/issues/452" target="_blank" rel="noopener noreferrer">#452</a></p>
+</li>
+<li>
+<p>Expose root drop target configuration options <a href="https://github.com/mathuo/dockview/issues/431" target="_blank" rel="noopener noreferrer">#431</a></p>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.9.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
+<ul>
+<li>Bug: Floating groups position reset when display<!-- -->:none<!-- --> applied to component <a href="https://github.com/mathuo/dockview/issues/458" target="_blank" rel="noopener noreferrer">#458</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.9.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>]]></content:encoded>
+            <category>release</category>
+        </item>
         <item>
             <title><![CDATA[Dockview 1.9.0]]></title>
             <link>https://dockview.dev/blog/dockview-1.9.0-release</link>
@@ -474,30 +497,6 @@ If you feel anything is missing or unclear please let me know.</p>
 <h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.4.2-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
 <ul>
 <li>Rename <code>onDidAddGroup</code> to <code>onDidAddPanel</code>, <code>onDidRemoveGroup</code> to <code>onDidRemovePanel</code> and <code>onDidActiveGroupChange</code> to <code>onDidActivePanelChange</code> on the Gridview API <a href="https://github.com/mathuo/dockview/pull/106" target="_blank" rel="noopener noreferrer">#106</a></li>
-</ul>]]></content:encoded>
-            <category>release</category>
-        </item>
-        <item>
-            <title><![CDATA[Dockview 1.4.1]]></title>
-            <link>https://dockview.dev/blog/dockview-1.4.1-release</link>
-            <guid>https://dockview.dev/blog/dockview-1.4.1-release</guid>
-            <pubDate>Wed, 11 May 2022 00:00:00 GMT</pubDate>
-            <description><![CDATA[🚀 Features]]></description>
-            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-features">🚀 Features<a href="https://dockview.dev/blog/dockview-1.4.1-release#-features" class="hash-link" aria-label="Direct link to 🚀 Features" title="Direct link to 🚀 Features">​</a></h2>
-<ul>
-<li>Fix Drag and Drop issues in Dockview on Firefox <a href="https://github.com/mathuo/dockview/pull/103" target="_blank" rel="noopener noreferrer">#103</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-miscs">🛠 Miscs<a href="https://dockview.dev/blog/dockview-1.4.1-release#-miscs" class="hash-link" aria-label="Direct link to 🛠 Miscs" title="Direct link to 🛠 Miscs">​</a></h2>
-<ul>
-<li>Documentation enhancements <a href="https://mathuo.github.io/dockview/docs/" target="_blank" rel="noopener noreferrer">https://mathuo.github.io/dockview/docs/</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="-breaking-changes">🔥 Breaking changes<a href="https://dockview.dev/blog/dockview-1.4.1-release#-breaking-changes" class="hash-link" aria-label="Direct link to 🔥 Breaking changes" title="Direct link to 🔥 Breaking changes">​</a></h2>
-<p>All breaking changes here are designed to simplify the library with only one way to do something.</p>
-<ul>
-<li>Remove <code>setVisible</code> and <code>setActive</code> from the Splitview API. You can still achieve the same behaviors through calling <code>setVisible</code> and <code>setActive</code> on the Splitview Panel API. <a href="https://github.com/mathuo/dockview/pull/105" target="_blank" rel="noopener noreferrer">#105</a></li>
-<li>Remove <code>setVisible</code>, <code>setActive</code> and <code>toggleVisiblity</code> from Gridview API. You can still achieve the same behaviors through calling <code>setVisible</code> and <code>setActive</code> on the Gridview Panel API <a href="https://github.com/mathuo/dockview/pull/105" target="_blank" rel="noopener noreferrer">#105</a></li>
-<li>Remove <code>onFocusEvent</code> from Panel API as this was not intended to be a public method. You can use <code>onDidFocusChange</code> instead <a href="https://github.com/mathuo/dockview/pull/105" target="_blank" rel="noopener noreferrer">#105</a></li>
-<li>Remove HOC <code>&lt;DockviewComponents.Panel\&gt;</code>, <code>&lt;DockviewComponents.Content&gt;</code>, <code>&lt;DockviewComponents.Tab&gt;</code> and <code>&lt;DockviewComponents.Actions&gt;</code> <a href="https://github.com/mathuo/dockview/pull/105" target="_blank" rel="noopener noreferrer">#105</a></li>
 </ul>]]></content:encoded>
             <category>release</category>
         </item>
