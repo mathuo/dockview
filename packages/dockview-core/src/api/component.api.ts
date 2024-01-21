@@ -36,12 +36,13 @@ import {
     IDockviewGroupPanel,
 } from '../dockview/dockviewGroupPanel';
 import { Emitter, Event } from '../events';
+import { GroupOptions } from '../dockview/dockviewGroupPanelModel';
 import { IDockviewPanel } from '../dockview/dockviewPanel';
 import { PaneviewDropEvent } from '../paneview/draggablePaneviewPanel';
 import {
     GroupDragEvent,
     TabDragEvent,
-} from '../dockview/components/titlebar/tabsContainer';
+  } from '../dockview/components/titlebar/tabsContainer';
 import { Box } from '../types';
 
 export interface CommonApi<T = any> {
@@ -736,8 +737,8 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     /**
      * Add a group and return the created object.
      */
-    addGroup(options?: AddGroupOptions): DockviewGroupPanel {
-        return this.component.addGroup(options);
+    addGroup(groupOptions?: GroupOptions, positionOptions?: AddGroupOptions): DockviewGroupPanel {
+        return this.component.addGroup(groupOptions, positionOptions);
     }
 
     /**

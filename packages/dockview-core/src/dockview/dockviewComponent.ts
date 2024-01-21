@@ -261,7 +261,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     getGroupPanel: (id: string) => IDockviewPanel | undefined;
     createWatermarkComponent(): IWatermarkRenderer;
     // lifecycle
-    addGroup(options?: AddGroupOptions): DockviewGroupPanel;
+    addGroup(groupOptions?: GroupOptions, positionOptions?: AddGroupOptions): DockviewGroupPanel;
     closeAllGroups(): void;
     // events
     moveToNext(options?: MovementOptions): void;
@@ -1280,23 +1280,23 @@ export class DockviewComponent
         }
     }
 
-    addGroup(options?: AddGroupOptions): DockviewGroupPanel {
-        const group = this.createGroup();
+    addGroup(groupOptions?: GroupOptions, positionOptions?: AddGroupOptions): DockviewGroupPanel {
+        const group = this.createGroup(groupOptions);
 
-        if (options) {
+        if (positionOptions) {
             let referenceGroup: DockviewGroupPanel | undefined;
 
-            if (isGroupOptionsWithPanel(options)) {
+            if (isGroupOptionsWithPanel(positionOptions)) {
                 const referencePanel =
-                    typeof options.referencePanel === 'string'
+                    typeof positionOptions.referencePanel === 'string'
                         ? this.panels.find(
-                              (panel) => panel.id === options.referencePanel
+                              (panel) => panel.id === positionOptions.referencePanel
                           )
-                        : options.referencePanel;
+                        : positionOptions.referencePanel;
 
                 if (!referencePanel) {
                     throw new Error(
-                        `reference panel ${options.referencePanel} does not exist`
+                        `reference panel ${positionOptions.referencePanel} does not exist`
                     );
                 }
 
@@ -1304,28 +1304,28 @@ export class DockviewComponent
 
                 if (!referenceGroup) {
                     throw new Error(
-                        `reference group for reference panel ${options.referencePanel} does not exist`
+                        `reference group for reference panel ${positionOptions.referencePanel} does not exist`
                     );
                 }
-            } else if (isGroupOptionsWithGroup(options)) {
+            } else if (isGroupOptionsWithGroup(positionOptions)) {
                 referenceGroup =
-                    typeof options.referenceGroup === 'string'
-                        ? this._groups.get(options.referenceGroup)?.value
-                        : options.referenceGroup;
+                    typeof positionOptions.referenceGroup === 'string'
+                        ? this._groups.get(positionOptions.referenceGroup)?.value
+                        : positionOptions.referenceGroup;
 
                 if (!referenceGroup) {
                     throw new Error(
-                        `reference group ${options.referenceGroup} does not exist`
+                        `reference group ${positionOptions.referenceGroup} does not exist`
                     );
                 }
             } else {
                 const group = this.orthogonalize(
-                    directionToPosition(<Direction>options.direction)
+                    directionToPosition(<Direction>positionOptions.direction)
                 );
                 return group;
             }
 
-            const target = toTarget(<Direction>options.direction || 'within');
+            const target = toTarget(<Direction>positionOptions.direction || 'within');
 
             const location = getGridLocation(referenceGroup.element);
             const relativeLocation = getRelativeLocation(

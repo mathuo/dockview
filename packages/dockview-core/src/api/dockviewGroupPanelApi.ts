@@ -49,9 +49,12 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
 
         const group =
             options.group ??
-            this.accessor.addGroup({
-                direction: positionToDirection(options.position ?? 'right'),
-            });
+            this.accessor.addGroup(
+                undefined,
+                {
+                  direction: positionToDirection(options.position ?? 'right'),
+                }
+            );
 
         this.accessor.moveGroupOrPanel(
             group,
