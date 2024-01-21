@@ -42,7 +42,7 @@ import { PaneviewDropEvent } from '../paneview/draggablePaneviewPanel';
 import {
     GroupDragEvent,
     TabDragEvent,
-  } from '../dockview/components/titlebar/tabsContainer';
+} from '../dockview/components/titlebar/tabsContainer';
 import { Box } from '../types';
 
 export interface CommonApi<T = any> {
