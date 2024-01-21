@@ -261,7 +261,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     getGroupPanel: (id: string) => IDockviewPanel | undefined;
     createWatermarkComponent(): IWatermarkRenderer;
     // lifecycle
-    addGroup(groupOptions?: GroupOptions, positionOptions?: AddGroupOptions): DockviewGroupPanel;
+    addGroup(options?: AddGroupOptions): DockviewGroupPanel;
     closeAllGroups(): void;
     // events
     moveToNext(options?: MovementOptions): void;
