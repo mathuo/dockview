@@ -1280,23 +1280,23 @@ export class DockviewComponent
         }
     }
 
-    addGroup(groupOptions?: GroupOptions, positionOptions?: AddGroupOptions): DockviewGroupPanel {
-        const group = this.createGroup(groupOptions);
+    addGroup(options?: AddGroupOptions): DockviewGroupPanel {
+        const group = this.createGroup(options);
 
-        if (positionOptions) {
+        if (options) {
             let referenceGroup: DockviewGroupPanel | undefined;
 
-            if (isGroupOptionsWithPanel(positionOptions)) {
+            if (isGroupOptionsWithPanel(options)) {
                 const referencePanel =
-                    typeof positionOptions.referencePanel === 'string'
+                    typeof options.referencePanel === 'string'
                         ? this.panels.find(
-                              (panel) => panel.id === positionOptions.referencePanel
+                              (panel) => panel.id === options.referencePanel
                           )
-                        : positionOptions.referencePanel;
+                        : options.referencePanel;
 
                 if (!referencePanel) {
                     throw new Error(
-                        `reference panel ${positionOptions.referencePanel} does not exist`
+                        `reference panel ${options.referencePanel} does not exist`
                     );
                 }
 
@@ -1304,28 +1304,28 @@ export class DockviewComponent
 
                 if (!referenceGroup) {
                     throw new Error(
-                        `reference group for reference panel ${positionOptions.referencePanel} does not exist`
+                        `reference group for reference panel ${options.referencePanel} does not exist`
                     );
                 }
-            } else if (isGroupOptionsWithGroup(positionOptions)) {
+            } else if (isGroupOptionsWithGroup(options)) {
                 referenceGroup =
-                    typeof positionOptions.referenceGroup === 'string'
-                        ? this._groups.get(positionOptions.referenceGroup)?.value
-                        : positionOptions.referenceGroup;
+                    typeof options.referenceGroup === 'string'
+                        ? this._groups.get(options.referenceGroup)?.value
+                        : options.referenceGroup;
 
                 if (!referenceGroup) {
                     throw new Error(
-                        `reference group ${positionOptions.referenceGroup} does not exist`
+                        `reference group ${options.referenceGroup} does not exist`
                     );
                 }
             } else {
                 const group = this.orthogonalize(
-                    directionToPosition(<Direction>positionOptions.direction)
+                    directionToPosition(<Direction>options.direction)
                 );
                 return group;
             }
 
-            const target = toTarget(<Direction>positionOptions.direction || 'within');
+            const target = toTarget(<Direction>options.direction || 'within');
 
             const location = getGridLocation(referenceGroup.element);
             const relativeLocation = getRelativeLocation(
