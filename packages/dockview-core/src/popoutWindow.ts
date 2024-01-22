@@ -5,6 +5,8 @@ import { Box } from './types';
 
 export type PopoutWindowOptions = {
     url: string;
+    onOpened?: (id: string, window: Window) => void;
+    onClosing?: (id: string, window: Window) => void;
 } & Box;
 
 export class PopoutWindow extends CompositeDisposable {
@@ -42,6 +44,10 @@ export class PopoutWindow extends CompositeDisposable {
 
     close(): void {
         if (this._window) {
+            if (this.options.onClosing) {
+                this.options.onClosing(this.id, this._window.value);
+            }
+
             this._window.disposable.dispose();
             this._window.value.close();
             this._window = null;
@@ -114,5 +120,9 @@ export class PopoutWindow extends CompositeDisposable {
                 cleanUp();
             });
         });
+
+        if (this.options.onOpened) {
+            this.options.onOpened(this.id, externalWindow);
+        }
     }
 }
