@@ -14,6 +14,7 @@ import { ISplitviewStyles, Orientation } from '../splitview/splitview';
 import { PanelTransfer } from '../dnd/dataTransfer';
 import { IDisposable } from '../lifecycle';
 import { DroptargetOverlayModel, Position } from '../dnd/droptarget';
+import { GroupOptions } from './dockviewGroupPanelModel';
 import { IDockviewPanel } from './dockviewPanel';
 import {
     ComponentConstructor,
@@ -186,10 +187,12 @@ type AddGroupOptionsWithGroup = {
     direction?: Omit<Direction, 'within'>;
 };
 
-export type AddGroupOptions =
+export type AddGroupOptions = (
     | AddGroupOptionsWithGroup
     | AddGroupOptionsWithPanel
-    | AbsolutePosition;
+    | AbsolutePosition
+) &
+    GroupOptions;
 
 export function isGroupOptionsWithPanel(
     data: AddGroupOptions

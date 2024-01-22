@@ -1281,7 +1281,7 @@ export class DockviewComponent
     }
 
     addGroup(options?: AddGroupOptions): DockviewGroupPanel {
-        const group = this.createGroup();
+        const group = this.createGroup(options);
 
         if (options) {
             let referenceGroup: DockviewGroupPanel | undefined;
