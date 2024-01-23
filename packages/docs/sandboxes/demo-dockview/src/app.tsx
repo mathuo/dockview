@@ -15,7 +15,22 @@ const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
         return (
             <div style={{ height: '100%', overflow: 'auto', color: 'white' }}>
-                {''}
+                {props.api.title}
+                <h3
+                    style={{
+                        position: 'absolute',
+                        pointerEvents: 'none',
+                        top: '50%',
+                        left: '50%',
+                        opacity: 0.5,
+                        transform: 'translate(-50%,-50%)',
+                        color: 'white',
+                        fontWeight: 'normal',
+                        fontSize: '36px',
+                    }}
+                >
+                    {props.api.title}
+                </h3>
             </div>
         );
     },

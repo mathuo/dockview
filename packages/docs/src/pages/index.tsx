@@ -8,6 +8,8 @@ import { Introduction } from '../components/HomepageFeatures/introduction';
 import styles from './index.module.css';
 import './index.scss';
 
+import Splashscreen from '@site/static/img/splashscreen.svg';
+
 function HomepageHeader2() {
     const { siteConfig } = useDocusaurusContext();
     return (
@@ -15,12 +17,7 @@ function HomepageHeader2() {
             <div className="container homepage">
                 <img src={useBaseUrl('/img/dockview_logo.svg')} />
                 <h1 className="hero__title">{siteConfig.title}</h1>
-                {/* <div className="badge-container">
-                            <img src="https://badge.fury.io/js/dockview.svg" />
-                            <img src="https://github.com/mathuo/dockview/workflows/CI/badge.svg" />
-                            <img src="https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=coverage" />
-                            <img src="https://sonarcloud.io/api/project_badges/measure?project=mathuo_dockview&metric=alert_status" />
-                        </div> */}
+
                 <p className="hero__subtitle">{siteConfig.tagline}</p>
                 <div className={styles.buttons}>
                     <Link
@@ -44,11 +41,37 @@ function HomepageHeader2() {
 export default function Home(): JSX.Element {
     const { siteConfig } = useDocusaurusContext();
     return (
-        <Layout
-            title={`${siteConfig.tagline}`}
-            description={`${siteConfig.description}`}
-        >
-            <HomepageHeader2 />
+        <Layout title={`${siteConfig.tagline}`}>
+            <div
+                style={{
+                    paddingTop: '100px',
+                    paddingBottom: '50px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                }}
+            >
+                <div
+                    style={{
+                        display: 'grid',
+                        gridGap: '40px',
+                        // gridAutoFlow: 'column',
+                    }}
+                >
+                    <div>
+                        <h1>Dockview</h1>
+                        <h3>
+                            Zero dependency layout managment and docking
+                            controls
+                        </h3>
+                    </div>
+                    <img
+                        // style={{ maxWidth: '800px' }}
+                        src={useBaseUrl('/img/Animation.gif')}
+                    />
+                </div>
+            </div>
+
+            {/* <HomepageHeader2 /> */}
 
             <main className="container">
                 <Introduction />
@@ -56,3 +79,12 @@ export default function Home(): JSX.Element {
         </Layout>
     );
 }
+
+const featureList = [
+    'Popout Windows',
+    'Floating Windows',
+    'Custom Header Actions',
+    'Serialization',
+    'Themable',
+    'Drag And Drop',
+];

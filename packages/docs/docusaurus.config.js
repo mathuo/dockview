@@ -157,6 +157,12 @@ const config = {
                         position: 'left',
                     },
                     {
+                        type: 'docSidebar',
+                        position: 'left',
+                        sidebarId: 'api',
+                        label: 'API',
+                    },
+                    {
                         type: 'docsVersionDropdown',
                         position: 'right',
                     },

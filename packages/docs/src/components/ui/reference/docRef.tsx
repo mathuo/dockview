@@ -85,6 +85,9 @@ export const DocRef = (props: DocRefProps) => {
 
     return (
         <div>
+            <div>
+                <h3>{props.declaration}</h3>
+            </div>
             <table className="doc-ref-table">
                 <tbody>
                     {docs.map((doc) => {
@@ -92,13 +95,13 @@ export const DocRef = (props: DocRefProps) => {
                             <tr>
                                 <th
                                     style={{
-                                        width: '30%',
+                                        width: '40%',
                                         display: 'flex',
                                     }}
                                 >
                                     <div
                                         style={{
-                                            // width: '30%',
+                                            // maxWidth: '30%',
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'start',
@@ -137,9 +140,7 @@ export const DocRef = (props: DocRefProps) => {
                                         </div>
                                     </div>
                                 </th>
-                                <th
-                                // style={{ width: '70%' }}
-                                >
+                                <th style={{ width: '60%' }}>
                                     {/* <div>{'-'}</div> */}
                                     <div>
                                         <div>
