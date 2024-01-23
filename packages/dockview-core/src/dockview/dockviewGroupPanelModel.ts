@@ -138,7 +138,6 @@ export class DockviewGroupPanelModel
 {
     private readonly tabsContainer: ITabsContainer;
     private readonly contentContainer: IContentContainer;
-    // private readonly dropTarget: Droptarget;
     private _activePanel: IDockviewPanel | undefined;
     private watermark?: IWatermarkRenderer;
     private _isGroupActive = false;
@@ -527,6 +526,7 @@ export class DockviewGroupPanelModel
             if (!skipSetGroupActive) {
                 this.accessor.doSetGroupActive(this.groupPanel);
             }
+            this.contentContainer.renderPanel(panel, { asActive: true });
             return;
         }
 
