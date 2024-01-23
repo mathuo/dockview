@@ -6,6 +6,7 @@
     "build": "docusaurus build",
     "clear": "docusaurus clear",
     "start": "docusaurus start",
+    "version": "docusaurus docs:version",
     "typecheck": "tsc"
   },
   "browserslist": {
