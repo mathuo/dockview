@@ -1,6 +1,6 @@
 {
   "name": "dockview-docs",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "private": true,
   "scripts": {
     "build": "docusaurus build",
@@ -31,7 +31,7 @@
     "@radix-ui/react-popover": "^1.0.7",
     "axios": "^1.6.3",
     "clsx": "^2.1.0",
-    "dockview": "^1.9.1",
+    "dockview": "^1.9.2",
     "prism-react-renderer": "^2.3.1",
     "react-dnd": "^16.0.1",
     "recoil": "^0.7.7",
