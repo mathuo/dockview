@@ -1,0 +1,22 @@
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import DockviewNative from '@site/sandboxes/fullwidthtab-dockview/src/app';
+import { attach as attachNativeDockview } from '@site/sandboxes/javascript/fullwidthtab-dockview/src/app';
+import Link from '@docusaurus/Link';
+
+# Full width tabs
+
+`DockviewReactComponent` accepts the prop `singleTabMode`. If set `singleTabMode=fullwidth` then when there is only one tab in a group this tab will expand
+to the entire width of the group. For example:
+
+> This can be conmbined with <Link to="./dockview/#locked-group">Locked Groups</Link> to create an application that feels more like a Window Manager
+> rather than a collection of groups and tabs.
+
+```tsx
+<DockviewReactComponent singleTabMode="fullwidth" {...otherProps} />
+```
+
+<MultiFrameworkContainer
+    sandboxId="fullwidthtab-dockview"
+    react={DockviewNative}
+    typescript={attachNativeDockview}
+/>

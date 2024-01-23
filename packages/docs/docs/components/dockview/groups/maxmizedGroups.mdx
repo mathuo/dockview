@@ -1,0 +1,42 @@
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import DockviewMaximizeGroup from '@site/sandboxes/maximizegroup-dockview/src/app';
+
+
+## Maximized Groups
+
+To maximize a group from the component `api`:
+
+```tsx
+// maximize a specified group
+api.maxmimizeGroup(group);
+
+// check whether a specific group is maximized
+const result: boolean = api.isMaximizedGroup(group);
+
+// if there is any maximized group exit the maximized state
+exitMaximizedGroup();
+
+// is there a maximized group
+const result: boolean = hasMaximizedGroup();
+```
+
+The following methods are available on both the panel and group `api` objects:
+
+> `api.<method>` is equivalent to `api.group.api.<method>` for all of these methods. The methods exist on the panel `api` object for convenience.
+
+```ts
+// maximize the group
+api.maximize();
+
+// is this group maximized (if another group is maximized this method will still return false)
+const result: boolean = api.isMaxmized();
+
+// exit only if this group is maximzied (if another group is maxmized this has no affect)
+api.exitMaximized();
+```
+
+<MultiFrameworkContainer
+    height={600}
+    sandboxId="maximizegroup-dockview"
+    react={DockviewMaximizeGroup}
+/>

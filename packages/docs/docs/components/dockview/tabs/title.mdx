@@ -1,0 +1,28 @@
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import DockviewSetTitle from '@site/sandboxes/updatetitle-dockview/src/app';
+
+### Default Tab Title
+
+If you are using the default tab renderer you can set the title of a tab when creating it
+
+```tsx
+api.addPanel({
+    id: 'panel_1',
+    component: 'my_component',
+    title: 'my_custom_title', // <-- special param for title
+});
+```
+
+You can update the title through the panel api which can be accessed via `props.api` if you are inside the panel
+component or via `api.getPanel('panel1').api` if you are accessing from outside of the panel component.
+
+```tsx
+api.setTitle('my_new_custom_title');
+```
+
+> Note this only works when using the default tab implementation.
+
+<MultiFrameworkContainer
+    sandboxId="updatetitle-dockview"
+    react={DockviewSetTitle}
+/>

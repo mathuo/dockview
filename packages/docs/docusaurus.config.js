@@ -150,26 +150,29 @@ const config = {
                         position: 'left',
                         label: 'Docs',
                     },
-                    { to: '/blog', label: 'Blog', position: 'left' },
-                    {
-                        to: 'https://dockview.dev/typedocs',
-                        label: 'TSDoc',
-                        position: 'left',
-                    },
                     {
                         type: 'docSidebar',
                         position: 'left',
                         sidebarId: 'api',
                         label: 'API',
                     },
+                    { to: '/blog', label: 'Blog', position: 'left' },
+                    { to: '/demo', label: 'Demo', position: 'left' },
+                    // {
+                    //     to: 'https://dockview.dev/typedocs',
+                    //     label: 'TSDoc',
+                    //     position: 'left',
+                    // },
+
                     {
                         type: 'docsVersionDropdown',
                         position: 'right',
                     },
                     {
                         href: 'https://github.com/mathuo/dockview',
-                        label: 'GitHub',
                         position: 'right',
+                        className: 'header-github-link',
+                        'aria-label': 'GitHub repository',
                     },
                 ],
             },

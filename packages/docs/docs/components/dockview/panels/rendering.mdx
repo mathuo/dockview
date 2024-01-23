@@ -1,0 +1,81 @@
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import DockviewRenderMode from '@site/sandboxes/rendermode-dockview/src/app';
+import RenderingDockview from '@site/sandboxes/rendering-dockview/src/app';
+
+# Panel Rendering
+
+## Render Mode
+
+Dockview has two rendering modes `onlyWhenVisible` (default) and `always`. A rendering mode can be defined through the `renderer` prop to `DockviewReact` or at an individual panel level when added where
+the panel declaration takes precedence if both are defined. Rendering modes defined at the panel level are persisted, those defined at the `DockviewReact` level are not persisted.
+
+- `onlyWhenVisible` mode is the default mode. In this mode when a panel is no longer visible through either it's visiblity being hidden or it not being the active panel within a group the panels HTMLElement is removed
+from the DOM and any DOM state such as scrollbar positions will be lost. If you are using any ResizeObservers to measure size this will result both zero height and width as the HTMLElement no longer belongs to the DOM.
+This design allows for maximum performance at some cost.
+- `always` mode. In this mode when panels become hidden the HTMLElement is not destroyed so all DOM state such as scrollbar positions will be maintained. This is implemented by rendering each panel as an absolutely positioned
+HTMLElement and hidden the HTMLElement with `display: none` when it should be hidden.
+
+<MultiFrameworkContainer
+    height={500}
+    sandboxId="rendermode-dockview"
+    react={DockviewRenderMode}
+/>
+
+By default `DockviewReact` only adds to the DOM those panels that are visible,
+if a panel is not the active tab and not shown the contents of the hidden panel will be removed from the DOM.
+
+When a panel is in `onlyWhenVisible` render mode this only affects the contents within the DOM. The lifecycle of that panel instance is still maintained.
+The React Components associated with each panel are only created once and will always exist for as long as the panel exists, hidden or not.
+
+> e.g. This means that any hooks in those components will run whether the panel is visible or not which may lead to excessive background work depending
+> on the panels implementation.
+
+You can listen to the visiblity state of the panel and write additional logic to optimize your application if required, although this is an advanced case.
+
+If you wanted to unmount the React Components when the panel is not visible you could create a Higher-Order-Component that listens to the panels
+visiblity state and only renders the panel when visible.
+
+```tsx title="Only rendering the React Component when the panel is visible, otherwise rendering a null React Component"
+import { IDockviewPanelProps } from 'dockview';
+import * as React from 'react';
+
+function RenderWhenVisible(
+    component: React.FunctionComponent<IDockviewPanelProps>
+) {
+    const HigherOrderComponent = (props: IDockviewPanelProps) => {
+        const [visible, setVisible] = React.useState<boolean>(
+            props.api.isVisible
+        );
+
+        React.useEffect(() => {
+            const disposable = props.api.onDidVisibilityChange((event) =>
+                setVisible(event.isVisible)
+            );
+
+            return () => {
+                disposable.dispose();
+            };
+        }, [props.api]);
+
+        if (!visible) {
+            return null;
+        }
+
+        return React.createElement(component, props);
+    };
+    return HigherOrderComponent;
+}
+```
+
+```tsx
+const components = { default: RenderWhenVisible(MyComponent) };
+```
+
+Toggling the checkbox you can see that when you only render those panels which are visible the underling React component is destroyed when it becomes hidden and re-created when it becomes visible.
+
+
+<MultiFrameworkContainer
+    sandboxId="rendering-dockview"
+    react={RenderingDockview}
+/>

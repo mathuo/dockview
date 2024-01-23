@@ -1,0 +1,215 @@
+---
+description: Dockview Documentation
+---
+
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+
+import Link from '@docusaurus/Link';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+
+import SimpleDockview from '@site/sandboxes/simple-dockview/src/app';
+
+
+
+
+import NestedDockview from '@site/sandboxes/nested-dockview/src/app';
+import EventsDockview from '@site/sandboxes/events-dockview/src/app';
+
+
+import DockviewNative from '@site/sandboxes/fullwidthtab-dockview/src/app';
+import DockviewNative2 from '@site/sandboxes/nativeapp-dockview/src/app';
+
+
+
+
+
+import DockviewWithIFrames from '@site/sandboxes/iframe-dockview/src/app';
+
+import DockviewKeyboard from '@site/sandboxes/keyboard-dockview/src/app';
+
+
+
+import DockviewScrollbars from '@site/sandboxes/scrollbars-dockview/src/app';
+import DockviewExampleApp from '@site/sandboxes/example-app-dockview/src/app';
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+import { attach as attachDockviewVanilla } from '@site/sandboxes/javascript/vanilla-dockview/src/app';
+import { attach as attachSimpleDockview } from '@site/sandboxes/javascript/simple-dockview/src/app';
+import { attach as attachTabHeightDockview } from '@site/sandboxes/javascript/tabheight-dockview/src/app';
+import { attach as attachNativeDockview } from '@site/sandboxes/javascript/fullwidthtab-dockview/src/app';
+
+# Dockview
+
+<MultiFrameworkContainer
+    sandboxId="example-app-dockview"
+    react={DockviewExampleApp}
+/>
+
+
+## Introduction
+
+Dockview is an abstraction built on top of [Gridviews](./gridview) where each view is a container of many tabbed panels.
+
+<MultiFrameworkContainer
+    sandboxId="simple-dockview"
+    react={SimpleDockview}
+    typescript={attachSimpleDockview}
+/>
+
+<br />
+
+> You can access the panels associated group through the `panel.group` variable.
+> The group will always be defined and will change if a panel is moved into another group.
+
+## DockviewReact Component
+
+You can create a Dockview through the use of the `DockviewReact` component.
+
+<p style={{ fontSize: '1.3em' }}>
+    <span>{'All of these are React props available through the '}</span>
+    <code>DockviewReact</code>
+    <span>{' component.'}</span>
+</p>
+<DocRef declaration="IDockviewReactProps" />
+
+## Dockview API
+
+The Dockview API is exposed both at the `onReady` event and on each panel through `props.containerApi`.
+Through this API you can control general features of the component and access all added panels.
+
+```tsx title="Dockview API via Panel component"
+const MyComponent = (props: IDockviewPanelProps<{ title: string }>) => {
+    // props.containerApi...
+
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+```tsx title="Dockview API via the onReady callback"
+const onReady = (event: DockviewReadyEvent) => {
+    // event.api...
+};
+```
+
+<p style={{ fontSize: '1.3em' }}>
+    <span>{'All of these methods are available through the '}</span>
+    <code>api</code>
+    <span>{' property of '}</span>
+    <code>DockviewComponent</code>
+    <span>{' and the '}</span>
+    <code>containerApi</code>
+    <span>{' property of '}</span>
+    <code>IDockviewPanel</code>
+    <span>.</span>
+</p>
+
+<DocRef declaration="DockviewApi" />
+
+## Dockview Panel API
+
+```tsx
+const MyComponent = (props: IDockviewPanelProps<{ title: string }>) => {
+    // props.api...
+
+    return <div>{`My first panel has the title: ${props.params.title}`}</div>;
+};
+```
+
+<p style={{ fontSize: '1.3em' }}>
+    <span>{'All of these are methods are available through the '}</span>
+    <code>api</code>
+    <span>{' property of '}</span>
+    <code>IDockviewPanel</code>
+    <span>.</span>
+</p>
+
+<DocRef declaration="DockviewPanelApi" />
+
+## Theme
+
+As well as importing the `dockview` stylesheet you must provide a class-based theme somewhere in your application. For example.
+
+```tsx
+// Providing a theme directly through the DockviewReact component props
+<DockviewReact className="dockview-theme-dark" />
+
+// Providing a theme somewhere in the DOM tree
+<div className="dockview-theme-dark">
+  <div>
+    {/**...  */}
+    <DockviewReact  />
+  </div>
+</div>
+```
+
+You can find more details on theming <Link to="../theme">here</Link>.
+
+
+
+
+
+
+
+
+
+## iFrames
+
+iFrames required special attention because of a particular behaviour in how iFrames render:
+
+> Re-parenting an iFrame will reload the contents of the iFrame or the rephrase this, moving an iFrame within the DOM will cause a reload of its contents.
+
+You can find many examples of discussions on this. Two reputable forums for example are linked [here](https://bugzilla.mozilla.org/show_bug.cgi?id=254144) and [here](https://github.com/whatwg/html/issues/5484).
+
+To ensure iFrames work as expected you should render them in panels with `renderer: 'always'` to ensure they are never removed from the DOM, alternatively set the defaultRenderer to `always`.
+
+> See the **Panel Rendering** section for more information of render modes.
+
+```tsx title="Example of a panel using an alternative renderer"
+api.addPanel({
+  id: 'my_panel_id',
+  component: 'my_component',
+  renderer: 'always',
+});
+        ```
+
+<MultiFrameworkContainer
+    sandboxId="iframe-dockview"
+    height={600}
+    react={DockviewWithIFrames}
+/>
+
+## Events
+
+A simple example showing events fired by `dockviewz that can be interacted with.
+
+<MultiFrameworkContainer
+    height={600}
+    sandboxId="events-dockview"
+    react={EventsDockview}
+/>
+
+## Keyboard Navigation
+
+Keyboard shortcuts
+
+<MultiFrameworkContainer
+    height={600}
+    sandboxId="keyboard-dockview"
+    react={DockviewKeyboard}
+/>
+
+### Nested Dockviews
+
+You can safely create multiple dockview instances within one page and nest dockviews within other dockviews.
+If you wish to interact with the drop event from one dockview instance in another dockview instance you can implement the `showDndOverlay` and `onDidDrop` props on `DockviewReact`.
+
+<MultiFrameworkContainer sandboxId="nested-dockview" react={NestedDockview} />
+
+### Window-like mananger with tabs
+
+
+<MultiFrameworkContainer sandboxId="nativeapp-dockview" react={DockviewNative2} />
+
+

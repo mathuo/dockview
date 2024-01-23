@@ -1,0 +1,84 @@
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import CustomHeadersDockview from '@site/sandboxes/customheader-dockview/src/app';
+
+# Custom Tab Renderer
+
+You can provide custom renderers for your tab headers for maximum customization.
+A default implementation of `DockviewDefaultTab` is provided should you only wish to attach minor
+changes and events that do not alter the default behaviour, for example to add a custom context menu event
+handler or to hide the close button.
+
+The `DockviewDefaultTab` component accepts a `hideClose` prop if you wish only to hide the close button.
+
+```tsx title="Attaching a custom context menu event handlers to a custom header"
+import { IDockviewPanelHeaderProps, DockviewDefaultTab } from 'dockview';
+
+const MyCustomheader = (props: IDockviewPanelHeaderProps) => {
+    const onContextMenu = (event: React.MouseEvent) => {
+        event.preventDefault();
+        alert('context menu');
+    };
+    return <DockviewDefaultTab onContextMenu={onContextMenu} hideClose={true} {...props} />;
+};
+```
+
+You are also free to define a custom renderer entirely from scratch and not make use of the `DockviewDefaultTab` component.
+To use a custom renderer you can must register a collection of tab components.
+
+```tsx
+const tabComponents = {
+    myCustomHeader: MyCustomHeader,
+};
+
+return <DockviewReact tabComponents={tabComponents}  ... />;
+```
+
+```tsx
+api.addPanel({
+    id: 'panel_1',
+    component: 'default',
+    tabComponent: 'myCustomHeader', // <-- your registered renderers
+    title: 'Panel 1',
+});
+```
+
+You can also override the default tab renderer which will be used when no `tabComponent` is provided to the `addPanel` function.
+
+```tsx
+<DockviewReact defaultTabComponent={MyCustomHeader}  ... />;
+```
+
+As a simple example the below attaches a custom event handler for the context menu on all tabs as a default tab renderer
+
+The below example uses a custom tab renderer to reigster a popover when the user right clicked on a tab.
+This still makes use of the `DockviewDefaultTab` since it's only a minor change.
+
+<MultiFrameworkContainer
+    sandboxId="customheader-dockview"
+    react={CustomHeadersDockview}
+/>
+
+## Custom Tab Title
+
+If you are using a custom tab implementation you should pass variables through as a parameter and render them
+through your tab components implementation.
+
+```tsx title="Add a panel with custom parameters"
+api.addPanel({
+    id: 'panel_2',
+    component: 'my_component',
+    tabComponent: 'my_tab',
+    params: {
+        myTitle: 'Window 2', // <-- passing a variable to use as a title
+    },
+});
+```
+
+```tsx title="Accessing custom parameters from a custom tab renderer"
+const tabComponents = {
+    default: (props: IDockviewPanelHeaderProps<{ myTitle: string }>) => {
+        const title = props.params.myTitle; // <-- accessing my custom varaible
+        return <div>{/** tab implementation as chosen by developer */}</div>;
+    },
+};
+```
