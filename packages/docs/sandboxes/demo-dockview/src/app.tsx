@@ -14,23 +14,27 @@ import './app.scss';
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
         return (
-            <div style={{ height: '100%', overflow: 'auto', color: 'white' }}>
-                {props.api.title}
-                <h3
+            <div
+                style={{
+                    height: '100%',
+                    overflow: 'auto',
+                    color: 'white',
+                    position: 'relative',
+                }}
+            >
+                <span
                     style={{
                         position: 'absolute',
-                        pointerEvents: 'none',
                         top: '50%',
                         left: '50%',
-                        opacity: 0.5,
                         transform: 'translate(-50%,-50%)',
-                        color: 'white',
-                        fontWeight: 'normal',
-                        fontSize: '36px',
+                        pointerEvents: 'none',
+                        fontSize: '42px',
+                        opacity: 0.5,
                     }}
                 >
                     {props.api.title}
-                </h3>
+                </span>
             </div>
         );
     },

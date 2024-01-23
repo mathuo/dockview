@@ -127,7 +127,7 @@ const useLocalStorage = <T,>(
     ];
 };
 
-export const DockviewPersistance = (props: { theme?: string }) => {
+export const DockviewPersistence = (props: { theme?: string }) => {
     const [api, setApi] = React.useState<DockviewApi>();
     const [layout, setLayout] =
         useLocalStorage<SerializedDockview>('floating.layout');
@@ -289,7 +289,7 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
     );
 };
 
-export default DockviewPersistance;
+export default DockviewPersistence;
 
 const Watermark = () => {
     return <div style={{ color: 'white', padding: '8px' }}>watermark</div>;
