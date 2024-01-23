@@ -47,11 +47,11 @@ function loadDefaultLayout(api: DockviewApi) {
     });
 }
 
-export const DockviewPersistance = (props: { theme?: string }) => {
+export const DockviewPersistence = (props: { theme?: string }) => {
     const [api, setApi] = React.useState<DockviewApi>();
 
     const clearLayout = () => {
-        localStorage.removeItem('dockview_persistance_layout');
+        localStorage.removeItem('dockview_persistence_layout');
         if (api) {
             api.clear();
             loadDefaultLayout(api);
@@ -60,7 +60,7 @@ export const DockviewPersistance = (props: { theme?: string }) => {
 
     const onReady = (event: DockviewReadyEvent) => {
         const layoutString = localStorage.getItem(
-            'dockview_persistance_layout'
+            'dockview_persistence_layout'
         );
 
         let success = false;
@@ -91,7 +91,7 @@ export const DockviewPersistance = (props: { theme?: string }) => {
             const layout = api.toJSON();
 
             localStorage.setItem(
-                'dockview_persistance_layout',
+                'dockview_persistence_layout',
                 JSON.stringify(layout)
             );
         });
@@ -125,7 +125,7 @@ export const DockviewPersistance = (props: { theme?: string }) => {
     );
 };
 
-export default DockviewPersistance;
+export default DockviewPersistence;
 
 const Watermark = () => {
     return <div style={{ color: 'white', padding: '8px' }}>watermark</div>;
