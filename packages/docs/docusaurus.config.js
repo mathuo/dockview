@@ -3,7 +3,26 @@
 
 const { themes } = require('prism-react-renderer');
 const lightCodeTheme = themes.nightOwlLight;
-const darkCodeTheme = themes.vsDark;
+const darkCodeTheme = themes.oneDark;
+
+// dracula
+// duotoneDark
+// duotoneLight
+// github
+// jettwaveDark
+// jettwaveLight
+// nightOwl
+// nightOwlLight
+// oceanicNext
+// okaidia
+// oneDark
+// oneLight
+// palenight
+// shadesOfPurple
+// synthwave84
+// ultramin
+// vsDark
+// vsLight
 
 const path = require('path');
 
@@ -101,7 +120,7 @@ const config = {
                         'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
                 },
                 theme: {
-                    customCss: require.resolve('./src/css/custom.css'),
+                    customCss: require.resolve('./src/css/custom.scss'),
                 },
                 gtag: process.env.CI
                     ? {
