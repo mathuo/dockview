@@ -1,0 +1,9 @@
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import NestedDockview from '@site/sandboxes/nested-dockview/src/app';
+
+# Nested Dockviews
+
+You can safely create multiple dockview instances within one page and nest dockviews within other dockviews.
+If you wish to interact with the drop event from one dockview instance in another dockview instance you can implement the `showDndOverlay` and `onDidDrop` props on `DockviewReact`.
+
+<MultiFrameworkContainer sandboxId="nested-dockview" react={NestedDockview} />
