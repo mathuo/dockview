@@ -165,7 +165,7 @@ const config = {
                 items: [
                     {
                         type: 'doc',
-                        docId: 'index',
+                        docId: 'getStarted/quickStart',
                         position: 'left',
                         label: 'Docs',
                     },
