@@ -1,0 +1,19 @@
+---
+title: Remove Panel
+sidebar_position: 3
+---
+
+# Remove panel
+
+You can programatically remove a panel using the panel `api`.
+
+```ts
+panel.api.close();
+```
+
+Given a reference to the panel you can also use the component `api` to remove it.
+
+```ts
+const panel = api.getPanel('myPanel');
+api.removePanel(panel);
+```

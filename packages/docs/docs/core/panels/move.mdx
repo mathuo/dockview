@@ -1,0 +1,19 @@
+---
+title: Move Panel
+sidebar_position: 2
+---
+
+# Move panel
+
+You can programatically move a panel using the panel `api`.
+
+```ts
+panel.api.moveTo({ group, position, index });
+```
+
+An equivalent method for moving groups is avaliable on the group `api`.
+
+```ts
+const group = panel.api.group;
+group.api.moveTo({ group, position });
+```

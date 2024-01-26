@@ -1,10 +1,9 @@
 ---
-title: Adding Panels
+title: Add Panel
+sidebar_position: 0
 ---
 
-# Panels
-
-## Add Panel
+# Add Panel
 
 Using the dockview API you can access the `addPanel` method which returns an instance of the created panel.
 The minimum method signature is:
@@ -93,68 +92,4 @@ const panel2 = api.addPanel({
     component: 'default',
     floating: { x: 10, y: 10, width: 300, height: 300 },
 });
-```
-
-## Update Panel
-
-You can programatically update the `params` passed through to the panel through the panal api using `api.updateParameters`.
-
-```ts
-const panel = api.addPanel({
-    id: 'panel_1',
-    component: 'default',
-    params: {
-        keyA: 'valueA',
-    },
-});
-
-// ...
-
-panel.api.updateParameters({
-    keyB: 'valueB',
-});
-
-// ...
-
-panel.api.updateParameters({
-    keyA: 'anotherValueA',
-});
-```
-
-To delete a parameter you should pass a value of `undefined` for the key.
-
-```ts
-panel.api.updateParameters({
-    keyA: undefined, // this will delete 'keyA'.
-});
-```
-
-## Move panel
-
-You can programatically move a panel using the panel `api`.
-
-```ts
-panel.api.moveTo({ group, position, index });
-```
-
-An equivalent method for moving groups is avaliable on the group `api`.
-
-```ts
-const group = panel.api.group;
-group.api.moveTo({ group, position });
-```
-
-## Remove panel
-
-You can programatically remove a panel using the panel `api`.
-
-```ts
-panel.api.close();
-```
-
-Given a reference to the panel you can also use the component `api` to remove it.
-
-```ts
-const panel = api.getPanel('myPanel');
-api.removePanel(panel);
 ```

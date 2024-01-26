@@ -1,6 +1,6 @@
 {
-  "position": 4,
-  "label": "Panels",
+  "position": 0,
+  "label": "API",
   "collapsible": true,
   "collapsed": true
 }

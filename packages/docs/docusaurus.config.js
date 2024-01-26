@@ -156,6 +156,11 @@ const config = {
                     ].join(' ,'),
                 },
             ],
+            docs: {
+                sidebar: {
+                    autoCollapseCategories: true,
+                },
+            },
             navbar: {
                 title: 'Dockview',
                 logo: {
