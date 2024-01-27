@@ -323,7 +323,7 @@ export class DockviewGroupPanelModel
                 this.handleDropEvent(event.event, 'center', event.index);
             }),
             this.contentContainer.onDidFocus(() => {
-                this.accessor.doSetGroupActive(this.groupPanel, true);
+                this.accessor.doSetGroupActive(this.groupPanel);
             }),
             this.contentContainer.onDidBlur(() => {
                 // noop
@@ -338,6 +338,10 @@ export class DockviewGroupPanelModel
             this._onDidRemovePanel,
             this._onDidActivePanelChange
         );
+    }
+
+    focusContent(): void {
+        this.contentContainer.element.focus();
     }
 
     initialize(): void {
@@ -504,7 +508,6 @@ export class DockviewGroupPanelModel
         panel: IDockviewPanel,
         options: {
             index?: number;
-            skipFocus?: boolean;
             skipSetPanelActive?: boolean;
             skipSetGroupActive?: boolean;
         } = {}
@@ -537,10 +540,7 @@ export class DockviewGroupPanelModel
         }
 
         if (!skipSetGroupActive) {
-            this.accessor.doSetGroupActive(
-                this.groupPanel,
-                !!options.skipFocus
-            );
+            this.accessor.doSetGroupActive(this.groupPanel);
         }
 
         this.updateContainer();

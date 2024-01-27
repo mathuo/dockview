@@ -246,22 +246,16 @@ export abstract class BaseGrid<T extends IGridPanelView>
         return this._groups.get(id)?.value;
     }
 
-    public doSetGroupActive(group: T | undefined, skipFocus?: boolean): void {
+    public doSetGroupActive(group: T | undefined): void {
         if (this._activeGroup === group) {
             return;
         }
         if (this._activeGroup) {
             this._activeGroup.setActive(false);
-            if (!skipFocus) {
-                this._activeGroup.focus?.();
-            }
         }
 
         if (group) {
             group.setActive(true);
-            if (!skipFocus) {
-                group.focus?.();
-            }
         }
 
         this._activeGroup = group;

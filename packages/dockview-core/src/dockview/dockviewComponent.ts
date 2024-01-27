@@ -1609,10 +1609,9 @@ export class DockviewComponent
 
     doSetGroupAndPanelActive(
         group: DockviewGroupPanel | undefined,
-        skipFocus?: boolean
     ): void {
         const activePanel = this.activePanel;
-        super.doSetGroupActive(group, skipFocus);
+        super.doSetGroupActive(group);
 
         if (this._activeGroup?.activePanel !== activePanel) {
             this._onDidActivePanelChange.fire(this._activeGroup?.activePanel);

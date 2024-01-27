@@ -386,9 +386,7 @@ export class TabsContainer
                     return;
                 }
 
-                this.group.model.openPanel(panel, {
-                    skipFocus: alreadyFocused,
-                });
+                this.group.model.openPanel(panel);
             }),
             tab.onDrop((event) => {
                 this._onDrop.fire({

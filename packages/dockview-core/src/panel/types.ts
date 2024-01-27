@@ -22,7 +22,7 @@ export interface IPanel extends IDisposable {
     layout(width: number, height: number): void;
     update(event: PanelUpdateEvent<Parameters>): void;
     toJSON(): object;
-    focus?(): void;
+    focus(): void;
 }
 
 export interface IFrameworkPart extends IDisposable {

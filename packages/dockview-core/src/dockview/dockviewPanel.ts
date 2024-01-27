@@ -10,6 +10,7 @@ import { IPanel, PanelUpdateEvent, Parameters } from '../panel/types';
 import { IDockviewPanelModel } from './dockviewPanelModel';
 import { DockviewComponent } from './dockviewComponent';
 import { DockviewPanelRenderer } from '../overlayRenderContainer';
+import { WillFocusEvent } from '../api/panelApi';
 
 export interface IDockviewPanel extends IDisposable, IPanel {
     readonly view: IDockviewPanelModel;
@@ -93,7 +94,24 @@ export class DockviewPanel
     }
 
     focus(): void {
-        this.api._onFocusEvent.fire();
+        /**
+         * This is a progmatic request of focus -
+         * We need to tell the active panel that it can choose it's focus
+         * If the panel doesn't choose the panels container for it
+         */
+
+        if (!this.api.isActive) {
+            this.api.setActive();
+        }
+
+        const event = new WillFocusEvent();
+        this.api._onWillFocus.fire(event);
+
+        if (event.defaultPrevented) {
+            return;
+        }
+
+        this.group.model.focusContent();
     }
 
     public toJSON(): GroupviewPanelState {

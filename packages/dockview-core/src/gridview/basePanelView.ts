@@ -7,7 +7,7 @@ import {
     IPanel,
     Parameters,
 } from '../panel/types';
-import { PanelApi, PanelApiImpl } from '../api/panelApi';
+import { PanelApi, PanelApiImpl, WillFocusEvent } from '../api/panelApi';
 
 export interface BasePanelViewState {
     readonly id: string;
@@ -84,7 +84,14 @@ export abstract class BasePanelView<T extends PanelApiImpl>
     }
 
     focus(): void {
-        this.api._onFocusEvent.fire();
+        const event = new WillFocusEvent();
+        this.api._onWillFocus.fire(event);
+
+        if (event.defaultPrevented) {
+            return;
+        }
+
+        this._element.focus();
     }
 
     layout(width: number, height: number): void {

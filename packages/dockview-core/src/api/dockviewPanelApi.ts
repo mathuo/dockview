@@ -106,6 +106,8 @@ export class DockviewPanelApiImpl
 
         this._group = group;
 
+
+
         this.addDisposables(
             this.disposable,
             this._onDidRendererChange,
