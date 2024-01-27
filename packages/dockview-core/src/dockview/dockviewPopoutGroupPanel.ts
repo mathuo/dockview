@@ -25,13 +25,16 @@ export class DockviewPopoutGroupPanel extends CompositeDisposable {
             height: this.options.box.height,
         });
 
-        group.model.location = 'popout';
+        group.model.location = {
+            type: 'popout',
+            getWindow: () => this.window.window!,
+        };
 
         this.addDisposables(
             this.window,
             {
                 dispose: () => {
-                    group.model.location = 'grid';
+                    group.model.location = { type: 'grid' };
                 },
             },
             this.window.onDidClose(() => {

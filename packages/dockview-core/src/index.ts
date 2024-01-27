@@ -11,6 +11,8 @@ export {
     CompositeDisposable as DockviewCompositeDisposable,
 } from './lifecycle';
 
+export { PopoutWindow } from './popoutWindow';
+
 export * from './panel/types';
 export * from './panel/componentFactory';
 

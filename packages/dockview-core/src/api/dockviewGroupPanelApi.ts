@@ -8,6 +8,13 @@ import { GridviewPanelApi, GridviewPanelApiImpl } from './gridviewPanelApi';
 export interface DockviewGroupPanelApi extends GridviewPanelApi {
     readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent>;
     readonly location: DockviewGroupLocation;
+    /**
+     *
+     * If you require the documents Window object you can call `document.defaultView`.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/defaultView
+     */
+    getDocument(): Document;
     moveTo(options: { group?: DockviewGroupPanel; position?: Position }): void;
     maximize(): void;
     isMaximized(): boolean;
@@ -42,6 +49,12 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
         this.addDisposables(this._onDidLocationChange);
     }
 
+    getDocument(): Document {
+        return this.location.type === 'popout'
+            ? this.location.getWindow().document
+            : window.document;
+    }
+
     moveTo(options: { group?: DockviewGroupPanel; position?: Position }): void {
         if (!this._group) {
             throw new Error(NOT_INITIALIZED_MESSAGE);
@@ -66,7 +79,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             throw new Error(NOT_INITIALIZED_MESSAGE);
         }
 
-        if (this.location !== 'grid') {
+        if (this.location.type !== 'grid') {
             // only grid groups can be maximized
             return;
         }

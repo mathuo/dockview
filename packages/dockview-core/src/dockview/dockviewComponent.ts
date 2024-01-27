@@ -67,6 +67,7 @@ import {
     DockviewPanelRenderer,
     OverlayRenderContainer,
 } from '../overlayRenderContainer';
+import { PopoutWindow } from '../popoutWindow';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
@@ -608,7 +609,7 @@ export class DockviewComponent
             }
         }
 
-        group.model.location = 'floating';
+        group.model.location = { type: 'floating' };
 
         const overlayLeft =
             typeof coord?.x === 'number'
@@ -683,7 +684,7 @@ export class DockviewComponent
                 dispose: () => {
                     disposable.dispose();
 
-                    group.model.location = 'grid';
+                    group.model.location = { type: 'grid' };
                     remove(this._floatingGroups, floatingGroupPanel);
                     this.updateWatermark();
                 },
@@ -1173,7 +1174,7 @@ export class DockviewComponent
                 group.model.openPanel(panel);
                 this.doSetGroupAndPanelActive(group);
             } else if (
-                referenceGroup.api.location === 'floating' ||
+                referenceGroup.api.location.type === 'floating' ||
                 target === 'center'
             ) {
                 panel = this.createPanel(options, referenceGroup);
@@ -1259,7 +1260,10 @@ export class DockviewComponent
     }
 
     private updateWatermark(): void {
-        if (this.groups.filter((x) => x.api.location === 'grid').length === 0) {
+        if (
+            this.groups.filter((x) => x.api.location.type === 'grid').length ===
+            0
+        ) {
             if (!this.watermark) {
                 this.watermark = this.createWatermarkComponent();
 
@@ -1377,7 +1381,7 @@ export class DockviewComponent
               }
             | undefined
     ): DockviewGroupPanel {
-        if (group.api.location === 'floating') {
+        if (group.api.location.type === 'floating') {
             const floatingGroup = this._floatingGroups.find(
                 (_) => _.group === group
             );
@@ -1406,7 +1410,7 @@ export class DockviewComponent
             throw new Error('failed to find floating group');
         }
 
-        if (group.api.location === 'popout') {
+        if (group.api.location.type === 'popout') {
             const selectedGroup = this._popoutGroups.find(
                 (_) => _.group === group
             );
@@ -1486,7 +1490,7 @@ export class DockviewComponent
             if (sourceGroup && sourceGroup.size < 2) {
                 const [targetParentLocation, to] = tail(targetLocation);
 
-                if (sourceGroup.api.location === 'grid') {
+                if (sourceGroup.api.location.type === 'grid') {
                     const sourceLocation = getGridLocation(sourceGroup.element);
                     const [sourceParentLocation, from] = tail(sourceLocation);
 
@@ -1562,7 +1566,7 @@ export class DockviewComponent
                     });
                 }
             } else {
-                switch (sourceGroup.api.location) {
+                switch (sourceGroup.api.location.type) {
                     case 'grid':
                         this.gridview.removeView(
                             getGridLocation(sourceGroup.element)

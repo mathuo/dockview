@@ -9,6 +9,7 @@ import { DockviewGroupPanelModel } from '../../../../dockview/dockviewGroupPanel
 import { fireEvent } from '@testing-library/dom';
 import { TestPanel } from '../../dockviewGroupPanelModel.spec';
 import { IDockviewPanel } from '../../../../dockview/dockviewPanel';
+import { fromPartial } from '@total-typescript/shoehorn';
 
 describe('tabsContainer', () => {
     test('that an external event does not render a drop target and calls through to the group mode', () => {
@@ -478,7 +479,7 @@ describe('tabsContainer', () => {
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
-                api: { location: 'grid' } as any,
+                api: { location: { type: 'grid' } } as any,
             }) as DockviewGroupPanel;
         });
 
@@ -538,7 +539,7 @@ describe('tabsContainer', () => {
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
-                api: { location: 'floating' } as any,
+                api: { location: { type: 'floating' } } as any,
             }) as DockviewGroupPanel;
         });
 
@@ -591,7 +592,7 @@ describe('tabsContainer', () => {
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
-                api: { location: 'floating' } as any,
+                api: { location: { type: 'floating' } } as any,
                 model: {} as any,
             }) as DockviewGroupPanel;
         });
@@ -601,23 +602,20 @@ describe('tabsContainer', () => {
 
         const cut = new TabsContainer(accessor, groupPanel);
 
-        const panelMock = jest.fn<IDockviewPanel, [string]>((id: string) => {
-            const partial: Partial<IDockviewPanel> = {
+        const createPanel = (id: string) =>
+            fromPartial<IDockviewPanel>({
                 id,
-
                 view: {
                     tab: {
                         element: document.createElement('div'),
-                    } as any,
+                    },
                     content: {
                         element: document.createElement('div'),
-                    } as any,
-                } as any,
-            };
-            return partial as IDockviewPanel;
-        });
+                    },
+                },
+            });
 
-        const panel = new panelMock('test_id');
+        const panel = createPanel('test_id');
         cut.openPanel(panel);
 
         const el = cut.element.querySelector('.tab')!;
@@ -628,15 +626,15 @@ describe('tabsContainer', () => {
         fireEvent(el, event);
 
         // a floating group with a single tab shouldn't be eligible
-        expect(preventDefaultSpy).toBeCalledTimes(0);
-        expect(accessor.addFloatingGroup).toBeCalledTimes(0);
+        expect(preventDefaultSpy).toHaveBeenCalledTimes(0);
+        expect(accessor.addFloatingGroup).toHaveBeenCalledTimes(0);
 
-        const panel2 = new panelMock('test_id_2');
+        const panel2 = createPanel('test_id_2');
         cut.openPanel(panel2);
         fireEvent(el, event);
 
-        expect(preventDefaultSpy).toBeCalledTimes(1);
-        expect(accessor.addFloatingGroup).toBeCalledTimes(1);
+        expect(preventDefaultSpy).toHaveBeenCalledTimes(1);
+        expect(accessor.addFloatingGroup).toHaveBeenCalledTimes(1);
     });
 
     test('pre header actions', () => {
@@ -653,7 +651,7 @@ describe('tabsContainer', () => {
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
-                api: { location: 'grid' } as any,
+                api: { location: { type: 'grid' } } as any,
                 model: {} as any,
             }) as DockviewGroupPanel;
         });
@@ -723,7 +721,7 @@ describe('tabsContainer', () => {
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
-                api: { location: 'grid' } as any,
+                api: { location: { type: 'grid' } } as any,
                 model: {} as any,
             }) as DockviewGroupPanel;
         });
@@ -793,7 +791,7 @@ describe('tabsContainer', () => {
 
         const groupPanelMock = jest.fn<DockviewGroupPanel, []>(() => {
             return (<Partial<DockviewGroupPanel>>{
-                api: { location: 'grid' } as any,
+                api: { location: { type: 'grid' } } as any,
                 model: {} as any,
             }) as DockviewGroupPanel;
         });
