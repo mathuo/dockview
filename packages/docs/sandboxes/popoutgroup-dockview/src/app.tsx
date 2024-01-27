@@ -5,12 +5,53 @@ import {
     IDockviewHeaderActionsProps,
     IDockviewPanelProps,
     SerializedDockview,
+    DockviewPanelApi,
+    DockviewGroupLocation,
 } from 'dockview';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import { Icon } from './utils';
+import { PopoverMenu } from './popover';
+
+function usePopoutWindowContext(api: DockviewPanelApi): Window {
+    const [location, setLocation] = React.useState<DockviewGroupLocation>(
+        api.location
+    );
+
+    React.useEffect(() => {
+        const disposable = api.onDidLocationChange((event) => {
+            setLocation(event.location);
+        });
+
+        return () => {
+            disposable.dispose();
+        };
+    });
+
+    const windowContext = React.useMemo(() => {
+        if (location.type === 'popout') {
+            return location.getWindow();
+        }
+        return window;
+    }, [location]);
+
+    return windowContext;
+}
 
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
+        const windowContext = usePopoutWindowContext(props.api);
+
+        React.useEffect(() => {
+            setTimeout(() => {
+                const a = windowContext.document.createElement('div');
+                a.className = 'aaa';
+                windowContext.document.body.appendChild(a);
+            }, 5000);
+        }, [windowContext]);
+
+        const [reset, setReset] = React.useState<boolean>(false);
+
         return (
             <div
                 style={{
@@ -19,7 +60,19 @@ const components = {
                     background: 'var(--dv-group-view-background-color)',
                 }}
             >
-                {props.params.title}
+                <button
+                    onClick={() => {
+                        console.log(windowContext);
+                        setReset(true);
+                        setTimeout(() => {
+                            setReset(false);
+                        }, 2000);
+                    }}
+                >
+                    Print
+                </button>
+                {!reset && <PopoverMenu api={props.api} />}
+                {props.api.title}
             </div>
         );
     },
@@ -31,31 +84,31 @@ function loadDefaultLayout(api: DockviewApi) {
         component: 'default',
     });
 
-    api.addPanel({
-        id: 'panel_2',
-        component: 'default',
-    });
+    // api.addPanel({
+    //     id: 'panel_2',
+    //     component: 'default',
+    // });
 
-    api.addPanel({
-        id: 'panel_3',
-        component: 'default',
-    });
+    // api.addPanel({
+    //     id: 'panel_3',
+    //     component: 'default',
+    // });
 
-    api.addPanel({
-        id: 'panel_4',
-        component: 'default',
-    });
+    // api.addPanel({
+    //     id: 'panel_4',
+    //     component: 'default',
+    // });
 
-    api.addPanel({
-        id: 'panel_5',
-        component: 'default',
-        position: { direction: 'right' },
-    });
+    // api.addPanel({
+    //     id: 'panel_5',
+    //     component: 'default',
+    //     position: { direction: 'right' },
+    // });
 
-    api.addPanel({
-        id: 'panel_6',
-        component: 'default',
-    });
+    // api.addPanel({
+    //     id: 'panel_6',
+    //     component: 'default',
+    // });
 }
 
 let panelCount = 0;
@@ -223,7 +276,7 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
             const group = props.containerApi.addGroup();
             props.group.api.moveTo({ group });
         } else {
-            props.containerApi.addPopoutGroup(props.group, {
+            const window = props.containerApi.addPopoutGroup(props.group, {
                 popoutUrl: '/popout/index.html',
             });
         }
