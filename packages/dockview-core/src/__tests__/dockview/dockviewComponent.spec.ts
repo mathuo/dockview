@@ -111,6 +111,13 @@ describe('dockviewComponent', () => {
     });
 
     describe('memory leakage', () => {
+        beforeEach(() => {
+            window.open = () => fromPartial<Window>({
+                addEventListener: jest.fn(),
+                close: jest.fn(),
+            });
+        });
+
         test('event leakage', () => {
             Emitter.setLeakageMonitorEnabled(true);
 
@@ -4415,6 +4422,15 @@ describe('dockviewComponent', () => {
     });
 
     describe('popout group', () => {
+        beforeEach(() => {
+            jest.spyOn(window, 'open').mockReturnValue(
+                fromPartial<Window>({
+                    addEventListener: jest.fn(),
+                    close: jest.fn(),
+                })
+            );
+        });
+
         test('that can remove a popout group', () => {
             const container = document.createElement('div');
 

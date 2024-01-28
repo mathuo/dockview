@@ -66,7 +66,7 @@ export class PopoutWindow extends CompositeDisposable {
         }
     }
 
-    open(content: HTMLElement): void {
+    async open(): Promise<HTMLElement | null> {
         if (this._window) {
             throw new Error('instance of popout window is already open');
         }
@@ -88,8 +88,12 @@ export class PopoutWindow extends CompositeDisposable {
         const externalWindow = window.open(url, this.target, features);
 
         if (!externalWindow) {
-            return;
+            /**
+             * Popup blocked
+             */
+            return null;
         }
+
 
         const disposable = new CompositeDisposable();
 
@@ -104,36 +108,41 @@ export class PopoutWindow extends CompositeDisposable {
                  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
                  */
                 this.close();
-            })
-        );
-
-        externalWindow.addEventListener('load', () => {
-            /**
-             * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event
-             */
-
-            const externalDocument = externalWindow.document;
-            externalDocument.title = document.title;
-
-            const container = this.createPopoutWindowContainer();
-            container.classList.add(this.className);
-            container.appendChild(content);
-
-            // externalDocument.body.replaceChildren(container);
-            externalDocument.body.appendChild(container);
-            externalDocument.body.classList.add(this.className);
-
-            addStyles(externalDocument, window.document.styleSheets);
-
-            externalWindow.addEventListener('beforeunload', () => {
+            }),
+            addDisposableWindowListener(externalWindow, 'beforeunload', () => {
                 /**
                  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
                  */
                 this.close();
-            });
+            })
+        );
+
+        const container = this.createPopoutWindowContainer();
+        container.classList.add(this.className);
+
+        this.options.onDidOpen?.({
+            id: this.target,
+            window: externalWindow,
         });
 
-        this.options.onDidOpen?.({ id: this.target, window: externalWindow });
+        return new Promise<HTMLElement | null>((resolve) => {
+            externalWindow.addEventListener('load', () => {
+                /**
+                 * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event
+                 */
+
+                const externalDocument = externalWindow.document;
+                externalDocument.title = document.title;
+
+                // externalDocument.body.replaceChildren(container);
+                externalDocument.body.appendChild(container);
+                externalDocument.body.classList.add(this.className);
+
+                addStyles(externalDocument, window.document.styleSheets);
+
+                resolve(container);
+            });
+        });
     }
 
     private createPopoutWindowContainer(): HTMLElement {

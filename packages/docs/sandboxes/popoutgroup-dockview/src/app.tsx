@@ -6,49 +6,30 @@ import {
     IDockviewPanelProps,
     SerializedDockview,
     DockviewPanelApi,
-    DockviewGroupLocation,
 } from 'dockview';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import { Icon } from './utils';
 import { PopoverMenu } from './popover';
 
-function usePopoutWindowContext(api: DockviewPanelApi): Window {
-    const [location, setLocation] = React.useState<DockviewGroupLocation>(
-        api.location
-    );
+function usePanelWindowObject(api: DockviewPanelApi): Window {
+    const [document, setDocument] = React.useState<Window>(api.getWindow());
 
     React.useEffect(() => {
         const disposable = api.onDidLocationChange((event) => {
-            setLocation(event.location);
+            setDocument(api.getWindow());
         });
 
         return () => {
             disposable.dispose();
         };
-    });
+    }, [api]);
 
-    const windowContext = React.useMemo(() => {
-        if (location.type === 'popout') {
-            return location.getWindow();
-        }
-        return window;
-    }, [location]);
-
-    return windowContext;
+    return document;
 }
 
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
-        const windowContext = usePopoutWindowContext(props.api);
-
-        React.useEffect(() => {
-            setTimeout(() => {
-                const a = windowContext.document.createElement('div');
-                a.className = 'aaa';
-                windowContext.document.body.appendChild(a);
-            }, 5000);
-        }, [windowContext]);
+        const _window = usePanelWindowObject(props.api);
 
         const [reset, setReset] = React.useState<boolean>(false);
 
@@ -62,7 +43,7 @@ const components = {
             >
                 <button
                     onClick={() => {
-                        console.log(windowContext);
+                        console.log(_window);
                         setReset(true);
                         setTimeout(() => {
                             setReset(false);
@@ -71,7 +52,7 @@ const components = {
                 >
                     Print
                 </button>
-                {!reset && <PopoverMenu api={props.api} />}
+                {!reset && <PopoverMenu window={_window} />}
                 {props.api.title}
             </div>
         );
@@ -258,12 +239,12 @@ const LeftComponent = (props: IDockviewHeaderActionsProps) => {
 
 const RightComponent = (props: IDockviewHeaderActionsProps) => {
     const [popout, setPopout] = React.useState<boolean>(
-        props.api.location === 'popout'
+        props.api.location.type === 'popout'
     );
 
     React.useEffect(() => {
         const disposable = props.group.api.onDidLocationChange((event) => [
-            setPopout(event.location === 'popout'),
+            setPopout(event.location.type === 'popout'),
         ]);
 
         return () => {

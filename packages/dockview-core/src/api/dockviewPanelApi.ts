@@ -44,12 +44,9 @@ export interface DockviewPanelApi
     isMaximized(): boolean;
     exitMaximized(): void;
     /**
-     *
-     * If you require the documents Window object you can call `document.defaultView`.
-     *
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/defaultView
+     * If you require the Window object
      */
-    getDocument(): Document;
+    getWindow(): Window;
 }
 
 export class DockviewPanelApiImpl
@@ -145,8 +142,8 @@ export class DockviewPanelApiImpl
         );
     }
 
-    getDocument(): Document {
-        return this.group.api.getDocument();
+    getWindow(): Window {
+        return this.group.api.getWindow();
     }
 
     moveTo(options: {
