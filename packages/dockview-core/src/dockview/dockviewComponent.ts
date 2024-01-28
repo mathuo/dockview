@@ -287,8 +287,8 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
         options?: {
             position?: Box;
             popoutUrl?: string;
-            onOpened?: (id: string, window: Window) => void;
-            onClosing?: (id: string, window: Window) => void;
+            onDidOpen?: (event: { id: string; window: Window }) => void;
+            onWillClose?: (event: { id: string; window: Window }) => void;
         }
     ): void;
 }
@@ -516,8 +516,8 @@ export class DockviewComponent
             skipRemoveGroup?: boolean;
             position?: Box;
             popoutUrl?: string;
-            onOpened?: (id: string, window: Window) => void;
-            onClosing?: (id: string, window: Window) => void;
+            onDidOpen?: (event: { id: string; window: Window }) => void;
+            onWillClose?: (event: { id: string; window: Window }) => void;
         }
     ): void {
         let group: DockviewGroupPanel;
@@ -566,8 +566,8 @@ export class DockviewComponent
                     width: box.width,
                     height: box.height,
                 },
-                onOpened: options?.onOpened,
-                onClosing: options?.onClosing
+                onDidOpen: options?.onDidOpen,
+                onWillClose: options?.onWillClose,
             }
         );
 

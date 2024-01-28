@@ -5,8 +5,8 @@ import { Box } from './types';
 
 export type PopoutWindowOptions = {
     url: string;
-    onOpened?: (id: string, window: Window) => void;
-    onClosing?: (id: string, window: Window) => void;
+    onDidOpen?: (event: { id: string; window: Window }) => void;
+    onWillClose?: (event: { id: string; window: Window }) => void;
 } & Box;
 
 export class PopoutWindow extends CompositeDisposable {
@@ -53,9 +53,10 @@ export class PopoutWindow extends CompositeDisposable {
         if (this._window) {
             this._onWillClose.fire();
 
-            if (this.options.onClosing) {
-                this.options.onClosing(this.target, this._window.value);
-            }
+            this.options.onWillClose?.({
+                id: this.target,
+                window: this._window.value,
+            });
 
             this._window.disposable.dispose();
             this._window.value.close();
@@ -132,9 +133,7 @@ export class PopoutWindow extends CompositeDisposable {
             });
         });
 
-        if (this.options.onOpened) {
-            this.options.onOpened(this.target, externalWindow);
-        }
+        this.options.onDidOpen?.({ id: this.target, window: externalWindow });
     }
 
     private createPopoutWindowContainer(): HTMLElement {

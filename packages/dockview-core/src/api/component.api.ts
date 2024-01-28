@@ -830,8 +830,8 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         options?: {
             position?: Box;
             popoutUrl?: string;
-            onOpened?: (id: string, window: Window) => void;
-            onClosing?: (id: string, window: Window) => void;
+            onDidOpen?: (event: { id: string; window: Window }) => void;
+            onWillClose?: (event: { id: string; window: Window }) => void;
         }
     ): void {
         this.component.addPopoutGroup(item, options);
