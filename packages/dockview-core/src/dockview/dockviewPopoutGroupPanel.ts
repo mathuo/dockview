@@ -13,6 +13,8 @@ export class DockviewPopoutGroupPanel extends CompositeDisposable {
             className: string;
             popoutUrl: string;
             box: Box;
+            onOpened?: (id: string, window: Window) => void;
+            onClosing?: (id: string, window: Window) => void;
         }
     ) {
         super();
@@ -23,6 +25,8 @@ export class DockviewPopoutGroupPanel extends CompositeDisposable {
             top: this.options.box.top,
             width: this.options.box.width,
             height: this.options.box.height,
+            onOpened: this.options.onOpened,
+            onClosing: this.options.onClosing,
         });
 
         group.model.location = {
