@@ -122,6 +122,7 @@ export const ThemePicker = () => {
     return (
         <div
             style={{
+              
                 height: '20px',
                 display: 'flex',
                 alignItems: 'center',
@@ -143,6 +144,10 @@ export const ThemePicker = () => {
         </div>
     );
 };
+
+export function useTheme(): string {
+    return useLocalStorageItem('dv-theme-class-name', 'dockview-theme-abyss');
+}
 
 export const MultiFrameworkContainer2 = (props: {
     react: React.FC;

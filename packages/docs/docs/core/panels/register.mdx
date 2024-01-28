@@ -1,0 +1,21 @@
+---
+title: Register A Panel
+sidebar_position: 0
+---
+
+This section describes how to register a panel for later use.
+
+The render implementation of the panel is linked to a key that can be referenced later on.
+A collection of panels can be provided through the `components` option.
+
+<FrameworkSpecific framework='React'>
+```tsx
+const components = {
+  my_component: (props: IDockviewPanelProps) => {
+    return <div>{/** logic */}</div>
+  }
+}
+
+<DockviewReact components={components}/>
+```
+</FrameworkSpecific>

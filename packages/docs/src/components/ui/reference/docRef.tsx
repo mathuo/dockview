@@ -84,45 +84,41 @@ export const DocRef = (props: DocRefProps) => {
     }
 
     return (
-        <div>
-            <div>
-                <h3>{props.declaration}</h3>
-            </div>
-            <table className="doc-ref-table">
-                <tbody>
-                    {docs.map((doc) => {
-                        return (
-                            <tr>
-                                <th
+        <table className="doc-ref-table">
+            <tbody>
+                {docs.map((doc) => {
+                    return (
+                        <tr>
+                            <th
+                                style={{
+                                    width: '40%',
+                                    display: 'flex',
+                                }}
+                            >
+                                <div
                                     style={{
-                                        width: '40%',
+                                        // maxWidth: '30%',
                                         display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'start',
                                     }}
                                 >
+                                    <h6
+                                        style={{
+                                            fontFamily: 'monospace',
+                                            fontSize: '1.2em',
+                                        }}
+                                    >
+                                        {doc.name}
+                                    </h6>
                                     <div
                                         style={{
-                                            // maxWidth: '30%',
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'start',
                                         }}
                                     >
-                                        <h6
-                                            style={{
-                                                fontFamily: 'monospace',
-                                                fontSize: '1.2em',
-                                            }}
-                                        >
-                                            {doc.name}
-                                        </h6>
-                                        <div
-                                            style={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                alignItems: 'start',
-                                            }}
-                                        >
-                                            {/* <span
+                                        {/* <span
                                                 style={{
                                                     fontSize: '0.75em',
                                                     color: 'var(--ifm-color-content-secondary)',
@@ -137,29 +133,26 @@ export const DocRef = (props: DocRefProps) => {
                                             >
                                                 {doc.type}
                                             </span> */}
-                                        </div>
                                     </div>
-                                </th>
-                                <th style={{ width: '60%' }}>
-                                    {/* <div>{'-'}</div> */}
+                                </div>
+                            </th>
+                            <th style={{ width: '60%' }}>
+                                {/* <div>{'-'}</div> */}
+                                <div>
                                     <div>
-                                        <div>
-                                            {doc.comment && (
-                                                <Summary
-                                                    summary={doc.comment}
-                                                />
-                                            )}
-                                        </div>
-                                        <CodeBlock language="tsx">
-                                            {doc.code}
-                                        </CodeBlock>
+                                        {doc.comment && (
+                                            <Summary summary={doc.comment} />
+                                        )}
                                     </div>
-                                </th>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
-        </div>
+                                    <CodeBlock language="tsx">
+                                        {doc.code}
+                                    </CodeBlock>
+                                </div>
+                            </th>
+                        </tr>
+                    );
+                })}
+            </tbody>
+        </table>
     );
 };

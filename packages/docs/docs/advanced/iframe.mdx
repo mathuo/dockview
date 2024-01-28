@@ -1,7 +1,9 @@
 import { MultiFrameworkContainer } from '@site/src/components/ui/container';
 import DockviewWithIFrames from '@site/sandboxes/iframe-dockview/src/app';
 
-# iFrames
+# iframes
+
+iframes reload when repositioned within the DOM which can cause issues.
 
 iFrames required special attention because of a particular behaviour in how iFrames render:
 
@@ -11,7 +13,7 @@ You can find many examples of discussions on this. Two reputable forums for exam
 
 To ensure iFrames work as expected you should render them in panels with `renderer: 'always'` to ensure they are never removed from the DOM, alternatively set the defaultRenderer to `always`.
 
-> See the **Panel Rendering** section for more information of render modes.
+> See the [Panel Rendering](/core/panels/rendering.mdx) section for more information of render modes.
 
 ```tsx title="Example of a panel using an alternative renderer"
 api.addPanel({

@@ -85,6 +85,35 @@
     > p:first-of-type {
         font-size: 1.5em;
     }
+
+    table {
+        border-collapse: collapse;
+        display: table;
+        table-layout: fixed;
+        width: 100%;
+
+        thead {
+            text-align: left;
+            background-color: inherit;
+
+            tr {
+                border: none;
+            }
+        }
+
+        overflow: hidden;
+
+        th,
+        td {
+            border: none;
+            padding: none;
+            text-align: left;
+        }
+
+        tr {
+            background-color: inherit !important;
+        }
+    }
 }
 
 @import '~dockview/dist/styles/dockview.css';

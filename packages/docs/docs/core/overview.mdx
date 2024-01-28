@@ -1,0 +1,25 @@
+---
+title: Overview
+sidebar_position: 0
+---
+
+This section provided a core overview.
+
+
+After creating an instance of the component you will want to obtain a reference to the [API](/docs/api/dockview/overview)
+object which will facilitate further interactions with the component.
+
+<FrameworkSpecific framework='React'>
+```tsx
+function onReady(event: DockviewReadyEvent) {
+  /**
+   * You should store a reference to `api` in a Ref or State
+   * for later interactions
+   */
+  const api: DockviewApi = event.api;
+}
+
+<DockviewReact onReady={onReady}/>
+```
+</FrameworkSpecific>
+

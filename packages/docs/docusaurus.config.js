@@ -3,7 +3,7 @@
 
 const { themes } = require('prism-react-renderer');
 const lightCodeTheme = themes.nightOwlLight;
-const darkCodeTheme = themes.oneDark;
+const darkCodeTheme = themes.palenight;
 
 // dracula
 // duotoneDark
@@ -170,7 +170,7 @@ const config = {
                 items: [
                     {
                         type: 'doc',
-                        docId: 'getStarted/quickStart',
+                        docId: 'overview/getStarted/installation',
                         position: 'left',
                         label: 'Docs',
                     },
