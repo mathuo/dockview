@@ -11,6 +11,8 @@ import { IDockviewPanel } from '../../../../dockview/dockviewPanel';
 import { IDockviewPanelModel } from '../../../../dockview/dockviewPanelModel';
 import { DockviewComponent } from '../../../../dockview/dockviewComponent';
 import { OverlayRenderContainer } from '../../../../overlayRenderContainer';
+import { fromPartial } from '@total-typescript/shoehorn';
+import { DockviewGroupPanelModel } from '../../../../dockview/dockviewGroupPanelModel';
 
 class TestContentRenderer
     extends CompositeDisposable
@@ -26,6 +28,7 @@ class TestContentRenderer
     constructor(public id: string) {
         super();
         this.element = document.createElement('div');
+        this.element.id = id;
     }
 
     init(parameters: GroupPanelContentPartInitParameters): void {
@@ -145,5 +148,41 @@ describe('contentContainer', () => {
         expect(blur).toBe(3);
 
         disposable.dispose();
+    });
+
+    test("that panels renderered as 'onlyWhenVisibile' are removed when closed", () => {
+        const cut = new ContentContainer(
+            fromPartial<DockviewComponent>({
+                overlayRenderContainer: {
+                    detatch: jest.fn(),
+                },
+            }),
+            fromPartial<DockviewGroupPanelModel>({})
+        );
+
+        const panel1 = fromPartial<IDockviewPanel>({
+            api: {
+                renderer: 'onlyWhenVisibile',
+            },
+            view: { content: new TestContentRenderer('panel_1') },
+        });
+
+        const panel2 = fromPartial<IDockviewPanel>({
+            api: {
+                renderer: 'onlyWhenVisibile',
+            },
+            view: { content: new TestContentRenderer('panel_2') },
+        });
+
+        cut.openPanel(panel1);
+
+        expect(panel1.view.content.element.parentElement).toBe(cut.element);
+        expect(cut.element.childNodes.length).toBe(1);
+
+        cut.openPanel(panel2);
+
+        expect(panel1.view.content.element.parentElement).toBeNull();
+        expect(panel2.view.content.element.parentElement).toBe(cut.element);
+        expect(cut.element.childNodes.length).toBe(1);
     });
 });

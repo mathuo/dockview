@@ -1,11 +1,12 @@
 {
   "name": "dockview-docs",
-  "version": "1.9.0",
+  "version": "1.9.2",
   "private": true,
   "scripts": {
     "build": "docusaurus build",
     "clear": "docusaurus clear",
     "start": "docusaurus start",
+    "docs:version": "docusaurus docs:version",
     "typecheck": "tsc"
   },
   "browserslist": {
@@ -30,9 +31,10 @@
     "@radix-ui/react-popover": "^1.0.7",
     "axios": "^1.6.3",
     "clsx": "^2.1.0",
-    "dockview": "^1.9.0",
+    "dockview": "^1.9.2",
     "prism-react-renderer": "^2.3.1",
     "react-dnd": "^16.0.1",
+    "react-laag": "^2.0.5",
     "recoil": "^0.7.7",
     "source-map-loader": "^4.0.2",
     "uuid": "^9.0.1"

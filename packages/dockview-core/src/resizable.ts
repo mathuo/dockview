@@ -17,19 +17,12 @@ export abstract class Resizable extends CompositeDisposable {
         this._disableResizing = value;
     }
 
-    constructor(parentElement?: HTMLElement, disableResizing = false) {
+    constructor(parentElement: HTMLElement, disableResizing = false) {
         super();
 
         this._disableResizing = disableResizing;
 
-        if (parentElement) {
-            this._element = parentElement;
-        } else {
-            this._element = document.createElement('div');
-            this._element.style.height = '100%';
-            this._element.style.width = '100%';
-            this._element.className = 'dv-resizable-container';
-        }
+        this._element = parentElement;
 
         this.addDisposables(
             watchElementResize(this._element, (entry) => {

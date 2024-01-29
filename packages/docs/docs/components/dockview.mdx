@@ -7,7 +7,7 @@ import { MultiFrameworkContainer } from '@site/src/components/ui/container';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-import DockviewPersistance from '@site/sandboxes/layout-dockview/src/app';
+import DockviewPersistence from '@site/sandboxes/layout-dockview/src/app';
 import SimpleDockview from '@site/sandboxes/simple-dockview/src/app';
 import ResizeDockview from '@site/sandboxes/resize-dockview/src/app';
 import DockviewWatermark from '@site/sandboxes/watermark-dockview/src/app';
@@ -140,7 +140,7 @@ As well as importing the `dockview` stylesheet you must provide a class-based th
 
 You can find more details on theming <Link to="../theme">here</Link>.
 
-## Layout Persistance
+## Layout Persistence
 
 Layouts are loaded and saved via to `fromJSON` and `toJSON` methods on the Dockview api.
 The api also exposes an event `onDidLayoutChange` you can listen on to determine when the layout has changed.
@@ -156,7 +156,7 @@ React.useEffect(() => {
         const layout = api.toJSON();
 
         localStorage.setItem(
-            'dockview_persistance_layout',
+            'dockview_persistence_layout',
             JSON.stringify(layout)
         );
     });
@@ -169,7 +169,7 @@ React.useEffect(() => {
 
 ```tsx title="Loading a layout from localStorage"
 const onReady = (event: DockviewReadyEvent) => {
-    const layoutString = localStorage.getItem('dockview_persistance_layout');
+    const layoutString = localStorage.getItem('dockview_persistence_layout');
 
     let success = false;
 
@@ -194,7 +194,7 @@ If you refresh the page you should notice your layout is loaded as you left it.
 
 <MultiFrameworkContainer
     sandboxId="layout-dockview"
-    react={DockviewPersistance}
+    react={DockviewPersistence}
 />
 
 ## Scrollbars
@@ -263,6 +263,18 @@ which will be rendered when there are no panels or groups.
 />
 
 ## Drag And Drop
+
+You can override the conditions of the far edge overlays through the `rootOverlayModel` prop.
+
+```tsx
+<DockviewReact
+  {...props}
+   rootOverlayModel={{
+    size: { value: 100, type: 'pixels' },
+    activationSize: { value: 5, type: 'percentage' },
+  }}
+  />
+```
 
 ### Built-in behaviours
 

@@ -14,6 +14,32 @@
     .dv-overlay-render-container {
         position: relative;
     }
+
+    .split-view-container {
+        &.horizontal {
+            > .view-container > .view {
+                &:not(:last-child) {
+                    border-right: var(--dv-group-gap-size) solid transparent;
+                }
+
+                &:not(:first-child) {
+                    border-left: var(--dv-group-gap-size) solid transparent;
+                }
+            }
+        }
+
+        &.vertical {
+            > .view-container > .view {
+                &:not(:last-child) {
+                    border-bottom: var(--dv-group-gap-size) solid transparent;
+                }
+
+                &:not(:first-child) {
+                    border-top: var(--dv-group-gap-size) solid transparent;
+                }
+            }
+        }
+    }
 }
 
 .groupview {
