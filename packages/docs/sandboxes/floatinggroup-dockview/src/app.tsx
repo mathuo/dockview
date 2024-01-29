@@ -127,7 +127,7 @@ const useLocalStorage = <T,>(
     ];
 };
 
-export const DockviewPersistance = (props: { theme?: string }) => {
+export const DockviewPersistence = (props: { theme?: string }) => {
     const [api, setApi] = React.useState<DockviewApi>();
     const [layout, setLayout] =
         useLocalStorage<SerializedDockview>('floating.layout');
@@ -255,13 +255,13 @@ const LeftComponent = (props: IDockviewHeaderActionsProps) => {
 
 const RightComponent = (props: IDockviewHeaderActionsProps) => {
     const [floating, setFloating] = React.useState<boolean>(
-        props.api.location === 'floating'
+        props.api.location.type === 'floating'
     );
 
     React.useEffect(() => {
         const disposable = props.group.api.onDidLocationChange(
             (event) => {
-                setFloating(event.location === 'floating');
+                setFloating(event.location.type === 'floating');
             }
         );
 
@@ -289,7 +289,7 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
     );
 };
 
-export default DockviewPersistance;
+export default DockviewPersistence;
 
 const Watermark = () => {
     return <div style={{ color: 'white', padding: '8px' }}>watermark</div>;

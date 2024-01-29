@@ -172,7 +172,10 @@ export interface IDockviewGroupPanelModel extends IPanel {
     ): boolean;
 }
 
-export type DockviewGroupLocation = 'grid' | 'floating' | 'popout';
+export type DockviewGroupLocation =
+    | { type: 'grid' }
+    | { type: 'floating' }
+    | { type: 'popout'; getWindow: () => Window };
 
 export interface WillShowOverlayLocationEvent {
     event: WillShowOverlayEvent;
@@ -193,7 +196,7 @@ export class DockviewGroupPanelModel
     private _leftHeaderActions: IHeaderActionsRenderer | undefined;
     private _prefixHeaderActions: IHeaderActionsRenderer | undefined;
 
-    private _location: DockviewGroupLocation = 'grid';
+    private _location: DockviewGroupLocation = { type: 'grid' };
 
     private mostRecentlyUsed: IDockviewPanel[] = [];
 
@@ -311,7 +314,7 @@ export class DockviewGroupPanelModel
         toggleClass(this.container, 'dv-groupview-floating', false);
         toggleClass(this.container, 'dv-groupview-popout', false);
 
-        switch (value) {
+        switch (value.type) {
             case 'grid':
                 this.contentContainer.dropTarget.setTargetZones([
                     'top',
@@ -604,6 +607,7 @@ export class DockviewGroupPanelModel
             if (!skipSetGroupActive) {
                 this.accessor.doSetGroupActive(this.groupPanel);
             }
+            this.contentContainer.renderPanel(panel, { asActive: true });
             return;
         }
 
@@ -945,6 +949,7 @@ export class DockviewGroupPanelModel
 
         this.watermark?.element.remove();
         this.watermark?.dispose?.();
+        this.watermark = undefined;
 
         for (const panel of this.panels) {
             panel.dispose();

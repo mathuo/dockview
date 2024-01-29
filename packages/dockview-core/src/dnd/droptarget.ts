@@ -323,16 +323,25 @@ export class Droptarget extends CompositeDisposable {
 
         this.overlayElement.style.transform = transform;
 
-        toggleClass(this.overlayElement, 'dv-overlay-small-vertical', isSmallY);
         toggleClass(
             this.overlayElement,
-            'dv-overlay-small-horizontal',
+            'dv-drop-target-small-vertical',
+            isSmallY
+        );
+        toggleClass(
+            this.overlayElement,
+            'dv-drop-target-small-horizontal',
             isSmallX
         );
-        toggleClass(this.overlayElement, 'dv-overlay-left', isLeft);
-        toggleClass(this.overlayElement, 'dv-overlay-right', isRight);
-        toggleClass(this.overlayElement, 'dv-overlay-top', isTop);
-        toggleClass(this.overlayElement, 'dv-overlay-bottom', isBottom);
+        toggleClass(this.overlayElement, 'dv-drop-target-left', isLeft);
+        toggleClass(this.overlayElement, 'dv-drop-target-right', isRight);
+        toggleClass(this.overlayElement, 'dv-drop-target-top', isTop);
+        toggleClass(this.overlayElement, 'dv-drop-target-bottom', isBottom);
+        toggleClass(
+            this.overlayElement,
+            'dv-drop-target-center',
+            quadrant === 'center'
+        );
     }
 
     private calculateQuadrant(

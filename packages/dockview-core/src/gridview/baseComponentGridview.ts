@@ -1,7 +1,7 @@
 import { Emitter, Event, TickDelayedEvent } from '../events';
 import { getGridLocation, Gridview, IGridView } from './gridview';
 import { Position } from '../dnd/droptarget';
-import { IValueDisposable } from '../lifecycle';
+import { Disposable, IValueDisposable } from '../lifecycle';
 import { sequentialNumberGenerator } from '../math';
 import { ISplitviewStyles, Orientation, Sizing } from '../splitview/splitview';
 import { IPanel } from '../panel/types';
@@ -32,7 +32,7 @@ export interface BaseGridOptions {
     readonly proportionalLayout: boolean;
     readonly orientation: Orientation;
     readonly styles?: ISplitviewStyles;
-    readonly parentElement?: HTMLElement;
+    readonly parentElement: HTMLElement;
     readonly disableAutoResizing?: boolean;
 }
 
@@ -134,7 +134,9 @@ export abstract class BaseGrid<T extends IGridPanelView>
     }
 
     constructor(options: BaseGridOptions) {
-        super(options.parentElement, options.disableAutoResizing);
+        super(document.createElement('div'), options.disableAutoResizing);
+
+        options.parentElement.appendChild(this.element);
 
         this.gridview = new Gridview(
             !!options.proportionalLayout,
@@ -147,6 +149,9 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.layout(0, 0, true); // set some elements height/widths
 
         this.addDisposables(
+            Disposable.from(() => {
+                this.element.parentElement?.removeChild(this.element);
+            }),
             this.gridview.onDidChange(() => {
                 this._bufferOnDidLayoutChange.fire();
             }),

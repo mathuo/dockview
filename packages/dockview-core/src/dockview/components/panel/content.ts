@@ -70,7 +70,7 @@ export class ContentContainer
                 if (
                     !data &&
                     event.shiftKey &&
-                    this.group.location !== 'floating'
+                    this.group.location.type !== 'floating'
                 ) {
                     return false;
                 }
@@ -198,11 +198,11 @@ export class ContentContainer
 
     public closePanel(): void {
         if (this.panel) {
-            if (this.accessor.options.defaultRenderer === 'onlyWhenVisibile') {
+            if (this.panel.api.renderer === 'onlyWhenVisibile') {
                 this._element.removeChild(this.panel.view.content.element);
             }
-            this.panel = undefined;
         }
+        this.panel = undefined;
     }
 
     public dispose(): void {

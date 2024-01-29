@@ -22,26 +22,26 @@
             will-change: transform;
             pointer-events: none;
 
-            &.dv-overlay-top {
-                &.dv-overlay-small-vertical {
+            &.dv-drop-target-top {
+                &.dv-drop-target-small-vertical {
                     border-top: 1px solid var(--dv-drag-over-border-color);
                 }
             }
 
-            &.dv-overlay-bottom {
-                &.dv-overlay-small-vertical {
+            &.dv-drop-target-bottom {
+                &.dv-drop-target-small-vertical {
                     border-bottom: 1px solid var(--dv-drag-over-border-color);
                 }
             }
 
-            &.dv-overlay-left {
-                &.dv-overlay-small-horizontal {
+            &.dv-drop-target-left {
+                &.dv-drop-target-small-horizontal {
                     border-left: 1px solid var(--dv-drag-over-border-color);
                 }
             }
 
-            &.dv-overlay-right {
-                &.dv-overlay-small-horizontal {
+            &.dv-drop-target-right {
+                &.dv-drop-target-small-horizontal {
                     border-right: 1px solid var(--dv-drag-over-border-color);
                 }
             }

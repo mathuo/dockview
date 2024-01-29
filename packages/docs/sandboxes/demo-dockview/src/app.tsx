@@ -14,8 +14,27 @@ import './app.scss';
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
         return (
-            <div style={{ height: '100%', overflow: 'auto', color: 'white' }}>
-                {''}
+            <div
+                style={{
+                    height: '100%',
+                    overflow: 'auto',
+                    color: 'white',
+                    position: 'relative',
+                }}
+            >
+                <span
+                    style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%,-50%)',
+                        pointerEvents: 'none',
+                        fontSize: '42px',
+                        opacity: 0.5,
+                    }}
+                >
+                    {props.api.title}
+                </span>
             </div>
         );
     },
@@ -68,7 +87,7 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
     );
 
     const [isPopout, setIsPopout] = React.useState<boolean>(
-        props.api.location === 'popout'
+        props.api.location.type === 'popout'
     );
 
     React.useEffect(() => {
@@ -77,7 +96,7 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
         });
 
         const disposable2 = props.api.onDidLocationChange(() => {
-            setIsPopout(props.api.location === 'popout');
+            setIsPopout(props.api.location.type === 'popout');
         });
 
         return () => {

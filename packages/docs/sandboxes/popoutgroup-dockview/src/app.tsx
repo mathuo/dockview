@@ -1,17 +1,38 @@
 import {
     DockviewApi,
-    DockviewGroupPanel,
     DockviewReact,
     DockviewReadyEvent,
     IDockviewHeaderActionsProps,
     IDockviewPanelProps,
     SerializedDockview,
+    DockviewPanelApi,
 } from 'dockview';
 import * as React from 'react';
 import { Icon } from './utils';
+import { PopoverMenu } from './popover';
+
+function usePanelWindowObject(api: DockviewPanelApi): Window {
+    const [document, setDocument] = React.useState<Window>(api.getWindow());
+
+    React.useEffect(() => {
+        const disposable = api.onDidLocationChange((event) => {
+            setDocument(api.getWindow());
+        });
+
+        return () => {
+            disposable.dispose();
+        };
+    }, [api]);
+
+    return document;
+}
 
 const components = {
     default: (props: IDockviewPanelProps<{ title: string }>) => {
+        const _window = usePanelWindowObject(props.api);
+
+        const [reset, setReset] = React.useState<boolean>(false);
+
         return (
             <div
                 style={{
@@ -20,19 +41,23 @@ const components = {
                     background: 'var(--dv-group-view-background-color)',
                 }}
             >
-                {props.params.title}
+                <button
+                    onClick={() => {
+                        console.log(_window);
+                        setReset(true);
+                        setTimeout(() => {
+                            setReset(false);
+                        }, 2000);
+                    }}
+                >
+                    Print
+                </button>
+                {!reset && <PopoverMenu window={_window} />}
+                {props.api.title}
             </div>
         );
     },
 };
-
-const counter = (() => {
-    let i = 0;
-
-    return {
-        next: () => ++i,
-    };
-})();
 
 function loadDefaultLayout(api: DockviewApi) {
     api.addPanel({
@@ -40,31 +65,31 @@ function loadDefaultLayout(api: DockviewApi) {
         component: 'default',
     });
 
-    api.addPanel({
-        id: 'panel_2',
-        component: 'default',
-    });
+    // api.addPanel({
+    //     id: 'panel_2',
+    //     component: 'default',
+    // });
 
-    api.addPanel({
-        id: 'panel_3',
-        component: 'default',
-    });
+    // api.addPanel({
+    //     id: 'panel_3',
+    //     component: 'default',
+    // });
 
-    api.addPanel({
-        id: 'panel_4',
-        component: 'default',
-    });
+    // api.addPanel({
+    //     id: 'panel_4',
+    //     component: 'default',
+    // });
 
-    api.addPanel({
-        id: 'panel_5',
-        component: 'default',
-        position: { direction: 'right' },
-    });
+    // api.addPanel({
+    //     id: 'panel_5',
+    //     component: 'default',
+    //     position: { direction: 'right' },
+    // });
 
-    api.addPanel({
-        id: 'panel_6',
-        component: 'default',
-    });
+    // api.addPanel({
+    //     id: 'panel_6',
+    //     component: 'default',
+    // });
 }
 
 let panelCount = 0;
@@ -214,12 +239,12 @@ const LeftComponent = (props: IDockviewHeaderActionsProps) => {
 
 const RightComponent = (props: IDockviewHeaderActionsProps) => {
     const [popout, setPopout] = React.useState<boolean>(
-        props.api.location === 'popout'
+        props.api.location.type === 'popout'
     );
 
     React.useEffect(() => {
         const disposable = props.group.api.onDidLocationChange((event) => [
-            setPopout(event.location === 'popout'),
+            setPopout(event.location.type === 'popout'),
         ]);
 
         return () => {
@@ -232,7 +257,7 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
             const group = props.containerApi.addGroup();
             props.group.api.moveTo({ group });
         } else {
-            props.containerApi.addPopoutGroup(props.group, {
+            const window = props.containerApi.addPopoutGroup(props.group, {
                 popoutUrl: '/popout/index.html',
             });
         }

@@ -93,7 +93,7 @@ export const App: React.FC = (props: { theme?: string }) => {
     );
 };
 
-const Container = () => {
+const Container = (props: any) => {
     const [value, setValue] = React.useState<string>('50');
 
     return (
@@ -108,7 +108,7 @@ const Container = () => {
                 value={value}
             />
             <div style={{ height: `${value}%`, width: `${value}%` }}>
-                <App />
+                <App {...props} />
             </div>
         </div>
     );

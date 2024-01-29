@@ -16,6 +16,7 @@ import {
 import { LayoutPriority } from '../splitview/splitview';
 import { Emitter, Event } from '../events';
 import { IViewSize } from './gridview';
+import { BaseGrid, IGridPanelView } from './baseComponentGridview';
 
 export interface GridviewInitParameters extends PanelInitParameters {
     minimumWidth?: number;
@@ -24,7 +25,7 @@ export interface GridviewInitParameters extends PanelInitParameters {
     maximumHeight?: number;
     priority?: LayoutPriority;
     snap?: boolean;
-    accessor: GridviewComponent;
+    accessor: BaseGrid<IGridPanelView>;
     isVisible?: boolean;
 }
 
@@ -157,14 +158,16 @@ export abstract class GridviewPanel<
         this.api.initialize(this); // TODO: required to by-pass 'super before this' requirement
 
         this.addDisposables(
-            this.api.onVisibilityChange((event) => {
-                const { isVisible } = event;
+            this.api.onDidHiddenChange((event) => {
+                const { isHidden } = event;
                 const { accessor } = this._params as GridviewInitParameters;
-                accessor.setVisible(this, isVisible);
+
+                accessor.setVisible(this, !isHidden);
             }),
             this.api.onActiveChange(() => {
                 const { accessor } = this._params as GridviewInitParameters;
-                accessor.setActive(this);
+
+                accessor.doSetGroupActive(this);
             }),
             this.api.onDidConstraintsChangeInternal((event) => {
                 if (

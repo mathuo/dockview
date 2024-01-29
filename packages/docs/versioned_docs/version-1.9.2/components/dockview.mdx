@@ -7,7 +7,7 @@ import { MultiFrameworkContainer } from '@site/src/components/ui/container';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-import DockviewPersistance from '@site/sandboxes/layout-dockview/src/app';
+import DockviewPersistence from '@site/sandboxes/layout-dockview/src/app';
 import SimpleDockview from '@site/sandboxes/simple-dockview/src/app';
 import ResizeDockview from '@site/sandboxes/resize-dockview/src/app';
 import DockviewWatermark from '@site/sandboxes/watermark-dockview/src/app';
@@ -31,6 +31,7 @@ import DockviewKeyboard from '@site/sandboxes/keyboard-dockview/src/app';
 import DockviewPopoutGroup from '@site/sandboxes/popoutgroup-dockview/src/app';
 import DockviewMaximizeGroup from '@site/sandboxes/maximizegroup-dockview/src/app';
 import DockviewRenderMode from '@site/sandboxes/rendermode-dockview/src/app';
+import DockviewScrollbars from '@site/sandboxes/scrollbars-dockview/src/app';
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
@@ -139,7 +140,7 @@ As well as importing the `dockview` stylesheet you must provide a class-based th
 
 You can find more details on theming <Link to="../theme">here</Link>.
 
-## Layout Persistance
+## Layout Persistence
 
 Layouts are loaded and saved via to `fromJSON` and `toJSON` methods on the Dockview api.
 The api also exposes an event `onDidLayoutChange` you can listen on to determine when the layout has changed.
@@ -155,7 +156,7 @@ React.useEffect(() => {
         const layout = api.toJSON();
 
         localStorage.setItem(
-            'dockview_persistance_layout',
+            'dockview_persistence_layout',
             JSON.stringify(layout)
         );
     });
@@ -168,7 +169,7 @@ React.useEffect(() => {
 
 ```tsx title="Loading a layout from localStorage"
 const onReady = (event: DockviewReadyEvent) => {
-    const layoutString = localStorage.getItem('dockview_persistance_layout');
+    const layoutString = localStorage.getItem('dockview_persistence_layout');
 
     let success = false;
 
@@ -193,7 +194,23 @@ If you refresh the page you should notice your layout is loaded as you left it.
 
 <MultiFrameworkContainer
     sandboxId="layout-dockview"
-    react={DockviewPersistance}
+    react={DockviewPersistence}
+/>
+
+## Scrollbars
+
+Scrollbars will appear if the contents of your view has a fixed height. If you are using a relative height such
+as *100%* you will need to define an inner container with the appropiate `overflow` value to allow scrollbars to appear.
+
+The following container three views:
+- **Panel 1**: Sets `height: 100%` and no scrollbar appears even, the content is clipped.
+- **Panel 2**: Sets `height: 2000px` and a scrollbar does appear since a fixed height has been used.
+- **Panel 3**: Sets `height: 100%` and defines an inner component with `overflow: auto` to enable the scrollbars.
+
+
+<MultiFrameworkContainer
+    sandboxId="scrollbars-dockview"
+    react={DockviewScrollbars}
 />
 
 ## Resizing
@@ -246,6 +263,18 @@ which will be rendered when there are no panels or groups.
 />
 
 ## Drag And Drop
+
+You can override the conditions of the far edge overlays through the `rootOverlayModel` prop.
+
+```tsx
+<DockviewReact
+  {...props}
+   rootOverlayModel={{
+    size: { value: 100, type: 'pixels' },
+    activationSize: { value: 5, type: 'percentage' },
+  }}
+  />
+```
 
 ### Built-in behaviours
 
