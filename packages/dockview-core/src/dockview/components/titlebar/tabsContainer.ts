@@ -350,7 +350,8 @@ export class TabsContainer
                     !this.accessor.options.disableFloatingGroups;
 
                 const isFloatingWithOnePanel =
-                    this.group.api.location.type === 'floating' && this.size === 1;
+                    this.group.api.location.type === 'floating' &&
+                    this.size === 1;
 
                 if (
                     isFloatingGroupsEnabled &&

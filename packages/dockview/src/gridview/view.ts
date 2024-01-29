@@ -3,6 +3,7 @@ import {
     GridviewPanel,
     GridviewInitParameters,
     IFrameworkPart,
+    GridviewComponent,
 } from 'dockview-core';
 import { ReactPart, ReactPortalStore } from '../react';
 import { IGridviewPanelProps } from './gridview';
@@ -25,8 +26,10 @@ export class ReactGridPanelView extends GridviewPanel {
             {
                 params: this._params?.params ?? {},
                 api: this.api,
+                // TODO: fix casting hack
                 containerApi: new GridviewApi(
-                    (this._params as GridviewInitParameters).accessor
+                    (this._params as GridviewInitParameters)
+                        .accessor as GridviewComponent
                 ),
             }
         );

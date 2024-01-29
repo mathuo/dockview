@@ -94,7 +94,6 @@ export class PopoutWindow extends CompositeDisposable {
             return null;
         }
 
-
         const disposable = new CompositeDisposable();
 
         this._window = { value: externalWindow, disposable };
@@ -108,17 +107,14 @@ export class PopoutWindow extends CompositeDisposable {
                  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
                  */
                 this.close();
-            }),
-            addDisposableWindowListener(externalWindow, 'beforeunload', () => {
-                /**
-                 * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
-                 */
-                this.close();
             })
         );
 
         const container = this.createPopoutWindowContainer();
-        container.classList.add(this.className);
+
+        if (this.className) {
+            container.classList.add(this.className);
+        }
 
         this.options.onDidOpen?.({
             id: this.target,
@@ -126,6 +122,11 @@ export class PopoutWindow extends CompositeDisposable {
         });
 
         return new Promise<HTMLElement | null>((resolve) => {
+            externalWindow.addEventListener('unload', (e) => {
+                // if page fails to load before unloading
+                // this.close();
+            });
+
             externalWindow.addEventListener('load', () => {
                 /**
                  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event
@@ -134,11 +135,24 @@ export class PopoutWindow extends CompositeDisposable {
                 const externalDocument = externalWindow.document;
                 externalDocument.title = document.title;
 
-                // externalDocument.body.replaceChildren(container);
                 externalDocument.body.appendChild(container);
-                externalDocument.body.classList.add(this.className);
 
                 addStyles(externalDocument, window.document.styleSheets);
+
+                /**
+                 * beforeunload must be registered after load for reasons I could not determine
+                 * otherwise the beforeunload event will not fire when the window is closed
+                 */
+                addDisposableWindowListener(
+                    externalWindow,
+                    'beforeunload',
+                    () => {
+                        /**
+                         * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
+                         */
+                        this.close();
+                    }
+                );
 
                 resolve(container);
             });

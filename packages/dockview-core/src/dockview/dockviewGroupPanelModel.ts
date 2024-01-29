@@ -838,6 +838,7 @@ export class DockviewGroupPanelModel
 
         this.watermark?.element.remove();
         this.watermark?.dispose?.();
+        this.watermark = undefined;
 
         for (const panel of this.panels) {
             panel.dispose();

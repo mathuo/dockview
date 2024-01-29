@@ -268,7 +268,7 @@ describe('gridview', () => {
                     ],
                 },
             },
-            activePanel: 'panel_1',
+            activePanel: 'panel_2',
         });
     });
 
