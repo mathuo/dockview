@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
     DockviewComponent,
-    DockviewDropEvent,
+    DockviewWillDropEvent,
     DockviewDndOverlayEvent,
     GroupPanelFrameworkComponentFactory,
     DockviewPanelApi,
@@ -12,6 +12,7 @@ import {
     IHeaderActionsRenderer,
     DockviewPanelRenderer,
     DroptargetOverlayModel,
+    DockviewDidDropEvent,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
@@ -61,7 +62,8 @@ export interface IDockviewReactProps {
     components: PanelCollection<IDockviewPanelProps>;
     tabComponents?: PanelCollection<IDockviewPanelHeaderProps>;
     watermarkComponent?: React.FunctionComponent<IWatermarkPanelProps>;
-    onDidDrop?: (event: DockviewDropEvent) => void;
+    onDidDrop?: (event: DockviewDidDropEvent) => void;
+    onWillDrop?: (event: DockviewWillDropEvent) => void;
     showDndOverlay?: (event: DockviewDndOverlayEvent) => boolean;
     hideBorders?: boolean;
     className?: string;
@@ -81,6 +83,7 @@ export interface IDockviewReactProps {
     debug?: boolean;
     defaultRenderer?: DockviewPanelRenderer;
     rootOverlayModel?: DroptargetOverlayModel;
+    disableDnd?: boolean;
 }
 
 const DEFAULT_REACT_TAB = 'props.defaultTabComponent';
@@ -183,6 +186,7 @@ export const DockviewReact = React.forwardRef(
                 defaultRenderer: props.defaultRenderer,
                 debug: props.debug,
                 rootOverlayModel: props.rootOverlayModel,
+                disableDnd: props.disableDnd,
             });
 
             const { clientWidth, clientHeight } = domRef.current;
@@ -201,6 +205,15 @@ export const DockviewReact = React.forwardRef(
 
         React.useEffect(() => {
             if (!dockviewRef.current) {
+                return;
+            }
+            dockviewRef.current.updateOptions({
+                disableDnd: props.disableDnd,
+            });
+        }, [props.disableDnd]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
                 return () => {
                     // noop
                 };
@@ -216,6 +229,24 @@ export const DockviewReact = React.forwardRef(
                 disposable.dispose();
             };
         }, [props.onDidDrop]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return () => {
+                    // noop
+                };
+            }
+
+            const disposable = dockviewRef.current.onWillDrop((event) => {
+                if (props.onWillDrop) {
+                    props.onWillDrop(event);
+                }
+            });
+
+            return () => {
+                disposable.dispose();
+            };
+        }, [props.onWillDrop]);
 
         React.useEffect(() => {
             if (!dockviewRef.current) {

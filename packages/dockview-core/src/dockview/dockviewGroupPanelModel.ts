@@ -1,9 +1,14 @@
 import { DockviewApi } from '../api/component.api';
 import { getPanelData, PanelTransfer } from '../dnd/dataTransfer';
-import { Position } from '../dnd/droptarget';
+import { Position, WillShowOverlayEvent } from '../dnd/droptarget';
 import { DockviewComponent } from './dockviewComponent';
 import { isAncestor, toggleClass } from '../dom';
-import { addDisposableListener, Emitter, Event } from '../events';
+import {
+    addDisposableListener,
+    DockviewEvent,
+    Emitter,
+    Event,
+} from '../events';
 import { IViewSize } from '../gridview/gridview';
 import { CompositeDisposable } from '../lifecycle';
 import { IPanel, PanelInitParameters, PanelUpdateEvent } from '../panel/types';
@@ -21,26 +26,6 @@ import { DockviewDropTargets, IWatermarkRenderer } from './types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
 import { IHeaderActionsRenderer } from './options';
-
-export interface DndService {
-    canDisplayOverlay(
-        group: IDockviewGroupPanelModel,
-        event: DragEvent,
-        target: DockviewDropTargets
-    ): boolean;
-    onDrop(
-        group: IDockviewGroupPanelModel,
-        event: DragEvent,
-        position: Position,
-        index?: number
-    ): void;
-}
-
-export interface IGroupItem {
-    id: string;
-    header: { element: HTMLElement };
-    body: { element: HTMLElement };
-}
 
 interface GroupMoveEvent {
     groupId: string;
@@ -66,15 +51,69 @@ export interface GroupPanelViewState extends CoreGroupOptions {
     id: string;
 }
 
-export interface GroupviewChangeEvent {
+export interface DockviewGroupChangeEvent {
     readonly panel: IDockviewPanel;
 }
 
-export interface GroupviewDropEvent {
-    readonly nativeEvent: DragEvent;
-    readonly position: Position;
-    readonly index?: number;
-    getData(): PanelTransfer | undefined;
+export class DockviewDidDropEvent extends DockviewEvent {
+    get nativeEvent(): DragEvent {
+        return this.options.nativeEvent;
+    }
+
+    get position(): Position {
+        return this.options.position;
+    }
+
+    get panel(): IDockviewPanel | undefined {
+        return this.options.panel;
+    }
+
+    get group(): DockviewGroupPanel | undefined {
+        return this.options.group;
+    }
+
+    get api(): DockviewApi {
+        return this.options.api;
+    }
+
+    constructor(
+        private readonly options: {
+            readonly nativeEvent: DragEvent;
+            readonly position: Position;
+            readonly panel?: IDockviewPanel;
+            getData(): PanelTransfer | undefined;
+            group?: DockviewGroupPanel;
+            api: DockviewApi;
+        }
+    ) {
+        super();
+    }
+
+    getData(): PanelTransfer | undefined {
+        return this.options.getData();
+    }
+}
+
+export class DockviewWillDropEvent extends DockviewDidDropEvent {
+    private readonly _kind: DockviewGroupDropLocation;
+
+    get kind(): DockviewGroupDropLocation {
+        return this._kind;
+    }
+
+    constructor(options: {
+        readonly nativeEvent: DragEvent;
+        readonly position: Position;
+        readonly panel?: IDockviewPanel;
+        getData(): PanelTransfer | undefined;
+        kind: DockviewGroupDropLocation;
+        group?: DockviewGroupPanel;
+        api: DockviewApi;
+    }) {
+        super(options);
+
+        this._kind = options.kind;
+    }
 }
 
 export interface IHeader {
@@ -83,6 +122,8 @@ export interface IHeader {
 
 export type DockviewGroupPanelLocked = boolean | 'no-drop-target';
 
+export type DockviewGroupDropLocation = 'tab' | 'header_space' | 'content';
+
 export interface IDockviewGroupPanelModel extends IPanel {
     readonly isActive: boolean;
     readonly size: number;
@@ -90,10 +131,11 @@ export interface IDockviewGroupPanelModel extends IPanel {
     readonly activePanel: IDockviewPanel | undefined;
     readonly header: IHeader;
     readonly isContentFocused: boolean;
-    readonly onDidDrop: Event<GroupviewDropEvent>;
-    readonly onDidAddPanel: Event<GroupviewChangeEvent>;
-    readonly onDidRemovePanel: Event<GroupviewChangeEvent>;
-    readonly onDidActivePanelChange: Event<GroupviewChangeEvent>;
+    readonly onDidDrop: Event<DockviewDidDropEvent>;
+    readonly onWillDrop: Event<DockviewWillDropEvent>;
+    readonly onDidAddPanel: Event<DockviewGroupChangeEvent>;
+    readonly onDidRemovePanel: Event<DockviewGroupChangeEvent>;
+    readonly onDidActivePanelChange: Event<DockviewGroupChangeEvent>;
     readonly onMove: Event<GroupMoveEvent>;
     locked: DockviewGroupPanelLocked;
     setActive(isActive: boolean): void;
@@ -135,6 +177,11 @@ export type DockviewGroupLocation =
     | { type: 'floating' }
     | { type: 'popout'; getWindow: () => Window };
 
+export interface WillShowOverlayLocationEvent {
+    event: WillShowOverlayEvent;
+    kind: DockviewGroupDropLocation;
+}
+
 export class DockviewGroupPanelModel
     extends CompositeDisposable
     implements IDockviewGroupPanelModel
@@ -165,8 +212,16 @@ export class DockviewGroupPanelModel
     private readonly _onMove = new Emitter<GroupMoveEvent>();
     readonly onMove: Event<GroupMoveEvent> = this._onMove.event;
 
-    private readonly _onDidDrop = new Emitter<GroupviewDropEvent>();
-    readonly onDidDrop: Event<GroupviewDropEvent> = this._onDidDrop.event;
+    private readonly _onDidDrop = new Emitter<DockviewDidDropEvent>();
+    readonly onDidDrop: Event<DockviewDidDropEvent> = this._onDidDrop.event;
+
+    private readonly _onWillDrop = new Emitter<DockviewWillDropEvent>();
+    readonly onWillDrop: Event<DockviewWillDropEvent> = this._onWillDrop.event;
+
+    private readonly _onWillShowOverlay =
+        new Emitter<WillShowOverlayLocationEvent>();
+    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent> =
+        this._onWillShowOverlay.event;
 
     private readonly _onTabDragStart = new Emitter<TabDragEvent>();
     readonly onTabDragStart: Event<TabDragEvent> = this._onTabDragStart.event;
@@ -175,18 +230,21 @@ export class DockviewGroupPanelModel
     readonly onGroupDragStart: Event<GroupDragEvent> =
         this._onGroupDragStart.event;
 
-    private readonly _onDidAddPanel = new Emitter<GroupviewChangeEvent>();
-    readonly onDidAddPanel: Event<GroupviewChangeEvent> =
+    private readonly _onDidAddPanel = new Emitter<DockviewGroupChangeEvent>();
+    readonly onDidAddPanel: Event<DockviewGroupChangeEvent> =
         this._onDidAddPanel.event;
 
-    private readonly _onDidRemovePanel = new Emitter<GroupviewChangeEvent>();
-    readonly onDidRemovePanel: Event<GroupviewChangeEvent> =
+    private readonly _onDidRemovePanel =
+        new Emitter<DockviewGroupChangeEvent>();
+    readonly onDidRemovePanel: Event<DockviewGroupChangeEvent> =
         this._onDidRemovePanel.event;
 
     private readonly _onDidActivePanelChange =
-        new Emitter<GroupviewChangeEvent>();
-    readonly onDidActivePanelChange: Event<GroupviewChangeEvent> =
+        new Emitter<DockviewGroupChangeEvent>();
+    readonly onDidActivePanelChange: Event<DockviewGroupChangeEvent> =
         this._onDidActivePanelChange.event;
+
+    private readonly _api: DockviewApi;
 
     get element(): HTMLElement {
         throw new Error('not supported');
@@ -301,6 +359,8 @@ export class DockviewGroupPanelModel
 
         toggleClass(this.container, 'groupview', true);
 
+        this._api = new DockviewApi(this.accessor);
+
         this.tabsContainer = new TabsContainer(this.accessor, this.groupPanel);
 
         this.contentContainer = new ContentContainer(this.accessor, this);
@@ -316,6 +376,7 @@ export class DockviewGroupPanelModel
         this.addDisposables(
             this._onTabDragStart,
             this._onGroupDragStart,
+            this._onWillShowOverlay,
             this.tabsContainer.onTabDragStart((event) => {
                 this._onTabDragStart.fire(event);
             }),
@@ -323,8 +384,14 @@ export class DockviewGroupPanelModel
                 this._onGroupDragStart.fire(event);
             }),
             this.tabsContainer.onDrop((event) => {
-                this.handleDropEvent(event.event, 'center', event.index);
+                this.handleDropEvent(
+                    'header',
+                    event.event,
+                    'center',
+                    event.index
+                );
             }),
+
             this.contentContainer.onDidFocus(() => {
                 this.accessor.doSetGroupActive(this.groupPanel, true);
             }),
@@ -332,11 +399,22 @@ export class DockviewGroupPanelModel
                 // noop
             }),
             this.contentContainer.dropTarget.onDrop((event) => {
-                this.handleDropEvent(event.nativeEvent, event.position);
+                this.handleDropEvent(
+                    'content',
+                    event.nativeEvent,
+                    event.position
+                );
+            }),
+            this.tabsContainer.onWillShowOverlay((event) => {
+                this._onWillShowOverlay.fire(event);
+            }),
+            this.contentContainer.dropTarget.onWillShowOverlay((event) => {
+                this._onWillShowOverlay.fire({ event, kind: 'content' });
             }),
             this._onMove,
             this._onDidChange,
             this._onDidDrop,
+            this._onWillDrop,
             this._onDidAddPanel,
             this._onDidRemovePanel,
             this._onDidActivePanelChange
@@ -344,13 +422,13 @@ export class DockviewGroupPanelModel
     }
 
     initialize(): void {
-        if (this.options?.panels) {
+        if (this.options.panels) {
             this.options.panels.forEach((panel) => {
                 this.doAddPanel(panel);
             });
         }
 
-        if (this.options?.activePanel) {
+        if (this.options.activePanel) {
             this.openPanel(this.options.activePanel);
         }
 
@@ -366,7 +444,7 @@ export class DockviewGroupPanelModel
                 );
             this.addDisposables(this._rightHeaderActions);
             this._rightHeaderActions.init({
-                containerApi: new DockviewApi(this.accessor),
+                containerApi: this._api,
                 api: this.groupPanel.api,
             });
             this.tabsContainer.setRightActionsElement(
@@ -381,7 +459,7 @@ export class DockviewGroupPanelModel
                 );
             this.addDisposables(this._leftHeaderActions);
             this._leftHeaderActions.init({
-                containerApi: new DockviewApi(this.accessor),
+                containerApi: this._api,
                 api: this.groupPanel.api,
             });
             this.tabsContainer.setLeftActionsElement(
@@ -396,7 +474,7 @@ export class DockviewGroupPanelModel
                 );
             this.addDisposables(this._prefixHeaderActions);
             this._prefixHeaderActions.init({
-                containerApi: new DockviewApi(this.accessor),
+                containerApi: this._api,
                 api: this.groupPanel.api,
             });
             this.tabsContainer.setPrefixActionsElement(
@@ -735,7 +813,7 @@ export class DockviewGroupPanelModel
         if (this.isEmpty && !this.watermark) {
             const watermark = this.accessor.createWatermarkComponent();
             watermark.init({
-                containerApi: new DockviewApi(this.accessor),
+                containerApi: this._api,
                 group: this.groupPanel,
             });
             this.watermark = watermark;
@@ -778,11 +856,40 @@ export class DockviewGroupPanelModel
     }
 
     private handleDropEvent(
+        type: 'header' | 'content',
         event: DragEvent,
         position: Position,
         index?: number
     ): void {
         if (this.locked === 'no-drop-target') {
+            return;
+        }
+
+        function getKind(): DockviewGroupDropLocation {
+            switch (type) {
+                case 'header':
+                    return typeof index === 'number' ? 'tab' : 'header_space';
+                case 'content':
+                    return 'content';
+            }
+        }
+
+        const panel =
+            typeof index === 'number' ? this.panels[index] : undefined;
+
+        const willDropEvent = new DockviewWillDropEvent({
+            nativeEvent: event,
+            position,
+            panel,
+            getData: () => getPanelData(),
+            kind: getKind(),
+            group: this.groupPanel,
+            api: this._api,
+        });
+
+        this._onWillDrop.fire(willDropEvent);
+
+        if (willDropEvent.defaultPrevented) {
             return;
         }
 
@@ -824,12 +931,16 @@ export class DockviewGroupPanelModel
                 index,
             });
         } else {
-            this._onDidDrop.fire({
-                nativeEvent: event,
-                position,
-                index,
-                getData: () => getPanelData(),
-            });
+            this._onDidDrop.fire(
+                new DockviewDidDropEvent({
+                    nativeEvent: event,
+                    position,
+                    panel,
+                    getData: () => getPanelData(),
+                    group: this.groupPanel,
+                    api: this._api,
+                })
+            );
         }
     }
 

@@ -15,11 +15,7 @@ import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
 import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
 import { Event, Emitter } from '../events';
 import { Watermark } from './components/watermark/watermark';
-import {
-    IWatermarkRenderer,
-    GroupviewPanelState,
-    DockviewDropTargets,
-} from './types';
+import { IWatermarkRenderer, GroupviewPanelState } from './types';
 import { sequentialNumberGenerator } from '../math';
 import { DefaultDockviewDeserialzier } from './deserializer';
 import { createComponent } from '../panel/componentFactory';
@@ -44,7 +40,9 @@ import { Orientation, Sizing } from '../splitview/splitview';
 import {
     GroupOptions,
     GroupPanelViewState,
-    GroupviewDropEvent,
+    DockviewDidDropEvent,
+    DockviewWillDropEvent,
+    WillShowOverlayLocationEvent,
 } from './dockviewGroupPanelModel';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
@@ -230,18 +228,16 @@ export type DockviewComponentUpdateOptions = Pick<
     | 'disableFloatingGroups'
     | 'floatingGroupBounds'
     | 'rootOverlayModel'
+    | 'disableDnd'
 >;
-
-export interface DockviewDropEvent extends GroupviewDropEvent {
-    api: DockviewApi;
-    group: DockviewGroupPanel | null;
-}
 
 export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly activePanel: IDockviewPanel | undefined;
     readonly totalPanels: number;
     readonly panels: IDockviewPanel[];
-    readonly onDidDrop: Event<DockviewDropEvent>;
+    readonly onDidDrop: Event<DockviewDidDropEvent>;
+    readonly onWillDrop: Event<DockviewWillDropEvent>;
+    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent>;
     readonly orientation: Orientation;
     updateOptions(options: DockviewComponentUpdateOptions): void;
     moveGroupOrPanel(
@@ -311,8 +307,16 @@ export class DockviewComponent
     readonly onWillDragGroup: Event<GroupDragEvent> =
         this._onWillDragGroup.event;
 
-    private readonly _onDidDrop = new Emitter<DockviewDropEvent>();
-    readonly onDidDrop: Event<DockviewDropEvent> = this._onDidDrop.event;
+    private readonly _onDidDrop = new Emitter<DockviewDidDropEvent>();
+    readonly onDidDrop: Event<DockviewDidDropEvent> = this._onDidDrop.event;
+
+    private readonly _onWillDrop = new Emitter<DockviewWillDropEvent>();
+    readonly onWillDrop: Event<DockviewWillDropEvent> = this._onWillDrop.event;
+
+    private readonly _onWillShowOverlay =
+        new Emitter<WillShowOverlayLocationEvent>();
+    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent> =
+        this._onWillShowOverlay.event;
 
     private readonly _onDidRemovePanel = new Emitter<IDockviewPanel>();
     readonly onDidRemovePanel: Event<IDockviewPanel> =
@@ -391,11 +395,13 @@ export class DockviewComponent
             this.overlayRenderContainer,
             this._onWillDragPanel,
             this._onWillDragGroup,
+            this._onWillShowOverlay,
             this._onDidActivePanelChange,
             this._onDidAddPanel,
             this._onDidRemovePanel,
             this._onDidLayoutFromJSON,
             this._onDidDrop,
+            this._onWillDrop,
             Event.any(
                 this.onDidAddGroup,
                 this.onDidRemoveGroup
@@ -474,7 +480,7 @@ export class DockviewComponent
                     return this.options.showDndOverlay({
                         nativeEvent: event,
                         position: position,
-                        target: DockviewDropTargets.Edge,
+                        target: 'edge',
                         getData: getPanelData,
                     });
                 }
@@ -488,6 +494,22 @@ export class DockviewComponent
 
         this.addDisposables(
             this._rootDropTarget.onDrop((event) => {
+                const willDropEvent = new DockviewWillDropEvent({
+                    nativeEvent: event.nativeEvent,
+                    position: event.position,
+                    panel: undefined,
+                    api: this._api,
+                    group: undefined,
+                    getData: getPanelData,
+                    kind: 'content',
+                });
+
+                this._onWillDrop.fire(willDropEvent);
+
+                if (willDropEvent.defaultPrevented) {
+                    return;
+                }
+
                 const data = getPanelData();
 
                 if (data) {
@@ -498,12 +520,16 @@ export class DockviewComponent
                         'center'
                     );
                 } else {
-                    this._onDidDrop.fire({
-                        ...event,
-                        api: this._api,
-                        group: null,
-                        getData: getPanelData,
-                    });
+                    this._onDidDrop.fire(
+                        new DockviewDidDropEvent({
+                            nativeEvent: event.nativeEvent,
+                            position: event.position,
+                            panel: undefined,
+                            api: this._api,
+                            group: undefined,
+                            getData: getPanelData,
+                        })
+                    );
                 }
             }),
             this._rootDropTarget
@@ -1752,11 +1778,18 @@ export class DockviewComponent
                     this.moveGroupOrPanel(view, groupId, itemId, target, index);
                 }),
                 view.model.onDidDrop((event) => {
-                    this._onDidDrop.fire({
-                        ...event,
-                        api: this._api,
-                        group: view,
-                    });
+                    this._onDidDrop.fire(event);
+                }),
+                view.model.onWillDrop((event) => {
+                    this._onWillDrop.fire(event);
+                }),
+                view.model.onWillShowOverlay((event) => {
+                    if (this.options.disableDnd) {
+                        event.event.preventDefault();
+                        return;
+                    }
+
+                    this._onWillShowOverlay.fire(event);
                 }),
                 view.model.onDidAddPanel((event) => {
                     this._onDidAddPanel.fire(event.panel);
