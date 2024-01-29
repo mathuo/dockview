@@ -8,6 +8,10 @@ import { GridviewPanelApi, GridviewPanelApiImpl } from './gridviewPanelApi';
 export interface DockviewGroupPanelApi extends GridviewPanelApi {
     readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent>;
     readonly location: DockviewGroupLocation;
+    /**
+     * If you require the Window object
+     */
+    getWindow(): Window;
     moveTo(options: { group?: DockviewGroupPanel; position?: Position }): void;
     maximize(): void;
     isMaximized(): boolean;
@@ -42,6 +46,12 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
         this.addDisposables(this._onDidLocationChange);
     }
 
+    getWindow(): Window {
+        return this.location.type === 'popout'
+            ? this.location.getWindow()
+            : window;
+    }
+
     moveTo(options: { group?: DockviewGroupPanel; position?: Position }): void {
         if (!this._group) {
             throw new Error(NOT_INITIALIZED_MESSAGE);
@@ -66,7 +76,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
             throw new Error(NOT_INITIALIZED_MESSAGE);
         }
 
-        if (this.location !== 'grid') {
+        if (this.location.type !== 'grid') {
             // only grid groups can be maximized
             return;
         }

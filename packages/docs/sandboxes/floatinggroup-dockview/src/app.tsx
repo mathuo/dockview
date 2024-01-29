@@ -255,13 +255,13 @@ const LeftComponent = (props: IDockviewHeaderActionsProps) => {
 
 const RightComponent = (props: IDockviewHeaderActionsProps) => {
     const [floating, setFloating] = React.useState<boolean>(
-        props.api.location === 'floating'
+        props.api.location.type === 'floating'
     );
 
     React.useEffect(() => {
         const disposable = props.group.api.onDidLocationChange(
             (event) => {
-                setFloating(event.location === 'floating');
+                setFloating(event.location.type === 'floating');
             }
         );
 

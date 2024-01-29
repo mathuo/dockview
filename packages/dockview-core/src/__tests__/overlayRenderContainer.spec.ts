@@ -41,7 +41,7 @@ describe('overlayRenderContainer', () => {
             },
             group: {
                 api: {
-                    location: 'grid',
+                    location: { type: 'grid' },
                 },
             },
         });
@@ -77,7 +77,7 @@ describe('overlayRenderContainer', () => {
             },
             group: {
                 api: {
-                    location: 'grid',
+                    location: { type: 'grid' },
                 },
             },
         });

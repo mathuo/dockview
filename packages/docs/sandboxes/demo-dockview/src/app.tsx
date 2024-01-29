@@ -87,7 +87,7 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
     );
 
     const [isPopout, setIsPopout] = React.useState<boolean>(
-        props.api.location === 'popout'
+        props.api.location.type === 'popout'
     );
 
     React.useEffect(() => {
@@ -96,7 +96,7 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
         });
 
         const disposable2 = props.api.onDidLocationChange(() => {
-            setIsPopout(props.api.location === 'popout');
+            setIsPopout(props.api.location.type === 'popout');
         });
 
         return () => {

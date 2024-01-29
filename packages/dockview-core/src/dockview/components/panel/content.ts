@@ -71,7 +71,7 @@ export class ContentContainer
                 if (
                     !data &&
                     event.shiftKey &&
-                    this.group.location !== 'floating'
+                    this.group.location.type !== 'floating'
                 ) {
                     return false;
                 }

@@ -24,10 +24,10 @@ export namespace Disposable {
 }
 
 export class CompositeDisposable {
-    private readonly _disposables: IDisposable[];
+    private _disposables: IDisposable[];
     private _isDisposed = false;
 
-    protected get isDisposed(): boolean {
+    get isDisposed(): boolean {
         return this._isDisposed;
     }
 
@@ -40,9 +40,13 @@ export class CompositeDisposable {
     }
 
     public dispose(): void {
-        this._disposables.forEach((arg) => arg.dispose());
+        if (this._isDisposed) {
+            return;
+        }
 
         this._isDisposed = true;
+        this._disposables.forEach((arg) => arg.dispose());
+        this._disposables = [];
     }
 }
 
