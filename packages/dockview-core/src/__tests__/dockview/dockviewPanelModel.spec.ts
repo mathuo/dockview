@@ -38,6 +38,7 @@ describe('dockviewGroupPanel', () => {
         accessorMock = jest.fn<DockviewComponent, []>(() => {
             const partial: Partial<DockviewComponent> = {
                 options: {
+                    parentElement: document.createElement('div'),
                     components: {
                         contentComponent: contentMock,
                     },
@@ -131,6 +132,7 @@ describe('dockviewGroupPanel', () => {
         accessorMock = jest.fn<DockviewComponent, []>(() => {
             const partial: Partial<DockviewComponent> = {
                 options: {
+                    parentElement: document.createElement('div'),
                     components: {
                         contentComponent: contentMock,
                     },
@@ -159,6 +161,7 @@ describe('dockviewGroupPanel', () => {
         accessorMock = jest.fn<DockviewComponent, []>(() => {
             const partial: Partial<DockviewComponent> = {
                 options: {
+                    parentElement: document.createElement('div'),
                     components: {
                         contentComponent: contentMock,
                     },
@@ -190,6 +193,7 @@ describe('dockviewGroupPanel', () => {
         accessorMock = jest.fn<DockviewComponent, []>(() => {
             const partial: Partial<DockviewComponent> = {
                 options: {
+                    parentElement: document.createElement('div'),
                     components: {
                         contentComponent: contentMock,
                     },
@@ -222,6 +226,7 @@ describe('dockviewGroupPanel', () => {
         accessorMock = jest.fn<DockviewComponent, []>(() => {
             const partial: Partial<DockviewComponent> = {
                 options: {
+                    parentElement: document.createElement('div'),
                     components: {
                         contentComponent: contentMock,
                     },
@@ -244,6 +249,7 @@ describe('dockviewGroupPanel', () => {
         accessorMock = jest.fn<DockviewComponent, []>(() => {
             const partial: Partial<DockviewComponent> = {
                 options: {
+                    parentElement: document.createElement('div'),
                     components: {
                         contentComponent: jest.fn().mockImplementation(() => {
                             return contentMock;
@@ -271,6 +277,7 @@ describe('dockviewGroupPanel', () => {
         accessorMock = jest.fn<DockviewComponent, []>(() => {
             const partial: Partial<DockviewComponent> = {
                 options: {
+                    parentElement: document.createElement('div'),
                     frameworkComponents: {
                         contentComponent: contentMock,
                     },

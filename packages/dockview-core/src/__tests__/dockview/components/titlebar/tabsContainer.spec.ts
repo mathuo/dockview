@@ -16,7 +16,7 @@ describe('tabsContainer', () => {
             return {
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
-                options: {},
+                options: { parentElement: document.createElement('div') },
             };
         });
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -71,7 +71,7 @@ describe('tabsContainer', () => {
                 id: 'testcomponentid',
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
-                options: {},
+                options: { parentElement: document.createElement('div') },
             };
         });
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -139,7 +139,7 @@ describe('tabsContainer', () => {
                 id: 'testcomponentid',
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
-                options: {},
+                options: { parentElement: document.createElement('div') },
             };
         });
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -204,7 +204,7 @@ describe('tabsContainer', () => {
                 id: 'testcomponentid',
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
-                options: {},
+                options: { parentElement: document.createElement('div') },
             };
         });
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -269,7 +269,7 @@ describe('tabsContainer', () => {
                 id: 'testcomponentid',
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
-                options: {},
+                options: { parentElement: document.createElement('div') },
             };
         });
         const groupviewMock = jest.fn<Partial<DockviewGroupPanelModel>, []>(
@@ -336,7 +336,7 @@ describe('tabsContainer', () => {
     test('left actions', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return (<Partial<DockviewComponent>>{
-                options: {},
+                options: { parentElement: document.createElement('div') },
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
             }) as DockviewComponent;
@@ -402,7 +402,7 @@ describe('tabsContainer', () => {
     test('right actions', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return (<Partial<DockviewComponent>>{
-                options: {},
+                options: { parentElement: document.createElement('div') },
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
             }) as DockviewComponent;
@@ -468,7 +468,7 @@ describe('tabsContainer', () => {
     test('that a tab will become floating when clicked if not floating and shift is selected', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return (<Partial<DockviewComponent>>{
-                options: {},
+                options: { parentElement: document.createElement('div') },
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
                 element: document.createElement('div'),
@@ -514,21 +514,21 @@ describe('tabsContainer', () => {
             },
             { inDragMode: true }
         );
-        expect(accessor.addFloatingGroup).toBeCalledTimes(1);
-        expect(eventPreventDefaultSpy).toBeCalledTimes(1);
+        expect(accessor.addFloatingGroup).toHaveBeenCalledTimes(1);
+        expect(eventPreventDefaultSpy).toHaveBeenCalledTimes(1);
 
         const event2 = new KeyboardEvent('mousedown', { shiftKey: false });
         const eventPreventDefaultSpy2 = jest.spyOn(event2, 'preventDefault');
         fireEvent(container, event2);
 
-        expect(accessor.addFloatingGroup).toBeCalledTimes(1);
-        expect(eventPreventDefaultSpy2).toBeCalledTimes(0);
+        expect(accessor.addFloatingGroup).toHaveBeenCalledTimes(1);
+        expect(eventPreventDefaultSpy2).toHaveBeenCalledTimes(0);
     });
 
     test('that a tab that is already floating cannot be floated again', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return (<Partial<DockviewComponent>>{
-                options: {},
+                options: { parentElement: document.createElement('div') },
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
                 element: document.createElement('div'),
@@ -580,7 +580,7 @@ describe('tabsContainer', () => {
     test('that selecting a tab with shift down will move that tab into a new floating group', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return (<Partial<DockviewComponent>>{
-                options: {},
+                options: { parentElement: document.createElement('div') },
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
                 element: document.createElement('div'),
@@ -642,7 +642,7 @@ describe('tabsContainer', () => {
     test('pre header actions', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return (<Partial<DockviewComponent>>{
-                options: {},
+                options: { parentElement: document.createElement('div') },
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
                 element: document.createElement('div'),
@@ -712,7 +712,7 @@ describe('tabsContainer', () => {
     test('left header actions', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return (<Partial<DockviewComponent>>{
-                options: {},
+                options: { parentElement: document.createElement('div') },
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
                 element: document.createElement('div'),
@@ -782,7 +782,7 @@ describe('tabsContainer', () => {
     test('right header actions', () => {
         const accessorMock = jest.fn<DockviewComponent, []>(() => {
             return (<Partial<DockviewComponent>>{
-                options: {},
+                options: { parentElement: document.createElement('div') },
                 onDidAddPanel: jest.fn(),
                 onDidRemovePanel: jest.fn(),
                 element: document.createElement('div'),
