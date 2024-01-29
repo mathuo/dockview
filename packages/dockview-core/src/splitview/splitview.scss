@@ -25,7 +25,7 @@
     height: 100%;
     width: 100%;
 
-    &.dv-splitview-locked {
+    &.dv-splitview-disabled {
         & > .sash-container > .sash {
             pointer-events: none;
         }

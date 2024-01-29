@@ -42,7 +42,7 @@ function flipNode<T extends Node>(
             node.styles,
             size,
             orthogonalSize,
-            node.locked
+            node.disabled
         );
 
         let totalSize = 0;
@@ -350,7 +350,7 @@ export class Gridview implements IDisposable {
             const node = branch.pop();
 
             if (node instanceof BranchNode) {
-                node.locked = value;
+                node.disabled = value;
                 branch.push(...node.children);
             }
         }

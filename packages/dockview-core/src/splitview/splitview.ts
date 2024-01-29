@@ -201,14 +201,14 @@ export class Splitview {
         this.updateSashEnablement();
     }
 
-    get locked(): boolean {
+    get disabled(): boolean {
         return this._disabled;
     }
 
-    set locked(value: boolean) {
+    set disabled(value: boolean) {
         this._disabled = value;
 
-        toggleClass(this.element, 'dv-splitview-locked', value);
+        toggleClass(this.element, 'dv-splitview-disabled', value);
     }
 
     constructor(

@@ -131,12 +131,12 @@ export class BranchNode extends CompositeDisposable implements IView {
         return LayoutPriority.Normal;
     }
 
-    get locked(): boolean {
-        return this.splitview.locked;
+    get disabled(): boolean {
+        return this.splitview.disabled;
     }
 
-    set locked(value: boolean) {
-        this.splitview.locked = value;
+    set disabled(value: boolean) {
+        this.splitview.disabled = value;
     }
 
     constructor(
@@ -187,7 +187,7 @@ export class BranchNode extends CompositeDisposable implements IView {
             });
         }
 
-        this.locked = disabled;
+        this.disabled = disabled;
 
         this.addDisposables(
             this._onDidChange,
