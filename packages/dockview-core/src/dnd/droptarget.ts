@@ -304,24 +304,43 @@ export class Droptarget extends CompositeDisposable {
             }
         }
 
-        const translate = (1 - size) / 2;
-        const scale = size;
+        const box = { top: '0px', left: '0px', width: '100%', height: '100%' };
 
-        let transform: string;
-
+        /**
+         * You can also achieve the overlay placement using the transform CSS property
+         * to translate and scale the element however this has the undesired effect of
+         * 'skewing' the element. Comment left here for anybody that ever revisits this.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/CSS/transform
+         *
+         * right
+         * translateX(${100 * (1 - size) / 2}%) scaleX(${scale})
+         *
+         * left
+         * translateX(-${100 * (1 - size) / 2}%) scaleX(${scale})
+         *
+         * top
+         * translateY(-${100 * (1 - size) / 2}%) scaleY(${scale})
+         *
+         * bottom
+         * translateY(${100 * (1 - size) / 2}%) scaleY(${scale})
+         */
         if (rightClass) {
-            transform = `translateX(${100 * translate}%) scaleX(${scale})`;
+            box.left = `${100 * (1 - size)}%`;
+            box.width = `${100 * size}%`;
         } else if (leftClass) {
-            transform = `translateX(-${100 * translate}%) scaleX(${scale})`;
+            box.width = `${100 * size}%`;
         } else if (topClass) {
-            transform = `translateY(-${100 * translate}%) scaleY(${scale})`;
+            box.height = `${100 * size}%`;
         } else if (bottomClass) {
-            transform = `translateY(${100 * translate}%) scaleY(${scale})`;
-        } else {
-            transform = '';
+            box.top = `${100 * size}%`;
+            box.height = `${100 * size}%`;
         }
 
-        this.overlayElement.style.transform = transform;
+        this.overlayElement.style.top = box.top;
+        this.overlayElement.style.left = box.left;
+        this.overlayElement.style.width = box.width;
+        this.overlayElement.style.height = box.height;
 
         toggleClass(
             this.overlayElement,
