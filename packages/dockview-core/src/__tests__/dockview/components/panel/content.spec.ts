@@ -62,16 +62,19 @@ describe('contentContainer', () => {
 
         const disposable = new CompositeDisposable();
 
-        const dockviewComponent = jest.fn<DockviewComponent, []>(() => {
-            return {
-                renderer: 'onlyWhenVisibile',
-                overlayRenderContainer: new OverlayRenderContainer(
-                    document.createElement('div')
-                ),
-            } as DockviewComponent;
-        });
+        const overlayRenderContainer = new OverlayRenderContainer(
+            document.createElement('div')
+        );
 
-        const cut = new ContentContainer(dockviewComponent(), jest.fn() as any);
+        const cut = new ContentContainer(
+            fromPartial<DockviewComponent>({
+                renderer: 'onlyWhenVisibile',
+                overlayRenderContainer,
+            }),
+            fromPartial<DockviewGroupPanelModel>({
+                renderContainer: overlayRenderContainer,
+            })
+        );
 
         disposable.addDisposables(
             cut.onDidFocus(() => {
@@ -84,12 +87,12 @@ describe('contentContainer', () => {
 
         const contentRenderer = new TestContentRenderer('id-1');
 
-        const panel = {
+        const panel = fromPartial<IDockviewPanel>({
             view: {
                 content: contentRenderer,
-            } as Partial<IDockviewPanelModel>,
+            },
             api: { renderer: 'onlyWhenVisibile' },
-        } as Partial<IDockviewPanel>;
+        });
 
         cut.openPanel(panel as IDockviewPanel);
 
@@ -151,13 +154,17 @@ describe('contentContainer', () => {
     });
 
     test("that panels renderered as 'onlyWhenVisibile' are removed when closed", () => {
+        const overlayRenderContainer = fromPartial<OverlayRenderContainer>({
+            detatch: jest.fn(),
+        });
+
         const cut = new ContentContainer(
             fromPartial<DockviewComponent>({
-                overlayRenderContainer: {
-                    detatch: jest.fn(),
-                },
+                overlayRenderContainer,
             }),
-            fromPartial<DockviewGroupPanelModel>({})
+            fromPartial<DockviewGroupPanelModel>({
+                renderContainer: overlayRenderContainer,
+            })
         );
 
         const panel1 = fromPartial<IDockviewPanel>({

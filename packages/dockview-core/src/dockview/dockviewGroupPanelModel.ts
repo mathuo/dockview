@@ -26,6 +26,7 @@ import { DockviewDropTargets, IWatermarkRenderer } from './types';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
 import { IHeaderActionsRenderer } from './options';
+import { OverlayRenderContainer } from '../overlayRenderContainer';
 
 interface GroupMoveEvent {
     groupId: string;
@@ -418,6 +419,27 @@ export class DockviewGroupPanelModel
             this._onDidAddPanel,
             this._onDidRemovePanel,
             this._onDidActivePanelChange
+        );
+    }
+
+    private _overwriteRenderContainer: OverlayRenderContainer | null = null;
+
+    set renderContainer(value: OverlayRenderContainer | null) {
+        this.panels.forEach((panel) => {
+            this.renderContainer.detatch(panel);
+        });
+
+        this._overwriteRenderContainer = value;
+
+        this.panels.forEach((panel) => {
+            this.rerender(panel);
+        });
+    }
+
+    get renderContainer(): OverlayRenderContainer {
+        return (
+            this._overwriteRenderContainer ??
+            this.accessor.overlayRenderContainer
         );
     }
 
