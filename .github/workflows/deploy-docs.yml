@@ -2,8 +2,6 @@ name: Deploy Docs
 
 on:
     workflow_dispatch:
-    schedule:
-        - cron: '0 3 * * *' # every day at 3 am UTC
 
 jobs:
     deploy-nightly-demo-app:
