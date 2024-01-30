@@ -12,14 +12,10 @@ import {
 } from '../dnd/droptarget';
 import { tail, sequenceEquals, remove } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
-import { CompositeDisposable, Disposable } from '../lifecycle';
-import { Event, Emitter } from '../events';
+import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
+import { Event, Emitter, addDisposableWindowListener } from '../events';
 import { Watermark } from './components/watermark/watermark';
-import {
-    IWatermarkRenderer,
-    GroupviewPanelState,
-    DockviewDropTargets,
-} from './types';
+import { IWatermarkRenderer, GroupviewPanelState } from './types';
 import { sequentialNumberGenerator } from '../math';
 import { DefaultDockviewDeserialzier } from './deserializer';
 import { createComponent } from '../panel/componentFactory';
@@ -44,7 +40,9 @@ import { Orientation, Sizing } from '../splitview/splitview';
 import {
     GroupOptions,
     GroupPanelViewState,
-    GroupviewDropEvent,
+    DockviewDidDropEvent,
+    DockviewWillDropEvent,
+    WillShowOverlayLocationEvent,
 } from './dockviewGroupPanelModel';
 import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { DockviewPanelModel } from './dockviewPanelModel';
@@ -58,7 +56,6 @@ import {
     TabDragEvent,
 } from './components/titlebar/tabsContainer';
 import { Box } from '../types';
-import { DockviewPopoutGroupPanel } from './dockviewPopoutGroupPanel';
 import {
     DEFAULT_FLOATING_GROUP_OVERFLOW_SIZE,
     DEFAULT_FLOATING_GROUP_POSITION,
@@ -67,13 +64,14 @@ import {
     DockviewPanelRenderer,
     OverlayRenderContainer,
 } from '../overlayRenderContainer';
+import { PopoutWindow } from '../popoutWindow';
 
 const DEFAULT_ROOT_OVERLAY_MODEL: DroptargetOverlayModel = {
     activationSize: { type: 'pixels', value: 10 },
     size: { type: 'pixels', value: 20 },
 };
 
-function getTheme(element: HTMLElement): string | undefined {
+function getDockviewTheme(element: HTMLElement): string | undefined {
     function toClassList(element: HTMLElement) {
         const list: string[] = [];
 
@@ -230,18 +228,16 @@ export type DockviewComponentUpdateOptions = Pick<
     | 'disableFloatingGroups'
     | 'floatingGroupBounds'
     | 'rootOverlayModel'
+    | 'disableDnd'
 >;
-
-export interface DockviewDropEvent extends GroupviewDropEvent {
-    api: DockviewApi;
-    group: DockviewGroupPanel | null;
-}
 
 export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly activePanel: IDockviewPanel | undefined;
     readonly totalPanels: number;
     readonly panels: IDockviewPanel[];
-    readonly onDidDrop: Event<DockviewDropEvent>;
+    readonly onDidDrop: Event<DockviewDidDropEvent>;
+    readonly onWillDrop: Event<DockviewWillDropEvent>;
+    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent>;
     readonly orientation: Orientation;
     updateOptions(options: DockviewComponentUpdateOptions): void;
     moveGroupOrPanel(
@@ -286,8 +282,10 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
         options?: {
             position?: Box;
             popoutUrl?: string;
+            onDidOpen?: (event: { id: string; window: Window }) => void;
+            onWillClose?: (event: { id: string; window: Window }) => void;
         }
-    ): void;
+    ): Promise<void>;
 }
 
 export class DockviewComponent
@@ -309,8 +307,16 @@ export class DockviewComponent
     readonly onWillDragGroup: Event<GroupDragEvent> =
         this._onWillDragGroup.event;
 
-    private readonly _onDidDrop = new Emitter<DockviewDropEvent>();
-    readonly onDidDrop: Event<DockviewDropEvent> = this._onDidDrop.event;
+    private readonly _onDidDrop = new Emitter<DockviewDidDropEvent>();
+    readonly onDidDrop: Event<DockviewDidDropEvent> = this._onDidDrop.event;
+
+    private readonly _onWillDrop = new Emitter<DockviewWillDropEvent>();
+    readonly onWillDrop: Event<DockviewWillDropEvent> = this._onWillDrop.event;
+
+    private readonly _onWillShowOverlay =
+        new Emitter<WillShowOverlayLocationEvent>();
+    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent> =
+        this._onWillShowOverlay.event;
 
     private readonly _onDidRemovePanel = new Emitter<IDockviewPanel>();
     readonly onDidRemovePanel: Event<IDockviewPanel> =
@@ -329,7 +335,12 @@ export class DockviewComponent
         this._onDidActivePanelChange.event;
 
     private readonly _floatingGroups: DockviewFloatingGroupPanel[] = [];
-    private readonly _popoutGroups: DockviewPopoutGroupPanel[] = [];
+    private readonly _popoutGroups: {
+        window: PopoutWindow;
+        popoutGroup: DockviewGroupPanel;
+        referenceGroup: DockviewGroupPanel;
+        disposable: IDisposable;
+    }[] = [];
     private readonly _rootDropTarget: Droptarget;
 
     get orientation(): Orientation {
@@ -369,6 +380,7 @@ export class DockviewComponent
             styles: options.styles,
             parentElement: options.parentElement,
             disableAutoResizing: options.disableAutoResizing,
+            locked: options.locked,
         });
 
         const gready = document.createElement('div');
@@ -384,11 +396,13 @@ export class DockviewComponent
             this.overlayRenderContainer,
             this._onWillDragPanel,
             this._onWillDragGroup,
+            this._onWillShowOverlay,
             this._onDidActivePanelChange,
             this._onDidAddPanel,
             this._onDidRemovePanel,
             this._onDidLayoutFromJSON,
             this._onDidDrop,
+            this._onWillDrop,
             Event.any(
                 this.onDidAddGroup,
                 this.onDidRemoveGroup
@@ -410,7 +424,7 @@ export class DockviewComponent
 
                 // iterate over a copy of the array since .dispose() mutates the original array
                 for (const group of [...this._popoutGroups]) {
-                    group.dispose();
+                    group.disposable.dispose();
                 }
             })
         );
@@ -467,7 +481,7 @@ export class DockviewComponent
                     return this.options.showDndOverlay({
                         nativeEvent: event,
                         position: position,
-                        target: DockviewDropTargets.Edge,
+                        target: 'edge',
                         getData: getPanelData,
                     });
                 }
@@ -481,6 +495,22 @@ export class DockviewComponent
 
         this.addDisposables(
             this._rootDropTarget.onDrop((event) => {
+                const willDropEvent = new DockviewWillDropEvent({
+                    nativeEvent: event.nativeEvent,
+                    position: event.position,
+                    panel: undefined,
+                    api: this._api,
+                    group: undefined,
+                    getData: getPanelData,
+                    kind: 'content',
+                });
+
+                this._onWillDrop.fire(willDropEvent);
+
+                if (willDropEvent.defaultPrevented) {
+                    return;
+                }
+
                 const data = getPanelData();
 
                 if (data) {
@@ -491,12 +521,16 @@ export class DockviewComponent
                         'center'
                     );
                 } else {
-                    this._onDidDrop.fire({
-                        ...event,
-                        api: this._api,
-                        group: null,
-                        getData: getPanelData,
-                    });
+                    this._onDidDrop.fire(
+                        new DockviewDidDropEvent({
+                            nativeEvent: event.nativeEvent,
+                            position: event.position,
+                            panel: undefined,
+                            api: this._api,
+                            group: undefined,
+                            getData: getPanelData,
+                        })
+                    );
                 }
             }),
             this._rootDropTarget
@@ -513,71 +547,176 @@ export class DockviewComponent
             skipRemoveGroup?: boolean;
             position?: Box;
             popoutUrl?: string;
+            onDidOpen?: (event: { id: string; window: Window }) => void;
+            onWillClose?: (event: { id: string; window: Window }) => void;
         }
-    ): void {
-        let group: DockviewGroupPanel;
-        let box: Box | undefined = options?.position;
+    ): Promise<void> {
+        if (item instanceof DockviewPanel && item.group.size === 1) {
+            return this.addPopoutGroup(item.group);
+        }
 
-        if (item instanceof DockviewPanel) {
-            group = this.createGroup();
+        const theme = getDockviewTheme(this.gridview.element);
+        const element = this.element;
 
-            this.removePanel(item, {
-                removeEmptyGroup: true,
-                skipDispose: true,
+        function moveGroupWithoutDestroying(options: {
+            from: DockviewGroupPanel;
+            to: DockviewGroupPanel;
+        }) {
+            const activePanel = options.from.activePanel;
+            const panels = [...options.from.panels].map((panel) =>
+                options.from.model.removePanel(panel)
+            );
+
+            panels.forEach((panel) => {
+                options.to.model.openPanel(panel, {
+                    skipSetPanelActive: activePanel !== panel,
+                });
             });
-
-            group.model.openPanel(item);
-
-            if (!box) {
-                box = this.element.getBoundingClientRect();
-            }
-        } else {
-            group = item;
-
-            if (!box) {
-                box = group.element.getBoundingClientRect();
-            }
-
-            const skip =
-                typeof options?.skipRemoveGroup === 'boolean' &&
-                options.skipRemoveGroup;
-
-            if (!skip) {
-                this.doRemoveGroup(item, { skipDispose: true });
-            }
         }
 
-        const theme = getTheme(this.gridview.element);
+        function getBox(): Box {
+            if (options?.position) {
+                return options.position;
+            }
 
-        const popoutWindow = new DockviewPopoutGroupPanel(
-            `${this.id}-${group.id}`, // globally unique within dockview
-            group,
+            if (item instanceof DockviewGroupPanel) {
+                return item.element.getBoundingClientRect();
+            }
+
+            if (item.group) {
+                return item.group.element.getBoundingClientRect();
+            }
+            return element.getBoundingClientRect();
+        }
+
+        const box: Box = getBox();
+
+        const groupId = this.getNextGroupId(); //item.id;
+
+        item.api.setHidden(true);
+
+        const _window = new PopoutWindow(
+            `${this.id}-${groupId}`, // unique id
+            theme ?? '',
             {
-                className: theme ?? '',
-                popoutUrl: options?.popoutUrl ?? '/popout.html',
-                box: {
-                    left: window.screenX + box.left,
-                    top: window.screenY + box.top,
-                    width: box.width,
-                    height: box.height,
-                },
+                url: options?.popoutUrl ?? '/popout.html',
+                left: window.screenX + box.left,
+                top: window.screenY + box.top,
+                width: box.width,
+                height: box.height,
+                onDidOpen: options?.onDidOpen,
+                onWillClose: options?.onWillClose,
             }
         );
 
-        popoutWindow.addDisposables(
-            {
-                dispose: () => {
-                    remove(this._popoutGroups, popoutWindow);
-                    this.updateWatermark();
-                },
-            },
-            popoutWindow.window.onDidClose(() => {
-                this.doAddGroup(group, [0]);
+        const popoutWindowDisposable = new CompositeDisposable(
+            _window,
+            _window.onDidClose(() => {
+                popoutWindowDisposable.dispose();
             })
         );
 
-        this._popoutGroups.push(popoutWindow);
-        this.updateWatermark();
+        return _window
+            .open()
+            .then((popoutContainer) => {
+                if (_window.isDisposed) {
+                    return;
+                }
+
+                if (popoutContainer === null) {
+                    popoutWindowDisposable.dispose();
+                    return;
+                }
+
+                const gready = document.createElement('div');
+                gready.className = 'dv-overlay-render-container';
+
+                const overlayRenderContainer = new OverlayRenderContainer(
+                    gready
+                );
+
+                const referenceGroup =
+                    item instanceof DockviewPanel ? item.group : item;
+
+                const group = this.createGroup({ id: groupId });
+                group.model.renderContainer = overlayRenderContainer;
+
+                if (item instanceof DockviewPanel) {
+                    const panel = referenceGroup.model.removePanel(item);
+                    group.model.openPanel(panel);
+                } else {
+                    moveGroupWithoutDestroying({
+                        from: referenceGroup,
+                        to: group,
+                    });
+                    referenceGroup.api.setHidden(true);
+                }
+
+                popoutContainer.classList.add('dv-dockview');
+                popoutContainer.style.overflow = 'hidden';
+                popoutContainer.appendChild(gready);
+
+                popoutContainer.appendChild(group.element);
+
+                group.model.location = {
+                    type: 'popout',
+                    getWindow: () => _window.window!,
+                };
+
+                const value = {
+                    window: _window,
+                    popoutGroup: group,
+                    referenceGroup,
+                    disposable: popoutWindowDisposable,
+                };
+
+                popoutWindowDisposable.addDisposables(
+                    /**
+                     * ResizeObserver seems slow here, I do not know why but we don't need it
+                     * since we can reply on the window resize event as we will occupy the full
+                     * window dimensions
+                     */
+                    addDisposableWindowListener(
+                        _window.window!,
+                        'resize',
+                        () => {
+                            group.layout(window.innerWidth, window.innerHeight);
+                        }
+                    ),
+                    overlayRenderContainer,
+                    Disposable.from(() => {
+                        if (this.getPanel(referenceGroup.id)) {
+                            moveGroupWithoutDestroying({
+                                from: group,
+                                to: referenceGroup,
+                            });
+
+                            if (referenceGroup.api.isHidden) {
+                                referenceGroup.api.setHidden(false);
+                            }
+
+                            this.doRemoveGroup(group, {
+                                skipPopoutAssociated: true,
+                            });
+                        } else {
+                            const removedGroup = this.doRemoveGroup(group, {
+                                skipDispose: true,
+                                skipActive: true,
+                            });
+                            removedGroup.model.renderContainer =
+                                this.overlayRenderContainer;
+                            removedGroup.model.location = { type: 'grid' };
+                            this.doAddGroup(removedGroup, [0]);
+                        }
+                    })
+                );
+
+                this._popoutGroups.push(value);
+                this.updateWatermark();
+            })
+            .catch((err) => {
+                console.error(err);
+            });
     }
 
     addFloatingGroup(
@@ -608,7 +747,7 @@ export class DockviewComponent
             }
         }
 
-        group.model.location = 'floating';
+        group.model.location = { type: 'floating' };
 
         const overlayLeft =
             typeof coord?.x === 'number'
@@ -683,7 +822,7 @@ export class DockviewComponent
                 dispose: () => {
                     disposable.dispose();
 
-                    group.model.location = 'grid';
+                    group.model.location = { type: 'grid' };
                     remove(this._floatingGroups, floatingGroupPanel);
                     this.updateWatermark();
                 },
@@ -876,7 +1015,7 @@ export class DockviewComponent
         const popoutGroups: SerializedPopoutGroup[] = this._popoutGroups.map(
             (group) => {
                 return {
-                    data: group.group.toJSON() as GroupPanelViewState,
+                    data: group.popoutGroup.toJSON() as GroupPanelViewState,
                     position: group.window.dimensions(),
                 };
             }
@@ -1173,7 +1312,7 @@ export class DockviewComponent
                 group.model.openPanel(panel);
                 this.doSetGroupAndPanelActive(group);
             } else if (
-                referenceGroup.api.location === 'floating' ||
+                referenceGroup.api.location.type === 'floating' ||
                 target === 'center'
             ) {
                 panel = this.createPanel(options, referenceGroup);
@@ -1259,7 +1398,11 @@ export class DockviewComponent
     }
 
     private updateWatermark(): void {
-        if (this.groups.filter((x) => x.api.location === 'grid').length === 0) {
+        if (
+            this.groups.filter(
+                (x) => x.api.location.type === 'grid' && !x.api.isHidden
+            ).length === 0
+        ) {
             if (!this.watermark) {
                 this.watermark = this.createWatermarkComponent();
 
@@ -1374,10 +1517,11 @@ export class DockviewComponent
             | {
                   skipActive?: boolean;
                   skipDispose?: boolean;
+                  skipPopoutAssociated?: boolean;
               }
             | undefined
     ): DockviewGroupPanel {
-        if (group.api.location === 'floating') {
+        if (group.api.location.type === 'floating') {
             const floatingGroup = this._floatingGroups.find(
                 (_) => _.group === group
             );
@@ -1406,19 +1550,23 @@ export class DockviewComponent
             throw new Error('failed to find floating group');
         }
 
-        if (group.api.location === 'popout') {
+        if (group.api.location.type === 'popout') {
             const selectedGroup = this._popoutGroups.find(
-                (_) => _.group === group
+                (_) => _.popoutGroup === group
             );
 
             if (selectedGroup) {
                 if (!options?.skipDispose) {
-                    selectedGroup.group.dispose();
+                    if (!options?.skipPopoutAssociated) {
+                        this.removeGroup(selectedGroup.referenceGroup);
+                    }
+
+                    selectedGroup.popoutGroup.dispose();
                     this._groups.delete(group.id);
                     this._onDidRemoveGroup.fire(group);
                 }
 
-                selectedGroup.dispose();
+                selectedGroup.disposable.dispose();
 
                 if (!options?.skipActive && this._activeGroup === group) {
                     const groups = Array.from(this._groups.values());
@@ -1428,7 +1576,8 @@ export class DockviewComponent
                     );
                 }
 
-                return selectedGroup.group;
+                this.updateWatermark();
+                return selectedGroup.popoutGroup;
             }
 
             throw new Error('failed to find popout group');
@@ -1486,7 +1635,7 @@ export class DockviewComponent
             if (sourceGroup && sourceGroup.size < 2) {
                 const [targetParentLocation, to] = tail(targetLocation);
 
-                if (sourceGroup.api.location === 'grid') {
+                if (sourceGroup.api.location.type === 'grid') {
                     const sourceLocation = getGridLocation(sourceGroup.element);
                     const [sourceParentLocation, from] = tail(sourceLocation);
 
@@ -1562,7 +1711,7 @@ export class DockviewComponent
                     });
                 }
             } else {
-                switch (sourceGroup.api.location) {
+                switch (sourceGroup.api.location.type) {
                     case 'grid':
                         this.gridview.removeView(
                             getGridLocation(sourceGroup.element)
@@ -1580,12 +1729,12 @@ export class DockviewComponent
                     }
                     case 'popout': {
                         const selectedPopoutGroup = this._popoutGroups.find(
-                            (x) => x.group === sourceGroup
+                            (x) => x.popoutGroup === sourceGroup
                         );
                         if (!selectedPopoutGroup) {
                             throw new Error('failed to find popout group');
                         }
-                        selectedPopoutGroup.dispose();
+                        selectedPopoutGroup.disposable.dispose();
                     }
                 }
 
@@ -1619,6 +1768,15 @@ export class DockviewComponent
         }
     }
 
+    private getNextGroupId(): string {
+        let id = this.nextGroupId.next();
+        while (this._groups.has(id)) {
+            id = this.nextGroupId.next();
+        }
+
+        return id;
+    }
+
     createGroup(options?: GroupOptions): DockviewGroupPanel {
         if (!options) {
             options = {};
@@ -1641,7 +1799,7 @@ export class DockviewComponent
         }
 
         const view = new DockviewGroupPanel(this, id, options);
-        view.init({ params: {}, accessor: <any>null }); // required to initialized .part and allow for correct disposal of group
+        view.init({ params: {}, accessor: this });
 
         if (!this._groups.has(view.id)) {
             const disposable = new CompositeDisposable(
@@ -1656,11 +1814,18 @@ export class DockviewComponent
                     this.moveGroupOrPanel(view, groupId, itemId, target, index);
                 }),
                 view.model.onDidDrop((event) => {
-                    this._onDidDrop.fire({
-                        ...event,
-                        api: this._api,
-                        group: view,
-                    });
+                    this._onDidDrop.fire(event);
+                }),
+                view.model.onWillDrop((event) => {
+                    this._onWillDrop.fire(event);
+                }),
+                view.model.onWillShowOverlay((event) => {
+                    if (this.options.disableDnd) {
+                        event.event.preventDefault();
+                        return;
+                    }
+
+                    this._onWillShowOverlay.fire(event);
                 }),
                 view.model.onDidAddPanel((event) => {
                     this._onDidAddPanel.fire(event.panel);
@@ -1676,8 +1841,7 @@ export class DockviewComponent
             this._groups.set(view.id, { value: view, disposable });
         }
 
-        // TODO: must be called after the above listeners have been setup,
-        // not an ideal pattern
+        // TODO: must be called after the above listeners have been setup, not an ideal pattern
         view.initialize();
 
         return view;

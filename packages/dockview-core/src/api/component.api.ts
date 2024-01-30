@@ -1,5 +1,4 @@
 import {
-    DockviewDropEvent,
     IDockviewComponent,
     SerializedDockview,
 } from '../dockview/dockviewComponent';
@@ -43,6 +42,11 @@ import {
     TabDragEvent,
 } from '../dockview/components/titlebar/tabsContainer';
 import { Box } from '../types';
+import {
+    DockviewDidDropEvent,
+    DockviewWillDropEvent,
+    WillShowOverlayLocationEvent,
+} from '../dockview/dockviewGroupPanelModel';
 
 export interface CommonApi<T = any> {
     readonly height: number;
@@ -648,8 +652,25 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     /**
      * Invoked when a Drag'n'Drop event occurs that the component was unable to handle. Exposed for custom Drag'n'Drop functionality.
      */
-    get onDidDrop(): Event<DockviewDropEvent> {
+    get onDidDrop(): Event<DockviewDidDropEvent> {
         return this.component.onDidDrop;
+    }
+
+    /**
+     * Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and
+     * prevent the event from occuring using the standard `preventDefault()` syntax.
+     *
+     * Preventing certain events may causes unexpected behaviours, use carefully.
+     */
+    get onWillDrop(): Event<DockviewWillDropEvent> {
+        return this.component.onWillDrop;
+    }
+
+    /**
+     *
+     */
+    get onWillShowOverlay(): Event<WillShowOverlayLocationEvent> {
+        return this.component.onWillShowOverlay;
     }
 
     /**
@@ -830,8 +851,10 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         options?: {
             position?: Box;
             popoutUrl?: string;
+            onDidOpen?: (event: { id: string; window: Window }) => void;
+            onWillClose?: (event: { id: string; window: Window }) => void;
         }
-    ): void {
-        this.component.addPopoutGroup(item, options);
+    ): Promise<void> {
+        return this.component.addPopoutGroup(item, options);
     }
 }

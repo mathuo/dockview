@@ -4,12 +4,14 @@ import {
     IValueDisposable,
 } from '../../../lifecycle';
 import { addDisposableListener, Emitter, Event } from '../../../events';
-import { ITab, Tab } from '../tab/tab';
-import { DockviewComponent } from '../../dockviewComponent';
+import { Tab } from '../tab/tab';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
 import { VoidContainer } from './voidContainer';
 import { toggleClass } from '../../../dom';
 import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
+import { DockviewComponent } from '../../dockviewComponent';
+import { WillShowOverlayEvent } from '../../../dnd/droptarget';
+import { DockviewGroupDropLocation } from '../../dockviewGroupPanelModel';
 
 export interface TabDropIndexEvent {
     readonly event: DragEvent;
@@ -30,17 +32,21 @@ export interface ITabsContainer extends IDisposable {
     readonly element: HTMLElement;
     readonly panels: string[];
     readonly size: number;
+    readonly onDrop: Event<TabDropIndexEvent>;
+    readonly onTabDragStart: Event<TabDragEvent>;
+    readonly onGroupDragStart: Event<GroupDragEvent>;
+    readonly onWillShowOverlay: Event<{
+        event: WillShowOverlayEvent;
+        kind: DockviewGroupDropLocation;
+    }>;
     hidden: boolean;
-    delete: (id: string) => void;
-    indexOf: (id: string) => number;
-    onDrop: Event<TabDropIndexEvent>;
-    onTabDragStart: Event<TabDragEvent>;
-    onGroupDragStart: Event<GroupDragEvent>;
-    setActive: (isGroupActive: boolean) => void;
-    setActivePanel: (panel: IDockviewPanel) => void;
-    isActive: (tab: ITab) => boolean;
-    closePanel: (panel: IDockviewPanel) => void;
-    openPanel: (panel: IDockviewPanel, index?: number) => void;
+    delete(id: string): void;
+    indexOf(id: string): number;
+    setActive(isGroupActive: boolean): void;
+    setActivePanel(panel: IDockviewPanel): void;
+    isActive(tab: Tab): boolean;
+    closePanel(panel: IDockviewPanel): void;
+    openPanel(panel: IDockviewPanel, index?: number): void;
     setRightActionsElement(element: HTMLElement | undefined): void;
     setLeftActionsElement(element: HTMLElement | undefined): void;
     setPrefixActionsElement(element: HTMLElement | undefined): void;
@@ -59,7 +65,7 @@ export class TabsContainer
     private readonly preActionsContainer: HTMLElement;
     private readonly voidContainer: VoidContainer;
 
-    private tabs: IValueDisposable<ITab>[] = [];
+    private tabs: IValueDisposable<Tab>[] = [];
     private selectedIndex = -1;
     private rightActions: HTMLElement | undefined;
     private leftActions: HTMLElement | undefined;
@@ -76,6 +82,15 @@ export class TabsContainer
     private readonly _onGroupDragStart = new Emitter<GroupDragEvent>();
     readonly onGroupDragStart: Event<GroupDragEvent> =
         this._onGroupDragStart.event;
+
+    private readonly _onWillShowOverlay = new Emitter<{
+        event: WillShowOverlayEvent;
+        kind: DockviewGroupDropLocation;
+    }>();
+    readonly onWillShowOverlay: Event<{
+        event: WillShowOverlayEvent;
+        kind: DockviewGroupDropLocation;
+    }> = this._onWillShowOverlay.event;
 
     get panels(): string[] {
         return this.tabs.map((_) => _.value.panel.id);
@@ -150,7 +165,7 @@ export class TabsContainer
         return this._element;
     }
 
-    public isActive(tab: ITab): boolean {
+    public isActive(tab: Tab): boolean {
         return (
             this.selectedIndex > -1 &&
             this.tabs[this.selectedIndex].value === tab
@@ -167,12 +182,6 @@ export class TabsContainer
     ) {
         super();
 
-        this.addDisposables(
-            this._onDrop,
-            this._onTabDragStart,
-            this._onGroupDragStart
-        );
-
         this._element = document.createElement('div');
         this._element.className = 'tabs-and-actions-container';
 
@@ -180,27 +189,6 @@ export class TabsContainer
             this._element,
             'dv-full-width-single-tab',
             this.accessor.options.singleTabMode === 'fullwidth'
-        );
-
-        this.addDisposables(
-            this.accessor.onDidAddPanel((e) => {
-                if (e.api.group === this.group) {
-                    toggleClass(
-                        this._element,
-                        'dv-single-tab',
-                        this.size === 1
-                    );
-                }
-            }),
-            this.accessor.onDidRemovePanel((e) => {
-                if (e.api.group === this.group) {
-                    toggleClass(
-                        this._element,
-                        'dv-single-tab',
-                        this.size === 1
-                    );
-                }
-            })
         );
 
         this.rightActionsContainer = document.createElement('div');
@@ -224,6 +212,28 @@ export class TabsContainer
         this._element.appendChild(this.rightActionsContainer);
 
         this.addDisposables(
+            this.accessor.onDidAddPanel((e) => {
+                if (e.api.group === this.group) {
+                    toggleClass(
+                        this._element,
+                        'dv-single-tab',
+                        this.size === 1
+                    );
+                }
+            }),
+            this.accessor.onDidRemovePanel((e) => {
+                if (e.api.group === this.group) {
+                    toggleClass(
+                        this._element,
+                        'dv-single-tab',
+                        this.size === 1
+                    );
+                }
+            }),
+            this._onWillShowOverlay,
+            this._onDrop,
+            this._onTabDragStart,
+            this._onGroupDragStart,
             this.voidContainer,
             this.voidContainer.onDragStart((event) => {
                 this._onGroupDragStart.fire({
@@ -237,6 +247,9 @@ export class TabsContainer
                     index: this.tabs.length,
                 });
             }),
+            this.voidContainer.onWillShowOverlay((event) => {
+                this._onWillShowOverlay.fire({ event, kind: 'header_space' });
+            }),
             addDisposableListener(
                 this.voidContainer.element,
                 'mousedown',
@@ -247,7 +260,7 @@ export class TabsContainer
                     if (
                         isFloatingGroupsEnabled &&
                         event.shiftKey &&
-                        this.group.api.location !== 'floating'
+                        this.group.api.location.type !== 'floating'
                     ) {
                         event.preventDefault();
 
@@ -286,7 +299,7 @@ export class TabsContainer
     }
 
     private addTab(
-        tab: IValueDisposable<ITab>,
+        tab: IValueDisposable<Tab>,
         index: number = this.tabs.length
     ): void {
         if (index < 0 || index > this.tabs.length) {
@@ -350,7 +363,8 @@ export class TabsContainer
                     !this.accessor.options.disableFloatingGroups;
 
                 const isFloatingWithOnePanel =
-                    this.group.api.location === 'floating' && this.size === 1;
+                    this.group.api.location.type === 'floating' &&
+                    this.size === 1;
 
                 if (
                     isFloatingGroupsEnabled &&
@@ -395,10 +409,13 @@ export class TabsContainer
                     event: event.nativeEvent,
                     index: this.tabs.findIndex((x) => x.value === tab),
                 });
+            }),
+            tab.onWillShowOverlay((event) => {
+                this._onWillShowOverlay.fire({ event, kind: 'tab' });
             })
         );
 
-        const value: IValueDisposable<ITab> = { value: tab, disposable };
+        const value: IValueDisposable<Tab> = { value: tab, disposable };
 
         this.addTab(value, index);
     }

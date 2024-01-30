@@ -41,7 +41,8 @@ function flipNode<T extends Node>(
             node.proportionalLayout,
             node.styles,
             size,
-            orthogonalSize
+            orthogonalSize,
+            node.disabled
         );
 
         let totalSize = 0;
@@ -273,7 +274,10 @@ export class Gridview implements IDisposable {
     readonly element: HTMLElement;
 
     private _root: BranchNode | undefined;
-    private _maximizedNode: LeafNode | undefined = undefined;
+    private _locked = false;
+    private _maximizedNode:
+        | { leaf: LeafNode; hiddenOnMaximize: LeafNode[] }
+        | undefined = undefined;
     private readonly disposable: MutableDisposable = new MutableDisposable();
 
     private readonly _onDidChange = new Emitter<{
@@ -328,8 +332,32 @@ export class Gridview implements IDisposable {
         return this.root.maximumHeight;
     }
 
+    get locked(): boolean {
+        return this._locked;
+    }
+
+    set locked(value: boolean) {
+        this._locked = value;
+
+        const branch: Node[] = [this.root];
+
+        /**
+         * simple depth-first-search to cover all nodes
+         *
+         * @see https://en.wikipedia.org/wiki/Depth-first_search
+         */
+        while (branch.length > 0) {
+            const node = branch.pop();
+
+            if (node instanceof BranchNode) {
+                node.disabled = value;
+                branch.push(...node.children);
+            }
+        }
+    }
+
     maximizedView(): IGridView | undefined {
-        return this._maximizedNode?.view;
+        return this._maximizedNode?.leaf.view;
     }
 
     hasMaximizedView(): boolean {
@@ -344,7 +372,7 @@ export class Gridview implements IDisposable {
             return;
         }
 
-        if (this._maximizedNode === node) {
+        if (this._maximizedNode?.leaf === node) {
             return;
         }
 
@@ -352,12 +380,18 @@ export class Gridview implements IDisposable {
             this.exitMaximizedView();
         }
 
+        const hiddenOnMaximize: LeafNode[] = [];
+
         function hideAllViewsBut(parent: BranchNode, exclude: LeafNode): void {
             for (let i = 0; i < parent.children.length; i++) {
                 const child = parent.children[i];
                 if (child instanceof LeafNode) {
                     if (child !== exclude) {
-                        parent.setChildVisible(i, false);
+                        if (parent.isChildVisible(i)) {
+                            parent.setChildVisible(i, false);
+                        } else {
+                            hiddenOnMaximize.push(child);
+                        }
                     }
                 } else {
                     hideAllViewsBut(child, exclude);
@@ -366,7 +400,7 @@ export class Gridview implements IDisposable {
         }
 
         hideAllViewsBut(this.root, node);
-        this._maximizedNode = node;
+        this._maximizedNode = { leaf: node, hiddenOnMaximize };
         this._onDidMaxmizedNodeChange.fire();
     }
 
@@ -375,11 +409,15 @@ export class Gridview implements IDisposable {
             return;
         }
 
+        const hiddenOnMaximize = this._maximizedNode.hiddenOnMaximize;
+
         function showViewsInReverseOrder(parent: BranchNode): void {
             for (let index = parent.children.length - 1; index >= 0; index--) {
                 const child = parent.children[index];
                 if (child instanceof LeafNode) {
-                    parent.setChildVisible(index, true);
+                    if (!hiddenOnMaximize.includes(child)) {
+                        parent.setChildVisible(index, true);
+                    }
                 } else {
                     showViewsInReverseOrder(child);
                 }
@@ -395,8 +433,8 @@ export class Gridview implements IDisposable {
     public serialize(): SerializedGridview<any> {
         if (this.hasMaximizedView()) {
             /**
-             * do not persist maximized view state but we must first exit any maximized views
-             * before serialization to ensure the correct dimensions are persisted
+             * do not persist maximized view state
+             * firstly exit any maximized views to ensure the correct dimensions are persisted
              */
             this.exitMaximizedView();
         }
@@ -427,7 +465,8 @@ export class Gridview implements IDisposable {
             this.proportionalLayout,
             this.styles,
             this.root.size,
-            this.root.orthogonalSize
+            this.root.orthogonalSize,
+            this._locked
         );
     }
 
@@ -487,8 +526,8 @@ export class Gridview implements IDisposable {
                 this.proportionalLayout,
                 this.styles,
                 node.size, // <- orthogonal size - flips at each depth
-                orthogonalSize, // <- size - flips at each depth
-
+                orthogonalSize, // <- size - flips at each depth,
+                this._locked,
                 children
             );
         } else {
@@ -540,7 +579,8 @@ export class Gridview implements IDisposable {
             this.proportionalLayout,
             this.styles,
             this.root.orthogonalSize,
-            this.root.size
+            this.root.size,
+            this._locked
         );
 
         if (oldRoot.children.length === 0) {
@@ -655,7 +695,8 @@ export class Gridview implements IDisposable {
             proportionalLayout,
             styles,
             0,
-            0
+            0,
+            this._locked
         );
     }
 
@@ -739,7 +780,8 @@ export class Gridview implements IDisposable {
                 this.proportionalLayout,
                 this.styles,
                 parent.size,
-                parent.orthogonalSize
+                parent.orthogonalSize,
+                this._locked
             );
             grandParent.addChild(newParent, parent.size, parentIndex);
 

@@ -24,6 +24,18 @@ export namespace Event {
     };
 }
 
+export class DockviewEvent {
+    private _defaultPrevented = false;
+
+    get defaultPrevented(): boolean {
+        return this._defaultPrevented;
+    }
+
+    preventDefault(): void {
+        this._defaultPrevented = true;
+    }
+}
+
 class LeakageMonitor {
     readonly events = new Map<Event<any>, Stacktrace>();
 

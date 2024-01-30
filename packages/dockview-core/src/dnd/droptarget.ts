@@ -1,9 +1,36 @@
 import { toggleClass } from '../dom';
-import { Emitter, Event } from '../events';
+import { DockviewEvent, Emitter, Event } from '../events';
 import { CompositeDisposable } from '../lifecycle';
 import { DragAndDropObserver } from './dnd';
 import { clamp } from '../math';
 import { Direction } from '../gridview/baseComponentGridview';
+
+export interface DroptargetEvent {
+    readonly position: Position;
+    readonly nativeEvent: DragEvent;
+}
+
+export class WillShowOverlayEvent
+    extends DockviewEvent
+    implements DroptargetEvent
+{
+    get nativeEvent(): DragEvent {
+        return this.options.nativeEvent;
+    }
+
+    get position(): Position {
+        return this.options.position;
+    }
+
+    constructor(
+        private readonly options: {
+            nativeEvent: DragEvent;
+            position: Position;
+        }
+    ) {
+        super();
+    }
+}
 
 export function directionToPosition(direction: Direction): Position {
     switch (direction) {
@@ -39,11 +66,6 @@ export function positionToDirection(position: Position): Direction {
     }
 }
 
-export interface DroptargetEvent {
-    readonly position: Position;
-    readonly nativeEvent: DragEvent;
-}
-
 export type Position = 'top' | 'bottom' | 'left' | 'right' | 'center';
 
 export type CanDisplayOverlay =
@@ -70,6 +92,12 @@ const DEFAULT_SIZE: MeasuredValue = {
 const SMALL_WIDTH_BOUNDARY = 100;
 const SMALL_HEIGHT_BOUNDARY = 100;
 
+export interface DroptargetOptions {
+    canDisplayOverlay: CanDisplayOverlay;
+    acceptedTargetZones: Position[];
+    overlayModel?: DroptargetOverlayModel;
+}
+
 export class Droptarget extends CompositeDisposable {
     private targetElement: HTMLElement | undefined;
     private overlayElement: HTMLElement | undefined;
@@ -78,6 +106,10 @@ export class Droptarget extends CompositeDisposable {
 
     private readonly _onDrop = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDrop.event;
+
+    private readonly _onWillShowOverlay = new Emitter<WillShowOverlayEvent>();
+    readonly onWillShowOverlay: Event<WillShowOverlayEvent> =
+        this._onWillShowOverlay.event;
 
     readonly dnd: DragAndDropObserver;
 
@@ -89,11 +121,7 @@ export class Droptarget extends CompositeDisposable {
 
     constructor(
         private readonly element: HTMLElement,
-        private readonly options: {
-            canDisplayOverlay: CanDisplayOverlay;
-            acceptedTargetZones: Position[];
-            overlayModel?: DroptargetOverlayModel;
-        }
+        private readonly options: DroptargetOptions
     ) {
         super();
 
@@ -138,6 +166,22 @@ export class Droptarget extends CompositeDisposable {
                  */
                 if (this.isAlreadyUsed(e) || quadrant === null) {
                     // no drop target should be displayed
+                    this.removeDropTarget();
+                    return;
+                }
+
+                const willShowOverlayEvent = new WillShowOverlayEvent({
+                    nativeEvent: e,
+                    position: quadrant,
+                });
+
+                /**
+                 * Provide an opportunity to prevent the overlay appearing and in turn
+                 * any dnd behaviours
+                 */
+                this._onWillShowOverlay.fire(willShowOverlayEvent);
+
+                if (willShowOverlayEvent.defaultPrevented) {
                     this.removeDropTarget();
                     return;
                 }
@@ -192,7 +236,7 @@ export class Droptarget extends CompositeDisposable {
             },
         });
 
-        this.addDisposables(this._onDrop, this.dnd);
+        this.addDisposables(this._onDrop, this._onWillShowOverlay, this.dnd);
     }
 
     setTargetZones(acceptedTargetZones: Position[]): void {
@@ -260,24 +304,43 @@ export class Droptarget extends CompositeDisposable {
             }
         }
 
-        const translate = (1 - size) / 2;
-        const scale = size;
+        const box = { top: '0px', left: '0px', width: '100%', height: '100%' };
 
-        let transform: string;
-
+        /**
+         * You can also achieve the overlay placement using the transform CSS property
+         * to translate and scale the element however this has the undesired effect of
+         * 'skewing' the element. Comment left here for anybody that ever revisits this.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/CSS/transform
+         *
+         * right
+         * translateX(${100 * (1 - size) / 2}%) scaleX(${scale})
+         *
+         * left
+         * translateX(-${100 * (1 - size) / 2}%) scaleX(${scale})
+         *
+         * top
+         * translateY(-${100 * (1 - size) / 2}%) scaleY(${scale})
+         *
+         * bottom
+         * translateY(${100 * (1 - size) / 2}%) scaleY(${scale})
+         */
         if (rightClass) {
-            transform = `translateX(${100 * translate}%) scaleX(${scale})`;
+            box.left = `${100 * (1 - size)}%`;
+            box.width = `${100 * size}%`;
         } else if (leftClass) {
-            transform = `translateX(-${100 * translate}%) scaleX(${scale})`;
+            box.width = `${100 * size}%`;
         } else if (topClass) {
-            transform = `translateY(-${100 * translate}%) scaleY(${scale})`;
+            box.height = `${100 * size}%`;
         } else if (bottomClass) {
-            transform = `translateY(${100 * translate}%) scaleY(${scale})`;
-        } else {
-            transform = '';
+            box.top = `${100 * size}%`;
+            box.height = `${100 * size}%`;
         }
 
-        this.overlayElement.style.transform = transform;
+        this.overlayElement.style.top = box.top;
+        this.overlayElement.style.left = box.left;
+        this.overlayElement.style.width = box.width;
+        this.overlayElement.style.height = box.height;
 
         toggleClass(
             this.overlayElement,

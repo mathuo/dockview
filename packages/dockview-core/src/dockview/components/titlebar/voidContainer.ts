@@ -1,22 +1,27 @@
 import { last } from '../../../array';
 import { getPanelData } from '../../../dnd/dataTransfer';
-import { Droptarget, DroptargetEvent } from '../../../dnd/droptarget';
+import {
+    Droptarget,
+    DroptargetEvent,
+    WillShowOverlayEvent,
+} from '../../../dnd/droptarget';
 import { GroupDragHandler } from '../../../dnd/groupDragHandler';
 import { DockviewComponent } from '../../dockviewComponent';
 import { addDisposableListener, Emitter, Event } from '../../../events';
 import { CompositeDisposable } from '../../../lifecycle';
 import { DockviewGroupPanel } from '../../dockviewGroupPanel';
-import { DockviewDropTargets } from '../../types';
 
 export class VoidContainer extends CompositeDisposable {
     private readonly _element: HTMLElement;
-    private readonly voidDropTarget: Droptarget;
+    private readonly dropTraget: Droptarget;
 
     private readonly _onDrop = new Emitter<DroptargetEvent>();
     readonly onDrop: Event<DroptargetEvent> = this._onDrop.event;
 
     private readonly _onDragStart = new Emitter<DragEvent>();
     readonly onDragStart = this._onDragStart.event;
+
+    readonly onWillShowOverlay: Event<WillShowOverlayEvent>;
 
     get element(): HTMLElement {
         return this._element;
@@ -44,7 +49,7 @@ export class VoidContainer extends CompositeDisposable {
 
         const handler = new GroupDragHandler(this._element, accessor, group);
 
-        this.voidDropTarget = new Droptarget(this._element, {
+        this.dropTraget = new Droptarget(this._element, {
             acceptedTargetZones: ['center'],
             canDisplayOverlay: (event, position) => {
                 const data = getPanelData();
@@ -62,23 +67,21 @@ export class VoidContainer extends CompositeDisposable {
                     return last(this.group.panels)?.id !== data.panelId;
                 }
 
-                return group.model.canDisplayOverlay(
-                    event,
-                    position,
-                    DockviewDropTargets.Panel
-                );
+                return group.model.canDisplayOverlay(event, position, 'panel');
             },
         });
+
+        this.onWillShowOverlay = this.dropTraget.onWillShowOverlay;
 
         this.addDisposables(
             handler,
             handler.onDragStart((event) => {
                 this._onDragStart.fire(event);
             }),
-            this.voidDropTarget.onDrop((event) => {
+            this.dropTraget.onDrop((event) => {
                 this._onDrop.fire(event);
             }),
-            this.voidDropTarget
+            this.dropTraget
         );
     }
 }
