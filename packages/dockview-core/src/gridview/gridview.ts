@@ -41,7 +41,8 @@ function flipNode<T extends Node>(
             node.proportionalLayout,
             node.styles,
             size,
-            orthogonalSize
+            orthogonalSize,
+            node.disabled
         );
 
         let totalSize = 0;
@@ -273,6 +274,7 @@ export class Gridview implements IDisposable {
     readonly element: HTMLElement;
 
     private _root: BranchNode | undefined;
+    private _locked = false;
     private _maximizedNode:
         | { leaf: LeafNode; hiddenOnMaximize: LeafNode[] }
         | undefined = undefined;
@@ -328,6 +330,30 @@ export class Gridview implements IDisposable {
 
     get maximumHeight(): number {
         return this.root.maximumHeight;
+    }
+
+    get locked(): boolean {
+        return this._locked;
+    }
+
+    set locked(value: boolean) {
+        this._locked = value;
+
+        const branch: Node[] = [this.root];
+
+        /**
+         * simple depth-first-search to cover all nodes
+         *
+         * @see https://en.wikipedia.org/wiki/Depth-first_search
+         */
+        while (branch.length > 0) {
+            const node = branch.pop();
+
+            if (node instanceof BranchNode) {
+                node.disabled = value;
+                branch.push(...node.children);
+            }
+        }
     }
 
     maximizedView(): IGridView | undefined {
@@ -439,7 +465,8 @@ export class Gridview implements IDisposable {
             this.proportionalLayout,
             this.styles,
             this.root.size,
-            this.root.orthogonalSize
+            this.root.orthogonalSize,
+            this._locked
         );
     }
 
@@ -499,8 +526,8 @@ export class Gridview implements IDisposable {
                 this.proportionalLayout,
                 this.styles,
                 node.size, // <- orthogonal size - flips at each depth
-                orthogonalSize, // <- size - flips at each depth
-
+                orthogonalSize, // <- size - flips at each depth,
+                this._locked,
                 children
             );
         } else {
@@ -552,7 +579,8 @@ export class Gridview implements IDisposable {
             this.proportionalLayout,
             this.styles,
             this.root.orthogonalSize,
-            this.root.size
+            this.root.size,
+            this._locked
         );
 
         if (oldRoot.children.length === 0) {
@@ -667,7 +695,8 @@ export class Gridview implements IDisposable {
             proportionalLayout,
             styles,
             0,
-            0
+            0,
+            this._locked
         );
     }
 
@@ -751,7 +780,8 @@ export class Gridview implements IDisposable {
                 this.proportionalLayout,
                 this.styles,
                 parent.size,
-                parent.orthogonalSize
+                parent.orthogonalSize,
+                this._locked
             );
             grandParent.addChild(newParent, parent.size, parentIndex);
 

@@ -102,6 +102,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     defaultRenderer?: DockviewPanelRenderer;
     debug?: boolean;
     rootOverlayModel?: DroptargetOverlayModel;
+    locked?: boolean;
     disableDnd?: boolean;
 }
 

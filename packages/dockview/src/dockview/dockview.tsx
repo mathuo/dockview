@@ -83,6 +83,7 @@ export interface IDockviewReactProps {
     debug?: boolean;
     defaultRenderer?: DockviewPanelRenderer;
     rootOverlayModel?: DroptargetOverlayModel;
+    locked?: boolean;
     disableDnd?: boolean;
 }
 
@@ -186,6 +187,7 @@ export const DockviewReact = React.forwardRef(
                 defaultRenderer: props.defaultRenderer,
                 debug: props.debug,
                 rootOverlayModel: props.rootOverlayModel,
+                locked: props.locked,
                 disableDnd: props.disableDnd,
             });
 
@@ -207,6 +209,15 @@ export const DockviewReact = React.forwardRef(
             if (!dockviewRef.current) {
                 return;
             }
+
+            dockviewRef.current.locked = !!props.locked;
+        }, [props.locked]);
+
+        React.useEffect(() => {
+            if (!dockviewRef.current) {
+                return;
+            }
+
             dockviewRef.current.updateOptions({
                 disableDnd: props.disableDnd,
             });
