@@ -13,7 +13,7 @@ import {
 import { tail, sequenceEquals, remove } from '../array';
 import { DockviewPanel, IDockviewPanel } from './dockviewPanel';
 import { CompositeDisposable, Disposable, IDisposable } from '../lifecycle';
-import { Event, Emitter } from '../events';
+import { Event, Emitter, addDisposableWindowListener } from '../events';
 import { Watermark } from './components/watermark/watermark';
 import { IWatermarkRenderer, GroupviewPanelState } from './types';
 import { sequentialNumberGenerator } from '../math';
@@ -561,12 +561,15 @@ export class DockviewComponent
             from: DockviewGroupPanel;
             to: DockviewGroupPanel;
         }) {
+            const activePanel = options.from.activePanel;
             const panels = [...options.from.panels].map((panel) =>
                 options.from.model.removePanel(panel)
             );
 
             panels.forEach((panel) => {
-                options.to.model.openPanel(panel);
+                options.to.model.openPanel(panel, {
+                    skipSetPanelActive: activePanel !== panel,
+                });
             });
         }
 
@@ -624,10 +627,18 @@ export class DockviewComponent
                     return;
                 }
 
+                const gready = document.createElement('div');
+                gready.className = 'dv-overlay-render-container';
+
+                const overlayRenderContainer = new OverlayRenderContainer(
+                    gready
+                );
+
                 const referenceGroup =
                     item instanceof DockviewPanel ? item.group : item;
 
                 const group = this.createGroup({ id: groupId });
+                group.model.renderContainer = overlayRenderContainer;
 
                 if (item instanceof DockviewPanel) {
                     const panel = referenceGroup.model.removePanel(item);
@@ -637,8 +648,12 @@ export class DockviewComponent
                         from: referenceGroup,
                         to: group,
                     });
-                    referenceGroup.api.setHidden(false);
+                    referenceGroup.api.setHidden(true);
                 }
+
+                popoutContainer.classList.add('dv-dockview');
+                popoutContainer.style.overflow = 'hidden';
+                popoutContainer.appendChild(gready);
 
                 popoutContainer.appendChild(group.element);
 
@@ -655,6 +670,19 @@ export class DockviewComponent
                 };
 
                 popoutWindowDisposable.addDisposables(
+                    /**
+                     * ResizeObserver seems slow here, I do not know why but we don't need it
+                     * since we can reply on the window resize event as we will occupy the full
+                     * window dimensions
+                     */
+                    addDisposableWindowListener(
+                        _window.window!,
+                        'resize',
+                        () => {
+                            group.layout(window.innerWidth, window.innerHeight);
+                        }
+                    ),
+                    overlayRenderContainer,
                     Disposable.from(() => {
                         if (this.getPanel(referenceGroup.id)) {
                             moveGroupWithoutDestroying({
@@ -666,12 +694,16 @@ export class DockviewComponent
                                 referenceGroup.api.setHidden(false);
                             }
 
-                            this.doRemoveGroup(group);
+                            this.doRemoveGroup(group, {
+                                skipPopoutAssociated: true,
+                            });
                         } else {
                             const removedGroup = this.doRemoveGroup(group, {
                                 skipDispose: true,
                                 skipActive: true,
                             });
+                            removedGroup.model.renderContainer =
+                                this.overlayRenderContainer;
                             removedGroup.model.location = { type: 'grid' };
                             this.doAddGroup(removedGroup, [0]);
                         }
@@ -1484,6 +1516,7 @@ export class DockviewComponent
             | {
                   skipActive?: boolean;
                   skipDispose?: boolean;
+                  skipPopoutAssociated?: boolean;
               }
             | undefined
     ): DockviewGroupPanel {
@@ -1523,7 +1556,9 @@ export class DockviewComponent
 
             if (selectedGroup) {
                 if (!options?.skipDispose) {
-                    this.doRemoveGroup(selectedGroup.referenceGroup);
+                    if (!options?.skipPopoutAssociated) {
+                        this.removeGroup(selectedGroup.referenceGroup);
+                    }
 
                     selectedGroup.popoutGroup.dispose();
                     this._groups.delete(group.id);

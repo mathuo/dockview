@@ -133,7 +133,7 @@ export class ContentContainer
 
         switch (panel.api.renderer) {
             case 'onlyWhenVisibile':
-                this.accessor.overlayRenderContainer.detatch(panel);
+                this.group.renderContainer.detatch(panel);
                 if (this.panel) {
                     if (doRender) {
                         this._element.appendChild(
@@ -149,7 +149,7 @@ export class ContentContainer
                 ) {
                     this._element.removeChild(panel.view.content.element);
                 }
-                container = this.accessor.overlayRenderContainer.attach({
+                container = this.group.renderContainer.attach({
                     panel,
                     referenceContainer: this,
                 });

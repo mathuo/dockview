@@ -4434,42 +4434,10 @@ describe('dockviewComponent', () => {
                                 cb();
                             }
                         }),
+                    removeEventListener: jest.fn(),
                     close: jest.fn(),
                 })
             );
-        });
-
-        test('that can remove a popout group', async () => {
-            const container = document.createElement('div');
-
-            const dockview = new DockviewComponent({
-                parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
-                },
-                orientation: Orientation.HORIZONTAL,
-            });
-
-            dockview.layout(1000, 500);
-
-            const panel1 = dockview.addPanel({
-                id: 'panel_1',
-                component: 'default',
-            });
-
-            await dockview.addPopoutGroup(panel1);
-
-            expect(dockview.panels.length).toBe(1);
-            expect(dockview.groups.length).toBe(2);
-            expect(panel1.api.group.api.location.type).toBe('popout');
-
-            dockview.removePanel(panel1);
-
-            expect(dockview.panels.length).toBe(0);
-            expect(dockview.groups.length).toBe(0);
         });
 
         test('add a popout group', async () => {
@@ -4509,6 +4477,39 @@ describe('dockviewComponent', () => {
             expect(panel2.group.api.location.type).toBe('popout');
             expect(dockview.groups.length).toBe(2);
             expect(dockview.panels.length).toBe(2);
+        });
+
+        test('that can remove a popout group', async () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent({
+                parentElement: container,
+                components: {
+                    default: PanelContentPartTest,
+                },
+                tabComponents: {
+                    test_tab_id: PanelTabPartTest,
+                },
+                orientation: Orientation.HORIZONTAL,
+            });
+
+            dockview.layout(1000, 500);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            await dockview.addPopoutGroup(panel1);
+
+            expect(dockview.panels.length).toBe(1);
+            expect(dockview.groups.length).toBe(2);
+            expect(panel1.api.group.api.location.type).toBe('popout');
+
+            dockview.removePanel(panel1);
+
+            expect(dockview.panels.length).toBe(0);
+            expect(dockview.groups.length).toBe(0);
         });
 
         test('move from fixed to popout group and back', async () => {
