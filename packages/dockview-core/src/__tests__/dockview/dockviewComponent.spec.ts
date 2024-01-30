@@ -1,6 +1,5 @@
 import { DockviewComponent } from '../../dockview/dockviewComponent';
 import {
-    DockviewDropTargets,
     GroupPanelPartInitParameters,
     IContentRenderer,
     ITabRenderer,
@@ -2974,7 +2973,7 @@ describe('dockviewComponent', () => {
         expect(showDndOverlay).toHaveBeenCalledWith({
             nativeEvent: eventLeft,
             position: 'left',
-            target: DockviewDropTargets.Edge,
+            target: 'edge',
             getData: getPanelData,
         });
         expect(showDndOverlay).toBeCalledTimes(1);
@@ -2993,7 +2992,7 @@ describe('dockviewComponent', () => {
         expect(showDndOverlay).toHaveBeenCalledWith({
             nativeEvent: eventRight,
             position: 'right',
-            target: DockviewDropTargets.Edge,
+            target: 'edge',
             getData: getPanelData,
         });
         expect(showDndOverlay).toBeCalledTimes(2);
@@ -3012,7 +3011,7 @@ describe('dockviewComponent', () => {
         expect(showDndOverlay).toHaveBeenCalledWith({
             nativeEvent: eventTop,
             position: 'top',
-            target: DockviewDropTargets.Edge,
+            target: 'edge',
             getData: getPanelData,
         });
         expect(showDndOverlay).toBeCalledTimes(3);
@@ -3031,7 +3030,7 @@ describe('dockviewComponent', () => {
         expect(showDndOverlay).toHaveBeenCalledWith({
             nativeEvent: eventBottom,
             position: 'bottom',
-            target: DockviewDropTargets.Edge,
+            target: 'edge',
             getData: getPanelData,
         });
         expect(showDndOverlay).toBeCalledTimes(4);
@@ -3067,7 +3066,7 @@ describe('dockviewComponent', () => {
         expect(showDndOverlay).toHaveBeenCalledWith({
             nativeEvent: eventTop,
             position: 'center',
-            target: DockviewDropTargets.Edge,
+            target: 'edge',
             getData: getPanelData,
         });
         expect(showDndOverlay).toBeCalledTimes(5);
@@ -4435,42 +4434,10 @@ describe('dockviewComponent', () => {
                                 cb();
                             }
                         }),
+                    removeEventListener: jest.fn(),
                     close: jest.fn(),
                 })
             );
-        });
-
-        test('that can remove a popout group', async () => {
-            const container = document.createElement('div');
-
-            const dockview = new DockviewComponent({
-                parentElement: container,
-                components: {
-                    default: PanelContentPartTest,
-                },
-                tabComponents: {
-                    test_tab_id: PanelTabPartTest,
-                },
-                orientation: Orientation.HORIZONTAL,
-            });
-
-            dockview.layout(1000, 500);
-
-            const panel1 = dockview.addPanel({
-                id: 'panel_1',
-                component: 'default',
-            });
-
-            await dockview.addPopoutGroup(panel1);
-
-            expect(dockview.panels.length).toBe(1);
-            expect(dockview.groups.length).toBe(2);
-            expect(panel1.api.group.api.location.type).toBe('popout');
-
-            dockview.removePanel(panel1);
-
-            expect(dockview.panels.length).toBe(0);
-            expect(dockview.groups.length).toBe(0);
         });
 
         test('add a popout group', async () => {
@@ -4510,6 +4477,39 @@ describe('dockviewComponent', () => {
             expect(panel2.group.api.location.type).toBe('popout');
             expect(dockview.groups.length).toBe(2);
             expect(dockview.panels.length).toBe(2);
+        });
+
+        test('that can remove a popout group', async () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent({
+                parentElement: container,
+                components: {
+                    default: PanelContentPartTest,
+                },
+                tabComponents: {
+                    test_tab_id: PanelTabPartTest,
+                },
+                orientation: Orientation.HORIZONTAL,
+            });
+
+            dockview.layout(1000, 500);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            await dockview.addPopoutGroup(panel1);
+
+            expect(dockview.panels.length).toBe(1);
+            expect(dockview.groups.length).toBe(2);
+            expect(panel1.api.group.api.location.type).toBe('popout');
+
+            dockview.removePanel(panel1);
+
+            expect(dockview.panels.length).toBe(0);
+            expect(dockview.groups.length).toBe(0);
         });
 
         test('move from fixed to popout group and back', async () => {

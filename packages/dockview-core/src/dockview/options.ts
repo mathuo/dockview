@@ -103,6 +103,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     debug?: boolean;
     rootOverlayModel?: DroptargetOverlayModel;
     locked?: boolean;
+    disableDnd?: boolean;
 }
 
 export interface PanelOptions<P extends object = Parameters> {

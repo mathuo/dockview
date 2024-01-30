@@ -2,8 +2,6 @@ name: Deploy Docs
 
 on:
     workflow_dispatch:
-    schedule:
-        - cron: '0 3 * * *' # every day at 3 am UTC
 
 jobs:
     deploy-nightly-demo-app:
@@ -14,7 +12,7 @@ jobs:
             - name: Use Node.js
               uses: actions/setup-node@v3
               with:
-                  node-version: '18.x'
+                  node-version: '20.x'
 
             - uses: actions/cache@v3
               with:
