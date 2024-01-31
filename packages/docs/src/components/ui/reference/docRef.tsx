@@ -4,6 +4,7 @@ import './docRef.scss';
 
 export interface DocRefProps {
     declaration: string;
+    methods?: string[];
 }
 
 import docsJson from '../../../generated/api.output.json';
@@ -87,6 +88,10 @@ export const DocRef = (props: DocRefProps) => {
         <table className="doc-ref-table">
             <tbody>
                 {docs.map((doc) => {
+                    if (props.methods && !props.methods.includes(doc.name)) {
+                        return null;
+                    }
+
                     return (
                         <tr>
                             <th

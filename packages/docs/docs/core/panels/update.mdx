@@ -3,6 +3,20 @@ title: Update Panel
 sidebar_position: 2
 ---
 
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+This section describes how to update the parameters of a panel.
+
+:::warning
+**Use this feature sparingly**: Anything you assign to the `params` options of a panel will be persisted.
+Only use this to store small amounts of static view data.
+**Do not** use this to pass application state.
+:::
+
+## Panel API
+
+<DocRef declaration="DockviewPanelApi" methods={['updateParameters']} />
+
 ## Update Panel
 
 You can programatically update the `params` passed through to the panel through the panal api using `api.updateParameters`.

@@ -4,7 +4,10 @@
 }
 
 @media (min-width: 997px) {
+  /* @media (min-width: 1500px) { */
   .docItemCol {
     max-width: 100% !important;
+    /* max-width: 75% !important; */
   }
 }
+

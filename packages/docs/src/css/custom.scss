@@ -13,6 +13,9 @@
 :root {
     --ifm-font-weight-bold: 600;
 
+    --ifm-alert-padding-vertical: 8px;
+    --ifm-alert-padding-horizontal: 8px;
+
     --ifm-color-primary: #21222c;
     --ifm-color-primary-dark: #1e1f28;
     --ifm-color-primary-darker: #1c1d25;
@@ -112,6 +115,22 @@
 
         tr {
             background-color: inherit !important;
+
+            &:last-child {
+                border-bottom: var(--ifm-table-border-width) solid
+                    var(--ifm-table-border-color);
+            }
+        }
+    }
+
+    code {
+        .token {
+            &.maybe-class-name {
+                color: #cf8cff;
+            }
+            &.keyword {
+                color: rgb(130, 170, 255);
+            }
         }
     }
 }
@@ -210,4 +229,20 @@
         transition: background-color var(--ifm-transition-fast)
             var(--ifm-transition-timing-default);
     }
+}
+
+.toc-display {
+    display: none;
+}
+
+@media (min-width: 1500px) {
+    .toc-display {
+        display: block;
+    }
+}
+
+.theme-admonition {
+    border: none;
+    display: flex;
+    padding: 8px 16px;
 }

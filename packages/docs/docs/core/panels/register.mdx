@@ -3,19 +3,30 @@ title: Register A Panel
 sidebar_position: 0
 ---
 
-This section describes how to register a panel for later use.
+This section describes how to register a panel.
 
-The render implementation of the panel is linked to a key that can be referenced later on.
-A collection of panels can be provided through the `components` option.
+You can register panes through the `components` option.
 
 <FrameworkSpecific framework='React'>
-```tsx
-const components = {
-  my_component: (props: IDockviewPanelProps) => {
+```jsx
+<DockviewReact components={{
+  component_1: (props: IDockviewPanelProps) => {
+    const api: DockviewPanelApi  = props.api;
+    const containerApi: DockviewApi  = props.containerApi;
+
+    return <div>{/** logic */}</div>
+  },
+  component_2: (props: IDockviewPanelProps) => {
     return <div>{/** logic */}</div>
   }
-}
-
-<DockviewReact components={components}/>
+}}/>
 ```
 </FrameworkSpecific>
+
+
+Each panel has an [API](/docs/api/dockview/panelApi) which can be used to control the panel and you can
+also has access the dock [API](/docs/api/dockview/overview) directly from the panel.
+
+It is expected you should be able to achieve everything you need through these two APIs. If you find yourself
+building work-arounds to accommodate requires please raise an [Issue](https://github.com/mathuo/dockview/issues)
+to see if it's something that could be added.
