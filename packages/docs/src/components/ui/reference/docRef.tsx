@@ -7,7 +7,8 @@ export interface DocRefProps {
     methods?: string[];
 }
 
-import docsJson from '../../../generated/api.output.json';
+import docsJson_ from '../../../generated/api.output.json';
+const docsJson = docsJson_ as any as DocsJson;
 
 type DocsContent = { kind: string; text: string; tag?: string };
 type DocsTag = { tag: string; content: DocsContent[] };
@@ -15,13 +16,19 @@ type DocsComment = {
     summary?: DocsContent[];
     blockTags?: DocsTag[];
 };
+type Doc = {
+    name: string;
+    code: string;
+    comment?: DocsComment;
+    kind: 'accessor' | 'property' | 'method';
+    pieces: string[];
+};
 type DocsJson = {
-    [index: string]: Array<{
-        name: string;
-        code: string;
-        comment?: DocsComment;
-        kind: 'accessor' | 'property' | 'method';
-    }>;
+    [index: string]: {
+        kind: string;
+        metadata?: Doc;
+        children: Doc[];
+    };
 };
 
 export const Text = (props: { content: DocsContent[] }) => {
@@ -74,87 +81,125 @@ export const Markdown = (props: { children: string }) => {
     return <span>{props.children}</span>;
 };
 
+const Piece = (props: { piece: string }) => {
+    const item = docsJson[props.piece];
+
+    if (!item) {
+        return;
+    }
+
+    if (item.kind === 'interface') {
+        return;
+    }
+
+    if (!item.metadata?.code) {
+        return;
+    }
+
+    return <CodeBlock language="tsx">{item.metadata.code}</CodeBlock>;
+};
+
+const Row = (props: { doc: Doc }) => {
+    return (
+        <tr>
+            <th
+                style={{
+                    width: '40%',
+                    display: 'flex',
+                }}
+            >
+                <div
+                    style={{
+                        // maxWidth: '30%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'start',
+                    }}
+                >
+                    <h6
+                        style={{
+                            fontFamily: 'monospace',
+                            fontSize: '1.2em',
+                        }}
+                    >
+                        {props.doc.name}
+                    </h6>
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'start',
+                        }}
+                    >
+                        {/* <span
+                            style={{
+                                fontSize: '0.75em',
+                                color: 'var(--ifm-color-content-secondary)',
+                            }}
+                        >
+                            {'Type'}
+                        </span>
+                        <span
+                            style={{
+                                color: 'var(--ifm-color-primary)',
+                            }}
+                        >
+                            {doc.type}
+                        </span> */}
+                    </div>
+                </div>
+            </th>
+            <th style={{ width: '60%' }}>
+                {/* <div>{'-'}</div> */}
+                <div>
+                    <div>
+                        {props.doc.comment && (
+                            <Summary summary={props.doc.comment} />
+                        )}
+                    </div>
+                    <CodeBlock language="tsx">{props.doc.code}</CodeBlock>
+                </div>
+            </th>
+        </tr>
+    );
+};
+
 export const DocRef = (props: DocRefProps) => {
     const docs = React.useMemo(
         () => (docsJson as DocsJson)[props.declaration],
         [props.declaration]
     );
 
+    const filteredDocs = React.useMemo(
+        () =>
+            docs?.children?.filter((child) => {
+                if (props.methods && !props.methods.includes(child.name)) {
+                    return false;
+                }
+                return true;
+            }),
+        [docs]
+    );
+
     if (!docs) {
-        return null;
+        return <span>{`Failed to find docs for '${props.declaration}'`}</span>;
     }
 
     return (
         <table className="doc-ref-table">
             <tbody>
-                {docs.map((doc) => {
-                    if (props.methods && !props.methods.includes(doc.name)) {
-                        return null;
-                    }
-
+                {filteredDocs.map((doc, i) => {
                     return (
-                        <tr>
-                            <th
-                                style={{
-                                    width: '40%',
-                                    display: 'flex',
-                                }}
-                            >
-                                <div
-                                    style={{
-                                        // maxWidth: '30%',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'start',
-                                    }}
-                                >
-                                    <h6
-                                        style={{
-                                            fontFamily: 'monospace',
-                                            fontSize: '1.2em',
-                                        }}
-                                    >
-                                        {doc.name}
-                                    </h6>
-                                    <div
-                                        style={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'start',
-                                        }}
-                                    >
-                                        {/* <span
-                                                style={{
-                                                    fontSize: '0.75em',
-                                                    color: 'var(--ifm-color-content-secondary)',
-                                                }}
-                                            >
-                                                {'Type'}
-                                            </span>
-                                            <span
-                                                style={{
-                                                    color: 'var(--ifm-color-primary)',
-                                                }}
-                                            >
-                                                {doc.type}
-                                            </span> */}
-                                    </div>
-                                </div>
-                            </th>
-                            <th style={{ width: '60%' }}>
-                                {/* <div>{'-'}</div> */}
-                                <div>
-                                    <div>
-                                        {doc.comment && (
-                                            <Summary summary={doc.comment} />
-                                        )}
-                                    </div>
-                                    <CodeBlock language="tsx">
-                                        {doc.code}
-                                    </CodeBlock>
-                                </div>
-                            </th>
-                        </tr>
+                        <>
+                            <Row key={i} doc={doc} />
+                            {/* {doc.pieces?.map((piece) => (
+                                <tr>
+                                    <th colSpan={2}>
+                                        <Piece piece={piece} />
+                                    </th>
+                                </tr>
+                            ))} */}
+                        </>
                     );
                 })}
             </tbody>

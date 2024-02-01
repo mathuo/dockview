@@ -170,10 +170,10 @@ type AddPanelPositionUnion = {
 
 type AddPanelOptionsUnion = AddPanelFloatingGroupUnion | AddPanelPositionUnion;
 
-export type AddPanelOptions<P extends object = Parameters> = Omit<
-    PanelOptions<P>,
-    'component' | 'tabComponent'
-> & {
+export type AddPanelOptions<P extends object = Parameters> = {
+    params?: P;
+    id: string;
+    title?: string;
     component: string;
     tabComponent?: string;
     renderer?: DockviewPanelRenderer;

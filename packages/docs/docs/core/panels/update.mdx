@@ -4,49 +4,43 @@ sidebar_position: 2
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
+import LiveExample from '@site/src/components/ui/exampleFrame';
 
 This section describes how to update the parameters of a panel.
 
 :::warning
-**Use this feature sparingly**: Anything you assign to the `params` options of a panel will be persisted.
+**Use this feature sparingly**: Anything you assign to the `params` options of a panel will be saved when calling `api.toJSON()`.
 Only use this to store small amounts of static view data.
-**Do not** use this to pass application state.
+**Do not** use this to store application state or dynamic panel state.
 :::
 
-## Panel API
+## Methods
 
 <DocRef declaration="DockviewPanelApi" methods={['updateParameters']} />
 
-## Update Panel
+## Updating parameters
 
-You can programatically update the `params` passed through to the panel through the panal api using `api.updateParameters`.
+:::info
+If you want to set initial parameters when adding a panel see the [Add Panel](/docs/core/panels/add) section.
+:::
+
+You can update a panel through the [Panel API](/docs/api/dockview/panelApi).
 
 ```ts
-const panel = api.addPanel({
-    id: 'panel_1',
-    component: 'default',
-    params: {
-        keyA: 'valueA',
-    },
-});
-
-// ...
-
-panel.api.updateParameters({
-    keyB: 'valueB',
-});
-
-// ...
-
 panel.api.updateParameters({
     keyA: 'anotherValueA',
+    keyB: 'valueB',
 });
 ```
 
-To delete a parameter you should pass a value of `undefined` for the key.
+To delete a parameter you should pass a value of `undefined`.
 
 ```ts
 panel.api.updateParameters({
-    keyA: undefined, // this will delete 'keyA'.
+    keyA: undefined,
 });
 ```
+
+## Live Example
+
+<LiveExample framework="react" id="dockview/update-parameters"/>

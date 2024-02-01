@@ -9,95 +9,128 @@ This section describes how to add a new panel.
 
 ## API
 
-The API associated with opening a panel
-
 <DocRef declaration="DockviewApi" methods={['addPanel']} />
 
-## Open a panel
+## Opening a Simple Panel
 
-Using the dockview API you can access the `addPanel` method which returns an instance of the created panel.
-The minimum method signature is:
+The minimum options required to open a panel a unique `id` for the panel and the name of the `component` you want to render.
 
 ```ts
-const panel = api.addPanel({
+const panel: IDockviewPanel = api.addPanel({
     id: 'my_unique_panel_id',
     component: 'my_component',
 });
 ```
 
-where `id` is the unique id of the panel and `component` is the implenentation which
-will be used to render the panel. You will have registered this using the `components` prop of the `DockviewReactComponent` component.
+> See [Overview](/docs/core/overview) to learn how to register components.
 
-You can optionally provide a `tabComponent` parameters to the `addPanel` method which will render the tab using a custom renderer.
-You will have registered this using the `tabComponents` prop of the `DockviewReactComponent` component.
+## Provide a custom Tab renderer
+
+:::info
+You can override the default tab renderer through the [Options](/docs/api/dockview/options).
+:::
+
+To render a custom tab component you should specify the `tabComponent`.
 
 ```ts
-const panel = api.addPanel({
+const panel: IDockviewPanel = api.addPanel({
     id: 'my_unique_panel_id',
     component: 'my_component',
     tabComponent: 'my_tab_component',
 });
 ```
 
-You can pass properties to the panel using the `params` key.
-You can update these properties through the panels `api` object and its `updateParameters` method.
+> See [Overview](/docs/core/overview) to learn how to register tab components.
+
+## Provide custom Parameters
+
+Using the `params` option you can specific a simple object that is accessible in both the panel and tab renderer.
+To update these parameters after the panel has been created see [Update Panel](/docs/core/panels/update).
 
 ```ts
-const panel = api.addPanel({
+const panel: IDockviewPanel = api.addPanel({
     id: 'my_unique_panel_id',
     component: 'my_component',
     params: {
         myCustomKey: 'my_custom_value',
     },
 });
-
-panel.api.updateParameters({
-    myCustomKey: 'my_custom_value',
-    myOtherCustomKey: 'my_other_custom_key',
-});
 ```
 
-> Note `updateParameters` does not accept partial parameter updates, you should call it with the entire set of parameters
-> you want the panel to receive.
+## Rendering
 
-Finally `addPanel` accepts a `position` object which tells dockview where to place the panel.
+Rendering is worthy of it's own page which can be found [here](/docs/core/panels/rendering).
 
--   This object optionally accepts either a `referencePanel` or `referenceGroup` which can be the associated id as a string
-    or the panel/group object reference.
--   This object accepts a `direction` property which dictates where,
-    relative to the provided reference the new panel will be placed.
+## Positioning the Panel
 
-> If neither a `referencePanel` or `referenceGroup` is provided then the `direction` will be treated as absolute.
-
-> If no `direction` is provided the library will place the new panel in a pre-determined position.
+### Relative to another Panel
 
 ```ts
-const panel = api.addPanel({
-    id: 'panel_1',
-    component: 'default',
-});
-
-const panel2 = api.addPanel({
+const panel2: IDockviewPanel = api.addPanel({
     id: 'panel_2',
     component: 'default',
     position: {
-        referencePanel: panel1,
-        direction: 'right',
-    },
+      referencePanel: 'panel_1',
+      direction: 'above'
+    }
+});
+
+api.addPanel({
+    id: 'panel_3',
+    component: 'default',
+    position: {
+      referencePanel: panel2,
+      direction: 'above'
+    }
 });
 ```
 
-To add a floating panel you should include the `floating` variable which can be either a `boolean` or an object defining it's bounds.
-These bounds are relative to the dockview component.
+### Relative to another Group
 
 ```ts
-const panel1 = api.addPanel({
+const panel2: IDockviewPanel = api.addPanel({
     id: 'panel_2',
+    component: 'default',
+    position: {
+      referenceGroup: 'panel_1',
+      direction: 'left'
+    }
+});
+
+const panel = api.addPanel({
+    id: 'panel_2',
+    component: 'default',
+    position: {
+      referenceGroup: panel2.group,
+      direction: 'left'
+    }
+});
+```
+
+### Relative to the container
+
+```ts
+const panel = api.addPanel({
+    id: 'panel_2',
+    component: 'default',
+    position: {
+      direction: 'right'
+    }
+});
+```
+
+### Floating
+
+You should specific the `floating` option which can be either `true` or an object describing the position of the floating group.
+
+```ts
+api.addPanel({
+    id: 'panel_1',
     component: 'default',
     floating: true,
 });
 
-const panel2 = api.addPanel({
+api.addPanel({
     id: 'panel_2',
     component: 'default',
     floating: { x: 10, y: 10, width: 300, height: 300 },

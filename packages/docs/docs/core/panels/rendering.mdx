@@ -7,18 +7,66 @@ import { MultiFrameworkContainer } from '@site/src/components/ui/container';
 import DockviewRenderMode from '@site/sandboxes/rendermode-dockview/src/app';
 import RenderingDockview from '@site/sandboxes/rendering-dockview/src/app';
 
-## Panel Rendering
+Rendering type is an important consideration when creating your application and whether your panels should be destroyed when hidden.
 
-## Render Mode
+:::info
+If you are looking for information on how to render **iframes** in Dockview please go the the [iframes](/docs/advanced/iframe) section.
+:::
 
-Dockview has two rendering modes `onlyWhenVisible` (default) and `always`. A rendering mode can be defined through the `renderer` prop to `DockviewReact` or at an individual panel level when added where
-the panel declaration takes precedence if both are defined. Rendering modes defined at the panel level are persisted, those defined at the `DockviewReact` level are not persisted.
+When a panel is selected all other panels in that group are not visible. The API does expose methods to determine whether your panel is visible or not
+and the panel instance only ever destroyed when removed however the question still remains, what to do with the partial DOM tree that makes up your panel and there are two options the dock can take:
 
-- `onlyWhenVisible` mode is the default mode. In this mode when a panel is no longer visible through either it's visiblity being hidden or it not being the active panel within a group the panels HTMLElement is removed
-from the DOM and any DOM state such as scrollbar positions will be lost. If you are using any ResizeObservers to measure size this will result both zero height and width as the HTMLElement no longer belongs to the DOM.
-This design allows for maximum performance at some cost.
-- `always` mode. In this mode when panels become hidden the HTMLElement is not destroyed so all DOM state such as scrollbar positions will be maintained. This is implemented by rendering each panel as an absolutely positioned
-HTMLElement and hidden the HTMLElement with `display: none` when it should be hidden.
+1. (*onlyWhenVisible*) Remove the element from the DOM tree to make space for the new panel.
+
+This will cause the element to loss any DOM-specific state such as scrollbar position and if you measure the size of any elements during this time you will mostly like see both a width and height of 0px,
+this is also true for any active ResizeObservers.
+
+```ts
+api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    renderer: 'always'
+});
+```
+
+2. (*always*) Keep the DOM tree alive but hide it in order to allow the select panels content to show.
+
+This approach will maintain any DOM-sepcific state you had and is essential if you require the native scrollbar position to be preserved.
+
+```ts
+api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    renderer: 'onlyWhenVisible'
+});
+```
+
+Both are valid use-cases therefore the dock allows you to choose your rendering mode, the default however is the first option since this is the most memory efficient solution.
+
+> You can change the `defaultRenderer` in the Dock [Options](/docs/api/dockview/options).
+
+:::info
+The panel instance is only ever destroyed when it is removed from the dock allowing you to still run code associated with the panel when it is not visible.
+The renderer only affects what happens to the DOM element.
+:::
+
+## Choose a Render Mode
+
+```ts
+api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    renderer: 'always'
+});
+
+api.addPanel({
+    id: 'my_unique_panel_id',
+    component: 'my_component',
+    renderer: 'onlyWhenVisible'
+});
+```
+
+## Live Example
 
 <MultiFrameworkContainer
     height={500}

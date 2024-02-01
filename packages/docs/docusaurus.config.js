@@ -260,6 +260,9 @@ const config = {
                 id: 'announcementBar', // Increment on change
                 content: `⭐️ If you like Dockview, give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/mathuo/dockview">GitHub</a>`,
             },
+            tableOfContents: {
+                maxHeadingLevel: 5,
+            },
         }),
 };
 

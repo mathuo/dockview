@@ -1,4 +1,4 @@
-import { ISerializableView, PanelViewInitParameters } from './options';
+import { PanelViewInitParameters } from './options';
 import {
     BasePanelView,
     BasePanelViewExported,
@@ -19,7 +19,7 @@ export interface ISplitviewPanel
 
 export abstract class SplitviewPanel
     extends BasePanelView<SplitviewPanelApiImpl>
-    implements ISerializableView, ISplitviewPanel
+    implements ISplitviewPanel
 {
     private _evaluatedMinimumSize = 0;
     private _evaluatedMaximumSize = Number.POSITIVE_INFINITY;

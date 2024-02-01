@@ -5,6 +5,7 @@ import {
     IDockviewPanelHeaderProps,
     IDockviewPanelProps,
     IDockviewHeaderActionsProps,
+    DockviewApi,
 } from 'dockview';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -36,6 +37,17 @@ const components = {
                     {props.api.title}
                 </span>
             </div>
+        );
+    },
+    iframe: () => {
+        return (
+            <iframe
+                style={{
+                    width: '100%',
+                    height: '100%',
+                }}
+                src="https://dockview.dev"
+            />
         );
     },
 };
@@ -114,7 +126,7 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
     };
 
     const onClick2 = () => {
-        if (props.api.location !== 'popout') {
+        if (props.api.location.type !== 'popout') {
             props.containerApi.addPopoutGroup(props.group);
         } else {
             props.api.moveTo({ position: 'right' });
@@ -198,10 +210,21 @@ const PrefixHeaderControls = (props: IDockviewHeaderActionsProps) => {
 };
 
 const DockviewDemo = (props: { theme?: string }) => {
+    const [api, setApi] = React.useState<DockviewApi>();
+
     const onReady = (event: DockviewReadyEvent) => {
+        setApi(event.api);
+
+        const value = localStorage.getItem('dv-demo-app');
+        if (typeof value === 'string') {
+            event.api.fromJSON(JSON.parse(value));
+            return;
+        }
+
         const panel1 = event.api.addPanel({
             id: 'panel_1',
-            component: 'default',
+            component: 'iframe',
+            renderer: 'always',
             title: 'Panel 1',
         });
 
@@ -258,15 +281,64 @@ const DockviewDemo = (props: { theme?: string }) => {
     };
 
     return (
-        <DockviewReact
-            components={components}
-            defaultTabComponent={headerComponents.default}
-            rightHeaderActionsComponent={RightControls}
-            leftHeaderActionsComponent={LeftControls}
-            prefixHeaderActionsComponent={PrefixHeaderControls}
-            onReady={onReady}
-            className={props.theme || 'dockview-theme-abyss'}
-        />
+        <div
+            style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+        >
+            <div>
+                <button
+                    onClick={() => {
+                        if (!api) {
+                            return;
+                        }
+
+                        const value = localStorage.getItem('dv-demo-app');
+                        if (typeof value === 'string') {
+                            api.fromJSON(JSON.parse(value));
+                        }
+                    }}
+                >
+                    {'Load'}
+                </button>
+                <button
+                    onClick={() => {
+                        if (!api) {
+                            return;
+                        }
+                        localStorage.setItem(
+                            'dv-demo-app',
+                            JSON.stringify(api.toJSON())
+                        );
+                    }}
+                >
+                    {'Save'}
+                </button>
+                <button
+                    onClick={() => {
+                        api?.clear();
+                    }}
+                >
+                    {'Clear'}
+                </button>
+                <button
+                    onClick={() => {
+                        localStorage.removeItem('dv-demo-app');
+                    }}
+                >
+                    {'Reset'}
+                </button>
+            </div>
+            <div style={{ flexGrow: 1 }}>
+                <DockviewReact
+                    components={components}
+                    defaultTabComponent={headerComponents.default}
+                    rightHeaderActionsComponent={RightControls}
+                    leftHeaderActionsComponent={LeftControls}
+                    prefixHeaderActionsComponent={PrefixHeaderControls}
+                    onReady={onReady}
+                    className={props.theme || 'dockview-theme-abyss'}
+                />
+            </div>
+        </div>
     );
 };
 

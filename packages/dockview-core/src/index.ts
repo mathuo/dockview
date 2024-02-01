@@ -15,10 +15,11 @@ export * from './panel/types';
 export * from './panel/componentFactory';
 
 export * from './splitview/splitview';
-export * from './splitview/options';
+export { SplitviewComponentOptions } from './splitview/options';
 
 export * from './paneview/paneview';
 export * from './gridview/gridview';
+export { GridviewComponentOptions } from './gridview/options';
 export * from './dockview/dockviewGroupPanelModel';
 export * from './gridview/baseComponentGridview';
 

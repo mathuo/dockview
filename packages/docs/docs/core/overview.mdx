@@ -5,7 +5,10 @@ sidebar_position: 0
 
 This section provided a core overview.
 
-Once you have created an dock you will want to store a reference to the [API](/docs/api/dockview/overview).
+
+
+The component takes a collection of [Options](/docs/api/dockview/options) as inputs and
+once you have created a dock you can store a reference to the [API](/docs/api/dockview/overview) that is created.
 
 <FrameworkSpecific framework='React'>
 ```tsx
@@ -18,6 +21,15 @@ function onReady(event: DockviewReadyEvent) {
 }
 
 <DockviewReact onReady={onReady}/>
+```
+</FrameworkSpecific>
+
+
+<FrameworkSpecific framework='JavaScript'>
+```tsx
+const component = new DockviewComponent({
+  /** options */
+});
 ```
 </FrameworkSpecific>
 
