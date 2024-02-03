@@ -18,11 +18,15 @@ export interface IDockviewPanel extends IDisposable, IPanel {
     readonly api: DockviewPanelApi;
     readonly title: string | undefined;
     readonly params: Parameters | undefined;
-    updateParentGroup(group: DockviewGroupPanel, isGroupActive: boolean): void;
+    updateParentGroup(
+        group: DockviewGroupPanel,
+        options: { isGroupActive: boolean }
+    ): void;
     init(params: IGroupPanelInitParameters): void;
     toJSON(): GroupviewPanelState;
     setTitle(title: string): void;
     update(event: PanelUpdateEvent): void;
+    runEvents(): void;
 }
 
 export class DockviewPanel
@@ -94,16 +98,6 @@ export class DockviewPanel
     }
 
     focus(): void {
-        /**
-         * This is a progmatic request of focus -
-         * We need to tell the active panel that it can choose it's focus
-         * If the panel doesn't choose the panels container for it
-         */
-
-        if (!this.api.isActive) {
-            this.api.setActive();
-        }
-
         const event = new WillFocusEvent();
         this.api._onWillFocus.fire(event);
 
@@ -111,7 +105,9 @@ export class DockviewPanel
             return;
         }
 
-        this.group.model.focusContent();
+        if (!this.api.isActive) {
+            this.api.setActive();
+        }
     }
 
     public toJSON(): GroupviewPanelState {
@@ -183,24 +179,49 @@ export class DockviewPanel
 
     public updateParentGroup(
         group: DockviewGroupPanel,
-        isGroupActive: boolean
+        options: { isGroupActive: boolean }
     ): void {
         this._group = group;
-        this.api.group = group;
 
+        // const isPanelVisible = this._group.model.isPanelActive(this);
+
+        // const isActive = options.isGroupActive && isPanelVisible;
+
+        // if (this.api.isActive !== isActive) {
+        //     this.api._onDidActiveChange.fire({
+        //         isActive: options.isGroupActive && isPanelVisible,
+        //     });
+        // }
+
+        // if (this.api.isVisible !== isPanelVisible) {
+        //     this.api._onDidVisibilityChange.fire({
+        //         isVisible: isPanelVisible,
+        //     });
+        // }
+
+        // this.view.updateParentGroup(
+        //     this._group,
+        //     this._group.model.isPanelActive(this)
+        // );
+    }
+
+    runEvents(): void {
+        this.api.group = this._group;
         const isPanelVisible = this._group.model.isPanelActive(this);
 
-        this.api._onDidActiveChange.fire({
-            isActive: isGroupActive && isPanelVisible,
-        });
-        this.api._onDidVisibilityChange.fire({
-            isVisible: isPanelVisible,
-        });
+        const isActive = this.group.api.isActive && isPanelVisible;
 
-        this.view.updateParentGroup(
-            this._group,
-            this._group.model.isPanelActive(this)
-        );
+        if (this.api.isActive !== isActive) {
+            this.api._onDidActiveChange.fire({
+                isActive: this.group.api.isActive && isPanelVisible,
+            });
+        }
+
+        if (this.api.isVisible !== isPanelVisible) {
+            this.api._onDidVisibilityChange.fire({
+                isVisible: isPanelVisible,
+            });
+        }
     }
 
     public layout(width: number, height: number): void {

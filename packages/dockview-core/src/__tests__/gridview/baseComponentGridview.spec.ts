@@ -114,17 +114,17 @@ describe('baseComponentGridview', () => {
             proportionalLayout: true,
         });
 
-        const events: (TestPanel | undefined)[] = [];
+        const events: { type: string; panel: TestPanel | undefined }[] = [];
 
         const disposable = new CompositeDisposable(
-            cut.onDidAddGroup((event) => {
-                events.push(event);
+            cut.onDidAdd((event) => {
+                events.push({ type: 'add', panel: event });
             }),
-            cut.onDidRemoveGroup((event) => {
-                events.push(event);
+            cut.onDidRemove((event) => {
+                events.push({ type: 'remove', panel: event });
             }),
-            cut.onDidActiveGroupChange((event) => {
-                events.push(event);
+            cut.onDidActiveChange((event) => {
+                events.push({ type: 'active', panel: event });
             })
         );
 
@@ -141,9 +141,8 @@ describe('baseComponentGridview', () => {
 
         cut.doAddGroup(panel1);
 
-        expect(events.length).toBe(2);
-        expect(events[0]).toBe(panel1);
-        expect(events[1]).toBe(panel1);
+        expect(events.length).toBe(1);
+        expect(events[0]).toEqual({ type: 'add', panel: panel1 });
 
         const panel2 = new TestPanel(
             'id',
@@ -158,12 +157,12 @@ describe('baseComponentGridview', () => {
 
         cut.doAddGroup(panel2);
 
-        expect(events.length).toBe(4);
-        expect(events[2]).toBe(panel2);
+        expect(events.length).toBe(2);
+        expect(events[1]).toEqual({ type: 'add', panel: panel2 });
 
         cut.doRemoveGroup(panel1);
-        expect(events.length).toBe(5);
-        expect(events[4]).toBe(panel1);
+        expect(events.length).toBe(3);
+        expect(events[2]).toEqual({ type: 'remove', panel: panel1 });
 
         disposable.dispose();
         cut.dispose();

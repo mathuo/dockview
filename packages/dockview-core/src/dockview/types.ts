@@ -47,8 +47,6 @@ export interface ITabRenderer
     > {
     readonly element: HTMLElement;
     init(parameters: GroupPanelPartInitParameters): void;
-    onGroupChange?(group: DockviewGroupPanel): void;
-    onPanelVisibleChange?(isPanelVisible: boolean): void;
 }
 
 export interface IContentRenderer
@@ -60,8 +58,6 @@ export interface IContentRenderer
     readonly onDidFocus?: Event<void>;
     readonly onDidBlur?: Event<void>;
     init(parameters: GroupPanelContentPartInitParameters): void;
-    onGroupChange?(group: DockviewGroupPanel): void;
-    onPanelVisibleChange?(isPanelVisible: boolean): void;
 }
 
 // watermark component

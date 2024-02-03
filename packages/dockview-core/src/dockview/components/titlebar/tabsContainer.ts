@@ -390,17 +390,15 @@ export class TabsContainer
                     return;
                 }
 
-                const alreadyFocused =
-                    panel.id === this.group.model.activePanel?.id &&
-                    this.group.model.isContentFocused;
-
                 const isLeftClick = event.button === 0;
 
                 if (!isLeftClick || event.defaultPrevented) {
                     return;
                 }
 
-                this.group.model.openPanel(panel);
+                if (this.group.activePanel !== panel) {
+                    this.group.model.openPanel(panel);
+                }
             }),
             tab.onDrop((event) => {
                 this._onDrop.fire({
