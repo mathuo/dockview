@@ -131,17 +131,27 @@ export class BranchNode extends CompositeDisposable implements IView {
         return LayoutPriority.Normal;
     }
 
+    get disabled(): boolean {
+        return this.splitview.disabled;
+    }
+
+    set disabled(value: boolean) {
+        this.splitview.disabled = value;
+    }
+
     constructor(
         readonly orientation: Orientation,
         readonly proportionalLayout: boolean,
         readonly styles: ISplitviewStyles | undefined,
         size: number,
         orthogonalSize: number,
+        disabled: boolean,
         childDescriptors?: INodeDescriptor[]
     ) {
         super();
         this._orthogonalSize = orthogonalSize;
         this._size = size;
+
         this.element = document.createElement('div');
         this.element.className = 'branch-node';
 
@@ -177,6 +187,8 @@ export class BranchNode extends CompositeDisposable implements IView {
             });
         }
 
+        this.disabled = disabled;
+
         this.addDisposables(
             this._onDidChange,
             this._onDidVisibilityChange,
@@ -202,7 +214,7 @@ export class BranchNode extends CompositeDisposable implements IView {
         return this.splitview.isViewVisible(index);
     }
 
-     setChildVisible(index: number, visible: boolean): void {
+    setChildVisible(index: number, visible: boolean): void {
         if (index < 0 || index >= this.children.length) {
             throw new Error('Invalid index');
         }

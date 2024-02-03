@@ -90,7 +90,7 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
         group: DockviewGroupPanel
     ) => IHeaderActionsRenderer;
     singleTabMode?: 'fullwidth' | 'default';
-    parentElement?: HTMLElement;
+    parentElement: HTMLElement;
     disableFloatingGroups?: boolean;
     floatingGroupBounds?:
         | 'boundedWithinViewport'
@@ -102,6 +102,8 @@ export interface DockviewComponentOptions extends DockviewRenderFunctions {
     defaultRenderer?: DockviewPanelRenderer;
     debug?: boolean;
     rootOverlayModel?: DroptargetOverlayModel;
+    locked?: boolean;
+    disableDnd?: boolean;
 }
 
 export interface PanelOptions<P extends object = Parameters> {

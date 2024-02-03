@@ -1,11 +1,13 @@
 import { Emitter, Event } from '../events';
 import { GridviewPanelApiImpl, GridviewPanelApi } from './gridviewPanelApi';
 import { DockviewGroupPanel } from '../dockview/dockviewGroupPanel';
-import { MutableDisposable } from '../lifecycle';
+import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { DockviewPanel } from '../dockview/dockviewPanel';
 import { DockviewComponent } from '../dockview/dockviewComponent';
 import { Position } from '../dnd/droptarget';
 import { DockviewPanelRenderer } from '../overlayRenderContainer';
+import { DockviewGroupPanelFloatingChangeEvent } from './dockviewGroupPanelApi';
+import { DockviewGroupLocation } from '../dockview/dockviewGroupPanelModel';
 
 export interface TitleEvent {
     readonly title: string;
@@ -28,6 +30,8 @@ export interface DockviewPanelApi
     readonly onDidActiveGroupChange: Event<void>;
     readonly onDidGroupChange: Event<void>;
     readonly onDidRendererChange: Event<RendererChangedEvent>;
+    readonly location: DockviewGroupLocation;
+    readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent>;
     close(): void;
     setTitle(title: string): void;
     setRenderer(renderer: DockviewPanelRenderer): void;
@@ -39,6 +43,10 @@ export interface DockviewPanelApi
     maximize(): void;
     isMaximized(): boolean;
     exitMaximized(): void;
+    /**
+     * If you require the Window object
+     */
+    getWindow(): Window;
 }
 
 export class DockviewPanelApiImpl
@@ -59,7 +67,16 @@ export class DockviewPanelApiImpl
     readonly _onDidRendererChange = new Emitter<RendererChangedEvent>();
     readonly onDidRendererChange = this._onDidRendererChange.event;
 
-    private readonly disposable = new MutableDisposable();
+    private readonly _onDidLocationChange =
+        new Emitter<DockviewGroupPanelFloatingChangeEvent>();
+    readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent> =
+        this._onDidLocationChange.event;
+
+    private readonly groupEventsDisposable = new MutableDisposable();
+
+    get location(): DockviewGroupLocation {
+        return this.group.api.location;
+    }
 
     get title(): string | undefined {
         return this.panel.title;
@@ -81,13 +98,22 @@ export class DockviewPanelApiImpl
         this._onDidGroupChange.fire();
 
         if (this._group) {
-            this.disposable.value = this._group.api.onDidActiveChange(() => {
-                this._onDidActiveGroupChange.fire();
-            });
+            this.groupEventsDisposable.value = new CompositeDisposable(
+                this.group.api.onDidLocationChange((event) => {
+                    this._onDidLocationChange.fire(event);
+                }),
+                this.group.api.onDidActiveChange(() => {
+                    this._onDidActiveGroupChange.fire();
+                })
+            );
 
             if (this.isGroupActive !== isOldGroupActive) {
                 this._onDidActiveGroupChange.fire();
             }
+
+            this._onDidLocationChange.fire({
+                location: this.group.api.location,
+            });
         }
     }
 
@@ -109,12 +135,17 @@ export class DockviewPanelApiImpl
 
 
         this.addDisposables(
-            this.disposable,
+            this.groupEventsDisposable,
             this._onDidRendererChange,
             this._onDidTitleChange,
             this._onDidGroupChange,
-            this._onDidActiveGroupChange
+            this._onDidActiveGroupChange,
+            this._onDidLocationChange
         );
+    }
+
+    getWindow(): Window {
+        return this.group.api.getWindow();
     }
 
     moveTo(options: {

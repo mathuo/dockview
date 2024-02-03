@@ -11,7 +11,7 @@ describe('groupDragHandler', () => {
         const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
             const partial: Partial<DockviewGroupPanel> = {
                 id: 'test_group_id',
-                api: { location: 'grid' } as any,
+                api: { location: { type: 'grid' } } as any,
             };
             return partial as DockviewGroupPanel;
         });
@@ -53,7 +53,7 @@ describe('groupDragHandler', () => {
 
         const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
             const partial: Partial<DockviewGroupPanel> = {
-                api: { location: 'floating' } as any,
+                api: { location: { type: 'floating' } } as any,
             };
             return partial as DockviewGroupPanel;
         });
@@ -85,7 +85,7 @@ describe('groupDragHandler', () => {
 
         const groupMock = jest.fn<DockviewGroupPanel, []>(() => {
             const partial: Partial<DockviewGroupPanel> = {
-                api: { location: 'grid' } as any,
+                api: { location: { type: 'grid' } } as any,
             };
             return partial as DockviewGroupPanel;
         });

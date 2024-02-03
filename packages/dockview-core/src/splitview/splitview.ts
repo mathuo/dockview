@@ -109,6 +109,7 @@ export class Splitview {
     private proportionalLayout: boolean;
     private _startSnappingEnabled = true;
     private _endSnappingEnabled = true;
+    private _disabled = false;
 
     private readonly _onDidSashEnd = new Emitter<void>();
     readonly onDidSashEnd = this._onDidSashEnd.event;
@@ -198,6 +199,16 @@ export class Splitview {
 
         this._endSnappingEnabled = endSnappingEnabled;
         this.updateSashEnablement();
+    }
+
+    get disabled(): boolean {
+        return this._disabled;
+    }
+
+    set disabled(value: boolean) {
+        this._disabled = value;
+
+        toggleClass(this.element, 'dv-splitview-disabled', value);
     }
 
     constructor(

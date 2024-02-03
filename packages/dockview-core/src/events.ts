@@ -23,6 +23,7 @@ export namespace Event {
         };
     };
 }
+
 export class DockviewEvent {
     private _defaultPrevented = false;
 

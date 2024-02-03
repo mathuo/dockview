@@ -5,22 +5,31 @@ import { Box } from './types';
 
 export type PopoutWindowOptions = {
     url: string;
+    onDidOpen?: (event: { id: string; window: Window }) => void;
+    onWillClose?: (event: { id: string; window: Window }) => void;
 } & Box;
 
 export class PopoutWindow extends CompositeDisposable {
+    private readonly _onWillClose = new Emitter<void>();
+    readonly onWillClose = this._onWillClose.event;
+
     private readonly _onDidClose = new Emitter<void>();
     readonly onDidClose = this._onDidClose.event;
 
     private _window: { value: Window; disposable: IDisposable } | null = null;
 
+    get window(): Window | null {
+        return this._window?.value ?? null;
+    }
+
     constructor(
-        private readonly id: string,
+        private readonly target: string,
         private readonly className: string,
         private readonly options: PopoutWindowOptions
     ) {
         super();
 
-        this.addDisposables(this._onDidClose, {
+        this.addDisposables(this._onWillClose, this._onDidClose, {
             dispose: () => {
                 this.close();
             },
@@ -42,13 +51,22 @@ export class PopoutWindow extends CompositeDisposable {
 
     close(): void {
         if (this._window) {
+            this._onWillClose.fire();
+
+            this.options.onWillClose?.({
+                id: this.target,
+                window: this._window.value,
+            });
+
             this._window.disposable.dispose();
             this._window.value.close();
             this._window = null;
+
+            this._onDidClose.fire();
         }
     }
 
-    open(content: HTMLElement): void {
+    async open(): Promise<HTMLElement | null> {
         if (this._window) {
             throw new Error('instance of popout window is already open');
         }
@@ -64,55 +82,93 @@ export class PopoutWindow extends CompositeDisposable {
             .map(([key, value]) => `${key}=${value}`)
             .join(',');
 
-        // https://developer.mozilla.org/en-US/docs/Web/API/Window/open
-        const externalWindow = window.open(url, this.id, features);
+        /**
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/open
+         */
+        const externalWindow = window.open(url, this.target, features);
 
         if (!externalWindow) {
-            return;
+            /**
+             * Popup blocked
+             */
+            return null;
         }
 
         const disposable = new CompositeDisposable();
 
         this._window = { value: externalWindow, disposable };
 
-        const cleanUp = () => {
-            this._onDidClose.fire();
-            this._window = null;
-        };
-
-        // prevent any default content from loading
-        // externalWindow.document.body.replaceWith(document.createElement('div'));
-
         disposable.addDisposables(
             addDisposableWindowListener(window, 'beforeunload', () => {
-                cleanUp();
+                /**
+                 * before the main window closes we should close this popup too
+                 * to be good citizens
+                 *
+                 * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
+                 */
                 this.close();
             })
         );
 
-        externalWindow.addEventListener('load', () => {
-            const externalDocument = externalWindow.document;
-            externalDocument.title = document.title;
+        const container = this.createPopoutWindowContainer();
 
-            const div = document.createElement('div');
-            div.classList.add('dv-popout-window');
-            div.style.position = 'absolute';
-            div.style.width = '100%';
-            div.style.height = '100%';
-            div.style.top = '0px';
-            div.style.left = '0px';
-            div.classList.add(this.className);
-            div.appendChild(content);
+        if (this.className) {
+            container.classList.add(this.className);
+        }
 
-            externalDocument.body.replaceChildren(div);
-            externalDocument.body.classList.add(this.className);
+        this.options.onDidOpen?.({
+            id: this.target,
+            window: externalWindow,
+        });
 
-            addStyles(externalDocument, window.document.styleSheets);
+        return new Promise<HTMLElement | null>((resolve) => {
+            externalWindow.addEventListener('unload', (e) => {
+                // if page fails to load before unloading
+                // this.close();
+            });
 
-            externalWindow.addEventListener('beforeunload', () => {
-                // TODO: indicate external window is closing
-                cleanUp();
+            externalWindow.addEventListener('load', () => {
+                /**
+                 * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event
+                 */
+
+                const externalDocument = externalWindow.document;
+                externalDocument.title = document.title;
+
+                externalDocument.body.appendChild(container);
+
+                addStyles(externalDocument, window.document.styleSheets);
+
+                /**
+                 * beforeunload must be registered after load for reasons I could not determine
+                 * otherwise the beforeunload event will not fire when the window is closed
+                 */
+                addDisposableWindowListener(
+                    externalWindow,
+                    'beforeunload',
+                    () => {
+                        /**
+                         * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
+                         */
+                        this.close();
+                    }
+                );
+
+                resolve(container);
             });
         });
+    }
+
+    private createPopoutWindowContainer(): HTMLElement {
+        const el = document.createElement('div');
+        el.classList.add('dv-popout-window');
+        el.id = 'dv-popout-window';
+        el.style.position = 'absolute';
+        el.style.width = '100%';
+        el.style.height = '100%';
+        el.style.top = '0px';
+        el.style.left = '0px';
+
+        return el;
     }
 }

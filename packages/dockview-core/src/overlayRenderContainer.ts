@@ -93,7 +93,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
             toggleClass(
                 focusContainer,
                 'dv-render-overlay-float',
-                panel.group.api.location === 'floating'
+                panel.group.api.location.type === 'floating'
             );
         };
 
