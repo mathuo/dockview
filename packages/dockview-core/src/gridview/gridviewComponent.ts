@@ -71,6 +71,9 @@ export interface IGridviewComponent extends IBaseGrid<GridviewPanel> {
     ): void;
     setVisible(panel: IGridviewPanel, visible: boolean): void;
     setActive(panel: IGridviewPanel): void;
+    readonly onDidRemoveGroup: Event<GridviewPanel>;
+    readonly onDidAddGroup: Event<GridviewPanel>;
+    readonly onDidActiveGroupChange: Event<GridviewPanel | undefined>;
 }
 
 export class GridviewComponent
@@ -82,6 +85,19 @@ export class GridviewComponent
 
     private readonly _onDidLayoutfromJSON = new Emitter<void>();
     readonly onDidLayoutFromJSON: Event<void> = this._onDidLayoutfromJSON.event;
+
+    private readonly _onDidRemoveGroup = new Emitter<GridviewPanel>();
+    readonly onDidRemoveGroup: Event<GridviewPanel> =
+        this._onDidRemoveGroup.event;
+
+    protected readonly _onDidAddGroup = new Emitter<GridviewPanel>();
+    readonly onDidAddGroup: Event<GridviewPanel> = this._onDidAddGroup.event;
+
+    private readonly _onDidActiveGroupChange = new Emitter<
+        GridviewPanel | undefined
+    >();
+    readonly onDidActiveGroupChange: Event<GridviewPanel | undefined> =
+        this._onDidActiveGroupChange.event;
 
     get orientation(): Orientation {
         return this.gridview.orientation;
@@ -113,6 +129,21 @@ export class GridviewComponent
         });
 
         this._options = options;
+
+        this.addDisposables(
+            this._onDidAddGroup,
+            this._onDidRemoveGroup,
+            this._onDidActiveGroupChange,
+            this.onDidAdd((event) => {
+                this._onDidAddGroup.fire(event);
+            }),
+            this.onDidRemove((event) => {
+                this._onDidRemoveGroup.fire(event);
+            }),
+            this.onDidActiveChange((event) => {
+                this._onDidActiveGroupChange.fire(event);
+            })
+        );
 
         if (!this.options.components) {
             this.options.components = {};
@@ -364,6 +395,7 @@ export class GridviewComponent
         this.registerPanel(view);
 
         this.doAddGroup(view, relativeLocation, options.size);
+        this.doSetGroupActive(view);
 
         return view;
     }

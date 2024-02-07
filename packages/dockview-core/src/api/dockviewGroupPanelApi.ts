@@ -63,12 +63,15 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
                 direction: positionToDirection(options.position ?? 'right'),
             });
 
-        this.accessor.moveGroupOrPanel(
-            group,
-            this._group.id,
-            undefined,
-            options.group ? options.position ?? 'center' : 'center'
-        );
+        this.accessor.moveGroupOrPanel({
+            from: { groupId: this._group.id },
+            to: {
+                group,
+                position: options.group
+                    ? options.position ?? 'center'
+                    : 'center',
+            },
+        });
     }
 
     maximize(): void {

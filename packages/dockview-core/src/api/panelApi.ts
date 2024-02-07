@@ -1,4 +1,4 @@
-import { Emitter, Event } from '../events';
+import { DockviewEvent, Emitter, Event } from '../events';
 import { CompositeDisposable, MutableDisposable } from '../lifecycle';
 import { IPanel, Parameters } from '../panel/types';
 
@@ -59,6 +59,14 @@ export interface PanelApi {
      * The panel height in pixels
      */
     readonly height: number;
+
+    readonly onWillFocus: Event<WillFocusEvent>;
+}
+
+export class WillFocusEvent extends DockviewEvent {
+    constructor() {
+        super();
+    }
 }
 
 /**
@@ -83,10 +91,10 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
         replay: true,
     });
     readonly onDidFocusChange: Event<FocusEvent> = this._onDidChangeFocus.event;
-
-    readonly _onFocusEvent = new Emitter<void>();
-    readonly onFocusEvent: Event<void> = this._onFocusEvent.event;
-
+    //
+    readonly _onWillFocus = new Emitter<WillFocusEvent>();
+    readonly onWillFocus: Event<WillFocusEvent> = this._onWillFocus.event;
+    //
     readonly _onDidVisibilityChange = new Emitter<VisibilityEvent>({
         replay: true,
     });
@@ -159,8 +167,10 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
             this._onDidChangeFocus,
             this._onDidVisibilityChange,
             this._onDidActiveChange,
-            this._onFocusEvent,
+            this._onWillFocus,
             this._onActiveChange,
+            this._onUpdateParameters,
+            this._onWillFocus,
             this._onDidHiddenChange,
             this._onUpdateParameters
         );
