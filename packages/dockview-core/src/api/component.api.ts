@@ -835,7 +835,7 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.hasMaximizedGroup();
     }
 
-    exitMaxmizedGroup(): void {
+    exitMaximizedGroup(): void {
         this.component.exitMaximizedGroup();
     }
 

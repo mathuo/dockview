@@ -119,30 +119,6 @@
                 "pieces": []
             },
             {
-                "name": "_onDidAddGroup",
-                "code": "Emitter<BaseGrid.T>",
-                "kind": "property",
-                "flags": {
-                    "isProtected": true,
-                    "isReadonly": true
-                },
-                "pieces": [
-                    "Emitter"
-                ]
-            },
-            {
-                "name": "_onDidRemoveGroup",
-                "code": "Emitter<BaseGrid.T>",
-                "kind": "property",
-                "flags": {
-                    "isProtected": true,
-                    "isReadonly": true
-                },
-                "pieces": [
-                    "Emitter"
-                ]
-            },
-            {
                 "name": "gridview",
                 "code": "Gridview",
                 "kind": "property",
@@ -155,7 +131,7 @@
                 ]
             },
             {
-                "name": "onDidActiveGroupChange",
+                "name": "onDidActiveChange",
                 "code": "Event<BaseGrid.T | undefined>",
                 "kind": "property",
                 "flags": {
@@ -166,7 +142,7 @@
                 ]
             },
             {
-                "name": "onDidAddGroup",
+                "name": "onDidAdd",
                 "code": "Event<BaseGrid.T>",
                 "kind": "property",
                 "flags": {
@@ -188,7 +164,7 @@
                 ]
             },
             {
-                "name": "onDidRemoveGroup",
+                "name": "onDidRemove",
                 "code": "Event<BaseGrid.T>",
                 "kind": "property",
                 "flags": {
@@ -326,7 +302,7 @@
             },
             {
                 "name": "doSetGroupActive",
-                "code": "(group: BaseGrid.T | undefined, skipFocus?: boolean): void",
+                "code": "(group: BaseGrid.T | undefined): void",
                 "kind": "method",
                 "pieces": []
             },
@@ -961,7 +937,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\r\nprevent the event from occuring using the standard "
+                            "text": "Invoked when a Drag'n'Drop event occurs but before dockview handles it giving the user an opportunity to intecept and\nprevent the event from occuring using the standard "
                         },
                         {
                             "kind": "code",
@@ -969,7 +945,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": " syntax.\r\n\r\nPreventing certain events may causes unexpected behaviours, use carefully."
+                            "text": " syntax.\n\nPreventing certain events may causes unexpected behaviours, use carefully."
                         }
                     ]
                 },
@@ -1132,7 +1108,7 @@
                 "pieces": []
             },
             {
-                "name": "exitMaxmizedGroup",
+                "name": "exitMaximizedGroup",
                 "code": "(): void",
                 "kind": "method",
                 "pieces": []
@@ -1381,18 +1357,6 @@
                 ]
             },
             {
-                "name": "_onDidRemoveGroup",
-                "code": "Emitter<DockviewGroupPanel>",
-                "kind": "property",
-                "flags": {
-                    "isProtected": true,
-                    "isReadonly": true
-                },
-                "pieces": [
-                    "Emitter"
-                ]
-            },
-            {
                 "name": "gridview",
                 "code": "Gridview",
                 "kind": "property",
@@ -1402,6 +1366,17 @@
                 },
                 "pieces": [
                     "Gridview"
+                ]
+            },
+            {
+                "name": "onDidActiveChange",
+                "code": "Event<DockviewGroupPanel | undefined>",
+                "kind": "property",
+                "flags": {
+                    "isReadonly": true
+                },
+                "pieces": [
+                    "Event"
                 ]
             },
             {
@@ -1418,6 +1393,17 @@
             {
                 "name": "onDidActivePanelChange",
                 "code": "Event<IDockviewPanel | undefined>",
+                "kind": "property",
+                "flags": {
+                    "isReadonly": true
+                },
+                "pieces": [
+                    "Event"
+                ]
+            },
+            {
+                "name": "onDidAdd",
+                "code": "Event<DockviewGroupPanel>",
                 "kind": "property",
                 "flags": {
                     "isReadonly": true
@@ -1473,6 +1459,17 @@
             {
                 "name": "onDidLayoutFromJSON",
                 "code": "Event<void>",
+                "kind": "property",
+                "flags": {
+                    "isReadonly": true
+                },
+                "pieces": [
+                    "Event"
+                ]
+            },
+            {
+                "name": "onDidRemove",
+                "code": "Event<DockviewGroupPanel>",
                 "kind": "property",
                 "flags": {
                     "isReadonly": true
@@ -1700,7 +1697,7 @@
             },
             {
                 "name": "addFloatingGroup",
-                "code": "(item: DockviewPanel | DockviewGroupPanel, coord?: { height?: number, width?: number, x?: number, y?: number }, options?: { inDragMode: boolean, skipRemoveGroup?: boolean }): void",
+                "code": "(item: DockviewPanel | DockviewGroupPanel, coord?: { height?: number, width?: number, x?: number, y?: number }, options?: { inDragMode: boolean, skipActiveGroup?: boolean, skipRemoveGroup?: boolean }): void",
                 "kind": "method",
                 "pieces": []
             },
@@ -1781,13 +1778,13 @@
             },
             {
                 "name": "doSetGroupActive",
-                "code": "(group: DockviewGroupPanel | undefined, skipFocus?: boolean): void",
+                "code": "(group: DockviewGroupPanel | undefined): void",
                 "kind": "method",
                 "pieces": []
             },
             {
                 "name": "doSetGroupAndPanelActive",
-                "code": "(group: DockviewGroupPanel | undefined, skipFocus?: boolean): void",
+                "code": "(group: DockviewGroupPanel | undefined): void",
                 "kind": "method",
                 "pieces": []
             },
@@ -1860,12 +1857,19 @@
                 ]
             },
             {
-                "name": "moveGroupOrPanel",
-                "code": "(destinationGroup: DockviewGroupPanel, sourceGroupId: string, sourceItemId: string | undefined, destinationTarget: Position, destinationIndex?: number): void",
+                "name": "moveGroup",
+                "code": "(options: MoveGroupOptions): void",
                 "kind": "method",
                 "pieces": [
-                    "DockviewGroupPanel",
-                    "Position"
+                    "MoveGroupOptions"
+                ]
+            },
+            {
+                "name": "moveGroupOrPanel",
+                "code": "(options: MoveGroupOrPanelOptions): void",
+                "kind": "method",
+                "pieces": [
+                    "MoveGroupOrPanelOptions"
                 ]
             },
             {
@@ -1885,6 +1889,14 @@
                 ]
             },
             {
+                "name": "movingLock",
+                "code": "<T>(func: (): T): T",
+                "kind": "method",
+                "pieces": [
+                    "T"
+                ]
+            },
+            {
                 "name": "removeGroup",
                 "code": "(group: DockviewGroupPanel, options?: { skipActive?: boolean, skipDispose?: boolean }): void",
                 "kind": "method",
@@ -1894,7 +1906,7 @@
             },
             {
                 "name": "removePanel",
-                "code": "(panel: IDockviewPanel, options: { removeEmptyGroup: boolean, skipDispose: boolean }): void",
+                "code": "(panel: IDockviewPanel, options: { removeEmptyGroup: boolean, skipDispose: boolean, skipSetActiveGroup?: boolean }): void",
                 "kind": "method",
                 "pieces": [
                     "IDockviewPanel"
@@ -2079,6 +2091,12 @@
                 "pieces": [
                     "Event"
                 ]
+            },
+            {
+                "name": "value",
+                "code": "Emitter.T | undefined",
+                "kind": "accessor",
+                "pieces": []
             },
             {
                 "name": "dispose",
@@ -2628,6 +2646,12 @@
                 "pieces": []
             },
             {
+                "name": "focusContent",
+                "code": "(): void",
+                "kind": "method",
+                "pieces": []
+            },
+            {
                 "name": "indexOf",
                 "code": "(panel: IDockviewPanel): number",
                 "kind": "method",
@@ -2677,7 +2701,7 @@
             },
             {
                 "name": "openPanel",
-                "code": "(panel: IDockviewPanel, options: { index?: number, skipFocus?: boolean, skipSetGroupActive?: boolean, skipSetPanelActive?: boolean }): void",
+                "code": "(panel: IDockviewPanel, options: { index?: number, skipSetActive?: boolean, skipSetGroupActive?: boolean }): void",
                 "kind": "method",
                 "pieces": [
                     "IDockviewPanel"
@@ -2685,7 +2709,7 @@
             },
             {
                 "name": "removePanel",
-                "code": "(groupItemOrId: IDockviewPanel | string): IDockviewPanel",
+                "code": "(groupItemOrId: IDockviewPanel | string, options: { skipSetActive?: boolean, skipSetActiveGroup?: boolean }): IDockviewPanel",
                 "kind": "method",
                 "pieces": [
                     "IDockviewPanel"
@@ -2701,7 +2725,7 @@
             },
             {
                 "name": "setActive",
-                "code": "(isGroupActive: boolean, skipFocus: boolean, force: boolean): void",
+                "code": "(isGroupActive: boolean, force: boolean): void",
                 "kind": "method",
                 "pieces": []
             },
@@ -2852,6 +2876,12 @@
                 "pieces": []
             },
             {
+                "name": "runEvents",
+                "code": "(): void",
+                "kind": "method",
+                "pieces": []
+            },
+            {
                 "name": "setRenderer",
                 "code": "(renderer: DockviewPanelRenderer): void",
                 "kind": "method",
@@ -2883,7 +2913,7 @@
             },
             {
                 "name": "updateParentGroup",
-                "code": "(group: DockviewGroupPanel, isGroupActive: boolean): void",
+                "code": "(group: DockviewGroupPanel, options?: { skipSetActive?: boolean }): void",
                 "kind": "method",
                 "pieces": [
                     "DockviewGroupPanel"
@@ -3425,7 +3455,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node\r\nIf the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node"
+                            "text": "If the root is orientated as a VERTICAL node then nest the existing root within a new HORIZIONTAL root node\nIf the root is orientated as a HORIZONTAL node then nest the existing root within a new VERITCAL root node"
                         }
                     ]
                 },
@@ -3929,18 +3959,6 @@
                 ]
             },
             {
-                "name": "_onDidRemoveGroup",
-                "code": "Emitter<GridviewPanel<GridviewPanelApiImpl>>",
-                "kind": "property",
-                "flags": {
-                    "isProtected": true,
-                    "isReadonly": true
-                },
-                "pieces": [
-                    "Emitter"
-                ]
-            },
-            {
                 "name": "gridview",
                 "code": "Gridview",
                 "kind": "property",
@@ -3953,8 +3971,30 @@
                 ]
             },
             {
+                "name": "onDidActiveChange",
+                "code": "Event<GridviewPanel<GridviewPanelApiImpl> | undefined>",
+                "kind": "property",
+                "flags": {
+                    "isReadonly": true
+                },
+                "pieces": [
+                    "Event"
+                ]
+            },
+            {
                 "name": "onDidActiveGroupChange",
                 "code": "Event<GridviewPanel<GridviewPanelApiImpl> | undefined>",
+                "kind": "property",
+                "flags": {
+                    "isReadonly": true
+                },
+                "pieces": [
+                    "Event"
+                ]
+            },
+            {
+                "name": "onDidAdd",
+                "code": "Event<GridviewPanel<GridviewPanelApiImpl>>",
                 "kind": "property",
                 "flags": {
                     "isReadonly": true
@@ -3988,6 +4028,17 @@
             {
                 "name": "onDidLayoutFromJSON",
                 "code": "Event<void>",
+                "kind": "property",
+                "flags": {
+                    "isReadonly": true
+                },
+                "pieces": [
+                    "Event"
+                ]
+            },
+            {
+                "name": "onDidRemove",
+                "code": "Event<GridviewPanel<GridviewPanelApiImpl>>",
                 "kind": "property",
                 "flags": {
                     "isReadonly": true
@@ -4167,7 +4218,7 @@
             },
             {
                 "name": "doSetGroupActive",
-                "code": "(group: GridviewPanel<GridviewPanelApiImpl> | undefined, skipFocus?: boolean): void",
+                "code": "(group: GridviewPanel<GridviewPanelApiImpl> | undefined): void",
                 "kind": "method",
                 "pieces": []
             },
@@ -6189,7 +6240,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Invoked whenever any aspect of the layout changes.\r\nIf listening to this event it may be worth debouncing ouputs."
+                            "text": "Invoked whenever any aspect of the layout changes.\nIf listening to this event it may be worth debouncing ouputs."
                         }
                     ]
                 },
@@ -6409,7 +6460,7 @@
                         },
                         {
                             "kind": "text",
-                            "text": " method\r\nfor the subsequent resize."
+                            "text": " method\nfor the subsequent resize."
                         }
                     ]
                 },
@@ -7542,7 +7593,7 @@
             },
             {
                 "name": "defaultRenderer",
-                "code": "'onlyWhenVisibile' | 'always'",
+                "code": "'always' | 'onlyWhenVisibile'",
                 "kind": "property",
                 "flags": {
                     "isOptional": true
@@ -7679,7 +7730,7 @@
             },
             {
                 "name": "singleTabMode",
-                "code": "'fullwidth' | 'default'",
+                "code": "'default' | 'fullwidth'",
                 "kind": "property",
                 "flags": {
                     "isOptional": true
@@ -7986,6 +8037,17 @@
                 ]
             },
             {
+                "name": "onWillFocus",
+                "code": "Event<WillFocusEvent>",
+                "kind": "property",
+                "flags": {
+                    "isReadonly": true
+                },
+                "pieces": [
+                    "Event"
+                ]
+            },
+            {
                 "name": "width",
                 "code": "number",
                 "kind": "property",
@@ -8237,7 +8299,7 @@
             },
             {
                 "name": "onDidActiveGroupChange",
-                "code": "Event<void>",
+                "code": "Event<ActiveGroupEvent>",
                 "kind": "property",
                 "flags": {
                     "isReadonly": true
@@ -8270,7 +8332,7 @@
             },
             {
                 "name": "onDidGroupChange",
-                "code": "Event<void>",
+                "code": "Event<GroupChangedEvent>",
                 "kind": "property",
                 "flags": {
                     "isReadonly": true
@@ -8315,6 +8377,17 @@
             {
                 "name": "onDidVisibilityChange",
                 "code": "Event<VisibilityEvent>",
+                "kind": "property",
+                "flags": {
+                    "isReadonly": true
+                },
+                "pieces": [
+                    "Event"
+                ]
+            },
+            {
+                "name": "onWillFocus",
+                "code": "Event<WillFocusEvent>",
                 "kind": "property",
                 "flags": {
                     "isReadonly": true
@@ -9049,6 +9122,17 @@
                 ]
             },
             {
+                "name": "onWillFocus",
+                "code": "Event<WillFocusEvent>",
+                "kind": "property",
+                "flags": {
+                    "isReadonly": true
+                },
+                "pieces": [
+                    "Event"
+                ]
+            },
+            {
                 "name": "width",
                 "code": "number",
                 "kind": "property",
@@ -9172,6 +9256,15 @@
                 "flags": {
                     "isOptional": true,
                     "isReadonly": true
+                },
+                "pieces": []
+            },
+            {
+                "name": "skipSetActive",
+                "code": "boolean",
+                "kind": "property",
+                "flags": {
+                    "isOptional": true
                 },
                 "pieces": []
             }
@@ -9334,6 +9427,15 @@
                 "pieces": []
             },
             {
+                "name": "skipSetActive",
+                "code": "boolean",
+                "kind": "property",
+                "flags": {
+                    "isOptional": true
+                },
+                "pieces": []
+            },
+            {
                 "name": "views",
                 "code": "string[]",
                 "kind": "property",
@@ -9372,7 +9474,7 @@
             },
             {
                 "name": "renderer",
-                "code": "'onlyWhenVisibile' | 'always'",
+                "code": "'always' | 'onlyWhenVisibile'",
                 "kind": "property",
                 "flags": {
                     "isOptional": true
@@ -9496,28 +9598,6 @@
                 "pieces": []
             },
             {
-                "name": "onDidActiveGroupChange",
-                "code": "Event<IBaseGrid.T | undefined>",
-                "kind": "property",
-                "flags": {
-                    "isReadonly": true
-                },
-                "pieces": [
-                    "Event"
-                ]
-            },
-            {
-                "name": "onDidAddGroup",
-                "code": "Event<IBaseGrid.T>",
-                "kind": "property",
-                "flags": {
-                    "isReadonly": true
-                },
-                "pieces": [
-                    "Event"
-                ]
-            },
-            {
                 "name": "onDidLayoutChange",
                 "code": "Event<void>",
                 "kind": "property",
@@ -9531,17 +9611,6 @@
             {
                 "name": "onDidMaxmizedGroupChange",
                 "code": "Event<void>",
-                "kind": "property",
-                "flags": {
-                    "isReadonly": true
-                },
-                "pieces": [
-                    "Event"
-                ]
-            },
-            {
-                "name": "onDidRemoveGroup",
-                "code": "Event<IBaseGrid.T>",
                 "kind": "property",
                 "flags": {
                     "isReadonly": true
@@ -9838,20 +9907,6 @@
             {
                 "name": "layout",
                 "code": "(width: number, height: number): void",
-                "kind": "method",
-                "pieces": []
-            },
-            {
-                "name": "onGroupChange",
-                "code": "(group: DockviewGroupPanel): void",
-                "kind": "method",
-                "pieces": [
-                    "DockviewGroupPanel"
-                ]
-            },
-            {
-                "name": "onPanelVisibleChange",
-                "code": "(isPanelVisible: boolean): void",
                 "kind": "method",
                 "pieces": []
             },
@@ -10308,12 +10363,19 @@
                 ]
             },
             {
-                "name": "moveGroupOrPanel",
-                "code": "(referenceGroup: DockviewGroupPanel, groupId: string, itemId: string, target: Position, index?: number): void",
+                "name": "moveGroup",
+                "code": "(options: MoveGroupOptions): void",
                 "kind": "method",
                 "pieces": [
-                    "DockviewGroupPanel",
-                    "Position"
+                    "MoveGroupOptions"
+                ]
+            },
+            {
+                "name": "moveGroupOrPanel",
+                "code": "(options: MoveGroupOrPanelOptions): void",
+                "kind": "method",
+                "pieces": [
+                    "MoveGroupOrPanelOptions"
                 ]
             },
             {
@@ -10919,6 +10981,12 @@
                 "pieces": []
             },
             {
+                "name": "runEvents",
+                "code": "(): void",
+                "kind": "method",
+                "pieces": []
+            },
+            {
                 "name": "setTitle",
                 "code": "(title: string): void",
                 "kind": "method",
@@ -10942,7 +11010,7 @@
             },
             {
                 "name": "updateParentGroup",
-                "code": "(group: DockviewGroupPanel, isGroupActive: boolean): void",
+                "code": "(group: DockviewGroupPanel, options?: { skipSetActive?: boolean }): void",
                 "kind": "method",
                 "pieces": [
                     "DockviewGroupPanel"
@@ -12908,20 +12976,6 @@
                 "pieces": []
             },
             {
-                "name": "onGroupChange",
-                "code": "(group: DockviewGroupPanel): void",
-                "kind": "method",
-                "pieces": [
-                    "DockviewGroupPanel"
-                ]
-            },
-            {
-                "name": "onPanelVisibleChange",
-                "code": "(isPanelVisible: boolean): void",
-                "kind": "method",
-                "pieces": []
-            },
-            {
                 "name": "toJSON",
                 "code": "(): object",
                 "kind": "method",
@@ -13488,6 +13542,17 @@
                 ]
             },
             {
+                "name": "onWillFocus",
+                "code": "Event<WillFocusEvent>",
+                "kind": "property",
+                "flags": {
+                    "isReadonly": true
+                },
+                "pieces": [
+                    "Event"
+                ]
+            },
+            {
                 "name": "width",
                 "code": "number",
                 "kind": "property",
@@ -13671,6 +13736,65 @@
                 "code": "Partial<PanelUpdateEvent.T>",
                 "kind": "property",
                 "flags": {},
+                "pieces": []
+            }
+        ]
+    },
+    "PanelViewInitParameters": {
+        "kind": "interface",
+        "children": [
+            {
+                "name": "accessor",
+                "code": "SplitviewComponent",
+                "kind": "property",
+                "flags": {},
+                "pieces": [
+                    "SplitviewComponent"
+                ]
+            },
+            {
+                "name": "maximumSize",
+                "code": "number",
+                "kind": "property",
+                "flags": {
+                    "isOptional": true
+                },
+                "pieces": []
+            },
+            {
+                "name": "minimumSize",
+                "code": "number",
+                "kind": "property",
+                "flags": {
+                    "isOptional": true
+                },
+                "pieces": []
+            },
+            {
+                "name": "params",
+                "code": "Parameters",
+                "kind": "property",
+                "flags": {},
+                "pieces": [
+                    "Parameters"
+                ]
+            },
+            {
+                "name": "priority",
+                "code": "LayoutPriority.Normal | LayoutPriority.High | LayoutPriority.Low",
+                "kind": "property",
+                "flags": {
+                    "isOptional": true
+                },
+                "pieces": []
+            },
+            {
+                "name": "snap",
+                "code": "boolean",
+                "kind": "property",
+                "flags": {
+                    "isOptional": true
+                },
                 "pieces": []
             }
         ]
@@ -14051,6 +14175,17 @@
                 ]
             },
             {
+                "name": "onWillFocus",
+                "code": "Event<WillFocusEvent>",
+                "kind": "property",
+                "flags": {
+                    "isReadonly": true
+                },
+                "pieces": [
+                    "Event"
+                ]
+            },
+            {
                 "name": "width",
                 "code": "number",
                 "kind": "property",
@@ -14129,7 +14264,9 @@
                 "name": "renderer",
                 "code": "DockviewPanelRenderer",
                 "kind": "property",
-                "flags": {},
+                "flags": {
+                    "isReadonly": true
+                },
                 "pieces": [
                     "DockviewPanelRenderer"
                 ]
@@ -14401,7 +14538,9 @@
                 "name": "gridReferenceGroup",
                 "code": "string",
                 "kind": "property",
-                "flags": {},
+                "flags": {
+                    "isOptional": true
+                },
                 "pieces": []
             },
             {
@@ -14868,6 +15007,17 @@
             {
                 "name": "onDidVisibilityChange",
                 "code": "Event<VisibilityEvent>",
+                "kind": "property",
+                "flags": {
+                    "isReadonly": true
+                },
+                "pieces": [
+                    "Event"
+                ]
+            },
+            {
+                "name": "onWillFocus",
+                "code": "Event<WillFocusEvent>",
                 "kind": "property",
                 "flags": {
                     "isReadonly": true
@@ -15687,7 +15837,7 @@
             },
             {
                 "name": "defaultRenderer",
-                "code": "'onlyWhenVisibile' | 'always'",
+                "code": "'always' | 'onlyWhenVisibile'",
                 "kind": "property",
                 "flags": {
                     "isOptional": true
@@ -15732,7 +15882,7 @@
             },
             {
                 "name": "floatingGroupBounds",
-                "code": "{ minimumHeightWithinViewport?: number, minimumWidthWithinViewport?: number } | 'boundedWithinViewport'",
+                "code": "'boundedWithinViewport' | { minimumHeightWithinViewport?: number, minimumWidthWithinViewport?: number }",
                 "kind": "property",
                 "flags": {
                     "isOptional": true
@@ -15831,7 +15981,7 @@
             },
             {
                 "name": "singleTabMode",
-                "code": "'fullwidth' | 'default'",
+                "code": "'default' | 'fullwidth'",
                 "kind": "property",
                 "flags": {
                     "isOptional": true

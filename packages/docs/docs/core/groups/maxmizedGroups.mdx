@@ -4,10 +4,15 @@ title: Maximized Groups
 
 import { MultiFrameworkContainer } from '@site/src/components/ui/container';
 import DockviewMaximizeGroup from '@site/sandboxes/maximizegroup-dockview/src/app';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 ## Maximized Groups
 
 To maximize a group from the component `api`:
+
+<DocRef declaration="DockviewPanelApi" methods={['maximize', 'isMaximized', 'exitMaximized']} />
+
+<DocRef declaration="DockviewApi" methods={['maximizeGroup', 'hasMaximizedGroup', 'exitMaximizedGroup', 'onDidMaxmizedGroupChange']} />
 
 ```tsx
 // maximize a specified group

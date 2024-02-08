@@ -3,13 +3,25 @@ title: Floating Groups
 ---
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
-import { MultiFrameworkContainer } from '@site/src/components/ui/container';
-import DockviewFloating from '@site/sandboxes/floatinggroup-dockview/src/app';
+import LiveExample from '@site/src/components/ui/exampleFrame';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
 
 ## Floating Groups
 
 Dockview has built-in support for floating groups. Each floating container can contain a single group with many panels
 and you can have as many floating containers as needed. You cannot dock multiple groups together in the same floating container.
+
+<FrameworkSpecific framework='React'>
+  <DocRef declaration="IDockviewReactProps" methods={['floatingGroupBounds', 'disableFloatingGroups']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+  <DocRef declaration="DockviewComponentOptions" methods={['floatingGroupBounds', 'disableFloatingGroups']} />
+</FrameworkSpecific>
+
+<LiveExample framework="react" id="dockview/floating-groups"/>
+
 
 Floating groups can be interacted with whilst holding the `shift` key activating the `event.shiftKey` boolean property on `KeyboardEvent` events.
 
@@ -35,8 +47,4 @@ You can control the bounding box of floating groups through the optional `floati
 -   `{minimumHeightWithinViewport?: number, minimumWidthWithinViewport?: number}` sets the respective dimension minimums that must appears within the docks viewport
 -   If no options are provided the defaults of `100px` minimum height and width within the viewport are set.
 
-<MultiFrameworkContainer
-    height={600}
-    sandboxId="floatinggroup-dockview"
-    react={DockviewFloating}
-/>
+
