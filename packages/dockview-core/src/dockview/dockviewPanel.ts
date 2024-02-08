@@ -20,7 +20,7 @@ export interface IDockviewPanel extends IDisposable, IPanel {
     readonly params: Parameters | undefined;
     updateParentGroup(
         group: DockviewGroupPanel,
-        options: { isGroupActive: boolean }
+        options?: { skipSetActive?: boolean }
     ): void;
     init(params: IGroupPanelInitParameters): void;
     toJSON(): GroupviewPanelState;
@@ -179,34 +179,30 @@ export class DockviewPanel
 
     public updateParentGroup(
         group: DockviewGroupPanel,
-        options: { isGroupActive: boolean }
+        options?: { skipSetActive?: boolean }
     ): void {
         this._group = group;
+        this.api.group = this._group;
 
-        // const isPanelVisible = this._group.model.isPanelActive(this);
+        const isPanelVisible = this._group.model.isPanelActive(this);
+        const isActive = this.group.api.isActive && isPanelVisible;
 
-        // const isActive = options.isGroupActive && isPanelVisible;
+        if (!options?.skipSetActive) {
+            if (this.api.isActive !== isActive) {
+                this.api._onDidActiveChange.fire({
+                    isActive: this.group.api.isActive && isPanelVisible,
+                });
+            }
+        }
 
-        // if (this.api.isActive !== isActive) {
-        //     this.api._onDidActiveChange.fire({
-        //         isActive: options.isGroupActive && isPanelVisible,
-        //     });
-        // }
-
-        // if (this.api.isVisible !== isPanelVisible) {
-        //     this.api._onDidVisibilityChange.fire({
-        //         isVisible: isPanelVisible,
-        //     });
-        // }
-
-        // this.view.updateParentGroup(
-        //     this._group,
-        //     this._group.model.isPanelActive(this)
-        // );
+        if (this.api.isVisible !== isPanelVisible) {
+            this.api._onDidVisibilityChange.fire({
+                isVisible: isPanelVisible,
+            });
+        }
     }
 
     runEvents(): void {
-        this.api.group = this._group;
         const isPanelVisible = this._group.model.isPanelActive(this);
 
         const isActive = this.group.api.isActive && isPanelVisible;
@@ -225,7 +221,7 @@ export class DockviewPanel
     }
 
     public layout(width: number, height: number): void {
-        // the obtain the correct dimensions of the content panel we must deduct the tab height
+        // TODO: Can we somehow do height without header height or indicate what the header height is?
         this.api._onDidDimensionChange.fire({
             width,
             height: height,

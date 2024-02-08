@@ -233,7 +233,7 @@ describe('componentSplitview', () => {
             },
         });
 
-        splitview.layout(600, 400);
+        splitview.layout(300, 200);
 
         splitview.addPanel({ id: 'panel1', component: 'testPanel' });
         splitview.addPanel({ id: 'panel2', component: 'testPanel' });
@@ -254,6 +254,8 @@ describe('componentSplitview', () => {
                 panel2Dimensions = event;
             })
         );
+
+        splitview.layout(600, 400);
 
         expect(panel1Dimensions).toEqual({ width: 600, height: 200 });
         expect(panel2Dimensions).toEqual({ width: 600, height: 200 });
@@ -283,7 +285,7 @@ describe('componentSplitview', () => {
             },
         });
 
-        splitview.layout(600, 400);
+        splitview.layout(300, 200);
 
         splitview.addPanel({ id: 'panel1', component: 'testPanel' });
         splitview.addPanel({ id: 'panel2', component: 'testPanel' });
@@ -304,6 +306,8 @@ describe('componentSplitview', () => {
                 panel2Dimensions = event;
             })
         );
+
+        splitview.layout(600, 400);
 
         expect(panel1Dimensions).toEqual({ width: 300, height: 400 });
         expect(panel2Dimensions).toEqual({ width: 300, height: 400 });

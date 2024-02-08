@@ -82,22 +82,16 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
 
     private readonly panelUpdatesDisposable = new MutableDisposable();
 
-    readonly _onDidDimensionChange = new Emitter<PanelDimensionChangeEvent>({
-        replay: true,
-    });
+    readonly _onDidDimensionChange = new Emitter<PanelDimensionChangeEvent>();
     readonly onDidDimensionsChange = this._onDidDimensionChange.event;
 
-    readonly _onDidChangeFocus = new Emitter<FocusEvent>({
-        replay: true,
-    });
+    readonly _onDidChangeFocus = new Emitter<FocusEvent>();
     readonly onDidFocusChange: Event<FocusEvent> = this._onDidChangeFocus.event;
     //
     readonly _onWillFocus = new Emitter<WillFocusEvent>();
     readonly onWillFocus: Event<WillFocusEvent> = this._onWillFocus.event;
     //
-    readonly _onDidVisibilityChange = new Emitter<VisibilityEvent>({
-        replay: true,
-    });
+    readonly _onDidVisibilityChange = new Emitter<VisibilityEvent>();
     readonly onDidVisibilityChange: Event<VisibilityEvent> =
         this._onDidVisibilityChange.event;
 
@@ -105,9 +99,7 @@ export class PanelApiImpl extends CompositeDisposable implements PanelApi {
     readonly onDidHiddenChange: Event<HiddenEvent> =
         this._onDidHiddenChange.event;
 
-    readonly _onDidActiveChange = new Emitter<ActiveEvent>({
-        replay: true,
-    });
+    readonly _onDidActiveChange = new Emitter<ActiveEvent>();
     readonly onDidActiveChange: Event<ActiveEvent> =
         this._onDidActiveChange.event;
 

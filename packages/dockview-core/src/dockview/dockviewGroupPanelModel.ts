@@ -611,8 +611,7 @@ export class DockviewGroupPanelModel
         panel: IDockviewPanel,
         options: {
             index?: number;
-            skipRender?: boolean;
-            skipEvents?: boolean;
+            skipSetActive?: boolean;
             skipSetGroupActive?: boolean;
         } = {}
     ): void {
@@ -630,13 +629,15 @@ export class DockviewGroupPanelModel
             options.index = this.panels.length;
         }
 
-        const skipRender = !!options.skipRender;
+        const skipSetActive = !!options.skipSetActive;
 
         // ensure the group is updated before we fire any events
-        panel.updateParentGroup(this.groupPanel, { isGroupActive: true });
+        panel.updateParentGroup(this.groupPanel, {
+            skipSetActive: options.skipSetActive,
+        });
 
         this.doAddPanel(panel, options.index, {
-            skipRender,
+            skipSetActive: skipSetActive,
         });
 
         if (this._activePanel === panel) {
@@ -644,7 +645,7 @@ export class DockviewGroupPanelModel
             return;
         }
 
-        if (!skipRender) {
+        if (!skipSetActive) {
             this.doSetActivePanel(panel);
         }
 
@@ -652,8 +653,7 @@ export class DockviewGroupPanelModel
             this.accessor.doSetGroupActive(this.groupPanel);
         }
 
-        if (!options.skipEvents) {
-            panel.runEvents();
+        if (!options.skipSetActive) {
             this.updateContainer();
         }
     }
@@ -661,14 +661,10 @@ export class DockviewGroupPanelModel
     public removePanel(
         groupItemOrId: IDockviewPanel | string,
         options: {
-            skipRender?: boolean;
-            skipEvents?: boolean;
-            skipActive?: boolean;
+            skipSetActive?: boolean;
             skipSetActiveGroup?: boolean;
         } = {
-            skipRender: false,
-            skipEvents: false,
-            skipActive: false,
+            skipSetActive: false,
         }
     ): IDockviewPanel {
         const id =
@@ -746,8 +742,7 @@ export class DockviewGroupPanelModel
     private _removePanel(
         panel: IDockviewPanel,
         options: {
-            skipRender?: boolean;
-            skipEvents?: boolean;
+            skipSetActive?: boolean;
             skipSetActiveGroup?: boolean;
         }
     ): IDockviewPanel {
@@ -758,8 +753,7 @@ export class DockviewGroupPanelModel
         if (isActivePanel && this.panels.length > 0) {
             const nextPanel = this.mostRecentlyUsed[0];
             this.openPanel(nextPanel, {
-                skipRender: options.skipRender,
-                skipEvents: options.skipEvents,
+                skipSetActive: options.skipSetActive,
                 skipSetGroupActive: options.skipSetActiveGroup,
             });
         }
@@ -768,7 +762,7 @@ export class DockviewGroupPanelModel
             this.doSetActivePanel(undefined);
         }
 
-        if (!options.skipEvents) {
+        if (!options.skipSetActive) {
             this.updateContainer();
         }
 
@@ -799,8 +793,8 @@ export class DockviewGroupPanelModel
         panel: IDockviewPanel,
         index: number = this.panels.length,
         options: {
-            skipRender: boolean;
-        } = { skipRender: false }
+            skipSetActive: boolean;
+        } = { skipSetActive: false }
     ): void {
         const existingPanel = this._panels.indexOf(panel);
         const hasExistingPanel = existingPanel > -1;
@@ -810,7 +804,7 @@ export class DockviewGroupPanelModel
 
         this.tabsContainer.openPanel(panel, index);
 
-        if (!options.skipRender) {
+        if (!options.skipSetActive) {
             this.contentContainer.openPanel(panel);
         }
 
@@ -858,12 +852,7 @@ export class DockviewGroupPanelModel
     private updateContainer(): void {
         toggleClass(this.container, 'empty', this.isEmpty);
 
-        this.panels.forEach((panel) =>
-            // panel.updateParentGroup(this.groupPanel, {
-            //     isGroupActive: this.isActive,
-            // })
-            panel.runEvents()
-        );
+        this.panels.forEach((panel) => panel.runEvents());
 
         if (this.isEmpty && !this.watermark) {
             const watermark = this.accessor.createWatermarkComponent();
