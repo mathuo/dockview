@@ -795,15 +795,17 @@ export class DockviewComponent
                                 skipPopoutAssociated: true,
                             });
                         } else {
-                            const removedGroup = this.doRemoveGroup(group, {
-                                skipDispose: true,
-                                skipActive: true,
-                            });
-                            removedGroup.model.renderContainer =
-                                this.overlayRenderContainer;
-                            removedGroup.model.location = { type: 'grid' };
-                            this.doAddGroup(removedGroup, [0]);
-                            this.doSetGroupAndPanelActive(removedGroup);
+                            if (this.getPanel(group.id)) {
+                                const removedGroup = this.doRemoveGroup(group, {
+                                    skipDispose: true,
+                                    skipActive: true,
+                                });
+                                removedGroup.model.renderContainer =
+                                    this.overlayRenderContainer;
+                                removedGroup.model.location = { type: 'grid' };
+                                this.doAddGroup(removedGroup, [0]);
+                                this.doSetGroupAndPanelActive(removedGroup);
+                            }
                         }
                     })
                 );
@@ -1594,7 +1596,9 @@ export class DockviewComponent
                 const group = this.orthogonalize(
                     directionToPosition(<Direction>options.direction)
                 );
-                this.doSetGroupAndPanelActive(group);
+                if (!options.skipSetActive) {
+                    this.doSetGroupAndPanelActive(group);
+                }
                 return group;
             }
 
@@ -1607,7 +1611,9 @@ export class DockviewComponent
                 target
             );
             this.doAddGroup(group, relativeLocation);
-            this.doSetGroupAndPanelActive(group);
+            if (!options.skipSetActive) {
+                this.doSetGroupAndPanelActive(group);
+            }
             return group;
         } else {
             this.doAddGroup(group);
@@ -1922,10 +1928,12 @@ export class DockviewComponent
                 for (const panel of panels) {
                     to.model.openPanel(panel, {
                         skipSetActive: panel !== activePanel,
-                        skipSetGroupActive: panel !== activePanel,
+                        skipSetGroupActive: true,
                     });
                 }
             });
+
+            this.doSetGroupAndPanelActive(to);
 
             panels.forEach((panel) => {
                 this._onDidMovePanel.fire({ panel });
