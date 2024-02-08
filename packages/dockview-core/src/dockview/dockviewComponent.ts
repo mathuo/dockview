@@ -632,7 +632,7 @@ export class DockviewComponent
 
             panels.forEach((panel) => {
                 options.to.model.openPanel(panel, {
-                    skipRender: activePanel !== panel,
+                    skipSetActive: activePanel !== panel,
                 });
             });
         }
@@ -1207,7 +1207,7 @@ export class DockviewComponent
                         activeView === panel.id;
 
                     group.model.openPanel(panel, {
-                        skipRender: !isActive,
+                        skipSetActive: !isActive,
                         skipSetGroupActive: true,
                     });
                 }
@@ -1780,8 +1780,7 @@ export class DockviewComponent
             const removedPanel: IDockviewPanel | undefined = this.movingLock(
                 () =>
                     sourceGroup.model.removePanel(sourceItemId, {
-                        skipEvents: true,
-                        skipActive: true,
+                        skipSetActive: true,
                         skipSetActiveGroup: true,
                     })
             );
@@ -1873,8 +1872,7 @@ export class DockviewComponent
                 const removedPanel: IDockviewPanel | undefined =
                     this.movingLock(() =>
                         sourceGroup.model.removePanel(sourceItemId, {
-                            skipEvents: true,
-                            skipActive: true,
+                            skipSetActive: true,
                             skipSetActiveGroup: true,
                         })
                     );
@@ -1892,7 +1890,6 @@ export class DockviewComponent
                 const group = this.createGroupAtLocation(dropLocation);
                 this.movingLock(() =>
                     group.model.openPanel(removedPanel, {
-                        skipEvents: true,
                         skipSetGroupActive: true,
                     })
                 );
@@ -1912,8 +1909,7 @@ export class DockviewComponent
             const panels = this.movingLock(() =>
                 [...from.panels].map((p) =>
                     from.model.removePanel(p.id, {
-                        skipRender: true,
-                        skipEvents: true,
+                        skipSetActive: true,
                     })
                 )
             );
@@ -1925,7 +1921,7 @@ export class DockviewComponent
             this.movingLock(() => {
                 for (const panel of panels) {
                     to.model.openPanel(panel, {
-                        skipRender: panel !== activePanel,
+                        skipSetActive: panel !== activePanel,
                         skipSetGroupActive: panel !== activePanel,
                     });
                 }
