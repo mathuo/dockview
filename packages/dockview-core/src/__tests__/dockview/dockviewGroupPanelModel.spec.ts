@@ -196,7 +196,11 @@ export class TestPanel implements IDockviewPanel {
         this._params = params;
     }
 
-    updateParentGroup(group: DockviewGroupPanel, isGroupActive: boolean): void {
+    updateParentGroup(group: DockviewGroupPanel): void {
+        //
+    }
+
+    runEvents(): void {
         //
     }
 
@@ -624,7 +628,7 @@ describe('dockviewGroupPanelModel', () => {
             renderer: 'onlyWhenVisibile',
         } as any);
 
-        cut.openPanel(panel3, { skipSetPanelActive: true });
+        cut.openPanel(panel3, { skipSetActive: true });
         expect(contentContainer.length).toBe(1);
         expect(contentContainer.item(0)).toBe(panel2.view.content.element);
 

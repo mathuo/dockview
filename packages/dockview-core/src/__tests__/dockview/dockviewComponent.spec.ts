@@ -257,9 +257,17 @@ describe('dockviewComponent', () => {
         const panel4 = dockview.getGroupPanel('panel4');
 
         const group1 = panel1!.group;
-        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', 'right');
+
+        dockview.moveGroupOrPanel({
+            from: { groupId: group1.id, panelId: 'panel1' },
+            to: { group: group1, position: 'right' },
+        });
         const group2 = panel1!.group;
-        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', 'center');
+
+        dockview.moveGroupOrPanel({
+            from: { groupId: group1.id, panelId: 'panel3' },
+            to: { group: group2, position: 'center' },
+        });
 
         expect(dockview.activeGroup).toBe(group2);
         expect(dockview.activeGroup!.model.activePanel).toBe(panel3);
@@ -309,9 +317,16 @@ describe('dockviewComponent', () => {
         const panel1 = dockview.getGroupPanel('panel1')!;
         const panel2 = dockview.getGroupPanel('panel2')!;
         const group1 = panel1.group;
-        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', 'right');
+
+        dockview.moveGroupOrPanel({
+            from: { groupId: group1.id, panelId: 'panel1' },
+            to: { group: group1, position: 'right' },
+        });
         const group2 = panel1.group;
-        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', 'center');
+        dockview.moveGroupOrPanel({
+            from: { groupId: group1.id, panelId: 'panel3' },
+            to: { group: group2, position: 'center' },
+        });
 
         expect(dockview.size).toBe(2);
         expect(dockview.totalPanels).toBe(4);
@@ -374,9 +389,16 @@ describe('dockviewComponent', () => {
         expect(panel4.api.isActive).toBeFalsy();
 
         const group1 = panel1.group;
-        dockview.moveGroupOrPanel(group1, group1.id, 'panel1', 'right');
+
+        dockview.moveGroupOrPanel({
+            from: { groupId: group1.id, panelId: 'panel1' },
+            to: { group: group1, position: 'right' },
+        });
         const group2 = panel1.group;
-        dockview.moveGroupOrPanel(group2, group1.id, 'panel3', 'center');
+        dockview.moveGroupOrPanel({
+            from: { groupId: group1.id, panelId: 'panel3' },
+            to: { group: group2, position: 'center' },
+        });
 
         expect(dockview.size).toBe(2);
         expect(panel1.group).toBe(panel3.group);
@@ -443,7 +465,10 @@ describe('dockviewComponent', () => {
         expect(group.model.indexOf(panel1)).toBe(0);
         expect(group.model.indexOf(panel2)).toBe(1);
 
-        dockview.moveGroupOrPanel(group, group.id, 'panel1', 'right');
+        dockview.moveGroupOrPanel({
+            from: { groupId: group.id, panelId: 'panel1' },
+            to: { group, position: 'right' },
+        });
 
         expect(dockview.size).toBe(2);
         expect(dockview.totalPanels).toBe(2);
@@ -493,7 +518,10 @@ describe('dockviewComponent', () => {
         expect(viewQuery.length).toBe(1);
 
         const group = dockview.getGroupPanel('panel1')!.group;
-        dockview.moveGroupOrPanel(group, group.id, 'panel1', 'right');
+        dockview.moveGroupOrPanel({
+            from: { groupId: group.id, panelId: 'panel1' },
+            to: { group, position: 'right' },
+        });
 
         viewQuery = container.querySelectorAll(
             '.branch-node > .split-view-container > .view-container > .view'
@@ -908,8 +936,8 @@ describe('dockviewComponent', () => {
 
         expect(events).toEqual([
             { type: 'ADD_GROUP', group: panel1.group },
-            { type: 'ACTIVE_GROUP', group: panel1.group },
             { type: 'ADD_PANEL', panel: panel1 },
+            { type: 'ACTIVE_GROUP', group: panel1.group },
             { type: 'ACTIVE_PANEL', panel: panel1 },
         ]);
 
@@ -956,8 +984,8 @@ describe('dockviewComponent', () => {
 
         expect(events).toEqual([
             { type: 'ADD_GROUP', group: panel4.group },
-            { type: 'ACTIVE_GROUP', group: panel4.group },
             { type: 'ADD_PANEL', panel: panel4 },
+            { type: 'ACTIVE_GROUP', group: panel4.group },
             { type: 'ACTIVE_PANEL', panel: panel4 },
         ]);
 
@@ -973,36 +1001,24 @@ describe('dockviewComponent', () => {
         ]);
 
         events = [];
-        dockview.moveGroupOrPanel(
-            panel2.group!,
-            panel5.group!.id,
-            panel5.id,
-            'center'
-        );
+        dockview.moveGroupOrPanel({
+            from: { groupId: panel5.group.id, panelId: panel5.id },
+            to: { group: panel2.group, position: 'center' },
+        });
 
-        expect(events).toEqual([
-            { type: 'REMOVE_PANEL', panel: panel5 },
-            { type: 'ACTIVE_PANEL', panel: panel4 },
-            { type: 'ADD_PANEL', panel: panel5 },
-            { type: 'ACTIVE_PANEL', panel: panel5 },
-            { type: 'ACTIVE_GROUP', group: panel2.group },
-        ]);
+        expect(events).toEqual([{ type: 'ACTIVE_GROUP', group: panel2.group }]);
 
         events = [];
 
         const groupReferenceBeforeMove = panel4.group;
 
-        dockview.moveGroupOrPanel(
-            panel2.group!,
-            panel4.group!.id,
-            panel4.id,
-            'center'
-        );
+        dockview.moveGroupOrPanel({
+            from: { groupId: panel4.group.id, panelId: panel4.id },
+            to: { group: panel2.group, position: 'center' },
+        });
 
         expect(events).toEqual([
-            { type: 'REMOVE_PANEL', panel: panel4 },
             { type: 'REMOVE_GROUP', group: groupReferenceBeforeMove },
-            { type: 'ADD_PANEL', panel: panel4 },
             { type: 'ACTIVE_PANEL', panel: panel4 },
         ]);
 
@@ -1022,8 +1038,8 @@ describe('dockviewComponent', () => {
         expect(events).toEqual([
             { type: 'ADD_GROUP', group: panel6.group },
             { type: 'ADD_PANEL', panel: panel6 },
-            { type: 'ACTIVE_PANEL', panel: panel6 },
             { type: 'ACTIVE_GROUP', group: panel6.group },
+            { type: 'ACTIVE_PANEL', panel: panel6 },
         ]);
 
         events = [];
@@ -1038,8 +1054,8 @@ describe('dockviewComponent', () => {
         expect(events).toEqual([
             { type: 'ADD_GROUP', group: panel7.group },
             { type: 'ADD_PANEL', panel: panel7 },
-            { type: 'ACTIVE_PANEL', panel: panel7 },
             { type: 'ACTIVE_GROUP', group: panel7.group },
+            { type: 'ACTIVE_PANEL', panel: panel7 },
         ]);
 
         expect(dockview.activePanel === panel7).toBeTruthy();
@@ -1061,6 +1077,7 @@ describe('dockviewComponent', () => {
             { type: 'REMOVE_PANEL', panel: panel6 },
             { type: 'REMOVE_GROUP', group: panel6Group },
             { type: 'ACTIVE_GROUP', group: undefined },
+            { type: 'ACTIVE_PANEL', group: undefined },
         ]);
 
         expect(dockview.size).toBe(0);
@@ -1317,12 +1334,10 @@ describe('dockviewComponent', () => {
         const panel1Spy = jest.spyOn(panel1, 'dispose');
         const panel2Spy = jest.spyOn(panel2, 'dispose');
 
-        dockview.moveGroupOrPanel(
-            panel1.group,
-            panel2.group.id,
-            'panel2',
-            'left'
-        );
+        dockview.moveGroupOrPanel({
+            from: { groupId: panel2.group.id, panelId: 'panel2' },
+            to: { group: panel1.group, position: 'left' },
+        });
 
         expect(panel1Spy).not.toHaveBeenCalled();
         expect(panel2Spy).not.toHaveBeenCalled();
@@ -1359,12 +1374,10 @@ describe('dockviewComponent', () => {
         const panel1Spy = jest.spyOn(panel1, 'dispose');
         const panel2Spy = jest.spyOn(panel2, 'dispose');
 
-        dockview.moveGroupOrPanel(
-            panel1.group,
-            panel2.group.id,
-            'panel2',
-            'center'
-        );
+        dockview.moveGroupOrPanel({
+            from: { groupId: panel2.group.id, panelId: 'panel2' },
+            to: { group: panel1.group, position: 'center' },
+        });
 
         expect(panel1Spy).not.toHaveBeenCalled();
         expect(panel2Spy).not.toHaveBeenCalled();
@@ -1399,13 +1412,10 @@ describe('dockviewComponent', () => {
         const panel1Spy = jest.spyOn(panel1, 'dispose');
         const panel2Spy = jest.spyOn(panel2, 'dispose');
 
-        dockview.moveGroupOrPanel(
-            panel1.group,
-            panel1.group.id,
-            'panel1',
-            'center',
-            0
-        );
+        dockview.moveGroupOrPanel({
+            from: { groupId: panel1.group.id, panelId: 'panel1' },
+            to: { group: panel1.group, position: 'center', index: 0 },
+        });
 
         expect(panel1Spy).not.toHaveBeenCalled();
         expect(panel2Spy).not.toHaveBeenCalled();
@@ -1563,12 +1573,10 @@ describe('dockviewComponent', () => {
 
         expect(dockview.groups.length).toBe(2);
 
-        dockview.moveGroupOrPanel(
-            panel3.group,
-            panel1.group.id,
-            undefined,
-            'center'
-        );
+        dockview.moveGroupOrPanel({
+            from: { groupId: panel1.group.id },
+            to: { group: panel3.group, position: 'center' },
+        });
 
         expect(dockview.groups.length).toBe(1);
         expect(panel1Spy).toBeCalledTimes(1);
@@ -1697,7 +1705,7 @@ describe('dockviewComponent', () => {
         expect(activeGroup.length).toBe(1);
         expect(addPanel.length).toBe(5);
         expect(removePanel.length).toBe(0);
-        expect(activePanel.length).toBe(5);
+        expect(activePanel.length).toBe(1);
         expect(layoutChange).toBe(1);
         expect(layoutChangeFromJson).toBe(1);
 
@@ -2728,32 +2736,26 @@ describe('dockviewComponent', () => {
 
         expect(dockview.element.querySelectorAll('.view').length).toBe(1);
 
-        dockview.moveGroupOrPanel(
-            panel3.group,
-            panel3.group.id,
-            panel3.id,
-            'right'
-        );
+        dockview.moveGroupOrPanel({
+            from: { groupId: panel3.group.id, panelId: panel3.id },
+            to: { group: panel3.group, position: 'right' },
+        });
 
         expect(dockview.groups.length).toBe(2);
         expect(dockview.element.querySelectorAll('.view').length).toBe(2);
 
-        dockview.moveGroupOrPanel(
-            panel3.group,
-            panel2.group.id,
-            panel2.id,
-            'bottom'
-        );
+        dockview.moveGroupOrPanel({
+            from: { groupId: panel2.group.id, panelId: panel2.id },
+            to: { group: panel3.group, position: 'bottom' },
+        });
 
         expect(dockview.groups.length).toBe(3);
         expect(dockview.element.querySelectorAll('.view').length).toBe(4);
 
-        dockview.moveGroupOrPanel(
-            panel2.group,
-            panel1.group.id,
-            panel1.id,
-            'center'
-        );
+        dockview.moveGroupOrPanel({
+            from: { groupId: panel1.group.id, panelId: panel1.id },
+            to: { group: panel2.group, position: 'center' },
+        });
 
         expect(dockview.groups.length).toBe(2);
 
@@ -3463,12 +3465,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(2);
             expect(dockview.panels.length).toBe(2);
 
-            dockview.moveGroupOrPanel(
-                panel1.group,
-                panel2.group.id,
-                undefined,
-                'right'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel2.group.id },
+                to: { group: panel1.group, position: 'right' },
+            });
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
@@ -3508,12 +3508,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(2);
             expect(dockview.panels.length).toBe(2);
 
-            dockview.moveGroupOrPanel(
-                panel1.group,
-                panel2.group.id,
-                undefined,
-                'center'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel2.group.id },
+                to: { group: panel1.group, position: 'center' },
+            });
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
@@ -3560,12 +3558,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(3);
             expect(dockview.panels.length).toBe(3);
 
-            dockview.moveGroupOrPanel(
-                panel2.group,
-                panel3.group.id,
-                undefined,
-                'center'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel3.group.id },
+                to: { group: panel2.group, position: 'center' },
+            });
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
@@ -3613,12 +3609,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(2);
             expect(dockview.panels.length).toBe(3);
 
-            dockview.moveGroupOrPanel(
-                panel1.group,
-                panel2.group.id,
-                undefined,
-                'right'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel2.group.id },
+                to: { group: panel1.group, position: 'right' },
+            });
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
@@ -3666,12 +3660,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(2);
             expect(dockview.panels.length).toBe(3);
 
-            dockview.moveGroupOrPanel(
-                panel1.group,
-                panel2.group.id,
-                undefined,
-                'center'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel2.group.id },
+                to: { group: panel1.group, position: 'center' },
+            });
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
@@ -3726,12 +3718,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(3);
             expect(dockview.panels.length).toBe(4);
 
-            dockview.moveGroupOrPanel(
-                panel4.group,
-                panel2.group.id,
-                undefined,
-                'center'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel2.group.id },
+                to: { group: panel4.group, position: 'center' },
+            });
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
@@ -3773,12 +3763,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(2);
             expect(dockview.panels.length).toBe(2);
 
-            dockview.moveGroupOrPanel(
-                panel1.group,
-                panel2.group.id,
-                panel2.id,
-                'right'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel2.group.id, panelId: panel2.id },
+                to: { group: panel1.group, position: 'right' },
+            });
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
@@ -3818,12 +3806,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(2);
             expect(dockview.panels.length).toBe(2);
 
-            dockview.moveGroupOrPanel(
-                panel1.group,
-                panel2.group.id,
-                panel2.id,
-                'center'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel2.group.id, panelId: panel2.id },
+                to: { group: panel1.group, position: 'center' },
+            });
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
@@ -3870,12 +3856,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(3);
             expect(dockview.panels.length).toBe(3);
 
-            dockview.moveGroupOrPanel(
-                panel2.group,
-                panel3.group.id,
-                panel3.id,
-                'center'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel3.group.id, panelId: panel3.id },
+                to: { group: panel2.group, position: 'center' },
+            });
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
@@ -3923,12 +3907,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(2);
             expect(dockview.panels.length).toBe(3);
 
-            dockview.moveGroupOrPanel(
-                panel1.group,
-                panel2.group.id,
-                panel2.id,
-                'right'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel2.group.id, panelId: panel2.id },
+                to: { group: panel1.group, position: 'right' },
+            });
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
@@ -3976,12 +3958,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(2);
             expect(dockview.panels.length).toBe(3);
 
-            dockview.moveGroupOrPanel(
-                panel1.group,
-                panel2.group.id,
-                panel2.id,
-                'center'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel2.group.id, panelId: panel2.id },
+                to: { group: panel1.group, position: 'center' },
+            });
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');
@@ -4036,12 +4016,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(3);
             expect(dockview.panels.length).toBe(4);
 
-            dockview.moveGroupOrPanel(
-                panel4.group,
-                panel2.group.id,
-                panel2.id,
-                'center'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel2.group.id, panelId: panel2.id },
+                to: { group: panel4.group, position: 'center' },
+            });
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('floating');
@@ -4090,12 +4068,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(3);
             expect(dockview.panels.length).toBe(3);
 
-            dockview.moveGroupOrPanel(
-                panel3.group,
-                panel1.group.id,
-                panel1.id,
-                'center'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel1.group.id, panelId: panel1.id },
+                to: { group: panel3.group, position: 'center' },
+            });
 
             expect(panel1.group.api.location.type).toBe('floating');
             expect(panel2.group.api.location.type).toBe('grid');
@@ -4142,12 +4118,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(2);
             expect(dockview.panels.length).toBe(3);
 
-            dockview.moveGroupOrPanel(
-                panel3.group,
-                panel1.group.id,
-                panel1.id,
-                'center'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel1.group.id, panelId: panel1.id },
+                to: { group: panel3.group, position: 'center' },
+            });
 
             expect(panel1.group.api.location.type).toBe('floating');
             expect(panel2.group.api.location.type).toBe('grid');
@@ -4195,12 +4169,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(3);
             expect(dockview.panels.length).toBe(3);
 
-            dockview.moveGroupOrPanel(
-                panel3.group,
-                panel1.group.id,
-                undefined,
-                'center'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel1.group.id },
+                to: { group: panel3.group, position: 'center' },
+            });
 
             expect(panel1.group.api.location.type).toBe('floating');
             expect(panel2.group.api.location.type).toBe('grid');
@@ -4247,12 +4219,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(2);
             expect(dockview.panels.length).toBe(3);
 
-            dockview.moveGroupOrPanel(
-                panel3.group,
-                panel1.group.id,
-                undefined,
-                'center'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel1.group.id },
+                to: { group: panel3.group, position: 'center' },
+            });
 
             expect(panel1.group.api.location.type).toBe('floating');
             expect(panel2.group.api.location.type).toBe('floating');
@@ -4427,6 +4397,7 @@ describe('dockviewComponent', () => {
                     document: fromPartial<Document>({
                         body: document.createElement('body'),
                     }),
+                    focus: jest.fn(),
                     addEventListener: jest
                         .fn()
                         .mockImplementation((name, cb) => {
@@ -4560,12 +4531,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(3);
             expect(dockview.panels.length).toBe(3);
 
-            dockview.moveGroupOrPanel(
-                panel3.api.group,
-                panel2.api.group.id,
-                panel2.api.id,
-                'right'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel2.group.id, panelId: panel2.id },
+                to: { group: panel3.group, position: 'right' },
+            });
 
             expect(panel1.group.api.location.type).toBe('popout');
             expect(panel2.group.api.location.type).toBe('grid');
@@ -4573,12 +4542,10 @@ describe('dockviewComponent', () => {
             expect(dockview.groups.length).toBe(4);
             expect(dockview.panels.length).toBe(3);
 
-            dockview.moveGroupOrPanel(
-                panel3.api.group,
-                panel1.api.group.id,
-                panel1.api.id,
-                'center'
-            );
+            dockview.moveGroupOrPanel({
+                from: { groupId: panel1.group.id, panelId: panel1.id },
+                to: { group: panel3.group, position: 'center' },
+            });
 
             expect(panel1.group.api.location.type).toBe('grid');
             expect(panel2.group.api.location.type).toBe('grid');

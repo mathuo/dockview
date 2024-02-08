@@ -93,6 +93,10 @@ export class Emitter<T> implements IDisposable {
         Emitter.ENABLE_TRACKING = isEnabled;
     }
 
+    get value(): T | undefined {
+        return this._last;
+    }
+
     constructor(private readonly options?: EmitterOptions) {}
 
     get event(): Event<T> {

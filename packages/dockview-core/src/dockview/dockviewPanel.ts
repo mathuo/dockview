@@ -10,6 +10,7 @@ import { IPanel, PanelUpdateEvent, Parameters } from '../panel/types';
 import { IDockviewPanelModel } from './dockviewPanelModel';
 import { DockviewComponent } from './dockviewComponent';
 import { DockviewPanelRenderer } from '../overlayRenderContainer';
+import { WillFocusEvent } from '../api/panelApi';
 
 export interface IDockviewPanel extends IDisposable, IPanel {
     readonly view: IDockviewPanelModel;
@@ -17,11 +18,15 @@ export interface IDockviewPanel extends IDisposable, IPanel {
     readonly api: DockviewPanelApi;
     readonly title: string | undefined;
     readonly params: Parameters | undefined;
-    updateParentGroup(group: DockviewGroupPanel, isGroupActive: boolean): void;
+    updateParentGroup(
+        group: DockviewGroupPanel,
+        options?: { skipSetActive?: boolean }
+    ): void;
     init(params: IGroupPanelInitParameters): void;
     toJSON(): GroupviewPanelState;
     setTitle(title: string): void;
     update(event: PanelUpdateEvent): void;
+    runEvents(): void;
 }
 
 export class DockviewPanel
@@ -93,7 +98,16 @@ export class DockviewPanel
     }
 
     focus(): void {
-        this.api._onFocusEvent.fire();
+        const event = new WillFocusEvent();
+        this.api._onWillFocus.fire(event);
+
+        if (event.defaultPrevented) {
+            return;
+        }
+
+        if (!this.api.isActive) {
+            this.api.setActive();
+        }
     }
 
     public toJSON(): GroupviewPanelState {
@@ -165,28 +179,49 @@ export class DockviewPanel
 
     public updateParentGroup(
         group: DockviewGroupPanel,
-        isGroupActive: boolean
+        options?: { skipSetActive?: boolean }
     ): void {
         this._group = group;
-        this.api.group = group;
+        this.api.group = this._group;
 
         const isPanelVisible = this._group.model.isPanelActive(this);
+        const isActive = this.group.api.isActive && isPanelVisible;
 
-        this.api._onDidActiveChange.fire({
-            isActive: isGroupActive && isPanelVisible,
-        });
-        this.api._onDidVisibilityChange.fire({
-            isVisible: isPanelVisible,
-        });
+        if (!options?.skipSetActive) {
+            if (this.api.isActive !== isActive) {
+                this.api._onDidActiveChange.fire({
+                    isActive: this.group.api.isActive && isPanelVisible,
+                });
+            }
+        }
 
-        this.view.updateParentGroup(
-            this._group,
-            this._group.model.isPanelActive(this)
-        );
+        if (this.api.isVisible !== isPanelVisible) {
+            this.api._onDidVisibilityChange.fire({
+                isVisible: isPanelVisible,
+            });
+        }
+    }
+
+    runEvents(): void {
+        const isPanelVisible = this._group.model.isPanelActive(this);
+
+        const isActive = this.group.api.isActive && isPanelVisible;
+
+        if (this.api.isActive !== isActive) {
+            this.api._onDidActiveChange.fire({
+                isActive: this.group.api.isActive && isPanelVisible,
+            });
+        }
+
+        if (this.api.isVisible !== isPanelVisible) {
+            this.api._onDidVisibilityChange.fire({
+                isVisible: isPanelVisible,
+            });
+        }
     }
 
     public layout(width: number, height: number): void {
-        // the obtain the correct dimensions of the content panel we must deduct the tab height
+        // TODO: Can we somehow do height without header height or indicate what the header height is?
         this.api._onDidDimensionChange.fire({
             width,
             height: height,

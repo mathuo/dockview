@@ -394,7 +394,7 @@ export class DockviewGroupPanelModel
             }),
 
             this.contentContainer.onDidFocus(() => {
-                this.accessor.doSetGroupActive(this.groupPanel, true);
+                this.accessor.doSetGroupActive(this.groupPanel);
             }),
             this.contentContainer.onDidBlur(() => {
                 // noop
@@ -420,6 +420,10 @@ export class DockviewGroupPanelModel
             this._onDidRemovePanel,
             this._onDidActivePanelChange
         );
+    }
+
+    focusContent(): void {
+        this.contentContainer.element.focus();
     }
 
     private _overwriteRenderContainer: OverlayRenderContainer | null = null;
@@ -456,7 +460,7 @@ export class DockviewGroupPanelModel
 
         // must be run after the constructor otherwise this.parent may not be
         // correctly initialized
-        this.setActive(this.isActive, true, true);
+        this.setActive(this.isActive, true);
         this.updateContainer();
 
         if (this.accessor.options.createRightHeaderActionsElement) {
@@ -600,18 +604,24 @@ export class DockviewGroupPanelModel
     }
 
     focus(): void {
-        this._activePanel?.focus?.();
+        this._activePanel?.focus();
     }
 
     public openPanel(
         panel: IDockviewPanel,
         options: {
             index?: number;
-            skipFocus?: boolean;
-            skipSetPanelActive?: boolean;
+            skipSetActive?: boolean;
             skipSetGroupActive?: boolean;
         } = {}
     ): void {
+        /**
+         * set the panel group
+         * add the panel
+         * check if group active
+         * check if panel active
+         */
+
         if (
             typeof options.index !== 'number' ||
             options.index > this.panels.length
@@ -619,37 +629,44 @@ export class DockviewGroupPanelModel
             options.index = this.panels.length;
         }
 
-        const skipSetPanelActive = !!options.skipSetPanelActive;
-        const skipSetGroupActive = !!options.skipSetGroupActive;
+        const skipSetActive = !!options.skipSetActive;
 
         // ensure the group is updated before we fire any events
-        panel.updateParentGroup(this.groupPanel, true);
+        panel.updateParentGroup(this.groupPanel, {
+            skipSetActive: options.skipSetActive,
+        });
+
+        this.doAddPanel(panel, options.index, {
+            skipSetActive: skipSetActive,
+        });
 
         if (this._activePanel === panel) {
-            if (!skipSetGroupActive) {
-                this.accessor.doSetGroupActive(this.groupPanel);
-            }
             this.contentContainer.renderPanel(panel, { asActive: true });
             return;
         }
 
-        this.doAddPanel(panel, options.index, skipSetPanelActive);
-
-        if (!skipSetPanelActive) {
+        if (!skipSetActive) {
             this.doSetActivePanel(panel);
         }
 
-        if (!skipSetGroupActive) {
-            this.accessor.doSetGroupActive(
-                this.groupPanel,
-                !!options.skipFocus
-            );
+        if (!options.skipSetGroupActive) {
+            this.accessor.doSetGroupActive(this.groupPanel);
         }
 
-        this.updateContainer();
+        if (!options.skipSetActive) {
+            this.updateContainer();
+        }
     }
 
-    public removePanel(groupItemOrId: IDockviewPanel | string): IDockviewPanel {
+    public removePanel(
+        groupItemOrId: IDockviewPanel | string,
+        options: {
+            skipSetActive?: boolean;
+            skipSetActiveGroup?: boolean;
+        } = {
+            skipSetActive: false,
+        }
+    ): IDockviewPanel {
         const id =
             typeof groupItemOrId === 'string'
                 ? groupItemOrId
@@ -661,7 +678,7 @@ export class DockviewGroupPanelModel
             throw new Error('invalid operation');
         }
 
-        return this._removePanel(panelToRemove);
+        return this._removePanel(panelToRemove, options);
     }
 
     public closeAllPanels(): void {
@@ -692,15 +709,8 @@ export class DockviewGroupPanelModel
         this.tabsContainer.setRightActionsElement(element);
     }
 
-    public setActive(
-        isGroupActive: boolean,
-        skipFocus = false,
-        force = false
-    ): void {
+    public setActive(isGroupActive: boolean, force = false): void {
         if (!force && this.isActive === isGroupActive) {
-            if (!skipFocus) {
-                this._activePanel?.focus?.();
-            }
             return;
         }
 
@@ -716,12 +726,6 @@ export class DockviewGroupPanelModel
         }
 
         this.updateContainer();
-
-        if (isGroupActive) {
-            if (!skipFocus) {
-                this._activePanel?.focus?.();
-            }
-        }
     }
 
     public layout(width: number, height: number): void {
@@ -735,21 +739,33 @@ export class DockviewGroupPanelModel
         }
     }
 
-    private _removePanel(panel: IDockviewPanel): IDockviewPanel {
+    private _removePanel(
+        panel: IDockviewPanel,
+        options: {
+            skipSetActive?: boolean;
+            skipSetActiveGroup?: boolean;
+        }
+    ): IDockviewPanel {
         const isActivePanel = this._activePanel === panel;
 
         this.doRemovePanel(panel);
 
         if (isActivePanel && this.panels.length > 0) {
             const nextPanel = this.mostRecentlyUsed[0];
-            this.openPanel(nextPanel);
+            this.openPanel(nextPanel, {
+                skipSetActive: options.skipSetActive,
+                skipSetGroupActive: options.skipSetActiveGroup,
+            });
         }
 
         if (this._activePanel && this.panels.length === 0) {
             this.doSetActivePanel(undefined);
         }
 
-        this.updateContainer();
+        if (!options.skipSetActive) {
+            this.updateContainer();
+        }
+
         return panel;
     }
 
@@ -776,7 +792,9 @@ export class DockviewGroupPanelModel
     private doAddPanel(
         panel: IDockviewPanel,
         index: number = this.panels.length,
-        skipSetActive = false
+        options: {
+            skipSetActive: boolean;
+        } = { skipSetActive: false }
     ): void {
         const existingPanel = this._panels.indexOf(panel);
         const hasExistingPanel = existingPanel > -1;
@@ -786,7 +804,7 @@ export class DockviewGroupPanelModel
 
         this.tabsContainer.openPanel(panel, index);
 
-        if (!skipSetActive) {
+        if (!options.skipSetActive) {
             this.contentContainer.openPanel(panel);
         }
 
@@ -802,6 +820,10 @@ export class DockviewGroupPanelModel
     }
 
     private doSetActivePanel(panel: IDockviewPanel | undefined): void {
+        if (this._activePanel === panel) {
+            return;
+        }
+
         this._activePanel = panel;
 
         if (panel) {
@@ -811,7 +833,9 @@ export class DockviewGroupPanelModel
 
             this.updateMru(panel);
 
-            this._onDidActivePanelChange.fire({ panel });
+            this._onDidActivePanelChange.fire({
+                panel,
+            });
         }
     }
 
@@ -828,9 +852,7 @@ export class DockviewGroupPanelModel
     private updateContainer(): void {
         toggleClass(this.container, 'empty', this.isEmpty);
 
-        this.panels.forEach((panel) =>
-            panel.updateParentGroup(this.groupPanel, this.isActive)
-        );
+        this.panels.forEach((panel) => panel.runEvents());
 
         if (this.isEmpty && !this.watermark) {
             const watermark = this.accessor.createWatermarkComponent();

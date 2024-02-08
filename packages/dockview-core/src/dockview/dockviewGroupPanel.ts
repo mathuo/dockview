@@ -88,6 +88,13 @@ export class DockviewGroupPanel
         );
     }
 
+    override focus(): void {
+        if (!this.api.isActive) {
+            this.api.setActive();
+        }
+        super.focus();
+    }
+
     initialize(): void {
         this._model.initialize();
     }

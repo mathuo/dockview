@@ -25,9 +25,6 @@ export class DockviewPanelModel implements IDockviewPanelModel {
     private readonly _content: IContentRenderer;
     private readonly _tab: ITabRenderer;
 
-    private _group: DockviewGroupPanel | null = null;
-    private _isPanelVisible: boolean | null = null;
-
     get content(): IContentRenderer {
         return this._content;
     }
@@ -52,28 +49,10 @@ export class DockviewPanelModel implements IDockviewPanelModel {
     }
 
     updateParentGroup(
-        group: DockviewGroupPanel,
-        isPanelVisible: boolean
+        _group: DockviewGroupPanel,
+        _isPanelVisible: boolean
     ): void {
-        if (group !== this._group) {
-            this._group = group;
-            if (this._content.onGroupChange) {
-                this._content.onGroupChange(group);
-            }
-            if (this._tab.onGroupChange) {
-                this._tab.onGroupChange(group);
-            }
-        }
-
-        if (isPanelVisible !== this._isPanelVisible) {
-            this._isPanelVisible = isPanelVisible;
-            if (this._content.onPanelVisibleChange) {
-                this._content.onPanelVisibleChange(isPanelVisible);
-            }
-            if (this._tab.onPanelVisibleChange) {
-                this._tab.onPanelVisibleChange(isPanelVisible);
-            }
-        }
+        // noop
     }
 
     layout(width: number, height: number): void {

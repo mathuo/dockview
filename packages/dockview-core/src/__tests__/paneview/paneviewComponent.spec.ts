@@ -78,7 +78,7 @@ describe('componentPaneview', () => {
             },
         });
 
-        paneview.layout(600, 400);
+        paneview.layout(300, 200);
 
         paneview.addPanel({
             id: 'panel1',
@@ -107,6 +107,8 @@ describe('componentPaneview', () => {
                 panel2Dimensions = event;
             })
         );
+
+        paneview.layout(600, 400);
 
         expect(panel1Dimensions).toEqual({ width: 600, height: 22 });
         expect(panel2Dimensions).toEqual({ width: 600, height: 22 });
