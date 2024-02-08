@@ -38,6 +38,7 @@ interface GroupMoveEvent {
 interface CoreGroupOptions {
     locked?: DockviewGroupPanelLocked;
     hideHeader?: boolean;
+    skipSetActive?: boolean;
 }
 
 export interface GroupOptions extends CoreGroupOptions {
