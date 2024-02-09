@@ -218,7 +218,7 @@ const RightComponent = (props: IDockviewHeaderActionsProps) => {
     );
 
     React.useEffect(() => {
-        const disposable = props.containerApi.onDidMaxmizedGroupChange(() => {
+        const disposable = props.containerApi.onDidMaximizedGroupChange(() => {
             setMaximized(props.api.isMaximized());
         });
 

@@ -260,7 +260,7 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
     );
 
     React.useEffect(() => {
-        const disposable = props.containerApi.onDidMaxmizedGroupChange(() => {
+        const disposable = props.containerApi.onDidMaximizedGroupChange(() => {
             setIsMaximized(props.containerApi.hasMaximizedGroup());
         });
 
@@ -276,7 +276,7 @@ const RightControls = (props: IDockviewHeaderActionsProps) => {
 
     const onClick = () => {
         if (props.containerApi.hasMaximizedGroup()) {
-            props.containerApi.exitMaxmizedGroup();
+            props.containerApi.exitMaximizedGroup();
         } else {
             props.activePanel?.api.maximize();
         }

@@ -843,7 +843,7 @@ describe('gridview', () => {
         gridview.layout(1000, 1000);
 
         let counter = 0;
-        const subscription = gridview.onDidMaxmizedNodeChange(() => {
+        const subscription = gridview.onDidMaximizedNodeChange(() => {
             counter++;
         });
 

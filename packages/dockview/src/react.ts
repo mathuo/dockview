@@ -102,14 +102,14 @@ export class ReactPart<P extends object, C extends object = {}>
             throw new Error('invalid operation: resource is already disposed');
         }
 
-        if (typeof this.component !== 'function') {
+        if (!isReactComponent(this.component)) {
             /**
              * we know this isn't a React.FunctionComponent so throw an error here.
-             * if we do not intercept this the React library will throw a very obsure error
-             * for the same reason, at least at this point we will emit a sensible stacktrace.
+             * if we do not intercept then React library will throw a very obsure error
+             * for the same reason... at least at this point we will emit a sensible stacktrace.
              */
             throw new Error(
-                'Invalid Operation. dockview only supports React Functional Components.'
+                'Dockview: Only React.memo(...), React.ForwardRef(...) and functional components are accepted as components'
             );
         }
 
@@ -192,9 +192,15 @@ export const usePortalsLifecycle: PortalLifecycleHook = () => {
     return [portals, addPortal];
 };
 
-// it does the job...
-export function isReactElement(
-    element: unknown
-): element is React.ReactElement {
-    return !!(element as React.ReactElement)?.type;
+
+export function isReactComponent(component: any): boolean {
+  /**
+   * Yes, we could use "react-is" but that would introduce an unwanted peer dependency
+   * so for now we will check in a rather crude fashion...
+   */
+    return (
+        typeof component === 'function' /** Functional Componnts */ ||
+        !!(component as React.ExoticComponent)
+            ?.$$typeof /** React.memo(...) Components */
+    );
 }
