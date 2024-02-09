@@ -194,6 +194,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     maximizeGroup(panel: T): void {
         this.gridview.maximizeView(panel);
+        this.doSetGroupActive(panel);
     }
 
     isMaximizedGroup(panel: T): boolean {

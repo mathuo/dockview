@@ -4554,4 +4554,46 @@ describe('dockviewComponent', () => {
             expect(dockview.panels.length).toBe(3);
         });
     });
+
+    describe('maximized group', () => {
+        test('that a maximzied group is set to active', () => {
+            const container = document.createElement('div');
+
+            const dockview = new DockviewComponent({
+                parentElement: container,
+                components: {
+                    default: PanelContentPartTest,
+                },
+                tabComponents: {
+                    test_tab_id: PanelTabPartTest,
+                },
+                orientation: Orientation.HORIZONTAL,
+            });
+
+            dockview.layout(1000, 500);
+
+            const panel1 = dockview.addPanel({
+                id: 'panel_1',
+                component: 'default',
+            });
+
+            const panel2 = dockview.addPanel({
+                id: 'panel_2',
+                component: 'default',
+                position: { direction: 'right' },
+            });
+
+            expect(panel1.api.isActive).toBeFalsy();
+            expect(panel1.group.api.isActive).toBeFalsy();
+            expect(panel2.api.isActive).toBeTruthy();
+            expect(panel2.group.api.isActive).toBeTruthy();
+
+            panel1.api.maximize();
+
+            expect(panel1.api.isActive).toBeTruthy();
+            expect(panel1.group.api.isActive).toBeTruthy();
+            expect(panel2.api.isActive).toBeFalsy();
+            expect(panel2.group.api.isActive).toBeFalsy();
+        });
+    });
 });
