@@ -1,4 +1,4 @@
-import { ReactPart } from '../react';
+import { ReactPart, isReactComponent } from '../react';
 import * as React from 'react';
 import { render, screen, act } from '@testing-library/react';
 
@@ -38,6 +38,25 @@ describe('react', () => {
                 'anotherStringA'
             );
             expect(screen.getByTestId('valueB').textContent).toBe('22');
+        });
+    });
+
+    describe('isReactElement', () => {
+        test('functional component', () => {
+            const FunctionalComponent: React.FC = () => <div />;
+            expect(isReactComponent(FunctionalComponent)).toBeTruthy();
+        });
+
+        test('React.memo component', () => {
+            const memoComponent = React.memo(() => <div />);
+            expect(isReactComponent(memoComponent)).toBeTruthy();
+        });
+
+        test('forward ref component', () => {
+            const ForwardRefComponent = React.forwardRef((props, ref) => (
+                <div />
+            ));
+            expect(isReactComponent(ForwardRefComponent)).toBeTruthy();
         });
     });
 });
