@@ -287,8 +287,8 @@ export class Gridview implements IDisposable {
     readonly onDidChange: Event<{ size?: number; orthogonalSize?: number }> =
         this._onDidChange.event;
 
-    private readonly _onDidMaxmizedNodeChange = new Emitter<void>();
-    readonly onDidMaxmizedNodeChange = this._onDidMaxmizedNodeChange.event;
+    private readonly _onDidMaximizedNodeChange = new Emitter<void>();
+    readonly onDidMaximizedNodeChange = this._onDidMaximizedNodeChange.event;
 
     public get length(): number {
         return this._root ? this._root.children.length : 0;
@@ -401,7 +401,7 @@ export class Gridview implements IDisposable {
 
         hideAllViewsBut(this.root, node);
         this._maximizedNode = { leaf: node, hiddenOnMaximize };
-        this._onDidMaxmizedNodeChange.fire();
+        this._onDidMaximizedNodeChange.fire();
     }
 
     exitMaximizedView(): void {
@@ -427,7 +427,7 @@ export class Gridview implements IDisposable {
         showViewsInReverseOrder(this.root);
 
         this._maximizedNode = undefined;
-        this._onDidMaxmizedNodeChange.fire();
+        this._onDidMaximizedNodeChange.fire();
     }
 
     public serialize(): SerializedGridview<any> {
@@ -452,7 +452,7 @@ export class Gridview implements IDisposable {
     public dispose(): void {
         this.disposable.dispose();
         this._onDidChange.dispose();
-        this._onDidMaxmizedNodeChange.dispose();
+        this._onDidMaximizedNodeChange.dispose();
         this.root.dispose();
         this._maximizedNode = undefined;
         this.element.remove();

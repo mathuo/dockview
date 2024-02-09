@@ -65,7 +65,7 @@ export interface IBaseGrid<T extends IGridPanelView> {
     isMaximizedGroup(panel: T): boolean;
     exitMaximizedGroup(): void;
     hasMaximizedGroup(): boolean;
-    readonly onDidMaxmizedGroupChange: Event<void>;
+    readonly onDidMaximizedGroupChange: Event<void>;
     readonly onDidLayoutChange: Event<void>;
 }
 
@@ -194,6 +194,7 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     maximizeGroup(panel: T): void {
         this.gridview.maximizeView(panel);
+        this.doSetGroupActive(panel);
     }
 
     isMaximizedGroup(panel: T): boolean {
@@ -208,8 +209,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
         return this.gridview.hasMaximizedView();
     }
 
-    get onDidMaxmizedGroupChange(): Event<void> {
-        return this.gridview.onDidMaxmizedNodeChange;
+    get onDidMaximizedGroupChange(): Event<void> {
+        return this.gridview.onDidMaximizedNodeChange;
     }
 
     protected doAddGroup(
