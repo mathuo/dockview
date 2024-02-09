@@ -366,6 +366,66 @@ const PrefixHeaderControls = (props: IDockviewHeaderActionsProps) => {
     );
 };
 
+function defaultConfig(api: DockviewApi) {
+    const panel1 = api.addPanel({
+        id: 'panel_1',
+        component: 'iframe',
+        renderer: 'always',
+        title: 'Panel 1',
+    });
+
+    api.addPanel({
+        id: 'panel_2',
+        component: 'default',
+        title: 'Panel 2',
+        position: { referencePanel: panel1 },
+    });
+
+    api.addPanel({
+        id: 'panel_3',
+        component: 'default',
+        title: 'Panel 3',
+        position: { referencePanel: panel1 },
+    });
+
+    const panel4 = api.addPanel({
+        id: 'panel_4',
+        component: 'default',
+        title: 'Panel 4',
+        position: { referencePanel: panel1, direction: 'right' },
+    });
+
+    const panel5 = api.addPanel({
+        id: 'panel_5',
+        component: 'default',
+        title: 'Panel 5',
+        position: { referencePanel: panel4 },
+    });
+
+    const panel6 = api.addPanel({
+        id: 'panel_6',
+        component: 'default',
+        title: 'Panel 6',
+        position: { referencePanel: panel5, direction: 'below' },
+    });
+
+    const panel7 = api.addPanel({
+        id: 'panel_7',
+        component: 'default',
+        title: 'Panel 7',
+        position: { referencePanel: panel6, direction: 'left' },
+    });
+
+    api.addPanel({
+        id: 'panel8',
+        component: 'default',
+        title: 'Panel 8',
+        position: { referencePanel: panel7, direction: 'below' },
+    });
+
+    panel1.api.setActive();
+}
+
 const DockviewDemo = (props: { theme?: string }) => {
     const [logLines, setLogLines] = React.useState<any[]>([]);
 
@@ -375,6 +435,34 @@ const DockviewDemo = (props: { theme?: string }) => {
 
     const [activePanel, setActivePanel] = React.useState<string>();
     const [activeGroup, setActiveGroup] = React.useState<string>();
+
+    const onClear = () => {
+        api?.clear();
+    };
+
+    const onLoad = () => {
+        const state = localStorage.getItem('dv-demo-state');
+        if (state) {
+            try {
+                api?.fromJSON(JSON.parse(state));
+            } catch {
+                localStorage.removeItem('dv-demo-state');
+            }
+        }
+    };
+
+    const onSave = () => {
+        if (api) {
+            localStorage.setItem('dv-demo-state', JSON.stringify(api.toJSON()));
+        }
+    };
+
+    const onReset = () => {
+        if (api) {
+            api.clear();
+            defaultConfig(api);
+        }
+    };
 
     const onReady = (event: DockviewReadyEvent) => {
         setApi(event.api);
@@ -423,63 +511,17 @@ const DockviewDemo = (props: { theme?: string }) => {
             setLogLines((line) => [`Group Activated ${event?.id}`, ...line]);
         });
 
-        const panel1 = event.api.addPanel({
-            id: 'panel_1',
-            component: 'iframe',
-            renderer: 'always',
-            title: 'Panel 1',
-        });
+        const state = localStorage.getItem('dv-demo-state');
+        if (state) {
+            try {
+                api?.fromJSON(JSON.parse(state));
+                return;
+            } catch {
+                localStorage.removeItem('dv-demo-state');
+            }
+        }
 
-        event.api.addPanel({
-            id: 'panel_2',
-            component: 'default',
-            title: 'Panel 2',
-            position: { referencePanel: panel1 },
-        });
-
-        event.api.addPanel({
-            id: 'panel_3',
-            component: 'default',
-            title: 'Panel 3',
-            position: { referencePanel: panel1 },
-        });
-
-        const panel4 = event.api.addPanel({
-            id: 'panel_4',
-            component: 'default',
-            title: 'Panel 4',
-            position: { referencePanel: panel1, direction: 'right' },
-        });
-
-        const panel5 = event.api.addPanel({
-            id: 'panel_5',
-            component: 'default',
-            title: 'Panel 5',
-            position: { referencePanel: panel4 },
-        });
-
-        const panel6 = event.api.addPanel({
-            id: 'panel_6',
-            component: 'default',
-            title: 'Panel 6',
-            position: { referencePanel: panel5, direction: 'below' },
-        });
-
-        const panel7 = event.api.addPanel({
-            id: 'panel_7',
-            component: 'default',
-            title: 'Panel 7',
-            position: { referencePanel: panel6, direction: 'left' },
-        });
-
-        event.api.addPanel({
-            id: 'panel8',
-            component: 'default',
-            title: 'Panel 8',
-            position: { referencePanel: panel7, direction: 'below' },
-        });
-
-        panel1.api.setActive();
+        defaultConfig(event.api);
     };
 
     const onAddPanel = () => {
@@ -508,6 +550,10 @@ const DockviewDemo = (props: { theme?: string }) => {
                 >
                     <button onClick={onAddPanel}>Add Panel</button>
                     <button onClick={onAddGroup}>Add Group</button>
+                    <button onClick={onClear}>Clear</button>
+                    <button onClick={onLoad}>Load</button>
+                    <button onClick={onSave}>Save</button>
+                    <button onClick={onReset}>Reset</button>
                 </div>
                 <div
                     style={{

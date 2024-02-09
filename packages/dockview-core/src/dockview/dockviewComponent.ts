@@ -1324,6 +1324,8 @@ export class DockviewComponent
             throw err;
         }
 
+        this.updateWatermark();
+
         this._onDidLayoutFromJSON.fire();
     }
 
@@ -1878,7 +1880,7 @@ export class DockviewComponent
                 const removedPanel: IDockviewPanel | undefined =
                     this.movingLock(() =>
                         sourceGroup.model.removePanel(sourceItemId, {
-                            skipSetActive: true,
+                            skipSetActive: false,
                             skipSetActiveGroup: true,
                         })
                     );
