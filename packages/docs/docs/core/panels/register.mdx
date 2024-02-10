@@ -8,8 +8,8 @@ This section describes how to register a panel.
 You can register panes through the `components` option.
 
 <FrameworkSpecific framework='React'>
-```jsx
-<DockviewReact components={{
+```tsx
+const components = {
   component_1: (props: IDockviewPanelProps) => {
     const api: DockviewPanelApi  = props.api;
     const containerApi: DockviewApi  = props.containerApi;
@@ -19,7 +19,9 @@ You can register panes through the `components` option.
   component_2: (props: IDockviewPanelProps) => {
     return <div>{/** logic */}</div>
   }
-}}/>
+}
+
+return <DockviewReact components={components}/>
 ```
 </FrameworkSpecific>
 

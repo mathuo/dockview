@@ -6,11 +6,14 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 import LiveExample from '@site/src/components/ui/exampleFrame';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-
-## Floating Groups
+This section describes floating groups.
 
 Dockview has built-in support for floating groups. Each floating container can contain a single group with many panels
 and you can have as many floating containers as needed. You cannot dock multiple groups together in the same floating container.
+
+## Options
+
+The following properties can be set to configure the behaviours of floating groups.
 
 <FrameworkSpecific framework='React'>
   <DocRef declaration="IDockviewReactProps" methods={['floatingGroupBounds', 'disableFloatingGroups']} />
@@ -19,6 +22,8 @@ and you can have as many floating containers as needed. You cannot dock multiple
 <FrameworkSpecific framework='JavaScript'>
   <DocRef declaration="DockviewComponentOptions" methods={['floatingGroupBounds', 'disableFloatingGroups']} />
 </FrameworkSpecific>
+
+## Live Example
 
 <LiveExample framework="react" id="dockview/floating-groups"/>
 

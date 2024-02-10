@@ -2,19 +2,29 @@
 title: Maximized Groups
 ---
 
-import { MultiFrameworkContainer } from '@site/src/components/ui/container';
-import DockviewMaximizeGroup from '@site/sandboxes/maximizegroup-dockview/src/app';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
+import LiveExample from '@site/src/components/ui/exampleFrame';
 
-## Maximized Groups
+This section described how to maxmimize groups.
 
-To maximize a group from the component `api`:
+
+:::info
+Floating and Popout groups cannot be maximized. Calling maximize function on groups in these states will have no effect.
+:::
+
+## API methods
+
+The following methods on the [API](/docs/api/dockview/overview) are related to maximizing groups.
 
 <DocRef declaration="DockviewPanelApi" methods={['maximize', 'isMaximized', 'exitMaximized']} />
 
+and the followng methods on the [Panel API](/docs/api/dockview/panelApi) are related to maximizing groups.
+
 <DocRef declaration="DockviewApi" methods={['maximizeGroup', 'hasMaximizedGroup', 'exitMaximizedGroup', 'onDidMaxmizedGroupChange']} />
 
-If you maximize a group that group will automatically become active.
+## Live Examples
+
+<LiveExample framework="react" id="dockview/maximize-group"/>
 
 ```tsx
 // maximize a specified group
@@ -45,8 +55,4 @@ const result: boolean = api.isMaxmized();
 api.exitMaximized();
 ```
 
-<MultiFrameworkContainer
-    height={600}
-    sandboxId="maximizegroup-dockview"
-    react={DockviewMaximizeGroup}
-/>
+

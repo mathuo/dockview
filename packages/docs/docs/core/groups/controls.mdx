@@ -2,49 +2,41 @@
 title: Group Controls
 ---
 
-import { MultiFrameworkContainer } from '@site/src/components/ui/container';
-import DockviewGroupControl from '@site/sandboxes/headeractions-dockview/src/app';
+import LiveExample from '@site/src/components/ui/exampleFrame';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-## Group Controls Panel
+This section describes how you can customize the header component of each group.
 
-`DockviewReact` accepts `leftHeaderActionsComponent`, `rightHeaderActionsComponent` and `prefixHeaderActionsComponent` which expect a React component with props `IDockviewHeaderActionsProps`.
-These controls are rendered to left and right side of the space to the right of the tabs in the header bar as well as before the first tab in the case of the prefix header prop.
+<FrameworkSpecific framework='React'>
+  <DocRef declaration="IDockviewReactProps" methods={['leftHeaderActionsComponent', 'rightHeaderActionsComponent', 'prefixHeaderActionsComponent']} />
+</FrameworkSpecific>
 
-```tsx
-const Component: React.FunctionComponent<IDockviewHeaderActionsProps> = () => {
-    return <div>{'...'}</div>;
-};
-
-return <DockviewReact {...props} leftHeaderActionsComponent={Component} rightHeaderActionsComponent={...} />;
-```
-
-As a simple example the below uses the `groupControlComponent` to render a small control that indicates whether the group
-is active and which panel is active in that group.
+<FrameworkSpecific framework='JavaScript'>
+  <DocRef declaration="DockviewComponentOptions"
+    methods={['createLeftHeaderActionsElement', 'createRightHeaderActionsElement', 'createPrefixHeaderActionsElement']} />
+</FrameworkSpecific>
 
 ```tsx
-const RightHeaderActionsComponent = (props: IDockviewHeaderActionsProps) => {
-    const isGroupActive = props.isGroupActive;
-    const activePanel = props.activePanel;
-
-    return (
-        <div className="dockview-groupcontrol-demo">
-            <span
-                className="dockview-groupcontrol-demo-group-active"
-                style={{
-                    background: isGroupActive ? 'green' : 'red',
-                }}
-            >
-                {isGroupActive ? 'Group Active' : 'Group Inactive'}
-            </span>
-            <span className="dockview-groupcontrol-demo-active-panel">{`activePanel: ${
-                activePanel?.id || 'null'
-            }`}</span>
-        </div>
-    );
+const LeftComponent = (props: IDockviewHeaderActionsProps) => {
+    return <div>{/** content */}</div>;
 };
+
+const RightComponent = (props: IDockviewHeaderActionsProps) => {
+       return <div>{/** content */}</div>;
+};
+
+const PrefixComponent = (props: IDockviewHeaderActionsProps) => {
+    return <div>{/** content */}</div>;
+};
+
+return <DockviewReact
+  leftHeaderActionsComponent={LeftComponent}
+  rightHeaderActionsComponent={RightComponent}
+  prefixHeaderActionsComponent={PrefixComponent}
+/>;
 ```
 
-<MultiFrameworkContainer
-    sandboxId="groupcontrol-dockview"
-    react={DockviewGroupControl}
-/>
+## Live Example
+
+<LiveExample framework="react" id="dockview/group-actions"/>
+

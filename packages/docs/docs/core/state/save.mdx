@@ -1,0 +1,69 @@
+---
+title: Saving State
+---
+
+
+import { MultiFrameworkContainer } from '@site/src/components/ui/container';
+import LiveExample from '@site/src/components/ui/exampleFrame';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+This section describes how to serialize a dockview instance.
+
+<DocRef declaration="DockviewApi" methods={['toJSON', 'onDidLayoutChange']} />
+
+
+
+## Layout Persistence
+
+Layouts are loaded and saved via to `fromJSON` and `toJSON` methods on the Dockview api.
+The api also exposes an event `onDidLayoutChange` you can listen on to determine when the layout has changed.
+Below are some snippets showing how you might load from and save to localStorage.
+
+```tsx title="Saving the layout state to localStorage"
+React.useEffect(() => {
+    if (!api) {
+        return;
+    }
+
+    const disposable = api.onDidLayoutChange(() => {
+        const layout = api.toJSON();
+
+        localStorage.setItem(
+            'dockview_persistence_layout',
+            JSON.stringify(layout)
+        );
+    });
+
+    return () => {
+        disposable.dispose();
+    };
+}, [api]);
+```
+
+```tsx title="Loading a layout from localStorage"
+const onReady = (event: DockviewReadyEvent) => {
+    const layoutString = localStorage.getItem('dockview_persistence_layout');
+
+    let success = false;
+
+    if (layoutString) {
+        try {
+            const layout = JSON.parse(layoutString);
+            event.api.fromJSON(layout);
+            success = true;
+        } catch (err) {
+            //
+        }
+    }
+
+    if (!success) {
+        // do something if there is no layout or there was a loading error
+    }
+};
+```
+
+Here is an example using the above code loading from and saving to localStorage.
+If you refresh the page you should notice your layout is loaded as you left it.
+
+<LiveExample framework="react" id="dockview/layout"/>
+

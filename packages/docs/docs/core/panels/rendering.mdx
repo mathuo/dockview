@@ -4,8 +4,10 @@ sidebar_postiion: 5
 ---
 
 import { MultiFrameworkContainer } from '@site/src/components/ui/container';
-import DockviewRenderMode from '@site/sandboxes/rendermode-dockview/src/app';
 import RenderingDockview from '@site/sandboxes/rendering-dockview/src/app';
+
+import LiveExample from '@site/src/components/ui/exampleFrame';
+
 
 Rendering type is an important consideration when creating your application and whether your panels should be destroyed when hidden.
 
@@ -68,11 +70,8 @@ api.addPanel({
 
 ## Live Example
 
-<MultiFrameworkContainer
-    height={500}
-    sandboxId="rendermode-dockview"
-    react={DockviewRenderMode}
-/>
+<LiveExample framework="react" id="dockview/render-mode"/>
+
 
 By default `DockviewReact` only adds to the DOM those panels that are visible,
 if a panel is not the active tab and not shown the contents of the hidden panel will be removed from the DOM.

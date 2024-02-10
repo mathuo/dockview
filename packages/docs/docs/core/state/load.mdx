@@ -1,37 +1,22 @@
 ---
-title: Layouts
+title: Loading State
 ---
 
-
 import { MultiFrameworkContainer } from '@site/src/components/ui/container';
-import DockviewPersistence from '@site/sandboxes/layout-dockview/src/app';
+import LiveExample from '@site/src/components/ui/exampleFrame';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-# Layout Persistence
+This section described loading a dock layout.9
+
+<DocRef declaration="DockviewApi" methods={['fromJSON', 'onDidLayoutFromJSON']} />
+
+## Layout Persistence
 
 Layouts are loaded and saved via to `fromJSON` and `toJSON` methods on the Dockview api.
 The api also exposes an event `onDidLayoutChange` you can listen on to determine when the layout has changed.
 Below are some snippets showing how you might load from and save to localStorage.
 
-```tsx title="Saving the layout state to localStorage"
-React.useEffect(() => {
-    if (!api) {
-        return;
-    }
-
-    const disposable = api.onDidLayoutChange(() => {
-        const layout = api.toJSON();
-
-        localStorage.setItem(
-            'dockview_persistence_layout',
-            JSON.stringify(layout)
-        );
-    });
-
-    return () => {
-        disposable.dispose();
-    };
-}, [api]);
-```
+If you try to load a invalid or corrupted layout the dock will recover g
 
 ```tsx title="Loading a layout from localStorage"
 const onReady = (event: DockviewReadyEvent) => {
@@ -45,7 +30,7 @@ const onReady = (event: DockviewReadyEvent) => {
             event.api.fromJSON(layout);
             success = true;
         } catch (err) {
-            //
+            // log the error
         }
     }
 
@@ -58,7 +43,5 @@ const onReady = (event: DockviewReadyEvent) => {
 Here is an example using the above code loading from and saving to localStorage.
 If you refresh the page you should notice your layout is loaded as you left it.
 
-<MultiFrameworkContainer
-    sandboxId="layout-dockview"
-    react={DockviewPersistence}
-/>
+<LiveExample framework="react" id="dockview/layout"/>
+

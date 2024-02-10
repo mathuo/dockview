@@ -110,7 +110,6 @@ const Row = (props: { doc: Doc }) => {
             >
                 <div
                     style={{
-                        // maxWidth: '30%',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'start',

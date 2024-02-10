@@ -1,0 +1,20 @@
+---
+title: Scrolling
+---
+
+import LiveExample from '@site/src/components/ui/exampleFrame';
+
+It's important to understand how to configure the scrollbar within a panel.
+
+A panel will appear with a scrollbar if the the contents of your view has a fixed height.
+If you are using a relative height such as `100%` you will need a child container
+with the appropiate `overflow` value to allow for scrollbars.
+
+## Live Examples
+
+The following example contains three views:
+- **Panel 1** (`height: 100%`): No scrollbar appears and the content is clipped.
+- **Panel 2** (`height: 2000px`): A scrollbar does appear since a fixed height has been used.
+- **Panel 3**: `height: 100%` and a child component with `overflow: auto` which will enable scrollbars.
+
+<LiveExample framework="react" id="dockview/scrollbars"/>

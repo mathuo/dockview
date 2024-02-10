@@ -657,6 +657,18 @@ const DockviewDemo = (props: { theme?: string }) => {
                                 >
                                     pop
                                 </button>
+                                <button
+                                    onClick={() => {
+                                        const panel = api?.getGroup(x);
+                                        if (panel?.api.isMaximized()) {
+                                            panel.api.exitMaximized();
+                                        } else {
+                                            panel?.api.maximize();
+                                        }
+                                    }}
+                                >
+                                    max
+                                </button>
                             </>
                         );
                     })}

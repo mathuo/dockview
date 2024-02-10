@@ -1,13 +1,24 @@
 ---
+title: 'Dnd'
 sidebar_position: 2
 ---
-
-
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import { MultiFrameworkContainer } from '@site/src/components/ui/container';
 import DndDockview from '@site/sandboxes/dnd-dockview/src/app';
 import DockviewExternalDnd from '@site/sandboxes/externaldnd-dockview/src/app';
+
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+The dock makes heavy use of drag and drop functionalities.
+
+<DocRef declaration="DockviewApi"
+  methods={[
+    'onWillDragPanel', 'onWillDragGroup',
+    'onWillDrop', 'onDidDrop', 'onWillShowOverlay'
+  ]}
+  />
+
 
 # Drag And Drop
 

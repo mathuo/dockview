@@ -2,9 +2,7 @@
 title: Popout Windows
 ---
 
-import { MultiFrameworkContainer } from '@site/src/components/ui/container';
-import DockviewPopoutGroup from '@site/sandboxes/popoutgroup-dockview/src/app';
-
+import LiveExample from '@site/src/components/ui/exampleFrame';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 ## Popout Groups
@@ -48,9 +46,4 @@ const group = props.containerApi.addGroup();
 props.group.api.moveTo({ group });
 ```
 
-<MultiFrameworkContainer
-    height={600}
-    sandboxId="popoutgroup-dockview"
-    react={DockviewPopoutGroup}
-/>
-
+<LiveExample framework="react" id="dockview/popout-group"/>
