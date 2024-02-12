@@ -43,21 +43,21 @@ describe('tabsContainer', () => {
 
         const emptySpace = cut.element
             .getElementsByClassName('void-container')
-            .item(0);
+            .item(0)
 
-        if (!emptySpace) {
+        if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
             () => 100
         );
 
-        fireEvent.dragEnter(emptySpace);
-        fireEvent.dragOver(emptySpace);
+        fireEvent.dragEnter(emptySpace!);
+        fireEvent.dragOver(emptySpace!);
 
         expect(groupView.canDisplayOverlay).toHaveBeenCalled();
 
@@ -102,14 +102,14 @@ describe('tabsContainer', () => {
             .getElementsByClassName('void-container')
             .item(0);
 
-        if (!emptySpace) {
+        if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -124,8 +124,8 @@ describe('tabsContainer', () => {
             PanelTransfer.prototype
         );
 
-        fireEvent.dragEnter(emptySpace);
-        fireEvent.dragOver(emptySpace);
+        fireEvent.dragEnter(emptySpace!);
+        fireEvent.dragOver(emptySpace!);
 
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
@@ -173,14 +173,14 @@ describe('tabsContainer', () => {
             .getElementsByClassName('void-container')
             .item(0);
 
-        if (!emptySpace) {
+        if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -189,8 +189,8 @@ describe('tabsContainer', () => {
             PanelTransfer.prototype
         );
 
-        fireEvent.dragEnter(emptySpace);
-        fireEvent.dragOver(emptySpace);
+        fireEvent.dragEnter(emptySpace!);
+        fireEvent.dragOver(emptySpace!);
 
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
@@ -238,14 +238,14 @@ describe('tabsContainer', () => {
             .getElementsByClassName('void-container')
             .item(0);
 
-        if (!emptySpace) {
+        if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -254,8 +254,8 @@ describe('tabsContainer', () => {
             PanelTransfer.prototype
         );
 
-        fireEvent.dragEnter(emptySpace);
-        fireEvent.dragOver(emptySpace);
+        fireEvent.dragEnter(emptySpace!);
+        fireEvent.dragOver(emptySpace!);
 
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(0);
 
@@ -302,14 +302,14 @@ describe('tabsContainer', () => {
             .getElementsByClassName('void-container')
             .item(0);
 
-        if (!emptySpace) {
+        if (!emptySpace!) {
             fail('element not found');
         }
 
-        jest.spyOn(emptySpace, 'clientHeight', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientHeight', 'get').mockImplementation(
             () => 100
         );
-        jest.spyOn(emptySpace, 'clientWidth', 'get').mockImplementation(
+        jest.spyOn(emptySpace!, 'clientWidth', 'get').mockImplementation(
             () => 100
         );
 
@@ -324,8 +324,8 @@ describe('tabsContainer', () => {
             PanelTransfer.prototype
         );
 
-        fireEvent.dragEnter(emptySpace);
-        fireEvent.dragOver(emptySpace);
+        fireEvent.dragEnter(emptySpace!);
+        fireEvent.dragOver(emptySpace!);
 
         expect(groupView.canDisplayOverlay).toHaveBeenCalledTimes(1);
 
