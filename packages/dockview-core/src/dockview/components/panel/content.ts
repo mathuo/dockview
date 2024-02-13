@@ -199,7 +199,9 @@ export class ContentContainer
     public closePanel(): void {
         if (this.panel) {
             if (this.panel.api.renderer === 'onlyWhenVisibile') {
-                this._element.removeChild(this.panel.view.content.element);
+                this.panel.view.content.element.parentElement?.removeChild(
+                    this.panel.view.content.element
+                );
             }
         }
         this.panel = undefined;
