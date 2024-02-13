@@ -538,7 +538,12 @@ const DockviewDemo = (props: { theme?: string }) => {
 
     return (
         <div
-            style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+            style={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                flexGrow: 1,
+            }}
         >
             <div>
                 <div
@@ -674,7 +679,14 @@ const DockviewDemo = (props: { theme?: string }) => {
                     })}
                 </div>
             </div>
-            <div style={{ flexGrow: 1 }}>
+            <div
+                style={{
+                    flexGrow: 1,
+                    overflow: 'hidden',
+                    // flexBasis: 0
+                    height: 0,
+                }}
+            >
                 <DockviewReact
                     components={components}
                     defaultTabComponent={headerComponents.default}

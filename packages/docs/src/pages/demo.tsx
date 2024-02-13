@@ -14,7 +14,6 @@ export default function Popout() {
                 style={{
                     height: 'calc(100% - var(--ifm-navbar-height))',
                     flexGrow: 1,
-                    overflow: 'hidden',
                     padding: '10px',
                     display: 'flex',
                     flexDirection: 'column',
@@ -40,7 +39,13 @@ export default function Popout() {
                         })}
                     </select>
                 </div>
-                <div style={{ flexGrow: 1, display: 'grid' }}>
+                <div
+                    style={{
+                        flexGrow: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                    }}
+                >
                     <DemoApp theme={theme} />
                 </div>
             </div>

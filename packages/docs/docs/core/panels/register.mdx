@@ -3,9 +3,22 @@ title: Register A Panel
 sidebar_position: 0
 ---
 
+import { DocRef } from '@site/src/components/ui/reference/docRef';
+
+
 This section describes how to register a panel.
 
-You can register panes through the `components` option.
+You can register panels through the `components` [option](/docs/api/dockview/options).
+
+
+<FrameworkSpecific framework='React'>
+  <DocRef declaration="IDockviewReactProps" methods={['components']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+  <DocRef declaration="DockviewComponentOptions" methods={['components']} />
+</FrameworkSpecific>
+
 
 <FrameworkSpecific framework='React'>
 ```tsx
@@ -26,9 +39,5 @@ return <DockviewReact components={components}/>
 </FrameworkSpecific>
 
 
-Each panel has an [API](/docs/api/dockview/panelApi) which can be used to control the panel and you can
-also has access the dock [API](/docs/api/dockview/overview) directly from the panel.
-
-It is expected you should be able to achieve everything you need through these two APIs. If you find yourself
-building work-arounds to accommodate requires please raise an [Issue](https://github.com/mathuo/dockview/issues)
-to see if it's something that could be added.
+Each panel has it's own [API](/docs/api/dockview/panelApi) which can be used to control the panel and you can
+also has access the dock [API](/docs/api/dockview/overview) from the panel directly.
