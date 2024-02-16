@@ -333,7 +333,7 @@ export class Droptarget extends CompositeDisposable {
         } else if (topClass) {
             box.height = `${100 * size}%`;
         } else if (bottomClass) {
-            box.top = `${100 * size}%`;
+            box.top = `${100 * (1 - size)}%`;
             box.height = `${100 * size}%`;
         }
 
