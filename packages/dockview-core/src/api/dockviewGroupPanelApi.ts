@@ -16,6 +16,7 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
     maximize(): void;
     isMaximized(): boolean;
     exitMaximized(): void;
+    close(): void;
 }
 
 export interface DockviewGroupPanelFloatingChangeEvent {
@@ -44,6 +45,13 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
         super(id);
 
         this.addDisposables(this._onDidLocationChange);
+    }
+
+    close(): void {
+        if (!this._group) {
+            return;
+        }
+        return this.accessor.removeGroup(this._group);
     }
 
     getWindow(): Window {
