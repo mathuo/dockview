@@ -272,16 +272,25 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     readonly activePanel: IDockviewPanel | undefined;
     readonly totalPanels: number;
     readonly panels: IDockviewPanel[];
+    readonly orientation: Orientation;
     readonly onDidDrop: Event<DockviewDidDropEvent>;
     readonly onWillDrop: Event<DockviewWillDropEvent>;
     readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent>;
-    readonly orientation: Orientation;
+    readonly onDidRemovePanel: Event<IDockviewPanel>;
+    readonly onDidAddPanel: Event<IDockviewPanel>;
+    readonly onDidLayoutFromJSON: Event<void>;
+    readonly onDidActivePanelChange: Event<IDockviewPanel | undefined>;
+    readonly onWillDragPanel: Event<TabDragEvent>;
+    readonly onWillDragGroup: Event<GroupDragEvent>;
+    readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
+    readonly onDidAddGroup: Event<DockviewGroupPanel>;
+    readonly onDidActiveGroupChange: Event<DockviewGroupPanel | undefined>;
+    readonly options: DockviewComponentOptions;
     updateOptions(options: DockviewComponentUpdateOptions): void;
     moveGroupOrPanel(options: MoveGroupOrPanelOptions): void;
     moveGroup(options: MoveGroupOptions): void;
     doSetGroupActive: (group: DockviewGroupPanel, skipFocus?: boolean) => void;
     removeGroup: (group: DockviewGroupPanel) => void;
-    options: DockviewComponentOptions;
     addPanel<T extends object = Parameters>(
         options: AddPanelOptions<T>
     ): IDockviewPanel;
@@ -299,12 +308,6 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     toJSON(): SerializedDockview;
     fromJSON(data: SerializedDockview): void;
     //
-    readonly onDidRemovePanel: Event<IDockviewPanel>;
-    readonly onDidAddPanel: Event<IDockviewPanel>;
-    readonly onDidLayoutFromJSON: Event<void>;
-    readonly onDidActivePanelChange: Event<IDockviewPanel | undefined>;
-    readonly onWillDragPanel: Event<TabDragEvent>;
-    readonly onWillDragGroup: Event<GroupDragEvent>;
     addFloatingGroup(
         item: IDockviewPanel | DockviewGroupPanel,
         coord?: { x: number; y: number }
@@ -318,9 +321,6 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
             onWillClose?: (event: { id: string; window: Window }) => void;
         }
     ): Promise<void>;
-    readonly onDidRemoveGroup: Event<DockviewGroupPanel>;
-    readonly onDidAddGroup: Event<DockviewGroupPanel>;
-    readonly onDidActiveGroupChange: Event<DockviewGroupPanel | undefined>;
 }
 
 export class DockviewComponent
@@ -1845,7 +1845,7 @@ export class DockviewComponent
             const removedPanel: IDockviewPanel | undefined = this.movingLock(
                 () =>
                     sourceGroup.model.removePanel(sourceItemId, {
-                        skipSetActive: true,
+                        skipSetActive: false,
                         skipSetActiveGroup: true,
                     })
             );
