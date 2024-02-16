@@ -8,6 +8,10 @@ import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 This section describes floating groups.
 
+:::info
+Floating groups cannot be maximized. Calling maximize function on groups in these states will have no effect.
+:::
+
 Dockview has built-in support for floating groups. Each floating container can contain a single group with many panels
 and you can have as many floating containers as needed. You cannot dock multiple groups together in the same floating container.
 
@@ -23,12 +27,13 @@ The following properties can be set to configure the behaviours of floating grou
   <DocRef declaration="DockviewComponentOptions" methods={['floatingGroupBounds', 'disableFloatingGroups']} />
 </FrameworkSpecific>
 
+Floating groups can be interacted with whilst holding the `shift` key activating the `event.shiftKey` boolean property on `KeyboardEvent` events.
+
 ## Live Example
 
 <LiveExample framework="react" id="dockview/floating-groups"/>
 
 
-Floating groups can be interacted with whilst holding the `shift` key activating the `event.shiftKey` boolean property on `KeyboardEvent` events.
 
 > Float an existing tab by holding `shift` whilst interacting with the tab
 

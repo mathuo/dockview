@@ -514,11 +514,12 @@ const DockviewDemo = (props: { theme?: string }) => {
         const state = localStorage.getItem('dv-demo-state');
         if (state) {
             try {
-                api?.fromJSON(JSON.parse(state));
+                event.api.fromJSON(JSON.parse(state));
                 return;
             } catch {
                 localStorage.removeItem('dv-demo-state');
             }
+            return;
         }
 
         defaultConfig(event.api);
@@ -574,22 +575,19 @@ const DockviewDemo = (props: { theme?: string }) => {
                         return (
                             <>
                                 <button
+                                    className={'demo-button'}
                                     onClick={onClick}
                                     style={{
-                                        minWidth: '50px',
-                                        border: 'none',
-                                        margin: '0px 2px',
-                                        padding: '0px 2px',
                                         backgroundColor:
                                             activePanel === x
                                                 ? 'blueviolet'
                                                 : 'dodgerblue',
-                                        borderRadius: '2px',
                                     }}
                                 >
                                     {x}
                                 </button>
                                 <button
+                                    className="demo-icon-button"
                                     onClick={() => {
                                         const panel = api?.getPanel(x);
                                         if (panel) {
@@ -597,9 +595,12 @@ const DockviewDemo = (props: { theme?: string }) => {
                                         }
                                     }}
                                 >
-                                    float
+                                    <span className="material-symbols-outlined">
+                                        ad_group
+                                    </span>
                                 </button>
                                 <button
+                                    className="demo-icon-button"
                                     onClick={() => {
                                         const panel = api?.getPanel(x);
                                         if (panel) {
@@ -607,7 +608,20 @@ const DockviewDemo = (props: { theme?: string }) => {
                                         }
                                     }}
                                 >
-                                    pop
+                                    <span className="material-symbols-outlined">
+                                        open_in_new
+                                    </span>
+                                </button>
+                                <button
+                                    className="demo-icon-button"
+                                    onClick={() => {
+                                        const panel = api?.getPanel(x);
+                                        panel?.api.close();
+                                    }}
+                                >
+                                    <span className="material-symbols-outlined">
+                                        close
+                                    </span>
                                 </button>
                             </>
                         );
@@ -627,22 +641,19 @@ const DockviewDemo = (props: { theme?: string }) => {
                         return (
                             <>
                                 <button
+                                    className={'demo-button'}
                                     onClick={onClick}
                                     style={{
-                                        minWidth: '50px',
-                                        border: 'none',
-                                        margin: '0px 2px',
-                                        padding: '0px 2px',
                                         backgroundColor:
                                             activeGroup === x
                                                 ? 'blueviolet'
                                                 : 'dodgerblue',
-                                        borderRadius: '2px',
                                     }}
                                 >
                                     {x}
                                 </button>
                                 <button
+                                    className="demo-icon-button"
                                     onClick={() => {
                                         const panel = api?.getGroup(x);
                                         if (panel) {
@@ -650,9 +661,12 @@ const DockviewDemo = (props: { theme?: string }) => {
                                         }
                                     }}
                                 >
-                                    float
+                                    <span className="material-symbols-outlined">
+                                        ad_group
+                                    </span>
                                 </button>
                                 <button
+                                    className="demo-icon-button"
                                     onClick={() => {
                                         const panel = api?.getGroup(x);
                                         if (panel) {
@@ -660,9 +674,12 @@ const DockviewDemo = (props: { theme?: string }) => {
                                         }
                                     }}
                                 >
-                                    pop
+                                    <span className="material-symbols-outlined">
+                                        open_in_new
+                                    </span>
                                 </button>
                                 <button
+                                    className="demo-icon-button"
                                     onClick={() => {
                                         const panel = api?.getGroup(x);
                                         if (panel?.api.isMaximized()) {
@@ -672,7 +689,20 @@ const DockviewDemo = (props: { theme?: string }) => {
                                         }
                                     }}
                                 >
-                                    max
+                                    <span className="material-symbols-outlined">
+                                        fullscreen
+                                    </span>
+                                </button>
+                                <button
+                                    className="demo-icon-button"
+                                    onClick={() => {
+                                        const panel = api?.getGroup(x);
+                                        panel?.api.close();
+                                    }}
+                                >
+                                    <span className="material-symbols-outlined">
+                                        close
+                                    </span>
                                 </button>
                             </>
                         );

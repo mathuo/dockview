@@ -14,3 +14,28 @@
         }
     }
 }
+
+.demo-button {
+    min-width: 50px;
+    border: none;
+    margin: 0px 2px;
+    padding: 0px 2px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+}
+
+.demo-icon-button {
+    display: flex;
+    align-items: center;
+    border-radius: 0px;
+    border: none;
+
+    &:hover {
+        background-color: orange;
+    }
+
+    span {
+        font-size: 16px;
+    }
+}

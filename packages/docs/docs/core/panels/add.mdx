@@ -1,19 +1,20 @@
 ---
-title: Add Panel
+title: Adding Panels
 sidebar_position: 1
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-This section describes how to add a new panel.
+This section describes how to add a new panel and the options you can provide.
 
-## API
+
+Panels can be added through the dock api.
 
 <DocRef declaration="DockviewApi" methods={['addPanel']} />
 
-## Opening a Simple Panel
+## Opening a Basic Panel
 
-The minimum options required to open a panel are a unique `id` for the panel and the name of the `component` to render.
+To open a panel requires a unique `id` and the name of the `component` to render.
 
 ```ts
 const panel: IDockviewPanel = api.addPanel({
@@ -22,7 +23,29 @@ const panel: IDockviewPanel = api.addPanel({
 });
 ```
 
-> See [Overview](/docs/core/overview) to learn how to register components.
+> See [Overview](/docs/core/overview) to register components.
+
+## Providing a Panel Title
+
+:::warning
+Registering and updating the title using these built-in variables only works for the default tab renderer.
+If you use a custom tab render you can optionally access these variables to render the title, or you can take
+your own approach to rendering a tab title.
+:::
+
+Use `title` to provide a custom title for the panel. If no `title` is provided then the dock will render `id` in the tab.
+
+```tsx
+api.addPanel({
+    id: 'panel_1',
+    component: 'my_component',
+    title: 'my_custom_title',
+});
+```
+
+```tsx
+api.setTitle('my_new_custom_title');
+```
 
 ## Provide a custom Tab renderer
 

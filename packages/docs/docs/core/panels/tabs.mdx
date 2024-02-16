@@ -1,18 +1,21 @@
 ---
-title: Custom Tab Rendering
+title: Tabs
 sidebar_position: 2
 ---
 
 import { MultiFrameworkContainer } from '@site/src/components/ui/container';
 import CustomHeadersDockview from '@site/sandboxes/customheader-dockview/src/app';
+import DockviewNative from '@site/sandboxes/fullwidthtab-dockview/src/app';
+import { attach as attachNativeDockview } from '@site/sandboxes/javascript/fullwidthtab-dockview/src/app';
+import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 This section describes how to implement custom tab renderers
 
 ## Register a Tab Component
 
 <FrameworkSpecific framework='React'>
-```jsx
-<DockviewReact tabComponents={{
+```tsx
+const components = {
   tab_1: (props: IDockviewPanelHeaderProps) => {
     const api: DockviewPanelApi  = props.api;
     const containerApi: DockviewApi  = props.containerApi;
@@ -22,7 +25,9 @@ This section describes how to implement custom tab renderers
   tab_2: (props: IDockviewPanelHeaderProps) => {
     return <div>{/** logic */}</div>
   }
-}}/>
+};
+
+return <DockviewReact tabComponents={tabComponents}/>
 ```
 </FrameworkSpecific>
 
@@ -35,14 +40,14 @@ not implemented
 
 <FrameworkSpecific framework='React'>
 ```jsx
-const MyTab = (props: IDockviewPanelHeaderProps) => {
+const CustomTabRenderer = (props: IDockviewPanelHeaderProps) => {
   const api: DockviewPanelApi  = props.api;
   const containerApi: DockviewApi  = props.containerApi;
 
   return <div>{/** logic */}</div>
 }
 
-return <DockviewReact defaultTabRenderer={MyTab}/>
+return <DockviewReact defaultTabRenderer={CustomTabRenderer}/>
 ```
 </FrameworkSpecific>
 
@@ -97,4 +102,39 @@ This still makes use of the `DockviewDefaultTab` since it's only a minor change.
 <MultiFrameworkContainer
     sandboxId="customheader-dockview"
     react={CustomHeadersDockview}
+/>
+
+## Full Width Tab
+
+When a group has only one single tab you may want that tab to take the full width.
+
+<FrameworkSpecific framework='React'>
+  <DocRef declaration="IDockviewReactProps" methods={['singleTabMode']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+  <DocRef declaration="DockviewComponentOptions" methods={['singleTabMode']} />
+</FrameworkSpecific>
+
+```tsx
+return <DockviewReactComponent singleTabMode="fullwidth" />
+```
+
+<MultiFrameworkContainer
+    sandboxId="fullwidthtab-dockview"
+    react={DockviewNative}
+    typescript={attachNativeDockview}
+/>
+
+import DockviewTabheight from '@site/sandboxes/tabheight-dockview/src/app';
+import { attach as attachTabHeightDockview } from '@site/sandboxes/javascript/tabheight-dockview/src/app';
+
+## Tab Height
+
+Tab height can be controlled through CSS.
+
+<MultiFrameworkContainer
+    sandboxId="tabheight-dockview"
+    react={DockviewTabheight}
+    typescript={attachTabHeightDockview}
 />

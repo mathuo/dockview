@@ -6,27 +6,26 @@ import { MultiFrameworkContainer } from '@site/src/components/ui/container';
 import LiveExample from '@site/src/components/ui/exampleFrame';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
-This section described loading a dock layout.9
+This section described loading a dock layout.
 
 <DocRef declaration="DockviewApi" methods={['fromJSON', 'onDidLayoutFromJSON']} />
 
-## Layout Persistence
+## Load A Layout
 
-Layouts are loaded and saved via to `fromJSON` and `toJSON` methods on the Dockview api.
-The api also exposes an event `onDidLayoutChange` you can listen on to determine when the layout has changed.
-Below are some snippets showing how you might load from and save to localStorage.
+To load a layout you should a pass a valid object to `fromJSON`. If you try to load an invalid or corrupted layout the dock will throw an Error and the dock will reset gracefully ready
+for another attempt with a valid object.
 
-If you try to load a invalid or corrupted layout the dock will recover g
+You could load a previously saved layout from local storage for example.
 
-```tsx title="Loading a layout from localStorage"
+```tsx
 const onReady = (event: DockviewReadyEvent) => {
-    const layoutString = localStorage.getItem('dockview_persistence_layout');
-
     let success = false;
 
-    if (layoutString) {
+    const mySerializedLayout = localStorage.getItem('my_layout');
+
+    if (mySerializedLayout) {
         try {
-            const layout = JSON.parse(layoutString);
+            const layout = JSON.parse(mySerializedLayout);
             event.api.fromJSON(layout);
             success = true;
         } catch (err) {
@@ -35,13 +34,14 @@ const onReady = (event: DockviewReadyEvent) => {
     }
 
     if (!success) {
-        // do something if there is no layout or there was a loading error
+        // perhap load a default layout?
     }
 };
+
+return <DockviewComponent onReady={onReady}/>;
 ```
 
-Here is an example using the above code loading from and saving to localStorage.
-If you refresh the page you should notice your layout is loaded as you left it.
+# Live Example
 
 <LiveExample framework="react" id="dockview/layout"/>
 

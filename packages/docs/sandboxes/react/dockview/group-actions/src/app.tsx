@@ -15,12 +15,11 @@ const components = {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    color: 'white',
+                    color: 'gray',
                     height: '100%',
                 }}
             >
-                <span>{`${props.params.title}`}</span>
-                {props.params.x && <span>{`  ${props.params.x}`}</span>}
+                <span>{`${props.api.title}`}</span>
             </div>
         );
     },
@@ -55,36 +54,33 @@ const LeftHeaderActions = (props: IDockviewHeaderActionsProps) => {
     );
 };
 
+const PrefixHeader = (props: IDockviewHeaderActionsProps) => {
+    const activePanel = props.activePanel;
+
+    return <div className="dockview-groupcontrol-demo">{'🌲'}</div>;
+};
+
 const DockviewGroupControl = (props: { theme: string }) => {
     const onReady = (event: DockviewReadyEvent) => {
-        const panel1 = event.api.addPanel({
+        event.api.addPanel({
             id: 'panel_1',
             component: 'default',
-            tabComponent: 'default',
-            params: {
-                title: 'Window 1',
-            },
+            title: 'Panel 1',
         });
 
-        const panel2 = event.api.addPanel({
+        event.api.addPanel({
             id: 'panel_2',
             component: 'default',
-            tabComponent: 'default',
-            params: {
-                title: 'Window 2',
-            },
+            title: 'Panel 2',
             position: {
                 direction: 'right',
             },
         });
 
-        const panel3 = event.api.addPanel({
+        event.api.addPanel({
             id: 'panel_3',
             component: 'default',
-            tabComponent: 'default',
-            params: {
-                title: 'Window 3',
-            },
+            title: 'Panel 3',
             position: {
                 direction: 'below',
             },
@@ -95,6 +91,7 @@ const DockviewGroupControl = (props: { theme: string }) => {
         <DockviewReact
             onReady={onReady}
             components={components}
+            prefixHeaderActionsComponent={PrefixHeader}
             leftHeaderActionsComponent={LeftHeaderActions}
             rightHeaderActionsComponent={RightHeaderActions}
             className={`${props.theme || 'dockview-theme-abyss'}`}
