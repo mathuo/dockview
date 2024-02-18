@@ -7,21 +7,13 @@ import LiveExample from '@site/src/components/ui/exampleFrame';
 
 This section described how to maxmimize groups.
 
-## API methods
-
-The following methods on the [API](/docs/api/dockview/overview) are related to maximizing groups.
-
-<DocRef declaration="DockviewPanelApi" methods={['maximize', 'isMaximized', 'exitMaximized']} />
-
-and the followng methods on the [Panel API](/docs/api/dockview/panelApi) are related to maximizing groups.
+## Options
 
 <DocRef declaration="DockviewApi" methods={['maximizeGroup', 'hasMaximizedGroup', 'exitMaximizedGroup', 'onDidMaxmizedGroupChange']} />
 
-## Live Examples
-
-<LiveExample framework="react" id="dockview/maximize-group"/>
-
 ```tsx
+const api: DockviewApi;
+
 // maximize a specified group
 api.maxmimizeGroup(group);
 
@@ -35,11 +27,13 @@ exitMaximizedGroup();
 const result: boolean = hasMaximizedGroup();
 ```
 
-The following methods are available on both the panel and group `api` objects:
+## Panel API
 
-> `api.<method>` is equivalent to `api.group.api.<method>` for all of these methods. The methods exist on the panel `api` object for convenience.
+<DocRef declaration="DockviewPanelApi" methods={['maximize', 'isMaximized', 'exitMaximized']} />
 
-```ts
+```tsx
+const api: DockviewPanelApi;
+
 // maximize the group
 api.maximize();
 
@@ -49,5 +43,16 @@ const result: boolean = api.isMaxmized();
 // exit only if this group is maximzied (if another group is maxmized this has no affect)
 api.exitMaximized();
 ```
+
+:::tip
+`api.<maximize|isMaximized|exitMaximized>` is equivalent to `api.group.api.<maximize|isMaximized|exitMaximized>`.
+The methods exist on the panel `api` object for convenience.
+:::
+
+## Live Examples
+
+<LiveExample framework="react" id="dockview/maximize-group"/>
+
+
 
 

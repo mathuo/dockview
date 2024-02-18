@@ -4,165 +4,16 @@ import {
     DockviewReadyEvent,
     IDockviewPanelHeaderProps,
     IDockviewPanelProps,
-    IDockviewHeaderActionsProps,
-    DockviewPanelApi,
-    DockviewPanelRenderer,
-    DockviewGroupLocation,
     DockviewApi,
 } from 'dockview';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { v4 } from 'uuid';
 import './app.scss';
-
-interface PanelApiMetadata {
-    isActive: {
-        value: boolean;
-        count: number;
-    };
-    isVisible: {
-        value: boolean;
-        count: number;
-    };
-    isHidden: {
-        value: boolean;
-        count: number;
-    };
-    renderer: {
-        value: DockviewPanelRenderer;
-        count: number;
-    };
-    isGroupActive: {
-        value: boolean;
-        count: number;
-    };
-    groupChanged: {
-        count: number;
-    };
-    location: {
-        value: DockviewGroupLocation;
-        count: number;
-    };
-    didFocus: {
-        count: number;
-    };
-    dimensions: {
-        count: number;
-        height: number;
-        width: number;
-    };
-}
-
-function usePanelApiMetadata(api: DockviewPanelApi): PanelApiMetadata {
-    const [state, setState] = React.useState<PanelApiMetadata>({
-        isActive: { value: api.isActive, count: 0 },
-        isVisible: { value: api.isVisible, count: 0 },
-        isHidden: { value: api.isHidden, count: 0 },
-        renderer: { value: api.renderer, count: 0 },
-        isGroupActive: { value: api.isGroupActive, count: 0 },
-        groupChanged: { count: 0 },
-        location: { value: api.location, count: 0 },
-        didFocus: { count: 0 },
-        dimensions: { count: 0, height: api.height, width: api.width },
-    });
-
-    React.useEffect(() => {
-        const d1 = api.onDidActiveChange((event) => {
-            setState((_) => ({
-                ..._,
-                isActive: {
-                    value: event.isActive,
-                    count: _.isActive.count + 1,
-                },
-            }));
-        });
-        const d2 = api.onDidActiveGroupChange((event) => {
-            setState((_) => ({
-                ..._,
-                isGroupActive: {
-                    value: event.isActive,
-                    count: _.isGroupActive.count + 1,
-                },
-            }));
-        });
-        const d3 = api.onDidDimensionsChange((event) => {
-            setState((_) => ({
-                ..._,
-                dimensions: {
-                    count: _.dimensions.count + 1,
-                    height: event.height,
-                    width: event.width,
-                },
-            }));
-        });
-        const d4 = api.onDidFocusChange((event) => {
-            setState((_) => ({
-                ..._,
-                didFocus: {
-                    count: _.didFocus.count + 1,
-                },
-            }));
-        });
-        const d5 = api.onDidGroupChange((event) => {
-            setState((_) => ({
-                ..._,
-                groupChanged: {
-                    count: _.groupChanged.count + 1,
-                },
-            }));
-        });
-        const d6 = api.onDidHiddenChange((event) => {
-            setState((_) => ({
-                ..._,
-                isHidden: {
-                    value: event.isHidden,
-                    count: _.isHidden.count + 1,
-                },
-            }));
-        });
-        const d7 = api.onDidLocationChange((event) => {
-            setState((_) => ({
-                ..._,
-                location: {
-                    value: event.location,
-                    count: _.location.count + 1,
-                },
-            }));
-        });
-        const d8 = api.onDidRendererChange((event) => {
-            setState((_) => ({
-                ..._,
-                renderer: {
-                    value: event.renderer,
-                    count: _.renderer.count + 1,
-                },
-            }));
-        });
-        const d9 = api.onDidVisibilityChange((event) => {
-            setState((_) => ({
-                ..._,
-                isVisible: {
-                    value: event.isVisible,
-                    count: _.isVisible.count + 1,
-                },
-            }));
-        });
-
-        return () => {
-            d1.dispose();
-            d2.dispose();
-            d3.dispose();
-            d4.dispose();
-            d5.dispose();
-            d6.dispose();
-            d7.dispose();
-            d8.dispose();
-            d9.dispose();
-        };
-    }, [api]);
-
-    return state;
-}
+import { defaultConfig } from './defaultLayout';
+import { GridActions } from './gridActions';
+import { PanelActions } from './panelActions';
+import { GroupActions } from './groupActions';
+import { LeftControls, PrefixHeaderControls, RightControls } from './controls';
+import { Table, usePanelApiMetadata } from './debugPanel';
 
 const components = {
     default: (props: IDockviewPanelProps) => {
@@ -177,9 +28,7 @@ const components = {
                     position: 'relative',
                 }}
             >
-                <pre style={{ fontSize: '11px' }}>
-                    {JSON.stringify(metadata, null, 4)}
-                </pre>
+                <Table data={metadata} />
                 <span
                     style={{
                         position: 'absolute',
@@ -219,213 +68,6 @@ const headerComponents = {
     },
 };
 
-const Icon = (props: {
-    icon: string;
-    title?: string;
-    onClick?: (event: React.MouseEvent) => void;
-}) => {
-    return (
-        <div title={props.title} className="action" onClick={props.onClick}>
-            <span
-                style={{ fontSize: 'inherit' }}
-                className="material-symbols-outlined"
-            >
-                {props.icon}
-            </span>
-        </div>
-    );
-};
-
-const groupControlsComponents: Record<string, React.FC> = {
-    panel_1: () => {
-        return <Icon icon="file_download" />;
-    },
-};
-
-const RightControls = (props: IDockviewHeaderActionsProps) => {
-    const Component = React.useMemo(() => {
-        if (!props.isGroupActive || !props.activePanel) {
-            return null;
-        }
-
-        return groupControlsComponents[props.activePanel.id];
-    }, [props.isGroupActive, props.activePanel]);
-
-    const [isMaximized, setIsMaximized] = React.useState<boolean>(
-        props.containerApi.hasMaximizedGroup()
-    );
-
-    const [isPopout, setIsPopout] = React.useState<boolean>(
-        props.api.location.type === 'popout'
-    );
-
-    React.useEffect(() => {
-        const disposable = props.containerApi.onDidMaximizedGroupChange(() => {
-            setIsMaximized(props.containerApi.hasMaximizedGroup());
-        });
-
-        const disposable2 = props.api.onDidLocationChange(() => {
-            setIsPopout(props.api.location.type === 'popout');
-        });
-
-        return () => {
-            disposable.dispose();
-            disposable2.dispose();
-        };
-    }, [props.containerApi]);
-
-    const onClick = () => {
-        if (props.containerApi.hasMaximizedGroup()) {
-            props.containerApi.exitMaximizedGroup();
-        } else {
-            props.activePanel?.api.maximize();
-        }
-    };
-
-    const onClick2 = () => {
-        if (props.api.location.type !== 'popout') {
-            props.containerApi.addPopoutGroup(props.group);
-        } else {
-            props.api.moveTo({ position: 'right' });
-        }
-    };
-
-    return (
-        <div
-            className="group-control"
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '0px 8px',
-                height: '100%',
-                color: 'var(--dv-activegroup-visiblepanel-tab-color)',
-            }}
-        >
-            {props.isGroupActive && <Icon icon="star" />}
-            {Component && <Component />}
-            <Icon
-                title={isPopout ? 'Close Window' : 'Open In New Window'}
-                icon={isPopout ? 'close_fullscreen' : 'open_in_new'}
-                onClick={onClick2}
-            />
-            {!isPopout && (
-                <Icon
-                    title={isMaximized ? 'Minimize View' : 'Maximize View'}
-                    icon={isMaximized ? 'collapse_content' : 'expand_content'}
-                    onClick={onClick}
-                />
-            )}
-        </div>
-    );
-};
-
-let counter = 0;
-
-const LeftControls = (props: IDockviewHeaderActionsProps) => {
-    const onClick = () => {
-        props.containerApi.addPanel({
-            id: `id_${Date.now().toString()}`,
-            component: 'default',
-            title: `Tab ${counter++}`,
-            position: {
-                referenceGroup: props.group,
-            },
-        });
-    };
-
-    return (
-        <div
-            className="group-control"
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '0px 8px',
-                height: '100%',
-                color: 'var(--dv-activegroup-visiblepanel-tab-color)',
-            }}
-        >
-            <Icon onClick={onClick} icon="add" />
-        </div>
-    );
-};
-
-const PrefixHeaderControls = (props: IDockviewHeaderActionsProps) => {
-    return (
-        <div
-            className="group-control"
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '0px 8px',
-                height: '100%',
-                color: 'var(--dv-activegroup-visiblepanel-tab-color)',
-            }}
-        >
-            <Icon icon="Menu" />
-        </div>
-    );
-};
-
-function defaultConfig(api: DockviewApi) {
-    const panel1 = api.addPanel({
-        id: 'panel_1',
-        component: 'iframe',
-        renderer: 'always',
-        title: 'Panel 1',
-    });
-
-    api.addPanel({
-        id: 'panel_2',
-        component: 'default',
-        title: 'Panel 2',
-        position: { referencePanel: panel1 },
-    });
-
-    api.addPanel({
-        id: 'panel_3',
-        component: 'default',
-        title: 'Panel 3',
-        position: { referencePanel: panel1 },
-    });
-
-    const panel4 = api.addPanel({
-        id: 'panel_4',
-        component: 'default',
-        title: 'Panel 4',
-        position: { referencePanel: panel1, direction: 'right' },
-    });
-
-    const panel5 = api.addPanel({
-        id: 'panel_5',
-        component: 'default',
-        title: 'Panel 5',
-        position: { referencePanel: panel4 },
-    });
-
-    const panel6 = api.addPanel({
-        id: 'panel_6',
-        component: 'default',
-        title: 'Panel 6',
-        position: { referencePanel: panel5, direction: 'below' },
-    });
-
-    const panel7 = api.addPanel({
-        id: 'panel_7',
-        component: 'default',
-        title: 'Panel 7',
-        position: { referencePanel: panel6, direction: 'left' },
-    });
-
-    api.addPanel({
-        id: 'panel8',
-        component: 'default',
-        title: 'Panel 8',
-        position: { referencePanel: panel7, direction: 'below' },
-    });
-
-    panel1.api.setActive();
-}
-
 const DockviewDemo = (props: { theme?: string }) => {
     const [logLines, setLogLines] = React.useState<any[]>([]);
 
@@ -435,34 +77,6 @@ const DockviewDemo = (props: { theme?: string }) => {
 
     const [activePanel, setActivePanel] = React.useState<string>();
     const [activeGroup, setActiveGroup] = React.useState<string>();
-
-    const onClear = () => {
-        api?.clear();
-    };
-
-    const onLoad = () => {
-        const state = localStorage.getItem('dv-demo-state');
-        if (state) {
-            try {
-                api?.fromJSON(JSON.parse(state));
-            } catch {
-                localStorage.removeItem('dv-demo-state');
-            }
-        }
-    };
-
-    const onSave = () => {
-        if (api) {
-            localStorage.setItem('dv-demo-state', JSON.stringify(api.toJSON()));
-        }
-    };
-
-    const onReset = () => {
-        if (api) {
-            api.clear();
-            defaultConfig(api);
-        }
-    };
 
     const onReady = (event: DockviewReadyEvent) => {
         setApi(event.api);
@@ -525,18 +139,6 @@ const DockviewDemo = (props: { theme?: string }) => {
         defaultConfig(event.api);
     };
 
-    const onAddPanel = () => {
-        api?.addPanel({
-            id: `id_${Date.now().toString()}`,
-            component: 'default',
-            title: `Tab ${counter++}`,
-        });
-    };
-
-    const onAddGroup = () => {
-        api?.addGroup();
-    };
-
     return (
         <div
             style={{
@@ -547,167 +149,17 @@ const DockviewDemo = (props: { theme?: string }) => {
             }}
         >
             <div>
-                <div
-                    style={{
-                        display: 'flex',
-                        height: '25px',
-                        padding: '2px 0px',
-                    }}
-                >
-                    <button onClick={onAddPanel}>Add Panel</button>
-                    <button onClick={onAddGroup}>Add Group</button>
-                    <button onClick={onClear}>Clear</button>
-                    <button onClick={onLoad}>Load</button>
-                    <button onClick={onSave}>Save</button>
-                    <button onClick={onReset}>Reset</button>
-                </div>
-                <div
-                    style={{
-                        display: 'flex',
-                        height: '25px',
-                        padding: '2px 0px',
-                    }}
-                >
-                    {panels.map((x) => {
-                        const onClick = () => {
-                            api?.getPanel(x)?.focus();
-                        };
-                        return (
-                            <>
-                                <button
-                                    className={'demo-button'}
-                                    onClick={onClick}
-                                    style={{
-                                        backgroundColor:
-                                            activePanel === x
-                                                ? 'blueviolet'
-                                                : 'dodgerblue',
-                                    }}
-                                >
-                                    {x}
-                                </button>
-                                <button
-                                    className="demo-icon-button"
-                                    onClick={() => {
-                                        const panel = api?.getPanel(x);
-                                        if (panel) {
-                                            api?.addFloatingGroup(panel);
-                                        }
-                                    }}
-                                >
-                                    <span className="material-symbols-outlined">
-                                        ad_group
-                                    </span>
-                                </button>
-                                <button
-                                    className="demo-icon-button"
-                                    onClick={() => {
-                                        const panel = api?.getPanel(x);
-                                        if (panel) {
-                                            api?.addPopoutGroup(panel);
-                                        }
-                                    }}
-                                >
-                                    <span className="material-symbols-outlined">
-                                        open_in_new
-                                    </span>
-                                </button>
-                                <button
-                                    className="demo-icon-button"
-                                    onClick={() => {
-                                        const panel = api?.getPanel(x);
-                                        panel?.api.close();
-                                    }}
-                                >
-                                    <span className="material-symbols-outlined">
-                                        close
-                                    </span>
-                                </button>
-                            </>
-                        );
-                    })}
-                </div>
-                <div
-                    style={{
-                        display: 'flex',
-                        height: '25px',
-                        padding: '2px 0px',
-                    }}
-                >
-                    {groups.map((x) => {
-                        const onClick = () => {
-                            api?.getGroup(x)?.focus();
-                        };
-                        return (
-                            <>
-                                <button
-                                    className={'demo-button'}
-                                    onClick={onClick}
-                                    style={{
-                                        backgroundColor:
-                                            activeGroup === x
-                                                ? 'blueviolet'
-                                                : 'dodgerblue',
-                                    }}
-                                >
-                                    {x}
-                                </button>
-                                <button
-                                    className="demo-icon-button"
-                                    onClick={() => {
-                                        const panel = api?.getGroup(x);
-                                        if (panel) {
-                                            api?.addFloatingGroup(panel);
-                                        }
-                                    }}
-                                >
-                                    <span className="material-symbols-outlined">
-                                        ad_group
-                                    </span>
-                                </button>
-                                <button
-                                    className="demo-icon-button"
-                                    onClick={() => {
-                                        const panel = api?.getGroup(x);
-                                        if (panel) {
-                                            api?.addPopoutGroup(panel);
-                                        }
-                                    }}
-                                >
-                                    <span className="material-symbols-outlined">
-                                        open_in_new
-                                    </span>
-                                </button>
-                                <button
-                                    className="demo-icon-button"
-                                    onClick={() => {
-                                        const panel = api?.getGroup(x);
-                                        if (panel?.api.isMaximized()) {
-                                            panel.api.exitMaximized();
-                                        } else {
-                                            panel?.api.maximize();
-                                        }
-                                    }}
-                                >
-                                    <span className="material-symbols-outlined">
-                                        fullscreen
-                                    </span>
-                                </button>
-                                <button
-                                    className="demo-icon-button"
-                                    onClick={() => {
-                                        const panel = api?.getGroup(x);
-                                        panel?.api.close();
-                                    }}
-                                >
-                                    <span className="material-symbols-outlined">
-                                        close
-                                    </span>
-                                </button>
-                            </>
-                        );
-                    })}
-                </div>
+                <GridActions api={api} />
+                <PanelActions
+                    api={api}
+                    panels={panels}
+                    activePanel={activePanel}
+                />
+                <GroupActions
+                    api={api}
+                    groups={groups}
+                    activeGroup={activeGroup}
+                />
             </div>
             <div
                 style={{

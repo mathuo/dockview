@@ -4,6 +4,7 @@ sidebar_position: 1
 ---
 
 import { DocRef } from '@site/src/components/ui/reference/docRef';
+import LiveExample from '@site/src/components/ui/exampleFrame';
 
 This section describes how to add a new panel and the options you can provide.
 
@@ -46,6 +47,8 @@ api.addPanel({
 ```tsx
 api.setTitle('my_new_custom_title');
 ```
+
+<LiveExample framework="react" id="dockview/update-title" height={250}/>
 
 ## Provide a custom Tab renderer
 

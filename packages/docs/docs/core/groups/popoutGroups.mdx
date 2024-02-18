@@ -8,7 +8,7 @@ import { DocRef } from '@site/src/components/ui/reference/docRef';
 This section describes have to create popout windows.
 
 :::info
-Popout groups cannot be maximized. Calling maximize function on groups in these states will have no effect.
+Popout groups **cannot** be maximized. Calling maximize function on groups in these states will have no effect.
 :::
 
 <DocRef declaration="DockviewApi" methods={['addPopoutGroup']} />
@@ -20,7 +20,7 @@ windows as needed. You cannot dock multiple groups together in the same window.
 Popout windows require your website to have a blank `.html` page that can be used, by default this is set to `/popout.html` but
 can be configured to match requirements.
 
-```tsx title="Open new popout group from the component api"
+```tsx
 api.addPopoutGroup(
   group,
   // the second arguments (options) is optional

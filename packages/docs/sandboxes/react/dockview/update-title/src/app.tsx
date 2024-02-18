@@ -7,7 +7,7 @@ import * as React from 'react';
 
 const components = {
     default: (props: IDockviewPanelProps<{ myValue: string }>) => {
-        const [title, setTitle] = React.useState<string>(props.api.title);
+        const [title, setTitle] = React.useState<string>(props.api.title ?? '');
 
         const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             setTitle(event.target.value);
