@@ -1872,7 +1872,7 @@ export class DockviewComponent
                 const removedPanel: IDockviewPanel | undefined =
                     this.movingLock(() =>
                         sourceGroup.model.removePanel(sourceItemId, {
-                            skipSetActive: true,
+                            skipSetActive: false,
                             skipSetActiveGroup: true,
                         })
                     );

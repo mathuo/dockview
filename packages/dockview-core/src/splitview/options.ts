@@ -15,10 +15,6 @@ export interface PanelViewInitParameters extends PanelInitParameters {
     accessor: SplitviewComponent;
 }
 
-export interface ISerializableView extends IView, IPanel {
-    init: (params: PanelViewInitParameters) => void;
-}
-
 export interface SplitviewComponentOptions extends SplitViewOptions {
     disableAutoResizing?: boolean;
     components?: {

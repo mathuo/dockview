@@ -220,8 +220,6 @@ export abstract class BaseGrid<T extends IGridPanelView>
         this.gridview.addView(group, size ?? Sizing.Distribute, location);
 
         this._onDidAdd.fire(group);
-
-        // this.doSetGroupActive(group);
     }
 
     protected doRemoveGroup(
