@@ -22,6 +22,7 @@ export {
 
 export * from './paneview/paneview';
 export * from './gridview/gridview';
+export { GridviewComponentOptions } from './gridview/options';
 export * from './dockview/dockviewGroupPanelModel';
 export * from './gridview/baseComponentGridview';
 
