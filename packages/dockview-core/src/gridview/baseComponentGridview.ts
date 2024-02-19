@@ -141,6 +141,8 @@ export abstract class BaseGrid<T extends IGridPanelView>
 
     constructor(options: BaseGridOptions) {
         super(document.createElement('div'), options.disableAutoResizing);
+        this.element.style.height = '100%';
+        this.element.style.width = '100%';
 
         options.parentElement.appendChild(this.element);
 
