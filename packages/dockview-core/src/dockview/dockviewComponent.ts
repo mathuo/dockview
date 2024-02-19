@@ -1374,6 +1374,8 @@ export class DockviewComponent
             throw err;
         }
 
+        this.updateWatermark();
+
         this._onDidLayoutFromJSON.fire();
     }
 
