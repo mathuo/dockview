@@ -28,6 +28,8 @@ export class OverlayRenderContainer extends CompositeDisposable {
         }
     > = {};
 
+    private _disposed = false;
+
     constructor(private readonly element: HTMLElement) {
         super();
 
@@ -37,6 +39,7 @@ export class OverlayRenderContainer extends CompositeDisposable {
                     value.disposable.dispose();
                     value.destroy.dispose();
                 }
+                this._disposed = true;
             })
         );
     }
@@ -149,8 +152,11 @@ export class OverlayRenderContainer extends CompositeDisposable {
         );
 
         this.map[panel.api.id].destroy = Disposable.from(() => {
-            focusContainer.removeChild(panel.view.content.element);
-            this.element.removeChild(focusContainer);
+            if (panel.view.content.element.parentElement === focusContainer) {
+                focusContainer.removeChild(panel.view.content.element);
+            }
+
+            focusContainer.parentElement?.removeChild(focusContainer);
         });
 
         queueMicrotask(() => {
