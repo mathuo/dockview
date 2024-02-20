@@ -19,8 +19,21 @@ const ExampleFrame = (props: {
 
     return (
         <React.Suspense>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <div style={{ height: props.height ?? '500px' }}>
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flexGrow: 1,
+                }}
+            >
+                <div
+                    style={{
+                        height: props.height ?? '500px',
+                        flexGrow: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                    }}
+                >
                     <Component />
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>

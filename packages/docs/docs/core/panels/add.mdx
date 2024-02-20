@@ -66,7 +66,7 @@ const panel: IDockviewPanel = api.addPanel({
 });
 ```
 
-> See [Overview](/docs/core/overview) to learn how to register tab components.
+> See [Tabs](/docs/core/panels/tabs) to learn how to register tab components.
 
 ## Provide custom Parameters
 
@@ -87,13 +87,12 @@ const panel: IDockviewPanel = api.addPanel({
 
 See [Panel Rendering](/docs/core/panels/rendering).
 
-## Tab Title
-
-See [Tab Title](/docs/core/tabs/title).
-
 ## Positioning the Panel
 
-### Relative to another Panel
+You can position a panel relative to an existing panel, group using `direction`. If you do not provide a reference panel
+or group then the panel will be positioned to the edge of the dock in the specified direction.
+
+#### Relative to another Panel
 
 ```ts
 const panel2: IDockviewPanel = api.addPanel({
@@ -115,7 +114,7 @@ api.addPanel({
 });
 ```
 
-### Relative to another Group
+#### Relative to another Group
 
 ```ts
 const panel2: IDockviewPanel = api.addPanel({
@@ -137,7 +136,7 @@ const panel = api.addPanel({
 });
 ```
 
-### Relative to the container
+#### Relative to the container
 
 ```ts
 const panel = api.addPanel({

@@ -1,7 +1,7 @@
 import React from 'react';
 import Layout from '@theme/Layout';
-import DemoApp from '@site/sandboxes/demo-dockview/src/app';
 import { themeConfig } from '../config/theme.config';
+import ExampleFrame from '../components/ui/exampleFrame';
 
 export default function Popout() {
     const [theme, setTheme] = React.useState<string>(
@@ -39,16 +39,14 @@ export default function Popout() {
                         })}
                     </select>
                 </div>
-                <div
-                    style={{
-                        flexGrow: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                    }}
-                >
-                    <DemoApp theme={theme} />
+
+                    <ExampleFrame
+                        framework="react"
+                        height="100%"
+                        id="dockview/demo-dockview"
+                    />
                 </div>
-            </div>
+
         </Layout>
     );
 }
