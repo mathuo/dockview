@@ -2,11 +2,9 @@
 title: Resizing
 ---
 
-import useBaseUrl from '@docusaurus/useBaseUrl';
-import { MultiFrameworkContainer } from '@site/src/components/ui/container';
-import DockviewResizeContainer from '@site/sandboxes/resizecontainer-dockview/src/app';
-import ResizeDockview from '@site/sandboxes/resize-dockview/src/app';
+This section describes how to programatically resize a panel.
 
+import LiveExample from '@site/src/components/ui/exampleFrame';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 <DocRef declaration="DockviewPanelApi" methods={['height', 'width', 'setSize', 'onDidDimensionsChange']} />
@@ -15,12 +13,10 @@ import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 ## Panel Resizing
 
-Each Dockview contains of a number of groups and each group has a number of panels.
-Logically a user may want to resize a panel, but this translates to resizing the group which contains that panel.
+Each dock contains groups and each group contains panels.
+Logically a user may want to resize a panel but this really translates to resizing the group which contains that panel.
 
-You can set the size of a panel using `props.api.setSize(...)`.
-You can also set the size of the group associated with the panel using `props.api.group.api.setSize(...)` although this isn't recommended
-due to the clunky syntax.
+The panel resize methods are repeats of the same resize methods found on the group.
 
 ```tsx
 // it's mandatory to provide either a height or a width, providing both is optional
@@ -29,7 +25,10 @@ props.api.setSize({
     width: 200,
 });
 
-// you could also resize the panels group, although not recommended it achieved the same result
+/**
+ * you could also resize the panels group, although not recommended due to the
+ * clunky syntax it does achieve the same result
+ */
 props.api.group.api.setSize({
     height: 100,
     width: 200,
@@ -38,13 +37,4 @@ props.api.group.api.setSize({
 
 You can see an example invoking both approaches below.
 
-<MultiFrameworkContainer sandboxId="resize-dockview" react={ResizeDockview} />
-
-## Container Resizing
-
-The component will automatically resize to it's container.
-
-<MultiFrameworkContainer
-    sandboxId="resizecontainer-dockview"
-    react={DockviewResizeContainer}
-/>
+<LiveExample framework="react" id="dockview/resize"/>

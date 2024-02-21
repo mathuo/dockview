@@ -3,9 +3,9 @@ title: Overview
 sidebar_position: 0
 ---
 
+import LiveExample from '@site/src/components/ui/exampleFrame';
+
 This section provided a core overview.
-
-
 
 The component takes a collection of [Options](/docs/api/dockview/options) as inputs and
 once you have created a dock you can store a reference to the [API](/docs/api/dockview/overview) that is created.
@@ -33,3 +33,8 @@ const component = new DockviewComponent({
 ```
 </FrameworkSpecific>
 
+## Container Resizing
+
+The component will automatically resize to it's container.
+
+<LiveExample framework="react" id="dockview/resize-container"/>

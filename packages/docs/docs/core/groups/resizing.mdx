@@ -2,12 +2,7 @@
 title: Resizing
 ---
 
-
-import useBaseUrl from '@docusaurus/useBaseUrl';
-import { MultiFrameworkContainer } from '@site/src/components/ui/container';
-import DockviewResizeContainer from '@site/sandboxes/resizecontainer-dockview/src/app';
-import ResizeDockview from '@site/sandboxes/resize-dockview/src/app';
-
+import LiveExample from '@site/src/components/ui/exampleFrame';
 import { DocRef } from '@site/src/components/ui/reference/docRef';
 
 <DocRef declaration="DockviewGroupPanelApi" methods={['height', 'width', 'setSize', 'onDidDimensionsChange']} />
@@ -38,13 +33,5 @@ props.api.group.api.setSize({
 
 You can see an example invoking both approaches below.
 
-<MultiFrameworkContainer sandboxId="resize-dockview" react={ResizeDockview} />
 
-## Container Resizing
-
-The component will automatically resize to it's container.
-
-<MultiFrameworkContainer
-    sandboxId="resizecontainer-dockview"
-    react={DockviewResizeContainer}
-/>
+<LiveExample framework="react" id="dockview/resize"/>
