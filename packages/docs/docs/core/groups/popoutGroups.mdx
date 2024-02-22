@@ -39,6 +39,8 @@ From within a panel you may say
 props.containerApi.addPopoutGroup(props.api.group);
 ```
 
+## Closing the Popout Group
+
 To programatically move the popout group back into the main grid you can use the `moveTo` method in many ways, one of the following would suffice
 
 ```tsx
@@ -49,5 +51,10 @@ props.group.api.moveTo({ position: 'right' });
 const group = props.containerApi.addGroup();
 props.group.api.moveTo({ group });
 ```
+
+Alternatively, if the user closes the Window the group the dock will make a best attempt to place it back
+in it's original location within the grid. If the dock cannot determine the original location it will
+choose a new location.
+
 
 <LiveExample framework="react" id="dockview/popout-group"/>
