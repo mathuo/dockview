@@ -61,6 +61,19 @@
     --dv-docs-markdown-text-color: #cdced8;
 }
 
+.navbar__brand {
+    flex-direction: row-reverse;
+
+    .navbar__logo {
+        margin-left: 0.5em;
+        margin-right: 0px;
+    }
+
+    .navbar__title {
+        font-size: 1.6em;
+    }
+}
+
 .header-github-link::before {
     content: '';
     width: 24px;

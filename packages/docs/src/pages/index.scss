@@ -31,3 +31,25 @@
         margin: 0px 20px;
     }
 }
+
+.intro-container {
+    display: flex;
+    flex-direction: column;
+    margin: auto auto;
+    max-width: 1400px;
+}
+
+@media screen and (min-width: 1020px) {
+    .intro-container {
+        flex-direction: row;
+
+        div {
+            width: 400px;
+        }
+
+        img {
+            min-width: 600px;
+            max-width: 800px;
+        }
+    }
+}

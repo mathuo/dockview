@@ -50,15 +50,9 @@ export default function Home(): JSX.Element {
                     justifyContent: 'center',
                 }}
             >
-                <div
-                    style={{
-                        display: 'grid',
-                        gridGap: '40px',
-                        // gridAutoFlow: 'column',
-                    }}
-                >
+                <div className="intro-container">
                     <div>
-                        <h1>Dockview</h1>
+                        <h1>Fully Featured Docking Layout Manager</h1>
                         <h3>
                             Zero dependency layout managment and docking
                             controls
