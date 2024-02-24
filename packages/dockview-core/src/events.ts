@@ -24,7 +24,12 @@ export namespace Event {
     };
 }
 
-export class DockviewEvent {
+export interface IDockviewEvent {
+    readonly defaultPrevented: boolean;
+    preventDefault(): void;
+}
+
+export class DockviewEvent implements IDockviewEvent {
     private _defaultPrevented = false;
 
     get defaultPrevented(): boolean {

@@ -2134,7 +2134,7 @@ export class DockviewComponent
                 }),
                 view.model.onWillShowOverlay((event) => {
                     if (this.options.disableDnd) {
-                        event.event.preventDefault();
+                        event.preventDefault();
                         return;
                     }
 
