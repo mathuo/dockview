@@ -11,7 +11,10 @@ import { toggleClass } from '../../../dom';
 import { DockviewPanel, IDockviewPanel } from '../../dockviewPanel';
 import { DockviewComponent } from '../../dockviewComponent';
 import { WillShowOverlayEvent } from '../../../dnd/droptarget';
-import { DockviewGroupDropLocation } from '../../dockviewGroupPanelModel';
+import {
+    DockviewGroupDropLocation,
+    WillShowOverlayLocationEvent,
+} from '../../dockviewGroupPanelModel';
 
 export interface TabDropIndexEvent {
     readonly event: DragEvent;
@@ -35,10 +38,7 @@ export interface ITabsContainer extends IDisposable {
     readonly onDrop: Event<TabDropIndexEvent>;
     readonly onTabDragStart: Event<TabDragEvent>;
     readonly onGroupDragStart: Event<GroupDragEvent>;
-    readonly onWillShowOverlay: Event<{
-        event: WillShowOverlayEvent;
-        kind: DockviewGroupDropLocation;
-    }>;
+    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent>;
     hidden: boolean;
     delete(id: string): void;
     indexOf(id: string): number;
@@ -83,14 +83,10 @@ export class TabsContainer
     readonly onGroupDragStart: Event<GroupDragEvent> =
         this._onGroupDragStart.event;
 
-    private readonly _onWillShowOverlay = new Emitter<{
-        event: WillShowOverlayEvent;
-        kind: DockviewGroupDropLocation;
-    }>();
-    readonly onWillShowOverlay: Event<{
-        event: WillShowOverlayEvent;
-        kind: DockviewGroupDropLocation;
-    }> = this._onWillShowOverlay.event;
+    private readonly _onWillShowOverlay =
+        new Emitter<WillShowOverlayLocationEvent>();
+    readonly onWillShowOverlay: Event<WillShowOverlayLocationEvent> =
+        this._onWillShowOverlay.event;
 
     get panels(): string[] {
         return this.tabs.map((_) => _.value.panel.id);
@@ -248,7 +244,11 @@ export class TabsContainer
                 });
             }),
             this.voidContainer.onWillShowOverlay((event) => {
-                this._onWillShowOverlay.fire({ event, kind: 'header_space' });
+                this._onWillShowOverlay.fire(
+                    new WillShowOverlayLocationEvent(event, {
+                        kind: 'header_space',
+                    })
+                );
             }),
             addDisposableListener(
                 this.voidContainer.element,
@@ -407,7 +407,9 @@ export class TabsContainer
                 });
             }),
             tab.onWillShowOverlay((event) => {
-                this._onWillShowOverlay.fire({ event, kind: 'tab' });
+                this._onWillShowOverlay.fire(
+                    new WillShowOverlayLocationEvent(event, { kind: 'tab' })
+                );
             })
         );
 
