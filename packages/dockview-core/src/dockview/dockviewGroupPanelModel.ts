@@ -8,6 +8,7 @@ import {
     DockviewEvent,
     Emitter,
     Event,
+    IDockviewEvent,
 } from '../events';
 import { IViewSize } from '../gridview/gridview';
 import { CompositeDisposable } from '../lifecycle';
@@ -179,9 +180,39 @@ export type DockviewGroupLocation =
     | { type: 'floating' }
     | { type: 'popout'; getWindow: () => Window };
 
-export interface WillShowOverlayLocationEvent {
-    event: WillShowOverlayEvent;
-    kind: DockviewGroupDropLocation;
+type A = typeof WillShowOverlayEvent;
+
+export class WillShowOverlayLocationEvent implements IDockviewEvent {
+    private _kind: DockviewGroupDropLocation;
+
+    get kind(): DockviewGroupDropLocation {
+        return this._kind;
+    }
+
+    get nativeEvent(): DragEvent {
+        return this.event.nativeEvent;
+    }
+
+    get position(): Position {
+        return this.event.position;
+    }
+
+    get defaultPrevented(): boolean {
+        return this.event.defaultPrevented;
+    }
+
+    preventDefault(): void {
+        this.event.preventDefault();
+    }
+
+    constructor(
+        private readonly event: WillShowOverlayEvent,
+        options: {
+            kind: DockviewGroupDropLocation;
+        }
+    ) {
+        this._kind = options.kind;
+    }
 }
 
 export class DockviewGroupPanelModel
@@ -411,7 +442,11 @@ export class DockviewGroupPanelModel
                 this._onWillShowOverlay.fire(event);
             }),
             this.contentContainer.dropTarget.onWillShowOverlay((event) => {
-                this._onWillShowOverlay.fire({ event, kind: 'content' });
+                this._onWillShowOverlay.fire(
+                    new WillShowOverlayLocationEvent(event, {
+                        kind: 'content',
+                    })
+                );
             }),
             this._onMove,
             this._onDidChange,
