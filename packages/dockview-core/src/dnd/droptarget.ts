@@ -1,5 +1,5 @@
 import { toggleClass } from '../dom';
-import { DockviewEvent, Emitter, Event } from '../events';
+import { Emitter, Event } from '../events';
 import { CompositeDisposable } from '../lifecycle';
 import { DragAndDropObserver } from './dnd';
 import { clamp } from '../math';
@@ -10,26 +10,9 @@ export interface DroptargetEvent {
     readonly nativeEvent: DragEvent;
 }
 
-export class WillShowOverlayEvent
-    extends DockviewEvent
-    implements DroptargetEvent
-{
-    get nativeEvent(): DragEvent {
-        return this.options.nativeEvent;
-    }
-
-    get position(): Position {
-        return this.options.position;
-    }
-
-    constructor(
-        private readonly options: {
-            nativeEvent: DragEvent;
-            position: Position;
-        }
-    ) {
-        super();
-    }
+export interface WillShowOverlayEvent extends DroptargetEvent {
+    readonly nativeEvent: DragEvent;
+    readonly position: Position;
 }
 
 export function directionToPosition(direction: Direction): Position {
@@ -170,10 +153,10 @@ export class Droptarget extends CompositeDisposable {
                     return;
                 }
 
-                const willShowOverlayEvent = new WillShowOverlayEvent({
+                const willShowOverlayEvent: WillShowOverlayEvent = {
                     nativeEvent: e,
                     position: quadrant,
-                });
+                };
 
                 /**
                  * Provide an opportunity to prevent the overlay appearing and in turn
@@ -181,7 +164,7 @@ export class Droptarget extends CompositeDisposable {
                  */
                 this._onWillShowOverlay.fire(willShowOverlayEvent);
 
-                if (willShowOverlayEvent.defaultPrevented) {
+                if (willShowOverlayEvent.nativeEvent.defaultPrevented) {
                     this.removeDropTarget();
                     return;
                 }
