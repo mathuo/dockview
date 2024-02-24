@@ -3,6 +3,7 @@ import { CodeSandboxButton } from './codeSandboxButton';
 
 const ExampleFrame = (props: {
     framework: string;
+    theme?: string;
     id: string;
     height?: string;
 }) => {
@@ -34,7 +35,7 @@ const ExampleFrame = (props: {
                         flexDirection: 'column',
                     }}
                 >
-                    <Component />
+                    <Component theme={props.theme} />
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <span style={{ width: '220px' }}>

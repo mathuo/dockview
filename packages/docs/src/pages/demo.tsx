@@ -5,7 +5,7 @@ import ExampleFrame from '../components/ui/exampleFrame';
 
 export default function Popout() {
     const [theme, setTheme] = React.useState<string>(
-        new URLSearchParams(location.search).get('theme') ?? themeConfig[0].id
+        new URLSearchParams(location.search).get('theme') ?? themeConfig[3].id
     );
 
     return (
@@ -40,13 +40,13 @@ export default function Popout() {
                     </select>
                 </div>
 
-                    <ExampleFrame
-                        framework="react"
-                        height="100%"
-                        id="dockview/demo-dockview"
-                    />
-                </div>
-
+                <ExampleFrame
+                    theme={theme}
+                    framework="react"
+                    height="100%"
+                    id="dockview/demo-dockview"
+                />
+            </div>
         </Layout>
     );
 }
